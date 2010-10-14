@@ -20,12 +20,38 @@ public static class Myro {
 	robot.backward(power, time);
   }
 
+  public static void stop() {
+	robot.stop();
+  }
+  
   public class Robot {
-	public virtual void forward(float power, float? time) {
+
+	public Object myLock = new Object();
+
+    public virtual void move(float translate, float rotate) {
+	  // Override in subclassed robots
+	}
+
+	public void stop() {
+	  move(0, 0);
+	}
+
+	public void forward(float speed, float? interval) {
+	  move(speed, 0);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
 	}
 	
-	public virtual void backward(float power, float? time) {
+	public void backward(float speed, float? interval) {
+	  move(-speed, 0);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
 	}
+	
   }
 
   public static bool Contains(object item, params object[] items) {
@@ -37,8 +63,11 @@ public static class Myro {
 	public string port;
 	public SerialPort serial;
 	public string dongle;
-	public byte [] lastSensors;
 	public int volume;
+
+	private float _lastTranslate;
+	private float _lastRotate;
+	private byte [] _lastSensors;
 
     static int SOFT_RESET=33;
     static int GET_ALL=65 ;
@@ -66,13 +95,19 @@ public static class Myro {
     static int GET_RLE=82 ; // a segmented and run-length encoded image
     static int GET_IMAGE=83 ; // the entire 256 x 192 image in YUYV format
     static int GET_WINDOW=84 ; // the windowed image (followed by which window)
-    static int GET_DONGLE_L_IR=85 ; // number of returned pulses when left emitter is turned on
-    static int GET_DONGLE_C_IR=86 ; // number of returned pulses when center emitter is turned on
-    static int GET_DONGLE_R_IR=87 ; // number of returned pulses when right emitter is turned on
-    static int GET_WINDOW_LIGHT=88   ; // average intensity in the user defined region
+    static int GET_DONGLE_L_IR=85 ; // number of returned pulses when
+									// left emitter is turned on
+    static int GET_DONGLE_C_IR=86 ; // number of returned pulses when
+									// center emitter is turned on
+    static int GET_DONGLE_R_IR=87 ; // number of returned pulses when
+									// right emitter is turned on
+    static int GET_WINDOW_LIGHT=88   ; // average intensity in the
+									   // user defined region
     static int GET_BATTERY=89 ; // battery voltage
-    static int GET_SERIAL_MEM=90 ; // with the address returns the value in serial memory
-    static int GET_SCRIB_PROGRAM=91 ; // with offset, returns the scribbler program buffer
+    static int GET_SERIAL_MEM=90 ; // with the address returns the
+								   // value in serial memory
+    static int GET_SCRIB_PROGRAM=91 ; // with offset, returns the
+									  // scribbler program buffer
     static int GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
 
     static int GET_BLOB=95;
@@ -106,15 +141,19 @@ public static class Myro {
     static int SET_DONGLE_IR=120;       // set dongle IR power
     static int SET_SERIAL_MEM=121;      // set serial memory byte
     static int SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
-    static int SET_START_PROGRAM=123;   // initiate scribbler programming process
+    static int SET_START_PROGRAM=123;   // initiate scribbler
+										// programming process 
     static int SET_RESET_SCRIBBLER=124; // hard reset scribbler
     static int SET_SERIAL_ERASE=125;    // erase serial memory
     static int SET_DIMMER_LED=126;      // set dimmer led
     static int SET_WINDOW=127;          // set user defined window
     static int SET_FORWARDNESS=128;     // set direction of scribbler
     static int SET_WHITE_BALANCE=129;   // turn on white balance on camera 
-    static int SET_NO_WHITE_BALANCE=130; // diable white balance on camera (default)
-    static int SET_CAM_PARAM=131;       // with address and value, sets the camera parameter at that address
+    static int SET_NO_WHITE_BALANCE=130; // diable white balance on
+										 // camera (default)
+    static int SET_CAM_PARAM=131;       // with address and value, 
+	                                    // sets the camera parameter
+	                                    // at that address
 
     static int GET_JPEG_GRAY_HEADER=135;
 	static int GET_JPEG_GRAY_SCAN=136;
@@ -154,11 +193,22 @@ public static class Myro {
 	static int CAM_COMB_EXPOSURE_CONTROL_OFF=(CAM_COMB_DEFAULT & ~(1 << 0));
 
 	public Scribbler(string port, int baud) {
+	  PythonDictionary info = null;
 	  this.port = port;
 	  serial = new SerialPort(this.port, baud);
 	  serial.ReadTimeout = 100; // milliseconds
-	  serial.Open();
-	  PythonDictionary info = getInfo();
+	  try {
+		serial.Open();
+	  } catch {
+		Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+				this.port));
+		return;
+	  }
+	  try {
+		info = getInfo();
+	  } catch {
+		Console.WriteLine("ERROR: unable to talk to Scribbler");
+	  }
 	  if (info.Contains("fluke")) {
 		dongle = (string)info["fluke"];
 		Console.WriteLine("You are using fluke firmware {0}", info["fluke"]);
@@ -191,29 +241,23 @@ public static class Myro {
 
     public byte [] GetBytes(int value, int bytes=1) {
 	  byte [] retval = null;
-	  try {
-		//lock.acquire();
+	  lock(myLock) {
 		write(value);
 		read(Scribbler.PACKET_LENGTH); // read the echo
 		retval = read(bytes);
-	  } finally {
-		//lock.release();
 	  }
 	  return retval;
 	}
 
     public List GetWord(int value, int bytes=1) {
 	  List retval = new List();
-	  try {
-		//lock.acquire();
+	  lock(myLock) {
 		write(value);
 		read(Scribbler.PACKET_LENGTH); // read the echo
 		byte [] retvalBytes = read(bytes);
 		for (int p = 0; p < retvalBytes.Length; p += 2) {
 		  retval.append(retvalBytes[p] << 8 | retvalBytes[p + 1]);
 		}
-	  } finally {
-		// lock.release();
 	  }
 	  return retval;
 	}
@@ -230,9 +274,9 @@ public static class Myro {
 		}
 	  } else if (sensor == "stall") {
 		// lastSensors are the single byte sensors
-		lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
+		_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
 		// returned as bytes
-		return (object)(lastSensors[10]);
+		return (object)(_lastSensors[10]);
 	  } else if (sensor == "forwardness") {
 		if (read_mem(0, 0) != 0xDF) {
 		  retval = "fluke-forward";
@@ -285,25 +329,25 @@ public static class Myro {
 				getBright("middle"), 
 				getBright("right"));
 		  } else if (sensor == "all") {
-			lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
+			_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
 			// returned as bytes
 			// single bit sensors
 			if (dongle == null) {
 			  return dict(
-				  "light", list(lastSensors[2] << 8 | lastSensors[3], 
-					  lastSensors[4] << 8 | lastSensors[5], 
-					  lastSensors[6] << 8 | lastSensors[7]),
-				  "ir", list(lastSensors[0], lastSensors[1]), 
-				  "line", list(lastSensors[8], lastSensors[9]), 
-				  "stall", lastSensors[10]);
+				  "light", list(_lastSensors[2] << 8 | _lastSensors[3], 
+					  _lastSensors[4] << 8 | _lastSensors[5], 
+					 _lastSensors[6] << 8 |_lastSensors[7]),
+				  "ir", list(_lastSensors[0],_lastSensors[1]), 
+				  "line", list(_lastSensors[8],_lastSensors[9]), 
+				  "stall",_lastSensors[10]);
 			} else {
 			  return dict(
-				  "light", list(lastSensors[2] << 8 | lastSensors[3], 
-					  lastSensors[4] << 8 | lastSensors[5], 
-					  lastSensors[6] << 8 | lastSensors[7]),
-				  "ir", list(lastSensors[0], lastSensors[1]), 
-				  "line", list(lastSensors[8], lastSensors[9]), 
-				  "stall", lastSensors[10],
+				  "light", list(_lastSensors[2] << 8 |_lastSensors[3], 
+					 _lastSensors[4] << 8 |_lastSensors[5], 
+					 _lastSensors[6] << 8 |_lastSensors[7]),
+				  "ir", list(_lastSensors[0],_lastSensors[1]), 
+				  "line", list(_lastSensors[8],_lastSensors[9]), 
+				  "stall",_lastSensors[10],
 				  "obstacle", list(getObstacle("left"), 
 					  getObstacle("center"), 
 					  getObstacle("right")),
@@ -379,7 +423,7 @@ public static class Myro {
                         "battery": 1, "obstacle": 3, "bright": 3}
         elif sensor == "stall":
             retval = GetBytes(Scribbler.GET_ALL, 11) // returned as bytes
-            lastSensors = retval // single bit sensors
+           _lastSensors = retval // single bit sensors
             return retval[10]
         elif sensor == "forwardness":
             if read_mem(ser, 0, 0) != 0xDF:
@@ -427,7 +471,7 @@ public static class Myro {
                     return [getBright("left"), getBright("middle"), getBright("right") ]
                 elif sensor == "all":
                     retval = GetBytes(Scribbler.GET_ALL, 11) // returned as bytes
-                    lastSensors = retval // single bit sensors
+                   _lastSensors = retval // single bit sensors
                     if dongle == null:
                         return {"light": [retval[2] << 8 | retval[3], retval[4] << 8 | retval[5], retval[6] << 8 | retval[7]],
                                 "ir": [retval[0], retval[1]], "line": [retval[8], retval[9]], "stall": retval[10]}
@@ -521,20 +565,28 @@ public static class Myro {
 	  string retval;
 	  // serial.setTimeout(4)
 	  serial.ReadTimeout = 4000; // milliseconds
-        
+      
 	  manual_flush();
 	  // have to do this twice since sometime the first echo isn't
 	  // echoed correctly (spaces) from the scribbler
 
 	  serial.Write(String.Format("{0}        ", (char)Scribbler.GET_INFO));
-	  retval = serial.ReadLine();
+	  try {
+		retval = serial.ReadLine();
+	  } catch {
+		return retDict;
+	  }
 	  //#print "Got", retval
 
 	  Thread.Sleep(100); 
 	  //time.sleep(.1)
         
 	  serial.Write(String.Format("{0}        ", (char)Scribbler.GET_INFO));
-	  retval = serial.ReadLine();
+	  try {
+		retval = serial.ReadLine();
+	  } catch {
+		return retDict;
+	  }
 	  //#print "Got", retval
         
 	  //# remove echoes
@@ -558,30 +610,39 @@ public static class Myro {
 		  string it = split_pair[0]; string value = split_pair[1];
 		  retDict[it.ToLower().Trim()] = value.Trim();
 		}
-        //if (len(item) == 0) {
-		//  return retDict;
-		//} else {             
-		//retval = [];
-		//for it in item {
-		//retval.append(retDict[it.ToLower().Trim()]);
-		//}
-		//if len(retval) == 1 {
-		//return retval[0];
-		//} else {
-		//return retval;
-		//}
 	  }
 	  return retDict;
 	}
 	
-	public override void forward(float power, float? time) {
-	  // deal with null time
+    public override void move(float translate, float rotate) {
+	  _lastTranslate = translate;
+	  _lastRotate = rotate;
+	  adjustSpeed();
 	}
-	
-	public override void backward(float power, float? time) {
-	  // deal with null time
+
+    public void adjustSpeed() {
+	  float left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
+	  float right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
+	  int leftPower = (int)((left + 1.0) * 100.0);
+	  int rightPower = (int)((right + 1.0) * 100.0);
+	  Set(Scribbler.SET_MOTORS, rightPower, leftPower);
 	}
-	
+
+    public void Set(params int [] values) {
+	  lock(myLock) {
+		write(values);
+		read(Scribbler.PACKET_LENGTH); // read echo
+		_lastSensors = read(11); // single bit sensors
+		/* 
+		if (requestStop) {
+		  requestStop = false;
+		  stop();
+		  lock.Release();
+		} 
+		*/
+	  }
+	}
+
 	public byte [] read(int bytes) {
 	  byte[] buffer = new byte[bytes];
 	  int len = serial.Read(buffer, 0, (int)buffer.Length);
