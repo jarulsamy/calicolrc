@@ -195,6 +195,13 @@ public static class Myro {
 	public Scribbler(string port, int baud) {
 	  PythonDictionary info = null;
 	  this.port = port;
+	  if (Myro.robot is Scribbler) {
+		if (((Scribbler)(Myro.robot)).serial is SerialPort) {
+		  if (((Scribbler)(Myro.robot)).serial.IsOpen) {
+			((Scribbler)(Myro.robot)).serial.Close();
+		  }
+		}
+	  }
 	  serial = new SerialPort(this.port, baud);
 	  serial.ReadTimeout = 100; // milliseconds
 	  try {
@@ -242,7 +249,7 @@ public static class Myro {
     public byte [] GetBytes(int value, int bytes=1) {
 	  byte [] retval = null;
 	  lock(myLock) {
-		write(value);
+		write_packet(value);
 		read(Scribbler.PACKET_LENGTH); // read the echo
 		retval = read(bytes);
 	  }
@@ -252,7 +259,7 @@ public static class Myro {
     public List GetWord(int value, int bytes=1) {
 	  List retval = new List();
 	  lock(myLock) {
-		write(value);
+		write_packet(value);
 		read(Scribbler.PACKET_LENGTH); // read the echo
 		byte [] retvalBytes = read(bytes);
 		for (int p = 0; p < retvalBytes.Length; p += 2) {
@@ -630,7 +637,7 @@ public static class Myro {
 
     public void Set(params int [] values) {
 	  lock(myLock) {
-		write(values);
+		write_packet(values);
 		read(Scribbler.PACKET_LENGTH); // read echo
 		_lastSensors = read(11); // single bit sensors
 		/* 
@@ -645,9 +652,14 @@ public static class Myro {
 
 	public byte [] read(int bytes) {
 	  byte[] buffer = new byte[bytes];
-	  int len = serial.Read(buffer, 0, (int)buffer.Length);
+	  int len = 0;
+	  try {
+		len = serial.Read(buffer, 0, (int)buffer.Length);
+	  } catch {
+		// pass
+	  }
 	  if (len != bytes) 
-		throw new Exception("wrong number of bytes read");
+		Console.WriteLine("read: Wrong number of bytes read");
 	  //sp.BaseStream.Read(buffer, 0, (int)buffer.Length);
 	  return buffer;
 	}
@@ -662,7 +674,11 @@ public static class Myro {
 		tmpByte = (byte) serial.ReadByte();
 		while (tmpByte != 255) {
 		  rxString += ((char) tmpByte);
-		  tmpByte = (byte) serial.ReadByte();			
+		  try {
+			tmpByte = (byte) serial.ReadByte();			
+		  } catch {
+			// pass
+		  }
 		}
 	  } catch {
 	  }
@@ -670,12 +686,12 @@ public static class Myro {
 	}
 	
 	public void write_2byte(int value) {
-	  write((char)((value >> 8) & 0xFF));
-	  write((char)(value & 0xFF));
+	  write_char((char)((value >> 8) & 0xFF));
+	  write_char((char)(value & 0xFF));
 	}
 
 	public int read_mem(int page, int offset) {
-	  write((char)Scribbler.GET_SERIAL_MEM);
+	  write_char((char)Scribbler.GET_SERIAL_MEM);
 	  write_2byte(page);
 	  write_2byte(offset);
 	  return read(1)[0];
@@ -686,10 +702,23 @@ public static class Myro {
 	  return true;		
 	}
 
-	public bool write(params int [] data) {
+	public void write_char(char c) {
+	  serial.Write(String.Format("{0}", c));
+	}
+
+	public bool write_packet(params int [] data) {
+	  int count = 0;
 	  foreach (int datum in data) {
+		string s = String.Format("{0}", (char)datum);
+		Console.Write(s);
 		serial.Write(String.Format("{0}", (char)datum));
+		count++;
 	  }
+	  while (count < Scribbler.PACKET_LENGTH) {
+		serial.Write(String.Format("{0}", (char)0));
+		count++;
+	  }
+	  Console.Write("\n");
 	  return true;		
 	}
 
