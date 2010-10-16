@@ -12,11 +12,11 @@ public static class Myro {
 	robot = new Scribbler(port, baud);
   }
   
-  public static void forward(float power=1, float? time=null) {
+  public static void forward(double power=1, double? time=null) {
 	robot.forward(power, time);
   }
   
-  public static void backward(float power=1, float? time=null) {
+  public static void backward(double power=1, double? time=null) {
 	robot.backward(power, time);
   }
 
@@ -24,11 +24,21 @@ public static class Myro {
 	robot.stop();
   }
   
+  public static void beep(double duration, double? frequency=null, 
+	  double? frequency2=null) {
+	robot.beep(duration, frequency, frequency2);
+  }
+
   public class Robot {
 
 	public Object myLock = new Object();
 
-    public virtual void move(float translate, float rotate) {
+    public virtual void move(double translate, double rotate) {
+	  // Override in subclassed robots
+	}
+
+    public virtual void beep(double duration, double? frequency=null, 
+		double? frequency2=null) {
 	  // Override in subclassed robots
 	}
 
@@ -36,7 +46,7 @@ public static class Myro {
 	  move(0, 0);
 	}
 
-	public void forward(float speed, float? interval) {
+	public void forward(double speed, double? interval) {
 	  move(speed, 0);
 	  if (interval != null) {
 		Thread.Sleep((int)(interval * 1000)); 
@@ -44,7 +54,7 @@ public static class Myro {
 	  }
 	}
 	
-	public void backward(float speed, float? interval) {
+	public void backward(double speed, double? interval) {
 	  move(-speed, 0);
 	  if (interval != null) {
 		Thread.Sleep((int)(interval * 1000)); 
@@ -64,133 +74,134 @@ public static class Myro {
 	public SerialPort serial;
 	public string dongle;
 	public int volume;
+	public string startsong;
 
-	private float _lastTranslate;
-	private float _lastRotate;
+	private double _lastTranslate;
+	private double _lastRotate;
 	private byte [] _lastSensors;
 
-    static int SOFT_RESET=33;
-    static int GET_ALL=65 ;
-    static int GET_ALL_BINARY=66  ;
-    static int GET_LIGHT_LEFT=67  ;
-    static int GET_LIGHT_CENTER=68  ;
-    static int GET_LIGHT_RIGHT=69  ;
-    static int GET_LIGHT_ALL=70  ;
-    static int GET_IR_LEFT=71  ;
-    static int GET_IR_RIGHT=72  ;
-    static int GET_IR_ALL=73  ;
-    static int GET_LINE_LEFT=74  ;
-    static int GET_LINE_RIGHT=75  ;
-    static int GET_LINE_ALL=76  ;
-    static int GET_STATE=77  ;
-    static int GET_NAME1=78;
-    static int GET_NAME2=64;
-    static int GET_STALL=79  ;
-    static int GET_INFO=80  ;
-    static int GET_DATA=81  ;
+    static byte SOFT_RESET=33;
+    static byte GET_ALL=65 ;
+    static byte GET_ALL_BINARY=66  ;
+    static byte GET_LIGHT_LEFT=67  ;
+    static byte GET_LIGHT_CENTER=68  ;
+    static byte GET_LIGHT_RIGHT=69  ;
+    static byte GET_LIGHT_ALL=70  ;
+    static byte GET_IR_LEFT=71  ;
+    static byte GET_IR_RIGHT=72  ;
+    static byte GET_IR_ALL=73  ;
+    static byte GET_LINE_LEFT=74  ;
+    static byte GET_LINE_RIGHT=75  ;
+    static byte GET_LINE_ALL=76  ;
+    static byte GET_STATE=77  ;
+    static byte GET_NAME1=78;
+    static byte GET_NAME2=64;
+    static byte GET_STALL=79  ;
+    static byte GET_INFO=80  ;
+    static byte GET_DATA=81  ;
 
-    static int GET_PASS1=50;
-    static int GET_PASS2=51;
+    static byte GET_PASS1=50;
+    static byte GET_PASS2=51;
 
-    static int GET_RLE=82 ; // a segmented and run-length encoded image
-    static int GET_IMAGE=83 ; // the entire 256 x 192 image in YUYV format
-    static int GET_WINDOW=84 ; // the windowed image (followed by which window)
-    static int GET_DONGLE_L_IR=85 ; // number of returned pulses when
+    static byte GET_RLE=82 ; // a segmented and run-length encoded image
+    static byte GET_IMAGE=83 ; // the entire 256 x 192 image in YUYV format
+    static byte GET_WINDOW=84 ; // the windowed image (followed by which window)
+    static byte GET_DONGLE_L_IR=85 ; // number of returned pulses when
 									// left emitter is turned on
-    static int GET_DONGLE_C_IR=86 ; // number of returned pulses when
+    static byte GET_DONGLE_C_IR=86 ; // number of returned pulses when
 									// center emitter is turned on
-    static int GET_DONGLE_R_IR=87 ; // number of returned pulses when
+    static byte GET_DONGLE_R_IR=87 ; // number of returned pulses when
 									// right emitter is turned on
-    static int GET_WINDOW_LIGHT=88   ; // average intensity in the
+    static byte GET_WINDOW_LIGHT=88   ; // average intensity in the
 									   // user defined region
-    static int GET_BATTERY=89 ; // battery voltage
-    static int GET_SERIAL_MEM=90 ; // with the address returns the
+    static byte GET_BATTERY=89 ; // battery voltage
+    static byte GET_SERIAL_MEM=90 ; // with the address returns the
 								   // value in serial memory
-    static int GET_SCRIB_PROGRAM=91 ; // with offset, returns the
+    static byte GET_SCRIB_PROGRAM=91 ; // with offset, returns the
 									  // scribbler program buffer
-    static int GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
+    static byte GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
 
-    static int GET_BLOB=95;
+    static byte GET_BLOB=95;
 
-    static int SET_PASS1=55;
-    static int SET_PASS2=56;
-    static int SET_SINGLE_DATA=96;
-    static int SET_DATA=97;
-    static int SET_ECHO_MODE=98;
-    static int SET_LED_LEFT_ON=99 ;
-    static int SET_LED_LEFT_OFF=100;
-    static int SET_LED_CENTER_ON=101;
-    static int SET_LED_CENTER_OFF=102;
-    static int SET_LED_RIGHT_ON=103;
-    static int SET_LED_RIGHT_OFF=104;
-    static int SET_LED_ALL_ON=105;
-    static int SET_LED_ALL_OFF=106;
-    static int SET_LED_ALL=107 ;
-    static int SET_MOTORS_OFF=108;
-    static int SET_MOTORS=109 ;
-    static int SET_NAME1=110 ;
-    static int SET_NAME2=119;           // set name2 byte
-	static int SET_LOUD=111;
-    static int SET_QUIET=112;
-    static int SET_SPEAKER=113;
-    static int SET_SPEAKER_2=114;
+    static byte SET_PASS1=55;
+    static byte SET_PASS2=56;
+    static byte SET_SINGLE_DATA=96;
+    static byte SET_DATA=97;
+    static byte SET_ECHO_MODE=98;
+    static byte SET_LED_LEFT_ON=99 ;
+    static byte SET_LED_LEFT_OFF=100;
+    static byte SET_LED_CENTER_ON=101;
+    static byte SET_LED_CENTER_OFF=102;
+    static byte SET_LED_RIGHT_ON=103;
+    static byte SET_LED_RIGHT_OFF=104;
+    static byte SET_LED_ALL_ON=105;
+    static byte SET_LED_ALL_OFF=106;
+    static byte SET_LED_ALL=107 ;
+    static byte SET_MOTORS_OFF=108;
+    static byte SET_MOTORS=109 ;
+    static byte SET_NAME1=110 ;
+    static byte SET_NAME2=119;           // set name2 byte
+	static byte SET_LOUD=111;
+    static byte SET_QUIET=112;
+    static byte SET_SPEAKER=113;
+    static byte SET_SPEAKER_2=114;
 
-    static int SET_DONGLE_LED_ON=116;   // turn binary dongle led on
-    static int SET_DONGLE_LED_OFF=117;  // turn binary dongle led off
-    static int SET_RLE=118;             // set rle parameters 
-    static int SET_DONGLE_IR=120;       // set dongle IR power
-    static int SET_SERIAL_MEM=121;      // set serial memory byte
-    static int SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
-    static int SET_START_PROGRAM=123;   // initiate scribbler
+    static byte SET_DONGLE_LED_ON=116;   // turn binary dongle led on
+    static byte SET_DONGLE_LED_OFF=117;  // turn binary dongle led off
+    static byte SET_RLE=118;             // set rle parameters 
+    static byte SET_DONGLE_IR=120;       // set dongle IR power
+    static byte SET_SERIAL_MEM=121;      // set serial memory byte
+    static byte SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
+    static byte SET_START_PROGRAM=123;   // initiate scribbler
 										// programming process 
-    static int SET_RESET_SCRIBBLER=124; // hard reset scribbler
-    static int SET_SERIAL_ERASE=125;    // erase serial memory
-    static int SET_DIMMER_LED=126;      // set dimmer led
-    static int SET_WINDOW=127;          // set user defined window
-    static int SET_FORWARDNESS=128;     // set direction of scribbler
-    static int SET_WHITE_BALANCE=129;   // turn on white balance on camera 
-    static int SET_NO_WHITE_BALANCE=130; // diable white balance on
+    static byte SET_RESET_SCRIBBLER=124; // hard reset scribbler
+    static byte SET_SERIAL_ERASE=125;    // erase serial memory
+    static byte SET_DIMMER_LED=126;      // set dimmer led
+    static byte SET_WINDOW=127;          // set user defined window
+    static byte SET_FORWARDNESS=128;     // set direction of scribbler
+    static byte SET_WHITE_BALANCE=129;   // turn on white balance on camera 
+    static byte SET_NO_WHITE_BALANCE=130; // diable white balance on
 										 // camera (default)
-    static int SET_CAM_PARAM=131;       // with address and value, 
+    static byte SET_CAM_PARAM=131;       // with address and value, 
 	                                    // sets the camera parameter
 	                                    // at that address
 
-    static int GET_JPEG_GRAY_HEADER=135;
-	static int GET_JPEG_GRAY_SCAN=136;
-    static int GET_JPEG_COLOR_HEADER=137;
-    static int GET_JPEG_COLOR_SCAN=138;
+    static byte GET_JPEG_GRAY_HEADER=135;
+	static byte GET_JPEG_GRAY_SCAN=136;
+    static byte GET_JPEG_COLOR_HEADER=137;
+    static byte GET_JPEG_COLOR_SCAN=138;
 
-    static int SET_PASS_N_BYTES=139;
-    static int GET_PASS_N_BYTES=140;
-    static int GET_PASS_BYTES_UNTIL=141;
+    static byte SET_PASS_N_BYTES=139;
+    static byte GET_PASS_N_BYTES=140;
+    static byte GET_PASS_BYTES_UNTIL=141;
 
-    static int GET_VERSION=142;
+    static byte GET_VERSION=142;
 
-    static int GET_IR_MESSAGE = 150;
-    static int SEND_IR_MESSAGE = 151;
-    static int SET_IR_EMITTERS = 152;
+    static byte GET_IR_MESSAGE = 150;
+    static byte SEND_IR_MESSAGE = 151;
+    static byte SET_IR_EMITTERS = 152;
 
-    static int PACKET_LENGTH     =  9;
+    static byte PACKET_LENGTH     =  9;
     	
 	// #### Camera Addresses ####
-	static int CAM_PID=0x0A;
-	static int CAM_PID_DEFAULT=0x76;
+	static byte CAM_PID=0x0A;
+	static byte CAM_PID_DEFAULT=0x76;
 	static int	CAM_VER=0x0B;
-	static int CAM_VER_DEFAULT=0x48;
-	static int CAM_BRT=0x06;
-	static int CAM_BRT_DEFAULT=0x80;
-	static int CAM_EXP=0x10;
-	static int CAM_EXP_DEFAULT=0x41;
-	static int CAM_COMA=0x12;
-	static int CAM_COMA_DEFAULT=0x14;
-	static int CAM_COMA_WHITE_BALANCE_ON= (CAM_COMA_DEFAULT |  (1 << 2));
-	static int CAM_COMA_WHITE_BALANCE_OFF=(CAM_COMA_DEFAULT & ~(1 << 2));
-	static int CAM_COMB=0x13;
-	static int CAM_COMB_DEFAULT=0xA3;
-	static int CAM_COMB_GAIN_CONTROL_ON= (CAM_COMB_DEFAULT |  (1 << 1));
-	static int CAM_COMB_GAIN_CONTROL_OFF=(CAM_COMB_DEFAULT & ~(1 << 1));
-	static int CAM_COMB_EXPOSURE_CONTROL_ON= (CAM_COMB_DEFAULT |  (1 << 0));
-	static int CAM_COMB_EXPOSURE_CONTROL_OFF=(CAM_COMB_DEFAULT & ~(1 << 0));
+	static byte CAM_VER_DEFAULT=0x48;
+	static byte CAM_BRT=0x06;
+	static byte CAM_BRT_DEFAULT=0x80;
+	static byte CAM_EXP=0x10;
+	static byte CAM_EXP_DEFAULT=0x41;
+	static byte CAM_COMA=0x12;
+	static byte CAM_COMA_DEFAULT=0x14;
+	static byte CAM_COMA_WHITE_BALANCE_ON= (byte)(CAM_COMA_DEFAULT |  (1 << 2));
+	static byte CAM_COMA_WHITE_BALANCE_OFF=(byte)(CAM_COMA_DEFAULT & ~(1 << 2));
+	static byte CAM_COMB=0x13;
+	static byte CAM_COMB_DEFAULT=0xA3;
+	static byte CAM_COMB_GAIN_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 1));
+	static byte CAM_COMB_GAIN_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 1));
+	static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
+	static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
 
 	public Scribbler(string port, int baud) {
 	  PythonDictionary info = null;
@@ -226,8 +237,19 @@ public static class Myro {
 		dongle = null;
 		Console.WriteLine("You are using the scribbler without the fluke");
 	  }
+	  stop();
+	  Set("led", "all", "off");
+	  beep(.03, 784);
+	  beep(.03, 880);
+	  beep(.03, 698);
+	  beep(.03, 349);
+	  beep(.03, 523);
+	  string name = (string)Get("name");
+	  Console.WriteLine("Hello, I'm {0}!", name);
 	}
 
+	// ------------------------------------------------------------
+	// Data structures:
 	public PythonDictionary dict(params object [] list) {
 	  // make a dictionary from a list
 	  PythonDictionary retval = new PythonDictionary();
@@ -245,8 +267,9 @@ public static class Myro {
 	  }
 	  return retval;
 	}
+	// ------------------------------------------------------------
 
-    public byte [] GetBytes(int value, int bytes=1) {
+    public byte [] GetBytes(byte value, int bytes=1) {
 	  byte [] retval = null;
 	  lock(myLock) {
 		write_packet(value);
@@ -256,7 +279,7 @@ public static class Myro {
 	  return retval;
 	}
 
-    public List GetWord(int value, int bytes=1) {
+    public List GetWord(byte value, int bytes=1) {
 	  List retval = new List();
 	  lock(myLock) {
 		write_packet(value);
@@ -267,6 +290,10 @@ public static class Myro {
 		}
 	  }
 	  return retval;
+	}
+
+    public object Get(string sensor="all") {
+	  return Get(sensor, null);
 	}
 
     public object Get(string sensor="all", params object [] position) {
@@ -302,15 +329,21 @@ public static class Myro {
 	  } else if (sensor == "info") {
 		return getInfo();
 	  } else if (sensor == "name") {
-		string c = "Scribby";
-		//c = GetBytes(Scribbler.GET_NAME1, 8);
-		//c += GetBytes(Scribbler.GET_NAME2, 8);
+		string s = "";
+		byte [] c1 = GetBytes(Scribbler.GET_NAME1, 8);
+		byte [] c2 = GetBytes(Scribbler.GET_NAME2, 8);
+		foreach (char c in c1)
+		  if ((int)c >= (int)'0' & (int)c <= 'z')
+			s += c;
+		foreach (char c in c2)
+		  if ((int)c >= (int)'0' & (int)c <= 'z')
+			s += c;
 		//c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
-		return c;
+		return s;
 	  } else if (sensor == "password") {
 		string c = "Scribby";
-		//c = GetBytes(Scribbler.GET_PASS1, 8);
-		//c += GetBytes(Scribbler.GET_PASS2, 8);
+		byte [] c1 = GetBytes(Scribbler.GET_PASS1, 8);
+		byte [] c2 = GetBytes(Scribbler.GET_PASS2, 8);
 		//c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
 		return c;
 	  } else if (sensor == "volume") {
@@ -375,29 +408,29 @@ public static class Myro {
 		  if (sensor == "light") {
 			List values = GetWord(Scribbler.GET_LIGHT_ALL, 6);
 			if (Contains(pos, 0, "left")) {
-			  retvals.append(values[0]);
+			  retvals.append((int)values[0]);
 			} else if (Contains(pos, 1, "middle", "center")) {
-			  retvals.append(values[1]);
+			  retvals.append((int)values[1]);
 			} else if (Contains(pos, 2, "right")) {
-			  retvals.append(values[2]);
+			  retvals.append((int)values[2]);
 			} else if (pos == null | (string)pos == "all") {
 			  retvals.append(values);
 			}
 		  } else if (sensor == "ir") {
 			byte [] values = GetBytes(Scribbler.GET_IR_ALL, 2);
 			if (Contains(pos, 0, "left")) {
-			  retvals.append(values[0]);
+			  retvals.append((int)values[0]);
 			} else if (Contains(pos, 1, "right")) {
-			  retvals.append(values[1]);
+			  retvals.append((int)values[1]);
 			} else if (pos == null | (string)pos == "all") {
 			  retvals.append(values);
 			}
 		  } else if (sensor == "line") {
 			byte [] values = GetBytes(Scribbler.GET_LINE_ALL, 2);
 			if (Contains(pos, 0, "left")) {
-			  retvals.append(values[0]);
+			  retvals.append((int)values[0]);
 			} else if (Contains(pos, 1, "right")) {
-			  retvals.append(values[1]);
+			  retvals.append((int)values[1]);
 			}
 		  } else if (sensor == "obstacle") {
 			return getObstacle(pos);
@@ -546,6 +579,126 @@ public static class Myro {
                 return retval
 	*/
 
+	public object setLEDFront(string value) {
+	  return 0;
+	}
+	public object setLEDBack(string value) {
+	  return 0;
+	}
+	public object setWhiteBalance(string position) {
+	  return 0;
+	}
+	public object setIRPower(string position) {
+	  return 0;
+	}
+	public object setEchoMode(string position) {
+	  return 0;
+	}
+	public object setData(string position, string value) {
+	  return 0;
+	}
+	public object setPassword(string position) {
+	  return 0;
+	}
+	public object setForwardness(string position) {
+	  return 0;
+	}
+
+	public bool isTrue(string value) {
+	  return (value == "on");
+	}
+
+    public object Set(params byte [] values) {
+	  lock(myLock) {
+		write_packet(values);
+		read(Scribbler.PACKET_LENGTH); // read echo
+		_lastSensors = read(11); // single bit sensors
+		/* 
+		if (requestStop) {
+		  requestStop = false;
+		  stop();
+		  lock.Release();
+		} 
+		*/
+	  }
+	  return "ok";
+	}
+
+    public object Set(string item, string position, string value) {
+	  if (item == "led") {
+		if (position == "center") {
+		  if (isTrue(value))
+			return Set(Scribbler.SET_LED_CENTER_ON);
+		  else
+			return Set(Scribbler.SET_LED_CENTER_OFF);
+		} else if (position == "left") {
+		  if (isTrue(value)) 
+			return Set(Scribbler.SET_LED_LEFT_ON);
+		  else             
+			return Set(Scribbler.SET_LED_LEFT_OFF);
+		} else if (position == "right") {
+		  if (isTrue(value)) 
+			return Set(Scribbler.SET_LED_RIGHT_ON);
+		  else
+			return Set(Scribbler.SET_LED_RIGHT_OFF);
+		} else if (position == "front") {
+		  return setLEDFront(value);
+		} else if (position == "back") {
+		  return setLEDBack(value);
+		} else if (position == "all") {
+		  if (isTrue(value)) 
+			return Set(Scribbler.SET_LED_ALL_ON);
+		  else
+			return Set(Scribbler.SET_LED_ALL_OFF);
+		} else {
+		  throw new Exception(String.Format("no such LED: '{0}'", position));
+		}
+	  } else if (item == "name") {
+		//position = position + (" " * 16);
+		//name1 = position[:8].strip();
+		//name1_raw = map(lambda x:  ord(x), name1);
+		//name2 = position[8:16].strip();
+		//name2_raw = map(lambda x:  ord(x), name2);
+		//Set(*([Scribbler.SET_NAME1] + name1_raw));
+		//Set(*([Scribbler.SET_NAME2] + name2_raw));
+		return "ok";
+	  } else if (item == "password") {
+		//position = position + (" " * 16);
+		//pass1 = position[:8].strip();
+		//pass1_raw = map(lambda x:  ord(x), pass1);
+		//pass2 = position[8:16].strip();
+		//pass2_raw = map(lambda x:  ord(x), pass2);
+		//Set(*([Scribbler.SET_PASS1] + pass1_raw));
+		//Set(*([Scribbler.SET_PASS2] + pass2_raw));
+		return "ok";
+	  } else if (item == "whitebalance") {
+		return setWhiteBalance(position);
+	  } else if (item == "irpower") {
+		return setIRPower(position);
+	  } else if (item == "volume") {
+		if (isTrue(position)){
+		  volume = 1;
+		  return Set(Scribbler.SET_LOUD);
+		} else {
+		  volume = 0;
+		  return Set(Scribbler.SET_QUIET);
+		}
+	  } else if (item == "startsong") {
+		startsong = position;
+		return "ok";
+	  } else if (item == "echomode") {
+		return setEchoMode(position);
+	  } else if (item == "data") {
+		return setData(position, value);
+	  } else if (item == "password") {
+		return setPassword(position);
+	  } else if (item == "forwardness") {
+		return setForwardness(position);
+	  } else {
+		throw new Exception(String.Format("invalid set item name: '{0}'", item));
+	  }
+	}
+
 	public int getObstacle(object position) {
 	  return 0;
 	}
@@ -576,11 +729,11 @@ public static class Myro {
 	  manual_flush();
 	  // have to do this twice since sometime the first echo isn't
 	  // echoed correctly (spaces) from the scribbler
-
-	  serial.Write(String.Format("{0}        ", (char)Scribbler.GET_INFO));
+	  write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
 	  try {
 		retval = serial.ReadLine();
 	  } catch {
+		serial.ReadTimeout = old;
 		return retDict;
 	  }
 	  //#print "Got", retval
@@ -588,16 +741,18 @@ public static class Myro {
 	  Thread.Sleep(100); 
 	  //time.sleep(.1)
         
-	  serial.Write(String.Format("{0}        ", (char)Scribbler.GET_INFO));
+	  write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
 	  try {
 		retval = serial.ReadLine();
 	  } catch {
+		serial.ReadTimeout = old;
 		return retDict;
 	  }
 	  //#print "Got", retval
         
 	  //# remove echoes
 	  if (retval.Length == 0) {
+		serial.ReadTimeout = old;
 		return retDict;
 	  }
         
@@ -608,8 +763,6 @@ public static class Myro {
 	  if (retval[0] == 'P' | retval[0] == 'p') {
 		retval = retval.Substring(1);
 	  }
-
-	  serial.ReadTimeout = old;
 
 	  foreach (string pair in retval.Split(',')) {
 		if (pair.Contains(":")) {
@@ -618,38 +771,57 @@ public static class Myro {
 		  retDict[it.ToLower().Trim()] = value.Trim();
 		}
 	  }
+	  serial.ReadTimeout = old;
 	  return retDict;
 	}
 	
-    public override void move(float translate, float rotate) {
+    public override void move(double translate, double rotate) {
 	  _lastTranslate = translate;
 	  _lastRotate = rotate;
 	  adjustSpeed();
 	}
 
     public void adjustSpeed() {
-	  float left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
-	  float right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
-	  int leftPower = (int)((left + 1.0) * 100.0);
-	  int rightPower = (int)((right + 1.0) * 100.0);
+	  double left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
+	  double right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
+	  byte leftPower = (byte)((left + 1.0) * 100.0);
+	  byte rightPower = (byte)((right + 1.0) * 100.0);
 	  Set(Scribbler.SET_MOTORS, rightPower, leftPower);
 	}
 
-    public void Set(params int [] values) {
+    public override void beep(double duration, double? frequency=null, 
+		double? frequency2=null) {
 	  lock(myLock) {
-		write_packet(values);
-		read(Scribbler.PACKET_LENGTH); // read echo
-		_lastSensors = read(11); // single bit sensors
-		/* 
-		if (requestStop) {
-		  requestStop = false;
-		  stop();
-		  lock.Release();
-		} 
-		*/
+		int old = serial.ReadTimeout; // milliseconds
+		serial.ReadTimeout = (int)(duration * 1000 + 2000); // milliseconds
+		if (frequency2 == null) {
+		  set_speaker((int)frequency, (int)(duration * 1000));
+		} else {
+		  set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
+		}
+        read(Scribbler.PACKET_LENGTH + 11);
+		serial.ReadTimeout = old; // milliseconds
 	  }
 	}
 
+    public void set_speaker(int frequency, int duration) {
+	  write_packet(Scribbler.SET_SPEAKER, 
+		  (byte)(duration >> 8),
+		  (byte)(duration % 256),
+		  (byte)(frequency >> 8),
+		  (byte)(frequency % 256));
+	}
+        
+    public void set_speaker_2(int freq1, int freq2, int duration) {
+        write_packet(Scribbler.SET_SPEAKER_2, 
+			(byte)(duration >> 8),
+			(byte)(duration % 256),
+			(byte)(freq1 >> 8),
+			(byte)(freq1 % 256),
+			(byte)(freq2 >> 8),
+			(byte)(freq2 % 256));
+	}
+	
 	public byte [] read(int bytes) {
 	  byte[] buffer = new byte[bytes];
 	  int len = 0;
@@ -661,6 +833,10 @@ public static class Myro {
 	  if (len != bytes) 
 		Console.WriteLine("read: Wrong number of bytes read");
 	  //sp.BaseStream.Read(buffer, 0, (int)buffer.Length);
+	  if (dongle == null) {
+		// HACK! THIS SEEMS TO NEED TO BE HERE!
+		Thread.Sleep(10); 
+	  }
 	  return buffer;
 	}
 
@@ -685,41 +861,46 @@ public static class Myro {
 	  return rxString;
 	}
 	
-	public void write_2byte(int value) {
-	  write_char((char)((value >> 8) & 0xFF));
-	  write_char((char)(value & 0xFF));
-	}
-
 	public int read_mem(int page, int offset) {
-	  write_char((char)Scribbler.GET_SERIAL_MEM);
-	  write_2byte(page);
-	  write_2byte(offset);
+	  write_byte(Scribbler.GET_SERIAL_MEM);
+	  write_bytes(page);
+	  write_bytes(offset);
 	  return read(1)[0];
 	}
 
-	public bool write(string data) {
-	  serial.Write(data);
-	  return true;		
+	public void write_byte(params byte [] b) {
+	  serial.Write(b, 0, 1);
 	}
 
-	public void write_char(char c) {
-	  serial.Write(String.Format("{0}", c));
+	public void write_bytes(int value) {
+	  write_byte((byte)((value >> 8) & 0xFF));
+	  write_byte((byte)(value & 0xFF));
 	}
 
-	public bool write_packet(params int [] data) {
-	  int count = 0;
-	  foreach (int datum in data) {
-		string s = String.Format("{0}", (char)datum);
-		Console.Write(s);
-		serial.Write(String.Format("{0}", (char)datum));
-		count++;
+	public void write_packet(params byte [] data) {
+	  // serial.Write(System.Array[System.Byte]([109, 100, 100, 0, 0,
+	  // 0, 0, 0, 0]), 0, 9)	  
+	  byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+	  try {
+		serial.Write(data, 0, data.Length);
+	  } catch {
+		Console.WriteLine("ERROR: in write");
 	  }
-	  while (count < Scribbler.PACKET_LENGTH) {
-		serial.Write(String.Format("{0}", (char)0));
-		count++;
+	  if (Scribbler.PACKET_LENGTH - data.Length > 0) {
+		try {
+		  serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
+		} catch {
+		  Console.WriteLine("ERROR: in write");
+		}
+	  } 
+	  Console.Write("[");
+	  for (int i = 0; i < data.Length; i++) {
+		Console.Write("'0x{0:x}', ", data[i]);
 	  }
-	  Console.Write("\n");
-	  return true;		
+	  for (int i = 0; i < Scribbler.PACKET_LENGTH - data.Length; i++) {
+		Console.Write("'0x{0:x}', ", 0);
+	  }
+	  Console.WriteLine("]");
 	}
 
 	public void manual_flush() {
