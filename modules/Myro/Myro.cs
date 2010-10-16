@@ -32,6 +32,14 @@ public static class Myro {
 	robot.forward(power, time);
   }
   
+  public static void translate(double power=1, double? time=null) {
+	robot.translate(power, time);
+  }
+  
+  public static void rotate(double power=1, double? time=null) {
+	robot.rotate(power, time);
+  }
+
   public static void backward(double power=1, double? time=null) {
 	robot.backward(power, time);
   }
@@ -40,10 +48,103 @@ public static class Myro {
 	robot.stop();
   }
   
+  public static void turnLeft(double power=1, double? time=null) {
+	robot.turnLeft(power, time);
+  }
+
+  public static void turnRight(double power=1, double? time=null) {
+	robot.turnRight(power, time);
+  }
+
+  public static void motors(double left, double right) {
+	robot.motors(left, right);
+  }
+
   public static void beep(double duration, double? frequency=null, 
 	  double? frequency2=null) {
 	robot.beep(duration, frequency, frequency2);
   }
+
+  public static string flipCoin() {
+	if (Random.random() < .5) {
+	  return "heads";
+	} else {
+	  return "tails";
+	}
+  }
+
+  public static bool heads() {
+	return (flipCoin() == "heads");
+  }
+
+  public static bool tails() {
+	return (flipCoin() == "tails");
+  }
+
+  public static double randomNumber() {
+	return Random.random();
+  }
+
+  public static object pickOne(params object [] items) {
+	if (items.Length == 1) {
+	  if (items[0] is int) {
+		return (int)(Random.random() * (int)items[0]);
+	  } else if (items[0] is IList<object>) {
+		int pos = (int)(Random.random() * ((IList<object>)items[0]).Count);
+		return ((IList<object>)items[0])[pos];
+	  } else {
+		throw new Exception("pickOne: unknown item type");
+	  }
+	} else {
+	  int pos = (int)(Random.random() * items.Length);
+	  return items[pos];
+	}
+  }
+
+  public static void wait(double seconds) {
+	Thread.Sleep((int)(seconds * 1000));
+  }
+
+  public static double currentTime() {
+	System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
+	return t.TotalSeconds;
+  }
+
+  public static bool odd(int n) {
+	return ((n % 2) == 1);
+  }
+
+  public static bool even(int n) {
+	return ((n % 2) == 0);
+  }
+
+  public class Randomizer {
+	int _seed; 
+	Random _random = new Random();
+	
+	public Randomizer(int seed=0) {
+	  if (seed != 0)
+		this.seed = seed;
+	}
+
+	public int seed {
+	  get { 
+		return _seed; 
+	  }
+	  set { 
+		_seed = value; 
+		_random = new Random(_seed);
+	  }
+	}
+
+	public double random() {
+	  return _random.NextDouble();
+	}
+
+  }
+	
+  // singleton
+  public static Randomizer Random = new Randomizer(); 
 
   public class Robot {
 
@@ -69,6 +170,22 @@ public static class Myro {
 		stop();
 	  }
 	}
+
+	public void translate(double speed, double? interval) {
+	  move(speed, 0);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
+	}
+
+	public void rotate(double speed, double? interval) {
+	  move(0, speed);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
+	}
 	
 	public void backward(double speed, double? interval) {
 	  move(-speed, 0);
@@ -76,6 +193,28 @@ public static class Myro {
 		Thread.Sleep((int)(interval * 1000)); 
 		stop();
 	  }
+	}
+
+	public void turnLeft(double speed, double? interval) {
+	  move(0, speed);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
+	}
+
+	public void turnRight(double speed, double? interval) {
+	  move(0, -speed);
+	  if (interval != null) {
+		Thread.Sleep((int)(interval * 1000)); 
+		stop();
+	  }
+	}
+	
+	public void motors(double left, double right) {
+	  double trans = (right + left) / 2.0;
+      double rotate = (right - left) / 2.0;
+	  move(trans, rotate);
 	}
 	
   }
@@ -358,11 +497,16 @@ public static class Myro {
 		//c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
 		return s;
 	  } else if (sensor == "password") {
-		string c = "Scribby";
+		string s = "";
 		byte [] c1 = GetBytes(Scribbler.GET_PASS1, 8);
 		byte [] c2 = GetBytes(Scribbler.GET_PASS2, 8);
-		//c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
-		return c;
+		foreach (char c in c1)
+		  if ((int)c >= (int)'0' & (int)c <= 'z')
+			s += c;
+		foreach (char c in c2)
+		  if ((int)c >= (int)'0' & (int)c <= 'z')
+			s += c;
+		return s;
 	  } else if (sensor == "volume") {
 		return volume;
 	  } else if (sensor == "battery") {
@@ -470,131 +614,20 @@ public static class Myro {
 	  }
 	  return null;
 	}
-	/*
-        sensor = sensor.lower()
-        if sensor == "config":
-            if dongle == null:
-                return {"ir": 2, "line": 2, "stall": 1, "light": 3}
-            else:
-                return {"ir": 2, "line": 2, "stall": 1, "light": 3,
-                        "battery": 1, "obstacle": 3, "bright": 3}
-        elif sensor == "stall":
-            retval = GetBytes(Scribbler.GET_ALL, 11) // returned as bytes
-           _lastSensors = retval // single bit sensors
-            return retval[10]
-        elif sensor == "forwardness":
-            if read_mem(ser, 0, 0) != 0xDF:
-                retval = "fluke-forward"
-            else:
-                retval = "scribbler-forward"
-            return retval
-        elif sensor == "startsong":
-            //TODO: need to get this from flash memory
-            return "tada"
-        elif sensor == "version":
-            //TODO: just return this version for now; get from flash
-            return __REVISION__.split()[1]
-        elif sensor == "data":
-            return getData(*position)
-        elif sensor == "info":
-            return getInfo(*position)
-        elif sensor == "name":
-            c = GetBytes(Scribbler.GET_NAME1, 8)
-            c += GetBytes(Scribbler.GET_NAME2, 8)
-            c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip()
-            return c
-        elif sensor == "password":
-            c = GetBytes(Scribbler.GET_PASS1, 8)
-            c += GetBytes(Scribbler.GET_PASS2, 8)
-            c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip()
-            return c
-        elif sensor == "volume":
-            return volume
-        elif sensor == "battery":
-            return getBattery()
-        elif sensor == "blob":
-            return getBlob()
-        else:
-            if position.Length == 0:
-                if sensor == "light":
-                    return GetWord(Scribbler.GET_LIGHT_ALL, 6)
-                elif sensor == "line":
-                    return GetBytes(Scribbler.GET_LINE_ALL, 2)
-                elif sensor == "ir":
-                    return GetBytes(Scribbler.GET_IR_ALL, 2)
-                elif sensor == "obstacle":
-                    return [getObstacle("left"), getObstacle("center"), getObstacle("right")]
-                elif sensor == "bright":
-                    return [getBright("left"), getBright("middle"), getBright("right") ]
-                elif sensor == "all":
-                    retval = GetBytes(Scribbler.GET_ALL, 11) // returned as bytes
-                   _lastSensors = retval // single bit sensors
-                    if dongle == null:
-                        return {"light": [retval[2] << 8 | retval[3], retval[4] << 8 | retval[5], retval[6] << 8 | retval[7]],
-                                "ir": [retval[0], retval[1]], "line": [retval[8], retval[9]], "stall": retval[10]}
-                    else:
-                        return {"light": [retval[2] << 8 | retval[3], retval[4] << 8 | retval[5], retval[6] << 8 | retval[7]],
-                                "ir": [retval[0], retval[1]], "line": [retval[8], retval[9]], "stall": retval[10],
-                                "obstacle": [getObstacle("left"), getObstacle("center"), getObstacle("right")],
-                                "bright": [getBright("left"), getBright("middle"), getBright("right")],
-                                "blob": getBlob(),
-                                "battery": getBattery(),
-                                }
-                else:                
-                    raise ("invalid sensor name: '%s'" % sensor)
-            retvals = []
-            for pos in position:
-                if sensor == "light":
-                    values = GetWord(Scribbler.GET_LIGHT_ALL, 6)
-                    if pos in [0, "left"]:
-                        retvals.append(values[0])
-                    elif pos in [1, "middle", "center"]:
-                        retvals.append(values[1])
-                    elif pos in [2, "right"]:
-                        retvals.append(values[2])
-                    elif pos == null | pos == "all":
-                        retvals.append(values)
-                elif sensor == "ir":
-                    values = GetBytes(Scribbler.GET_IR_ALL, 2)                    
-                    if pos in [0, "left"]:
-                        retvals.append(values[0])
-                    elif pos in [1, "right"]:
-                        retvals.append(values[1])
-                    elif pos == null | pos == "all":
-                        retvals.append(values)
-                elif sensor == "line":
-                    values = GetBytes(Scribbler.GET_LINE_ALL, 2)
-                    if pos in [0, "left"]:
-                        retvals.append(values[0])
-                    elif pos in [1, "right"]:
-                        retvals.append(values[1])
-                elif sensor == "obstacle":
-                    return getObstacle(pos)
-                elif sensor == "bright":
-                    return getBright(pos)
-                elif sensor == "picture":
-                    return takePicture(pos)
-                else:
-                    raise ("invalid sensor name: '%s'" % sensor)
-            if retvals.Length == 0:
-                return null;
-            elif retvals.Length == 1:
-                return retvals[0]
-            else:
-                return retvals
-
-    def getData(self, *position):
-        if len(position) == 0: 
-            return GetBytes(Scribbler.GET_DATA, 8)
-        else:   
-            retval = []               
-            for p in position:
-                retval.append(GetBytes(Scribbler.GET_DATA, 8)[p])
-            if len(retval) == 1:
-                return retval[0]
-            else:
-                return retval
-	*/
+	
+    public object getData(params int [] position) {
+	  if (position.Length == 0) {
+		return GetBytes(Scribbler.GET_DATA, 8);
+	  } else {
+		List retval = list();
+		foreach (int p in position)
+		  retval.append(GetBytes(Scribbler.GET_DATA, 8)[p]);
+		if (retval.Count == 1) 
+		  return retval[0];
+		else
+		  return retval;
+	  }
+	}
 
 	public object setLEDFront(string value) {
 	  return 0;
@@ -809,18 +842,12 @@ public static class Myro {
     public override void beep(double duration, double? frequency=null, 
 		double? frequency2=null) {
 	  lock(myLock) {
-		//int old = serial.ReadTimeout; // milliseconds
-		//serial.ReadTimeout = (int)(duration * 1000 + 2000); // milliseconds
-		Console.WriteLine("   send commands...");
 		if (frequency2 == null) {
 		  set_speaker((int)frequency, (int)(duration * 1000));
 		} else {
 		  set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
 		}
-		Console.WriteLine("   read...");
 		read_until(Scribbler.PACKET_LENGTH + 11);
-		Console.WriteLine("   done!");
-		//serial.ReadTimeout = old; // milliseconds
 	  }
 	}
 
@@ -858,11 +885,9 @@ public static class Myro {
 	  try {
 		len = serial.Read(buffer, 0, bytes);
 	  } catch {
-		// pass
 	  }
-	  if (len != bytes) 
-		Console.WriteLine("read: Wrong number of bytes read");
-	  //sp.BaseStream.Read(buffer, 0, (int)buffer.Length);
+	  //if (len != bytes) 
+	  //Console.WriteLine("read: Wrong number of bytes read");
 	  if (dongle == null) {
 		// HACK! THIS SEEMS TO NEED TO BE HERE!
 		Thread.Sleep(10); 
@@ -887,8 +912,6 @@ public static class Myro {
 	}
 
 	public void write_packet(params byte [] data) {
-	  // serial.Write(System.Array[System.Byte]([109, 100, 100, 0, 0,
-	  // 0, 0, 0, 0]), 0, 9)	  
 	  byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
 	  try {
 		serial.Write(data, 0, data.Length);
@@ -902,6 +925,7 @@ public static class Myro {
 		  Console.WriteLine("ERROR: in write");
 		}
 	  } 
+	  /*
 	  Console.Write("[");
 	  for (int i = 0; i < data.Length; i++) {
 		Console.Write("'0x{0:x}', ", data[i]);
@@ -910,15 +934,13 @@ public static class Myro {
 		Console.Write("'0x{0:x}', ", 0);
 	  }
 	  Console.WriteLine("]");
+	  */
 	}
 
 	public void manual_flush() {
 	  int old = serial.ReadTimeout; // milliseconds
-	  //old = ser.timeout
-	  //ser.setTimeout(.5)
 	  serial.ReadTimeout = 500; // milliseconds
 	  int count = 0;
-	  Console.WriteLine("Flushing...");
 	  while (count < 10) {
 		byte [] retval = read(10000);
 		if (retval.Length == 0)
@@ -926,7 +948,6 @@ public static class Myro {
 		count++;
 	  }
 	  serial.ReadTimeout = old;
-	  Console.WriteLine("Done flushing!");
 	}
   }
 }
