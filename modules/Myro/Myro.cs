@@ -4,6 +4,22 @@ using System.Threading;
 using IronPython.Runtime;
 using System.Collections.Generic; // IList
 
+public static class Extensions {
+  public static T[] Slice<T>(this T[] source, int start, int end) {
+	// Handles negative ends.
+	if (end < 0) {
+	  end = source.Length + end;
+	}
+	int len = end - start;
+	// Return new array.
+	T[] res = new T[len];
+	for (int i = 0; i < len; i++) {
+	  res[i] = source[i + start];
+	}
+	return res;
+  }
+}
+
 public static class Myro {
   public static Robot robot;
   public static string REVISION = "$Revision: $";
@@ -237,6 +253,7 @@ public static class Myro {
 		dongle = null;
 		Console.WriteLine("You are using the scribbler without the fluke");
 	  }
+	  manual_flush();
 	  stop();
 	  Set("led", "all", "off");
 	  beep(.03, 784);
@@ -611,8 +628,8 @@ public static class Myro {
     public object Set(params byte [] values) {
 	  lock(myLock) {
 		write_packet(values);
-		read(Scribbler.PACKET_LENGTH); // read echo
-		_lastSensors = read(11); // single bit sensors
+		read_until(Scribbler.PACKET_LENGTH); // read echo
+		_lastSensors = read_until(11); // single bit sensors
 		/* 
 		if (requestStop) {
 		  requestStop = false;
@@ -792,15 +809,18 @@ public static class Myro {
     public override void beep(double duration, double? frequency=null, 
 		double? frequency2=null) {
 	  lock(myLock) {
-		int old = serial.ReadTimeout; // milliseconds
-		serial.ReadTimeout = (int)(duration * 1000 + 2000); // milliseconds
+		//int old = serial.ReadTimeout; // milliseconds
+		//serial.ReadTimeout = (int)(duration * 1000 + 2000); // milliseconds
+		Console.WriteLine("   send commands...");
 		if (frequency2 == null) {
 		  set_speaker((int)frequency, (int)(duration * 1000));
 		} else {
 		  set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
 		}
-        read(Scribbler.PACKET_LENGTH + 11);
-		serial.ReadTimeout = old; // milliseconds
+		Console.WriteLine("   read...");
+		read_until(Scribbler.PACKET_LENGTH + 11);
+		Console.WriteLine("   done!");
+		//serial.ReadTimeout = old; // milliseconds
 	  }
 	}
 
@@ -821,12 +841,22 @@ public static class Myro {
 			(byte)(freq2 >> 8),
 			(byte)(freq2 % 256));
 	}
+
+	public byte [] read_until(int bytes) {
+	  int count = 0;
+	  byte [] buffer = new byte[bytes];
+	  while (count < bytes) {
+		byte [] retval = read(bytes);
+		count += retval.Length;
+	  }
+	  return buffer;
+	}
 	
 	public byte [] read(int bytes) {
 	  byte[] buffer = new byte[bytes];
 	  int len = 0;
 	  try {
-		len = serial.Read(buffer, 0, (int)buffer.Length);
+		len = serial.Read(buffer, 0, bytes);
 	  } catch {
 		// pass
 	  }
@@ -837,30 +867,9 @@ public static class Myro {
 		// HACK! THIS SEEMS TO NEED TO BE HERE!
 		Thread.Sleep(10); 
 	  }
-	  return buffer;
+	  return buffer.Slice(0, len);
 	}
 
-	public string read() {
-	  //byte[] buffer = new byte[256];
-	  //len = _serial.Read(buffer, 0, (int)buffer.Length);
-	  //sp.BaseStream.Read(buffer, 0, (int)buffer.Length);
-	  byte tmpByte;
-	  string rxString = "";
-	  try {
-		tmpByte = (byte) serial.ReadByte();
-		while (tmpByte != 255) {
-		  rxString += ((char) tmpByte);
-		  try {
-			tmpByte = (byte) serial.ReadByte();			
-		  } catch {
-			// pass
-		  }
-		}
-	  } catch {
-	  }
-	  return rxString;
-	}
-	
 	public int read_mem(int page, int offset) {
 	  write_byte(Scribbler.GET_SERIAL_MEM);
 	  write_bytes(page);
@@ -908,15 +917,17 @@ public static class Myro {
 	  //old = ser.timeout
 	  //ser.setTimeout(.5)
 	  serial.ReadTimeout = 500; // milliseconds
-	  string l = "a";
 	  int count = 0;
-	  while (l.Length != 0 & count < 50000) {
-		l = read();
-		count += l.Length;
+	  Console.WriteLine("Flushing...");
+	  while (count < 10) {
+		byte [] retval = read(10000);
+		if (retval.Length == 0)
+		  break;
+		count++;
 	  }
 	  serial.ReadTimeout = old;
+	  Console.WriteLine("Done flushing!");
 	}
-
   }
 }
 
