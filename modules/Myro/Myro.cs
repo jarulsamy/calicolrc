@@ -949,6 +949,123 @@ public static class Myro {
 	  }
 	  serial.ReadTimeout = old;
 	}
+
+    public Picture takePicture(string mode="jpeg") {
+	  int width = 256;
+	  int height = 192;
+	  Picture p = new Picture();
+	  if (mode == "color") {
+		byte [] a = grab_array();
+		p.set(width, height, a);
+	  } else if (mode == "jpeg") {
+		//byte [] jpeg = grab_jpeg_color(1);
+		//stream = cStringIO.StringIO(jpeg)  ;
+		//p.set(width, height, stream, "jpeg");
+	  } else if (mode == "jpeg-fast") {
+		//byte [] jpeg = grab_jpeg_color(0);
+		//stream = cStringIO.StringIO(jpeg);
+		//p.set(width, height, stream, "jpeg");
+	  } else if (mode == "gray" | mode == "grey") {
+		//byte [] jpeg = grab_jpeg_gray(1);
+		//stream = cStringIO.StringIO(jpeg);
+		//p.set(width, height, stream, "jpeg");
+	  } else if (mode == "grayjpeg") {
+		//byte [] jpeg = grab_jpeg_gray(1);
+		//stream = cStringIO.StringIO(jpeg);
+		//p.set(width, height, stream, "jpeg");
+	  } else if (mode == "grayjpeg-fast") {
+		//byte [] jpeg = grab_jpeg_gray(0);
+		//stream = cStringIO.StringIO(jpeg);
+		//p.set(width, height, stream, "jpeg");
+	  } else if (mode == "grayraw" | mode == "greyraw") {
+		//conf_window(serial, 0, 1, 0, 255, 191, 2, 2);
+		byte [] a = grab_gray_array();
+		//conf_gray_window(serial, 0, 2, 0,    128, 191, 1, 1);
+		p.set(width, height, a, "gray");
+	  } else if (mode == "blob") {
+		byte [] a = grab_blob_array();
+		p.set(width, height, a, "blob");
+	  }
+	  return p;
+	}
+
+	public byte [] grab_array() { // old color, uncompressed
+	  int width = 256;
+	  int height = 192;
+	  int size = width * height;
+	  byte [] buffer = new byte [height * width * 3];
+	  int vy, vu, y1v, y1u, uy, uv, y2u, y2v;
+	  int Y = 0, U = 0, V = 0;
+      lock(myLock) {
+		write_packet(Scribbler.GET_IMAGE);
+		byte [] line = read_until(size); //BufferedRead(self.ser, size, start = 0);
+		//create the image from the YUV layer
+		for (int i=0; i < height; i++) {
+		  for (int j=0; j < width; j++) {
+			if (j >= 3) {
+			  // go to the left for other values
+			  vy = -1; vu = -2; y1v = -1; y1u = -3; uy = -1; uv = -2; y2u = -1; y2v = -3;
+			} else {
+			  // go to the right for other values
+			  vy = 1; vu = 2; y1v = 3; y1u = 1; uy = 1; uv = 2; y2u = 3; y2v = 1;
+			}
+			//   0123 0123 0123
+			if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
+			  V = line[i * width + j];
+			  Y = line[i * width + j + vy];
+			  U = line[i * width + j + vu];
+			} else if ((j % 4) == 1) { //0 #3
+			  Y = line[i * width + j];
+			  V = line[i * width + j + y1v];
+			  U = line[i * width + j + y1u];
+			} else if ((j % 4) == 2) { //1 #0
+			  U = line[i * width + j];
+			  Y = line[i * width + j + uy];
+			  V = line[i * width + j + uv];
+			} else if ((j % 4) == 3) { //2 #1
+			  Y = line[i * width + j];
+			  U = line[i * width + j + y2u];
+			  V = line[i * width + j + y2v];
+			}
+			U = U - 128;
+			V = V - 128;
+			// Y = Y;
+			buffer[(i * width + j) * 3 + 0] = (byte)Math.Max(Math.Min(Y + 1.13983 * V, 255), 0);
+			buffer[(i * width + j) * 3 + 1] = (byte)Math.Max(Math.Min(Y - 0.39466*U-0.58060*V, 255), 0);
+			buffer[(i * width + j) * 3 + 2] = (byte)Math.Max(Math.Min(Y + 2.03211*U, 255), 0);
+		  }
+		}            
+	  }
+	  return buffer;
+	}
+
+	public byte [] grab_jpeg_color(int mode) { // new color,
+											   // compressed (0=fast,
+											   // 1=reg)
+	  return null;
+	}
+
+	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
+											  // (0=fast, 1=reg)
+	  return null;
+	}
+
+	public byte [] grab_blob_array() { // blob, RLE
+	  return null;
+	}
+
+	public byte [] grab_gray_array() {
+	  return null;
+	}
+
   }
+
+  public class Picture {
+
+	public void set(int width, int height, byte [] stream, string mode=null) {
+	}
+
+  }
+
 }
 
