@@ -2,12 +2,17 @@
 import sys, os, traceback
 sys.path.append(os.path.abspath("modules"))
 
+# Windows
+sys.path.append("c:\\Program Files (x86)\\Mono-2.8\\lib\\mono\\gtk-sharp-2.0")
+
 # Bring in DLLs to import from:
 import clr
+# Mono graphics:
 clr.AddReference("gtk-sharp")
 clr.AddReference("pango-sharp")
-clr.AddReference("Microsoft.Scripting")
 clr.AddReference("glib-sharp")
+# Other DLLs:
+clr.AddReference("Microsoft.Scripting")
 
 # Bring .NET References into IronPython scope:
 import Gtk

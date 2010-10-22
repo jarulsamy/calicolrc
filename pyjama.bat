@@ -1,1 +1,1 @@
-bin\ipy.exe src\pyjama.py 
+mono bin\ipy.exe src\pyjama.py 

@@ -392,7 +392,7 @@ public static class Myro {
 		dongle = null;
 		Console.WriteLine("You are using the scribbler without the fluke");
 	  }
-	  manual_flush();
+	  flush();
 	  stop();
 	  Set("led", "all", "off");
 	  beep(.03, 784);
@@ -776,7 +776,7 @@ public static class Myro {
 	  // serial.setTimeout(4)
 	  serial.ReadTimeout = 4000; // milliseconds
       
-	  manual_flush();
+	  flush();
 	  // have to do this twice since sometime the first echo isn't
 	  // echoed correctly (spaces) from the scribbler
 	  write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
@@ -937,17 +937,9 @@ public static class Myro {
 	  */
 	}
 
-	public void manual_flush() {
-	  int old = serial.ReadTimeout; // milliseconds
-	  serial.ReadTimeout = 500; // milliseconds
-	  int count = 0;
-	  while (count < 10) {
-		byte [] retval = read(10000);
-		if (retval.Length == 0)
-		  break;
-		count++;
-	  }
-	  serial.ReadTimeout = old;
+	public void flush() {
+	    serial.DiscardInBuffer();
+	    serial.DiscardOutBuffer();
 	}
 
     public Picture takePicture(string mode="jpeg") {
