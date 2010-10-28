@@ -5,9 +5,8 @@ MONO_PATH=/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-shar
 
 # Polygon.cs Vector.cs Collision.cs
 ../Graphics.dll: Graphics.cs
-	MONO_PATH=$(MONO_PATH) gmcs -target:library Graphics.cs \
-		-out:../Graphics.dll -pkg:gtk-sharp-2.0 -pkg:gdk-sharp-2.0 \
-		-pkg:pango-sharp-2.0 -r:Mono.Cairo.dll -pkg:glib-sharp-2.0
+	MONO_PATH=$(MONO_PATH) gmcs -target:library Graphics.cs  \
+		-out:../Graphics.dll -pkg:gtk-sharp-2.0 -r:Mono.Cairo.dll 
 
 clean::
 	rm -rf ../Graphics.dll *~

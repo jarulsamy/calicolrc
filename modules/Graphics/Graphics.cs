@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices; // Marshal
 using System.Collections.Generic;
 using System.Threading;
 using System;
@@ -634,6 +635,22 @@ public static class Graphics {
 	}
   }
 
+  public class Pixel {
+	private Picture picture;
+	public int x;
+	public int y;
+
+	public Pixel(Picture picture, int x, int y) {
+	  this.picture = picture;
+	  this.x = x;
+	  this.y = y;
+	}
+
+	public int getRed(int x, int y) {
+	  return picture.getRed(x, y);
+	}
+  }
+
   public class Picture : Shape {
 	public Gdk.Pixbuf _pixbuf; // in memory rep of picture
 	public Cairo.Format format = Cairo.Format.Rgb24;
@@ -641,6 +658,8 @@ public static class Graphics {
 	public Cairo.Context context;
 
 	public Picture(string filename) : base(true) {
+	  if (! Graphics.initialize) 
+		Graphics.init();
 	  _pixbuf = new Gdk.Pixbuf(filename);
 	  format = Cairo.Format.Rgb24;
 	  if (_pixbuf.HasAlpha) {
@@ -648,6 +667,41 @@ public static class Graphics {
 	  }
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	}
+
+	public int getRed(int x, int y) {
+	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
+	  // red, green, blue, alpha
+	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0);
+	}
+
+	public void setRed(int x, int y, byte value) {
+	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0, value);
+	}
+
+	public int getGreen(int x, int y) {
+	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
+	  // red, green, blue, alpha
+	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1);
+	}
+
+	public int getBlue(int x, int y) {
+	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
+	  // red, green, blue, alpha
+	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2);
+	}
+
+	public int getAlpha(int x, int y) {
+	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
+	  // red, green, blue, alpha
+	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 3);
 	}
 
 	public override void render(Cairo.Context g) {
@@ -684,9 +738,6 @@ public static class Graphics {
 	  return new Pixel[10];
 	}
 
-  }
-
-  public class Pixel {
   }
 
   public class Polygon : Shape {
