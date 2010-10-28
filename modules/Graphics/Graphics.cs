@@ -649,6 +649,27 @@ public static class Graphics {
 	public int getRed(int x, int y) {
 	  return picture.getRed(x, y);
 	}
+	public int getGreen(int x, int y) {
+	  return picture.getGreen(x, y);
+	}
+	public int getBlue(int x, int y) {
+	  return picture.getBlue(x, y);
+	}
+	public int getAlpha(int x, int y) {
+	  return picture.getAlpha(x, y);
+	}
+	public void setRed(int x, int y, byte value) {
+	  picture.setRed(x, y, value);
+	}
+	public void setGreen(int x, int y, byte value) {
+	  picture.setGreen(x, y, value);
+	}
+	public void setBlue(int x, int y, byte value) {
+	  picture.setBlue(x, y, value);
+	}
+	public void setAlpha(int x, int y, byte value) {
+	  picture.setAlpha(x, y, value);
+	}
   }
 
   public class Picture : Shape {
@@ -670,38 +691,80 @@ public static class Graphics {
 	}
 
 	public int getRed(int x, int y) {
-	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
 	  // red, green, blue, alpha
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0);
 	}
 
-	public void setRed(int x, int y, byte value) {
-	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
-	  // red, green, blue, alpha
-	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-		  x * _pixbuf.NChannels + 0, value);
-	}
-
 	public int getGreen(int x, int y) {
-	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
 	  // red, green, blue, alpha
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 1);
 	}
 
 	public int getBlue(int x, int y) {
-	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
 	  // red, green, blue, alpha
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 2);
 	}
 
 	public int getAlpha(int x, int y) {
-	  // Gdk.Pixbuf _pixbuf; // in memory rep of picture
 	  // red, green, blue, alpha
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 3);
+	}
+
+	public void setRed(int x, int y, byte value) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0, value);
+	  QueueDraw();
+	}
+
+	public void setGreen(int x, int y, byte value) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1, value);
+	  QueueDraw();
+	}
+
+	public void setBlue(int x, int y, byte value) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2, value);
+	  QueueDraw();
+	}
+
+	public void setAlpha(int x, int y, byte value) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 3, value);
+	  QueueDraw();
+	}
+
+	public void setRGB(int x, int y, byte red, byte green, byte blue) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0, red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1, red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2, red);
+	  QueueDraw();
+	}
+
+	public void setRGBA(int x, int y, byte red, byte green, byte blue, 
+		byte alpha) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0, red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1, red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2, red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 3, alpha);
+	  QueueDraw();
 	}
 
 	public override void render(Cairo.Context g) {
