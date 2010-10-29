@@ -1,10 +1,21 @@
+using IronPython.Runtime;
 using System.Runtime.InteropServices; // Marshal
 using System.Collections.Generic;
+using System.Collections; // IEnumerator
 using System.Threading;
 using System;
 
 public static class Graphics {
   
+  public static List newlist(params object [] items) {
+	// make a list from an array
+	List retval = new List();
+	for (int i = 0; i < items.Length; i++) {
+	  retval.append(items[i]);
+	}
+	return retval;
+  }
+
   public static bool initialize;
   private static Dictionary<string, Cairo.Color> _color_map = 
 	  new Dictionary<string, Cairo.Color>();
@@ -646,28 +657,40 @@ public static class Graphics {
 	  this.y = y;
 	}
 
-	public int getRed(int x, int y) {
+	public List getRGB() {
+	  return picture.getRGB(x, y);
+	}
+	public List getRGBA() {
+	  return picture.getRGBA(x, y);
+	}
+	public int getRed() {
 	  return picture.getRed(x, y);
 	}
-	public int getGreen(int x, int y) {
+	public int getGreen() {
 	  return picture.getGreen(x, y);
 	}
-	public int getBlue(int x, int y) {
+	public int getBlue() {
 	  return picture.getBlue(x, y);
 	}
-	public int getAlpha(int x, int y) {
+	public int getAlpha() {
 	  return picture.getAlpha(x, y);
 	}
-	public void setRed(int x, int y, byte value) {
+	public void setRGB(byte red, byte green, byte blue) {
+	  picture.setRGB(x, y, red, green, blue);
+	}
+	public void setRGBA(byte red, byte green, byte blue, byte alpha) {
+	  picture.setRGBA(x, y, red, green, blue, alpha);
+	}
+	public void setRed(byte value) {
 	  picture.setRed(x, y, value);
 	}
-	public void setGreen(int x, int y, byte value) {
+	public void setGreen(byte value) {
 	  picture.setGreen(x, y, value);
 	}
-	public void setBlue(int x, int y, byte value) {
+	public void setBlue(byte value) {
 	  picture.setBlue(x, y, value);
 	}
-	public void setAlpha(int x, int y, byte value) {
+	public void setAlpha(byte value) {
 	  picture.setAlpha(x, y, value);
 	}
   }
@@ -688,6 +711,28 @@ public static class Graphics {
 	  }
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	}
+
+	public Pixel getPixel(int x, int y) {
+	  return new Pixel(this, x, y);
+	}
+
+	public IEnumerator getPixels() {
+	  for (int x=0; x < width; x++) {
+		for (int y=0; y < height; y++) {
+		  yield return getPixel(x, y);
+		}
+	  }
+	}
+
+	public List getRGB(int x, int y) {
+	  // red, green, blue, alpha
+	  return newlist(getRed(x, y), getGreen(x, y), getBlue(x, y));
+	}
+
+	public List getRGBA(int x, int y) {
+	  // red, green, blue, alpha
+	  return newlist(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
 	}
 
 	public int getRed(int x, int y) {
@@ -747,9 +792,9 @@ public static class Graphics {
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, red);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-		  x * _pixbuf.NChannels + 1, red);
+		  x * _pixbuf.NChannels + 1, green);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-		  x * _pixbuf.NChannels + 2, red);
+		  x * _pixbuf.NChannels + 2, blue);
 	  QueueDraw();
 	}
 
@@ -759,9 +804,9 @@ public static class Graphics {
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, red);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-		  x * _pixbuf.NChannels + 1, red);
+		  x * _pixbuf.NChannels + 1, green);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-		  x * _pixbuf.NChannels + 2, red);
+		  x * _pixbuf.NChannels + 2, blue);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 3, alpha);
 	  QueueDraw();

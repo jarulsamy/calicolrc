@@ -1,11 +1,11 @@
 
 all: ../Graphics.dll
 
-MONO_PATH=/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
+MONO_PATH=../../bin
 
 # Polygon.cs Vector.cs Collision.cs
 ../Graphics.dll: Graphics.cs
-	MONO_PATH=$(MONO_PATH) gmcs -target:library Graphics.cs  \
+	MONO_PATH=$(MONO_PATH) gmcs -target:library Graphics.cs  -r:IronPython \
 		-out:../Graphics.dll -pkg:gtk-sharp-2.0 -r:Mono.Cairo.dll 
 
 clean::
