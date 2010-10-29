@@ -1,4 +1,4 @@
-file = "/home/test/Desktop/Pyjama/images/blankenship.jpg"
+file = "/home/dblank/Desktop/blankenship.jpg"
 from Graphics import *
 init()
 pic = Picture(file)

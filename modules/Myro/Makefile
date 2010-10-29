@@ -1,10 +1,16 @@
 
 all: ../Myro.dll
 
-MONO_PATH=../../bin
+MONO_PATH=../../bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
+
 
 ../Myro.dll: Myro.cs
-	MONO_PATH=$(MONO_PATH) gmcs -target:library Myro.cs -r:IronPython -out:../Myro.dll
-
+	MONO_PATH=$(MONO_PATH) gmcs -target:library \
+		Myro.cs \
+		../Graphics/Graphics.cs \
+		-r:IronPython -out:../Myro.dll \
+		-pkg:gtk-sharp-2.0 -pkg:gdk-sharp-2.0 \
+		-pkg:pango-sharp-2.0 -r:Mono.Cairo.dll \
+		-pkg:glib-sharp-2.0
 clean::
 	rm -rf ../Myro.dll */*~ *~

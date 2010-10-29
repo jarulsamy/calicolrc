@@ -48,6 +48,57 @@ public static class Graphics {
 	}
   }
   
+  public static IEnumerator getPixels(Picture picture) {
+	for (int x=0; x < picture.width; x++) {
+	  for (int y=0; y < picture.height; y++) {
+		yield return picture.getPixel(x, y);
+	  }
+	}
+  }
+  public static List getRGB(Pixel pixel) {
+	return pixel.getRGB();
+  }
+  public static List getRGBA(Pixel pixel) {
+	return pixel.getRGBA();
+  }
+  public static int getRed(Pixel pixel) {
+	return pixel.getRed();
+  }
+  public static int getGreen(Pixel pixel) {
+	return pixel.getGreen();
+  }
+  public static int getBlue(Pixel pixel) {
+	return pixel.getBlue();
+  }
+  public static int getAlpha(Pixel pixel) {
+	return pixel.getAlpha();
+  }
+  public static void setRGB(Pixel pixel, byte red, byte green, byte blue) {
+	pixel.setRGB(red, green, blue);
+  }
+  public static void setRGBA(Pixel pixel, byte red, byte green, byte blue, byte alpha) {
+	pixel.setRGBA(red, green, blue, alpha);
+  }
+  public static void setRed(Pixel pixel, byte value) {
+	pixel.setRed(value);
+  }
+  public static void setGreen(Pixel pixel, byte value) {
+	pixel.setGreen(value);
+  }
+  public static void setBlue(Pixel pixel, byte value) {
+	pixel.setBlue(value);
+  }
+  public static void setAlpha(Pixel pixel, byte value) {
+	pixel.setAlpha(value);
+  }
+
+  public static Picture makePicture(int x, int y) {
+	return new Picture(x, y);
+  }
+  public static Picture makePicture(string filename) {
+	return new Picture(filename);
+  }
+  
   public class Window : Gtk.Window {
 	private Canvas _canvas;
 	private bool _dirty = false;
@@ -78,6 +129,20 @@ public static class Graphics {
 	  }
 	}
 	
+	public int height {
+	  get {
+		int width, height;
+		this.GetSize(out width, out height);
+		return height;
+	  }
+	}
+	public int width {
+	  get {
+		int width, height;
+		this.GetSize(out width, out height);
+		return width;
+	  }
+	}
 
 	public Canvas canvas {
 	  get {
@@ -705,10 +770,37 @@ public static class Graphics {
 	  if (! Graphics.initialize) 
 		Graphics.init();
 	  _pixbuf = new Gdk.Pixbuf(filename);
-	  format = Cairo.Format.Rgb24;
-	  if (_pixbuf.HasAlpha) {
-        format = Cairo.Format.Argb32;
+	  if (!_pixbuf.HasAlpha) {
+		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
 	  }
+	  format = Cairo.Format.Argb32;
+	  // Create a new ImageSurface
+	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	}
+
+	public Picture(int width, int height) : base(true) {
+	  if (! Graphics.initialize) 
+		Graphics.init();
+	  // Colorspace, has_alpha, bits_per_sample, width, height:
+	  _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
+	  if (!_pixbuf.HasAlpha) {
+		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+	  }
+	  // WORKAROUND: image needs alpha set to zero (full opacity/no
+	  // transparency). Might as well set default color, too:
+	  for (int x=0; x < _pixbuf.Width; x++) {
+		for (int y=0; y < _pixbuf.Height; y++) {
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 0, 255);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 1, 255);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 2, 255);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 3, 255);
+		}
+	  }
+	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
 	}
