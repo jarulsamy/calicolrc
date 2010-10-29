@@ -1,4 +1,4 @@
-using IronPython.Runtime;
+using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 using System.Runtime.InteropServices; // Marshal
 using System.Collections.Generic;
 using System.Collections; // IEnumerator
@@ -7,13 +7,18 @@ using System;
 
 public static class Graphics {
   
-  public static List newlist(params object [] items) {
+  public static List PyList(params object [] items) {
 	// make a list from an array
 	List retval = new List();
 	for (int i = 0; i < items.Length; i++) {
 	  retval.append(items[i]);
 	}
 	return retval;
+  }
+
+  public static PythonTuple PyTuple(params object [] items) {
+	// make a tuple from an array
+	return new PythonTuple(items);
   }
 
   public static bool initialize;
@@ -55,10 +60,10 @@ public static class Graphics {
 	  }
 	}
   }
-  public static List getRGB(Pixel pixel) {
+  public static PythonTuple getRGB(Pixel pixel) {
 	return pixel.getRGB();
   }
-  public static List getRGBA(Pixel pixel) {
+  public static PythonTuple getRGBA(Pixel pixel) {
 	return pixel.getRGBA();
   }
   public static int getRed(Pixel pixel) {
@@ -100,6 +105,7 @@ public static class Graphics {
   }
   
   public class Window : Gtk.Window {
+	private Gtk.EventBox eventbox;
 	private Canvas _canvas;
 	private bool _dirty = false;
 	private bool timer_running = false;
@@ -107,6 +113,7 @@ public static class Graphics {
 	private uint _update_interval = 100; // how often, in ms, to auto update
 	public uint animate_step_time = 200; // how often, in ms, to
 										 // animate steps
+	public List<PythonFunction> onClickCallbacks = new List<PythonFunction>();
 	
 	public Window(string title="Pyjama Graphics Window", 
 		int width=300, 
@@ -116,8 +123,28 @@ public static class Graphics {
 		Graphics.init();
 	  _canvas = new Canvas("draw");
 	  SetDefaultSize(width, height);
-	  this.Add(_canvas);
+	  eventbox = new Gtk.EventBox();
+	  this.Add(eventbox);
+	  eventbox.Add(_canvas);
+	  eventbox.ButtonPressEvent += new Gtk.ButtonPressEventHandler(HandleClickCallbacks);
 	  ShowAll();
+	}
+	
+	private void HandleClickCallbacks(object obj, 
+		Gtk.ButtonPressEventArgs args) {
+	  Console.WriteLine("Callbacks!");
+	  foreach (PythonFunction function in onClickCallbacks) {
+		Console.Write("Calling...");
+		/// FIXME: crashes on print callback
+		Gtk.Application.Invoke(delegate { 
+			  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+			});
+	  }
+	  Console.WriteLine(" done!");
+	}
+
+	public void onClick(PythonFunction function) {
+	  onClickCallbacks.Add(function);
 	}
 	
 	public uint update_interval {
@@ -149,7 +176,11 @@ public static class Graphics {
 		return _canvas;
 	  }
 	}
-	
+
+	public PythonTuple getMouse() {
+	  return PyTuple(0, 0);
+	}
+
 	public void step() {
 	  if (mode == "animate") {
 		Thread.Sleep((int)(animate_step_time));
@@ -722,10 +753,10 @@ public static class Graphics {
 	  this.y = y;
 	}
 
-	public List getRGB() {
+	public PythonTuple getRGB() {
 	  return picture.getRGB(x, y);
 	}
-	public List getRGBA() {
+	public PythonTuple getRGBA() {
 	  return picture.getRGBA(x, y);
 	}
 	public int getRed() {
@@ -817,14 +848,14 @@ public static class Graphics {
 	  }
 	}
 
-	public List getRGB(int x, int y) {
+	public PythonTuple getRGB(int x, int y) {
 	  // red, green, blue, alpha
-	  return newlist(getRed(x, y), getGreen(x, y), getBlue(x, y));
+	  return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y));
 	}
 
-	public List getRGBA(int x, int y) {
+	public PythonTuple getRGBA(int x, int y) {
 	  // red, green, blue, alpha
-	  return newlist(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
+	  return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
 	}
 
 	public int getRed(int x, int y) {
