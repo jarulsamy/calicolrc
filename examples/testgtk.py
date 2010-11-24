@@ -21,4 +21,4 @@ for x in range(10):
                random.random() * 6 - 3)
 
 for x in range(1000):
-    turtles[x].color = ["red", "green", "blue", "black"][x / 333]
+    turtles[x].color = random.choice(["red", "green", "blue", "black"])

@@ -111,8 +111,8 @@ public static class Graphics {
 	private bool timer_running = false;
 	private DateTime last_update = new DateTime(2000,1,1);
 	private uint _update_interval = 100; // how often, in ms, to auto update
-	public uint animate_step_time = 200; // how often, in ms, to
-										 // animate steps
+	public uint step_time = 200; // how often, in ms, to
+					    			  // automatically step
 	public List<PythonFunction> onClickCallbacks = new List<PythonFunction>();
 	
 	public Window(string title="Pyjama Graphics Window", 
@@ -121,7 +121,7 @@ public static class Graphics {
 	  
 	  if (! Graphics.initialize) 
 		Graphics.init();
-	  _canvas = new Canvas("draw");
+	  _canvas = new Canvas("auto");
 	  SetDefaultSize(width, height);
 	  eventbox = new Gtk.EventBox();
 	  this.Add(eventbox);
@@ -182,11 +182,15 @@ public static class Graphics {
 	}
 
 	public void step() {
-	  if (mode == "animate") {
-		Thread.Sleep((int)(animate_step_time));
+	  // Same as update, but will make sure it 
+	  // doesn't update too fast.
+	  DateTime now = DateTime.Now;
+	  // diff is TimeSpan
+	  double diff = (now - last_update).TotalMilliseconds * 100;
+	  if (diff < step_time) {
+		Thread.Sleep((int)(step_time - diff));
 	  }
-	  update(); // used without timing in "draw" mode, but draw
-	            // issues QueueDraw's per object redraw
+	  update(); 
 	}
 
 	public string mode {
@@ -194,10 +198,10 @@ public static class Graphics {
 		return _canvas.mode;
 	  }
 	  set {
-		if (value == "animate" || value == "draw")
+		if (value == "auto" || value == "manual")
 		  _canvas.mode = value;
 		else
-		  throw new Exception("window mode must be 'animate' or 'draw'");
+		  throw new Exception("window mode must be 'auto' or 'manual'");
 	  }
 	}	  
 	
@@ -218,10 +222,11 @@ public static class Graphics {
 		  GLib.Timeout.Add(update_interval, 
 			  new GLib.TimeoutHandler(_redraw_now) );
 		}
-	  } else {
-		last_update = now;
-		_dirty = false;
-		QueueDraw();
+	  } else { // it is not too soon
+		// let's spawn one to check in 100 ms or so
+		timer_running = true;
+		GLib.Timeout.Add(update_interval, 
+			new GLib.TimeoutHandler(_redraw_now) );
 	  }
 	}
 	
@@ -230,20 +235,35 @@ public static class Graphics {
 	  if (_dirty) {
 		last_update = now;
 		_dirty = false;
-		QueueDraw();
+		QueueDraw(); // gtk
 	  }
 	  timer_running = false;
 	  return false; // return true to try again
 	}
 	
 	public new void Show() {
-	  Gtk.Application.Invoke(delegate { base.Show(); });
+	  Gtk.Application.Invoke(delegate { 
+			DateTime now = DateTime.Now;
+			last_update = now;
+			_dirty = false;
+			base.Show(); 
+		  });
 	}
 	public new void ShowAll() {
-	  Gtk.Application.Invoke(delegate { base.ShowAll(); });
+	  Gtk.Application.Invoke(delegate { 
+			DateTime now = DateTime.Now;
+			last_update = now;
+			_dirty = false;
+			base.ShowAll(); 
+		  });
 	}
 	public void update() {
-	  Gtk.Application.Invoke(delegate { base.QueueDraw(); });
+	  Gtk.Application.Invoke(delegate { 
+			DateTime now = DateTime.Now;
+			last_update = now;
+			_dirty = false;
+			base.QueueDraw(); 
+		  });
 	}
   }
 
@@ -298,10 +318,10 @@ public static class Graphics {
 		return _mode;
 	  }
 	  set {
-		if (value == "animate" || value == "draw")
+		if (value == "manual" || value == "auto")
 		  _mode = value;
 		else
-		  throw new Exception("canvas mode must be 'animate' or 'draw'");
+		  throw new Exception("canvas mode must be 'manual' or 'auto'");
 	  }
 	}
 	
@@ -396,10 +416,11 @@ public static class Graphics {
 	  }
 	}
 	
-	public void QueueDraw() {
+	public void QueueDraw() { // shape
 	  if (window is Window) {
 		Gtk.Application.Invoke(delegate {
-			  if (window.mode == "draw") { // else, we will issue an update, or step
+			  if (window.mode == "auto") { 
+				// else, we will issue an update() or step()
 				window.need_to_redraw();
 			  }
 			});

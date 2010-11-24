@@ -1,5 +1,5 @@
 from Graphics import *
-win = Window("Mandelbrot", 50, 50)
+win = Window("Mandelbrot", 500, 500)
 pic = Picture(win.width, win.height) 
 pic.draw(win)
 pic.move(pic.width/2, pic.height/2)
