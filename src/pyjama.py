@@ -29,7 +29,8 @@ def handle_exception(e):
     print e.__class__.__name__
 
 # Turn on Unhandled Exception Handled:
-#GLib.ExceptionManager.UnhandledException += handle_exception
+# FIXME EXCEPTION HANDLER
+GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
 from utils import _

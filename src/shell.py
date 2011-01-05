@@ -172,16 +172,17 @@ class ShellWindow(Window):
         self.vbox.PackEnd(self.statusbar, False, False, 0)
         self.window.ShowAll()
         # Set this Python's stderr:
-        #sys.stdout = CustomStream(self.history_textview, "black")
-        #sys.stderr = CustomStream(self.history_textview, "red")
-        #self.project.engine.set_redirects(sys.stdout, sys.stderr, None)
+        # FIXME EXCEPTION HANDLER
+        sys.stdout = CustomStream(self.history_textview, "black")
+        sys.stderr = CustomStream(self.history_textview, "red")
+        self.project.engine.set_redirects(sys.stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
 
     def make_language_menu(self):
         languages = []
         num = 1
-        for lang in self.project.engine.get_languages():
+        for lang in sorted(self.project.engine.get_languages()):
             if self.project.engine[lang].text_based:
                 languages.append(["Change to %s" % lang.title(), 
                     None, "<control>%d" % num, 

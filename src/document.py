@@ -23,8 +23,13 @@ class BaseDocument(object):
             self.title = "New %s Script" % self.language.title()
         self.make_tab()
         self.make_widget()
+        if hasattr(self.textview.Buffer, "BeginNotUndoableAction"):
+            self.textview.Buffer.BeginNotUndoableAction()
         if self.filename and os.path.exists(self.filename):
             self.open()
+        if hasattr(self.textview.Buffer, "EndNotUndoableAction"):
+            self.textview.Buffer.EndNotUndoableAction()
+        self.textview.Buffer.Modified = False
 
     def grab_focus(self):
         self.textview.GrabFocus()
