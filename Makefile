@@ -4,7 +4,7 @@ all: modules/Graphics.dll modules/Myro.dll languages/PJScheme.dll \
 	modules/Conx.dll
 
 build: clean-build all 
-	zip -r Pyjama-$(BUILD).zip * -x \*/.svn/\* \*~ 
+	cd ..; zip -r Pyjama/Pyjama-$(BUILD).zip Pyjama/* -x \*/.svn/\* \*~ 
 
 modules/Graphics.dll:
 	cd modules/Graphics; make
