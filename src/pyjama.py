@@ -3,7 +3,27 @@ import sys, os, traceback
 sys.path.append(os.path.abspath("modules"))
 
 # Windows
-sys.path.append("c:\\Program Files (x86)\\Mono-2.8\\lib\\mono\\gtk-sharp-2.0")
+import Microsoft
+try:
+    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
+except:
+    registry = None
+if registry:
+    # Get Mono Path
+    version = registry.GetValue("DefaultCLR") # '2.8', '2.8.1', etc
+    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\%s\\" % version)
+    path = registry.GetValue("SdkInstallRoot") # Path to Mono
+    if path:
+        sys.path.append("%s\\lib\\mono\\gtk-sharp-2.0" % path)
+    else:
+        print "Gtk not found in registry!"
+    # Get SdlDotNet Path
+    registry = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software\\SdlDotNet\\")
+    path = registry.GetValue("")
+    if path:
+        sys.path.append("%s\\bin" % path)
+    else:
+        print "SdlDotNet not found in registry!"
 
 # Bring in DLLs to import from:
 import clr
