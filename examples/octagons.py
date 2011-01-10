@@ -7,8 +7,8 @@ turtle1 = Arrow(Point(30, 35))
 turtle1.color = "red"
 
 turtle1.draw(win)
-win.mode = "animate"
-win.animate_step_time = 5
+win.mode = "manual"
+win.step_time = 100
 
 hexes = []
 count = 0
@@ -32,10 +32,19 @@ for rows in range(10):
         turtle1.move_to(30, turtle1.center.y + 27)
     count += 1
 
-win.animate_step_time = 20
+win.step_time = 5
 #hexes = list(hexes)
-for x in range(10):
+for x in range(100):
     random.shuffle(hexes)
     for s in hexes:
         s.alpha = min(max(s.alpha + random.random() * .5 - .25, 0), 1)
-        win.step()
+    win.step()
+
+"""
+win.mode = 'auto'
+for s in hexes:
+    s.alpha = 1
+win.update()
+group = Group(*hexes)
+group.rotate(20)
+"""

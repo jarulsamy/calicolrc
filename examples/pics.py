@@ -1,29 +1,28 @@
-file = "/home/dblank/Desktop/blankenship.jpg"
 from Graphics import *
-init()
-pic = Picture(file)
+import random
+
+file = "examples/blankenship.jpg"
 win = Window("Laura")
+pic = Picture(file)
 pic.draw(win)
 pic.move(150, 150)
-
-#for pixel in pic.getPixels():
-#    r, g, b = pixel.getRGB()
-#    pixel.setRGB(255 - r, 255 - g, 255 - b)
-
 pixels = list(pic.getPixels())
 
-import random
-random.shuffle(pixels)
-for p in pixels:
-    p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
 
-pixels.sort(key=lambda p: p.x + p.y)
-for p in pixels:
-    p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
+def reverse():
+    win.mode = 'auto'
+    for p in pixels:
+        p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
 
-#for x in range(pic.width):
-#   for y in range(pic.height):
-#       r = pic.getRed(x, y)
-#       g = pic.getGreen(x, y)
-#       b = pic.getBlue(x, y)
-#       pic.setRGB(x, y, 255 - r, 255 - g, 255 - b)
+def spin():
+    win.mode = 'manual'
+    for times in range(3):
+        for degrees in range(0, 360, 10):
+            pic.rotate(10)
+            win.step()
+
+def sortem():
+    pixels.sort(key=lambda p: p.x + p.y)
+
+def shuffle():
+    random.shuffle(pixels)
