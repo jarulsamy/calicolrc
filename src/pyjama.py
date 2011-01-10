@@ -8,8 +8,8 @@ try:
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
 except:
     registry = None
+# Get Mono Path    
 if registry:
-    # Get Mono Path
     version = registry.GetValue("DefaultCLR") # '2.8', '2.8.1', etc
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\%s\\" % version)
     path = registry.GetValue("SdkInstallRoot") # Path to Mono
@@ -17,8 +17,12 @@ if registry:
         sys.path.append("%s\\lib\\mono\\gtk-sharp-2.0" % path)
     else:
         print "Gtk not found in registry!"
-    # Get SdlDotNet Path
+# Get SdlDotNet Path
+try:
     registry = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software\\SdlDotNet\\")
+except:
+    registry = None
+if registry:
     path = registry.GetValue("")
     if path:
         sys.path.append("%s\\bin" % path)
@@ -103,6 +107,18 @@ class PyjamaProject(object):
         if request_shell:
             from shell import ShellWindow
             self.shell = ShellWindow(self)
+
+    def load(self, filename):
+        for name in self.languages:
+            if filename.endswith("." + self.languages[name].extension):
+                return self.engine[name].execute_file(filename)
+        raise AttributeError("unknown file extension: '%s'" % filename)
+
+    def get_language_from_filename(self, filename):
+        for name in self.languages:
+            if filename.endswith("." + self.languages[name].extension):
+                return name
+        return "python" # FIXME: default language come from config
 
     def Print(self, message):
         self.setup_shell()

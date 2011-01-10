@@ -123,18 +123,7 @@ class BaseDocument(object):
         return retval
 
     def on_change_file(self):
-        # FIXME: get this from languages
-        if self.filename.endswith(".ss"):
-            self.language = "scheme"
-        elif self.filename.endswith(".py"):
-            self.language = "python"
-        elif self.filename.endswith(".dnh"):
-            self.language = "dinah"
-        elif self.filename.endswith(".rb"):
-            self.language = "ruby"
-        else:
-            self.language = "python"
-
+        self.language = self.project.get_language_from_filename(self.filename)
 
 try:
     import clr

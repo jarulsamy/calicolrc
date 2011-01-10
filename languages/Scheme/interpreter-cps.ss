@@ -603,6 +603,12 @@
 	      (m exp toplevel-env init-handler init-cont)))))
       (trampoline)))
 
+(define execute-file
+  (lambda (filename)
+    (load-files (list filename) toplevel-env REP-handler REP-k)
+    ;; need this to start the computation after registers are set up
+    (trampoline)))
+
 (define try-parse-string
   (lambda (string)
     (read-datum string init-handler

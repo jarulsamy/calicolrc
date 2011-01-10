@@ -60,6 +60,7 @@
     (pc "Function" ("null"))
     (Main "void" ("string []"))
     (execute "object" ("string"))
+    (execute-file "void" ("string"))
     (make-toplevel-env "object" ())
     (make-macro-env "object" ())
     (make-empty-environment "object" ())

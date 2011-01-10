@@ -10,14 +10,19 @@ class SchemeEngine(Engine):
     def __init__(self, manager):
         super(SchemeEngine, self).__init__(manager, "scheme")
         self.engine = PJScheme
+
     def execute(self, text):
         result = self.engine.execute(text)
         self.stdout.write("%s\n" % result)
+
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)
+        self.engine.execute_file(filename)
+
     def setup(self):
         super(SchemeEngine, self).setup()
         self.engine.set_dlr(self.manager.scope, self.manager.runtime)
+
     def ready_for_execute(self, text):
         """
         Return True if expression parses ok.
