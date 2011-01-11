@@ -44,6 +44,9 @@
   (define-exp
     (id symbol?)
     (rhs-exp (list-of expression?)))
+  (global-exp
+    (id symbol?)
+    (rhs-exp (list-of expression?)))
   (define-syntax-exp
     (keyword symbol?)
     (clauses (list-of (list-of pattern?))))
@@ -383,6 +386,10 @@
 		    (parse (caddr datum) handler
 			(lambda-cont (docstring)
 			    (k (define-exp (cadr datum) (list docstring body))))))))))
+      ((global? datum)
+       (parse (caddr datum) handler 
+         (lambda-cont (body)
+           (k (global-exp (cadr datum) (list body))))))
       ((define-syntax? datum)
        (k (define-syntax-exp (cadr datum) (cddr datum))))
       ((begin? datum)
@@ -560,6 +567,7 @@
 (define if-else? (tagged-list 'if = 4))
 (define assignment? (tagged-list 'set! = 3))
 (define define? (tagged-list 'define >= 3))
+(define global? (tagged-list 'global >= 3))
 (define define-syntax? (tagged-list 'define-syntax >= 3))
 (define begin? (tagged-list 'begin >= 2))
 (define lambda? (tagged-list 'lambda >= 3))

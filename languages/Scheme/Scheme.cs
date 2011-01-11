@@ -2458,4 +2458,9 @@ public class Vector {
     _dlr_runtime = runtime;
   }
 
+  public static void set_global_value_b(object var, object value) {
+    _dlr_env.SetVariable(var.ToString(), 
+        value);
+  }
+
 }

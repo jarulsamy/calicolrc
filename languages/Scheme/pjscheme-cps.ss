@@ -827,6 +827,9 @@
   (define-exp
     (id symbol?)
     (rhs-exp (list-of expression?)))
+  (global-exp
+    (id symbol?)
+    (rhs-exp (list-of expression?)))
   (define-syntax-exp
     (keyword symbol?)
     (clauses (list-of (list-of pattern?))))
@@ -1166,6 +1169,10 @@
 		    (parse (caddr datum) handler
 			(lambda-cont (docstring)
 			    (k (define-exp (cadr datum) (list docstring body))))))))))
+      ((global? datum)
+       (parse (caddr datum) handler 
+         (lambda-cont (body)
+           (k (global-exp (cadr datum) (list body))))))
       ((define-syntax? datum)
        (k (define-syntax-exp (cadr datum) (cddr datum))))
       ((begin? datum)
@@ -1343,6 +1350,7 @@
 (define if-else? (tagged-list 'if = 4))
 (define assignment? (tagged-list 'set! = 3))
 (define define? (tagged-list 'define >= 3))
+(define global? (tagged-list 'global >= 3))
 (define define-syntax? (tagged-list 'define-syntax >= 3))
 (define begin? (tagged-list 'begin >= 2))
 (define lambda? (tagged-list 'lambda >= 3))
@@ -1511,6 +1519,11 @@
 			     (set-binding-docstring! binding docstring)
 			     (set-binding-value! binding rhs-value)
 			     (k '<void>)))))))))
+      (global-exp (var rhs-exp)
+        (m (car rhs-exp) env handler
+          (lambda-cont (rhs-value)
+            (set-global-value! var rhs-value)
+            (k '<void>))))
       (define-syntax-exp (keyword clauses)
 	(lookup-binding-in-first-frame keyword macro-env handler
 	  (lambda-cont (binding)
@@ -1990,7 +2003,7 @@
     (printf "Pyjama Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
     ;; in the register machine, this call just sets up the registers
-    (load-files (list args) toplevel-env REP-handler REP-k)
+    (load-files (list args) toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))
 
@@ -2005,7 +2018,7 @@
 
 (define execute-file
   (lambda (filename)
-    (load-file filename toplevel-env REP-handler REP-k)
+    (load-file filename toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))
 

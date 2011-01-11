@@ -86,6 +86,7 @@
     (if-else? "Func<object,bool>" ())
     (assignment? "Func<object,bool>" ())
     (define? "Func<object,bool>" ())
+    (global? "Func<object,bool>" ())
     (define-syntax? "Func<object,bool>" ())
     (begin? "Func<object,bool>" ())
     (lambda? "Func<object,bool>" ())

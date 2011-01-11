@@ -111,6 +111,11 @@
 			     (set-binding-docstring! binding docstring)
 			     (set-binding-value! binding rhs-value)
 			     (k '<void>)))))))))
+      (global-exp (var rhs-exp)
+        (m (car rhs-exp) env handler
+          (lambda-cont (rhs-value)
+            (set-global-value! var rhs-value)
+            (k '<void>))))
       (define-syntax-exp (keyword clauses)
 	(lookup-binding-in-first-frame keyword macro-env handler
 	  (lambda-cont (binding)
@@ -590,7 +595,7 @@
     (printf "Pyjama Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
     ;; in the register machine, this call just sets up the registers
-    (load-files (list args) toplevel-env REP-handler REP-k)
+    (load-files (list args) toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))
 
@@ -605,7 +610,7 @@
 
 (define execute-file
   (lambda (filename)
-    (load-file filename toplevel-env REP-handler REP-k)
+    (load-file filename toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))
 
