@@ -1,4 +1,4 @@
-(global factorial
+(define! factorial
     (lambda (n)
         (if (eq? n 1)
             1

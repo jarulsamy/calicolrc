@@ -39,7 +39,10 @@ class CustomStream(System.IO.Stream):
         #    ev.Set()
         #Gtk.Application.Invoke(invoke)
         #ev.WaitOne()
-        System.Console.Write(text)
+        if self.tag == "red":
+            System.Console.Error.Write(text)
+        else:
+            System.Console.Write(text)
 
     def goto_end(self):
         end = self.textview.Buffer.EndIter

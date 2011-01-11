@@ -34,6 +34,8 @@
    (datum anything?))
   (var-exp
     (id symbol?))
+  (func-exp
+    (exp expression?))
   (if-exp
    (test-exp expression?)
    (then-exp expression?)
@@ -44,7 +46,7 @@
   (define-exp
     (id symbol?)
     (rhs-exp (list-of expression?)))
-  (global-exp
+  (define!-exp
     (id symbol?)
     (rhs-exp (list-of expression?)))
   (define-syntax-exp
@@ -372,6 +374,9 @@
        (parse (caddr datum) handler
 	 (lambda-cont (v)
 	   (k (assign-exp (cadr datum) v)))))
+      ((func? datum) (parse (cadr datum) handler
+                       (lambda-cont (e)
+                         (k (func-exp e)))))
       ((define? datum)
        (if (mit-style? datum)
 	 (mit-define-transformer datum
@@ -386,10 +391,10 @@
 		    (parse (caddr datum) handler
 			(lambda-cont (docstring)
 			    (k (define-exp (cadr datum) (list docstring body))))))))))
-      ((global? datum)
+      ((define!? datum)
        (parse (caddr datum) handler 
          (lambda-cont (body)
-           (k (global-exp (cadr datum) (list body))))))
+           (k (define!-exp (cadr datum) (list body))))))
       ((define-syntax? datum)
        (k (define-syntax-exp (cadr datum) (cddr datum))))
       ((begin? datum)
@@ -560,6 +565,7 @@
 	   (eq? (car datum) tag)))))
 
 (define quote? (tagged-list 'quote = 2))
+(define func? (tagged-list 'func = 2))
 (define quasiquote? (tagged-list 'quasiquote = 2))
 (define unquote? (tagged-list 'unquote = 2))
 (define unquote-splicing? (tagged-list 'unquote-splicing = 2))
@@ -567,7 +573,7 @@
 (define if-else? (tagged-list 'if = 4))
 (define assignment? (tagged-list 'set! = 3))
 (define define? (tagged-list 'define >= 3))
-(define global? (tagged-list 'global >= 3))
+(define define!? (tagged-list 'define! >= 3))
 (define define-syntax? (tagged-list 'define-syntax >= 3))
 (define begin? (tagged-list 'begin >= 2))
 (define lambda? (tagged-list 'lambda >= 3))
@@ -583,10 +589,9 @@
 (define reserved-keyword?
   (lambda (x)
     (and (symbol? x)
-	 (memq x '(quote quasiquote lambda if set! define begin
-		    cond and or let let* letrec case record-case
-		    try catch finally raise dict
-		    )))))
+	 (memq x '(quote func define! quasiquote lambda if set! define
+                    begin cond and or let let* letrec case record-case
+                    try catch finally raise dict )))))
 
 (define try? (tagged-list 'try >= 2))
 (define try-body (lambda (x) (cadr x)))

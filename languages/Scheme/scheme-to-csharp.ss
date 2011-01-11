@@ -79,6 +79,7 @@
     (sort "object" ("Predicate2" "object"))
 
     (quote? "Func<object,bool>" ())
+    (func? "Func<object,bool>" ())
     (quasiquote? "Func<object,bool>" ())
     (unquote? "Func<object,bool>" ())
     (unquote-splicing? "Func<object,bool>" ())
@@ -86,7 +87,7 @@
     (if-else? "Func<object,bool>" ())
     (assignment? "Func<object,bool>" ())
     (define? "Func<object,bool>" ())
-    (global? "Func<object,bool>" ())
+    (define!? "Func<object,bool>" ())
     (define-syntax? "Func<object,bool>" ())
     (begin? "Func<object,bool>" ())
     (lambda? "Func<object,bool>" ())

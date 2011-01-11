@@ -8,13 +8,14 @@
 
 (define-datatype expression expression?
   (lit-exp (datum anything?)) (var-exp (id symbol?))
+  (func-exp (exp expression?))
   (if-exp
     (test-exp expression?)
     (then-exp expression?)
     (else-exp expression?))
   (assign-exp (var symbol?) (rhs-exp expression?))
   (define-exp (id symbol?) (rhs-exp (list-of expression?)))
-  (global-exp (id symbol?) (rhs-exp (list-of expression?)))
+  (define!-exp (id symbol?) (rhs-exp (list-of expression?)))
   (define-syntax-exp
     (keyword symbol?)
     (clauses (list-of (list-of pattern?))))
@@ -174,7 +175,7 @@
          ((null? (cdr value)) (apply-cont k (car value)))
          (else (apply-cont k (begin-exp value)))))
       (<cont-27> (datum k)
-       (apply-cont k (global-exp (cadr datum) (list value))))
+       (apply-cont k (define!-exp (cadr datum) (list value))))
       (<cont-28> (datum body k)
        (apply-cont k (define-exp (cadr datum) (list value body))))
       (<cont-29> (datum handler k)
@@ -185,231 +186,233 @@
       (<cont-30> (datum k)
        (apply-cont k (define-exp (cadr datum) (list value))))
       (<cont-31> (handler k) (parse value handler k))
-      (<cont-32> (datum k)
+      (<cont-32> (k) (apply-cont k (func-exp value)))
+      (<cont-33> (datum k)
        (apply-cont k (assign-exp (cadr datum) value)))
-      (<cont-33> (v1 v2 k) (apply-cont k (if-exp v1 v2 value)))
-      (<cont-34> (datum v1 handler k)
+      (<cont-34> (v1 v2 k) (apply-cont k (if-exp v1 v2 value)))
+      (<cont-35> (datum v1 handler k)
        (parse
          (cadddr datum)
          handler
-         (make-cont '<cont-33> v1 value k)))
-      (<cont-35> (datum handler k)
+         (make-cont '<cont-34> v1 value k)))
+      (<cont-36> (datum handler k)
        (parse
          (caddr datum)
          handler
-         (make-cont '<cont-34> datum value handler k)))
-      (<cont-36> (v1 k)
+         (make-cont '<cont-35> datum value handler k)))
+      (<cont-37> (v1 k)
        (apply-cont k (if-exp v1 value (lit-exp #f))))
-      (<cont-37> (datum handler k)
+      (<cont-38> (datum handler k)
        (parse
          (caddr datum)
          handler
-         (make-cont '<cont-36> value k)))
-      (<cont-38> (a b k) (apply-cont k (cons (list a b) value)))
-      (<cont-39> (a pairs handler k)
+         (make-cont '<cont-37> value k)))
+      (<cont-39> (a b k) (apply-cont k (cons (list a b) value)))
+      (<cont-40> (a pairs handler k)
        (parse-pairs
          (cdr pairs)
          handler
-         (make-cont '<cont-38> a value k)))
-      (<cont-40> (pairs handler k)
+         (make-cont '<cont-39> a value k)))
+      (<cont-41> (pairs handler k)
        (parse
          (cadar pairs)
          handler
-         (make-cont '<cont-39> value pairs handler k)))
-      (<cont-41> (a k) (apply-cont k (cons a value)))
-      (<cont-42> (datum-list handler k)
+         (make-cont '<cont-40> value pairs handler k)))
+      (<cont-42> (a k) (apply-cont k (cons a value)))
+      (<cont-43> (datum-list handler k)
        (parse-all
          (cdr datum-list)
          handler
-         (make-cont '<cont-41> value k)))
-      (<cont-43> (v1 k) (apply-cont k `(cons ,v1 ,value)))
-      (<cont-44> (datum handler k)
+         (make-cont '<cont-42> value k)))
+      (<cont-44> (v1 k) (apply-cont k `(cons ,v1 ,value)))
+      (<cont-45> (datum handler k)
        (expand-quasiquote
          (cdr datum)
          handler
-         (make-cont '<cont-43> value k)))
-      (<cont-45> (k) (apply-cont k `(list ,@value)))
-      (<cont-46> (datum k)
+         (make-cont '<cont-44> value k)))
+      (<cont-46> (k) (apply-cont k `(list ,@value)))
+      (<cont-47> (datum k)
        (apply-cont k `(append ,(cadr (car datum)) ,value)))
-      (<cont-47> (k) (apply-cont k `(list->vector ,value)))
-      (<cont-48> (v1 k) (apply-cont k (cons v1 value)))
-      (<cont-49> (datum handler k)
+      (<cont-48> (k) (apply-cont k `(list->vector ,value)))
+      (<cont-49> (v1 k) (apply-cont k (cons v1 value)))
+      (<cont-50> (datum handler k)
        (expand-quasiquote-list
          (cdr datum)
          handler
-         (make-cont '<cont-48> value k)))
-      (<cont-50> () (parse-sexps value init-handler init-cont))
-      (<cont-51> (exp k) (apply-cont k (cons exp value)))
-      (<cont-52> (tokens-left handler k)
+         (make-cont '<cont-49> value k)))
+      (<cont-51> () (parse-sexps value init-handler init-cont))
+      (<cont-52> (exp k) (apply-cont k (cons exp value)))
+      (<cont-53> (tokens-left handler k)
        (parse-sexps
          tokens-left
          handler
-         (make-cont '<cont-51> value k)))
-      (<cont-53> () (m value toplevel-env REP-handler REP-k))
-      (<cont-54> ()
-       (read-datum "(exit)" REP-handler (make-cont2 '<cont2-20>)))
+         (make-cont '<cont-52> value k)))
+      (<cont-54> () (m value toplevel-env REP-handler REP-k))
       (<cont-55> ()
-       (m value toplevel-env REP-handler (make-cont '<cont-54>)))
+       (read-datum "(exit)" REP-handler (make-cont2 '<cont2-20>)))
       (<cont-56> ()
+       (m value toplevel-env REP-handler (make-cont '<cont-55>)))
+      (<cont-57> ()
        (read-datum
          "(test-all)"
          REP-handler
          (make-cont2 '<cont2-21>)))
-      (<cont-57> ()
-       (m value toplevel-env REP-handler (make-cont '<cont-56>)))
       (<cont-58> ()
+       (m value toplevel-env REP-handler (make-cont '<cont-57>)))
+      (<cont-59> ()
        (if (not (eq? value '<void>)) (pretty-print-prim value))
        (if *need-newline* (newline))
        (read-eval-print))
-      (<cont-59> (args env handler k)
+      (<cont-60> (args env handler k)
        (if (dlr-exp? value)
            (apply-cont k (dlr-apply value args))
            (apply-proc value args env handler k)))
-      (<cont-60> (operator env handler k)
+      (<cont-61> (operator env handler k)
        (m operator
           env
           handler
-          (make-cont '<cont-59> value env handler k)))
-      (<cont-61> (handler) (apply-handler handler value))
-      (<cont-62> (v k) (apply-cont k v))
-      (<cont-63> (fexps env handler k)
+          (make-cont '<cont-60> value env handler k)))
+      (<cont-62> (handler) (apply-handler handler value))
+      (<cont-63> (v k) (apply-cont k v))
+      (<cont-64> (fexps env handler k)
        (eval-sequence
          fexps
          env
          handler
-         (make-cont '<cont-62> value k)))
-      (<cont-64> (clauses k)
+         (make-cont '<cont-63> value k)))
+      (<cont-65> (clauses k)
        (set-binding-value! value (make-pattern-macro clauses))
        (apply-cont k '<void>))
-      (<cont-65> (var k)
+      (<cont-66> (var k)
        (set-global-value! var value)
        (apply-cont k '<void>))
-      (<cont-66> (docstring rhs-value k)
+      (<cont-67> (docstring rhs-value k)
        (set-binding-docstring! value docstring)
        (set-binding-value! value rhs-value)
        (apply-cont k '<void>))
-      (<cont-67> (rhs-value var env handler k)
+      (<cont-68> (rhs-value var env handler k)
        (lookup-binding-in-first-frame
          var
          env
          handler
-         (make-cont '<cont-66> value rhs-value k)))
-      (<cont-68> (rhs-exp var env handler k)
+         (make-cont '<cont-67> value rhs-value k)))
+      (<cont-69> (rhs-exp var env handler k)
        (m (car rhs-exp)
           env
           handler
-          (make-cont '<cont-67> value var env handler k)))
-      (<cont-69> (rhs-value k)
+          (make-cont '<cont-68> value var env handler k)))
+      (<cont-70> (rhs-value k)
        (set-binding-value! value rhs-value)
        (apply-cont k '<void>))
-      (<cont-70> (var env handler k)
+      (<cont-71> (var env handler k)
        (lookup-binding-in-first-frame
          var
          env
          handler
-         (make-cont '<cont-69> value k)))
-      (<cont-71> (var env handler k)
+         (make-cont '<cont-70> value k)))
+      (<cont-72> (var env handler k)
        (lookup-binding
          var
          env
          handler
-         (make-cont '<cont-69> value k)))
-      (<cont-72> (else-exp then-exp env handler k)
+         (make-cont '<cont-70> value k)))
+      (<cont-73> (else-exp then-exp env handler k)
        (if value
            (m then-exp env handler k)
            (m else-exp env handler k)))
-      (<cont-73> (e handler) (apply-handler handler e))
-      (<cont-74> (exps env handler k)
-       (m* (cdr exps) env handler (make-cont '<cont-48> value k)))
-      (<cont-75> (exps env handler k)
+      (<cont-74> (k) (apply-cont k (dlr-func value)))
+      (<cont-75> (e handler) (apply-handler handler e))
+      (<cont-76> (exps env handler k)
+       (m* (cdr exps) env handler (make-cont '<cont-49> value k)))
+      (<cont-77> (exps env handler k)
        (if (null? (cdr exps))
            (apply-cont k value)
            (eval-sequence (cdr exps) env handler k)))
-      (<cont-76> (handler k2) (m value toplevel-env handler k2))
-      (<cont-77> (list1 proc env handler k)
+      (<cont-78> (handler k2) (m value toplevel-env handler k2))
+      (<cont-79> (list1 proc env handler k)
        (map1 proc (cdr list1) env handler
-         (make-cont '<cont-48> value k)))
-      (<cont-78> (list1 proc k)
+         (make-cont '<cont-49> value k)))
+      (<cont-80> (list1 proc k)
        (apply-cont
          k
          (cons (dlr-apply proc (list (car list1))) value)))
-      (<cont-79> (list1 list2 proc env handler k)
+      (<cont-81> (list1 list2 proc env handler k)
        (map2 proc (cdr list1) (cdr list2) env handler
-         (make-cont '<cont-48> value k)))
-      (<cont-80> (list1 list2 proc k)
+         (make-cont '<cont-49> value k)))
+      (<cont-82> (list1 list2 proc k)
        (apply-cont
          k
          (cons
            (dlr-apply proc (list (car list1) (car list2)))
            value)))
-      (<cont-81> (lists proc env handler k)
+      (<cont-83> (lists proc env handler k)
        (mapN proc (map cdr lists) env handler
-         (make-cont '<cont-48> value k)))
-      (<cont-82> (lists proc k)
+         (make-cont '<cont-49> value k)))
+      (<cont-84> (lists proc k)
        (apply-cont
          k
          (cons (dlr-apply proc (map car lists)) value)))
-      (<cont-83> (arg-list proc env handler k)
+      (<cont-85> (arg-list proc env handler k)
        (for-each-prim proc (map cdr arg-list) env handler k))
-      (<cont-84> (args sym handler k)
+      (<cont-86> (args sym handler k)
        (cond
          ((null? (cdr args)) (apply-cont k value))
          ((not (environment? value))
           (apply-handler handler (format "~a is not a module" sym)))
          (else (get-primitive (cdr args) value handler k))))
-      (<cont-85> (filename env handler k)
+      (<cont-87> (filename env handler k)
        (let ((module (extend env '() '())))
          (set-binding-value! value module)
          (load-file filename module handler k)))
-      (<cont-86> (k)
+      (<cont-88> (k)
        (set! load-stack (cdr load-stack))
        (apply-cont k value))
-      (<cont-87> (env handler k)
-       (load-loop value env handler (make-cont '<cont-86> k)))
-      (<cont-88> (tokens-left env handler k)
+      (<cont-89> (env handler k)
+       (load-loop value env handler (make-cont '<cont-88> k)))
+      (<cont-90> (tokens-left env handler k)
        (load-loop tokens-left env handler k))
-      (<cont-89> (tokens-left env handler k)
+      (<cont-91> (tokens-left env handler k)
        (m value
           env
           handler
-          (make-cont '<cont-88> tokens-left env handler k)))
-      (<cont-90> (filenames env handler k)
+          (make-cont '<cont-90> tokens-left env handler k)))
+      (<cont-92> (filenames env handler k)
        (load-files (cdr filenames) env handler k))
-      (<cont-91> (k) (apply-cont k (binding-docstring value)))
-      (<cont-92> () (m value toplevel-env init-handler init-cont))
-      (<cont-93> (pattern var k)
+      (<cont-93> (k) (apply-cont k (binding-docstring value)))
+      (<cont-94> () (m value toplevel-env init-handler init-cont))
+      (<cont-95> (pattern var k)
        (if value (apply-cont k #t) (occurs? var (cdr pattern) k)))
-      (<cont-94> (p1 p2 k)
+      (<cont-96> (p1 p2 k)
        (if value
            (apply-cont k #f)
            (apply-cont k (make-sub 'unit p1 p2))))
-      (<cont-95> (s-car k)
+      (<cont-97> (s-car k)
        (if (not value)
            (apply-cont k #f)
            (apply-cont k (make-sub 'composite s-car value))))
-      (<cont-96> (new-cdr1 s-car k)
+      (<cont-98> (new-cdr1 s-car k)
        (unify-patterns
          new-cdr1
          value
-         (make-cont '<cont-95> s-car k)))
-      (<cont-97> (pair2 s-car k)
+         (make-cont '<cont-97> s-car k)))
+      (<cont-99> (pair2 s-car k)
        (instantiate
          (cdr pair2)
          s-car
-         (make-cont '<cont-96> value s-car k)))
-      (<cont-98> (pair1 pair2 k)
+         (make-cont '<cont-98> value s-car k)))
+      (<cont-100> (pair1 pair2 k)
        (if (not value)
            (apply-cont k #f)
            (instantiate
              (cdr pair1)
              value
-             (make-cont '<cont-97> pair2 value k))))
-      (<cont-99> (pattern s k)
+             (make-cont '<cont-99> pair2 value k))))
+      (<cont-101> (pattern s k)
        (instantiate
          (cdr pattern)
          s
-         (make-cont '<cont-41> value k)))
-      (<cont-100> (s2 k) (instantiate value s2 k))
+         (make-cont '<cont-42> value k)))
+      (<cont-102> (s2 k) (instantiate value s2 k))
       (else (error 'apply-cont "bad continuation: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -525,21 +528,21 @@
        (parse
          value1
          handler
-         (make-cont '<cont-52> value2 handler k)))
+         (make-cont '<cont-53> value2 handler k)))
       (<cont2-20> ()
-       (parse value1 REP-handler (make-cont '<cont-53>)))
+       (parse value1 REP-handler (make-cont '<cont-54>)))
       (<cont2-21> ()
-       (parse value1 REP-handler (make-cont '<cont-55>)))
+       (parse value1 REP-handler (make-cont '<cont-56>)))
       (<cont2-22> ()
-       (parse value1 REP-handler (make-cont '<cont-57>)))
+       (parse value1 REP-handler (make-cont '<cont-58>)))
       (<cont2-23> (handler k2) (parse value1 handler k2))
       (<cont2-24> (env handler k)
        (parse
          value1
          handler
-         (make-cont '<cont-89> value2 env handler k)))
+         (make-cont '<cont-91> value2 env handler k)))
       (<cont2-25> ()
-       (parse value1 init-handler (make-cont '<cont-92>)))
+       (parse value1 init-handler (make-cont '<cont-94>)))
       (else (error 'apply-cont2 "bad continuation2: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -562,7 +565,7 @@
          fexps
          env
          handler
-         (make-cont '<cont-73> exception handler)))
+         (make-cont '<cont-75> exception handler)))
       (<handler-5> (cexps cvar fexps env handler k)
        (let ((new-env (extend env (list cvar) (list exception))))
          (let ((catch-handler (try-finally-handler
@@ -573,7 +576,7 @@
              cexps
              new-env
              catch-handler
-             (make-cont '<cont-63> fexps env handler k)))))
+             (make-cont '<cont-64> fexps env handler k)))))
       (else (error 'apply-handler "bad handler: ~a" handler)))))
 
 ;;----------------------------------------------------------------------
@@ -678,7 +681,7 @@
        (parse
          (car args)
          handler
-         (make-cont '<cont-76> handler k2)))
+         (make-cont '<cont-78> handler k2)))
       (<proc-49> ()
        (set! macro-env (make-macro-env))
        (set! toplevel-env (make-toplevel-env))
@@ -1643,17 +1646,19 @@
        (parse
          (cadr datum)
          handler
-         (make-cont '<cont-37> datum handler k)))
+         (make-cont '<cont-38> datum handler k)))
       ((if-else? datum)
        (parse
          (cadr datum)
          handler
-         (make-cont '<cont-35> datum handler k)))
+         (make-cont '<cont-36> datum handler k)))
       ((assignment? datum)
        (parse
          (caddr datum)
          handler
-         (make-cont '<cont-32> datum k)))
+         (make-cont '<cont-33> datum k)))
+      ((func? datum)
+       (parse (cadr datum) handler (make-cont '<cont-32> k)))
       ((define? datum)
        (if (mit-style? datum)
            (apply-macro
@@ -1666,7 +1671,7 @@
                  (cadddr datum)
                  handler
                  (make-cont '<cont-29> datum handler k)))))
-      ((global? datum)
+      ((define!? datum)
        (parse
          (caddr datum)
          handler
@@ -1731,7 +1736,7 @@
         (parse
           (caar pairs)
           handler
-          (make-cont '<cont-40> pairs handler k)))))
+          (make-cont '<cont-41> pairs handler k)))))
 
 (define*
   parse-all
@@ -1741,7 +1746,7 @@
         (parse
           (car datum-list)
           handler
-          (make-cont '<cont-42> datum-list handler k)))))
+          (make-cont '<cont-43> datum-list handler k)))))
 
 (define*
   expand-quasiquote
@@ -1751,7 +1756,7 @@
        (expand-quasiquote
          (vector->list datum)
          handler
-         (make-cont '<cont-47> k)))
+         (make-cont '<cont-48> k)))
       ((not (pair? datum)) (apply-cont k `',datum))
       ((quasiquote? datum) (apply-cont k `',datum))
       ((unquote? datum) (apply-cont k (cadr datum)))
@@ -1761,17 +1766,17 @@
            (expand-quasiquote
              (cdr datum)
              handler
-             (make-cont '<cont-46> datum k))))
+             (make-cont '<cont-47> datum k))))
       ((quasiquote-list? datum)
        (expand-quasiquote-list
          datum
          handler
-         (make-cont '<cont-45> k)))
+         (make-cont '<cont-46> k)))
       (else
        (expand-quasiquote
          (car datum)
          handler
-         (make-cont '<cont-44> datum handler k))))))
+         (make-cont '<cont-45> datum handler k))))))
 
 (define*
   expand-quasiquote-list
@@ -1781,7 +1786,7 @@
         (expand-quasiquote
           (car datum)
           handler
-          (make-cont '<cont-49> datum handler k)))))
+          (make-cont '<cont-50> datum handler k)))))
 
 (define quasiquote-list?
   (lambda (datum)
@@ -1840,9 +1845,9 @@
     (and (symbol? x)
          (memq
            x
-           '(quote quasiquote lambda if set! define begin cond and or
-              let let* letrec case record-case try catch finally raise
-              dict)))))
+           '(quote func define! quasiquote lambda if set! define begin
+             cond and or let let* letrec case record-case try catch
+             finally raise dict)))))
 
 (define try-body (lambda (x) (cadr x)))
 
@@ -1861,7 +1866,7 @@
     (scan-input
       (read-content filename)
       init-handler
-      (make-cont '<cont-50>))))
+      (make-cont '<cont-51>))))
 
 (define*
   parse-sexps
@@ -1911,78 +1916,81 @@
   m
   (lambda (exp env handler k)
     (cases expression exp (lit-exp (datum) (apply-cont k datum))
-      (var-exp (id) (lookup-value id env handler k))
-      (if-exp
-        (test-exp then-exp else-exp)
-        (m test-exp
-           env
-           handler
-           (make-cont '<cont-72> else-exp then-exp env handler k)))
-      (assign-exp
-        (var rhs-exp)
-        (m rhs-exp
-           env
-           handler
-           (make-cont '<cont-71> var env handler k)))
-      (define-exp
-        (var rhs-exp)
-        (if (= (length rhs-exp) 1)
-            (m (car rhs-exp)
-               env
-               handler
-               (make-cont '<cont-70> var env handler k))
-            (m (cadr rhs-exp)
-               env
-               handler
-               (make-cont '<cont-68> rhs-exp var env handler k))))
-      (global-exp
-        (var rhs-exp)
-        (m (car rhs-exp) env handler (make-cont '<cont-65> var k)))
-      (define-syntax-exp
-        (keyword clauses)
-        (lookup-binding-in-first-frame
-          keyword
-          macro-env
+     (var-exp (id) (lookup-value id env handler k))
+     (func-exp
+       (exp)
+       (m exp env handler (make-cont '<cont-74> k)))
+     (if-exp
+       (test-exp then-exp else-exp)
+       (m test-exp
+          env
           handler
-          (make-cont '<cont-64> clauses k)))
-      (begin-exp (exps) (eval-sequence exps env handler k))
-      (lambda-exp
-        (formals body)
-        (apply-cont k (closure formals body env)))
-      (mu-lambda-exp
-        (formals runt body)
-        (apply-cont k (mu-closure formals runt body env)))
-      (try-catch-exp
-        (body cvar cexps)
-        (let ((new-handler (try-catch-handler cvar cexps env handler
-                             k)))
-          (m body env new-handler k)))
-      (try-finally-exp
-        (body fexps)
-        (let ((new-handler (try-finally-handler fexps env handler)))
-          (m body
-             env
-             new-handler
-             (make-cont '<cont-63> fexps env handler k))))
-      (try-catch-finally-exp
-        (body cvar cexps fexps)
-        (let ((new-handler (try-catch-finally-handler cvar cexps
-                             fexps env handler k)))
-          (m body
-             env
-             new-handler
-             (make-cont '<cont-63> fexps env handler k))))
-      (raise-exp
-        (exp)
-        (m exp env handler (make-cont '<cont-61> handler)))
-      (dict-exp (pairs) (apply-cont k (list 'dict pairs)))
-      (app-exp
-        (operator operands)
-        (m* operands
+          (make-cont '<cont-73> else-exp then-exp env handler k)))
+     (assign-exp
+       (var rhs-exp)
+       (m rhs-exp
+          env
+          handler
+          (make-cont '<cont-72> var env handler k)))
+     (define-exp
+       (var rhs-exp)
+       (if (= (length rhs-exp) 1)
+           (m (car rhs-exp)
+              env
+              handler
+              (make-cont '<cont-71> var env handler k))
+           (m (cadr rhs-exp)
+              env
+              handler
+              (make-cont '<cont-69> rhs-exp var env handler k))))
+     (define!-exp
+       (var rhs-exp)
+       (m (car rhs-exp) env handler (make-cont '<cont-66> var k)))
+     (define-syntax-exp
+       (keyword clauses)
+       (lookup-binding-in-first-frame
+         keyword
+         macro-env
+         handler
+         (make-cont '<cont-65> clauses k)))
+     (begin-exp (exps) (eval-sequence exps env handler k))
+     (lambda-exp
+       (formals body)
+       (apply-cont k (closure formals body env)))
+     (mu-lambda-exp
+       (formals runt body)
+       (apply-cont k (mu-closure formals runt body env)))
+     (try-catch-exp
+       (body cvar cexps)
+       (let ((new-handler (try-catch-handler cvar cexps env handler
+                            k)))
+         (m body env new-handler k)))
+     (try-finally-exp
+       (body fexps)
+       (let ((new-handler (try-finally-handler fexps env handler)))
+         (m body
             env
-            handler
-            (make-cont '<cont-60> operator env handler k)))
-      (else (error 'm "bad abstract syntax: ~a" exp)))))
+            new-handler
+            (make-cont '<cont-64> fexps env handler k))))
+     (try-catch-finally-exp
+       (body cvar cexps fexps)
+       (let ((new-handler (try-catch-finally-handler cvar cexps
+                            fexps env handler k)))
+         (m body
+            env
+            new-handler
+            (make-cont '<cont-64> fexps env handler k))))
+     (raise-exp
+       (exp)
+       (m exp env handler (make-cont '<cont-62> handler)))
+     (dict-exp (pairs) (apply-cont k (list 'dict pairs)))
+     (app-exp
+       (operator operands)
+       (m* operands
+           env
+           handler
+           (make-cont '<cont-61> operator env handler k)))
+     (else (error 'm "bad abstract syntax: ~a" exp)))))
 
 (define try-catch-handler
   (lambda (cvar cexps env handler k)
@@ -2012,7 +2020,7 @@
         (m (car exps)
            env
            handler
-           (make-cont '<cont-74> exps env handler k)))))
+           (make-cont '<cont-76> exps env handler k)))))
 
 (define*
   eval-sequence
@@ -2020,7 +2028,7 @@
     (m (car exps)
        env
        handler
-       (make-cont '<cont-75> exps env handler k))))
+       (make-cont '<cont-77> exps env handler k))))
 
 (define make-initial-env-extended (lambda (env) env))
 
@@ -2096,9 +2104,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (map1 proc (cdr list1) env handler
-              (make-cont '<cont-78> list1 proc k))
+              (make-cont '<cont-80> list1 proc k))
             (apply-proc proc (list (car list1)) env handler
-              (make-cont '<cont-77> list1 proc env handler k))))))
+              (make-cont '<cont-79> list1 proc env handler k))))))
 
 (define*
   map2
@@ -2107,9 +2115,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (map2 proc (cdr list1) (cdr list2) env handler
-              (make-cont '<cont-80> list1 list2 proc k))
+              (make-cont '<cont-82> list1 list2 proc k))
             (apply-proc proc (list (car list1) (car list2)) env handler
-              (make-cont '<cont-79> list1 list2 proc env handler k))))))
+              (make-cont '<cont-81> list1 list2 proc env handler k))))))
 
 (define*
   mapN
@@ -2118,9 +2126,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (mapN proc (map cdr lists) env handler
-              (make-cont '<cont-82> lists proc k))
+              (make-cont '<cont-84> lists proc k))
             (apply-proc proc (map car lists) env handler
-              (make-cont '<cont-81> lists proc env handler k))))))
+              (make-cont '<cont-83> lists proc env handler k))))))
 
 (define*
   for-each-prim
@@ -2133,7 +2141,7 @@
                 (dlr-apply proc (map car arg-list))
                 (for-each-prim proc (map cdr arg-list) env handler k))
               (apply-proc proc (map car arg-list) env handler
-                (make-cont '<cont-83> arg-list proc env handler k)))))))
+                (make-cont '<cont-85> arg-list proc env handler k)))))))
 
 (define get-current-time
   (lambda ()
@@ -2149,7 +2157,7 @@
         sym
         env
         handler
-        (make-cont '<cont-84> args sym handler k)))))
+        (make-cont '<cont-86> args sym handler k)))))
 
 (define*
   import-primitive
@@ -2162,7 +2170,7 @@
               module-name
               env
               handler
-              (make-cont '<cont-85> filename env handler k)))))))
+              (make-cont '<cont-87> filename env handler k)))))))
 
 (define*
   call/cc-primitive
@@ -2220,7 +2228,7 @@
        (scan-input
          (read-content filename)
          handler
-         (make-cont '<cont-87> env handler k))))))
+         (make-cont '<cont-89> env handler k))))))
 
 (define*
   load-loop
@@ -2241,12 +2249,12 @@
           (car filenames)
           env
           handler
-          (make-cont '<cont-90> filenames env handler k)))))
+          (make-cont '<cont-92> filenames env handler k)))))
 
 (define*
   help-prim
   (lambda (var env handler k)
-    (lookup-binding var env handler (make-cont '<cont-91> k))))
+    (lookup-binding var env handler (make-cont '<cont-93> k))))
 
 (define range
   (lambda args
@@ -2288,6 +2296,11 @@
     (read-datum string init-handler (make-cont2 '<cont2-18>))
     (trampoline)))
 
+(define dlr-func
+  (lambda (exp env)
+    (m exp env init-handler init-cont)
+    (trampoline)))
+
 (define pattern?
   (lambda (x)
     (or (null? x)
@@ -2316,7 +2329,7 @@
        (occurs?
          var
          (car pattern)
-         (make-cont '<cont-93> pattern var k))))))
+         (make-cont '<cont-95> pattern var k))))))
 
 (define*
   unify-patterns
@@ -2325,7 +2338,7 @@
       ((pattern-variable? p1)
        (if (pattern-variable? p2)
            (apply-cont k (make-sub 'unit p1 p2))
-           (occurs? p1 p2 (make-cont '<cont-94> p1 p2 k))))
+           (occurs? p1 p2 (make-cont '<cont-96> p1 p2 k))))
       ((pattern-variable? p2) (unify-patterns p2 p1 k))
       ((and (constant? p1) (constant? p2) (equal? p1 p2))
        (apply-cont k (make-sub 'empty)))
@@ -2338,7 +2351,7 @@
     (unify-patterns
       (car pair1)
       (car pair2)
-      (make-cont '<cont-98> pair1 pair2 k))))
+      (make-cont '<cont-100> pair1 pair2 k))))
 
 (define*
   instantiate
@@ -2350,7 +2363,7 @@
        (instantiate
          (car pattern)
          s
-         (make-cont '<cont-99> pattern s k)))
+         (make-cont '<cont-101> pattern s k)))
       (else (error 'instantiate "bad pattern: ~a" pattern)))))
 
 (define make-sub (lambda args (cons 'substitution args)))
@@ -2365,7 +2378,7 @@
            (apply-cont k new-pattern)
            (apply-cont k var)))
       (composite (s1 s2)
-       (apply-sub s1 var (make-cont '<cont-100> s2 k)))
+       (apply-sub s1 var (make-cont '<cont-102> s2 k)))
       (else (error 'apply-sub "bad substitution: ~a" s)))))
 
 (define chars-to-scan 'undefined)
@@ -2402,6 +2415,8 @@
 
 (define quote? (tagged-list 'quote = 2))
 
+(define func? (tagged-list 'func = 2))
+
 (define quasiquote? (tagged-list 'quasiquote = 2))
 
 (define unquote? (tagged-list 'unquote = 2))
@@ -2417,7 +2432,7 @@
 
 (define define? (tagged-list 'define >= 3))
 
-(define global? (tagged-list 'global >= 3))
+(define define!? (tagged-list 'define! >= 3))
 
 (define define-syntax? (tagged-list 'define-syntax >= 3))
 
@@ -2437,7 +2452,7 @@
 
 (define *need-newline* #f)
 
-(define REP-k (make-cont '<cont-58>))
+(define REP-k (make-cont '<cont-59>))
 
 (define REP-handler (make-handler '<handler-2>))
 

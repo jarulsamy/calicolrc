@@ -2463,4 +2463,10 @@ public class Vector {
         value);
   }
 
+  public static object dlr_func(object exp) {
+    //public static object make_dlr_func(params args) {
+    //m(exp, init_
+    //}
+    return exp;
+  }
 }

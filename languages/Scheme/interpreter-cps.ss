@@ -81,6 +81,9 @@
     (cases expression exp
       (lit-exp (datum) (k datum))
       (var-exp (id) (lookup-value id env handler k))
+      (func-exp (exp) (m exp env handler
+                        (lambda-cont (f)
+                          (k (dlr-func f)))))
       (if-exp (test-exp then-exp else-exp)
 	(m test-exp env handler
 	  (lambda-cont (bool)
@@ -111,7 +114,7 @@
 			     (set-binding-docstring! binding docstring)
 			     (set-binding-value! binding rhs-value)
 			     (k '<void>)))))))))
-      (global-exp (var rhs-exp)
+      (define!-exp (var rhs-exp)
         (m (car rhs-exp) env handler
           (lambda-cont (rhs-value)
             (set-global-value! var rhs-value)
@@ -621,3 +624,7 @@
 	(parse datum init-handler init-cont)))
     (trampoline)))
     
+(define dlr-func
+    (lambda (exp env)
+      (m exp env init-handler init-cont)
+      (trampoline)))
