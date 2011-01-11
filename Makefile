@@ -1,10 +1,11 @@
-BUILD=0.1.4
+BUILD=0.1.5
 
 all: modules/Graphics.dll modules/Myro.dll languages/PJScheme.dll \
 	modules/Conx.dll
 
 build: clean-build all 
 	cd ..; zip -r Pyjama/Pyjama-$(BUILD).zip Pyjama/* -x \*/.svn/\* \*~ 
+	scp Pyjama-$(BUILD).zip dblank@myro.roboteducation.org:html/download/
 
 modules/Graphics.dll:
 	cd modules/Graphics; make
