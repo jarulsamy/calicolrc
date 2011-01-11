@@ -27,18 +27,19 @@ class CustomStream(System.IO.Stream):
         self.textview = textview
 
     def write(self, text):
-        if DEBUG:
-            print text,
-            return
+        #if DEBUG:
+        #    print text,
+        #    return
 
-        ev = ManualResetEvent(False)
-        def invoke(sender, args):
-            end = self.textview.Buffer.EndIter
-            self.textview.Buffer.InsertWithTagsByName(end, text, "red")
-            self.goto_end()
-            ev.Set()
-        Gtk.Application.Invoke(invoke)
-        ev.WaitOne()
+        #ev = ManualResetEvent(False)
+        #def invoke(sender, args):
+        #    end = self.textview.Buffer.EndIter
+        #    self.textview.Buffer.InsertWithTagsByName(end, text, "red")
+        #    self.goto_end()
+        #    ev.Set()
+        #Gtk.Application.Invoke(invoke)
+        #ev.WaitOne()
+        System.Console.Write(text)
 
     def goto_end(self):
         end = self.textview.Buffer.EndIter

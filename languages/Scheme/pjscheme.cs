@@ -7769,6 +7769,16 @@ public class PJScheme:Scheme
       PJScheme.trampoline ();
    }
 
+   new public static void execute_file (string filename)
+   {
+      k_reg = REP_k;
+      handler_reg = REP_handler;
+      env_reg = toplevel_env;
+      filename_reg = filename;
+      pc = (Function) load_file;
+      PJScheme.trampoline ();
+   }
+
    new public static object execute (string input_string)
    {
       k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-25>"));

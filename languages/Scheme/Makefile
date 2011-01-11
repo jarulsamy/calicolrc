@@ -39,7 +39,8 @@ pjscheme.cs:
 
 pjscheme.exe: pjscheme-rm.ss scheme-to-csharp.ss Scheme.cs pjscheme.cs
 	$(MCS) -debug pjscheme.cs Scheme.cs getline.cs -main:PJScheme \
-		-lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
+	-lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll \
+	-r:IronPython.dll -r:Microsoft.Dynamic 
 
 Test.exe: Test.cs
 	$(MCS) Test.cs -lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll

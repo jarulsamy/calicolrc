@@ -2251,8 +2251,8 @@
 
 (define Main
   (lambda (args)
-    (printf "Pyjama Scheme (0.1)\n")
-    (printf "(c) 2009, IPRE\n")
+    (printf "Pyjama Scheme (0.2)\n")
+    (printf "(c) 2009-2011, IPRE\n")
     (load-files (list args) toplevel-env REP-handler REP-k)
     (trampoline)))
 
@@ -2262,6 +2262,11 @@
       input-string
       init-handler
       (make-cont2 '<cont2-25>))
+    (trampoline)))
+
+(define execute-file
+  (lambda (filename)
+    (load-file filename toplevel-env REP-handler REP-k)
     (trampoline)))
 
 (define try-parse-string

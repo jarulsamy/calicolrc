@@ -4158,8 +4158,8 @@
 
 (define Main
   (lambda (args)
-    (printf "Pyjama Scheme (0.1)\n")
-    (printf "(c) 2009, IPRE\n")
+    (printf "Pyjama Scheme (0.2)\n")
+    (printf "(c) 2009-2011, IPRE\n")
     (set! k_reg REP-k)
     (set! handler_reg REP-handler)
     (set! env_reg toplevel-env)
@@ -4173,6 +4173,15 @@
     (set! handler_reg init-handler)
     (set! input_reg input-string)
     (set! pc read-datum)
+    (return* (trampoline))))
+
+(define execute-file
+  (lambda (filename)
+    (set! k_reg REP-k)
+    (set! handler_reg REP-handler)
+    (set! env_reg toplevel-env)
+    (set! filename_reg filename)
+    (set! pc load-file)
     (return* (trampoline))))
 
 (define try-parse-string

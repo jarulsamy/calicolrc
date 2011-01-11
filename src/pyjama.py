@@ -2,7 +2,7 @@
 import sys, os, traceback
 sys.path.append(os.path.abspath("modules"))
 
-# Windows
+# Add some paths for Windows:
 import Microsoft
 try:
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
@@ -15,8 +15,6 @@ if registry:
     path = registry.GetValue("SdkInstallRoot") # Path to Mono
     if path:
         sys.path.append("%s\\lib\\mono\\gtk-sharp-2.0" % path)
-    else:
-        print "Gtk not found in registry!"
 # Get SdlDotNet Path
 try:
     registry = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software\\SdlDotNet\\")
@@ -26,8 +24,6 @@ if registry:
     path = registry.GetValue("")
     if path:
         sys.path.append("%s\\bin" % path)
-    else:
-        print "SdlDotNet not found in registry!"
 
 # Bring in DLLs to import from:
 import clr
@@ -109,6 +105,8 @@ class PyjamaProject(object):
             self.shell = ShellWindow(self)
 
     def load(self, filename):
+        # force into a Python string:
+        filename = str(filename.ToString())
         for name in self.languages:
             if filename.endswith("." + self.languages[name].extension):
                 return self.engine[name].execute_file(filename)
@@ -175,3 +173,4 @@ except:
     sys.exit()
 #------------------------------
 Gtk.Application.Run()
+
