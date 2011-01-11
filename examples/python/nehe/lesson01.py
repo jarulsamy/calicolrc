@@ -61,6 +61,7 @@ class NeHe001(object):
         Gl.glMatrixMode(Gl.GL_MODELVIEW)
         ## Reset The Modelview Matrix
         Gl.glLoadIdentity()
+        print "reshape"
 
     ### Initializes the OpenGL system
     def InitGL(self):
@@ -76,6 +77,7 @@ class NeHe001(object):
         Gl.glDepthFunc(Gl.GL_LEQUAL)
         ## Really Nice Perspective Calculations
         Gl.glHint(Gl.GL_PERSPECTIVE_CORRECTION_HINT, Gl.GL_NICEST)
+        print "initgl"
 
     ### Renders the scene
     def DrawGLScene(self):
@@ -90,13 +92,15 @@ class NeHe001(object):
             Events.QuitApplication()
         elif e.Key == Key.F1:
             ## Toggle fullscreen
-            if ((self.screen.FullScreen)):
+            if (self.screen.FullScreen):
                 self.screen = Video.SetVideoMode(self.width, self.height, 
-                                                 True, True, True)
+                                                   True, True, True)
                 self.WindowAttributes()
+                print "reg screen"
             else:
                 self.screen = Video.SetVideoMode(self.width, self.height, 
-                                                 True, True)
+                                                   True, True)
+                print "full screen"
             self.Reshape()
 
     def Tick(self, sender, e):
@@ -115,13 +119,6 @@ class NeHe001(object):
         ##        this.Reshape()
         ##      }
         ##    }
-
-        #endregion Event Handlers
-
-        #region Run Loop
-        ### <summary>
-        ### Starts lesson
-        ### </summary>
 
 def main():
     t = NeHe001()
