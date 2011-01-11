@@ -16,7 +16,8 @@ class Window(object):
                         menuitem = Gtk.MenuItem(subtext)
                     else:
                         menuitem = Gtk.ImageMenuItem(img, accel_group)
-                    menuitem.Activated += function
+                    if function:
+                        menuitem.Activated += function
                     if accel:
                         key, mod = Gtk.Accelerator.Parse(accel)
                         menuitem.AddAccelerator("activate", accel_group, 
@@ -30,11 +31,12 @@ class Window(object):
         self.toolbar = Gtk.Toolbar()
         self.toolbar.ToolbarStyle = Gtk.ToolbarStyle.Icons
         i = 0
-        for (img, funtion) in toolbar:
+        for (img, function) in toolbar:
             if img is None:
                 tool_item = Gtk.SeparatorToolItem()
             else:
                 tool_item = Gtk.ToolButton(img)
+            if function:
                 tool_item.Clicked += function
             self.toolbar.Insert(tool_item, i)
             i += 1

@@ -83,9 +83,11 @@ class EditorWindow(Window):
         if doc:
             self.statusbar.Pop(0)
             self.statusbar.Push(0, _("Language: %s") % doc.language.title())
+            self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
         else:
             self.statusbar.Pop(0)
             self.statusbar.Push(0, _("Language: "))
+            self.window.Title = _("Pyjama Editor")
 
     def on_open_file(self, obj, event):
         retval = False
