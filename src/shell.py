@@ -149,7 +149,7 @@ class ShellWindow(Window):
         self.textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
         self.scrolled_window.AddWithViewport(self.textview)
         self.results = Gtk.ScrolledWindow()
-        for color in ["red", "blue", "green", "black"]:
+        for color in ["red", "blue", "purple", "black"]:
             tag = Gtk.TextTag(color)
             if color in ["red"]:
                 tag.Weight = Pango.Weight.Bold
@@ -188,9 +188,10 @@ class ShellWindow(Window):
                     None, "<control>%d" % num, 
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
                 num += 1
-        return ([("Run", Gtk.Stock.Apply, "F5", self.on_run)] + 
-                languages +
-                [("Reset Shell", None, "<control>r", self.reset_shell)])
+        return ([("Run", Gtk.Stock.Apply, "F5", self.on_run),
+                 ("Restart Shell", None, "<control>r", self.reset_shell),
+                 None] + 
+                languages)
 
     def update_gui(self):
         self.window.Title = _("%s - Pyjama Shell") % self.language.title()
@@ -279,15 +280,12 @@ class ShellWindow(Window):
         self.message("Reset shell\n")
         self.message("-----------\n")
 
-    def message(self, message, tag="green"):
-        # DO NOT PUT the ev stuff here!
-        #ev = ManualResetEvent(False)
+    def message(self, message, tag="purple"):
+        # DO NOT PUT the ev, WaitOne stuff here!
         def invoke(sender, args):
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
-            #ev.Set()
         Gtk.Application.Invoke(invoke)
-        #ev.WaitOne()
 
     @BGThread
     def execute_file(self, filename, language):

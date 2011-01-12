@@ -15,6 +15,10 @@ class SchemeEngine(Engine):
         result = self.engine.execute(text)
         self.stdout.write("%s\n" % result)
 
+    def eval(self, text):
+        result = self.engine.execute(text)
+        return result
+
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)
         self.engine.execute_file(filename)
