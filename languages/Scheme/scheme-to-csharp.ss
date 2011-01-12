@@ -171,7 +171,8 @@
 		*code*)))))
 
 (define cs-trampoline
-  "      new public static object trampoline () {
+  "
+  new public static object trampoline () {
 	while (pc != null) {
             try {
 	        pc ();
@@ -188,6 +189,20 @@
 	return (final_reg);
   }
 
+  public static Closure dlr_func(object proc) {
+    // Make a C# function that when evaluated will 
+    // call apply on the proc
+    return delegate (object[] args) { 
+      k_reg = init_cont;
+      k2_reg = init_cont;
+      handler_reg = init_handler;
+      env_reg = toplevel_env;
+      args_reg = PJScheme.list ((object) args);
+      proc_reg = proc;
+      pc = (Function) apply_proc;
+      return (object) PJScheme.trampoline();
+    };
+  }
 ")
 
 (define lookup-signature

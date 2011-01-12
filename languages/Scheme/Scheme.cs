@@ -210,6 +210,7 @@ public class Scheme {
 
   public static Symbol EmptyList = (Symbol) symbol("()");
 
+  public delegate object Closure(params object[] args);
   public delegate void Function();
   public delegate bool Predicate(object obj);
   public delegate bool Predicate2(object obj1, object obj2);
@@ -1202,7 +1203,11 @@ public class Scheme {
 	  return ((Method)proc).method.Invoke(((Method)proc).classobj, 
 		  list_to_array(args));
 	} else {
-      return _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+      try {
+        return _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+      } catch {
+        return (proc as Closure)(list_to_array(args));
+      }
     }
   }
 
@@ -2463,10 +2468,4 @@ public class Vector {
         value);
   }
 
-  public static object dlr_func(object exp) {
-    //public static object make_dlr_func(params args) {
-    //m(exp, init_
-    //}
-    return exp;
-  }
 }

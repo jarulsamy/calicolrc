@@ -8250,6 +8250,7 @@ public class PJScheme:Scheme
    static object toplevel_env = PJScheme.make_toplevel_env ();
    static object macro_env = PJScheme.make_macro_env ();
 
+
    new public static object trampoline ()
    {
       while (pc != null)
@@ -8275,6 +8276,23 @@ public class PJScheme:Scheme
       return (final_reg);
    }
 
+   public static Closure dlr_func (object proc)
+   {
+      // Make a C# function that when evaluated will 
+      // call apply on the proc
+      //FIXME: scheme can't execute delegates yet
+      return delegate (object[]args)
+      {
+	 k_reg = init_cont;
+	 k2_reg = init_cont;
+	 handler_reg = init_handler;
+	 env_reg = toplevel_env;
+	 args_reg = PJScheme.list ((object) args);
+	 proc_reg = proc;
+	 pc = (Function) apply_proc;
+	 return (object) PJScheme.trampoline ();
+      };
+   }
    public static Proc get_variables_from_frame_proc =
       new Proc ("get-variables-from-frame",
 		(Procedure1) get_variables_from_frame, 1, 1);
