@@ -231,6 +231,10 @@ class DinahDocument(BaseDocument):
         self.widget.Add2(layout_scroll)
         self.widget.ShowAll()
 
+    def get_dirty(self):
+        # FIXME: keep track of whether this is dirty
+        return True
+
     def grab_focus(self):
         self.treeview.GrabFocus()
 

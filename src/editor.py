@@ -100,6 +100,9 @@ class EditorWindow(Window):
             page = self.make_document(fc.Filename)
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.CurrentPage = page_num
+            doc0 = self.notebook.GetNthPage(0).document
+            if doc0.filename == None and not doc0.get_dirty():
+                self.notebook.RemovePage(0)
             retval = True
         fc.Destroy()
         return retval
@@ -112,6 +115,9 @@ class EditorWindow(Window):
         page = self.project.languages[language].get_document_class()(None, self.project, language)
         page_num = self.notebook.AppendPage(page.widget, page.tab)
         self.notebook.CurrentPage = page_num
+        doc0 = self.notebook.GetNthPage(0).document
+        if doc0.filename == None and not doc0.get_dirty():
+            self.notebook.RemovePage(0)
 
     def make_new_file_menu(self):
         retval = []
@@ -124,12 +130,15 @@ class EditorWindow(Window):
 
     def make_document(self, filename):
         if filename:
-            pathname, extension = filename.rsplit(".")
+            if "." in filename:
+                pathname, extension = filename.rsplit(".")
+            else:
+                pathname, extension = filename, ""
             for lang in self.project.languages:
                 if self.project.languages[lang].extension == extension:
                     page = self.project.languages[lang].get_document_class()(filename, self.project, lang)
                     return page
-        # FIXME: handle default here
+        # FIXME: get default from config 
         page = self.project.languages["python"].get_document_class()(filename, self.project, "python")
         return page
 

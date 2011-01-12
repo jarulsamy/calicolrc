@@ -166,6 +166,70 @@ class PyjamaProject(object):
                 self.editor.window.Present()
             Gtk.Application.Invoke(invoke)
 
+    def grep(self, pattern, file_pat="*.py", dir=".", 
+             flags=0, recursive=True):
+        """
+        grep("FIXME")
+        grep("import sys", "*.py", ".", True)
+        flags = 0 # re.IGNORECASE
+        """
+        # Based on code from idlelib
+        import re
+        prog = re.compile(pattern, flags)
+        list = self.findfiles(dir, file_pat, recursive)
+        list.sort()
+        print "Searching %r in %s/%s..." % (pattern, dir, file_pat)
+        hits = 0
+        for fn in list:
+            try:
+                f = open(fn)
+            except IOError, msg:
+                print msg
+                continue
+            lineno = 0
+            while 1:
+                block = f.readlines(100000)
+                if not block:
+                    break
+                for line in block:
+                    lineno = lineno + 1
+                    if line[-1:] == '\n':
+                        line = line[:-1]
+                    if prog.search(line):
+                        sys.stdout.write("  File \"%s\", line %d, %s\"\n" % 
+                                         (fn, lineno, line.strip()))
+                        hits = hits + 1
+        if hits:
+            if hits == 1:
+                s = ""
+            else:
+                s = "es"
+            print "Found", hits, "match%s. Right-click file to open." % s
+        else:
+            print "No matches."
+
+    def findfiles(self, dir, base, recursive=True):
+        # Based on code from idlelib
+        import fnmatch
+        try:
+            names = os.listdir(dir or os.curdir)
+        except os.error, msg:
+            print msg
+            return []
+        list = []
+        subdirs = []
+        for name in names:
+            fn = os.path.join(dir, name)
+            if os.path.isdir(fn):
+                subdirs.append(fn)
+            else:
+                if fnmatch.fnmatch(name, base):
+                    list.append(fn)
+        if recursive:
+            for subdir in subdirs:
+                list.extend(self.findfiles(subdir, base, recursive))
+        return list
+
 # Let's start!
 Gtk.Application.Init()
 #------------------------------
