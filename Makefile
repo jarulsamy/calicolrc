@@ -1,4 +1,4 @@
-BUILD=0.1.5
+BUILD=0.1.6
 
 all: modules/Graphics.dll modules/Myro.dll languages/PJScheme.dll \
 	modules/Conx.dll
