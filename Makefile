@@ -33,8 +33,8 @@ pyjama.exe: src/pyjama.cs
 		-r:IronPython \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \
+		-r:Microsoft.Scripting.ExtensionAttribute \
 		-out:pyjama.exe 
-
 
 # mono ../bin/ipy.exe ../bin/pyc.py *.py /main:__main__.py /target:exe
 # ISSUES:

@@ -103,7 +103,7 @@ class ShellWindow(Window):
                    (Gtk.Stock.Stop, self.on_stop),
                    ]
         self.make_gui(menu, toolbar)
-        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+        Gtk.Application.Invoke(self.stop_running)
         self.history = History()
         self.statusbar = Gtk.Statusbar()
         self.statusbar.Show()
@@ -262,7 +262,7 @@ class ShellWindow(Window):
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             self.message("Stopping...\n")
             self.executeThread.Abort()
-        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+        Gtk.Application.Invoke(self.stop_running)
 
     # these aren't needed?
     def on_new_file(self, obj, event):
@@ -296,9 +296,9 @@ class ShellWindow(Window):
 
         def background():
             self.message("Loading file '%s'...\n" % filename)
-            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+            Gtk.Application.Invoke(self.start_running)
             self.project.engine[language].execute_file(filename)
-            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+            Gtk.Application.Invoke(self.stop_running)
             self.message("Done loading file.\n")
 
         self.executeThread = System.Threading.Thread(
@@ -339,15 +339,21 @@ class ShellWindow(Window):
         self.update_gui()
         self.execute_in_background(text)
 
+    def start_running(self, sender, args):
+        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+
+    def stop_running(self, sender, args):
+        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+
     def execute_in_background(self, text):
         if (self.executeThread and 
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             return
 
         def background():
-            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+            Gtk.Application.Invoke(self.start_running)
             self.project.engine[self.language].execute(text)
-            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+            Gtk.Application.Invoke(self.stop_running)
 
         self.executeThread = System.Threading.Thread(
                                 System.Threading.ThreadStart(background))
