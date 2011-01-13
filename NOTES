@@ -1,1 +1,9 @@
-Need to build gtksourceview-sharp on windows
+1. Need to build gtksourceview-sharp on windows
+
+2. opening a file with no extension causes lockup
+
+3. clicking in mandelbrot window cause lockup
+
+4. need gtkscourceview, or need to make indent do right thing
+
+5. (robot.beep 1.0 400.0 400.0) needs to be floats
