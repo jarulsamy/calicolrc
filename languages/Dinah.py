@@ -15,6 +15,7 @@ from utils import Language
 from document import BaseDocument, MyScrolledWindow
 from engine import Engine
 import glob
+import os
 
 # color names
 blue = Gdk.Color(70, 227, 207)
@@ -876,7 +877,8 @@ class DinahEngine(Engine):
         super(DinahEngine, self).setup()
         for file in glob.glob("modules/*.dll"):
             #path, dll_name = os.path.split(file)
-            clr.AddReference(file)
+            full_path = os.path.abspath(file)
+            clr.AddReference(full_path)
 
     def execute_file(self, filename):
         print("Run filename '%s'!" % filename)

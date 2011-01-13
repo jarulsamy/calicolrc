@@ -83,7 +83,8 @@ class DLREngine(Engine):
         # ---------------------------------------
         for file in glob.glob("modules/*.dll"):
             #path, dll_name = os.path.split(file)
-            clr.AddReference(file)
+            full_path = os.path.abspath(file)
+            clr.AddReference(full_path)
         for assembly in clr.References:
             self.engine.Runtime.LoadAssembly(assembly)
         # ---------------------------------------

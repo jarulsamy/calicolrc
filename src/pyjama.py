@@ -1,9 +1,13 @@
 # Setup environment:
-import sys, os, traceback
+import sys
+for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
+    sys.path.append(dir)
+import os, traceback
 sys.path.append(os.path.abspath("modules"))
 
 # Add some paths for Windows:
 import Microsoft
+import System
 try:
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
 except:
@@ -235,7 +239,8 @@ class PyjamaProject(object):
 Gtk.Application.Init()
 #------------------------------
 try:
-    pw = PyjamaProject(sys.argv[1:])
+    pw = PyjamaProject(sys.argv[1:] or 
+                       list(System.Environment.GetCommandLineArgs())[1:])
 except:
     traceback.print_exc()
     sys.exit()
