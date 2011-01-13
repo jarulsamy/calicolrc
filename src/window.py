@@ -31,11 +31,13 @@ class Window(object):
         self.toolbar = Gtk.Toolbar()
         self.toolbar.ToolbarStyle = Gtk.ToolbarStyle.Icons
         i = 0
+        self.toolbar_buttons = {}
         for (img, function) in toolbar:
             if img is None:
                 tool_item = Gtk.SeparatorToolItem()
             else:
                 tool_item = Gtk.ToolButton(img)
+                self.toolbar_buttons[img] = tool_item
             if function:
                 tool_item.Clicked += function
             self.toolbar.Insert(tool_item, i)

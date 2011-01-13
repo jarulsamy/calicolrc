@@ -11,7 +11,7 @@ for x in range(4):
     turtle.draw(win)
     turtles.append(turtle)
 
-win.mode = "animate"
+win.mode = "manual"
 
 #turtle.pen_down()
 #turtle
@@ -25,7 +25,7 @@ for x in range(10):
     poly.rotate(36)
     win.step()
 
-win.animate_step_time = 20
+win.step_time = 100
 for x in range(360):
     group.rotate(1)
     win.step()

@@ -129,7 +129,7 @@ class PyjamaProject(object):
         doc = self.get_current_doc()
         if doc and doc.textview.HasFocus:
             text = str(doc.textview.Buffer.Text)
-            doc.execute(text, "Loading file...")
+            doc.execute(text)
         else:
             self.command_pane.textview.HasFocus = True
             text = str(self.command_pane.textview.Buffer.Text)

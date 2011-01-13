@@ -13,19 +13,6 @@ from System.Threading import ManualResetEvent
 
 DEBUG = False
 
-## FIXME: how do you kill this:
-if DEBUG:
-    def BGThread(fun):
-        return fun
-else:
-    def BGThread(fun):  
-        def argUnpacker(args):  
-            fun(*args) 
-        def wrapper(*args):  
-            System.Threading.ThreadPool.QueueUserWorkItem(
-                System.Threading.WaitCallback(argUnpacker), args) 
-        return wrapper 
-
 class History(object):
     def __init__(self):
         self.history = []
@@ -74,6 +61,7 @@ class MyWindow(Gtk.Window):
 class ShellWindow(Window):
     def __init__(self, project):
         self.project = project
+        self.executeThread = None
         self.language = "python"
         self.lang_manager = None
         self.window = MyWindow(_("Pyjama Shell"))
@@ -112,8 +100,10 @@ class ShellWindow(Window):
         toolbar = [(Gtk.Stock.New, self.on_new_file),
                    (Gtk.Stock.Open, self.on_open_file),
                    (Gtk.Stock.Apply, self.on_run),
+                   (Gtk.Stock.Stop, self.on_stop),
                    ]
         self.make_gui(menu, toolbar)
+        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
         self.history = History()
         self.statusbar = Gtk.Statusbar()
         self.statusbar.Show()
@@ -194,7 +184,7 @@ class ShellWindow(Window):
                 languages)
 
     def update_gui(self):
-        self.window.Title = _("%s - Pyjama Shell") % self.language.title()
+        self.set_title(_("%s - Pyjama Shell") % self.language.title())
         self.prompt.Text = "%-6s>" % self.language
         self.statusbar.Pop(0)
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
@@ -265,6 +255,12 @@ class ShellWindow(Window):
     def on_run(self, obj, event):
         pass
 
+    def on_stop(self, obj, event):
+        self.message("Stopping...\n")
+        if self.executeThread:
+            self.executeThread.Abort()
+        self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+
     # these aren't needed?
     def on_new_file(self, obj, event):
         self.project.setup_editor()
@@ -287,11 +283,29 @@ class ShellWindow(Window):
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
         Gtk.Application.Invoke(invoke)
 
-    @BGThread
+    def set_title(self, text):
+        self.window.Title = text
+
     def execute_file(self, filename, language):
-        return self.project.engine[language].execute_file(filename)
+        if (self.executeThread and 
+            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+            return
+
+        def background():
+            self.message("Loading file '%s'...\n" % filename)
+            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+            self.project.engine[language].execute_file(filename)
+            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+            self.message("Done loading file.\n")
+
+        self.executeThread = System.Threading.Thread(
+                                System.Threading.ThreadStart(background))
+        self.executeThread.Start()
 
     def execute(self, text, language):
+        if (self.executeThread and 
+            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+            return
         self.textview.Buffer.Clear()
         prompt = "%-6s> " % language
         for line in text.split("\n"):
@@ -322,9 +336,19 @@ class ShellWindow(Window):
         self.update_gui()
         self.execute_in_background(text)
 
-    @BGThread
     def execute_in_background(self, text):
-        self.project.engine[self.language].execute(text)
+        if (self.executeThread and 
+            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+            return
+
+        def background():
+            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+            self.project.engine[self.language].execute(text)
+            self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+
+        self.executeThread = System.Threading.Thread(
+                                System.Threading.ThreadStart(background))
+        self.executeThread.Start()
 
     def ready_for_execute(self, text):
         return self.project.engine[self.language].ready_for_execute(text)
