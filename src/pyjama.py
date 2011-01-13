@@ -60,6 +60,7 @@ def get_registered_languages():
     sys.path.append(os.path.abspath("languages"))
     results = {}
     for filename in glob.glob("languages/*.py"):
+        if "Sympl" in filename: continue
         try:
             import_name, ext = os.path.basename(filename).rsplit(".")
             exec("import %s as LanguageModule" % import_name)

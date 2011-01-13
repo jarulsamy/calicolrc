@@ -1,7 +1,7 @@
 from Graphics import *
 import random
 
-file = "examples/blankenship.jpg"
+file = "examples/images/blankenship.jpg"
 win = Window("Laura")
 pic = Picture(file)
 pic.draw(win)

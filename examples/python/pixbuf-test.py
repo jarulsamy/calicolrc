@@ -1,6 +1,6 @@
 from Graphics import *
 win = Window()
-pic = Picture("/home/dblank/Desktop/blankenship.jpg")
+pic = Picture("examples/images/blankenship.jpg")
 pic.center.x = win.width/2
 pic.center.y = win.height/2
 pic.draw(win)

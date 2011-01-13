@@ -134,7 +134,6 @@ class ShellWindow(Window):
             self.textview.AcceptsTab = True
         except:
             self.textview = Gtk.TextView()
-        #self.textview.KeyPressEvent += self.on_key_press
         self.textview.Show()
         self.textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
         self.scrolled_window.AddWithViewport(self.textview)
@@ -179,7 +178,8 @@ class ShellWindow(Window):
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
                 num += 1
         return ([("Run", Gtk.Stock.Apply, "F5", self.on_run),
-                 ("Restart Shell", None, "<control>r", self.reset_shell),
+                 ("Restart shell", None, "<control>r", self.reset_shell),
+                 ("Stop script", None, "Escape", self.on_stop),
                  None] + 
                 languages)
 
@@ -190,7 +190,9 @@ class ShellWindow(Window):
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
 
     def on_key_press(self, event):
-        if str(event.Key) == "Return":
+        #if event is not None:
+        #    self.message(str(event.Key))
+        if event is None or str(event.Key) == "Return":
             end = self.textview.Buffer.EndIter
             start = self.textview.Buffer.StartIter
             text = self.textview.Buffer.GetText(start, end, False)
@@ -253,11 +255,12 @@ class ShellWindow(Window):
         return True
 
     def on_run(self, obj, event):
-        pass
+        self.on_key_press(None)
 
     def on_stop(self, obj, event):
-        self.message("Stopping...\n")
-        if self.executeThread:
+        if (self.executeThread and 
+            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+            self.message("Stopping...\n")
             self.executeThread.Abort()
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
 
