@@ -193,6 +193,15 @@
     // Make a C# function that when evaluated will 
     // call apply on the proc
     return delegate (object[] args) { 
+      object temp_k_reg, temp_k2_reg, temp_handler_reg, temp_env_reg, temp_args_reg, temp_proc_reg, retval;
+      // make backups:
+      temp_k_reg = k_reg;
+      temp_k2_reg = k2_reg;
+      temp_handler_reg = handler_reg;
+      temp_env_reg = env_reg;
+      temp_args_reg = args_reg;
+      temp_proc_reg = proc_reg;
+      // set up registers:
       k_reg = init_cont;
       k2_reg = init_cont;
       handler_reg = init_handler;
@@ -200,7 +209,15 @@
       args_reg = PJScheme.list ((object) args);
       proc_reg = proc;
       pc = (Function) apply_proc;
-      return (object) PJScheme.trampoline();
+      retval = (object) PJScheme.trampoline();
+      // Put things back the way they were:
+      k_reg = temp_k_reg;
+      k2_reg = temp_k2_reg;
+      handler_reg = temp_handler_reg;
+      env_reg = temp_env_reg;
+      args_reg = temp_args_reg;
+      proc_reg = temp_proc_reg;
+      return retval;
     };
   }
 ")
