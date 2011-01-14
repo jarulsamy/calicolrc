@@ -11,11 +11,11 @@ class MyScrolledWindow(Gtk.ScrolledWindow):
     """
 
 class BaseDocument(object):
-    def __init__(self, filename, project, language="python"):
+    def __init__(self, filename, pyjama, language="python"):
         self.filename = filename
         if filename:
             filename = os.path.abspath(filename)
-        self.project = project
+        self.pyjama = pyjama
         self.language = language
         if self.filename:
             self.title = os.path.basename(self.filename)
@@ -59,7 +59,7 @@ class BaseDocument(object):
         button.Add(img)
         button.Show()
         button.Clicked += lambda obj, event: \
-            self.project.editor.on_close_tab(self.widget)
+            self.pyjama.editor.on_close_tab(self.widget)
         self.tab.PackEnd(button)
 
     def on_modified(self, obj, event):
@@ -109,7 +109,7 @@ class BaseDocument(object):
     def save_as(self):
         retval = False
         fc = Gtk.FileChooserDialog("Enter the file to save",
-                                   self.project.editor.window,
+                                   self.pyjama.editor.window,
                                    Gtk.FileChooserAction.Save,
                                    "Cancel", Gtk.ResponseType.Cancel,
                                    "Save", Gtk.ResponseType.Accept)
@@ -123,7 +123,7 @@ class BaseDocument(object):
         return retval
 
     def on_change_file(self):
-        self.language = self.project.get_language_from_filename(self.filename)
+        self.language = self.pyjama.get_language_from_filename(self.filename)
 
 try:
     import clr

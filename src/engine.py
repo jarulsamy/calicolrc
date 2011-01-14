@@ -9,8 +9,8 @@ import System
 from utils import CustomStream
 
 class EngineManager(object):
-    def __init__(self, project):
-        self.project = project
+    def __init__(self, pyjama):
+        self.pyjama = pyjama
         self.scriptRuntimeSetup = Microsoft.Scripting.Hosting.ScriptRuntimeSetup()
         self.engine = {}	
 
@@ -28,7 +28,7 @@ class EngineManager(object):
     	self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
             self.scriptRuntimeSetup)
     	self.scope = self.runtime.CreateScope()
-        self.scope.SetVariable("pyjama", self.project)
+        self.scope.SetVariable("pyjama", self.pyjama)
         for engine in self.engine:
             self.engine[engine].setup()
 

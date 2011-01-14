@@ -1,11 +1,13 @@
 import Gtk
+import GLib
+import System
 
 from window import Window
 from utils import _
 
 class EditorWindow(Window):
-    def __init__(self, project, files=None):
-        self.project = project
+    def __init__(self, pyjama, files=None):
+        self.pyjama = pyjama
         # create the parts
         self.window = Gtk.Window(_("Pyjama Editor"))
         self.window.SetDefaultSize(600, 550)
@@ -35,8 +37,8 @@ class EditorWindow(Window):
                 ("She_ll", [("Run", Gtk.Stock.Apply,
                             "F5", self.on_run)]),
                 ("Windows", [
-                    ("Editor", None, "F6", self.project.setup_editor),
-                    ("Shell", None, "F7", self.project.setup_shell),
+                    ("Editor", None, "F6", self.pyjama.setup_editor),
+                    ("Shell", None, "F7", self.pyjama.setup_shell),
                     ]),
                 ("O_ptions", []),
                 ("_Help", []),
@@ -90,19 +92,41 @@ class EditorWindow(Window):
             self.window.Title = _("Pyjama Editor")
 
     def select_or_open(self, filename, lineno=0):
+        """
+        Open, or select a file if already opened.
+        lineno == 0 means don't care, otherwise go to
+        a specific line number.
+        """
+        page = None
         # if already open, select it
         for page_num in range(self.notebook.NPages):
-            page = self.notebook.GetNthPage(page_num)
-            if page.document.filename == filename:
+            npage = self.notebook.GetNthPage(page_num)
+            if npage.document.filename == filename:
                 self.notebook.CurrentPage = page_num
-                return 
-        page = self.make_document(filename)
-        page_num = self.notebook.AppendPage(page.widget, page.tab)
-        self.notebook.CurrentPage = page_num
+                page = npage
+                break
+        if page is None:
+            page = self.make_document(filename)
+            page_num = self.notebook.AppendPage(page.widget, page.tab)
+            self.notebook.CurrentPage = page_num
+        if page and lineno != 0:
+            Gtk.Application.Invoke(lambda s, a: self.goto_line(lineno))
+        # Finally, remove temp page, if one:
         if self.notebook.NPages == 2:
             doc0 = self.notebook.GetNthPage(0).document
-            if doc0.filename == None and not doc0.get_dirty():
+            if doc0.filename is None and not doc0.get_dirty():
                 self.notebook.RemovePage(0)
+
+    def goto_line(self, lineno):
+        """
+        Go to a line number in the current document. Call with [1, n]. Internally,
+        linenumbers are zero-based.
+        """
+        # This should occur in a Gtk.Application.Invoke()
+        doc = self.get_current_doc()
+        line = doc.textview.Buffer.GetIterAtLine(lineno - 1)
+        doc.textview.Buffer.PlaceCursor(line)
+        GLib.Timeout.Add(100, lambda: doc.textview.ScrollToIter(line, 0.4, True, 0, 1.0))
 
     def on_open_file(self, obj, event):
         retval = False
@@ -122,7 +146,7 @@ class EditorWindow(Window):
         self.notebook.RemovePage(page_num)
 
     def on_new_file(self, obj, event, language="python"):
-        page = self.project.languages[language].get_document_class()(None, self.project, language)
+        page = self.pyjama.languages[language].get_document_class()(None, self.pyjama, language)
         page_num = self.notebook.AppendPage(page.widget, page.tab)
         self.notebook.CurrentPage = page_num
         doc0 = self.notebook.GetNthPage(0).document
@@ -131,7 +155,7 @@ class EditorWindow(Window):
 
     def make_new_file_menu(self):
         retval = []
-        for lang in self.project.languages:
+        for lang in self.pyjama.languages:
             retval.append(
                 ("New %s Script" % lang.title(), None, 
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
@@ -139,17 +163,18 @@ class EditorWindow(Window):
         return retval
 
     def make_document(self, filename):
+        # FIXME: allow TXT types files, just to edit
         if filename:
             if "." in filename:
                 pathname, extension = filename.rsplit(".")
             else:
                 pathname, extension = filename, ""
-            for lang in self.project.languages:
-                if self.project.languages[lang].extension == extension:
-                    page = self.project.languages[lang].get_document_class()(filename, self.project, lang)
+            for lang in self.pyjama.languages:
+                if self.pyjama.languages[lang].extension == extension:
+                    page = self.pyjama.languages[lang].get_document_class()(filename, self.pyjama, lang)
                     return page
-        # FIXME: get default from config 
-        page = self.project.languages["python"].get_document_class()(filename, self.project, "python")
+        # FIXME: get default type of file from config 
+        page = self.pyjama.languages["python"].get_document_class()(filename, self.pyjama, "python")
         return page
 
     def on_save_file(self, obj, event):
@@ -172,11 +197,11 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             if doc.save():
-                self.project.setup_shell()
-                self.project.shell.execute_file(doc.filename, doc.language)
+                self.pyjama.setup_shell()
+                self.pyjama.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):
-        self.project.on_close("editor")
+        self.pyjama.on_close("editor")
         return True
 
     def on_quit(self, obj, event):

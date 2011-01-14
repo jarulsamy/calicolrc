@@ -60,8 +60,8 @@ class MyWindow(Gtk.Window):
                 Gtk.Window.OnKeyPressEvent(self, event))
 
 class ShellWindow(Window):
-    def __init__(self, project):
-        self.project = project
+    def __init__(self, pyjama):
+        self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
         self.lang_manager = None
@@ -71,10 +71,10 @@ class ShellWindow(Window):
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.history_textview = Gtk.TextView()
         # Set up all of the engines:
-        self.project.engine.set_redirects(CustomStream(self.history_textview), 
-                                          CustomStream(self.history_textview,
-                                                       "red"), 
-                                          None)
+        self.pyjama.engine.set_redirects(CustomStream(self.history_textview), 
+                                         CustomStream(self.history_textview,
+                                                      "red"), 
+                                         None)
         self.vbox = Gtk.VBox()
         # ---------------------
         # make menu:
@@ -92,8 +92,8 @@ class ShellWindow(Window):
                 ("_Edit", []),
                 ("She_ll", self.make_language_menu()),
                 ("Windows", [
-                    ("Editor", None, "F6", self.project.setup_editor),
-                    ("Shell", None, "F7", self.project.setup_shell),
+                    ("Editor", None, "F6", self.pyjama.setup_editor),
+                    ("Shell", None, "F7", self.pyjama.setup_shell),
                     ]),
                 ("O_ptions", []),
                 ("_Help", []),
@@ -165,15 +165,15 @@ class ShellWindow(Window):
         # FIXME EXCEPTION HANDLER
         sys.stdout = CustomStream(self.history_textview, "black")
         sys.stderr = CustomStream(self.history_textview, "red")
-        self.project.engine.set_redirects(sys.stdout, sys.stderr, None)
+        self.pyjama.engine.set_redirects(sys.stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
 
     def make_language_menu(self):
         languages = []
         num = 1
-        for lang in sorted(self.project.engine.get_languages()):
-            if self.project.engine[lang].text_based:
+        for lang in sorted(self.pyjama.engine.get_languages()):
+            if self.pyjama.engine[lang].text_based:
                 languages.append(["Change to %s" % lang.title(), 
                     None, "<control>%d" % num, 
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
@@ -252,7 +252,7 @@ class ShellWindow(Window):
         Gtk.Application.Quit()
 
     def on_close(self, obj, event):
-        self.project.on_close("shell")
+        self.pyjama.on_close("shell")
         return True
 
     def on_run(self, obj, event):
@@ -267,15 +267,15 @@ class ShellWindow(Window):
 
     # these aren't needed?
     def on_new_file(self, obj, event):
-        self.project.setup_editor()
-        self.project.editor.on_new_file(obj, event)
+        self.pyjama.setup_editor()
+        self.pyjama.editor.on_new_file(obj, event)
 
     def on_open_file(self, obj, event):
-        self.project.setup_editor()
-        self.project.editor.on_open_file(obj, event)
+        self.pyjama.setup_editor()
+        self.pyjama.editor.on_open_file(obj, event)
 
     def reset_shell(self, obj, event):
-        self.project.engine.reset()
+        self.pyjama.engine.reset()
         self.message("-----------\n")
         self.message("Reset shell\n")
         self.message("-----------\n")
@@ -298,7 +298,7 @@ class ShellWindow(Window):
         def background():
             self.message("Loading file '%s'...\n" % filename)
             Gtk.Application.Invoke(self.start_running)
-            self.project.engine[language].execute_file(filename)
+            self.pyjama.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
             self.message("Done loading file.\n")
 
@@ -329,7 +329,7 @@ class ShellWindow(Window):
         elif text and text[0:2] == "#;":
             text = text[2:].strip()
             command = text.lower()
-            if command in self.project.engine.get_languages():
+            if command in self.pyjama.engine.get_languages():
                 self.language = command
                 self.update_gui()
                 return True
@@ -353,7 +353,7 @@ class ShellWindow(Window):
 
         def background():
             Gtk.Application.Invoke(self.start_running)
-            self.project.engine[self.language].execute(text)
+            self.pyjama.engine[self.language].execute(text)
             Gtk.Application.Invoke(self.stop_running)
 
         self.executeThread = System.Threading.Thread(
@@ -361,11 +361,11 @@ class ShellWindow(Window):
         self.executeThread.Start()
 
     def ready_for_execute(self, text):
-        return self.project.engine[self.language].ready_for_execute(text)
+        return self.pyjama.engine[self.language].ready_for_execute(text)
 
     def goto_file(self, filename, lineno):
-        self.project.setup_editor()
-        self.project.editor.select_or_open(filename, lineno)
+        self.pyjama.setup_editor()
+        self.pyjama.editor.select_or_open(filename, lineno)
 
     def popup(self, textview, popup_args):
         mark = textview.Buffer.InsertMark
