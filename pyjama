@@ -1,7 +1,2 @@
 #!/bin/sh
-if [ "$1" = "--debug" ]; then
-        MONO_OPTIONS="--debug"
-        shift
-fi
-OPTIONS="-X:FullFrames -X:ShowClrExceptions -X:Debug -X:ExceptionDetail"
-MONO_PATH=bin /usr/bin/env mono $MONO_OPTIONS pyjama.exe "$@"
+/usr/bin/env mono $MONO_OPTIONS bin/pyjama.exe "$@"
