@@ -28,7 +28,9 @@ class EngineManager(object):
     	self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
             self.scriptRuntimeSetup)
     	self.scope = self.runtime.CreateScope()
+        # Create pyjama as a module:
         self.scope.SetVariable("pyjama", self.pyjama)
+        # Set up language engines:
         for engine in self.engine:
             self.engine[engine].setup()
 
