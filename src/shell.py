@@ -1,6 +1,7 @@
 # Bring .NET References into IronPython scope:
 import Gtk, Pango
 import System
+import re
 
 from window import Window
 from utils import _, CustomStream
@@ -145,7 +146,7 @@ class ShellWindow(Window):
             tag.Foreground = color 
             self.history_textview.Buffer.TagTable.Add(tag)
         self.history_textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
-
+        self.history_textview.PopulatePopup += self.popup
         self.history_textview.WrapMode = Gtk.WrapMode.Word
         self.history_textview.Editable = False
         self.results.Add(self.history_textview)
@@ -361,3 +362,25 @@ class ShellWindow(Window):
 
     def ready_for_execute(self, text):
         return self.project.engine[self.language].ready_for_execute(text)
+
+    def goto_file(self, filename, lineno):
+        self.project.setup_editor()
+        self.project.editor.select_or_open(filename, lineno)
+
+    def popup(self, textview, popup_args):
+        mark = textview.Buffer.InsertMark
+        iter = textview.Buffer.GetIterAtMark(mark)
+        start = textview.Buffer.GetIterAtLine(iter.Line)
+        iter.Offset = start.Offset + start.CharsInLine
+        text = textview.Buffer.GetText(start, iter, False) # invisible chars
+
+        match = re.search('File \"(.*)\", line (\d*)', text)
+        if match: # 'File "<string>", line 167'
+            filename, lineno = match.groups()
+            lineno = int(lineno)
+            basename = os.path.basename(filename)
+            filename = os.path.abspath(filename)
+            menuitem = Gtk.MenuItem("Edit %s" % basename)
+            Gtk.Application.Invoke(lambda s, a: menuitem.Show())
+            menuitem.Activated += lambda w, e: self.goto_file(filename, lineno)
+            popup_args.Menu.Append(menuitem)

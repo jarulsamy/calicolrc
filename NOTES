@@ -7,3 +7,12 @@
 4. need gtkscourceview, or need to make indent do right thing
 
 5. (robot.beep 1.0 400.0 400.0) needs to be floats
+
+6. Need icon
+
+7. make sure to do graphics init for all objects
+   make sure to do update for all changes
+
+8. When you try to open a file, look through open ones first
+
+9. Right-click in history_textview to edit file/lineno

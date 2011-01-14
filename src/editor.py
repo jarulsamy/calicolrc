@@ -89,6 +89,21 @@ class EditorWindow(Window):
             self.statusbar.Push(0, _("Language: "))
             self.window.Title = _("Pyjama Editor")
 
+    def select_or_open(self, filename, lineno=0):
+        # if already open, select it
+        for page_num in range(self.notebook.NPages):
+            page = self.notebook.GetNthPage(page_num)
+            if page.document.filename == filename:
+                self.notebook.CurrentPage = page_num
+                return 
+        page = self.make_document(filename)
+        page_num = self.notebook.AppendPage(page.widget, page.tab)
+        self.notebook.CurrentPage = page_num
+        if self.notebook.NPages == 2:
+            doc0 = self.notebook.GetNthPage(0).document
+            if doc0.filename == None and not doc0.get_dirty():
+                self.notebook.RemovePage(0)
+
     def on_open_file(self, obj, event):
         retval = False
         fc = Gtk.FileChooserDialog("Select the file to open",
@@ -97,12 +112,7 @@ class EditorWindow(Window):
                                    "Cancel", Gtk.ResponseType.Cancel,
                                    "Open", Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
-            page = self.make_document(fc.Filename)
-            page_num = self.notebook.AppendPage(page.widget, page.tab)
-            self.notebook.CurrentPage = page_num
-            doc0 = self.notebook.GetNthPage(0).document
-            if doc0.filename == None and not doc0.get_dirty():
-                self.notebook.RemovePage(0)
+            self.select_or_open(fc.Filename)
             retval = True
         fc.Destroy()
         return retval
