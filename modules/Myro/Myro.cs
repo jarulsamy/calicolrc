@@ -65,6 +65,10 @@ public static class Myro {
 	robot.beep(duration, frequency, frequency2);
   }
 
+  public static Graphics.Window show(Picture picture) {
+	return new Graphics.Window("default");
+  }
+
   public static string flipCoin() {
 	if (Random.random() < .5) {
 	  return "heads";
