@@ -33,9 +33,8 @@ class EditorWindow(Window):
                   ("Quit", Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", []),
-                ("She_ll", [("Run", Gtk.Stock.Apply,
-                            "F5", self.on_run)]),
+                ("_Edit", [
+                    ("Run", Gtk.Stock.Apply, "F5", self.on_run)]),
                 ("Windows", [
                     ("Editor", None, "F6", self.pyjama.setup_editor),
                     ("Shell", None, "F7", self.pyjama.setup_shell),

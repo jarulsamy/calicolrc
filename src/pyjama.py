@@ -80,7 +80,7 @@ class PyjamaProject(object):
         self.shell = None
         self.editor = None
         self.languages = get_registered_languages()
-	self.engine = EngineManager(self)
+        self.engine = EngineManager(self)
         for lang in self.languages:
             language = self.languages[lang]
             lclass = language.get_engine_class()

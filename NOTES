@@ -12,3 +12,9 @@
    make sure to do update for all changes
 
 10. glib.io_add_watch - watch to see if someone else edits file
+
+11. handle tabs in env with no 
+
+13. toggle word wrap
+
+12. connect menu edit/copy/paste/select all

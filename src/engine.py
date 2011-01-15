@@ -12,7 +12,7 @@ class EngineManager(object):
     def __init__(self, pyjama):
         self.pyjama = pyjama
         self.scriptRuntimeSetup = Microsoft.Scripting.Hosting.ScriptRuntimeSetup()
-        self.engine = {}	
+        self.engine = {}
 
     def __getitem__(self, name):
         return self.engine[name]
@@ -25,9 +25,9 @@ class EngineManager(object):
         self.engine[engine.language] = engine
 
     def setup(self): 
-    	self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
+        self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
             self.scriptRuntimeSetup)
-    	self.scope = self.runtime.CreateScope()
+        self.scope = self.runtime.CreateScope()
         # Create pyjama as a module:
         self.scope.SetVariable("pyjama", self.pyjama)
         # Set up language engines:
@@ -78,7 +78,7 @@ class DLREngine(Engine):
         # True? A hint from the interwebs:
         #options["Debug"] = true;
         #Python.CreateEngine(options);
-	self.engine = self.manager.runtime.GetEngine(self.dlr_name)
+        self.engine = self.manager.runtime.GetEngine(self.dlr_name)
         # Load mscorlib.dll:
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(System.String).Assembly)

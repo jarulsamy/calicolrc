@@ -1,5 +1,5 @@
 # Bring .NET References into IronPython scope:
-import Gtk, Pango
+import Gtk, Gdk, Pango
 import System
 import re
 
@@ -89,7 +89,12 @@ class ShellWindow(Window):
                   ("Quit", Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", []),
+                ("_Edit", [
+                    ("_Copy", None, None, None),
+                    ("_Paste", None, None, None),
+                    ("Cut", None, None, None),
+                    ("Select all", Gtk.Stock.SelectAll, None, None),
+                          ]),
                 ("She_ll", self.make_language_menu()),
                 ("Windows", [
                     ("Editor", None, "F6", self.pyjama.setup_editor),
@@ -135,6 +140,8 @@ class ShellWindow(Window):
             self.textview.AcceptsTab = True
         except:
             self.textview = Gtk.TextView()
+            self.textview.WrapMode = Gtk.WrapMode.Char
+            self.textview.AcceptsTab = True
         self.textview.Show()
         self.textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
         self.scrolled_window.AddWithViewport(self.textview)
@@ -168,7 +175,14 @@ class ShellWindow(Window):
         self.pyjama.engine.set_redirects(sys.stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
-
+        # Setup clipboard stuff:
+        self.clipboard = Gtk.Clipboard.Get(
+              Gdk.Atom.Intern("CLIPBOARD", True))
+    
+    def OnCopyClicked(self, obj, args):
+        #self.clipboard.SetText("xxx")
+        pass
+    
     def make_language_menu(self):
         languages = []
         num = 1
@@ -179,6 +193,7 @@ class ShellWindow(Window):
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
                 num += 1
         return ([("Run", Gtk.Stock.Apply, "F5", self.on_run),
+                 ("Clear", None, "<control>Delete", self.clear),
                  ("Restart shell", None, "<control>r", self.reset_shell),
                  ("Stop script", None, "Escape", self.on_stop),
                  None] + 
@@ -247,6 +262,11 @@ class ShellWindow(Window):
 
     def on_save_file_as(self, obj, event):
         pass
+
+    def clear(self, obj, event):
+        def invoke_clear(sender, args):
+            self.history_textview.Buffer.Text = ''
+        Gtk.Application.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
         Gtk.Application.Quit()
