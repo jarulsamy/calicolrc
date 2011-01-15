@@ -135,13 +135,11 @@ class ShellWindow(Window):
             self.textview.IndentWidth = 4
             self.textview.Buffer.Language = self.lang_manager.GetLanguage(
                 self.language)
-            self.textview.Editable = True
-            self.textview.WrapMode = Gtk.WrapMode.Word
-            self.textview.AcceptsTab = True
         except:
             self.textview = Gtk.TextView()
-            self.textview.WrapMode = Gtk.WrapMode.Char
-            self.textview.AcceptsTab = True
+        self.textview.Editable = True
+        self.textview.WrapMode = Gtk.WrapMode.Char
+        self.textview.AcceptsTab = True
         self.textview.Show()
         self.textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
         self.scrolled_window.AddWithViewport(self.textview)
@@ -154,7 +152,7 @@ class ShellWindow(Window):
             self.history_textview.Buffer.TagTable.Add(tag)
         self.history_textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
         self.history_textview.PopulatePopup += self.popup
-        self.history_textview.WrapMode = Gtk.WrapMode.Word
+        self.history_textview.WrapMode = Gtk.WrapMode.Char
         self.history_textview.Editable = False
         self.results.Add(self.history_textview)
         self.results.Show()
@@ -221,6 +219,9 @@ class ShellWindow(Window):
                     self.history.add(text)
                 self.execute(text, self.language)
                 return True
+        #elif str(event.Key) == "Tab":
+        #    Gtk.Application.Invoke(lambda s,a: self.textview.InsertAtCursor("    "))
+        #    return True
         elif str(event.Key) == "Up":
             mark = self.textview.Buffer.InsertMark
             itermark = self.textview.Buffer.GetIterAtMark(mark)

@@ -80,7 +80,7 @@ class BaseDocument(object):
             Pango.FontDescription.FromString("Monospace 10"))
         self.widget.Add(self.textview)
         self.textview.Editable = True
-        self.textview.WrapMode = Gtk.WrapMode.Word
+        self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.AcceptsTab = True
         self.textview.Show()
         self.widget.Show()
@@ -145,7 +145,7 @@ try:
                 self.language)
             self.widget.Add(self.textview)
             self.textview.Editable = True
-            self.textview.WrapMode = Gtk.WrapMode.Word
+            self.textview.WrapMode = Gtk.WrapMode.Char
             self.textview.AcceptsTab = True
             self.textview.Show()
             self.widget.Show()

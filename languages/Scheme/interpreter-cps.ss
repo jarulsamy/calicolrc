@@ -115,10 +115,18 @@
 			     (set-binding-value! binding rhs-value)
 			     (k '<void>)))))))))
       (define!-exp (var rhs-exp)
-        (m (car rhs-exp) env handler
-          (lambda-cont (rhs-value)
-            (set-global-value! var rhs-value)
-            (k '<void>))))
+        (if (= (length rhs-exp) 1)
+            (m (car rhs-exp) env handler
+              (lambda-cont (rhs-value)
+                 (set-global-value! var rhs-value)
+                 (k '<void>)))
+            (m (cadr rhs-exp) env handler ;; body
+              (lambda-cont (rhs-value)
+		 (m (car rhs-exp) env handler ;; docstring
+ 		    (lambda-cont (docstring)
+                       (set-global-value! var rhs-value)
+                       (set-global-docstring! var docstring)
+    	               (k '<void>)))))))
       (define-syntax-exp (keyword clauses)
 	(lookup-binding-in-first-frame keyword macro-env handler
 	  (lambda-cont (binding)

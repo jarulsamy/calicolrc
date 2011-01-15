@@ -33,8 +33,10 @@ class EditorWindow(Window):
                   ("Quit", Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", [
-                    ("Run", Gtk.Stock.Apply, "F5", self.on_run)]),
+                ("Script", [
+                    ("Run", Gtk.Stock.Apply, "F5", self.on_run),
+                    ("Reset and run", None, "<control>F5", self.on_reset_run),
+                           ]),
                 ("Windows", [
                     ("Editor", None, "F6", self.pyjama.setup_editor),
                     ("Shell", None, "F7", self.pyjama.setup_shell),
@@ -191,6 +193,14 @@ class EditorWindow(Window):
             return self.notebook.GetNthPage(self.notebook.CurrentPage).document
         else:
             return None
+
+    def on_reset_run(self, obj, event):
+        doc = self.get_current_doc()
+        if doc:
+            if doc.save():
+                self.pyjama.setup_shell()
+                self.pyjama.shell.reset_shell(None, None)
+                self.pyjama.shell.execute_file(doc.filename, doc.language)
 
     def on_run(self, obj, event):
         doc = self.get_current_doc()

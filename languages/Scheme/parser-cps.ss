@@ -392,9 +392,19 @@
 			(lambda-cont (docstring)
 			    (k (define-exp (cadr datum) (list docstring body))))))))))
       ((define!? datum)
-       (parse (caddr datum) handler 
-         (lambda-cont (body)
-           (k (define!-exp (cadr datum) (list body))))))
+       (if (mit-style? datum)
+	 (mit-define-transformer datum
+	   (lambda-cont (v)
+	     (parse v handler k)))
+	 (if (= (length datum) 3) ;; (define! x 1)
+	     (parse (caddr datum) handler 
+		(lambda-cont (body)
+		    (k (define!-exp (cadr datum) (list body)))))
+	     (parse (cadddr datum) handler ;; (define! x "" 8)
+		 (lambda-cont (body)
+		    (parse (caddr datum) handler
+			(lambda-cont (docstring)
+			    (k (define!-exp (cadr datum) (list docstring body))))))))))
       ((define-syntax? datum)
        (k (define-syntax-exp (cadr datum) (cddr datum))))
       ((begin? datum)

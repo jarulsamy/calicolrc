@@ -2468,4 +2468,7 @@ public class Vector {
         value);
   }
 
+  public static void set_global_docstring_b(object var, object value) {
+      // FIXME: how to set docstring?
+  }
 }
