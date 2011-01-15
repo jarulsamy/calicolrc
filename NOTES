@@ -1,7 +1,5 @@
 1. Need to build gtksourceview-sharp on windows
 
-2. opening a file with no extension causes lockup
-
 3. clicking in mandelbrot window cause lockup
 
 4. need gtkscourceview, or need to make indent do right thing
@@ -13,6 +11,4 @@
 7. make sure to do graphics init for all objects
    make sure to do update for all changes
 
-8. When you try to open a file, look through open ones first
-
-9. Right-click in history_textview to edit file/lineno
+10. glib.io_add_watch - watch to see if someone else edits file
