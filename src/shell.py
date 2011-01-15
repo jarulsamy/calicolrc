@@ -13,6 +13,8 @@ import System.Threading
 from System.Threading import ManualResetEvent
 
 DEBUG = False
+TRY_TO_USE_SOURCEVIEW = True
+SOURCEVIEW = False # are we using it?
 
 class History(object):
     def __init__(self):
@@ -124,18 +126,22 @@ class ShellWindow(Window):
         self.scrolled_window.ShadowType = Gtk.ShadowType.Out
         self.scrolled_window.HeightRequest = 20
 
-        try:
-            import clr
-            clr.AddReference("gtksourceview2-sharp")
-            import GtkSourceView
-            self.lang_manager = GtkSourceView.SourceLanguageManager()
-            self.textview = GtkSourceView.SourceView()
-            self.textview.ShowLineNumbers = False
-            self.textview.InsertSpacesInsteadOfTabs = True
-            self.textview.IndentWidth = 4
-            self.textview.Buffer.Language = self.lang_manager.GetLanguage(
-                self.language)
-        except:
+        if TRY_TO_USE_SOURCEVIEW:
+            try:
+                import clr
+                clr.AddReference("gtksourceview2-sharp")
+                import GtkSourceView
+                self.lang_manager = GtkSourceView.SourceLanguageManager()
+                self.textview = GtkSourceView.SourceView()
+                self.textview.ShowLineNumbers = False
+                self.textview.InsertSpacesInsteadOfTabs = True
+                self.textview.IndentWidth = 4
+                self.textview.Buffer.Language = self.lang_manager.GetLanguage(
+                    self.language)
+                SOURCEVIEW = True
+            except:
+                self.textview = Gtk.TextView()
+        else:
             self.textview = Gtk.TextView()
         self.textview.Editable = True
         self.textview.WrapMode = Gtk.WrapMode.Char
@@ -207,21 +213,24 @@ class ShellWindow(Window):
         #if event is not None:
         #    self.message(str(event.Key))
         if event is None or str(event.Key) == "Return":
-            end = self.textview.Buffer.EndIter
-            start = self.textview.Buffer.StartIter
-            text = self.textview.Buffer.GetText(start, end, False)
-            if text.strip() == "":
+            # if cursor in middle, insert a Return
+            mark = self.textview.Buffer.InsertMark
+            itermark = self.textview.Buffer.GetIterAtMark(mark)
+            line = itermark.Line
+            if line != self.textview.Buffer.LineCount - 1:
+                return False
+            # else, execute text
+            text = self.textview.Buffer.Text # extra line at end signals ready_to_execute
+            if text == "":
                 return True # nothing to do, but handled
             elif self.ready_for_execute(text):
                 if self.history.dirty and self.history.nextlast():
                     self.history.replace(text)
                 else:
                     self.history.add(text)
-                self.execute(text, self.language)
+                self.textview.Buffer.Clear()
+                self.execute(text.rstrip(), self.language)
                 return True
-        #elif str(event.Key) == "Tab":
-        #    Gtk.Application.Invoke(lambda s,a: self.textview.InsertAtCursor("    "))
-        #    return True
         elif str(event.Key) == "Up":
             mark = self.textview.Buffer.InsertMark
             itermark = self.textview.Buffer.GetIterAtMark(mark)
@@ -252,7 +261,80 @@ class ShellWindow(Window):
                 if text is not None:
                     self.textview.Buffer.Text = text
                     return True
+            # handle these keystrokes, but only when without sourceview
+        elif str(event.Key) == "Tab":
+            mark = self.textview.Buffer.InsertMark
+            current = self.textview.Buffer.GetIterAtMark(mark)
+            pos = current.LineOffset
+            line = current.Line
+            start = self.textview.Buffer.GetIterAtLine(line)
+            text = self.textview.Buffer.GetText(start, current, True)
+            if text.strip():
+                help_text = self.completion(text)
+                if help_text:
+                    self.message(help_text)
+                return True
+            else: # not a completion type tab
+                if not SOURCEVIEW:
+                    self.textview.Buffer.InsertAtCursor("    ")
+                    return True
         return False
+
+    def undent_text(self, text):
+        """
+        Removes same number of spaces from each line, if all indented.
+        """
+        # FIXME: could also remove "......>" from history_text window.
+        spaces = re.match("\s*", text).group()
+        if spaces:
+            lines = []
+            for line in text.split("\n"):
+                if not line.startswith(spaces):
+                    return text
+                else:
+                    lines.append(line[len(spaces):])
+            return "\n".join(lines)
+        return text
+        
+    def completion(self, text):
+        variable = self.find_variable(text)
+        items = []
+        if variable:
+            parts = variable.split(".")
+            root = parts[0]
+            if len(parts) == 1:
+                items = [x for x in self.pyjama.engine.scope.GetVariableNames() if x.startswith(root)]
+            else:
+                partial = parts[-1]
+                (found, value) = self.pyjama.engine.scope.TryGetVariable(root)
+                if found:
+                    for part in parts[1:-1]:
+                        if hasattr(value, part):
+                            value = getattr(value, part)
+                        else:
+                            value = None
+                            break
+                    if value:
+                        items = [x for x in dir(value) if x.startswith(partial) and not x.startswith("_")]
+        if items:           
+            return "Possible completions:\n   " + ("\n   ".join(items)) + "\n"
+        else:
+            return "No completions found for '%s'.\n" % text
+
+    def find_variable(self, text):
+        """
+        Finds variable-like characters in a text.
+        """
+        candidate = ""
+        for char in reversed(text):
+            if char.isalnum() or char in ["_", "."]:
+                candidate += char
+            else:
+                break
+        candidate = "".join(reversed(candidate))
+        if candidate.isdecimal() or candidate.isdigit() or candidate.isnumeric():
+            return None
+        return candidate
 
     def change_to_lang(self, language):
         self.language = language
@@ -327,11 +409,15 @@ class ShellWindow(Window):
                                 System.Threading.ThreadStart(background))
         self.executeThread.Start()
 
+    def load_text(self, text, language):
+        self.language = language
+        self.textview.Buffer.Text = self.undent_text(text.rstrip())
+        self.update_gui()
+
     def execute(self, text, language):
         if (self.executeThread and 
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             return
-        self.textview.Buffer.Clear()
         prompt = "%-6s> " % language
         for line in text.split("\n"):
             end = self.history_textview.Buffer.EndIter

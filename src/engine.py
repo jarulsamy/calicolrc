@@ -12,6 +12,7 @@ class EngineManager(object):
     def __init__(self, pyjama):
         self.pyjama = pyjama
         self.scriptRuntimeSetup = Microsoft.Scripting.Hosting.ScriptRuntimeSetup()
+        #self.scriptRuntimeSetup.DebugMode = True
         self.engine = {}
 
     def __getitem__(self, name):
@@ -30,6 +31,9 @@ class EngineManager(object):
         self.scope = self.runtime.CreateScope()
         # Create pyjama as a module:
         self.scope.SetVariable("pyjama", self.pyjama)
+        # set up other items which can be imported:
+        #self.runtime.Globals.SetVariable("goodname", badname)
+        #[x for x in self.runtime.Globals.GetVariableNames()]
         # Set up language engines:
         for engine in self.engine:
             self.engine[engine].setup()

@@ -4,6 +4,7 @@ import System
 
 from window import Window
 from utils import _
+import os
 
 class EditorWindow(Window):
     def __init__(self, pyjama, files=None):
@@ -72,7 +73,8 @@ class EditorWindow(Window):
         # Open files on command line, or just a New Script:
         if files:
             for file in files:
-                page = self.make_document(file)
+                filename = os.path.abspath(file)
+                page = self.make_document(filename)
                 self.notebook.AppendPage(page.widget, page.tab)
         else:
             page = self.make_document(None)
@@ -207,7 +209,14 @@ class EditorWindow(Window):
         if doc:
             if doc.save():
                 self.pyjama.setup_shell()
-                self.pyjama.shell.execute_file(doc.filename, doc.language)
+                # if text selected, use that
+                (selected, start, end) = doc.textview.Buffer.GetSelectionBounds()
+                if selected:
+                    text = doc.textview.Buffer.GetText(start, end, True)
+                    self.pyjama.shell.load_text(text, doc.language)
+                else:
+                    # else, load file
+                    self.pyjama.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):
         self.pyjama.on_close("editor")
