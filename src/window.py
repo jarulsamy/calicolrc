@@ -1,4 +1,5 @@
 import Gtk
+import Gnome
 
 class Window(object):
     def make_gui(self, menu, toolbar):
@@ -42,3 +43,27 @@ class Window(object):
                 tool_item.Clicked += function
             self.toolbar.Insert(tool_item, i)
             i += 1
+
+    def print_view(self):
+        pj = Gnome.PrintJob(Gnome.PrintConfig.Default())
+        dialog = Gnome.PrintDialog(pj, "Print Test", 0)
+        response = dialog.Run()
+        if (response == Gnome.PrintButtons.Cancel):
+            dialog.Hide()
+            dialog.Dispose()
+	    return
+        gpc = pj.Context
+        self.print_view_to_gc(gpc)
+        pj.Close()
+	if response == Gnome.PrintButtons.Print: 
+            pj.Print()
+        elif response == Gnome.PrintButtons.Preview:
+            Gnome.PrintJobPreview(pj, "Print Test").Show()
+        dialog.Hide()
+	dialog.Dispose()
+
+    def print_view_to_gc(self, gpc):
+        Gnome.Print.Beginpage(gpc, "Pyjama")
+        Gnome.Print.Moveto(gpc, 1, 700)
+        Gnome.Print.Show(gpc, self.textview.Buffer.Text)
+        Gnome.Print.Showpage(gpc)

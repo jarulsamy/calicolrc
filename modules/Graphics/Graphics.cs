@@ -667,9 +667,11 @@ public static class Graphics {
 	}
 
 	public void undraw() {
-	  window.canvas.shapes.Remove(this);
-	  window = null;
-	  QueueDraw();
+	  Gtk.Application.Invoke(delegate { 
+        	  window.canvas.shapes.Remove(this);
+        	  window = null;
+        	  QueueDraw();
+	  });
 	}
   }
   
@@ -988,6 +990,21 @@ public static class Graphics {
 
 	public Pixel [] get_pixels() {
 	  return new Pixel[10];
+	}
+
+  }
+
+  public class Rectangle : Shape {
+	public Rectangle(Point point1, Point point2) : base(true) {
+	  this.points = new Point [4];
+          this.points[0] = new Point(point1.x, point1.y);
+          this.points[1] = new Point(point2.x, point1.y);
+          this.points[2] = new Point(point2.x, point2.y);
+          this.points[3] = new Point(point1.x, point2.y);
+	  compute_center_point();
+	  center.x = points_center.x;
+	  center.y = points_center.y;
+	  compute_points_around_origin();
 	}
 
   }
