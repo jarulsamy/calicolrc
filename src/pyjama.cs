@@ -15,7 +15,7 @@ public class Pyjama {
 	try {
 	  source.Execute(scope);
 	} catch {
-	  System.Console.WriteLine("Pyjama has crashed.");
+            // suppress quit message
 	}
   }
 }

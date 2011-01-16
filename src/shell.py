@@ -4,7 +4,7 @@ import System
 import re
 
 from window import Window
-from utils import _, CustomStream, MUTEX
+from utils import _, CustomStream, MUTEX, ConsoleStream
 
 import traceback
 import sys, os
@@ -59,6 +59,23 @@ class MyWindow(Gtk.Window):
         return (self.on_key_press(event) or 
                 Gtk.Window.OnKeyPressEvent(self, event))
 
+class Shell(object):
+    def __init__(self, pyjama, files):
+        self.DEBUG = False
+        self.pyjama = pyjama
+        self.pyjama.engine.set_redirects(ConsoleStream(), 
+                                         ConsoleStream("red"), None)
+        for file in files:
+            self.execute_file(file, self.pyjama.get_language_from_filename(file))
+
+    def message(self, text):
+        print text,
+
+    def execute_file(self, filename, language):
+        self.message("Loading file '%s'...\n" % filename)
+        self.pyjama.engine[language].execute_file(filename)
+        self.message("Done loading file.\n")
+
 class ShellWindow(Window):
     def __init__(self, pyjama):
         self.DEBUG = False
@@ -71,11 +88,6 @@ class ShellWindow(Window):
         self.window.SetDefaultSize(600, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.history_textview = Gtk.TextView()
-        # Set up all of the engines:
-        self.pyjama.engine.set_redirects(CustomStream(self.history_textview), 
-                                         CustomStream(self.history_textview,
-                                                      "red"), 
-                                         None)
         self.vbox = Gtk.VBox()
         # ---------------------
         # make menu:
@@ -175,7 +187,7 @@ class ShellWindow(Window):
         self.vbox.PackEnd(self.statusbar, False, False, 0)
         self.window.ShowAll()
         # Set this Python's stderr:
-        # FIXME EXCEPTION HANDLER
+        # EXCEPTION HANDLER
         stdout = CustomStream(self.history_textview, "black")
         sys.stderr = CustomStream(self.history_textview, "red")
         self.pyjama.engine.set_redirects(stdout, sys.stderr, None)

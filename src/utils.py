@@ -16,6 +16,45 @@ class Language(object):
         self.language = language
         self.extension = extension
 
+class ConsoleStream(System.IO.Stream):
+    def __init__(self, tag=None):
+        self.tag = tag
+
+    def write(self, text):
+        if self.tag == "red":
+            System.Console.Error.Write(text)
+        else:
+            System.Console.Write(text)
+
+    def goto_end(self):
+        pass
+
+    def Write(self, bytes, offset, count):
+        text = System.Text.Encoding.UTF8.GetString(bytes, offset, count)
+        print text,
+
+    @property
+    def CanRead(self):
+        return False
+
+    @property
+    def CanSeek(self):
+        return False
+
+    @property
+    def CanWrite(self):
+        return True
+
+    def Flush(self):
+        pass
+
+    def Close(self):
+        pass
+
+    @property
+    def Position(self):
+        return 0
+
 class CustomStream(System.IO.Stream):
     def __init__(self, textview, tag=None):
         self.textview = textview

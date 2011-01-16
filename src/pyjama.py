@@ -80,6 +80,8 @@ class PyjamaProject(object):
     def __init__(self, argv):
         self.shell = None
         self.editor = None
+        self.gui = True
+        self.standalone = False
         self.languages = get_registered_languages()
         self.engine = EngineManager(self)
         for lang in self.languages:
@@ -98,17 +100,28 @@ class PyjamaProject(object):
                 request_shell = True
             elif arg == "--editor":
                 request_editor = True
+            elif arg == "--nogui":
+                self.gui = False
+                request_shell = True
+            elif arg == "--exec":
+                self.standalone = True
+                request_shell = True
             else:
                 files.append(arg)
                 request_editor = True
         if files == [] and not request_editor:
             request_shell = True
         if request_editor:
-            from editor import EditorWindow
-            self.editor = EditorWindow(self, files)
+            if not self.standalone:
+                from editor import EditorWindow
+                self.editor = EditorWindow(self, files)
         if request_shell:
-            from shell import ShellWindow
-            self.shell = ShellWindow(self)
+            if self.standalone:
+                from shell import Shell
+                self.shell = Shell(self, files)
+            else:
+                from shell import ShellWindow
+                self.shell = ShellWindow(self)
 
     def load(self, filename):
         # force into a Python string:
@@ -237,14 +250,29 @@ class PyjamaProject(object):
         return list
 
 # Let's start!
-Gtk.Application.Init()
+args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
+if "--help" in args:
+    print "Pyjama Project, Version 0.2.1"    
+    print "-----------------------------"
+    print "Start pyjama with the following options:"
+    print "  pyjama                            Defaults to shell"
+    print "  pyjama FILENAMES                  Edits FILENAMES"
+    print "  pyjama --shell                    Brings up shell"
+    print "  pyjama --editor                   Brings up editor"
+    print "  pyjama --exec FILENAMES           Runs FILENAMES standalone, with graphics"
+    print "  pyjama --exec --nogui FILENAMES   Runs FILENAMES standalone, no graphics"
+    print "  pyjama --help                     Displays this message"
+    print
+    sys.exit(0)
+if "--nogui" not in args:
+    Gtk.Application.Init()
 #------------------------------
 try:
-    pw = PyjamaProject(sys.argv[1:] or 
-                       list(System.Environment.GetCommandLineArgs())[1:])
+    pw = PyjamaProject(args)
 except:
     traceback.print_exc()
     sys.exit()
 #------------------------------
-Gtk.Application.Run()
+if "--nogui" not in args:
+    Gtk.Application.Run()
 

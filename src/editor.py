@@ -100,6 +100,9 @@ class EditorWindow(Window):
             self.statusbar.Pop(0)
             self.statusbar.Push(0, _("Language: %s") % doc.language.title())
             self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
+            if doc.filename:
+                path, filename = os.path.split(doc.filename)
+                os.chdir(path)
         else:
             self.statusbar.Pop(0)
             self.statusbar.Push(0, _("Language: "))
