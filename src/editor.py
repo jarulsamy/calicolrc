@@ -207,15 +207,15 @@ class EditorWindow(Window):
     def on_run(self, obj, event):
         doc = self.get_current_doc()
         if doc:
-            if doc.save():
-                self.pyjama.setup_shell()
-                # if text selected, use that
-                (selected, start, end) = doc.textview.Buffer.GetSelectionBounds()
-                if selected:
-                    text = doc.textview.Buffer.GetText(start, end, True)
-                    self.pyjama.shell.load_text(text, doc.language)
-                else:
-                    # else, load file
+            self.pyjama.setup_shell()
+            # if text selected, use that
+            (selected, start, end) = doc.textview.Buffer.GetSelectionBounds()
+            if selected:
+                text = doc.textview.Buffer.GetText(start, end, True)
+                self.pyjama.shell.load_text(text, doc.language)
+            else:
+                # else, load file
+                if doc.save():
                     self.pyjama.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):

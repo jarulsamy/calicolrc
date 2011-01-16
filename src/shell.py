@@ -1,5 +1,5 @@
 # Bring .NET References into IronPython scope:
-import Gtk, Gdk, Pango
+import Gtk, Gdk, Pango, GLib
 import System
 import re
 
@@ -12,7 +12,6 @@ import sys, os
 import System.Threading
 from System.Threading import ManualResetEvent
 
-DEBUG = False
 TRY_TO_USE_SOURCEVIEW = True
 SOURCEVIEW = False # are we using it?
 
@@ -63,6 +62,7 @@ class MyWindow(Gtk.Window):
 
 class ShellWindow(Window):
     def __init__(self, pyjama):
+        self.DEBUG = False
         self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
@@ -96,6 +96,9 @@ class ShellWindow(Window):
                     ("_Paste", None, None, None),
                     ("Cut", None, None, None),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
+                    None,
+                    ("Indent", None, "<control>bracketright", self.indent_region),
+                    ("Unindent", None, "<control>bracketleft", self.unindent_region),
                           ]),
                 ("She_ll", self.make_language_menu()),
                 ("Windows", [
@@ -210,8 +213,8 @@ class ShellWindow(Window):
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
 
     def on_key_press(self, event):
-        #if event is not None:
-        #    self.message(str(event.Key))
+        if self.DEBUG and event is not None:
+            self.message(str(event.Key))
         if event is None or str(event.Key) == "Return":
             # if cursor in middle, insert a Return
             mark = self.textview.Buffer.InsertMark
@@ -220,7 +223,8 @@ class ShellWindow(Window):
             if line != self.textview.Buffer.LineCount - 1:
                 return False
             # else, execute text
-            text = self.textview.Buffer.Text # extra line at end signals ready_to_execute
+            # extra line at end signals ready_to_execute:
+            text = self.textview.Buffer.Text 
             if text == "":
                 return True # nothing to do, but handled
             elif self.ready_for_execute(text):
@@ -278,6 +282,36 @@ class ShellWindow(Window):
                 if not SOURCEVIEW:
                     self.textview.Buffer.InsertAtCursor("    ")
                     return True
+        return False
+
+    def indent_region(self, obj, event):
+        (selected, start, end) = self.textview.Buffer.GetSelectionBounds()
+        if selected:
+            text = self.textview.Buffer.GetText(start, end, True)
+            retval = ""
+            for line in text.split("\n"):
+                retval += "    " + line + "\n"
+            def invoke(sender, args):
+                self.textview.Buffer.DeleteSelection(True, True)
+                self.textview.Buffer.InsertAtCursor(retval)
+            Gtk.Application.Invoke(invoke)
+            # FIXME: reselect this text
+            return True
+        return False
+
+    def unindent_region(self, obj, event):
+        (selected, start, end) = self.textview.Buffer.GetSelectionBounds()
+        if selected:
+            text = self.textview.Buffer.GetText(start, end, True)
+            retval = ""
+            for line in text.split("\n"):
+                retval += line[4:] + "\n"
+            def invoke(sender, args):
+                self.textview.Buffer.DeleteSelection(True, True)
+                self.textview.Buffer.InsertAtCursor(retval)
+            Gtk.Application.Invoke(invoke)
+            # FIXME: reselect this text
+            return True
         return False
 
     def undent_text(self, text):
@@ -388,6 +422,9 @@ class ShellWindow(Window):
         def invoke(sender, args):
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
+            end = self.history_textview.Buffer.EndIter
+            GLib.Timeout.Add(100, 
+             lambda: self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0))
         Gtk.Application.Invoke(invoke)
 
     def set_title(self, text):

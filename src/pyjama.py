@@ -35,6 +35,7 @@ import clr
 clr.AddReference("gtk-sharp")
 clr.AddReference("pango-sharp")
 clr.AddReference("glib-sharp")
+#clr.AddReference("gnome-sharp")
 # Other DLLs:
 clr.AddReference("Microsoft.Scripting")
 

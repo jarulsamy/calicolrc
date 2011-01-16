@@ -1,5 +1,3 @@
-import clr
-clr.AddReference("gtk-sharp")
 import Gtk
 import System
 from System.Threading import ManualResetEvent
