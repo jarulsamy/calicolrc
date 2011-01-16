@@ -34,6 +34,15 @@ class EditorWindow(Window):
                   ("Quit", Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
+                ("_Edit", [
+                    ("_Copy", None, None, None),
+                    ("_Paste", None, None, None),
+                    ("Cut", None, None, None),
+                    ("Select all", Gtk.Stock.SelectAll, None, None),
+                    None,
+                    ("Indent", None, "<control>bracketright", self.indent_region),
+                    ("Unindent", None, "<control>bracketleft", self.unindent_region),
+                          ]),
                 ("Script", [
                     ("Run", Gtk.Stock.Apply, "F5", self.on_run),
                     ("Reset and run", None, "<control>F5", self.on_reset_run),
@@ -76,9 +85,11 @@ class EditorWindow(Window):
                 filename = os.path.abspath(file)
                 page = self.make_document(filename)
                 self.notebook.AppendPage(page.widget, page.tab)
+                self.notebook.SetTabReorderable(page.widget, True)
         else:
             page = self.make_document(None)
             self.notebook.AppendPage(page.widget, page.tab)
+            self.notebook.SetTabReorderable(page.widget, True)
         doc = self.get_current_doc()
         if doc:
             doc.grab_focus()
@@ -111,25 +122,27 @@ class EditorWindow(Window):
         if page is None:
             page = self.make_document(filename)
             page_num = self.notebook.AppendPage(page.widget, page.tab)
+            self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
-        if page and lineno != 0:
-            Gtk.Application.Invoke(lambda s, a: self.goto_line(lineno))
-        # Finally, remove temp page, if one:
+        # Remove temp page, if one:
         if self.notebook.NPages == 2:
             doc0 = self.notebook.GetNthPage(0).document
             if doc0.filename is None and not doc0.get_dirty():
                 self.notebook.RemovePage(0)
+        if page and lineno != 0:
+            self.goto_line(lineno)
 
     def goto_line(self, lineno):
         """
         Go to a line number in the current document. Call with [1, n]. Internally,
         linenumbers are zero-based.
         """
-        # This should occur in a Gtk.Application.Invoke()
-        doc = self.get_current_doc()
-        line = doc.textview.Buffer.GetIterAtLine(lineno - 1)
-        doc.textview.Buffer.PlaceCursor(line)
-        GLib.Timeout.Add(100, lambda: doc.textview.ScrollToIter(line, 0.4, True, 0, 1.0))
+        def invoke(sender, args):
+            doc = self.get_current_doc()
+            line = doc.textview.Buffer.GetIterAtLine(lineno - 1)
+            doc.textview.Buffer.PlaceCursor(line)
+            GLib.Timeout.Add(200, lambda: doc.textview.ScrollToIter(line, 0.4, True, 0, 1.0))
+        Gtk.Application.Invoke(invoke)
 
     def on_open_file(self, obj, event):
         retval = False
@@ -140,6 +153,8 @@ class EditorWindow(Window):
                                    "Open", Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.select_or_open(fc.Filename)
+            path, base = os.path.split(fc.Filename)
+            os.chdir(path)
             retval = True
         fc.Destroy()
         return retval
@@ -151,6 +166,7 @@ class EditorWindow(Window):
     def on_new_file(self, obj, event, language="python"):
         page = self.pyjama.languages[language].get_document_class()(None, self.pyjama, language)
         page_num = self.notebook.AppendPage(page.widget, page.tab)
+        self.notebook.SetTabReorderable(page.widget, True)
         self.notebook.CurrentPage = page_num
         doc0 = self.notebook.GetNthPage(0).document
         if doc0.filename == None and not doc0.get_dirty():
@@ -224,3 +240,9 @@ class EditorWindow(Window):
 
     def on_quit(self, obj, event):
         Gtk.Application.Quit()
+
+    def get_textview(self):
+        """
+        Overloaded to give the current doc's textview.
+        """
+        return self.get_current_doc().textview

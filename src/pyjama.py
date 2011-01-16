@@ -51,10 +51,10 @@ from engine import EngineManager
 
 # Setup Runtime environment:
 def handle_exception(e):
-    print e.__class__.__name__
+    print >> sys.stderr, e.__class__.__name__
 
 # Turn on Unhandled Exception Handled:
-# FIXME EXCEPTION HANDLER
+# EXCEPTION HANDLER
 GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
@@ -73,7 +73,7 @@ def get_registered_languages():
             results[lang.language] = lang
         except:
             traceback.print_exc()
-            print "Cannot load language file '%s'" % filename
+            print >> sys.stderr, "Cannot load language file '%s'" % filename
     return results
 
 class PyjamaProject(object):
@@ -184,13 +184,13 @@ class PyjamaProject(object):
         prog = re.compile(pattern, flags)
         list = self.findfiles(dir, file_pat, recursive)
         list.sort()
-        print "Searching %r in %s/%s..." % (pattern, dir, file_pat)
+        self.shell.message("Searching %r in %s/%s...\n" % (pattern, dir, file_pat))
         hits = 0
         for fn in list:
             try:
                 f = open(fn)
             except IOError, msg:
-                print msg
+                self.shell.message(msg + "\n")
                 continue
             lineno = 0
             while 1:
@@ -202,7 +202,7 @@ class PyjamaProject(object):
                     if line[-1:] == '\n':
                         line = line[:-1]
                     if prog.search(line):
-                        sys.stdout.write("  File \"%s\", line %d, %s\"\n" % 
+                        self.shell.message("  File \"%s\", line %d, %s\"\n" % 
                                          (fn, lineno, line.strip()))
                         hits = hits + 1
         if hits:
@@ -210,9 +210,9 @@ class PyjamaProject(object):
                 s = ""
             else:
                 s = "es"
-            print "Found", hits, "match%s. Right-click file to open." % s
+            self.shell.message("Found %d match%s. Right-click file to open.\n" % (hits, s))
         else:
-            print "No matches."
+            self.shell.message("No matches.\n")
 
     def findfiles(self, dir, base, recursive=True):
         # Based on code from idlelib
@@ -220,7 +220,7 @@ class PyjamaProject(object):
         try:
             names = os.listdir(dir or os.curdir)
         except os.error, msg:
-            print msg
+            self.shell.message(msg + "\n")
             return []
         list = []
         subdirs = []

@@ -138,6 +138,7 @@ try:
             self.textview.Buffer.ModifiedChanged += self.on_modified
             self.textview.ShowLineNumbers =True
             self.textview.InsertSpacesInsteadOfTabs = True
+            self.textview.HighlightCurrentLine = True
             self.textview.IndentWidth = 4
             self.textview.ModifyFont(
                 Pango.FontDescription.FromString("Monospace 10"))

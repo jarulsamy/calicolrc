@@ -1,8 +1,8 @@
 import Gtk
 import System
-from System.Threading import ManualResetEvent
+from System.Threading import Mutex, ManualResetEvent
 
-DEBUG = False
+MUTEX = Mutex(False, "PyjamaMutex")
 
 def _(text): return text
 
@@ -25,18 +25,6 @@ class CustomStream(System.IO.Stream):
         self.textview = textview
 
     def write(self, text):
-        #if DEBUG:
-        #    print text,
-        #    return
-
-        #ev = ManualResetEvent(False)
-        #def invoke(sender, args):
-        #    end = self.textview.Buffer.EndIter
-        #    self.textview.Buffer.InsertWithTagsByName(end, text, "red")
-        #    self.goto_end()
-        #    ev.Set()
-        #Gtk.Application.Invoke(invoke)
-        #ev.WaitOne()
         if self.tag == "red":
             System.Console.Error.Write(text)
         else:
@@ -49,13 +37,9 @@ class CustomStream(System.IO.Stream):
         self.textview.ScrollToMark(insert_mark, 0.0, True, 0, 1.0)
 
     def Write(self, bytes, offset, count):
-        if DEBUG:
-            text = System.Text.Encoding.UTF8.GetString(bytes, offset, count)
-            print text,
-            return
-
         ev = ManualResetEvent(False)
         def invoke(sender, args):
+            MUTEX.WaitOne()
             text = System.Text.Encoding.UTF8.GetString(bytes, offset, count)
             if self.tag:
                 end = self.textview.Buffer.EndIter
@@ -64,6 +48,7 @@ class CustomStream(System.IO.Stream):
                 self.textview.Buffer.InsertAtCursor(text)
             self.goto_end()
             ev.Set()
+            MUTEX.ReleaseMutex()
         Gtk.Application.Invoke(invoke)
         ev.WaitOne()
 

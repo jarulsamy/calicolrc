@@ -4,13 +4,12 @@ import System
 import re
 
 from window import Window
-from utils import _, CustomStream
+from utils import _, CustomStream, MUTEX
 
 import traceback
 import sys, os
 
 import System.Threading
-from System.Threading import ManualResetEvent
 
 TRY_TO_USE_SOURCEVIEW = True
 SOURCEVIEW = False # are we using it?
@@ -177,9 +176,9 @@ class ShellWindow(Window):
         self.window.ShowAll()
         # Set this Python's stderr:
         # FIXME EXCEPTION HANDLER
-        sys.stdout = CustomStream(self.history_textview, "black")
+        stdout = CustomStream(self.history_textview, "black")
         sys.stderr = CustomStream(self.history_textview, "red")
-        self.pyjama.engine.set_redirects(sys.stdout, sys.stderr, None)
+        self.pyjama.engine.set_redirects(stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
         # Setup clipboard stuff:
@@ -212,7 +211,7 @@ class ShellWindow(Window):
         self.statusbar.Pop(0)
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
 
-    def on_key_press(self, event):
+    def on_key_press(self, event, force=False):
         if self.DEBUG and event is not None:
             self.message(str(event.Key))
         if event is None or str(event.Key) == "Return":
@@ -220,14 +219,14 @@ class ShellWindow(Window):
             mark = self.textview.Buffer.InsertMark
             itermark = self.textview.Buffer.GetIterAtMark(mark)
             line = itermark.Line
-            if line != self.textview.Buffer.LineCount - 1:
+            if line != self.textview.Buffer.LineCount - 1 and not force:
                 return False
             # else, execute text
             # extra line at end signals ready_to_execute:
             text = self.textview.Buffer.Text 
             if text == "":
                 return True # nothing to do, but handled
-            elif self.ready_for_execute(text):
+            elif self.ready_for_execute(text) or force:
                 if self.history.dirty and self.history.nextlast():
                     self.history.replace(text)
                 else:
@@ -282,36 +281,6 @@ class ShellWindow(Window):
                 if not SOURCEVIEW:
                     self.textview.Buffer.InsertAtCursor("    ")
                     return True
-        return False
-
-    def indent_region(self, obj, event):
-        (selected, start, end) = self.textview.Buffer.GetSelectionBounds()
-        if selected:
-            text = self.textview.Buffer.GetText(start, end, True)
-            retval = ""
-            for line in text.split("\n"):
-                retval += "    " + line + "\n"
-            def invoke(sender, args):
-                self.textview.Buffer.DeleteSelection(True, True)
-                self.textview.Buffer.InsertAtCursor(retval)
-            Gtk.Application.Invoke(invoke)
-            # FIXME: reselect this text
-            return True
-        return False
-
-    def unindent_region(self, obj, event):
-        (selected, start, end) = self.textview.Buffer.GetSelectionBounds()
-        if selected:
-            text = self.textview.Buffer.GetText(start, end, True)
-            retval = ""
-            for line in text.split("\n"):
-                retval += line[4:] + "\n"
-            def invoke(sender, args):
-                self.textview.Buffer.DeleteSelection(True, True)
-                self.textview.Buffer.InsertAtCursor(retval)
-            Gtk.Application.Invoke(invoke)
-            # FIXME: reselect this text
-            return True
         return False
 
     def undent_text(self, text):
@@ -382,7 +351,9 @@ class ShellWindow(Window):
 
     def clear(self, obj, event):
         def invoke_clear(sender, args):
+            MUTEX.WaitOne()
             self.history_textview.Buffer.Text = ''
+            MUTEX.ReleaseMutex()
         Gtk.Application.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
@@ -393,7 +364,7 @@ class ShellWindow(Window):
         return True
 
     def on_run(self, obj, event):
-        self.on_key_press(None)
+        self.on_key_press(None, force=True)
 
     def on_stop(self, obj, event):
         if (self.executeThread and 
@@ -420,12 +391,18 @@ class ShellWindow(Window):
     def message(self, message, tag="purple"):
         # DO NOT PUT the ev, WaitOne stuff here!
         def invoke(sender, args):
+            MUTEX.WaitOne()
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
-            end = self.history_textview.Buffer.EndIter
-            GLib.Timeout.Add(100, 
-             lambda: self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0))
+            MUTEX.ReleaseMutex()
+            GLib.Timeout.Add(100, self.goto_end)
         Gtk.Application.Invoke(invoke)
+
+    def goto_end(self):
+        MUTEX.WaitOne()
+        end = self.history_textview.Buffer.EndIter
+        self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0)
+        MUTEX.ReleaseMutex()
 
     def set_title(self, text):
         self.window.Title = text
@@ -456,6 +433,7 @@ class ShellWindow(Window):
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             return
         prompt = "%-6s> " % language
+        MUTEX.WaitOne()
         for line in text.split("\n"):
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, 
@@ -466,6 +444,7 @@ class ShellWindow(Window):
                              "%s\n" % line,
                              "blue")
             prompt = "......>"
+        MUTEX.ReleaseMutex()
 
         # pragma/meta commands, start with #;
         if text == "":
