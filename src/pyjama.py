@@ -48,6 +48,7 @@ clr.AddReference("Microsoft.Scripting")
 # Bring .NET References into IronPython scope:
 import Gtk
 import GLib
+import Pango
 
 # Import pure-Python modules:
 import traceback
@@ -88,6 +89,8 @@ class PyjamaProject(object):
         self.editor = None
         self.gui = True
         self.standalone = False
+        self.fontsize = 10
+        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
         self.languages = get_registered_languages()
         self.engine = EngineManager(self)
         for lang in self.languages:
@@ -254,6 +257,22 @@ class PyjamaProject(object):
             for subdir in subdirs:
                 list.extend(self.findfiles(subdir, base, recursive))
         return list
+
+    def increase_fontsize(self, obj, event):
+        self.fontsize += 1
+        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
+        Gtk.Application.Invoke(self.update_fonts)
+
+    def update_fonts(self, sender, args):
+        if self.shell:
+            self.shell.modify_font(self.font)
+        if self.editor:
+            self.editor.modify_font(self.font)
+
+    def decrease_fontsize(self, obj, event):
+        self.fontsize -= 1
+        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
+        Gtk.Application.Invoke(self.update_fonts)
 
 # Let's start!
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]

@@ -51,7 +51,10 @@ class EditorWindow(Window):
                     ("Editor", None, "F6", self.pyjama.setup_editor),
                     ("Shell", None, "F7", self.pyjama.setup_shell),
                     ]),
-                ("O_ptions", []),
+                ("O_ptions", [
+                    ("Make font larger", None, None, self.pyjama.increase_fontsize),
+                    ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
+                    ]),
                 ("_Help", []),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
@@ -215,6 +218,10 @@ class EditorWindow(Window):
         else:
             return None
 
+    def get_docs(self):
+        return [self.notebook.GetNthPage(i).document 
+                for i in range(self.notebook.NPages)]
+
     def on_reset_run(self, obj, event):
         doc = self.get_current_doc()
         if doc:
@@ -249,3 +256,8 @@ class EditorWindow(Window):
         Overloaded to give the current doc's textview.
         """
         return self.get_current_doc().textview
+
+    def modify_font(self, font):
+        for doc in self.get_docs():
+            doc.modify_font(font)
+

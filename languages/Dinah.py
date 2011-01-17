@@ -232,6 +232,9 @@ class DinahDocument(BaseDocument):
         self.widget.Add2(layout_scroll)
         self.widget.ShowAll()
 
+    def modify_font(self, font):
+        pass
+
     def get_dirty(self):
         # FIXME: keep track of whether this is dirty
         return True

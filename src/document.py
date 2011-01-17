@@ -1,6 +1,3 @@
-import clr
-clr.AddReference("gtk-sharp")
-clr.AddReference("pango-sharp")
 import Gtk
 import Pango
 import os
@@ -76,8 +73,7 @@ class BaseDocument(object):
         self.widget.document = self
         self.textview = Gtk.TextView()
         self.textview.Buffer.ModifiedChanged += self.on_modified
-        self.textview.ModifyFont(
-            Pango.FontDescription.FromString("Monospace 10"))
+        self.textview.ModifyFont(self.pyjama.font)
         self.widget.Add(self.textview)
         self.textview.Editable = True
         self.textview.WrapMode = Gtk.WrapMode.Char
@@ -85,6 +81,9 @@ class BaseDocument(object):
         self.textview.Show()
         self.widget.Show()
         self.textview.GrabFocus()
+
+    def modify_font(self, font):
+        self.textview.ModifyFont(font)
 
     def get_text(self):
         return self.textview.Buffer.Text
@@ -140,8 +139,7 @@ try:
             self.textview.InsertSpacesInsteadOfTabs = True
             self.textview.HighlightCurrentLine = True
             self.textview.IndentWidth = 4
-            self.textview.ModifyFont(
-                Pango.FontDescription.FromString("Monospace 10"))
+            self.textview.ModifyFont(self.pyjama.font)
             self.textview.Buffer.Language = self.lang_manager.GetLanguage(
                 self.language)
             self.widget.Add(self.textview)
@@ -162,3 +160,4 @@ except:
 
 # How to list relevant items out of a reference:
 # [getattr(clr.References[2], x) for x in dir(clr.References[2]) if type(getattr(clr.References[2], x)) is type]
+

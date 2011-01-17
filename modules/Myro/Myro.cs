@@ -122,6 +122,10 @@ public static class Myro {
 	return ((n % 2) == 0);
   }
 
+  public static Picture takePicture(string mode="jpeg") {
+	return robot.takePicture(mode);
+  }
+
   public class Randomizer {
 	int _seed; 
 	Random _random = new Random();
@@ -161,6 +165,11 @@ public static class Myro {
     public virtual void beep(double duration, double? frequency=null, 
 		double? frequency2=null) {
 	  // Override in subclassed robots
+	}
+
+    public virtual Picture takePicture(string mode="jpeg") {
+	  // Override in subclassed robots
+	  return null;
 	}
 
 	public void stop() {
@@ -601,8 +610,6 @@ public static class Myro {
 			return getObstacle(pos);
 		  } else if (sensor == "bright") {
 			return getBright(pos);
-		  } else if (sensor == "picture") {
-			return takePicture(pos);
 		  } else {
 			throw new Exception(String.Format("invalid sensor name: '{0}'",
 					sensor));
@@ -766,10 +773,6 @@ public static class Myro {
 	}
 
 	public int getBattery() {
-	  return 0;
-	}
-
-	public int takePicture(object position) {
 	  return 0;
 	}
 

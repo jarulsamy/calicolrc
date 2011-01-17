@@ -116,7 +116,10 @@ class ShellWindow(Window):
                     ("Editor", None, "F6", self.pyjama.setup_editor),
                     ("Shell", None, "F7", self.pyjama.setup_shell),
                     ]),
-                ("O_ptions", []),
+                ("O_ptions", [
+                    ("Make font larger", None, None, self.pyjama.increase_fontsize),
+                    ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
+                    ]),
                 ("_Help", []),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
@@ -161,7 +164,7 @@ class ShellWindow(Window):
         self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.AcceptsTab = True
         self.textview.Show()
-        self.textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
+        self.textview.ModifyFont(self.pyjama.font)
         self.scrolled_window.AddWithViewport(self.textview)
         self.results = Gtk.ScrolledWindow()
         for color in ["red", "blue", "purple", "black"]:
@@ -170,7 +173,7 @@ class ShellWindow(Window):
                 tag.Weight = Pango.Weight.Bold
             tag.Foreground = color 
             self.history_textview.Buffer.TagTable.Add(tag)
-        self.history_textview.ModifyFont(Pango.FontDescription.FromString("Monospace 10"))
+        self.history_textview.ModifyFont(self.pyjama.font)
         self.history_textview.PopulatePopup += self.popup
         self.history_textview.WrapMode = Gtk.WrapMode.Char
         self.history_textview.Editable = False
@@ -197,6 +200,10 @@ class ShellWindow(Window):
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
     
+    def modify_font(self, font):
+        self.textview.ModifyFont(font)
+        self.history_textview.ModifyFont(font)
+
     def OnCopyClicked(self, obj, args):
         #self.clipboard.SetText("xxx")
         pass

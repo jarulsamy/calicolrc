@@ -104,6 +104,22 @@ public static class Graphics {
 	return new Picture(filename);
   }
   
+  public static Picture makePicture(Graphics.Window window) { //, string filename) {
+	ManualResetEvent ev = new ManualResetEvent(false);
+	Gdk.Pixbuf pixbuf = null;
+	Gtk.Application.Invoke( delegate {
+		  Gdk.Drawable drawable = window.GdkWindow;
+		  Gdk.Colormap colormap = drawable.Colormap;
+		  int width = 0;
+		  int height = 0;
+		  drawable.GetSize(out width, out height);
+		  pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, width, height);
+		  ev.Set();
+		});
+	ev.WaitOne();
+	return new Picture(pixbuf);
+  }
+
   public class Window : Gtk.Window {
 	private Gtk.EventBox eventbox;
 	private Canvas _canvas;
@@ -832,6 +848,18 @@ public static class Graphics {
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
 	}
 
+	public Picture(Gdk.Pixbuf pixbuf) : base(true) {
+	  if (! Graphics.initialize) 
+		Graphics.init();
+	  _pixbuf = pixbuf;
+	  if (!_pixbuf.HasAlpha) {
+		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+	  }
+	  format = Cairo.Format.Argb32;
+	  // Create a new ImageSurface
+	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	}
+
 	public Picture(int width, int height) : base(true) {
 	  if (! Graphics.initialize) 
 		Graphics.init();
@@ -857,6 +885,11 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	}
+
+	public void saveToFile(string filename) {
+	  // png, and jpg
+	  _pixbuf.Save(filename, filename.Substring(filename.Length - 3, 3));
 	}
 
 	public Pixel getPixel(int x, int y) {
