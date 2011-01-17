@@ -134,3 +134,76 @@ def pick_file():
     ev.WaitOne()
     return retval
 
+
+def zipfiles(files_and_dirs, filename):
+    import clr
+    clr.AddReference("ICSharpCode.SharpZipLib")
+    import ICSharpCode
+    ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile
+    # first, make sure all files are files. if dir, expand to all files
+    # in it, recursively:
+    files = get_files(files_and_dirs)
+    zf = ZipFile.Create(filename)
+    zf.BeginUpdate()
+    path, basename = os.path.split(filename)
+    base, ext = os.path.splitext(basename)
+    # Make zip file be in a directory called same name as zip (minus .zip)
+    for (file, newfile) in rename_files_for_zip_package(files, base):
+        zf.Add(file, newfile)
+    zf.CommitUpdate()
+    zf.Close()
+
+def get_files(items):
+    import glob
+    files = []
+    for item in items:
+        if os.path.isfile(item):
+            files.append(item)
+        elif os.path.isdir(item):
+            files.extend(get_files(glob.glob(item + os.path.sep + "*")))
+        else:
+            pass # ignore things that don't exist, etc.
+    return files
+
+def rename_files_for_zip_package(files, package_name):
+    """
+    Finds the longest common pathname among files.
+    Assumes all file paths are absolute.
+    """
+    prefix = ""
+    done = False
+    original_files = files[:]
+    while not done:
+        candidate = None
+        # Go through files to get next candidate
+        for file in files:
+            if os.path.sep not in file:
+                done = True
+                break
+            path, filename = os.path.split(file)
+            path_parts = path.split(os.path.sep)
+            if candidate is None:
+                # first, get a candidate prefix that they all might share
+                candidate = path_parts[0]
+            if len(path_parts) > 0 and path_parts[0] == candidate:
+                pass # ok so far
+            else:
+                done = True
+        if candidate is None:
+            done = True
+        if not done:
+            prefix += (candidate + os.path.sep)
+            # go through files and remove candidate:
+            newfiles = []
+            for file in files:
+                path, filename = os.path.split(file)
+                path_parts = path.split(os.path.sep)
+                path_parts.pop(0)
+                if len(path_parts) == 0:
+                    newfiles.append(filename)
+                else:
+                    newfiles.append(os.path.sep.join(path_parts) + os.path.sep + filename)
+            files = newfiles
+    return zip(original_files, 
+               [file.replace(prefix, package_name + os.path.sep) 
+                for file in original_files])

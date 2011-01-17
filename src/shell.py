@@ -442,6 +442,7 @@ class ShellWindow(Window):
             return
         prompt = "%-6s> " % language
         MUTEX.WaitOne()
+        count = 2
         for line in text.split("\n"):
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, 
@@ -451,7 +452,8 @@ class ShellWindow(Window):
             self.history_textview.Buffer.InsertWithTagsByName(end, 
                              "%s\n" % line,
                              "blue")
-            prompt = "......>"
+            prompt = ((".....%d" % count)[-6:]) + ">"
+            count += 1
         MUTEX.ReleaseMutex()
 
         # pragma/meta commands, start with #;
