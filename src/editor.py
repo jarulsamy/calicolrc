@@ -2,7 +2,7 @@ import Gtk
 import GLib
 import System
 
-from window import Window
+from window import Window, MyWindow
 from utils import _
 import os
 
@@ -10,7 +10,8 @@ class EditorWindow(Window):
     def __init__(self, pyjama, files=None):
         self.pyjama = pyjama
         # create the parts
-        self.window = Gtk.Window(_("Pyjama Editor"))
+        self.window = MyWindow(_("Pyjama Editor"))
+        self.window.set_on_key_press(self.on_key_press)
         self.window.SetDefaultSize(600, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.vbox = Gtk.VBox()
@@ -96,6 +97,18 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             doc.grab_focus()
+
+    def on_key_press(self, eventkey):
+        """
+        Handles key press events for the entire window. If handled
+        here, return True.
+        """
+        if str(eventkey.Key) == "Tab":
+            textview = self.get_current_doc().textview
+            if textview:
+                textview.Buffer.InsertAtCursor(self.pyjama.indent_string)
+            return True
+        return False
 
     def changed_page(self, obj, event):
         doc = self.get_current_doc()

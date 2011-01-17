@@ -3,16 +3,13 @@ import Gtk, Gdk, Pango, GLib
 import System
 import re
 
-from window import Window
+from window import Window, MyWindow
 from utils import _, CustomStream, MUTEX, ConsoleStream
 
 import traceback
 import sys, os
 
 import System.Threading
-
-TRY_TO_USE_SOURCEVIEW = True
-SOURCEVIEW = False # are we using it?
 
 class History(object):
     def __init__(self):
@@ -50,14 +47,6 @@ class History(object):
 
     def nextlast(self):
         return self.position == len(self.history) - 1
-
-class MyWindow(Gtk.Window):
-    def set_on_key_press(self, on_key_press):
-        self.on_key_press = on_key_press
-
-    def OnKeyPressEvent(self, event):
-        return (self.on_key_press(event) or 
-                Gtk.Window.OnKeyPressEvent(self, event))
 
 class Shell(object):
     def __init__(self, pyjama, files):
@@ -143,23 +132,20 @@ class ShellWindow(Window):
         self.scrolled_window.ShadowType = Gtk.ShadowType.Out
         self.scrolled_window.HeightRequest = 20
 
-        if TRY_TO_USE_SOURCEVIEW:
-            try:
-                import clr
-                clr.AddReference("gtksourceview2-sharp")
-                import GtkSourceView
-                self.lang_manager = GtkSourceView.SourceLanguageManager()
-                self.textview = GtkSourceView.SourceView()
-                self.textview.ShowLineNumbers = False
-                self.textview.InsertSpacesInsteadOfTabs = True
-                self.textview.IndentWidth = 4
-                self.textview.Buffer.Language = self.lang_manager.GetLanguage(
-                    self.language)
-                SOURCEVIEW = True
-            except:
-                self.textview = Gtk.TextView()
-        else:
+        try:
+            import clr
+            clr.AddReference("gtksourceview2-sharp")
+            import GtkSourceView
+            self.lang_manager = GtkSourceView.SourceLanguageManager()
+            self.textview = GtkSourceView.SourceView()
+            self.textview.ShowLineNumbers = False
+            self.textview.InsertSpacesInsteadOfTabs = True
+            self.textview.IndentWidth = 4
+            self.textview.Buffer.Language = self.lang_manager.GetLanguage(
+                self.language)
+        except:
             self.textview = Gtk.TextView()
+
         self.textview.Editable = True
         self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.AcceptsTab = True
@@ -231,6 +217,9 @@ class ShellWindow(Window):
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
 
     def on_key_press(self, event, force=False):
+        # FIXME: this should be handled in textview, but haven't
+        # figured out how to overload just it.
+        # So, this currently handles the keys for the whole window.
         if self.DEBUG and event is not None:
             self.message(str(event.Key))
         if event is None or str(event.Key) == "Return":
@@ -283,7 +272,6 @@ class ShellWindow(Window):
                 if text is not None:
                     self.textview.Buffer.Text = text
                     return True
-            # handle these keystrokes, but only when without sourceview
         elif str(event.Key) == "Tab":
             mark = self.textview.Buffer.InsertMark
             current = self.textview.Buffer.GetIterAtMark(mark)
@@ -297,9 +285,10 @@ class ShellWindow(Window):
                     self.message(help_text)
                 return True
             else: # not a completion type tab
-                if not SOURCEVIEW:
-                    self.textview.Buffer.InsertAtCursor("    ")
-                    return True
+                # We will always handle tabs, to insert the spaces
+                self.textview.Buffer.InsertAtCursor(
+                    self.pyjama.indent_string)
+                return True
         return False
 
     def undent_text(self, text):

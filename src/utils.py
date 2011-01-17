@@ -134,4 +134,3 @@ def pick_file():
     ev.WaitOne()
     return retval
 
-

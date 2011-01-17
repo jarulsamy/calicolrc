@@ -8,12 +8,6 @@ class MyScrolledWindow(Gtk.ScrolledWindow):
     items.
     """
 
-class MyTextView(Gtk.TextView):
-    """
-    Wrapper so that we can keep track of (and access) additional
-    items.
-    """
-
 class BaseDocument(object):
     def __init__(self, filename, pyjama, language="python"):
         self.filename = filename
@@ -27,6 +21,9 @@ class BaseDocument(object):
             self.title = "New %s Script" % self.language.title()
         self.make_tab()
         self.make_widget()
+        self.textview.Editable = True
+        self.textview.WrapMode = Gtk.WrapMode.Char
+        self.textview.AcceptsTab = True
         if (hasattr(self, "textview") and 
             hasattr(self.textview.Buffer, "BeginNotUndoableAction")):
             self.textview.Buffer.BeginNotUndoableAction()
@@ -78,14 +75,11 @@ class BaseDocument(object):
     def make_widget(self):
         self.widget = MyScrolledWindow()
         self.widget.document = self
-        self.textview = MyTextView()
+        # FIXME: need to handle keys in editor:
+        self.textview = Gtk.TextView() 
+        self.widget.Add(self.textview)
         self.textview.Buffer.ModifiedChanged += self.on_modified
         self.textview.ModifyFont(self.pyjama.font)
-        self.widget.Add(self.textview)
-        self.textview.Editable = True
-        self.textview.WrapMode = Gtk.WrapMode.Char
-        self.textview.AcceptsTab = True
-        #self.textview.KeyPressEvent += self.on_key_press
         self.textview.Show()
         self.widget.Show()
         self.textview.GrabFocus()
@@ -140,30 +134,20 @@ try:
     import clr
     clr.AddReference("gtksourceview2-sharp")
     import GtkSourceView
-    class MySourceView(GtkSourceView.SourceView):
-        """
-        Wrapper so that we can keep track of (and access) additional
-        items.
-        """
 
     class Document(BaseDocument):
         def make_widget(self):
             self.widget = MyScrolledWindow()
             self.widget.document = self
             self.lang_manager = GtkSourceView.SourceLanguageManager()
-            self.textview = MySourceView()
-            self.textview.Buffer.ModifiedChanged += self.on_modified
+            # FIXME: need to handle keys in editor:
+            self.textview = GtkSourceView.SourceView()
             self.textview.ShowLineNumbers =True
-            self.textview.InsertSpacesInsteadOfTabs = True
             self.textview.HighlightCurrentLine = True
-            self.textview.IndentWidth = 4
             self.textview.ModifyFont(self.pyjama.font)
             self.textview.Buffer.Language = self.lang_manager.GetLanguage(
                 self.language)
             self.widget.Add(self.textview)
-            self.textview.Editable = True
-            self.textview.WrapMode = Gtk.WrapMode.Char
-            self.textview.AcceptsTab = True
             self.textview.Show()
             self.widget.Show()
             self.textview.GrabFocus()

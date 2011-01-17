@@ -89,6 +89,7 @@ class PyjamaProject(object):
         self.editor = None
         self.gui = True
         self.standalone = False
+        self.indent_string = "    "
         self.fontsize = 10
         self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
         self.languages = get_registered_languages()

@@ -1,6 +1,27 @@
 import Gtk
 import Gdk
 
+class MyWindow(Gtk.Window):
+    def on_key_press(self, eventkey):
+        """
+        Handle the key press for the entire window. Return True if
+        handled.  This is generally overloaded.
+        """
+        return False
+
+    def set_on_key_press(self, on_key_press):
+        """
+        Set the key press handler method:
+        """
+        self.on_key_press = on_key_press
+
+    def OnKeyPressEvent(self, eventkey):
+        """
+        Override the main event handler to insert ours beforehand.
+        """
+        return (self.on_key_press(eventkey) or 
+                Gtk.Window.OnKeyPressEvent(self, eventkey))
+
 class Window(object):
     def make_gui(self, menu, toolbar):
         self.menubar = Gtk.MenuBar()
