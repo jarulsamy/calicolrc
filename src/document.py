@@ -4,7 +4,14 @@ import os
 
 class MyScrolledWindow(Gtk.ScrolledWindow):
     """
-    Wrapper so that we can keep track of additional items.
+    Wrapper so that we can keep track of (and access) additional
+    items.
+    """
+
+class MyTextView(Gtk.TextView):
+    """
+    Wrapper so that we can keep track of (and access) additional
+    items.
     """
 
 class BaseDocument(object):
@@ -71,16 +78,21 @@ class BaseDocument(object):
     def make_widget(self):
         self.widget = MyScrolledWindow()
         self.widget.document = self
-        self.textview = Gtk.TextView()
+        self.textview = MyTextView()
         self.textview.Buffer.ModifiedChanged += self.on_modified
         self.textview.ModifyFont(self.pyjama.font)
         self.widget.Add(self.textview)
         self.textview.Editable = True
         self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.AcceptsTab = True
+        #self.textview.KeyPressEvent += self.on_key_press
         self.textview.Show()
         self.widget.Show()
         self.textview.GrabFocus()
+
+    def on_key_press(self, obj, event):
+	print event
+	return False
 
     def modify_font(self, font):
         self.textview.ModifyFont(font)
@@ -128,12 +140,18 @@ try:
     import clr
     clr.AddReference("gtksourceview2-sharp")
     import GtkSourceView
+    class MySourceView(GtkSourceView.SourceView):
+        """
+        Wrapper so that we can keep track of (and access) additional
+        items.
+        """
+
     class Document(BaseDocument):
         def make_widget(self):
             self.widget = MyScrolledWindow()
             self.widget.document = self
             self.lang_manager = GtkSourceView.SourceLanguageManager()
-            self.textview = GtkSourceView.SourceView()
+            self.textview = MySourceView()
             self.textview.Buffer.ModifiedChanged += self.on_modified
             self.textview.ShowLineNumbers =True
             self.textview.InsertSpacesInsteadOfTabs = True

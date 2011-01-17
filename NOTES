@@ -13,8 +13,10 @@
 
 10. glib.io_add_watch - watch to see if someone else edits file
 
-11. handle tabs in env with no 
+12. Move some keys to be handled by window, others handled by textview
 
 13. toggle word wrap
 
 12. connect menu edit/copy/paste/select all
+
+13. Infinite loop in Pyjama Python on Windows crashes rather than reports error.
