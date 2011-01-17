@@ -527,11 +527,11 @@ class DinahDocument(BaseDocument):
         return self.layout
  
     def save(self):
-        print process_widgets(self.layout)
+        #print process_widgets(self.layout)
         return True
 
     def save_as(self):
-        print process_widgets(self.layout)
+        #print process_widgets(self.layout)
         return True
 
     def treeviewHandleSourceDragDataGet(self, obj, args):
@@ -660,7 +660,7 @@ class DinahDocument(BaseDocument):
         Create a target table base on parameters.
         """
         # Formats target will accept:
-        print "making accepts for", item
+        #print "making accepts for", item
         target_table = System.Array[Gtk.TargetEntry]([
                 Gtk.TargetEntry("application/x-dinah", 0, 0),
                 ])
@@ -671,7 +671,7 @@ class DinahDocument(BaseDocument):
         Create a source table base on parameters.
         """
         # Formats source provides:
-        print "making provides for", item
+        #print "making provides for", item
         source_table = System.Array[Gtk.TargetEntry]([
                 Gtk.TargetEntry("application/x-dinah", 0, 0),
                 ])
