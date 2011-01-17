@@ -532,9 +532,9 @@ class DinahDocument(BaseDocument):
         return True
 
     def treeviewHandleSourceDragDataGet(self, obj, args):
-        print "treeviewHandleSourceDragDataGet!"
+        #print "treeviewHandleSourceDragDataGet!"
         # DragDropGetArgs: args
-        print "dnd get", obj, args
+        #print "dnd get", obj, args
         targets = args.Context.Targets
         selected, treeiter = obj.Selection.GetSelected()
         item = obj.Model.GetValue(treeiter, 1) # 0- text, 1-object
@@ -586,7 +586,7 @@ class DinahDocument(BaseDocument):
     def typeEnclosureDragDataReceived(self, obj, args):
         # FIXME: remove item [Integer] in the related hbox
         # obj is the dropped upon label to be replaced
-        print "Received onto a type place holder!"
+        #print "Received onto a type place holder!"
         #print obj, str(id(obj))
         if str(id(obj)) in self.layouts:
             #print "Yes, label's layout found!"
@@ -611,7 +611,7 @@ class DinahDocument(BaseDocument):
             print "label not found"
 
     def handleDragDataReceived(self, obj, args, where):
-        print "Received!", where
+        #print "Received!", where
         bytes = args.SelectionData.Data
         data = System.Text.Encoding.UTF8.GetString(bytes)
         if data in self.lookup:
@@ -644,7 +644,7 @@ class DinahDocument(BaseDocument):
             print self.lookup
 
     def handleSourceDragDataGet(self, obj, args):
-        print "handleSourceDragDropGet!"
+        #print "handleSourceDragDropGet!"
         # DragDropGetArgs: args
         #print "dnd get", obj, args
         targets = args.Context.Targets

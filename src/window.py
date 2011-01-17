@@ -1,4 +1,5 @@
 import Gtk
+import Gdk
 
 class Window(object):
     def make_gui(self, menu, toolbar):
@@ -102,8 +103,8 @@ class Window(object):
             end_line = self.layout.get_line_count()
 
     def print_view2(self):
-        pj = Gtk.PrintJob(Gtk.PrintConfig.Default())
-        dialog = Gtk.PrintDialog(pj, "Print Test", 0)
+        pj = Gtk.PrintJob(Gnome.PrintConfig.Default())
+        dialog = Gnome.PrintDialog(pj, "Print Test", 0)
         response = dialog.Run()
         if (response == Gtk.PrintButtons.Cancel):
             dialog.Hide()
@@ -119,16 +120,26 @@ class Window(object):
         dialog.Hide()
 	dialog.Dispose()
 
+    def print_view3(self):
+        pc = Gnome.PrintConfig.Default()
+        Gtk.Print.RunPageSetupDialog(self.window, None, pc)
+
     def print_view_to_gc(self, gpc):
-        Gtk.Print.Beginpage(gpc, "Pyjama")
-        Gtk.Print.Moveto(gpc, 1, 700)
-        Gtk.Print.Show(gpc, self.textview.Buffer.Text)
-        Gtk.Print.Showpage(gpc)
+        Gnome.Print.Beginpage(gpc, "Pyjama")
+        Gnome.Print.Moveto(gpc, 1, 700)
+        Gnome.Print.Show(gpc, self.textview.Buffer.Text)
+        Gnome.Print.Showpage(gpc)
 
     def get_textview(self):
+        """
+        Return the default textview for this window.
+        """
         return self.textview
 
     def indent_region(self, obj, event):
+        """
+        Indent the selected region of text.
+        """
         (selected, start, end) = self.get_textview().Buffer.GetSelectionBounds()
         if selected:
             text = self.get_textview().Buffer.GetText(start, end, True)
@@ -145,6 +156,9 @@ class Window(object):
         return False
 
     def unindent_region(self, obj, event):
+        """
+        Unindent the selected region of text.
+        """
         (selected, start, end) = self.get_textview().Buffer.GetSelectionBounds()
         if selected:
             text = self.get_textview().Buffer.GetText(start, end, True)
@@ -159,3 +173,16 @@ class Window(object):
             # FIXME: slight bug in replace (too many newlines?)
             return True
         return False
+
+    def save_as_filename(self, filename):
+        """
+        Save the contents of the current window into a file.
+        Filename can be at least a jpg, or png.
+        """
+        def invoke(sender, args):
+            drawable = self.window.GdkWindow
+            colormap = drawable.Colormap 
+            size = drawable.GetSize()
+            pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, size[0], size[1])
+            pixbuf.Save(filename, filename.rsplit(".")[-1])
+        Gtk.Application.Invoke(invoke)

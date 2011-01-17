@@ -79,16 +79,39 @@ class Engine(object):
 
 class DLREngine(Engine):
     def setup(self):
-        # True? A hint from the interwebs:
-        #options["Debug"] = true;
-        #Python.CreateEngine(options);
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)
+        #if self.language == "python":
+        #    options = self.engine.GetCompilerOptions()
+        #    options.AllowWithStatement = True 
+        #    options.TrueDivision = True
+        #    options = self.engine.GetCompilerOptions()
+        #    print options.TrueDivision
+        #('AbsoluteImports', False), 
+        #('AllowWithStatement', False), 
+        #('DontImplyDedent', False), 
+        #('InitialIndent', None), 
+        #('Interpreted', False), 
+        #('Module', IronPython.Runtime.ModuleOptions.None), 
+        #('ModuleName', None), 
+        #('Optimized', False), 
+        #('PrintFunction', False), 
+        #('SkipFirstLine', False), 
+        #('TrueDivision', False), 
+        #('UnicodeLiterals', False), 
+        #('Verbatim', False), 
+        #setup = self.engine.Setup
+        #setup.ExceptionDetail = True
+        #Dictionary options = new Dictionary(); 
+        #options["FullFrames"] = ScriptingRuntimeHelpers.True; 
+        #options["Debug"] = ScriptingRuntimeHelpers.True; 
+        #ScriptEngine engine = Python.CreateEngine(options); 
+        #Python.SetTrace(engine, OnTraceBack); 
+        # {'FullFrames': True}
         # Load mscorlib.dll:
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(System.String).Assembly)
         # ---------------------------------------
         for file in glob.glob("modules/*.dll"):
-            #path, dll_name = os.path.split(file)
             full_path = os.path.abspath(file)
             clr.AddReference(full_path)
         for assembly in clr.References:
@@ -105,8 +128,6 @@ class DLREngine(Engine):
         if stderr:
             self.engine.Runtime.IO.SetErrorOutput(stderr,
                                                   System.Text.Encoding.UTF8)
-        # Only do this when you have it debugged; crashes just seem to hang
-        # the GUI:
         System.Console.SetOut(self.engine.Runtime.IO.OutputWriter)
         System.Console.SetError(self.engine.Runtime.IO.ErrorWriter)
         System.Console.Out.AutoFlush = True

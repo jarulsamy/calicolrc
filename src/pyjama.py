@@ -1,7 +1,13 @@
 # Setup environment:
 import sys
+import os
+# First, let's find out where this file is: src/pyjama.py
+pyjama_fullpath = os.path.abspath(__file__)
+# Next, let's add the absolute paths of what we need:
+fullpath, basename = os.path.split(pyjama_fullpath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
-    sys.path.append(dir)
+    path = os.path.join(fullpath, dir)
+    sys.path.append(path)
 import os, traceback
 sys.path.append(os.path.abspath("modules"))
 
