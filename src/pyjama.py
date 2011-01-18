@@ -87,6 +87,8 @@ class PyjamaProject(object):
     def __init__(self, argv):
         self.shell = None
         self.editor = None
+        self.version = version
+        self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
         self.indent_string = "    "
@@ -276,14 +278,39 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(self.update_fonts)
 
     def about(self, obj, event):
-        from window import aboutPyjama
-        aboutPyjama()
-
+        def invoke(sender, args):
+            aboutDialog = Gtk.AboutDialog()
+            aboutDialog.DefaultResponse = Gtk.ResponseType.Close
+            #aboutDialog.Close += lambda o, e: aboutDialog.Destroy()
+            #aboutDialog.SetEmailHook(lambda dialog, email: self.message(email))
+            #aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
+            # 
+            #aboutDialog.Artists =""
+            aboutDialog.Authors = System.Array[str](["Douglas Blank <dblank@cs.brynmawr.edu>"])
+            aboutDialog.Comments = "Scripting Environment\n\nRunning on %s" % self.system
+            aboutDialog.Copyright = "(c) 2011, Institute for Personal Robots in Education"
+            #aboutDialog.Documenters
+            #aboutDialog.License
+            #aboutDialog.Logo
+            #aboutDialog.LogoIconName
+            aboutDialog.Name = "Pyjama Project"
+            #aboutDialog.TranslatorCredits
+            aboutDialog.Version = self.version
+            aboutDialog.Website = "http://PyjamaProject.org/"
+            #aboutDialog.WebsiteLabel
+            aboutDialog.WrapLicense = True
+            aboutDialog.Run()
+            aboutDialog.Destroy()
+        Gtk.Application.Invoke(invoke)
+    
 # Let's start!
+version = "0.2.1"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
-    print "Pyjama Project, Version 0.2.1"    
-    print "-----------------------------"
+    print
+    print "Pyjama Project, Version %s, on %s" % (version, 
+                                                 System.Environment.OSVersion.VersionString)
+    print "----------------------------------------------------------------------------"
     print "Start pyjama with the following options:"
     print "  pyjama                            Defaults to shell"
     print "  pyjama FILENAMES                  Edits FILENAMES"
@@ -291,8 +318,12 @@ if "--help" in args:
     print "  pyjama --editor                   Brings up editor"
     print "  pyjama --exec FILENAMES           Runs FILENAMES standalone, with graphics"
     print "  pyjama --exec --nogui FILENAMES   Runs FILENAMES standalone, no graphics"
+    print "  pyjama --version                  Displays the version number (%s)" % version
     print "  pyjama --help                     Displays this message"
     print
+    sys.exit(0)
+elif "--version" in args:
+    print version
     sys.exit(0)
 if "--nogui" not in args:
     Gtk.Application.Init()

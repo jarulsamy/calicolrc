@@ -187,6 +187,8 @@ class ShellWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
+        self.message("Pyjama Project, Version %s, on %s" % (self.pyjama.version, 
+                                                            self.pyjama.system))
     
     def modify_font(self, font):
         self.textview.ModifyFont(font)
@@ -362,7 +364,7 @@ class ShellWindow(Window):
     def clear(self, obj, event):
         def invoke_clear(sender, args):
             MUTEX.WaitOne()
-            self.history_textview.Buffer.Text = ''
+            self.history_textview.Buffer.Text = ""
             MUTEX.ReleaseMutex()
         Gtk.Application.Invoke(invoke_clear)
 

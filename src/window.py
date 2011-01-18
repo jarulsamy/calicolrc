@@ -209,28 +209,3 @@ class Window(object):
             pixbuf.Save(filename, filename.rsplit(".")[-1])
         Gtk.Application.Invoke(invoke)
 
-def aboutPyjama():
-    def invoke(sender, args):
-        aboutDialog = Gtk.AboutDialog()
-        aboutDialog.DefaultResponse = Gtk.ResponseType.Close
-        #aboutDialog.Close += lambda o, e: aboutDialog.Destroy()
-        #aboutDialog.SetEmailHook(lambda dialog, email: self.message(email))
-        #aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
-        # 
-        #aboutDialog.Artists =""
-        aboutDialog.Authors = System.Array[str](["Douglas Blank <dblank@cs.brynmawr.edu>"])
-        aboutDialog.Comments = "Scripting Environment"
-        aboutDialog.Copyright = "(c) 2011, Institute for Personal Robots in Education"
-        #aboutDialog.Documenters
-        #aboutDialog.License
-        #aboutDialog.Logo
-        #aboutDialog.LogoIconName
-        aboutDialog.Name = "Pyjama Project"
-        #aboutDialog.TranslatorCredits
-        aboutDialog.Version = "0.2.1"
-        aboutDialog.Website = "http://PyjamaProject.org/"
-        #aboutDialog.WebsiteLabel
-        aboutDialog.WrapLicense = True
-        aboutDialog.Run()
-        aboutDialog.Destroy()
-    Gtk.Application.Invoke(invoke)

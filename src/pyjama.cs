@@ -14,8 +14,8 @@ public class Pyjama {
 	source.Compile();
 	try {
 	  source.Execute(scope);
-	} catch {
-            // suppress quit message
+	} catch (IronPython.Runtime.Exceptions.SystemExitException e) {
+	  // Nothing to do but exit
 	}
   }
 }
