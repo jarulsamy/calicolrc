@@ -275,6 +275,10 @@ class PyjamaProject(object):
         self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
         Gtk.Application.Invoke(self.update_fonts)
 
+    def about(self, obj, event):
+        from window import aboutPyjama
+        aboutPyjama()
+
 # Let's start!
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
