@@ -1,6 +1,7 @@
 import Gtk
 import System
 from System.Threading import Mutex, ManualResetEvent
+import os
 
 MUTEX = Mutex(False, "PyjamaMutex")
 
