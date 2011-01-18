@@ -239,6 +239,9 @@ class DinahDocument(BaseDocument):
         # FIXME: keep track of whether this is dirty
         return True
 
+    def configure(self):
+        pass
+
     def grab_focus(self):
         self.treeview.GrabFocus()
 
