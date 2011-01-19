@@ -187,8 +187,8 @@ class ShellWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
-        self.message("Pyjama Project, Version %s, on %s" % (self.pyjama.version, 
-                                                            self.pyjama.system))
+        self.message("Pyjama Project, Version %s, on %s\n" % (
+                        self.pyjama.version, self.pyjama.system))
     
     def modify_font(self, font):
         self.textview.ModifyFont(font)

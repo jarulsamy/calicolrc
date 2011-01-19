@@ -56,7 +56,9 @@ class EditorWindow(Window):
                     ("Make font larger", None, None, self.pyjama.increase_fontsize),
                     ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
                     ]),
-                ("_Help", []),
+                ("_Help", [
+                    ("About the Pyjama Project", Gtk.Stock.About, None, self.pyjama.about),
+                          ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
                    (Gtk.Stock.Open, self.on_open_file),
