@@ -1,48 +1,63 @@
-1. Need to build gtksourceview-sharp on windows
+Problems, issues, features, and questions.
 
-2. clicking in Graphics windows cause lockup
+= Pyjama =
 
-3. need gtkscourceview, or need to make indent do right thing
+These are issues with the code in Pyjama/src/*.py
 
-4. (robot.beep 1.0 400.0 400.0) needs to be floats
+# Pyjama: Need to run code in a procedure rather than thread
+# Pyjama: Need to build gtksourceview-sharp on windows
+# Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
+# Pyjama: Add Printing
+# Pyjama: Add license to each file
+# Pyjama: toggle word wrap, linenumbers, others# Pyjama: connect menu edit/copy/paste/select all (see mono-list for hints)
+# Pyjama: Log file for teacher analysis
+# Pyjama: Submit zipfile to teacher dialog (zipfiles written in src/utils.py)
+# Pyjama: Provide student "Hint" links to wiki page on error
+# Pyjama: Move some key handlers so that some can be handled by window, others handled by textview
+# Pyjama: Need a config file to save user options 
+# Pyjama: No backups made of files when editing
+# Pyjama: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
+# Pyjama: Recent files, save in config
+# Pyjama: Plugins (see the way that gedit handles plugins)
+# Pyjama: Need project icon/graphics
+# Pyjama: glib.io_add_watch - watch to see if something else edits file?
+# Pyjama: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
+# Pyjama: Command-line history 
+## don't add empty entries
+## sometimes doesn't add entries
+## don't repeat items
 
-5. Need icon
+= Modules =
 
-6. make sure to do graphics init for all objects
-   make sure to do update for all changes
+These are issue in Pyjama/modules/*
 
-7. glib.io_add_watch - watch to see if someone else edits file
+# Myro: Robot needs jpeg decompress
+# Myro: Write do_together in C#
 
-8. Move some keys to be handled by window, others handled by textview
+# Graphics: clicking in Graphics windows cause lockup
+# Graphics: make sure to do graphics init for all objects
+# Graphics: make sure to do update for all interactive object changes
+# Graphics: Need move_to_top, move_to_bottom (for Shape objects in modules/Graphics/Graphics.cs)
+# Graphics: Unify graphics move/rotate (use Cairo rotate/translate or adjust our own points)
+# Graphics: alpha doesn't apply to Pictures yet
+# Graphics: Missing shapes: Circle, Oval, Text (C#, modules/Graphics/Graphics.cs)
+# Graphics: multi-point line using cairo
 
-9. toggle word wrap
+= Languages = 
 
-10. connect menu edit/copy/paste/select all
+# Scheme: (robot.beep 1.0 400.0 400.0) needs to be floats?
 
-11. Infinite loop in Pyjama Python on Windows crashes rather than reports error.
+# Dinah: Get working
+## read classes, methods, params and return values from DLL
+## save/read file format
+## execute file
 
-12. No backups made of files.
+= System = 
 
-13. Quit doesn't ask if you are sure, or if you want to save unsaved edits.
+DLR things for the Dynamic Language Runtime. Mono is the open source VM for the CLR.
 
-14. Need toggles for line numbers, wrap
+# DLR: Stack overflow in Mono IronPython on Windows crashes rather than reports error.
+# DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
 
-15. Need a config file to save config
+# Mono: Dinah crashes on Mac on drop. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
 
-16. Recent files, save in config
-
-17. Submit to> dialog
-
-18. Log file for teacher
-
-19. Dinah crashes on Mac on drop.
-
-20. Robot needs jpeg decompress
-
-21. Find, replace, search, across files, directories (see pyjama.grep)
-
-22. Add license to each file
-
-23. Printing
-
-24. Plugins (see gedit plugins)
