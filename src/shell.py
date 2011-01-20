@@ -92,9 +92,9 @@ class ShellWindow(Window):
                    None, self.on_quit),
                   ]),
                 ("_Edit", [
-                    ("_Copy", Gtk.Stock.Copy, None, None),
-                    ("_Paste", None, None, self.on_paste),
-                    ("Cut", None, None, self.on_cut),
+                    ("_Copy", None, None, None),
+                    ("_Paste", None, None, None),
+                    ("Cut", None, None, None),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
                     None,
                     ("Indent", None, "<control>bracketright", self.indent_region),
@@ -203,18 +203,18 @@ class ShellWindow(Window):
 
     def on_copy(self, obj, event):
         focused = self.window.Focus
-        #if focused:
-        #    focused.CopyClipboard()
+        if focused:
+            focused.CopyClipboard(self.clipboard)
 
     def on_cut(self, obj):
         focused = self.window.Focus
-        #if focused:
-        #    focused.CutClipboard()
+        if focused:
+            focused.CutClipboard(self.clipboard, True) # FIXME: editable?
 
     def on_paste(self, obj):
         focused = self.window.Focus
-        #if focused:
-        #    focused.PasteClipboard()
+        if focused:
+            focused.PasteClipboard(self.clipboard, None, True) # FIXME: editable?
     
     def make_language_menu(self):
         languages = []
