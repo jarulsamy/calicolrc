@@ -333,7 +333,7 @@ class ShellWindow(Window):
         variable = self.find_variable(text)
         items = []
         if variable:
-            parts = variable.split(".")
+            parts = variable.split(".", 1)
             root = parts[0]
             if len(parts) == 1:
                 items = [x for x in self.pyjama.engine.scope.GetVariableNames() if x.startswith(root)]

@@ -206,7 +206,7 @@ class EditorWindow(Window):
         # FIXME: allow TXT types files, just to edit
         if filename:
             if "." in filename:
-                pathname, extension = filename.rsplit(".")
+                pathname, extension = filename.rsplit(".", 1)
             else:
                 pathname, extension = filename, ""
             for lang in self.pyjama.languages:

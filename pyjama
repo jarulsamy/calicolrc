@@ -1,2 +1,3 @@
 #!/bin/sh
+DYLD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$DYLD_LIBRARY_PATH
 /usr/bin/env mono $MONO_OPTIONS bin/pyjama.exe "$@"

@@ -206,6 +206,6 @@ class Window(object):
             colormap = drawable.Colormap 
             size = drawable.GetSize()
             pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, size[0], size[1])
-            pixbuf.Save(filename, filename.rsplit(".")[-1])
+            pixbuf.Save(filename, filename.rsplit(".", 1)[-1])
         Gtk.Application.Invoke(invoke)
 
