@@ -92,9 +92,9 @@ class ShellWindow(Window):
                    None, self.on_quit),
                   ]),
                 ("_Edit", [
-                    ("_Copy", None, None, None),
-                    ("_Paste", None, None, None),
-                    ("Cut", None, None, None),
+                    ("_Copy", Gtk.Stock.Copy, None, None),
+                    ("_Paste", None, None, self.on_paste),
+                    ("Cut", None, None, self.on_cut),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
                     None,
                     ("Indent", None, "<control>bracketright", self.indent_region),
@@ -136,10 +136,17 @@ class ShellWindow(Window):
 
         try:
             import clr
+            #import GLib
             clr.AddReference("gtksourceview2-sharp")
             import GtkSourceView
+            #class MyGtkSourceView(GtkSourceView.SourceView):
+            #    def __init__(self):
+            #        GLib.Object.__init__(self)
+            #        self.set_name("_mygtksourceview_")
+            #GLib.Object.RegisterGType(MyGtkSourceView)
+
             self.lang_manager = GtkSourceView.SourceLanguageManager()
-            self.textview = GtkSourceView.SourceView()
+            self.textview = GtkSourceView.SourceView() # MyGtkSourceView()
             self.textview.ShowLineNumbers = False
             self.textview.InsertSpacesInsteadOfTabs = True
             self.textview.IndentWidth = 4
@@ -194,9 +201,20 @@ class ShellWindow(Window):
         self.textview.ModifyFont(font)
         self.history_textview.ModifyFont(font)
 
-    def OnCopyClicked(self, obj, args):
-        #self.clipboard.SetText("xxx")
-        pass
+    def on_copy(self, obj, event):
+        focused = self.window.Focus
+        #if focused:
+        #    focused.CopyClipboard()
+
+    def on_cut(self, obj):
+        focused = self.window.Focus
+        #if focused:
+        #    focused.CutClipboard()
+
+    def on_paste(self, obj):
+        focused = self.window.Focus
+        #if focused:
+        #    focused.PasteClipboard()
     
     def make_language_menu(self):
         languages = []
