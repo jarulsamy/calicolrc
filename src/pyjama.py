@@ -14,14 +14,15 @@ sys.path.append(os.path.abspath("modules"))
 # Add some paths for Windows:
 import Microsoft
 import System
+mono_version = "?.?.?"
 try:
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
 except:
     registry = None
 # Get Mono Path    
 if registry:
-    version = registry.GetValue("DefaultCLR") # '2.8', '2.8.1', etc
-    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\%s\\" % version)
+    mono_version = registry.GetValue("DefaultCLR") # '2.8', '2.8.1', etc
+    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\%s\\" % mono_version)
     path = registry.GetValue("SdkInstallRoot") # Path to Mono
     if path:
         sys.path.append("%s\\lib\\mono\\gtk-sharp-2.0" % path)
@@ -90,6 +91,7 @@ class PyjamaProject(object):
         self.shell = None
         self.editor = None
         self.version = version
+        self.mono_version = mono_version
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
@@ -289,7 +291,8 @@ class PyjamaProject(object):
             # 
             #aboutDialog.Artists =""
             aboutDialog.Authors = System.Array[str](["Douglas Blank <dblank@cs.brynmawr.edu>"])
-            aboutDialog.Comments = "Scripting Environment\n\nRunning on %s" % self.system
+            aboutDialog.Comments = "Scripting Environment\n\nRunning on %s\nMono %s\n" % (self.system, 
+                                                                                          self.mono_version)
             aboutDialog.Copyright = "(c) 2011, Institute for Personal Robots in Education"
             #aboutDialog.Documenters
             #aboutDialog.License
