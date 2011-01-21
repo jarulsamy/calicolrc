@@ -57,12 +57,14 @@ import traceback
 from engine import EngineManager
 
 # Setup Runtime environment:
-def handle_exception(e):
-    print >> sys.stderr, e.__class__.__name__
+def handle_exception(arg):
+    #print >> sys.stderr, e.__class__.__name__
+    print dir(arg)
+    sys.exit(1)
 
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
-GLib.ExceptionManager.UnhandledException += handle_exception
+#GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
 from utils import _

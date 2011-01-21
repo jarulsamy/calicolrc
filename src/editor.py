@@ -89,9 +89,7 @@ class EditorWindow(Window):
         if files:
             for file in files:
                 filename = os.path.abspath(file)
-                page = self.make_document(filename)
-                self.notebook.AppendPage(page.widget, page.tab)
-                self.notebook.SetTabReorderable(page.widget, True)
+                self.select_or_open(filename)
         else:
             page = self.make_document(None)
             self.notebook.AppendPage(page.widget, page.tab)
@@ -120,7 +118,10 @@ class EditorWindow(Window):
             self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
             if doc.filename:
                 path, filename = os.path.split(doc.filename)
-                os.chdir(path)
+                try:
+                    os.chdir(path)
+                except:
+                    pass # Fail silently
         else:
             self.statusbar.Pop(0)
             self.statusbar.Push(0, _("Language: "))

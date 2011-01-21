@@ -25,6 +25,30 @@ class PythonEngine(DLREngine):
         super(PythonEngine, self).setup()
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(IronPython.Hosting.Python).Assembly)
+        # Execute startup script in Python
+        text = ("from __future__ import division, with_statement;" +
+                "del division, with_statement")
+        sctype = Microsoft.Scripting.SourceCodeKind.Statements
+        source = self.engine.CreateScriptSourceFromString(text, sctype)
+        source.Compile()
+        source.Execute(self.manager.scope)
+
+        # Other possible options:
+        #self.compiler_options.AllowWithStatement = True 
+        #self.compiler_options.TrueDivision = True
+        #('AbsoluteImports', False), 
+        #('DontImplyDedent', False), 
+        #('InitialIndent', None), 
+        #('Interpreted', False), 
+        #('Module', IronPython.Runtime.ModuleOptions.None), 
+        #('ModuleName', None), 
+        #('Optimized', False), 
+        #('PrintFunction', False), 
+        #('SkipFirstLine', False), 
+        #('UnicodeLiterals', False), 
+        #('Verbatim', False), 
+        #setup = self.engine.Setup
+        #setup.ExceptionDetail = True
 
     def start(self):
         paths = self.engine.GetSearchPaths()

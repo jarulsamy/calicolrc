@@ -80,33 +80,7 @@ class Engine(object):
 class DLREngine(Engine):
     def setup(self):
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)
-        #if self.language == "python":
-        #    options = self.engine.GetCompilerOptions()
-        #    options.AllowWithStatement = True 
-        #    options.TrueDivision = True
-        #    options = self.engine.GetCompilerOptions()
-        #    print options.TrueDivision
-        #('AbsoluteImports', False), 
-        #('AllowWithStatement', False), 
-        #('DontImplyDedent', False), 
-        #('InitialIndent', None), 
-        #('Interpreted', False), 
-        #('Module', IronPython.Runtime.ModuleOptions.None), 
-        #('ModuleName', None), 
-        #('Optimized', False), 
-        #('PrintFunction', False), 
-        #('SkipFirstLine', False), 
-        #('TrueDivision', False), 
-        #('UnicodeLiterals', False), 
-        #('Verbatim', False), 
-        #setup = self.engine.Setup
-        #setup.ExceptionDetail = True
-        #Dictionary options = new Dictionary(); 
-        #options["FullFrames"] = ScriptingRuntimeHelpers.True; 
-        #options["Debug"] = ScriptingRuntimeHelpers.True; 
-        #ScriptEngine engine = Python.CreateEngine(options); 
         #Python.SetTrace(engine, OnTraceBack); 
-        # {'FullFrames': True}
         # Load mscorlib.dll:
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(System.String).Assembly)
