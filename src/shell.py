@@ -159,7 +159,7 @@ class ShellWindow(Window):
         self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.AcceptsTab = True
         self.textview.Show()
-        self.textview.ModifyFont(self.pyjama.font)
+        self.textview.ModifyFont(self.pyjama.get_fontname())
         self.scrolled_window.AddWithViewport(self.textview)
         self.results = Gtk.ScrolledWindow()
         for color in ["red", "blue", "purple", "black"]:
@@ -168,7 +168,7 @@ class ShellWindow(Window):
                 tag.Weight = Pango.Weight.Bold
             tag.Foreground = color 
             self.history_textview.Buffer.TagTable.Add(tag)
-        self.history_textview.ModifyFont(self.pyjama.font)
+        self.history_textview.ModifyFont(self.pyjama.get_fontname())
         self.history_textview.PopulatePopup += self.popup
         self.history_textview.WrapMode = Gtk.WrapMode.Char
         self.history_textview.Editable = False

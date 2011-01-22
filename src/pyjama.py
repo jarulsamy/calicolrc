@@ -56,6 +56,8 @@ import traceback
 
 # Pyjama imports:
 from engine import EngineManager
+from config import config
+from utils import _
 
 # Setup Runtime environment:
 def handle_exception(arg):
@@ -68,7 +70,7 @@ def handle_exception(arg):
 #GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
-from utils import _
+
 
 def get_registered_languages():
     import glob
@@ -90,14 +92,13 @@ class PyjamaProject(object):
     def __init__(self, argv):
         self.shell = None
         self.editor = None
-        self.version = version
-        self.mono_version = mono_version
+        self.version = version           # from global variable
+        self.config = config             # from global variable
+        self.mono_version = mono_version # from global variable
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
         self.indent_string = "    "
-        self.fontsize = 10
-        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
         self.languages = get_registered_languages()
         self.engine = EngineManager(self)
         for lang in self.languages:
@@ -265,20 +266,27 @@ class PyjamaProject(object):
                 list.extend(self.findfiles(subdir, base, recursive))
         return list
 
-    def increase_fontsize(self, obj, event):
-        self.fontsize += 1
-        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
-        Gtk.Application.Invoke(self.update_fonts)
+    def get_fontname(self):
+        fontsize = self.config.get("pyjama.fontsize")
+        font = self.config.get("pyjama.font")
+        pangofont = Pango.FontDescription.FromString("%s %d" % (font, fontsize))
+        return pangofont
 
     def update_fonts(self, sender, args):
+        pangofont = self.get_fontname()
         if self.shell:
-            self.shell.modify_font(self.font)
+            self.shell.modify_font(pangofont)
         if self.editor:
-            self.editor.modify_font(self.font)
+            self.editor.modify_font(pangofont)
+
+    def increase_fontsize(self, obj, event):
+        self.config.set("pyjama.fontsize", 
+                        min(self.config.get("pyjama.fontsize") + 1, 36))
+        Gtk.Application.Invoke(self.update_fonts)
 
     def decrease_fontsize(self, obj, event):
-        self.fontsize -= 1
-        self.font = Pango.FontDescription.FromString("Monospace %d" % self.fontsize)
+        self.config.set("pyjama.fontsize", 
+                        max(self.config.get("pyjama.fontsize") - 1, 5))
         Gtk.Application.Invoke(self.update_fonts)
 
     def about(self, obj, event):
@@ -341,4 +349,5 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
+    config.save()
 

@@ -6,7 +6,9 @@ using Microsoft.Scripting.Hosting;
 public class Pyjama {
   static void Main(string[] args) {
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
-	scriptRuntimeSetup.LanguageSetups.Add(Python.CreateLanguageSetup(null));
+        LanguageSetup language = Python.CreateLanguageSetup(null);
+        language.Options["FullFrames"] = true;
+	scriptRuntimeSetup.LanguageSetups.Add(language);
 	ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 	ScriptScope scope = runtime.CreateScope();
 	ScriptEngine engine = runtime.GetEngine("python");

@@ -159,7 +159,7 @@ class ConfigManager(object):
                         # this could be a third-party setting; add it:
                         self.data[name][setting] = value
 
-    def save(self, filename = None):
+    def save(self, filename=None):
         """
         Saves the current section/settings to an .ini file. Optional filename
         will override the default filename to save to, if given.
@@ -374,3 +374,8 @@ class ConfigManager(object):
                 setting in self.callbacks[section]):
                 self.emit(key)
 
+# Set defaults:
+config = ConfigManager(os.path.expanduser("~/.pyjama.ini"))
+config.register("pyjama.font", "Monospace")
+config.register("pyjama.fontsize", 10)
+config.load()

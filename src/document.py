@@ -82,7 +82,7 @@ class BaseDocument(object):
         self.textview = Gtk.TextView() 
         self.widget.Add(self.textview)
         self.textview.Buffer.ModifiedChanged += self.on_modified
-        self.textview.ModifyFont(self.pyjama.font)
+        self.textview.ModifyFont(self.pyjama.get_fontname())
         self.textview.Show()
         self.widget.Show()
         self.textview.GrabFocus()
@@ -147,7 +147,7 @@ try:
             self.textview = GtkSourceView.SourceView()
             self.textview.ShowLineNumbers =True
             self.textview.HighlightCurrentLine = True
-            self.textview.ModifyFont(self.pyjama.font)
+            self.textview.ModifyFont(self.pyjama.get_fontname())
             self.textview.Buffer.Language = self.lang_manager.GetLanguage(
                 self.language)
             self.widget.Add(self.textview)
