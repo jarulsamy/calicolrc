@@ -146,6 +146,12 @@ class EditorWindow(Window):
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
+            # FIXME: also add to live Recent files menu:
+            if filename not in self.pyjama.config.get("pyjama.recent_files"):
+                self.pyjama.config.get("pyjama.recent_files").append(filename)
+            if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
+                self.pyjama.config.get("pyjama.recent_files").pop()
+            ############################################
         # Remove temp page, if one:
         if self.notebook.NPages == 2:
             doc0 = self.notebook.GetNthPage(0).document
@@ -190,9 +196,10 @@ class EditorWindow(Window):
         page_num = self.notebook.AppendPage(page.widget, page.tab)
         self.notebook.SetTabReorderable(page.widget, True)
         self.notebook.CurrentPage = page_num
-        doc0 = self.notebook.GetNthPage(0).document
-        if doc0.filename == None and not doc0.get_dirty():
-            self.notebook.RemovePage(0)
+        if page_num == 2:
+            doc0 = self.notebook.GetNthPage(0).document
+            if doc0.filename == None and not doc0.get_dirty():
+                self.notebook.RemovePage(0)
 
     def make_new_file_menu(self):
         retval = []
@@ -201,6 +208,10 @@ class EditorWindow(Window):
                 ("New %s Script" % lang.title(), None, 
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
                 )
+        retval.append(None) # separator
+        retval.append("Recent files") # submenu
+        for file in sorted(self.pyjama.config.get("pyjama.recent_files")):
+            retval.append(("Recent files", (file, None, None, lambda o,e,file=file: self.select_or_open(file))))
         return retval
 
     def make_document(self, filename):

@@ -23,29 +23,45 @@ class MyWindow(Gtk.Window):
         return (self.on_key_press(eventkey) or 
                 Gtk.Window.OnKeyPressEvent(self, eventkey))
 
+def make_menuitem(row, accel_group):
+    subtext, img, accel, function = row
+    if img is None:
+        menuitem = Gtk.MenuItem(subtext)
+    else:
+        menuitem = Gtk.ImageMenuItem(img, accel_group)
+    if function:
+        menuitem.Activated += function
+    if accel:
+        key, mod = Gtk.Accelerator.Parse(accel)
+        menuitem.AddAccelerator("activate", accel_group, 
+                                key, mod, 
+                                Gtk.AccelFlags.Visible)
+    return menuitem
+
 class Window(object):
     def make_gui(self, menu, toolbar):
         self.menubar = Gtk.MenuBar()
+        self.submenu = {}
         for text, items in menu:
             submenu = Gtk.Menu()
             accel_group = Gtk.AccelGroup()
             self.window.AddAccelGroup(accel_group)
             for row in items:
-                if row is None:
+                if row is None: # separator
                     menuitem = Gtk.SeparatorMenuItem()
+                elif isinstance(row, str): # submenu
+                    self.submenu[row] = Gtk.Menu()
+                    menuitem = Gtk.MenuItem(row)
+                    menuitem.Submenu = self.submenu[row]
+                    submenu.Append(menuitem)
+                    continue
+                elif len(row) == 2: # submenu, entry
+                    menuname, row = row
+                    menuitem = make_menuitem(row, accel_group)
+                    self.submenu[menuname].Append(menuitem)
+                    continue
                 else:
-                    subtext, img, accel, function = row
-                    if img is None:
-                        menuitem = Gtk.MenuItem(subtext)
-                    else:
-                        menuitem = Gtk.ImageMenuItem(img, accel_group)
-                    if function:
-                        menuitem.Activated += function
-                    if accel:
-                        key, mod = Gtk.Accelerator.Parse(accel)
-                        menuitem.AddAccelerator("activate", accel_group, 
-                                                key, mod, 
-                                                Gtk.AccelFlags.Visible)
+                    menuitem = make_menuitem(row, accel_group)
                 submenu.Append(menuitem)
             menuitem = Gtk.MenuItem(text)
             menuitem.Submenu = submenu

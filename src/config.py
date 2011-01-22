@@ -378,4 +378,5 @@ class ConfigManager(object):
 config = ConfigManager(os.path.expanduser("~/.pyjama.ini"))
 config.register("pyjama.font", "Monospace")
 config.register("pyjama.fontsize", 10)
+config.register("pyjama.recent_files", [])
 config.load()
