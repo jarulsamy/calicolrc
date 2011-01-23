@@ -2,7 +2,7 @@ import clr
 import sys
 from System.IO import StringReader
 from sympl import sympl
-from document import Document
+from document import MakeDocument
 from engine import Engine
 from utils import Language
 
@@ -42,7 +42,7 @@ class Sympl(Language):
         return SymplEngine
 
     def get_document_class(self):
-        return Document
+        return MakeDocument
 
 def register_language():
     return Sympl("sympl", "sympl")

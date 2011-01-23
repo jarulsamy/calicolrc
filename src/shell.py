@@ -1,16 +1,18 @@
 # Bring .NET References into IronPython scope:
 import Gtk, Gdk, Pango, GLib
 import System
+import System.Threading
 import re
 
+# Pyjama modules:
 from window import Window, MyWindow
 from utils import _, CustomStream, MUTEX, ConsoleStream
 
+# Pure-Python modules:
 import traceback
 import sys, os
 
-import System.Threading
-
+# Local classes:
 class History(object):
     def __init__(self):
         self.history = []
@@ -474,7 +476,7 @@ class ShellWindow(Window):
             self.history_textview.Buffer.InsertWithTagsByName(end, 
                              "%s\n" % line,
                              "blue")
-            prompt = ((".....%d" % count)[-6:]) + ">"
+            prompt = ((".....%d" % count)[-6:]) + "> "
             count += 1
         MUTEX.ReleaseMutex()
 

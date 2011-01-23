@@ -104,10 +104,10 @@ class EditorWindow(Window):
         here, return True.
         """
         if str(eventkey.Key) == "Tab":
-            textview = self.get_current_doc().textview
-            if textview:
-                textview.Buffer.InsertAtCursor(self.pyjama.indent_string)
-            return True
+            doc = self.get_current_doc()
+            if doc:
+                doc.insert_at_cursor(self.pyjama.indent_string)
+                return True
         return False
 
     def changed_page(self, obj, event):
@@ -127,7 +127,7 @@ class EditorWindow(Window):
             self.statusbar.Push(0, _("Language: "))
             self.window.Title = _("Pyjama Editor")
 
-    def select_or_open(self, filename, lineno=0):
+    def select_or_open(self, filename, lineno=0, language="python"):
         """
         Open, or select a file if already opened.
         lineno == 0 means don't care, otherwise go to
@@ -135,14 +135,18 @@ class EditorWindow(Window):
         """
         page = None
         # if already open, select it
-        for page_num in range(self.notebook.NPages):
-            npage = self.notebook.GetNthPage(page_num)
-            if npage.document.filename == filename:
-                self.notebook.CurrentPage = page_num
-                page = npage
-                break
-        if page is None:
-            page = self.make_document(filename)
+        if filename is not None:
+            for page_num in range(self.notebook.NPages):
+                npage = self.notebook.GetNthPage(page_num)
+                if npage.document.filename == filename:
+                    self.notebook.CurrentPage = page_num
+                    page = npage # reselect opened filename
+                    break
+            if page is None:
+                page = self.make_document(filename) # make a new document with filename
+        else: # make a no-named document of type language
+            page = self.make_document(None, language)
+        if page:
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
@@ -151,8 +155,8 @@ class EditorWindow(Window):
                 self.pyjama.config.get("pyjama.recent_files").append(filename)
             if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
                 self.pyjama.config.get("pyjama.recent_files").pop()
-            ############################################
-        # Remove temp page, if one:
+        ###########################################################
+        # Remove temp page, if one, and not same kind as one added:
         if self.notebook.NPages == 2:
             doc0 = self.notebook.GetNthPage(0).document
             if doc0.filename is None and not doc0.get_dirty():
@@ -162,15 +166,12 @@ class EditorWindow(Window):
 
     def goto_line(self, lineno):
         """
-        Go to a line number in the current document. Call with [1, n]. Internally,
-        linenumbers are zero-based.
+        Go to a line number in the current document. Call with [1, n]
+        inclusive.
         """
-        def invoke(sender, args):
-            doc = self.get_current_doc()
-            line = doc.textview.Buffer.GetIterAtLine(lineno - 1)
-            doc.textview.Buffer.PlaceCursor(line)
-            GLib.Timeout.Add(200, lambda: doc.textview.ScrollToIter(line, 0.4, True, 0, 1.0))
-        Gtk.Application.Invoke(invoke)
+        doc = self.get_current_doc()
+        if doc:
+            doc.goto_line(lineno)
 
     def on_open_file(self, obj, event):
         retval = False
@@ -192,14 +193,7 @@ class EditorWindow(Window):
         self.notebook.RemovePage(page_num)
 
     def on_new_file(self, obj, event, language="python"):
-        page = self.pyjama.languages[language].get_document_class()(None, self.pyjama, language)
-        page_num = self.notebook.AppendPage(page.widget, page.tab)
-        self.notebook.SetTabReorderable(page.widget, True)
-        self.notebook.CurrentPage = page_num
-        if page_num == 2:
-            doc0 = self.notebook.GetNthPage(0).document
-            if doc0.filename == None and not doc0.get_dirty():
-                self.notebook.RemovePage(0)
+        self.select_or_open(None, language=language)
 
     def make_new_file_menu(self):
         retval = []
@@ -214,7 +208,11 @@ class EditorWindow(Window):
             retval.append(("Recent files", (file, None, None, lambda o,e,file=file: self.select_or_open(file))))
         return retval
 
-    def make_document(self, filename):
+    # FIXME: get default type of file from config 
+    def make_document(self, filename, language="python"):
+        """
+        Provide language if filename is not given.
+        """
         # FIXME: allow TXT types files, just to edit
         if filename:
             if "." in filename:
@@ -225,8 +223,7 @@ class EditorWindow(Window):
                 if self.pyjama.languages[lang].extension == extension:
                     page = self.pyjama.languages[lang].get_document_class()(filename, self.pyjama, lang)
                     return page
-        # FIXME: get default type of file from config 
-        page = self.pyjama.languages["python"].get_document_class()(filename, self.pyjama, "python")
+        page = self.pyjama.languages[language].get_document_class()(filename, self.pyjama, language)
         return page
 
     def on_save_file(self, obj, event):
@@ -262,9 +259,8 @@ class EditorWindow(Window):
         if doc:
             self.pyjama.setup_shell()
             # if text selected, use that
-            (selected, start, end) = doc.textview.Buffer.GetSelectionBounds()
-            if selected:
-                text = doc.textview.Buffer.GetText(start, end, True)
+            text = doc.get_selected_text()
+            if text:
                 self.pyjama.shell.load_text(text, doc.language)
             else:
                 # else, load file
@@ -277,12 +273,6 @@ class EditorWindow(Window):
 
     def on_quit(self, obj, event):
         Gtk.Application.Quit()
-
-    def get_textview(self):
-        """
-        Overloaded to give the current doc's textview.
-        """
-        return self.get_current_doc().textview
 
     def modify_font(self, font):
         for doc in self.get_docs():

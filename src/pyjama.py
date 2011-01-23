@@ -48,7 +48,6 @@ clr.AddReference("Microsoft.Scripting")
 
 # Bring .NET References into IronPython scope:
 import Gtk
-import GLib
 import Pango
 
 # Import pure-Python modules:
@@ -160,16 +159,6 @@ class PyjamaProject(object):
     def Print(self, message):
         self.setup_shell()
         self.shell.message(message, "green")
-
-    def on_run(self, obj, event):
-        doc = self.get_current_doc()
-        if doc and doc.textview.HasFocus:
-            text = str(doc.textview.Buffer.Text)
-            doc.execute(text)
-        else:
-            self.command_pane.textview.HasFocus = True
-            text = str(self.command_pane.textview.Buffer.Text)
-            doc.execute(text)
 
     def on_close(self, what):
         if what == "shell":

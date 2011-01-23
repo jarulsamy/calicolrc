@@ -2,7 +2,7 @@ import clr
 import sys
 clr.AddReference("PJScheme.dll")
 import PJScheme
-from document import Document
+from document import MakeDocument
 from engine import Engine
 from utils import Language
 
@@ -44,7 +44,8 @@ class Scheme(Language):
         return SchemeEngine
 
     def get_document_class(self):
-        return Document
+        return MakeDocument
 
 def register_language():
     return Scheme("scheme", "ss")
+

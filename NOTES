@@ -4,12 +4,12 @@ Problems, issues, features, and questions.
 
 These are issues with the code in Pyjama/src/*.py
 
-# Pyjama: Need to run code in a procedure rather than thread
-# Pyjama: Need to build gtksourceview-sharp on windows
+# Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
 # Pyjama: Add Printing
 # Pyjama: Add license to each file
-# Pyjama: toggle word wrap, linenumbers, others# Pyjama: connect menu edit/copy/paste/select all (see mono-list for hints)
+# Pyjama: toggle word wrap, linenumbers, others
+# Pyjama: connect menu edit/copy/paste/select all (see mono-list for hints)
 # Pyjama: Log file for teacher analysis
 # Pyjama: Submit zipfile to teacher dialog (zipfiles written in src/utils.py)
 # Pyjama: Provide student "Hint" links to wiki page on error
@@ -22,17 +22,30 @@ These are issues with the code in Pyjama/src/*.py
 # Pyjama: Need project icon/graphics
 # Pyjama: glib.io_add_watch - watch to see if something else edits file?
 # Pyjama: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
-# Pyjama: Command-line history 
+# Pyjama: Rewrite Command-line history 
 ## don't add empty entries
 ## sometimes doesn't add entries
 ## don't repeat items
+# Pyjama: Python exception when Gtk is running just hangs; why? In other thread?
+
+= Education =
+
+# Provide easy method to take surveys, quiz
+# Log file analysis
+# Give hint on error; link to web page
+# Interactive instruction ala Classroom Presenter, but via chat
+# Chat window
 
 = Modules =
 
 These are issue in Pyjama/modules/*
 
+Myro module for using robots:
+
 # Myro: Robot needs jpeg decompress
 # Myro: Write do_together in C#
+
+Graphics module for easy 2D graphics:
 
 # Graphics: clicking in Graphics windows cause lockup
 # Graphics: make sure to do graphics init for all objects
@@ -45,7 +58,11 @@ These are issue in Pyjama/modules/*
 
 = Languages = 
 
+Experimental CLR Scheme:
+
 # Scheme: (robot.beep 1.0 400.0 400.0) needs to be floats?
+
+Drag and drop language Dinah:
 
 # Dinah: Get working
 ## read classes, methods, params and return values from DLL
@@ -59,5 +76,6 @@ DLR things for the Dynamic Language Runtime. Mono is the open source VM for the 
 # DLR: Stack overflow in Mono IronPython on Windows crashes rather than reports error.
 # DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
 
-# Mono: Dinah crashes on Mac on drop. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
+# Mono: Dinah crashes on Mac on drop. 
+# Mono: Windows doesn't respond to treeview drags. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
 

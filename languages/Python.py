@@ -5,7 +5,7 @@ clr.AddReference("Microsoft.Scripting")
 import IronPython
 import System
 import Microsoft.Scripting
-from document import Document
+from document import MakeDocument
 from engine import DLREngine
 from utils import Language
 import os
@@ -62,7 +62,7 @@ class Python(Language):
         return PythonEngine
 
     def get_document_class(self):
-        return Document
+        return MakeDocument
 
 def register_language():
     return Python("python", "py")

@@ -12,7 +12,7 @@ import Pango
 import System
 import Microsoft.Scripting.Ast as Ast
 from utils import Language
-from document import BaseDocument, MyScrolledWindow
+from document import Document, MyScrolledWindow
 from engine import Engine
 import glob
 import os
@@ -172,7 +172,7 @@ class MyHPaned(Gtk.HPaned):
     To add reference to document
     """
 
-class DinahDocument(BaseDocument):
+class DinahDocument(Document):
     def make_widget(self):
         self.layouts = {}
         self.lookup = {}

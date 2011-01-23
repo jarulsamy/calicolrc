@@ -3,6 +3,9 @@ import System
 import time
 import os
 
+# How to list relevant items out of a reference:
+# [getattr(clr.References[2], x) for x in dir(clr.References[2]) if type(getattr(clr.References[2], x)) is type]
+
 def get_reference(dll_file):
     """
     >>> get_reference("Myro.dll")
