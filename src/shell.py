@@ -96,7 +96,7 @@ class ShellWindow(Window):
         self.lang_manager = None
         self.window = MyWindow(_("Pyjama Shell"))
         self.window.set_on_key_press(self.on_key_press)
-        self.window.SetDefaultSize(600, 550)
+        self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.history_textview = Gtk.TextView()
         self.vbox = Gtk.VBox()

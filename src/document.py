@@ -51,24 +51,6 @@ class Document(object):
             self.open()
         self.end_not_undoable()
 
-    def begin_not_undoable(self):
-        pass
-
-    def end_not_undoable(self):
-        pass
-
-    def configure(self):
-        pass
-
-    def grab_focus(self):
-        pass
-
-    def search(self):
-        pass
-        
-    def text_has_focus(self):
-        pass
-
     def make_tab(self):
         self.tab = Gtk.HBox()
         self.label = Gtk.Label(self.title)
@@ -92,9 +74,6 @@ class Document(object):
         else:
             self.label.Text = self.title
 
-    def get_dirty(self):
-        pass
-
     def make_widget(self):
         """
         Side-effect creates self.widget with a .document property to
@@ -102,22 +81,6 @@ class Document(object):
         """
         self.widget = MyScrolledWindow()
         self.widget.document = self
-
-    def on_key_press(self, obj, event):
-	print event
-	return False
-
-    def modify_font(self, font):
-        pass
-
-    def get_text(self):
-        pass
-
-    def insert_at_cursor(self, text):
-        pass
-
-    def open(self):
-        pass
 
     def save(self):
         """
@@ -128,6 +91,7 @@ class Document(object):
             fp = open(self.filename, "w")
             fp.write(self.get_text())
             fp.close()
+            self.set_clean()
             return True
         return False
 
@@ -147,21 +111,58 @@ class Document(object):
         fc.Destroy()
         return retval
 
+    def set_clean(self):
+        pass
+
+    def get_dirty(self):
+        pass
+
+    def begin_not_undoable(self):
+        pass
+
+    def end_not_undoable(self):
+        pass
+
     def on_change_file(self):
         self.language = self.pyjama.get_language_from_filename(self.filename)
 
-class TextViewDocument(Document):
     def begin_not_undoable(self):
-        if (hasattr(self, "textview") and 
-            hasattr(self.textview.Buffer, "BeginNotUndoableAction")):
-            self.textview.Buffer.BeginNotUndoableAction()
+        pass
 
     def end_not_undoable(self):
-        if hasattr(self, "textview"): 
-            if hasattr(self.textview.Buffer, "EndNotUndoableAction"):
-                self.textview.Buffer.EndNotUndoableAction()
-            self.textview.Buffer.Modified = False
+        pass
 
+    def configure(self):
+        pass
+
+    def grab_focus(self):
+        pass
+
+    def search(self):
+        pass
+        
+    def text_has_focus(self):
+        pass
+
+    def on_key_press(self, obj, event):
+        return False
+
+    def modify_font(self, font):
+        pass
+
+    def get_text(self):
+        pass
+
+    def insert_at_cursor(self, text):
+        pass
+
+    def open(self):
+        pass
+
+    def goto_line(self, lineno):
+        pass
+
+class TextViewDocument(Document):
     def configure(self):
         self.textview.Editable = True
         self.textview.WrapMode = Gtk.WrapMode.Char
@@ -173,6 +174,9 @@ class TextViewDocument(Document):
     def get_dirty(self):
         return self.textview.Buffer.Modified
 
+    def set_clean(self):
+        self.textview.Buffer.Modified = False
+
     def search(self):
         pass
         # start = self.textview.Buffer.StartIter
@@ -183,7 +187,7 @@ class TextViewDocument(Document):
         #     self.textview.Buffer.SelectRange(mstart, mend)
         
     def make_widget(self):
-        super(TextViewDocument, self).make_widget()
+        Document.make_widget(self)
         # FIXME: need to handle keys in editor:
         self.textview = Gtk.TextView() 
         self.widget.Add(self.textview)
@@ -191,7 +195,7 @@ class TextViewDocument(Document):
         self.modify_font()
         self.textview.Show()
         self.widget.Show()
-        self.textview.GrabFocus()
+        self.grab_focus()
 
     def modify_font(self, font=None):
         if font is None:
@@ -222,16 +226,8 @@ class TextViewDocument(Document):
         Gtk.Application.Invoke(invoke)
 
     def open(self):
-        self.textview.Buffer.Text = "".join(file(self.filename).readlines())
-        self.textview.GrabFocus()
-
-    def save(self):
-        """
-        """
-        retval = super(TextViewDocument, self).save()
-        if retval:
-            self.textview.Buffer.Modified = False
-        return retval
+        self.textview.Buffer.Text = "".join(file(self.filename).xreadlines())
+        self.grab_focus()
 
     def text_has_focus(self):
         return self.textview.HasFocus
@@ -242,8 +238,15 @@ try:
     import GtkSourceView
 
     class SourceViewDocument(TextViewDocument):
+        def begin_not_undoable(self):
+            self.textview.Buffer.BeginNotUndoableAction()
+
+        def end_not_undoable(self):
+            self.textview.Buffer.EndNotUndoableAction()
+            self.set_clean()
+
         def make_widget(self):
-            super(TextViewDocument, self).make_widget()
+            TextViewDocument.make_widget(self)
             self.lang_manager = GtkSourceView.SourceLanguageManager()
             # FIXME: need to handle keys in editor:
             self.textview = GtkSourceView.SourceView()
@@ -253,23 +256,115 @@ try:
             self.widget.Add(self.textview)
             self.textview.Show()
             self.widget.Show()
-            self.textview.GrabFocus()
+            self.grab_focus()
 
         def configure(self):
-            super(SourceViewDocument, self).configure()
+            TextViewDocument.configure(self)
             self.textview.ShowLineNumbers = True
             self.textview.HighlightCurrentLine = True
 
         def on_change_file(self):
-            super(Document, self).on_change_file()
+            TextViewDocument.on_change_file(self)
             self.textview.Buffer.Language = self.lang_manager.GetLanguage(
                 self.language)
-
 except:
     SourceViewDocument = None
 
+try:
+    import clr
+    clr.AddReference("Mono.TextEditor")
+    from Mono.TextEditor import TextEditor
+
+    class TextEditorDocument(Document):
+        def make_widget(self):
+            Document.make_widget(self)
+            # FIXME: need to handle keys in editor:
+            self.texteditor = TextEditor()
+            #self.modify_font()
+            # FIXME: not quite right: should reset on undo and doesn't 
+            # set on space
+            self.texteditor.Document.DocumentUpdated += self.on_modified
+            self.texteditor.Document.MimeType = "text/x-%s" % self.language
+            self.widget.Add(self.texteditor)
+            self.texteditor.Show()
+            self.widget.Show()
+            self.grab_focus()
+
+        def configure(self):
+            #self.texteditor.Options.AllowTabsAfterNonTabs = 
+            #self.texteditor.Options.AutoIndent
+            #self.texteditor.Options.CanResetZoom
+            #self.texteditor.Options.HighlightCaretLine
+            #self.texteditor.Options.HighlightMatchingBracket
+            #self.texteditor.Options.IndentationSize
+            #self.texteditor.Options.IndentationString
+            #self.texteditor.Options.RemoveTrailingWhitespaces
+            #self.texteditor.Options.RulerColumn
+            #self.texteditor.Options.ShowEolMarkers
+            #self.texteditor.Options.ShowFoldMargin
+            #self.texteditor.Options.ShowIconMargin
+            self.texteditor.Options.ShowInvalidLines = False
+            self.texteditor.Options.ShowLineNumberMargin = True
+            #self.texteditor.Options.ShowRuler
+            #self.texteditor.Options.ShowSpaces
+            #self.texteditor.Options.ShowTabs
+            #self.texteditor.Options.TabSize
+            #self.texteditor.Options.TabsToSpaces
+            #self.texteditor.Options.WordFindStrategy
+            #self.texteditor.Options.Zoom
+            #self.texteditor.Options.ZoomIn
+            #self.texteditor.Options.ZoomOut
+            #self.texteditor.Options.ZoomReset
+
+        def on_change_file(self):
+            Document.on_change_file(self)
+            self.texteditor.Document.MimeType = "text/x-%s" % self.language
+
+        def begin_not_undoable(self):
+            pass
+
+        def end_not_undoable(self):
+            pass
+
+        def grab_focus(self):
+            self.texteditor.GrabFocus()
+
+        def search(self):
+            pass
+
+        def text_has_focus(self):
+            pass
+
+        def modify_font(self, font):
+            pass
+
+        def get_text(self):
+            return self.texteditor.Document.Text
+
+        def insert_at_cursor(self, text):
+            pass
+
+        def open(self):
+            self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
+            self.grab_focus()
+            
+        def goto_line(self, lineno):
+            pass
+
+        def get_dirty(self):
+            return self.texteditor.Document.IsDirty
+
+        def set_clean(self):
+            self.texteditor.Document.SetNotDirtyState()
+
+except:
+    TextEditorDocument = None
+
 def MakeDocument(*args, **kwargs):
-    if SourceViewDocument:
+    # In order of Preference:
+    if TextEditorDocument:
+        return TextEditorDocument(*args, **kwargs)
+    elif SourceViewDocument:
         return SourceViewDocument(*args, **kwargs)
     else:
         return TextViewDocument(*args, **kwargs)

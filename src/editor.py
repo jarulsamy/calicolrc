@@ -32,7 +32,7 @@ class EditorWindow(Window):
         # create the parts
         self.window = MyWindow(_("Pyjama Editor"))
         self.window.set_on_key_press(self.on_key_press)
-        self.window.SetDefaultSize(600, 550)
+        self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.vbox = Gtk.VBox()
         # ---------------------
@@ -261,6 +261,8 @@ class EditorWindow(Window):
             return self.notebook.GetNthPage(self.notebook.CurrentPage).document
         else:
             return None
+
+    document = property(get_current_doc)
 
     def get_docs(self):
         return [self.notebook.GetNthPage(i).document 
