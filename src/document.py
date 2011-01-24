@@ -273,9 +273,16 @@ except:
 try:
     import clr
     clr.AddReference("Mono.TextEditor")
-    from Mono.TextEditor import TextEditor
+    from Mono.TextEditor import TextEditor, Highlighting
+    path, filename = os.path.split(__file__)
+    # /.../Pyjama/src/
+    Highlighting.SyntaxModeService.LoadStylesAndModes(
+        os.path.join(path, "..", "bin", "SyntaxModes"))
 
     class TextEditorDocument(Document):
+        def __init__(self, filename, pyjama, language="python"):
+            Document.__init__(self, filename, pyjama, language)
+
         def make_widget(self):
             Document.make_widget(self)
             # FIXME: need to handle keys in editor:

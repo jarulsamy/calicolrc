@@ -115,6 +115,7 @@ class PyjamaProject(object):
         self.version = version           # from global variable
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
+        self.pyjama_root = os.path.abspath(".")
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
