@@ -206,50 +206,6 @@ class Window(object):
         Gnome.Print.Show(gpc, self.textview.Buffer.Text)
         Gnome.Print.Showpage(gpc)
 
-    def get_textview(self):
-        """
-        Return the default textview for this window.
-        """
-        return self.textview
-
-    def indent_region(self, obj, event):
-        """
-        Indent the selected region of text.
-        """
-        (selected, start, end) = self.get_textview().Buffer.GetSelectionBounds()
-        if selected:
-            text = self.get_textview().Buffer.GetText(start, end, True)
-            retval = ""
-            for line in text.split("\n"):
-                retval += "    " + line + "\n"
-            def invoke(sender, args):
-                self.get_textview().Buffer.DeleteSelection(True, True)
-                self.get_textview().Buffer.InsertAtCursor(retval)
-            Gtk.Application.Invoke(invoke)
-            # FIXME: reselect this text
-            # FIXME: slight bug in replace (too many newlines?)
-            return True
-        return False
-
-    def unindent_region(self, obj, event):
-        """
-        Unindent the selected region of text.
-        """
-        (selected, start, end) = self.get_textview().Buffer.GetSelectionBounds()
-        if selected:
-            text = self.get_textview().Buffer.GetText(start, end, True)
-            retval = ""
-            for line in text.split("\n"):
-                retval += line[4:] + "\n"
-            def invoke(sender, args):
-                self.get_textview().Buffer.DeleteSelection(True, True)
-                self.get_textview().Buffer.InsertAtCursor(retval)
-            Gtk.Application.Invoke(invoke)
-            # FIXME: reselect this text
-            # FIXME: slight bug in replace (too many newlines?)
-            return True
-        return False
-
     def save_as_filename(self, filename):
         """
         Save the contents of the current window into a file.

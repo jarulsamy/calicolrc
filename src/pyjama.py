@@ -66,12 +66,22 @@ clr.AddReference("gtk-sharp")
 clr.AddReference("pango-sharp")
 clr.AddReference("glib-sharp")
 #clr.AddReference("gnome-sharp")
+
 # Other DLLs:
 clr.AddReference("Microsoft.Scripting")
+clr.AddReference("Mono.TextEditor")
 
 # Bring .NET References into IronPython scope:
 import Gtk
 import Pango
+
+from Mono.TextEditor import Highlighting
+
+# Initialize text highlighting
+path, filename = os.path.split(__file__)
+# path = "/.../Pyjama/src/"
+Highlighting.SyntaxModeService.LoadStylesAndModes(
+    os.path.join(path, "..", "bin", "SyntaxModes"))
 
 # Import pure-Python modules:
 import traceback

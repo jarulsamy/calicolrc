@@ -19,10 +19,10 @@
 # $Id: $
 
 # Bring .NET References into IronPython scope:
+from Mono.TextEditor import TextEditor, TextEditorOptions
 import Gtk, Gdk, Pango, GLib
 import System
 import System.Threading
-import re
 
 # Pyjama modules:
 from window import Window, MyWindow
@@ -31,6 +31,7 @@ from utils import _, CustomStream, MUTEX, ConsoleStream
 # Pure-Python modules:
 import traceback
 import sys, os
+import re
 
 # Local classes:
 class History(object):
@@ -72,7 +73,6 @@ class History(object):
 
 class Shell(object):
     def __init__(self, pyjama, files):
-        self.DEBUG = False
         self.pyjama = pyjama
         self.pyjama.engine.set_redirects(ConsoleStream(), 
                                          ConsoleStream("red"), None)
@@ -89,7 +89,6 @@ class Shell(object):
 
 class ShellWindow(Window):
     def __init__(self, pyjama):
-        self.DEBUG = False
         self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
@@ -119,9 +118,6 @@ class ShellWindow(Window):
                     ("_Paste", None, None, None),
                     ("Cut", None, None, None),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
-                    None,
-                    ("Indent", None, "<control>bracketright", self.indent_region),
-                    ("Unindent", None, "<control>bracketleft", self.unindent_region),
                           ]),
                 ("She_ll", self.make_language_menu()),
                 ("Windows", [
@@ -157,32 +153,16 @@ class ShellWindow(Window):
         self.scrolled_window.ShadowType = Gtk.ShadowType.Out
         self.scrolled_window.HeightRequest = 20
 
-        try:
-            import clr
-            #import GLib
-            clr.AddReference("gtksourceview2-sharp")
-            import GtkSourceView
-            #class MyGtkSourceView(GtkSourceView.SourceView):
-            #    def __init__(self):
-            #        GLib.Object.__init__(self)
-            #        self.set_name("_mygtksourceview_")
-            #GLib.Object.RegisterGType(MyGtkSourceView)
+        options = TextEditorOptions()
+        self.textview = TextEditor(Options=options)
+        self.textview.Options.ShowFoldMargin = False
+        self.textview.Options.ShowIconMargin = False
+        self.textview.Options.ShowInvalidLines = False
+        self.textview.Options.ShowLineNumberMargin = True
+        self.textview.Document.MimeType = "text/x-%s" % self.language
 
-            self.lang_manager = GtkSourceView.SourceLanguageManager()
-            self.textview = GtkSourceView.SourceView() # MyGtkSourceView()
-            self.textview.ShowLineNumbers = False
-            self.textview.InsertSpacesInsteadOfTabs = True
-            self.textview.IndentWidth = 4
-            self.textview.Buffer.Language = self.lang_manager.GetLanguage(
-                self.language)
-        except:
-            self.textview = Gtk.TextView()
-
-        self.textview.Editable = True
-        self.textview.WrapMode = Gtk.WrapMode.Char
-        self.textview.AcceptsTab = True
         self.textview.Show()
-        self.textview.ModifyFont(self.pyjama.get_fontname())
+        #self.textview.ModifyFont(self.pyjama.get_fontname())
         self.scrolled_window.AddWithViewport(self.textview)
         self.results = Gtk.ScrolledWindow()
         for color in ["red", "blue", "purple", "black"]:
@@ -221,7 +201,7 @@ class ShellWindow(Window):
         self.message(("-" * 50) + "\n")
     
     def modify_font(self, font):
-        self.textview.ModifyFont(font)
+        #self.textview.ModifyFont(font)
         self.history_textview.ModifyFont(font)
 
     def on_copy(self, obj, event):
@@ -265,29 +245,30 @@ class ShellWindow(Window):
         # FIXME: this should be handled in textview, but haven't
         # figured out how to overload just it.
         # So, this currently handles the keys for the whole window.
-        if self.DEBUG and event is not None:
-            self.message(str(event.Key))
+        #if event is not None:
+        #    self.message(str(event.Key))
         if event is None or str(event.Key) == "Return":
             # if cursor in middle, insert a Return
-            mark = self.textview.Buffer.InsertMark
-            itermark = self.textview.Buffer.GetIterAtMark(mark)
-            line = itermark.Line
-            if line != self.textview.Buffer.LineCount - 1 and not force:
+            caret = self.textview.Caret
+            line = caret.Line
+            line_count = self.textview.Document.LineCount
+            if line != line_count - 1 and not force:
                 return False
             # else, execute text
             # extra line at end signals ready_to_execute:
-            text = self.textview.Buffer.Text 
+            text = self.textview.Document.Text
             if text == "":
                 return True # nothing to do, but handled
             elif self.ready_for_execute(text) or force:
                 if self.history.dirty and self.history.nextlast():
-                    self.history.replace(text)
+                    self.history.replace(text.rstrip())
                 else:
-                    self.history.add(text)
-                self.textview.Buffer.Clear()
+                    self.history.add(text.rstrip())
+                self.textview.Document.Text = '' # FIXME: correct?
                 self.execute(text.rstrip(), self.language)
                 return True
         elif str(event.Key) == "Up":
+            return False
             mark = self.textview.Buffer.InsertMark
             itermark = self.textview.Buffer.GetIterAtMark(mark)
             line = itermark.Line
@@ -309,6 +290,7 @@ class ShellWindow(Window):
                     self.textview.Buffer.Text = text
                     return True
         elif str(event.Key) == "Down":
+            return False
             mark = self.textview.Buffer.InsertMark
             itermark = self.textview.Buffer.GetIterAtMark(mark)
             line = itermark.Line
@@ -318,6 +300,7 @@ class ShellWindow(Window):
                     self.textview.Buffer.Text = text
                     return True
         elif str(event.Key) == "Tab":
+            return False
             mark = self.textview.Buffer.InsertMark
             current = self.textview.Buffer.GetIterAtMark(mark)
             pos = current.LineOffset
@@ -329,29 +312,8 @@ class ShellWindow(Window):
                 if help_text:
                     self.message(help_text)
                 return True
-            else: # not a completion type tab
-                # We will always handle tabs, to insert the spaces
-                self.textview.Buffer.InsertAtCursor(
-                    self.pyjama.indent_string)
-                return True
         return False
 
-    def undent_text(self, text):
-        """
-        Removes same number of spaces from each line, if all indented.
-        """
-        # FIXME: could also remove "......>" from history_text window.
-        spaces = re.match("\s*", text).group()
-        if spaces:
-            lines = []
-            for line in text.split("\n"):
-                if not line.startswith(spaces):
-                    return text
-                else:
-                    lines.append(line[len(spaces):])
-            return "\n".join(lines)
-        return text
-        
     def completion(self, text):
         variable = self.find_variable(text)
         items = []
@@ -481,7 +443,7 @@ class ShellWindow(Window):
 
     def load_text(self, text, language):
         self.language = language
-        self.textview.Buffer.Text = self.undent_text(text.rstrip())
+        self.textview.Document.Text = self.undent_text(text.rstrip())
         self.update_gui()
 
     def execute(self, text, language):
@@ -565,3 +527,20 @@ class ShellWindow(Window):
             Gtk.Application.Invoke(lambda s, a: menuitem.Show())
             menuitem.Activated += lambda w, e: self.goto_file(filename, lineno)
             popup_args.Menu.Append(menuitem)
+
+    def undent_text(self, text):
+        """
+        Removes same number of spaces from each line, if all indented.
+        """
+        # FIXME: could also remove "......>" from history_text window.
+        spaces = re.match("\s*", text).group()
+        if spaces:
+            lines = []
+            for line in text.split("\n"):
+                if not line.startswith(spaces):
+                    return text
+                else:
+                    lines.append(line[len(spaces):])
+            return "\n".join(lines)
+        return text
+        

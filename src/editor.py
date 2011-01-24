@@ -60,9 +60,6 @@ class EditorWindow(Window):
                     ("_Paste", None, None, None),
                     ("Cut", None, None, None),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
-                    None,
-                    ("Indent", None, "<control>bracketright", self.indent_region),
-                    ("Unindent", None, "<control>bracketleft", self.unindent_region),
                           ]),
                 ("Script", [
                     ("Run", Gtk.Stock.Apply, "F5", self.on_run),
@@ -123,11 +120,11 @@ class EditorWindow(Window):
         Handles key press events for the entire window. If handled
         here, return True.
         """
-        if str(eventkey.Key) == "Tab":
-            doc = self.get_current_doc()
-            if doc:
-                doc.insert_at_cursor(self.pyjama.indent_string)
-                return True
+        #if str(eventkey.Key) == "Tab":
+        #    doc = self.get_current_doc()
+        #    if doc:
+        #        doc.insert_at_cursor(self.pyjama.indent_string)
+        #        return True
         return False
 
     def changed_page(self, obj, event):
@@ -179,7 +176,14 @@ class EditorWindow(Window):
                                                     lambda o,e,file=filename: self.select_or_open(filename)),
                                                   self.accel_group["Recent files"])
                     self.submenu["Recent files"].Append(menuitem)
-                    # FIXME: add to shell recent files too
+                    self.submenu["Recent files"].ShowAll()
+                    if self.pyjama.shell:
+                        shell = self.pyjama.shell
+                        menuitem = self.make_menuitem((filename, None, None,
+                                                       lambda o,e,file=filename: shell.select_or_open(filename)),
+                                                      shell.accel_group["Recent files"])
+                        shell.submenu["Recent files"].Append(menuitem)
+                        shell.submenu["Recent files"].ShowAll()
                 if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
                     self.pyjama.config.get("pyjama.recent_files").pop()
                     # FIXME: remove from self.submenu["Recent files"]

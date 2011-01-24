@@ -5,7 +5,6 @@ Problems, issues, features, and questions.
 These are issues with the code in Pyjama/src/*.py
 
 # f5 doesn't work with new texteditor
-# File menu should be same on both
 
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
