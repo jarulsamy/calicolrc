@@ -21,7 +21,8 @@ languages/PJScheme.dll:
 	cd languages/Scheme; make
 
 clean-build:
-	rm -f Pyjama-*.zip *~
+	rm -f Pyjama-*.zip
+	rm -rf `find | grep "~$"`
 
 clean:
 	rm -f modules/Graphics.dll modules/Myro.dll modules/Conx.dll \

@@ -155,18 +155,20 @@ class EditorWindow(Window):
         """
         page = None
         # if already open, select it
+        add_it = True
         if filename is not None:
             for page_num in range(self.notebook.NPages):
                 npage = self.notebook.GetNthPage(page_num)
                 if npage.document.filename == filename:
                     self.notebook.CurrentPage = page_num
                     page = npage # reselect opened filename
+                    add_it = False
                     break
             if page is None:
                 page = self.make_document(filename) # make a new document with filename
         else: # make a no-named document of type language
             page = self.make_document(None, language)
-        if page:
+        if add_it:
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num

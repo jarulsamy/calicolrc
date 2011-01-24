@@ -349,7 +349,11 @@ try:
             self.grab_focus()
             
         def goto_line(self, lineno):
-            pass
+            def invoke(sender, args):
+                self.texteditor.Caret.Line = lineno - 1
+                self.texteditor.Caret.Column = 0
+                self.texteditor.ScrollToCaret()
+            Gtk.Application.Invoke(invoke)
 
         def get_dirty(self):
             return self.texteditor.Document.IsDirty
