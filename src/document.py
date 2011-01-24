@@ -153,6 +153,9 @@ class Document(object):
     def get_text(self):
         pass
 
+    def get_selected_text(self):
+        pass
+
     def insert_at_cursor(self, text):
         pass
 
@@ -347,6 +350,9 @@ try:
 
         def get_text(self):
             return self.texteditor.Document.Text
+
+        def get_selected_text(self):
+            return self.texteditor.SelectedText
 
         def insert_at_cursor(self, text):
             pass

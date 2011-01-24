@@ -57,6 +57,7 @@ class Window(object):
                     menuitem = Gtk.SeparatorMenuItem()
                 elif isinstance(row, str): # submenu
                     self.submenu[row] = Gtk.Menu()
+                    self.accel_group[row] = accel_group
                     menuitem = Gtk.MenuItem(row)
                     menuitem.Submenu = self.submenu[row]
                     submenu.Append(menuitem)
@@ -65,7 +66,6 @@ class Window(object):
                     menuname, row = row
                     menuitem = self.make_menuitem(row, accel_group)
                     self.submenu[menuname].Append(menuitem)
-                    self.accel_group[menuname] = accel_group
                     continue
                 else:
                     menuitem = self.make_menuitem(row, accel_group)
