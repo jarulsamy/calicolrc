@@ -104,6 +104,22 @@ class Window(object):
                                     Gtk.AccelFlags.Visible)
         return menuitem
 
+    def make_new_file_menu(self):
+        retval = []
+        for lang in self.pyjama.languages:
+            retval.append(
+                ("New %s Script" % lang.title(), None,
+                 None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
+                )
+        retval.append(None) # separator
+        retval.append("Recent files") # submenu
+        for file in self.pyjama.config.get("pyjama.recent_files"):
+            if file:
+                retval.append(("Recent files",
+                               (file, None, None,
+                                lambda o,e,file=file: self.select_or_open(file))))
+        return retval
+
     def print_view(self):
         papersize = Gtk.PaperSize(Gtk.PaperSize.Default)
         setup = Gtk.PageSetup()
@@ -173,12 +189,12 @@ class Window(object):
         gpc = pj.Context
         self.print_view_to_gc(gpc)
         pj.Close()
-	if response == Gtk.PrintButtons.Print: 
+        if response == Gtk.PrintButtons.Print: 
             pj.Print()
         elif response == Gtk.PrintButtons.Preview:
             Gtk.PrintJobPreview(pj, "Print Test").Show()
         dialog.Hide()
-	dialog.Dispose()
+        dialog.Dispose()
 
     def print_view3(self):
         pc = Gnome.PrintConfig.Default()

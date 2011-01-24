@@ -102,12 +102,13 @@ class ShellWindow(Window):
         self.vbox = Gtk.VBox()
         # ---------------------
         # make menu:
-        menu = [("_File", 
-                 [("Open Script...", Gtk.Stock.Open,
+        menu = [("_File",
+                 [("Open Script...", Gtk.Stock.Open, 
                    None, self.on_open_file),
-                  ("New Script", Gtk.Stock.New,
-                   None, self.on_new_file),
                   None,
+                  ] +
+                  self.make_new_file_menu() +
+                  [None,
                   ("Close", Gtk.Stock.Close,
                    None, self.on_close),
                   ("Quit", Gtk.Stock.Quit,
@@ -216,8 +217,8 @@ class ShellWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
-        self.message("Pyjama Project, Version %s, on %s\n" % (
-                        self.pyjama.version, self.pyjama.system))
+        self.message("Pyjama Project %s\n" % self.pyjama.version)
+        self.message(("-" * 50) + "\n")
     
     def modify_font(self, font):
         self.textview.ModifyFont(font)
@@ -374,7 +375,7 @@ class ShellWindow(Window):
         if items:           
             return "Possible completions:\n   " + ("\n   ".join(items)) + "\n"
         else:
-            return "No completions found for '%s'.\n" % text
+            return "No completions found for '%s'\n" % text
 
     def find_variable(self, text):
         """
@@ -425,14 +426,17 @@ class ShellWindow(Window):
             self.executeThread.Abort()
         Gtk.Application.Invoke(self.stop_running)
 
-    # these aren't needed?
-    def on_new_file(self, obj, event):
+    def on_new_file(self, obj, event, language="python"):
         self.pyjama.setup_editor()
-        self.pyjama.editor.on_new_file(obj, event)
+        self.pyjama.editor.on_new_file(obj, event, language)
 
     def on_open_file(self, obj, event):
         self.pyjama.setup_editor()
         self.pyjama.editor.on_open_file(obj, event)
+
+    def select_or_open(self, filename, lineno=0, language="python"):
+        self.pyjama.setup_editor()
+        self.pyjama.editor.select_or_open(filename, lineno, language)
 
     def reset_shell(self, obj, event):
         self.pyjama.engine.reset()

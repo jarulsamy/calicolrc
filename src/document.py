@@ -358,7 +358,8 @@ try:
             pass
 
         def open(self):
-            self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
+            if os.path.isfile(self.filename):
+                self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
             self.grab_focus()
             
         def goto_line(self, lineno):

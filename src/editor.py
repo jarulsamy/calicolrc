@@ -172,7 +172,6 @@ class EditorWindow(Window):
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
-            # FIXME: also add to live Recent files menu:
             if filename:
                 if filename not in self.pyjama.config.get("pyjama.recent_files"):
                     self.pyjama.config.get("pyjama.recent_files").append(filename)
@@ -180,9 +179,11 @@ class EditorWindow(Window):
                                                     lambda o,e,file=filename: self.select_or_open(filename)),
                                                   self.accel_group["Recent files"])
                     self.submenu["Recent files"].Append(menuitem)
+                    # FIXME: add to shell recent files too
                 if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
                     self.pyjama.config.get("pyjama.recent_files").pop()
                     # FIXME: remove from self.submenu["Recent files"]
+                    # FIXME: remove from shell self.submenu["Recent files"] too
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
         if self.notebook.NPages == 2:
@@ -222,22 +223,6 @@ class EditorWindow(Window):
 
     def on_new_file(self, obj, event, language="python"):
         self.select_or_open(None, language=language)
-
-    def make_new_file_menu(self):
-        retval = []
-        for lang in self.pyjama.languages:
-            retval.append(
-                ("New %s Script" % lang.title(), None, 
-                 None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
-                )
-        retval.append(None) # separator
-        retval.append("Recent files") # submenu
-        for file in self.pyjama.config.get("pyjama.recent_files"):
-            if file:
-                retval.append(("Recent files",
-                               (file, None, None,
-                                lambda o,e,file=file: self.select_or_open(file))))
-        return retval
 
     # FIXME: get default type of file from config 
     def make_document(self, filename, language="python"):

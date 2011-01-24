@@ -199,19 +199,17 @@ class PyjamaProject(object):
         if self.shell is None:
             from shell import ShellWindow
             self.shell = ShellWindow(self)
-        else:
-            def invoke(sender, args):
-                self.shell.window.Present()
-            Gtk.Application.Invoke(invoke)
+        def invoke(sender, args):
+            self.shell.window.Present()
+        Gtk.Application.Invoke(invoke)
 
     def setup_editor(self, *args, **kwargs):
         if self.editor is None:
             from editor import EditorWindow
             self.editor = EditorWindow(self)
-        else:
-            def invoke(sender, args):
-                self.editor.window.Present()
-            Gtk.Application.Invoke(invoke)
+        def invoke(sender, args):
+            self.editor.window.Present()
+        Gtk.Application.Invoke(invoke)
 
     def grep(self, pattern, file_pat="*.py", dir=".", 
              flags=0, recursive=True):
