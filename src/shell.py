@@ -159,6 +159,8 @@ class ShellWindow(Window):
         self.textview.Options.ShowIconMargin = False
         self.textview.Options.ShowInvalidLines = False
         self.textview.Options.ShowLineNumberMargin = True
+        self.textview.Options.TabsToSpaces = True
+        self.textview.Options.HighlightMatchingBracket = True
         self.textview.Document.MimeType = "text/x-%s" % self.language
 
         self.textview.Show()
@@ -264,8 +266,13 @@ class ShellWindow(Window):
                     self.history.replace(text.rstrip())
                 else:
                     self.history.add(text.rstrip())
-                self.textview.Document.Text = '' # FIXME: correct?
                 self.execute(text.rstrip(), self.language)
+                def invoke(sender, args):
+                    self.textview.Document.Text = ''
+                    self.textview.GrabFocus()
+                    self.textview.Caret.Line = 0
+                    self.textview.Caret.Column = 0
+                Gtk.Application.Invoke(invoke)
                 return True
         elif str(event.Key) == "Up":
             return False

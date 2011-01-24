@@ -187,11 +187,9 @@ class TextEditorDocument(Document):
         self.grab_focus()
 
     def configure(self):
-        #self.texteditor.Options.AllowTabsAfterNonTabs = 
+        #self.texteditor.Options.AllowTabsAfterNonTabs
         #self.texteditor.Options.AutoIndent
         #self.texteditor.Options.CanResetZoom
-        #self.texteditor.Options.HighlightCaretLine
-        #self.texteditor.Options.HighlightMatchingBracket
         #self.texteditor.Options.IndentationSize
         #self.texteditor.Options.IndentationString
         #self.texteditor.Options.RemoveTrailingWhitespaces
@@ -201,11 +199,13 @@ class TextEditorDocument(Document):
         #self.texteditor.Options.ShowIconMargin = False
         self.texteditor.Options.ShowInvalidLines = False
         self.texteditor.Options.ShowLineNumberMargin = True
+        self.texteditor.Options.TabsToSpaces = True
+        self.texteditor.Options.HighlightCaretLine = True
+        self.texteditor.Options.HighlightMatchingBracket = True
         #self.texteditor.Options.ShowRuler
         #self.texteditor.Options.ShowSpaces
         #self.texteditor.Options.ShowTabs
         #self.texteditor.Options.TabSize
-        #self.texteditor.Options.TabsToSpaces
         #self.texteditor.Options.WordFindStrategy
         #self.texteditor.Options.Zoom
         #self.texteditor.Options.ZoomIn

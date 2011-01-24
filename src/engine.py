@@ -139,7 +139,7 @@ class DLREngine(Engine):
             source = self.engine.CreateScriptSourceFromString(text, sctype)
             return (source.GetCodeProperties() == 
                     Microsoft.Scripting.ScriptCodeParseResult.Complete)
-        return lines[-1] == ""
+        return lines[-1].strip() == ""
 
     def execute(self, text):
         sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
