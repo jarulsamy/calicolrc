@@ -1,5 +1,5 @@
 #
-# Pyjama - Educational Scripting Environment
+# Pyjama - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -28,13 +28,16 @@ fullpath, basename = os.path.split(pyjama_fullpath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
     path = os.path.join(fullpath, dir)
     sys.path.append(path)
-import os, traceback
+import traceback
 sys.path.append(os.path.abspath("modules"))
 
 # Add some paths for Windows:
 import Microsoft
 import System
 mono_version = "?.?.?"
+mtype = System.Type.GetType("Mono.Runtime")
+method = mtype.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+mono_runtime = method.Invoke(None, None)
 try:
     registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
 except:
@@ -79,17 +82,15 @@ from config import config
 from utils import _
 
 # Setup Runtime environment:
-def handle_exception(arg):
-    #print >> sys.stderr, e.__class__.__name__
-    print dir(arg)
-    sys.exit(1)
-
+#def handle_exception(arg):
+#    #print >> sys.stderr, e.__class__.__name__
+#    sys.exit(1)
+#
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
 #GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
-
 
 def get_registered_languages():
     import glob
@@ -113,7 +114,7 @@ class PyjamaProject(object):
         self.editor = None
         self.version = version           # from global variable
         self.config = config             # from global variable
-        self.mono_version = mono_version # from global variable
+        self.mono_runtime = mono_runtime # from global variable
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
@@ -143,7 +144,7 @@ class PyjamaProject(object):
                 self.standalone = True
                 request_shell = True
             else:
-                files.append(arg)
+                files.append(os.path.abspath(arg))
                 request_editor = True
         if files == [] and not request_editor:
             request_shell = True
@@ -302,14 +303,12 @@ class PyjamaProject(object):
         def invoke(sender, args):
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.DefaultResponse = Gtk.ResponseType.Close
-            #aboutDialog.Close += lambda o, e: aboutDialog.Destroy()
             #aboutDialog.SetEmailHook(lambda dialog, email: self.message(email))
             #aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
-            # 
             #aboutDialog.Artists =""
             aboutDialog.Authors = System.Array[str](["Douglas Blank <dblank@cs.brynmawr.edu>"])
             aboutDialog.Comments = "Scripting Environment\n\nRunning on %s\nMono %s\n" % (self.system, 
-                                                                                          self.mono_version)
+                                                                                          self.mono_runtime)
             aboutDialog.Copyright = "(c) 2011, Institute for Personal Robots in Education"
             #aboutDialog.Documenters
             #aboutDialog.License
@@ -326,7 +325,7 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
     
 # Let's start!
-version = "0.2.2"
+version = "0.2.3"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print

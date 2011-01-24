@@ -1,5 +1,5 @@
 #
-# Pyjama - Educational Scripting Environment
+# Pyjama - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -43,25 +43,11 @@ class MyWindow(Gtk.Window):
         return (self.on_key_press(eventkey) or 
                 Gtk.Window.OnKeyPressEvent(self, eventkey))
 
-def make_menuitem(row, accel_group):
-    subtext, img, accel, function = row
-    if img is None:
-        menuitem = Gtk.MenuItem(subtext)
-    else:
-        menuitem = Gtk.ImageMenuItem(img, accel_group)
-    if function:
-        menuitem.Activated += function
-    if accel:
-        key, mod = Gtk.Accelerator.Parse(accel)
-        menuitem.AddAccelerator("activate", accel_group, 
-                                key, mod, 
-                                Gtk.AccelFlags.Visible)
-    return menuitem
-
 class Window(object):
     def make_gui(self, menu, toolbar):
         self.menubar = Gtk.MenuBar()
         self.submenu = {}
+        self.accel_group = {}
         for text, items in menu:
             submenu = Gtk.Menu()
             accel_group = Gtk.AccelGroup()
@@ -77,11 +63,12 @@ class Window(object):
                     continue
                 elif len(row) == 2: # submenu, entry
                     menuname, row = row
-                    menuitem = make_menuitem(row, accel_group)
+                    menuitem = self.make_menuitem(row, accel_group)
                     self.submenu[menuname].Append(menuitem)
+                    self.accel_group[menuname] = accel_group
                     continue
                 else:
-                    menuitem = make_menuitem(row, accel_group)
+                    menuitem = self.make_menuitem(row, accel_group)
                 submenu.Append(menuitem)
             menuitem = Gtk.MenuItem(text)
             menuitem.Submenu = submenu
@@ -101,6 +88,21 @@ class Window(object):
                 tool_item.Clicked += function
             self.toolbar.Insert(tool_item, i)
             i += 1
+
+    def make_menuitem(self, row, accel_group):
+        subtext, img, accel, function = row
+        if img is None:
+            menuitem = Gtk.MenuItem(subtext)
+        else:
+            menuitem = Gtk.ImageMenuItem(img, accel_group)
+        if function:
+            menuitem.Activated += function
+        if accel:
+            key, mod = Gtk.Accelerator.Parse(accel)
+            menuitem.AddAccelerator("activate", accel_group,
+                                    key, mod,
+                                    Gtk.AccelFlags.Visible)
+        return menuitem
 
     def print_view(self):
         papersize = Gtk.PaperSize(Gtk.PaperSize.Default)

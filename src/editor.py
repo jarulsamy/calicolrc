@@ -1,5 +1,5 @@
 #
-# Pyjama - Educational Scripting Environment
+# Pyjama - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -171,10 +171,16 @@ class EditorWindow(Window):
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
             # FIXME: also add to live Recent files menu:
-            if filename not in self.pyjama.config.get("pyjama.recent_files"):
-                self.pyjama.config.get("pyjama.recent_files").append(filename)
-            if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
-                self.pyjama.config.get("pyjama.recent_files").pop()
+            if filename:
+                if filename not in self.pyjama.config.get("pyjama.recent_files"):
+                    self.pyjama.config.get("pyjama.recent_files").append(filename)
+                    menuitem = self.make_menuitem((filename, None, None,
+                                                    lambda o,e,file=filename: self.select_or_open(filename)),
+                                                  self.accel_group["Recent files"])
+                    self.submenu["Recent files"].Append(menuitem)
+                if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
+                    self.pyjama.config.get("pyjama.recent_files").pop()
+                    # FIXME: remove from self.submenu["Recent files"]
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
         if self.notebook.NPages == 2:
@@ -224,8 +230,11 @@ class EditorWindow(Window):
                 )
         retval.append(None) # separator
         retval.append("Recent files") # submenu
-        for file in sorted(self.pyjama.config.get("pyjama.recent_files")):
-            retval.append(("Recent files", (file, None, None, lambda o,e,file=file: self.select_or_open(file))))
+        for file in self.pyjama.config.get("pyjama.recent_files"):
+            if file:
+                retval.append(("Recent files",
+                               (file, None, None,
+                                lambda o,e,file=file: self.select_or_open(file))))
         return retval
 
     # FIXME: get default type of file from config 

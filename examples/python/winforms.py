@@ -1,6 +1,6 @@
 #! ./pyjama --exec --nogui winforms.py
 #
-# Pyjama - Educational Scripting Environment
+# Pyjama - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #

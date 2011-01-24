@@ -1,5 +1,5 @@
 #
-# Pyjama - Educational Scripting Environment
+# Pyjama - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -34,9 +34,9 @@ class Document(object):
     Base Document for all languages.
     """
     def __init__(self, filename, pyjama, language="python"):
-        self.filename = filename
         if filename:
             filename = os.path.abspath(filename)
+        self.filename = filename
         self.pyjama = pyjama
         self.language = language
         if self.filename:
