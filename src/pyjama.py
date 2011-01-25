@@ -102,22 +102,6 @@ from utils import _
 
 # Define local functions and classes
 
-def get_registered_languages():
-    import glob
-    sys.path.append(os.path.abspath("languages"))
-    results = {}
-    for filename in glob.glob("languages/*.py"):
-        if "Sympl" in filename: continue
-        try:
-            import_name, ext = os.path.basename(filename).rsplit(".")
-            exec("import %s as LanguageModule" % import_name)
-            lang = LanguageModule.register_language()
-            results[lang.language] = lang
-        except:
-            traceback.print_exc()
-            print >> sys.stderr, "Cannot load language file '%s'" % filename
-    return results
-
 class PyjamaProject(object):
     def __init__(self, argv):
         self.shell = None
@@ -130,7 +114,7 @@ class PyjamaProject(object):
         self.gui = True
         self.standalone = False
         self.indent_string = "    "
-        self.languages = get_registered_languages()
+        self.languages = self.get_registered_languages()
         self.engine = EngineManager(self)
         for lang in self.languages:
             language = self.languages[lang]
@@ -170,6 +154,25 @@ class PyjamaProject(object):
             else:
                 from shell import ShellWindow
                 self.shell = ShellWindow(self)
+
+    def get_registered_languages(self):
+        import glob
+        sys.path.append(os.path.abspath("languages"))
+        results = {}
+        for filename in glob.glob("languages/*.py"):
+            path, basename = os.path.split(filename)
+            base, ext = os.path.splitext(basename)
+            if (base in self.config.get("pyjama.languages") or
+                "All" in self.config.get("pyjama.languages")):
+                try:
+                    import_name, ext = os.path.basename(filename).rsplit(".")
+                    exec("import %s as LanguageModule" % import_name)
+                    lang = LanguageModule.register_language()
+                    results[lang.language] = lang
+                except:
+                    traceback.print_exc()
+                    print >> sys.stderr, "Cannot load language file '%s'" % filename
+        return results
 
     def load(self, filename):
         # force into a Python string:
@@ -269,7 +272,6 @@ class PyjamaProject(object):
         try:
             names = os.listdir(dir or os.curdir)
         except os.error, msg:
-            self.shell.message(msg + "\n")
             return []
         list = []
         subdirs = []

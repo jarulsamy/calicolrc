@@ -106,18 +106,18 @@ class Window(object):
 
     def make_new_file_menu(self):
         retval = []
-        for lang in self.pyjama.languages:
-            retval.append(
-                ("New %s Script" % lang.title(), None,
-                 None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
-                )
-        retval.append(None) # separator
         retval.append("Recent files") # submenu
         for file in self.pyjama.config.get("pyjama.recent_files"):
             if file:
                 retval.append(("Recent files",
                                (file, None, None,
                                 lambda o,e,file=file: self.select_or_open(file))))
+        retval.append(None) # separator
+        for lang in self.pyjama.languages:
+            retval.append(
+                ("New %s Script" % lang.title(), None,
+                 None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
+                )
         return retval
 
     def print_view(self):

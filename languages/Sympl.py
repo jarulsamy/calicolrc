@@ -20,6 +20,7 @@
 
 import clr
 import sys
+import System
 from System.IO import StringReader
 from sympl import sympl
 from document import MakeDocument

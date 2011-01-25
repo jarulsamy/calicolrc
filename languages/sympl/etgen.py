@@ -7,6 +7,7 @@ else:
     clr.AddReference("System.Core")
     import System.Linq.Expressions as Exprs
 
+import System
 from System.Collections.Generic import IEnumerable
 from System.Dynamic import CallInfo
 
