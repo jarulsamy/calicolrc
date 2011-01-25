@@ -53,6 +53,7 @@ blue = Rectangle(Point(0,0), Point(300, 214))
 blue.fill_color = "blue"
 blue.color = "blue"
 blue.draw(win)
+stars = []
 for col in range(6):
     for row in range(9):
         if row % 2 == 1: # odd row
@@ -63,4 +64,12 @@ for col in range(6):
             x = col * 50
         y = row * 22
         star = make_star(x + 10, y + 13, 5)
+        stars.append(star)
 
+def animate():
+    g = Group(*stars)
+    win.mode = "manual"
+    win.step_time = 100
+    for i in range(20):
+        g.rotate(10)
+        win.step()

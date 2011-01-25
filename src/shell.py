@@ -57,6 +57,14 @@ class History(object):
             self.history.append(text)
         self.position = len(self.history) - 1
 
+    def last(self, text):
+        # turns space into last command
+        if len(self.history) > 1 and self.history[-2] == text:
+            pass # same, skip it!
+        else:
+            self.history[-1] = text
+        self.position = len(self.history) - 1
+
 class Shell(object):
     def __init__(self, pyjama, files):
         self.pyjama = pyjama
@@ -248,7 +256,7 @@ class ShellWindow(Window):
             if text == "":
                 return True # nothing to do, but handled
             elif self.ready_for_execute(text) or force:
-                self.history.update(text.rstrip())
+                self.history.last(text.rstrip())
                 self.history.add("")
                 self.execute(text.rstrip(), self.language)
                 def invoke(sender, args):
