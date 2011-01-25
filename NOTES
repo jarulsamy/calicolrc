@@ -4,12 +4,10 @@ Problems, issues, features, and questions.
 
 These are issues with the code in Pyjama/src/*.py
 
-# f5 doesn't work with new texteditor
-
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
 # Pyjama: Add Printing
-# Pyjama: toggle word wrap, linenumbers, others
+# Pyjama: options for toggle word wrap, linenumbers, others
 # Pyjama: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
 # Pyjama: Move some key handlers so that some can be handled by window, others handled by textview
 # Pyjama: No backups made of files when editing
@@ -18,10 +16,6 @@ These are issues with the code in Pyjama/src/*.py
 # Pyjama: Need project icon/graphics
 # Pyjama: glib.io_add_watch - watch to see if something else edits file?
 # Pyjama: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
-# Pyjama: Rewrite Command-line history 
-## don't add empty entries
-## sometimes doesn't add entries
-## don't repeat items
 # Pyjama: Python exception when Gtk is running just hangs; why? In other thread?
 
 = Education =
@@ -72,9 +66,8 @@ Drag and drop language Dinah:
 
 DLR things for the Dynamic Language Runtime. Mono is the open source VM for the CLR.
 
-# DLR: Stack overflow in Mono IronPython on Windows crashes rather than reports error.
+# DLR: Stack overflow in Mono IronPython crashes rather than reports error.
 # DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
 
 # Mono: Dinah crashes on Mac on drop. 
 # Mono: Windows doesn't respond to treeview drags. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
-

@@ -282,7 +282,7 @@ class ShellWindow(Window):
                 def invoke(sender, args):
                     self.textview.Document.Text = text
                     self.textview.GrabFocus()
-                    self.textview.Caret.Line = 0
+                    self.textview.Caret.Line = self.textview.Document.LineCount - 1
                     self.textview.Caret.Column = 0
                 Gtk.Application.Invoke(invoke)
         elif str(event.Key) == "Tab":
