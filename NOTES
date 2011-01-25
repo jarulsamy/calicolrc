@@ -4,6 +4,8 @@ Problems, issues, features, and questions.
 
 These are issues with the code in Pyjama/src/*.py
 
+# BUG: right-click on an error line 2nd time on windows doesn't load file
+
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
 # Pyjama: Add Printing
