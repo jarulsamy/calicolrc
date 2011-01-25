@@ -36,40 +36,26 @@ import re
 # Local classes:
 class History(object):
     def __init__(self):
-        self.history = []
-        self.position = None
-        self.dirty = False
+        self.history = [""]
+        self.position = 0
 
     def up(self):
-        #print "up", self.position, self.history
-        if self.position is not None and 0 <= self.position - 1 < len(self.history):
+        if self.position > 0:
             self.position -= 1
-            #print "ok"
-            return self.history[self.position]
-        return None
+        return self.history[self.position]
 
     def down(self):
-        #print "down", self.position, self.history
-        if self.position is not None and 0 <= self.position + 1 < len(self.history):
+        if self.position < len(self.history) - 1:
             self.position += 1
-            #print "ok"
-            return self.history[self.position]
-        return None
+        return self.history[self.position]
 
-    def replace(self, text):
-        self.history[-1] = text
+    def update(self, text):
+        self.history[self.position] = text
 
     def add(self, text):
-        self.dirty = False
-        self.history.append(text)
-        self.position = len(self.history)
-        #print "add", self.position, self.history
-
-    def last(self):
-        return self.position == len(self.history)
-
-    def nextlast(self):
-        return self.position == len(self.history) - 1
+        if self.history[-1] != text: # different
+            self.history.append(text)
+        self.position = len(self.history) - 1
 
 class Shell(object):
     def __init__(self, pyjama, files):
@@ -262,10 +248,8 @@ class ShellWindow(Window):
             if text == "":
                 return True # nothing to do, but handled
             elif self.ready_for_execute(text) or force:
-                if self.history.dirty and self.history.nextlast():
-                    self.history.replace(text.rstrip())
-                else:
-                    self.history.add(text.rstrip())
+                self.history.update(text.rstrip())
+                self.history.add("")
                 self.execute(text.rstrip(), self.language)
                 def invoke(sender, args):
                     self.textview.Document.Text = ''
@@ -275,37 +259,32 @@ class ShellWindow(Window):
                 Gtk.Application.Invoke(invoke)
                 return True
         elif str(event.Key) == "Up":
-            return False
-            mark = self.textview.Buffer.InsertMark
-            itermark = self.textview.Buffer.GetIterAtMark(mark)
-            line = itermark.Line
-            start = self.textview.Buffer.StartIter
-            end = self.textview.Buffer.EndIter
-            alltext = self.textview.Buffer.GetText(start, end, False)
-            #print "line:", line
+            text = self.textview.Document.Text
+            caret = self.textview.Caret
+            line = caret.Line
             if line == 0:
-                # if on a new line, save it
-                if not self.history.dirty:
-                    self.history.add(alltext)
-                    self.history.dirty = True
-                    self.history.up()
-                elif self.history.nextlast():
-                    self.history.replace(alltext)
-                #else: abandon any changes
+                self.history.update(text.rstrip())
                 text = self.history.up()
-                if text is not None:
-                    self.textview.Buffer.Text = text
-                    return True
+                def invoke(sender, args):
+                    self.textview.Document.Text = text
+                    self.textview.GrabFocus()
+                    self.textview.Caret.Line = 0
+                    self.textview.Caret.Column = 0
+                Gtk.Application.Invoke(invoke)
         elif str(event.Key) == "Down":
-            return False
-            mark = self.textview.Buffer.InsertMark
-            itermark = self.textview.Buffer.GetIterAtMark(mark)
-            line = itermark.Line
-            if line == self.textview.Buffer.LineCount - 1:
+            text = self.textview.Document.Text
+            caret = self.textview.Caret
+            line = caret.Line
+            line_count = self.textview.Document.LineCount
+            if line == line_count - 1:
+                self.history.update(text.rstrip())
                 text = self.history.down()
-                if text is not None:
-                    self.textview.Buffer.Text = text
-                    return True
+                def invoke(sender, args):
+                    self.textview.Document.Text = text
+                    self.textview.GrabFocus()
+                    self.textview.Caret.Line = 0
+                    self.textview.Caret.Column = 0
+                Gtk.Application.Invoke(invoke)
         elif str(event.Key) == "Tab":
             return False
             mark = self.textview.Buffer.InsertMark

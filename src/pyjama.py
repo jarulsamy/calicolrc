@@ -93,7 +93,7 @@ from utils import _
 
 # Setup Runtime environment:
 #def handle_exception(arg):
-#    #print >> sys.stderr, e.__class__.__name__
+#    print >> sys.stderr, e.__class__.__name__
 #    sys.exit(1)
 #
 # Turn on Unhandled Exception Handled:
