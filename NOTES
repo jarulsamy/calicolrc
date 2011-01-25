@@ -4,7 +4,7 @@ Problems, issues, features, and questions.
 
 These are issues with the code in Pyjama/src/*.py
 
-# BUG: right-click on an error line 2nd time on windows doesn't load file
+# BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
@@ -12,7 +12,8 @@ These are issues with the code in Pyjama/src/*.py
 # Pyjama: options for toggle word wrap, linenumbers, others
 # Pyjama: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
 # Pyjama: Move some key handlers so that some can be handled by window, others handled by textview
-# Pyjama: No backups made of files when editing
+# Pyjama: No backups made of files when saving
+# Pyjama: No backups made during editing (autosave)
 # Pyjama: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
 # Pyjama: Plugins (see the way that gedit handles plugins)
 # Pyjama: Need project icon/graphics

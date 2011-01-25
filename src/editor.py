@@ -296,7 +296,11 @@ class EditorWindow(Window):
     def on_quit(self, obj, event):
         Gtk.Application.Quit()
 
-    def modify_font(self, font):
+    def increase_font_size(self, font):
         for doc in self.get_docs():
-            doc.modify_font(font)
+            doc.increase_font_size(font)
+
+    def decrease_font_size(self, font):
+        for doc in self.get_docs():
+            doc.decrease_font_size(font)
 

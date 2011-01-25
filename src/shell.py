@@ -35,9 +35,12 @@ import re
 
 # Local classes:
 class History(object):
-    def __init__(self):
-        self.history = [""]
-        self.position = 0
+    def __init__(self, config):
+        self.config = config
+        self.history = self.config.get("pyjama.history")
+        if len(self.history) == 0 or self.history[-1] != "":
+            self.history.append("")
+        self.position = len(self.history) - 1
 
     def up(self):
         if self.position > 0:
@@ -133,7 +136,7 @@ class ShellWindow(Window):
                    ]
         self.make_gui(menu, toolbar)
         Gtk.Application.Invoke(self.stop_running)
-        self.history = History()
+        self.history = History(self.pyjama.config)
         self.statusbar = Gtk.Statusbar()
         self.statusbar.Show()
         self.statusbar.Push(0, "Language: Python")
@@ -152,7 +155,7 @@ class ShellWindow(Window):
         self.textview.Options.ShowFoldMargin = False
         self.textview.Options.ShowIconMargin = False
         self.textview.Options.ShowInvalidLines = False
-        self.textview.Options.ShowLineNumberMargin = True
+        self.textview.Options.ShowLineNumberMargin = False # option
         self.textview.Options.TabsToSpaces = True
         self.textview.Options.HighlightMatchingBracket = True
         self.textview.Document.MimeType = "text/x-%s" % self.language
@@ -196,9 +199,13 @@ class ShellWindow(Window):
         self.message("Pyjama Project %s\n" % self.pyjama.version)
         self.message(("-" * 50) + "\n")
     
-    def modify_font(self, font):
-        #self.textview.ModifyFont(font)
+    def decrease_font_size(self, font):
         self.history_textview.ModifyFont(font)
+        self.textview.Options.ZoomOut()
+
+    def increase_font_size(self, font):
+        self.history_textview.ModifyFont(font)
+        self.textview.Options.ZoomIn()
 
     def on_copy(self, obj, event):
         focused = self.window.Focus
@@ -277,7 +284,8 @@ class ShellWindow(Window):
                     self.textview.Document.Text = text
                     self.textview.GrabFocus()
                     self.textview.Caret.Line = 0
-                    self.textview.Caret.Column = 0
+                    col = self.textview.Document.GetLine(0).Length
+                    self.textview.Caret.Column = col
                 Gtk.Application.Invoke(invoke)
         elif str(event.Key) == "Down":
             text = self.textview.Document.Text
@@ -291,7 +299,7 @@ class ShellWindow(Window):
                     self.textview.Document.Text = text
                     self.textview.GrabFocus()
                     self.textview.Caret.Line = self.textview.Document.LineCount - 1
-                    self.textview.Caret.Column = 0
+                    self.textview.Caret.Column = self.textview.Document.GetLine(0).Length
                 Gtk.Application.Invoke(invoke)
         elif str(event.Key) == "Tab":
             return False

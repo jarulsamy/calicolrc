@@ -293,22 +293,27 @@ class PyjamaProject(object):
         pangofont = Pango.FontDescription.FromString("%s %d" % (font, fontsize))
         return pangofont
 
-    def update_fonts(self, sender, args):
-        pangofont = self.get_fontname()
-        if self.shell:
-            self.shell.modify_font(pangofont)
-        if self.editor:
-            self.editor.modify_font(pangofont)
-
     def increase_fontsize(self, obj, event):
-        self.config.set("pyjama.fontsize", 
+        self.config.set("pyjama.fontsize",
                         min(self.config.get("pyjama.fontsize") + 1, 36))
-        Gtk.Application.Invoke(self.update_fonts)
+        def invoke(sender, args):
+            pangofont = self.get_fontname()
+            if self.shell:
+                self.shell.increase_font_size(pangofont)
+            if self.editor:
+                self.editor.increase_font_size(pangofont)
+        Gtk.Application.Invoke(invoke)
 
     def decrease_fontsize(self, obj, event):
-        self.config.set("pyjama.fontsize", 
+        self.config.set("pyjama.fontsize",
                         max(self.config.get("pyjama.fontsize") - 1, 5))
-        Gtk.Application.Invoke(self.update_fonts)
+        def invoke(sender, args):
+            pangofont = self.get_fontname()
+            if self.shell:
+                self.shell.decrease_font_size(pangofont)
+            if self.editor:
+                self.editor.decrease_font_size(pangofont)
+        Gtk.Application.Invoke(invoke)
 
     def about(self, obj, event):
         def invoke(sender, args):
@@ -368,5 +373,7 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
+    # Let's not let this get too big:
+    config.set("pyjama.history", config.get("pyjama.history")[:30])
     config.save()
 

@@ -231,8 +231,11 @@ class TextEditorDocument(Document):
     def text_has_focus(self):
         pass
 
-    def modify_font(self, font):
-        pass
+    def increase_font_size(self, font):
+        self.texteditor.Options.ZoomIn()
+
+    def decrease_font_size(self, font):
+        self.texteditor.Options.ZoomOut()
 
     def get_text(self):
         return self.texteditor.Document.Text
@@ -244,6 +247,8 @@ class TextEditorDocument(Document):
         pass
 
     def open(self):
+        # FIXME: does this print statement make right-click open work?
+        print "Document.open:", self.filename
         if os.path.isfile(self.filename):
             self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
         self.grab_focus()
