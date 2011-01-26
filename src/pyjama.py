@@ -228,7 +228,7 @@ class PyjamaProject(object):
              flags=0, recursive=True):
         """
         grep("FIXME")
-        grep("import sys", "*.py", ".", True)
+        grep("import sys", "*.py", ".", recursive=True)
         flags = 0 # re.IGNORECASE
         """
         # Based on code from idlelib

@@ -108,10 +108,16 @@ class EditorWindow(Window):
             for file in files:
                 filename = os.path.abspath(file)
                 self.select_or_open(filename)
-        elif self.pyjama.config.get("editor.last_files"):
+        elif self.pyjama.config.get("editor.load_last_files"):
+            added_a_file = False
             for file in self.pyjama.config.get("editor.last_files"):
                 filename = os.path.abspath(file)
                 self.select_or_open(filename)
+                added_a_file = True
+            if not added_a_file:
+                page = self.make_document(None)
+                self.notebook.AppendPage(page.widget, page.tab)
+                self.notebook.SetTabReorderable(page.widget, True)
         else:
             page = self.make_document(None)
             self.notebook.AppendPage(page.widget, page.tab)
@@ -156,10 +162,11 @@ class EditorWindow(Window):
         a specific line number.
         """
         # First, check for filename:N format:
-        match = re.match("(.*)\:(\d+)$", filename)
-        if match and lineno == 0:
-            filename, lineno = match.groups()
-            lineno = int(lineno)
+        if filename:
+            match = re.match("(.*)\:(\d+)$", filename)
+            if match and lineno == 0:
+                filename, lineno = match.groups()
+                lineno = int(lineno)
         # FIXME: can attempt to open bogus path/filename
         # but this is useful for file creation
         page = None
