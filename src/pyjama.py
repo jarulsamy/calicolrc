@@ -374,6 +374,6 @@ except:
 if "--nogui" not in args:
     Gtk.Application.Run()
     # Let's not let this get too big:
-    config.set("pyjama.history", config.get("pyjama.history")[:30])
+    config.set("pyjama.history", config.get("pyjama.history")[-30:])
     config.save()
 
