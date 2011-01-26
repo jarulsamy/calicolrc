@@ -107,14 +107,11 @@ class EditorWindow(Window):
         if files:
             for file in files:
                 filename = os.path.abspath(file)
-                # FIXME: can give a bogus path, but is useful for
-                # new file creation:
                 self.select_or_open(filename)
         elif self.pyjama.config.get("editor.last_files"):
             for file in self.pyjama.config.get("editor.last_files"):
                 filename = os.path.abspath(file)
-                if os.path.isfile(filename):
-                    self.select_or_open(filename)
+                self.select_or_open(filename)
         else:
             page = self.make_document(None)
             self.notebook.AppendPage(page.widget, page.tab)
@@ -163,6 +160,8 @@ class EditorWindow(Window):
         if match and lineno == 0:
             filename, lineno = match.groups()
             lineno = int(lineno)
+        # FIXME: can attempt to open bogus path/filename
+        # but this is useful for file creation
         page = None
         # if already open, select it
         add_it = True

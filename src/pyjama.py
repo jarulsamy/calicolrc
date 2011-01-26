@@ -349,11 +349,11 @@ if "--help" in args:
     print "----------------------------------------------------------------------------"
     print "Start pyjama with the following options:"
     print "  pyjama                            Defaults to shell"
-    print "  pyjama FILENAMES                  Edits FILENAMES"
+    print "  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
     print "  pyjama --shell                    Brings up shell"
     print "  pyjama --editor                   Brings up editor"
-    print "  pyjama --exec FILENAMES           Runs FILENAMES standalone, with graphics"
-    print "  pyjama --exec --nogui FILENAMES   Runs FILENAMES standalone, no graphics"
+    print "  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
+    print "  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
     print "  pyjama --version                  Displays the version number (%s)" % version
     print "  pyjama --help                     Displays this message"
     print
