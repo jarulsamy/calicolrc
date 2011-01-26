@@ -395,10 +395,16 @@ class ConfigManager(object):
                 self.emit(key)
 
 # Set defaults:
-config = ConfigManager(os.path.expanduser("~/.pyjama.ini"))
+user = os.path.expanduser("~/")
+# make a .pyjama directory in user's home dir:
+pyjama_user = os.path.join(user, ".pyjama")
+if not os.path.isdir(pyjama_user):
+    os.path.os.mkdir(pyjama_user)
+config = ConfigManager(os.path.join(pyjama_user, "pyjama.ini"))
 config.register("pyjama.font", "Monospace")
 config.register("pyjama.fontsize", 10)
 config.register("pyjama.recent_files", [])
 config.register("pyjama.languages", ["All"])
-config.register("pyjama.history", [])
+config.register("shell.history", [])
+config.register("editor.last_files", [])
 config.load()

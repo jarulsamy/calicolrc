@@ -196,11 +196,11 @@ class PyjamaProject(object):
         self.shell.message(message, "green")
 
     def on_close(self, what):
-        if what == "shell":
+        if what in ["shell", "all"]:
             if self.shell:
                 self.shell.window.Destroy()
                 self.shell = None 
-        elif what == "editor":
+        if what in ["editor", "all"]:
             if self.editor:
                 self.editor.window.Destroy()
                 self.editor = None 
@@ -241,8 +241,7 @@ class PyjamaProject(object):
         for fn in list:
             try:
                 f = open(fn)
-            except IOError, msg:
-                self.shell.message(msg + "\n")
+            except:
                 continue
             lineno = 0
             while 1:
@@ -373,7 +372,5 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
-    # Let's not let this get too big:
-    config.set("pyjama.history", config.get("pyjama.history")[-30:])
     config.save()
 

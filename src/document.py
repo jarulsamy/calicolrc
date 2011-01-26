@@ -167,6 +167,9 @@ class Document(object):
     def goto_line(self, lineno):
         pass
 
+    def get_line(self):
+        return 0
+
 class TextEditorDocument(Document):
     def __init__(self, filename, pyjama, language="python"):
         Document.__init__(self, filename, pyjama, language)
@@ -265,6 +268,9 @@ class TextEditorDocument(Document):
 
     def set_clean(self):
         self.texteditor.Document.SetNotDirtyState()
+
+    def get_line(self):
+        return self.texteditor.Caret.Line + 1
 
 def MakeDocument(*args, **kwargs):
     return TextEditorDocument(*args, **kwargs)

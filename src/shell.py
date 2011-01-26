@@ -37,7 +37,7 @@ import re
 class History(object):
     def __init__(self, config):
         self.config = config
-        self.history = self.config.get("pyjama.history")
+        self.history = self.config.get("shell.history")
         if len(self.history) == 0 or self.history[-1] != "":
             self.history.append("")
         self.position = len(self.history) - 1
@@ -374,9 +374,17 @@ class ShellWindow(Window):
         Gtk.Application.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
-        Gtk.Application.Quit()
+        self.clean_up()
+        self.pyjama.on_close("all")
+        return True
+
+    def clean_up(self):
+        # Let's not let this get too big:
+        self.pyjama.config.set("shell.history",
+                        self.pyjama.config.get("shell.history")[-30:])
 
     def on_close(self, obj, event):
+        self.clean_up()
         self.pyjama.on_close("shell")
         return True
 

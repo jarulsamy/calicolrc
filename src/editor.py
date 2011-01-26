@@ -25,6 +25,7 @@ import System
 from window import Window, MyWindow
 from utils import _
 import os
+import re
 
 class EditorWindow(Window):
     def __init__(self, pyjama, files=None):
@@ -106,7 +107,14 @@ class EditorWindow(Window):
         if files:
             for file in files:
                 filename = os.path.abspath(file)
+                # FIXME: can give a bogus path, but is useful for
+                # new file creation:
                 self.select_or_open(filename)
+        elif self.pyjama.config.get("editor.last_files"):
+            for file in self.pyjama.config.get("editor.last_files"):
+                filename = os.path.abspath(file)
+                if os.path.isfile(filename):
+                    self.select_or_open(filename)
         else:
             page = self.make_document(None)
             self.notebook.AppendPage(page.widget, page.tab)
@@ -150,6 +158,11 @@ class EditorWindow(Window):
         lineno == 0 means don't care, otherwise go to
         a specific line number.
         """
+        # First, check for filename:N format:
+        match = re.match("(.*)\:(\d+)$", filename)
+        if match and lineno == 0:
+            filename, lineno = match.groups()
+            lineno = int(lineno)
         page = None
         # if already open, select it
         add_it = True
@@ -290,11 +303,22 @@ class EditorWindow(Window):
                     self.pyjama.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):
-        self.pyjama.on_close("editor")
+        retval = self.clean_up()
+        if retval:
+            self.pyjama.on_close("editor")
         return True
 
     def on_quit(self, obj, event):
-        Gtk.Application.Quit()
+        retval = self.clean_up()
+        if retval:
+            self.pyjama.on_close("all")
+        return True
+
+    def clean_up(self):
+        self.pyjama.config.set("editor.last_files",
+                ["%s:%d" % (doc.filename, doc.get_line())
+                 for doc in self.get_docs() if doc.filename])
+        return True
 
     def increase_font_size(self, font):
         for doc in self.get_docs():
