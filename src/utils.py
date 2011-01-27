@@ -37,6 +37,10 @@ class Language(object):
         self.language = language
         self.extension = extension
 
+    def get_document_class(self):
+        from document import MakeDocument
+        return MakeDocument
+
 class ConsoleStream(System.IO.Stream):
     def __init__(self, tag=None):
         self.tag = tag

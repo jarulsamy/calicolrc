@@ -22,7 +22,6 @@ import clr
 import sys
 clr.AddReference("PJScheme.dll")
 import PJScheme
-from document import MakeDocument
 from engine import Engine
 from utils import Language
 
@@ -34,10 +33,6 @@ class SchemeEngine(Engine):
     def execute(self, text):
         result = self.engine.execute(text)
         self.stdout.write("%s\n" % result)
-
-    def eval(self, text):
-        result = self.engine.execute(text)
-        return result
 
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)

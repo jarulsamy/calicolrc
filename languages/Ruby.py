@@ -25,7 +25,6 @@ clr.AddReference("Microsoft.Scripting")
 import IronRuby
 import Microsoft.Scripting
 import System
-from document import MakeDocument
 from engine import DLREngine
 from utils import Language
 import os
@@ -60,9 +59,6 @@ class RubyEngine(DLREngine):
 class Ruby(Language):
     def get_engine_class(self):
         return RubyEngine
-
-    def get_document_class(self):
-        return MakeDocument
 
 def register_language():
     return Ruby("ruby", "rb")

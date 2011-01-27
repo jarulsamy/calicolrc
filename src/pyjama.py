@@ -182,9 +182,6 @@ class PyjamaProject(object):
                 return self.engine[name].execute_file(filename)
         raise AttributeError("unknown file extension: '%s'" % filename)
 
-    def eval(self, language, exp):
-        return self.engine[language].eval(exp)
-
     def get_language_from_filename(self, filename):
         for name in self.languages:
             if filename.endswith("." + self.languages[name].extension):

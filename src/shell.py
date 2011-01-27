@@ -475,7 +475,6 @@ class ShellWindow(Window):
             prompt = ((".....%d" % count)[-6:]) + "> "
             count += 1
         MUTEX.ReleaseMutex()
-
         # pragma/meta commands, start with #;
         if text == "":
             return False

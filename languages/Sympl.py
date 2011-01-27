@@ -23,7 +23,6 @@ import sys
 import System
 from System.IO import StringReader
 from sympl import sympl
-from document import MakeDocument
 from engine import Engine
 from utils import Language
 
