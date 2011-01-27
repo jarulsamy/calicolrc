@@ -337,7 +337,7 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
     
 # Let's start!
-version = "0.2.5"
+version = "0.2.6"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print
