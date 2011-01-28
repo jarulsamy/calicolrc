@@ -31,19 +31,26 @@ from utils import Language, ConsoleStream
 class CSharpEngine(Engine):
     def __init__(self, manager):
         super(CSharpEngine, self).__init__(manager, "csharp")
+        # FIXME: set console outputs and errors for Evaluate
         self.engine = Mono.CSharp.Evaluator
         for assembly in System.AppDomain.CurrentDomain.GetAssemblies():
             self.engine.ReferenceAssembly(assembly)
         self.engine.Init(System.Array[System.String]([]))
-        #self.engine.DescribeTypeExpressions = True
         # FIXME: make pyjama available in some manner
         #self.engine.Evaluate("pyjama", manager.pyjama)
 
     def execute(self, text):
-        # FIXME: set console outputs and errors for Evaluate
         result = None
+        # First, do the using lines:
+        program = []
         for line in text.split("\n"):
             if line.strip() == "": continue
+            if line.startswith("using "):
+                self.engine.Run(line)
+            else:
+                program.append(line)
+        # Next, everything else:
+        if program:
             try:
                 result = self.engine.Evaluate(line)
             except ValueError, exp:
@@ -53,8 +60,16 @@ class CSharpEngine(Engine):
 
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)
+        program = []
+        # First, do the using lines:
         for line in file(filename):
-            self.engine.Run(line);
+            if line.startswith("using "):
+                self.engine.Run(line);
+            else:
+                program += line
+        # Next, everything else:
+        if program:
+            self.engine.Run("".join(program))
         return
 
     def ready_for_execute(self, text):
