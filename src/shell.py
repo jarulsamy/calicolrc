@@ -33,6 +33,10 @@ import traceback
 import sys, os
 import re
 
+def exec_invoke(text):
+    # FIXME: if this fails, it crashes pyjama; why?
+    exec(text)
+
 # Local classes:
 class History(object):
     def __init__(self, config):
@@ -240,7 +244,7 @@ class ShellWindow(Window):
 
     def update_gui(self):
         self.set_title(_("%s - Pyjama Shell") % self.language.title())
-        self.prompt.Text = "%-6s>" % self.language
+        self.prompt.Text = "%s>" % (self.language + "------")[:6]
         self.statusbar.Pop(0)
         self.statusbar.Push(0, _("Language: %s") % self.language.title())
 
@@ -460,7 +464,7 @@ class ShellWindow(Window):
         if (self.executeThread and 
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             return
-        prompt = "%-6s> " % language
+        prompt = "%s> " % (language + "------")[:6]
         MUTEX.WaitOne()
         count = 2
         for line in text.split("\n"):
@@ -486,7 +490,7 @@ class ShellWindow(Window):
                 self.update_gui()
                 return True
             else:
-                exec(text)
+                Gtk.Application.Invoke(lambda s, a: exec_invoke(text))
                 return True
         self.language = language
         self.update_gui()
