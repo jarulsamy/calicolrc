@@ -42,10 +42,12 @@ class CSharpEngine(Engine):
     def execute(self, text):
         # FIXME: set console outputs and errors for Evaluate
         result = None
-        try:
-            result = self.engine.Evaluate(text)
-        except ValueError, exp:
-            pass
+        for line in text.split("\n"):
+            if line.strip() == "": continue
+            try:
+                result = self.engine.Evaluate(line)
+            except ValueError, exp:
+                pass
         if result:
             self.stdout.write("%s\n" % result)
 
