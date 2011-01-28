@@ -27,8 +27,7 @@ button.click do
 end
 win.destroy do
     print "Destroy!" 
-    Gtk.Quit
+    win.Hide
 end
 win.Add(button)
 win.ShowAll
-Gtk.Main
