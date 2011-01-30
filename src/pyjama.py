@@ -90,6 +90,7 @@ import traceback
 from engine import EngineManager
 from config import config
 from utils import _
+import chat
 
 # Setup Runtime environment:
 #def handle_exception(arg):
@@ -364,9 +365,33 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
 
     def login(self, user=None, password=None, debug=False):
-        import chat
         self.connection = chat.Chat(self, user, password, debug)
-    
+
+    def register(self, user, email, password, keyword, debug=True):
+        # Use a restricted acces account, to talk to admin
+        ch = chat.Chat(self, "testname", "password", debug)
+        System.Threading.Thread.Sleep(5000)
+        ch.send("admin", """register
+    email: %s
+    username: %s
+    password: %s
+    keyword: %s
+    """ % (email, user, password, keyword))
+        # send a special message to create account
+        # wait for response:
+        messages = ch.receive()
+        count = 0
+        while len(messages) == 0 and count < 10:
+            messages = ch.receive()
+            System.Threading.Thread.Sleep(1000)
+            print "   waiting for confirmation..."
+            count += 1
+        print "received messages:"
+        for message in messages:
+            print message[1]
+            print
+        ch.close()
+
 # Let's start!
 version = "0.2.8"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]

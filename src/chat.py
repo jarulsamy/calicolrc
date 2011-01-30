@@ -22,9 +22,11 @@ import clr
 clr.AddReference("agsXMPP")
 import agsXMPP
 import traceback
+import System
 
 class Chat:
     def __init__(self, pyjama, user, password, debug=False):
+        self.status = "off-line"
         self.pyjama = pyjama
         self.user = user
         self.password = password
@@ -42,6 +44,8 @@ class Chat:
         self.client.OnLogin += self.OnLogin
         self.client.OnMessage += agsXMPP.protocol.client.MessageHandler(self.OnMessage)
         self.client.OnError += agsXMPP.ErrorHandler(self.OnError)
+        self.client.OnAuthError += agsXMPP.XmppElementHandler(self.OnAuthError)
+        self.client.OnClose += self.close
 
         try:
             self.client.Open(self.user, self.password, "PyjamaClient", 5)
@@ -61,33 +65,41 @@ class Chat:
         retval, self.messages[:] = self.messages[:], []
         return retval
 
-    def close(self):
+    def close(self, sender=None):
+        self.status = "off-line"
         self.client.Close()
 
     def OnLogin(self, sender):
+        self.status = "login"
         if self.debug:
             print "LOGIN:", self.user
             #self.client.SendMyPresence()
+        self.send("", "2") # make this my only login
 
     def OnError(self, sender, exp):
         if self.debug:
             print "ERROR:", self.user, exp
 
+    def OnAuthError(self, sender, xml):
+        self.status = "rejected"
+        if self.debug:
+            print "AUTHERROR:", self.user, xml
+
     def OnReadXml(self, sender, xml):
         if self.debug:
-            print "READ:", self.user, xml
+            print "READXML:", self.user, xml
 
     def OnWriteXml(self, sender, xml):
         if self.debug:
-            print "WRITE:", self.user, xml
+            print "WRITEXML:", self.user, xml
 
     def OnMessage(self, sender, msg):
         """
         msg.From = "id@server/client"
         """
-        self.messages.append((msg.From, msg.Body))
+        mfrom = "%s@%s" % (msg.From.User, msg.From.Server)
+        self.messages.append((mfrom, msg.Body))
         if self.alert:
-            self.pyjama.Print("Message from %s just received.\n" % msg.From)
+            self.pyjama.Print("Message from %s just received.\n" % mfrom)
         if self.debug:
             print "MESSAGE:", self.user, msg
-
