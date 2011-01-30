@@ -38,22 +38,11 @@ class Chat:
         self.client.OnLogin += self.OnLogin
         self.client.OnMessage += agsXMPP.protocol.client.MessageHandler(self.OnMessage)
         self.client.OnError += agsXMPP.ErrorHandler(self.OnError)
-        self.client.MessageGrabber.Add(
-            agsXMPP.Jid("%s@%s" % (self.user, self.server)),
-            agsXMPP.Collections.BareJidComparer(),
-            agsXMPP.MessageCB(self.OnGetMessage), None)
 
         try:
             self.client.Open(self.user, self.password, "PyjamaClient", 5)
         except Exception, exp:
             traceback.print_exp()
-
-    def OnGetMessage(self, sender, msg, data):
-        if (msg.Body != None):
-            print "msg:", msg.From.User, msg.Body
-            #Console.ForegroundColor = ConsoleColor.Red;
-            #Console.WriteLine("{0}>> {1}", msg.From.User, msg.Body);
-            #Console.ForegroundColor = ConsoleColor.Green;
 
     def send(self, to, text):
         self.client.Send(
@@ -69,14 +58,14 @@ class Chat:
         #self.client.SendMyPresence()
 
     def OnError(self, sender, exp):
-        print(exp)
+        print("ERROR:", self.user, exp)
 
     def OnReadXml(self, sender, xml):
-        print("RECV XML: " + xml )
+        print("READ:", self.user, xml )
 
     def OnWriteXml(self, sender, xml):
-        print("SEND XML: " + xml )
+        print("WRITE:", self.user, xml )
 
     def OnMessage(self, sender, xml):
-        print("MESSAGE: " + xml)
+        print("MESSAGE:", self.user, xml)
 
