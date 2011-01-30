@@ -40,8 +40,8 @@ class Chat:
         self.client.OnError += agsXMPP.ErrorHandler(self.OnError)
         self.client.MessageGrabber.Add(
             agsXMPP.Jid("%s@%s" % (self.user, self.server)),
-            None,
-            agsXMPP.MessageCB(self.OnGetMessage))
+            agsXMPP.Collections.BareJidComparer(),
+            agsXMPP.MessageCB(self.OnGetMessage), None)
 
         try:
             self.client.Open(self.user, self.password, "PyjamaClient", 5)
