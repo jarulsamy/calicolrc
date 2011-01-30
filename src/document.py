@@ -106,6 +106,7 @@ class Document(object):
                                    "Save", Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.filename = fc.Filename
+            self.save()
             self.title = os.path.basename(self.filename)
             self.label.Text = self.title
             self.on_change_file()

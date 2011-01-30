@@ -168,7 +168,7 @@ class ShellWindow(Window):
         #self.textview.ModifyFont(self.pyjama.get_fontname())
         self.scrolled_window.AddWithViewport(self.textview)
         self.results = Gtk.ScrolledWindow()
-        for color in ["red", "blue", "purple", "black"]:
+        for color in ["red", "blue", "purple", "black", "green"]:
             tag = Gtk.TextTag(color)
             if color in ["red"]:
                 tag.Weight = Pango.Weight.Bold

@@ -103,9 +103,19 @@ from utils import _
 # Define local functions and classes
 
 class PyjamaProject(object):
+    """
+    This class is meant to be created as a singleton instance
+    to hold all of the components of one user together.
+    """
     def __init__(self, argv):
+        """
+        Constructor for the singleton Pyjama instance. argv is the
+        command-line files and flags.
+        """
         self.shell = None
         self.editor = None
+        self.chat = None
+        self.connection = None
         self.version = version           # from global variable
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
@@ -156,6 +166,11 @@ class PyjamaProject(object):
                 self.shell = ShellWindow(self)
 
     def get_registered_languages(self):
+        """
+        Return a dictionary of Language objects for each language
+        currently available. The language name (lowercase) is the
+        key in the dictionary pointing to a Language object.
+        """
         import glob
         sys.path.append(os.path.abspath("languages"))
         results = {}
@@ -175,6 +190,10 @@ class PyjamaProject(object):
         return results
 
     def load(self, filename):
+        """
+        Load a program. The filename extension will be used to find
+        the appropriate language engine.
+        """
         # force into a Python string:
         filename = str(filename.ToString())
         for name in self.languages:
@@ -183,14 +202,22 @@ class PyjamaProject(object):
         raise AttributeError("unknown file extension: '%s'" % filename)
 
     def get_language_from_filename(self, filename):
+        """
+        Get the language string (lower-case) based on a filename
+        extension.
+        """
         for name in self.languages:
             if filename.endswith("." + self.languages[name].extension):
                 return name
         return "python" # FIXME: default language come from config
 
-    def Print(self, message):
+    def Print(self, message, tag="green"):
+        """
+        Short-hand for message, but makes sure that the shell is up
+        and running.
+        """
         self.setup_shell()
-        self.shell.message(message, "green")
+        self.shell.message(message, tag)
 
     def on_close(self, what):
         if what in ["shell", "all"]:
@@ -335,6 +362,10 @@ class PyjamaProject(object):
             aboutDialog.Run()
             aboutDialog.Destroy()
         Gtk.Application.Invoke(invoke)
+
+    def login(self, user=None, password=None, debug=False):
+        import chat
+        self.connection = chat.Chat(self, user, password, debug)
     
 # Let's start!
 version = "0.2.8"
@@ -369,5 +400,9 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
+    # Clean up, save settings:
     config.save()
+    # Close connections:
+    if pw and pw.connection:
+        pw.connection.close()
 
