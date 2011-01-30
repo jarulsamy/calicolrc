@@ -393,7 +393,7 @@ class PyjamaProject(object):
         ch.close()
 
 # Let's start!
-version = "0.2.8"
+version = "0.2.9"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print
