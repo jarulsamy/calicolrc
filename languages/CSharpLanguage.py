@@ -34,7 +34,11 @@ class CSharpEngine(Engine):
         # FIXME: set console outputs and errors for Evaluate
         self.engine = Mono.CSharp.Evaluator
         for assembly in System.AppDomain.CurrentDomain.GetAssemblies():
-            self.engine.ReferenceAssembly(assembly)
+            try:
+                self.engine.ReferenceAssembly(assembly)
+            except:
+                print "unable to load assembly"
+                return
         self.engine.Init(System.Array[System.String]([]))
         # FIXME: make pyjama available in some manner
         #self.engine.Evaluate("pyjama", manager.pyjama)
