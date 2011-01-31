@@ -20,8 +20,8 @@
 
 import Gtk
 import Gdk
-import System
 
+# Pyjama modules:
 import Graphics
 
 class MyWindow(Gtk.Window):
@@ -237,3 +237,4 @@ def make_barchart(title, labels, data):
         bar.draw(win)
     win.ShowAll()
     return win
+

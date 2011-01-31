@@ -89,8 +89,7 @@ import traceback
 # Pyjama imports:
 from engine import EngineManager
 from config import config
-from utils import _
-import chat
+from utils import _, Chat
 
 # Setup Runtime environment:
 #def handle_exception(arg):
@@ -229,9 +228,22 @@ class PyjamaProject(object):
             if self.editor:
                 self.editor.window.Destroy()
                 self.editor = None 
+        if what in ["chat", "all"]:
+            if self.chat:
+                self.chat.window.Destroy()
+                self.chat = None
         if ((self.editor is None) and
-            (self.shell is None)):
+            (self.shell is None) and
+            (self.chat is None)):
             Gtk.Application.Quit()
+
+    def setup_chat(self, *args, **kwargs):
+        if self.chat is None:
+            from chat import ChatWindow
+            self.chat = ChatWindow(self)
+        def invoke(sender, args):
+            self.chat.window.Present()
+        Gtk.Application.Invoke(invoke)
 
     def setup_shell(self, *args, **kwargs):
         if self.shell is None:
@@ -365,11 +377,11 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
 
     def login(self, user=None, password=None, debug=False):
-        self.connection = chat.Chat(self, user, password, debug)
+        self.connection = Chat(self, user, password, debug)
 
     def register(self, user, email, password, keyword, debug=True):
         # Use a restricted acces account, to talk to admin
-        ch = chat.Chat(self, "testname", "password", debug)
+        ch = Chat(self, "testname", "password", debug)
         System.Threading.Thread.Sleep(5000)
         ch.send("admin", """register
     email: %s

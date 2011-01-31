@@ -127,6 +127,7 @@ class ShellWindow(Window):
                 ("Windows", [
                     ("Editor", None, "F6", self.pyjama.setup_editor),
                     ("Shell", None, "F7", self.pyjama.setup_shell),
+                    ("Chat", None, "F8", self.pyjama.setup_chat),
                     ]),
                 ("O_ptions", [
                     ("Make font larger", None, None, self.pyjama.increase_fontsize),
