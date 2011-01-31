@@ -135,9 +135,9 @@ class ChatWindow(Window):
                     self.pyjama.connection.send("admin", "[broadcast]\nroom: %s\n%s" % (self.room, self.entry.Text))
                 self.entry.Text = ""
             else:
-                self.message("You are not currently online.")
+                self.message("You are not currently online.\n")
         else:
-            self.message("You need to log in first.")
+            self.message("You need to log in first.\n")
 
     def decrease_font_size(self, font):
         self.textview.ModifyFont(font)
