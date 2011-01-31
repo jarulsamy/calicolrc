@@ -231,7 +231,7 @@ def make_barchart(title, labels, data):
     for value in data:
         # put bar in place
         # x,y is bottom, right-hand point
-        height = 
+        height = 34
         bar = Rectangle(Graphics.Point(x, y - height),
                         Graphics.Point(x + width, y))
         bar.draw(win)
