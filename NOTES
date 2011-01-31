@@ -7,6 +7,7 @@ These are issues with the code in Pyjama/src/*.py
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret
+# BUG: On close, need to wait for the connection to finish
 
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
