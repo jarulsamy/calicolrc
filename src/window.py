@@ -22,6 +22,8 @@ import Gtk
 import Gdk
 import System
 
+import Graphics
+
 class MyWindow(Gtk.Window):
     def on_key_press(self, eventkey):
         """
@@ -219,3 +221,19 @@ class Window(object):
             pixbuf.Save(filename, filename.rsplit(".", 1)[-1])
         Gtk.Application.Invoke(invoke)
 
+def make_barchart(title, labels, data):
+    win = Graphics.Window(title, 600, 300)
+    maxvalue = max(data)
+    for text in labels:
+        # put labels across
+        label = Label(Graphics.Point(x, y), text)
+        label.draw(win)
+    for value in data:
+        # put bar in place
+        # x,y is bottom, right-hand point
+        height = 
+        bar = Rectangle(Graphics.Point(x, y - height),
+                        Graphics.Point(x + width, y))
+        bar.draw(win)
+    win.ShowAll()
+    return win
