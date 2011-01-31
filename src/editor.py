@@ -23,7 +23,7 @@ import GLib
 import System
 
 from window import Window, MyWindow
-from utils import _
+from utils import _, StatusBar
 import os
 import re
 
@@ -95,10 +95,8 @@ class EditorWindow(Window):
         self.notebook.TabVborder = 1
         self.notebook.SwitchPage += self.changed_page
         self.notebook.PageRemoved += self.changed_page
-        self.statusbar = Gtk.Statusbar()
-        self.statusbar.Push(0, "Language: Python")
-        self.statusbar.HasResizeGrip = True
-        self.statusbar.Show()
+        self.statusbar = StatusBar()
+        self.statusbar.init("Language", "Status")
         # initialize
         self.window.Add(self.vbox)
         self.vbox.PackStart(self.menubar, False, False, 0)
@@ -145,8 +143,7 @@ class EditorWindow(Window):
     def changed_page(self, obj, event):
         doc = self.get_current_doc()
         if doc:
-            self.statusbar.Pop(0)
-            self.statusbar.Push(0, _("Language: %s") % doc.language.title())
+            self.statusbar.set("Language", doc.language.title())
             self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
             if doc.filename:
                 path, filename = os.path.split(doc.filename)
@@ -155,8 +152,7 @@ class EditorWindow(Window):
                 except:
                     pass # Fail silently
         else:
-            self.statusbar.Pop(0)
-            self.statusbar.Push(0, _("Language: "))
+            self.statusbar.set("Language", "")
             self.window.Title = _("Pyjama Editor")
 
     def select_or_open(self, filename, lineno=0, language="python"):
@@ -219,6 +215,15 @@ class EditorWindow(Window):
                 self.notebook.RemovePage(0)
         if page and lineno != 0:
             self.goto_line(lineno)
+
+    def update_status(self):
+        self.statusbar.set("Status", self.get_status())
+
+    def get_status(self):
+        if self.pyjama.connection:
+            return self.pyjama.connection.status
+        else:
+            return "offline"
 
     def goto_line(self, lineno):
         """

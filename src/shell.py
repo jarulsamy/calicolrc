@@ -26,7 +26,7 @@ import System.Threading
 
 # Pyjama modules:
 from window import Window, MyWindow
-from utils import _, CustomStream, MUTEX, ConsoleStream
+from utils import _, CustomStream, MUTEX, ConsoleStream, StatusBar
 
 # Pure-Python modules:
 import traceback
@@ -145,9 +145,8 @@ class ShellWindow(Window):
         self.make_gui(menu, toolbar)
         Gtk.Application.Invoke(self.stop_running)
         self.history = History(self.pyjama.config)
-        self.statusbar = Gtk.Statusbar()
-        self.statusbar.Show()
-        self.statusbar.Push(0, "Language: Python")
+        self.statusbar = StatusBar()
+        self.statusbar.init("Language", "Status")
         self.command_area = Gtk.HBox()
         alignment = Gtk.Alignment( 0.5, 0.0, 0, 0)
         self.prompt = Gtk.Label("python>")
@@ -249,8 +248,17 @@ class ShellWindow(Window):
     def update_gui(self):
         self.set_title(_("%s - Pyjama Shell") % self.language.title())
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
-        self.statusbar.Pop(0)
-        self.statusbar.Push(0, _("Language: %s") % self.language.title())
+        self.statusbar.set("Language", self.language.title())
+        self.statusbar.set("Status", self.get_status())
+
+    def update_status(self):
+        self.statusbar.set("Status", self.get_status())
+
+    def get_status(self):
+        if self.pyjama.connection:
+            return self.pyjama.connection.status
+        else:
+            return "offline"
 
     def on_key_press(self, event, force=False):
         # FIXME: this should be handled in textview, but haven't

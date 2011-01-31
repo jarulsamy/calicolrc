@@ -24,7 +24,7 @@ import Pango
 import GLib
 import System
 
-from utils import _, Mutex
+from utils import _, Mutex, StatusBar
 from window import Window, MyWindow
 
 class ChatWindow(Window):
@@ -79,9 +79,8 @@ class ChatWindow(Window):
                    (Gtk.Stock.Open, self.on_open_file),
                    ]
         self.make_gui(menu, toolbar)
-        self.statusbar = Gtk.Statusbar()
-        self.statusbar.Show()
-        self.statusbar.Push(0, "Status: ")
+        self.statusbar = StatusBar()
+        self.statusbar.init("Status")
 
         # Enter messages:
         self.vbox = Gtk.VBox()
@@ -138,6 +137,15 @@ class ChatWindow(Window):
                 self.message("You are not currently online.\n")
         else:
             self.message("You need to log in first.\n")
+
+    def update_status(self):
+        self.statusbar.set("Status", self.get_status())
+
+    def get_status(self):
+        if self.pyjama.connection:
+            return self.pyjama.connection.status
+        else:
+            return "offline"
 
     def decrease_font_size(self, font):
         self.textview.ModifyFont(font)

@@ -261,6 +261,16 @@ class PyjamaProject(object):
             self.editor.window.Present()
         Gtk.Application.Invoke(invoke)
 
+    def update_status(self):
+        def invoke(sender, args):
+            if self.shell:
+                self.shell.update_status()
+            if self.editor:
+                self.editor.update_status()
+            if self.chat:
+                self.chat.update_status()
+        Gtk.Application.Invoke(invoke)
+
     def grep(self, pattern, file_pat="*.py", dir=".", 
              flags=0, recursive=True):
         """
@@ -338,6 +348,8 @@ class PyjamaProject(object):
                 self.shell.increase_font_size(pangofont)
             if self.editor:
                 self.editor.increase_font_size(pangofont)
+            if self.chat:
+                self.chat.increase_font_size(pangofont)
         Gtk.Application.Invoke(invoke)
 
     def decrease_fontsize(self, obj, event):
@@ -349,6 +361,8 @@ class PyjamaProject(object):
                 self.shell.decrease_font_size(pangofont)
             if self.editor:
                 self.editor.decrease_font_size(pangofont)
+            if self.chat:
+                self.chat.decrease_font_size(pangofont)
         Gtk.Application.Invoke(invoke)
 
     def about(self, obj, event):

@@ -8,6 +8,7 @@ These are issues with the code in Pyjama/src/*.py
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret
 # BUG: On close, need to wait for the connection to finish
+# BUG: goto_end usually doesn't, don't know why
 
 # Pyjama: Need to run code in a process rather than thread
 # Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)

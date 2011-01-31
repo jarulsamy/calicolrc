@@ -58,9 +58,6 @@ class Scheme(Language):
     def get_engine_class(self):
         return SchemeEngine
 
-    def get_document_class(self):
-        return MakeDocument
-
 def register_language():
     return Scheme("scheme", "ss")
 

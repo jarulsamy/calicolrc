@@ -61,9 +61,6 @@ class Sympl(Language):
     def get_engine_class(self):
         return SymplEngine
 
-    def get_document_class(self):
-        return MakeDocument
-
 def register_language():
     return Sympl("sympl", "sympl")
 

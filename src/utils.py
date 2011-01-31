@@ -304,6 +304,7 @@ class Chat:
             print "READXML:", self.user, xml
 
     def OnWriteXml(self, sender, xml):
+        self.pyjama.update_status()
         if self.debug:
             print "WRITEXML:", self.user, xml
 
@@ -328,3 +329,18 @@ class Chat:
         if self.debug:
             print "MESSAGE:", self.user, msg
 
+class StatusBar(Gtk.HBox):
+    def init(self, *labels):
+        self.labels = labels
+        self.statusbars = {}
+        for label in labels:
+            self.statusbars[label] = Gtk.Statusbar()
+            self.statusbars[label].Push(0, "%s: " % label)
+            self.statusbars[label].HasResizeGrip = (label == labels[-1])
+            self.PackStart(self.statusbars[label])
+            self.statusbars[label].Show()
+        self.Show()
+
+    def set(self, label, value):
+        self.statusbars[label].Pop(0)
+        self.statusbars[label].Push(0, _("%s: %s") % (label, value))
