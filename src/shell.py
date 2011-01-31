@@ -109,6 +109,9 @@ class ShellWindow(Window):
                   ] +
                   self.make_new_file_menu() +
                   [None,
+                  ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
+                  ("Login...", None, None, lambda o, e: self.pyjama.login_dialog(self.window)),
+                  None,
                   ("Close", Gtk.Stock.Close,
                    None, self.on_close),
                   ("Quit", Gtk.Stock.Quit,

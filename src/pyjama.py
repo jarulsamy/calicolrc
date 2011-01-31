@@ -392,6 +392,78 @@ class PyjamaProject(object):
             print
         ch.close()
 
+    def login_dialog(self, window):
+        def invoke(sender, args):
+            dialog = Gtk.Dialog("Pyjama Login", window,
+                                Gtk.DialogFlags.DestroyWithParent)
+            dialog.Modal = True
+            items = ["Username", "Password"]
+            table = Gtk.Table(len(items), 2, False)
+            row = 0
+            data = {}
+            for item in items:
+                label = Gtk.Label("%s:" % item)
+                label.Justify = Gtk.Justification.Right
+                entry = Gtk.Entry()
+                if "Password" in item:
+                    entry.Visibility = False
+                data[item] = entry
+                table.Attach(label, 0, 1, row, row + 1,
+                    Gtk.AttachOptions.Expand, Gtk.AttachOptions.Expand, 0, 0)
+                table.Attach(entry, 1, 2, row, row + 1)
+                row += 1
+            expand, fill, padding = True, True, 0
+            dialog.VBox.PackStart(table, expand, fill, padding)
+            dialog.AddButton("Login", Gtk.ResponseType.Apply)
+            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.ShowAll()
+            response = dialog.Run()
+            print response, Gtk.ResponseType.Apply
+            if response == int(Gtk.ResponseType.Apply):
+                self.login(data["Username"].Text,
+                           data["Password"].Text, True)
+            dialog.Destroy()
+            # FIXME: report results
+        Gtk.Application.Invoke(invoke)
+
+    def register_dialog(self, window):
+        def invoke(sender, args):
+            dialog = Gtk.Dialog("Pyjama Registration", window,
+                                Gtk.DialogFlags.DestroyWithParent)
+            dialog.Modal = True
+            items = ["Username", "Email", "Password", "Password again",
+                        "Course keyword"]
+            table = Gtk.Table(len(items), 2, False)
+            row = 0
+            data = {}
+            for item in items:
+                label = Gtk.Label("%s:" % item)
+                label.Justify = Gtk.Justification.Right
+                entry = Gtk.Entry()
+                if "Password" in item:
+                    entry.Visibility = False
+                data[item] = entry
+                table.Attach(label, 0, 1, row, row + 1,
+                    Gtk.AttachOptions.Expand, Gtk.AttachOptions.Expand, 0, 0)
+                table.Attach(entry, 1, 2, row, row + 1)
+                row += 1
+            expand, fill, padding = True, True, 0
+            dialog.VBox.PackStart(table, expand, fill, padding)
+            dialog.AddButton("Register", Gtk.ResponseType.Apply)
+            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.ShowAll()
+            response = dialog.Run()
+            if response == int(Gtk.ResponseType.Apply):
+                # FIXME: check passwords, report and repeat if necessary
+                self.register(data["Username"].Text,
+                              data["Email"].Text,
+                              data["Password"].Text,
+                              data["Course keyword"].Text, True)
+            dialog.Destroy()
+            # FIXME: report results
+        Gtk.Application.Invoke(invoke)
+
+
 # Let's start!
 version = "0.2.9"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
