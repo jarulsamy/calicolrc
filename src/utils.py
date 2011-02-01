@@ -285,16 +285,21 @@ class Chat:
 
     def OnLogin(self, sender):
         self.status = "online"
+        self.send("", "2") # make this my only login
+        if self.alert:
+            self.pyjama.alert("You are now logged in as '%s'." % self.user)
         if self.debug:
             print "LOGIN:", self.user
             #self.client.SendMyPresence()
-        self.send("", "2") # make this my only login
 
     def OnError(self, sender, exp):
         print "ERROR in Chat:", self.user, exp
 
     def OnAuthError(self, sender, xml):
         self.status = "rejected"
+        if self.alert:
+            self.pyjama.alert("You were not allowed to log in.\n" +
+                              "Please check your ID and password.")
         if self.debug:
             print "AUTHERROR:", self.user, xml
 
@@ -312,6 +317,8 @@ class Chat:
         msg.From = "id@server/resource"
         """
         mfrom = "%s@%s" % (msg.From.User, msg.From.Server)
+        if self.debug:
+            print "MESSAGE:", self.user, msg
         if str(msg.Body).startswith("[broadcast]"):
             line0, rest = str(msg.Body).split("\n", 1) # [broadcast]
             if "\n" in rest:
@@ -332,11 +339,22 @@ class Chat:
                 fileheader, filename = [item.strip() for item in line3.split(":", 1)]
                 self.pyjama.blast(address, type, filename, code)
                 return
+        elif str(msg.Body).startswith("[result]"):
+            line0, rest = str(msg.Body).split("\n", 1) # [blast]
+            self.pyjama.alert(rest)
+            return
+        elif str(msg.Body).startswith("[update]"):
+            line0, rest = str(msg.Body).split("\n", 1) # [update]
+            line1, rest = rest.split("\n", 1) # room:
+            header, value = [item.strip() for item in line1.split(":", 1)]
+            if header == "room":
+                self.room = value
+            return
+        elif str(msg.Body).startswith("[info]"):
+            # ignore
+            return
+        # otherwise, receive for user's own use
         self.messages.append((mfrom, msg.Body))
-        if self.alert:
-            self.pyjama.Print("Message from %s just received.\n" % mfrom)
-        if self.debug:
-            print "MESSAGE:", self.user, msg
 
 class StatusBar(Gtk.HBox):
     def init(self, *labels):

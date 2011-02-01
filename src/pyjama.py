@@ -545,6 +545,17 @@ class PyjamaProject(object):
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
 
+    def alert(self, message):
+        def invoke(sender, args):
+            md = Gtk.MessageDialog(self.get_window(),
+                                  Gtk.DialogFlags.DestroyWithParent,
+                                  Gtk.MessageType.Info,
+                                  Gtk.ButtonsType.Ok,
+                                  message)
+            md.Run()
+            md.Destroy()
+        Gtk.Application.Invoke(invoke)
+
 
 # Let's start!
 version = "0.2.9"
