@@ -24,14 +24,16 @@ import Pango
 import GLib
 import System
 
-from utils import _, Mutex, StatusBar
+from utils import _, Mutex, StatusBar, get_colors
 from window import Window, MyWindow
+from random import choice
 
 class ChatWindow(Window):
     def __init__(self, pyjama):
         self.MUTEX = Mutex(False, "PyjamaChatMutex")
         self.room = "General"
         self.pyjama = pyjama
+        self.colormap = {}
         self.window = MyWindow(_("Pyjama Chat"))
         self.window.set_on_key_press(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
@@ -95,7 +97,7 @@ class ChatWindow(Window):
 
         self.textview = Gtk.TextView()
         self.results = Gtk.ScrolledWindow()
-        for color in ["red", "blue", "purple", "black", "green"]:
+        for color in get_colors():
             tag = Gtk.TextTag(color)
             if color in ["red"]:
                 tag.Weight = Pango.Weight.Bold
@@ -105,7 +107,7 @@ class ChatWindow(Window):
         self.textview.PopulatePopup += self.popup
         self.textview.WrapMode = Gtk.WrapMode.Char
         self.textview.Editable = False
-        self.results.AddWithViewport(self.textview)
+        self.results.Add(self.textview)
         # initialize
         self.window.Add(self.vbox)
         self.vbox.PackStart(self.menubar, False, False, 0)
@@ -212,6 +214,15 @@ class ChatWindow(Window):
         self.pyjama.setup_editor()
         self.pyjama.editor.select_or_open(filename, lineno, language)
 
+    def display_message(self, name, message):
+        if name in self.colormap:
+            color = self.colormap[name]
+        else:
+            color = choice(get_colors())
+            self.colormap[name] = color
+        self.pyjama.chat.message("%s: " % name, color)
+        self.pyjama.chat.message("%s\n" % message, "black")
+
     def message(self, message, tag="purple"):
         # DO NOT PUT the ev, WaitOne stuff here!
         def invoke(sender, args):
@@ -223,10 +234,12 @@ class ChatWindow(Window):
         Gtk.Application.Invoke(invoke)
 
     def goto_end(self):
-        self.MUTEX.WaitOne()
-        end = self.textview.Buffer.EndIter
-        self.textview.ScrollToIter(end, 0.4, True, 0, 1.0)
-        self.MUTEX.ReleaseMutex()
+        def invoke(sender, args):
+            self.MUTEX.WaitOne()
+            end = self.textview.Buffer.EndIter
+            self.textview.ScrollToIter(end, 0.0, True, 0, 0.5)
+            self.MUTEX.ReleaseMutex()
+        Gtk.Application.Invoke(invoke)
 
     def set_title(self, text):
         self.window.Title = text

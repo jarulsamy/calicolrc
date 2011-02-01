@@ -261,7 +261,9 @@ class TextEditorDocument(Document):
         def invoke(sender, args):
             self.texteditor.Caret.Line = lineno - 1
             self.texteditor.Caret.Column = 0
-            self.texteditor.ScrollToCaret()
+            #self.texteditor.ScrollToCaret()
+            self.texteditor.GrabFocus()
+            GLib.Timeout.Add(100, self.texteditor.CenterToCaret)
         Gtk.Application.Invoke(invoke)
 
     def get_dirty(self):

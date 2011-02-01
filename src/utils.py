@@ -103,7 +103,7 @@ class CustomStream(System.IO.Stream):
         end = self.textview.Buffer.EndIter
         insert_mark = self.textview.Buffer.InsertMark 
         self.textview.Buffer.PlaceCursor(end)
-        self.textview.ScrollToMark(insert_mark, 0.0, True, 0, 1.0)
+        self.textview.ScrollToMark(insert_mark, 0.0, True, 0, 0.5)
 
     def Write(self, bytes, offset, count):
         ev = ManualResetEvent(False)
@@ -320,8 +320,7 @@ class Chat:
                 fromheader, address = [item.strip() for item in line1.split(":")]
                 name, domain = address.split("@")
                 if self.pyjama.chat:
-                    self.pyjama.chat.message("%s: " % name, "purple")
-                    self.pyjama.chat.message("%s\n" % message, "black")
+                    self.pyjama.chat.display_message(name, message)
                     return
         self.messages.append((mfrom, msg.Body))
         if self.alert:
@@ -344,3 +343,6 @@ class StatusBar(Gtk.HBox):
     def set(self, label, value):
         self.statusbars[label].Pop(0)
         self.statusbars[label].Push(0, _("%s: %s") % (label, value))
+
+def get_colors():
+    return ["red", "blue", "purple", "black", "green"]

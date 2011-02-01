@@ -136,12 +136,15 @@ class PyjamaProject(object):
         self.engine.start()
         request_shell = False
         request_editor = False
+        request_chat = False
         files = []
         for arg in argv:
             if arg == "--shell":
                 request_shell = True
             elif arg == "--editor":
                 request_editor = True
+            elif arg == "--chat":
+                request_chat = True
             elif arg == "--nogui":
                 self.gui = False
                 request_shell = True
@@ -151,7 +154,8 @@ class PyjamaProject(object):
             else:
                 files.append(os.path.abspath(arg))
                 request_editor = True
-        if files == [] and not request_editor:
+        if files == [] and not request_editor and not request_chat:
+            # a default action, given nothing else requested
             request_shell = True
         if request_editor:
             if not self.standalone:
@@ -164,6 +168,12 @@ class PyjamaProject(object):
             else:
                 from shell import ShellWindow
                 self.shell = ShellWindow(self)
+        if request_chat:
+            if self.standalone:
+                pass # no chat in standalone mode
+            else:
+                from chat import ChatWindow
+                self.chat = ChatWindow(self)
 
     def get_registered_languages(self):
         """
@@ -216,8 +226,10 @@ class PyjamaProject(object):
         Short-hand for message, but makes sure that the shell is up
         and running.
         """
-        self.setup_shell()
-        self.shell.message(message, tag)
+        if self.shell:
+            self.shell.message(message, tag)
+        else:
+            print message
 
     def on_close(self, what):
         if what in ["shell", "all"]:
@@ -393,7 +405,7 @@ class PyjamaProject(object):
     def login(self, user=None, password=None, debug=False):
         self.connection = Chat(self, user, password, debug)
 
-    def register(self, user, email, password, keyword, debug=True):
+    def register(self, user, email, password, keyword, debug=False):
         # Use a restricted acces account, to talk to admin
         ch = Chat(self, "testname", "password", debug)
         System.Threading.Thread.Sleep(5000)
@@ -431,7 +443,7 @@ class PyjamaProject(object):
                 label = Gtk.Label("%s:" % item)
                 label.Justify = Gtk.Justification.Right
                 entry = Gtk.Entry()
-                if "Password" in item:
+                if "password" in item.lower():
                     entry.Visibility = False
                 data[item] = entry
                 table.Attach(label, 0, 1, row, row + 1,
@@ -444,10 +456,9 @@ class PyjamaProject(object):
             dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
             dialog.ShowAll()
             response = dialog.Run()
-            print response, Gtk.ResponseType.Apply
             if response == int(Gtk.ResponseType.Apply):
                 self.login(data["Username"].Text,
-                           data["Password"].Text, True)
+                           data["Password"].Text)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
@@ -466,7 +477,7 @@ class PyjamaProject(object):
                 label = Gtk.Label("%s:" % item)
                 label.Justify = Gtk.Justification.Right
                 entry = Gtk.Entry()
-                if "Password" in item:
+                if "password" in item.lower():
                     entry.Visibility = False
                 data[item] = entry
                 table.Attach(label, 0, 1, row, row + 1,
@@ -484,7 +495,7 @@ class PyjamaProject(object):
                 self.register(data["Username"].Text,
                               data["Email"].Text,
                               data["Password"].Text,
-                              data["Course keyword"].Text, True)
+                              data["Course keyword"].Text)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
@@ -501,8 +512,9 @@ if "--help" in args:
     print "Start pyjama with the following options:"
     print "  pyjama                            Defaults to shell"
     print "  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
-    print "  pyjama --shell                    Brings up shell"
-    print "  pyjama --editor                   Brings up editor"
+    print "  pyjama --shell                    Brings up shell window"
+    print "  pyjama --editor                   Brings up editor window"
+    print "  pyjama --chat                     Brings up chat window"
     print "  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
     print "  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
     print "  pyjama --version                  Displays the version number (%s)" % version
