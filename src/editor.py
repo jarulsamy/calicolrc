@@ -68,6 +68,7 @@ class EditorWindow(Window):
                 ("Script", [
                     ("Run", Gtk.Stock.Apply, "F5", self.on_run),
                     ("Reset and run", None, "<control>F5", self.on_reset_run),
+                    ("Blast...", None, None, self.blast_dialog),
                            ]),
                 ("Windows", [
                     ("Editor", None, "F6", self.pyjama.setup_editor),
@@ -344,3 +345,44 @@ class EditorWindow(Window):
         for doc in self.get_docs():
             doc.decrease_font_size(font)
 
+    def blast_dialog(self, obj, event):
+        def invoke(sender, args):
+            dialog = Gtk.Dialog("Pyjama Script Blast", self.window,
+                                Gtk.DialogFlags.DestroyWithParent)
+            dialog.Modal = True
+            items = ["To"]
+            table = Gtk.Table(len(items), 2, False)
+            row = 0
+            data = {}
+            for item in items:
+                label = Gtk.Label("%s:" % item)
+                label.Justify = Gtk.Justification.Right
+                entry = Gtk.Entry()
+                if "password" in item.lower():
+                    entry.Visibility = False
+                data[item] = entry
+                table.Attach(label, 0, 1, row, row + 1,
+                    Gtk.AttachOptions.Expand, Gtk.AttachOptions.Expand, 0, 0)
+                table.Attach(entry, 1, 2, row, row + 1)
+                row += 1
+            expand, fill, padding = True, True, 0
+            dialog.VBox.PackStart(table, expand, fill, padding)
+            dialog.AddButton("Blast!", Gtk.ResponseType.Apply)
+            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.ShowAll()
+            response = dialog.Run()
+            if response == int(Gtk.ResponseType.Apply):
+                # FIXME: need to have connection
+                self.blast_script(data["To"].Text, self.document)
+            dialog.Destroy()
+            # FIXME: report results
+        Gtk.Application.Invoke(invoke)
+
+    def blast_script(self, to, document):
+        if self.pyjama.connection:
+            if self.pyjama.connection.status == "online":
+                self.pyjama.connection.send("admin", "[blast]\nto: %s\n%s" % (to, document.get_text()))
+            else:
+                print "You are not online."
+        else:
+            print "You need to login."

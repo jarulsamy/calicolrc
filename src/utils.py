@@ -310,7 +310,7 @@ class Chat:
 
     def OnMessage(self, sender, msg):
         """
-        msg.From = "id@server/client"
+        msg.From = "id@server/resource"
         """
         mfrom = "%s@%s" % (msg.From.User, msg.From.Server)
         if str(msg.Body).startswith("[broadcast]"):
@@ -322,6 +322,15 @@ class Chat:
                 if self.pyjama.chat:
                     self.pyjama.chat.display_message(name, message)
                     return
+        elif str(msg.Body).startswith("[blast]"):
+            line0, rest = str(msg.Body).split("\n", 1) # [blast]
+            if "\n" in rest:
+                line1, code = rest.split("\n", 1) # from:
+                fromheader, address = [item.strip() for item in line1.split(":")]
+                # FIXME: ask yes/no run code from address
+                # FIXME: execute in a locked-down, secure environment
+                self.pyjama.blast(code)
+                return
         self.messages.append((mfrom, msg.Body))
         if self.alert:
             self.pyjama.Print("Message from %s just received.\n" % mfrom)

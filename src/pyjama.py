@@ -211,6 +211,12 @@ class PyjamaProject(object):
                 return self.engine[name].execute_file(filename)
         raise AttributeError("unknown file extension: '%s'" % filename)
 
+    def blast(self, code, language="python"):
+        """
+        Run a program.
+        """
+        return self.engine[language].execute(code)
+
     def get_language_from_filename(self, filename):
         """
         Get the language string (lower-case) based on a filename
