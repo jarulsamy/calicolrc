@@ -105,7 +105,7 @@ class ChatWindow(Window):
             self.textview.Buffer.TagTable.Add(tag)
         self.textview.ModifyFont(self.pyjama.get_fontname())
         self.textview.PopulatePopup += self.popup
-        self.textview.WrapMode = Gtk.WrapMode.Char
+        self.textview.WrapMode = Gtk.WrapMode.Word
         self.textview.Editable = False
         self.results.Add(self.textview)
         # initialize
@@ -123,15 +123,39 @@ class ChatWindow(Window):
               Gdk.Atom.Intern("CLIPBOARD", True))
         def invoke(sender, args):
             self.window.ShowAll()
+            self.update_status()
+            self.message("Pyjama Chat Window\n" +
+                         "-------------------\n" +
+                         "Enter /help for details\n\n")
         Gtk.Application.Invoke(invoke)
 
     def send_clicked(self, obj=None, event=None):
-        if self.pyjama.connection:
+        text = str(self.entry.Text)
+        if text.startswith("/help"):
+            self.message("/help\n", "black")
+            self.message("""
+Chat commands:
+   MESAGE              - send a message to
+                         conference participants
+   @USER MESSAGE       - send a message to just
+                         USER
+   /join CONFERENCE    - join a conference
+   /list               - list known conferences
+   /create CONFERENCE  - create conference
+   /help               - this help message
+
+""")
+            self.entry.Text = ""
+        elif self.pyjama.connection:
             if self.pyjama.connection.status == "online":
-                # FIXME: escape text to make XML body appropriate
+                # FIXME: escape text to make XML body appropriate (it may do that automatically)
+                # FIXME: add /create and /list
                 if str(self.entry.Text).startswith("/join "):
                     self.room = str(self.entry.Text)[6:].strip()
                     self.pyjama.connection.send("admin", "[join]\nroom: %s" % self.room)
+                elif str(self.entry.Text).startswith("@"):
+                    user, message = str(self.entry.Text).split(" ", 1)
+                    self.pyjama.connection.send("admin", "[broadcast]\nto: %s\n%s" % (user[1:], message))
                 else:
                     self.pyjama.connection.send("admin", "[broadcast]\nroom: %s\n%s" % (self.room, self.entry.Text))
                 self.entry.Text = ""
