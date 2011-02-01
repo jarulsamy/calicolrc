@@ -85,6 +85,7 @@ Highlighting.SyntaxModeService.LoadStylesAndModes(
 
 # Import pure-Python modules:
 import traceback
+import tempfile
 
 # Pyjama imports:
 from engine import EngineManager
@@ -211,11 +212,39 @@ class PyjamaProject(object):
                 return self.engine[name].execute_file(filename)
         raise AttributeError("unknown file extension: '%s'" % filename)
 
-    def blast(self, code, language="python"):
+    def blast(self, mfrom, type, filename, code):
         """
         Run a program.
         """
-        return self.engine[language].execute(code)
+        language = self.get_language_from_filename(filename)
+        q = None
+        if type == "execute":
+            q = "Do you want to run it?"
+        elif type == "edit":
+            q = "Do you want to open it?"
+        md = Gtk.MessageDialog(self.get_window(),
+                              Gtk.DialogFlags.DestroyWithParent,
+                              Gtk.MessageType.Question,
+                              Gtk.ButtonsType.YesNo,
+                              "You have received a blast from '%s'.\n%s"
+                              % (mfrom, q))
+        def invoke(sender, args):
+            result = md.Run()
+            md.Destroy()
+            if result == int(Gtk.ResponseType.Yes):
+                if type == "execute":
+                    self.setup_shell()
+                    # FIXME: execute in a locked-down, secure environment
+                    self.shell.execute(code, language)
+                elif type == "edit":
+                    self.setup_editor()
+                    path = tempfile.gettempdir()
+                    temp = os.path.abspath(os.path.join(path, filename))
+                    fp = open(temp, "w")
+                    fp.write(code)
+                    fp.close()
+                    self.editor.select_or_open(temp, language=language)
+        Gtk.Application.Invoke(invoke)
 
     def get_language_from_filename(self, filename):
         """
@@ -236,6 +265,16 @@ class PyjamaProject(object):
             self.shell.message(message, tag)
         else:
             print message
+
+    def get_window(self):
+        if self.chat:
+            return self.chat.window
+        elif self.shell:
+            return self.shell.window
+        elif self.editor:
+            return self.editor.window
+        else:
+            return None
 
     def on_close(self, what):
         if what in ["shell", "all"]:

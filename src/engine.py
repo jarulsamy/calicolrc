@@ -158,6 +158,7 @@ class DLREngine(Engine):
             source.Execute(self.manager.scope)
         except:
             traceback.print_exc()
+            return False
         return True
 
     def execute_file(self, filename):

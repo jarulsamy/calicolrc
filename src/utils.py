@@ -291,8 +291,7 @@ class Chat:
         self.send("", "2") # make this my only login
 
     def OnError(self, sender, exp):
-        if self.debug:
-            print "ERROR:", self.user, exp
+        print "ERROR in Chat:", self.user, exp
 
     def OnAuthError(self, sender, xml):
         self.status = "rejected"
@@ -325,11 +324,13 @@ class Chat:
         elif str(msg.Body).startswith("[blast]"):
             line0, rest = str(msg.Body).split("\n", 1) # [blast]
             if "\n" in rest:
-                line1, code = rest.split("\n", 1) # from:
-                fromheader, address = [item.strip() for item in line1.split(":")]
-                # FIXME: ask yes/no run code from address
-                # FIXME: execute in a locked-down, secure environment
-                self.pyjama.blast(code)
+                line1, rest = rest.split("\n", 1) # from:
+                fromheader, address = [item.strip() for item in line1.split(":", 1)]
+                line2, rest = rest.split("\n", 1) # type:
+                typeheader, type = [item.strip() for item in line2.split(":", 1)]
+                line3, code = rest.split("\n", 1) # filename:
+                fileheader, filename = [item.strip() for item in line3.split(":", 1)]
+                self.pyjama.blast(address, type, filename, code)
                 return
         self.messages.append((mfrom, msg.Body))
         if self.alert:

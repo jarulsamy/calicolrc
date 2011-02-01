@@ -52,7 +52,7 @@ class EditorWindow(Window):
                    None, self.on_save_file_as),
                   None,
                   ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  ("Login...", None, None, lambda o, e: self.pyjama.login_dialog(self.window)),
+                  ("Login...", None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
                   ("Close", Gtk.Stock.Close,
                    None, self.on_close),
@@ -365,6 +365,12 @@ class EditorWindow(Window):
                     Gtk.AttachOptions.Expand, Gtk.AttachOptions.Expand, 0, 0)
                 table.Attach(entry, 1, 2, row, row + 1)
                 row += 1
+            # add select for execute or edit
+            radio1 = Gtk.RadioButton("Open script in their editor")
+            radio2 = Gtk.RadioButton(radio1, "Run script on their computer")
+            table.Attach(radio1, 1, 2, row, row + 1)
+            row += 1
+            table.Attach(radio2, 1, 2, row, row + 1)
             expand, fill, padding = True, True, 0
             dialog.VBox.PackStart(table, expand, fill, padding)
             dialog.AddButton("Blast!", Gtk.ResponseType.Apply)
@@ -372,16 +378,25 @@ class EditorWindow(Window):
             dialog.ShowAll()
             response = dialog.Run()
             if response == int(Gtk.ResponseType.Apply):
-                # FIXME: need to have connection
-                self.blast_script(data["To"].Text, self.document)
+                if radio2.Active:
+                    self.blast_script(data["To"].Text, "execute", self.document)
+                else:
+                    self.blast_script(data["To"].Text, "edit", self.document)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
 
-    def blast_script(self, to, document):
+    def blast_script(self, to, type, document):
         if self.pyjama.connection:
             if self.pyjama.connection.status == "online":
-                self.pyjama.connection.send("admin", "[blast]\nto: %s\n%s" % (to, document.get_text()))
+                # [blast]
+                # to: address | conference
+                # type: execute | edit
+                # filename: filename.ext
+                # data...
+                path, basefilename = os.path.split(document.filename)
+                self.pyjama.connection.send("admin", "[blast]\nto: %s\ntype: %s\nfilename: %s\n%s" %
+                                            (to, type, basefilename, document.get_text()))
             else:
                 print "You are not online."
         else:
