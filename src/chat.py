@@ -36,7 +36,7 @@ class ChatWindow(Window):
         self.colormap = {}
         self.window = MyWindow(_("Pyjama Chat"))
         self.window.set_on_key_press(self.on_key_press)
-        self.window.SetDefaultSize(700, 550)
+        self.window.SetDefaultSize(350, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.textview = Gtk.TextView()
         self.vbox = Gtk.VBox()
@@ -135,14 +135,14 @@ class ChatWindow(Window):
             self.message("/help\n", "black")
             self.message("""
 Chat commands:
-   MESAGE              - send a message to
-                         conference participants
-   @USER MESSAGE       - send a message to just
-                         USER
-   /join CONFERENCE    - join a conference
-   /list               - list known conferences
-   /create CONFERENCE  - create conference
-   /help               - this help message
+   MESAGE        - send a message to
+                   all in conference
+   @USER MESSAGE - send a message to
+                   USER
+   /join CONF    - join a conference
+   /list         - list conferences
+   /create CONF  - create conference
+   /help         - this help message
 
 """)
             self.entry.Text = ""

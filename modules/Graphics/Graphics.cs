@@ -702,7 +702,37 @@ public static class Graphics {
 	  compute_points_around_origin();
 	}
   }
-  
+
+  public class Text : Shape {
+    public Text(Point p1, string text) : base(has_pen) {
+    }
+    public override void render(Cairo.Context g) {
+      // render path
+      g.Save();
+      Point temp;
+      if (path != null) {
+        g.LineWidth = line_width;
+        temp = screen_coord(path[0]);
+        g.MoveTo(temp.x, temp.y);
+        for (int p = 1; p < path.Count; p++) {
+          temp = screen_coord(path[p]);
+          g.LineTo(temp.x, temp.y);
+        }
+        if (fill_path) {
+          g.ClosePath();
+          g.Color = raw_fill_color;
+          g.FillPreserve();
+          g.Color = raw_outline_color;
+          g.Stroke();
+        } else {
+          g.Color = raw_outline_color;
+          g.Stroke();
+        }
+      }
+      g.Restore();
+    }
+  }
+
   public class Arrow : Shape {
 	public Arrow(Point new_center) : this(new_center, 0) {
 	  
