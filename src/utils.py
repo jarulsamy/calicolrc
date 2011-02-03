@@ -22,6 +22,7 @@ import clr
 clr.AddReference("agsXMPP")
 
 import Gtk
+import Gdk
 import System
 from System.Threading import Mutex, ManualResetEvent
 import os
@@ -356,11 +357,37 @@ class Chat:
         # otherwise, receive for user's own use
         self.messages.append((mfrom, msg.Body))
 
+class MyEntry(Gtk.Entry):
+    def set_searchbar(self, searchbar):
+        self.searchbar = searchbar
+
+    def OnKeyPressEvent(self, event):
+        # FIXME: how to compare None with State, int()? Don't know, so do this first:
+        if event.Key == Gdk.Key.Return and bool(event.State & Gdk.ModifierType.ShiftMask):
+            self.searchbar.prev()
+            return True
+        elif event.Key == Gdk.Key.Return:
+            self.searchbar.next()
+            return True
+        elif event.Key == Gdk.Key.Escape:
+            def invoke(sender, args):
+                self.searchbar.Hide()
+                if self.searchbar.editor.document:
+                    self.searchbar.editor.document.texteditor.GrabFocus()
+            Gtk.Application.Invoke(invoke)
+            return True
+        else:
+            retval = Gtk.Entry.OnKeyPressEvent(self, event)
+            if retval:
+                self.searchbar.next(from_selection_start=True)
+            return retval
+
 class SearchBar(Gtk.HBox):
     def __init__(self, *args, **kwargs):
         self.editor = None
         self.label = Gtk.Label("Search:")
-        self.entry = Gtk.Entry()
+        self.entry = MyEntry()
+        self.entry.set_searchbar(self)
         # Previous:
         prev_button = Gtk.Button()
         img = Gtk.Image(Gtk.Stock.GoUp, Gtk.IconSize.Menu)
@@ -386,20 +413,17 @@ class SearchBar(Gtk.HBox):
     def set_editor(self, editor):
         self.editor = editor
 
-    def search_on(self):
-        def invoke(sener, args):
-            self.entry.GrabFocus()
-            self.entry.SelectRegion(0, len(self.entry.Text))
-            self.ShowAll()
-        Gtk.Application.Invoke(invoke)
-
-    def next(self, obj, event):
+    def next(self, obj=None, event=None, from_selection_start=False):
         def invoke(sender, args):
             if self.editor.document:
+                self.Show()
                 self.editor.document.texteditor.SearchPattern = self.entry.Text
                 selection_range = self.editor.document.texteditor.SelectionRange
                 if selection_range:
-                    offset = selection_range.Offset + selection_range.Length
+                    if from_selection_start:
+                        offset = selection_range.Offset
+                    else:
+                        offset = selection_range.Offset + selection_range.Length
                 else:
                     offset = self.editor.document.texteditor.Caret.Offset
                 search_result = self.editor.document.texteditor.SearchForward(offset)
@@ -409,12 +433,13 @@ class SearchBar(Gtk.HBox):
                     self.editor.document.texteditor.Caret.Offset = offset + length
                     self.editor.document.texteditor.SetSelection(offset, 
                                                                  offset + length)
-                    self.editor.document.texteditor.CenterToCaret()
+                    self.editor.document.texteditor.ScrollToCaret()
         Gtk.Application.Invoke(invoke)
 
-    def prev(self, obj, event):
+    def prev(self, obj=None, event=None):
         def invoke(sender, args):
             if self.editor.document:
+                self.Show()
                 self.editor.document.texteditor.SearchPattern = self.entry.Text
                 selection_range = self.editor.document.texteditor.SelectionRange
                 if selection_range:
@@ -428,14 +453,28 @@ class SearchBar(Gtk.HBox):
                     self.editor.document.texteditor.Caret.Offset = offset + length
                     self.editor.document.texteditor.SetSelection(offset, 
                                                                  offset + length)
-                    self.editor.document.texteditor.CenterToCaret()
+                    self.editor.document.texteditor.ScrollToCaret()
+        Gtk.Application.Invoke(invoke)
+
+    def open(self, obj, event):
+        self.search_on()
+
+    def search_on(self):
+        def invoke(sener, args):
+            self.entry.GrabFocus()
+            self.entry.SelectRegion(0, len(self.entry.Text))
+            self.ShowAll()
         Gtk.Application.Invoke(invoke)
 
     def close(self, obj, event):
-        Gtk.Application.Invoke(lambda s, a: self.Hide())
+        self.search_off()
 
     def search_off(self):
-        Gtk.Application.Invoke(lambda s, a: self.Hide())
+        def invoke(sender, args):
+            self.Hide()
+            if self.editor.document:
+                self.editor.document.texteditor.GrabFocus()
+        Gtk.Application.Invoke(invoke)
 
 class StatusBar(Gtk.VBox):
     def init(self, *labels):

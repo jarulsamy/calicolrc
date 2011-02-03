@@ -63,6 +63,7 @@ if registry:
 import clr
 # Mono graphics:
 clr.AddReference("gtk-sharp")
+clr.AddReference("gdk-sharp")
 clr.AddReference("pango-sharp")
 clr.AddReference("glib-sharp")
 #clr.AddReference("gnome-sharp")

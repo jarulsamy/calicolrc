@@ -37,6 +37,8 @@ class EditorWindow(Window):
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.vbox = Gtk.VBox()
+        # Define here so as to connect signals to it
+        self.searchbar = SearchBar()
         # ---------------------
         # make menu:
         menu = [("_File", 
@@ -65,6 +67,10 @@ class EditorWindow(Window):
                     ("_Paste", None, None, None),
                     ("Cut", None, None, None),
                     ("Select all", Gtk.Stock.SelectAll, None, None),
+                    None,
+                    ("Search...", None, "<control>f", self.searchbar.open),
+                    ("Find next", None, "<control>g", self.searchbar.next),
+                    ("Find previous", None, "<control><shift>g", self.searchbar.prev),
                           ]),
                 ("Script", [
                     ("Run", Gtk.Stock.Apply, "F5", self.on_run),
@@ -99,7 +105,6 @@ class EditorWindow(Window):
         self.notebook.PageRemoved += self.changed_page
         self.statusbar = StatusBar()
         self.statusbar.init("Language", "Status")
-        self.searchbar = SearchBar()
         self.searchbar.set_editor(self)
         # initialize
         self.window.Add(self.vbox)
@@ -142,14 +147,6 @@ class EditorWindow(Window):
         Handles key press events for the entire window. If handled
         here, return True.
         """
-        if str(event.Key) == "f" and event.State & Gdk.ModifierType.ControlMask:
-            self.searchbar.search_on()
-            return True
-        #if str(eventkey.Key) == "Tab":
-        #    doc = self.get_current_doc()
-        #    if doc:
-        #        doc.insert_at_cursor(self.pyjama.indent_string)
-        #        return True
         return False
 
     def changed_page(self, obj, event):
