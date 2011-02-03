@@ -1,0 +1,451 @@
+Index: modules/__init__.py
+===================================================================
+--- modules/__init__.py	(revision 36)
++++ modules/__init__.py	(working copy)
+@@ -4,7 +4,7 @@
+ #from psyco.classes import *
+ 
+ for m in os.listdir('modules'):
+-    if m[:2]=='__' or m[-3:]<>'.py': continue
++    if m[:5]=='sasl_' or m[:2]=='__' or m[-3:]<>'.py': continue
+     exec "import "+m[:-3]
+ 
+ addons = [
+Index: modules/router.py
+===================================================================
+--- modules/router.py	(revision 36)
++++ modules/router.py	(working copy)
+@@ -174,7 +174,7 @@
+ 
+         frm=stanza['from']
+         to=stanza['to']
+-        if stanza.getNamespace()==NS_SERVER:
++        if session.xmlns==NS_SERVER: # stanza.getNamespace()
+             if not frm or not to \
+               or frm.getDomain()<>session.peer \
+               or to.getDomain()<>session.ourname:
+Index: modules/sasl_digest_md5.py
+===================================================================
+--- modules/sasl_digest_md5.py	(revision 0)
++++ modules/sasl_digest_md5.py	(revision 0)
+@@ -0,0 +1,71 @@
++import sha,random,md5
++
++def HH(some): return md5.new(some).hexdigest()
++def H(some): return md5.new(some).digest()
++def C(some): return ':'.join(some)
++
++class SASL_DIGEST_MD5:
++    mechanism = 'DIGEST-MD5'
++    nc = 0
++    nonce = None
++    authzid = None
++
++    def UpdateNonce(self):
++        self.nc = self.nc + 1
++        nonce=''
++        for i in range(7):
++            nonce+=hex(int(random.random()*65536*4096))[2:]
++        self.nonce = nonce
++
++    def AuthHandler(self,session,sasl,data):
++
++        chal={}
++        for pair in data.split(','):
++            if pair.find('=')==-1:
++                session.sasl['otherdata']=pair
++                continue
++            key,value=pair.split('=',1)
++            if value[:1]=='"' and value[-1:]=='"': value=value[1:-1]
++            if key in ['qop','username','realm','nonce','cnonce','digest-uri',
++                       'nc','response','charset','rspauth','algorithm']:
++                chal[key]=value
++
++        if self.nc == 0:
++            self.UpdateNonce()
++            resp={}
++            resp['realm']=session.ourname
++            resp['nonce']=self.nonce
++            resp['charset']='utf-8'
++            resp['qop']='auth'
++            resp['algorithm']='md5-sess'
++            sasl_data=''
++            for key in ['charset','realm','nonce','qop','algorithm']:
++                if key in ['algorithm','charset']: sasl_data+="%s=%s,"%(key,resp[key])
++                else: sasl_data+='%s="%s",'%(key,resp[key])
++            return 'challenge', None, sasl_data[:-1]
++        elif self.nc == 1:
++            authzid = '%s@%s' % (chal['username'], chal['realm'])
++            if "%08X"%self.nc != chal['nc']:
++                sasl.DEBUG('nc mismatch','error')
++                return 'fail', authzid, 'not-authorized'
++            if self.nonce != chal['nonce']:
++                sasl.DEBUG('nonce mismatch','error')
++                return 'fail', authzid, 'not-authorized'
++            resp={}
++
++            password = sasl._owner.AUTH.getpassword(chal['username'], chal['realm'])
++            A1=C([H(C([chal['username'],chal['realm'],password])),chal['nonce'],chal['cnonce']])
++            A2=C(['AUTHENTICATE',chal['digest-uri']])
++            expectedresponse = HH(C([HH(A1),chal['nonce'],chal['nc'],chal['cnonce'],chal['qop'],HH(A2)]))
++
++            if expectedresponse != chal['response']:
++                sasl.DEBUG('response mismatch','error')
++                return 'fail', authzid, 'not-authorized'
++
++            self.UpdateNonce()
++            self.authzid = authzid
++            A2=C(['',chal['digest-uri']])
++            rspauth = HH(C([HH(A1),chal['nonce'],chal['nc'],chal['cnonce'],chal['qop'],HH(A2)]))
++            return 'challenge', authzid, 'rspauth=%s'%rspauth
++        elif self.nc == 2:
++            return 'success', self.authzid, None
+Index: modules/sasl_gssapi.py
+===================================================================
+--- modules/sasl_gssapi.py	(revision 0)
++++ modules/sasl_gssapi.py	(revision 0)
+@@ -0,0 +1,44 @@
++import sspi
++import sspicon
++
++class SASL_GSSAPI:
++    mechanism = 'GSSAPI'
++    package = 'Negotiate'
++
++    def __init__(self):
++        self.sa = sspi.ServerAuth(self.package,scflags=\
++            sspicon.ASC_REQ_INTEGRITY|sspicon.ASC_REQ_SEQUENCE_DETECT|\
++            sspicon.ASC_REQ_REPLAY_DETECT|sspicon.ASC_REQ_CONFIDENTIALITY|\
++            sspicon.ASC_REQ_IDENTIFY)
++
++    def AuthHandler(self,session,sasl,data):
++
++        if not data:
++            return 'challenge', None, None
++
++        try:
++            err, sec_buffer = self.sa.authorize(data)
++        except sspi.error, details:
++            print "FAILED to authorize client:", details
++            return 'fail', None, 'not-authorized'
++
++        if err==0:
++
++            names = self.sa.ctxt.QueryContextAttributes(sspicon.SECPKG_ATTR_NAMES).lower().split('\\', 1)
++            # This assumes all users are connecting to the right servername,
++            #  we should rather put a domain/realm on each server and search for it.
++            authzid = '%s@%s'%(names[1],session.ourname)
++
++            if sec_buffer[0].BufferSize:
++                return 'success', authzid, sec_buffer[0].Buffer
++            else:
++                return 'success', authzid, None
++
++        return 'challenge', None, sec_buffer[0].Buffer
++
++class SASL_SPNEGO(SASL_GSSAPI):
++    mechanism = 'SPNEGO'
++
++class SASL_NTLM(SASL_GSSAPI):
++    mechanism = 'NTLM'
++    package = 'NTLM'
+Index: modules/sasl_plain.py
+===================================================================
+--- modules/sasl_plain.py	(revision 0)
++++ modules/sasl_plain.py	(revision 0)
+@@ -0,0 +1,29 @@
++class SASL_PLAIN:
++    mechanism = 'PLAIN'
++
++    def AuthHandler(self,session,sasl,data):
++        
++        """The mechanism consists of a single message from the client to the
++           server.  The client sends the authorization identity (identity to
++           login as), followed by a NUL (U+0000) character, followed by the
++           authentication identity (identity whose password will be used),
++           followed by a NUL (U+0000) character, followed by the clear-text
++           password."""
++        pack=data.split('\000')
++        authzid=session.peer
++        if len(pack)<>3: res=0
++        else:
++            authzid, authcid, passwd = pack
++            if not authzid:
++                authzid=authcid
++                if session.xmlns==NS_CLIENT: authzid+='@'+session.ourname
++            username,domain=(authzid.split('@',1)+[''])[:2]
++            res = ( passwd == sasl._owner.AUTH.getpassword(username, domain) )
++        if res:
++            result = 'success'
++            extra = None
++        else:
++            result = 'fail'
++            extra = 'not-authorized'
++
++        return result, authzid, extra
+Index: modules/stream.py
+===================================================================
+--- modules/stream.py	(revision 36)
++++ modules/stream.py	(working copy)
+@@ -6,7 +6,7 @@
+ 
+ from xmpp import *
+ from xmppd import *
+-import socket,thread
++import socket,thread,os,base64
+ from tlslite.api import *
+ 
+ class TLS(PlugIn):
+@@ -108,12 +108,6 @@
+             session.send(Node('starttls',{'xmlns':NS_TLS}))
+         raise NodeProcessed
+ 
+-import sha,base64,random,md5
+-
+-def HH(some): return md5.new(some).hexdigest()
+-def H(some): return md5.new(some).digest()
+-def C(some): return ':'.join(some)
+-
+ class SASL(PlugIn):
+     NS=NS_SASL
+     """ 3.                        <features/>
+@@ -134,40 +128,25 @@
+     def plugin(self,server):
+         server.Dispatcher.RegisterNamespaceHandler(NS_SASL,self.SASLHandler)
+ #        server.Dispatcher.RegisterHandler('features',self.FeaturesHandler,xmlns=NS_STREAMS)
+-        self.mechanisms=['PLAIN']#,'DIGEST-MD5']  # for announce in <features/> tag
+ 
+-    """    def startauth(self,session,username,password):
+-        session.username=username
+-        session.password=password
+-        if session.Stream.features:
+-            try: self.FeaturesHandler(session,session.Stream.features)
+-            except NodeProcessed: pass
++        self.mechanisms=[]
++        self.auths={}
++        for m in os.listdir('modules'):
++            if m[:5]<>'sasl_' or m[:2]=='__' or m[-3:]<>'.py': continue
++            try:
++                exec "import "+m[:-3]
++                for s in dir(eval(m[:-3])):
++                    if s[:5]<>'SASL_': continue
++                    auth = eval('%s.%s'%(m[:-3],s))
++                    self.DEBUG('Registering SASL method "%s" as %s'%(auth.mechanism,auth),'info')
++                    self.mechanisms.append(auth.mechanism)
++                    self.auths[auth.mechanism]=auth
++            except:
++                self.DEBUG('Failed to import SASL module "%s"'%(m[:-3]),'warn')
++        self.authmech = None
+ 
+-    def FeaturesHandler(self,session,feats):
+-        if session.feature_in_process: return     # some other feature is already underway
+-        if not session.__dict__.has_key('username'): return
+-        if not feats.getTag('mechanisms',namespace=NS_SASL):
+-            session.unfeature(NS_SASL)
+-            self.DEBUG('SASL not supported by server','error')
+-            return
+-        mecs=[]
+-        for mec in feats.getTag('mechanisms',namespace=NS_SASL).getTags('mechanism'):
+-            mecs.append(mec.getData())
+-        if "DIGEST-MD5" in mecs:
+-            node=Node('auth',attrs={'xmlns':NS_SASL,'mechanism':'DIGEST-MD5'})
+-        elif "PLAIN" in mecs:
+-            sasl_data='%s\x00%s\x00%s'%(self.username+'@'+session.peer,self.username,self.password)
+-            node=Node('auth',attrs={'xmlns':NS_SASL,'mechanism':'PLAIN'},payload=[base64.encodestring(sasl_data)])
+-        else:
+-            session.startsasl='failure'
+-            self.DEBUG('I can only use DIGEST-MD5 and PLAIN mecanisms.','error')
+-            return
+-        session.startsasl='in-process'
+-        session.send(node)
+-        raise NodeProcessed
+-"""
+-    def commit_auth(self,session,authzid):
+-        session.send(Node('success',{'xmlns':NS_SASL}))
++    def commit_auth(self,session,authzid,payload=[]):
++        session.send(Node('success',{'xmlns':NS_SASL}, payload))
+         session.feature(NS_SASL)
+         session.unfeature(NS_TLS)
+         session.sasl['next']=[]
+@@ -177,11 +156,11 @@
+         else: session.set_session_state(SESSION_BOUND)
+         self.DEBUG('Peer %s successfully authenticated'%authzid,'ok')
+ 
+-    def reject_auth(self,session,authzid='unknown'):
+-        session.send(Node('failure',{'xmlns':NS_SASL},[Node('not-authorized')]))
++    def reject_auth(self,session,authzid='unknown',reason='not-authorized'):
++        session.send(Node('failure',{'xmlns':NS_SASL},[Node(reason)]))
+         session.sasl['retries']=session.sasl['retries']-1
+         if session.sasl['retries']<=0: session.terminate_stream()
+-        self.DEBUG('Peer %s failed to authenticate'%authzid,'error')
++        self.DEBUG('Peer %s failed to authenticate because %s'%(authzid,reason),'error')
+ 
+     def SASLHandler(self,session,stanza):
+         """simple username: servername _or_ node@servername : 6.1 (6)
+@@ -193,89 +172,69 @@
+             session.sasl={'retries':3}
+         if not session.sasl.has_key('next'):
+             session.sasl={'retries':session.sasl['retries']}
+-            if session.TYP=='server': session.sasl['next']=['auth']
++            if session.TYP=='server': session.sasl['next']=['auth','abort']
+             else: session.sasl['next']=['challenge','success','failure']
+         if stanza.getName() not in session.sasl['next']:
+             # screwed SASL implementation on the other side. terminating stream
+-            session.terminate_stream(STREAM_BAD_REQUEST)
++            session.terminate_stream(ERR_BAD_REQUEST)
+             raise NodeProcessed
+-        #=================== preparation ===============================================
+-        try: data=base64.decodestring(stanza.getData())
+-        except:
+-            session.terminate_stream(STREAM_BAD_REQUEST)
+-            raise NodeProcessed
++        #=================== preparation ===============================================
++        data=stanza.getData()
++        if data:
++            try: data=base64.decodestring(data)
++            except:
++                session.terminate_stream(ERR_BAD_REQUEST)
++                raise NodeProcessed
++        else:
++            data=None
+         self.DEBUG('Got challenge: '+`data`,'ok')
+-        for pair in data.split(','):
+-            if pair.find('=')==-1:
+-                session.sasl['otherdata']=pair
+-                continue
+-            key,value=pair.split('=',1)
+-            if value[:1]=='"' and value[-1:]=='"': value=value[1:-1]
+-            if key in ['qop','username','realm','nonce','cnonce','digest-uri',
+-                       'nc','response','charset','rspauth','algorithm']:
+-                chal[key]=value
+-        #=================== SASL begin ===============================================
++        #=================== SASL server begin =========================================
+         if stanza.getName()=='auth':
+-            session.sasl['next']=['response','abort','auth']
++            session.sasl['next']=['response','abort']
+             # client requested some mechanism. May be ever provided credentials already.
+             mec=stanza['mechanism']
+             session.sasl['mechanism']=mec
+-            if mec=='PLAIN':
+-                """The mechanism consists of a single message from the client to the
+-                   server.  The client sends the authorization identity (identity to
+-                   login as), followed by a NUL (U+0000) character, followed by the
+-                   authentication identity (identity whose password will be used),
+-                   followed by a NUL (U+0000) character, followed by the clear-text
+-                   password."""
+-                if session.sasl.has_key('otherdata'): pack=session.sasl['otherdata'].split('\000')
+-                else: pack=[]
+-                authzid=session.peer
+-                if len(pack)<>3: res=0
++            self.authmech = None
++            if mec in self.mechanisms:
++                self.authmech = self.auths[mec]()
++        if stanza.getName()=='auth' or stanza.getName()=='response':
++            if self.authmech:
++                result, authzid, extra = self.authmech.AuthHandler(session, self, data)
++                if result == 'success':
++                    if extra != None:
++                        if extra:
++                            payload = base64.encodestring(extra).replace('\n','')
++                        else:
++                            payload = '='
++                    else:                            
++                        payload=[]
++                    self.commit_auth(session,authzid,payload)
++                elif result == 'fail':
++                    session.sasl['next']=['auth','abort']
++                    self.reject_auth(session,authzid,extra)
++                elif result == 'challenge':
++                    session.sasl['next']=['response','abort']
++                    if extra != None:
++                        if extra:
++                            payload = base64.encodestring(extra).replace('\n','')
++                        else:
++                            payload = '='
++                    else:
++                        payload=[]
++                    session.send(Node(result,{'xmlns':NS_SASL},payload))
+                 else:
+-                    authzid, authcid, passwd = pack
+-                    if not authzid:
+-                        authzid=authcid
+-                        if session.xmlns==NS_CLIENT: authzid+='@'+session.ourname
+-                    username,domain=(authzid.split('@',1)+[''])[:2]
+-                    res = ( passwd == self._owner.AUTH.getpassword(username, domain) )
+-                if res: self.commit_auth(session,authzid)
+-                else: self.reject_auth(session,authzid)
+-            elif mec=='DIGEST-MD5': pass
++                    self.DEBUG('Bad AuthHandler result: %s'%result,'error')
++                    session.terminate_stream(ERR_BAD_REQUEST)
+             else:
+                 session.terminate_stream(Node('failure',{'xmlns':NS_SASL},[Node('invalid-mechanism')]))
+             raise NodeProcessed
+-            """elif stanza.getName()=='challenge':
+-            session.sasl['next']=['challenge','success','failure']
+-            # DIGEST-MD5 only
+-            if chal.has_key('qop') and chal['qop']=='auth':
+-                resp={}
+-                resp['username']=self.username
+-                resp['realm']=self._owner.Server
+-                resp['nonce']=chal['nonce']
+-                cnonce=''
+-                for i in range(7):
+-                    cnonce+=hex(int(random.random()*65536*4096))[2:]
+-                resp['cnonce']=cnonce
+-                resp['nc']=('00000001')
+-                resp['qop']='auth'
+-                resp['digest-uri']='xmpp/'
+-                A1=C([H(C([resp['username'],resp['realm'],self.password])),resp['nonce'],resp['cnonce']])
+-                A2=C(['AUTHENTICATE',resp['digest-uri']])
+-                response= HH(C([HH(A1),resp['nonce'],resp['nc'],resp['cnonce'],resp['qop'],HH(A2)]))
+-                resp['response']=response
+-                resp['charset']='utf-8'
+-                sasl_data=''
+-                for key in ['charset','username','realm','nonce','nc','cnonce','digest-uri','response','qop']:
+-                    if key in ['nc','qop','response','charset']: sasl_data+="%s=%s,"%(key,resp[key])
+-                    else: sasl_data+='%s="%s",'%(key,resp[key])
+-                node=Node('response',attrs={'xmlns':NS_SASL},payload=[base64.encodestring(sasl_data[:-1]).replace('\n','')])
+-                self._owner.send(node)
+-            elif chal.has_key('rspauth'): self._owner.send(Node('response',attrs={'xmlns':NS_SASL}))
+-"""
+-        elif stanza.getName()=='response':
+-            session.sasl['next']=['response','abort']
+         elif stanza.getName()=='abort':
+             session.sasl['next']=['auth']
++            self.authmech = None
++            self.reject_auth(session,reason='aborted')
++        #=================== SASL client begin =========================================
++        elif stanza.getName()=='challenge':
++            session.sasl['next']=['challenge','success','failure']
+         elif stanza.getName()=='success':
+             session.sasl['next']=[]
+             session.startsasl='success'
+@@ -287,6 +246,8 @@
+             try: reason=challenge.getChildren()[0]
+             except: reason=challenge
+             self.DEBUG('Failed SASL authentification: %s'%reason,'error')
++        else:
++            session.terminate_stream(ERR_BAD_REQUEST)
+         raise NodeProcessed
+ 
+ class Bind(PlugIn):
+Index: xmppd.py
+===================================================================
+--- xmppd.py	(revision 36)
++++ xmppd.py	(working copy)
+@@ -481,9 +481,12 @@
+         if tag<>'stream': return self.terminate_stream(STREAM_INVALID_XML)
+         if ns<>NS_STREAMS: return self.terminate_stream(STREAM_INVALID_NAMESPACE)
+         if self.Stream.xmlns<>self.xmlns: return self.terminate_stream(STREAM_BAD_NAMESPACE_PREFIX)
+-        if not attrs.has_key('to'): return self.terminate_stream(STREAM_IMPROPER_ADDRESSING)
+-        if attrs['to'] not in self._owner.servernames: return self.terminate_stream(STREAM_HOST_UNKNOWN)
+-        self.ourname=attrs['to'].lower()
++        if not attrs.has_key('to'):
++            self.ourname=self._owner.servernames[0]
++            #return self.terminate_stream(STREAM_IMPROPER_ADDRESSING)
++        else:
++            if attrs['to'] not in self._owner.servernames: return self.terminate_stream(STREAM_HOST_UNKNOWN)
++            self.ourname=attrs['to'].lower()
+         if self.TYP=='server' and attrs.has_key('version'): self.send_features()
+ 
+     def send_features(self):
