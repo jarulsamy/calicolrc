@@ -19,6 +19,7 @@
 # $Id: $
 
 import Gtk
+import Gdk
 import GLib
 import System
 
@@ -99,6 +100,7 @@ class EditorWindow(Window):
         self.statusbar = StatusBar()
         self.statusbar.init("Language", "Status")
         self.searchbar = SearchBar()
+        self.searchbar.set_editor(self)
         # initialize
         self.window.Add(self.vbox)
         self.vbox.PackStart(self.menubar, False, False, 0)
@@ -135,11 +137,14 @@ class EditorWindow(Window):
         if doc:
             doc.grab_focus()
 
-    def on_key_press(self, eventkey):
+    def on_key_press(self, event):
         """
         Handles key press events for the entire window. If handled
         here, return True.
         """
+        if str(event.Key) == "f" and event.State & Gdk.ModifierType.ControlMask:
+            self.searchbar.search_on()
+            return True
         #if str(eventkey.Key) == "Tab":
         #    doc = self.get_current_doc()
         #    if doc:

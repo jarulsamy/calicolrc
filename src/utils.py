@@ -358,25 +358,81 @@ class Chat:
 
 class SearchBar(Gtk.HBox):
     def __init__(self, *args, **kwargs):
-        label = Gtk.Label("Search:")
-        entry = Gtk.Entry()
+        self.editor = None
+        self.label = Gtk.Label("Search:")
+        self.entry = Gtk.Entry()
+        # Previous:
         prev_button = Gtk.Button()
         img = Gtk.Image(Gtk.Stock.GoUp, Gtk.IconSize.Menu)
         prev_button.Add(img)
+        prev_button.Clicked += self.prev
+        # Next:
         next_button = Gtk.Button()
+        next_button.Clicked += self.next
         img = Gtk.Image(Gtk.Stock.GoDown, Gtk.IconSize.Menu)
         next_button.Add(img)
+        # Close:
         close_button = Gtk.Button()
         img = Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu)
         close_button.Add(img)
-        self.PackStart(label, False, False, 0)
-        self.PackStart(entry, True, True, 0)
+        close_button.Clicked += self.close
+        # Add them
+        self.PackStart(self.label, False, False, 0)
+        self.PackStart(self.entry, True, True, 0)
         self.PackStart(prev_button, False, False, 0)
         self.PackStart(next_button, False, False, 0)
         self.PackStart(close_button, False, False, 0)
 
+    def set_editor(self, editor):
+        self.editor = editor
+
     def search_on(self):
-        Gtk.Application.Invoke(lambda s, a: self.ShowAll())
+        def invoke(sener, args):
+            self.entry.GrabFocus()
+            self.entry.SelectRegion(0, len(self.entry.Text))
+            self.ShowAll()
+        Gtk.Application.Invoke(invoke)
+
+    def next(self, obj, event):
+        def invoke(sender, args):
+            if self.editor.document:
+                self.editor.document.texteditor.SearchPattern = self.entry.Text
+                selection_range = self.editor.document.texteditor.SelectionRange
+                if selection_range:
+                    offset = selection_range.Offset + selection_range.Length
+                else:
+                    offset = self.editor.document.texteditor.Caret.Offset
+                search_result = self.editor.document.texteditor.SearchForward(offset)
+                if search_result:
+                    offset = search_result.Offset
+                    length = search_result.Length
+                    self.editor.document.texteditor.Caret.Offset = offset + length
+                    self.editor.document.texteditor.SetSelection(offset, 
+                                                                 offset + length)
+                    self.editor.document.texteditor.CenterToCaret()
+        Gtk.Application.Invoke(invoke)
+
+    def prev(self, obj, event):
+        def invoke(sender, args):
+            if self.editor.document:
+                self.editor.document.texteditor.SearchPattern = self.entry.Text
+                selection_range = self.editor.document.texteditor.SelectionRange
+                if selection_range:
+                    offset = selection_range.Offset
+                else:
+                    offset = self.editor.document.texteditor.Caret.Offset
+                search_result = self.editor.document.texteditor.SearchBackward(offset)
+                if search_result:
+                    offset = search_result.Offset
+                    length = search_result.Length
+                    self.editor.document.texteditor.Caret.Offset = offset + length
+                    self.editor.document.texteditor.SetSelection(offset, 
+                                                                 offset + length)
+                    self.editor.document.texteditor.CenterToCaret()
+        Gtk.Application.Invoke(invoke)
+
+    def close(self, obj, event):
+        Gtk.Application.Invoke(lambda s, a: self.Hide())
 
     def search_off(self):
         Gtk.Application.Invoke(lambda s, a: self.Hide())
