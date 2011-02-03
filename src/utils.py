@@ -356,16 +356,46 @@ class Chat:
         # otherwise, receive for user's own use
         self.messages.append((mfrom, msg.Body))
 
-class StatusBar(Gtk.HBox):
+class SearchBar(Gtk.HBox):
+    def __init__(self, *args, **kwargs):
+        label = Gtk.Label("Search:")
+        entry = Gtk.Entry()
+        prev_button = Gtk.Button()
+        img = Gtk.Image(Gtk.Stock.GoUp, Gtk.IconSize.Menu)
+        prev_button.Add(img)
+        next_button = Gtk.Button()
+        img = Gtk.Image(Gtk.Stock.GoDown, Gtk.IconSize.Menu)
+        next_button.Add(img)
+        close_button = Gtk.Button()
+        img = Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu)
+        close_button.Add(img)
+        self.PackStart(label, False, False, 0)
+        self.PackStart(entry, True, True, 0)
+        self.PackStart(prev_button, False, False, 0)
+        self.PackStart(next_button, False, False, 0)
+        self.PackStart(close_button, False, False, 0)
+
+    def search_on(self):
+        Gtk.Application.Invoke(lambda s, a: self.ShowAll())
+
+    def search_off(self):
+        Gtk.Application.Invoke(lambda s, a: self.Hide())
+
+class StatusBar(Gtk.VBox):
     def init(self, *labels):
         self.labels = labels
+        self.hbox = Gtk.HBox()
         self.statusbars = {}
         for label in labels:
             self.statusbars[label] = Gtk.Statusbar()
             self.statusbars[label].Push(0, "%s: " % label)
             self.statusbars[label].HasResizeGrip = (label == labels[-1])
-            self.PackStart(self.statusbars[label])
+            self.hbox.PackStart(self.statusbars[label])
             self.statusbars[label].Show()
+        # Add other items, hidden here
+        ###############################################
+        self.hbox.Show()
+        self.PackStart(self.hbox)
         self.Show()
 
     def set(self, label, value):

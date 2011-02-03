@@ -23,7 +23,7 @@ import GLib
 import System
 
 from window import Window, MyWindow
-from utils import _, StatusBar
+from utils import _, StatusBar, SearchBar
 import os
 import re
 
@@ -98,14 +98,20 @@ class EditorWindow(Window):
         self.notebook.PageRemoved += self.changed_page
         self.statusbar = StatusBar()
         self.statusbar.init("Language", "Status")
+        self.searchbar = SearchBar()
         # initialize
         self.window.Add(self.vbox)
         self.vbox.PackStart(self.menubar, False, False, 0)
         self.vbox.PackStart(self.toolbar, False, False, 0)
+        self.vbox.PackStart(self.searchbar, False, False, 0)
         self.vbox.PackStart(self.notebook, True, True, 0)
         self.vbox.PackStart(self.statusbar, False, False, 0)
-        self.window.ShowAll()
-
+        self.menubar.ShowAll()
+        self.toolbar.ShowAll()
+        self.notebook.ShowAll()
+        self.statusbar.Show()
+        self.vbox.Show()
+        self.window.Show()
         # Open files on command line, or just a New Script:
         if files:
             for file in files:
@@ -401,3 +407,15 @@ class EditorWindow(Window):
                 print "You are not online."
         else:
             print "You need to login."
+
+    def search(self):
+        # set pattern:
+        # .texteditor.SearchPattern = "def search"
+        # search forward from start:
+        # .texteditor.SearchEngine.SearchForward(1)
+        # returns SearchResult
+        # .Offset - in chars/bytes
+        # .Length - of match
+        # .SearchWrapped - if that is the end
+        # next, increment Offset by 1, and SearchForward
+        pass
