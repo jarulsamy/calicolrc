@@ -223,7 +223,16 @@ class ShellWindow(Window):
               Gdk.Atom.Intern("CLIPBOARD", True))
         self.message("Pyjama Project %s\n" % self.pyjama.version)
         self.message(("-" * 50) + "\n")
-    
+        self.set_font()
+
+    def set_font(self, font=None):
+        if font is None:
+            font = self.pyjama.get_fontname()
+        def invoke(sender, args):
+            # FIXME: set textview font, too
+            self.history_textview.ModifyFont(font)
+        Gtk.Application.Invoke(invoke)
+
     def decrease_font_size(self, font):
         self.history_textview.ModifyFont(font)
         self.textview.Options.ZoomOut()
