@@ -199,6 +199,7 @@ class DinahDocument(Document):
         self.widget = MyHPaned()
         self.widget.document = self
         tree_scroll = Gtk.ScrolledWindow()
+        tree_scroll.SetSizeRequest(120, -1)
         layout_scroll = Gtk.ScrolledWindow()
         self.treeview = Gtk.TreeView()
         self.treeview.GrabFocus()
@@ -558,17 +559,24 @@ class DinahDocument(Document):
         return True
 
     def treeviewHandleSourceDragDataGet(self, obj, args):
-        #print "treeviewHandleSourceDragDataGet!"
+        print "treeviewHandleSourceDragDataGet!"
         # DragDropGetArgs: args
-        #print "dnd get", obj, args
+        print "dnd get", obj, args
         targets = args.Context.Targets
+        print "targets:", targets
         selected, treeiter = obj.Selection.GetSelected()
+        print "selected:", selected, "treeiter", treeiter
         item = obj.Model.GetValue(treeiter, 1) # 0- text, 1-object
         if item:
+            print 1
             data = "create:%s" % item.pid
+            print 2
             self.lookup[data] = item
+            print 3
             self.lookup[item.pid] = item
+            print 4
             packed = System.Text.Encoding.UTF8.GetBytes(data)
+            print 5
             args.SelectionData.Set(targets[0], 8, packed)
 
     def beforeHandleDragDataReceived(self, obj, args):
