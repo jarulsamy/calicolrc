@@ -357,6 +357,18 @@ class Chat:
         # otherwise, receive for user's own use
         self.messages.append((mfrom, msg.Body))
 
+class MySearchInFilesEntry(Gtk.Entry):
+    def set_pyjama(self, pyjama):
+        self.pyjama = pyjama
+
+    def OnKeyPressEvent(self, event):
+        if event.Key == Gdk.Key.Return:
+            self.pyjama.grep(self.Text)
+            return True
+        else:
+            retval = Gtk.Entry.OnKeyPressEvent(self, event)
+            return retval
+
 class MyEntry(Gtk.Entry):
     def set_searchbar(self, searchbar):
         self.searchbar = searchbar
@@ -474,6 +486,45 @@ class SearchBar(Gtk.HBox):
             self.Hide()
             if self.editor.document:
                 self.editor.document.texteditor.GrabFocus()
+        Gtk.Application.Invoke(invoke)
+
+class SearchInFilesBar(Gtk.HBox):
+    def __init__(self, *args, **kwargs):
+        self.shell = None
+        self.label = Gtk.Label("Search in files:")
+        self.entry = MySearchInFilesEntry()
+        # Close:
+        close_button = Gtk.Button()
+        img = Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu)
+        close_button.Add(img)
+        close_button.Clicked += self.close
+        # Add them
+        self.PackStart(self.label, False, False, 0)
+        self.PackStart(self.entry, True, True, 0)
+        self.PackStart(close_button, False, False, 0)
+
+    def set_shell(self, shell):
+        self.shell = shell
+        self.entry.set_pyjama(self.shell.pyjama)
+
+    def open(self, obj, event):
+        self.search_on()
+
+    def search_on(self):
+        def invoke(sener, args):
+            self.entry.GrabFocus()
+            self.entry.SelectRegion(0, len(self.entry.Text))
+            self.ShowAll()
+        Gtk.Application.Invoke(invoke)
+
+    def close(self, obj, event):
+        self.search_off()
+
+    def search_off(self):
+        def invoke(sender, args):
+            self.Hide()
+            if self.shell.textview:
+                self.shell.textview.GrabFocus()
         Gtk.Application.Invoke(invoke)
 
 class StatusBar(Gtk.VBox):
