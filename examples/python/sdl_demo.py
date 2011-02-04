@@ -31,5 +31,7 @@ js = SdlDotNet.Input.Joysticks.OpenJoystick(0)
 #SdlDotNet.Core.Events.Run()
 for i in range(10000):
     Tao.Sdl.Sdl.SDL_PumpEvents()
-    print js.GetButtonState(0)
+    if js.GetButtonState(0):
+        print "Pressed!"
+    System.Threading.Thread.Sleep(100)
     
