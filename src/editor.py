@@ -320,7 +320,6 @@ class EditorWindow(Window):
             # if text selected, use that
             text = doc.get_selected_text()
             if text:
-                self.pyjama.setup_shell()
                 self.pyjama.shell.load_text(text, doc.language)
             else:
                 # else, load file

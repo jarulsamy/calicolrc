@@ -87,6 +87,7 @@ Highlighting.SyntaxModeService.LoadStylesAndModes(
 # Import pure-Python modules:
 import traceback
 import tempfile
+import re
 
 # Pyjama imports:
 from engine import EngineManager
@@ -210,6 +211,8 @@ class PyjamaProject(object):
         filename = str(filename.ToString())
         for name in self.languages:
             if filename.endswith("." + self.languages[name].extension):
+                if self.shell:
+                    self.shell.change_to_lang(name)
                 return self.engine[name].execute_file(filename)
         raise AttributeError("unknown file extension: '%s'" % filename)
 
@@ -330,18 +333,18 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
 
     def grep(self, pattern, file_pat="*.py", dir=".", 
-             flags=0, recursive=True):
+             flags=re.IGNORECASE, recursive=True):
         """
         grep("FIXME")
         grep("import sys", "*.py", ".", recursive=True)
         flags = 0 # re.IGNORECASE
         """
         # Based on code from idlelib
-        import re
+        self.shell.message("Searching %r in %s/%s...\n" %
+                    (pattern, os.path.abspath(dir), file_pat), "black")
         prog = re.compile(pattern, flags)
         list = self.findfiles(dir, file_pat, recursive)
         list.sort()
-        self.shell.message("Searching %r in %s/%s...\n" % (pattern, dir, file_pat))
         hits = 0
         for fn in list:
             try:
@@ -366,9 +369,9 @@ class PyjamaProject(object):
                 s = ""
             else:
                 s = "es"
-            self.shell.message("Found %d match%s. Right-click file to open.\n" % (hits, s))
+            self.shell.message("Found %d match%s. Right-click file to open.\n" % (hits, s), "black")
         else:
-            self.shell.message("No matches.\n")
+            self.shell.message("No matches.\n", "black")
 
     def findfiles(self, dir, base, recursive=True):
         # Based on code from idlelib

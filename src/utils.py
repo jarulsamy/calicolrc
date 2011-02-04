@@ -365,6 +365,17 @@ class MySearchInFilesEntry(Gtk.Entry):
         if event.Key == Gdk.Key.Return:
             self.pyjama.grep(self.Text)
             return True
+        elif event.Key == Gdk.Key.Escape:
+            def invoke(sender, args):
+                self.searchbar.Hide()
+                if self.searchbar.shell:
+                    self.searchbar.shell.GrabFocus()
+            Gtk.Application.Invoke(invoke)
+            return True
+        elif event.Key == Gdk.Key.Up:
+            return True
+        elif event.Key == Gdk.Key.Down:
+            return True
         else:
             retval = Gtk.Entry.OnKeyPressEvent(self, event)
             return retval
@@ -374,12 +385,15 @@ class MyEntry(Gtk.Entry):
         self.searchbar = searchbar
 
     def OnKeyPressEvent(self, event):
-        # FIXME: how to compare None with State, int()? Don't know, so do this first:
         if event.Key == Gdk.Key.Return and bool(event.State & Gdk.ModifierType.ShiftMask):
             self.searchbar.prev()
             return True
         elif event.Key == Gdk.Key.Return:
             self.searchbar.next()
+            return True
+        elif event.Key == Gdk.Key.Up:
+            return True
+        elif event.Key == Gdk.Key.Down:
             return True
         elif event.Key == Gdk.Key.Escape:
             def invoke(sender, args):

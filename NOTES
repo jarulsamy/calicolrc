@@ -8,14 +8,12 @@ These are issues with the code in Pyjama/src/*.py
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret
 # BUG: On close, need to wait for the connection to finish
-# BUG: goto_end usually doesn't, don't know why
+# BUG: F5 second time in scheme editor window crashes
 
-# Pyjama: Need to run code in a process rather than thread
-# Pyjama: Find, replace, search, across files, directories (see pyjama.grep in src/pyjama.py)
+# Pyjama: Need to run code in a process rather than thread?
 # Pyjama: Add Printing
 # Pyjama: options for toggle word wrap, linenumbers, others
 # Pyjama: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
-# Pyjama: Move some key handlers so that some can be handled by window, others handled by textview
 # Pyjama: No backups made of files when saving
 # Pyjama: No backups made during editing (autosave)
 # Pyjama: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
@@ -27,12 +25,10 @@ These are issues with the code in Pyjama/src/*.py
 
 = Education =
 
-# Figure out Chat protocol to implement following
 # Provide easy method to take surveys, quiz
 # Log file for teacher analysis
 # Provide student "Hint" links to wiki page on error
 # Interactive instruction ala Classroom Presenter, but via chat
-# Chat window
 # Submit zipfile to teacher dialog (zipfiles written in src/utils.py)
 
 = Modules =
@@ -77,4 +73,4 @@ DLR things for the Dynamic Language Runtime. Mono is the open source VM for the 
 # DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
 
 # Mono: Dinah crashes on Mac on drop. 
-# Mono: Windows doesn't respond to treeview drags. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
+# Mono: Windows doesn't respond to treeview drags after Mono 2.6.4. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824

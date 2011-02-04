@@ -18,20 +18,26 @@
 #
 # $Id: $
 
+# Pure-Python modules:
+import traceback
+import sys, os
+import re
+
 # Bring .NET References into IronPython scope:
-from Mono.TextEditor import TextEditor, TextEditorOptions
+from Mono.TextEditor import TextEditor, TextEditorOptions, Highlighting
+path, filename = os.path.split(__file__)
+# /.../Pyjama/src/
+Highlighting.SyntaxModeService.LoadStylesAndModes(
+                os.path.join(path, "..", "bin", "SyntaxModes"))
+
 import Gtk, Gdk, Pango, GLib
 import System
 import System.Threading
 
 # Pyjama modules:
 from window import Window, MyWindow
-from utils import _, CustomStream, MUTEX, ConsoleStream, StatusBar
-
-# Pure-Python modules:
-import traceback
-import sys, os
-import re
+from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar, 
+                   SearchInFilesBar)
 
 def exec_invoke(text):
     # FIXME: if this fails, it crashes pyjama; why?
@@ -93,13 +99,14 @@ class ShellWindow(Window):
         self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
-        self.lang_manager = None
         self.window = MyWindow(_("Pyjama Shell"))
         self.window.set_on_key_press(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.history_textview = Gtk.TextView()
         self.vbox = Gtk.VBox()
+        self.searchbar = SearchInFilesBar()
+        self.searchbar.set_shell(self)
         # ---------------------
         # make menu:
         menu = [("_File",
@@ -109,6 +116,9 @@ class ShellWindow(Window):
                   ] +
                   self.make_new_file_menu() +
                   [None,
+                  ("Search in files...", None, "<control>f",
+                  self.searchbar.open),
+                   None,
                   ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
                   ("Login...", None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
@@ -165,7 +175,10 @@ class ShellWindow(Window):
         self.textview.Options.ShowLineNumberMargin = False # option
         self.textview.Options.TabsToSpaces = True
         self.textview.Options.HighlightMatchingBracket = True
-        self.textview.Document.MimeType = "text/x-%s" % self.language
+        try:
+            self.textview.Document.MimeType = "text/x-%s" % self.language
+        except:
+            pass
 
         self.textview.Show()
         #self.textview.ModifyFont(self.pyjama.get_fontname())
@@ -177,7 +190,6 @@ class ShellWindow(Window):
                 tag.Weight = Pango.Weight.Bold
             tag.Foreground = color 
             self.history_textview.Buffer.TagTable.Add(tag)
-        self.history_textview.ModifyFont(self.pyjama.get_fontname())
         self.history_textview.PopulatePopup += self.popup
         self.history_textview.WrapMode = Gtk.WrapMode.Char
         self.history_textview.Editable = False
@@ -190,9 +202,15 @@ class ShellWindow(Window):
         self.window.Add(self.vbox)
         self.vbox.PackStart(self.menubar, False, False, 0)
         self.vbox.PackStart(self.toolbar, False, False, 0)
+        self.vbox.PackStart(self.searchbar, False, False, 0)
         self.vbox.PackStart(self.vpane, True, True, 0)
         self.vbox.PackEnd(self.statusbar, False, False, 0)
-        self.window.ShowAll()
+        self.vbox.Show()
+        self.menubar.ShowAll()
+        self.toolbar.ShowAll()
+        self.vpane.ShowAll()
+        self.statusbar.ShowAll()
+        self.window.Show()
         # Set this Python's stderr:
         # EXCEPTION HANDLER
         stdout = CustomStream(self.history_textview, "black")
@@ -246,6 +264,10 @@ class ShellWindow(Window):
                 languages)
 
     def update_gui(self):
+        try:
+            self.textview.Document.MimeType = "text/x-%s" % self.language
+        except:
+            pass
         self.set_title(_("%s - Pyjama Shell") % self.language.title())
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
         self.statusbar.set("Language", self.language.title())
@@ -261,76 +283,69 @@ class ShellWindow(Window):
             return "offline"
 
     def on_key_press(self, event, force=False):
-        # FIXME: this should be handled in textview, but haven't
-        # figured out how to overload just it.
+        # FIXME: this should be handled in textview, but if we subclass
+        # TextEditor, then we mess up the signals on scrolling window
         # So, this currently handles the keys for the whole window.
         #if event is not None:
         #    self.message(str(event.Key))
-        if event is None or str(event.Key) == "Return":
-            # if cursor in middle, insert a Return
-            caret = self.textview.Caret
-            line = caret.Line
-            line_count = self.textview.Document.LineCount
-            if line != line_count - 1 and not force:
+        # These are only if we are inside textview
+        if self.window.Focus == self.textview:
+            if event is None or str(event.Key) == "Return":
+                # if cursor in middle, insert a Return
+                caret = self.textview.Caret
+                line = caret.Line
+                line_count = self.textview.Document.LineCount
+                if line != line_count - 1 and not force:
+                    return False
+                # else, execute text
+                # extra line at end signals ready_to_execute:
+                text = self.textview.Document.Text
+                if text == "":
+                    return True # nothing to do, but handled
+                elif self.ready_for_execute(text) or force:
+                    self.history.last(text.rstrip())
+                    self.history.add("")
+                    self.execute(text.rstrip(), self.language)
+                    def invoke(sender, args):
+                        self.textview.Document.Text = ''
+                        self.textview.GrabFocus()
+                        self.textview.Caret.Line = 0
+                        self.textview.Caret.Column = 0
+                    Gtk.Application.Invoke(invoke)
+                    return True
+            elif str(event.Key) == "Up":
+                text = self.textview.Document.Text
+                caret = self.textview.Caret
+                line = caret.Line
+                if line == 0:
+                    self.history.update(text.rstrip())
+                    text = self.history.up()
+                    def invoke(sender, args):
+                        self.textview.Document.Text = text
+                        self.textview.GrabFocus()
+                        self.textview.Caret.Line = 0
+                        col = self.textview.Document.GetLine(0).Length
+                        self.textview.Caret.Column = col
+                    Gtk.Application.Invoke(invoke)
+            elif str(event.Key) == "Down":
+                text = self.textview.Document.Text
+                caret = self.textview.Caret
+                line = caret.Line
+                line_count = self.textview.Document.LineCount
+                if line == line_count - 1:
+                    self.history.update(text.rstrip())
+                    text = self.history.down()
+                    def invoke(sender, args):
+                        self.textview.Document.Text = text
+                        self.textview.GrabFocus()
+                        self.textview.Caret.Line = self.textview.Document.LineCount - 1
+                        self.textview.Caret.Column = self.textview.Document.GetLine(0).Length
+                    Gtk.Application.Invoke(invoke)
+            elif str(event.Key) == "Tab":
                 return False
-            # else, execute text
-            # extra line at end signals ready_to_execute:
-            text = self.textview.Document.Text
-            if text == "":
-                return True # nothing to do, but handled
-            elif self.ready_for_execute(text) or force:
-                self.history.last(text.rstrip())
-                self.history.add("")
-                self.execute(text.rstrip(), self.language)
-                def invoke(sender, args):
-                    self.textview.Document.Text = ''
-                    self.textview.GrabFocus()
-                    self.textview.Caret.Line = 0
-                    self.textview.Caret.Column = 0
-                Gtk.Application.Invoke(invoke)
-                return True
-        elif str(event.Key) == "Up":
-            text = self.textview.Document.Text
-            caret = self.textview.Caret
-            line = caret.Line
-            if line == 0:
-                self.history.update(text.rstrip())
-                text = self.history.up()
-                def invoke(sender, args):
-                    self.textview.Document.Text = text
-                    self.textview.GrabFocus()
-                    self.textview.Caret.Line = 0
-                    col = self.textview.Document.GetLine(0).Length
-                    self.textview.Caret.Column = col
-                Gtk.Application.Invoke(invoke)
-        elif str(event.Key) == "Down":
-            text = self.textview.Document.Text
-            caret = self.textview.Caret
-            line = caret.Line
-            line_count = self.textview.Document.LineCount
-            if line == line_count - 1:
-                self.history.update(text.rstrip())
-                text = self.history.down()
-                def invoke(sender, args):
-                    self.textview.Document.Text = text
-                    self.textview.GrabFocus()
-                    self.textview.Caret.Line = self.textview.Document.LineCount - 1
-                    self.textview.Caret.Column = self.textview.Document.GetLine(0).Length
-                Gtk.Application.Invoke(invoke)
-        elif str(event.Key) == "Tab":
             return False
-            mark = self.textview.Buffer.InsertMark
-            current = self.textview.Buffer.GetIterAtMark(mark)
-            pos = current.LineOffset
-            line = current.Line
-            start = self.textview.Buffer.GetIterAtLine(line)
-            text = self.textview.Buffer.GetText(start, current, True)
-            if text.strip():
-                help_text = self.completion(text)
-                if help_text:
-                    self.message(help_text)
-                return True
-        return False
+        else:
+            return False
 
     def completion(self, text):
         variable = self.find_variable(text)
@@ -374,9 +389,6 @@ class ShellWindow(Window):
 
     def change_to_lang(self, language):
         self.language = language
-        if self.lang_manager:
-            self.textview.Buffer.Language = self.lang_manager.GetLanguage(
-                self.language)
         self.update_gui()
 
     def on_save_file_as(self, obj, event):
@@ -412,7 +424,9 @@ class ShellWindow(Window):
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             self.message("Stopping...\n")
             self.executeThread.Abort()
-        Gtk.Application.Invoke(self.stop_running)
+            Gtk.Application.Invoke(self.stop_running)
+        else:
+            self.searchbar.search_off()
 
     def on_new_file(self, obj, event, language="python"):
         self.pyjama.setup_editor()

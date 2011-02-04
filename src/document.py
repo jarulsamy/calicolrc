@@ -22,7 +22,11 @@ import Gtk
 import GLib
 import Pango
 import os
-from Mono.TextEditor import TextEditor, TextEditorOptions
+from Mono.TextEditor import TextEditor, Highlighting, TextEditorOptions
+path, filename = os.path.split(__file__)
+# /.../Pyjama/src/
+Highlighting.SyntaxModeService.LoadStylesAndModes(
+                os.path.join(path, "..", "bin", "SyntaxModes"))
 
 # Local classes:
 class MyScrolledWindow(Gtk.ScrolledWindow):
@@ -177,14 +181,16 @@ class TextEditorDocument(Document):
 
     def make_widget(self):
         Document.make_widget(self)
-        # FIXME: need to handle keys in editor:
         options = TextEditorOptions()
         self.texteditor = TextEditor(Options=options)
         #self.modify_font()
         # FIXME: not quite right: should reset on undo and doesn't 
         # set on space
         self.texteditor.Document.DocumentUpdated += self.on_modified
-        self.texteditor.Document.MimeType = "text/x-%s" % self.language
+        try:
+            self.texteditor.Document.MimeType = "text/x-%s" % self.language
+        except:
+            pass
         self.widget.Add(self.texteditor)
         self.texteditor.Show()
         self.widget.Show()
@@ -218,7 +224,10 @@ class TextEditorDocument(Document):
 
     def on_change_file(self):
         Document.on_change_file(self)
-        self.texteditor.Document.MimeType = "text/x-%s" % self.language
+        try:
+            self.texteditor.Document.MimeType = "text/x-%s" % self.language
+        except:
+            pass
 
     def begin_not_undoable(self):
         pass
