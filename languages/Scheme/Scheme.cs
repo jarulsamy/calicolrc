@@ -2244,7 +2244,10 @@ public class Scheme {
   }
 
   public static object read_content(object filename) {
-	return File.OpenText(filename.ToString()).ReadToEnd();
+    fp = File.OpenText(filename.ToString());
+	string text = fp.ReadToEnd();
+    fp.Close();
+    return text;
   }
 
   public static object string_append(object obj1, object obj2) {
