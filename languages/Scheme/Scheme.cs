@@ -2244,7 +2244,7 @@ public class Scheme {
   }
 
   public static object read_content(object filename) {
-    fp = File.OpenText(filename.ToString());
+    System.IO.StreamReader fp = File.OpenText(filename.ToString());
 	string text = fp.ReadToEnd();
     fp.Close();
     return text;
