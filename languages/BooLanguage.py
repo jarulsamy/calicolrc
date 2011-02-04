@@ -20,8 +20,8 @@
 
 import sys
 import clr
-clr.AddReference("Boo.Lang.Interpreter")
-clr.AddReference("Boo.Lang.Compiler")
+clr.AddReference("Boo.Lang.Interpreter.dll")
+clr.AddReference("Boo.Lang.Compiler.dll")
 
 import Boo.Lang.Interpreter
 import Boo.Lang.Compiler
