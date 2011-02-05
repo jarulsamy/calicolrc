@@ -192,6 +192,47 @@ class MyHPaned(Gtk.HPaned):
     To add reference to document
     """
 
+class MyTreeView(Gtk.TreeView):
+    def OnDragDropGet(self, *args):
+        print "OnDragDropGet:", args
+        return Gtk.TreeView.OnDragDropGet(self, *args)
+
+    def OnDragBegin(self, context):
+        print "OnDragBegin:", context
+        return Gtk.TreeView.OnDragBegin(self, context)
+
+    def OnDragDataDelete(self, *args):
+        print "OnDragDataDelete:", args
+        return Gtk.TreeView.OnDragDataDelete(self, *args)
+
+    def OnDragDataGet(self, context, selection, int1, int2):
+        print "OnDragDataGet:", context
+        return Gtk.TreeView.OnDragDataGet(self, context, selection, int1, int2)
+
+    def OnDragDataReceived(self, *args):
+        print "OnDragDataReceived:", args
+        return Gtk.TreeView.OnDragDataReceived(self, *args)
+
+    def OnDragDrop(self, *args):
+        print "OnDragDrop:", args
+        return Gtk.TreeView.OnDragDrop(self, *args)
+
+    def OnDragEnd(self, context):
+        print "OnDragEnd:", context
+        return Gtk.TreeView.OnDragEnd(self, context)
+
+    def OnDragFailed(self, *args):
+        print "OnDragFailed:", args
+        return Gtk.TreeView.OnDragFailed(self, *args)
+
+    def OnDragLeave(self, *args):
+        print "OnDragLeave:", args
+        return Gtk.TreeView.OnDragLeave(self, *args)
+
+    def OnDragMotion(self, *args):
+        print "OnDragMotion:", args
+        return Gtk.TreeView.OnDragMotion(self, *args)
+
 class DinahDocument(Document):
     def make_widget(self):
         self.layouts = {}
@@ -199,9 +240,9 @@ class DinahDocument(Document):
         self.widget = MyHPaned()
         self.widget.document = self
         tree_scroll = Gtk.ScrolledWindow()
-        tree_scroll.SetSizeRequest(120, -1)
+        tree_scroll.SetSizeRequest(140, -1)
         layout_scroll = Gtk.ScrolledWindow()
-        self.treeview = Gtk.TreeView()
+        self.treeview = MyTreeView()
         self.treeview.GrabFocus()
         self.treeview.Model = self.make_store()
 
@@ -563,6 +604,8 @@ class DinahDocument(Document):
         # DragDropGetArgs: args
         print "dnd get", obj, args
         targets = args.Context.Targets
+        self.myargs = args
+
         print "targets:", targets
         selected, treeiter = obj.Selection.GetSelected()
         print "selected:", selected, "treeiter", treeiter
