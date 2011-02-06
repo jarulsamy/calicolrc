@@ -198,7 +198,7 @@ class MyTreeView(Gtk.TreeView):
         return Gtk.TreeView.OnDragDropGet(self, *args)
 
     def OnDragBegin(self, context):
-        print "OnDragBegin:", context
+        print "OnDragBegin:", context.Targets
         return Gtk.TreeView.OnDragBegin(self, context)
 
     def OnDragDataDelete(self, *args):
@@ -206,7 +206,7 @@ class MyTreeView(Gtk.TreeView):
         return Gtk.TreeView.OnDragDataDelete(self, *args)
 
     def OnDragDataGet(self, context, selection, int1, int2):
-        print "OnDragDataGet:", context
+        print "OnDragDataGet:", context.Targets
         return Gtk.TreeView.OnDragDataGet(self, context, selection, int1, int2)
 
     def OnDragDataReceived(self, *args):
@@ -218,7 +218,7 @@ class MyTreeView(Gtk.TreeView):
         return Gtk.TreeView.OnDragDrop(self, *args)
 
     def OnDragEnd(self, context):
-        print "OnDragEnd:", context
+        print "OnDragEnd:", context.Targets
         return Gtk.TreeView.OnDragEnd(self, context)
 
     def OnDragFailed(self, *args):
@@ -235,6 +235,8 @@ class MyTreeView(Gtk.TreeView):
 
 class DinahDocument(Document):
     def make_widget(self):
+        self.source_table = None
+        self.target_table = None
         self.layouts = {}
         self.lookup = {}
         self.widget = MyHPaned()
@@ -734,22 +736,24 @@ class DinahDocument(Document):
         Create a target table base on parameters.
         """
         # Formats target will accept:
-        #print "making accepts for", item
-        target_table = System.Array[Gtk.TargetEntry]([
-                Gtk.TargetEntry("application/x-dinah", 0, 0),
-                ])
-        return target_table
+        if self.target_table is None:
+            self.target_table = System.Array[Gtk.TargetEntry]([
+                    Gtk.TargetEntry("application/x-dinah", 0, 0),
+                    ])
+            print "making accepts targets:", self.target_table
+        return self.target_table
 
     def provides(self, item):
         """
         Create a source table base on parameters.
         """
         # Formats source provides:
-        #print "making provides for", item
-        source_table = System.Array[Gtk.TargetEntry]([
-                Gtk.TargetEntry("application/x-dinah", 0, 0),
-                ])
-        return source_table
+        if self.source_table is None:
+            self.source_table = System.Array[Gtk.TargetEntry]([
+                    Gtk.TargetEntry("application/x-dinah", 0, 0),
+                    ])
+            print "making provides targets:", self.source_table
+        return self.source_table
 
     def make_drag_drop(self, name, item, color, widget_id):
         box = MyEventBox()
