@@ -194,13 +194,23 @@ class MyHPaned(Gtk.HPaned):
 
 class MyTreeView(Gtk.TreeView):
 
+    def __init__(self, *args):
+        print "setting up"
+        self.DragDataGet += self.handler # self.OnDragDataGet
+        print "ok"
+
+    def handler(self, widget, args):
+        print "handler:", args.Context.Targets
+        #
+        #'Args', 'Context', 'Empty', 'Info', 'RetVal', 'SelectionData'
+
     def OnDragBegin(self, *args):
         print "OnDragBegin:", args
         return Gtk.TreeView.OnDragBegin(self, *args)
 
-    def OnDragDropGet(self, *args):
-        print "OnDragDropGet:", args
-        return Gtk.TreeView.OnDragDropGet(self, *args)
+    #def OnDragDropGet(self, widget, context):
+    #    print "OnDragDropGet:", widget, context
+    #    #return Gtk.TreeView.OnDragDropGet(self, *args)
 
     def OnDragDataDelete(self, *args):
         print "OnDragDataDelete:", args
@@ -623,7 +633,7 @@ class DinahDocument(Document):
             print 4
             packed = System.Text.Encoding.UTF8.GetBytes(data)
             print 5
-            args.SelectionData.Set(targets[0], 8, packed)
+            #args.SelectionData.Set(targets[0], 8, packed)
 
     def beforeHandleDragDataReceived(self, obj, args):
         self.handleDragDataReceived(obj, args, "before")
@@ -730,7 +740,7 @@ class DinahDocument(Document):
         targets = args.Context.Targets
         data = obj.id
         packed = System.Text.Encoding.UTF8.GetBytes(data)
-        args.SelectionData.Set(targets[0], 8, packed)
+        #args.SelectionData.Set(targets[0], 8, packed)
 
     def accepts(self, item):
         """
