@@ -193,13 +193,14 @@ class MyHPaned(Gtk.HPaned):
     """
 
 class MyTreeView(Gtk.TreeView):
+
+    def OnDragBegin(self, *args):
+        print "OnDragBegin:", args
+        return Gtk.TreeView.OnDragBegin(self, *args)
+
     def OnDragDropGet(self, *args):
         print "OnDragDropGet:", args
         return Gtk.TreeView.OnDragDropGet(self, *args)
-
-    def OnDragBegin(self, context):
-        print "OnDragBegin:", context.Targets
-        return Gtk.TreeView.OnDragBegin(self, context)
 
     def OnDragDataDelete(self, *args):
         print "OnDragDataDelete:", args
