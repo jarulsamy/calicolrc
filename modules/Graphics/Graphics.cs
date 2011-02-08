@@ -21,9 +21,18 @@ public static class Graphics {
 	return new PythonTuple(items);
   }
 
-  public static bool initialize;
+  private static Dictionary<string, Graphics.GWindow> _windows = 
+	  new Dictionary<string, Graphics.GWindow>();
+
   private static Dictionary<string, Cairo.Color> _color_map = 
-	  new Dictionary<string, Cairo.Color>();
+	  new Dictionary<string, Cairo.Color>() {
+	{"black", new Cairo.Color(0, 0, 0, 1)},
+	{"white", new Cairo.Color(255, 255, 255, 1)},
+	{"red", new Cairo.Color(255, 0, 0, 1)},
+	{"green", new Cairo.Color(0, 255, 0, 1)},
+	{"blue", new Cairo.Color(0, 0, 255, 1)},
+	{"yellow", new Cairo.Color(255, 255, 0, 1)},
+  };
   
   public static Cairo.Color color_map(string name) {
 	if (_color_map.ContainsKey(name))
@@ -38,19 +47,6 @@ public static class Graphics {
   
   public static List<string> color_names() {
 	return new List<string>(_color_map.Keys);
-  }
-  
-  public static void init() {
-	if (!initialize) {
-	  initialize = true;
-	  _color_map.Add("black", new Cairo.Color(0, 0, 0, 1));
-	  _color_map.Add("white", new Cairo.Color(255, 255, 255, 1));
-	  _color_map.Add("red", new Cairo.Color(255, 0, 0, 1));
-	  _color_map.Add("green", new Cairo.Color(0, 255, 0, 1));
-	  _color_map.Add("blue", new Cairo.Color(0, 0, 255, 1));
-	  _color_map.Add("yellow", new Cairo.Color(255, 255, 0, 1));
-	  Gtk.Application.Init();
-	}
   }
   
   public static IEnumerator getPixels(Picture picture) {
@@ -104,7 +100,7 @@ public static class Graphics {
 	return new Picture(filename);
   }
   
-  public static Picture makePicture(Graphics.Window window) { //, string filename) {
+  public static Picture makePicture(Graphics.GWindow window) { //, string filename) {
 	ManualResetEvent ev = new ManualResetEvent(false);
 	Gdk.Pixbuf pixbuf = null;
 	Gtk.Application.Invoke( delegate {
@@ -120,7 +116,29 @@ public static class Graphics {
 	return new Picture(pixbuf);
   }
 
-  public class Window : Gtk.Window {
+  public static Graphics.GWindow makeWindow(string title="Pyjama Graphics", 
+	  int width=300, 
+	  int height=300) {
+	if (_windows.ContainsKey(title)) {
+	  return _windows[title];
+	} else {
+	  _windows[title] = new Graphics.GWindow(title, width, height);
+	  return _windows[title];
+	}
+  }
+
+  public static Graphics.GWindow Window(string title="Pyjama Graphics", 
+	  int width=300, 
+	  int height=300) {
+	if (_windows.ContainsKey(title)) {
+	  return _windows[title];
+	} else {
+	  _windows[title] = new Graphics.GWindow(title, width, height);
+	  return _windows[title];
+	}
+  }
+
+  public class GWindow : Gtk.Window {
 	private Gtk.EventBox eventbox;
 	private Canvas _canvas;
 	private bool _dirty = false;
@@ -131,12 +149,9 @@ public static class Graphics {
 					    			  // automatically step
 	public List<PythonFunction> onClickCallbacks = new List<PythonFunction>();
 	
-	public Window(string title="Pyjama Graphics Window", 
+	public GWindow(string title="Pyjama Graphics Window", 
 		int width=300, 
 		int height=300) : base(title) {
-	  
-	  if (! Graphics.initialize) 
-		Graphics.init();
 	  _canvas = new Canvas("auto");
 	  SetDefaultSize(width, height);
 	  eventbox = new Gtk.EventBox();
@@ -366,7 +381,7 @@ public static class Graphics {
 
   public class Shape {
 	public Point center;
-	public Window window;
+	public GWindow window;
 	public double _direction; // radians
 	public bool fill_path;
 	
@@ -433,7 +448,7 @@ public static class Graphics {
 	}
 	
 	public void QueueDraw() { // shape
-	  if (window is Window) {
+	  if (window is GWindow) {
 		Gtk.Application.Invoke(delegate {
 			  if (window.mode == "auto") { 
 				// else, we will issue an update() or step()
@@ -673,7 +688,7 @@ public static class Graphics {
 	  QueueDraw();
 	}
 	
-	public void draw(Window win) {
+	public void draw(GWindow win) {
 	  // Add this shape to the Canvas dictionary.
 	  win.canvas.shapes.Add(this);
 	  // FIXME: QueueDrawRect
@@ -703,6 +718,7 @@ public static class Graphics {
 	}
   }
 
+  /*
   public class Text : Shape {
     public Text(Point p1, string text) : base(has_pen) {
     }
@@ -732,7 +748,7 @@ public static class Graphics {
       g.Restore();
     }
   }
-
+  */
   public class Arrow : Shape {
 	public Arrow(Point new_center) : this(new_center, 0) {
 	  
@@ -867,8 +883,6 @@ public static class Graphics {
 	public Cairo.Context context;
 
 	public Picture(string filename) : base(true) {
-	  if (! Graphics.initialize) 
-		Graphics.init();
 	  _pixbuf = new Gdk.Pixbuf(filename);
 	  if (!_pixbuf.HasAlpha) {
 		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
@@ -879,8 +893,6 @@ public static class Graphics {
 	}
 
 	public Picture(Gdk.Pixbuf pixbuf) : base(true) {
-	  if (! Graphics.initialize) 
-		Graphics.init();
 	  _pixbuf = pixbuf;
 	  if (!_pixbuf.HasAlpha) {
 		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
@@ -888,11 +900,39 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	  center.x = _pixbuf.Width/2;
+	  center.y = _pixbuf.Height/2;
+	}
+
+	public Picture(int width, int height, byte [] buffer) : base(true) {
+	  // Colorspace, has_alpha, bits_per_sample, width, height:
+	  _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
+	  if (!_pixbuf.HasAlpha) {
+		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+	  }
+	  for (int x=0; x < _pixbuf.Width; x++) {
+		for (int y=0; y < _pixbuf.Height; y++) {
+		  byte r = buffer[(y * width + x) * 3 + 0];
+		  byte g = buffer[(y * width + x) * 3 + 1];
+		  byte b = buffer[(y * width + x) * 3 + 2];
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 0, r);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 1, g);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 2, b);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x * _pixbuf.NChannels + 3, 255);
+		}
+	  }
+	  format = Cairo.Format.Argb32;
+	  // Create a new ImageSurface
+	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	  center.x = _pixbuf.Width/2;
+	  center.y = _pixbuf.Height/2;
 	}
 
 	public Picture(int width, int height) : base(true) {
-	  if (! Graphics.initialize) 
-		Graphics.init();
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
 	  _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
 	  if (!_pixbuf.HasAlpha) {
@@ -915,6 +955,8 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	  center.x = _pixbuf.Width/2;
+	  center.y = _pixbuf.Height/2;
 	}
 
 	public void saveToFile(string filename) {

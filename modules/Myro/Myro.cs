@@ -65,8 +65,9 @@ public static class Myro {
 	robot.beep(duration, frequency, frequency2);
   }
 
-  public static Graphics.Window show(Picture picture) {
-	return new Graphics.Window("default");
+  public static void show(Graphics.Picture picture) {
+	Graphics.GWindow win = Graphics.makeWindow("Myro Camera", picture.width, picture.height);
+	picture.draw(win);
   }
 
   public static string flipCoin() {
@@ -122,7 +123,7 @@ public static class Myro {
 	return ((n % 2) == 0);
   }
 
-  public static Picture takePicture(string mode="jpeg") {
+  public static Graphics.Picture takePicture(string mode="jpeg") {
 	return robot.takePicture(mode);
   }
 
@@ -167,7 +168,7 @@ public static class Myro {
 	  // Override in subclassed robots
 	}
 
-    public virtual Picture takePicture(string mode="jpeg") {
+    public virtual Graphics.Picture takePicture(string mode="jpeg") {
 	  // Override in subclassed robots
 	  return null;
 	}
@@ -382,7 +383,8 @@ public static class Myro {
 		}
 	  }
 	  serial = new SerialPort(this.port, baud);
-	  serial.ReadTimeout = 100; // milliseconds
+	  serial.ReadTimeout = 1000; // milliseconds
+	  serial.WriteTimeout = 1000; // milliseconds
 	  try {
 		serial.Open();
 	  } catch {
@@ -396,14 +398,17 @@ public static class Myro {
 		Console.WriteLine("ERROR: unable to talk to Scribbler");
 	  }
 	  if (info.Contains("fluke")) {
-		dongle = (string)info["fluke"];
-		Console.WriteLine("You are using fluke firmware {0}", info["fluke"]);
+		Console.WriteLine("You are using:\n   Fluke, version {0}", info["fluke"]);
+        if (info.Contains("robot") && info.Contains("robot-version")) {
+          Console.WriteLine("   {0}, version {1}",
+                (string)info["robot"], (string)info["robot-version"]);
+        }
 	  } else if (info.Contains("dongle")) {
 		dongle = (string)info["dongle"];
-		Console.WriteLine("You are using fluke firmware {0}", info["dongle"]);
+		Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
 	  } else {
 		dongle = null;
-		Console.WriteLine("You are using the scribbler without the fluke");
+		Console.WriteLine("You are using:\n   Scribbler, version 0.0.0");
 	  }
 	  flush();
 	  stop();
@@ -414,8 +419,7 @@ public static class Myro {
 	  beep(.03, 349);
 	  beep(.03, 523);
 	  string name = (string)Get("name");
-	  Console.WriteLine("Hello, I'm {0}!", name);
-
+	  Console.WriteLine("Hello, my name is '{0}'!", name);
 	}
 
 	// ------------------------------------------------------------
@@ -673,8 +677,8 @@ public static class Myro {
     public object Set(params byte [] values) {
 	  lock(myLock) {
 		write_packet(values);
-		read_until(Scribbler.PACKET_LENGTH); // read echo
-		_lastSensors = read_until(11); // single bit sensors
+		read(Scribbler.PACKET_LENGTH); // read echo
+		_lastSensors = read(11); // single bit sensors
 		/* 
 		if (requestStop) {
 		  requestStop = false;
@@ -855,7 +859,8 @@ public static class Myro {
 		} else {
 		  set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
 		}
-		read_until(Scribbler.PACKET_LENGTH + 11);
+        System.Threading.Thread.Sleep((int)(duration * 1000));
+		read(Scribbler.PACKET_LENGTH + 11);
 	  }
 	}
 
@@ -877,25 +882,38 @@ public static class Myro {
 			(byte)(freq2 % 256));
 	}
 
-	public byte [] read_until(int bytes) {
-	  int count = 0;
-	  byte [] buffer = new byte[bytes];
-	  while (count < bytes) {
-		byte [] retval = read(bytes-count);
-		count += retval.Length;
-	  }
-	  return buffer;
-	}
-	
 	public byte [] read(int bytes) {
+	  int count = 0;
+      int tries = 0;
+	  byte [] buffer = new byte[bytes];
+	  while (count < bytes && tries < 4) { // 4 seconds
+		byte [] retval = try_read(bytes-count);
+        buffer_copy(retval, buffer, count, retval.Length);
+		count += retval.Length;
+		if (retval.Length == 0)
+		  tries++;
+	  }
+	  return buffer.Slice(0, count);
+	}
+
+    static void buffer_copy(byte [] from_buf, byte [] to_buf, int start, int length) {
+        int count = 0;
+        for (int i=start; i < start + length; i++) {
+            to_buf[i] = from_buf[count];
+            count++;
+        }
+    }
+
+	public byte [] try_read(int bytes) {
 	  byte[] buffer = new byte[bytes];
 	  int len = 0;
 	  try {
 		len = serial.Read(buffer, 0, bytes);
 	  } catch {
+		Thread.Sleep(10); 
 	  }
-	  //if (len != bytes) 
-	  //Console.WriteLine("read: Wrong number of bytes read");
+	  //if (len != bytes)
+	  //  Console.WriteLine("read: Wrong number of bytes read");
 	  if (dongle == null) {
 		// HACK! THIS SEEMS TO NEED TO BE HERE!
 		Thread.Sleep(10); 
@@ -904,19 +922,19 @@ public static class Myro {
 	}
 
 	public int read_mem(int page, int offset) {
-	  write_byte(Scribbler.GET_SERIAL_MEM);
+	  write(Scribbler.GET_SERIAL_MEM);
 	  write_bytes(page);
 	  write_bytes(offset);
 	  return read(1)[0];
 	}
 
-	public void write_byte(params byte [] b) {
+	public void write(params byte [] b) {
 	  serial.Write(b, 0, 1);
 	}
 
 	public void write_bytes(int value) {
-	  write_byte((byte)((value >> 8) & 0xFF));
-	  write_byte((byte)(value & 0xFF));
+	  write((byte)((value >> 8) & 0xFF));
+	  write((byte)(value & 0xFF));
 	}
 
 	public void write_packet(params byte [] data) {
@@ -933,16 +951,6 @@ public static class Myro {
 		  Console.WriteLine("ERROR: in write");
 		}
 	  } 
-	  /*
-	  Console.Write("[");
-	  for (int i = 0; i < data.Length; i++) {
-		Console.Write("'0x{0:x}', ", data[i]);
-	  }
-	  for (int i = 0; i < Scribbler.PACKET_LENGTH - data.Length; i++) {
-		Console.Write("'0x{0:x}', ", 0);
-	  }
-	  Console.WriteLine("]");
-	  */
 	}
 
 	public void flush() {
@@ -950,13 +958,14 @@ public static class Myro {
 	    serial.DiscardOutBuffer();
 	}
 
-    public Picture takePicture(string mode="jpeg") {
+    public Graphics.Picture takePicture(string mode="jpeg") {
 	  int width = 256;
 	  int height = 192;
-	  Picture p = new Picture();
+	  Graphics.Picture p = null;
 	  if (mode == "color") {
-		byte [] a = grab_array();
-		p.set(width, height, a);
+		byte [] a = grab_array_yuv();
+		if (a.Length == (width * height * 3))
+		  p = new Graphics.Picture(width, height, a);
 	  } else if (mode == "jpeg") {
 		//byte [] jpeg = grab_jpeg_color(1);
 		//stream = cStringIO.StringIO(jpeg)  ;
@@ -965,7 +974,7 @@ public static class Myro {
 		//byte [] jpeg = grab_jpeg_color(0);
 		//stream = cStringIO.StringIO(jpeg);
 		//p.set(width, height, stream, "jpeg");
-	  } else if (mode == "gray" | mode == "grey") {
+	  } else if (mode == "gray" || mode == "grey") {
 		//byte [] jpeg = grab_jpeg_gray(1);
 		//stream = cStringIO.StringIO(jpeg);
 		//p.set(width, height, stream, "jpeg");
@@ -977,28 +986,29 @@ public static class Myro {
 		//byte [] jpeg = grab_jpeg_gray(0);
 		//stream = cStringIO.StringIO(jpeg);
 		//p.set(width, height, stream, "jpeg");
-	  } else if (mode == "grayraw" | mode == "greyraw") {
+	  } else if (mode == "grayraw" || mode == "greyraw") {
 		//conf_window(serial, 0, 1, 0, 255, 191, 2, 2);
 		byte [] a = grab_gray_array();
 		//conf_gray_window(serial, 0, 2, 0,    128, 191, 1, 1);
-		p.set(width, height, a, "gray");
+		p = new Graphics.Picture(width, height, a);
 	  } else if (mode == "blob") {
-		byte [] a = grab_blob_array();
-		p.set(width, height, a, "blob");
+		byte [] a = grab_blob_array(); // FIXME: make an rgbrgb array
+		p = new Graphics.Picture(width, height, a);
 	  }
 	  return p;
 	}
 
-	public byte [] grab_array() { // old color, uncompressed
+	public byte [] grab_array_yuv() { // YUV color
 	  int width = 256;
 	  int height = 192;
 	  int size = width * height;
-	  byte [] buffer = new byte [height * width * 3];
+	  byte [] buffer = new byte [size * 3];
 	  int vy, vu, y1v, y1u, uy, uv, y2u, y2v;
 	  int Y = 0, U = 0, V = 0;
       lock(myLock) {
-		write_packet(Scribbler.GET_IMAGE);
-		byte [] line = read_until(size); //BufferedRead(self.ser, size, start = 0);
+		write(Scribbler.GET_IMAGE);
+		byte [] line = read(size); //BufferedRead(self.ser, size,
+								   //start = 0);
 		//create the image from the YUV layer
 		for (int i=0; i < height; i++) {
 		  for (int j=0; j < width; j++) {
@@ -1057,15 +1067,6 @@ public static class Myro {
 	public byte [] grab_gray_array() {
 	  return null;
 	}
-
   }
-
-  public class Picture {
-
-	public void set(int width, int height, byte [] stream, string mode=null) {
-	}
-
-  }
-
 }
 
