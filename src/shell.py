@@ -399,6 +399,7 @@ class ShellWindow(Window):
     def change_to_lang(self, language):
         self.language = language
         self.update_gui()
+        #self.show_prompt()
 
     def on_save_file_as(self, obj, event):
         pass
@@ -474,6 +475,9 @@ class ShellWindow(Window):
     def set_title(self, text):
         self.window.Title = text
 
+    def show_prompt(self):
+        self.message("%s\n" % self.prompt.Text, tag="purple")
+
     def execute_file(self, filename, language):
         if (self.executeThread and 
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
@@ -485,6 +489,7 @@ class ShellWindow(Window):
             self.pyjama.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
             self.message("Done loading file.\n")
+            #self.show_prompt()
 
         self.executeThread = System.Threading.Thread(
                                 System.Threading.ThreadStart(background))
@@ -546,6 +551,7 @@ class ShellWindow(Window):
         def background():
             Gtk.Application.Invoke(self.start_running)
             self.pyjama.engine[self.language].execute(text)
+            #self.show_prompt()
             Gtk.Application.Invoke(self.stop_running)
 
         self.executeThread = System.Threading.Thread(
