@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$LD_LIBRARY_PATH
+cd "$( dirname "$0" )"
 /usr/bin/env mono $MONO_OPTIONS bin/pyjama.exe "$@"
