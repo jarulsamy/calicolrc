@@ -226,7 +226,7 @@ public static class Myro {
 	
 	public void motors(double left, double right) {
 	  double trans = (right + left) / 2.0;
-      double rotate = (right - left) / 2.0;
+      	  double rotate = (right - left) / 2.0;
 	  move(trans, rotate);
 	}
 	
@@ -415,6 +415,7 @@ public static class Myro {
 	  beep(.03, 523);
 	  string name = (string)Get("name");
 	  Console.WriteLine("Hello, I'm {0}!", name);
+
 	}
 
 	// ------------------------------------------------------------
@@ -880,7 +881,7 @@ public static class Myro {
 	  int count = 0;
 	  byte [] buffer = new byte[bytes];
 	  while (count < bytes) {
-		byte [] retval = read(bytes);
+		byte [] retval = read(bytes-count);
 		count += retval.Length;
 	  }
 	  return buffer;
