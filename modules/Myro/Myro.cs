@@ -65,8 +65,8 @@ public static class Myro {
 	robot.beep(duration, frequency, frequency2);
   }
 
-  public static void show(Graphics.Picture picture) {
-	Graphics.GWindow win = Graphics.makeWindow("Myro Camera", picture.width, picture.height);
+  public static void show(Graphics.Picture picture, string title="Myro Camera") {
+	Graphics.GWindow win = Graphics.makeWindow(title, picture.width, picture.height);
 	picture.draw(win);
   }
 
@@ -375,22 +375,28 @@ public static class Myro {
 	public Scribbler(string port, int baud) {
 	  PythonDictionary info = null;
 	  this.port = port;
+	  bool need_port = true;
 	  if (Myro.robot is Scribbler) {
 		if (((Scribbler)(Myro.robot)).serial is SerialPort) {
 		  if (((Scribbler)(Myro.robot)).serial.IsOpen) {
-			((Scribbler)(Myro.robot)).serial.Close();
-		  }
+			//((Scribbler)(Myro.robot)).serial.Close();
+			// let's try using it
+			need_port = false;
+			serial = ((Scribbler)(Myro.robot)).serial;
+		  } 
 		}
 	  }
-	  serial = new SerialPort(this.port, baud);
-	  serial.ReadTimeout = 1000; // milliseconds
-	  serial.WriteTimeout = 1000; // milliseconds
-	  try {
-		serial.Open();
-	  } catch {
-		Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
-				this.port));
-		return;
+	  if (need_port) {
+		serial = new SerialPort(this.port, baud);
+		serial.ReadTimeout = 1000; // milliseconds
+		serial.WriteTimeout = 1000; // milliseconds
+		try {
+		  serial.Open();
+		} catch {
+		  Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+				  this.port));
+		  return;
+		}
 	  }
 	  try {
 		info = getInfo();

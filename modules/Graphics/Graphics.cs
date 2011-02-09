@@ -120,6 +120,7 @@ public static class Graphics {
 	  int width=300, 
 	  int height=300) {
 	if (_windows.ContainsKey(title)) {
+	  _windows[title].ShowAll();
 	  return _windows[title];
 	} else {
 	  _windows[title] = new Graphics.GWindow(title, width, height);
@@ -157,21 +158,24 @@ public static class Graphics {
 	  eventbox = new Gtk.EventBox();
 	  this.Add(eventbox);
 	  eventbox.Add(_canvas);
-	  eventbox.ButtonPressEvent += new Gtk.ButtonPressEventHandler(HandleClickCallbacks);
+	  eventbox.ButtonPressEvent += HandleClickCallbacks;
+	  DeleteEvent += OnDelete;
 	  ShowAll();
 	}
 	
+	private void OnDelete(object obj, Gtk.DeleteEventArgs args)  {
+	  _windows.Remove(Title);
+	}
+
 	private void HandleClickCallbacks(object obj, 
 		Gtk.ButtonPressEventArgs args) {
-	  Console.WriteLine("Callbacks!");
 	  foreach (PythonFunction function in onClickCallbacks) {
-		Console.Write("Calling...");
-		/// FIXME: crashes on print callback
-		Gtk.Application.Invoke(delegate { 
-			  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-			});
+		try {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} catch {
+		  Console.Error.WriteLine("callback failed to fire.");
+		}
 	  }
-	  Console.WriteLine(" done!");
 	}
 
 	public void onClick(PythonFunction function) {
@@ -1097,7 +1101,11 @@ public static class Graphics {
 	  return new Pixel[10];
 	}
 
-  }
+	public string __repr__() {
+	  return String.Format("<Picture ({0}, {1})>", width, height);
+	}
+
+  } // -- end of Picture class
 
   public class Rectangle : Shape {
 	public Rectangle(Point point1, Point point2) : base(true) {
