@@ -34,4 +34,5 @@ bin/pyjama.exe: src/pyjama.cs
 		-r:IronPython \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \
+		-r:Mono.Posix \
 		-out:bin/pyjama.exe 

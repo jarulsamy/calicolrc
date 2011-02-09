@@ -20,6 +20,7 @@
 
 import clr
 clr.AddReference("agsXMPP")
+clr.AddReference("Mono.Posix")
 
 import Gtk
 import Gdk
@@ -28,10 +29,12 @@ from System.Threading import Mutex, ManualResetEvent
 import os
 import agsXMPP
 import traceback
+import Mono
 
 MUTEX = Mutex(False, "PyjamaMutex")
 
-def _(text): return text
+_ = Mono.Unix.Catalog.GetString
+#_ = lambda text: text
 
 def Array(*list):
     Type = type(list[0])

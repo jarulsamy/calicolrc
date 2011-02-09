@@ -2,9 +2,11 @@ using System;
 using IronPython.Hosting;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
+using Mono.Unix;
 
 public class Pyjama {
   static void Main(string[] args) {
+  	Catalog.Init("pyjama","./locale");
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
         LanguageSetup language = Python.CreateLanguageSetup(null);
         language.Options["FullFrames"] = true;
