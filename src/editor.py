@@ -41,53 +41,53 @@ class EditorWindow(Window):
         self.searchbar = SearchBar()
         # ---------------------
         # make menu:
-        menu = [("_File", 
-                 [("Open Script...", Gtk.Stock.Open, 
+        menu = [(_("File"), 
+                 [(_("Open Script..."), Gtk.Stock.Open, 
                    None, self.on_open_file),
                   None,
                   ] + 
                   self.make_new_file_menu() +
                  [
                   None,
-                  ("Save...", Gtk.Stock.Save, 
+                  (_("Save..."), Gtk.Stock.Save, 
                    None, self.on_save_file),
-                  ("Save as...", Gtk.Stock.SaveAs,
+                  (_("Save as..."), Gtk.Stock.SaveAs,
                    None, self.on_save_file_as),
                   None,
-                  ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  ("Login...", None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
-                  ("Close", Gtk.Stock.Close,
+                  (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
-                  ("Quit", Gtk.Stock.Quit,
+                  (_("Quit"), Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", [
-                    ("_Copy", None, None, None),
-                    ("_Paste", None, None, None),
-                    ("Cut", None, None, None),
-                    ("Select all", Gtk.Stock.SelectAll, None, None),
+                (_("Edit"), [
+                    (_("Copy"), None, None, None),
+                    (_("Paste"), None, None, None),
+                    (_("Cut"), None, None, None),
+                    (_("Select all"), Gtk.Stock.SelectAll, None, None),
                     None,
-                    ("Search...", None, "<control>f", self.searchbar.open),
-                    ("Find next", None, "<control>g", self.searchbar.next),
-                    ("Find previous", None, "<control><shift>g", self.searchbar.prev),
+                    (_("Search..."), None, "<control>f", self.searchbar.open),
+                    (_("Find next"), None, "<control>g", self.searchbar.next),
+                    (_("Find previous"), None, "<control><shift>g", self.searchbar.prev),
                           ]),
-                ("Script", [
-                    ("Run", Gtk.Stock.Apply, "F5", self.on_run),
-                    ("Reset and run", None, "<control>F5", self.on_reset_run),
-                    ("Blast...", None, None, self.blast_dialog),
+                (_("Script"), [
+                    (_("Run"), Gtk.Stock.Apply, "F5", self.on_run),
+                    (_("Reset and run"), None, "<control>F5", self.on_reset_run),
+                    (_("Blast..."), None, None, self.blast_dialog),
                            ]),
-                ("Windows", [
-                    ("Editor", None, "F6", self.pyjama.setup_editor),
-                    ("Shell", None, "F7", self.pyjama.setup_shell),
-                    ("Chat", None, "F8", self.pyjama.setup_chat),
+                (_("Windows"), [
+                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
+                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
+                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
                     ]),
-                ("O_ptions", [
-                    ("Make font larger", None, None, self.pyjama.increase_fontsize),
-                    ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
+                (_("Options"), [
+                    (_("Make font larger"), None, None, self.pyjama.increase_fontsize),
+                    (_("Make font smaller"), None, None, self.pyjama.decrease_fontsize),
                     ]),
-                ("_Help", [
-                    ("About the Pyjama Project", Gtk.Stock.About, None, self.pyjama.about),
+                (_("Help"), [
+                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                           ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
@@ -104,7 +104,7 @@ class EditorWindow(Window):
         self.notebook.SwitchPage += self.changed_page
         self.notebook.PageRemoved += self.changed_page
         self.statusbar = StatusBar()
-        self.statusbar.init("Language", "Status")
+        self.statusbar.init(_("Language"), _("Status"))
         self.searchbar.set_editor(self)
         # initialize
         self.window.Add(self.vbox)
@@ -152,7 +152,7 @@ class EditorWindow(Window):
     def changed_page(self, obj, event):
         doc = self.get_current_doc()
         if doc:
-            self.statusbar.set("Language", doc.language.title())
+            self.statusbar.set(_("Language"), doc.language.title())
             self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
             if doc.filename:
                 path, filename = os.path.split(doc.filename)
@@ -161,7 +161,7 @@ class EditorWindow(Window):
                 except:
                     pass # Fail silently
         else:
-            self.statusbar.set("Language", "")
+            self.statusbar.set(_("Language"), "")
             self.window.Title = _("Pyjama Editor")
 
     def select_or_open(self, filename, lineno=0, language="python"):
@@ -226,13 +226,13 @@ class EditorWindow(Window):
             self.goto_line(lineno)
 
     def update_status(self):
-        self.statusbar.set("Status", self.get_status())
+        self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
         if self.pyjama.connection:
             return self.pyjama.connection.status
         else:
-            return "offline"
+            return _("offline")
 
     def goto_line(self, lineno):
         """
@@ -245,11 +245,11 @@ class EditorWindow(Window):
 
     def on_open_file(self, obj, event):
         retval = False
-        fc = Gtk.FileChooserDialog("Select the file to open",
+        fc = Gtk.FileChooserDialog(_("Select the file to open"),
                                    self.window,
                                    Gtk.FileChooserAction.Open,
-                                   "Cancel", Gtk.ResponseType.Cancel,
-                                   "Open", Gtk.ResponseType.Accept)
+                                   _("Cancel"), Gtk.ResponseType.Cancel,
+                                   _("Open"), Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.select_or_open(fc.Filename)
             path, base = os.path.split(fc.Filename)
@@ -354,10 +354,10 @@ class EditorWindow(Window):
 
     def blast_dialog(self, obj, event):
         def invoke(sender, args):
-            dialog = Gtk.Dialog("Pyjama Script Blast", self.window,
+            dialog = Gtk.Dialog(_("Pyjama Script Blast"), self.window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
-            items = ["To"]
+            items = [_("To")]
             table = Gtk.Table(len(items), 2, False)
             row = 0
             data = {}
@@ -365,37 +365,35 @@ class EditorWindow(Window):
                 label = Gtk.Label("%s:" % item)
                 label.Justify = Gtk.Justification.Right
                 entry = Gtk.Entry()
-                if "password" in item.lower():
-                    entry.Visibility = False
                 data[item] = entry
                 table.Attach(label, 0, 1, row, row + 1,
                     Gtk.AttachOptions.Expand, Gtk.AttachOptions.Expand, 0, 0)
                 table.Attach(entry, 1, 2, row, row + 1)
                 row += 1
             # add select for execute or edit
-            radio1 = Gtk.RadioButton("Open script in their editor")
-            radio2 = Gtk.RadioButton(radio1, "Run script on their computer")
+            radio1 = Gtk.RadioButton(_("Open script in their editor"))
+            radio2 = Gtk.RadioButton(radio1, _("Run script on their computer"))
             table.Attach(radio1, 1, 2, row, row + 1)
             row += 1
             table.Attach(radio2, 1, 2, row, row + 1)
             expand, fill, padding = True, True, 0
             dialog.VBox.PackStart(table, expand, fill, padding)
-            dialog.AddButton("Blast!", Gtk.ResponseType.Apply)
-            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.AddButton(_("Blast!"), Gtk.ResponseType.Apply)
+            dialog.AddButton(_("Cancel"), Gtk.ResponseType.Cancel)
             dialog.ShowAll()
             response = dialog.Run()
             if response == int(Gtk.ResponseType.Apply):
                 if radio2.Active:
-                    self.blast_script(data["To"].Text, "execute", self.document)
+                    self.blast_script(data[_("To")].Text, "execute", self.document)
                 else:
-                    self.blast_script(data["To"].Text, "edit", self.document)
+                    self.blast_script(data[_("To")].Text, "edit", self.document)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
 
     def blast_script(self, to, type, document):
         if self.pyjama.connection:
-            if self.pyjama.connection.status == "online":
+            if self.pyjama.connection.status == _("online"):
                 # [blast]
                 # to: address | conference
                 # type: execute | edit
@@ -405,9 +403,9 @@ class EditorWindow(Window):
                 self.pyjama.connection.send("admin", "[blast]\nto: %s\ntype: %s\nfilename: %s\n%s" %
                                             (to, type, basefilename, document.get_text()))
             else:
-                print "You are not online."
+                print _("You are not online")
         else:
-            print "You need to login."
+            print _("You need to login")
 
     def search(self):
         # set pattern:

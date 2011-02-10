@@ -42,39 +42,39 @@ class ChatWindow(Window):
         self.vbox = Gtk.VBox()
         # ---------------------
         # make menu:
-        menu = [("_File",
-                 [("Open Script...", Gtk.Stock.Open,
+        menu = [(_("File"),
+                 [(_("Open Script..."), Gtk.Stock.Open,
                    None, self.on_open_file),
                   None,
                   ] +
                   self.make_new_file_menu() +
                   [None,
-                  ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  ("Login...", None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
-                  ("Close", Gtk.Stock.Close,
+                  (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
-                  ("Quit", Gtk.Stock.Quit,
+                  (_("Quit"), Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", [
-                    ("_Copy", None, None, None),
-                    ("_Paste", None, None, None),
-                    ("Cut", None, None, None),
-                    ("Select all", Gtk.Stock.SelectAll, None, None),
+                (_("Edit"), [
+                    (_("Copy"), None, None, None),
+                    (_("Paste"), None, None, None),
+                    (_("Cut"), None, None, None),
+                    (_("Select all"), Gtk.Stock.SelectAll, None, None),
                           ]),
-                ("Chat", []),
-                ("Windows", [
-                    ("Editor", None, "F6", self.pyjama.setup_editor),
-                    ("Shell", None, "F7", self.pyjama.setup_shell),
-                    ("Chat", None, "F8", self.pyjama.setup_chat),
+                (_("Chat"), []),
+                (_("Windows"), [
+                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
+                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
+                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
                     ]),
-                ("O_ptions", [
-                    ("Make font larger", None, None, self.pyjama.increase_fontsize),
-                    ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
+                (_("Options"), [
+                    (_("Make font larger"), None, None, self.pyjama.increase_fontsize),
+                    (_("Make font smaller"), None, None, self.pyjama.decrease_fontsize),
                     ]),
-                ("_Help", [
-                    ("About the Pyjama Project", Gtk.Stock.About, None, self.pyjama.about),
+                (_("Help"), [
+                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                     ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
@@ -82,14 +82,14 @@ class ChatWindow(Window):
                    ]
         self.make_gui(menu, toolbar)
         self.statusbar = StatusBar()
-        self.statusbar.init("Status")
+        self.statusbar.init(_("Status"))
 
         # Enter messages:
         self.vbox = Gtk.VBox()
         self.command_area = Gtk.HBox()
-        self.prompt = Gtk.Label("Chat:")
+        self.prompt = Gtk.Label(_("Chat: "))
         self.entry = Gtk.Entry()
-        self.send_button = Gtk.Button("Send")
+        self.send_button = Gtk.Button(_("Send"))
         self.send_button.Clicked += self.send_clicked 
         self.command_area.PackStart(self.prompt, False, False, 0)
         self.command_area.PackStart(self.entry, True, True, 0)
@@ -124,16 +124,16 @@ class ChatWindow(Window):
         def invoke(sender, args):
             self.window.ShowAll()
             self.update_status()
-            self.message("Pyjama Chat Window\n" +
+            self.message(_("Pyjama Chat Window") + "\n" +
                          "-------------------\n" +
-                         "Enter /help for details\n\n")
+                         _("Enter /help for details") + "\n")
         Gtk.Application.Invoke(invoke)
 
     def send_clicked(self, obj=None, event=None):
         text = str(self.entry.Text)
         if text.startswith("/help"):
-            self.message("/help\n", "black")
-            self.message("""
+            self.message("/help", "black")
+            self.message(_("""
 Chat commands:
    MESAGE        - send a message to
                    all in conference
@@ -144,7 +144,7 @@ Chat commands:
    /create CONF  - create conference
    /help         - this help message
 
-""")
+"""))
             self.entry.Text = ""
         elif self.pyjama.connection:
             if self.pyjama.connection.status == "online":
@@ -160,18 +160,18 @@ Chat commands:
                     self.pyjama.connection.send("admin", "[broadcast]\nroom: %s\n%s" % (self.room, self.entry.Text))
                 self.entry.Text = ""
             else:
-                self.message("You are not currently online.\n")
+                self.message(_("You are not currently online"))
         else:
-            self.message("You need to log in first.\n")
+            self.message(_("You need to login first"))
 
     def update_status(self):
-        self.statusbar.set("Status", self.get_status())
+        self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
         if self.pyjama.connection:
             return self.pyjama.connection.status
         else:
-            return "offline"
+            return _("offline")
 
     def decrease_font_size(self, font):
         self.textview.ModifyFont(font)
@@ -244,10 +244,12 @@ Chat commands:
         else:
             color = choice(get_colors())
             self.colormap[name] = color
-        self.pyjama.chat.message("%s: " % name, color)
-        self.pyjama.chat.message("%s\n" % message, "black")
+        self.pyjama.chat.message("%s: " % name, color, newline=False)
+        self.pyjama.chat.message(message, "black")
 
-    def message(self, message, tag="purple"):
+    def message(self, message, tag="purple", newline=True):
+        if newline:
+            message += "\n"
         # DO NOT PUT the ev, WaitOne stuff here!
         def invoke(sender, args):
             self.MUTEX.WaitOne()

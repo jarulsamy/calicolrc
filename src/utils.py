@@ -151,11 +151,11 @@ def pick_file():
     global retval
     retval = None
     Gtk.Application.Init()
-    fc = Gtk.FileChooserDialog("Select a file",
+    fc = Gtk.FileChooserDialog(_("Select a file"),
                                None,
                                Gtk.FileChooserAction.Open,
-                               "Cancel", Gtk.ResponseType.Cancel,
-                               "Open", Gtk.ResponseType.Accept)
+                               _("Cancel"), Gtk.ResponseType.Cancel,
+                               _("Open"), Gtk.ResponseType.Accept)
     Gtk.Application.Invoke(lambda obj, args: fc.ShowAll())
     ev = ManualResetEvent(False)
     def get_filename_cb(obj, args):
@@ -244,7 +244,7 @@ def rename_files_for_zip_package(files, package_name):
 
 class Chat:
     def __init__(self, pyjama, user, password, debug=False):
-        self.status = "offline"
+        self.status = _("offline")
         self.pyjama = pyjama
         self.user = user
         self.password = password
@@ -284,14 +284,14 @@ class Chat:
         return retval
 
     def close(self, sender=None):
-        self.status = "offline"
+        self.status = _("offline")
         self.client.Close()
 
     def OnLogin(self, sender):
-        self.status = "online"
+        self.status = _("online")
         self.send("", "2") # make this my only login
         if self.alert:
-            self.pyjama.alert("You are now logged in as '%s'." % self.user)
+            self.pyjama.alert(_("You are now logged in as '%s'.") % self.user)
         if self.debug:
             print "LOGIN:", self.user
             #self.client.SendMyPresence()
@@ -300,10 +300,10 @@ class Chat:
         print "ERROR in Chat:", self.user, exp
 
     def OnAuthError(self, sender, xml):
-        self.status = "rejected"
+        self.status = _("rejected")
         if self.alert:
-            self.pyjama.alert("You were not allowed to log in.\n" +
-                              "Please check your ID and password.")
+            self.pyjama.alert(_("You were not allowed to log in.") + "\n" +
+                              _("Please check your ID and password."))
         if self.debug:
             print "AUTHERROR:", self.user, xml
 
@@ -414,7 +414,7 @@ class MyEntry(Gtk.Entry):
 class SearchBar(Gtk.HBox):
     def __init__(self, *args, **kwargs):
         self.editor = None
-        self.label = Gtk.Label("Search:")
+        self.label = Gtk.Label(_("Search: "))
         self.entry = MyEntry()
         self.entry.set_searchbar(self)
         # Previous:
@@ -508,7 +508,7 @@ class SearchBar(Gtk.HBox):
 class SearchInFilesBar(Gtk.HBox):
     def __init__(self, *args, **kwargs):
         self.shell = None
-        self.label = Gtk.Label("Search in files:")
+        self.label = Gtk.Label(_("Search in files:"))
         self.entry = MySearchInFilesEntry()
         # Close:
         close_button = Gtk.Button()

@@ -28,6 +28,8 @@ path, filename = os.path.split(__file__)
 Highlighting.SyntaxModeService.LoadStylesAndModes(
                 os.path.join(path, "..", "bin", "SyntaxModes"))
 
+from utils import _
+
 # Local classes:
 class MyScrolledWindow(Gtk.ScrolledWindow):
     """
@@ -48,7 +50,7 @@ class Document(object):
         if self.filename:
             self.title = os.path.basename(self.filename)
         else:
-            self.title = "New %s Script" % self.language.title()
+            self.title = _("New %s Script") % self.language.title()
         self.make_tab()
         self.make_widget()
         self.configure()
@@ -103,11 +105,11 @@ class Document(object):
 
     def save_as(self):
         retval = False
-        fc = Gtk.FileChooserDialog("Enter the file to save",
+        fc = Gtk.FileChooserDialog(_("Enter the file to save"),
                                    self.pyjama.editor.window,
                                    Gtk.FileChooserAction.Save,
-                                   "Cancel", Gtk.ResponseType.Cancel,
-                                   "Save", Gtk.ResponseType.Accept)
+                                   _("Cancel"), Gtk.ResponseType.Cancel,
+                                   _("Save"), Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.filename = fc.Filename
             self.save()
@@ -261,7 +263,7 @@ class TextEditorDocument(Document):
 
     def open(self):
         # FIXME: does this print statement make right-click open work?
-        print "Document.open:", self.filename
+        print _("Opened document:"), self.filename
         if os.path.isfile(self.filename):
             self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
         self.grab_focus()

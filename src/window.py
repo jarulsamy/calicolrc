@@ -23,6 +23,7 @@ import Gdk
 
 # Pyjama modules:
 import Graphics
+from utils import _
 
 class MyWindow(Gtk.Window):
     def on_key_press(self, eventkey):
@@ -108,16 +109,16 @@ class Window(object):
 
     def make_new_file_menu(self):
         retval = []
-        retval.append("Recent files") # submenu
+        retval.append(_("Recent files")) # submenu
         for file in self.pyjama.config.get("pyjama.recent_files"):
             if file:
-                retval.append(("Recent files",
+                retval.append((_("Recent files"),
                                (file, None, None,
                                 lambda o,e,file=file: self.select_or_open(file))))
         retval.append(None) # separator
         for lang in self.pyjama.languages:
             retval.append(
-                ("New %s Script" % lang.title(), None,
+                (_("New %s Script") % lang.title(), None,
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
                 )
         return retval

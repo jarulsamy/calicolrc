@@ -86,13 +86,16 @@ class Shell(object):
         for file in files:
             self.execute_file(file, self.pyjama.get_language_from_filename(file))
 
-    def message(self, text):
-        print text,
+    def message(self, text, newline=True):
+        if newline:
+            print text
+        else:
+            print text,
 
     def execute_file(self, filename, language):
-        self.message("Loading file '%s'...\n" % filename)
+        self.message(_("Loading file '%s'...") % filename)
         self.pyjama.engine[language].execute_file(filename)
-        self.message("Done loading file.\n")
+        self.message(_("Done loading file."))
 
 class ShellWindow(Window):
     def __init__(self, pyjama):
@@ -109,42 +112,42 @@ class ShellWindow(Window):
         self.searchbar.set_shell(self)
         # ---------------------
         # make menu:
-        menu = [("_File",
-                 [("Open Script...", Gtk.Stock.Open, 
+        menu = [(_("File"),
+                 [(_("Open Script..."), Gtk.Stock.Open, 
                    None, self.on_open_file),
                   None,
                   ] +
                   self.make_new_file_menu() +
                   [None,
-                  ("Search in files...", None, "<control>f",
+                  (_("Search in files..."), None, "<control>f",
                   self.searchbar.open),
                    None,
-                  ("Register...", None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  ("Login...", None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
-                  ("Close", Gtk.Stock.Close,
+                  (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
-                  ("Quit", Gtk.Stock.Quit,
+                  (_("Quit"), Gtk.Stock.Quit,
                    None, self.on_quit),
                   ]),
-                ("_Edit", [
-                    ("_Copy", None, None, None),
-                    ("_Paste", None, None, None),
-                    ("Cut", None, None, None),
-                    ("Select all", Gtk.Stock.SelectAll, None, None),
+                (_("Edit"), [
+                    (_("Copy"), None, None, None),
+                    (_("Paste"), None, None, None),
+                    (_("Cut"), None, None, None),
+                    (_("Select all"), Gtk.Stock.SelectAll, None, None),
                           ]),
-                ("She_ll", self.make_language_menu()),
-                ("Windows", [
-                    ("Editor", None, "F6", self.pyjama.setup_editor),
-                    ("Shell", None, "F7", self.pyjama.setup_shell),
-                    ("Chat", None, "F8", self.pyjama.setup_chat),
+                (_("Shell"), self.make_language_menu()),
+                (_("Windows"), [
+                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
+                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
+                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
                     ]),
-                ("O_ptions", [
-                    ("Make font larger", None, None, self.pyjama.increase_fontsize),
-                    ("Make font smaller", None, None, self.pyjama.decrease_fontsize),
+                (_("Options"), [
+                    (_("Make font larger"), None, None, self.pyjama.increase_fontsize),
+                    (_("Make font smaller"), None, None, self.pyjama.decrease_fontsize),
                     ]),
-                ("_Help", [
-                    ("About the Pyjama Project", Gtk.Stock.About, None, self.pyjama.about),
+                (_("Help"), [
+                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                     ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file),
@@ -156,7 +159,7 @@ class ShellWindow(Window):
         Gtk.Application.Invoke(self.stop_running)
         self.history = History(self.pyjama.config)
         self.statusbar = StatusBar()
-        self.statusbar.init("Language", "Status")
+        self.statusbar.init(_("Language"), _("Status"))
         self.command_area = Gtk.HBox()
         alignment = Gtk.Alignment( 0.5, 0.0, 0, 0)
         self.prompt = Gtk.Label("python>")
@@ -221,8 +224,8 @@ class ShellWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
-        self.message("Pyjama Project %s\n" % self.pyjama.version)
-        self.message(("-" * 50) + "\n")
+        self.message(_("Pyjama Project %s") % self.pyjama.version)
+        self.message(("-" * 50))
         self.set_font()
 
     def set_font(self, font=None):
@@ -261,14 +264,14 @@ class ShellWindow(Window):
         num = 1
         for lang in sorted(self.pyjama.engine.get_languages()):
             if self.pyjama.engine[lang].text_based:
-                languages.append(["Change to %s" % lang.title(), 
+                languages.append([_("Change to %s") % lang.title(), 
                     None, "<control>%d" % num, 
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
                 num += 1
-        return ([("Run", Gtk.Stock.Apply, "F5", self.on_run),
-                 ("Clear", None, "<control>Delete", self.clear),
-                 ("Restart shell", None, "<control>r", self.reset_shell),
-                 ("Stop script", None, "Escape", self.on_stop),
+        return ([(_("Run"), Gtk.Stock.Apply, "F5", self.on_run),
+                 (_("Clear"), None, "<control>Delete", self.clear),
+                 (_("Restart shell"), None, "<control>r", self.reset_shell),
+                 (_("Stop script"), None, "Escape", self.on_stop),
                  None] + 
                 languages)
 
@@ -279,17 +282,17 @@ class ShellWindow(Window):
             pass
         self.set_title(_("%s - Pyjama Shell") % self.language.title())
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
-        self.statusbar.set("Language", self.language.title())
-        self.statusbar.set("Status", self.get_status())
+        self.statusbar.set(_("Language"), self.language.title())
+        self.statusbar.set(_("Status"), self.get_status())
 
     def update_status(self):
-        self.statusbar.set("Status", self.get_status())
+        self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
         if self.pyjama.connection:
             return self.pyjama.connection.status
         else:
-            return "offline"
+            return _("offline")
 
     def on_key_press(self, event, force=False):
         # FIXME: this should be handled in textview, but if we subclass
@@ -377,9 +380,9 @@ class ShellWindow(Window):
                     if value:
                         items = [x for x in dir(value) if x.startswith(partial) and not x.startswith("_")]
         if items:           
-            return "Possible completions:\n   " + ("\n   ".join(items)) + "\n"
+            return _("Possible completions:\n   ") + ("\n   ".join(items)) + "\n"
         else:
-            return "No completions found for '%s'\n" % text
+            return _("No completions found for '%s'\n") % text
 
     def find_variable(self, text):
         """
@@ -432,7 +435,7 @@ class ShellWindow(Window):
     def on_stop(self, obj, event):
         if (self.executeThread and 
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
-            self.message("Stopping...\n")
+            self.message(_("Stopping..."))
             self.executeThread.Abort()
             Gtk.Application.Invoke(self.stop_running)
         else:
@@ -452,12 +455,14 @@ class ShellWindow(Window):
 
     def reset_shell(self, obj, event):
         self.pyjama.engine.reset()
-        self.message("-----------\n")
-        self.message("Reset shell\n")
-        self.message("-----------\n")
+        self.message("-----------")
+        self.message(_("Reset shell"))
+        self.message("-----------")
 
-    def message(self, message, tag="purple"):
+    def message(self, message, tag="purple", newline=True):
         # DO NOT PUT the ev, WaitOne stuff here!
+        if newline:
+            message += "\n"
         def invoke(sender, args):
             MUTEX.WaitOne()
             end = self.history_textview.Buffer.EndIter
@@ -476,7 +481,7 @@ class ShellWindow(Window):
         self.window.Title = text
 
     def show_prompt(self):
-        self.message("%s\n" % self.prompt.Text, tag="purple")
+        self.message(self.prompt.Text, tag="purple")
 
     def execute_file(self, filename, language):
         if (self.executeThread and 
@@ -484,11 +489,11 @@ class ShellWindow(Window):
             return
 
         def background():
-            self.message("Loading file '%s'...\n" % filename)
+            self.message(_("Loading file '%s'...") % filename)
             Gtk.Application.Invoke(self.start_running)
             self.pyjama.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
-            self.message("Done loading file.\n")
+            self.message(_("Done loading file."))
             #self.show_prompt()
 
         self.executeThread = System.Threading.Thread(
@@ -572,13 +577,13 @@ class ShellWindow(Window):
         iter.Offset = start.Offset + start.CharsInLine
         text = textview.Buffer.GetText(start, iter, False) # invisible chars
 
-        match = re.search('File \"(.*)\", line (\d*)', text)
+        match = re.search(_('File \"(.*)\", line (\d*)'), text)
         if match: # 'File "<string>", line 167'
             filename, lineno = match.groups()
             lineno = int(lineno)
             basename = os.path.basename(filename)
             filename = os.path.abspath(filename)
-            menuitem = Gtk.MenuItem("Edit %s" % basename)
+            menuitem = Gtk.MenuItem(_("Edit %s") % basename)
             Gtk.Application.Invoke(lambda s, a: menuitem.Show())
             menuitem.Activated += lambda w, e: self.goto_file(filename, lineno)
             popup_args.Menu.Append(menuitem)

@@ -199,7 +199,7 @@ class PyjamaProject(object):
                     results[lang.language] = lang
                 except:
                     traceback.print_exc()
-                    print >> sys.stderr, "Cannot load language file '%s'" % filename
+                    print >> sys.stderr, _("Cannot load language file '%s'") % filename
         return results
 
     def load(self, filename):
@@ -214,7 +214,7 @@ class PyjamaProject(object):
                 if self.shell:
                     self.shell.change_to_lang(name)
                 return self.engine[name].execute_file(filename)
-        raise AttributeError("unknown file extension: '%s'" % filename)
+        raise AttributeError(_("unknown file extension: '%s'") % filename)
 
     def blast(self, mfrom, type, filename, code):
         """
@@ -223,14 +223,14 @@ class PyjamaProject(object):
         language = self.get_language_from_filename(filename)
         q = None
         if type == "execute":
-            q = "Do you want to run it?"
+            q = _("Do you want to run the script?")
         elif type == "edit":
-            q = "Do you want to open it?"
+            q = _("Do you want to open the script?")
         md = Gtk.MessageDialog(self.get_window(),
                               Gtk.DialogFlags.DestroyWithParent,
                               Gtk.MessageType.Question,
                               Gtk.ButtonsType.YesNo,
-                              "You have received a blast from '%s'.\n%s"
+                              _("You have received a blast from '%s'.\n%s")
                               % (mfrom, q))
         def invoke(sender, args):
             result = md.Run()
@@ -340,7 +340,7 @@ class PyjamaProject(object):
         flags = 0 # re.IGNORECASE
         """
         # Based on code from idlelib
-        self.shell.message("Searching %r in %s/%s...\n" %
+        self.shell.message(_("Searching for %r in %s/%s...") %
                     (pattern, os.path.abspath(dir), file_pat), "black")
         prog = re.compile(pattern, flags)
         list = self.findfiles(dir, file_pat, recursive)
@@ -361,7 +361,7 @@ class PyjamaProject(object):
                     if line[-1:] == '\n':
                         line = line[:-1]
                     if prog.search(line):
-                        self.shell.message("  File \"%s\", line %d, %s\"\n" % 
+                        self.shell.message(_("  File \"%s\", line %d, %s\"") %
                                          (fn, lineno, line.strip()))
                         hits = hits + 1
         if hits:
@@ -369,9 +369,9 @@ class PyjamaProject(object):
                 s = ""
             else:
                 s = "es"
-            self.shell.message("Found %d match%s. Right-click file to open.\n" % (hits, s), "black")
+            self.shell.message(_("Found %d match%s. Right-click file to open.") % (hits, s), "black")
         else:
-            self.shell.message("No matches.\n", "black")
+            self.shell.message(_("No matches found."), "black")
 
     def findfiles(self, dir, base, recursive=True):
         # Based on code from idlelib
@@ -434,14 +434,14 @@ class PyjamaProject(object):
             #aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
             #aboutDialog.Artists =""
             aboutDialog.Authors = System.Array[str](["Douglas Blank <dblank@cs.brynmawr.edu>"])
-            aboutDialog.Comments = "Scripting Environment\n\nRunning on %s\nMono %s\n" % (self.system, 
+            aboutDialog.Comments = (_("Scripting Environment") + "\n\n" + _("Running on %s") + "\nMono %s\n") % (self.system,
                                                                                           self.mono_runtime)
-            aboutDialog.Copyright = "(c) 2011, Institute for Personal Robots in Education"
+            aboutDialog.Copyright = _("(c) 2011, Institute for Personal Robots in Education")
             #aboutDialog.Documenters
             #aboutDialog.License
             #aboutDialog.Logo
             #aboutDialog.LogoIconName
-            aboutDialog.Name = "Pyjama Project"
+            aboutDialog.Name = _("Pyjama Project")
             #aboutDialog.TranslatorCredits
             aboutDialog.Version = self.version
             aboutDialog.Website = "http://PyjamaProject.org/"
@@ -471,9 +471,9 @@ class PyjamaProject(object):
         while len(messages) == 0 and count < 10:
             messages = ch.receive()
             System.Threading.Thread.Sleep(1000)
-            print "   waiting for confirmation..."
+            print _("   waiting for confirmation...")
             count += 1
-        print "received messages:"
+        print _("received messages:")
         for message in messages:
             print message[1]
             print
@@ -481,18 +481,18 @@ class PyjamaProject(object):
 
     def login_dialog(self, window):
         def invoke(sender, args):
-            dialog = Gtk.Dialog("Pyjama Login", window,
+            dialog = Gtk.Dialog(_("Pyjama Login"), window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
-            items = ["Username", "Password"]
+            items = [(_("Username"), False), (_("Password"), True)]
             table = Gtk.Table(len(items), 2, False)
             row = 0
             data = {}
-            for item in items:
+            for item, password in items:
                 label = Gtk.Label("%s:" % item)
                 label.Justify = Gtk.Justification.Right
                 entry = Gtk.Entry()
-                if "password" in item.lower():
+                if password:
                     entry.Visibility = False
                 data[item] = entry
                 table.Attach(label, 0, 1, row, row + 1,
@@ -501,32 +501,35 @@ class PyjamaProject(object):
                 row += 1
             expand, fill, padding = True, True, 0
             dialog.VBox.PackStart(table, expand, fill, padding)
-            dialog.AddButton("Login", Gtk.ResponseType.Apply)
-            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.AddButton(_("Login"), Gtk.ResponseType.Apply)
+            dialog.AddButton(_("Cancel"), Gtk.ResponseType.Cancel)
             dialog.ShowAll()
             response = dialog.Run()
             if response == int(Gtk.ResponseType.Apply):
-                self.login(data["Username"].Text,
-                           data["Password"].Text)
+                self.login(data[_("Username")].Text,
+                           data[_("Password")].Text)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
 
     def register_dialog(self, window):
         def invoke(sender, args):
-            dialog = Gtk.Dialog("Pyjama Registration", window,
+            dialog = Gtk.Dialog(_("Pyjama Registration"), window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
-            items = ["Username", "Email", "Password", "Password again",
-                        "Course keyword"]
+            items = [(_("Username"), False),
+                     (_("Email"), False),
+                     (_("Password"), True),
+                     (_("Password again"), True),
+                     (_("Course keyword"), False)]
             table = Gtk.Table(len(items), 2, False)
             row = 0
             data = {}
-            for item in items:
-                label = Gtk.Label("%s:" % item)
+            for item, password in items:
+                label = Gtk.Label("%s: " % item)
                 label.Justify = Gtk.Justification.Right
                 entry = Gtk.Entry()
-                if "password" in item.lower():
+                if password:
                     entry.Visibility = False
                 data[item] = entry
                 table.Attach(label, 0, 1, row, row + 1,
@@ -535,16 +538,16 @@ class PyjamaProject(object):
                 row += 1
             expand, fill, padding = True, True, 0
             dialog.VBox.PackStart(table, expand, fill, padding)
-            dialog.AddButton("Register", Gtk.ResponseType.Apply)
-            dialog.AddButton("Cancel", Gtk.ResponseType.Cancel)
+            dialog.AddButton(_("Register"), Gtk.ResponseType.Apply)
+            dialog.AddButton(_("Cancel"), Gtk.ResponseType.Cancel)
             dialog.ShowAll()
             response = dialog.Run()
             if response == int(Gtk.ResponseType.Apply):
                 # FIXME: check passwords, report and repeat if necessary
-                self.register(data["Username"].Text,
-                              data["Email"].Text,
-                              data["Password"].Text,
-                              data["Course keyword"].Text)
+                self.register(data[_("Username")].Text,
+                              data[_("Email")].Text,
+                              data[_("Password")].Text,
+                              data[_("Course keyword")].Text)
             dialog.Destroy()
             # FIXME: report results
         Gtk.Application.Invoke(invoke)
@@ -562,23 +565,23 @@ class PyjamaProject(object):
 
 
 # Let's start!
-version = "0.3.2"
+version = "0.3.3"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print
-    print "Pyjama Project, Version %s, on %s" % (version, 
+    print _("Pyjama Project, Version %s, on %s") % (version,
                                                  System.Environment.OSVersion.VersionString)
     print "----------------------------------------------------------------------------"
-    print "Start pyjama with the following options:"
-    print "  pyjama                            Defaults to shell"
-    print "  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
-    print "  pyjama --shell                    Brings up shell window"
-    print "  pyjama --editor                   Brings up editor window"
-    print "  pyjama --chat                     Brings up chat window"
-    print "  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
-    print "  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
-    print "  pyjama --version                  Displays the version number (%s)" % version
-    print "  pyjama --help                     Displays this message"
+    print _("Start pyjama with the following options:")
+    print _("  pyjama                            Defaults to shell")
+    print _("  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs")
+    print _("  pyjama --shell                    Brings up shell window")
+    print _("  pyjama --editor                   Brings up editor window")
+    print _("  pyjama --chat                     Brings up chat window")
+    print _("  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics")
+    print _("  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics")
+    print _("  pyjama --version                  Displays the version number (%s)" % version)
+    print _("  pyjama --help                     Displays this message")
     print
     sys.exit(0)
 elif "--version" in args:
