@@ -23,11 +23,32 @@ public static class Extensions {
 public static class Myro {
   public static Robot robot;
   public static string REVISION = "$Revision: $";
-  
+
+  // Functional Interface
+
   public static void init(string port, int baud=38400) {
-	robot = new Scribbler(port, baud);
+    initialize(port, baud);
   }
-  
+
+  public static void initialize(string port, int baud=38400) {
+      bool need_port = true;
+      if (Myro.robot is Scribbler) {
+        if (((Scribbler)(Myro.robot)).serial is SerialPort) {
+          if (((Scribbler)(Myro.robot)).serial.IsOpen) {
+             if (serial.port == port && serial.baud == baud) {
+               need_port = false;
+               serial = ((Scribbler)(Myro.robot)).serial;
+             } else {
+               // It exists, but wrong port/baud, so close it:
+               ((Scribbler)(Myro.robot)).serial.Close();
+          } // already closed
+        } // not a serial port
+      } // not a scribbler
+      if (need_port) {
+        robot = new Scribbler(port, baud);
+      }
+  }
+
   public static void forward(double power=1, double? time=null) {
 	robot.forward(power, time);
   }
@@ -63,6 +84,16 @@ public static class Myro {
   public static void beep(double duration, double? frequency=null, 
 	  double? frequency2=null) {
 	robot.beep(duration, frequency, frequency2);
+  }
+
+  public static void beep(int duration, int? frequency=null,
+      int? frequency2=null) {
+    robot.beep(duration, frequency, frequency2);
+  }
+
+  public static void beep(double duration, int? frequency=null,
+      int? frequency2=null) {
+    robot.beep(duration, frequency, frequency2);
   }
 
   public static void show(Graphics.Picture picture, string title="Myro Camera") {
@@ -244,6 +275,7 @@ public static class Myro {
 	public string dongle;
 	public int volume;
 	public string startsong;
+    public color_header = null;
 
 	private double _lastTranslate;
 	private double _lastRotate;
@@ -374,19 +406,6 @@ public static class Myro {
 
 	public Scribbler(string port, int baud) {
 	  PythonDictionary info = null;
-	  this.port = port;
-	  bool need_port = true;
-	  if (Myro.robot is Scribbler) {
-		if (((Scribbler)(Myro.robot)).serial is SerialPort) {
-		  if (((Scribbler)(Myro.robot)).serial.IsOpen) {
-			//((Scribbler)(Myro.robot)).serial.Close();
-			// let's try using it
-			need_port = false;
-			serial = ((Scribbler)(Myro.robot)).serial;
-		  } 
-		}
-	  }
-	  if (need_port) {
 		serial = new SerialPort(this.port, baud);
 		serial.ReadTimeout = 1000; // milliseconds
 		serial.WriteTimeout = 1000; // milliseconds
@@ -1055,10 +1074,23 @@ public static class Myro {
 	  return buffer;
 	}
 
+    public read_jpeg_header() {
+        buf = self.ser.read(2);
+        len = ord(buf[0]) + ord(buf[1]) * 256;
+        return self.ser.read(len);
+    }
+
 	public byte [] grab_jpeg_color(int mode) { // new color,
 											   // compressed (0=fast,
 											   // 1=reg)
-	  return null;
+        if (color_header == null) {
+            write(Scribbler.GET_JPEG_COLOR_HEADER);
+            color_header = read_jpeg_header();
+        }
+        self.ser.write(chr(self.GET_JPEG_COLOR_SCAN))
+        self.ser.write(chr(reliable))
+        jpeg = self.color_header + self.read_jpeg_scan()
+        return jpeg
 	}
 
 	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
