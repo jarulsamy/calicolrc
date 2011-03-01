@@ -31,22 +31,25 @@ public static class Myro {
   }
 
   public static void initialize(string port, int baud=38400) {
-      bool need_port = true;
-      if (Myro.robot is Scribbler) {
-        if (((Scribbler)(Myro.robot)).serial is SerialPort) {
-          if (((Scribbler)(Myro.robot)).serial.IsOpen) {
-             if (serial.port == port && serial.baud == baud) {
-               need_port = false;
-               serial = ((Scribbler)(Myro.robot)).serial;
-             } else {
-               // It exists, but wrong port/baud, so close it:
-               ((Scribbler)(Myro.robot)).serial.Close();
-          } // already closed
-        } // not a serial port
-      } // not a scribbler
-      if (need_port) {
-        robot = new Scribbler(port, baud);
-      }
+	bool need_port = true;
+	if (Myro.robot is Scribbler) {
+	  if (((Scribbler)(Myro.robot)).serial is SerialPort) {
+		SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+		if (serial.IsOpen) {
+		  if (serial.PortName == port && serial.BaudRate == baud) {
+			need_port = false;
+		  } else {
+			// It exists, but wrong port/baud, so close it:
+			serial.Close(); // and need_port
+		  } // already closed
+		} // not a serial port
+	  }
+	} // not a scribbler
+	if (need_port) {
+	  robot = new Scribbler(port, baud);
+	} else {
+	  ((Scribbler)robot).setup();
+	}
   }
 
   public static void forward(double power=1, double? time=null) {
@@ -270,12 +273,11 @@ public static class Myro {
   
   [Serializable()]
   public class Scribbler: Robot {
-	public string port;
 	public SerialPort serial;
 	public string dongle;
 	public int volume;
 	public string startsong;
-    public color_header = null;
+    public byte [] color_header = null;
 
 	private double _lastTranslate;
 	private double _lastRotate;
@@ -404,19 +406,26 @@ public static class Myro {
 	static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
 	static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
 
+	public Scribbler(SerialPort serial) {
+	  setup();
+	}
+
 	public Scribbler(string port, int baud) {
-	  PythonDictionary info = null;
-		serial = new SerialPort(this.port, baud);
-		serial.ReadTimeout = 1000; // milliseconds
-		serial.WriteTimeout = 1000; // milliseconds
-		try {
-		  serial.Open();
-		} catch {
-		  Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
-				  this.port));
-		  return;
-		}
+	  serial = new SerialPort(port, baud);
+	  serial.ReadTimeout = 1000; // milliseconds
+	  serial.WriteTimeout = 1000; // milliseconds
+	  try {
+		serial.Open();
+	  } catch {
+		Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+				port));
+		return;
 	  }
+	  setup();
+	}
+
+	public void setup() {
+	  PythonDictionary info = null;
 	  try {
 		info = getInfo();
 	  } catch {
@@ -424,10 +433,10 @@ public static class Myro {
 	  }
 	  if (info.Contains("fluke")) {
 		Console.WriteLine("You are using:\n   Fluke, version {0}", info["fluke"]);
-        if (info.Contains("robot") && info.Contains("robot-version")) {
-          Console.WriteLine("   {0}, version {1}",
-                (string)info["robot"], (string)info["robot-version"]);
-        }
+		if (info.Contains("robot") && info.Contains("robot-version")) {
+		  Console.WriteLine("   {0}, version {1}",
+			  (string)info["robot"], (string)info["robot-version"]);
+		}
 	  } else if (info.Contains("dongle")) {
 		dongle = (string)info["dongle"];
 		Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
@@ -446,7 +455,7 @@ public static class Myro {
 	  string name = (string)Get("name");
 	  Console.WriteLine("Hello, my name is '{0}'!", name);
 	}
-
+	
 	// ------------------------------------------------------------
 	// Data structures:
 	public PythonDictionary dict(params object [] list) {
@@ -457,8 +466,8 @@ public static class Myro {
 	  }
 	  return retval;
 	}
-
-	public List list(params object [] items) {
+	
+    public List list(params object [] items) {
 	  // make a list from an array
 	  List retval = new List();
 	  for (int i = 0; i < items.Length; i++) {
@@ -691,7 +700,7 @@ public static class Myro {
 	public object setPassword(string position) {
 	  return 0;
 	}
-	public object setForwardness(string position) {
+    public object setForwardness(string position) {
 	  return 0;
 	}
 
@@ -929,6 +938,13 @@ public static class Myro {
         }
     }
 
+	static byte [] buffer_add(byte [] buf1, byte [] buf2) {
+	  byte[] buffer = new byte[buf1.Length + buf2.Length];
+	  buffer_copy(buf1, buffer, 0, buf1.Length);
+	  buffer_copy(buf2, buffer, buf1.Length, buf2.Length);
+	  return buffer;
+	}
+
 	public byte [] try_read(int bytes) {
 	  byte[] buffer = new byte[bytes];
 	  int len = 0;
@@ -983,7 +999,7 @@ public static class Myro {
 	    serial.DiscardOutBuffer();
 	}
 
-    public Graphics.Picture takePicture(string mode="jpeg") {
+  public Graphics.Picture takePicture(string mode="jpeg") {
 	  int width = 256;
 	  int height = 192;
 	  Graphics.Picture p = null;
@@ -1074,30 +1090,57 @@ public static class Myro {
 	  return buffer;
 	}
 
-    public read_jpeg_header() {
-        buf = self.ser.read(2);
-        len = ord(buf[0]) + ord(buf[1]) * 256;
-        return self.ser.read(len);
-    }
-
+	public byte [] read_jpeg_header() {
+	  byte [] buf = read(2);
+	  int len = buf[0] + buf[1] * 256;
+	  return read(len);
+	}
+	
 	public byte [] grab_jpeg_color(int mode) { // new color,
 											   // compressed (0=fast,
 											   // 1=reg)
-        if (color_header == null) {
-            write(Scribbler.GET_JPEG_COLOR_HEADER);
-            color_header = read_jpeg_header();
+	  if (color_header == null) {
+		write(Scribbler.GET_JPEG_COLOR_HEADER);
+		color_header = read_jpeg_header();
+	  }
+	  write(GET_JPEG_COLOR_SCAN);
+	  write((byte)mode);
+	  byte [] jpeg = buffer_add(color_header, read_jpeg_scan());
+	  return jpeg;
+	}
+	
+
+    public byte [] read_jpeg_scan() {
+	  byte [] bytes = new byte[0];
+	  byte last_byte = 0;
+	  while (true) {
+		byte [] mybyte = read(1);
+		bytes = buffer_add(bytes, mybyte);
+		if (last_byte == 0xff && mybyte[0] == 0xd9) {
+		  // End-of-image marker
+		  break;
+		  last_byte = mybyte[0];
+		}
+		/*
+        bm0 = read_uint32();   // Start
+        bm1 = read_uint32();   // Read
+        bm2 = read_uint32();   // Compress
+
+        if (self.debug) {
+		  print "got image";
+		  freq = 60e6;
+		  print '%.3f %.3f' % (((bm1 - bm0) / freq), ((bm2 - bm1) / freq));
         }
-        self.ser.write(chr(self.GET_JPEG_COLOR_SCAN))
-        self.ser.write(chr(reliable))
-        jpeg = self.color_header + self.read_jpeg_scan()
-        return jpeg
+		*/
+	  }
+	  return bytes;
 	}
 
 	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
 											  // (0=fast, 1=reg)
 	  return null;
 	}
-
+	
 	public byte [] grab_blob_array() { // blob, RLE
 	  return null;
 	}
