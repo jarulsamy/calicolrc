@@ -916,6 +916,19 @@ public static class Myro {
 			(byte)(freq2 % 256));
 	}
 
+	public void read(int bytes, byte [] buffer, int start) {
+      int tries = 0;
+	  int count = 0;
+	  while (count < bytes && tries < 4) { // 4 seconds
+		byte [] retval = try_read(bytes-count);
+        buffer_copy(retval, buffer, start, retval.Length);
+		count += retval.Length;
+		start += retval.Length;
+		if (retval.Length == 0)
+		  tries++;
+	  }
+	}
+
 	public byte [] read(int bytes) {
 	  int count = 0;
       int tries = 0;
@@ -999,7 +1012,7 @@ public static class Myro {
 	    serial.DiscardOutBuffer();
 	}
 
-  public Graphics.Picture takePicture(string mode="jpeg") {
+  public override Graphics.Picture takePicture(string mode="jpeg") {
 	  int width = 256;
 	  int height = 192;
 	  Graphics.Picture p = null;
@@ -1008,13 +1021,15 @@ public static class Myro {
 		if (a.Length == (width * height * 3))
 		  p = new Graphics.Picture(width, height, a);
 	  } else if (mode == "jpeg") {
-		//byte [] jpeg = grab_jpeg_color(1);
-		//stream = cStringIO.StringIO(jpeg)  ;
-		//p.set(width, height, stream, "jpeg");
+		byte [] buffer = grab_jpeg_color(1);
+		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+		p = new Graphics.Picture(bitmap);
 	  } else if (mode == "jpeg-fast") {
-		//byte [] jpeg = grab_jpeg_color(0);
-		//stream = cStringIO.StringIO(jpeg);
-		//p.set(width, height, stream, "jpeg");
+		byte [] buffer = grab_jpeg_color(0);
+		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+		p = new Graphics.Picture(bitmap);
 	  } else if (mode == "gray" || mode == "grey") {
 		//byte [] jpeg = grab_jpeg_gray(1);
 		//stream = cStringIO.StringIO(jpeg);
@@ -1093,6 +1108,7 @@ public static class Myro {
 	public byte [] read_jpeg_header() {
 	  byte [] buf = read(2);
 	  int len = buf[0] + buf[1] * 256;
+	  //System.Console.WriteLine("Reading jpeg header, size = {0}", len);
 	  return read(len);
 	}
 	
@@ -1111,29 +1127,22 @@ public static class Myro {
 	
 
     public byte [] read_jpeg_scan() {
-	  byte [] bytes = new byte[0];
+	  //System.Console.WriteLine("Reading jpeg scan...");
+	  byte [] bytes = new byte[100000];
 	  byte last_byte = 0;
+	  int count = 0;
 	  while (true) {
-		byte [] mybyte = read(1);
-		bytes = buffer_add(bytes, mybyte);
-		if (last_byte == 0xff && mybyte[0] == 0xd9) {
+		read(1, bytes, count);
+		//System.Console.WriteLine("read_jpeg_scan: {0} == {1} && {2} == {3}, count={4}", 
+		//last_byte, 0xff, bytes[count], 0xd9, count);
+		if ((last_byte == 0xff) && (bytes[count] == 0xd9)) {
 		  // End-of-image marker
 		  break;
-		  last_byte = mybyte[0];
 		}
-		/*
-        bm0 = read_uint32();   // Start
-        bm1 = read_uint32();   // Read
-        bm2 = read_uint32();   // Compress
-
-        if (self.debug) {
-		  print "got image";
-		  freq = 60e6;
-		  print '%.3f %.3f' % (((bm1 - bm0) / freq), ((bm2 - bm1) / freq));
-        }
-		*/
+		last_byte = bytes[count];
+		count++;
 	  }
-	  return bytes;
+	  return bytes.Slice(0, count);
 	}
 
 	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
