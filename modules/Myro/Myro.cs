@@ -74,6 +74,24 @@ public static class Myro {
 	}
   }
 
+  public static string repeat(string s, int times) {
+	// repeat(" ", 10) => "          "
+	string retval = "";
+	for(int i = 0; i < times; i++) {
+	  retval += s;
+	}
+	return retval;
+  }
+  
+  public static string pad(string s, int length) {
+	// pad("hi", 3) => "hi "
+	if (length <= s.Length) { // trim
+	  return s.Substring(0, length);
+	} else {
+	  return (s + repeat(" ", length)).Substring(0, length);
+	}
+  }
+  
   public static void forward(double power=1, double? time=null) {
 	robot.forward(power, time);
   }
@@ -136,8 +154,77 @@ public static class Myro {
 	return robot.getName();
   }
 
+  public static PythonDictionary getAll() {
+	return robot.getAll();
+  }
+
+  public static PythonDictionary getInfo() {
+	return robot.getInfo();
+  }
+
+  public static object getLight(params object [] position) {
+	if (position == null || position.Length == 0)
+	  return robot.getLight();
+	else
+	  return robot.getLight(position);
+  }
+
+  public static object getIR(params object [] position) {
+	if (position == null || position.Length == 0)
+	  return robot.getIR();
+	else
+	  return robot.getIR(position);
+  }
+
+  public static object getLine(params object [] position) {
+	if (position == null || position.Length == 0)
+	  return robot.getLine();
+	else
+	  return robot.getLine(position);
+  }
+
+  public static object get(string sensor="all") {
+	return robot.get(sensor);
+  }
+
+  public static object get(string sensor="all", params object [] position) {
+	return robot.get(sensor, position);
+  }
+
+  public static string getPassword() {
+	return robot.getPassword();
+  }
+
   public static double getBattery() {
 	return robot.getBattery();
+  }
+
+  public static PythonDictionary getConfig() {
+	return robot.getConfig();
+  }
+
+  public static int getStall() {
+	return robot.getStall();
+  }
+
+  public static void setLED(string position, object value) {
+	robot.setLED(position, value);
+  }
+
+  public static void setLEDFront(object value) {
+	robot.setLEDFront(value);
+  }
+
+  public static void setLEDBack(double value) {
+	robot.setLEDBack(value);
+  }
+
+  public static void setName(string name) {
+	robot.setName(name);
+  }
+
+  public static void setPassword(string password) {
+	robot.setPassword(password);
   }
 
   public static string flipCoin() {
@@ -243,8 +330,63 @@ public static class Myro {
 	  return null;
 	}
 
+	public virtual PythonDictionary getAll() {
+	  return null;
+	}
+
+	public virtual PythonDictionary getInfo() {
+	  return null;
+	}
+
+	public virtual object getLight(params object [] position) {
+	  return null;
+	}
+
+	public virtual object getIR(params object [] position) {
+	  return null;
+	}
+
+	public virtual object getLine(params object [] position) {
+	  return null;
+	}
+
+	public virtual object get(string sensor="all") {
+	  return null;
+	}
+
+	public virtual object get(string sensor="all", params object [] position) {
+	  return null;
+	}
+
+	public virtual string getPassword() {
+	  return null;
+	}
+
+	public virtual PythonDictionary getConfig() {
+	  return null;
+	}
+
+	public virtual int getStall() {
+	  return 0;
+	}
+
 	public virtual double getBattery() {
 	  return 0.0;
+	}
+
+	public virtual void setLED(string position, object value) {
+	}
+
+	public virtual void setLEDFront(object value) {
+	}
+
+	public virtual void setLEDBack(double value) {
+	}
+
+	public virtual void setName(string name) {
+	}
+
+	public virtual void setPassword(string password) {
 	}
 
     public virtual void move(double translate, double rotate) {
@@ -489,7 +631,7 @@ public static class Myro {
 	  }
 	  flush();
 	  stop();
-	  Set("led", "all", "off");
+	  set("led", "all", "off");
 	  beep(.03, 784);
 	  beep(.03, 880);
 	  beep(.03, 698);
@@ -519,7 +661,7 @@ public static class Myro {
 	}
 	// ------------------------------------------------------------
 
-    public byte [] GetBytes(byte value, int bytes=1) {
+    byte [] GetBytes(byte value, int bytes=1) {
 	  byte [] retval = null;
 	  lock(myLock) {
 		write_packet(value);
@@ -529,7 +671,7 @@ public static class Myro {
 	  return retval;
 	}
 
-    public List GetWord(byte value, int bytes=1) {
+    List GetWord(byte value, int bytes=1) {
 	  List retval = new List();
 	  lock(myLock) {
 		write_packet(value);
@@ -542,11 +684,11 @@ public static class Myro {
 	  return retval;
 	}
 
-    public object Get(string sensor="all") {
-	  return Get(sensor, null);
+    public override object get(string sensor="all") {
+	  return get(sensor, null);
 	}
 
-    public object Get(string sensor="all", params object [] position) {
+    public override object get(string sensor="all", params object [] position) {
 	  object retval = null;
 	  sensor = sensor.ToLower();
 	  if (sensor == "config") {
@@ -560,7 +702,7 @@ public static class Myro {
 		// lastSensors are the single byte sensors
 		_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
 		// returned as bytes
-		return (object)(_lastSensors[10]);
+		return (int)(_lastSensors[10]);
 	  } else if (sensor == "forwardness") {
 		if (read_mem(0, 0) != 0xDF) {
 		  retval = "fluke-forward";
@@ -608,7 +750,7 @@ public static class Myro {
 	  } else if (sensor == "blob") {
 		//return getBlob();
 	  } else {
-		if (position.Length == 0) {
+		if (position == null) {
 		  if (sensor == "light") {
 			return GetWord(Scribbler.GET_LIGHT_ALL, 6);
 		  } else if (sensor == "line") {
@@ -629,24 +771,28 @@ public static class Myro {
 			// single bit sensors
 			if (dongle == null) {
 			  return dict(
-				  "light", list(_lastSensors[2] << 8 | _lastSensors[3], 
-					  _lastSensors[4] << 8 | _lastSensors[5], 
-					 _lastSensors[6] << 8 |_lastSensors[7]),
-				  "ir", list(_lastSensors[0],_lastSensors[1]), 
-				  "line", list(_lastSensors[8],_lastSensors[9]), 
-				  "stall",_lastSensors[10]);
+				  "light", list(
+					  (int)(_lastSensors[2] << 8 | _lastSensors[3]), 
+					  (int)(_lastSensors[4] << 8 | _lastSensors[5]), 
+					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
+				  "ir", list((int)_lastSensors[0], (int)_lastSensors[1]), 
+				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
+				  "stall",(int)_lastSensors[10]);
 			} else {
 			  return dict(
-				  "light", list(_lastSensors[2] << 8 |_lastSensors[3], 
-					 _lastSensors[4] << 8 |_lastSensors[5], 
-					 _lastSensors[6] << 8 |_lastSensors[7]),
-				  "ir", list(_lastSensors[0],_lastSensors[1]), 
-				  "line", list(_lastSensors[8],_lastSensors[9]), 
-				  "stall",_lastSensors[10],
-				  "obstacle", list(getObstacle("left"), 
+				  "light", list(
+					  (int)(_lastSensors[2] << 8 |_lastSensors[3]), 
+					  (int)(_lastSensors[4] << 8 |_lastSensors[5]), 
+					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
+				  "ir", list((int)_lastSensors[0],(int)_lastSensors[1]), 
+				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
+				  "stall", (int)_lastSensors[10],
+				  "obstacle", list(
+					  getObstacle("left"), 
 					  getObstacle("center"), 
 					  getObstacle("right")),
-				  "bright", list(getBright("left"), 
+				  "bright", list(
+					  getBright("left"), 
 					  getBright("middle"), 
 					  getBright("right")),
 				  "blob", getBlob(),
@@ -660,6 +806,7 @@ public static class Myro {
 		}
 		List retvals = list();
 		foreach (object pos in position) {
+		  //System.Console.WriteLine("pos = {0}", pos);
 		  if (sensor == "light") {
 			List values = GetWord(Scribbler.GET_LIGHT_ALL, 6);
 			if (Contains(pos, 0, "left")) {
@@ -670,7 +817,7 @@ public static class Myro {
 			  retvals.append((int)values[2]);
 			} else if (pos == null | (string)pos == "all") {
 			  retvals.append(values);
-			}
+			} 
 		  } else if (sensor == "ir") {
 			byte [] values = GetBytes(Scribbler.GET_IR_ALL, 2);
 			if (Contains(pos, 0, "left")) {
@@ -721,36 +868,87 @@ public static class Myro {
 	  }
 	}
 
-	public object setLEDFront(string value) {
-	  return 0;
+	public override void setLED(string position, object value) {
+	  set("led", position, value);
 	}
-	public object setLEDBack(string value) {
-	  return 0;
+
+	public override void setLEDFront(object value) {
+	  if (isTrue(value)) {
+		write(Scribbler.SET_DONGLE_LED_ON);
+	  } else {
+		write(Scribbler.SET_DONGLE_LED_OFF);
+	  }
 	}
+
+	public override void setLEDBack(double value) {
+	  if (value > 1) {
+		value = 1;
+	  } else if (value <= 0) {
+		value = 0;
+	  } else {
+		value = (int)(value * (255 - 170) + 170); // scale
+	  }
+	  write(Scribbler.SET_DIMMER_LED);
+	  write((byte)value);
+	}
+
+	public override void setName(string name) {
+	  name = pad(name, 16);
+	  string name1 = name.Substring(0, 8);
+	  string name2 = name.Substring(8, 8);
+	  set(Scribbler.SET_NAME1, name1);
+	  set(Scribbler.SET_NAME2, name2);
+	}
+	
 	public object setWhiteBalance(string position) {
 	  return 0;
 	}
+
 	public object setIRPower(string position) {
 	  return 0;
 	}
+
 	public object setEchoMode(string position) {
 	  return 0;
 	}
+
 	public object setData(string position, string value) {
 	  return 0;
 	}
-	public object setPassword(string position) {
-	  return 0;
+
+	public override void setPassword(string password) {
+	  password = pad(password, 16);
+	  string pass1 = password.Substring(0, 8);
+	  string pass2 = password.Substring(8, 8);
+	  set(Scribbler.SET_PASS1, pass1);
+	  set(Scribbler.SET_PASS2, pass2);
 	}
+
     public object setForwardness(string position) {
 	  return 0;
 	}
 
-	public bool isTrue(string value) {
-	  return (value == "on");
+	public bool isTrue(object value) {
+	  if (value as string != null) {
+		return ((string)value == "on" ||
+			(string)value == "1");
+	  } else if (value as int? != null) {
+		return ((int)value == 1);
+	  } else 
+		return false;
 	}
 
-    public object Set(params byte [] values) {
+    public object set(byte value, string s) {
+	  byte [] buffer = new byte[s.Length + 1];
+	  buffer[0] = value;
+	  for (int i = 0; i < s.Length; i++) {
+		buffer[i + 1] = (byte)s[i];
+	  }
+	  set(buffer);
+	  return "ok";
+	}
+
+    public object set(params byte [] values) {
 	  lock(myLock) {
 		write_packet(values);
 		read(Scribbler.PACKET_LENGTH); // read echo
@@ -766,87 +964,136 @@ public static class Myro {
 	  return "ok";
 	}
 
-    public object Set(string item, string position, string value) {
+    public void set(string item, string position, object value) {
 	  if (item == "led") {
 		if (position == "center") {
 		  if (isTrue(value))
-			return Set(Scribbler.SET_LED_CENTER_ON);
+			set(Scribbler.SET_LED_CENTER_ON);
 		  else
-			return Set(Scribbler.SET_LED_CENTER_OFF);
+			set(Scribbler.SET_LED_CENTER_OFF);
 		} else if (position == "left") {
 		  if (isTrue(value)) 
-			return Set(Scribbler.SET_LED_LEFT_ON);
+			set(Scribbler.SET_LED_LEFT_ON);
 		  else             
-			return Set(Scribbler.SET_LED_LEFT_OFF);
+			set(Scribbler.SET_LED_LEFT_OFF);
 		} else if (position == "right") {
 		  if (isTrue(value)) 
-			return Set(Scribbler.SET_LED_RIGHT_ON);
+			set(Scribbler.SET_LED_RIGHT_ON);
 		  else
-			return Set(Scribbler.SET_LED_RIGHT_OFF);
+			set(Scribbler.SET_LED_RIGHT_OFF);
 		} else if (position == "front") {
-		  return setLEDFront(value);
+		  setLEDFront(value);
 		} else if (position == "back") {
-		  return setLEDBack(value);
+		  setLEDBack((double)value);
 		} else if (position == "all") {
 		  if (isTrue(value)) 
-			return Set(Scribbler.SET_LED_ALL_ON);
+			set(Scribbler.SET_LED_ALL_ON);
 		  else
-			return Set(Scribbler.SET_LED_ALL_OFF);
+			set(Scribbler.SET_LED_ALL_OFF);
 		} else {
 		  throw new Exception(String.Format("no such LED: '{0}'", position));
 		}
 	  } else if (item == "name") {
-		//position = position + (" " * 16);
-		//name1 = position[:8].strip();
-		//name1_raw = map(lambda x:  ord(x), name1);
-		//name2 = position[8:16].strip();
-		//name2_raw = map(lambda x:  ord(x), name2);
-		//Set(*([Scribbler.SET_NAME1] + name1_raw));
-		//Set(*([Scribbler.SET_NAME2] + name2_raw));
-		return "ok";
-	  } else if (item == "password") {
-		//position = position + (" " * 16);
-		//pass1 = position[:8].strip();
-		//pass1_raw = map(lambda x:  ord(x), pass1);
-		//pass2 = position[8:16].strip();
-		//pass2_raw = map(lambda x:  ord(x), pass2);
-		//Set(*([Scribbler.SET_PASS1] + pass1_raw));
-		//Set(*([Scribbler.SET_PASS2] + pass2_raw));
-		return "ok";
+		setName(position);
 	  } else if (item == "whitebalance") {
-		return setWhiteBalance(position);
+		setWhiteBalance(position);
 	  } else if (item == "irpower") {
-		return setIRPower(position);
+		setIRPower(position);
 	  } else if (item == "volume") {
 		if (isTrue(position)){
 		  volume = 1;
-		  return Set(Scribbler.SET_LOUD);
+		  set(Scribbler.SET_LOUD);
 		} else {
 		  volume = 0;
-		  return Set(Scribbler.SET_QUIET);
+		  set(Scribbler.SET_QUIET);
 		}
 	  } else if (item == "startsong") {
 		startsong = position;
-		return "ok";
 	  } else if (item == "echomode") {
-		return setEchoMode(position);
+		setEchoMode(position);
 	  } else if (item == "data") {
-		return setData(position, value);
+		setData(position, (string)value);
 	  } else if (item == "password") {
-		return setPassword(position);
+		setPassword(position);
 	  } else if (item == "forwardness") {
-		return setForwardness(position);
+		setForwardness(position);
 	  } else {
 		throw new Exception(String.Format("invalid set item name: '{0}'", item));
 	  }
 	}
 
 	public int getObstacle(object position) {
-	  return 0;
+	  if (position == null) {
+		return (int)get("obstacle");
+	  } else {
+		if (position as string != null) {
+		  string value = (string)position;
+		  if (value == "left") {
+			write(Scribbler.GET_DONGLE_L_IR);
+		  } else if (value == "middle" || value == "center") {
+			write(Scribbler.GET_DONGLE_C_IR);
+		  } else if (value == "right") {
+			write(Scribbler.GET_DONGLE_R_IR);
+		  } else {
+			throw new Exception();
+		  }
+		} else {
+		  int value = (int)position;
+		  if (value == 0) {
+			write(Scribbler.GET_DONGLE_L_IR);
+		  } else if (value == 1) {
+			write(Scribbler.GET_DONGLE_C_IR);
+		  } else if (value == 2) {
+			write(Scribbler.GET_DONGLE_R_IR);
+		  } else {
+			throw new Exception();
+		  }
+		}
+		return read_2byte();
+	  }
 	}
 
-	public int getBright(object position) {
-	  return 0;
+	public override object getLight(params object [] position) {
+	  if (position == null || position.Length == 0) {
+		return get("light");
+	  } else {
+		return get("light", position);
+	  }
+	}
+
+	public override object getIR(params object [] position) {
+	  if (position == null || position.Length == 0) {
+		return get("ir");
+	  } else {
+		return get("ir", position);
+	  }
+	}
+
+	public override object getLine(params object [] position) {
+	  if (position == null || position.Length == 0) {
+		return get("line");
+	  } else {
+		return get("line", position);
+	  }
+	}
+
+	public int getBright(object window=null) {
+	  if (window == null || (string)window == "all") {
+		return (int)get("bright");
+	  } else if (window as string != null) {
+		if ((string)window == "left") {
+		  window = 0;
+		} else if ((string)window == "middle" || (string)window == "center") {
+		  window = 1;
+		} else if ((string)window == "right") {
+		  window = 2;
+		} else {
+		  throw new Exception();
+		}
+	  }
+	  write(Scribbler.GET_WINDOW_LIGHT);
+	  write((byte)window);
+	  return read_3byte(); // (63.0 * 192.0 * 255.0)
 	}
 
 	public int getBlob() {
@@ -859,7 +1106,14 @@ public static class Myro {
 	  return (int)((hbyte << 8) | lbyte);
 	}
 
-	public PythonDictionary getInfo() {
+	public int read_3byte() {
+	  byte hbyte = read_byte();
+	  byte mbyte = read_byte();
+	  byte lbyte = read_byte();
+	  return (hbyte << 16)| (mbyte << 8) | lbyte;
+	}
+
+	public override PythonDictionary getInfo() {
 	  PythonDictionary retDict = new PythonDictionary();
 	  int old = serial.ReadTimeout; // milliseconds
 	  string retval;
@@ -926,7 +1180,7 @@ public static class Myro {
 	  double right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
 	  byte leftPower = (byte)((left + 1.0) * 100.0);
 	  byte rightPower = (byte)((right + 1.0) * 100.0);
-	  Set(Scribbler.SET_MOTORS, rightPower, leftPower);
+	  set(Scribbler.SET_MOTORS, rightPower, leftPower);
 	}
 
     public override void beep(double duration, double? frequency=null, 
@@ -961,13 +1215,29 @@ public static class Myro {
 	}
 
 	public override string getName() {
-	  return (string)Get("name");
+	  return (string)get("name");
+	}
+
+	public override PythonDictionary getAll() {
+	  return (PythonDictionary)get("all");
+	}
+
+	public override string getPassword() {
+	  return (string)get("password");
 	}
 
 	public override double getBattery() {
 	  write(Scribbler.GET_BATTERY);
 	  double retval = read_2byte() / 20.9813;
 	  return retval;
+	}
+
+	public override int getStall() {
+	  return (int)get("stall");
+	}
+
+	public override PythonDictionary getConfig() {
+	  return (PythonDictionary)get("config");
 	}
 
 	public byte read_byte() {
