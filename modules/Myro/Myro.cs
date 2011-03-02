@@ -1,3 +1,23 @@
+/*
+Pyjama - Scripting Environment
+
+Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+$Id: $
+*/
 using System;
 using System.IO.Ports;
 using System.Threading;
@@ -74,6 +94,10 @@ public static class Myro {
 	robot.stop();
   }
   
+  public static void move(double translate, double rotate) {
+	robot.move(translate, rotate);
+  }
+  
   public static void turnLeft(double power=1, double? time=null) {
 	robot.turnLeft(power, time);
   }
@@ -101,9 +125,19 @@ public static class Myro {
     robot.beep(duration, frequency, frequency2);
   }
 
-  public static void show(Graphics.Picture picture, string title="Myro Camera") {
-	Graphics.GWindow win = Graphics.makeWindow(title, picture.width, picture.height);
+  public static void show(Graphics.Picture picture, 
+	  string title="Myro Camera") {
+	Graphics.GWindow win = Graphics.makeWindow(title, 
+		picture.width, picture.height);
 	picture.draw(win);
+  }
+
+  public static string getName() {
+	return robot.getName();
+  }
+
+  public static double getBattery() {
+	return robot.getBattery();
   }
 
   public static string flipCoin() {
@@ -195,10 +229,6 @@ public static class Myro {
 
 	public Object myLock = new Object();
 
-    public virtual void move(double translate, double rotate) {
-	  // Override in subclassed robots
-	}
-
     public virtual void beep(double duration, double? frequency=null, 
 		double? frequency2=null) {
 	  // Override in subclassed robots
@@ -207,6 +237,18 @@ public static class Myro {
     public virtual Graphics.Picture takePicture(string mode="jpeg") {
 	  // Override in subclassed robots
 	  return null;
+	}
+
+	public virtual string getName() {
+	  return null;
+	}
+
+	public virtual double getBattery() {
+	  return 0.0;
+	}
+
+    public virtual void move(double translate, double rotate) {
+	  // Override in subclassed robots
 	}
 
 	public void stop() {
@@ -266,7 +308,6 @@ public static class Myro {
       	  double rotate = (right - left) / 2.0;
 	  move(trans, rotate);
 	}
-	
   }
 
   public static bool Contains(object item, params object[] items) {
@@ -454,8 +495,7 @@ public static class Myro {
 	  beep(.03, 698);
 	  beep(.03, 349);
 	  beep(.03, 523);
-	  string name = (string)Get("name");
-	  Console.WriteLine("Hello, my name is '{0}'!", name);
+	  Console.WriteLine("Hello, my name is '{0}'!", getName());
 	}
 	
 	// ------------------------------------------------------------
@@ -530,7 +570,7 @@ public static class Myro {
 		return retval;
 	  } else if (sensor == "startsong") {
 		//TODO: need to get this from flash memory
-		return "tada";
+		return "close-encounters";
 	  } else if (sensor == "version") {
 		//TODO: just return this version for now; get from flash
 		return REVISION.Split()[1];
@@ -564,7 +604,7 @@ public static class Myro {
 	  } else if (sensor == "volume") {
 		return volume;
 	  } else if (sensor == "battery") {
-		//return getBattery();
+		return getBattery();
 	  } else if (sensor == "blob") {
 		//return getBlob();
 	  } else {
@@ -813,8 +853,10 @@ public static class Myro {
 	  return 0;
 	}
 
-	public int getBattery() {
-	  return 0;
+	public int read_2byte() {
+	  byte hbyte = read_byte();
+	  byte lbyte = read_byte();
+	  return (int)((hbyte << 8) | lbyte);
 	}
 
 	public PythonDictionary getInfo() {
@@ -918,6 +960,22 @@ public static class Myro {
 			(byte)(freq2 % 256));
 	}
 
+	public override string getName() {
+	  return (string)Get("name");
+	}
+
+	public override double getBattery() {
+	  write(Scribbler.GET_BATTERY);
+	  double retval = read_2byte() / 20.9813;
+	  return retval;
+	}
+
+	public byte read_byte() {
+	  byte [] bytes = new byte[1];
+	  serial.Read(bytes, 0, 1);
+	  return bytes[0];
+	}
+
 	public void read(int bytes, byte [] buffer, int start) {
       int tries = 0;
 	  int count = 0;
@@ -981,7 +1039,7 @@ public static class Myro {
 	  write(Scribbler.GET_SERIAL_MEM);
 	  write_bytes(page);
 	  write_bytes(offset);
-	  return read(1)[0];
+	  return read_byte();
 	}
 
 	public void write(params byte [] b) {
@@ -1127,7 +1185,6 @@ public static class Myro {
 	  return jpeg;
 	}
 	
-
     public byte [] read_jpeg_scan() {
 	  byte [] bytes = new byte[100000];
 	  byte last_byte = 0;
@@ -1141,9 +1198,9 @@ public static class Myro {
 		last_byte = bytes[count];
 		count++;
 	  }
-      int bm0 = read_uint32();   // Start
-      int bm1 = read_uint32();   // Read
-      int bm2 = read_uint32();   // Compress
+      read_uint32();   // Start
+      read_uint32();   // Read
+      read_uint32();   // Compress
       return bytes.Slice(0, count);
 	}
 
