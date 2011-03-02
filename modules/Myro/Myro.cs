@@ -6,6 +6,8 @@ using System.Collections.Generic; // IList
 
 public static class Extensions {
   public static T[] Slice<T>(this T[] source, int start, int end) {
+    if (start == 0 && end == source.Length)
+        return source;
 	// Handles negative ends.
 	if (end < 0) {
 	  end = source.Length + end;
@@ -1024,12 +1026,12 @@ public static class Myro {
 		byte [] buffer = grab_jpeg_color(1);
 		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
 		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap);
+		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "jpeg-fast") {
 		byte [] buffer = grab_jpeg_color(0);
 		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
 		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap);
+		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "gray" || mode == "grey") {
 		//byte [] jpeg = grab_jpeg_gray(1);
 		//stream = cStringIO.StringIO(jpeg);
@@ -1127,14 +1129,11 @@ public static class Myro {
 	
 
     public byte [] read_jpeg_scan() {
-	  //System.Console.WriteLine("Reading jpeg scan...");
 	  byte [] bytes = new byte[100000];
 	  byte last_byte = 0;
 	  int count = 0;
 	  while (true) {
-		read(1, bytes, count);
-		//System.Console.WriteLine("read_jpeg_scan: {0} == {1} && {2} == {3}, count={4}", 
-		//last_byte, 0xff, bytes[count], 0xd9, count);
+		serial.Read(bytes, count, 1);
 		if ((last_byte == 0xff) && (bytes[count] == 0xd9)) {
 		  // End-of-image marker
 		  break;
@@ -1142,8 +1141,16 @@ public static class Myro {
 		last_byte = bytes[count];
 		count++;
 	  }
-	  return bytes.Slice(0, count);
+      int bm0 = read_uint32();   // Start
+      int bm1 = read_uint32();   // Read
+      int bm2 = read_uint32();   // Compress
+      return bytes.Slice(0, count);
 	}
+
+    public int read_uint32() {
+        byte [] buf = read(4);
+        return buf[0] + buf[1] * 256 + buf[2] * 65536 + buf[3] * 16777216;
+    }
 
 	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
 											  // (0=fast, 1=reg)

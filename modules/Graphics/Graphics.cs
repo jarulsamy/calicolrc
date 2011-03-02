@@ -908,17 +908,16 @@ public static class Graphics {
 	  center.y = _pixbuf.Height/2;
 	}
 
-	public Picture(System.Drawing.Bitmap bitmap) : base(true) {
-	  int width = bitmap.Width;
-	  int height = bitmap.Height;
+	public Picture(System.Drawing.Bitmap bitmap, int width, int height) : base(true) {
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
 	  _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
 	  if (!_pixbuf.HasAlpha) {
 		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
 	  }
-	  for (int x=0; x < _pixbuf.Width; x++) {
+	  for (int x=0; x < _pixbuf.Width; x += 2) {
 		for (int y=0; y < _pixbuf.Height; y++) {
-		  System.Drawing.Color pixel = bitmap.GetPixel(x, y);
+		  System.Drawing.Color pixel = bitmap.GetPixel(x/2, y);
+		  // First pixel
 		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 			  x * _pixbuf.NChannels + 0, pixel.R);
 		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -927,6 +926,16 @@ public static class Graphics {
 			  x * _pixbuf.NChannels + 2, pixel.B);
 		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 			  x * _pixbuf.NChannels + 3, pixel.A);
+		  // Second pixel
+		  int x2 = x + 1;
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x2 * _pixbuf.NChannels + 0, pixel.R);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x2 * _pixbuf.NChannels + 1, pixel.G);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x2 * _pixbuf.NChannels + 2, pixel.B);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			  x2 * _pixbuf.NChannels + 3, pixel.A);
 		}
 	  }
 	  format = Cairo.Format.Argb32;
