@@ -128,6 +128,10 @@ public static class Myro {
 	robot.motors(left, right);
   }
 
+  public static void reboot() {
+	robot.reboot();
+  }
+
   public static void beep(double duration, double? frequency=null, 
 	  double? frequency2=null) {
 	robot.beep(duration, frequency, frequency2);
@@ -321,6 +325,9 @@ public static class Myro {
 	  // Override in subclassed robots
 	}
 
+	public virtual void reboot() {
+	}
+
     public virtual Graphics.Picture takePicture(string mode="jpeg") {
 	  // Override in subclassed robots
 	  return null;
@@ -367,7 +374,7 @@ public static class Myro {
 	}
 
 	public virtual int getStall() {
-	  return 0;
+	  return 0; 
 	}
 
 	public virtual double getBattery() {
@@ -463,28 +470,30 @@ public static class Myro {
 	public int volume;
 	public string startsong;
     public byte [] color_header = null;
+    public byte [] gray_header = null;
+	public byte emitters = 0x1 | 0x2 | 0x4;
 
 	private double _lastTranslate;
 	private double _lastRotate;
 	private byte [] _lastSensors;
 
-    static byte SOFT_RESET=33;
+    //static byte SOFT_RESET=33;
     static byte GET_ALL=65 ;
-    static byte GET_ALL_BINARY=66  ;
-    static byte GET_LIGHT_LEFT=67  ;
-    static byte GET_LIGHT_CENTER=68  ;
-    static byte GET_LIGHT_RIGHT=69  ;
+    //static byte GET_ALL_BINARY=66  ;
+    //static byte GET_LIGHT_LEFT=67  ;
+    //static byte GET_LIGHT_CENTER=68  ;
+    //static byte GET_LIGHT_RIGHT=69  ;
     static byte GET_LIGHT_ALL=70  ;
-    static byte GET_IR_LEFT=71  ;
-    static byte GET_IR_RIGHT=72  ;
+    //static byte GET_IR_LEFT=71  ;
+    //static byte GET_IR_RIGHT=72  ;
     static byte GET_IR_ALL=73  ;
-    static byte GET_LINE_LEFT=74  ;
-    static byte GET_LINE_RIGHT=75  ;
+    //static byte GET_LINE_LEFT=74  ;
+    //static byte GET_LINE_RIGHT=75  ;
     static byte GET_LINE_ALL=76  ;
-    static byte GET_STATE=77  ;
+    //static byte GET_STATE=77  ;
     static byte GET_NAME1=78;
     static byte GET_NAME2=64;
-    static byte GET_STALL=79  ;
+    //static byte GET_STALL=79  ;
     static byte GET_INFO=80  ;
     static byte GET_DATA=81  ;
 
@@ -505,9 +514,9 @@ public static class Myro {
     static byte GET_BATTERY=89 ; // battery voltage
     static byte GET_SERIAL_MEM=90 ; // with the address returns the
 								   // value in serial memory
-    static byte GET_SCRIB_PROGRAM=91 ; // with offset, returns the
+    //static byte GET_SCRIB_PROGRAM=91 ; // with offset, returns the
 									  // scribbler program buffer
-    static byte GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
+    //static byte GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
 
     static byte GET_BLOB=95;
 
@@ -524,8 +533,8 @@ public static class Myro {
     static byte SET_LED_RIGHT_OFF=104;
     static byte SET_LED_ALL_ON=105;
     static byte SET_LED_ALL_OFF=106;
-    static byte SET_LED_ALL=107 ;
-    static byte SET_MOTORS_OFF=108;
+    //static byte SET_LED_ALL=107 ;
+    //static byte SET_MOTORS_OFF=108;
     static byte SET_MOTORS=109 ;
     static byte SET_NAME1=110 ;
     static byte SET_NAME2=119;           // set name2 byte
@@ -538,12 +547,12 @@ public static class Myro {
     static byte SET_DONGLE_LED_OFF=117;  // turn binary dongle led off
     static byte SET_RLE=118;             // set rle parameters 
     static byte SET_DONGLE_IR=120;       // set dongle IR power
-    static byte SET_SERIAL_MEM=121;      // set serial memory byte
-    static byte SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
-    static byte SET_START_PROGRAM=123;   // initiate scribbler
+    //static byte SET_SERIAL_MEM=121;      // set serial memory byte
+    //static byte SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
+    //static byte SET_START_PROGRAM=123;   // initiate scribbler
 										// programming process 
     static byte SET_RESET_SCRIBBLER=124; // hard reset scribbler
-    static byte SET_SERIAL_ERASE=125;    // erase serial memory
+    //static byte SET_SERIAL_ERASE=125;    // erase serial memory
     static byte SET_DIMMER_LED=126;      // set dimmer led
     static byte SET_WINDOW=127;          // set user defined window
     static byte SET_FORWARDNESS=128;     // set direction of scribbler
@@ -559,11 +568,11 @@ public static class Myro {
     static byte GET_JPEG_COLOR_HEADER=137;
     static byte GET_JPEG_COLOR_SCAN=138;
 
-    static byte SET_PASS_N_BYTES=139;
-    static byte GET_PASS_N_BYTES=140;
-    static byte GET_PASS_BYTES_UNTIL=141;
+    //static byte SET_PASS_N_BYTES=139;
+    //static byte GET_PASS_N_BYTES=140;
+    //static byte GET_PASS_BYTES_UNTIL=141;
 
-    static byte GET_VERSION=142;
+    //static byte GET_VERSION=142;
 
     static byte GET_IR_MESSAGE = 150;
     static byte SEND_IR_MESSAGE = 151;
@@ -572,24 +581,24 @@ public static class Myro {
     static byte PACKET_LENGTH     =  9;
     	
 	// #### Camera Addresses ####
-	static byte CAM_PID=0x0A;
-	static byte CAM_PID_DEFAULT=0x76;
-	static int	CAM_VER=0x0B;
-	static byte CAM_VER_DEFAULT=0x48;
-	static byte CAM_BRT=0x06;
-	static byte CAM_BRT_DEFAULT=0x80;
-	static byte CAM_EXP=0x10;
-	static byte CAM_EXP_DEFAULT=0x41;
+	//static byte CAM_PID=0x0A;
+	//static byte CAM_PID_DEFAULT=0x76;
+	//static int	CAM_VER=0x0B;
+	//static byte CAM_VER_DEFAULT=0x48;
+	//static byte CAM_BRT=0x06;
+	//static byte CAM_BRT_DEFAULT=0x80;
+	//static byte CAM_EXP=0x10;
+	//static byte CAM_EXP_DEFAULT=0x41;
 	static byte CAM_COMA=0x12;
 	static byte CAM_COMA_DEFAULT=0x14;
 	static byte CAM_COMA_WHITE_BALANCE_ON= (byte)(CAM_COMA_DEFAULT |  (1 << 2));
-	static byte CAM_COMA_WHITE_BALANCE_OFF=(byte)(CAM_COMA_DEFAULT & ~(1 << 2));
+	//static byte CAM_COMA_WHITE_BALANCE_OFF=(byte)(CAM_COMA_DEFAULT & ~(1 << 2));
 	static byte CAM_COMB=0x13;
 	static byte CAM_COMB_DEFAULT=0xA3;
 	static byte CAM_COMB_GAIN_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 1));
-	static byte CAM_COMB_GAIN_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 1));
+	//static byte CAM_COMB_GAIN_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 1));
 	static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
-	static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
+	//static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
 
 	public Scribbler(SerialPort serial) {
 	  setup();
@@ -625,6 +634,15 @@ public static class Myro {
 	  } else if (info.Contains("dongle")) {
 		dongle = (string)info["dongle"];
 		Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
+		set_cam_param(Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
+        set_cam_param(Scribbler.CAM_COMB, 
+			Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
+		// Config grayscale on window 0, 1, 2
+		conf_gray_window(0, 2,   0, 128, 191, 1, 1);
+		conf_gray_window(1, 64,  0, 190, 191, 1, 1);
+		conf_gray_window(2, 128, 0, 254, 191, 1, 1);
+		set_ir_power(135);
+		conf_rle(90, 4, 0, 255, 51, 136, 190, 255);
 	  } else {
 		dongle = null;
 		Console.WriteLine("You are using:\n   Scribbler, version 0.0.0");
@@ -921,8 +939,24 @@ public static class Myro {
 	  }
 	}
 
-	public void setData(string position, string value) {
-	  data = get(Scribbler.GET_DATA, 8);
+    byte [] _get(byte value, int bytes, string mode) {
+	  write(value);
+	  read(Scribbler.PACKET_LENGTH); // read the echo
+	  if (mode == "byte") {
+		return read(bytes);
+	  } else if (mode == "word") {
+		byte [] retvalBytes = read(bytes);
+		byte [] retval = new byte[retvalBytes.Length/2];
+		for (int p=0; p < retvalBytes.Length; p+=2) {
+		  retval[p/2] = (byte)(retvalBytes[p] << 8 | retvalBytes[p + 1]);
+		}
+		return retval;
+	  }
+	  return null;
+	}
+
+	public void setData(int position, byte value) {
+	  byte [] data = _get(Scribbler.GET_DATA, 8, "byte");
 	  data[position] = value;
 	  set(Scribbler.SET_DATA, data);
 	}
@@ -962,6 +996,15 @@ public static class Myro {
 	  buffer[0] = value;
 	  for (int i = 0; i < s.Length; i++) {
 		buffer[i + 1] = (byte)s[i];
+	  }
+	  set(buffer);
+	}
+
+    public void set(byte value, byte [] bytes) {
+	  byte [] buffer = new byte[bytes.Length + 1];
+	  buffer[0] = value;
+	  for (int i = 0; i < bytes.Length; i++) {
+		buffer[i + 1] = (byte)bytes[i];
 	  }
 	  set(buffer);
 	}
@@ -1029,7 +1072,7 @@ public static class Myro {
 	  } else if (item == "echomode") {
 		setEchoMode((string)position);
 	  } else if (item == "data") {
-		setData((string)position, (string)value);
+		setData((int)position, (byte)value);
 	  } else if (item == "password") {
 		setPassword((string)position);
 	  } else if (item == "forwardness") {
@@ -1113,8 +1156,12 @@ public static class Myro {
 	  return read_3byte(); // (63.0 * 192.0 * 255.0)
 	}
 
-	public int getBlob() {
-	  return 0;
+	public List getBlob() {
+	  write(Scribbler.GET_BLOB);
+	  int numpixs = read_2byte();
+	  int xloc = (int)read_byte();
+	  int yloc = (int)read_byte();
+	  return list(numpixs, xloc, yloc);
 	}
 
 	public int read_2byte() {
@@ -1198,6 +1245,10 @@ public static class Myro {
 	  byte leftPower = (byte)((left + 1.0) * 100.0);
 	  byte rightPower = (byte)((right + 1.0) * 100.0);
 	  set(Scribbler.SET_MOTORS, rightPower, leftPower);
+	}
+
+    public override void reboot() {
+	  write(Scribbler.SET_RESET_SCRIBBLER);
 	}
 
     public override void beep(double duration, double? frequency=null, 
@@ -1329,8 +1380,14 @@ public static class Myro {
 	  return read_byte();
 	}
 
-	public void write(params byte [] b) {
-	  serial.Write(b, 0, 1);
+	public void write(byte b) {
+	  byte [] buffer = new byte[1];
+	  buffer[0] = b;
+	  serial.Write(buffer, 0, 1);
+	}
+
+	public void write(byte [] b) {
+	  serial.Write(b, 0, b.Length);
 	}
 
 	public void write_bytes(int value) {
@@ -1353,13 +1410,13 @@ public static class Myro {
 		}
 	  } 
 	}
-
+  
 	public void flush() {
-	    serial.DiscardInBuffer();
-	    serial.DiscardOutBuffer();
+	  serial.DiscardInBuffer();
+	  serial.DiscardOutBuffer();
 	}
 
-  public override Graphics.Picture takePicture(string mode="jpeg") {
+	public override Graphics.Picture takePicture(string mode="jpeg") {
 	  int width = 256;
 	  int height = 192;
 	  Graphics.Picture p = null;
@@ -1378,29 +1435,32 @@ public static class Myro {
 		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
 		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "gray" || mode == "grey") {
-		//byte [] jpeg = grab_jpeg_gray(1);
-		//stream = cStringIO.StringIO(jpeg);
-		//p.set(width, height, stream, "jpeg");
+		byte [] buffer = grab_jpeg_gray(1);
+		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "grayjpeg") {
-		//byte [] jpeg = grab_jpeg_gray(1);
-		//stream = cStringIO.StringIO(jpeg);
-		//p.set(width, height, stream, "jpeg");
+		byte [] buffer = grab_jpeg_gray(1);
+		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "grayjpeg-fast") {
-		//byte [] jpeg = grab_jpeg_gray(0);
-		//stream = cStringIO.StringIO(jpeg);
-		//p.set(width, height, stream, "jpeg");
+		byte [] buffer = grab_jpeg_gray(0);
+		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "grayraw" || mode == "greyraw") {
 		//conf_window(serial, 0, 1, 0, 255, 191, 2, 2);
 		byte [] a = grab_gray_array();
 		//conf_gray_window(serial, 0, 2, 0,    128, 191, 1, 1);
-		p = new Graphics.Picture(width, height, a);
+		p = new Graphics.Picture(width, height, a, 1);
 	  } else if (mode == "blob") {
-		byte [] a = grab_blob_array(); // FIXME: make an rgbrgb array
+		byte [] a = grab_blob_array(); 
 		p = new Graphics.Picture(width, height, a);
 	  }
 	  return p;
 	}
-
+	
 	public byte [] grab_array_yuv() { // YUV color
 	  int width = 256;
 	  int height = 192;
@@ -1451,11 +1511,10 @@ public static class Myro {
 	  }
 	  return buffer;
 	}
-
+	
 	public byte [] read_jpeg_header() {
 	  byte [] buf = read(2);
 	  int len = buf[0] + buf[1] * 256;
-	  //System.Console.WriteLine("Reading jpeg header, size = {0}", len);
 	  return read(len);
 	}
 	
@@ -1469,6 +1528,18 @@ public static class Myro {
 	  write(GET_JPEG_COLOR_SCAN);
 	  write((byte)mode);
 	  byte [] jpeg = buffer_add(color_header, read_jpeg_scan());
+	  return jpeg;
+	}
+	
+	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
+											  // (0=fast, 1=reg)
+	  if (gray_header == null) {
+		write(Scribbler.GET_JPEG_GRAY_HEADER);
+		gray_header = read_jpeg_header();
+	  }
+	  write(Scribbler.GET_JPEG_GRAY_SCAN);
+	  write((byte)mode);
+	  byte [] jpeg = buffer_add(gray_header, read_jpeg_scan());
 	  return jpeg;
 	}
 	
@@ -1490,24 +1561,228 @@ public static class Myro {
       read_uint32();   // Compress
       return bytes.Slice(0, count);
 	}
-
+  
     public int read_uint32() {
         byte [] buf = read(4);
         return buf[0] + buf[1] * 256 + buf[2] * 65536 + buf[3] * 16777216;
     }
 
-	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
-											  // (0=fast, 1=reg)
-	  return null;
-	}
-	
 	public byte [] grab_blob_array() { // blob, RLE
-	  return null;
+	  int width = 256;
+	  int height = 192;
+      byte [] blobs = new byte[height * width * 3];  // RGB
+	  write(Scribbler.GET_RLE);
+	  int size=(int)read_byte();
+	  size = (size << 8) | read_byte();
+	  byte [] buffer = read(size);
+	  int px = 0;
+	  int counter = 0;
+	  int val = 128;
+	  bool inside = true;
+	  for (int i=0; i < height; i++) {
+		for (int j=0; j < width; j+=4) {
+		  if (counter < 1 && px < buffer.Length) {
+			counter = buffer[px];
+			px += 1;
+			counter = (counter << 8) | buffer[px];
+			px += 1;
+			if (inside) {
+			  val = 0;
+			  inside = false;
+			} else {
+			  val = 255;
+			  inside = true;
+			}
+		  }
+		  blobs[i * width * 3 + j + 0] = (byte)val; //red
+		  blobs[i * width * 3 + j + 1] = (byte)val; //green
+		  blobs[i * width * 3 + j + 2] = (byte)val; //blue
+		  counter -= 1;
+		}
+	  }
+	  return blobs;
+	}
+  	
+	public byte [] grab_gray_array() {
+	  int width = 128;
+	  int height = 96;
+	  int size= width * height; 
+	  write(Scribbler.GET_WINDOW);
+	  write((byte)0);
+	  byte [] line = read(size);
+	  return quadrupleSize(line, width);
+	}
+  
+	public byte [] quadrupleSize(byte [] line, int width) {
+	  byte [] retval = new byte[line.Length * 4]; 
+	  int col = 0;
+	  int row = 0;
+	  for (int i=0; i< line.Length; i++) {
+		byte c = line[i];
+		retval[row       * 2 * width + col]   = c;
+		retval[row       * 2 * width + col+1] = c;
+		retval[(row + 1) * 2 * width + col]   = c;
+		retval[(row + 1) * 2 * width + col+1] = c;
+		col += 2;
+		if (col == width * 2) {
+		  col = 0;
+		  row += 2;
+		}
+	  }
+	  return retval;
 	}
 
-	public byte [] grab_gray_array() {
-	  return null;
+	public void conf_gray_window(int window, int lx, int ly, int ux, int uy, int xstep, int ystep) {
+	  // Y's are on odd pixels
+	  if ((lx % 2) == 0) {
+		lx += 1;
+	  }
+	  if ((xstep % 2) == 1) {
+        xstep += 1;
+	  }
+	  conf_window(window, lx, ly, ux, uy, xstep, ystep);
+	}
+  
+	public void conf_window(int window, int X_LOW, int Y_LOW, 
+		int X_HIGH, int Y_HIGH, int X_STEP, int Y_STEP) {
+	  write(Scribbler.SET_WINDOW);
+	  write((byte)window);
+	  write((byte)X_LOW);
+	  write((byte)Y_LOW);
+	  write((byte)X_HIGH);
+	  write((byte)Y_HIGH);
+	  write((byte)X_STEP);
+	  write((byte)Y_STEP);
+	}
+
+	public void setSingleData(int position, int value) {
+	  byte [] data = new byte[1]; 
+	  data[0] = (byte)position;
+	  data[1] = (byte)value;
+	  set(Scribbler.SET_SINGLE_DATA, data);
+	}
+	
+	public void set_cam_param(int addr, int b) {
+	  write(Scribbler.SET_CAM_PARAM);
+	  write((byte)addr);
+	  write((byte)b);
+	  wait(.15); // camera needs time to reconfigure
+	}
+	
+	public void set_ir_power(int power) {
+	  write(Scribbler.SET_DONGLE_IR);
+	  write((byte)power);
+	}
+	
+	public byte [] getIRMessage() {
+	  write(Scribbler.GET_IR_MESSAGE);
+	  int size = read_2byte();
+	  return read(size);
+	}
+	
+	public void sendIRMessage(byte [] data) {
+	  write(Scribbler.SEND_IR_MESSAGE);
+	  write((byte)data.Length);
+	  write(data);
+	}
+	
+	public void setCommunicate() {
+	  write(Scribbler.SET_IR_EMITTERS);
+	  write(emitters);
+	}
+	
+	public void set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
+	  /*
+		xs = [x1,x2];
+		ys = [y1,y2];
+	xs.sort();
+	ys.sort();
+	
+	//set up variables to hold counts and accumulations:
+	totalY = 0.0;
+	totalU = 0.0;
+	totalV = 0.0;
+       
+	ySamples = [];
+	uSamples = [];
+	vSamples = [];
+        
+	for i in range(xs[0], xs[1], 1) {
+		for j in range(ys[0], ys[1], 1) {
+			r,g,b = picture.getPixel(i,j).getRGB();
+			y,u,v = rgb2yuv(r,g,b);
+			totalY = totalY + y;
+			totalU = totalU + u;
+			totalV = totalV + v;
+			ySamples.append(y);
+			uSamples.append(u);
+			vSamples.append(v);
+		  }
+	  }
+	
+	count = len(ySamples);
+	yMean = totalY / count;
+	uMean = totalU / count;
+	vMean = totalV / count;
+
+	// The standard deviation of a random variable with a normal 
+	// distribution is the root-mean-square (RMS) deviation of its 
+	// values from their mean.
+	sY = 0.0;
+	sU = 0.0;
+	sV = 0.0;
+
+	for i in range(0,len(ySamples)) {
+		sY = sY + (ySamples[i] - yMean)**2;
+		sU = sU + (uSamples[i] - uMean)**2;
+		sV = sV + (vSamples[i] - vMean)**2;
+	  }
+
+	sY = sqrt( sY / count);
+	sU = sqrt( sU / count);
+	sV = sqrt( sV / count);
+
+	// Select the U/V bounding box based upon stdMod stdDev
+	// from the mean, with approripate
+	// min/max values to fit in an 8 bit register.
+	//
+	stdMod = 3.0;
+
+	minU = max(0, (uMean - sU*stdMod)    );
+	maxU = min(255, (uMean + sU*stdMod)  );
+	minV = max(0, (vMean - sV*stdMod) );
+	maxV = min(255, (vMean + sV*stdMod) );
+	minU = int(minU);
+	maxU = int(maxU);
+	minV = int(minV);
+	maxV = int(maxV);
+
+	// Note that we use the default values for
+	// several parameters, most importantly the Y value
+	// defaults to a range of 0-254
+	conf_rle( u_low=minU, u_high=maxU, v_low=minV, v_high=maxV);
+
+	// Return a tupal of parameters suitable for the configureBlob
+	// function, to be shown to the user.
+	
+	return ( 0, 254, minU, maxU, minV, maxV);
+  }
+  */
+	}
+	
+	public void conf_rle(int delay = 90, int smooth_thresh = 4,
+		int y_low=0, int y_high=254,
+		int u_low=51, int u_high=136,
+		int v_low=190, int v_high=254) {
+	  write(Scribbler.SET_RLE);
+	  write((byte)delay);
+	  write((byte)smooth_thresh);
+	  write((byte)y_low);
+	  write((byte)y_high);
+	  write((byte)u_low);
+	  write((byte)u_high);
+	  write((byte)v_low);
+	  write((byte)v_high);
 	}
   }
 }
-
