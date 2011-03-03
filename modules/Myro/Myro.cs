@@ -92,6 +92,16 @@ public static class Myro {
 	}
   }
   
+  public static List rgb2yuv(int R, int G, int B) {
+    int Y = (int)(0.299 * R + 0.587 * G + 0.114 * B);
+	int U = (int)(-0.14713 * R - 0.28886 * G + 0.436 * B + 128);
+    int V = (int)( 0.615 * R - 0.51499* G - 0.10001 * B + 128);
+    return Graphics.PyList(
+		Math.Max(Math.Min(Y,255),0),
+		Math.Max(Math.Min(U,255),0),
+		Math.Max(Math.Min(V,255),0));
+  }
+
   public static void forward(double power=1, double? time=null) {
 	robot.forward(power, time);
   }
@@ -1691,37 +1701,37 @@ public static class Myro {
 	  write(emitters);
 	}
 	
-	public void set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
+	public PythonTuple set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
 	  int [] xs = new int[2]; //[x1,x2];
 	  int [] ys = new int[2]; //[y1,y2];
-	  xs[0] = min(x1, x2);
-	  xs[1] = max(x1, x2);
-	  ys[0] = min(y1, y2);
-	  ys[1] = max(y1, y2);
+	  xs[0] = Math.Min(x1, x2);
+	  xs[1] = Math.Max(x1, x2);
+	  ys[0] = Math.Min(y1, y2);
+	  ys[1] = Math.Max(y1, y2);
 	
 	  //set up variables to hold counts and accumulations:
-	  int totalY = 0.0;
-	  int totalU = 0.0;
-	  int totalV = 0.0;
+	  double totalY = 0.0;
+	  double totalU = 0.0;
+	  double totalV = 0.0;
        
 	  List ySamples = new List();
-	  List uSamples = new List;
+	  List uSamples = new List();
 	  List vSamples = new List();
         
 	  for (int i=xs[0]; i < xs[1]; i++) {
 		for (int j=ys[0]; j < ys[1]; j++) {
-		  rgb = picture.getPixel(i,j).getRGB();
-		  yuv = rgb2yuv(rgb[0],rgb[1],rgb[2]);
-		  totalY = totalY + yuv[0];
-		  totalU = totalU + yuv[1];
-		  totalV = totalV + yuv[2];
-		  ySamples.append(yuv[0]);
-		  uSamples.append(yuv[1]);
-		  vSamples.append(yuv[2]);
+		  PythonTuple rgb = picture.getPixel(i,j).getRGB();
+		  List yuv = rgb2yuv((int)rgb[0], (int)rgb[1], (int)rgb[2]);
+		  totalY = totalY + (int)yuv[0];
+		  totalU = totalU + (int)yuv[1];
+		  totalV = totalV + (int)yuv[2];
+		  ySamples.append((int)yuv[0]);
+		  uSamples.append((int)yuv[1]);
+		  vSamples.append((int)yuv[2]);
 		}
 	  }
 	  
-	  int count = ySamples.Length;
+	  int count = ySamples.Count;
 	  double yMean = totalY / count;
 	  double uMean = totalU / count;
 	  double vMean = totalV / count;
@@ -1733,15 +1743,15 @@ public static class Myro {
 	  double sU = 0.0;
 	  double sV = 0.0;
 	  
-	  for (int i=0; i < count) {
-		sY = sY + (ySamples[i] - yMean)**2;
-		sU = sU + (uSamples[i] - uMean)**2;
-		sV = sV + (vSamples[i] - vMean)**2;
+	  for (int i=0; i < count; i ++) {
+		sY = sY + ((int)ySamples[i] - yMean) * ((int)ySamples[i] - yMean);
+		sU = sU + ((int)uSamples[i] - uMean) * ((int)uSamples[i] - uMean);
+		sV = sV + ((int)vSamples[i] - vMean) * ((int)vSamples[i] - vMean);
 	  }
 
-	  sY = sqrt( sY / count);
-	  sU = sqrt( sU / count);
-	  sV = sqrt( sV / count);
+	  sY = Math.Sqrt( sY / count);
+	  sU = Math.Sqrt( sU / count);
+	  sV = Math.Sqrt( sV / count);
 
 	  // Select the U/V bounding box based upon stdMod stdDev
 	  // from the mean, with approripate
@@ -1749,19 +1759,15 @@ public static class Myro {
 	  //
 	  double stdMod = 3.0;
 
-	  minU = max(0, (uMean - sU*stdMod)    );
-	  maxU = min(255, (uMean + sU*stdMod)  );
-	  minV = max(0, (vMean - sV*stdMod) );
-	  maxV = min(255, (vMean + sV*stdMod) );
-	  minU = int(minU);
-	  maxU = int(maxU);
-	  minV = int(minV);
-	  maxV = int(maxV);
+	  int minU = (int)Math.Max(0, (uMean - sU*stdMod)    );
+	  int maxU = (int)Math.Min(255, (uMean + sU*stdMod)  );
+	  int minV = (int)Math.Max(0, (vMean - sV*stdMod) );
+	  int maxV = (int)Math.Min(255, (vMean + sV*stdMod) );
 	  
 	  // Note that we use the default values for
 	  // several parameters, most importantly the Y value
 	  // defaults to a range of 0-254
-	  conf_rle(u_low=minU, u_high=maxU, v_low=minV, v_high=maxV);
+	  conf_rle(minU, maxU, minV, maxV);
 
 	  // Return a tupal of parameters suitable for the configureBlob
 	  // function, to be shown to the user.
