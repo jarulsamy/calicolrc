@@ -900,20 +900,31 @@ public static class Myro {
 	  set(Scribbler.SET_NAME2, name2);
 	}
 	
-	public object setWhiteBalance(string position) {
-	  return 0;
+	public void setWhiteBalance(object value) {
+	  if (isTrue(value)) {
+		write(Scribbler.SET_WHITE_BALANCE);
+	  } else {
+		write(Scribbler.SET_NO_WHITE_BALANCE);
+	  }
 	}
 
-	public object setIRPower(string position) {
-	  return 0;
+	public void setIRPower(int power) {
+	  write(Scribbler.SET_DONGLE_IR);
+	  write((byte)power);
 	}
 
-	public object setEchoMode(string position) {
-	  return 0;
+	public void setEchoMode(string value) {
+	  if (isTrue(value)) { 
+		set(Scribbler.SET_ECHO_MODE, 1);
+	  } else {
+        set(Scribbler.SET_ECHO_MODE, 0);
+	  }
 	}
 
-	public object setData(string position, string value) {
-	  return 0;
+	public void setData(string position, string value) {
+	  data = get(Scribbler.GET_DATA, 8);
+	  data[position] = value;
+	  set(Scribbler.SET_DATA, data);
 	}
 
 	public override void setPassword(string password) {
@@ -924,8 +935,16 @@ public static class Myro {
 	  set(Scribbler.SET_PASS2, pass2);
 	}
 
-    public object setForwardness(string position) {
-	  return 0;
+    public void setForwardness(object direction) {
+	  if (Contains(direction, "fluke-forward", 1)) {
+		direction = 1;
+	  } else if (Contains(direction, "scribbler-forward", 0)) {
+		direction = 0;
+	  } else {
+		throw new Exception("unknown direction: should be 'fluke-forward' or 'scribbler-forward'");
+	  }
+	  write(Scribbler.SET_FORWARDNESS);
+	  write((byte)direction);
 	}
 
 	public bool isTrue(object value) {
@@ -938,17 +957,16 @@ public static class Myro {
 		return false;
 	}
 
-    public object set(byte value, string s) {
+    public void set(byte value, string s) {
 	  byte [] buffer = new byte[s.Length + 1];
 	  buffer[0] = value;
 	  for (int i = 0; i < s.Length; i++) {
 		buffer[i + 1] = (byte)s[i];
 	  }
 	  set(buffer);
-	  return "ok";
 	}
 
-    public object set(params byte [] values) {
+    public void set(params byte [] values) {
 	  lock(myLock) {
 		write_packet(values);
 		read(Scribbler.PACKET_LENGTH); // read echo
@@ -961,31 +979,30 @@ public static class Myro {
 		} 
 		*/
 	  }
-	  return "ok";
 	}
 
-    public void set(string item, string position, object value) {
+    public void set(string item, object position, object value) {
 	  if (item == "led") {
-		if (position == "center") {
+		if ((string)position == "center") {
 		  if (isTrue(value))
 			set(Scribbler.SET_LED_CENTER_ON);
 		  else
 			set(Scribbler.SET_LED_CENTER_OFF);
-		} else if (position == "left") {
+		} else if ((string)position == "left") {
 		  if (isTrue(value)) 
 			set(Scribbler.SET_LED_LEFT_ON);
 		  else             
 			set(Scribbler.SET_LED_LEFT_OFF);
-		} else if (position == "right") {
+		} else if ((string)position == "right") {
 		  if (isTrue(value)) 
 			set(Scribbler.SET_LED_RIGHT_ON);
 		  else
 			set(Scribbler.SET_LED_RIGHT_OFF);
-		} else if (position == "front") {
+		} else if ((string)position == "front") {
 		  setLEDFront(value);
-		} else if (position == "back") {
+		} else if ((string)position == "back") {
 		  setLEDBack((double)value);
-		} else if (position == "all") {
+		} else if ((string)position == "all") {
 		  if (isTrue(value)) 
 			set(Scribbler.SET_LED_ALL_ON);
 		  else
@@ -994,11 +1011,11 @@ public static class Myro {
 		  throw new Exception(String.Format("no such LED: '{0}'", position));
 		}
 	  } else if (item == "name") {
-		setName(position);
+		setName((string)position);
 	  } else if (item == "whitebalance") {
-		setWhiteBalance(position);
+		setWhiteBalance((string)position);
 	  } else if (item == "irpower") {
-		setIRPower(position);
+		setIRPower((int)position);
 	  } else if (item == "volume") {
 		if (isTrue(position)){
 		  volume = 1;
@@ -1008,15 +1025,15 @@ public static class Myro {
 		  set(Scribbler.SET_QUIET);
 		}
 	  } else if (item == "startsong") {
-		startsong = position;
+		startsong = (string)position;
 	  } else if (item == "echomode") {
-		setEchoMode(position);
+		setEchoMode((string)position);
 	  } else if (item == "data") {
-		setData(position, (string)value);
+		setData((string)position, (string)value);
 	  } else if (item == "password") {
-		setPassword(position);
+		setPassword((string)position);
 	  } else if (item == "forwardness") {
-		setForwardness(position);
+		setForwardness((string)position);
 	  } else {
 		throw new Exception(String.Format("invalid set item name: '{0}'", item));
 	  }
