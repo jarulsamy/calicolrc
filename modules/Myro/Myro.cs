@@ -1692,82 +1692,81 @@ public static class Myro {
 	}
 	
 	public void set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
-	  /*
-		xs = [x1,x2];
-		ys = [y1,y2];
-	xs.sort();
-	ys.sort();
+	  int [] xs = new int[2]; //[x1,x2];
+	  int [] ys = new int[2]; //[y1,y2];
+	  xs[0] = min(x1, x2);
+	  xs[1] = max(x1, x2);
+	  ys[0] = min(y1, y2);
+	  ys[1] = max(y1, y2);
 	
-	//set up variables to hold counts and accumulations:
-	totalY = 0.0;
-	totalU = 0.0;
-	totalV = 0.0;
+	  //set up variables to hold counts and accumulations:
+	  int totalY = 0.0;
+	  int totalU = 0.0;
+	  int totalV = 0.0;
        
-	ySamples = [];
-	uSamples = [];
-	vSamples = [];
+	  List ySamples = new List();
+	  List uSamples = new List;
+	  List vSamples = new List();
         
-	for i in range(xs[0], xs[1], 1) {
-		for j in range(ys[0], ys[1], 1) {
-			r,g,b = picture.getPixel(i,j).getRGB();
-			y,u,v = rgb2yuv(r,g,b);
-			totalY = totalY + y;
-			totalU = totalU + u;
-			totalV = totalV + v;
-			ySamples.append(y);
-			uSamples.append(u);
-			vSamples.append(v);
-		  }
+	  for (int i=xs[0]; i < xs[1]; i++) {
+		for (int j=ys[0]; j < ys[1]; j++) {
+		  rgb = picture.getPixel(i,j).getRGB();
+		  yuv = rgb2yuv(rgb[0],rgb[1],rgb[2]);
+		  totalY = totalY + yuv[0];
+		  totalU = totalU + yuv[1];
+		  totalV = totalV + yuv[2];
+		  ySamples.append(yuv[0]);
+		  uSamples.append(yuv[1]);
+		  vSamples.append(yuv[2]);
+		}
 	  }
-	
-	count = len(ySamples);
-	yMean = totalY / count;
-	uMean = totalU / count;
-	vMean = totalV / count;
-
-	// The standard deviation of a random variable with a normal 
-	// distribution is the root-mean-square (RMS) deviation of its 
-	// values from their mean.
-	sY = 0.0;
-	sU = 0.0;
-	sV = 0.0;
-
-	for i in range(0,len(ySamples)) {
+	  
+	  int count = ySamples.Length;
+	  double yMean = totalY / count;
+	  double uMean = totalU / count;
+	  double vMean = totalV / count;
+	  
+	  // The standard deviation of a random variable with a normal 
+	  // distribution is the root-mean-square (RMS) deviation of its 
+	  // values from their mean.
+	  double sY = 0.0;
+	  double sU = 0.0;
+	  double sV = 0.0;
+	  
+	  for (int i=0; i < count) {
 		sY = sY + (ySamples[i] - yMean)**2;
 		sU = sU + (uSamples[i] - uMean)**2;
 		sV = sV + (vSamples[i] - vMean)**2;
 	  }
 
-	sY = sqrt( sY / count);
-	sU = sqrt( sU / count);
-	sV = sqrt( sV / count);
+	  sY = sqrt( sY / count);
+	  sU = sqrt( sU / count);
+	  sV = sqrt( sV / count);
 
-	// Select the U/V bounding box based upon stdMod stdDev
-	// from the mean, with approripate
-	// min/max values to fit in an 8 bit register.
-	//
-	stdMod = 3.0;
+	  // Select the U/V bounding box based upon stdMod stdDev
+	  // from the mean, with approripate
+	  // min/max values to fit in an 8 bit register.
+	  //
+	  double stdMod = 3.0;
 
-	minU = max(0, (uMean - sU*stdMod)    );
-	maxU = min(255, (uMean + sU*stdMod)  );
-	minV = max(0, (vMean - sV*stdMod) );
-	maxV = min(255, (vMean + sV*stdMod) );
-	minU = int(minU);
-	maxU = int(maxU);
-	minV = int(minV);
-	maxV = int(maxV);
+	  minU = max(0, (uMean - sU*stdMod)    );
+	  maxU = min(255, (uMean + sU*stdMod)  );
+	  minV = max(0, (vMean - sV*stdMod) );
+	  maxV = min(255, (vMean + sV*stdMod) );
+	  minU = int(minU);
+	  maxU = int(maxU);
+	  minV = int(minV);
+	  maxV = int(maxV);
+	  
+	  // Note that we use the default values for
+	  // several parameters, most importantly the Y value
+	  // defaults to a range of 0-254
+	  conf_rle(u_low=minU, u_high=maxU, v_low=minV, v_high=maxV);
 
-	// Note that we use the default values for
-	// several parameters, most importantly the Y value
-	// defaults to a range of 0-254
-	conf_rle( u_low=minU, u_high=maxU, v_low=minV, v_high=maxV);
-
-	// Return a tupal of parameters suitable for the configureBlob
-	// function, to be shown to the user.
-	
-	return ( 0, 254, minU, maxU, minV, maxV);
-  }
-  */
+	  // Return a tupal of parameters suitable for the configureBlob
+	  // function, to be shown to the user.
+	  
+	  return Graphics.PyTuple(0, 254, minU, maxU, minV, maxV);
 	}
 	
 	public void conf_rle(int delay = 90, int smooth_thresh = 4,
