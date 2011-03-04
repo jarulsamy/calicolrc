@@ -32,6 +32,19 @@ festival> Voice_descriptions
 # mac:
 # say command, see Myro
 
+
+#festival> (voice.list)
+#(kal_diphone ked_diphone)
+#festival> (voice_ked_diphone)
+#ked_diphone
+#festival> (SayText "Hello")
+##<Utterance 021B4590>
+#festival> (voice_kal_diphone)
+#kal_diphone
+#festival> (SayText "Hello")
+##<Utterance 021EDAA0>
+#festival>
+
 import os, sys, re, random
 
 class TTSEngine:
