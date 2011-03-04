@@ -689,6 +689,14 @@ public static class Myro {
 	}
 	// ------------------------------------------------------------
 
+	List bytes2ints(byte [] bytes) {
+	  List ints = new List();
+	  for (int i = 0; i < bytes.Length; i++) {
+		ints.append((int)bytes[i]);
+	  }
+	  return ints;
+	}
+
     byte [] GetBytes(byte value, int bytes=1) {
 	  byte [] retval = null;
 	  lock(myLock) {
@@ -782,9 +790,9 @@ public static class Myro {
 		  if (sensor == "light") {
 			return GetWord(Scribbler.GET_LIGHT_ALL, 6);
 		  } else if (sensor == "line") {
-			return GetBytes(Scribbler.GET_LINE_ALL, 2);
+			return bytes2ints(GetBytes(Scribbler.GET_LINE_ALL, 2));
 		  } else if (sensor == "ir") {
-			return GetBytes(Scribbler.GET_IR_ALL, 2);
+			return bytes2ints(GetBytes(Scribbler.GET_IR_ALL, 2));
 		  } else if (sensor == "obstacle") {
 			return list(getObstacle("left"), 
 				getObstacle("center"), 
@@ -884,16 +892,15 @@ public static class Myro {
 	
     public object getData(params int [] position) {
 	  if (position.Length == 0) {
-		return GetBytes(Scribbler.GET_DATA, 8);
-	  } else {
-		List retval = list();
-		foreach (int p in position)
-		  retval.append(GetBytes(Scribbler.GET_DATA, 8)[p]);
-		if (retval.Count == 1) 
-		  return retval[0];
-		else
-		  return retval;
-	  }
+		position = new int[] {0, 1, 2, 3, 4, 5, 6, 7 };
+	  } 
+	  List retval = list();
+	  foreach (int p in position)
+		retval.append((int)GetBytes(Scribbler.GET_DATA, 8)[p]);
+	  if (retval.Count == 1) 
+		return (int)retval[0];
+	  else
+		return retval;
 	}
 
 	public override void setLED(string position, object value) {
@@ -1184,7 +1191,7 @@ public static class Myro {
 	  byte hbyte = read_byte();
 	  byte mbyte = read_byte();
 	  byte lbyte = read_byte();
-	  return (hbyte << 16)| (mbyte << 8) | lbyte;
+	  return (int)((hbyte << 16)| (mbyte << 8) | lbyte);
 	}
 
 	public override PythonDictionary getInfo() {
@@ -1385,8 +1392,8 @@ public static class Myro {
 
 	public int read_mem(int page, int offset) {
 	  write(Scribbler.GET_SERIAL_MEM);
-	  write_bytes(page);
-	  write_bytes(offset);
+	  write_2byte(page);
+	  write_2byte(offset);
 	  return read_byte();
 	}
 
@@ -1400,7 +1407,7 @@ public static class Myro {
 	  serial.Write(b, 0, b.Length);
 	}
 
-	public void write_bytes(int value) {
+	public void write_2byte(int value) {
 	  write((byte)((value >> 8) & 0xFF));
 	  write((byte)(value & 0xFF));
 	}
@@ -1462,7 +1469,7 @@ public static class Myro {
 	  } else if (mode == "grayraw" || mode == "greyraw") {
 		//conf_window(serial, 0, 1, 0, 255, 191, 2, 2);
 		byte [] a = grab_gray_array();
-		//conf_gray_window(serial, 0, 2, 0,    128, 191, 1, 1);
+		conf_gray_window(0, 2, 0,    128, 191, 1, 1);
 		p = new Graphics.Picture(width, height, a, 1);
 	  } else if (mode == "blob") {
 		byte [] a = grab_blob_array(); 
@@ -1642,7 +1649,8 @@ public static class Myro {
 	  return retval;
 	}
 
-	public void conf_gray_window(int window, int lx, int ly, int ux, int uy, int xstep, int ystep) {
+	public void conf_gray_window(int window, int lx, int ly, int ux, int uy, 
+		int xstep, int ystep) {
 	  // Y's are on odd pixels
 	  if ((lx % 2) == 0) {
 		lx += 1;
@@ -1684,10 +1692,10 @@ public static class Myro {
 	  write((byte)power);
 	}
 	
-	public byte [] getIRMessage() {
+	public List getIRMessage() {
 	  write(Scribbler.GET_IR_MESSAGE);
 	  int size = read_2byte();
-	  return read(size);
+	  return bytes2ints(read(size));
 	}
 	
 	public void sendIRMessage(byte [] data) {
