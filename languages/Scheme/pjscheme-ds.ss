@@ -6,9 +6,8 @@
 (load "petite-init.ss")
 (load "define-datatype.ss")
 
-(define-datatype expression expression?
-  (lit-exp (datum anything?)) (var-exp (id symbol?))
-  (func-exp (exp expression?))
+(define-datatype expression expression? (lit-exp (datum anything?))
+  (var-exp (id symbol?)) (func-exp (exp expression?))
   (if-exp
     (test-exp expression?)
     (then-exp expression?)
@@ -849,7 +848,7 @@
 ;;----------------------------------------------------------------------
 ;; main program
 
-(define 1st (lambda (n) (string-ref chars-to-scan n)))
+(define \x31;st (lambda (n) (string-ref chars-to-scan n)))
 
 (define remaining (lambda (n) (+ 1 n)))
 
@@ -887,7 +886,7 @@
       (shift (next)
        (begin
          (set! read-char-count (+ read-char-count 1))
-         (apply-action next (cons (1st chars) buffer)
+         (apply-action next (cons (\x31;st chars) buffer)
            (remaining chars) handler k)))
       (replace (new-char next)
        (apply-action next (cons new-char buffer) (remaining chars)
@@ -902,7 +901,7 @@
          (set! read-char-count (+ read-char-count 1))
          (apply-action next buffer (remaining chars) handler k)))
       (goto (state)
-       (let ((action (apply-state state (1st chars))))
+       (let ((action (apply-state state (\x31;st chars))))
          (if (eq? action 'error)
              (scan-error chars handler)
              (apply-action action buffer chars handler k))))
@@ -917,7 +916,7 @@
 (define*
   scan-error
   (lambda (chars handler)
-    (let ((c (1st chars)))
+    (let ((c (\x31;st chars)))
       (if (char=? c #\nul)
           (apply-handler
             handler
@@ -1107,8 +1106,8 @@
          ((char=? c #\b) '(replace #\backspace (goto string-state)))
          ((char=? c #\f) '(replace #\page (goto string-state)))
          ((char=? c #\n) '(replace #\newline (goto string-state)))
+         ((char=? c #\r) '(replace #\newline (goto string-state)))
          ((char=? c #\t) '(replace #\tab (goto string-state)))
-         ((char=? c #\r) '(replace #\return (goto string-state)))
          (else 'error)))
       (identifier-state
        (cond
@@ -2308,6 +2307,7 @@
 
 (define execute
   (lambda (input-string)
+    (set! load-stack '())
     (read-datum
       input-string
       init-handler
@@ -2316,6 +2316,7 @@
 
 (define execute-file
   (lambda (filename)
+    (set! load-stack '())
     (load-file filename toplevel-env init-handler init-cont)
     (trampoline)))
 

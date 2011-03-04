@@ -5144,18 +5144,18 @@ public class PJScheme:Scheme
 			  (object) PJScheme.list ((object) symbol ("goto"),
 						  (object)
 						  symbol ("string-state"))));
+	 else if (true_q (PJScheme.char_is__q ((object) c, (object) 'r')))
+	    return ((object) PJScheme.
+		    list ((object) symbol ("replace"), (object) "\n",
+			  (object) PJScheme.list ((object) symbol ("goto"),
+						  (object)
+						  symbol ("string-state"))));
 	 else if (true_q (PJScheme.char_is__q ((object) c, (object) 't')))
 	    return ((object) PJScheme.
 		    list ((object) symbol ("replace"), (object) "	",
 			  (object) PJScheme.
 			  list ((object) symbol ("goto"),
 				(object) symbol ("string-state"))));
-	 else if (true_q (PJScheme.char_is__q ((object) c, (object) 'r')))
-	    return ((object) PJScheme.
-		    list ((object) symbol ("replace"), (object) "",
-			  (object) PJScheme.list ((object) symbol ("goto"),
-						  (object)
-						  symbol ("string-state"))));
 	 else
 	    return ((object) symbol ("error"));
       else
@@ -8017,6 +8017,7 @@ public class PJScheme:Scheme
 
    new public static object execute (string input_string)
    {
+      load_stack = EmptyList;
       k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-25>"));
       handler_reg = init_handler;
       input_reg = input_string;
@@ -8026,6 +8027,7 @@ public class PJScheme:Scheme
 
    new public static void execute_file (string filename)
    {
+      load_stack = EmptyList;
       k_reg = init_cont;
       handler_reg = init_handler;
       env_reg = toplevel_env;

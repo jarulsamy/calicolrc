@@ -612,7 +612,8 @@
 
 (define execute
   (lambda (input-string)
-      (read-datum input-string init-handler
+    (set! load-stack '())
+    (read-datum input-string init-handler
 	(lambda-cont2 (datum tokens-left)
 	  (parse datum init-handler
 	    (lambda-cont (exp)
@@ -621,6 +622,7 @@
 
 (define execute-file
   (lambda (filename)
+    (set! load-stack '())
     (load-file filename toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))

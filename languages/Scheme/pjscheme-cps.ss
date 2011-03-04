@@ -266,8 +266,9 @@
 	  ((char=? c #\b) '(replace #\backspace (goto string-state)))
 	  ((char=? c #\f) '(replace #\page (goto string-state)))
 	  ((char=? c #\n) '(replace #\newline (goto string-state)))
+	  ((char=? c #\r) '(replace #\newline (goto string-state)))
 	  ((char=? c #\t) '(replace #\tab (goto string-state)))
-	  ((char=? c #\r) '(replace #\return (goto string-state)))
+	  ;;((char=? c #\r) '(replace #\return (goto string-state)))
 	  (else 'error)))
       (identifier-state
 	(cond
@@ -2035,7 +2036,8 @@
 
 (define execute
   (lambda (input-string)
-      (read-datum input-string init-handler
+    (set! load-stack '())
+    (read-datum input-string init-handler
 	(lambda-cont2 (datum tokens-left)
 	  (parse datum init-handler
 	    (lambda-cont (exp)
@@ -2044,6 +2046,7 @@
 
 (define execute-file
   (lambda (filename)
+    (set! load-stack '())
     (load-file filename toplevel-env init-handler init-cont)
     ;; need this to start the computation after registers are set up
     (trampoline)))

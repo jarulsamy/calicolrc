@@ -536,7 +536,7 @@
 (define split-clean
   (lambda (items)
     (cond
-     ((null? items) ())
+     ((null? items) '())
      (else (cons (list->string (reverse (car items)))
 		 (split-clean (cdr items)))))))
 
