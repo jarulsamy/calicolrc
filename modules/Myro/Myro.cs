@@ -1516,7 +1516,7 @@ public static class Myro {
 		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
 		p = new Graphics.Picture(bitmap, 256, 192);
 	  } else if (mode == "grayraw" || mode == "greyraw") {
-		//conf_window(serial, 0, 1, 0, 255, 191, 2, 2);
+		conf_window(0, 1, 0, 255, 191, 2, 2);
 		byte [] a = grab_gray_array();
 		conf_gray_window(0, 2, 0,    128, 191, 1, 1);
 		p = new Graphics.Picture(width, height, a, 1);
