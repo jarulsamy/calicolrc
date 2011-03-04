@@ -233,6 +233,9 @@ class ShellWindow(Window):
             font = self.pyjama.get_fontname()
         def invoke(sender, args):
             # FIXME: set textview font, too
+            fontname = self.pyjama.config.get("pyjama.font")
+            fontsize = self.pyjama.config.get("pyjama.fontsize")
+            self.textview.Options.FontName = str(fontname) + " " + str(fontsize)
             self.history_textview.ModifyFont(font)
         Gtk.Application.Invoke(invoke)
 
