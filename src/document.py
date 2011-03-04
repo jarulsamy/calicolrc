@@ -252,6 +252,12 @@ class TextEditorDocument(Document):
     def decrease_font_size(self, font):
         self.texteditor.Options.ZoomOut()
 
+    def set_font(self, font = None):
+        if font is None:
+            fontname = self.pyjama.config.get("pyjama.font")
+            fontsize = self.pyjama.config.get("pyjama.fontsize")
+            self.texteditor.Options.FontName = str(fontname) + " " + str(fontsize)
+
     def get_text(self):
         return self.texteditor.Document.Text
 

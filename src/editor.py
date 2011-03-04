@@ -142,6 +142,8 @@ class EditorWindow(Window):
         if doc:
             doc.grab_focus()
 
+        self.set_font()
+
     def on_key_press(self, event):
         """
         Handles key press events for the entire window. If handled
@@ -343,6 +345,10 @@ class EditorWindow(Window):
                 ["%s:%d" % (doc.filename, doc.get_line())
                  for doc in self.get_docs() if doc.filename])
         return True
+
+    def set_font(self, font = None):
+        for doc in self.get_docs():
+            doc.set_font(font)
 
     def increase_font_size(self, font):
         for doc in self.get_docs():
