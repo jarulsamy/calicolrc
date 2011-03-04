@@ -34,7 +34,9 @@ Myro.robot.rotate(.5, 1)
 Myro.robot.rotate(-.5, 1)
 #Myro.robot.sendIRMessage
 #Myro.robot.setCommunicate
-#Myro.robot.setData()
+Myro.robot.setData(0, 0)
+print Myro.robot.getData()
+Myro.robot.setData(0, 128)
 #Myro.robot.setEchoMode
 #Myro.robot.setForwardness
 #Myro.robot.setIRPower
