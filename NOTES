@@ -4,6 +4,11 @@ Problems, issues, features, and questions.
 
 These are issues with the code in Pyjama/src/*.py
 
+# IMMEDIATE:
+# add fudge factors
+# getObstacle() getBright() not working
+# setData() fails
+
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret (on windows?)
