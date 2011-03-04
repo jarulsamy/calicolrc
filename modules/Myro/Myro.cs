@@ -164,8 +164,29 @@ public static class Myro {
 	picture.draw(win);
   }
 
+  public static void setup() {
+  }
+
   public static string getName() {
 	return robot.getName();
+  }
+
+  public static List getIRMessage() {
+	return robot.getIRMessage();
+  }
+
+  public static void sendIRMessage(byte [] data) {
+  }
+
+  public static void setCommunicate() {
+  }
+
+  public static List getBlob() {
+	return robot.getBlob();
+  }
+
+  public static object getData(params int [] position) {
+	return robot.getData(position);
   }
 
   public static PythonDictionary getAll() {
@@ -343,7 +364,28 @@ public static class Myro {
 	  return null;
 	}
 
+	public virtual void setup() {
+	}
+
 	public virtual string getName() {
+	  return null;
+	}
+
+	public virtual List getIRMessage() {
+	  return null;
+	}
+
+	public virtual void setCommunicate() {
+	}
+
+	public virtual void sendIRMessage(byte [] data) {
+	}
+
+	public virtual List getBlob() {
+	  return null;
+	}
+
+    public virtual object getData(params int [] position) {
 	  return null;
 	}
 
@@ -628,7 +670,7 @@ public static class Myro {
 	  setup();
 	}
 
-	public void setup() {
+	public override void setup() {
 	  PythonDictionary info = null;
 	  try {
 		info = getInfo();
@@ -753,7 +795,7 @@ public static class Myro {
 		//TODO: just return this version for now; get from flash
 		return REVISION.Split()[1];
 	  } else if (sensor == "data") {
-		//return getData(position);
+		return getData(position);
 	  } else if (sensor == "info") {
 		return getInfo();
 	  } else if (sensor == "name") {
@@ -784,7 +826,7 @@ public static class Myro {
 	  } else if (sensor == "battery") {
 		return getBattery();
 	  } else if (sensor == "blob") {
-		//return getBlob();
+		return getBlob();
 	  } else {
 		if (position == null) {
 		  if (sensor == "light") {
@@ -887,10 +929,17 @@ public static class Myro {
 		  return retvals;
 		}
 	  }
-	  return null;
+	}
+
+    public object getData(object [] position) {
+	  int [] ints = new int[position.Length];
+	  for (int i=0; i < position.Length; i++) {
+		ints[i] = (int)position[i];
+	  }
+	  return getData(ints);
 	}
 	
-    public object getData(params int [] position) {
+    public override object getData(params int [] position) {
 	  if (position.Length == 0) {
 		position = new int[] {0, 1, 2, 3, 4, 5, 6, 7 };
 	  } 
@@ -1173,7 +1222,7 @@ public static class Myro {
 	  return read_3byte(); // (63.0 * 192.0 * 255.0)
 	}
 
-	public List getBlob() {
+	public override List getBlob() {
 	  write(Scribbler.GET_BLOB);
 	  int numpixs = read_2byte();
 	  int xloc = (int)read_byte();
@@ -1692,19 +1741,19 @@ public static class Myro {
 	  write((byte)power);
 	}
 	
-	public List getIRMessage() {
+	public override List getIRMessage() {
 	  write(Scribbler.GET_IR_MESSAGE);
 	  int size = read_2byte();
 	  return bytes2ints(read(size));
 	}
 	
-	public void sendIRMessage(byte [] data) {
+	public override void sendIRMessage(byte [] data) {
 	  write(Scribbler.SEND_IR_MESSAGE);
 	  write((byte)data.Length);
 	  write(data);
 	}
 	
-	public void setCommunicate() {
+	public override void setCommunicate() {
 	  write(Scribbler.SET_IR_EMITTERS);
 	  write(emitters);
 	}
