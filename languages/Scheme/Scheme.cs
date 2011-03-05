@@ -1312,6 +1312,12 @@ public class Scheme {
 	  return ""; // FIXME: should give void when forced
 	} else if (obj is bool) {
 	  return ((bool)obj) ? "#t" : "#f";
+	} else if (obj is IronPython.Runtime.List) {
+	  return ((IronPython.Runtime.List)obj).__repr__(
+		  IronPython.Runtime.DefaultContext.Default);
+	} else if (obj is IronPython.Runtime.PythonDictionary) {
+	  return ((IronPython.Runtime.PythonDictionary)obj).__repr__(
+		  IronPython.Runtime.DefaultContext.Default);
 	} else if (obj is Array) {
 	  return (string)array_to_string((object[]) obj);
 	} else if (obj is double) {
@@ -1362,10 +1368,30 @@ public class Scheme {
 	throw new Exception("invalid args to format");
   }
 
+  public static MethodInfo get_method(object obj, string method_name) {
+	Type t = obj.GetType();
+    MethodInfo[] mi = t.GetMethods();
+    foreach(MethodInfo m in mi) {
+	  System.Console.WriteLine("{0}", m.Name);
+	  if (m.Name == method_name) {
+		return m;
+	  }
+	}
+	return null;
+  }
+
   public static string format(object msg, params object[] rest) {
 	string retval = "";
 	string new_msg = "";
+	//MethodInfo mi = get_method(msg, "__repr__");
 	string smsg = msg.ToString();
+	/*
+	if (mi != null) {
+	  smsg = (string)mi.Invoke(msg, null);
+	} else {
+	  smsg = msg.ToString();
+	}
+	*/
 	int count = 0;
 	for (int i = 0; i < smsg.Length; i++) {
 	  if (smsg[i] == TILDE) {
@@ -2199,7 +2225,7 @@ public class Scheme {
   public static void pretty_print(object obj) {
 	// FIXME: need to make this safe
 	// Just get representation for now
-	printf(repr(obj));
+	System.Console.Write(repr(obj));
 	newline();
   }  
 

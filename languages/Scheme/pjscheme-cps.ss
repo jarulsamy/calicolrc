@@ -266,9 +266,9 @@
 	  ((char=? c #\b) '(replace #\backspace (goto string-state)))
 	  ((char=? c #\f) '(replace #\page (goto string-state)))
 	  ((char=? c #\n) '(replace #\newline (goto string-state)))
-	  ((char=? c #\r) '(replace #\newline (goto string-state)))
+	  ;;((char=? c #\r) '(replace #\newline (goto string-state)))
 	  ((char=? c #\t) '(replace #\tab (goto string-state)))
-	  ;;((char=? c #\r) '(replace #\return (goto string-state)))
+	  ((char=? c #\r) '(replace #\return (goto string-state)))
 	  (else 'error)))
       (identifier-state
 	(cond

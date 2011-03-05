@@ -2480,7 +2480,7 @@
                                             "bad macro-transformer: ~a"
                                             macro_reg)))))))))))))
 
-(define \x31;st
+(define 1st
   (lambda (n) (return* (string-ref chars-to-scan n))))
 
 (define remaining (lambda (n) (return* (+ 1 n))))
@@ -2526,7 +2526,7 @@
         (let ((next 'undefined))
           (set! next (list-ref action_reg 1))
           (set! read-char-count (+ read-char-count 1))
-          (set! buffer_reg (cons (\x31;st chars_reg) buffer_reg))
+          (set! buffer_reg (cons (1st chars_reg) buffer_reg))
           (set! chars_reg (remaining chars_reg))
           (set! action_reg next)
           (set! pc apply-action))
@@ -2557,7 +2557,7 @@
                         (let ((state 'undefined))
                           (set! state (list-ref action_reg 1))
                           (let ((action 'undefined))
-                            (set! action (apply-state state (\x31;st chars_reg)))
+                            (set! action (apply-state state (1st chars_reg)))
                             (if (eq? action 'error)
                                 (set! pc scan-error)
                                 (begin (set! action_reg action) (set! pc apply-action)))))
@@ -2575,7 +2575,7 @@
   scan-error
   (lambda ()
     (let ((c 'undefined))
-      (set! c (\x31;st chars_reg))
+      (set! c (1st chars_reg))
       (if (char=? c #\nul)
           (begin
             (set! exception_reg
@@ -2829,10 +2829,10 @@
                                                         (return* (list 'replace "\f" (list 'goto 'string-state)))
                                                         (if (char=? c #\n)
                                                             (return* (list 'replace "\n" (list 'goto 'string-state)))
-                                                            (if (char=? c #\r)
-                                                                (return* (list 'replace "\n" (list 'goto 'string-state)))
-                                                                (if (char=? c #\t)
-                                                                    (return* (list 'replace "\t" (list 'goto 'string-state)))
+                                                            (if (char=? c #\t)
+                                                                (return* (list 'replace "\t" (list 'goto 'string-state)))
+                                                                (if (char=? c #\r)
+                                                                    (return* (list 'replace "\r" (list 'goto 'string-state)))
                                                                     (return* 'error))))))))
                                         (if (eq? state 'identifier-state)
                                             (if (char-subsequent? c)
