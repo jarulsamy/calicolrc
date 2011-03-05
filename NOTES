@@ -6,10 +6,9 @@ These are issues with the code in Pyjama/src/*.py
 
 # IMMEDIATE:
 # add fudge factors
-# getObstacle() getBright() not working
+# getBright() not working
 # setData() fails
-# add static functions for all of myro_test.py
-# set font size not remembered for code text
+# set font size needs to be set for new docs
 # need a better flush? sometimes won't reconnect
 
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
