@@ -197,6 +197,13 @@ public static class Myro {
 	return robot.getInfo();
   }
 
+  public static object getObstacle(params object [] position) {
+	if (position == null || position.Length == 0)
+	  return robot.getObstacle();
+	else
+	  return robot.getObstacle(position);
+  }
+
   public static object getLight(params object [] position) {
 	if (position == null || position.Length == 0)
 	  return robot.getLight();
@@ -394,6 +401,10 @@ public static class Myro {
 	}
 
 	public virtual PythonDictionary getInfo() {
+	  return null;
+	}
+
+	public virtual object getObstacle(params object [] position) {
 	  return null;
 	}
 
@@ -836,9 +847,9 @@ public static class Myro {
 		  } else if (sensor == "ir") {
 			return bytes2ints(GetBytes(Scribbler.GET_IR_ALL, 2));
 		  } else if (sensor == "obstacle") {
-			return list(getObstacle("left"), 
-				getObstacle("center"), 
-				getObstacle("right"));
+			return list(getObstacle1("left"), 
+				getObstacle1("center"), 
+				getObstacle1("right"));
 		  } else if (sensor == "bright") {
 			return list(getBright("left"), 
 				getBright("middle"), 
@@ -866,9 +877,9 @@ public static class Myro {
 				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
 				  "stall", (int)_lastSensors[10],
 				  "obstacle", list(
-					  getObstacle("left"), 
-					  getObstacle("center"), 
-					  getObstacle("right")),
+					  getObstacle1("left"), 
+					  getObstacle1("center"), 
+					  getObstacle1("right")),
 				  "bright", list(
 					  getBright("left"), 
 					  getBright("middle"), 
@@ -913,7 +924,7 @@ public static class Myro {
 			  retvals.append((int)values[1]);
 			}
 		  } else if (sensor == "obstacle") {
-			return getObstacle(pos);
+			return getObstacle1(pos);
 		  } else if (sensor == "bright") {
 			return getBright(pos);
 		  } else {
@@ -1148,36 +1159,40 @@ public static class Myro {
 	  }
 	}
 
-	public int getObstacle(object position) {
-	  if (position == null) {
-		return (int)get("obstacle");
+	public override object getObstacle(params object [] position) {
+	  if (position == null || position.Length == 0) {
+		return get("obstacle");
 	  } else {
-		if (position as string != null) {
-		  string value = (string)position;
-		  if (value == "left") {
-			write(Scribbler.GET_DONGLE_L_IR);
-		  } else if (value == "middle" || value == "center") {
-			write(Scribbler.GET_DONGLE_C_IR);
-		  } else if (value == "right") {
-			write(Scribbler.GET_DONGLE_R_IR);
-		  } else {
-			throw new Exception();
-		  }
-		} else {
-		  int value = (int)position;
-		  if (value == 0) {
-			write(Scribbler.GET_DONGLE_L_IR);
-		  } else if (value == 1) {
-			write(Scribbler.GET_DONGLE_C_IR);
-		  } else if (value == 2) {
-			write(Scribbler.GET_DONGLE_R_IR);
-		  } else {
-			throw new Exception();
-		  }
-		}
-		return read_2byte();
+		return get("obstacle", position);
 	  }
 	}
+
+	int getObstacle1(object position) {
+      if (position as string != null) {
+        string value = (string)position;
+        if (value == "left") {
+          write(Scribbler.GET_DONGLE_L_IR);
+        } else if (value == "middle" || value == "center") {
+          write(Scribbler.GET_DONGLE_C_IR);
+        } else if (value == "right") {
+          write(Scribbler.GET_DONGLE_R_IR);
+        } else {
+          throw new Exception();
+        }
+      } else {
+        int value = (int)position;
+        if (value == 0) {
+          write(Scribbler.GET_DONGLE_L_IR);
+        } else if (value == 1) {
+          write(Scribbler.GET_DONGLE_C_IR);
+        } else if (value == 2) {
+          write(Scribbler.GET_DONGLE_R_IR);
+        } else {
+          throw new Exception();
+        }
+      }
+      return read_2byte();
+    }
 
 	public override object getLight(params object [] position) {
 	  if (position == null || position.Length == 0) {
