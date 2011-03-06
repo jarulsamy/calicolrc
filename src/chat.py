@@ -77,8 +77,8 @@ class ChatWindow(Window):
                     (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                     ]),
                 ]
-        toolbar = [(Gtk.Stock.New, self.on_new_file),
-                   (Gtk.Stock.Open, self.on_open_file),
+        toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
+                   (Gtk.Stock.Open, self.on_open_file, _("Open an existing script")),
                    ]
         self.make_gui(menu, toolbar)
         self.statusbar = StatusBar()

@@ -34,9 +34,5 @@
 
 (define! fact3
   "Factorial available and runnable by DLR languages"
-  (func
-    (lambda (n)
-        (if (eq? n 1)
-            1
-            (* n (fact3 (- n 1)))))))
+  (func fact2))
 

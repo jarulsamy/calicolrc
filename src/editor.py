@@ -90,10 +90,10 @@ class EditorWindow(Window):
                     (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                           ]),
                 ]
-        toolbar = [(Gtk.Stock.New, self.on_new_file),
-                   (Gtk.Stock.Open, self.on_open_file),
-                   (Gtk.Stock.Save, self.on_save_file), 
-                   (Gtk.Stock.Apply, self.on_run),
+        toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
+                   (Gtk.Stock.Open, self.on_open_file, _("Open an existing script")),
+                   (Gtk.Stock.Save, self.on_save_file, _("Save current script")),
+                   (Gtk.Stock.Apply, self.on_run, _("Run script")),
                    ]
         self.make_gui(menu, toolbar)
         self.notebook = Gtk.Notebook()

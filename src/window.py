@@ -81,7 +81,7 @@ class Window(object):
         self.toolbar.ToolbarStyle = Gtk.ToolbarStyle.Icons
         i = 0
         self.toolbar_buttons = {}
-        for (img, function) in toolbar:
+        for (img, function, tooltip) in toolbar:
             if img is None:
                 tool_item = Gtk.SeparatorToolItem()
             else:
@@ -89,6 +89,8 @@ class Window(object):
                 self.toolbar_buttons[img] = tool_item
             if function:
                 tool_item.Clicked += function
+            tooltips = Gtk.Tooltips()
+            tooltips.SetTip(tool_item, tooltip, None)
             self.toolbar.Insert(tool_item, i)
             i += 1
 

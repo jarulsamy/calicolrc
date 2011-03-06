@@ -150,11 +150,13 @@ class ShellWindow(Window):
                     (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
                     ]),
                 ]
-        toolbar = [(Gtk.Stock.New, self.on_new_file),
-                   (Gtk.Stock.Open, self.on_open_file),
-                   (Gtk.Stock.Apply, self.on_run),
-                   (Gtk.Stock.Stop, self.on_stop),
+        toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
+                   (Gtk.Stock.Open, self.on_open_file, _("Open an existing script")),
+                   (Gtk.Stock.Apply, self.on_run, _("Run script")),
+                   (Gtk.Stock.Stop, self.on_stop, _("Stop script")),
+                   (Gtk.Stock.GotoBottom, self.swap_panes, _("Swap script and history areas")),
                    ]
+        self.prompt_at_top = True
         self.make_gui(menu, toolbar)
         Gtk.Application.Invoke(self.stop_running)
         self.history = History(self.pyjama.config)
@@ -296,6 +298,21 @@ class ShellWindow(Window):
             return self.pyjama.connection.status
         else:
             return _("offline")
+
+    def swap_panes(self, obj, event):
+        if self.prompt_at_top:
+            self.toolbar_buttons[Gtk.Stock.GotoBottom].StockId = Gtk.Stock.GotoTop
+        else:
+            self.toolbar_buttons[Gtk.Stock.GotoBottom].StockId = Gtk.Stock.GotoBottom
+        self.prompt_at_top = not self.prompt_at_top
+        def invoke(sender, args):
+            c1 = self.vpane.Child1
+            c2 = self.vpane.Child2
+            self.vpane.Remove(c1)
+            self.vpane.Remove(c2)
+            self.vpane.Add1(c2)
+            self.vpane.Add2(c1)
+        Gtk.Application.Invoke(invoke)
 
     def on_key_press(self, event, force=False):
         # FIXME: this should be handled in textview, but if we subclass

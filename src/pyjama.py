@@ -75,6 +75,7 @@ clr.AddReference("Mono.TextEditor")
 # Bring .NET References into IronPython scope:
 import Gtk
 import Pango
+#import GLib
 
 from Mono.TextEditor import Highlighting
 
@@ -97,7 +98,7 @@ from utils import _, Chat
 # Setup Runtime environment:
 #def handle_exception(arg):
 #    print >> sys.stderr, e.__class__.__name__
-#    sys.exit(1)
+#    #sys.exit(1)
 #
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
