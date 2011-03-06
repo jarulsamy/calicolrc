@@ -83,8 +83,8 @@ class EditorWindow(Window):
                     (_("Chat"), None, "F8", self.pyjama.setup_chat),
                     ]),
                 (_("Options"), [
-                    (_("Make font larger"), None, None, self.pyjama.increase_fontsize),
-                    (_("Make font smaller"), None, None, self.pyjama.decrease_fontsize),
+                    (_("Make font larger"), None, "<control>equal", self.pyjama.increase_fontsize),
+                    (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
                     ]),
                 (_("Help"), [
                     (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
@@ -141,8 +141,6 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             doc.grab_focus()
-
-        self.set_font()
 
     def on_key_press(self, event):
         """
@@ -218,6 +216,7 @@ class EditorWindow(Window):
                     self.pyjama.config.get("pyjama.recent_files").pop()
                     # FIXME: remove from self.submenu["Recent files"]
                     # FIXME: remove from shell self.submenu["Recent files"] too
+            page.set_font()
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
         if self.notebook.NPages == 2:

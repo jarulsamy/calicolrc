@@ -70,8 +70,8 @@ class ChatWindow(Window):
                     (_("Chat"), None, "F8", self.pyjama.setup_chat),
                     ]),
                 (_("Options"), [
-                    (_("Make font larger"), None, None, self.pyjama.increase_fontsize),
-                    (_("Make font smaller"), None, None, self.pyjama.decrease_fontsize),
+                    (_("Make font larger"), None, "<control>equal", self.pyjama.increase_fontsize),
+                    (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
                     ]),
                 (_("Help"), [
                     (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),

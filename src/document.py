@@ -177,6 +177,9 @@ class Document(object):
     def get_line(self):
         return 0
 
+    def set_font(self, font=None):
+        pass
+
 class TextEditorDocument(Document):
     def __init__(self, filename, pyjama, language="python"):
         Document.__init__(self, filename, pyjama, language)
