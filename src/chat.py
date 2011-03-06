@@ -135,7 +135,7 @@ class ChatWindow(Window):
             self.message("/help", "black")
             self.message(_("""
 Chat commands:
-   MESAGE        - send a message to
+   MESSGE        - send a message to
                    all in conference
    @USER MESSAGE - send a message to
                    USER
