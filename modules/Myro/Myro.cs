@@ -23,6 +23,7 @@ using System.IO.Ports;
 using System.Threading;
 using IronPython.Runtime; // List
 using System.Collections.Generic; // IList
+using System.Collections; // IEnumerator
 
 public static class Extensions {
   public static T[] Slice<T>(this T[] source, int start, int end) {
@@ -1862,4 +1863,82 @@ public static class Myro {
 	  write((byte)v_high);
 	}
   }
+
+  // Graphics.cs
+
+  public static Cairo.Color color_map(string name) {
+    return Graphics.color_map(name);
+  }
+
+  public static Cairo.Color color_rgb(int r, int g, int b) {
+    return Graphics.color_rgb(r, g, b);
+  }
+
+  public static List<string> color_names() {
+    return Graphics.color_names();
+  }
+
+  public static IEnumerator getPixels(Graphics.Picture picture) {
+    return Graphics.getPixels(picture);
+  }
+  public static PythonTuple getRGB(Graphics.Pixel pixel) {
+    return pixel.getRGB();
+  }
+  public static PythonTuple getRGBA(Graphics.Pixel pixel) {
+    return pixel.getRGBA();
+  }
+  public static int getRed(Graphics.Pixel pixel) {
+    return pixel.getRed();
+  }
+  public static int getGreen(Graphics.Pixel pixel) {
+    return pixel.getGreen();
+  }
+  public static int getBlue(Graphics.Pixel pixel) {
+    return pixel.getBlue();
+  }
+  public static int getAlpha(Graphics.Pixel pixel) {
+    return pixel.getAlpha();
+  }
+  public static void setRGB(Graphics.Pixel pixel, byte red, byte green, byte blue) {
+    pixel.setRGB(red, green, blue);
+  }
+  public static void setRGBA(Graphics.Pixel pixel, byte red, byte green, byte blue, byte alpha) {
+    pixel.setRGBA(red, green, blue, alpha);
+  }
+  public static void setRed(Graphics.Pixel pixel, byte value) {
+    pixel.setRed(value);
+  }
+  public static void setGreen(Graphics.Pixel pixel, byte value) {
+    pixel.setGreen(value);
+  }
+  public static void setBlue(Graphics.Pixel pixel, byte value) {
+    pixel.setBlue(value);
+  }
+  public static void setAlpha(Graphics.Pixel pixel, byte value) {
+    pixel.setAlpha(value);
+  }
+
+  public static Graphics.Picture makePicture(int x, int y) {
+    return new Graphics.Picture(x, y);
+  }
+  public static Graphics.Picture makePicture(string filename) {
+    return new Graphics.Picture(filename);
+  }
+
+  public static Graphics.Picture makePicture(Graphics.GWindow window) { //, string filename) {
+    return Graphics.makePicture(window);
+  }
+
+  public static Graphics.GWindow makeWindow(string title="Pyjama Graphics",
+      int width=300,
+      int height=300) {
+    return Graphics.makeWindow(title, width, height);
+  }
+
+  public static Graphics.GWindow Window(string title="Pyjama Graphics",
+      int width=300,
+      int height=300) {
+    return Graphics.Window(title, width, height);
+  }
+
 }
