@@ -1,9 +1,14 @@
 #!/bin/bash
 export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$LD_LIBRARY_PATH
+uname=`uname` 
 if [ -L $0 ] ; then
-    DIR=$(dirname $(readlink -f "$0")) ;
+    if [[ "$uname" == 'Darwin' ]]; then
+        DIR=$(dirname $(readlink "$0")) ;
+    else
+        DIR=$(dirname $(readlink -f "$0")) ;
+    fi
 else
     DIR=$(dirname "$0") ;
 fi ;
-cd $DIR
-/usr/bin/env mono $MONO_OPTIONS bin/pyjama.exe "$@"
+#cd $DIR
+/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/pyjama.exe" "$@"

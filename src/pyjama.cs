@@ -26,7 +26,9 @@ using Mono.Unix;
 
 public class Pyjama {
   static void Main(string[] args) {
-  	Catalog.Init("pyjama","./locale");
+      string path = System.IO.Path.GetDirectoryName( 
+      	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+  	Catalog.Init("pyjama", System.IO.Path.Combine(path, "../locale"));
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
         LanguageSetup language = Python.CreateLanguageSetup(null);
         language.Options["FullFrames"] = true;
@@ -34,7 +36,7 @@ public class Pyjama {
 	ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 	ScriptScope scope = runtime.CreateScope();
 	ScriptEngine engine = runtime.GetEngine("python");
-	ScriptSource source = engine.CreateScriptSourceFromFile("src/pyjama.py");
+	ScriptSource source = engine.CreateScriptSourceFromFile(System.IO.Path.Combine(path, "../src/pyjama.py"));
 	source.Compile();
 	try {
 	  source.Execute(scope);

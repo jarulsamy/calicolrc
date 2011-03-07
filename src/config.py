@@ -401,7 +401,7 @@ pyjama_user = os.path.join(user, ".pyjama")
 if not os.path.isdir(pyjama_user):
     os.path.os.mkdir(pyjama_user)
 config = ConfigManager(os.path.join(pyjama_user, "pyjama.ini"))
-config.register("pyjama.font", "Monospace")
+config.register("pyjama.font", "Courier")
 config.register("pyjama.fontsize", 10)
 config.register("pyjama.recent_files", [])
 config.register("pyjama.languages", ["All"])

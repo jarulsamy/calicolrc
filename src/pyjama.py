@@ -21,10 +21,15 @@
 # Setup environment:
 import sys
 import os
-# First, let's find out where this file is: src/pyjama.py
+# First, let's save where we are:
+startpath = os.path.abspath(".")
+# Next, let's find out where this file is: src/pyjama.py
 pyjama_fullpath = os.path.abspath(__file__)
 # Next, let's add the absolute paths of what we need:
 fullpath, basename = os.path.split(pyjama_fullpath)
+pyjamapath = os.path.join(fullpath, "..") # /src/..
+# change here to start
+os.chdir(pyjamapath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
     path = os.path.join(fullpath, dir)
     sys.path.append(path)
@@ -123,6 +128,7 @@ class PyjamaProject(object):
         self.version = version           # from global variable
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
+        self.startpath = startpath       # from global variable
         self.pyjama_root = os.path.abspath(".")
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
@@ -138,6 +144,8 @@ class PyjamaProject(object):
         # Set up all of the engines:
         self.engine.setup()
         self.engine.start()
+        # Ok, done with initialization, let's go back to where we came
+        os.chdir(self.startpath)
         request_shell = False
         request_editor = False
         request_chat = False
