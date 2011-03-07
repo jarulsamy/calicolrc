@@ -148,6 +148,14 @@ public static class Graphics {
 	}
   }
 
+  public static Graphics.GWindow getWindow(string title) {
+	if (_windows.ContainsKey(title)) {
+	  return _windows[title];
+	} else {
+	  return null;
+	}
+  }
+
   public static Graphics.GWindow Window(string title="Pyjama Graphics", 
 	  int width=300, 
 	  int height=300) {
@@ -278,10 +286,14 @@ public static class Graphics {
 			  new GLib.TimeoutHandler(_redraw_now) );
 		}
 	  } else { // it is not too soon
-		// let's spawn one to check in 100 ms or so
-		timer_running = true;
-		GLib.Timeout.Add(update_interval, 
-			new GLib.TimeoutHandler(_redraw_now) );
+		if (timer_running) {
+		  // no need to start another
+		} else {
+		  // let's spawn one to check in 100 ms or so
+		  timer_running = true;
+		  GLib.Timeout.Add(update_interval, 
+			  new GLib.TimeoutHandler(_redraw_now) );
+		}
 	  }
 	}
 	

@@ -1968,6 +1968,10 @@ public static class Myro {
     return Graphics.makeWindow(title, width, height);
   }
 
+  public static Graphics.GWindow getWindow(string title) {
+    return Graphics.getWindow(title);
+  }
+
   public static Graphics.GWindow Window(string title="Pyjama Graphics",
       int width=300,
       int height=300) {
