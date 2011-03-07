@@ -367,6 +367,42 @@ public static class Myro {
     ev.WaitOne();
     return retval;
   }
+
+  public static string pickAFont() {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    string retval = null;
+    Gtk.Application.Invoke(delegate {
+        Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog("Select a font");
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
+           retval = fc.FontName;
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return retval;
+  }
+
+  public static bool yesno(string question) {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    bool retval = false;
+    Gtk.Application.Invoke(delegate {
+        Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                               0, Gtk.MessageType.Question,
+                               Gtk.ButtonsType.YesNo,
+                               question);
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Yes)) {
+           retval = true;
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return retval;
+  }
+
 /*
   public static object ask(PythonDictionary qdict, string title = "Information Request") {
     ManualResetEvent ev = new ManualResetEvent(false);
