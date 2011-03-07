@@ -288,6 +288,8 @@ class Chat:
         self.client.Close()
 
     def OnLogin(self, sender):
+        if self.user == "testname":
+            return
         self.status = _("online")
         self.send("", "2") # make this my only login
         if self.alert:
