@@ -28,6 +28,9 @@ public class Pyjama {
   static void Main(string[] args) {
     string path = System.IO.Path.GetDirectoryName(
       	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+    if (path.StartsWith("\\")) {
+        path = path.Substring(1);
+    }
     System.Console.WriteLine(path);
   	Catalog.Init("pyjama", System.IO.Path.Combine(path, "../locale"));
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
