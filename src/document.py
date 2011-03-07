@@ -62,6 +62,8 @@ class Document(object):
     def make_tab(self):
         self.tab = Gtk.HBox()
         self.label = Gtk.Label(self.title)
+        tooltips = Gtk.Tooltips()
+        tooltips.SetTip(self.label, self.filename, None)
         #self.tab.WidthRequest = 150
         #label.Ellipsize = Pango.EllipsizeMode.End
         self.label.Show()
@@ -112,6 +114,8 @@ class Document(object):
                                    _("Save"), Gtk.ResponseType.Accept)
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.filename = fc.Filename
+            tooltips = Gtk.Tooltips()
+            tooltips.SetTip(self.label, self.filename, None)
             self.save()
             self.title = os.path.basename(self.filename)
             self.label.Text = self.title

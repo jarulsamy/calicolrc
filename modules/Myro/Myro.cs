@@ -223,6 +223,14 @@ public static class Myro {
 	  return robot.getIR(position);
   }
 
+  public static object getBright(string window=null) {
+    return robot.getBright(window);
+  }
+
+  public static object getBright(int window) {
+    return robot.getBright(window);
+  }
+
   public static object getLine(params object [] position) {
 	if (position == null || position.Length == 0)
 	  return robot.getLine();
@@ -423,6 +431,14 @@ public static class Myro {
 	public virtual object getIR(params object [] position) {
 	  return null;
 	}
+
+    public virtual object getBright(string window = null) {
+      return null;
+    }
+
+    public virtual object getBright(int window) {
+      return null;
+    }
 
 	public virtual object getLine(params object [] position) {
 	  return null;
@@ -702,21 +718,13 @@ public static class Myro {
 		  Console.WriteLine("   {0}, version {1}",
 			  (string)info["robot"], (string)info["robot-version"]);
 		}
+        dongle = (string)info["fluke"];
 	  } else if (info.Contains("dongle")) {
-		dongle = (string)info["dongle"];
+        dongle = (string)info["dongle"];
 		Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
-		set_cam_param(Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
-        set_cam_param(Scribbler.CAM_COMB, 
-			Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
-		// Config grayscale on window 0, 1, 2
-		conf_gray_window(0, 2,   0, 128, 191, 1, 1);
-		conf_gray_window(1, 64,  0, 190, 191, 1, 1);
-		conf_gray_window(2, 128, 0, 254, 191, 1, 1);
-		set_ir_power(135);
-		conf_rle(90, 4, 0, 255, 51, 136, 190, 255);
-	  } else {
+      } else {
 		dongle = null;
-		Console.WriteLine("You are using:\n   Scribbler, version 0.0.0");
+		Console.WriteLine("You are using:\n   Scribbler without Fluke, version 0.0.0");
 	  }
 	  flush();
 	  stop();
@@ -727,6 +735,17 @@ public static class Myro {
 	  beep(.03, 349);
 	  beep(.03, 523);
 	  Console.WriteLine("Hello, my name is '{0}'!", getName());
+      if (dongle != null) {
+        set_cam_param(Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
+        set_cam_param(Scribbler.CAM_COMB,
+            Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
+        // Config grayscale on window 0, 1, 2
+        conf_gray_window(0, 2,   0, 128, 191, 1, 1);
+        conf_gray_window(1, 64,  0, 190, 191, 1, 1);
+        conf_gray_window(2, 128, 0, 254, 191, 1, 1);
+        set_ir_power(135);
+        conf_rle(90, 4, 0, 255, 51, 136, 190, 255);
+      }
 	}
 	
 	// ------------------------------------------------------------
@@ -934,7 +953,7 @@ public static class Myro {
 		  } else if (sensor == "obstacle") {
 			return getObstacle1(pos);
 		  } else if (sensor == "bright") {
-			return getBright(pos);
+			return getBright((string)pos);
 		  } else {
 			throw new Exception(String.Format("invalid sensor name: '{0}'",
 					sensor));
@@ -1226,22 +1245,29 @@ public static class Myro {
 	  }
 	}
 
-	public int getBright(object window=null) {
+    public override object getBright(int window) {
+      write(Scribbler.GET_WINDOW_LIGHT);
+      write((byte)window);
+      return read_3byte(); // (63.0 * 192.0 * 255.0)
+    }
+
+	public override object getBright(string window=null) {
+      byte byte_window = 0;
 	  if (window == null || (string)window == "all") {
-		return (int)get("bright");
+		return get("bright");
 	  } else if (window as string != null) {
 		if ((string)window == "left") {
-		  window = 0;
+		  byte_window = 0;
 		} else if ((string)window == "middle" || (string)window == "center") {
-		  window = 1;
+		  byte_window = 1;
 		} else if ((string)window == "right") {
-		  window = 2;
+		  byte_window = 2;
 		} else {
 		  throw new Exception();
 		}
 	  }
 	  write(Scribbler.GET_WINDOW_LIGHT);
-	  write((byte)window);
+	  write(byte_window);
 	  return read_3byte(); // (63.0 * 192.0 * 255.0)
 	}
 
