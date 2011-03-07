@@ -309,6 +309,47 @@ public static class Myro {
   public static double random() {
 	return Random.random();
   }
+
+  public static string pickAFile() {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    string retval = null;
+    Gtk.Application.Invoke(delegate {
+        Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Select a file",
+                               null,
+                               Gtk.FileChooserAction.Open,
+                               "Cancel", Gtk.ResponseType.Cancel,
+                               "Open", Gtk.ResponseType.Accept);
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
+           retval = fc.Filename;
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return retval;
+  }
+
+  public static string pickAFolder() {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    string retval = null;
+    Gtk.Application.Invoke(delegate {
+        Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Select a file",
+                               null,
+                               Gtk.FileChooserAction.SelectFolder,
+                               "Cancel", Gtk.ResponseType.Cancel,
+                               "Open", Gtk.ResponseType.Accept);
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
+           retval = fc.Filename;
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return retval;
+  }
+
   /*
   public static string ask(string question) {
 	ev = new ManualResetEvent(false);
