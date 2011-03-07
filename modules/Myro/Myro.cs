@@ -290,6 +290,10 @@ public static class Myro {
 	}
   }
 
+  public static int randint(int start, int end) {
+	return (int)(Random.random() * (end - start + 1) + start);
+  }
+
   public static bool heads() {
 	return (flipCoin() == "heads");
   }
@@ -302,6 +306,29 @@ public static class Myro {
 	return Random.random();
   }
 
+  public static double random() {
+	return Random.random();
+  }
+  /*
+  public static string ask(string question) {
+	ev = new ManualResetEvent(false);
+	string retval = null;
+	Gtk.Application.Invoke( delegate => {
+		  Gtk.Dialog dialog = new Gtk.Dialog(_("Pyjama Login"), null,
+			  Gtk.DialogFlags.DestroyWithParent);
+		  dialog.Modal = true;
+		  dialog.VBox.PackStart(table, expand, fill, padding);
+		  dialog.AddButton(_("Login"), Gtk.ResponseType.Apply);
+		  dialog.AddButton(_("Cancel"), Gtk.ResponseType.Cancel);
+		  dialog.ShowAll();
+		  response = dialog.Run();
+		  if (response == int(Gtk.ResponseType.Apply)) {
+		  }
+		  dialog.Destroy();
+		});
+	ev.WaitOne()
+  }
+  */
   public static object pickOne(params object [] items) {
 	if (items.Length == 1) {
 	  if (items[0] is int) {
@@ -1909,6 +1936,10 @@ public static class Myro {
 	while (currentTime() - start < seconds) {
 	  yield return (currentTime() - start);
 	}
+  }
+
+  public static void speak(string message) {
+	System.Console.WriteLine(message);
   }
 
   // Graphics.cs
