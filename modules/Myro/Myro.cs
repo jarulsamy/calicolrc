@@ -1897,6 +1897,20 @@ public static class Myro {
 	}
   }
 
+  public static IEnumerator timeRemaining(double seconds) {
+	double start = currentTime();
+	while (currentTime() - start < seconds) {
+	  yield return (currentTime() - start);
+	}
+  }
+
+  public static IEnumerator timer(double seconds) {
+	double start = currentTime();
+	while (currentTime() - start < seconds) {
+	  yield return (currentTime() - start);
+	}
+  }
+
   // Graphics.cs
 
   public static Cairo.Color color_map(string name) {
@@ -1977,5 +1991,4 @@ public static class Myro {
       int height=300) {
     return Graphics.Window(title, width, height);
   }
-
 }
