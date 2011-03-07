@@ -31,7 +31,6 @@ public class Pyjama {
     if (path.StartsWith("\\")) {
         path = path.Substring(1);
     }
-    System.Console.WriteLine(path);
   	Catalog.Init("pyjama", System.IO.Path.Combine(path, "../locale"));
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
         LanguageSetup language = Python.CreateLanguageSetup(null);
