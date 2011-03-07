@@ -350,6 +350,53 @@ public static class Myro {
     return retval;
   }
 
+  public static PythonTuple pickAColor() {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    PythonTuple retval = null;
+    Gtk.Application.Invoke(delegate {
+        Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog("Select a color");
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
+           retval = Graphics.PyTuple((int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Red))/Math.Pow(2,16) * 255.0),
+                                     (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Green))/Math.Pow(2, 16) * 255.0),
+                                     (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Blue))/Math.Pow(2, 16) * 255.0));
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return retval;
+  }
+/*
+  public static object ask(PythonDictionary qdict, string title = "Information Request") {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    string retval = null;
+    Gtk.Application.Invoke(delegate {
+        Gtk.AskDialog fc = new Gtk.AlertDialog(title,
+                               null);
+        fc.ShowAll();
+        if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
+           retval = fc.Filename;
+        }
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+
+
+         d = AskDialog(title, qdict)
+   ok = d.run()
+   if ok:
+      retval = {"ok": 1}
+      for name in qdict.keys():
+          retval[name] = d.textbox[name].get()
+      d.stop()
+      return retval
+   else:
+      d.stop()
+      return {"ok" : 0}
+      }
+*/
   /*
   public static string ask(string question) {
 	ev = new ManualResetEvent(false);
@@ -1991,6 +2038,18 @@ public static class Myro {
 
   public static Cairo.Color color_rgb(int r, int g, int b) {
     return Graphics.color_rgb(r, g, b);
+  }
+
+  public static Cairo.Color makeColor(int r, int g, int b) {
+    return Graphics.color_rgb(r, g, b);
+  }
+
+  public static Cairo.Color color_rgb(PythonTuple rgb) {
+    return Graphics.color_rgb((int)rgb[0], (int)rgb[1], (int)rgb[2]);
+  }
+
+  public static Cairo.Color makeColor(PythonTuple rgb) {
+    return Graphics.color_rgb((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
 
   public static List<string> color_names() {
