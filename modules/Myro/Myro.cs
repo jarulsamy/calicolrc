@@ -187,7 +187,11 @@ public static class Myro {
   }
 
   public static object getData(params int [] position) {
-	return robot.getData(position);
+    return robot.getData(position);
+  }
+
+  public static void setData(int position, int value) {
+    robot.setData(position, value);
   }
 
   public static PythonDictionary getAll() {
@@ -394,8 +398,11 @@ public static class Myro {
 	}
 
     public virtual object getData(params int [] position) {
-	  return null;
-	}
+      return null;
+    }
+
+    public virtual void setData(int position, int value) {
+    }
 
 	public virtual PythonDictionary getAll() {
 	  return null;
@@ -806,8 +813,6 @@ public static class Myro {
 	  } else if (sensor == "version") {
 		//TODO: just return this version for now; get from flash
 		return REVISION.Split()[1];
-	  } else if (sensor == "data") {
-		return getData(position);
 	  } else if (sensor == "info") {
 		return getInfo();
 	  } else if (sensor == "name") {
@@ -855,6 +860,8 @@ public static class Myro {
 			return list(getBright("left"), 
 				getBright("middle"), 
 				getBright("right"));
+          } else if (sensor == "data") {
+            return getData();
 		  } else if (sensor == "all") {
 			_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
 			// returned as bytes
@@ -952,7 +959,7 @@ public static class Myro {
 	}
 	
     public override object getData(params int [] position) {
-	  if (position.Length == 0) {
+	  if (position == null || position.Length == 0) {
 		position = new int[] {0, 1, 2, 3, 4, 5, 6, 7 };
 	  } 
 	  List retval = list();
@@ -1033,9 +1040,9 @@ public static class Myro {
 	  return null;
 	}
 
-	public void setData(int position, byte value) {
-	  byte [] data = _get(Scribbler.GET_DATA, 8, "byte");
-	  data[position] = value;
+	public override void setData(int position, int value) {
+      byte [] data = GetBytes(Scribbler.GET_DATA, 8);
+	  data[position] = (byte)value;
 	  set(Scribbler.SET_DATA, data);
 	}
 

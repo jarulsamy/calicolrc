@@ -193,6 +193,8 @@ class PyjamaProject(object):
             base, ext = os.path.splitext(basename)
             if (base in self.config.get("pyjama.languages") or
                 "All" in self.config.get("pyjama.languages")):
+                if base in self.config.get("pyjama.languages_ignore"):
+                    continue
                 try:
                     import_name, ext = os.path.basename(filename).rsplit(".")
                     exec("import %s as LanguageModule" % import_name)
@@ -510,7 +512,6 @@ class PyjamaProject(object):
                 self.login(data[_("Username")].Text,
                            data[_("Password")].Text)
             dialog.Destroy()
-            # FIXME: report results
         Gtk.Application.Invoke(invoke)
 
     def register_dialog(self, window):

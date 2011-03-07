@@ -292,6 +292,8 @@ class Chat:
         self.send("", "2") # make this my only login
         if self.alert:
             self.pyjama.alert(_("You are now logged in as '%s'.") % self.user)
+            self.send("admin", "[broadcast]\nroom: %s\n%s" % (self.pyjama.chat.room,
+                "%s has joined the discussion" % self.user))
         if self.debug:
             print "LOGIN:", self.user
             #self.client.SendMyPresence()
