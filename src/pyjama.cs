@@ -26,8 +26,9 @@ using Mono.Unix;
 
 public class Pyjama {
   static void Main(string[] args) {
-      string path = System.IO.Path.GetDirectoryName( 
+    string path = System.IO.Path.GetDirectoryName(
       	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+    System.Console.WriteLine(path);
   	Catalog.Init("pyjama", System.IO.Path.Combine(path, "../locale"));
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
         LanguageSetup language = Python.CreateLanguageSetup(null);
