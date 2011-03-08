@@ -55,6 +55,11 @@ public static class Myro {
     initialize(port, 38400);
   }
 
+  public static void initialize() {
+    string port = (string)ask("Port");
+    initialize(port, 38400);
+  }
+
   public static void init(string port, int baud=38400) {
     initialize(port, baud);
   }
