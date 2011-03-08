@@ -2163,6 +2163,9 @@ public static class Myro {
   public static void setRGBA(Graphics.Pixel pixel, byte red, byte green, byte blue, byte alpha) {
     pixel.setRGBA(red, green, blue, alpha);
   }
+  public static void setGray(Graphics.Pixel pixel, byte value) {
+    pixel.setGray(value);
+  }
   public static void setRed(Graphics.Pixel pixel, byte value) {
     pixel.setRed(value);
   }

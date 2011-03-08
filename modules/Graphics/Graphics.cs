@@ -100,6 +100,9 @@ public static class Graphics {
   public static void setRGBA(Pixel pixel, byte red, byte green, byte blue, byte alpha) {
 	pixel.setRGBA(red, green, blue, alpha);
   }
+  public static void setGray(Pixel pixel, byte value) {
+	pixel.setGray(value);
+  }
   public static void setRed(Pixel pixel, byte value) {
 	pixel.setRed(value);
   }
@@ -914,6 +917,9 @@ public static class Graphics {
 	public void setRGBA(byte red, byte green, byte blue, byte alpha) {
 	  picture.setRGBA(x, y, red, green, blue, alpha);
 	}
+	public void setGray(byte value) {
+	  picture.setGray(x, y, value);
+	}
 	public void setRed(byte value) {
 	  picture.setRed(x, y, value);
 	}
@@ -1177,6 +1183,17 @@ public static class Graphics {
 	  // red, green, blue, alpha
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, value);
+	  QueueDraw();
+	}
+
+	public void setGray(int x, int y, byte value) {
+	  // red, green, blue, alpha
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0, value);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1, value);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2, value);
 	  QueueDraw();
 	}
 
