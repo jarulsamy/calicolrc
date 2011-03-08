@@ -75,9 +75,11 @@ public static class Myro {
 		  } else {
 			// It exists, but wrong port/baud, so close it:
 			serial.Close(); // and need_port
-		  } // already closed
-		} // not a serial port
-	  }
+          }
+		} else { // already closed
+            serial.Open();
+        }
+	  } // not a serial port
 	} // not a scribbler
 	if (need_port) {
 	  robot = new Scribbler(port, baud);
@@ -2128,6 +2130,15 @@ public static class Myro {
   public static IEnumerator getPixels(Graphics.Picture picture) {
     return Graphics.getPixels(picture);
   }
+
+  public static Graphics.Pixel getPixel(Graphics.Picture picture, int col, int row) {
+    return picture.getPixel(col, row);
+  }
+
+  public static void setPixel(Graphics.Picture picture, int col, int row, Cairo.Color color) {
+    picture.setPixel(col, row, color);
+  }
+
   public static PythonTuple getRGB(Graphics.Pixel pixel) {
     return pixel.getRGB();
   }

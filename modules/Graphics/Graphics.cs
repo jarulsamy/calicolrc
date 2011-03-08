@@ -1086,9 +1086,16 @@ public static class Graphics {
 	  _pixbuf.Save(filename, filename.Substring(filename.Length - 3, 3));
 	}
 
-	public Pixel getPixel(int x, int y) {
-	  return new Pixel(this, x, y);
-	}
+    public Pixel getPixel(int x, int y) {
+      return new Pixel(this, x, y);
+    }
+
+    public void setPixel(int x, int y, Cairo.Color color) {
+      double red = color.R;
+      double green = color.G;
+      double blue = color.B;
+      this.setRGB(x, y, (byte)red, (byte)green, (byte)blue);
+    }
 
 	public IEnumerator getPixels() {
 	  for (int x=0; x < width; x++) {
