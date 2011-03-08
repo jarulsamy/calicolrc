@@ -117,9 +117,13 @@ public static class Graphics {
 	return new Picture(x, y);
   }
   public static Picture makePicture(string filename) {
-	return new Picture(filename);
+    return new Picture(filename);
   }
-  
+
+  public static Picture copyPicture(Picture picture) {
+    return new Picture(picture);
+  }
+
   public static Picture makePicture(Graphics.GWindow window) { //, string filename) {
 	ManualResetEvent ev = new ManualResetEvent(false);
 	Gdk.Pixbuf pixbuf = null;
@@ -930,15 +934,45 @@ public static class Graphics {
 	public Cairo.Surface surface;
 	public Cairo.Context context;
 
-	public Picture(string filename) : base(true) {
-	  _pixbuf = new Gdk.Pixbuf(filename);
-	  if (!_pixbuf.HasAlpha) {
-		_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-	  }
-	  format = Cairo.Format.Argb32;
-	  // Create a new ImageSurface
-	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	}
+    public Picture(string filename) : base(true) {
+      _pixbuf = new Gdk.Pixbuf(filename);
+      if (!_pixbuf.HasAlpha) {
+        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+      }
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+      center.x = _pixbuf.Width/2;
+      center.y = _pixbuf.Height/2;
+    }
+
+    public Picture(Picture original) : base(true) {
+      // Colorspace, has_alpha, bits_per_sample, width, height:
+      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, original.getWidth(), original.getHeight());
+      if (!_pixbuf.HasAlpha) {
+        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+      }
+      for (int x=0; x < _pixbuf.Width; x++) {
+        for (int y=0; y < _pixbuf.Height; y++) {
+          byte r = (byte)original.getRed(x, y);
+          byte g = (byte)original.getGreen(x, y);
+          byte b = (byte)original.getBlue(x, y);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 0, r);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 1, g);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 2, b);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 3, 255);
+        }
+      }
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+      center.x = original.center.x;
+      center.y = original.center.y;
+    }
 
 	public Picture(Gdk.Pixbuf pixbuf) : base(true) {
 	  _pixbuf = pixbuf;

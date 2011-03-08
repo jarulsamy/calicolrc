@@ -2187,6 +2187,10 @@ public static class Myro {
     return Graphics.makePicture(window);
   }
 
+  public static Graphics.Picture copyPicture(Graphics.Picture picture) { //, string filename) {
+    return Graphics.copyPicture(picture);
+  }
+
   public static Graphics.GWindow makeWindow(string title="Pyjama Graphics",
       int width=300,
       int height=300) {
