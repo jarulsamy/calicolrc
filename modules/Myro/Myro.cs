@@ -2145,6 +2145,9 @@ public static class Myro {
   public static PythonTuple getRGBA(Graphics.Pixel pixel) {
     return pixel.getRGBA();
   }
+  public static int getGray(Graphics.Pixel pixel) {
+    return pixel.getGray();
+  }
   public static int getRed(Graphics.Pixel pixel) {
     return pixel.getRed();
   }

@@ -82,6 +82,9 @@ public static class Graphics {
   public static PythonTuple getRGBA(Pixel pixel) {
 	return pixel.getRGBA();
   }
+  public static int getGray(Pixel pixel) {
+	return pixel.getGray();
+  }
   public static int getRed(Pixel pixel) {
 	return pixel.getRed();
   }
@@ -899,6 +902,9 @@ public static class Graphics {
 	public PythonTuple getRGBA() {
 	  return picture.getRGBA(x, y);
 	}
+	public int getGray() {
+	  return picture.getGray(x, y);
+	}
 	public int getRed() {
 	  return picture.getRed(x, y);
 	}
@@ -1153,6 +1159,17 @@ public static class Graphics {
 	public PythonTuple getRGBA(int x, int y) {
 	  // red, green, blue, alpha
 	  return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
+	}
+
+	public int getGray(int x, int y) {
+	  // red, green, blue, alpha
+	  int r = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 0);
+	  int g = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 1);
+	  int b = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		  x * _pixbuf.NChannels + 2);
+	  return (int)(((double)(r + g + b))/3.0);
 	}
 
 	public int getRed(int x, int y) {
