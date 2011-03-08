@@ -45,9 +45,15 @@ public static class Extensions {
 
 public static class Myro {
   public static Robot robot;
+  public static string dialogResponse = null;
   public static string REVISION = "$Revision: $";
 
   // Functional Interface
+
+  public static void init() {
+    string port = (string)ask("Port");
+    initialize(port, 38400);
+  }
 
   public static void init(string port, int baud=38400) {
     initialize(port, baud);
@@ -403,56 +409,78 @@ public static class Myro {
     return retval;
   }
 
-/*
-  public static object ask(PythonDictionary qdict, string title = "Information Request") {
+  public static string askQuestion(string question, List choices) {
     ManualResetEvent ev = new ManualResetEvent(false);
-    string retval = null;
+    dialogResponse = null;
     Gtk.Application.Invoke(delegate {
-        Gtk.AskDialog fc = new Gtk.AlertDialog(title,
-                               null);
+        Gtk.Dialog fc = new Gtk.Dialog("Question", null, 0);
+        fc.VBox.PackStart(new Gtk.Label(question));
+        foreach (string choice in choices) {
+            Gtk.Button button = new Gtk.Button(choice);
+            button.Clicked += new System.EventHandler(DialogHandler);
+            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+        }
         fc.ShowAll();
-        if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
-           retval = fc.Filename;
+        fc.Run();
+        fc.Destroy();
+        ev.Set();
+        });
+    ev.WaitOne();
+    return dialogResponse;
+  }
+
+  public static void DialogHandler(object obj, System.EventArgs args) {
+    dialogResponse = ((Gtk.Button)obj).Label;
+  }
+
+  public static object ask(object question, string title="Information Request") {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    object retval = null;
+    Gtk.Entry myentry = null;
+    PythonDictionary responses = new PythonDictionary();
+    Gtk.Application.Invoke(delegate {
+        Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                               0, Gtk.MessageType.Question,
+                               Gtk.ButtonsType.OkCancel,
+                               "Question?");
+        if (question is List) {
+            foreach (string choice in (List)question) {
+                Gtk.HBox hbox = new Gtk.HBox();
+                Gtk.Label label = new Gtk.Label(choice);
+                Gtk.Entry entry = new Gtk.Entry();
+                responses[choice] = entry;
+                hbox.PackStart(label);
+                hbox.PackStart(entry);
+                fc.VBox.PackStart(hbox);
+            }
+        } else {
+            string choice = (string)question;
+            Gtk.HBox hbox = new Gtk.HBox();
+            Gtk.Label label = new Gtk.Label(choice);
+            Gtk.Entry entry = new Gtk.Entry();
+            myentry = entry;
+            hbox.PackStart(label);
+            hbox.PackStart(entry);
+            fc.VBox.PackStart(hbox);
+        }
+        fc.ShowAll();
+        if (fc.Run() == (int)Gtk.ResponseType.Ok) {
+            if (question is List) {
+                foreach (string choice in responses.Keys) {
+                    responses[choice] = ((Gtk.Entry)responses[choice]).Text;
+                }
+                retval = responses;
+            } else {
+                retval = myentry.Text;
+            }
         }
         fc.Destroy();
         ev.Set();
         });
     ev.WaitOne();
-
-
-         d = AskDialog(title, qdict)
-   ok = d.run()
-   if ok:
-      retval = {"ok": 1}
-      for name in qdict.keys():
-          retval[name] = d.textbox[name].get()
-      d.stop()
-      return retval
-   else:
-      d.stop()
-      return {"ok" : 0}
-      }
-*/
-  /*
-  public static string ask(string question) {
-	ev = new ManualResetEvent(false);
-	string retval = null;
-	Gtk.Application.Invoke( delegate => {
-		  Gtk.Dialog dialog = new Gtk.Dialog(_("Pyjama Login"), null,
-			  Gtk.DialogFlags.DestroyWithParent);
-		  dialog.Modal = true;
-		  dialog.VBox.PackStart(table, expand, fill, padding);
-		  dialog.AddButton(_("Login"), Gtk.ResponseType.Apply);
-		  dialog.AddButton(_("Cancel"), Gtk.ResponseType.Cancel);
-		  dialog.ShowAll();
-		  response = dialog.Run();
-		  if (response == int(Gtk.ResponseType.Apply)) {
-		  }
-		  dialog.Destroy();
-		});
-	ev.WaitOne()
+    return retval;
   }
-  */
+
   public static object pickOne(params object [] items) {
 	if (items.Length == 1) {
 	  if (items[0] is int) {
