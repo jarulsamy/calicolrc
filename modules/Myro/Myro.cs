@@ -2191,4 +2191,20 @@ public static class Myro {
       int height=300) {
     return Graphics.Window(title, width, height);
   }
+
+  public static int getHeight(Graphics.GWindow window) {
+    return window.getHeight();
+  }
+
+  public static int getHeight(Graphics.Picture picture) {
+    return picture.getHeight();
+  }
+
+  public static int getWidth(Graphics.GWindow window) {
+    return window.getWidth();
+  }
+
+  public static int getWidth(Graphics.Picture picture) {
+    return picture.getWidth();
+  }
 }

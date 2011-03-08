@@ -195,7 +195,19 @@ public static class Graphics {
 	  _windows.Remove(Title);
 	}
 
-	private void HandleClickCallbacks(object obj, 
+    public int getWidth() {
+        int width, height;
+        this.GetSize(out width, out height);
+        return height;
+    }
+
+    public int getHeight() {
+        int width, height;
+        this.GetSize(out width, out height);
+        return width;
+    }
+
+    private void HandleClickCallbacks(object obj,
 		Gtk.ButtonPressEventArgs args) {
 	  foreach (PythonFunction function in onClickCallbacks) {
 		try {
@@ -1060,6 +1072,14 @@ public static class Graphics {
 	  center.x = _pixbuf.Width/2;
 	  center.y = _pixbuf.Height/2;
 	}
+
+    public int getWidth() {
+        return _pixbuf.Width;
+    }
+
+    public int getHeight() {
+        return _pixbuf.Height;
+    }
 
 	public void saveToFile(string filename) {
 	  // png, and jpg
