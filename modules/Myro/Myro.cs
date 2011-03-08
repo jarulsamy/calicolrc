@@ -51,13 +51,11 @@ public static class Myro {
   // Functional Interface
 
   public static void init() {
-    string port = (string)ask("Port");
-    initialize(port, 38400);
+    initialize(null);
   }
 
   public static void initialize() {
-    string port = (string)ask("Port");
-    initialize(port, 38400);
+    initialize(null);
   }
 
   public static void init(string port, int baud=38400) {
@@ -70,18 +68,23 @@ public static class Myro {
 	  if (((Scribbler)(Myro.robot)).serial is SerialPort) {
 		SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
 		if (serial.IsOpen) {
-		  if (serial.PortName == port && serial.BaudRate == baud) {
+		  if (port == null) 
+			need_port = false;
+		  else if (serial.PortName == port && serial.BaudRate == baud) {
 			need_port = false;
 		  } else {
 			// It exists, but wrong port/baud, so close it:
 			serial.Close(); // and need_port
           }
 		} else { // already closed
-            serial.Open();
+		  serial.Open();
         }
 	  } // not a serial port
 	} // not a scribbler
 	if (need_port) {
+	  if (port == null) {
+		port = (string)ask("Port");
+	  }
 	  robot = new Scribbler(port, baud);
 	} else {
 	  ((Scribbler)robot).setup();
@@ -449,7 +452,7 @@ public static class Myro {
         Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.OkCancel,
-                               "Question?");
+                               "Information Request");
         if (question is List) {
             foreach (string choice in (List)question) {
                 Gtk.HBox hbox = new Gtk.HBox();
