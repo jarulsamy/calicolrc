@@ -1091,9 +1091,9 @@ public static class Graphics {
     }
 
     public void setPixel(int x, int y, Cairo.Color color) {
-      double red = color.R;
-      double green = color.G;
-      double blue = color.B;
+      int red = (int)(color.R * 255);
+      int green = (int)(color.G * 255);
+      int blue = (int)(color.B * 255);
       this.setRGB(x, y, (byte)red, (byte)green, (byte)blue);
     }
 
