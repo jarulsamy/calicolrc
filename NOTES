@@ -6,17 +6,15 @@ These are issues with the code in Pyjama/src/*.py
 
 # IMMEDIATE:
 # add fudge factors
-# getBright() not working
-# setData() fails
-# set font size needs to be set for new docs
 # need a better flush? sometimes won't reconnect
+# negative image not working (setPixel?)
 
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret (on windows?)
 # BUG: On close, need to wait for the connection to finish
 
-# Pyjama: Need to run code in a process rather than thread?
+# Pyjama: Need to run code in an AppDomain rather than thread?
 # Pyjama: Add Printing
 # Pyjama: options for toggle word wrap, linenumbers, others
 # Pyjama: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
@@ -43,8 +41,7 @@ These are issue in Pyjama/modules/*
 
 Myro module for using robots:
 
-# Myro: Robot needs jpeg decompress
-# Myro: Write do_together in C#
+# Myro: Write doTogether in C#
 
 Graphics module for easy 2D graphics:
 
@@ -71,6 +68,7 @@ Experimental CLR Scheme:
 Drag and drop language Dinah:
 
 # Dinah: Get working
+## Mono doesn't allow drag and drop from TreeView
 ## read classes, methods, params and return values from DLL
 ## save/read file format
 ## execute file
