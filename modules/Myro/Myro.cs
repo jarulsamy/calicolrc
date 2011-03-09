@@ -291,7 +291,11 @@ public static class Myro {
   }
 
   public static void setName(string name) {
-	robot.setName(name);
+    robot.setName(name);
+  }
+
+  public static void setVolume(object volume) {
+    robot.setVolume(volume);
   }
 
   public static void setPassword(string password) {
@@ -666,8 +670,11 @@ public static class Myro {
 	public virtual void setLEDBack(double value) {
 	}
 
-	public virtual void setName(string name) {
-	}
+    public virtual void setName(string name) {
+    }
+
+    public virtual void setVolume(object volume) {
+    }
 
 	public virtual void setPassword(string password) {
 	}
@@ -742,6 +749,8 @@ public static class Myro {
   [Serializable()]
   public class Scribbler: Robot {
 	public SerialPort serial;
+    double [] _fudge  = new double[4];
+    double [] _oldFudge = new double[4];
 	public string dongle;
 	public int volume;
 	public string startsong;
@@ -916,6 +925,10 @@ public static class Myro {
 		Console.WriteLine("You are using:\n   Scribbler without Fluke, version 0.0.0");
 	  }
 	  flush();
+      setEchoMode(0);
+      wait(.25);
+      flush();
+      setEchoMode(0);
 	  stop();
 	  set("led", "all", "off");
 	  beep(.03, 784);
@@ -935,8 +948,85 @@ public static class Myro {
         set_ir_power(135);
         conf_rle(90, 4, 0, 255, 51, 136, 190, 255);
       }
+      if (info.Contains("robot")) {
+        loadFudge();
+	  }
 	}
-	
+
+    // Sets the fudge values (in memory, and on the flash memory on the robot)
+    public void setFudge(double f1, double f2, double f3, double f4) {
+        _fudge[0] = f1;
+        _fudge[1] = f2;
+        _fudge[2] = f3;
+        _fudge[3] = f4;
+
+        // Save the fudge data (in integer 0..255 form) to the flash memory
+        // f1-f4 are float values 0..2, convert to byte values
+        // But to make things quick, only save the ones that have changed!
+        // 0..255 and save.
+
+        if (_oldFudge[0] != _fudge[0]) {
+            if (dongle == null) {
+                setSingleData(0,  (int)(_fudge[0] * 127.0) );
+            } else {
+                setSingleData(3,  (int)(_fudge[0] * 127.0) );
+            }
+            _oldFudge[0] = _fudge[0];
+        }
+        if (_oldFudge[1] != _fudge[1]) {
+            if (dongle == null) {
+                setSingleData(1,  (int)(_fudge[1] * 127.0) );
+            } else {
+                setSingleData(2,  (int)(_fudge[1] * 127.0) );
+            }
+            _oldFudge[1] = _fudge[1];
+        }
+
+        if (_oldFudge[2] != _fudge[2]) {
+            if (dongle == null) {
+                setSingleData(2,  (int)(_fudge[2] * 127.0) );
+            } else {
+                setSingleData(1,  (int)(_fudge[2] * 127.0) );
+            }
+            _oldFudge[2] = _fudge[2];
+        }
+
+        if (_oldFudge[3] != _fudge[3]) {
+            if (dongle == null) {
+                setSingleData(3,  (int)(_fudge[3] * 127.0) );
+            } else {
+                setSingleData(0,  (int)(_fudge[3] * 127.0) );
+            }
+            _oldFudge[3] = _fudge[3];
+        }
+    }
+
+    public void loadFudge() {
+       for (int i=0; i < 4; i++) {
+         _fudge[i] = (int)get("data",i);
+         if (_fudge[i] == 0) {
+             _fudge[i] = 127;
+         }
+         _fudge[i] = _fudge[i] / 127.0;
+       }
+       if (dongle != null) {
+         double t1 = _fudge[3];
+         double t2 = _fudge[2];
+         double t3 = _fudge[1];
+         double t4 = _fudge[0];
+         _fudge[0] = t1;
+         _fudge[1] = t2;
+         _fudge[2] = t3;
+         _fudge[3] = t4;
+       }
+    }
+
+    //Gets the fudge values (from memory, so we don't get penalized by a slow
+    // serial link)
+    public PythonTuple getFudge() {
+        return Graphics.PyTuple(_fudge[0], _fudge[1], _fudge[2], _fudge[3]);
+    }
+
 	// ------------------------------------------------------------
 	// Data structures:
 	public PythonDictionary dict(params object [] list) {
@@ -1139,10 +1229,12 @@ public static class Myro {
 			} else if (Contains(pos, 1, "right")) {
 			  retvals.append((int)values[1]);
 			}
-		  } else if (sensor == "obstacle") {
-			return getObstacle1(pos);
+          } else if (sensor == "data") {
+            retvals.append(getData((int)pos));
+          } else if (sensor == "obstacle") {
+            retvals.append(getObstacle1(pos));
 		  } else if (sensor == "bright") {
-			return getBright((string)pos);
+			retvals.append(getBright((string)pos));
 		  } else {
 			throw new Exception(String.Format("invalid sensor name: '{0}'",
 					sensor));
@@ -1157,6 +1249,12 @@ public static class Myro {
 		}
 	  }
 	}
+
+    public object getData(int position) {
+      int [] ints = new int[1];
+      ints[0] = position;
+      return getData(ints);
+    }
 
     public object getData(object [] position) {
 	  int [] ints = new int[position.Length];
@@ -1202,6 +1300,9 @@ public static class Myro {
 	  write(Scribbler.SET_DIMMER_LED);
 	  write((byte)value);
 	}
+    public override void setVolume(object volume) {
+        set("volume", volume, null);
+    }
 
 	public override void setName(string name) {
 	  name = pad(name, 16);
@@ -1224,7 +1325,7 @@ public static class Myro {
 	  write((byte)power);
 	}
 
-	public void setEchoMode(string value) {
+	public void setEchoMode(int value) {
 	  if (isTrue(value)) { 
 		set(Scribbler.SET_ECHO_MODE, 1);
 	  } else {
@@ -1363,7 +1464,7 @@ public static class Myro {
 	  } else if (item == "startsong") {
 		startsong = (string)position;
 	  } else if (item == "echomode") {
-		setEchoMode((string)position);
+		setEchoMode((int)position);
 	  } else if (item == "data") {
 		setData((int)position, (byte)value);
 	  } else if (item == "password") {
