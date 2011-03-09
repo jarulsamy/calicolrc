@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 $Id: $
 */
 using System;
+using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports;
 using System.Threading;
 using IronPython.Runtime; // List
@@ -333,6 +334,36 @@ public static class Myro {
 
   public static double random() {
 	return Random.random();
+  }
+
+  public static List getFilenames(string path) {
+    List<string> retval = new List<string>();
+    List filenames = new List();
+    string directory = "";
+    string pattern;
+    string [] parts = path.Split(Path.DirectorySeparatorChar);
+    pattern = parts[parts.Length - 1]; // last
+    for (int i = 0; i < parts.Length - 1; i++) {
+        if (parts[i] == "") {
+            directory = (directory + Path.DirectorySeparatorChar);
+        } else {
+            directory = Path.Combine(directory, parts[i]);
+        }
+    }
+    if (directory == "") {
+        directory = ".";
+    }
+    directory = Path.GetFullPath(directory);
+    DirectoryInfo di = new DirectoryInfo(directory);
+    FileInfo[] rgFiles = di.GetFiles(pattern);
+    foreach(FileInfo fi in rgFiles) {
+        retval.Add(fi.Name);
+    }
+    retval.Sort();
+    foreach(string filename in retval) {
+        filenames.append(filename);
+    }
+    return filenames;
   }
 
   public static string pickAFile() {
