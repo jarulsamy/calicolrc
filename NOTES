@@ -2,11 +2,13 @@ Problems, issues, features, and questions.
 
 = Pyjama =
 
-These are issues with the code in Pyjama/src/*.py
+IMMEDIATE
 
-# IMMEDIATE:
-# add fudge factors
-# need a better flush? sometimes won't reconnect
+# Examples
+# Joystick/gamepad
+# Scheme doesn't raise exception in file load
+
+These are issues with the code in Pyjama/src/*.py
 
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
