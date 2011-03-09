@@ -77,7 +77,12 @@ public static class Myro {
 			serial.Close(); // and need_port
           }
 		} else { // already closed
-		  serial.Open();
+           if ((serial.PortName == port || port == null) && serial.BaudRate == baud) {
+            need_port = false;
+            serial.Open();
+          } else {
+            need_port = true;
+          }
         }
 	  } // not a serial port
 	} // not a scribbler

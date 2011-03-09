@@ -1,5 +1,5 @@
 import Myro
-Myro.init("/dev/rfcomm1")
+Myro.init()
 
 pic = Myro.takePicture()
 Myro.show(pic)
