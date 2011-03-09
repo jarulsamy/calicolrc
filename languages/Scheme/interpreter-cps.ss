@@ -384,12 +384,25 @@
 ;; supports procedures of any number of arguments
 (define* map-prim
   (lambda (proc args env handler k)
-    (let ((len (length args))
-	  (list-args (listify args)))
-      (cond
-       ((= len 1) (map1 proc (car list-args) env handler k))
-       ((= len 2) (map2 proc (car list-args) (cadr list-args) env handler k))
-       (else (mapN proc list-args env handler k))))))
+    (if (iterator? (car args))
+        (iterate-collect proc (car args) env handler k)
+        (let ((len (length args))
+              (list-args (listify args)))
+          (cond
+            ((= len 1) (map1 proc (car list-args) env handler k))
+            ((= len 2) (map2 proc (car list-args) (cadr list-args) env handler k))
+            (else (mapN proc list-args env handler k)))))))
+
+(define* iterate-collect
+  (lambda (proc iterator env handler k)
+    (let ((item (next-item iterator)))
+      (if (null? item)
+          (k '())
+          (proc (list item) env handler
+            (lambda-cont (v1)
+              (iterate-collect proc iterator env handler
+                (lambda-cont (v2)
+                  (k (cons v1 v2))))))))))
 
 (define listify
   (lambda (arg-list)
@@ -452,16 +465,27 @@
 
 (define* for-each-prim
   (lambda (proc lists env handler k)
-    (let ((arg-list (listify lists)))
-      (if (null? (car arg-list))
-	  (k '<void>)
-	  (if (dlr-exp? proc) 
-	      (begin 
-		(dlr-apply proc (map car arg-list))
-		(for-each-prim proc (map cdr arg-list) env handler k))
-	      (proc (map car arg-list) env handler
+    (if (iterator? (car lists))
+        (iterate proc (car lists) env handler k)
+        (let ((arg-list (listify lists)))
+          (if (null? (car arg-list))
+              (k '<void>)
+              (if (dlr-exp? proc) 
+                  (begin 
+                    (dlr-apply proc (map car arg-list))
+                    (for-each-prim proc (map cdr arg-list) env handler k))
+                  (proc (map car arg-list) env handler
 		    (lambda-cont (v1)
-				 (for-each-prim proc (map cdr arg-list) env handler k))))))))
+                      (for-each-prim proc (map cdr arg-list) env handler k)))))))))
+
+(define* iterate
+  (lambda (proc iterator env handler k)
+    (let ((item (next-item iterator)))
+      (if (null? item)
+          (k '())
+          (proc (list item) env handler
+            (lambda-cont (v)
+              (iterate proc iterator env handler k)))))))
 
 (define get-current-time
   (lambda ()

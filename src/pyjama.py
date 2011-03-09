@@ -121,6 +121,7 @@ class PyjamaProject(object):
         Constructor for the singleton Pyjama instance. argv is the
         command-line files and flags.
         """
+        self.debug = False
         self.shell = None
         self.editor = None
         self.chat = None
@@ -163,6 +164,8 @@ class PyjamaProject(object):
             elif arg == "--exec":
                 self.standalone = True
                 request_shell = True
+            elif arg == "--debug":
+                self.debug = True
             else:
                 files.append(os.path.abspath(arg))
                 request_editor = True
@@ -592,6 +595,7 @@ if "--help" in args:
     print _("  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics")
     print _("  pyjama --version                  Displays the version number (%s)" % version)
     print _("  pyjama --help                     Displays this message")
+    print _("  pyjama --debug                    Puts Pyjama in debugging mode")
     print
     sys.exit(0)
 elif "--version" in args:

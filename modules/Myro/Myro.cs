@@ -423,7 +423,7 @@ public static class Myro {
     ManualResetEvent ev = new ManualResetEvent(false);
     dialogResponse = null;
     Gtk.Application.Invoke(delegate {
-        Gtk.Dialog fc = new Gtk.Dialog("Question", null, 0);
+        Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
         fc.VBox.PackStart(new Gtk.Label(question));
         foreach (string choice in choices) {
             Gtk.Button button = new Gtk.Button(choice);

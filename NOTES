@@ -7,12 +7,13 @@ These are issues with the code in Pyjama/src/*.py
 # IMMEDIATE:
 # add fudge factors
 # need a better flush? sometimes won't reconnect
-# negative image not working (setPixel?)
 
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
 # BUG: UP and DOWN in history needs to move caret (on windows?)
 # BUG: On close, need to wait for the connection to finish
+
+Major missing features:
 
 # Pyjama: Need to run code in an AppDomain rather than thread?
 # Pyjama: Add Printing
@@ -64,6 +65,7 @@ IronPython on Mono:
 Experimental CLR Scheme:
 
 # Scheme: (robot.beep 1.0 400.0 400.0) needs to be floats?
+# Scheme: doesn't raise exception on loading file
 
 Drag and drop language Dinah:
 

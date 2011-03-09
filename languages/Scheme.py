@@ -36,7 +36,7 @@ class SchemeEngine(Engine):
 
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)
-        self.engine.execute_file(filename)
+        result = self.engine.execute_file(filename)
 
     def setup(self):
         super(SchemeEngine, self).setup()

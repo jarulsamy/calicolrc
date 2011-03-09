@@ -515,6 +515,7 @@ public class Scheme {
  	set_env_b(env, symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1));
  	set_env_b(env, symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1));
  	set_env_b(env, symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2));
+ 	set_env_b(env, symbol("iterator?"), new Proc("list?", (Procedure1Bool)iterator_q, 1, 2));
  	set_env_b(env, symbol("symbol?"), new Proc("symbol?", (Procedure1Bool)symbol_q, 1, 2));
  	set_env_b(env, symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2));
  	set_env_b(env, symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1));
@@ -1959,14 +1960,16 @@ public class Scheme {
 		trace(11, "length returned: {0}\n", len);
 		return len;
 	  } else {
-		throw new Exception("attempt to take length of an improper list");
+		throw new Exception(
+            String.Format("attempt to take length of an improper list: {0}", obj));
 	  }
 	} else if (string_q(obj)) {
 	  return obj.ToString().Length;
 	} else if (vector_q(obj)) {
 	  return ((Vector)obj).length();
 	} else
-	  throw new Exception("attempt to take length of a non-iterator");
+	  throw new Exception(
+          String.Format("attempt to take length of a non-iterator: {0}", obj));
   }
   
   public static object length_safe(object obj) {
@@ -1985,6 +1988,19 @@ public class Scheme {
 	  return len;
 	}
 	return -1;
+  }
+
+  public static object next_item(object iterator) {
+    object retval = EmptyList;
+    if (((IEnumerator)iterator).MoveNext()) {
+      retval = ((IEnumerator)iterator).Current;
+    }
+    return retval;
+  }
+
+  public static bool iterator_q(object obj) {
+    //System.Console.WriteLine("iterator_q: {0} {1}", obj.ToString(), (! list_q(obj)));
+    return (! list_q(obj));
   }
 
   public static bool list_q(object obj) {
