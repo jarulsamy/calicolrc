@@ -150,7 +150,8 @@ public static class Graphics {
 	  int width=300, 
 	  int height=300) {
 	if (_windows.ContainsKey(title)) {
-	  _windows[title].ShowAll();
+      _windows[title].ShowAll();
+      _windows[title].Resize(width, height);
 	  return _windows[title];
 	} else {
 	  _windows[title] = new Graphics.GWindow(title, width, height);
@@ -170,6 +171,7 @@ public static class Graphics {
 	  int width=300, 
 	  int height=300) {
 	if (_windows.ContainsKey(title)) {
+      _windows[title].Resize(width, height);
 	  return _windows[title];
 	} else {
 	  _windows[title] = new Graphics.GWindow(title, width, height);
@@ -192,6 +194,8 @@ public static class Graphics {
 		int width=300, 
 		int height=300) : base(title) {
 	  _canvas = new Canvas("auto");
+      AllowGrow = true;
+      AllowShrink = true;
 	  SetDefaultSize(width, height);
 	  eventbox = new Gtk.EventBox();
 	  this.Add(eventbox);
@@ -338,14 +342,19 @@ public static class Graphics {
 			base.Show(); 
 		  });
 	}
-	public new void ShowAll() {
-	  Gtk.Application.Invoke(delegate { 
-			DateTime now = DateTime.Now;
-			last_update = now;
-			_dirty = false;
-			base.ShowAll(); 
-		  });
-	}
+    public new void ShowAll() {
+      Gtk.Application.Invoke(delegate { 
+            DateTime now = DateTime.Now;
+            last_update = now;
+            _dirty = false;
+            base.ShowAll(); 
+          });
+    }
+    public new void Resize(int width, int height) {
+      Gtk.Application.Invoke(delegate {
+            base.Resize(width, height);
+          });
+    }
 	public void update() {
 	  Gtk.Application.Invoke(delegate { 
 			DateTime now = DateTime.Now;

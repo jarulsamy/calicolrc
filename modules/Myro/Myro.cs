@@ -23,6 +23,7 @@ using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports;
 using System.Threading;
 using IronPython.Runtime; // List
+using IronRuby.Builtins; // RubyArray
 using System.Collections.Generic; // IList
 using System.Collections; // IEnumerator
 
@@ -357,7 +358,7 @@ public static class Myro {
     DirectoryInfo di = new DirectoryInfo(directory);
     FileInfo[] rgFiles = di.GetFiles(pattern);
     foreach(FileInfo fi in rgFiles) {
-        retval.Add(fi.Name);
+        retval.Add(Path.Combine(directory, fi.Name));
     }
     retval.Sort();
     foreach(string filename in retval) {
@@ -457,6 +458,21 @@ public static class Myro {
         });
     ev.WaitOne();
     return retval;
+  }
+
+  public static string to_s(object obj) {
+    return obj.ToString();
+  }
+
+  public static List to_l(RubyArray obj) {
+    List list = new List();
+    foreach (object choice in obj)
+        list.append(choice.ToString());
+    return list;
+  }
+
+  public static string askQuestion(string question, RubyArray choices) {
+    return askQuestion(question, to_l(choices));
   }
 
   public static string askQuestion(string question, List choices) {

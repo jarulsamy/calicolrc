@@ -80,7 +80,7 @@ clr.AddReference("Mono.TextEditor")
 # Bring .NET References into IronPython scope:
 import Gtk
 import Pango
-#import GLib
+import GLib
 
 from Mono.TextEditor import Highlighting
 
@@ -91,7 +91,6 @@ Highlighting.SyntaxModeService.LoadStylesAndModes(
     os.path.join(path, "..", "bin", "SyntaxModes"))
 
 # Import pure-Python modules:
-import traceback
 import tempfile
 import re
 
@@ -101,13 +100,21 @@ from config import config
 from utils import _, Chat
 
 # Setup Runtime environment:
-#def handle_exception(arg):
-#    print >> sys.stderr, e.__class__.__name__
+def handle_exception(arg):
+    if pw.shell:
+        Gtk.Application.Invoke(pw.shell.stop_running)
+        Gtk.Application.Invoke(lambda s,a: pw.shell.message("Crashed!"))
+
+#    Gtk.Application.Invoke(lambda s,a: error_message())
+
+#def error_message():
+#    traceback.print_exc()
+
 #    #sys.exit(1)
 #
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
-#GLib.ExceptionManager.UnhandledException += handle_exception
+GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
 
@@ -213,8 +220,11 @@ class PyjamaProject(object):
                     results[lang.language] = lang
                 except:
                     traceback.print_exc()
-                    print >> sys.stderr, _("Cannot load language file '%s'") % filename
+                    self.error_message(_("Cannot load language file '%s'") % filename)
         return results
+
+    def error_message(self, message):
+        print >> sys.stderr, message
 
     def load(self, filename):
         """
@@ -310,6 +320,12 @@ class PyjamaProject(object):
         if ((self.editor is None) and
             (self.shell is None) and
             (self.chat is None)):
+            # Clean up, save settings:
+            self.config.get("pyjama.recent_files")[:] = self.config.get("pyjama.recent_files")[-10:]
+            config.save()
+            # Close connections:
+            if pw and pw.connection:
+                pw.connection.close()
             Gtk.Application.Quit()
 
     def setup_chat(self, *args, **kwargs):
@@ -612,9 +628,3 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
-    # Clean up, save settings:
-    config.save()
-    # Close connections:
-    if pw and pw.connection:
-        pw.connection.close()
-

@@ -212,10 +212,9 @@ class EditorWindow(Window):
                                                       shell.accel_group["Recent files"])
                         shell.submenu["Recent files"].Append(menuitem)
                         shell.submenu["Recent files"].ShowAll()
-                if len(self.pyjama.config.get("pyjama.recent_files")) > 10:
-                    self.pyjama.config.get("pyjama.recent_files").pop()
-                    # FIXME: remove from self.submenu["Recent files"]
-                    # FIXME: remove from shell self.submenu["Recent files"] too
+                else: # it is in list, move to end (most recent)
+                    self.pyjama.config.get("pyjama.recent_files").remove(filename)
+                    self.pyjama.config.get("pyjama.recent_files").append(filename)
             page.set_font()
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
