@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 $Id: $
 */
+
 using System;
 using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports;
@@ -199,7 +200,7 @@ public static class Myro {
 	return robot.getIRMessage();
   }
 
-  public static void sendIRMessage(byte [] data) {
+  public static void sendIRMessage(string data) {
   }
 
   public static void setCommunicate() {
@@ -297,8 +298,24 @@ public static class Myro {
 	robot.setLEDBack(value);
   }
 
+  public static void setEchoMode(int value) {
+    robot.setEchoMode(value);
+  }
+
   public static void setName(string name) {
     robot.setName(name);
+  }
+
+  public static void setIRPower(int power) {
+    robot.setIRPower(power);
+  }
+
+  public static void setWhiteBalance(object value) {
+    robot.setWhiteBalance(value);
+  }
+
+  public static void setForwardness(object value) {
+    robot.setForwardness(value);
   }
 
   public static void setVolume(object volume) {
@@ -643,7 +660,7 @@ public static class Myro {
 	public virtual void setCommunicate() {
 	}
 
-	public virtual void sendIRMessage(byte [] data) {
+	public virtual void sendIRMessage(string data) {
 	}
 
 	public virtual List getBlob() {
@@ -722,7 +739,19 @@ public static class Myro {
 	public virtual void setLEDBack(double value) {
 	}
 
+    public virtual void setEchoMode(int value) {
+    }
+
     public virtual void setName(string name) {
+    }
+
+    public virtual void setIRPower(int power) {
+    }
+
+    public virtual void setWhiteBalance(object value) {
+    }
+
+    public virtual void setForwardness(object value) {
     }
 
     public virtual void setVolume(object volume) {
@@ -1364,7 +1393,7 @@ public static class Myro {
 	  set(Scribbler.SET_NAME2, name2);
 	}
 	
-	public void setWhiteBalance(object value) {
+	public override void setWhiteBalance(object value) {
 	  if (isTrue(value)) {
 		write(Scribbler.SET_WHITE_BALANCE);
 	  } else {
@@ -1372,13 +1401,13 @@ public static class Myro {
 	  }
 	}
 
-	public void setIRPower(int power) {
+	public override void setIRPower(int power) {
 	  write(Scribbler.SET_DONGLE_IR);
 	  write((byte)power);
 	}
 
-	public void setEchoMode(int value) {
-	  if (isTrue(value)) { 
+    public override void setEchoMode(int value) {
+	  if (isTrue(value)) {
 		set(Scribbler.SET_ECHO_MODE, 1);
 	  } else {
         set(Scribbler.SET_ECHO_MODE, 0);
@@ -1415,7 +1444,7 @@ public static class Myro {
 	  set(Scribbler.SET_PASS2, pass2);
 	}
 
-    public void setForwardness(object direction) {
+    public override void setForwardness(object direction) {
 	  if (Contains(direction, "fluke-forward", 1)) {
 		direction = 1;
 	  } else if (Contains(direction, "scribbler-forward", 0)) {
@@ -2138,7 +2167,11 @@ public static class Myro {
 	  return bytes2ints(read(size));
 	}
 	
-	public override void sendIRMessage(byte [] data) {
+	public override void sendIRMessage(string message) {
+      byte [] data = new byte[message.Length];
+      for (int i = 0; i < message.Length; i ++) {
+        data[i] = (byte) message[i];
+      }
 	  write(Scribbler.SEND_IR_MESSAGE);
 	  write((byte)data.Length);
 	  write(data);
