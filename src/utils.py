@@ -294,7 +294,7 @@ class Chat:
         self.send("", "2") # make this my only login
         if self.alert:
             self.pyjama.alert(_("You are now logged in as '%s'.") % self.user)
-            self.send("admin", "[broadcast]\nroom: %s\n%s" % (self.pyjama.chat.room,
+            self.send("admin", "[broadcast]\nroom: %s\n%s" % ("General",
                 "%s has joined the discussion" % self.user))
         if self.debug:
             print "LOGIN:", self.user
@@ -352,11 +352,12 @@ class Chat:
             self.pyjama.alert(rest)
             return
         elif str(msg.Body).startswith("[update]"):
-            line0, rest = str(msg.Body).split("\n", 1) # [update]
-            line1, rest = rest.split("\n", 1) # room:
-            header, value = [item.strip() for item in line1.split(":", 1)]
-            if header == "room":
-                self.room = value
+            if self.pyjama.chat:
+                line0, rest = str(msg.Body).split("\n", 1) # [update]
+                line1, rest = rest.split("\n", 1) # room:
+                header, value = [item.strip() for item in line1.split(":", 1)]
+                if header == "room":
+                    self.pyjama.chat.room = value
             return
         elif str(msg.Body).startswith("[info]"):
             # ignore
