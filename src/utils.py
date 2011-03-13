@@ -26,15 +26,15 @@ import Gtk
 import Gdk
 import System
 from System.Threading import Mutex, ManualResetEvent
-import os
-import agsXMPP
-import traceback
 import Mono
+import agsXMPP
+
+import os
+import traceback
 
 MUTEX = Mutex(False, "PyjamaMutex")
 
 _ = Mono.Unix.Catalog.GetString
-#_ = lambda text: text
 
 def Array(*list):
     Type = type(list[0])
@@ -572,3 +572,36 @@ class StatusBar(Gtk.VBox):
 
 def get_colors():
     return ["red", "blue", "purple", "black", "green"]
+
+class Plugin:
+    """
+    A base class for plugins.
+    """
+    def __init__(self, pyjama):
+        self.pyjama = pyjama
+        self.init()
+
+    def on_create_window(self, window):
+        from shell import ShellWindow
+        from chat import ChatWindow
+        from editor import EditorWindow
+        print "Plugin setup for window '%s'" % window
+        self.window = window                  # Main window object
+        self.gtk_window = self.window.window  # Gtk.Window
+        if isinstance(self.window, ShellWindow):
+            self.window_type = "shell"
+        elif isinstance(self.window, EditorWindow):
+            self.window_type = "editor"
+            self.window.notebook.SwitchPage += self.on_switch_page
+        elif isinstance(self.window, ChatWindow):
+            self.window_type = "chat"
+        # Handle keystrokes:
+        self.gtk_window.insert_key_press_handler(self.on_key_press, 0)
+        # Errors:
+        # Running files:
+        
+    def on_key_press(self, *data):
+        return False
+
+    def on_select_page(self, *data):
+        return False

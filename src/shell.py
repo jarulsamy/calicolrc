@@ -103,7 +103,7 @@ class ShellWindow(Window):
         self.executeThread = None
         self.language = "python"
         self.window = MyWindow(_("Pyjama Shell"))
-        self.window.set_on_key_press(self.on_key_press)
+        self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.history_textview = Gtk.TextView()
@@ -229,6 +229,8 @@ class ShellWindow(Window):
         self.message(_("Pyjama Project %s") % self.pyjama.version)
         self.message(("-" * 50))
         self.set_font()
+        # Setup plugins
+        Window.__init__(self, pyjama)
 
     def set_font(self, font=None):
         if font is None:

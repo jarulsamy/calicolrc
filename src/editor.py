@@ -33,7 +33,7 @@ class EditorWindow(Window):
         self.pyjama = pyjama
         # create the parts
         self.window = MyWindow(_("Pyjama Editor"))
-        self.window.set_on_key_press(self.on_key_press)
+        self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.vbox = Gtk.VBox()
@@ -119,6 +119,8 @@ class EditorWindow(Window):
         self.statusbar.Show()
         self.vbox.Show()
         self.window.Show()
+        # Init plugins:
+        Window.__init__(self, pyjama)
         # Open files on command line, or just a New Script:
         if files:
             for file in files:

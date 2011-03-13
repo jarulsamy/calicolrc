@@ -21,6 +21,7 @@
 # Setup environment:
 import sys
 import os
+import traceback
 # First, let's save where we are:
 startpath = os.path.abspath(".")
 # Next, let's find out where this file is: src/pyjama.py
@@ -33,7 +34,6 @@ os.chdir(pyjamapath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
     path = os.path.join(fullpath, dir)
     sys.path.append(path)
-import traceback
 sys.path.append(os.path.abspath("modules"))
 
 # Add some paths for Windows:
@@ -93,6 +93,8 @@ Highlighting.SyntaxModeService.LoadStylesAndModes(
 # Import pure-Python modules:
 import tempfile
 import re
+import glob
+
 
 # Pyjama imports:
 from engine import EngineManager
@@ -152,12 +154,31 @@ class PyjamaProject(object):
         # Set up all of the engines:
         self.engine.setup()
         self.engine.start()
+        # Create the plugin handlers:
+        sys.path.append(os.path.abspath("plugins"))
+        self.plugins = {}
+        for filename in glob.glob("plugins/*.py"):
+            path, basename = os.path.split(filename)
+            base, ext = os.path.splitext(basename)
+            if base == "__init__":
+                continue
+            try:
+                module = __import__(base)
+                plugin = module.make_plugin(self)
+            except:
+                plugin = None
+            if plugin:
+                self.plugins[base] = plugin
+            else:
+                print "Could not load plugin '%s'" % filename
+                traceback.print_exc()
         # Ok, done with initialization, let's go back to where we came
         os.chdir(self.startpath)
         request_shell = False
         request_editor = False
         request_chat = False
         files = []
+        # Handle command line args:
         for arg in argv:
             if arg == "--shell":
                 request_shell = True
@@ -179,6 +200,7 @@ class PyjamaProject(object):
         if files == [] and not request_editor and not request_chat:
             # a default action, given nothing else requested
             request_shell = True
+        # Open requested windows
         if request_editor:
             if not self.standalone:
                 from editor import EditorWindow
@@ -203,7 +225,6 @@ class PyjamaProject(object):
         currently available. The language name (lowercase) is the
         key in the dictionary pointing to a Language object.
         """
-        import glob
         sys.path.append(os.path.abspath("languages"))
         results = {}
         for filename in glob.glob("languages/*.py"):

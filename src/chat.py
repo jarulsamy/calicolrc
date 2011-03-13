@@ -35,7 +35,7 @@ class ChatWindow(Window):
         self.pyjama = pyjama
         self.colormap = {}
         self.window = MyWindow(_("Pyjama Chat"))
-        self.window.set_on_key_press(self.on_key_press)
+        self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(350, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
         self.textview = Gtk.TextView()
@@ -121,6 +121,8 @@ class ChatWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
+        # Setup plugins
+        Window.__init__(self, pyjama)
         def invoke(sender, args):
             self.window.ShowAll()
             self.update_status()

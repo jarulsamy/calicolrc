@@ -768,7 +768,7 @@ public static class Myro {
 	  move(0, 0);
 	}
 
-	public void forward(double speed, double? interval) {
+	public void forward(double speed, double? interval=null) {
 	  move(speed, 0);
 	  if (interval != null) {
 		Thread.Sleep((int)(interval * 1000)); 
@@ -826,7 +826,33 @@ public static class Myro {
   public static bool Contains(object item, params object[] items) {
 	return ((IList<object>)items).Contains(item);
   }
-  
+
+/*
+def beep(seconds, freq, async=False):
+    if ser.inWaiting():
+        ser.write("CS")
+        ser.read(ser.inWaiting())
+    mseconds = seconds * 1000
+    ser.write("B" +
+              chr(int(mseconds / 255)) +
+              chr(int(mseconds % 255)) +
+              chr(int(freq / 255)) +
+              chr(int(freq % 255)))
+    ser.read(5)
+    if not async:
+        time.sleep(seconds)
+
+def motors(left, right):
+    if ser.inWaiting():
+        ser.write("CS")
+        ser.read(ser.inWaiting())
+    ser.write("V" +
+              chr(int(left * 20.0)) +
+              chr(int(right * 20.0)))
+    ser.read(3)
+
+*/
+
   [Serializable()]
   public class Scribbler: Robot {
 	public SerialPort serial;

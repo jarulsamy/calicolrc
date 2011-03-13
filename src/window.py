@@ -26,27 +26,44 @@ import Graphics
 from utils import _
 
 class MyWindow(Gtk.Window):
-    def on_key_press(self, eventkey):
-        """
-        Handle the key press for the entire window. Return True if
-        handled.  This is generally overloaded.
-        """
-        return False
 
-    def set_on_key_press(self, on_key_press):
+    def insert_key_press_handler(self, on_key_press, position):
         """
         Set the key press handler method:
         """
-        self.on_key_press = on_key_press
+        if hasattr(self, "key_press_handlers"):
+            self.key_press_handlers.insert(0, on_key_press)
+        else:
+            self.key_press_handlers = [on_key_press]
+
+    def add_key_press_handler(self, on_key_press):
+        """
+        Set the key press handler method:
+        """
+        if hasattr(self, "key_press_handlers"):
+            self.key_press_handlers.append(on_key_press)
+        else:
+            self.key_press_handlers = [on_key_press]
 
     def OnKeyPressEvent(self, eventkey):
         """
         Override the main event handler to insert ours beforehand.
         """
-        return (self.on_key_press(eventkey) or 
-                Gtk.Window.OnKeyPressEvent(self, eventkey))
+        if hasattr(self, "key_press_handlers"):
+            for key_press_handler in self.key_press_handlers:
+                #print "handler:", key_press_handler
+                result = key_press_handler(eventkey)
+                #print result
+                if result:
+                    return result
+        Gtk.Window.OnKeyPressEvent(self, eventkey)
 
 class Window(object):
+    def __init__(self, pyjama):
+        self.pyjama = pyjama
+        for plugin in self.pyjama.plugins:
+            self.pyjama.plugins[plugin].on_create_window(self)
+        
     def make_gui(self, menu, toolbar):
         self.menubar = Gtk.MenuBar()
         self.submenu = {}
