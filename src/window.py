@@ -131,8 +131,9 @@ class Window(object):
         retval.append(_("Recent files")) # submenu
         for file in self.pyjama.config.get("pyjama.recent_files"):
             if file:
+                menufile = file.replace("_", "__")
                 retval.append((_("Recent files"),
-                               (file, None, None,
+                               (menufile, None, None,
                                 lambda o,e,file=file: self.select_or_open(file))))
         retval.append(None) # separator
         for lang in self.pyjama.languages:

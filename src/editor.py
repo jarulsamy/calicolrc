@@ -200,20 +200,28 @@ class EditorWindow(Window):
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
             if filename:
+                menufilename = filename.replace("_", "__")
                 if filename not in self.pyjama.config.get("pyjama.recent_files"):
                     self.pyjama.config.get("pyjama.recent_files").append(filename)
-                    menuitem = self.make_menuitem((filename, None, None,
+                    menuitem = self.make_menuitem((menufilename, None, None,
                                                     lambda o,e,file=filename: self.select_or_open(filename)),
                                                   self.accel_group["Recent files"])
                     self.submenu["Recent files"].Append(menuitem)
                     self.submenu["Recent files"].ShowAll()
                     if self.pyjama.shell:
                         shell = self.pyjama.shell
-                        menuitem = self.make_menuitem((filename, None, None,
+                        menuitem = self.make_menuitem((menufilename, None, None,
                                                        lambda o,e,file=filename: shell.select_or_open(filename)),
                                                       shell.accel_group["Recent files"])
                         shell.submenu["Recent files"].Append(menuitem)
                         shell.submenu["Recent files"].ShowAll()
+                    if self.pyjama.chat:
+                        chat = self.pyjama.chat
+                        menuitem = self.make_menuitem((menufilename, None, None,
+                                                       lambda o,e,file=filename: chat.select_or_open(filename)),
+                                                      chat.accel_group["Recent files"])
+                        chat.submenu["Recent files"].Append(menuitem)
+                        chat.submenu["Recent files"].ShowAll()
                 else: # it is in list, move to end (most recent)
                     self.pyjama.config.get("pyjama.recent_files").remove(filename)
                     self.pyjama.config.get("pyjama.recent_files").append(filename)
