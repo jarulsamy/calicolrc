@@ -35,6 +35,7 @@ class Logger(Plugin):
         page = notebook.GetNthPage(args.PageNum)
         print time.time(), "switch", self.window_type, page.document.filename
 
-# Uncomment to activate:
-#def make_plugin(pyjama):
-#    return Logger(pyjama)
+def make_plugin(pyjama):
+    # Uncomment to activate:
+    #return Logger(pyjama)
+    return None
