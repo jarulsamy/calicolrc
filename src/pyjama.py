@@ -167,11 +167,10 @@ class PyjamaProject(object):
                 plugin = module.make_plugin(self)
             except:
                 plugin = None
+                traceback.print_exc()
+                print "Could not load plugin '%s'; skipping" % filename
             if plugin:
                 self.plugins[base] = plugin
-            else:
-                print "Could not load plugin '%s'" % filename
-                traceback.print_exc()
         # Ok, done with initialization, let's go back to where we came
         os.chdir(self.startpath)
         request_shell = False
