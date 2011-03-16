@@ -130,6 +130,18 @@ public static class Graphics {
     return new Picture(picture);
   }
 
+  public static void Init() { 
+    // Start a thread in Background to run Graphics
+    // Only for use in non-GUI environments
+    Thread t = new Thread(GraphicsLoop);
+    t.Start();
+  }
+ 
+  public static void GraphicsLoop() {
+    Gtk.Application.Init();
+    Gtk.Application.Run();
+  }
+
   public static Picture makePicture(Graphics.GWindow window) { //, string filename) {
 	ManualResetEvent ev = new ManualResetEvent(false);
 	Gdk.Pixbuf pixbuf = null;
