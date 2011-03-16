@@ -28,9 +28,9 @@ clean:
 	rm -f modules/Graphics.dll modules/Myro.dll modules/Conx.dll \
 		languages/PJScheme.dll Pyjama*.zip
 
-bin/pyjama.exe: src/pyjama.cs
+bin/pyjama.exe: bin/pyjama.cs
 	MONO_PATH=$(MONO_PATH) gmcs -target:exe \
-		src/pyjama.cs \
+		bin/pyjama.cs \
 		-r:IronPython \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \

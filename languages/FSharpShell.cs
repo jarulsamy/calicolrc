@@ -6,24 +6,39 @@ using System.Threading;
 public class FSharpShell {
      public Process process;
      public FSharpShell() {
+	     string path = System.IO.Path.GetDirectoryName(
+			 System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+	     if (path.StartsWith("\\")) {
+		   path = path.Substring(1);
+	     }
+#pragma warning disable 612
+		 string gtk = System.IO.Path.GetDirectoryName(
+			 System.Reflection.Assembly.LoadWithPartialName("gtk-sharp").CodeBase).Substring(5);
+		 string gdk = System.IO.Path.GetDirectoryName(
+			 System.Reflection.Assembly.LoadWithPartialName("gdk-sharp").CodeBase).Substring(5);
+		 string glib = System.IO.Path.GetDirectoryName(
+			 System.Reflection.Assembly.LoadWithPartialName("glib-sharp").CodeBase).Substring(5);
+		 string atk = System.IO.Path.GetDirectoryName(
+			 System.Reflection.Assembly.LoadWithPartialName("atk-sharp").CodeBase).Substring(5);
+		 string fsi = System.IO.Path.Combine(path, "fsi.exe");
          ProcessStartInfo startInfo = new ProcessStartInfo();
          startInfo.FileName = "mono";
-         startInfo.Arguments = ("/home/dblank/Pyjama/languages/fsi.exe " + 
-	    		        "--readline- " + 
-			        "--lib:/home/dblank/Pyjama/modules " + 
-			        "--lib:/home/dblank/Pyjama/bin " + 
-			        "--lib:/usr/lib/cli/gtk-sharp-2.0 " + 
-				"--lib:/usr/lib/cli/glib-sharp-2.0 " + 
-				"--lib:/usr/lib/cli/gdk-sharp-2.0 " + 
-				"--lib:/usr/lib/cli/atk-sharp-2.0 " + 
-				"-r:atk-sharp.dll " +
-				"-r:gdk-sharp.dll " +
-				"-r:glib-sharp.dll " +
-			        "-r:Myro.dll " + 
-			        "-r:gtk-sharp.dll " +
-				"-r:Mono.Cairo.dll " + 
-			        "-r:Myro.dll " + 
-			        "-r:Graphics.dll");
+         startInfo.Arguments = (fsi + " " +
+			 "--readline- " + 
+			 "--lib:" + path + "/../modules " + 
+			 "--lib:" + path + "/../bin " + 
+			 "--lib:" + gtk + " " + 
+			 "--lib:" + gdk + " " + 
+			 "--lib:" + glib + " " + 
+			 "--lib:" + atk + " " + 
+			 "-r:atk-sharp.dll " +
+			 "-r:gdk-sharp.dll " +
+			 "-r:glib-sharp.dll " +
+			 "-r:Myro.dll " + 
+			 "-r:gtk-sharp.dll " +
+			 "-r:Mono.Cairo.dll " + 
+			 "-r:Myro.dll " + 
+			 "-r:Graphics.dll");
          startInfo.UseShellExecute = false;
          startInfo.RedirectStandardError = true;
          startInfo.CreateNoWindow = true;
