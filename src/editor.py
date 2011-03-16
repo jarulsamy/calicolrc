@@ -200,31 +200,7 @@ class EditorWindow(Window):
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
             if filename:
-                menufilename = filename.replace("_", "__")
-                if filename not in self.pyjama.config.get("pyjama.recent_files"):
-                    self.pyjama.config.get("pyjama.recent_files").append(filename)
-                    menuitem = self.make_menuitem((menufilename, None, None,
-                                                    lambda o,e,file=filename: self.select_or_open(filename)),
-                                                  self.accel_group["Recent files"])
-                    self.submenu["Recent files"].Append(menuitem)
-                    self.submenu["Recent files"].ShowAll()
-                    if self.pyjama.shell:
-                        shell = self.pyjama.shell
-                        menuitem = self.make_menuitem((menufilename, None, None,
-                                                       lambda o,e,file=filename: shell.select_or_open(filename)),
-                                                      shell.accel_group["Recent files"])
-                        shell.submenu["Recent files"].Append(menuitem)
-                        shell.submenu["Recent files"].ShowAll()
-                    if self.pyjama.chat:
-                        chat = self.pyjama.chat
-                        menuitem = self.make_menuitem((menufilename, None, None,
-                                                       lambda o,e,file=filename: chat.select_or_open(filename)),
-                                                      chat.accel_group["Recent files"])
-                        chat.submenu["Recent files"].Append(menuitem)
-                        chat.submenu["Recent files"].ShowAll()
-                else: # it is in list, move to end (most recent)
-                    self.pyjama.config.get("pyjama.recent_files").remove(filename)
-                    self.pyjama.config.get("pyjama.recent_files").append(filename)
+                self.update_recent_files(filename)
             page.set_font()
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
@@ -234,6 +210,33 @@ class EditorWindow(Window):
                 self.notebook.RemovePage(0)
         if page and lineno != 0:
             self.goto_line(lineno)
+
+    def update_recent_files(self, filename):
+        menufilename = filename.replace("_", "__")
+        if filename not in self.pyjama.config.get("pyjama.recent_files"):
+            self.pyjama.config.get("pyjama.recent_files").append(filename)
+            menuitem = self.make_menuitem((menufilename, None, None,
+                                            lambda o,e,file=filename: self.select_or_open(filename)),
+                                          self.accel_group["Recent files"])
+            self.submenu["Recent files"].Append(menuitem)
+            self.submenu["Recent files"].ShowAll()
+            if self.pyjama.shell:
+                shell = self.pyjama.shell
+                menuitem = self.make_menuitem((menufilename, None, None,
+                                               lambda o,e,file=filename: shell.select_or_open(filename)),
+                                              shell.accel_group["Recent files"])
+                shell.submenu["Recent files"].Append(menuitem)
+                shell.submenu["Recent files"].ShowAll()
+            if self.pyjama.chat:
+                chat = self.pyjama.chat
+                menuitem = self.make_menuitem((menufilename, None, None,
+                                               lambda o,e,file=filename: chat.select_or_open(filename)),
+                                              chat.accel_group["Recent files"])
+                chat.submenu["Recent files"].Append(menuitem)
+                chat.submenu["Recent files"].ShowAll()
+        else: # it is in list, move to end (most recent)
+            self.pyjama.config.get("pyjama.recent_files").remove(filename)
+            self.pyjama.config.get("pyjama.recent_files").append(filename)
 
     def update_status(self):
         self.statusbar.set(_("Status"), self.get_status())
@@ -302,6 +305,9 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             doc.save_as()
+            if doc.filename:
+                self.changed_page(None, None)
+                self.update_recent_files(doc.filename)
 
     def get_current_doc(self):
         if self.notebook.CurrentPage >= 0:
