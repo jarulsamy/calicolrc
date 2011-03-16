@@ -41,8 +41,8 @@ public static class Graphics {
 	return new PythonTuple(items);
   }
 
-  private static Dictionary<string, Graphics.GWindow> _windows = 
-	  new Dictionary<string, Graphics.GWindow>();
+  private static Dictionary<string, Graphics.Window> _windows =
+	  new Dictionary<string, Graphics.Window>();
 
   private static Dictionary<string, Cairo.Color> _color_map = 
 	  new Dictionary<string, Cairo.Color>() {
@@ -142,7 +142,7 @@ public static class Graphics {
     Gtk.Application.Run();
   }
 
-  public static Picture makePicture(Graphics.GWindow window) { //, string filename) {
+  public static Picture makePicture(Graphics.Window window) { //, string filename) {
 	ManualResetEvent ev = new ManualResetEvent(false);
 	Gdk.Pixbuf pixbuf = null;
 	Gtk.Application.Invoke( delegate {
@@ -158,7 +158,7 @@ public static class Graphics {
 	return new Picture(pixbuf);
   }
 
-  public static Graphics.GWindow makeWindow(string title="Pyjama Graphics", 
+  public static Graphics.Window makeWindow(string title="Pyjama Graphics",
 	  int width=300, 
 	  int height=300) {
 	if (_windows.ContainsKey(title)) {
@@ -166,12 +166,12 @@ public static class Graphics {
       _windows[title].Resize(width, height);
 	  return _windows[title];
 	} else {
-	  _windows[title] = new Graphics.GWindow(title, width, height);
+	  _windows[title] = new Graphics.Window(title, width, height);
 	  return _windows[title];
 	}
   }
 
-  public static Graphics.GWindow getWindow(string title) {
+  public static Graphics.Window getWindow(string title) {
 	if (_windows.ContainsKey(title)) {
 	  return _windows[title];
 	} else {
@@ -179,19 +179,7 @@ public static class Graphics {
 	}
   }
 
-  public static Graphics.GWindow Window(string title="Pyjama Graphics", 
-	  int width=300, 
-	  int height=300) {
-	if (_windows.ContainsKey(title)) {
-      _windows[title].Resize(width, height);
-	  return _windows[title];
-	} else {
-	  _windows[title] = new Graphics.GWindow(title, width, height);
-	  return _windows[title];
-	}
-  }
-
-  public class GWindow : Gtk.Window {
+  public class Window : Gtk.Window {
 	private Gtk.EventBox eventbox;
 	private Canvas _canvas;
 	private bool _dirty = false;
@@ -202,7 +190,7 @@ public static class Graphics {
 					    			  // automatically step
 	public List<PythonFunction> onClickCallbacks = new List<PythonFunction>();
 	
-	public GWindow(string title="Pyjama Graphics Window", 
+	public Window(string title="Pyjama Graphics Window",
 		int width=300, 
 		int height=300) : base(title) {
 	  _canvas = new Canvas("auto");
@@ -460,7 +448,7 @@ public static class Graphics {
 
   public class Shape {
 	public Point center;
-	public GWindow window;
+	public Graphics.Window window;
 	public double _direction; // radians
 	public bool fill_path;
 	
@@ -527,7 +515,7 @@ public static class Graphics {
 	}
 	
 	public void QueueDraw() { // shape
-	  if (window is GWindow) {
+	  if (window is Graphics.Window) {
 		Gtk.Application.Invoke(delegate {
 			  if (window.mode == "auto") { 
 				// else, we will issue an update() or step()
@@ -767,7 +755,7 @@ public static class Graphics {
 	  QueueDraw();
 	}
 	
-	public void draw(GWindow win) {
+	public void draw(Graphics.Window win) {
 	  // Add this shape to the Canvas dictionary.
 	  win.canvas.shapes.Add(this);
 	  // FIXME: QueueDrawRect

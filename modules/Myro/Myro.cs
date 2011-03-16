@@ -184,7 +184,7 @@ public static class Myro {
 
   public static void show(Graphics.Picture picture, 
 	  string title="Myro Camera") {
-	Graphics.GWindow win = Graphics.makeWindow(title, 
+	Graphics.Window win = Graphics.makeWindow(title,
 		picture.width, picture.height);
 	picture.draw(win);
   }
@@ -2404,7 +2404,7 @@ def motors(left, right):
     return new Graphics.Picture(filename);
   }
 
-  public static Graphics.Picture makePicture(Graphics.GWindow window) { //, string filename) {
+  public static Graphics.Picture makePicture(Graphics.Window window) { //, string filename) {
     return Graphics.makePicture(window);
   }
 
@@ -2412,23 +2412,17 @@ def motors(left, right):
     return Graphics.copyPicture(picture);
   }
 
-  public static Graphics.GWindow makeWindow(string title="Pyjama Graphics",
+  public static Graphics.Window makeWindow(string title="Pyjama Graphics",
       int width=300,
       int height=300) {
     return Graphics.makeWindow(title, width, height);
   }
 
-  public static Graphics.GWindow getWindow(string title) {
+  public static Graphics.Window getWindow(string title) {
     return Graphics.getWindow(title);
   }
 
-  public static Graphics.GWindow Window(string title="Pyjama Graphics",
-      int width=300,
-      int height=300) {
-    return Graphics.Window(title, width, height);
-  }
-
-  public static int getHeight(Graphics.GWindow window) {
+  public static int getHeight(Graphics.Window window) {
     return window.getHeight();
   }
 
@@ -2436,7 +2430,7 @@ def motors(left, right):
     return picture.getHeight();
   }
 
-  public static int getWidth(Graphics.GWindow window) {
+  public static int getWidth(Graphics.Window window) {
     return window.getWidth();
   }
 
