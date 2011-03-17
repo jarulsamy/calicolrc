@@ -1,3 +1,5 @@
+#pragma warning disable 612
+
 using System;
 using System.IO;
 using System.Diagnostics;
@@ -6,31 +8,22 @@ using System.Threading;
 public class FSharpShell {
      public Process process;
      public FSharpShell() {
-	     string path = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
-	     if (path.StartsWith("\\")) {
-		   path = path.Substring(1);
-	     }
-#pragma warning disable 612
-		 string gtk = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.LoadWithPartialName("gtk-sharp").CodeBase).Substring(5);
-		 string gdk = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.LoadWithPartialName("gdk-sharp").CodeBase).Substring(5);
-		 string glib = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.LoadWithPartialName("glib-sharp").CodeBase).Substring(5);
-		 string atk = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.LoadWithPartialName("atk-sharp").CodeBase).Substring(5);
+	     string path = make_path("");
+		 string gtk = make_path("gtk-sharp");
+ 		 string gdk = make_path("gdk-sharp");
+		 string glib = make_path("glib-sharp");
+		 string atk = make_path("atk-sharp");
 		 string fsi = System.IO.Path.Combine(path, "fsi.exe");
          ProcessStartInfo startInfo = new ProcessStartInfo();
          startInfo.FileName = "mono";
-         startInfo.Arguments = (fsi + " " +
+         startInfo.Arguments = ("\"" + fsi + "\" " +
 			 "--readline- " + 
-			 "--lib:" + path + "/../modules " + 
-			 "--lib:" + path + "/../bin " + 
-			 "--lib:" + gtk + " " + 
-			 "--lib:" + gdk + " " + 
-			 "--lib:" + glib + " " + 
-			 "--lib:" + atk + " " + 
+			 "--lib:\"" + path + "/../modules\" " +
+			 "--lib:\"" + path + "/../bin\" " +
+			 "--lib:\"" + gtk + "\" " +
+			 "--lib:\"" + gdk + "\" " +
+			 "--lib:\"" + glib + "\" " +
+			 "--lib:\"" + atk + "\" " +
 			 "-r:atk-sharp.dll " +
 			 "-r:gdk-sharp.dll " +
 			 "-r:glib-sharp.dll " +
@@ -51,6 +44,21 @@ public class FSharpShell {
          process.ErrorDataReceived += new DataReceivedEventHandler(errorHandler);
          process.BeginOutputReadLine();
          process.BeginErrorReadLine();
+     }
+
+     public static string make_path(string assembly) {
+         string retval = "";
+         if (assembly == "") {
+            retval = System.IO.Path.GetDirectoryName(
+                 System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+         } else {
+            retval = System.IO.Path.GetDirectoryName(
+             System.Reflection.Assembly.LoadWithPartialName(assembly).CodeBase).Substring(5);
+         }
+         if (retval.StartsWith("\\")) {
+           retval = retval.Substring(1);
+         }
+         return retval;
      }
 
      public void Evaluate(string command) {
