@@ -67,6 +67,9 @@ class FSharpEngine(Engine):
             return False
         return True
 
+    def stop(self):
+        self.engine.Close()
+
 class FSharpLanguage(Language):
     def get_engine_class(self):
         return FSharpEngine

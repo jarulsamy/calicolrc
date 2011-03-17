@@ -97,6 +97,9 @@ class Engine(object):
     def start(self):
         pass
 
+    def stop(self):
+        pass
+
 class DLREngine(Engine):
     def setup(self):
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)

@@ -347,6 +347,8 @@ class PyjamaProject(object):
             # Close connections:
             if pw and pw.connection:
                 pw.connection.close()
+            for engine in self.engine.get_languages():
+                self.engine[engine].stop()
             Gtk.Application.Quit()
 
     def setup_chat(self, *args, **kwargs):
@@ -649,3 +651,4 @@ except:
 #------------------------------
 if "--nogui" not in args:
     Gtk.Application.Run()
+sys.exit(0)
