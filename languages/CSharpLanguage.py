@@ -37,9 +37,9 @@ class CSharpEngine(Engine):
             try:
                 self.engine.ReferenceAssembly(assembly)
             except:
-                print "unable to load assembly"
-                return
-        self.engine.Init(System.Array[System.String]([]))
+                #print "CSharp: unable to load assembly '%s'" % assembly
+                pass
+        #self.engine.Init(System.Array[System.String]([]))
         # FIXME: make pyjama available in some manner
         #self.engine.Evaluate("pyjama", manager.pyjama)
 

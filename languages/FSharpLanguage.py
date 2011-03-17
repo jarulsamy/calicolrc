@@ -25,6 +25,7 @@ import FSharpShell
 import System
 
 import traceback
+import os
 
 from engine import Engine
 from utils import Language, ConsoleStream
@@ -38,12 +39,10 @@ class FSharpEngine(Engine):
             try:
                 self.engine.ReferenceAssembly(assembly)
             except:
-                print "unable to load assembly '%s'" % assembly
-                return
+                #print "FSharp: unable to load assembly '%s'" % assembly
+                pass
         # FIXME: make pyjama available in some manner
         #self.engine.Evaluate("pyjama", manager.pyjama)
-        self.engine.Evaluate("#I \"%s\";;" %
-            os.path.join(self.pyjama.pyjama_root, "modules"))
 
     def execute(self, text):
         try:
