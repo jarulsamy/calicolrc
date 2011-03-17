@@ -226,7 +226,8 @@ class PyjamaProject(object):
         """
         sys.path.append(os.path.abspath("languages"))
         results = {}
-        for filename in glob.glob("languages/*.py"):
+        languages = glob.glob("languages/*.py")
+        for filename in languages: 
             path, basename = os.path.split(filename)
             base, ext = os.path.splitext(basename)
             if (base in self.config.get("pyjama.languages") or
