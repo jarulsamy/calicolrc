@@ -24,22 +24,9 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using System.Diagnostics;
 using Mono.Unix;
-using NDesk.DBus;
-using org.freedesktop.DBus;
 
 public class Pyjama {
   static void Main(string[] args) {
-    // Get the session bus
-    Bus bus = Bus.Session;
-
-    string busName = "org.PyjamaProject.Application";
-    if (bus.RequestName (busName) != RequestNameReply.PrimaryOwner) {
-      // Our name is already owned!
-      // Notify the existing owner here if desired.
-      // Now let's bail out...
-      return;
-    }
-
     string path = System.IO.Path.GetDirectoryName(
       	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
     if (path.StartsWith("\\")) {

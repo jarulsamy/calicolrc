@@ -640,6 +640,19 @@ if "--help" in args:
 elif "--version" in args:
     print version
     sys.exit(0)
+
+#################################################
+# Single Instance Application
+clr.AddReference("NDesk.DBus")
+import NDesk
+# Get the session bus
+bus = NDesk.DBus.Bus.Session
+busName = "org.PyjamaProject.Application"
+if (str(bus.RequestName(busName)) != "PrimaryOwner"):
+    print "Pyjama is already running"
+    sys.exit(0)
+#################################################
+
 if "--nogui" not in args:
     Gtk.Application.Init()
 #------------------------------
