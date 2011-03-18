@@ -117,11 +117,19 @@ class ShellWindow(Window):
                    None, self.on_open_file),
                   None,
                   ] +
-                  self.make_new_file_menu() +
-                  [None,
+                 self.make_new_file_menu() +
+                 [None,
                   (_("Search in files..."), None, "<control>f",
-                  self.searchbar.open),
-                   None,
+                   self.searchbar.open),
+                  ] +
+                 ["Examples/Python", 
+                  ("Examples/Python", ("Test1", None, None, lambda o, e: None)),
+                  ("Examples/Python", ("Test2", None, None, lambda o,e: None))] +
+                 ["Examples/Ruby", 
+                  ("Examples/Ruby", ("Test3", None, None, lambda o, e: None)),
+                  ("Examples/Ruby", ("Test4", None, None, lambda o,e: None))] +
+                 [
+                  None,
                   (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
                   (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,
@@ -135,7 +143,7 @@ class ShellWindow(Window):
                     (_("Paste"), None, None, None),
                     (_("Cut"), None, None, None),
                     (_("Select all"), Gtk.Stock.SelectAll, None, None),
-                          ]),
+                    ]),
                 (_("Shell"), self.make_language_menu()),
                 (_("Windows"), [
                     (_("Editor"), None, "F6", self.pyjama.setup_editor),

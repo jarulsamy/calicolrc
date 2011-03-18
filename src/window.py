@@ -21,6 +21,9 @@
 import Gtk
 import Gdk
 
+import os
+import glob
+
 # Pyjama modules:
 import Graphics
 from utils import _
@@ -76,11 +79,29 @@ class Window(object):
                 if row is None: # separator
                     menuitem = Gtk.SeparatorMenuItem()
                 elif isinstance(row, str): # submenu
-                    self.submenu[row] = Gtk.Menu()
-                    self.accel_group[row] = accel_group
-                    menuitem = Gtk.MenuItem(row)
-                    menuitem.Submenu = self.submenu[row]
-                    submenu.Append(menuitem)
+                    if "/" in row:
+                        path = row.split("/")
+                        path_so_far = ""
+                        parent = submenu
+                        for part in path:
+                            if path_so_far:
+                                path_so_far = path_so_far + "/" + part
+                            else:
+                                path_so_far = part
+                            if path_so_far not in self.submenu:
+                                print "make:", path_so_far
+                                self.submenu[path_so_far] = Gtk.Menu()
+                                self.accel_group[path_so_far] = accel_group
+                                menuitem = Gtk.MenuItem(part)
+                                menuitem.Submenu = self.submenu[path_so_far]
+                                parent.Append(menuitem)
+                            parent = self.submenu[path_so_far]
+                    else:
+                        self.submenu[row] = Gtk.Menu()
+                        self.accel_group[row] = accel_group
+                        menuitem = Gtk.MenuItem(row)
+                        menuitem.Submenu = self.submenu[row]
+                        submenu.Append(menuitem)
                     continue
                 elif len(row) == 2: # submenu, entry
                     menuname, row = row
@@ -90,6 +111,19 @@ class Window(object):
                 else:
                     menuitem = self.make_menuitem(row, accel_group)
                 submenu.Append(menuitem)
+            # Now, add menu to hang the submenu
+            # if "/" in text:
+            #     path = row.split("/")
+            #     path_so_far = ""
+            #     for part in path:
+            #         if path_so_far:
+            #             path_so_far = "/" + part
+            #         else:
+            #             path_so_far = part
+            #         menuitem = Gtk.MenuItem(text)
+            #         menuitem.Submenu = submenu
+            #         self.menubar.Append(menuitem)
+            # else:
             menuitem = Gtk.MenuItem(text)
             menuitem.Submenu = submenu
             self.menubar.Append(menuitem)
@@ -142,6 +176,19 @@ class Window(object):
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
                 )
         return retval
+
+    # def make_examples_menu(self):
+    #     retval = []
+    #     retval.append(_("Examples")) # submenu
+    #     for lang in self.pyjama.engine.get_languages():
+    #         menulang = lang.replace("_", "__")
+    #         path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
+    #         for file in glob.glob(path):
+    #             retval.append((_("Examples") + "/" + menulang,
+    #                            (file, None, None,
+    #                             lambda o,e,file=file: self.select_or_open(file))))
+    #         retval.append(None) # separator
+    #     return retval
 
     def print_view(self):
         papersize = Gtk.PaperSize(Gtk.PaperSize.Default)
