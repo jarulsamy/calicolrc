@@ -184,6 +184,9 @@ class Document(object):
     def set_font(self, font=None):
         pass
 
+    def update_language(self):
+        pass
+
 class TextEditorDocument(Document):
     def __init__(self, filename, pyjama, language="python"):
         Document.__init__(self, filename, pyjama, language)
@@ -237,6 +240,9 @@ class TextEditorDocument(Document):
             self.texteditor.Document.MimeType = "text/x-%s" % self.language
         except:
             pass
+
+    def update_language(self):
+        self.texteditor.Document.MimeType = "text/x-%s" % self.language
 
     def begin_not_undoable(self):
         pass
