@@ -113,23 +113,15 @@ class ShellWindow(Window):
         # ---------------------
         # make menu:
         menu = [(_("File"),
-                 [(_("Open Script..."), Gtk.Stock.Open, 
-                   None, self.on_open_file),
-                  None,
+                 [(_("Open Script..."), Gtk.Stock.Open, None, self.on_open_file),
                   ] +
+                 self.make_recents_menu() +
+                 self.make_examples_menu() +
+                 [None,
+                  (_("Search in files..."), None, "<control>f", self.searchbar.open),
+                  None] +
                  self.make_new_file_menu() +
                  [None,
-                  (_("Search in files..."), None, "<control>f",
-                   self.searchbar.open),
-                  ] +
-                 ["Examples/Python", 
-                  ("Examples/Python", ("Test1", None, None, lambda o, e: None)),
-                  ("Examples/Python", ("Test2", None, None, lambda o,e: None))] +
-                 ["Examples/Ruby", 
-                  ("Examples/Ruby", ("Test3", None, None, lambda o, e: None)),
-                  ("Examples/Ruby", ("Test4", None, None, lambda o,e: None))] +
-                 [
-                  None,
                   (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
                   (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
                   None,

@@ -89,7 +89,6 @@ class Window(object):
                             else:
                                 path_so_far = part
                             if path_so_far not in self.submenu:
-                                print "make:", path_so_far
                                 self.submenu[path_so_far] = Gtk.Menu()
                                 self.accel_group[path_so_far] = accel_group
                                 menuitem = Gtk.MenuItem(part)
@@ -162,14 +161,6 @@ class Window(object):
 
     def make_new_file_menu(self):
         retval = []
-        retval.append(_("Recent files")) # submenu
-        for file in self.pyjama.config.get("pyjama.recent_files"):
-            if file:
-                menufile = file.replace("_", "__")
-                retval.append((_("Recent files"),
-                               (menufile, None, None,
-                                lambda o,e,file=file: self.select_or_open(file))))
-        retval.append(None) # separator
         for lang in self.pyjama.languages:
             retval.append(
                 (_("New %s Script") % lang.title(), None,
@@ -177,18 +168,30 @@ class Window(object):
                 )
         return retval
 
-    # def make_examples_menu(self):
-    #     retval = []
-    #     retval.append(_("Examples")) # submenu
-    #     for lang in self.pyjama.engine.get_languages():
-    #         menulang = lang.replace("_", "__")
-    #         path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
-    #         for file in glob.glob(path):
-    #             retval.append((_("Examples") + "/" + menulang,
-    #                            (file, None, None,
-    #                             lambda o,e,file=file: self.select_or_open(file))))
-    #         retval.append(None) # separator
-    #     return retval
+    def make_recents_menu(self):
+        retval = []
+        retval.append(_("Recent files")) # submenu
+        for file in self.pyjama.config.get("pyjama.recent_files"):
+            if file:
+                menufile = file.replace("_", "__")
+                retval.append((_("Recent files"),
+                               (menufile, None, None,
+                                lambda o,e,file=file: self.select_or_open(file))))
+        return retval
+
+    def make_examples_menu(self):
+        retval = []
+        for lang in self.pyjama.engine.get_languages():
+            menulang = lang.title()
+            retval.append(_("Examples") + "/" + menulang) # submenu
+            path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
+            for file in glob.glob(path):
+                path, menufile = os.path.split(file)
+                menufile = menufile.replace("_", "__")
+                retval.append((_("Examples") + "/" + menulang,
+                               (menufile, None, None,
+                                lambda o,e,file=file: self.select_or_open(file))))
+        return retval
 
     def print_view(self):
         papersize = Gtk.PaperSize(Gtk.PaperSize.Default)

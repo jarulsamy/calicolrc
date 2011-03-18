@@ -42,10 +42,11 @@ class EditorWindow(Window):
         # ---------------------
         # make menu:
         menu = [(_("File"), 
-                 [(_("Open Script..."), Gtk.Stock.Open, 
-                   None, self.on_open_file),
-                  None,
-                  ] + 
+                 [(_("Open Script..."), Gtk.Stock.Open, None, self.on_open_file),
+                  ] +
+                  self.make_recents_menu() +
+                  self.make_examples_menu() +
+                  [None] +
                   self.make_new_file_menu() +
                  [
                   None,
