@@ -646,11 +646,17 @@ elif "--version" in args:
 clr.AddReference("NDesk.DBus")
 import NDesk
 # Get the session bus
-bus = NDesk.DBus.Bus.Session
-busName = "org.PyjamaProject.Application"
-if (str(bus.RequestName(busName)) != "PrimaryOwner"):
-    print "Pyjama is already running"
-    sys.exit(0)
+try:
+    bus = NDesk.DBus.Bus.Session
+except:
+    bus = None
+if bus:
+    busName = "org.PyjamaProject.Application"
+    if (str(bus.RequestName(busName)) != "PrimaryOwner"):
+        print "Pyjama is already running"
+        sys.exit(0)
+else:
+    print "dbus is not available; Pyjama is running without it..."
 #################################################
 
 if "--nogui" not in args:
