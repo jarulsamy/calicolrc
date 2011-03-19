@@ -643,7 +643,7 @@ elif "--version" in args:
 
 #################################################
 # Single Instance Application
-(mutex, locked) = System.Threading.Mutex(True, "Pyjama/dblank", None)
+(mutex, locked) = System.Threading.Mutex(True, "PyjamaProject/%s" % System.Environment.UserName, None)
 if not locked:
     # send a message to single version
     print "Pyjama already running..."
