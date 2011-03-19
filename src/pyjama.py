@@ -643,20 +643,12 @@ elif "--version" in args:
 
 #################################################
 # Single Instance Application
-clr.AddReference("NDesk.DBus")
-import NDesk
-# Get the session bus
-try:
-    bus = NDesk.DBus.Bus.Session
-except:
-    bus = None
-if bus:
-    busName = "org.PyjamaProject.Application"
-    if (str(bus.RequestName(busName)) != "PrimaryOwner"):
-        print "Pyjama is already running"
-        sys.exit(0)
-else:
-    print "dbus is not available; Pyjama is running without it..."
+(mutex, locked) = System.Threading.Mutex(True, "Pyjama/dblank", None)
+if not locked:
+    # send a message to single version
+    print "Pyjama already running..."
+    sys.exit()
+
 #################################################
 
 if "--nogui" not in args:
