@@ -28,6 +28,11 @@ startpath = os.path.abspath(".")
 pyjama_fullpath = os.path.abspath(__file__)
 # Next, let's add the absolute paths of what we need:
 fullpath, basename = os.path.split(pyjama_fullpath)
+user = os.path.expanduser("~/")
+# make a .pyjama directory in user's home dir:
+pyjama_user = os.path.join(user, ".pyjama")
+if not os.path.isdir(pyjama_user):
+    os.path.os.mkdir(pyjama_user)
 pyjamapath = os.path.join(fullpath, "..") # /src/..
 # change here to start
 os.chdir(pyjamapath)
@@ -95,7 +100,6 @@ import tempfile
 import re
 import glob
 
-
 # Pyjama imports:
 from engine import EngineManager
 from config import config
@@ -107,13 +111,6 @@ def handle_exception(arg):
         Gtk.Application.Invoke(pw.shell.stop_running)
         Gtk.Application.Invoke(lambda s,a: pw.shell.message("Crashed!"))
 
-#    Gtk.Application.Invoke(lambda s,a: error_message())
-
-#def error_message():
-#    traceback.print_exc()
-
-#    #sys.exit(1)
-#
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
 GLib.ExceptionManager.UnhandledException += handle_exception
@@ -139,6 +136,7 @@ class PyjamaProject(object):
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
         self.startpath = startpath       # from global variable
+        self.pyjama_user = pyjama_user   # from global variable
         self.pyjama_root = os.path.abspath(".")
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
@@ -641,33 +639,64 @@ elif "--version" in args:
     print version
     sys.exit(0)
 
+messagesLocked = False
+
 def handleMessages(sender, args):
-    print sender, args
-    #if pw.shell:
-    #    pw.shell.Show()
+    """
+    Callback for handling additional pyjama starts. This is run by the
+    main Pyjama program to read the messages sent by other attempts to
+    start.
+    """
+    global messagesLocked
+    if not messagesLocked:
+        messagesLocked = True
+        messages = os.path.join(pyjama_user, "messages")
+        os.chdir(startpath)
+        for line in file(messages, "r"):
+            # FIXME: using spaces as delimiters:
+            for word in line.split():
+                if word.startswith("--"):
+                    if word == "--chat":
+                        Gtk.Application.Invoke(lambda s,a: pw.setup_chat())
+                    elif word == "--editor":
+                        Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
+                    elif word == "--shell":
+                        Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
+                    continue
+                if word:
+                    filename = os.path.abspath(word)
+                    Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
+                    Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
+        fp = file(messages, "w")
+        fp.close()
+        messagesLocked = False
 
 #################################################
 # Single Instance Application
-user = os.path.expanduser("~/")
-# make a .pyjama directory in user's home dir:
-pyjama_user = os.path.join(user, ".pyjama")
-if not os.path.isdir(pyjama_user):
-    os.path.os.mkdir(pyjama_user)
+messages = os.path.join(pyjama_user, "messages")
 (mutex, locked) = System.Threading.Mutex(True, "PyjamaProject/%s" % System.Environment.UserName, None)
 if locked:
+    # We are the "server"; clean the messages file:
+    fp = file(messages, "w")
+    fp.close()
+    # set up a watcher to check for messages
     watcher = System.IO.FileSystemWatcher()
     watcher.Path = pyjama_user
     watcher.Filter = "messages"
     watcher.NotifyFilter = System.IO.NotifyFilters.LastWrite
     watcher.Changed += handleMessages
     watcher.EnableRaisingEvents = True
+    # and continue loading...
 else:
-    messages = os.path.join(pyjama_user, "messages")
+    # Not allowed! We'll send command line to running Pyjama through
+    # message file. Append args to command line:
     fp = file(messages, "a")
+    # FIXME: using spaces as delimiters:
     fp.write(" ".join(args) + "\n")
     fp.close()
-    sys.exit(1)
-
+    # Exit; message has been sent
+    sys.exit(0)
+# end of Single Instance logic
 #################################################
 
 if "--nogui" not in args:
