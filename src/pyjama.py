@@ -652,21 +652,20 @@ def handleMessages(sender, args):
         messagesLocked = True
         messages = os.path.join(pyjama_user, "messages")
         os.chdir(startpath)
-        for line in file(messages, "r"):
-            # FIXME: using spaces as delimiters:
-            for word in line.split():
-                if word.startswith("--"):
-                    if word == "--chat":
-                        Gtk.Application.Invoke(lambda s,a: pw.setup_chat())
-                    elif word == "--editor":
-                        Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
-                    elif word == "--shell":
-                        Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
-                    continue
-                if word:
-                    filename = os.path.abspath(word)
+        for word in file(messages, "r"):
+            word = word.strip()
+            if word.startswith("--"):
+                if word == "--chat":
+                    Gtk.Application.Invoke(lambda s,a: pw.setup_chat())
+                elif word == "--editor":
                     Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
-                    Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
+                elif word == "--shell":
+                    Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
+                continue
+            if word:
+                filename = os.path.abspath(word)
+                Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
+                Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
         fp = file(messages, "w")
         fp.close()
         messagesLocked = False
@@ -691,8 +690,7 @@ else:
     # Not allowed! We'll send command line to running Pyjama through
     # message file. Append args to command line:
     fp = file(messages, "a")
-    # FIXME: using spaces as delimiters:
-    fp.write(" ".join(args) + "\n")
+    fp.write("\n".join(args) + "\n")
     fp.close()
     # Exit; message has been sent
     sys.exit(0)
