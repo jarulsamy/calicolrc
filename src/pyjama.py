@@ -641,13 +641,32 @@ elif "--version" in args:
     print version
     sys.exit(0)
 
+def handleMessages(sender, args):
+    print sender, args
+    #if pw.shell:
+    #    pw.shell.Show()
+
 #################################################
 # Single Instance Application
+user = os.path.expanduser("~/")
+# make a .pyjama directory in user's home dir:
+pyjama_user = os.path.join(user, ".pyjama")
+if not os.path.isdir(pyjama_user):
+    os.path.os.mkdir(pyjama_user)
 (mutex, locked) = System.Threading.Mutex(True, "PyjamaProject/%s" % System.Environment.UserName, None)
-if not locked:
-    # send a message to single version
-    print "Pyjama already running..."
-    sys.exit()
+if locked:
+    watcher = System.IO.FileSystemWatcher()
+    watcher.Path = pyjama_user
+    watcher.Filter = "messages"
+    watcher.NotifyFilter = System.IO.NotifyFilters.LastWrite
+    watcher.Changed += handleMessages
+    watcher.EnableRaisingEvents = True
+else:
+    messages = os.path.join(pyjama_user, "messages")
+    fp = file(messages, "a")
+    fp.write(" ".join(args) + "\n")
+    fp.close()
+    sys.exit(1)
 
 #################################################
 
