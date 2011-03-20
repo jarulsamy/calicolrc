@@ -32,7 +32,6 @@ bin/pyjama.exe: bin/pyjama.cs
 	MONO_PATH=$(MONO_PATH) gmcs -target:exe \
 		bin/pyjama.cs \
 		-r:IronPython \
-        -r:NDesk.DBus.dll \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \
 		-r:Mono.Posix \
