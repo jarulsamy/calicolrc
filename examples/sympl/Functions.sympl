@@ -1,0 +1,19 @@
+; Lisp Function Examples
+
+(import system)
+
+; Create a function that will add 1 to a given number:
+
+(defun add1 (x)
+    (+ x  1))
+
+; Create a function that will add two numbers together:
+
+(defun addem (x y)
+    (+ x y))
+
+; Call both of the functions, and display the results:
+
+(system.console.writeline (add1 4))
+(system.console.writeline (addem 42 8))
+
