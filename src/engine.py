@@ -39,7 +39,7 @@ class EngineManager(object):
         return self.engine[name]
 
     def get_languages(self):
-        return self.engine.keys()
+        return sorted(self.engine.keys())
 
     def register(self, EngineClass):
         engine = EngineClass(self)

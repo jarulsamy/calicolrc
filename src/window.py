@@ -161,7 +161,7 @@ class Window(object):
 
     def make_new_file_menu(self):
         retval = []
-        for lang in self.pyjama.languages:
+        for lang in sorted(self.pyjama.languages):
             retval.append(
                 (_("New %s Script") % lang.title(), None,
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
@@ -185,7 +185,9 @@ class Window(object):
             menulang = lang.title()
             retval.append(_("Examples") + "/" + menulang) # submenu
             path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
-            for file in glob.glob(path):
+            files = glob.glob(path)
+            files.sort()
+            for file in files:
                 if os.path.isdir(file):
                     continue
                 path, menufile = os.path.split(file)
