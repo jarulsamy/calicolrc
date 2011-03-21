@@ -36,8 +36,8 @@ import System.Threading
 
 # Pyjama modules:
 from window import Window, MyWindow
-from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar, 
-                   SearchInFilesBar)
+from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar,
+                   SearchInFilesBar, OpenUrl)
 
 def exec_invoke(text):
     # FIXME: if this fails, it crashes pyjama; why?
@@ -218,8 +218,8 @@ class ShellWindow(Window):
         self.window.Show()
         # Set this Python's stderr:
         # EXCEPTION HANDLER
-        stdout = CustomStream(self.history_textview, "black")
-        sys.stderr = CustomStream(self.history_textview, "red")
+        stdout = CustomStream(self.pyjama, self.history_textview, "black")
+        sys.stderr = CustomStream(self.pyjama, self.history_textview, "red")
         self.pyjama.engine.set_redirects(stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
@@ -271,7 +271,7 @@ class ShellWindow(Window):
         num = 1
         for lang in sorted(self.pyjama.engine.get_languages()):
             if self.pyjama.engine[lang].text_based:
-                languages.append([_("Change to %s") % lang.title(), 
+                languages.append([_("Change to %s") % lang.title(),
                     None, "<control>%d" % num, 
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
                 num += 1
@@ -506,7 +506,7 @@ class ShellWindow(Window):
         self.message(self.prompt.Text, tag="purple")
 
     def execute_file(self, filename, language):
-        if (self.executeThread and 
+        if (self.executeThread and
             self.executeThread.ThreadState == System.Threading.ThreadState.Running):
             return
 
@@ -567,8 +567,35 @@ class ShellWindow(Window):
     def start_running(self, sender, args):
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
 
+    def make_error_url(self, language, message):
+        # FIXME: need to format url based on language
+        error = ""
+        for line in reversed(message.split("\n")):
+            if line.strip() != "":
+                error = line.strip()
+                break
+        if ":" in error:
+            error, details = error.rsplit(":", 1)
+        error = error.replace("<", "")
+        error = error.replace(">", "")
+        error = error.replace("'", "")
+        return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
+
     def stop_running(self, sender, args):
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+        if self.pyjama.last_error != "":
+            url = self.make_error_url(self.language, self.pyjama.last_error)
+            def invoke(sender, args):
+                MUTEX.WaitOne()
+                button = Gtk.Button(_("Get help on error"))
+                button.Clicked += lambda o, e: OpenUrl(url)
+                button.Show()
+                anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
+                self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
+                MUTEX.ReleaseMutex()
+            Gtk.Application.Invoke(invoke)
+            self.message("")
+            self.pyjama.last_error = ""
 
     def execute_in_background(self, text):
         if (self.executeThread and 

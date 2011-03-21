@@ -127,6 +127,7 @@ class PyjamaProject(object):
         Constructor for the singleton Pyjama instance. argv is the
         command-line files and flags.
         """
+        self.last_error = ""
         self.actionHandlers = []
         self.debug = False
         self.shell = None

@@ -90,7 +90,8 @@ class ConsoleStream(System.IO.Stream):
         return 0
 
 class CustomStream(System.IO.Stream):
-    def __init__(self, textview, tag=None):
+    def __init__(self, pyjama, textview, tag=None):
+        self.pyjama = pyjama
         self.textview = textview
         self.tag = tag
 
@@ -99,6 +100,7 @@ class CustomStream(System.IO.Stream):
 
     def write(self, text):
         if self.tag == "red":
+            # send it to Write method:
             System.Console.Error.Write(text)
         else:
             System.Console.Write(text)
@@ -110,6 +112,9 @@ class CustomStream(System.IO.Stream):
         self.textview.ScrollToMark(insert_mark, 0.0, True, 0, 0.5)
 
     def Write(self, bytes, offset, count):
+        """
+        Method for use by the lower-level CLR language.
+        """
         ev = ManualResetEvent(False)
         def invoke(sender, args):
             MUTEX.WaitOne()
@@ -117,6 +122,8 @@ class CustomStream(System.IO.Stream):
             if self.tag:
                 end = self.textview.Buffer.EndIter
                 self.textview.Buffer.InsertWithTagsByName(end, text, self.tag)
+                if self.tag == "red":
+                    self.pyjama.last_error += text
             else:
                 self.textview.Buffer.InsertAtCursor(text)
             self.goto_end()
@@ -605,3 +612,7 @@ class Plugin:
 
     def on_select_page(self, *data):
         return False
+
+def OpenUrl(url):
+    System.Diagnostics.Process.Start(url)
+
