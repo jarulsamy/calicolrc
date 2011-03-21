@@ -19,6 +19,7 @@
 # $Id: $
 
 import clr
+import System
 import sys
 clr.AddReference("PJScheme.dll")
 import PJScheme
@@ -32,7 +33,12 @@ class SchemeEngine(Engine):
 
     def execute(self, text):
         result = self.engine.execute(text)
-        self.stdout.write("%s\n" % result)
+        # FIXME: when exceptions have a better format in Scheme:
+        result = "%s" % result
+        if result.startswith("(exception "):
+            System.Console.Error.WriteLine(result)
+        else:
+            self.stdout.write("%s\n" % result)
 
     def execute_file(self, filename):
         self.stdout.write("Run filename '%s'!\n" % filename)
