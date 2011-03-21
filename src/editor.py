@@ -158,11 +158,14 @@ class EditorWindow(Window):
             self.statusbar.set(_("Language"), doc.language.title())
             self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
             if doc.filename:
+                self.pyjama.on_action("selected-document", filename=doc.filename)
                 path, filename = os.path.split(doc.filename)
                 try:
                     os.chdir(path)
                 except:
                     pass # Fail silently
+            else:
+                self.pyjama.on_action("selected-document", filename=None)
         else:
             self.statusbar.set(_("Language"), "")
             self.window.Title = _("Pyjama Editor")
@@ -197,6 +200,7 @@ class EditorWindow(Window):
         else: # make a no-named document of type language
             page = self.make_document(None, language)
         if add_it:
+            self.pyjama.on_action("opened-document", filename=filename)
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
@@ -301,6 +305,7 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             doc.save()
+            self.pyjama.on_action("saved-document", filename=doc.filename)
 
     def on_save_file_as(self, obj, event):
         doc = self.get_current_doc()
@@ -309,6 +314,7 @@ class EditorWindow(Window):
             if doc.filename:
                 self.changed_page(None, None)
                 self.update_recent_files(doc.filename)
+                self.pyjama.on_action("saved-as-document", filename=doc.filename)
 
     def get_current_doc(self):
         if self.notebook.CurrentPage >= 0:

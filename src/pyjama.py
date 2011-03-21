@@ -127,6 +127,7 @@ class PyjamaProject(object):
         Constructor for the singleton Pyjama instance. argv is the
         command-line files and flags.
         """
+        self.actionHandlers = []
         self.debug = False
         self.shell = None
         self.editor = None
@@ -612,6 +613,13 @@ class PyjamaProject(object):
             md.Run()
             md.Destroy()
         Gtk.Application.Invoke(invoke)
+
+    def on_action(self, action, **data):
+        """
+        Fires on actions throughout Pyjama.
+        """
+        for actionHandler in self.actionHandlers:
+            actionHandler(action, **data)
 
 
 # Let's start!

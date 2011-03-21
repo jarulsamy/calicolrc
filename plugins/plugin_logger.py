@@ -27,6 +27,10 @@ class Logger(Plugin):
     """
     def init(self):
         print "Logger Plugin created"
+        self.pyjama.actionHandlers.append(self.log_action)
+
+    def log_action(self, action, **data):
+        print time.time(), action, data
 
     def on_key_press(self, eventkey):
         print time.time(), "keystroke", self.window_type, [eventkey.State], eventkey.Key
@@ -36,6 +40,8 @@ class Logger(Plugin):
         print time.time(), "switch", self.window_type, page.document.filename
 
 def make_plugin(pyjama):
+    """
+    Function to make plugin.
+    """
     # Uncomment to activate:
     #return Logger(pyjama)
-    return None
