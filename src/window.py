@@ -186,6 +186,8 @@ class Window(object):
             retval.append(_("Examples") + "/" + menulang) # submenu
             path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
             for file in glob.glob(path):
+                if os.path.isdir(file):
+                    continue
                 path, menufile = os.path.split(file)
                 menufile = menufile.replace("_", "__")
                 retval.append((_("Examples") + "/" + menulang,
