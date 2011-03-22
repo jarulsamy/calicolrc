@@ -34,7 +34,7 @@ class ChatWindow(Window):
         self.room = "General"
         self.pyjama = pyjama
         self.colormap = {}
-        self.window = MyWindow(_("Pyjama Chat"))
+        self.window = MyWindow(_("Pyjama Chat - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(350, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)

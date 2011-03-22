@@ -102,7 +102,7 @@ class ShellWindow(Window):
         self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
-        self.window = MyWindow(_("Pyjama Shell"))
+        self.window = MyWindow(_("Pyjama Shell - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
@@ -287,7 +287,7 @@ class ShellWindow(Window):
             self.textview.Document.MimeType = "text/x-%s" % self.language
         except:
             pass
-        self.set_title(_("%s - Pyjama Shell") % self.language.title())
+        self.set_title(_("%s - Pyjama Shell - %s") % (self.language.title(), System.Environment.UserName))
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
         self.statusbar.set(_("Language"), self.language.title())
         self.statusbar.set(_("Status"), self.get_status())

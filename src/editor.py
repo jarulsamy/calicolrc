@@ -32,7 +32,7 @@ class EditorWindow(Window):
     def __init__(self, pyjama, files=None):
         self.pyjama = pyjama
         # create the parts
-        self.window = MyWindow(_("Pyjama Editor"))
+        self.window = MyWindow(_("Pyjama Editor - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
@@ -156,7 +156,7 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             self.statusbar.set(_("Language"), doc.language.title())
-            self.window.Title = "%s - %s" % (doc.title,  _("Pyjama Editor"))
+            self.window.Title = "%s - %s - %s" % (doc.title,  _("Pyjama Editor"), System.Environment.UserName)
             if doc.filename:
                 self.pyjama.on_action("selected-document", filename=doc.filename)
                 path, filename = os.path.split(doc.filename)
@@ -168,7 +168,7 @@ class EditorWindow(Window):
                 self.pyjama.on_action("selected-document", filename=None)
         else:
             self.statusbar.set(_("Language"), "")
-            self.window.Title = _("Pyjama Editor")
+            self.window.Title = _("Pyjama Editor - %s") % System.Environment.UserName
 
     def select_or_open(self, filename, lineno=0, language="python"):
         """
