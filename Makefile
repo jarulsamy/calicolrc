@@ -35,5 +35,5 @@ bin/pyjama.exe: bin/pyjama.cs
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \
 		-r:Mono.Posix \
-        /win32icon:examples/images/blueslug.ico \
+		/win32icon:examples/images/blueslug.ico \
 		-out:bin/pyjama.exe 
