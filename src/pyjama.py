@@ -695,6 +695,8 @@ if locked:
     watcher.Changed += handleMessages
     watcher.EnableRaisingEvents = True
     # and continue loading...
+elif "--exec" in args:
+    pass # will handle below
 else:
     # Not allowed! We'll send command line to running Pyjama through
     # message file. Append args to command line:
