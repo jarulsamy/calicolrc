@@ -624,7 +624,7 @@ class PyjamaProject(object):
 
 
 # Let's start!
-version = "0.4.3"
+version = "0.4.4"
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print
@@ -661,20 +661,29 @@ def handleMessages(sender, args):
         messagesLocked = True
         messages = os.path.join(pyjama_user, "messages")
         os.chdir(startpath)
+        execute = False
         for word in file(messages, "r"):
             word = word.strip()
             if word.startswith("--"):
-                if word == "--chat":
+                if word == "--exec":
+                    execute = True
+                elif word == "--chat":
                     Gtk.Application.Invoke(lambda s,a: pw.setup_chat())
                 elif word == "--editor":
+                    execute = False
                     Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
                 elif word == "--shell":
                     Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
                 continue
             if word:
                 filename = os.path.abspath(word)
-                Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
-                Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
+                if execute:
+                    import time
+                    Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
+                    Gtk.Application.Invoke(lambda s,a: pw.load(filename))
+                else:
+                    Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
+                    Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
         fp = file(messages, "w")
         fp.close()
         messagesLocked = False
@@ -695,8 +704,6 @@ if locked:
     watcher.Changed += handleMessages
     watcher.EnableRaisingEvents = True
     # and continue loading...
-elif "--exec" in args:
-    pass # will handle below
 else:
     # Not allowed! We'll send command line to running Pyjama through
     # message file. Append args to command line:
