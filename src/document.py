@@ -281,8 +281,6 @@ class TextEditorDocument(Document):
         pass
 
     def open(self):
-        # FIXME: does this print statement make right-click open work?
-        print _("Opened document:"), self.filename
         if os.path.isfile(self.filename):
             self.texteditor.Document.Text = "".join(file(self.filename).xreadlines())
         self.grab_focus()
