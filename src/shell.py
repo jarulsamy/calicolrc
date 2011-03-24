@@ -229,8 +229,20 @@ class ShellWindow(Window):
         self.message(_("Pyjama Project %s") % self.pyjama.version)
         self.message(("-" * 50))
         self.set_font()
+        self.show_icon()
+        self.message("")
         # Setup plugins
         Window.__init__(self, pyjama)
+
+    def show_icon(self):
+        def invoke(sender, args):
+            MUTEX.WaitOne()
+            image = Gtk.Image(os.path.join(self.pyjama.pyjama_root, "examples", "images", "blueslug.gif"))
+            image.Show()
+            anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
+            self.history_textview.AddChildAtAnchor(image, anchor_iter[0])
+            MUTEX.ReleaseMutex()
+        Gtk.Application.Invoke(invoke)
 
     def set_font(self, font=None):
         if font is None:
