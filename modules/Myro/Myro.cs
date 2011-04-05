@@ -127,19 +127,35 @@ public static class Myro {
 		Math.Max(Math.Min(V,255),0));
   }
 
-  public static void forward(double power=1, double? time=null) {
+  public static void forward(double power=1) {
+	robot.forward(power);
+  }
+  
+  public static void forward(double power, double time) {
 	robot.forward(power, time);
   }
   
-  public static void translate(double power=1, double? time=null) {
+  public static void translate(double power=1) {
+	robot.translate(power);
+  }
+  
+  public static void translate(double power, double time) {
 	robot.translate(power, time);
   }
   
-  public static void rotate(double power=1, double? time=null) {
+  public static void rotate(double power=1) {
+	robot.rotate(power);
+  }
+
+  public static void rotate(double power, double time) {
 	robot.rotate(power, time);
   }
 
-  public static void backward(double power=1, double? time=null) {
+  public static void backward(double power=1) {
+	robot.backward(power);
+  }
+
+  public static void backward(double power, double time) {
 	robot.backward(power, time);
   }
 
@@ -151,11 +167,19 @@ public static class Myro {
 	robot.move(translate, rotate);
   }
   
-  public static void turnLeft(double power=1, double? time=null) {
+  public static void turnLeft(double power=1) {
+	robot.turnLeft(power);
+  }
+
+  public static void turnLeft(double power, double time) {
 	robot.turnLeft(power, time);
   }
 
-  public static void turnRight(double power=1, double? time=null) {
+  public static void turnRight(double power=1) {
+	robot.turnRight(power);
+  }
+
+  public static void turnRight(double power, double time) {
 	robot.turnRight(power, time);
   }
 
@@ -167,18 +191,27 @@ public static class Myro {
 	robot.reboot();
   }
 
-  public static void beep(double duration, double? frequency=null, 
-	  double? frequency2=null) {
+  public static void beep(double duration, double frequency) {
+	robot.beep(duration, frequency);
+  }
+
+  public static void beep(double duration, double frequency, double frequency2) {
 	robot.beep(duration, frequency, frequency2);
   }
 
-  public static void beep(int duration, int? frequency=null,
-      int? frequency2=null) {
+  public static void beep(int duration, int frequency) {
+    robot.beep(duration, frequency);
+  }
+
+  public static void beep(int duration, int frequency, int frequency2) {
     robot.beep(duration, frequency, frequency2);
   }
 
-  public static void beep(double duration, int? frequency=null,
-      int? frequency2=null) {
+  public static void beep(double duration, int frequency) {
+    robot.beep(duration, frequency);
+  }
+
+  public static void beep(double duration, int frequency, int frequency2) {
     robot.beep(duration, frequency, frequency2);
   }
 
@@ -633,8 +666,11 @@ public static class Myro {
 
 	public Object myLock = new Object();
 
-    public virtual void beep(double duration, double? frequency=null, 
-		double? frequency2=null) {
+    public virtual void beep(double duration, double frequency, double frequency2) {
+	  // Override in subclassed robots
+	}
+
+    public virtual void beep(double duration, double frequency) {
 	  // Override in subclassed robots
 	}
 
@@ -768,52 +804,64 @@ public static class Myro {
 	  move(0, 0);
 	}
 
-	public void forward(double speed, double? interval=null) {
+	public void forward(double speed, double interval) {
 	  move(speed, 0);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
 	}
 
-	public void translate(double speed, double? interval) {
+	public void forward(double speed) {
 	  move(speed, 0);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
 	}
 
-	public void rotate(double speed, double? interval) {
+	public void translate(double speed) {
+	  move(speed, 0);
+	}
+
+	public void translate(double speed, double interval) {
+	  move(speed, 0);
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
+	}
+
+	public void rotate(double speed) {
 	  move(0, speed);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
 	}
 	
-	public void backward(double speed, double? interval) {
-	  move(-speed, 0);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
-	}
-
-	public void turnLeft(double speed, double? interval) {
+	public void rotate(double speed, double interval) {
 	  move(0, speed);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
+	}
+	
+	public void backward(double speed) {
+	  move(-speed, 0);
 	}
 
-	public void turnRight(double speed, double? interval) {
+	public void backward(double speed, double interval) {
+	  move(-speed, 0);
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
+	}
+
+	public void turnLeft(double speed) {
+	  move(0, speed);
+	}
+
+	public void turnLeft(double speed, double interval) {
+	  move(0, speed);
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
+	}
+
+	public void turnRight(double speed) {
 	  move(0, -speed);
-	  if (interval != null) {
-		Thread.Sleep((int)(interval * 1000)); 
-		stop();
-	  }
+	}
+	
+	public void turnRight(double speed, double interval) {
+	  move(0, -speed);
+	  Thread.Sleep((int)(interval * 1000)); 
+	  stop();
 	}
 	
 	public void motors(double left, double right) {
@@ -1763,14 +1811,17 @@ def motors(left, right):
 	  write(Scribbler.SET_RESET_SCRIBBLER);
 	}
 
-    public override void beep(double duration, double? frequency=null, 
-		double? frequency2=null) {
+    public override void beep(double duration, double frequency) {
 	  lock(myLock) {
-		if (frequency2 == null) {
-		  set_speaker((int)frequency, (int)(duration * 1000));
-		} else {
-		  set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
-		}
+		set_speaker((int)frequency, (int)(duration * 1000));
+        System.Threading.Thread.Sleep((int)(duration * 1000));
+		read(Scribbler.PACKET_LENGTH + 11);
+	  }
+	}
+
+    public override void beep(double duration, double frequency, double frequency2) {
+	  lock(myLock) {
+		set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
         System.Threading.Thread.Sleep((int)(duration * 1000));
 		read(Scribbler.PACKET_LENGTH + 11);
 	  }
