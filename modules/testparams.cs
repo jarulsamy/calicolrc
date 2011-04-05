@@ -15,8 +15,8 @@ public class TestParams {
             throw new System.ArgumentException("object is not a list");
     }
 
-    public static string make_string(object val) {
-        return val.ToString();
+    public static string make_string(string val) {
+      return val.ToUpper();
     }
 
     public static int make_int(object val) {
