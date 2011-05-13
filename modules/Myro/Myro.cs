@@ -51,6 +51,10 @@ public static class Myro {
   public static string dialogResponse = null;
   public static string REVISION = "$Revision: $";
 
+  public class MyTexView : Gtk.TextView  {
+	public string MyString;
+  }
+
   // Functional Interface
 
   public static void init() {
@@ -2487,5 +2491,13 @@ def motors(left, right):
 
   public static int getWidth(Graphics.Picture picture) {
     return picture.getWidth();
+  }
+
+  public static List doTogether(params object [] functions) {
+	List retval = new List();
+	foreach (object function in functions) {
+	  retval.append(function);
+	}
+	return retval;
   }
 }
