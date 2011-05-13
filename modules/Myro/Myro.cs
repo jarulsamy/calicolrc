@@ -1818,7 +1818,7 @@ def motors(left, right):
     public override void beep(double duration, double frequency) {
 	  lock(myLock) {
 		set_speaker((int)frequency, (int)(duration * 1000));
-        System.Threading.Thread.Sleep((int)(duration * 1000));
+		Thread.Sleep((int)(duration * 1000));
 		read(Scribbler.PACKET_LENGTH + 11);
 	  }
 	}
@@ -1826,7 +1826,7 @@ def motors(left, right):
     public override void beep(double duration, double frequency, double frequency2) {
 	  lock(myLock) {
 		set_speaker_2((int)frequency, (int)frequency2, (int)(duration * 1000));
-        System.Threading.Thread.Sleep((int)(duration * 1000));
+		Thread.Sleep((int)(duration * 1000));
 		read(Scribbler.PACKET_LENGTH + 11);
 	  }
 	}
@@ -2493,10 +2493,26 @@ def motors(left, right):
     return picture.getWidth();
   }
 
-  public static List doTogether(params object [] functions) {
+  public static Action functionInvoke(Func<object> func, List list, int position) {
+    return () => {  
+          list[position] = func.Invoke();
+    }; 
+  }
+
+  public static List doTogether(params Func<object> [] functions) {
 	List retval = new List();
-	foreach (object function in functions) {
-	  retval.append(function);
+	List threads = new List();
+	int position = 0; 
+	foreach (Func<object> function in functions) {
+	  retval.append(null);
+	  threads.append(new Thread( new ThreadStart(functionInvoke(function, retval, position))));
+	  position++;
+	}
+	foreach (Thread t in threads) {
+	  t.Start();
+	}
+	foreach (Thread t in threads) {
+	  t.Join();
 	}
 	return retval;
   }
