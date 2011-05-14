@@ -1,5 +1,9 @@
 Problems, issues, features, and questions.
 
+ # print might not be safe here due to threading... but Debug.WriteLine() is thread-safe
+ from System import Diagnostics
+ Diagnostics.Debug.WriteLine(foo)
+
 = Pyjama =
 
 IMMEDIATE
