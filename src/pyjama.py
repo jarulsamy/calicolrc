@@ -111,9 +111,11 @@ def handle_exception(arg):
         Gtk.Application.Invoke(pw.shell.stop_running)
         Gtk.Application.Invoke(lambda s,a: pw.shell.message("Crashed!"))
 
+args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
-GLib.ExceptionManager.UnhandledException += handle_exception
+if "--no-handler" not in args:
+    GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
 
@@ -625,7 +627,6 @@ class PyjamaProject(object):
 
 # Let's start!
 version = "0.4.6"
-args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 if "--help" in args:
     print
     print _("Pyjama Project, Version %s, on %s") % (version,

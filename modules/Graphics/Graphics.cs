@@ -180,7 +180,6 @@ public static class Graphics {
   }
 
   public class Window : Gtk.Window {
-	private Gtk.EventBox eventbox;
 	private Canvas _canvas;
 	private bool _dirty = false;
 	private bool timer_running = false;
@@ -188,19 +187,20 @@ public static class Graphics {
 	private uint _update_interval = 100; // how often, in ms, to auto update
 	public uint step_time = 200; // how often, in ms, to
 					    			  // automatically step
-	public List<PythonFunction> onClickCallbacks = new List<PythonFunction>();
+	public List onClickCallbacks = new List();
+    public PythonTuple lastClick;
+    ManualResetEvent lastClickFlag = new ManualResetEvent(false);
 	
 	public Window(string title="Pyjama Graphics Window",
 		int width=300, 
 		int height=300) : base(title) {
 	  _canvas = new Canvas("auto");
-      AllowGrow = true;
-      AllowShrink = true;
+	  AllowGrow = true;
+	  AllowShrink = true;
 	  SetDefaultSize(width, height);
-	  eventbox = new Gtk.EventBox();
-	  this.Add(eventbox);
-	  eventbox.Add(_canvas);
-	  eventbox.ButtonPressEvent += HandleClickCallbacks;
+	  AddEvents((int)Gdk.EventMask.ButtonPressMask);
+	  ButtonPressEvent += HandleClickCallbacks;
+	  ButtonPressEvent += saveLastClick;
 	  DeleteEvent += OnDelete;
 	  ShowAll();
 	}
@@ -221,17 +221,23 @@ public static class Graphics {
         return width;
     }
 
-    private void HandleClickCallbacks(object obj,
-		Gtk.ButtonPressEventArgs args) {
-	  foreach (PythonFunction function in onClickCallbacks) {
-		try {
-		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-		} catch {
-		  Console.Error.WriteLine("callback failed to fire.");
-		}
-	  }
-	}
+    void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
+      lastClick = PyTuple(args.Event.X, args.Event.X);
+      lastClickFlag.Set();
+    }
 
+    private void HandleClickCallbacks(object obj,
+				      Gtk.ButtonPressEventArgs args) {
+      foreach (object function in onClickCallbacks) {
+	if (function is PythonFunction) {
+	  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	} else {
+	  Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
+	  f(obj, args);
+	}
+      }
+    }
+    
 	public void onClick(PythonFunction function) {
 	  onClickCallbacks.Add(function);
 	}
@@ -267,7 +273,9 @@ public static class Graphics {
 	}
 
 	public PythonTuple getMouse() {
-	  return PyTuple(0, 0);
+	  lastClickFlag = new ManualResetEvent(false);
+	  lastClickFlag.WaitOne();
+	  return lastClick;
 	}
 
 	public void step() {

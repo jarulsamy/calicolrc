@@ -1,8 +1,27 @@
 Problems, issues, features, and questions.
 
- # print might not be safe here due to threading... but Debug.WriteLine() is thread-safe
- from System import Diagnostics
- Diagnostics.Debug.WriteLine(foo)
+Debugging:
+MONO_LOG_LEVEL=debug pyjama --no-handler 
+
+Bug:
+Ok:
+-----
+def callback(*args, **kwargs):
+    pyjama.shell.message("ok")
+    #print "ok"
+from Graphics import *
+win = Window()
+win.onClick(callback)
+--------
+Not ok:
+--------
+def callback(*args, **kwargs):
+    #pyjama.shell.message("ok")
+    print "ok"
+from Graphics import *
+win = Window()
+win.onClick(callback)
+--------
 
 = Pyjama =
 
