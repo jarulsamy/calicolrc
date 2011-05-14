@@ -525,6 +525,10 @@ public static class Myro {
     return list;
   }
 
+  public static string askQuestion(string question) {
+    return askQuestion(question, Graphics.PyList("Yes", "No"));
+  }
+
   public static string askQuestion(string question, RubyArray choices) {
     return askQuestion(question, to_l(choices));
   }
@@ -553,7 +557,15 @@ public static class Myro {
     dialogResponse = ((Gtk.Button)obj).Label;
   }
 
-  public static object ask(object question, string title="Information Request") {
+  public static string input(object question) {
+    return ask(question, "Input").ToString();
+  }
+
+  public static object ask(object question) {
+    return ask(question, "Information Request");
+  }
+
+  public static object ask(object question, string title) {
     ManualResetEvent ev = new ManualResetEvent(false);
     object retval = null;
     Gtk.Entry myentry = null;
@@ -562,7 +574,7 @@ public static class Myro {
         Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.OkCancel,
-                               "Information Request");
+                               title);
         if (question is List) {
             foreach (string choice in (List)question) {
                 Gtk.HBox hbox = new Gtk.HBox();
@@ -2353,13 +2365,6 @@ def motors(left, right):
 	}
   }
 
-  public static IEnumerator timeRemaining(double seconds) {
-	double start = currentTime();
-	while (currentTime() - start < seconds) {
-	  yield return (currentTime() - start);
-	}
-  }
-
   public static IEnumerator timer(double seconds) {
 	double start = currentTime();
 	while (currentTime() - start < seconds) {
@@ -2493,27 +2498,36 @@ def motors(left, right):
     return picture.getWidth();
   }
 
-  public static Action functionInvoke(Func<object> func, List list, int position) {
+  static Action functionInvoke(Func<object> func, List list, 
+				      int position) {
+    // Take a function, return list, and position
+    // Call the function, and put the result in the
+    // list in the given position.
     return () => {  
           list[position] = func.Invoke();
     }; 
   }
 
   public static List doTogether(params Func<object> [] functions) {
-	List retval = new List();
-	List threads = new List();
-	int position = 0; 
-	foreach (Func<object> function in functions) {
-	  retval.append(null);
-	  threads.append(new Thread( new ThreadStart(functionInvoke(function, retval, position))));
-	  position++;
-	}
-	foreach (Thread t in threads) {
-	  t.Start();
-	}
-	foreach (Thread t in threads) {
-	  t.Join();
-	}
-	return retval;
+    List retval = new List();
+    List threads = new List();
+    int position = 0; 
+    // For each function, make a return list, and thread list
+    foreach (Func<object> function in functions) {
+      retval.append(null);
+      threads.append(new Thread( 
+           new ThreadStart(functionInvoke(function, retval, position))));
+      position++;
+    }
+    // Start each thread
+    foreach (Thread t in threads) {
+      t.Start();
+    }
+    // Wait for them all to finish
+    foreach (Thread t in threads) {
+      t.Join();
+    }
+    // return
+    return retval;
   }
 }
