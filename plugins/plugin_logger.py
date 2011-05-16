@@ -32,7 +32,7 @@ class Logger(Plugin):
     def log_action(self, action, **data):
         print time.time(), action, data
 
-    def on_key_press(self, eventkey):
+    def on_key_press(self, widget, eventkey):
         print time.time(), "keystroke", self.window_type, [eventkey.State], eventkey.Key
 
     def on_switch_page(self, notebook, args):

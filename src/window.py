@@ -54,9 +54,7 @@ class MyWindow(Gtk.Window):
         """
         if hasattr(self, "key_press_handlers"):
             for key_press_handler in self.key_press_handlers:
-                #print "handler:", key_press_handler
-                result = key_press_handler(eventkey)
-                #print result
+                result = key_press_handler(self, eventkey)
                 if result:
                     return result
         Gtk.Window.OnKeyPressEvent(self, eventkey)

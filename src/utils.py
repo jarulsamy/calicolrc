@@ -588,6 +588,21 @@ class Plugin:
         self.pyjama = pyjama
         self.init()
 
+    def init(self):
+        pass
+
+    def log_action(self, action, **data):
+        pass
+
+    def on_switch_page(self, notebook, args):
+        pass
+
+    def on_key_press(self, widget, *data):
+        return False
+
+    def on_select_page(self, *data):
+        return False
+
     def on_create_window(self, window):
         from shell import ShellWindow
         from chat import ChatWindow
@@ -607,12 +622,6 @@ class Plugin:
         # Errors:
         # Running files:
         
-    def on_key_press(self, *data):
-        return False
-
-    def on_select_page(self, *data):
-        return False
-
 def OpenUrl(url):
     System.Diagnostics.Process.Start(url)
 

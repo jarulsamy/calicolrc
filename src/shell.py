@@ -328,7 +328,7 @@ class ShellWindow(Window):
             self.vpane.Add2(c1)
         Gtk.Application.Invoke(invoke)
 
-    def on_key_press(self, event, force=False):
+    def on_key_press(self, widget, event, force=False):
         # FIXME: this should be handled in textview, but if we subclass
         # TextEditor, then we mess up the signals on scrolling window
         # So, this currently handles the keys for the whole window.
@@ -464,7 +464,7 @@ class ShellWindow(Window):
         return True
 
     def on_run(self, obj, event):
-        self.on_key_press(None, force=True)
+        self.on_key_press(widget=self, event=None, force=True)
 
     def on_stop(self, obj, event):
         if (self.executeThread and 

@@ -145,7 +145,7 @@ class EditorWindow(Window):
         if doc:
             doc.grab_focus()
 
-    def on_key_press(self, event):
+    def on_key_press(self, widget, event):
         """
         Handles key press events for the entire window. If handled
         here, return True.

@@ -202,7 +202,7 @@ Chat commands:
         #self.statusbar.Push(0, _("Language: %s") % self.language.title())
         pass
 
-    def on_key_press(self, event, force=False):
+    def on_key_press(self, widget, event, force=False):
         if str(event.Key) == "Return":
             # if cursor in middle, insert a Return
             self.send_clicked()
