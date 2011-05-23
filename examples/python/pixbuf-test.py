@@ -19,8 +19,9 @@
 # $Id: $
 
 from Graphics import *
+from Myro import wait
 win = Window()
-pic = Picture("examples/images/blankenship.jpg")
+pic = Picture("../../examples/images/blankenship.jpg")
 pic.center.x = win.width/2
 pic.center.y = win.height/2
 pic.draw(win)
@@ -30,10 +31,15 @@ arrow.draw(win)
 
 win.update()
 
-win.mode = "auto"
+win.mode = "auto" # the default
 for x in range(36):
     pic.rotate(10)
-    #win.step()
+    wait(1)
+
+win.mode = "manual"
+for x in range(36):
+    pic.rotate(10)
+    win.step(1000)
 
 def negative(pic):
     for pixel in getPixels(pic):

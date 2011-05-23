@@ -69,7 +69,6 @@ for col in range(6):
 def animate():
     g = Group(*stars)
     win.mode = "manual"
-    win.step_time = 1000
     for i in range(20):
         g.rotate(10)
-        win.step()
+        win.step(500)
