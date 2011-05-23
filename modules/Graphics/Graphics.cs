@@ -202,6 +202,7 @@ public static class Graphics {
 	  ButtonPressEvent += HandleClickCallbacks;
 	  ButtonPressEvent += saveLastClick;
 	  DeleteEvent += OnDelete;
+	  Add(_canvas);
 	  ShowAll();
 	}
 	
@@ -222,7 +223,7 @@ public static class Graphics {
     }
 
     void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
-      lastClick = PyTuple(args.Event.X, args.Event.X);
+      lastClick = PyTuple(args.Event.X, args.Event.Y);
       lastClickFlag.Set();
     }
 
