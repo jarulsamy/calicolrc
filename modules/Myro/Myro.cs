@@ -44,18 +44,6 @@ public static class Extensions {
 	}
 	return res;
   }
-  public static void Each<T>(this IEnumerable<T> source, 
-				   Action<T> action)  {
-    if (source == null) {
-      throw new ArgumentNullException("source");
-    }
-    if (action == null) {
-      return;
-    }
-    foreach (T item in source) {
-      action(item);
-    }
-  }
 }
 
 public static class Myro {
@@ -2377,7 +2365,7 @@ def motors(left, right):
 	}
   }
 
-  public static IEnumerator timer(double seconds) {
+  public static IEnumerable timer(double seconds) {
 	double start = currentTime();
 	while (currentTime() - start < seconds) {
 	  yield return (currentTime() - start);
@@ -2414,19 +2402,19 @@ def motors(left, right):
     return Graphics.color_names();
   }
 
-  public static List toList(IEnumerator enumumerator) {
+  /*
+  public static List toList(IEnumerable enumumerator) {
     List retval = new List();
     object item = null;
     while (enumumerator.MoveNext()) {
       item = enumumerator.Current;
       retval.append(item);
     }
-    // Doesn't work in Mono 2.6.7; maybe later?
-    // enumumerator.Each(item => retval.append(item));
     return retval;
   }
+  */
 
-  public static IEnumerator getPixels(Graphics.Picture picture) {
+  public static IEnumerable getPixels(Graphics.Picture picture) {
     return Graphics.getPixels(picture);
   }
 

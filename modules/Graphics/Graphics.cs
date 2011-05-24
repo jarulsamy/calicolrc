@@ -21,24 +21,9 @@ $Id: $
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 using System.Runtime.InteropServices; // Marshal
 using System.Collections.Generic;
-using System.Collections; // IEnumerator
+using System.Collections; // IEnumerable
 using System.Threading;
 using System;
-
-public static class Extensions {
-  public static void Each<T>(this IEnumerable<T> source, 
-				   Action<T> action)  {
-    if (source == null) {
-      throw new ArgumentNullException("source");
-    }
-    if (action == null) {
-      return;
-    }
-    foreach (T item in source) {
-      action(item);
-    }
-  }
-}
 
 public static class Graphics {
   
@@ -84,7 +69,7 @@ public static class Graphics {
     return new List<string>(_color_map.Keys);
   }
 
-  public static IEnumerator getPixels(Picture picture) {
+  public static IEnumerable getPixels(Picture picture) {
     for (int x=0; x < picture.width; x++) {
       for (int y=0; y < picture.height; y++) {
 	yield return picture.getPixel(x, y);
@@ -1192,7 +1177,7 @@ public static class Graphics {
       this.setRGB(x, y, (byte)red, (byte)green, (byte)blue);
     }
 
-    public IEnumerator getPixels() {
+    public IEnumerable getPixels() {
 	  for (int x=0; x < width; x++) {
 	    for (int y=0; y < height; y++) {
 		  yield return getPixel(x, y);

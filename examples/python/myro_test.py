@@ -9,4 +9,4 @@ for pixel in getPixels(pic):
     r, g, b = getRGB(pixel)
     gray = (r + g + b)/3
     setRGB(pixel, gray, gray, gray)
-show(pic)
+    
