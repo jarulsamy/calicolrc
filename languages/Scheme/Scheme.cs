@@ -1316,9 +1316,8 @@ public class Scheme {
 	} else if (obj is IronPython.Runtime.List) {
 	  return ((IronPython.Runtime.List)obj).__repr__(
 		  IronPython.Runtime.DefaultContext.Default);
-	} else if (obj is IronPython.Runtime.PythonDictionary) {
-	  return ((IronPython.Runtime.PythonDictionary)obj).__repr__(
-		  IronPython.Runtime.DefaultContext.Default);
+	} else if (obj is IronPython.Runtime.PythonTuple) {
+	  return obj.ToString();
 	} else if (obj is Array) {
 	  return (string)array_to_string((object[]) obj);
 	} else if (obj is double) {

@@ -44,6 +44,20 @@ public static class Extensions {
 	}
 	return res;
   }
+  /*
+  public static void Each<T>(this IEnumerable<T> source, 
+				   Action<T> action)  {
+    if (source == null) {
+      throw new ArgumentNullException("source");
+    }
+    if (action == null) {
+      return;
+    }
+    foreach (T item in source) {
+      action(item);
+    }
+  }
+  */
 }
 
 public static class Myro {
@@ -221,7 +235,7 @@ public static class Myro {
 
   public static void show(Graphics.Picture picture, 
 	  string title="Myro Camera") {
-	Graphics.Window win = Graphics.makeWindow(title,
+	Graphics._Window win = Graphics.makeWindow(title,
 		picture.width, picture.height);
 	picture.draw(win);
   }
@@ -2435,8 +2449,24 @@ def motors(left, right):
   public static int getAlpha(Graphics.Pixel pixel) {
     return pixel.getAlpha();
   }
+  public static object get(PythonTuple tuple, int position) {
+    return tuple[position];
+  }
+  public static PythonTuple makeTuple(params object [] items) {
+    // make a tuple from an array
+    return new PythonTuple(items);
+  }
+  public static void setRGB(Graphics.Pixel pixel, PythonTuple rgb) {
+    pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
+  }
   public static void setRGB(Graphics.Pixel pixel, byte red, byte green, byte blue) {
     pixel.setRGB(red, green, blue);
+  }
+  public static void setRGB(Graphics.Pixel pixel, int red, int green, int blue) {
+    pixel.setRGB((byte)red, (byte)green, (byte)blue);
+  }
+  public static void setRGB(Graphics.Pixel pixel, float red, float green, float blue) {
+    pixel.setRGB((byte)red, (byte)green, (byte)blue);
   }
   public static void setRGBA(Graphics.Pixel pixel, byte red, byte green, byte blue, byte alpha) {
     pixel.setRGBA(red, green, blue, alpha);
@@ -2464,7 +2494,7 @@ def motors(left, right):
     return new Graphics.Picture(filename);
   }
 
-  public static Graphics.Picture makePicture(Graphics.Window window) { //, string filename) {
+  public static Graphics.Picture makePicture(Graphics._Window window) { //, string filename) {
     return Graphics.makePicture(window);
   }
 
@@ -2472,17 +2502,17 @@ def motors(left, right):
     return Graphics.copyPicture(picture);
   }
 
-  public static Graphics.Window makeWindow(string title="Pyjama Graphics",
+  public static Graphics._Window makeWindow(string title="Pyjama Graphics",
       int width=300,
       int height=300) {
     return Graphics.makeWindow(title, width, height);
   }
 
-  public static Graphics.Window getWindow(string title) {
+  public static Graphics._Window getWindow(string title) {
     return Graphics.getWindow(title);
   }
 
-  public static int getHeight(Graphics.Window window) {
+  public static int getHeight(Graphics._Window window) {
     return window.getHeight();
   }
 
@@ -2490,7 +2520,7 @@ def motors(left, right):
     return picture.getHeight();
   }
 
-  public static int getWidth(Graphics.Window window) {
+  public static int getWidth(Graphics._Window window) {
     return window.getWidth();
   }
 

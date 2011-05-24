@@ -25,6 +25,21 @@ using System.Collections; // IEnumerator
 using System.Threading;
 using System;
 
+public static class Extensions {
+  public static void Each<T>(this IEnumerable<T> source, 
+				   Action<T> action)  {
+    if (source == null) {
+      throw new ArgumentNullException("source");
+    }
+    if (action == null) {
+      return;
+    }
+    foreach (T item in source) {
+      action(item);
+    }
+  }
+}
+
 public static class Graphics {
   
   public static List PyList(params object [] items) {
@@ -96,6 +111,15 @@ public static class Graphics {
   }
   public static int getAlpha(Pixel pixel) {
     return pixel.getAlpha();
+  }
+  public static void setRGB(Pixel pixel, int red, int green, int blue) {
+    pixel.setRGB((byte)red, (byte)green, (byte)blue);
+  }
+  public static void setRGB(Pixel pixel, PythonTuple rgb) {
+    pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
+  }
+  public static void setRGB(Pixel pixel, float red, float green, float blue) {
+    pixel.setRGB((byte)red, (byte)green, (byte)blue);
   }
   public static void setRGB(Pixel pixel, byte red, byte green, byte blue) {
     pixel.setRGB(red, green, blue);

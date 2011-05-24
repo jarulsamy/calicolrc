@@ -32,6 +32,7 @@ IMMEDIATE
 # Scheme doesn't raise exception in file load
 # --exec with Pyjama running, where prog prints, deadlock?
 # Mandelbrot example not centered?
+# Scheme requires start in Pyjama root in order to use DLLs
 
 These are issues with the code in Pyjama/src/*.py
 
