@@ -1817,14 +1817,33 @@
             ((= len 2) (map2 proc (car list-args) (cadr list-args) env handler k))
             (else (mapN proc list-args env handler k)))))))
 
+(define* iterate
+  (lambda (proc generator env handler k)
+    (let ((iterator (get-iterator generator)))
+      (iterate-continue proc iterator env handler k))))
+
+(define* iterate-continue
+  (lambda (proc iterator env handler k)
+    (let ((item (next-item iterator)))
+      (if (null? item)
+          (k '())
+          (proc (list item) env handler
+            (lambda-cont (v)
+              (iterate-continue proc iterator env handler k)))))))
+
 (define* iterate-collect
+  (lambda (proc generator env handler k)
+    (let ((iterator (get-iterator generator)))
+      (iterate-collect-continue proc iterator env handler k))))
+
+(define* iterate-collect-continue
   (lambda (proc iterator env handler k)
     (let ((item (next-item iterator)))
       (if (null? item)
           (k '())
           (proc (list item) env handler
             (lambda-cont (v1)
-              (iterate-collect proc iterator env handler
+              (iterate-collect-continue proc iterator env handler
                 (lambda-cont (v2)
                   (k (cons v1 v2))))))))))
 
@@ -1901,15 +1920,6 @@
                   (proc (map car arg-list) env handler
 		    (lambda-cont (v1)
                       (for-each-prim proc (map cdr arg-list) env handler k)))))))))
-
-(define* iterate
-  (lambda (proc iterator env handler k)
-    (let ((item (next-item iterator)))
-      (if (null? item)
-          (k '())
-          (proc (list item) env handler
-            (lambda-cont (v)
-              (iterate proc iterator env handler k)))))))
 
 (define get-current-time
   (lambda ()

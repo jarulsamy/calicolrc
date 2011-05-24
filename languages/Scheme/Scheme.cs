@@ -1989,6 +1989,13 @@ public class Scheme {
 	return -1;
   }
 
+  public static IEnumerator get_iterator(object obj) {
+    if (obj is IEnumerable)
+      return ((IEnumerable)obj).GetEnumerator();
+    else
+      throw new Exception("not an enumerable");
+  }
+
   public static object next_item(object iterator) {
     object retval = EmptyList;
     if (((IEnumerator)iterator).MoveNext()) {

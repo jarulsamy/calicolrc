@@ -346,35 +346,35 @@
            (eval-sequence (cdr exps) env handler k)))
       (<cont-82> (handler k2) (m value toplevel-env handler k2))
       (<cont-83> (iterator proc env handler k)
-       (iterate-collect proc iterator env handler
+       (iterate-continue proc iterator env handler k))
+      (<cont-84> (iterator proc env handler k)
+       (iterate-collect-continue proc iterator env handler
          (make-cont '<cont-51> value k)))
-      (<cont-84> (list1 proc env handler k)
+      (<cont-85> (list1 proc env handler k)
        (map1 proc (cdr list1) env handler
          (make-cont '<cont-51> value k)))
-      (<cont-85> (list1 proc k)
+      (<cont-86> (list1 proc k)
        (apply-cont
          k
          (cons (dlr-apply proc (list (car list1))) value)))
-      (<cont-86> (list1 list2 proc env handler k)
+      (<cont-87> (list1 list2 proc env handler k)
        (map2 proc (cdr list1) (cdr list2) env handler
          (make-cont '<cont-51> value k)))
-      (<cont-87> (list1 list2 proc k)
+      (<cont-88> (list1 list2 proc k)
        (apply-cont
          k
          (cons
            (dlr-apply proc (list (car list1) (car list2)))
            value)))
-      (<cont-88> (lists proc env handler k)
+      (<cont-89> (lists proc env handler k)
        (mapN proc (map cdr lists) env handler
          (make-cont '<cont-51> value k)))
-      (<cont-89> (lists proc k)
+      (<cont-90> (lists proc k)
        (apply-cont
          k
          (cons (dlr-apply proc (map car lists)) value)))
-      (<cont-90> (arg-list proc env handler k)
+      (<cont-91> (arg-list proc env handler k)
        (for-each-prim proc (map cdr arg-list) env handler k))
-      (<cont-91> (iterator proc env handler k)
-       (iterate proc iterator env handler k))
       (<cont-92> (args sym handler k)
        (cond
          ((null? (cdr args)) (apply-cont k value))
@@ -2130,13 +2130,34 @@
             (else (mapN proc list-args env handler k)))))))
 
 (define*
-  iterate-collect
+  iterate
+  (lambda (proc generator env handler k)
+    (let ((iterator (get-iterator generator)))
+      (iterate-continue proc iterator env handler k))))
+
+(define*
+  iterate-continue
   (lambda (proc iterator env handler k)
     (let ((item (next-item iterator)))
       (if (null? item)
           (apply-cont k '())
           (apply-proc proc (list item) env handler
             (make-cont '<cont-83> iterator proc env handler k))))))
+
+(define*
+  iterate-collect
+  (lambda (proc generator env handler k)
+    (let ((iterator (get-iterator generator)))
+      (iterate-collect-continue proc iterator env handler k))))
+
+(define*
+  iterate-collect-continue
+  (lambda (proc iterator env handler k)
+    (let ((item (next-item iterator)))
+      (if (null? item)
+          (apply-cont k '())
+          (apply-proc proc (list item) env handler
+            (make-cont '<cont-84> iterator proc env handler k))))))
 
 (define listify
   (lambda (arg-list)
@@ -2164,9 +2185,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (map1 proc (cdr list1) env handler
-              (make-cont '<cont-85> list1 proc k))
+              (make-cont '<cont-86> list1 proc k))
             (apply-proc proc (list (car list1)) env handler
-              (make-cont '<cont-84> list1 proc env handler k))))))
+              (make-cont '<cont-85> list1 proc env handler k))))))
 
 (define*
   map2
@@ -2175,9 +2196,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (map2 proc (cdr list1) (cdr list2) env handler
-              (make-cont '<cont-87> list1 list2 proc k))
+              (make-cont '<cont-88> list1 list2 proc k))
             (apply-proc proc (list (car list1) (car list2)) env handler
-              (make-cont '<cont-86> list1 list2 proc env handler k))))))
+              (make-cont '<cont-87> list1 list2 proc env handler k))))))
 
 (define*
   mapN
@@ -2186,9 +2207,9 @@
         (apply-cont k '())
         (if (dlr-exp? proc)
             (mapN proc (map cdr lists) env handler
-              (make-cont '<cont-89> lists proc k))
+              (make-cont '<cont-90> lists proc k))
             (apply-proc proc (map car lists) env handler
-              (make-cont '<cont-88> lists proc env handler k))))))
+              (make-cont '<cont-89> lists proc env handler k))))))
 
 (define*
   for-each-prim
@@ -2203,17 +2224,8 @@
                     (dlr-apply proc (map car arg-list))
                     (for-each-prim proc (map cdr arg-list) env handler k))
                   (apply-proc proc (map car arg-list) env handler
-                    (make-cont '<cont-90> arg-list proc env handler
+                    (make-cont '<cont-91> arg-list proc env handler
                       k))))))))
-
-(define*
-  iterate
-  (lambda (proc iterator env handler k)
-    (let ((item (next-item iterator)))
-      (if (null? item)
-          (apply-cont k '())
-          (apply-proc proc (list item) env handler
-            (make-cont '<cont-91> iterator proc env handler k))))))
 
 (define get-current-time
   (lambda ()
