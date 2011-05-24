@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -26,7 +26,7 @@ import re
 # Bring .NET References into IronPython scope:
 from Mono.TextEditor import TextEditor, TextEditorOptions, Highlighting
 path, filename = os.path.split(__file__)
-# /.../Pyjama/src/
+# /.../Calico/src/
 Highlighting.SyntaxModeService.LoadStylesAndModes(
                 os.path.join(path, "..", "bin", "SyntaxModes"))
 
@@ -34,7 +34,7 @@ import Gtk, Gdk, Pango, GLib
 import System
 import System.Threading
 
-# Pyjama modules:
+# Calico modules:
 from window import Window, MyWindow
 from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar,
                    SearchInFilesBar, OpenUrl)
@@ -102,7 +102,7 @@ class ShellWindow(Window):
         self.pyjama = pyjama
         self.executeThread = None
         self.language = "python"
-        self.window = MyWindow(_("Pyjama Shell - %s") % System.Environment.UserName)
+        self.window = MyWindow(_("Calico Shell - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
@@ -147,7 +147,7 @@ class ShellWindow(Window):
                     (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
                     ]),
                 (_("Help"), [
-                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
+                    (_("About the Calico Project"), Gtk.Stock.About, None, self.pyjama.about),
                     ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
@@ -226,7 +226,7 @@ class ShellWindow(Window):
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
-        self.message(_("Pyjama Project %s") % self.pyjama.version)
+        self.message(_("Calico Project %s") % self.pyjama.version)
         self.message(("-" * 50))
         self.set_font()
         self.show_icon()
@@ -237,7 +237,7 @@ class ShellWindow(Window):
     def show_icon(self):
         def invoke(sender, args):
             MUTEX.WaitOne()
-            image = Gtk.Image(os.path.join(self.pyjama.pyjama_root, "examples", "images", "blueslug.gif"))
+            image = Gtk.Image(os.path.join(self.pyjama.pyjama_root, "examples", "images", "abstract-butterfly-sm.gif"))
             image.Show()
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(image, anchor_iter[0])
@@ -299,7 +299,7 @@ class ShellWindow(Window):
             self.textview.Document.MimeType = "text/x-%s" % self.language
         except:
             pass
-        self.set_title(_("%s - Pyjama Shell - %s") % (self.language.title(), System.Environment.UserName))
+        self.set_title(_("%s - Calico Shell - %s") % (self.language.title(), System.Environment.UserName))
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
         self.statusbar.set(_("Language"), self.language.title())
         self.statusbar.set(_("Status"), self.get_status())
