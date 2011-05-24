@@ -44,7 +44,6 @@ public static class Extensions {
 	}
 	return res;
   }
-  /*
   public static void Each<T>(this IEnumerable<T> source, 
 				   Action<T> action)  {
     if (source == null) {
@@ -57,7 +56,6 @@ public static class Extensions {
       action(item);
     }
   }
-  */
 }
 
 public static class Myro {
@@ -2414,6 +2412,18 @@ def motors(left, right):
 
   public static List<string> color_names() {
     return Graphics.color_names();
+  }
+
+  public static List toList(IEnumerator enumumerator) {
+    List retval = new List();
+    object item = null;
+    while (enumumerator.MoveNext()) {
+      item = enumumerator.Current;
+      retval.append(item);
+    }
+    // Doesn't work in Mono 2.6.7; maybe later?
+    // enumumerator.Each(item => retval.append(item));
+    return retval;
   }
 
   public static IEnumerator getPixels(Graphics.Picture picture) {

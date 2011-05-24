@@ -83,7 +83,7 @@ public static class Graphics {
   public static List<string> color_names() {
     return new List<string>(_color_map.Keys);
   }
-  
+
   public static IEnumerator getPixels(Picture picture) {
     for (int x=0; x < picture.width; x++) {
       for (int y=0; y < picture.height; y++) {
