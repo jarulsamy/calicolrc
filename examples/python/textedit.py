@@ -1,6 +1,6 @@
-#! .pyjama --exec --nogui textedit.py
+#! .calico --exec --nogui textedit.py
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #

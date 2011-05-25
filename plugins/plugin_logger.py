@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: pyjama.py 363 2011-03-13 18:13:56Z dblank $
+# $Id: calico.py 363 2011-03-13 18:13:56Z dblank $
 
 from utils import Plugin
 import time
@@ -27,7 +27,7 @@ class Logger(Plugin):
     """
     def init(self):
         print "Logger Plugin created"
-        self.pyjama.actionHandlers.append(self.log_action)
+        self.calico.actionHandlers.append(self.log_action)
 
     def log_action(self, action, **data):
         print time.time(), action, data
@@ -39,9 +39,9 @@ class Logger(Plugin):
         page = notebook.GetNthPage(args.PageNum)
         print time.time(), "switch", self.window_type, page.document.filename
 
-def make_plugin(pyjama):
+def make_plugin(calico):
     """
     Function to make plugin.
     """
     # Uncomment to activate:
-    #return Logger(pyjama)
+    #return Logger(calico)

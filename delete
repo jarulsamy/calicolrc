@@ -1,5 +1,0 @@
-svn rm pyjama
-svn rm pyjama.bat
-svn rm src/pyjama.py
-svn rm bin/pyjama.exe
-svn rm bin/pyjama.cs

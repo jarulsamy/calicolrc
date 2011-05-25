@@ -1,5 +1,5 @@
 /*
-Pyjama - Scripting Environment
+Calico - Scripting Environment
 
 Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 
@@ -2500,7 +2500,7 @@ def motors(left, right):
     return Graphics.copyPicture(picture);
   }
 
-  public static Graphics._Window makeWindow(string title="Pyjama Graphics",
+  public static Graphics._Window makeWindow(string title="Calico Graphics",
       int width=300,
       int height=300) {
     return Graphics.makeWindow(title, width, height);

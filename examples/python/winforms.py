@@ -1,6 +1,6 @@
-#! ./pyjama --exec --nogui winforms.py
+#! ./calico --exec --nogui winforms.py
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #

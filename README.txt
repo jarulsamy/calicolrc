@@ -1,22 +1,22 @@
-Pyjama Scripting Environment
+Calico Scripting Environment
 ----------------------------
 
 For installation instructions, see:
 
-   http://pyjamaproject.org/PyjamaDownload
+   http://calicoproject.org/CalicoDownload
 
-Assuming that this README.txt is in a directory named Pyjama:
+Assuming that this README.txt is in a directory named Calico:
 
 Under Mac OSX and Linux, run the program with:
 
-   Pyjama/pyjama
+   Calico/calico
 
 Under Windows, run the program with:
 
-   Pyjama\pyjama.bat
+   Calico\calico.bat
 
 Try:
 
-   pyjama --help
+   calico --help
 
 for more information.

@@ -1,13 +1,13 @@
 Problems, issues, features, and questions.
 
 Debugging:
-MONO_LOG_LEVEL=debug pyjama --no-handler 
+MONO_LOG_LEVEL=debug calico --no-handler 
 
 Bug:
 Ok:
 -----
 def callback(*args, **kwargs):
-    pyjama.shell.message("ok")
+    calico.shell.message("ok")
     #print "ok"
 from Graphics import *
 win = Window()
@@ -16,25 +16,25 @@ win.onClick(callback)
 Not ok:
 --------
 def callback(*args, **kwargs):
-    #pyjama.shell.message("ok")
+    #calico.shell.message("ok")
     print "ok"
 from Graphics import *
 win = Window()
 win.onClick(callback)
 --------
 
-= Pyjama =
+= Calico =
 
 IMMEDIATE
 
 # Examples
 # Joystick/gamepad
 # Scheme doesn't raise exception in file load
-# --exec with Pyjama running, where prog prints, deadlock?
+# --exec with Calico running, where prog prints, deadlock?
 # Mandelbrot example not centered?
-# Scheme requires start in Pyjama root in order to use DLLs
+# Scheme requires start in Calico root in order to use DLLs
 
-These are issues with the code in Pyjama/src/*.py
+These are issues with the code in Calico/src/*.py
 
 # BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
 # BUG: try to save to a read-only/link crashes
@@ -43,18 +43,18 @@ These are issues with the code in Pyjama/src/*.py
 
 Major missing features:
 
-# Pyjama: Need to run code in an AppDomain rather than thread?
-# Pyjama: Add Printing
-# Pyjama: options for toggle word wrap, linenumbers, others
-# Pyjama: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
-# Pyjama: No backups made of files when saving
-# Pyjama: No backups made during editing (autosave)
-# Pyjama: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
-# Pyjama: Plugins (see the way that gedit handles plugins)
-# Pyjama: Need project icon/graphics
-# Pyjama: glib.io_add_watch - watch to see if something else edits file?
-# Pyjama: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
-# Pyjama: Python exception when Gtk is running just hangs; why? In other thread?
+# Calico: Need to run code in an AppDomain rather than thread?
+# Calico: Add Printing
+# Calico: options for toggle word wrap, linenumbers, others
+# Calico: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
+# Calico: No backups made of files when saving
+# Calico: No backups made during editing (autosave)
+# Calico: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
+# Calico: Plugins (see the way that gedit handles plugins)
+# Calico: Need project icon/graphics
+# Calico: glib.io_add_watch - watch to see if something else edits file?
+# Calico: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
+# Calico: Python exception when Gtk is running just hangs; why? In other thread?
 
 = Education =
 
@@ -66,7 +66,7 @@ Major missing features:
 
 = Modules =
 
-These are issue in Pyjama/modules/*
+These are issue in Calico/modules/*
 
 Myro module for using robots:
 

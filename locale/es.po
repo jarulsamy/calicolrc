@@ -1,4 +1,4 @@
-# Pyjama Gettext Translation Template
+# Calico Gettext Translation Template
 # Copyright (C) 2011
 # This file is distributed under the same license as the PACKAGE package.
 # Douglas Blank <dblank@cs.brynmawr.edu>, 2011.
@@ -19,21 +19,21 @@ msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: ../src/chat.py:37
-msgid "Pyjama Chat"
-msgstr "el Pyjama Chat"
+msgid "Calico Chat"
+msgstr "el Calico Chat"
 
 #: ../src/editor.py:35 ../src/editor.py:156 ../src/editor.py:165
-msgid "Pyjama Editor"
-msgstr "el Pyjama Editor"
+msgid "Calico Editor"
+msgstr "el Calico Editor"
 
 #: ../src/shell.py:102
-msgid "Pyjama Shell"
-msgstr "el Pyjama Shell"
+msgid "Calico Shell"
+msgstr "el Calico Shell"
 
 #: ../src/shell.py:280
 #, python-format
-msgid "%s - Pyjama Shell"
-msgstr "%s - el Pyjama Shell"
+msgid "%s - Calico Shell"
+msgstr "%s - el Calico Shell"
 
 #: ../src/utils.py:563
 #, python-format

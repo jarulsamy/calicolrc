@@ -22,12 +22,12 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 
-using PyjamaInterfaces;
+using CalicoInterfaces;
 using System.Text;
 
 //using Scheme;
 
-public class SchemeShell: BaseShell, PyjamaInterfaces.IShell
+public class SchemeShell: BaseShell, CalicoInterfaces.IShell
 {
     public SchemeShell() : base()
     {

@@ -1,7 +1,7 @@
 
 all:
-	msgfmt es.po -o es/LC_MESSAGES/pyjama.mo
+	msgfmt es.po -o es/LC_MESSAGES/calico.mo
 
-pyjama.pot:
-	xgettext -L Python ../*/*.py -o pyjama.pot
+calico.pot:
+	xgettext -L Python ../*/*.py -o calico.pot
 

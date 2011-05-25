@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../src/chat.py:37
-msgid "Pyjama Chat"
+msgid "Calico Chat"
 msgstr ""
 
 #: ../src/chat.py:45 ../src/editor.py:44 ../src/shell.py:115
@@ -99,7 +99,7 @@ msgid "Help"
 msgstr ""
 
 #: ../src/chat.py:77 ../src/editor.py:90 ../src/shell.py:150
-msgid "About the Pyjama Project"
+msgid "About the Calico Project"
 msgstr ""
 
 #: ../src/chat.py:85 ../src/chat.py:168 ../src/editor.py:107
@@ -117,7 +117,7 @@ msgid "Send"
 msgstr ""
 
 #: ../src/chat.py:127
-msgid "Pyjama Chat Window"
+msgid "Calico Chat Window"
 msgstr ""
 
 #: ../src/chat.py:129
@@ -162,7 +162,7 @@ msgid "Enter the file to save"
 msgstr ""
 
 #: ../src/document.py:111 ../src/editor.py:253 ../src/editor.py:388
-#: ../src/pyjama.py:505 ../src/pyjama.py:542 ../src/utils.py:157
+#: ../src/calico.py:505 ../src/calico.py:542 ../src/utils.py:157
 msgid "Cancel"
 msgstr ""
 
@@ -175,7 +175,7 @@ msgid "Opened document:"
 msgstr ""
 
 #: ../src/editor.py:35 ../src/editor.py:158 ../src/editor.py:167
-msgid "Pyjama Editor"
+msgid "Calico Editor"
 msgstr ""
 
 #: ../src/editor.py:52
@@ -228,7 +228,7 @@ msgid "Open"
 msgstr ""
 
 #: ../src/editor.py:363
-msgid "Pyjama Script Blast"
+msgid "Calico Script Blast"
 msgstr ""
 
 #: ../src/editor.py:366 ../src/editor.py:393 ../src/editor.py:395
@@ -259,160 +259,160 @@ msgstr ""
 msgid "You need to login"
 msgstr ""
 
-#: ../src/pyjama.py:202
+#: ../src/calico.py:202
 #, python-format
 msgid "Cannot load language file '%s'"
 msgstr ""
 
-#: ../src/pyjama.py:217
+#: ../src/calico.py:217
 #, python-format
 msgid "unknown file extension: '%s'"
 msgstr ""
 
-#: ../src/pyjama.py:226
+#: ../src/calico.py:226
 msgid "Do you want to run the script?"
 msgstr ""
 
-#: ../src/pyjama.py:228
+#: ../src/calico.py:228
 msgid "Do you want to open the script?"
 msgstr ""
 
-#: ../src/pyjama.py:233
+#: ../src/calico.py:233
 #, python-format
 msgid ""
 "You have received a blast from '%s'.\n"
 "%s"
 msgstr ""
 
-#: ../src/pyjama.py:343
+#: ../src/calico.py:343
 #, python-format
 msgid "Searching for %r in %s/%s..."
 msgstr ""
 
-#: ../src/pyjama.py:364
+#: ../src/calico.py:364
 #, python-format
 msgid "  File \"%s\", line %d, %s\""
 msgstr ""
 
-#: ../src/pyjama.py:372
+#: ../src/calico.py:372
 #, python-format
 msgid "Found %d match%s. Right-click file to open."
 msgstr ""
 
-#: ../src/pyjama.py:374
+#: ../src/calico.py:374
 msgid "No matches found."
 msgstr ""
 
-#: ../src/pyjama.py:437
+#: ../src/calico.py:437
 msgid "Scripting Environment"
 msgstr ""
 
-#: ../src/pyjama.py:437
+#: ../src/calico.py:437
 #, python-format
 msgid "Running on %s"
 msgstr ""
 
-#: ../src/pyjama.py:439
+#: ../src/calico.py:439
 msgid "(c) 2011, Institute for Personal Robots in Education"
 msgstr ""
 
-#: ../src/pyjama.py:444
-msgid "Pyjama Project"
+#: ../src/calico.py:444
+msgid "Calico Project"
 msgstr ""
 
-#: ../src/pyjama.py:474
+#: ../src/calico.py:474
 msgid "   waiting for confirmation..."
 msgstr ""
 
-#: ../src/pyjama.py:476
+#: ../src/calico.py:476
 msgid "received messages:"
 msgstr ""
 
-#: ../src/pyjama.py:484
-msgid "Pyjama Login"
+#: ../src/calico.py:484
+msgid "Calico Login"
 msgstr ""
 
-#: ../src/pyjama.py:487 ../src/pyjama.py:509 ../src/pyjama.py:520
-#: ../src/pyjama.py:547
+#: ../src/calico.py:487 ../src/calico.py:509 ../src/calico.py:520
+#: ../src/calico.py:547
 msgid "Username"
 msgstr ""
 
-#: ../src/pyjama.py:487 ../src/pyjama.py:510 ../src/pyjama.py:522
-#: ../src/pyjama.py:549
+#: ../src/calico.py:487 ../src/calico.py:510 ../src/calico.py:522
+#: ../src/calico.py:549
 msgid "Password"
 msgstr ""
 
-#: ../src/pyjama.py:504
+#: ../src/calico.py:504
 msgid "Login"
 msgstr ""
 
-#: ../src/pyjama.py:517
-msgid "Pyjama Registration"
+#: ../src/calico.py:517
+msgid "Calico Registration"
 msgstr ""
 
-#: ../src/pyjama.py:521 ../src/pyjama.py:548
+#: ../src/calico.py:521 ../src/calico.py:548
 msgid "Email"
 msgstr ""
 
-#: ../src/pyjama.py:523
+#: ../src/calico.py:523
 msgid "Password again"
 msgstr ""
 
-#: ../src/pyjama.py:524 ../src/pyjama.py:550
+#: ../src/calico.py:524 ../src/calico.py:550
 msgid "Course keyword"
 msgstr ""
 
-#: ../src/pyjama.py:541
+#: ../src/calico.py:541
 msgid "Register"
 msgstr ""
 
-#: ../src/pyjama.py:572
+#: ../src/calico.py:572
 #, python-format
-msgid "Pyjama Project, Version %s, on %s"
+msgid "Calico Project, Version %s, on %s"
 msgstr ""
 
-#: ../src/pyjama.py:575
-msgid "Start pyjama with the following options:"
+#: ../src/calico.py:575
+msgid "Start calico with the following options:"
 msgstr ""
 
-#: ../src/pyjama.py:576
-msgid "  pyjama                            Defaults to shell"
+#: ../src/calico.py:576
+msgid "  calico                            Defaults to shell"
 msgstr ""
 
-#: ../src/pyjama.py:577
+#: ../src/calico.py:577
 msgid ""
-"  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
+"  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
 msgstr ""
 
-#: ../src/pyjama.py:578
-msgid "  pyjama --shell                    Brings up shell window"
+#: ../src/calico.py:578
+msgid "  calico --shell                    Brings up shell window"
 msgstr ""
 
-#: ../src/pyjama.py:579
-msgid "  pyjama --editor                   Brings up editor window"
+#: ../src/calico.py:579
+msgid "  calico --editor                   Brings up editor window"
 msgstr ""
 
-#: ../src/pyjama.py:580
-msgid "  pyjama --chat                     Brings up chat window"
+#: ../src/calico.py:580
+msgid "  calico --chat                     Brings up chat window"
 msgstr ""
 
-#: ../src/pyjama.py:581
+#: ../src/calico.py:581
 msgid ""
-"  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
+"  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
 msgstr ""
 
-#: ../src/pyjama.py:582
+#: ../src/calico.py:582
 msgid ""
-"  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
+"  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
 msgstr ""
 
-#: ../src/pyjama.py:583
+#: ../src/calico.py:583
 #, python-format
-msgid "  pyjama --version                  Displays the version number (%s)"
+msgid "  calico --version                  Displays the version number (%s)"
 msgstr ""
 
-#: ../src/pyjama.py:584
-msgid "  pyjama --help                     Displays this message"
+#: ../src/calico.py:584
+msgid "  calico --help                     Displays this message"
 msgstr ""
 
 #: ../src/shell.py:96 ../src/shell.py:495
@@ -425,7 +425,7 @@ msgid "Done loading file."
 msgstr ""
 
 #: ../src/shell.py:105
-msgid "Pyjama Shell"
+msgid "Calico Shell"
 msgstr ""
 
 #: ../src/shell.py:122
@@ -434,7 +434,7 @@ msgstr ""
 
 #: ../src/shell.py:227
 #, python-format
-msgid "Pyjama Project %s"
+msgid "Calico Project %s"
 msgstr ""
 
 #: ../src/shell.py:270
@@ -456,7 +456,7 @@ msgstr ""
 
 #: ../src/shell.py:286
 #, python-format
-msgid "%s - Pyjama Shell"
+msgid "%s - Calico Shell"
 msgstr ""
 
 #: ../src/shell.py:386

@@ -4549,7 +4549,7 @@
 
 (define Main
   (lambda (args)
-    (printf "Pyjama Scheme (0.2)\n")
+    (printf "Calico Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
     (set! k_reg init-cont)
     (set! handler_reg init-handler)

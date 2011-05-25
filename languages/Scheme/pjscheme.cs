@@ -8148,7 +8148,7 @@ public class PJScheme:Scheme
 
    new public static void Main (string[]args)
    {
-      PJScheme.printf ((object) "Pyjama Scheme (0.2)\n");
+      PJScheme.printf ((object) "Calico Scheme (0.2)\n");
       PJScheme.printf ((object) "(c) 2009-2011, IPRE\n");
       k_reg = init_cont;
       handler_reg = init_handler;

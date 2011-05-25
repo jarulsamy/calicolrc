@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [assembly: AssemblyVersion ("1.0.*")]
-[assembly: AssemblyKeyFile ("pyjama.key")]
+[assembly: AssemblyKeyFile ("calico.key")]
 public class LoadDLL {
 
 

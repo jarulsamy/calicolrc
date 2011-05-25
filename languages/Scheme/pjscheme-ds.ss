@@ -2357,7 +2357,7 @@
 
 (define Main
   (lambda (args)
-    (printf "Pyjama Scheme (0.2)\n")
+    (printf "Calico Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
     (load-files (list args) toplevel-env init-handler init-cont)
     (trampoline)))

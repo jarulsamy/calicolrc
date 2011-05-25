@@ -282,11 +282,11 @@ if __name__ == "__main__":
                         # FIXME: no permissions, just joining it
                         conferences[value].add(msg[0]) # from address
                         print >> log, ("/join: %s to %s" % (msg[0], value))
-                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[update]\nroom: %s" % value)
-                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[result]\nSuccessfully joined '%s'" % value)
+                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[update]\nroom: %s" % value)
+                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[result]\nSuccessfully joined '%s'" % value)
                     else:
                         print >> log, ("ERROR: cannot /join: %s to %s, no such conference" % (msg[0], value))
-                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[result]\nNo such conference '%s'" % value)
+                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[result]\nNo such conference '%s'" % value)
                 elif line0 == "[broadcast]":
                     line1, rest = rest.split("\n", 1)
                     prop, value = line1.split(":")
@@ -296,7 +296,7 @@ if __name__ == "__main__":
                         if msg[0] not in conferences[value]:
                             conferences[value].add(msg[0]) # from address
                         for address in conferences[value]:
-                            ch.send("%s/%s" % (address, "PyjamaClient"), "[broadcast]\nfrom: %s\n%s" % (msg[0], rest))
+                            ch.send("%s/%s" % (address, "CalicoClient"), "[broadcast]\nfrom: %s\n%s" % (msg[0], rest))
                             print >> log, ("/broadcast to %s" % address)
                 elif line0 == "[blast]":
                     line1, rest = rest.split("\n", 1)
@@ -307,11 +307,11 @@ if __name__ == "__main__":
                         if msg[0] not in conferences[value]:
                             conferences[value].add(msg[0]) # from address
                         for address in conferences[value]:
-                            ch.send("%s/%s" % (address, "PyjamaClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
+                            ch.send("%s/%s" % (address, "CalicoClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
                             print >> log, ("/broadcast to %s" % address)
                     else:
                         # send to an individual
-                        ch.send("%s@myro.roboteducation.org/%s" % (value, "PyjamaClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
+                        ch.send("%s@myro.roboteducation.org/%s" % (value, "CalicoClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
                         print >> log, ("/broadcast to %s" % value)
                 elif line0 == "[file]":
                     print >> log, "   receiving file..."

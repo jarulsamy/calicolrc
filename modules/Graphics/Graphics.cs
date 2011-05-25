@@ -1,5 +1,5 @@
 /*
-Pyjama - Scripting Environment
+Calico - Scripting Environment
 
 Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 
@@ -167,7 +167,7 @@ public static class Graphics {
     return new Picture(pixbuf);
   }
   
-  public static Graphics._Window makeWindow(string title="Pyjama Graphics",
+  public static Graphics._Window makeWindow(string title="Calico Graphics",
 					   int width=300, 
 					   int height=300) {
     if (_windows.ContainsKey(title)) {
@@ -188,7 +188,7 @@ public static class Graphics {
     }
   }
 
-  public static Graphics._Window Window(string title="Pyjama Graphics Window",
+  public static Graphics._Window Window(string title="Calico Graphics Window",
 				       int width=300, 
 				       int height=300) {
     return makeWindow(title, width, height);
@@ -204,7 +204,7 @@ public static class Graphics {
     public PythonTuple lastClick;
     ManualResetEvent lastClickFlag = new ManualResetEvent(false);
     
-    public _Window(string title="Pyjama Graphics Window",
+    public _Window(string title="Calico Graphics Window",
 		  int width=300, 
 		  int height=300) : base(title) {
       _canvas = new Canvas("auto");
