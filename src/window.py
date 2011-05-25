@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -24,7 +24,7 @@ import Gdk
 import os
 import glob
 
-# Pyjama modules:
+# Calico modules:
 import Graphics
 from utils import _
 
@@ -60,10 +60,10 @@ class MyWindow(Gtk.Window):
         Gtk.Window.OnKeyPressEvent(self, eventkey)
 
 class Window(object):
-    def __init__(self, pyjama):
-        self.pyjama = pyjama
-        for plugin in self.pyjama.plugins:
-            self.pyjama.plugins[plugin].on_create_window(self)
+    def __init__(self, calico):
+        self.calico = calico
+        for plugin in self.calico.plugins:
+            self.calico.plugins[plugin].on_create_window(self)
         
     def make_gui(self, menu, toolbar):
         self.menubar = Gtk.MenuBar()
@@ -159,7 +159,7 @@ class Window(object):
 
     def make_new_file_menu(self):
         retval = []
-        for lang in sorted(self.pyjama.languages):
+        for lang in sorted(self.calico.languages):
             retval.append(
                 (_("New %s Script") % lang.title(), None,
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
@@ -169,7 +169,7 @@ class Window(object):
     def make_recents_menu(self):
         retval = []
         retval.append(_("Recent files")) # submenu
-        for file in self.pyjama.config.get("pyjama.recent_files"):
+        for file in self.calico.config.get("calico.recent_files"):
             if file:
                 menufile = file.replace("_", "__")
                 retval.append((_("Recent files"),
@@ -179,10 +179,10 @@ class Window(object):
 
     def make_examples_menu(self):
         retval = []
-        for lang in self.pyjama.engine.get_languages():
+        for lang in self.calico.engine.get_languages():
             menulang = lang.title()
             retval.append(_("Examples") + "/" + menulang) # submenu
-            path = os.path.join(self.pyjama.pyjama_root, "examples", lang, "*")
+            path = os.path.join(self.calico.calico_root, "examples", lang, "*")
             files = glob.glob(path)
             files.sort()
             for file in files:
@@ -276,7 +276,7 @@ class Window(object):
         Gtk.Print.RunPageSetupDialog(self.window, None, pc)
 
     def print_view_to_gc(self, gpc):
-        Gnome.Print.Beginpage(gpc, "Pyjama")
+        Gnome.Print.Beginpage(gpc, "Calico")
         Gnome.Print.Moveto(gpc, 1, 700)
         Gnome.Print.Show(gpc, self.textview.Buffer.Text)
         Gnome.Print.Showpage(gpc)

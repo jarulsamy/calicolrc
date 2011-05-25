@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -40,8 +40,8 @@ class CSharpEngine(Engine):
                 #print "CSharp: unable to load assembly '%s'" % assembly
                 pass
         #self.engine.Init(System.Array[System.String]([]))
-        # FIXME: make pyjama available in some manner
-        #self.engine.Evaluate("pyjama", manager.pyjama)
+        # FIXME: make calico available in some manner
+        #self.engine.Evaluate("calico", manager.calico)
 
     def execute(self, text):
         result = None

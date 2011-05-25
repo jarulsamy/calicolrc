@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -32,7 +32,7 @@ import agsXMPP
 import os
 import traceback
 
-MUTEX = Mutex(False, "PyjamaMutex")
+MUTEX = Mutex(False, "CalicoMutex")
 
 _ = Mono.Unix.Catalog.GetString
 
@@ -90,8 +90,8 @@ class ConsoleStream(System.IO.Stream):
         return 0
 
 class CustomStream(System.IO.Stream):
-    def __init__(self, pyjama, textview, tag=None):
-        self.pyjama = pyjama
+    def __init__(self, calico, textview, tag=None):
+        self.calico = calico
         self.textview = textview
         self.tag = tag
 
@@ -123,7 +123,7 @@ class CustomStream(System.IO.Stream):
                 end = self.textview.Buffer.EndIter
                 self.textview.Buffer.InsertWithTagsByName(end, text, self.tag)
                 if self.tag == "red":
-                    self.pyjama.last_error += text
+                    self.calico.last_error += text
             else:
                 self.textview.Buffer.InsertAtCursor(text)
             self.goto_end()
@@ -250,9 +250,9 @@ def rename_files_for_zip_package(files, package_name):
                 for file in original_files])
 
 class Chat:
-    def __init__(self, pyjama, user, password, debug=False):
+    def __init__(self, calico, user, password, debug=False):
         self.status = _("offline")
-        self.pyjama = pyjama
+        self.calico = calico
         self.user = user
         self.password = password
         self.debug = debug
@@ -273,7 +273,7 @@ class Chat:
         self.client.OnClose += self.close
 
         try:
-            self.client.Open(self.user, self.password, "PyjamaClient", 5)
+            self.client.Open(self.user, self.password, "CalicoClient", 5)
         except Exception, exp:
             traceback.print_exp()
 
@@ -300,7 +300,7 @@ class Chat:
         self.status = _("online")
         self.send("", "2") # make this my only login
         if self.alert:
-            self.pyjama.alert(_("You are now logged in as '%s'.") % self.user)
+            self.calico.alert(_("You are now logged in as '%s'.") % self.user)
             self.send("admin", "[broadcast]\nroom: %s\n%s" % ("General",
                 "%s has joined the discussion" % self.user))
         if self.debug:
@@ -313,7 +313,7 @@ class Chat:
     def OnAuthError(self, sender, xml):
         self.status = _("rejected")
         if self.alert:
-            self.pyjama.alert(_("You were not allowed to log in.") + "\n" +
+            self.calico.alert(_("You were not allowed to log in.") + "\n" +
                               _("Please check your ID and password."))
         if self.debug:
             print "AUTHERROR:", self.user, xml
@@ -323,7 +323,7 @@ class Chat:
             print "READXML:", self.user, xml
 
     def OnWriteXml(self, sender, xml):
-        self.pyjama.update_status()
+        self.calico.update_status()
         if self.debug:
             print "WRITEXML:", self.user, xml
 
@@ -340,8 +340,8 @@ class Chat:
                 line1, message = rest.split("\n", 1) # from
                 fromheader, address = [item.strip() for item in line1.split(":")]
                 name, domain = address.split("@")
-                if self.pyjama.chat:
-                    self.pyjama.chat.display_message(name, message)
+                if self.calico.chat:
+                    self.calico.chat.display_message(name, message)
                     return
         elif str(msg.Body).startswith("[blast]"):
             line0, rest = str(msg.Body).split("\n", 1) # [blast]
@@ -352,19 +352,19 @@ class Chat:
                 typeheader, type = [item.strip() for item in line2.split(":", 1)]
                 line3, code = rest.split("\n", 1) # filename:
                 fileheader, filename = [item.strip() for item in line3.split(":", 1)]
-                self.pyjama.blast(address, type, filename, code)
+                self.calico.blast(address, type, filename, code)
                 return
         elif str(msg.Body).startswith("[result]"):
             line0, rest = str(msg.Body).split("\n", 1) # [blast]
-            self.pyjama.alert(rest)
+            self.calico.alert(rest)
             return
         elif str(msg.Body).startswith("[update]"):
-            if self.pyjama.chat:
+            if self.calico.chat:
                 line0, rest = str(msg.Body).split("\n", 1) # [update]
                 line1, rest = rest.split("\n", 1) # room:
                 header, value = [item.strip() for item in line1.split(":", 1)]
                 if header == "room":
-                    self.pyjama.chat.room = value
+                    self.calico.chat.room = value
             return
         elif str(msg.Body).startswith("[info]"):
             # ignore
@@ -373,12 +373,12 @@ class Chat:
         self.messages.append((mfrom, msg.Body))
 
 class MySearchInFilesEntry(Gtk.Entry):
-    def set_pyjama(self, pyjama):
-        self.pyjama = pyjama
+    def set_calico(self, calico):
+        self.calico = calico
 
     def OnKeyPressEvent(self, event):
         if event.Key == Gdk.Key.Return:
-            self.pyjama.grep(self.Text)
+            self.calico.grep(self.Text)
             return True
         elif event.Key == Gdk.Key.Escape:
             def invoke(sender, args):
@@ -534,7 +534,7 @@ class SearchInFilesBar(Gtk.HBox):
 
     def set_shell(self, shell):
         self.shell = shell
-        self.entry.set_pyjama(self.shell.pyjama)
+        self.entry.set_calico(self.shell.calico)
 
     def open(self, obj, event):
         self.search_on()
@@ -584,8 +584,8 @@ class Plugin:
     """
     A base class for plugins.
     """
-    def __init__(self, pyjama):
-        self.pyjama = pyjama
+    def __init__(self, calico):
+        self.calico = calico
         self.init()
 
     def init(self):

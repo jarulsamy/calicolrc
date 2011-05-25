@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -29,10 +29,10 @@ import os
 import re
 
 class EditorWindow(Window):
-    def __init__(self, pyjama, files=None):
-        self.pyjama = pyjama
+    def __init__(self, calico, files=None):
+        self.calico = calico
         # create the parts
-        self.window = MyWindow(_("Pyjama Editor - %s") % System.Environment.UserName)
+        self.window = MyWindow(_("Calico Editor - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
@@ -55,8 +55,8 @@ class EditorWindow(Window):
                   (_("Save as..."), Gtk.Stock.SaveAs,
                    None, self.on_save_file_as),
                   None,
-                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.calico.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.calico.login_dialog(self.window)),
                   None,
                   (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
@@ -79,16 +79,16 @@ class EditorWindow(Window):
                     (_("Blast..."), None, None, self.blast_dialog),
                            ]),
                 (_("Windows"), [
-                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
-                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
-                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
+                    (_("Editor"), None, "F6", self.calico.setup_editor),
+                    (_("Shell"), None, "F7", self.calico.setup_shell),
+                    (_("Chat"), None, "F8", self.calico.setup_chat),
                     ]),
                 (_("Options"), [
-                    (_("Make font larger"), None, "<control>equal", self.pyjama.increase_fontsize),
-                    (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
+                    (_("Make font larger"), None, "<control>equal", self.calico.increase_fontsize),
+                    (_("Make font smaller"), None, "<control>minus", self.calico.decrease_fontsize),
                     ]),
                 (_("Help"), [
-                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
+                    (_("About the Calico Project"), Gtk.Stock.About, None, self.calico.about),
                           ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
@@ -121,15 +121,15 @@ class EditorWindow(Window):
         self.vbox.Show()
         self.window.Show()
         # Init plugins:
-        Window.__init__(self, pyjama)
+        Window.__init__(self, calico)
         # Open files on command line, or just a New Script:
         if files:
             for file in files:
                 filename = os.path.abspath(file)
                 self.select_or_open(filename)
-        elif self.pyjama.config.get("editor.load_last_files"):
+        elif self.calico.config.get("editor.load_last_files"):
             added_a_file = False
-            for file in self.pyjama.config.get("editor.last_files"):
+            for file in self.calico.config.get("editor.last_files"):
                 filename = os.path.abspath(file)
                 self.select_or_open(filename)
                 added_a_file = True
@@ -156,19 +156,19 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             self.statusbar.set(_("Language"), doc.language.title())
-            self.window.Title = "%s - %s - %s" % (doc.title,  _("Pyjama Editor"), System.Environment.UserName)
+            self.window.Title = "%s - %s - %s" % (doc.title,  _("Calico Editor"), System.Environment.UserName)
             if doc.filename:
-                self.pyjama.on_action("selected-document", filename=doc.filename)
+                self.calico.on_action("selected-document", filename=doc.filename)
                 path, filename = os.path.split(doc.filename)
                 try:
                     os.chdir(path)
                 except:
                     pass # Fail silently
             else:
-                self.pyjama.on_action("selected-document", filename=None)
+                self.calico.on_action("selected-document", filename=None)
         else:
             self.statusbar.set(_("Language"), "")
-            self.window.Title = _("Pyjama Editor - %s") % System.Environment.UserName
+            self.window.Title = _("Calico Editor - %s") % System.Environment.UserName
 
     def select_or_open(self, filename, lineno=0, language="python"):
         """
@@ -200,7 +200,7 @@ class EditorWindow(Window):
         else: # make a no-named document of type language
             page = self.make_document(None, language)
         if add_it:
-            self.pyjama.on_action("opened-document", filename=filename)
+            self.calico.on_action("opened-document", filename=filename)
             page_num = self.notebook.AppendPage(page.widget, page.tab)
             self.notebook.SetTabReorderable(page.widget, True)
             self.notebook.CurrentPage = page_num
@@ -218,37 +218,37 @@ class EditorWindow(Window):
 
     def update_recent_files(self, filename):
         menufilename = filename.replace("_", "__")
-        if filename not in self.pyjama.config.get("pyjama.recent_files"):
-            self.pyjama.config.get("pyjama.recent_files").append(filename)
+        if filename not in self.calico.config.get("calico.recent_files"):
+            self.calico.config.get("calico.recent_files").append(filename)
             menuitem = self.make_menuitem((menufilename, None, None,
                                             lambda o,e,file=filename: self.select_or_open(filename)),
                                           self.accel_group["Recent files"])
             self.submenu["Recent files"].Append(menuitem)
             self.submenu["Recent files"].ShowAll()
-            if self.pyjama.shell:
-                shell = self.pyjama.shell
+            if self.calico.shell:
+                shell = self.calico.shell
                 menuitem = self.make_menuitem((menufilename, None, None,
                                                lambda o,e,file=filename: shell.select_or_open(filename)),
                                               shell.accel_group["Recent files"])
                 shell.submenu["Recent files"].Append(menuitem)
                 shell.submenu["Recent files"].ShowAll()
-            if self.pyjama.chat:
-                chat = self.pyjama.chat
+            if self.calico.chat:
+                chat = self.calico.chat
                 menuitem = self.make_menuitem((menufilename, None, None,
                                                lambda o,e,file=filename: chat.select_or_open(filename)),
                                               chat.accel_group["Recent files"])
                 chat.submenu["Recent files"].Append(menuitem)
                 chat.submenu["Recent files"].ShowAll()
         else: # it is in list, move to end (most recent)
-            self.pyjama.config.get("pyjama.recent_files").remove(filename)
-            self.pyjama.config.get("pyjama.recent_files").append(filename)
+            self.calico.config.get("calico.recent_files").remove(filename)
+            self.calico.config.get("calico.recent_files").append(filename)
 
     def update_status(self):
         self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
-        if self.pyjama.connection:
-            return self.pyjama.connection.status
+        if self.calico.connection:
+            return self.calico.connection.status
         else:
             return _("offline")
 
@@ -294,18 +294,18 @@ class EditorWindow(Window):
                 pathname, extension = filename.rsplit(".", 1)
             else:
                 pathname, extension = filename, ""
-            for lang in self.pyjama.languages:
-                if self.pyjama.languages[lang].extension == extension:
-                    page = self.pyjama.languages[lang].get_document_class()(filename, self.pyjama, lang)
+            for lang in self.calico.languages:
+                if self.calico.languages[lang].extension == extension:
+                    page = self.calico.languages[lang].get_document_class()(filename, self.calico, lang)
                     return page
-        page = self.pyjama.languages[language].get_document_class()(filename, self.pyjama, language)
+        page = self.calico.languages[language].get_document_class()(filename, self.calico, language)
         return page
 
     def on_save_file(self, obj, event):
         doc = self.get_current_doc()
         if doc:
             doc.save()
-            self.pyjama.on_action("saved-document", filename=doc.filename)
+            self.calico.on_action("saved-document", filename=doc.filename)
 
     def on_save_file_as(self, obj, event):
         doc = self.get_current_doc()
@@ -314,7 +314,7 @@ class EditorWindow(Window):
             if doc.filename:
                 self.changed_page(None, None)
                 self.update_recent_files(doc.filename)
-                self.pyjama.on_action("saved-as-document", filename=doc.filename)
+                self.calico.on_action("saved-as-document", filename=doc.filename)
 
     def get_current_doc(self):
         if self.notebook.CurrentPage >= 0:
@@ -332,37 +332,37 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             if doc.save():
-                self.pyjama.setup_shell()
-                self.pyjama.shell.reset_shell(None, None)
-                self.pyjama.shell.execute_file(doc.filename, doc.language)
+                self.calico.setup_shell()
+                self.calico.shell.reset_shell(None, None)
+                self.calico.shell.execute_file(doc.filename, doc.language)
 
     def on_run(self, obj, event):
         doc = self.get_current_doc()
         if doc:
-            self.pyjama.setup_shell()
+            self.calico.setup_shell()
             # if text selected, use that
             text = doc.get_selected_text()
             if text:
-                self.pyjama.shell.load_text(text, doc.language)
+                self.calico.shell.load_text(text, doc.language)
             else:
                 # else, load file
                 if doc.save():
-                    self.pyjama.shell.execute_file(doc.filename, doc.language)
+                    self.calico.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):
         retval = self.clean_up()
         if retval:
-            self.pyjama.on_close("editor")
+            self.calico.on_close("editor")
         return True
 
     def on_quit(self, obj, event):
         retval = self.clean_up()
         if retval:
-            self.pyjama.on_close("all")
+            self.calico.on_close("all")
         return True
 
     def clean_up(self):
-        self.pyjama.config.set("editor.last_files",
+        self.calico.config.set("editor.last_files",
                 ["%s:%d" % (doc.filename, doc.get_line())
                  for doc in self.get_docs() if doc.filename])
         return True
@@ -381,7 +381,7 @@ class EditorWindow(Window):
 
     def blast_dialog(self, obj, event):
         def invoke(sender, args):
-            dialog = Gtk.Dialog(_("Pyjama Script Blast"), self.window,
+            dialog = Gtk.Dialog(_("Calico Script Blast"), self.window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
             items = [_("To")]
@@ -419,15 +419,15 @@ class EditorWindow(Window):
         Gtk.Application.Invoke(invoke)
 
     def blast_script(self, to, type, document):
-        if self.pyjama.connection:
-            if self.pyjama.connection.status == _("online"):
+        if self.calico.connection:
+            if self.calico.connection.status == _("online"):
                 # [blast]
                 # to: address | conference
                 # type: execute | edit
                 # filename: filename.ext
                 # data...
                 path, basefilename = os.path.split(document.filename)
-                self.pyjama.connection.send("admin", "[blast]\nto: %s\ntype: %s\nfilename: %s\n%s" %
+                self.calico.connection.send("admin", "[blast]\nto: %s\ntype: %s\nfilename: %s\n%s" %
                                             (to, type, basefilename, document.get_text()))
             else:
                 print _("You are not online")

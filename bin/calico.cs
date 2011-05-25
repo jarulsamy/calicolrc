@@ -1,5 +1,5 @@
 /*
-Pyjama - Scripting Environment
+Calico - Scripting Environment
 
 Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 
@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$Id$
+$Id: calico.cs -1   $
 */
 using System;
 using IronPython.Hosting;
@@ -25,14 +25,14 @@ using Microsoft.Scripting.Hosting;
 using System.Diagnostics;
 using Mono.Unix;
 
-public class Pyjama {
+public class Calico {
   static void Main(string[] args) {
     string path = System.IO.Path.GetDirectoryName(
       	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
     if (path.StartsWith("\\")) {
         path = path.Substring(1);
     }
-  	Catalog.Init("pyjama", System.IO.Path.Combine(path, "../locale"));
+  	Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
 	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
         LanguageSetup language = Python.CreateLanguageSetup(null);
         language.Options["FullFrames"] = true;
@@ -40,7 +40,7 @@ public class Pyjama {
 	ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
 	ScriptScope scope = runtime.CreateScope();
 	ScriptEngine engine = runtime.GetEngine("python");
-	ScriptSource source = engine.CreateScriptSourceFromFile(System.IO.Path.Combine(path, "../src/pyjama.py"));
+	ScriptSource source = engine.CreateScriptSourceFromFile(System.IO.Path.Combine(path, "../src/calico.py"));
 	source.Compile();
 	try {
 	  source.Execute(scope);

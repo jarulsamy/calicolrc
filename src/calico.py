@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id$
+# $Id: calico.py -1   $
 
 # Setup environment:
 import sys
@@ -24,18 +24,18 @@ import os
 import traceback
 # First, let's save where we are:
 startpath = os.path.abspath(".")
-# Next, let's find out where this file is: src/pyjama.py
-pyjama_fullpath = os.path.abspath(__file__)
+# Next, let's find out where this file is: src/calico.py
+calico_fullpath = os.path.abspath(__file__)
 # Next, let's add the absolute paths of what we need:
-fullpath, basename = os.path.split(pyjama_fullpath)
+fullpath, basename = os.path.split(calico_fullpath)
 user = os.path.expanduser("~/")
-# make a .pyjama directory in user's home dir:
-pyjama_user = os.path.join(user, ".pyjama")
-if not os.path.isdir(pyjama_user):
-    os.path.os.mkdir(pyjama_user)
-pyjamapath = os.path.join(fullpath, "..") # /src/..
+# make a .calico directory in user's home dir:
+calico_user = os.path.join(user, ".calico")
+if not os.path.isdir(calico_user):
+    os.path.os.mkdir(calico_user)
+calicopath = os.path.join(fullpath, "..") # /src/..
 # change here to start
-os.chdir(pyjamapath)
+os.chdir(calicopath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
     path = os.path.join(fullpath, dir)
     sys.path.append(path)
@@ -91,7 +91,7 @@ from Mono.TextEditor import Highlighting
 
 # Initialize text highlighting
 path, filename = os.path.split(__file__)
-# path = "/.../Pyjama/src/"
+# path = "/.../Calico/src/"
 Highlighting.SyntaxModeService.LoadStylesAndModes(
     os.path.join(path, "..", "bin", "SyntaxModes"))
 
@@ -100,7 +100,7 @@ import tempfile
 import re
 import glob
 
-# Pyjama imports:
+# Calico imports:
 from engine import EngineManager
 from config import config
 from utils import _, Chat
@@ -119,14 +119,14 @@ if "--no-handler" not in args:
 
 # Define local functions and classes
 
-class PyjamaProject(object):
+class CalicoProject(object):
     """
     This class is meant to be created as a singleton instance
     to hold all of the components of one user together.
     """
     def __init__(self, argv):
         """
-        Constructor for the singleton Pyjama instance. argv is the
+        Constructor for the singleton Calico instance. argv is the
         command-line files and flags.
         """
         self.last_error = ""
@@ -140,8 +140,8 @@ class PyjamaProject(object):
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
         self.startpath = startpath       # from global variable
-        self.pyjama_user = pyjama_user   # from global variable
-        self.pyjama_root = os.path.abspath(".")
+        self.calico_user = calico_user   # from global variable
+        self.calico_root = os.path.abspath(".")
         self.system = System.Environment.OSVersion.VersionString
         self.gui = True
         self.standalone = False
@@ -232,9 +232,9 @@ class PyjamaProject(object):
         for filename in languages: 
             path, basename = os.path.split(filename)
             base, ext = os.path.splitext(basename)
-            if (base in self.config.get("pyjama.languages") or
-                "All" in self.config.get("pyjama.languages")):
-                if base in self.config.get("pyjama.languages_ignore"):
+            if (base in self.config.get("calico.languages") or
+                "All" in self.config.get("calico.languages")):
+                if base in self.config.get("calico.languages_ignore"):
                     continue
                 try:
                     import_name, ext = os.path.basename(filename).rsplit(".")
@@ -344,7 +344,7 @@ class PyjamaProject(object):
             (self.shell is None) and
             (self.chat is None)):
             # Clean up, save settings:
-            self.config.get("pyjama.recent_files")[:] = self.config.get("pyjama.recent_files")[-10:]
+            self.config.get("calico.recent_files")[:] = self.config.get("calico.recent_files")[-10:]
             config.save()
             # Close connections:
             if pw and pw.connection:
@@ -450,14 +450,14 @@ class PyjamaProject(object):
         return list
 
     def get_fontname(self):
-        fontsize = self.config.get("pyjama.fontsize")
-        font = self.config.get("pyjama.font")
+        fontsize = self.config.get("calico.fontsize")
+        font = self.config.get("calico.font")
         pangofont = Pango.FontDescription.FromString("%s %d" % (font, fontsize))
         return pangofont
 
     def increase_fontsize(self, obj, event):
-        self.config.set("pyjama.fontsize",
-                        min(self.config.get("pyjama.fontsize") + 1, 36))
+        self.config.set("calico.fontsize",
+                        min(self.config.get("calico.fontsize") + 1, 36))
         def invoke(sender, args):
             pangofont = self.get_fontname()
             if self.shell:
@@ -469,8 +469,8 @@ class PyjamaProject(object):
         Gtk.Application.Invoke(invoke)
 
     def decrease_fontsize(self, obj, event):
-        self.config.set("pyjama.fontsize",
-                        max(self.config.get("pyjama.fontsize") - 1, 5))
+        self.config.set("calico.fontsize",
+                        max(self.config.get("calico.fontsize") - 1, 5))
         def invoke(sender, args):
             pangofont = self.get_fontname()
             if self.shell:
@@ -496,10 +496,10 @@ class PyjamaProject(object):
             #aboutDialog.License
             #aboutDialog.Logo
             #aboutDialog.LogoIconName
-            aboutDialog.Name = _("Pyjama Project")
+            aboutDialog.Name = _("Calico Project")
             #aboutDialog.TranslatorCredits
             aboutDialog.Version = self.version
-            aboutDialog.Website = "http://PyjamaProject.org/"
+            aboutDialog.Website = "http://CalicoProject.org/"
             #aboutDialog.WebsiteLabel
             aboutDialog.WrapLicense = True
             aboutDialog.Run()
@@ -536,7 +536,7 @@ class PyjamaProject(object):
 
     def login_dialog(self, window):
         def invoke(sender, args):
-            dialog = Gtk.Dialog(_("Pyjama Login"), window,
+            dialog = Gtk.Dialog(_("Calico Login"), window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
             items = [(_("Username"), False), (_("Password"), True)]
@@ -568,7 +568,7 @@ class PyjamaProject(object):
 
     def register_dialog(self, window):
         def invoke(sender, args):
-            dialog = Gtk.Dialog(_("Pyjama Registration"), window,
+            dialog = Gtk.Dialog(_("Calico Registration"), window,
                                 Gtk.DialogFlags.DestroyWithParent)
             dialog.Modal = True
             items = [(_("Username"), False),
@@ -619,7 +619,7 @@ class PyjamaProject(object):
 
     def on_action(self, action, **data):
         """
-        Fires on actions throughout Pyjama.
+        Fires on actions throughout Calico.
         """
         for actionHandler in self.actionHandlers:
             actionHandler(action, **data)
@@ -629,20 +629,20 @@ class PyjamaProject(object):
 version = "0.4.6"
 if "--help" in args:
     print
-    print _("Pyjama Project, Version %s, on %s") % (version,
+    print _("Calico Project, Version %s, on %s") % (version,
                                                  System.Environment.OSVersion.VersionString)
     print "----------------------------------------------------------------------------"
-    print _("Start pyjama with the following options:")
-    print _("  pyjama                            Defaults to shell")
-    print _("  pyjama FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs")
-    print _("  pyjama --shell                    Brings up shell window")
-    print _("  pyjama --editor                   Brings up editor window")
-    print _("  pyjama --chat                     Brings up chat window")
-    print _("  pyjama --exec FILENAMEs           Runs FILENAMEs standalone, with graphics")
-    print _("  pyjama --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics")
-    print _("  pyjama --version                  Displays the version number (%s)" % version)
-    print _("  pyjama --help                     Displays this message")
-    print _("  pyjama --debug                    Puts Pyjama in debugging mode")
+    print _("Start calico with the following options:")
+    print _("  calico                            Defaults to shell")
+    print _("  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs")
+    print _("  calico --shell                    Brings up shell window")
+    print _("  calico --editor                   Brings up editor window")
+    print _("  calico --chat                     Brings up chat window")
+    print _("  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics")
+    print _("  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics")
+    print _("  calico --version                  Displays the version number (%s)" % version)
+    print _("  calico --help                     Displays this message")
+    print _("  calico --debug                    Puts Calico in debugging mode")
     print
     sys.exit(0)
 elif "--version" in args:
@@ -653,14 +653,14 @@ messagesLocked = False
 
 def handleMessages(sender, args):
     """
-    Callback for handling additional pyjama starts. This is run by the
-    main Pyjama program to read the messages sent by other attempts to
+    Callback for handling additional calico starts. This is run by the
+    main Calico program to read the messages sent by other attempts to
     start.
     """
     global messagesLocked
     if not messagesLocked:
         messagesLocked = True
-        messages = os.path.join(pyjama_user, "messages")
+        messages = os.path.join(calico_user, "messages")
         os.chdir(startpath)
         execute = False
         for word in file(messages, "r"):
@@ -691,22 +691,22 @@ def handleMessages(sender, args):
 
 #################################################
 # Single Instance Application
-messages = os.path.join(pyjama_user, "messages")
-(mutex, locked) = System.Threading.Mutex(True, "PyjamaProject/%s" % System.Environment.UserName, None)
+messages = os.path.join(calico_user, "messages")
+(mutex, locked) = System.Threading.Mutex(True, "CalicoProject/%s" % System.Environment.UserName, None)
 if locked:
     # We are the "server"; clean the messages file:
     fp = file(messages, "w")
     fp.close()
     # set up a watcher to check for messages
     watcher = System.IO.FileSystemWatcher()
-    watcher.Path = pyjama_user
+    watcher.Path = calico_user
     watcher.Filter = "messages"
     watcher.NotifyFilter = System.IO.NotifyFilters.LastWrite
     watcher.Changed += handleMessages
     watcher.EnableRaisingEvents = True
     # and continue loading...
 else:
-    # Not allowed! We'll send command line to running Pyjama through
+    # Not allowed! We'll send command line to running Calico through
     # message file. Append args to command line:
     fp = file(messages, "a")
     fp.write("\n".join(args) + "\n")
@@ -720,7 +720,7 @@ if "--nogui" not in args:
     Gtk.Application.Init()
 #------------------------------
 try:
-    pw = PyjamaProject(args)
+    pw = CalicoProject(args)
 except:
     traceback.print_exc()
     sys.exit()

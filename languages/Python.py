@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -71,7 +71,7 @@ class PythonEngine(DLREngine):
 
     def start(self):
         paths = self.engine.GetSearchPaths()
-        ## Let users find Pyjama modules:
+        ## Let users find Calico modules:
         for folder in ["modules", "src"]:
             paths.Add(os.path.abspath(folder))
         self.engine.SetSearchPaths(paths)

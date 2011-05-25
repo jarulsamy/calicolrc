@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -24,7 +24,7 @@ import Pango
 import os
 from Mono.TextEditor import TextEditor, Highlighting, TextEditorOptions
 path, filename = os.path.split(__file__)
-# /.../Pyjama/src/
+# /.../Calico/src/
 Highlighting.SyntaxModeService.LoadStylesAndModes(
                 os.path.join(path, "..", "bin", "SyntaxModes"))
 
@@ -41,11 +41,11 @@ class Document(object):
     """
     Base Document for all languages.
     """
-    def __init__(self, filename, pyjama, language="python"):
+    def __init__(self, filename, calico, language="python"):
         if filename:
             filename = os.path.abspath(filename)
         self.filename = filename
-        self.pyjama = pyjama
+        self.calico = calico
         self.language = language
         if self.filename:
             self.title = os.path.basename(self.filename)
@@ -75,7 +75,7 @@ class Document(object):
         button.Add(img)
         button.Show()
         button.Clicked += lambda obj, event: \
-            self.pyjama.editor.on_close_tab(self.widget)
+            self.calico.editor.on_close_tab(self.widget)
         self.tab.PackEnd(button)
 
     def on_modified(self, obj, event):
@@ -108,7 +108,7 @@ class Document(object):
     def save_as(self):
         retval = False
         fc = Gtk.FileChooserDialog(_("Enter the file to save"),
-                                   self.pyjama.editor.window,
+                                   self.calico.editor.window,
                                    Gtk.FileChooserAction.Save,
                                    _("Cancel"), Gtk.ResponseType.Cancel,
                                    _("Save"), Gtk.ResponseType.Accept)
@@ -137,7 +137,7 @@ class Document(object):
         pass
 
     def on_change_file(self):
-        self.language = self.pyjama.get_language_from_filename(self.filename)
+        self.language = self.calico.get_language_from_filename(self.filename)
 
     def begin_not_undoable(self):
         pass
@@ -188,8 +188,8 @@ class Document(object):
         pass
 
 class TextEditorDocument(Document):
-    def __init__(self, filename, pyjama, language="python"):
-        Document.__init__(self, filename, pyjama, language)
+    def __init__(self, filename, calico, language="python"):
+        Document.__init__(self, filename, calico, language)
 
     def make_widget(self):
         Document.make_widget(self)
@@ -267,8 +267,8 @@ class TextEditorDocument(Document):
 
     def set_font(self, font = None):
         if font is None:
-            fontname = self.pyjama.config.get("pyjama.font")
-            fontsize = self.pyjama.config.get("pyjama.fontsize")
+            fontname = self.calico.config.get("calico.font")
+            fontsize = self.calico.config.get("calico.fontsize")
             self.texteditor.Options.FontName = str(fontname) + " " + str(fontsize)
 
     def get_text(self):

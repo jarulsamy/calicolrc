@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -29,8 +29,8 @@ import System
 from utils import CustomStream
 
 class EngineManager(object):
-    def __init__(self, pyjama):
-        self.pyjama = pyjama
+    def __init__(self, calico):
+        self.calico = calico
         self.scriptRuntimeSetup = Microsoft.Scripting.Hosting.ScriptRuntimeSetup()
         #self.scriptRuntimeSetup.DebugMode = True
         self.engine = {}
@@ -49,8 +49,8 @@ class EngineManager(object):
         self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
             self.scriptRuntimeSetup)
         self.scope = self.runtime.CreateScope()
-        # Create pyjama as a module:
-        self.scope.SetVariable("pyjama", self.pyjama)
+        # Create calico as a module:
+        self.scope.SetVariable("calico", self.calico)
         # set up other items which can be imported:
         #self.runtime.Globals.SetVariable("goodname", badname)
         #[x for x in self.runtime.Globals.GetVariableNames()]
@@ -119,7 +119,7 @@ class DLREngine(Engine):
 
     def set_redirects(self, stdout, stderr, stdin): # textviews
         super(DLREngine, self).set_redirects(stdout, stderr, stdin)
-        if not self.manager.pyjama.debug:
+        if not self.manager.calico.debug:
             if stdout:
                 self.engine.Runtime.IO.SetOutput(stdout, 
                                                  System.Text.Encoding.UTF8)

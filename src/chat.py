@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -29,12 +29,12 @@ from window import Window, MyWindow
 from random import choice
 
 class ChatWindow(Window):
-    def __init__(self, pyjama):
-        self.MUTEX = Mutex(False, "PyjamaChatMutex")
+    def __init__(self, calico):
+        self.MUTEX = Mutex(False, "CalicoChatMutex")
         self.room = "General"
-        self.pyjama = pyjama
+        self.calico = calico
         self.colormap = {}
-        self.window = MyWindow(_("Pyjama Chat - %s") % System.Environment.UserName)
+        self.window = MyWindow(_("Calico Chat - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(350, 550)
         self.window.DeleteEvent += Gtk.DeleteEventHandler(self.on_close)
@@ -50,8 +50,8 @@ class ChatWindow(Window):
                   [None] + 
                   self.make_new_file_menu() +
                   [None,
-                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.calico.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.calico.login_dialog(self.window)),
                   None,
                   (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
@@ -66,16 +66,16 @@ class ChatWindow(Window):
                           ]),
                 (_("Chat"), []),
                 (_("Windows"), [
-                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
-                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
-                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
+                    (_("Editor"), None, "F6", self.calico.setup_editor),
+                    (_("Shell"), None, "F7", self.calico.setup_shell),
+                    (_("Chat"), None, "F8", self.calico.setup_chat),
                     ]),
                 (_("Options"), [
-                    (_("Make font larger"), None, "<control>equal", self.pyjama.increase_fontsize),
-                    (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
+                    (_("Make font larger"), None, "<control>equal", self.calico.increase_fontsize),
+                    (_("Make font smaller"), None, "<control>minus", self.calico.decrease_fontsize),
                     ]),
                 (_("Help"), [
-                    (_("About the Pyjama Project"), Gtk.Stock.About, None, self.pyjama.about),
+                    (_("About the Calico Project"), Gtk.Stock.About, None, self.calico.about),
                     ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
@@ -104,7 +104,7 @@ class ChatWindow(Window):
                 tag.Weight = Pango.Weight.Bold
             tag.Foreground = color
             self.textview.Buffer.TagTable.Add(tag)
-        self.textview.ModifyFont(self.pyjama.get_fontname())
+        self.textview.ModifyFont(self.calico.get_fontname())
         self.textview.PopulatePopup += self.popup
         self.textview.WrapMode = Gtk.WrapMode.Word
         self.textview.Editable = False
@@ -123,11 +123,11 @@ class ChatWindow(Window):
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
         # Setup plugins
-        Window.__init__(self, pyjama)
+        Window.__init__(self, calico)
         def invoke(sender, args):
             self.window.ShowAll()
             self.update_status()
-            self.message(_("Pyjama Chat Window") + "\n" +
+            self.message(_("Calico Chat Window") + "\n" +
                          "-------------------\n" +
                          _("Enter /help for details") + "\n")
         Gtk.Application.Invoke(invoke)
@@ -149,18 +149,18 @@ Chat commands:
 
 """))
             self.entry.Text = ""
-        elif self.pyjama.connection:
-            if self.pyjama.connection.status == "online":
+        elif self.calico.connection:
+            if self.calico.connection.status == "online":
                 # FIXME: escape text to make XML body appropriate (it may do that automatically)
                 # FIXME: add /create and /list
                 if str(self.entry.Text).startswith("/join "):
                     self.room = str(self.entry.Text)[6:].strip()
-                    self.pyjama.connection.send("admin", "[join]\nroom: %s" % self.room)
+                    self.calico.connection.send("admin", "[join]\nroom: %s" % self.room)
                 elif str(self.entry.Text).startswith("@"):
                     user, message = str(self.entry.Text).split(" ", 1)
-                    self.pyjama.connection.send("admin", "[broadcast]\nto: %s\n%s" % (user[1:], message))
+                    self.calico.connection.send("admin", "[broadcast]\nto: %s\n%s" % (user[1:], message))
                 else:
-                    self.pyjama.connection.send("admin", "[broadcast]\nroom: %s\n%s" % (self.room, self.entry.Text))
+                    self.calico.connection.send("admin", "[broadcast]\nroom: %s\n%s" % (self.room, self.entry.Text))
                 self.entry.Text = ""
             else:
                 self.message(_("You are not currently online"))
@@ -171,8 +171,8 @@ Chat commands:
         self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
-        if self.pyjama.connection:
-            return self.pyjama.connection.status
+        if self.calico.connection:
+            return self.calico.connection.status
         else:
             return _("offline")
 
@@ -218,7 +218,7 @@ Chat commands:
 
     def on_quit(self, obj, event):
         self.clean_up()
-        self.pyjama.on_close("all")
+        self.calico.on_close("all")
         return True
 
     def clean_up(self):
@@ -226,20 +226,20 @@ Chat commands:
 
     def on_close(self, obj, event):
         self.clean_up()
-        self.pyjama.on_close("chat")
+        self.calico.on_close("chat")
         return True
 
     def on_new_file(self, obj, event, language="python"):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.on_new_file(obj, event, language)
+        self.calico.setup_editor()
+        self.calico.editor.on_new_file(obj, event, language)
 
     def on_open_file(self, obj, event):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.on_open_file(obj, event)
+        self.calico.setup_editor()
+        self.calico.editor.on_open_file(obj, event)
 
     def select_or_open(self, filename, lineno=0, language="python"):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.select_or_open(filename, lineno, language)
+        self.calico.setup_editor()
+        self.calico.editor.select_or_open(filename, lineno, language)
 
     def display_message(self, name, message):
         if name in self.colormap:
@@ -247,8 +247,8 @@ Chat commands:
         else:
             color = choice(get_colors())
             self.colormap[name] = color
-        self.pyjama.chat.message("%s: " % name, color, newline=False)
-        self.pyjama.chat.message(message, "black")
+        self.calico.chat.message("%s: " % name, color, newline=False)
+        self.calico.chat.message(message, "black")
 
     def message(self, message, tag="purple", newline=True):
         if newline:

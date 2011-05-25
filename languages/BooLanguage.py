@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -39,7 +39,7 @@ class BooEngine(Engine):
         super(BooEngine, self).__init__(manager, "boo")
         self.engine = InteractiveInterpreter()
         self.engine.RememberLastValue = True
-        self.engine.SetValue("pyjama", manager.pyjama)
+        self.engine.SetValue("calico", manager.calico)
 
     def execute(self, text):
         compiler_context = self.engine.Eval(text)

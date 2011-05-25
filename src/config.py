@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -194,7 +194,7 @@ class ConfigManager(object):
                 if exp.errno != errno.EEXIST:
                     raise
             key_file = open(filename, "w")
-            key_file.write(";; Pyjama Configuration file\n")
+            key_file.write(";; Calico Configuration file\n")
             key_file.write((";; Automatically created at %s" % 
                       time.strftime("%Y/%m/%d %H:%M:%S")) + "\n\n")
             sections = sorted(self.data)
@@ -396,14 +396,14 @@ class ConfigManager(object):
 
 # Set defaults:
 user = os.path.expanduser("~/")
-# make a .pyjama directory in user's home dir:
-pyjama_user = os.path.join(user, ".pyjama")
-config = ConfigManager(os.path.join(pyjama_user, "pyjama.ini"))
-config.register("pyjama.font", "Courier")
-config.register("pyjama.fontsize", 10)
-config.register("pyjama.recent_files", [])
-config.register("pyjama.languages", ["All"])
-config.register("pyjama.languages_ignore", ["Dinah", "Sympl"])
+# make a .calico directory in user's home dir:
+calico_user = os.path.join(user, ".calico")
+config = ConfigManager(os.path.join(calico_user, "calico.ini"))
+config.register("calico.font", "Courier")
+config.register("calico.fontsize", 10)
+config.register("calico.recent_files", [])
+config.register("calico.languages", ["All"])
+config.register("calico.languages_ignore", ["Dinah", "Sympl"])
 config.register("shell.history", [])
 config.register("editor.load_last_files", True)
 config.register("editor.last_files", [])

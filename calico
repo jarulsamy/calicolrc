@@ -11,4 +11,4 @@ else
     DIR=$(dirname "$0") ;
 fi ;
 #cd $DIR
-/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/pyjama.exe" "$@"
+/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/calico.exe" "$@"

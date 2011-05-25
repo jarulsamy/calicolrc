@@ -40,7 +40,7 @@ from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar,
                    SearchInFilesBar, OpenUrl)
 
 def exec_invoke(text):
-    # FIXME: if this fails, it crashes pyjama; why?
+    # FIXME: if this fails, it crashes calico; why?
     exec(text)
 
 # Local classes:
@@ -79,12 +79,12 @@ class History(object):
         self.position = len(self.history) - 1
 
 class Shell(object):
-    def __init__(self, pyjama, files):
-        self.pyjama = pyjama
-        self.pyjama.engine.set_redirects(ConsoleStream(), 
+    def __init__(self, calico, files):
+        self.calico = calico
+        self.calico.engine.set_redirects(ConsoleStream(), 
                                          ConsoleStream("red"), None)
         for file in files:
-            self.execute_file(file, self.pyjama.get_language_from_filename(file))
+            self.execute_file(file, self.calico.get_language_from_filename(file))
 
     def message(self, text, newline=True):
         if newline:
@@ -94,12 +94,12 @@ class Shell(object):
 
     def execute_file(self, filename, language):
         self.message(_("Loading file '%s'...") % filename)
-        self.pyjama.engine[language].execute_file(filename)
+        self.calico.engine[language].execute_file(filename)
         self.message(_("Done loading file."))
 
 class ShellWindow(Window):
-    def __init__(self, pyjama):
-        self.pyjama = pyjama
+    def __init__(self, calico):
+        self.calico = calico
         self.executeThread = None
         self.language = "python"
         self.window = MyWindow(_("Calico Shell - %s") % System.Environment.UserName)
@@ -122,8 +122,8 @@ class ShellWindow(Window):
                   None] +
                  self.make_new_file_menu() +
                  [None,
-                  (_("Register..."), None, None, lambda o, e: self.pyjama.register_dialog(self.window)),
-                  (_("Login..."), None, "<control>l", lambda o, e: self.pyjama.login_dialog(self.window)),
+                  (_("Register..."), None, None, lambda o, e: self.calico.register_dialog(self.window)),
+                  (_("Login..."), None, "<control>l", lambda o, e: self.calico.login_dialog(self.window)),
                   None,
                   (_("Close"), Gtk.Stock.Close,
                    None, self.on_close),
@@ -138,16 +138,16 @@ class ShellWindow(Window):
                     ]),
                 (_("Shell"), self.make_language_menu()),
                 (_("Windows"), [
-                    (_("Editor"), None, "F6", self.pyjama.setup_editor),
-                    (_("Shell"), None, "F7", self.pyjama.setup_shell),
-                    (_("Chat"), None, "F8", self.pyjama.setup_chat),
+                    (_("Editor"), None, "F6", self.calico.setup_editor),
+                    (_("Shell"), None, "F7", self.calico.setup_shell),
+                    (_("Chat"), None, "F8", self.calico.setup_chat),
                     ]),
                 (_("Options"), [
-                    (_("Make font larger"), None, "<control>equal", self.pyjama.increase_fontsize),
-                    (_("Make font smaller"), None, "<control>minus", self.pyjama.decrease_fontsize),
+                    (_("Make font larger"), None, "<control>equal", self.calico.increase_fontsize),
+                    (_("Make font smaller"), None, "<control>minus", self.calico.decrease_fontsize),
                     ]),
                 (_("Help"), [
-                    (_("About the Calico Project"), Gtk.Stock.About, None, self.pyjama.about),
+                    (_("About the Calico Project"), Gtk.Stock.About, None, self.calico.about),
                     ]),
                 ]
         toolbar = [(Gtk.Stock.New, self.on_new_file, _("Create a new script")),
@@ -159,7 +159,7 @@ class ShellWindow(Window):
         self.prompt_at_top = True
         self.make_gui(menu, toolbar)
         Gtk.Application.Invoke(self.stop_running)
-        self.history = History(self.pyjama.config)
+        self.history = History(self.calico.config)
         self.statusbar = StatusBar()
         self.statusbar.init(_("Language"), _("Status"))
         self.command_area = Gtk.HBox()
@@ -186,7 +186,7 @@ class ShellWindow(Window):
             pass
 
         self.textview.Show()
-        #self.textview.ModifyFont(self.pyjama.get_fontname())
+        #self.textview.ModifyFont(self.calico.get_fontname())
         self.scrolled_window.Add(self.textview)
         self.results = Gtk.ScrolledWindow()
         for color in ["red", "blue", "purple", "black", "green"]:
@@ -218,26 +218,26 @@ class ShellWindow(Window):
         self.window.Show()
         # Set this Python's stderr:
         # EXCEPTION HANDLER
-        stdout = CustomStream(self.pyjama, self.history_textview, "black")
-        sys.stderr = CustomStream(self.pyjama, self.history_textview, "red")
-        self.pyjama.engine.set_redirects(stdout, sys.stderr, None)
+        stdout = CustomStream(self.calico, self.history_textview, "black")
+        sys.stderr = CustomStream(self.calico, self.history_textview, "red")
+        self.calico.engine.set_redirects(stdout, sys.stderr, None)
         self.textview.GrabFocus()
         self.change_to_lang(self.language)
         # Setup clipboard stuff:
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
-        self.message(_("Calico Project %s") % self.pyjama.version)
+        self.message(_("Calico Project %s") % self.calico.version)
         self.message(("-" * 50))
         self.set_font()
         self.show_icon()
         self.message("")
         # Setup plugins
-        Window.__init__(self, pyjama)
+        Window.__init__(self, calico)
 
     def show_icon(self):
         def invoke(sender, args):
             MUTEX.WaitOne()
-            image = Gtk.Image(os.path.join(self.pyjama.pyjama_root, "examples", "images", "abstract-butterfly-sm.gif"))
+            image = Gtk.Image(os.path.join(self.calico.calico_root, "examples", "images", "abstract-butterfly-sm.gif"))
             image.Show()
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(image, anchor_iter[0])
@@ -246,11 +246,11 @@ class ShellWindow(Window):
 
     def set_font(self, font=None):
         if font is None:
-            font = self.pyjama.get_fontname()
+            font = self.calico.get_fontname()
         def invoke(sender, args):
             # FIXME: set textview font, too
-            fontname = self.pyjama.config.get("pyjama.font")
-            fontsize = self.pyjama.config.get("pyjama.fontsize")
+            fontname = self.calico.config.get("calico.font")
+            fontsize = self.calico.config.get("calico.fontsize")
             self.textview.Options.FontName = str(fontname) + " " + str(fontsize)
             self.history_textview.ModifyFont(font)
         Gtk.Application.Invoke(invoke)
@@ -281,8 +281,8 @@ class ShellWindow(Window):
     def make_language_menu(self):
         languages = []
         num = 1
-        for lang in sorted(self.pyjama.engine.get_languages()):
-            if self.pyjama.engine[lang].text_based:
+        for lang in sorted(self.calico.engine.get_languages()):
+            if self.calico.engine[lang].text_based:
                 languages.append([_("Change to %s") % lang.title(),
                     None, "<control>%d" % num, 
                     lambda obj, event, lang=lang: self.change_to_lang(lang)])
@@ -308,8 +308,8 @@ class ShellWindow(Window):
         self.statusbar.set(_("Status"), self.get_status())
 
     def get_status(self):
-        if self.pyjama.connection:
-            return self.pyjama.connection.status
+        if self.calico.connection:
+            return self.calico.connection.status
         else:
             return _("offline")
 
@@ -400,10 +400,10 @@ class ShellWindow(Window):
             parts = variable.split(".", 1)
             root = parts[0]
             if len(parts) == 1:
-                items = [x for x in self.pyjama.engine.scope.GetVariableNames() if x.startswith(root)]
+                items = [x for x in self.calico.engine.scope.GetVariableNames() if x.startswith(root)]
             else:
                 partial = parts[-1]
-                (found, value) = self.pyjama.engine.scope.TryGetVariable(root)
+                (found, value) = self.calico.engine.scope.TryGetVariable(root)
                 if found:
                     for part in parts[1:-1]:
                         if hasattr(value, part):
@@ -450,17 +450,17 @@ class ShellWindow(Window):
 
     def on_quit(self, obj, event):
         self.clean_up()
-        self.pyjama.on_close("all")
+        self.calico.on_close("all")
         return True
 
     def clean_up(self):
         # Let's not let this get too big:
-        self.pyjama.config.set("shell.history",
-                        self.pyjama.config.get("shell.history")[-30:])
+        self.calico.config.set("shell.history",
+                        self.calico.config.get("shell.history")[-30:])
 
     def on_close(self, obj, event):
         self.clean_up()
-        self.pyjama.on_close("shell")
+        self.calico.on_close("shell")
         return True
 
     def on_run(self, obj, event):
@@ -476,19 +476,19 @@ class ShellWindow(Window):
             self.searchbar.search_off()
 
     def on_new_file(self, obj, event, language="python"):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.on_new_file(obj, event, language)
+        self.calico.setup_editor()
+        self.calico.editor.on_new_file(obj, event, language)
 
     def on_open_file(self, obj, event):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.on_open_file(obj, event)
+        self.calico.setup_editor()
+        self.calico.editor.on_open_file(obj, event)
 
     def select_or_open(self, filename, lineno=0, language="python"):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.select_or_open(filename, lineno, language)
+        self.calico.setup_editor()
+        self.calico.editor.select_or_open(filename, lineno, language)
 
     def reset_shell(self, obj, event):
-        self.pyjama.engine.reset()
+        self.calico.engine.reset()
         self.message("-----------")
         self.message(_("Reset shell"))
         self.message("-----------")
@@ -525,7 +525,7 @@ class ShellWindow(Window):
         def background():
             self.message(_("Loading file '%s'...") % filename)
             Gtk.Application.Invoke(self.start_running)
-            self.pyjama.engine[language].execute_file(filename)
+            self.calico.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
             self.message(_("Done loading file."))
             #self.show_prompt()
@@ -565,7 +565,7 @@ class ShellWindow(Window):
         elif text and text[0:2] == "#;":
             text = text[2:].strip()
             command = text.lower()
-            if command in self.pyjama.engine.get_languages():
+            if command in self.calico.engine.get_languages():
                 self.language = command
                 self.update_gui()
                 return True
@@ -595,8 +595,8 @@ class ShellWindow(Window):
 
     def stop_running(self, sender, args):
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
-        if self.pyjama.last_error != "":
-            url = self.make_error_url(self.language, self.pyjama.last_error)
+        if self.calico.last_error != "":
+            url = self.make_error_url(self.language, self.calico.last_error)
             def invoke(sender, args):
                 MUTEX.WaitOne()
                 button = Gtk.Button(_("Get help on error"))
@@ -607,7 +607,7 @@ class ShellWindow(Window):
                 MUTEX.ReleaseMutex()
             Gtk.Application.Invoke(invoke)
             self.message("")
-            self.pyjama.last_error = ""
+            self.calico.last_error = ""
 
     def execute_in_background(self, text):
         if (self.executeThread and 
@@ -616,7 +616,7 @@ class ShellWindow(Window):
 
         def background():
             Gtk.Application.Invoke(self.start_running)
-            self.pyjama.engine[self.language].execute(text)
+            self.calico.engine[self.language].execute(text)
             #self.show_prompt()
             Gtk.Application.Invoke(self.stop_running)
 
@@ -625,11 +625,11 @@ class ShellWindow(Window):
         self.executeThread.Start()
 
     def ready_for_execute(self, text):
-        return self.pyjama.engine[self.language].ready_for_execute(text)
+        return self.calico.engine[self.language].ready_for_execute(text)
 
     def goto_file(self, filename, lineno):
-        self.pyjama.setup_editor()
-        self.pyjama.editor.select_or_open(filename, lineno)
+        self.calico.setup_editor()
+        self.calico.editor.select_or_open(filename, lineno)
 
     def popup(self, textview, popup_args):
         mark = textview.Buffer.InsertMark

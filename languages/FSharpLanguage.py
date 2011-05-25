@@ -1,5 +1,5 @@
 #
-# Pyjama - Scripting Environment
+# Calico - Scripting Environment
 #
 # Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
 #
@@ -41,8 +41,8 @@ class FSharpEngine(Engine):
             except:
                 #print "FSharp: unable to load assembly '%s'" % assembly
                 pass
-        # FIXME: make pyjama available in some manner
-        #self.engine.Evaluate("pyjama", manager.pyjama)
+        # FIXME: make calico available in some manner
+        #self.engine.Evaluate("calico", manager.calico)
 
     def execute(self, text):
         try:
