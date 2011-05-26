@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$Id: calico.cs -1   $
+$Id: calico.cs $
 */
 using System;
 using IronPython.Hosting;
@@ -28,24 +28,41 @@ using Mono.Unix;
 public class Calico {
   static void Main(string[] args) {
     string path = System.IO.Path.GetDirectoryName(
-      	System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+                       System.Reflection.Assembly.GetExecutingAssembly()
+		       .GetName().CodeBase).Substring(5);
     if (path.StartsWith("\\")) {
-        path = path.Substring(1);
+      path = path.Substring(1);
     }
-  	Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
-	ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
-        LanguageSetup language = Python.CreateLanguageSetup(null);
-        language.Options["FullFrames"] = true;
-	scriptRuntimeSetup.LanguageSetups.Add(language);
-	ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-	ScriptScope scope = runtime.CreateScope();
-	ScriptEngine engine = runtime.GetEngine("python");
-	ScriptSource source = engine.CreateScriptSourceFromFile(System.IO.Path.Combine(path, "../src/calico.py"));
-	source.Compile();
-	try {
-	  source.Execute(scope);
-	} catch (IronPython.Runtime.Exceptions.SystemExitException e) {
-	  // Nothing to do but exit
-	}
+    Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
+    ScriptRuntimeSetup scriptRuntimeSetup = new ScriptRuntimeSetup();
+    LanguageSetup language = Python.CreateLanguageSetup(null);
+    language.Options["FullFrames"] = true;
+    scriptRuntimeSetup.LanguageSetups.Add(language);
+    ScriptRuntime runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+    ScriptScope scope = runtime.CreateScope();
+    ScriptEngine engine = runtime.GetEngine("python");
+    ScriptSource source = null;
+    try {
+      source = engine.CreateScriptSourceFromFile(
+		    System.IO.Path.Combine(path, "../src/calico.py"));
+    } catch (Exception e) {
+      ExceptionOperations eo = engine.GetService<ExceptionOperations>(); 
+      string error = eo.FormatException(e); 
+      System.Console.Error.WriteLine(error);
+      Environment.Exit(1);
+    }
+    try {
+      source.Compile();
+    } catch (Exception e) {
+      ExceptionOperations eo = engine.GetService<ExceptionOperations>(); 
+      string error = eo.FormatException(e); 
+      System.Console.Error.WriteLine(error);
+      Environment.Exit(1);
+    }
+    try {
+      source.Execute(scope);
+    } catch (IronPython.Runtime.Exceptions.SystemExitException) {
+      // Nothing to do but exit
+    }
   }
 }
