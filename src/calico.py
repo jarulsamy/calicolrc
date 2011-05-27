@@ -124,11 +124,12 @@ class CalicoProject(object):
     This class is meant to be created as a singleton instance
     to hold all of the components of one user together.
     """
-    def __init__(self, argv):
+    def __init__(self, mutex, argv):
         """
         Constructor for the singleton Calico instance. argv is the
         command-line files and flags.
         """
+        self.mutex = mutex
         self.last_error = ""
         self.actionHandlers = []
         self.debug = False
@@ -692,7 +693,7 @@ def handleMessages(sender, args):
 #################################################
 # Single Instance Application
 messages = os.path.join(calico_user, "messages")
-(mutex, locked) = System.Threading.Mutex(True, "CalicoProject/%s" % System.Environment.UserName, None)
+(mutex, locked) = System.Threading.Mutex(True, r"Global\CalicoProject/%s" % System.Environment.UserName, None)
 if locked:
     # We are the "server"; clean the messages file:
     fp = file(messages, "w")
@@ -720,7 +721,7 @@ if "--nogui" not in args:
     Gtk.Application.Init()
 #------------------------------
 try:
-    pw = CalicoProject(args)
+    pw = CalicoProject(mutex, args)
 except:
     traceback.print_exc()
     sys.exit()
