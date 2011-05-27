@@ -63,6 +63,11 @@ public class Calico {
       source.Execute(scope);
     } catch (IronPython.Runtime.Exceptions.SystemExitException) {
       // Nothing to do but exit
-    }
+    } catch (Exception e) {
+      ExceptionOperations eo = engine.GetService<ExceptionOperations>(); 
+      string error = eo.FormatException(e); 
+      System.Console.Error.WriteLine(error);
+      Environment.Exit(1);
+	}
   }
 }
