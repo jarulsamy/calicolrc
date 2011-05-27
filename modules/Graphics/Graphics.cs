@@ -442,18 +442,6 @@ public static class Graphics {
     }
   }
   
-  public class Dot : Shape {
-    public double x;
-    public double y;
-    
-    public Dot(double x, double y) : base(false) {
-      this.x = x;
-      this.y = y;
-      set_points(new Point(x,y));
-      move_to(points_center.x, points_center.y);
-    }
-  }
-  
   public class Canvas : Gtk.DrawingArea {
     
     // Shape.draw() will add them here:
@@ -1438,7 +1426,35 @@ public static class Graphics {
 	  raw_fill_color = color;
 	}
   }
-  
+
+  public class Dot : Shape {
+    public double x;
+    public double y;
+
+    public Dot(double x, double y) : base(false) {
+      this.x = x;
+      this.y = y;
+      set_points(new Point(x,y));
+      move_to(points_center.x, points_center.y);
+    }
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      Point temp;
+      if (points != null) {
+        g.LineWidth = line_width;
+        temp = screen_coord(points[0]);
+        g.MoveTo(temp.x, temp.y);
+        g.LineTo(temp.x + 1, temp.y + 1);
+        g.ClosePath();
+        g.Stroke();
+        if (has_pen)
+          pen.render(g);
+      }
+      g.Restore();
+    }
+  }
+
   public class Group {
     
 	public List<Shape> items = new List<Shape>();
