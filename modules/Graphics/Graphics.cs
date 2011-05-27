@@ -410,21 +410,43 @@ public static class Graphics {
   public class Point {
     public double x;
     public double y;
-    public Point(double x, double y) {
-      this.x = x;
-      this.y = y;
-    }
+    public Point(object x, object y) {
+	  if (x is int) 
+		this.x = (int)x;
+	  else if (x is float) 
+		this.x = (float)x;
+	  else if (x is double)
+		this.x = (double)x;
+	  else
+		throw new Exception("Point: cannot convert x to a number");
+	  if (y is int) 
+		this.y = (int)y;
+	  else if (y is float) 
+		this.y = (float)y;
+	  else if (y is double)
+		this.y = (double)y;
+	  else
+		throw new Exception("Point: cannot convert y to a number");
+	}
     public Point(int x, int y) {
       this.x = (double)x;
       this.y = (double)y;
     }
+    public Point(float x, float y) {
+      this.x = (double)x;
+      this.y = (double)y;
+    }
+    public Point(double x, double y) {
+      this.x = x;
+      this.y = y;
+    }
   }
   
-  public class GPoint : Shape {
+  public class Dot : Shape {
     public double x;
     public double y;
     
-    public GPoint(double x, double y) : base(false) {
+    public Dot(double x, double y) : base(false) {
       this.x = x;
       this.y = y;
       set_points(new Point(x,y));
@@ -549,6 +571,10 @@ public static class Graphics {
 	  }
 	}
 
+    public bool hit(IList iterable) {
+	  return hit(new Point(iterable[0], iterable[1]));
+	}
+
     public bool hit(Point p) {
 	  int counter = 0;
 	  double xinters;
@@ -637,6 +663,14 @@ public static class Graphics {
 	  }
 	}
     
+	public void set_points(params IList [] iterables) {
+	  points = new Point [iterables.Length];
+	  for (int i = 0; i < iterables.Length; i++) {
+		points[i] = new Point(iterables[i][0], 
+			iterables[i][1]);
+	  }
+	  compute_center_point();
+	}
 	public void set_points(params Point [] new_points) {
 	  points = new Point [new_points.Length];
 	  // copies
@@ -719,6 +753,9 @@ public static class Graphics {
 	  g.Restore();
 	}
     
+	public Point screen_coord(IList iterable) {
+	  return screen_coord(new Point(iterable[0], iterable[1]));
+	}
 	public Point screen_coord(Point point) {
 	  // first we rotate
 	  double x = ((point.x - points_center.x) * Math.Cos(_direction) - 
@@ -799,7 +836,17 @@ public static class Graphics {
   }
   
   public class Line : Shape {
+	public Line(IList iterable1, IList iterable2) :
+		this(new Point(iterable1[0], iterable1[1]), 
+			new Point(iterable2[0], iterable2[1])) {
+	  // Line((0,0), (100,100))
+	  // Nothing else to do
+	}
     public Line(Point p1, Point p2) : this(true, p1, p2) {
+	}
+    public Line(bool has_pen, IList iterable1, IList iterable2) : 
+		this(has_pen, new Point(iterable1[0], iterable1[1]), 
+			new Point(iterable2[0], iterable2[1])) {
 	}
     public Line(bool has_pen, Point p1, Point p2) : base(has_pen) {
 	  set_points(p1, p2);
@@ -842,10 +889,16 @@ public static class Graphics {
     }
   */
   public class Arrow : Shape {
-	public Arrow(Point new_center) : this(new_center, 0) {
-	  
+	public Arrow(IList iterable) :
+		this(new Point(iterable[0], iterable[1])) {
 	}
-    
+	public Arrow(Point new_center) : this(new_center, 0) {
+	}
+
+	public Arrow(IList iterable, double degrees) :
+		this(new Point(iterable[0], iterable[1]), degrees) {
+	}
+
 	public Arrow(Point new_center, double degrees) : base(true) {
 	  set_points(
 		  new Point(  0,  0),
@@ -872,6 +925,10 @@ public static class Graphics {
     public void reset_path() {
 	  _path = new List<Point>();
     }
+
+    public void append_path(IList iterable) {
+	  append_path(new Point(iterable[0], iterable[1]));
+	}
 	
     public void append_path(Point point) {
 	  _path.Add(point);
@@ -1335,6 +1392,10 @@ public static class Graphics {
   } // -- end of Picture class
 
   public class Rectangle : Shape {
+	public Rectangle(IList iterable1, IList iterable2) :
+		this(new Point(iterable1[0], iterable1[1]), 
+			new Point(iterable2[0], iterable2[1])) {
+	}
 	public Rectangle(Point point1, Point point2) : base(true) {
 	  this.points = new Point [4];
           this.points[0] = new Point(point1.x, point1.y);
@@ -1351,27 +1412,22 @@ public static class Graphics {
   
   public class Polygon : Shape {
     
-	public Polygon(string color, params object [] points) : base(true) {
-	  Cairo.Color raw_color = color_map(color);
-	  this.points = new Point [points.Length];
-	  int count = 0;
-	  foreach (Point p in points) {
-	    this.points[count] = p ;
-		count++;
-	  }
-	  compute_center_point();
-	  center.x = points_center.x;
-	  center.y = points_center.y;
-	  compute_points_around_origin();
-	  raw_outline_color = raw_color;
-	  raw_fill_color = raw_color;
+	public Polygon(string color, params object [] points) : 
+		this(color_map(color), points) {
 	}
     
-	public Polygon(Cairo.Color color, List<Point> points) : base(true) {
-	  this.points = new Point [points.Count];
+	public Polygon(Cairo.Color color, params object [] points) : base(true) {
+	  this.points = new Point [points.Length];
 	  int count = 0;
-	  foreach (Point p in points) {
-		this.points[count] = new Point(p.x, p.y);
+	  foreach (object o in points) {
+		if (o is Point)
+		  this.points[count] = (Point)o ;
+		else if (o is IList) {
+		  IList i = (IList)o;
+		  this.points[count] = new Point(i[0], i[1]);
+		} else {
+		  throw new Exception("Polygon: can't convert arg to a point");
+		}
 		count++;
 	  }
 	  compute_center_point();

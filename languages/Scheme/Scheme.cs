@@ -2303,7 +2303,7 @@ public class Scheme {
   }
 
 
-public class Cons {
+  public class Cons : IList {
   public object car;
   public object cdr;
   
@@ -2314,7 +2314,87 @@ public class Cons {
 	else
 	  this.cdr = b;
   }
-  
+
+  // Items necessary for it to be an IList
+  public bool IsFixedSize {
+	get {
+	  return false;
+	}
+  }
+
+  public bool IsReadOnly {
+	get {
+	  return false;
+	}
+  }
+
+  public bool IsSynchronized {
+	get {
+	  return false;
+	}
+  }
+
+  public void CopyTo(System.Array array, int index) {
+  }
+
+  public int Add(object value) {
+	return 1; // should return count
+  }
+
+  public int Count {
+	get {
+	  return 0;
+	}
+  }
+
+  public void Remove(object value) {
+  }
+
+  public void RemoveAt(int index) {
+  }
+
+  public void Clear() {
+  }
+
+  public bool Contains(object value) {
+	return false;
+  }
+
+  public int IndexOf(object value) {
+	return -1;
+  }
+
+  public void Insert(int index, object value) {
+  }
+
+  public object this[int index] {
+	get {
+	  object retval = null;
+	  object mylist = (object)this;
+	  while (index != -1) {
+		if (mylist is Cons) {
+		  retval = ((Cons)mylist).car;
+		  mylist = ((Cons)mylist).cdr;
+		}
+		index--;
+	  }
+	  return retval;
+	}
+	set { // value is the item
+	}
+  }
+  public object SyncRoot {
+	get {
+	  return this;
+	}
+  }
+  public IEnumerator GetEnumerator() {
+	// Refer to the IEnumerator documentation for an example of
+	// implementing an enumerator.
+	throw new Exception("The method or operation is not implemented.");
+  }
+
+  /// ---------------------------------------------------------------
   public string SafeToString() {
 	if (this.car == symbol("quote") &&
 		(this.cdr is Cons) &&
