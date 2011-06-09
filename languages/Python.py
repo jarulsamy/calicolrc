@@ -46,7 +46,9 @@ class PythonEngine(DLREngine):
             System.Type.GetType(IronPython.Hosting.Python).Assembly)
         # Execute startup script in Python
         text = ("from __future__ import division, with_statement;" +
-                "del division, with_statement")
+                "from Myro import ask;" + 
+                "__builtins__['input'] = ask;" +
+                "del division, with_statement, ask, raw_input;")
         sctype = Microsoft.Scripting.SourceCodeKind.Statements
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         source.Compile()

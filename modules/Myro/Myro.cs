@@ -567,6 +567,10 @@ public static class Myro {
     return ask(question, "Input").ToString();
   }
 
+  public static object ask() {
+    return ask("Input: ", "Information Request");
+  }
+
   public static object ask(object question) {
     return ask(question, "Information Request");
   }
