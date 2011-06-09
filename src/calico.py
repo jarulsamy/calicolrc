@@ -88,6 +88,10 @@ import Pango
 import GLib
 
 from Mono.TextEditor import Highlighting
+# Send paths to DLLs:
+clr.AddReference("Myro.dll")
+import Myro
+Myro.initialize_module(calicopath, os.name)
 
 # Initialize text highlighting
 path, filename = os.path.split(__file__)

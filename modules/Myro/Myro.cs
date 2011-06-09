@@ -20,6 +20,7 @@ $Id: $
 */
 
 using System;
+using System.Diagnostics; // Process
 using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports;
 using System.Threading;
@@ -50,6 +51,9 @@ public static class Myro {
   public static Robot robot;
   public static string dialogResponse = null;
   public static string REVISION = "$Revision: $";
+  public static string startup_path = null;
+  public static string os_name = null;
+  public static string speech_name = "default";
 
   public class MyTexView : Gtk.TextView  {
 	public string MyString;
@@ -2372,10 +2376,6 @@ def motors(left, right):
 	}
   }
 
-  public static void speak(string message) {
-	System.Console.WriteLine(message);
-  }
-
   // Graphics.cs
 
   public static Cairo.Color color_map(string name) {
@@ -2558,4 +2558,156 @@ def motors(left, right):
     // return
     return retval;
   }
+
+  public static void initialize_module(string startup_path, 
+				       string os_name) {
+    Myro.startup_path = startup_path;
+    Myro.os_name = os_name;
+  }
+
+  public static List getVoices() {
+    return Graphics.PyList(
+			   "af",
+			   "af+f1",
+			   "bs",
+			   "bs+f1",
+			   "ca",
+			   "ca+f1",
+			   "cs",
+			   "cs+f1",
+			   "cy",
+			   "cy+f1",
+			   "da",
+			   "da+f1",
+			   "de",
+			   "de+f1",
+			   "el",
+			   "el+f1",
+			   "en",
+			   "en+f1",
+			   "en-sc",
+			   "en-sc+f1",
+			   "en-uk",
+			   "en-uk+f1",
+			   "en-uk-north",
+			   "en-uk-north+f1",
+			   "en-uk-rp",
+			   "en-uk-rp+f1",
+			   "en-uk-wmids",
+			   "en-uk-wmids+f1",
+			   "en-us",
+			   "en-us+f1",
+			   "en-wi",
+			   "en-wi+f1",
+			   "eo",
+			   "eo+f1",
+			   "es",
+			   "es+f1",
+			   "es-la",
+			   "es-la+f1",
+			   "fi",
+			   "fi+f1",
+			   "fr",
+			   "fr+f1",
+			   "fr-be",
+			   "fr-be+f1",
+			   "grc",
+			   "grc+f1",
+			   "hi",
+			   "hi+f1",
+			   "hr",
+			   "hr+f1",
+			   "hu",
+			   "hu+f1",
+			   "hy",
+			   "hy",
+			   "hy+f1",
+			   "hy+f1",
+			   "id",
+			   "id+f1",
+			   "is",
+			   "is+f1",
+			   "it",
+			   "it+f1",
+			   "jbo",
+			   "jbo+f1",
+			   "ku",
+			   "ku+f1",
+			   "la",
+			   "la+f1",
+			   "lv",
+			   "lv+f1",
+			   "mk",
+			   "mk+f1",
+			   "nci",
+			   "nci+f1",
+			   "nl",
+			   "nl+f1",
+			   "no",
+			   "no+f1",
+			   "pap",
+			   "pap+f1",
+			   "pl",
+			   "pl+f1",
+			   "pt",
+			   "pt+f1",
+			   "pt-pt",
+			   "pt-pt+f1",
+			   "ro",
+			   "ro+f1",
+			   "ru",
+			   "ru+f1",
+			   "sk",
+			   "sk+f1",
+			   "sq",
+			   "sq+f1",
+			   "sr",
+			   "sr+f1",
+			   "sv",
+			   "sv+f1",
+			   "sw",
+			   "sw+f1",
+			   "ta",
+			   "ta+f1",
+			   "tr",
+			   "tr+f1",
+			   "vi",
+			   "vi+f1",
+			   "zh",
+			   "zh+f1",
+			   "zh-yue",
+			   "zh-yue+f1"
+			   );
+  }
+
+  public static void setVoice(string name) {
+    speech_name = name;
+  }
+
+  public static string getVoice() {
+    return speech_name;
+  }
+
+  public static void speak(string text) {
+    Process myProcess = new Process();
+    try {
+      myProcess.StartInfo.UseShellExecute = false;
+      /*
+      myProcess.StartInfo.FileName = Path.Combine(startup_path, 
+						  "bin",
+						  "windows"
+						  "eSpeak",
+						  "espeak.exe");
+      */
+      myProcess.StartInfo.FileName = "espeak";
+      myProcess.StartInfo.CreateNoWindow = true;
+      myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" \"" +
+				       text +
+				       "\"");
+      myProcess.Start();
+    } catch (Exception e) {
+      Console.WriteLine(e.Message);
+    }
+  }
+
 }
