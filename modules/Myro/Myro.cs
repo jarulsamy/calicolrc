@@ -49,11 +49,13 @@ public static class Extensions {
 
 public static class Myro {
   public static Robot robot;
-  public static string dialogResponse = null;
-  public static string REVISION = "$Revision: $";
-  public static string startup_path = null;
-  public static string os_name = null;
-  public static string speech_name = "default";
+  static string dialogResponse = null;
+  static string REVISION = "$Revision: $";
+  static string startup_path = null;
+  static string os_name = null;
+  static string speech_name = "default";
+  static bool warn_missing_speak = true;
+  static PythonDictionary voices = new PythonDictionary();
 
   public class MyTexView : Gtk.TextView  {
 	public string MyString;
@@ -2563,150 +2565,203 @@ def motors(left, right):
 				       string os_name) {
     Myro.startup_path = startup_path;
     Myro.os_name = os_name;
+    voices["af"] = "Afrikaans Male";
+    voices["af+f1"] = "Afrikaans Female";
+    voices["bs"] = "Bosnian Male";
+    voices["bs+f1"] = "Bosnian Female";
+    voices["ca"] = "Catalan Male";
+    voices["ca+f1"] = "Catalan Female";
+    voices["cs"] = "Czech Male";
+    voices["cs+f1"] = "Czech Female";
+    voices["cy"] = "Welsh Male";
+    voices["cy+f1"] = "Welsh Female";
+    voices["da"] = "Danish Male";
+    voices["da+f1"] = "Danish Female";
+    voices["de"] = "German Male";
+    voices["de+f1"] = "German Female";
+    voices["el"] = "Greek Male";
+    voices["el+f1"] = "Greek Female";
+    voices["en"] = "Default Male";
+    voices["en+f1"] = "Default Female";
+    voices["en-sc"] = "English-Scottish Male";
+    voices["en-sc+f1"] = "English-Scottish Female";
+    voices["en-uk"] = "Englsih-British Male";
+    voices["en-uk+f1"] = "English-British Female";
+    voices["en-uk-north"] = "English-British-Lancashire Male";
+    voices["en-uk-north+f1"] = "English-British-Lancashire Female";
+    voices["en-uk-rp"] = "English-British-RP Male";
+    voices["en-uk-rp+f1"] = "English-British-RP Female";
+    voices["en-uk-wmids"] = "English-British-WMIDS Male";
+    voices["en-uk-wmids+f1"] = "English-British-WMIDS Female";
+    voices["en-us"] = "English-US Male";
+    voices["en-us+f1"] = "English-US Female";
+    voices["en-wi"] = "English-West-Indies Male";
+    voices["en-wi+f1"] = "English-West-Indies Female";
+    voices["eo"] = "Esperanto Male";
+    voices["eo+f1"] = "Esperanto Female";
+    voices["es"] = "Spanish Male";
+    voices["es+f1"] = "Spanish Female";
+    voices["es-la"] = "Spanish-Latin-American Male";
+    voices["es-la+f1"] = "Spanish-Latin-American Female";
+    voices["fi"] = "Finnish Male";
+    voices["fi+f1"] = "Finnish Female";
+    voices["fr"] = "French Male";
+    voices["fr+f1"] = "French Female";
+    voices["fr-be"] = "French-Belgium Male";
+    voices["fr-be+f1"] = "French-Belgium Female";
+    voices["grc"] = "Greek-Ancient Male";
+    voices["grc+f1"] = "Greek-Ancient Female";
+    voices["hi"] = "Hindi Male";
+    voices["hi+f1"] = "Hindi Female";
+    voices["hr"] = "Croatian Male";
+    voices["hr+f1"] = "Croatian Female";
+    voices["hu"] = "Hungarian Male";
+    voices["hu+f1"] = "Hungarian Female";
+    voices["hy"] = "Armenian Male";
+    voices["hy+f1"] = "Armenian Female";
+    voices["hy-west"] = "Armenian-West Male";
+    voices["hy-west+f1"] = "Armenian-West Female";
+    voices["id"] = "Indonesian Male";
+    voices["id+f1"] = "Indonesian Female";
+    voices["is"] = "Icelandic Male";
+    voices["is+f1"] = "Icelandic Female";
+    voices["it"] = "Italian Male";
+    voices["it+f1"] = "Italian Female";
+    voices["jbo"] = "Lojban Male";
+    voices["jbo+f1"] = "Lojban Female";
+    voices["ku"] = "Kurdish Male";
+    voices["ku+f1"] = "Kurdish Female";
+    voices["la"] = "Latin Male";
+    voices["la+f1"] = "Latin Female";
+    voices["lv"] = "Latvian Male";
+    voices["lv+f1"] = "Latvian Female";
+    voices["mk"] = "Macedonian Male";
+    voices["mk+f1"] = "Macedonian Female";
+    voices["nci"] = "Nahautl-Classical Male";
+    voices["nci+f1"] = "Nahautl-ClassicalFemale";
+    voices["nl"] = "Dutch Male";
+    voices["nl+f1"] = "Dutch Female";
+    voices["no"] = "Norwegian Male";
+    voices["no+f1"] = "Norweigian Female";
+    voices["pap"] = "Papiamento Male";
+    voices["pap+f1"] = "Papiamento Female";
+    voices["pl"] = "Polish Male";
+    voices["pl+f1"] = "Polish Female";
+    voices["pt"] = "Brazil Male";
+    voices["pt+f1"] = "Brazil Female";
+    voices["pt-pt"] = "Portugal Male";
+    voices["pt-pt+f1"] = "Portugal Female";
+    voices["ro"] = "Romanian Male";
+    voices["ro+f1"] = "Romanian Female";
+    voices["ru"] = "Russian Male";
+    voices["ru+f1"] = "Russian Female";
+    voices["sk"] = "Slovak Male";
+    voices["sk+f1"] = "Slovak Female";
+    voices["sq"] = "Albanian Male";
+    voices["sq+f1"] = "Albanian Female";
+    voices["sr"] = "Serbian Male";
+    voices["sr+f1"] = "Serbian Female";
+    voices["sv"] = "Swedish Male";
+    voices["sv+f1"] = "Swahili Female";
+    voices["sw"] = "Swahili Male";
+    voices["sw+f1"] = "Swahili Female";
+    voices["ta"] = "Tamil Male";
+    voices["ta+f1"] = "Tamil Female";
+    voices["tr"] = "Turkish Male";
+    voices["tr+f1"] = "Turkish Female";
+    voices["vi"] = "Vietnam Male";
+    voices["vi+f1"] = "Vietnam Female";
+    voices["zh"] = "Mandarin Male";
+    voices["zh+f1"] = "Mandarin Female";
+    voices["zh-yue"] = "Cantonese Male";
+    voices["zh-yue+f1"] = "Cantonese Female";
+  }
+
+  public static List getVoiceNames() {
+    return voices.values();
   }
 
   public static List getVoices() {
-    return Graphics.PyList(
-			   "af",
-			   "af+f1",
-			   "bs",
-			   "bs+f1",
-			   "ca",
-			   "ca+f1",
-			   "cs",
-			   "cs+f1",
-			   "cy",
-			   "cy+f1",
-			   "da",
-			   "da+f1",
-			   "de",
-			   "de+f1",
-			   "el",
-			   "el+f1",
-			   "en",
-			   "en+f1",
-			   "en-sc",
-			   "en-sc+f1",
-			   "en-uk",
-			   "en-uk+f1",
-			   "en-uk-north",
-			   "en-uk-north+f1",
-			   "en-uk-rp",
-			   "en-uk-rp+f1",
-			   "en-uk-wmids",
-			   "en-uk-wmids+f1",
-			   "en-us",
-			   "en-us+f1",
-			   "en-wi",
-			   "en-wi+f1",
-			   "eo",
-			   "eo+f1",
-			   "es",
-			   "es+f1",
-			   "es-la",
-			   "es-la+f1",
-			   "fi",
-			   "fi+f1",
-			   "fr",
-			   "fr+f1",
-			   "fr-be",
-			   "fr-be+f1",
-			   "grc",
-			   "grc+f1",
-			   "hi",
-			   "hi+f1",
-			   "hr",
-			   "hr+f1",
-			   "hu",
-			   "hu+f1",
-			   "hy",
-			   "hy",
-			   "hy+f1",
-			   "hy+f1",
-			   "id",
-			   "id+f1",
-			   "is",
-			   "is+f1",
-			   "it",
-			   "it+f1",
-			   "jbo",
-			   "jbo+f1",
-			   "ku",
-			   "ku+f1",
-			   "la",
-			   "la+f1",
-			   "lv",
-			   "lv+f1",
-			   "mk",
-			   "mk+f1",
-			   "nci",
-			   "nci+f1",
-			   "nl",
-			   "nl+f1",
-			   "no",
-			   "no+f1",
-			   "pap",
-			   "pap+f1",
-			   "pl",
-			   "pl+f1",
-			   "pt",
-			   "pt+f1",
-			   "pt-pt",
-			   "pt-pt+f1",
-			   "ro",
-			   "ro+f1",
-			   "ru",
-			   "ru+f1",
-			   "sk",
-			   "sk+f1",
-			   "sq",
-			   "sq+f1",
-			   "sr",
-			   "sr+f1",
-			   "sv",
-			   "sv+f1",
-			   "sw",
-			   "sw+f1",
-			   "ta",
-			   "ta+f1",
-			   "tr",
-			   "tr+f1",
-			   "vi",
-			   "vi+f1",
-			   "zh",
-			   "zh+f1",
-			   "zh-yue",
-			   "zh-yue+f1"
-			   );
+    return voices.keys();
   }
 
   public static void setVoice(string name) {
     speech_name = name;
   }
 
+  public static void setVoiceName(string name) {
+    foreach (string key in voices.keys()) {
+      if ((string)voices[key] == name) {
+	speech_name = key;
+	return;
+      }
+    }
+    throw new Exception("voice name not found: " + name);
+  }
+
   public static string getVoice() {
     return speech_name;
   }
 
+  public static string getVoiceName() {
+    return getVoiceName(speech_name);
+  }
+  
+  public static string getVoiceName(string name) {
+    foreach (string key in voices.keys()) {
+      if (key == name) {
+	return (string)voices[key];
+      }
+    }
+    return name;
+  }
+
   public static void speak(string text) {
+    speak(text, 0); // not async, wait for exit
+  }
+
+  public static void speak(string text, bool async) {
+    speak(text, bool_to_int(async)); // not async, wait for exit
+  }
+
+  static int bool_to_int(bool value) {
+    if (value) return 1;
+    return 0;
+  }
+
+  public static void speak(string text, double async) {
+    speak(text, (int)async); // not async, wait for exit
+  }
+
+  public static void speak(string text, int async) {
+    Console.WriteLine(text);
     Process myProcess = new Process();
     try {
       myProcess.StartInfo.UseShellExecute = false;
-      /*
-      myProcess.StartInfo.FileName = Path.Combine(startup_path, 
-						  "bin",
-						  "windows"
-						  "eSpeak",
-						  "espeak.exe");
-      */
-      myProcess.StartInfo.FileName = "espeak";
+      if (os_name == "nt") {
+	string file = startup_path;
+	file = Path.Combine(file, "bin");
+	file = Path.Combine(file, "windows");
+	file = Path.Combine(file, "eSpeak");
+	myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
+      } else {
+	// assumes in path
+	myProcess.StartInfo.FileName = "espeak";
+      }
       myProcess.StartInfo.CreateNoWindow = true;
       myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" \"" +
 				       text +
 				       "\"");
       myProcess.Start();
+      if (async == 0)
+	myProcess.WaitForExit();
+#pragma warning disable 0168
     } catch (Exception e) {
-      Console.WriteLine(e.Message);
+#pragma warning restore 0168
+      if (warn_missing_speak) {
+	Console.WriteLine("WARNING: missing speak command");
+	warn_missing_speak = false; // just once
+      }
     }
   }
 
