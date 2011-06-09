@@ -48,7 +48,7 @@ class PythonEngine(DLREngine):
         text = ("from __future__ import division, with_statement;" +
                 "from Myro import ask;" + 
                 "__builtins__['input'] = ask;" +
-                "del division, with_statement, ask, raw_input;")
+                "del division, with_statement, ask;")
         sctype = Microsoft.Scripting.SourceCodeKind.Statements
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         source.Compile()
