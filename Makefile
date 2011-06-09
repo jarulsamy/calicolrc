@@ -1,4 +1,4 @@
-BUILD=0.4.7
+BUILD=0.4.8
 MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
 
 all: modules/Graphics.dll modules/Myro.dll languages/PJScheme.dll \
