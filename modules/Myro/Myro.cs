@@ -2873,6 +2873,11 @@ public static class Myro {
     return 0;
   }
 
+  static bool int_to_bool(int value) {
+    if (value == 0) return false;
+    return true;
+  }
+
   public static void speak(string text, double async) {
     speak(text, (int)async); // not async, wait for exit
   }
@@ -2931,48 +2936,44 @@ public static class Myro {
     robot.playSong(song);
   }
 
-  public static void saveSong(List song, int append) {
+  public static void saveSong(List song, string filename, int append) {
+    saveSong(song, filename, int_to_bool(append));
+  }
+
+  public static void saveSong(List song, string filename, bool append) {
     //  Writes a song list to a file. 
-    /*
-    if append:
-        mode = "w+"
-    else:
-        mode = "w"
-    fp = open(filename, mode) # will append it if it exists
-    if type(song) in [list]:
-        for tup in song:
-            if len(tup) == 2:
-                f, d = tup
-                fp.write("%s %s\n" % (_getNoteFromFrequency(f), d))
-            elif len(tup) == 3:
-                f1, f2, d = tup
-                fp.write("%s %s %s\n" % (_getNoteFromFrequency(f),
-                                         _getNoteFromFrequency(f), d))
-    else: # string
-        song = song.replace("\n", ";")
-        lines = song.split(";")
-        for line in lines:
-            fp.write(line + "\n")
-    fp.close()
-    */
+    System.IO.StreamWriter fp = new System.IO.StreamWriter(filename, append); 
+    foreach (IList tup in song) {
+      if (tup.Count == 2) {
+	double f = (double)tup[0]; 
+	double d = (double)tup[1];
+	fp.WriteLine("{0} {1}", getNoteFromFrequency(f), d);
+      } else if (tup.Count == 3) {
+	double f1 = (double)tup[0]; 
+	double f2 = (double)tup[1]; 
+	double d = (double)tup[2];
+	fp.WriteLine("{0} {1} {2}", getNoteFromFrequency(f1),
+		     getNoteFromFrequency(f2), d);
+	fp.Close();
+      }
+    }
   }
 
   public static List readSong(string filename) {
-    return new List();
-    // Read a song file. Returns a song list """
-    /*
-    if filename == None: return []
-    songFile = open(filename, "r")
-    song = []
-    lineNumber = 1
-    for line in songFile:
-        notes = line.split(";")
-        for n in notes:
-            _parseSongLine(song, n, lineNumber, filename)
-        lineNumber += 1
-    songFile.close()
-    return song
-    */
+    // Read a song file. Returns a song list 
+    List song = new List();
+    System.IO.StreamReader songFile = new System.IO.StreamReader(filename);
+    int lineNumber = 1;
+    string line;
+    while ((line = songFile.ReadLine()) != null) {
+      Array notes = line.Split(';');
+      foreach (string n in notes) {
+	parseSongLine(song, n, lineNumber, filename);
+      }
+      lineNumber += 1;
+    }
+    songFile.Close();
+    return song;
   }
 
   public static string song2text(List song) {
@@ -3002,7 +3003,7 @@ public static class Myro {
     Array songData = text.Split(';');
     int lineNumber = 1;
     foreach (string line in songData) {
-      parseSongLine(song, line, lineNumber, "text");
+      parseSongLine(song, line, lineNumber, "string");
       lineNumber += 1;
     }
     return song;
