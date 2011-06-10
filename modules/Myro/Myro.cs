@@ -49,6 +49,7 @@ public static class Extensions {
 
 public static class Myro {
   public static Robot robot;
+  public static Computer computer = new Computer();
   static string dialogResponse = null;
   static string REVISION = "$Revision: $";
   static string startup_path = null;
@@ -56,6 +57,7 @@ public static class Myro {
   static string speech_name = "default";
   static bool warn_missing_speak = true;
   static PythonDictionary voices = new PythonDictionary();
+  public static PythonDictionary frequencies = new PythonDictionary();
 
   public class MyTexView : Gtk.TextView  {
 	public string MyString;
@@ -687,183 +689,198 @@ public static class Myro {
 	
   // singleton
   public static Randomizer Random = new Randomizer(); 
-
+  
   public class Robot {
-
-	public Object myLock = new Object();
-
+    
+    public Object myLock = new Object();
+    
     public virtual void beep(double duration, double frequency, double frequency2) {
-	  // Override in subclassed robots
-	}
-
+      // Override in subclassed robots
+    }
+    
     public virtual void beep(double duration, double frequency) {
-	  // Override in subclassed robots
-	}
-
-	public virtual void reboot() {
-	}
-
+      // Override in subclassed robots
+    }
+    
+    public virtual void reboot() {
+    }
+    
     public virtual Graphics.Picture takePicture(string mode="jpeg") {
-	  // Override in subclassed robots
-	  return null;
-	}
-
-	public virtual void setup() {
-	}
-
-	public virtual string getName() {
-	  return null;
-	}
-
-	public virtual List getIRMessage() {
-	  return null;
-	}
-
-	public virtual void setCommunicate() {
-	}
-
-	public virtual void sendIRMessage(string data) {
-	}
-
-	public virtual List getBlob() {
-	  return null;
-	}
-
+      // Override in subclassed robots
+      return null;
+    }
+    
+    public virtual void setup() {
+    }
+    
+    public virtual string getName() {
+      return null;
+    }
+    
+    public virtual List getIRMessage() {
+      return null;
+    }
+    
+    public virtual void setCommunicate() {
+    }
+    
+    public virtual void sendIRMessage(string data) {
+    }
+    
+    public virtual List getBlob() {
+      return null;
+    }
+    
     public virtual object getData(params int [] position) {
       return null;
     }
-
+    
     public virtual void setData(int position, int value) {
     }
-
-	public virtual PythonDictionary getAll() {
-	  return null;
-	}
-
-	public virtual PythonDictionary getInfo() {
-	  return null;
-	}
-
-	public virtual object getObstacle(params object [] position) {
-	  return null;
-	}
-
-	public virtual object getLight(params object [] position) {
-	  return null;
-	}
-
-	public virtual object getIR(params object [] position) {
-	  return null;
-	}
-
+    
+    public virtual PythonDictionary getAll() {
+      return null;
+    }
+    
+    public virtual PythonDictionary getInfo() {
+      return null;
+    }
+    
+    public virtual object getObstacle(params object [] position) {
+      return null;
+    }
+    
+    public virtual object getLight(params object [] position) {
+      return null;
+    }
+    
+    public virtual object getIR(params object [] position) {
+      return null;
+    }
+    
     public virtual object getBright(string window = null) {
       return null;
     }
-
+    
     public virtual object getBright(int window) {
       return null;
     }
-
-	public virtual object getLine(params object [] position) {
-	  return null;
-	}
-
-	public virtual object get(string sensor="all") {
-	  return null;
-	}
-
-	public virtual object get(string sensor="all", params object [] position) {
-	  return null;
-	}
-
-	public virtual string getPassword() {
-	  return null;
-	}
-
-	public virtual PythonDictionary getConfig() {
-	  return null;
-	}
-
-	public virtual int getStall() {
-	  return 0; 
-	}
-
-	public virtual double getBattery() {
-	  return 0.0;
-	}
-
-	public virtual void setLED(string position, object value) {
-	}
-
-	public virtual void setLEDFront(object value) {
-	}
-
-	public virtual void setLEDBack(double value) {
-	}
-
+    
+    public virtual object getLine(params object [] position) {
+      return null;
+    }
+    
+    public virtual object get(string sensor="all") {
+      return null;
+    }
+    
+    public virtual object get(string sensor="all", params object [] position) {
+      return null;
+    }
+    
+    public virtual string getPassword() {
+      return null;
+    }
+    
+    public virtual PythonDictionary getConfig() {
+      return null;
+    }
+    
+    public virtual int getStall() {
+      return 0; 
+    }
+    
+    public virtual double getBattery() {
+      return 0.0;
+    }
+    
+    public virtual void setLED(string position, object value) {
+    }
+    
+    public virtual void setLEDFront(object value) {
+    }
+    
+    public virtual void setLEDBack(double value) {
+    }
+    
     public virtual void setEchoMode(int value) {
     }
-
+    
     public virtual void setName(string name) {
     }
-
+    
     public virtual void setIRPower(int power) {
     }
-
+    
     public virtual void setWhiteBalance(object value) {
     }
-
+    
     public virtual void setForwardness(object value) {
     }
-
+    
     public virtual void setVolume(object volume) {
     }
-
-	public virtual void setPassword(string password) {
-	}
-
+    
+    public virtual void setPassword(string password) {
+    }
+    
     public virtual void move(double translate, double rotate) {
-	  // Override in subclassed robots
+      // Override in subclassed robots
+    }
+    
+    public void playSong(List song) {
+      foreach(IList tup in song) {
+	if (tup.Count == 2) {
+	  double f = (double)tup[0]; 
+	  double d = (double)tup[1];
+	  beep(d, f);
+	} else if (tup.Count == 3) {
+	  double f1 = (double)tup[0]; 
+	  double f2 = (double)tup[1]; 
+	  double d = (double)tup[2];
+	  beep(d, f1, f2);
 	}
-
-	public void stop() {
-	  move(0, 0);
-	}
-
-	public void forward(double speed, double interval) {
-	  move(speed, 0);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
-
-	public void forward(double speed) {
-	  move(speed, 0);
-	}
-
-	public void translate(double speed) {
-	  move(speed, 0);
-	}
-
-	public void translate(double speed, double interval) {
-	  move(speed, 0);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
-
-	public void rotate(double speed) {
-	  move(0, speed);
-	}
-	
-	public void rotate(double speed, double interval) {
-	  move(0, speed);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
-	
-	public void backward(double speed) {
-	  move(-speed, 0);
-	}
-
+      }
+    }
+    
+    public void stop() {
+      move(0, 0);
+    }
+    
+    public void forward(double speed, double interval) {
+      move(speed, 0);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
+    
+    public void forward(double speed) {
+      move(speed, 0);
+    }
+    
+    public void translate(double speed) {
+      move(speed, 0);
+    }
+    
+    public void translate(double speed, double interval) {
+      move(speed, 0);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
+    
+    public void rotate(double speed) {
+      move(0, speed);
+    }
+    
+    public void rotate(double speed, double interval) {
+      move(0, speed);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
+    
+    public void backward(double speed) {
+      move(-speed, 0);
+    }
+    
 	public void backward(double speed, double interval) {
 	  move(-speed, 0);
 	  Thread.Sleep((int)(interval * 1000)); 
@@ -901,48 +918,25 @@ public static class Myro {
 	return ((IList<object>)items).Contains(item);
   }
 
-/*
-def beep(seconds, freq, async=False):
-    if ser.inWaiting():
-        ser.write("CS")
-        ser.read(ser.inWaiting())
-    mseconds = seconds * 1000
-    ser.write("B" +
-              chr(int(mseconds / 255)) +
-              chr(int(mseconds % 255)) +
-              chr(int(freq / 255)) +
-              chr(int(freq % 255)))
-    ser.read(5)
-    if not async:
-        time.sleep(seconds)
+  public class Computer: Robot {
+    
+  }
 
-def motors(left, right):
-    if ser.inWaiting():
-        ser.write("CS")
-        ser.read(ser.inWaiting())
-    ser.write("V" +
-              chr(int(left * 20.0)) +
-              chr(int(right * 20.0)))
-    ser.read(3)
-
-*/
-
-  [Serializable()]
   public class Scribbler: Robot {
-	public SerialPort serial;
+    public SerialPort serial;
     double [] _fudge  = new double[4];
     double [] _oldFudge = new double[4];
-	public string dongle;
-	public int volume;
-	public string startsong;
+    public string dongle;
+    public int volume;
+    public string startsong;
     public byte [] color_header = null;
     public byte [] gray_header = null;
-	public byte emitters = 0x1 | 0x2 | 0x4;
-
-	private double _lastTranslate;
-	private double _lastRotate;
-	private byte [] _lastSensors;
-
+    public byte emitters = 0x1 | 0x2 | 0x4;
+    
+    private double _lastTranslate;
+    private double _lastRotate;
+    private byte [] _lastSensors;
+    
     //static byte SOFT_RESET=33;
     static byte GET_ALL=65 ;
     //static byte GET_ALL_BINARY=66  ;
@@ -2679,6 +2673,152 @@ def motors(left, right):
     voices["zh+f1"] = "Mandarin Female";
     voices["zh-yue"] = "Cantonese Male";
     voices["zh-yue+f1"] = "Cantonese Female";
+
+    frequencies["rest"] = 0.0;
+    frequencies["pause"] = 0.0;
+    frequencies["a0"] = 27.50;
+    frequencies["a#0"] = 29.14;
+    frequencies["bb0"] = 29.14;
+    frequencies["b0"] = 30.87;
+    frequencies["c1"] = 32.70;
+    frequencies["c#1"] = 34.65;
+    frequencies["db1"] = 34.65;
+    frequencies["d1"] = 36.71;
+    frequencies["d#1"] = 38.89;
+    frequencies["eb1"] = 38.89;
+    frequencies["e1"] = 41.20;
+    frequencies["f1"] = 43.65;
+    frequencies["f#1"] = 46.25;
+    frequencies["gb1"] = 46.25;
+    frequencies["g1"] = 49.00;
+    frequencies["g#1"] = 51.91;
+    frequencies["ab1"] = 51.91;
+    frequencies["a1"] = 55.00;
+    frequencies["a#1"] = 58.27;
+    frequencies["bb1"] = 58.27;
+    frequencies["b1"] = 61.74;
+    frequencies["c2"] = 65.41;
+    frequencies["c#2"] = 69.30;
+    frequencies["db2"] = 69.30;
+    frequencies["d2"] = 73.42;
+    frequencies["d#2"] = 77.78;
+    frequencies["eb2"] = 77.78;
+    frequencies["e2"] = 82.41;
+    frequencies["f2"] = 87.31;
+    frequencies["f#2"] = 92.50;
+    frequencies["gb2"] = 92.50;
+    frequencies["g2"] = 98.00;
+    frequencies["g#2"] = 103.80;
+    frequencies["ab2"] = 103.80;
+    frequencies["a2"] = 110.00;
+    frequencies["a#2"] = 116.50;
+    frequencies["bb2"] = 116.50;
+    frequencies["b2"] = 123.471;
+    frequencies["c3"] = 130.8;
+    frequencies["c#3"] = 138.6;
+    frequencies["db3"] = 138.6;
+    frequencies["d3"] = 146.8;
+    frequencies["d#3"] = 155.6;
+    frequencies["eb3"] = 155.6;
+    frequencies["e3"] = 164.8;
+    frequencies["f3"] = 174.6;
+    frequencies["f#3"] = 185.0;
+    frequencies["gb3"] = 185.0;
+    frequencies["g3"] = 196.0;
+    frequencies["g#3"] = 207.7;
+    frequencies["ab3"] = 207.7;
+    frequencies["a3"] = 220.0;
+    frequencies["a#3"] = 233.1;
+    frequencies["bb3"] = 233.1;
+    frequencies["b3"] = 246.9;
+    frequencies["c4"] = 261.6;
+    frequencies["c#4"] = 277.2;
+    frequencies["db4"] = 277.2;
+    frequencies["d4"] = 293.7;
+    frequencies["d#4"] = 311.1;
+    frequencies["eb4"] = 311.1;
+    frequencies["e4"] = 329.6;
+    frequencies["f4"] = 349.2;
+    frequencies["f#4"] = 370.0;
+    frequencies["gb4"] = 370.0;
+    frequencies["g4"] = 392.0;
+    frequencies["g#4"] = 415.3;
+    frequencies["ab4"] = 415.3;
+    frequencies["a4"] = 440.0;
+    frequencies["a#4"] = 466.2;
+    frequencies["bb4"] = 466.2;
+    frequencies["b4"] = 493.9;
+    frequencies["c5"] = 523.3;
+    frequencies["c#5"] = 554.4;
+    frequencies["db5"] = 554.4;
+    frequencies["d5"] = 587.3;
+    frequencies["d#5"] = 622.3;
+    frequencies["eb5"] = 622.3;
+    frequencies["e5"] = 659.3;
+    frequencies["f5"] = 698.5;
+    frequencies["f#5"] = 740.0;
+    frequencies["gb5"] = 740.0;
+    frequencies["g5"] = 784.0;
+    frequencies["g#5"] = 830.6;
+    frequencies["ab5"] = 830.6;
+    frequencies["a5"] = 880.0;
+    frequencies["a#5"] = 932.3;
+    frequencies["bb5"] = 932.3;
+    frequencies["b5"] = 987.8;
+    // -------------------- default octave
+    frequencies["c"] = 523.3;
+    frequencies["c#"] = 554.4;
+    frequencies["db"] = 554.4;
+    frequencies["d"] = 587.3;
+    frequencies["d#"] = 622.3;
+    frequencies["eb"] = 622.3;
+    frequencies["e"] = 659.3;
+    frequencies["f"] = 698.5;
+    frequencies["f#"] = 740.0;
+    frequencies["gb"] = 740.0;
+    frequencies["g"] = 784.0;
+    frequencies["g#"] = 830.6;
+    frequencies["ab"] = 830.6;
+    frequencies["a"] = 880.0;
+    frequencies["a#"] = 932.3;
+    frequencies["bb"] = 932.3;
+    frequencies["b"] = 987.8;
+    // --------------------
+    frequencies["c6"] = 1047.0;
+    frequencies["c#6"] = 1109.0;
+    frequencies["db6"] = 1109.0;
+    frequencies["d6"] = 1175.0;
+    frequencies["d#6"] = 1245.0;
+    frequencies["eb6"] = 1245.0;
+    frequencies["e6"] = 1319.0;
+    frequencies["f6"] = 1397.0;
+    frequencies["f#6"] = 1480.0;
+    frequencies["gb6"] = 1480.0;
+    frequencies["g6"] = 1568.0;
+    frequencies["g#6"] = 1661.0;
+    frequencies["ab6"] = 1661.0;
+    frequencies["a6"] = 1760.0;
+    frequencies["a#6"] = 1865.0;
+    frequencies["bb6"] = 1865.0;
+    frequencies["b6"] = 1976.0;
+    frequencies["c7"] = 2093.0;
+    frequencies["c#7"] = 2217.0;
+    frequencies["db7"] = 2217.0;
+    frequencies["d7"] = 2349.0;
+    frequencies["d#7"] = 2489.0;
+    frequencies["eb7"] = 2489.0;
+    frequencies["e7"] = 2637.0;
+    frequencies["f7"] = 2794.0;
+    frequencies["f#7"] = 2960.0;
+    frequencies["gb7"] = 2960.0;
+    frequencies["g7"] = 3136.0;
+    frequencies["g#7"] = 3322.0;
+    frequencies["ab7"] = 3322.0;
+    frequencies["a7"] = 3520.0;
+    frequencies["a#7"] = 3729.0;
+    frequencies["bb7"] = 3729.0;
+    frequencies["b7"] = 3951.0;
+    frequencies["c8"] = 4186.0;
   }
 
   public static List getVoiceNames() {
@@ -2769,4 +2909,166 @@ def motors(left, right):
     }
   }
 
+  public static string getNoteFromFrequency(int frequency) {
+    return getNoteFromFrequency((double)frequency);
+  }
+
+  public static string getNoteFromFrequency(double frequency) {
+    // Return closest note name based on a given frequency. 
+    double diff = 100000;
+    string diffNote = "a";
+    foreach(string key in frequencies.keys()) {
+      if (Math.Abs(((double)frequencies[key]) - frequency) < diff) {
+	diff = (double) Math.Abs(((double)frequencies[key]) - frequency);
+	diffNote = key;
+      }
+    }
+    return diffNote.Substring(0, 1).ToUpper() + 
+      diffNote.Substring(1, diffNote.Length - 1);
+  }
+
+  public static void playSong(List song) {
+    robot.playSong(song);
+  }
+
+  public static void saveSong(List song, int append) {
+    //  Writes a song list to a file. 
+    /*
+    if append:
+        mode = "w+"
+    else:
+        mode = "w"
+    fp = open(filename, mode) # will append it if it exists
+    if type(song) in [list]:
+        for tup in song:
+            if len(tup) == 2:
+                f, d = tup
+                fp.write("%s %s\n" % (_getNoteFromFrequency(f), d))
+            elif len(tup) == 3:
+                f1, f2, d = tup
+                fp.write("%s %s %s\n" % (_getNoteFromFrequency(f),
+                                         _getNoteFromFrequency(f), d))
+    else: # string
+        song = song.replace("\n", ";")
+        lines = song.split(";")
+        for line in lines:
+            fp.write(line + "\n")
+    fp.close()
+    */
+  }
+
+  public static List readSong(string filename) {
+    return new List();
+    // Read a song file. Returns a song list """
+    /*
+    if filename == None: return []
+    songFile = open(filename, "r")
+    song = []
+    lineNumber = 1
+    for line in songFile:
+        notes = line.split(";")
+        for n in notes:
+            _parseSongLine(song, n, lineNumber, filename)
+        lineNumber += 1
+    songFile.close()
+    return song
+    */
+  }
+
+  public static string song2text(List song) {
+    // Given a song list, return a text string form 
+    string text = "";
+    foreach(IList tup in song) {
+      if (tup.Count == 2) {
+	double f = (double)tup[0]; 
+	double d = (double)tup[1];
+	text += String.Format("{0} {1}; ", getNoteFromFrequency(f), d);
+      } else if (tup.Count == 3) {
+	double f1 = (double)tup[0]; 
+	double f2 = (double)tup[1]; 
+	double d = (double)tup[2];
+	text += String.Format("{0} {1} {2}; ", 
+			      getNoteFromFrequency(f1),
+			      getNoteFromFrequency(f2), d);
+      }
+    }
+    return text;
+  }
+
+  public static List makeSong(string text) {
+    // Given a text string format of a song, return a song list 
+    List song = new List();
+    text = text.Replace('\n', ';');
+    Array songData = text.Split(';');
+    int lineNumber = 1;
+    foreach (string line in songData) {
+      parseSongLine(song, line, lineNumber, "text");
+      lineNumber += 1;
+    }
+    return song;
+  }
+
+  static void parseSongLine(List song, string line, 
+			    int lineNumber, string filename) {
+    line = line.Trim();
+    Array lineList = line.Split(' ');
+    // FIXME: remove duplicate spaces
+    if (lineList.Length <= 1) {
+      // blank line, skip
+    } else if (((string)lineList.GetValue(0))[0] == '#') {
+      // first word, first char is #, then skip comment
+    } else if (lineList.Length == 2) {
+      Array name1_dur = line.Split(' ');
+      string name1 = (string)name1_dur.GetValue(0);
+      string dur = (string)name1_dur.GetValue(1);
+      song.append(Graphics.PyTuple(getFrequency(name1, lineNumber, line),
+				   getDuration(dur, lineNumber, line)));
+    } else if (lineList.Length == 3) {
+      Array name1_name2_dur = line.Split(' ');
+      string name1 = (string)name1_name2_dur.GetValue(0);
+      string name2 = (string)name1_name2_dur.GetValue(1);
+      string dur = (string)name1_name2_dur.GetValue(2);
+      song.append( Graphics.PyTuple(getFrequency(name1, lineNumber, line),
+				    getFrequency(name2, lineNumber, line),
+				    getDuration(dur, lineNumber, line)) );
+    } else {
+      throw new Exception(String.Format("song format error in '{0}' at line {1}: {2}", filename, lineNumber, line));
+    }
+  }
+
+#pragma warning disable 0168
+  static double getFrequency(string s, int line, string text) {
+    //Takes a string that is a note name, or a frequency. Returns
+    try {
+      return (double)frequencies[s.ToLower()];
+    } catch (Exception e1) {
+      try {
+	return Double.Parse(s);
+      } catch (Exception e2) {
+	throw new Exception(String.Format("invalid note name/frequency '{0}' on line {1}: {2}", s, line, text));
+      }
+    }
+  }
+#pragma warning restore 0168
+
+  static double getDuration(string v, int line, string text) {
+    // Takes a string that is a fraction, or a number. Returns whole
+    // note portion as float. 
+    if (v.Contains("/")) {
+      try {
+	Array numerator_denominator = v.Split('/');
+	double numerator = Double.Parse((string)numerator_denominator.GetValue(0));
+	double denominator = Double.Parse((string)numerator_denominator.GetValue(1));
+	return numerator/denominator;
+#pragma warning disable 0168
+      } catch (Exception e) {
+#pragma warning restore 0168
+	throw new Exception(
+	   String.Format("invalid duration value '{0}' on line {1}: {2}",
+			 v, line, text));
+      }
+    } else {
+      return Double.Parse(v);
+    }
+  }
 }
