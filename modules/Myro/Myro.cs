@@ -2386,10 +2386,6 @@ public static class Myro {
     return Graphics.color_rgb(r, g, b);
   }
 
-  public static Cairo.Color makeColor(int r, int g, int b) {
-    return Graphics.color_rgb(r, g, b);
-  }
-
   public static Cairo.Color color_rgb(PythonTuple rgb) {
     return Graphics.color_rgb((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
@@ -2426,6 +2422,25 @@ public static class Myro {
     picture.setPixel(col, row, color);
   }
 
+  public static Graphics.Color makeColor(int r, int g, int b) {
+    return Graphics.makeColor(r, g, b);
+  }
+
+  public static Graphics.Color makeColor(int r, int g, int b, int a) {
+    return Graphics.makeColor(r, g, b, a);
+  }
+
+  public static Graphics.Color makeColor(double r, double g, double b) {
+    return Graphics.makeColor(r, g, b);
+  }
+
+  public static Graphics.Color makeColor(double r, double g, double b, double a) {
+    return Graphics.makeColor(r, g, b, a);
+  }
+
+  public static Graphics.Color getColor(Graphics.Pixel pixel) {
+    return pixel.getColor();
+  }
   public static PythonTuple getRGB(Graphics.Pixel pixel) {
     return pixel.getRGB();
   }
@@ -2487,6 +2502,9 @@ public static class Myro {
 
   public static Graphics.Picture makePicture(int x, int y) {
     return new Graphics.Picture(x, y);
+  }
+  public static Graphics.Picture makePicture(int x, int y, Graphics.Color c) {
+    return new Graphics.Picture(x, y, c);
   }
   public static Graphics.Picture makePicture(string filename) {
     return new Graphics.Picture(filename);

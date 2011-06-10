@@ -40,7 +40,7 @@ public static class Graphics {
     // make a tuple from an array
     return new PythonTuple(items);
   }
-  
+
   private static Dictionary<string, Graphics._Window> _windows =
     new Dictionary<string, Graphics._Window>();
   
@@ -75,6 +75,9 @@ public static class Graphics {
 	yield return picture.getPixel(x, y);
       }
     }
+  }
+  public static Color getColor(Pixel pixel) {
+    return pixel.getColor();
   }
   public static PythonTuple getRGB(Pixel pixel) {
     return pixel.getRGB();
@@ -130,6 +133,9 @@ public static class Graphics {
   
   public static Picture makePicture(int x, int y) {
     return new Picture(x, y);
+  }
+  public static Picture makePicture(int x, int y, Color c) {
+    return new Picture(x, y, c);
   }
   public static Picture makePicture(string filename) {
     return new Picture(filename);
@@ -192,6 +198,52 @@ public static class Graphics {
 				       int width=300, 
 				       int height=300) {
     return makeWindow(title, width, height);
+  }
+
+  public static Color makeColor(int r, int g, int b) {
+    return new Color(r, g, b);
+  }
+
+  public static Color makeColor(int r, int g, int b, int a) {
+    return new Color(r, g, b, a);
+  }
+
+  public static Color makeColor(double r, double g, double b) {
+    return new Color(r, g, b);
+  }
+
+  public static Color makeColor(double r, double g, double b, double a) {
+    return new Color(r, g, b, a);
+  }
+
+  public class Color {
+    public int red = 0;
+    public int green = 0;
+    public int blue = 0;
+    public int alpha = 255;
+
+    public Color(int r, int g, int b) {
+      red = r;
+      green = g;
+      blue = b;
+    }
+    public Color(int r, int g, int b, int a) {
+      red = r;
+      green = g;
+      blue = b;
+      alpha = a;
+    }
+    public Color(double r, double g, double b) {
+      red = (int)r;
+      green = (int)g;
+      blue = (int)b;
+    }
+    public Color(double r, double g, double b, double a) {
+      red = (int)r;
+      green = (int)g;
+      blue = (int)b;
+      alpha = (int)a;
+    }
   }
 
   public class _Window : Gtk.Window {
@@ -975,6 +1027,9 @@ public static class Graphics {
 	  this.y = y;
 	}
     
+	public Color getColor() {
+	  return picture.getColor(x, y);
+	}
 	public PythonTuple getRGB() {
 	  return picture.getRGB(x, y);
 	}
@@ -1198,6 +1253,33 @@ public static class Graphics {
 	  center.y = _pixbuf.Height/2;
     }
 
+    public Picture(int width, int height, Color color) : base(true) {
+	  // Colorspace, has_alpha, bits_per_sample, width, height:
+      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
+	  if (!_pixbuf.HasAlpha) {
+	    _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+	  }
+	  // WORKAROUND: image needs alpha set to zero (full opacity/no
+	  // transparency). Might as well set default color, too:
+	  for (int x=0; x < _pixbuf.Width; x++) {
+		for (int y=0; y < _pixbuf.Height; y++) {
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				    x * _pixbuf.NChannels + 0, (byte)color.red);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				    x * _pixbuf.NChannels + 1, (byte)color.green);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				    x * _pixbuf.NChannels + 2, (byte)color.blue);
+		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				    x * _pixbuf.NChannels + 3, (byte)color.alpha);
+		}
+	  }
+	  format = Cairo.Format.Argb32;
+	  // Create a new ImageSurface
+	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+	  center.x = _pixbuf.Width/2;
+	  center.y = _pixbuf.Height/2;
+    }
+
     public int getWidth() {
         return _pixbuf.Width;
     }
@@ -1230,10 +1312,15 @@ public static class Graphics {
 	  }
     }
 
+    public Color getColor(int x, int y) {
+      // red, green, blue, alpha
+      return new Color(getRed(x, y), getGreen(x, y), getBlue(x, y));
+    }
+    
     public PythonTuple getRGB(int x, int y) {
-	  // red, green, blue, alpha
+      // red, green, blue, alpha
       return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y));
-	}
+    }
     
 	public PythonTuple getRGBA(int x, int y) {
 	  // red, green, blue, alpha
