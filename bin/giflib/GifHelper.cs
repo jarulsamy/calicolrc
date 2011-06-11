@@ -37,7 +37,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     public enum SizeMode
     {

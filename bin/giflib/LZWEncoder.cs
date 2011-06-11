@@ -33,7 +33,7 @@ using System.Text;
 using System.IO;
 using System.Collections;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     internal class LZWEncoder
     {

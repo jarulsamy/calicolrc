@@ -36,7 +36,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     #region 类GifDecoder-gif文件解码类
     /// <summary>

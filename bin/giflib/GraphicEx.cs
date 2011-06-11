@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     #region 类GraphicEx
     /// <summary>

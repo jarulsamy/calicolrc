@@ -39,7 +39,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     /// <summary>
     /// Gif 使用的可变长度的LZW压缩算法解码器

@@ -21,7 +21,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Drawing;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     #region ½á¹¹Color32
     /// <summary>

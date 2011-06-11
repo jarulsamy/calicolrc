@@ -21,7 +21,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     #region °Ë²æÊ÷ÑÕÉ«Á¿»¯Æ÷OcTreeQuantizer
     /// <summary>

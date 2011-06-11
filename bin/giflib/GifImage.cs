@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 
-namespace Jillzhang.GifUtility
+namespace GifLib
 {
     #region ÀàGifImage - ÃèÊöGifµÄÀà
     /// <summary>
