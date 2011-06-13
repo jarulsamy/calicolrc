@@ -282,8 +282,8 @@ class CalicoProject(object):
                               Gtk.DialogFlags.DestroyWithParent,
                               Gtk.MessageType.Question,
                               Gtk.ButtonsType.YesNo,
-                              _("You have received a blast from '%s'.\n%s")
-                              % (mfrom, q))
+                              _("You have received a blast from '%(mfrom)s'.\n%(q)s")
+                              % {"mfrom": mfrom, "q": q})
         def invoke(sender, args):
             result = md.Run()
             md.Destroy()

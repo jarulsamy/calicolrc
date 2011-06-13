@@ -246,7 +246,7 @@ msgstr ""
 #: ../src/chat.py:70 ../src/editor.py:83 ../src/shell.py:139
 #: ../src/shell.py:142
 msgid "Shell"
-msgstr "el Shell"
+msgstr ""
 
 #: ../src/chat.py:73 ../src/editor.py:86 ../src/shell.py:145
 msgid "Options"
@@ -449,7 +449,7 @@ msgstr ""
 #: ../src/shell.py:105
 #, python-format
 msgid "Calico Shell - %s"
-msgstr "el Calico Shell - %s"
+msgstr ""
 
 #: ../src/shell.py:121
 msgid "Search in files..."
@@ -484,7 +484,7 @@ msgstr ""
 #: ../src/shell.py:302
 #, python-format
 msgid "%s - Calico Shell - %s"
-msgstr "%s - el Calico Shell - %s"
+msgstr ""
 
 #: ../src/shell.py:417
 msgid ""
