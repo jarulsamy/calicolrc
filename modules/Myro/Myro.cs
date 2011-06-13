@@ -2500,6 +2500,12 @@ public static class Myro {
     pixel.setAlpha(value);
   }
 
+  public static void savePicture(Graphics.Picture picture, string filename) {
+    picture.savePicture(filename);
+  }
+  public static void savePicture(List list, string filename, short delay, bool repeat) {
+    Graphics.savePicture(list, filename, delay, repeat);
+  }
   public static Graphics.Picture makePicture(int x, int y) {
     return new Graphics.Picture(x, y);
   }

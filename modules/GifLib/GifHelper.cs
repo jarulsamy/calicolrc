@@ -542,6 +542,54 @@ namespace GifLib
         /// <param name="outGif">合并后图像路径</param>
         /// <param name="delay">间隔时间</param>
         /// <param name="repeat">是否重复播放</param> 
+        public static void Merge(List<GifFrame> frames, string outGif, short delay, bool repeat)
+        {
+	  // make an image to add frames to:
+	  GifImage gifImage = new GifImage();
+	  gifImage.Header = "GIF89a";
+	  LogicalScreenDescriptor lcd = new LogicalScreenDescriptor();
+	  lcd.Width = (short)frames[0].Image.Width;
+	  lcd.Height = (short)frames[0].Image.Height;
+	  gifImage.LogicalScreenDescriptor = lcd;
+	  ApplicationEx ape = new ApplicationEx();
+	  List<ApplicationEx> apps = new List<ApplicationEx>();
+	  apps.Add(ape);
+	  gifImage.ApplictionExtensions = apps;
+	  // get frames
+	  int index = 0;
+	  short lastDelay = delay;
+	  foreach (GifFrame f in frames) {
+	    if (index == 0 && f.GraphicExtension.DisposalMethod == 0) {
+	      f.GraphicExtension.DisposalMethod = 2;
+	    }
+	    if (!f.ImageDescriptor.LctFlag) {
+	      f.ImageDescriptor.LctSize = f.LocalColorTable.Length / 3;
+	      f.ImageDescriptor.LctFlag = true;
+	      //f.GraphicExtension.TranIndex = 255; //FIXME: gif.LogicalScreenDescriptor.BgColorIndex;
+	      //FIXME: f.LocalColorTable = gif.GlobalColorTable;
+	    }
+	    if (index == 0) {
+	      f.Delay = f.GraphicExtension.Delay = lastDelay;
+	    }
+	    if (f.Delay == 0) {
+	      f.Delay = f.GraphicExtension.Delay = lastDelay;
+	    }
+	    f.ColorDepth = (byte)(Math.Log(f.ImageDescriptor.LctSize, 2));
+	    lastDelay = f.GraphicExtension.Delay;
+	    gifImage.Frames.Add(f);
+	    index++;
+	  }
+	  if (repeat && gifImage.ApplictionExtensions.Count == 0) {
+	    ApplicationEx ae = new ApplicationEx();
+	    gifImage.ApplictionExtensions.Add(ae);
+	  }
+	  //gifImage.LogicalScreenDescriptor.PixcelAspect = 0;
+	  //FIXME: Size maxSize = FindMaxSize(sourceGifs);
+	  //gifImage.LogicalScreenDescriptor.Width = (short)maxSize.Width;
+	  //gifImage.LogicalScreenDescriptor.Height = (short)maxSize.Height;
+	  GifEncoder.Encode(gifImage, outGif);
+        }
+
         public static void Merge(List<string> sourceGifs, string outGif, short delay, bool repeat)
         {
             GifImage gifImage = null;
@@ -815,7 +863,7 @@ namespace GifLib
             }
         }
 
-        static GifFrame Merge(List<GifFrame> frames)
+        public static GifFrame Merge(List<GifFrame> frames)
         {
             Bitmap bmp = null;
             Graphics g = null;
@@ -865,6 +913,25 @@ namespace GifLib
             }
             return buffer;
         }
+
+        public static GifFrame BitmapToFrame(Bitmap bmp) {
+	  GifFrame frame = new GifFrame();
+	  Color32[] palette = new OcTreeQuantizer(8).Quantizer(bmp);
+	  Quantizer(bmp, palette);
+	  frame.Image = bmp;
+	  frame.LocalColorTable = GetColorTable(palette);
+	  frame.ImageDescriptor = new ImageDescriptor();
+	  frame.ImageDescriptor.LctFlag = true;
+	  frame.ImageDescriptor.LctSize = palette.Length;
+	  frame.ImageDescriptor.Width = (short)bmp.Width;
+	  frame.ImageDescriptor.Height = (short)bmp.Height;
+	  frame.ColorDepth = 8;
+	  frame.GraphicExtension = new GraphicEx();
+	  frame.GraphicExtension.DisposalMethod = 0;
+	  frame.GraphicExtension.TransparencyFlag = true;
+	  frame.GraphicExtension.TranIndex = 255;
+	  return frame;
+	}
         #endregion
     }
 }

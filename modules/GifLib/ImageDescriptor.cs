@@ -29,7 +29,7 @@ namespace GifLib
     /// 字符开始，定义紧接着它的图象的性质，包括图象相对于逻辑屏幕边界的偏移量、
     /// 图象大小以及有无局部颜色列表和颜色列表大小，由10个字节组成
     /// </summary>
-    internal class ImageDescriptor
+    public class ImageDescriptor
     {
         #region 结构字段      
 

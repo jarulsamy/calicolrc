@@ -39,7 +39,7 @@ namespace GifLib
     /// <summary>
     /// 类GifImage - 描述Gif的类
     /// </summary>
-    internal class GifImage
+    public class GifImage
     {
         #region 背景图片的长度 
         /// <summary>

@@ -41,7 +41,7 @@ namespace GifLib
     /// 可以放在一个图象块(包括图象标识符、局部颜色列表和图象数据)或文本扩展块的前面，
     /// 用来控制跟在它后面的第一个图象（或文本）的渲染(Render)形式
     /// </summary>
-    internal class GraphicEx:ExData
+    public class GraphicEx:ExData
     {
         #region private fields
         byte _packed;

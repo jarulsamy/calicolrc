@@ -1,4 +1,16 @@
-#region Copyright & License
+ï»¿/*----------------------------------------------------------------
+// Copyright (C) 2008 jillzhang ç‰ˆæƒæ‰€æœ‰ã€‚ 
+//  
+// æ–‡ä»¶åï¼šExData.cs
+// æ–‡ä»¶åŠŸèƒ½æè¿°ï¼š
+// 
+// åˆ›å»ºæ ‡è¯†ï¼šjillzhang 
+// ä¿®æ”¹æ ‡è¯†ï¼š
+// ä¿®æ”¹æè¿°ï¼š
+//
+// ä¿®æ”¹æ ‡è¯†ï¼š
+// ä¿®æ”¹æè¿°ï¼š
+//----------------------------------------------------------------*/
 /*-------------------------New BSD License ------------------
  Copyright (c) 2008, jillzhang
 All rights reserved.
@@ -13,80 +25,29 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.InteropServices;
-using System.Drawing;
 
 namespace GifLib
 {
-    #region ½á¹¹Color32
-    /// <summary>
-    /// ·â×°µÄÑÕÉ«½á¹¹
-    /// </summary>
-    [StructLayout(LayoutKind.Explicit)]
-    internal struct Color32
+    public class ExData
     {
-        /// <summary>
-        /// ÑÕÉ«ÖĞµÄB,Î»ÓÚ×îµÍÎ»
-        /// </summary>
-        [FieldOffset(0)]
-        internal byte Blue;
-
-        /// <summary>
-        /// ÑÕÉ«ÖĞµÄG,Î»ÓÚµÚ¶şÎ»
-        /// </summary>
-        [FieldOffset(1)]
-        internal byte Green;
-
-        /// <summary>
-        /// ÑÕÉ«ÖĞµÄR,Î»ÓÚµÚÈıÎ»
-        /// </summary>
-        [FieldOffset(2)]
-        internal byte Red;
-
-        /// <summary>
-        /// ÑÕÉ«ÖĞµÄA,Î»ÓÚµÚËÄÎ»
-        /// </summary>
-        [FieldOffset(3)]
-        internal byte Alpha;
-
-        /// <summary>
-        /// ÑÕÉ«µÄÕûĞÎÖµ
-        /// </summary>
-        [FieldOffset(0)]
-        internal int ARGB;
-
-        /// <summary>
-        /// ÑÕÉ«
-        /// </summary>
-        internal Color Color
+        private static readonly byte _extensionIntroducer = 0x21;
+        private static readonly byte _blockTerminator = 0;
+        internal byte ExtensionIntroducer
         {
             get
             {
-                return Color.FromArgb(ARGB);
+                return _extensionIntroducer;
             }
         }
-
-        internal Color32(int c)
+        internal byte BlockTerminator
         {
-            Alpha =0 ;
-            Red = 0;
-            Green = 0;
-            Blue = 0;
-            ARGB =c;           
-        }
-        internal Color32(byte a, byte r, byte g, byte b)
-        {
-            ARGB = 0;
-            Alpha = a;
-            Red = r;
-            Green = g;
-            Blue = b;
+            get
+            {
+                return _blockTerminator;
+            }
         }
     }
-    #endregion
 }

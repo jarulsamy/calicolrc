@@ -227,6 +227,77 @@ namespace GifLib
             }
             return gifImage;
         }     
+        internal static GifImage Decode(MemoryStream fs)
+        {
+            StreamHelper streamHelper=null;
+            GifImage gifImage = new GifImage();
+            List<GraphicEx> graphics = new List<GraphicEx>();        
+            int frameCount = 0;
+            try
+            {
+                streamHelper = new StreamHelper(fs);
+                //读取文件头
+                gifImage.Header = streamHelper.ReadString(6);
+                //读取逻辑屏幕标示符
+                gifImage.LogicalScreenDescriptor = streamHelper.GetLCD(fs);  
+                if (gifImage.LogicalScreenDescriptor.GlobalColorTableFlag)
+                {
+                    //读取全局颜色列表
+                    gifImage.GlobalColorTable = streamHelper.ReadByte(gifImage.LogicalScreenDescriptor.GlobalColorTableSize * 3);
+                }
+                int nextFlag = streamHelper.Read();
+                while (nextFlag != 0)
+                {
+                    if (nextFlag == GifExtensions.ImageLabel)
+                    {
+                        ReadImage(streamHelper, fs, gifImage, graphics, frameCount);
+                        frameCount++;
+                    }
+                    else if (nextFlag == GifExtensions.ExtensionIntroducer)
+                    {
+                        int gcl = streamHelper.Read();
+                        switch (gcl)
+                        {
+                            case GifExtensions.GraphicControlLabel:
+                                {
+                                    GraphicEx graphicEx = streamHelper.GetGraphicControlExtension(fs);
+                                    graphics.Add(graphicEx);
+                                    break;
+                                }
+                            case GifExtensions.CommentLabel:
+                                {
+                                    CommentEx comment = streamHelper.GetCommentEx(fs);
+                                    gifImage.CommentExtensions.Add(comment);
+                                    break;
+                                }
+                            case GifExtensions.ApplicationExtensionLabel:
+                                {
+                                    ApplicationEx applicationEx = streamHelper.GetApplicationEx(fs);
+                                    gifImage.ApplictionExtensions.Add(applicationEx);
+                                    break;
+                                }
+                            case GifExtensions.PlainTextLabel:
+                                {
+                                    PlainTextEx textEx = streamHelper.GetPlainTextEx(fs);
+                                    gifImage.PlainTextEntensions.Add(textEx);
+                                    break;
+                                }
+                        }
+                    }
+                    else if (nextFlag == GifExtensions.EndIntroducer)
+                    {
+                        //到了文件尾
+                        break;
+                    }
+                    nextFlag = streamHelper.Read();
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return gifImage;
+        }     
         #endregion    
     }
     #endregion

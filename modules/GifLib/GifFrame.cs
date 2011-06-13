@@ -39,7 +39,7 @@ namespace GifLib
     /// <summary>
     /// Gif文件中可以包含多个图像，每个图像加上图像的一些特征，就组成了帧:GifFrame
     /// </summary>
-    internal class GifFrame
+    public class GifFrame
     {
         #region private fields
         private ImageDescriptor _imgDes;
@@ -79,7 +79,7 @@ namespace GifLib
         /// <summary>
         /// Gif的调色板
         /// </summary>
-        internal Color32[] Palette
+        public Color32[] Palette
         {
             get
             {

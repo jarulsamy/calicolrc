@@ -23,6 +23,8 @@ using System.Runtime.InteropServices; // Marshal
 using System.Collections.Generic;
 using System.Collections; // IEnumerable
 using System.Threading;
+using System.Drawing; // Image, Bitmap
+using System.IO; // MemoryStream
 using System;
 
 public static class Graphics {
@@ -131,6 +133,21 @@ public static class Graphics {
     pixel.setAlpha(value);
   }
   
+  public static void savePicture(Picture picture, string filename) {
+    picture.savePicture(filename);
+  }
+  public static void savePicture(List list, string filename, short delay, bool repeat) {
+    List<GifLib.GifFrame> frameList = new List<GifLib.GifFrame>();
+    foreach (Graphics.Picture picture in list) {
+      Gdk.Pixbuf pixbuf = picture.getPixbuf();
+      Byte [] buffer = pixbuf.SaveToBuffer("png");
+      MemoryStream ms = new MemoryStream(buffer);
+      Bitmap bitmap = new Bitmap(ms);
+      GifLib.GifFrame frame = GifLib.GifHelper.BitmapToFrame(bitmap);
+      frameList.Add(frame);
+    }
+    GifLib.GifHelper.Merge(frameList, filename, delay, repeat);
+  }
   public static Picture makePicture(int x, int y) {
     return new Picture(x, y);
   }
@@ -1280,6 +1297,11 @@ public static class Graphics {
 	  center.y = _pixbuf.Height/2;
     }
 
+    public Gdk.Pixbuf getPixbuf()
+    {
+      return _pixbuf;
+    }
+
     public int getWidth() {
         return _pixbuf.Width;
     }
@@ -1288,10 +1310,10 @@ public static class Graphics {
         return _pixbuf.Height;
     }
 
-    public void saveToFile(string filename) {
-	  // png, and jpg
+    public void savePicture(string filename) {
+      // png, and jpg
       _pixbuf.Save(filename, filename.Substring(filename.Length - 3, 3));
-	}
+    }
     
     public Pixel getPixel(int x, int y) {
       return new Pixel(this, x, y);
