@@ -160,6 +160,7 @@ class DLREngine(Engine):
         except:
             traceback.print_exc()
             return False
+        self.manager.calico.shell.message("Ok")
         return True
 
     def execute_file(self, filename):
