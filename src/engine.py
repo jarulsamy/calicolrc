@@ -78,9 +78,6 @@ class Engine(object):
         self.language = language
         self.text_based = True
 
-    def eval(self, text):
-        raise NotImplemented
-
     def execute(self, text):
         raise NotImplemented
 
@@ -176,8 +173,4 @@ class DLREngine(Engine):
             source.Execute(self.manager.scope)
         except:
             traceback.print_exc()
-
-    def eval(self, text):
-        return self.engine.Execute(text)
-            
 
