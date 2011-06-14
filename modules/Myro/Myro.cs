@@ -327,7 +327,7 @@ public static class Myro {
 	return robot.getConfig();
   }
 
-  public static int getStall() {
+  public static bool getStall() {
 	return robot.getStall();
   }
 
@@ -786,8 +786,8 @@ public static class Myro {
       return null;
     }
     
-    public virtual int getStall() {
-      return 0; 
+    public virtual bool getStall() {
+      return false; 
     }
     
     public virtual double getBattery() {
@@ -1272,7 +1272,7 @@ public static class Myro {
 		// lastSensors are the single byte sensors
 		_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
 		// returned as bytes
-		return (int)(_lastSensors[10]);
+		return byte_to_bool(_lastSensors[10]);
 	  } else if (sensor == "forwardness") {
 		if (read_mem(0, 0) != 0xDF) {
 		  retval = "fluke-forward";
@@ -1347,7 +1347,7 @@ public static class Myro {
 					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
 				  "ir", list((int)_lastSensors[0], (int)_lastSensors[1]), 
 				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
-				  "stall",(int)_lastSensors[10]);
+				  "stall",byte_to_bool(_lastSensors[10]));
 			} else {
 			  return dict(
 				  "light", list(
@@ -1356,7 +1356,7 @@ public static class Myro {
 					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
 				  "ir", list((int)_lastSensors[0],(int)_lastSensors[1]), 
 				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
-				  "stall", (int)_lastSensors[10],
+				  "stall", byte_to_bool(_lastSensors[10]),
 				  "obstacle", list(
 					  getObstacle1("left"), 
 					  getObstacle1("center"), 
@@ -1883,8 +1883,8 @@ public static class Myro {
 	  return retval;
 	}
 
-	public override int getStall() {
-	  return (int)get("stall");
+	public override bool getStall() {
+	  return (bool)get("stall");
 	}
 
 	public override PythonDictionary getConfig() {
@@ -2937,6 +2937,10 @@ public static class Myro {
   }
 
   static bool int_to_bool(int value) {
+    if (value == 0) return false;
+    return true;
+  }
+  static bool byte_to_bool(byte value) {
     if (value == 0) return false;
     return true;
   }
