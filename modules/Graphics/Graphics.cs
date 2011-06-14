@@ -43,8 +43,8 @@ public static class Graphics {
     return new PythonTuple(items);
   }
 
-  private static Dictionary<string, Graphics._Window> _windows =
-    new Dictionary<string, Graphics._Window>();
+  private static Dictionary<string, Graphics.WindowClass> _windows =
+    new Dictionary<string, Graphics.WindowClass>();
   
   private static Dictionary<string, Cairo.Color> _color_map = 
     new Dictionary<string, Cairo.Color>() {
@@ -143,6 +143,7 @@ public static class Graphics {
       Byte [] buffer = pixbuf.SaveToBuffer("png");
       MemoryStream ms = new MemoryStream(buffer);
       Bitmap bitmap = new Bitmap(ms);
+      //bitmap.MakeTransparent(backColor);
       GifLib.GifFrame frame = GifLib.GifHelper.BitmapToFrame(bitmap);
       frameList.Add(frame);
     }
@@ -174,11 +175,11 @@ public static class Graphics {
     Gtk.Application.Run();
   }
   
-  public static Picture makePicture(Graphics._Window window) { //, string filename) {
+  public static Picture makePicture(ICanvas can) { //, string filename) {
     ManualResetEvent ev = new ManualResetEvent(false);
     Gdk.Pixbuf pixbuf = null;
     Gtk.Application.Invoke( delegate {
-	Gdk.Drawable drawable = window.GdkWindow;
+	Gdk.Drawable drawable = can.getDrawable();
 	Gdk.Colormap colormap = drawable.Colormap;
 	int width = 0;
 	int height = 0;
@@ -190,20 +191,21 @@ public static class Graphics {
     return new Picture(pixbuf);
   }
   
-  public static Graphics._Window makeWindow(string title="Calico Graphics",
+  public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
 					   int width=300, 
 					   int height=300) {
     if (_windows.ContainsKey(title)) {
+      _windows[title]._canvas.shapes.Clear();
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
       return _windows[title];
     } else {
-      _windows[title] = new Graphics._Window(title, width, height);
+      _windows[title] = new Graphics.WindowClass(title, width, height);
       return _windows[title];
     }
   }
   
-  public static Graphics._Window getWindow(string title) {
+  public static Graphics.WindowClass getWindow(string title) {
     if (_windows.ContainsKey(title)) {
       return _windows[title];
     } else {
@@ -211,7 +213,7 @@ public static class Graphics {
     }
   }
 
-  public static Graphics._Window Window(string title="Calico Graphics Window",
+  public static Graphics.WindowClass Window(string title="Calico Graphics Window",
 				       int width=300, 
 				       int height=300) {
     return makeWindow(title, width, height);
@@ -263,8 +265,45 @@ public static class Graphics {
     }
   }
 
-  public class _Window : Gtk.Window {
-    private Canvas _canvas;
+  public interface ICanvas {
+    // Interface for allowing drawing on Windows and Canvases.
+    // Canvases are for off-screen drawing.
+    _Canvas getCanvas();
+    //int getWidth();
+    //int getHeight();
+    string getMode();
+    Gdk.Drawable getDrawable();
+    void update();
+  }
+
+  public class Canvas : ICanvas {
+    public int canvas_width = 0;
+    public int canvas_height = 0;
+    internal _Canvas _canvas;
+
+    public Canvas(int width=300, 
+		  int height=300) {
+      canvas_width = width;
+      canvas_height = height;
+      _canvas = new _Canvas("auto");
+    }
+
+    public Gdk.Drawable getDrawable() {
+      // canvas is a drawingarea
+      return _canvas.GdkWindow; // FIXME: get a Drawable from DrawingArea
+    }
+    public _Canvas getCanvas() {
+      return _canvas;
+    }
+    public string getMode() {
+      return _canvas.mode;
+    }
+    public void update() { 
+    }
+  }
+
+  public class WindowClass : Gtk.Window, ICanvas {
+    internal _Canvas _canvas;
     private bool _dirty = false;
     private bool timer_running = false;
     private DateTime last_update = new DateTime(2000,1,1);
@@ -273,10 +312,10 @@ public static class Graphics {
     public PythonTuple lastClick;
     ManualResetEvent lastClickFlag = new ManualResetEvent(false);
     
-    public _Window(string title="Calico Graphics Window",
+    public WindowClass(string title="Calico Graphics Window",
 		  int width=300, 
 		  int height=300) : base(title) {
-      _canvas = new Canvas("auto");
+      _canvas = new _Canvas("auto");
       AllowGrow = true;
       AllowShrink = true;
       SetDefaultSize(width, height);
@@ -288,6 +327,10 @@ public static class Graphics {
       ShowAll();
     }
     
+    public Gdk.Drawable getDrawable() {
+      return GdkWindow;
+    }
+
     private void OnDelete(object obj, Gtk.DeleteEventArgs args)  {
       _windows.Remove(Title);
     }
@@ -348,8 +391,12 @@ public static class Graphics {
 	return width;
       }
     }
+
+    public _Canvas getCanvas() {
+      return _canvas;
+    }
     
-    public Canvas canvas {
+    public _Canvas canvas {
       get {
 	return _canvas;
       }
@@ -421,6 +468,10 @@ public static class Graphics {
       }
       timer_running = false;
       return false; // return true to try again
+    }
+
+    public string getMode() {
+      return _canvas.mode;
     }
 
     public string mode {
@@ -511,7 +562,7 @@ public static class Graphics {
     }
   }
   
-  public class Canvas : Gtk.DrawingArea {
+  public class _Canvas : Gtk.DrawingArea {
     
     // Shape.draw() will add them here:
     public List<Shape> shapes = new List<Shape>();
@@ -529,7 +580,7 @@ public static class Graphics {
 	  }
     }
 	
-    public Canvas(string mode) : base() {
+    public _Canvas(string mode) : base() {
 	  this.mode = mode;
     }
 	
@@ -554,33 +605,31 @@ public static class Graphics {
   
   public class Shape {
     public Point center;
-	public Graphics._Window window;
+    public ICanvas window;
     public double _direction; // radians
-	public bool fill_path;
+    public bool fill_path;
     
-	public Point [] points;
-    public Point points_center;
-	private Cairo.Color _fill_color;
+    public Point [] points;
+    private Cairo.Color _fill_color;
     private Cairo.Color _outline_color;
-	private int _line_width;
+    private int _line_width;
     
-	private Pen _pen;
+    private Pen _pen;
     private bool _has_pen;
 	
     public Shape(bool has_pen=true) {
-	  _direction = 0;
-	  center = new Point(0,0);
-	  this.has_pen = has_pen;
-	  if (this.has_pen) 
-		pen = new Pen("black", 1);
-	  points_center = new Point(0,0);
-	  fill_color = "black";
-	  outline_color = "black";
-	  fill_path = true;
-	  line_width = 1;
-	}
+      _direction = 0;
+      center = new Point(0,0);
+      this.has_pen = has_pen;
+      if (this.has_pen) 
+	pen = new Pen("black", 1);
+      fill_color = "black";
+      outline_color = "black";
+      fill_path = true;
+      line_width = 1;
+    }
     
-	public bool has_pen {
+    public bool has_pen {
 	  get {
 		return _has_pen;
 	  }
@@ -621,8 +670,8 @@ public static class Graphics {
 	}
     
 	public void QueueDraw() { // shape
-	  if (window is Graphics._Window) {
-	    if (window.mode == "auto")
+	  if (window is Graphics.WindowClass) {
+	    if (window.getMode() == "auto")
 	      window.update();
 	    // else, manually call step()
 	  }
@@ -721,23 +770,51 @@ public static class Graphics {
 	}
     
 	public void set_points(params IList [] iterables) {
+	  // 1. set center to absolute
+	  double sumx = 0.0;
+	  double sumy = 0.0;
+	  if (points.Length > 0) {
+	    for (int i = 0; i < iterables.Length; i++) {
+	      sumx += (double)iterables[i][0];
+	      sumy += (double)iterables[i][1];
+	    }
+	    center.x = sumx/iterables.Length;
+	    center.y = sumy/iterables.Length;
+	  } else {
+	    center.x = 0;
+	    center.y = 0;
+	  }
+	  // 2. compute this.points in relative terms to center
 	  points = new Point [iterables.Length];
 	  for (int i = 0; i < iterables.Length; i++) {
-		points[i] = new Point(iterables[i][0], 
-			iterables[i][1]);
+	    points[i] = new Point((double)iterables[i][0] - center.x, 
+				  (double)iterables[i][1] - center.y);
 	  }
-	  compute_center_point();
 	}
-	public void set_points(params Point [] new_points) {
+
+        public void set_points(params Point [] new_points) {
+	  // 1. set center to absolute
+	  double sumx = 0.0;
+	  double sumy = 0.0;
+	  if (new_points.Length > 0) {
+	    for (int i = 0; i < new_points.Length; i++) {
+	      sumx += new_points[i].x;
+	      sumy += new_points[i].y;
+	    }
+	    center.x = sumx/new_points.Length;
+	    center.y = sumy/new_points.Length;
+	  } else {
+	    center.x = 0;
+	    center.y = 0;
+	  }
+	  // 2. compute this.points in relative terms to center
 	  points = new Point [new_points.Length];
-	  // copies
-	  for (int p = 0; p < points.Length; p++) {
-		points[p] = new Point(new_points[p].x, 
-				      new_points[p].y);
+	  for (int i = 0; i < new_points.Length; i++) {
+	    points[i] = new Point(new_points[i].x - center.x, 
+				  new_points[i].y - center.y);
 	  }
-	  compute_center_point();
 	}
-    
+
 	public void move_to(double x, double y) {
 	  double dx = x - center.x;
 	  double dy = y - center.y;
@@ -774,56 +851,49 @@ public static class Graphics {
 	}
 	
     public void pen_down() {
-	  pen.down = true;
-	  pen.reset_path();
-	  pen.append_path(new Point(center.x, center.y));
+      pen.down = true;
+      pen.reset_path();
+      pen.append_path(new Point(center.x, center.y));
     }
 		
     public void backward(double distance) {
-	  forward(-distance);
+      forward(-distance);
     }
 	
     public virtual void render(Cairo.Context g) {
-	  g.Save();
-	  Point temp;
-	  if (points != null) {
-	    g.LineWidth = line_width;
-		temp = screen_coord(points[0]);
-		g.MoveTo(temp.x, temp.y);
-		for (int p = 1; p < points.Length; p++) {
-		  temp = screen_coord(points[p]);
-		  g.LineTo(temp.x, temp.y);
-		}
-		if (fill_path) {
-		  g.ClosePath();
-		  g.Color = _fill_color;
-		  g.FillPreserve();
-		  g.Color = _outline_color;
-		  g.Stroke();
-		} else {
-		  g.Color = _outline_color;
-		  g.Stroke();
-		}
-		if (has_pen)
-		  pen.render(g);
-	  }
-	  g.Restore();
+      g.Save();
+      Point temp;
+      if (points != null) {
+	g.LineWidth = line_width;
+	temp = screen_coord(center);
+	g.Translate(temp.x, temp.y);
+	temp = screen_coord(points[0]);
+	g.MoveTo(temp.x, temp.y);
+	for (int p = 1; p < points.Length; p++) {
+	  temp = screen_coord(points[p]);
+	  g.LineTo(temp.x, temp.y);
 	}
+	if (fill_path) {
+	  g.ClosePath();
+	  g.Color = _fill_color;
+	  g.FillPreserve();
+	  g.Color = _outline_color;
+	  g.Stroke();
+	} else {
+	  g.Color = _outline_color;
+	  g.Stroke();
+	}
+	if (has_pen)
+	  pen.render(g);
+      }
+      g.Restore();
+    }
     
-	public Point screen_coord(IList iterable) {
-	  return screen_coord(new Point(iterable[0], iterable[1]));
-	}
-	public Point screen_coord(Point point) {
-	  // first we rotate
-	  double x = ((point.x - points_center.x) * Math.Cos(_direction) - 
-		      (point.y - points_center.y) * Math.Sin(_direction));
-	  double y = ((point.x - points_center.x) * Math.Sin(_direction) + 
-		      (point.y - points_center.y) * Math.Cos(_direction));
-	  // now we translate:
-	  return new Point(center.x + x - points_center.x, 
-		  center.y + y - points_center.y);
-	}
-	
+    public Point screen_coord(Point point) {
+      // FIXME: return in coords of screen
+      return point; // new Point(point.x - center.x, point.y - center.y);
+    }
+    
     public void rotate(double degrees) {
 	  _direction -= (Math.PI / 180.0) * degrees;
 	  QueueDraw();
@@ -834,83 +904,88 @@ public static class Graphics {
 	  QueueDraw();
 	}
 	
-    public void compute_points_around_origin() {
-	  if (points.Length == 0) {
-	    points_center.x = 0;
-		points_center.y = 0;
-	  } else if (points.Length == 1) {
-		points_center.x = 0;
-		points_center.y = 0;
-	  } else if (points.Length > 1) {
-	    for (int p = 0; p < points.Length; p++) {
-		  points[p].x -= points_center.x;
-		  points[p].y -= points_center.y;
-		}
-	    points_center.x = 0;
-		points_center.y = 0;
-	  }
-	}
-    
-	public void compute_center_point() {
-	  double sum_x = 0, sum_y = 0;
-	  if (points.Length == 0) {
-	    points_center.x = 0;
-		points_center.y = 0;
-	  } else if (points.Length == 1) {
-		points_center.x = points[0].x;
-		points_center.y = points[0].y;
-	  } else if (points.Length > 1) {
-	    for (int p = 0; p < points.Length; p++) {
-		  sum_x += points[p].x;
-		  sum_y += points[p].y;
-		}
-	    points_center.x = sum_x/points.Length;
-		points_center.y = sum_y/points.Length;
-	  }
-	}
     
 	public void update() { // Shape
 	  // Alias to QueueDraw
 	  QueueDraw(); 
 	}
     
-	public void draw(Graphics._Window win) {
-	  // Add this shape to the Canvas dictionary.
-	  win.canvas.shapes.Add(this);
+	public void draw(ICanvas can) {
+	  // Add this shape to the _Canvas dictionary.
+	  can.getCanvas().shapes.Add(this);
 	  // FIXME: QueueDrawRect
 	  // FIXME: invalidate from and to rects on move
-	  window = win;
+	  window = can;
 	  QueueDraw();
 	}
 
     public void undraw() {
 	  Gtk.Application.Invoke(delegate { 
-	      window.canvas.shapes.Remove(this);
+	      window.getCanvas().shapes.Remove(this);
         	  window = null;
         	  QueueDraw();
 	  });
     }
   }
   
+  public class Text : Shape {
+    public string text;
+    public string fontFace = "Georgia";
+    public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
+    public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
+    public double size = 18;
+    public string xJustification = "left"; // left, center, right
+    public string yJustification = "bottom"; // top, center, bottom
+
+    public Text(Point point, string text) {
+      this.text = text;
+      set_points(point);
+    }
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      Point temp = screen_coord(center);
+      g.Translate(temp.x, temp.y);
+      g.Color = new Cairo.Color(0, 0, 0);
+      g.SelectFontFace(fontFace, fontSlant, fontWeight);
+      g.SetFontSize(size);
+      Cairo.TextExtents te = g.TextExtents(text);
+      Point p = new Point(0,0);
+      if (xJustification == "center") {
+	p.x = points[0].x - te.Width  / 2 - te.XBearing;
+      } else if (xJustification == "left") {
+	p.x = points[0].x;
+      } else if (xJustification == "right") {
+	p.x = points[0].x + te.Width;
+      }
+      if (yJustification == "center") {
+	p.y = points[0].y - te.Height / 2 - te.YBearing;
+      } else if (yJustification == "bottom") {
+	p.y = points[0].y;
+      } else if (yJustification == "top") {
+	p.y = points[0].y - te.Height;
+      }
+      temp = screen_coord(p);
+      g.MoveTo(temp.x, temp.y);
+      g.ShowText(text);    
+      g.Restore();
+    }
+  }
+
   public class Line : Shape {
 	public Line(IList iterable1, IList iterable2) :
-		this(new Point(iterable1[0], iterable1[1]), 
-			new Point(iterable2[0], iterable2[1])) {
-	  // Line((0,0), (100,100))
-	  // Nothing else to do
+	this(new Point(iterable1[0], iterable1[1]), 
+	     new Point(iterable2[0], iterable2[1])) {
 	}
     public Line(Point p1, Point p2) : this(true, p1, p2) {
-	}
+    }
     public Line(bool has_pen, IList iterable1, IList iterable2) : 
-		this(has_pen, new Point(iterable1[0], iterable1[1]), 
-			new Point(iterable2[0], iterable2[1])) {
-	}
+              this(has_pen, 
+		   new Point(iterable1[0], iterable1[1]), 
+		   new Point(iterable2[0], iterable2[1])) {
+    }
     public Line(bool has_pen, Point p1, Point p2) : base(has_pen) {
-	  set_points(p1, p2);
-	  compute_center_point();
-	  center.x = points_center.x;
-	  center.y = points_center.y;
-	  compute_points_around_origin();
+      set_points(p1, p2);
     }
   }
   
@@ -963,7 +1038,8 @@ public static class Graphics {
 		  new Point(  5,  0),
 		  new Point( -5,  5) 
 				 );
-	  move_to(new_center.x, new_center.y);
+	  center.x = new_center.x;
+	  center.y = new_center.y;
 	  rotate(degrees);
 	}
   }
@@ -1009,7 +1085,8 @@ public static class Graphics {
 	public override void render(Cairo.Context g) {
 	  // render path
 	  g.Save();
-	  Point temp;
+	  Point temp = screen_coord(center);
+	  g.Translate(temp.x, temp.y);
 	  if (path != null) {
 	    g.LineWidth = line_width;
 		temp = screen_coord(path[0]);
@@ -1093,9 +1170,9 @@ public static class Graphics {
   
   public class Picture : Shape {
     public Gdk.Pixbuf _pixbuf; // in memory rep of picture
-	public Cairo.Format format = Cairo.Format.Rgb24;
+    public Cairo.Format format = Cairo.Format.Rgb24;
     public Cairo.Surface surface;
-	public Cairo.Context context;
+    public Cairo.Context context;
     
     public Picture(string filename) : base(true) {
       _pixbuf = new Gdk.Pixbuf(filename);
@@ -1105,8 +1182,10 @@ public static class Graphics {
       format = Cairo.Format.Argb32;
       // Create a new ImageSurface
       surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-      center.x = _pixbuf.Width/2;
-      center.y = _pixbuf.Height/2;
+      set_points(new Point(0, 0), 
+		 new Point(_pixbuf.Width, 0),
+		 new Point(_pixbuf.Width, _pixbuf.Height), 
+		 new Point(0, _pixbuf.Height));
     }
     
     public Picture(Picture original) : base(true) {
@@ -1133,8 +1212,7 @@ public static class Graphics {
       format = Cairo.Format.Argb32;
       // Create a new ImageSurface
       surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-      center.x = original.center.x;
-      center.y = original.center.y;
+      set_points(original.points);
     }
     
 	public Picture(Gdk.Pixbuf pixbuf) : base(true) {
@@ -1145,8 +1223,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
 	}
 
     public Picture(System.Drawing.Bitmap bitmap, int width, int height) : base(true) {
@@ -1182,8 +1262,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
     }
 
     public Picture(int width, int height, byte [] buffer, int depth) : base(true) {
@@ -1211,8 +1293,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
     }
 
     public Picture(int width, int height, byte [] buffer) : base(true) {
@@ -1239,8 +1323,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
     }
 
     public Picture(int width, int height) : base(true) {
@@ -1266,8 +1352,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
     }
 
     public Picture(int width, int height, Color color) : base(true) {
@@ -1293,8 +1381,10 @@ public static class Graphics {
 	  format = Cairo.Format.Argb32;
 	  // Create a new ImageSurface
 	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  center.x = _pixbuf.Width/2;
-	  center.y = _pixbuf.Height/2;
+	  set_points(new Point(0, 0), 
+		     new Point(_pixbuf.Width, 0),
+		     new Point(_pixbuf.Width, _pixbuf.Height), 
+		     new Point(0, _pixbuf.Height));
     }
 
     public Gdk.Pixbuf getPixbuf()
@@ -1451,7 +1541,8 @@ public static class Graphics {
 	public override void render(Cairo.Context g) {
 	  g.Save();
 	  //g.Translate(-_pixbuf.Width/2, -_pixbuf.Height/2);
-	  g.Translate(center.x, center.y);
+	  Point temp = screen_coord(center);
+	  g.Translate(temp.x, temp.y);
 	  g.Rotate(_direction);
 	  Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.Paint();
@@ -1494,15 +1585,10 @@ public static class Graphics {
 			new Point(iterable2[0], iterable2[1])) {
 	}
 	public Rectangle(Point point1, Point point2) : base(true) {
-	  this.points = new Point [4];
-          this.points[0] = new Point(point1.x, point1.y);
-          this.points[1] = new Point(point2.x, point1.y);
-          this.points[2] = new Point(point2.x, point2.y);
-          this.points[3] = new Point(point1.x, point2.y);
-	  compute_center_point();
-	  center.x = points_center.x;
-	  center.y = points_center.y;
-	  compute_points_around_origin();
+          set_points(new Point(point1.x, point1.y),
+		     new Point(point2.x, point1.y),
+		     new Point(point2.x, point2.y),
+		     new Point(point1.x, point2.y));
 	}
     
   }
@@ -1514,42 +1600,58 @@ public static class Graphics {
 	}
     
 	public Polygon(Cairo.Color color, params object [] points) : base(true) {
-	  this.points = new Point [points.Length];
+	  Point [] temp = new Point [points.Length];
 	  int count = 0;
 	  foreach (object o in points) {
-		if (o is Point)
-		  this.points[count] = (Point)o ;
-		else if (o is IList) {
-		  IList i = (IList)o;
-		  this.points[count] = new Point(i[0], i[1]);
-		} else {
-		  throw new Exception("Polygon: can't convert arg to a point");
-		}
-		count++;
+	    if (o is Point)
+	      temp[count] = (Point)o ;
+	    else if (o is IList) {
+	      IList i = (IList)o;
+	      temp[count] = new Point(i[0], i[1]);
+	    } else {
+	      throw new Exception("Polygon: can't convert arg to a point");
+	    }
+	    count++;
 	  }
-	  compute_center_point();
-	  center.x = points_center.x;
-	  center.y = points_center.y;
-	  compute_points_around_origin();
+	  set_points(temp);
 	  raw_outline_color = color;
 	  raw_fill_color = color;
 	}
   }
 
   public class Dot : Shape {
-    public double x;
-    public double y;
-
     public Dot(double x, double y) : base(false) {
-      this.x = x;
-      this.y = y;
       set_points(new Point(x,y));
-      move_to(points_center.x, points_center.y);
+    }
+
+    public double x
+    {
+      get
+	{
+	  return center.x;
+	}
+      set
+	{
+	  center.x = value;
+	}
+    }
+
+    public double y
+    {
+      get
+	{
+	  return center.y;
+	}
+      set
+	{
+	  center.y = value;
+	}
     }
 
     public override void render(Cairo.Context g) {
       g.Save();
-      Point temp;
+      Point temp = screen_coord(center);
+      g.Translate(temp.x, temp.y);
       if (points != null) {
         g.LineWidth = line_width;
         temp = screen_coord(points[0]);
@@ -1566,60 +1668,53 @@ public static class Graphics {
 
   public class Group {
     
-	public List<Shape> items = new List<Shape>();
+    public List<Shape> items = new List<Shape>();
     public string mode = "individual"; // squadron or individual
-	public Point center = new Point(0,0);
+    public Point center = new Point(0,0);
     
-	public Group(params Shape [] shapes) {
-	  foreach (Shape shape in shapes) {
-		items.Add(shape);
-	  }
-	}
+    public Group(params Shape [] shapes) {
+      foreach (Shape shape in shapes) {
+	items.Add(shape);
+      }
+    }
     
-	public void rotate(double degrees) {
-	  if (mode == "individual") {
-		foreach (Shape shape in items) {
-		  shape.rotate(degrees);
-		}
-	  } else {
-		// find center of screen positions
-	    double x = 0, y = 0;
-		foreach (Shape shape in items) {
-		  x += shape.center.x;
-		  y += shape.center.y;
-		}
-		center.x = x/(items.Count);
-		center.y = y/(items.Count);
-		// save the original points_center
-		// set all points_center to main center
-		foreach (Shape shape in items) {
-		  shape.points_center.x = center.x;
-		  shape.points_center.y = center.y;
-		}
-		// rotate them
-		foreach (Shape shape in items) {
-		  shape.rotate(degrees);
-		}
-		// set points_center's back?
-	  }
+    public void rotate(double degrees) {
+      if (mode == "individual") {
+	foreach (Shape shape in items) {
+	  shape.rotate(degrees);
 	}
+      } else {
+	// find center of screen positions
+	double x = 0, y = 0;
+	foreach (Shape shape in items) {
+	  x += shape.center.x;
+	  y += shape.center.y;
+	}
+	center.x = x/(items.Count);
+	center.y = y/(items.Count);
+	// rotate them
+	foreach (Shape shape in items) {
+	  shape.rotate(degrees);
+	}
+      }
+    }
     
-	public void rotate_to(double degrees) {
-	  foreach (Shape shape in items) {
-		shape.rotate_to(degrees);
-	  }
-	}
+    public void rotate_to(double degrees) {
+      foreach (Shape shape in items) {
+	shape.rotate_to(degrees);
+      }
+    }
     
-	public void move_to(int x, int y) {
-	  foreach (Shape shape in items) {
-		shape.move_to(x, y);
-	  }
-	}
+    public void move_to(int x, int y) {
+      foreach (Shape shape in items) {
+	shape.move_to(x, y);
+      }
+    }
     
-	public void move(int x, int y) {
-	  foreach (Shape shape in items) {
-		shape.move(x, y);
-	  }
-	}
+    public void move(int x, int y) {
+      foreach (Shape shape in items) {
+	shape.move(x, y);
+      }
+    }
   }
 }

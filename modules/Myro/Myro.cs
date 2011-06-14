@@ -229,7 +229,7 @@ public static class Myro {
 
   public static void show(Graphics.Picture picture, 
 	  string title="Myro Camera") {
-	Graphics._Window win = Graphics.makeWindow(title,
+	Graphics.WindowClass win = Graphics.makeWindow(title,
 		picture.width, picture.height);
 	picture.draw(win);
   }
@@ -2516,7 +2516,7 @@ public static class Myro {
     return new Graphics.Picture(filename);
   }
 
-  public static Graphics.Picture makePicture(Graphics._Window window) { //, string filename) {
+  public static Graphics.Picture makePicture(Graphics.WindowClass window) { //, string filename) {
     return Graphics.makePicture(window);
   }
 
@@ -2524,17 +2524,17 @@ public static class Myro {
     return Graphics.copyPicture(picture);
   }
 
-  public static Graphics._Window makeWindow(string title="Calico Graphics",
+  public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
       int width=300,
       int height=300) {
     return Graphics.makeWindow(title, width, height);
   }
 
-  public static Graphics._Window getWindow(string title) {
+  public static Graphics.WindowClass getWindow(string title) {
     return Graphics.getWindow(title);
   }
 
-  public static int getHeight(Graphics._Window window) {
+  public static int getHeight(Graphics.WindowClass window) {
     return window.getHeight();
   }
 
@@ -2542,7 +2542,7 @@ public static class Myro {
     return picture.getHeight();
   }
 
-  public static int getWidth(Graphics._Window window) {
+  public static int getWidth(Graphics.WindowClass window) {
     return window.getWidth();
   }
 
@@ -2558,6 +2558,45 @@ public static class Myro {
     return () => {  
           list[position] = func.Invoke();
     }; 
+  }
+
+  static Action functionInvokeWithArgs(Func<object,Array> func, 
+				       object [] args,
+				       List list, 
+				      int position) {
+    // Take a function, return list, and position
+    // Call the function, and put the result in the
+    // list in the given position.
+    return () => {  
+          list[position] = func.Invoke(args);
+    }; 
+  }
+
+  public static List doTogether(params IList [] objects) {
+    List retval = new List();
+    List threads = new List();
+    int position = 0; 
+    // For each function, make a return list, and thread list
+    foreach (IList list in objects) {
+      Console.WriteLine(list[0]);
+      // FIXME: what signature? Not: object [], IList, or Array
+      Func<object,Array> function = (Func<object,Array>)list[0];
+      object [] args = ((object [])list).Slice(1, list.Count);
+      retval.append(null);
+      threads.append(new Thread( 
+        new ThreadStart(functionInvokeWithArgs(function, args, retval, position))));
+      position++;
+    }
+    // Start each thread
+    foreach (Thread t in threads) {
+      t.Start();
+    }
+    // Wait for them all to finish
+    foreach (Thread t in threads) {
+      t.Join();
+    }
+    // return
+    return retval;
   }
 
   public static List doTogether(params Func<object> [] functions) {
