@@ -263,6 +263,17 @@ public static class Graphics {
       blue = (int)b;
       alpha = (int)a;
     }
+    public override string ToString()
+    {
+      return String.Format("<Color (r={0},g={1},b={2},a={3})>", 
+			   red, green, blue, alpha);
+    }
+
+    public string __repr__()
+    {
+      return ToString();
+    }
+
   }
 
   public interface ICanvas {
@@ -506,6 +517,17 @@ public static class Graphics {
       _dirty = false;
       QueueDraw(); // gtk
     }
+
+    public override string ToString()
+    {
+      return String.Format("<Window ('{0}',{1},{2})>", 
+			   Title, width, height);
+    }
+
+    public string __repr__()
+    {
+      return ToString();
+    }
   }
   
   public class Button : Gtk.Button {
@@ -560,6 +582,17 @@ public static class Graphics {
       this.x = x;
       this.y = y;
     }
+    
+    public override string ToString()
+    {
+      return String.Format("<Point (x={0},y={1})>", x, y);
+    }
+
+    public string __repr__()
+    {
+      return String.Format("<Point (x={0},y={1})>", x, y);
+    }
+
   }
   
   public class _Canvas : Gtk.DrawingArea {
@@ -629,6 +662,15 @@ public static class Graphics {
       line_width = 1;
     }
     
+    public Point getP1()
+    {
+      return points[0];
+    }
+    public Point getP2()
+    {
+      return points[1];
+    }
+
     public bool has_pen {
 	  get {
 		return _has_pen;
@@ -1574,7 +1616,7 @@ public static class Graphics {
     }
 
     public string __repr__() {
-	  return String.Format("<Picture ({0}, {1})>", width, height);
+	  return String.Format("<Picture (width={0}, height={1})>", width, height);
     }
 
   } // -- end of Picture class
