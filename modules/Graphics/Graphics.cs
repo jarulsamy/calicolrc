@@ -232,112 +232,106 @@ public static class Graphics {
   }
 
   public class Color {
-    public int red = 0;
-    public int green = 0;
-    public int blue = 0;
-    public int alpha = 255;
-    
+    public Cairo.Color _cairo;
+    public ICanvas window;
+
     public Color(string name) {
       if (colors.ContainsKey(name)) {
-	Color temp = colors[name];
-	red = temp.red;
-	green = temp.green;
-	blue = temp.blue;
-      } else
+	_cairo = colors[name]._cairo;
+      } else {
 	throw new Exception(String.Format("unknown colorname '{0}'", name));
+      }
     }
 
-    public Color(int r, int g, int b)
-    {
-      red = r;
-      green = g;
-      blue = b;
+    public Color(Color color) {
+      _cairo = new Cairo.Color(color._cairo.R, color._cairo.G, color._cairo.B, color._cairo.A);
     }
 
-    public Color(int r, int g, int b, int a)
-    {
-      red = r;
-      green = g;
-      blue = b;
-      alpha = a;
+    public Color(int r, int g, int b) {
+      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), 1.0);
     }
 
-    public Color(double r, double g, double b)
-    {
-      red = (int)r;
-      green = (int)g;
-      blue = (int)b;
+    public Color(int r, int g, int b, int a) {
+      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), ToCairo(a));
     }
 
-    public Color(double r, double g, double b, double a)
-    {
-      red = (int)r;
-      green = (int)g;
-      blue = (int)b;
-      alpha = (int)a;
+    public Color(double r, double g, double b) {
+      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), 1.0);
     }
 
-    public double R
-    {
-      get
-	{
-	  return ToCairo(red);
-	}
+    public Color(double r, double g, double b, double a) {
+      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), ToCairo(a));
     }
 
-    public double G
-    {
-      get
-	{
-	  return ToCairo(green);
-	}
+    public Color Copy() {
+      return new Color(red, green, blue, alpha);
     }
 
-    public double B
-    {
-      get
-	{
-	  return ToCairo(blue);
-	}
+    public void QueueDraw() { // shape
+      if (window is ICanvas) {
+	if (window.getMode() == "auto")
+	  window.update();
+	// else, manually call step()
+      }
+    }
+    
+    public int red {
+      get {
+	return FromCairo(_cairo.R);
+      }
+      set {
+	_cairo.R = ToCairo(value);
+	QueueDraw();
+      }
     }
 
-    public double A
-    {
-      get
-	{
-	  return ToCairo(alpha);
-	}
+    public int green {
+      get {
+	return FromCairo(_cairo.G);
+      }
+      set {
+	_cairo.G = ToCairo(value);
+	QueueDraw();
+      }
     }
 
-    public Cairo.Color ToCairo()
-    {
-      return new Cairo.Color(ToCairo(red), 
-			     ToCairo(green), 
-			     ToCairo(blue), 
-			     ToCairo(alpha));
+    public int blue {
+      get {
+	return FromCairo(_cairo.B);
+      }
+      set {
+	_cairo.B = ToCairo(value);
+	QueueDraw();
+      }
     }
 
-    double ToCairo(int value)
-    {
+    public int alpha {
+      get {
+	return FromCairo(_cairo.A);
+      }
+      set {
+	_cairo.A = ToCairo(value);
+	QueueDraw();
+      }
+    }
+
+    double ToCairo(int value) {
       return Math.Max(Math.Min((value / 255.0), 1.0), 0.0);
     }
-
-    int FromCairo(int value)
-    {
+    
+    double ToCairo(double value) {
+      return Math.Max(Math.Min((value / 255.0), 1.0), 0.0);
+    }
+    
+    int FromCairo(double value) {
       return (int)(value * 255);
     }
-
-    public override string ToString()
-    {
+    
+    public override string ToString() {
       return String.Format("<Color (r={0},g={1},b={2},a={3})>", 
 			   red, green, blue, alpha);
     }
-
-    public string __repr__()
-    {
-      return ToString();
-    }
-
+    
   }
 
   public interface ICanvas {
@@ -587,11 +581,6 @@ public static class Graphics {
       return String.Format("<Window (title='{0}',width={1},height={2})>", 
 			   Title, width, height);
     }
-
-    public string __repr__()
-    {
-      return ToString();
-    }
   }
   
   public class Button : Gtk.Button {
@@ -652,11 +641,6 @@ public static class Graphics {
       return String.Format("<Point (x={0},y={1})>", x, y);
     }
 
-    public string __repr__()
-    {
-      return String.Format("<Point (x={0},y={1})>", x, y);
-    }
-
   }
   
   public class _Canvas : Gtk.DrawingArea {
@@ -710,8 +694,8 @@ public static class Graphics {
     // FIXME: when done debugging
     //internal Cairo.Color? _fill;
     //internal Cairo.Color? _outline;
-    public Cairo.Color? _fill;
-    public Cairo.Color? _outline;
+    public Color _fill;
+    public Color _outline;
     private int _line_width;
     
     private Pen _pen;
@@ -787,7 +771,7 @@ public static class Graphics {
     }
     
     public void QueueDraw() { // shape
-      if (window is Graphics.WindowClass) {
+      if (window is ICanvas) {
 	if (window.getMode() == "auto")
 	  window.update();
 	// else, manually call step()
@@ -933,12 +917,12 @@ public static class Graphics {
 	}
 	if (_fill != null) {
 	  g.ClosePath();
-	  g.Color = (Cairo.Color)_fill;
+	  g.Color = _fill._cairo;
 	  g.FillPreserve();
-	  g.Color = (Cairo.Color)_outline;
+	  g.Color = _outline._cairo;
 	  g.Stroke();
 	} else {
-	  g.Color = (Cairo.Color)_outline;
+	  g.Color = _outline._cairo;
 	  g.Stroke();
 	}
 	if (has_pen)
@@ -989,15 +973,11 @@ public static class Graphics {
 	});
     }
 
-    /// <summary>
-    ///   
-    /// </summary>
-
     public Color color {
       set {
 	if (value != null) {
-	  _fill = ((Color)value).ToCairo();
-	  _outline = ((Color)value).ToCairo();
+	  _fill = ((Color)value).Copy();
+	  _outline = _fill;
 	} else {
 	  _fill = null;
 	  _outline = null;
@@ -1008,10 +988,8 @@ public static class Graphics {
 	{
 	  if (_fill != null)
 	    {
-	      return new Color(((Cairo.Color)_fill).R * 255, 
-			       ((Cairo.Color)_fill).G * 255, 
-			       ((Cairo.Color)_fill).B * 255, 
-			       ((Cairo.Color)_fill).A * 255);
+	      _fill.window = this.window;
+	      return _fill; // share!
 	    } 
 	  else
 	    return null;
@@ -1023,10 +1001,20 @@ public static class Graphics {
 	if (value == null) {
 	  _fill = null;
 	} else {
-	  _fill = ((Color)value).ToCairo();
+	  _fill = ((Color)value).Copy();
 	}
 	QueueDraw();
       }
+      get
+	{
+	  if (_fill != null)
+	    {
+	      _fill.window = this.window;
+	      return _fill;
+	    } 
+	  else
+	    return null;
+	}
     }
     
     public Color outline {
@@ -1034,10 +1022,20 @@ public static class Graphics {
 	if (value == null) {
 	  _outline = null;
 	} else {
-	  _outline = ((Color)value).ToCairo();
+	  _outline = ((Color)value).Copy();
 	}
 	QueueDraw();
       }
+      get
+	{
+	  if (_outline != null)
+	    {
+	      _outline.window = this.window;
+	      return _outline; // share!
+	    } 
+	  else
+	    return null;
+	}
     }
   }
   
@@ -1062,9 +1060,9 @@ public static class Graphics {
       g.Rotate(_direction);
       g.Scale(_scale, _scale);
       if (_fill != null)
-	g.Color = (Cairo.Color)_fill;
+	g.Color = _fill._cairo;
       else
-	g.Color = new Cairo.Color(0,0,0);
+	g.Color = new Cairo.Color(0,0,0); // default color when none given
       g.SelectFontFace(fontFace, fontSlant, fontWeight);
       g.SetFontSize(size);
       Cairo.TextExtents te = g.TextExtents(text);
@@ -1193,12 +1191,12 @@ public static class Graphics {
 		}
 		if (_fill != null) {
 		  g.ClosePath();
-		  g.Color = (Cairo.Color)_fill;
+		  g.Color = _fill._cairo;
 		  g.FillPreserve();
-		  g.Color = (Cairo.Color)_outline;
+		  g.Color = _outline._cairo;
 		  g.Stroke();
 		} else {
-		  g.Color = (Cairo.Color)_outline;
+		  g.Color = _outline._cairo;
 		  g.Stroke();
 		}
 	  }
@@ -1648,7 +1646,7 @@ public static class Graphics {
 	  g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.ClosePath();
-	  g.Color = (Cairo.Color)_outline;
+	  g.Color = _outline._cairo;
 	  g.Stroke();
 	  g.Restore();
 	  // FIXME: add pen
@@ -1669,7 +1667,7 @@ public static class Graphics {
 	  return new Pixel[10];
     }
 
-    public string __repr__() {
+    public override string ToString() {
 	  return String.Format("<Picture (width={0}, height={1})>", width, height);
     }
 
