@@ -30,7 +30,7 @@ for t in range(1000):
                          random.random() * win.DefaultHeight), 
                    random.random() * 360)
     turtle.draw(win)
-    turtle.color = random.choice(["red", "green", "blue", "yellow"])
+    turtle.color = makeColor(random.choice(["red", "green", "blue", "yellow"]))
     turtles.append(turtle)
 
 win.ShowAll()
@@ -41,7 +41,7 @@ for step in range(10):
                random.random() * 6 - 3)
 
 for t in range(1000):
-    turtles[t].color = random.choice(["red", "green", "blue", "black"])
+    turtles[t].color = makeColor(random.choice(["red", "green", "blue", "black"]))
 
 """
 for steps in range(100): 
@@ -52,7 +52,6 @@ win.mode = 'manual'
 for steps in range(100): 
     for t in range(1000):
         turtles[t].forward(1)
-    win.update()
 
 for t in range(1000):
     turtles[t].rotate(180)

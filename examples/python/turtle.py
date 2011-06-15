@@ -23,4 +23,4 @@ def move():
         for t in turtles:
             t.move(random.random() * 6 - 3, 
                    random.random() * 6 - 3)
-        win.update()
+

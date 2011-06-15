@@ -19,27 +19,29 @@
 # $Id: $
 
 from Graphics import *
+from Myro import wait
 import random
 
-file = "examples/images/blankenship.jpg"
+file = "../images/blankenship.jpg"
 win = Window("Laura")
 pic = Picture(file)
 pic.draw(win)
-pic.move(150, 150)
 pixels = list(pic.getPixels())
 
 
 def reverse():
-    win.mode = 'auto'
+    win.mode = 'manual'
     for p in pixels:
         p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
+        win.update()
+        wait(.0002)
 
 def spin():
     win.mode = 'manual'
     for times in range(3):
         for degrees in range(0, 360, 10):
             pic.rotate(10)
-            win.step()
+            win.step(100)
 
 def sortem():
     pixels.sort(key=lambda p: p.x + p.y)
