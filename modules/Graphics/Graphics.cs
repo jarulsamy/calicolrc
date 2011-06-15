@@ -28,6 +28,23 @@ using System.IO; // MemoryStream
 using System;
 
 public static class Graphics {
+
+  public static Color white = new Color(255, 255, 255);
+  public static Dictionary<string,Color> colors = 
+    new Dictionary<string,Color>(){
+	{"black",     new Color(  0,   0,   0)},
+	{"blue",      new Color(  0,   0, 255)},
+	{"green",     new Color(  0, 255,   0)},
+        {"cyan",      new Color(  0, 255, 255)},
+        {"darkGray",  new Color( 64,  64,  64)},
+        {"gray",      new Color(128, 128, 128)},
+        {"lightGray", new Color(192, 192, 192)},
+	{"red",       new Color(255,   0,   0)},
+        {"magenta",   new Color(255,   0, 255)},
+        {"pink",      new Color(255, 175, 175)},
+	{"yellow",    new Color(255, 255,   0)},
+	{"white",     new Color(255, 255, 255)}
+    };
   
   public static List PyList(params object [] items) {
     // make a list from an array
@@ -46,31 +63,6 @@ public static class Graphics {
   private static Dictionary<string, Graphics.WindowClass> _windows =
     new Dictionary<string, Graphics.WindowClass>();
   
-  private static Dictionary<string, Cairo.Color> _color_map = 
-    new Dictionary<string, Cairo.Color>() {
-	{"black", new Cairo.Color(0, 0, 0, 1)},
-	{"white", new Cairo.Color(255, 255, 255, 1)},
-	{"red", new Cairo.Color(255, 0, 0, 1)},
-	{"green", new Cairo.Color(0, 255, 0, 1)},
-	{"blue", new Cairo.Color(0, 0, 255, 1)},
-	{"yellow", new Cairo.Color(255, 255, 0, 1)},
-  };
-  
-  public static Cairo.Color color_map(string name) {
-    if (_color_map.ContainsKey(name))
-      return _color_map[name];
-    else
-      throw new Exception(String.Format("unknown color '{0}'", name));
-  }
-  
-  public static Cairo.Color color_rgb(int r, int g, int b) {
-    return new Cairo.Color(r/255.0, g/255.0, b/255.0, 1);
-  }
-  
-  public static List<string> color_names() {
-    return new List<string>(_color_map.Keys);
-  }
-
   public static IEnumerable getPixels(Picture picture) {
     for (int x=0; x < picture.width; x++) {
       for (int y=0; y < picture.height; y++) {
@@ -219,6 +211,10 @@ public static class Graphics {
     return makeWindow(title, width, height);
   }
 
+  public static Color makeColor(string color) {
+    return new Color(color);
+  }
+
   public static Color makeColor(int r, int g, int b) {
     return new Color(r, g, b);
   }
@@ -240,29 +236,97 @@ public static class Graphics {
     public int green = 0;
     public int blue = 0;
     public int alpha = 255;
+    
+    public Color(string name) {
+      if (colors.ContainsKey(name)) {
+	Color temp = colors[name];
+	red = temp.red;
+	green = temp.green;
+	blue = temp.blue;
+      } else
+	throw new Exception(String.Format("unknown colorname '{0}'", name));
+    }
 
-    public Color(int r, int g, int b) {
+    public Color(int r, int g, int b)
+    {
       red = r;
       green = g;
       blue = b;
     }
-    public Color(int r, int g, int b, int a) {
+
+    public Color(int r, int g, int b, int a)
+    {
       red = r;
       green = g;
       blue = b;
       alpha = a;
     }
-    public Color(double r, double g, double b) {
+
+    public Color(double r, double g, double b)
+    {
       red = (int)r;
       green = (int)g;
       blue = (int)b;
     }
-    public Color(double r, double g, double b, double a) {
+
+    public Color(double r, double g, double b, double a)
+    {
       red = (int)r;
       green = (int)g;
       blue = (int)b;
       alpha = (int)a;
     }
+
+    public double R
+    {
+      get
+	{
+	  return ToCairo(red);
+	}
+    }
+
+    public double G
+    {
+      get
+	{
+	  return ToCairo(green);
+	}
+    }
+
+    public double B
+    {
+      get
+	{
+	  return ToCairo(blue);
+	}
+    }
+
+    public double A
+    {
+      get
+	{
+	  return ToCairo(alpha);
+	}
+    }
+
+    public Cairo.Color ToCairo()
+    {
+      return new Cairo.Color(ToCairo(red), 
+			     ToCairo(green), 
+			     ToCairo(blue), 
+			     ToCairo(alpha));
+    }
+
+    double ToCairo(int value)
+    {
+      return Math.Max(Math.Min((value / 255.0), 1.0), 0.0);
+    }
+
+    int FromCairo(int value)
+    {
+      return (int)(value * 255);
+    }
+
     public override string ToString()
     {
       return String.Format("<Color (r={0},g={1},b={2},a={3})>", 
@@ -337,7 +401,7 @@ public static class Graphics {
       Add(_canvas);
       ShowAll();
     }
-    
+
     public Gdk.Drawable getDrawable() {
       return GdkWindow;
     }
@@ -520,7 +584,7 @@ public static class Graphics {
 
     public override string ToString()
     {
-      return String.Format("<Window ('{0}',{1},{2})>", 
+      return String.Format("<Window (title='{0}',width={1},height={2})>", 
 			   Title, width, height);
     }
 
@@ -640,11 +704,14 @@ public static class Graphics {
     public Point center;
     public ICanvas window;
     public double _direction; // radians
-    public bool fill_path;
+    public double _scale; // radians
     
     public Point [] points;
-    private Cairo.Color _fill_color;
-    private Cairo.Color _outline_color;
+    // FIXME: when done debugging
+    //internal Cairo.Color? _fill;
+    //internal Cairo.Color? _outline;
+    public Cairo.Color? _fill;
+    public Cairo.Color? _outline;
     private int _line_width;
     
     private Pen _pen;
@@ -652,13 +719,12 @@ public static class Graphics {
 	
     public Shape(bool has_pen=true) {
       _direction = 0;
+      _scale = 1.0;
       center = new Point(0,0);
       this.has_pen = has_pen;
       if (this.has_pen) 
-	pen = new Pen("black", 1);
-      fill_color = "black";
-      outline_color = "black";
-      fill_path = true;
+	pen = new Pen(new Color(0, 0, 0), 1);
+      color = new Color(0, 0, 0);
       line_width = 1;
     }
     
@@ -679,49 +745,58 @@ public static class Graphics {
 	    _has_pen = value;
 	  }
 	}
-	public double direction {
-	  get {
-		return _direction;
-	  }
-	  set {
-	    rotate_to(value);
-	  }
-	}
+    public double direction {
+      get {
+	return _direction;
+      }
+      set {
+	rotate_to(value);
+      }
+    }
+	
+    public double scale {
+      get {
+	return _scale;
+      }
+      set {
+	scale_to(value);
+      }
+    }
 	
     public int line_width {
-	  get {
-	    return _line_width;
-	  }
-	  set {
-		_line_width = value;
-	  }
-	}
+      get {
+	return _line_width;
+      }
+      set {
+	_line_width = value;
+      }
+    }
     
-	public Pen pen {
-	  get {
-		return _pen;
-	  }
-	  set {
-	    if (has_pen) {
-		  _pen = value;
-		  _pen.center.x = center.x;
-		  _pen.center.y = center.y;
-	    } else
-		  throw new Exception("this shape cannot have a pen");
-	  }
-	}
+    public Pen pen {
+      get {
+	return _pen;
+      }
+      set {
+	if (has_pen) {
+	  _pen = value;
+	  _pen.center.x = center.x;
+	  _pen.center.y = center.y;
+	} else
+	    throw new Exception("this shape cannot have a pen");
+      }
+    }
     
-	public void QueueDraw() { // shape
-	  if (window is Graphics.WindowClass) {
-	    if (window.getMode() == "auto")
-	      window.update();
-	    // else, manually call step()
-	  }
-	}
-
+    public void QueueDraw() { // shape
+      if (window is Graphics.WindowClass) {
+	if (window.getMode() == "auto")
+	  window.update();
+	// else, manually call step()
+      }
+    }
+    
     public bool hit(IList iterable) {
-	  return hit(new Point(iterable[0], iterable[1]));
-	}
+      return hit(new Point(iterable[0], iterable[1]));
+    }
 
     public bool hit(Point p) {
 	  int counter = 0;
@@ -750,158 +825,97 @@ public static class Graphics {
 	  }
     }
 
-    public double alpha {
-	  get {
-	    return _outline_color.A;
-	  }
-	  set {
-		_outline_color.A = value;
-		_fill_color.A = value;
-		QueueDraw();
-	  }
+    public void set_points(params IList [] iterables) {
+      // 1. set center to absolute
+      double sumx = 0.0;
+      double sumy = 0.0;
+      if (points.Length > 0) {
+	for (int i = 0; i < iterables.Length; i++) {
+	  sumx += (double)iterables[i][0];
+	  sumy += (double)iterables[i][1];
 	}
-    
-	public string outline_color {
-	  get {
-		return "#FIXME";
-	  }
-	  set {
-	    _outline_color = Graphics.color_map(value);
-		QueueDraw();
-	  }
-	}
-    
-	public string fill_color {
-	  get {
-		return "#FIXME";
-	  }
-	  set {
-	    _fill_color = Graphics.color_map(value);
-		QueueDraw();
-	  }
-	}
-    
-	public Cairo.Color raw_fill_color {
-	  // Set color from cairo color object
-	  get {
-	    return _fill_color;
-	  }
-	  set {
-		_fill_color = value;
-		QueueDraw();
-	  }
-	}
-	
-    public Cairo.Color raw_outline_color {
-	  // Set color from cairo color object
-      get {
-		return _outline_color;
+	center.x = sumx/iterables.Length;
+	center.y = sumy/iterables.Length;
+      } else {
+	center.x = 0;
+	center.y = 0;
       }
-	  set {
-	    _outline_color = value;
-		QueueDraw();
-	  }
-	}
+      // 2. compute this.points in relative terms to center
+      points = new Point [iterables.Length];
+      for (int i = 0; i < iterables.Length; i++) {
+	points[i] = new Point((double)iterables[i][0] - center.x, 
+			      (double)iterables[i][1] - center.y);
+      }
+    }
     
-	public string color {
-	  set {
-		_fill_color = Graphics.color_map(value);
-		_outline_color = Graphics.color_map(value);
-		QueueDraw();
-	  }
+    public void set_points(params Point [] new_points) {
+      // 1. set center to absolute
+      double sumx = 0.0;
+      double sumy = 0.0;
+      if (new_points.Length > 0) {
+	for (int i = 0; i < new_points.Length; i++) {
+	  sumx += new_points[i].x;
+	  sumy += new_points[i].y;
 	}
+	center.x = sumx/new_points.Length;
+	center.y = sumy/new_points.Length;
+      } else {
+	center.x = 0;
+	center.y = 0;
+      }
+      // 2. compute this.points in relative terms to center
+      points = new Point [new_points.Length];
+      for (int i = 0; i < new_points.Length; i++) {
+	points[i] = new Point(new_points[i].x - center.x, 
+			      new_points[i].y - center.y);
+      }
+    }
     
-	public void set_points(params IList [] iterables) {
-	  // 1. set center to absolute
-	  double sumx = 0.0;
-	  double sumy = 0.0;
-	  if (points.Length > 0) {
-	    for (int i = 0; i < iterables.Length; i++) {
-	      sumx += (double)iterables[i][0];
-	      sumy += (double)iterables[i][1];
-	    }
-	    center.x = sumx/iterables.Length;
-	    center.y = sumy/iterables.Length;
-	  } else {
-	    center.x = 0;
-	    center.y = 0;
-	  }
-	  // 2. compute this.points in relative terms to center
-	  points = new Point [iterables.Length];
-	  for (int i = 0; i < iterables.Length; i++) {
-	    points[i] = new Point((double)iterables[i][0] - center.x, 
-				  (double)iterables[i][1] - center.y);
-	  }
-	}
-
-        public void set_points(params Point [] new_points) {
-	  // 1. set center to absolute
-	  double sumx = 0.0;
-	  double sumy = 0.0;
-	  if (new_points.Length > 0) {
-	    for (int i = 0; i < new_points.Length; i++) {
-	      sumx += new_points[i].x;
-	      sumy += new_points[i].y;
-	    }
-	    center.x = sumx/new_points.Length;
-	    center.y = sumy/new_points.Length;
-	  } else {
-	    center.x = 0;
-	    center.y = 0;
-	  }
-	  // 2. compute this.points in relative terms to center
-	  points = new Point [new_points.Length];
-	  for (int i = 0; i < new_points.Length; i++) {
-	    points[i] = new Point(new_points[i].x - center.x, 
-				  new_points[i].y - center.y);
-	  }
-	}
-
-	public void move_to(double x, double y) {
-	  double dx = x - center.x;
-	  double dy = y - center.y;
-	  move(dx, dy);
-	}
+    public void move_to(double x, double y) {
+      double dx = x - center.x;
+      double dy = y - center.y;
+      move(dx, dy);
+    }
     
-	public void move(double dx, double dy) {
-	  if (has_pen && pen.down)
-		pen.append_path(new Point(center.x + dx, center.y + dy));
-	  center.x += dx;
-	  center.y += dy;
-	  QueueDraw();
-	}
+    public void move(double dx, double dy) {
+      if (has_pen && pen.down)
+	pen.append_path(new Point(center.x + dx, center.y + dy));
+      center.x += dx;
+      center.y += dy;
+      QueueDraw();
+    }
     
-	public double screen_angle(double dir) {
-	  // Screen coords are 45 degrees from system
-	  return dir - (45 * Math.PI/180.0);
-	}
+    public double screen_angle(double dir) {
+      // Screen coords are 45 degrees from system
+      return dir - (45 * Math.PI/180.0);
+    }
 
     public void forward(double distance) {
-	  double angle = screen_angle(_direction);
-	  double x = ((distance) * Math.Cos(angle) - (distance) * Math.Sin(angle));
-	  double y = ((distance) * Math.Sin(angle) + (distance) * Math.Cos(angle));
-	  center.x += x;
-	  center.y += y;
-	  if (has_pen && pen.down)
-		pen.append_path(new Point(center.x, center.y));
-	  QueueDraw();
-	}
+      double angle = screen_angle(_direction);
+      double x = ((distance) * Math.Cos(angle) - (distance) * Math.Sin(angle));
+      double y = ((distance) * Math.Sin(angle) + (distance) * Math.Cos(angle));
+      center.x += x;
+      center.y += y;
+      if (has_pen && pen.down)
+	pen.append_path(new Point(center.x, center.y));
+      QueueDraw();
+    }
     
-	public Polygon pen_up() {
-	  pen.down = false;
-	  return new Polygon(pen.raw_fill_color, pen.path);
-	}
-	
+    public Polygon pen_up() {
+      pen.down = false;
+      return new Polygon(pen.path.ToArray()); //, new Color(0,0,0));
+    }
+    
     public void pen_down() {
       pen.down = true;
       pen.reset_path();
       pen.append_path(new Point(center.x, center.y));
     }
-		
+    
     public void backward(double distance) {
       forward(-distance);
     }
-	
+    
     public virtual void render(Cairo.Context g) {
       g.Save();
       Point temp;
@@ -909,20 +923,22 @@ public static class Graphics {
 	g.LineWidth = line_width;
 	temp = screen_coord(center);
 	g.Translate(temp.x, temp.y);
+	g.Rotate(_direction);
+	g.Scale(_scale, _scale);
 	temp = screen_coord(points[0]);
 	g.MoveTo(temp.x, temp.y);
 	for (int p = 1; p < points.Length; p++) {
 	  temp = screen_coord(points[p]);
 	  g.LineTo(temp.x, temp.y);
 	}
-	if (fill_path) {
+	if (_fill != null) {
 	  g.ClosePath();
-	  g.Color = _fill_color;
+	  g.Color = (Cairo.Color)_fill;
 	  g.FillPreserve();
-	  g.Color = _outline_color;
+	  g.Color = (Cairo.Color)_outline;
 	  g.Stroke();
 	} else {
-	  g.Color = _outline_color;
+	  g.Color = (Cairo.Color)_outline;
 	  g.Stroke();
 	}
 	if (has_pen)
@@ -941,32 +957,87 @@ public static class Graphics {
 	  QueueDraw();
 	}
     
-	public void rotate_to(double degrees) {
-	  _direction = degrees * (Math.PI) / 180.0;
-	  QueueDraw();
-	}
-	
+    public void rotate_to(double degrees) {
+      _direction = degrees * (Math.PI) / 180.0;
+      QueueDraw();
+    }
     
-	public void update() { // Shape
-	  // Alias to QueueDraw
-	  QueueDraw(); 
-	}
+    public void scale_to(double percent) {
+      _scale = percent;
+      QueueDraw();
+    }
     
-	public void draw(ICanvas can) {
-	  // Add this shape to the _Canvas dictionary.
-	  can.getCanvas().shapes.Add(this);
-	  // FIXME: QueueDrawRect
-	  // FIXME: invalidate from and to rects on move
-	  window = can;
-	  QueueDraw();
-	}
-
+    public void update() { // Shape
+      // Alias to QueueDraw
+      QueueDraw(); 
+    }
+    
+    public void draw(ICanvas can) {
+      // Add this shape to the _Canvas list.
+      can.getCanvas().shapes.Add(this);
+      // FIXME: QueueDrawRect
+      // FIXME: invalidate from and to rects on move
+      window = can;
+      QueueDraw();
+    }
+    
     public void undraw() {
-	  Gtk.Application.Invoke(delegate { 
-	      window.getCanvas().shapes.Remove(this);
-        	  window = null;
-        	  QueueDraw();
-	  });
+      Gtk.Application.Invoke(delegate { 
+	  window.getCanvas().shapes.Remove(this);
+	  window = null;
+	  QueueDraw();
+	});
+    }
+
+    /// <summary>
+    ///   
+    /// </summary>
+
+    public Color color {
+      set {
+	if (value != null) {
+	  _fill = ((Color)value).ToCairo();
+	  _outline = ((Color)value).ToCairo();
+	} else {
+	  _fill = null;
+	  _outline = null;
+	}
+	QueueDraw();
+      }
+      get
+	{
+	  if (_fill != null)
+	    {
+	      return new Color(((Cairo.Color)_fill).R * 255, 
+			       ((Cairo.Color)_fill).G * 255, 
+			       ((Cairo.Color)_fill).B * 255, 
+			       ((Cairo.Color)_fill).A * 255);
+	    } 
+	  else
+	    return null;
+	}
+    }
+    
+    public Color fill {
+      set {
+	if (value == null) {
+	  _fill = null;
+	} else {
+	  _fill = ((Color)value).ToCairo();
+	}
+	QueueDraw();
+      }
+    }
+    
+    public Color outline {
+      set {
+	if (value == null) {
+	  _outline = null;
+	} else {
+	  _outline = ((Color)value).ToCairo();
+	}
+	QueueDraw();
+      }
     }
   }
   
@@ -988,7 +1059,12 @@ public static class Graphics {
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
-      g.Color = new Cairo.Color(0, 0, 0);
+      g.Rotate(_direction);
+      g.Scale(_scale, _scale);
+      if (_fill != null)
+	g.Color = (Cairo.Color)_fill;
+      else
+	g.Color = new Cairo.Color(0,0,0);
       g.SelectFontFace(fontFace, fontSlant, fontWeight);
       g.SetFontSize(size);
       Cairo.TextExtents te = g.TextExtents(text);
@@ -1009,6 +1085,8 @@ public static class Graphics {
       }
       temp = screen_coord(p);
       g.MoveTo(temp.x, temp.y);
+      // FIXME: how to rotate text?
+      // Possible hints: see TextPath, GlyphPath, ShowGlyph
       g.ShowText(text);    
       g.Restore();
     }
@@ -1031,37 +1109,6 @@ public static class Graphics {
     }
   }
   
-  /*
-    public class Text : Shape {
-    public Text(Point p1, string text) : base(has_pen) {
-    }
-    public override void render(Cairo.Context g) {
-    // render path
-      g.Save();
-      Point temp;
-      if (path != null) {
-      g.LineWidth = line_width;
-        temp = screen_coord(path[0]);
-        g.MoveTo(temp.x, temp.y);
-        for (int p = 1; p < path.Count; p++) {
-	temp = screen_coord(path[p]);
-          g.LineTo(temp.x, temp.y);
-	  }
-        if (fill_path) {
-	g.ClosePath();
-          g.Color = raw_fill_color;
-          g.FillPreserve();
-          g.Color = raw_outline_color;
-          g.Stroke();
-        } else {
-	g.Color = raw_outline_color;
-          g.Stroke();
-	  }
-      }
-      g.Restore();
-    }
-    }
-  */
   public class Arrow : Shape {
 	public Arrow(IList iterable) :
 		this(new Point(iterable[0], iterable[1])) {
@@ -1090,13 +1137,18 @@ public static class Graphics {
     private List<Point> _path; // = new List<Point>();
 	public bool _down;
     
-	public Pen(string color, int width) : base(false) {
-	  down = false;
-	  this.color = color;
-	  this.line_width = width;
-	  fill_path = false;
-	}
-	
+    public Pen(Color color, int width) : base(false) {
+      down = false;
+      this.color = color;
+      this.line_width = width;
+    }
+    
+    public Pen(int width) : base(false) {
+      down = false;
+      this.color = new Color(0, 0, 0);
+      this.line_width = width;
+    }
+    
     public void reset_path() {
 	  _path = new List<Point>();
     }
@@ -1129,6 +1181,8 @@ public static class Graphics {
 	  g.Save();
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
+	  g.Rotate(_direction);
+	  g.Scale(_scale, _scale);
 	  if (path != null) {
 	    g.LineWidth = line_width;
 		temp = screen_coord(path[0]);
@@ -1137,14 +1191,14 @@ public static class Graphics {
 		  temp = screen_coord(path[p]);
 		  g.LineTo(temp.x, temp.y);
 		}
-		if (fill_path) {
+		if (_fill != null) {
 		  g.ClosePath();
-		  g.Color = raw_fill_color;
+		  g.Color = (Cairo.Color)_fill;
 		  g.FillPreserve();
-		  g.Color = raw_outline_color;
+		  g.Color = (Cairo.Color)_outline;
 		  g.Stroke();
 		} else {
-		  g.Color = raw_outline_color;
+		  g.Color = (Cairo.Color)_outline;
 		  g.Stroke();
 		}
 	  }
@@ -1451,10 +1505,10 @@ public static class Graphics {
       return new Pixel(this, x, y);
     }
     
-    public void setPixel(int x, int y, Cairo.Color color) {
-      int red = (int)(color.R * 255);
-      int green = (int)(color.G * 255);
-      int blue = (int)(color.B * 255);
+    public void setPixel(int x, int y, Color color) {
+      int red = color.red;
+      int green = color.green;
+      int blue = color.blue;
       this.setRGB(x, y, (byte)red, (byte)green, (byte)blue);
     }
 
@@ -1582,10 +1636,10 @@ public static class Graphics {
     
 	public override void render(Cairo.Context g) {
 	  g.Save();
-	  //g.Translate(-_pixbuf.Width/2, -_pixbuf.Height/2);
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
 	  g.Rotate(_direction);
+	  g.Scale(_scale, _scale);
 	  Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.Paint();
 	  g.LineWidth = line_width;
@@ -1594,7 +1648,7 @@ public static class Graphics {
 	  g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.ClosePath();
-	  g.Color = raw_outline_color;
+	  g.Color = (Cairo.Color)_outline;
 	  g.Stroke();
 	  g.Restore();
 	  // FIXME: add pen
@@ -1637,11 +1691,7 @@ public static class Graphics {
   
   public class Polygon : Shape {
     
-	public Polygon(string color, params object [] points) : 
-		this(color_map(color), points) {
-	}
-    
-	public Polygon(Cairo.Color color, params object [] points) : base(true) {
+    public Polygon(params object [] points) : base(true) {
 	  Point [] temp = new Point [points.Length];
 	  int count = 0;
 	  foreach (object o in points) {
@@ -1656,8 +1706,8 @@ public static class Graphics {
 	    count++;
 	  }
 	  set_points(temp);
-	  raw_outline_color = color;
-	  raw_fill_color = color;
+	  //FIXME: add color to list
+	  //this.color = color;
 	}
   }
 
@@ -1694,6 +1744,8 @@ public static class Graphics {
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
+      g.Rotate(_direction);
+      g.Scale(_scale, _scale);
       if (points != null) {
         g.LineWidth = line_width;
         temp = screen_coord(points[0]);
@@ -1721,6 +1773,7 @@ public static class Graphics {
     }
     
     public void rotate(double degrees) {
+      // rotate group
       if (mode == "individual") {
 	foreach (Shape shape in items) {
 	  shape.rotate(degrees);

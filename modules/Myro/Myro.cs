@@ -469,16 +469,17 @@ public static class Myro {
     return retval;
   }
 
-  public static PythonTuple pickAColor() {
+  public static Graphics.Color pickAColor() {
     ManualResetEvent ev = new ManualResetEvent(false);
-    PythonTuple retval = null;
+    Graphics.Color retval = null;
     Gtk.Application.Invoke(delegate {
         Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog("Select a color");
         fc.ShowAll();
         if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
-           retval = Graphics.PyTuple((int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Red))/Math.Pow(2,16) * 255.0),
-                                     (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Green))/Math.Pow(2, 16) * 255.0),
-                                     (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Blue))/Math.Pow(2, 16) * 255.0));
+	  retval = new Graphics.Color(
+               (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Red))/Math.Pow(2,16) * 255.0),
+	       (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Green))/Math.Pow(2, 16) * 255.0),
+	       (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Blue))/Math.Pow(2, 16) * 255.0));
         }
         fc.Destroy();
         ev.Set();
@@ -2378,24 +2379,8 @@ public static class Myro {
 
   // Graphics.cs
 
-  public static Cairo.Color color_map(string name) {
-    return Graphics.color_map(name);
-  }
-
-  public static Cairo.Color color_rgb(int r, int g, int b) {
-    return Graphics.color_rgb(r, g, b);
-  }
-
-  public static Cairo.Color color_rgb(PythonTuple rgb) {
-    return Graphics.color_rgb((int)rgb[0], (int)rgb[1], (int)rgb[2]);
-  }
-
-  public static Cairo.Color makeColor(PythonTuple rgb) {
-    return Graphics.color_rgb((int)rgb[0], (int)rgb[1], (int)rgb[2]);
-  }
-
-  public static List<string> color_names() {
-    return Graphics.color_names();
+  public static Graphics.Color makeColor(PythonTuple rgb) {
+    return Graphics.makeColor((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
 
   /*
@@ -2418,7 +2403,7 @@ public static class Myro {
     return picture.getPixel(col, row);
   }
 
-  public static void setPixel(Graphics.Picture picture, int col, int row, Cairo.Color color) {
+  public static void setPixel(Graphics.Picture picture, int col, int row, Graphics.Color color) {
     picture.setPixel(col, row, color);
   }
 
