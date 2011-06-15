@@ -443,7 +443,7 @@ public static class Graphics {
       onClickCallbacks.Add(function);
     }
     
-    public uint update_interval {
+    public uint updateInterval {
       get {
 	return _update_interval;
       }
@@ -509,7 +509,7 @@ public static class Graphics {
       _dirty = true;
       DateTime now = DateTime.Now;
       // diff is TimeSpan
-      if ((now - last_update).TotalMilliseconds < update_interval) {
+      if ((now - last_update).TotalMilliseconds < updateInterval) {
 	// pass, too soon!
 	// but we need to make sure that someone checks
 	// in the future. 
@@ -519,7 +519,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(update_interval, 
+	  GLib.Timeout.Add(updateInterval, 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       } else { // it is not too soon
@@ -528,7 +528,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(update_interval, 
+	  GLib.Timeout.Add(updateInterval, 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       }
@@ -750,7 +750,7 @@ public static class Graphics {
 	return _direction;
       }
       set {
-	rotate_to(value);
+	rotateTo(value);
       }
     }
 	
@@ -871,7 +871,7 @@ public static class Graphics {
       }
     }
     
-    public void move_to(double x, double y) {
+    public void moveTo(double x, double y) {
       double dx = x - center.x;
       double dy = y - center.y;
       move(dx, dy);
@@ -901,12 +901,12 @@ public static class Graphics {
       QueueDraw();
     }
     
-    public Polygon pen_up() {
+    public Polygon penUp() {
       pen.down = false;
       return new Polygon(pen.path.ToArray()); //, new Color(0,0,0));
     }
     
-    public void pen_down() {
+    public void penDown() {
       pen.down = true;
       pen.reset_path();
       pen.append_path(new Point(center.x, center.y));
@@ -957,7 +957,7 @@ public static class Graphics {
 	  QueueDraw();
 	}
     
-    public void rotate_to(double degrees) {
+    public void rotateTo(double degrees) {
       _direction = degrees * (Math.PI) / 180.0;
       QueueDraw();
     }
@@ -1794,15 +1794,15 @@ public static class Graphics {
       }
     }
     
-    public void rotate_to(double degrees) {
+    public void rotateTo(double degrees) {
       foreach (Shape shape in items) {
-	shape.rotate_to(degrees);
+	shape.rotateTo(degrees);
       }
     }
     
-    public void move_to(int x, int y) {
+    public void moveTo(int x, int y) {
       foreach (Shape shape in items) {
-	shape.move_to(x, y);
+	shape.moveTo(x, y);
       }
     }
     

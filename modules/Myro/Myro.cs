@@ -111,6 +111,15 @@ public static class Myro {
 	}
   }
 
+  public static void uninit() {
+    if (Myro.robot is Scribbler) {
+      if (((Scribbler)(Myro.robot)).serial is SerialPort) {
+	SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+	serial.Close(); // and need_port
+      } // not a serial port
+    } // not a scribbler
+  }
+
   public static string repeat(string s, int times) {
 	// repeat(" ", 10) => "          "
 	string retval = "";
@@ -828,8 +837,12 @@ public static class Myro {
     public virtual void move(double translate, double rotate) {
       // Override in subclassed robots
     }
-    
+
     public void playSong(List song) {
+      playSong(song, 1.0);
+    }
+    
+    public void playSong(List song, double speed) {
       foreach(IList tup in song) {
 	if (tup.Count == 2) {
 	  double f = (double)tup[0]; 
@@ -839,7 +852,7 @@ public static class Myro {
 	  double f1 = (double)tup[0]; 
 	  double f2 = (double)tup[1]; 
 	  double d = (double)tup[2];
-	  beep(d, f1, f2);
+	  beep(d * speed, f1, f2);
 	}
       }
     }
@@ -1061,25 +1074,28 @@ public static class Myro {
 	static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
 	//static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
 
-	public Scribbler(SerialPort serial) {
-	  setup();
-	}
+    public Scribbler(SerialPort serial) {
+      setup();
+    }
 
-	public Scribbler(string port, int baud) {
-	  serial = new SerialPort(port, baud);
-	  serial.ReadTimeout = 1000; // milliseconds
-	  serial.WriteTimeout = 1000; // milliseconds
-	  try {
-		serial.Open();
-	  } catch {
-		Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
-				port));
-		return;
-	  }
-	  setup();
-	}
-
-	public override void setup() {
+    public Scribbler(string port):  this(port, 38400) {
+    }  
+    
+    public Scribbler(string port, int baud) {
+      serial = new SerialPort(port, baud);
+      serial.ReadTimeout = 1000; // milliseconds
+      serial.WriteTimeout = 1000; // milliseconds
+      try {
+	serial.Open();
+      } catch {
+	Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+					port));
+	return;
+      }
+      setup();
+    }
+    
+    public override void setup() {
 	  PythonDictionary info = null;
 	  try {
 		info = getInfo();
