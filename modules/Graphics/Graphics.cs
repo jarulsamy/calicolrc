@@ -234,6 +234,9 @@ public static class Graphics {
   public class Color {
     public Cairo.Color _cairo;
     public ICanvas window;
+    public Picture picture;
+    public int x;
+    public int y;
 
     public Color(string name) {
       if (colors.ContainsKey(name)) {
@@ -267,12 +270,12 @@ public static class Graphics {
       return new Color(red, green, blue, alpha);
     }
 
-    public void QueueDraw() { // shape
+    public void QueueDraw() { // color
       if (window is ICanvas) {
 	if (window.getMode() == "auto")
 	  window.update();
 	// else, manually call step()
-      }
+      } 
     }
     
     public int red {
@@ -281,7 +284,10 @@ public static class Graphics {
       }
       set {
 	_cairo.R = ToCairo(value);
-	QueueDraw();
+	if (picture is Picture) {
+	  picture.setRed(x, y, (byte)value);
+	} else 
+	    QueueDraw();
       }
     }
 
@@ -291,7 +297,10 @@ public static class Graphics {
       }
       set {
 	_cairo.G = ToCairo(value);
-	QueueDraw();
+	if (picture is Picture) {
+	  picture.setGreen(x, y, (byte)value);
+	} else
+	    QueueDraw();
       }
     }
 
@@ -301,7 +310,10 @@ public static class Graphics {
       }
       set {
 	_cairo.B = ToCairo(value);
-	QueueDraw();
+	if (picture is Picture) {
+	  picture.setBlue(x, y, (byte)value);
+	} else
+	    QueueDraw();
       }
     }
 
@@ -311,7 +323,10 @@ public static class Graphics {
       }
       set {
 	_cairo.A = ToCairo(value);
-	QueueDraw();
+	if (picture is Picture) {
+	  picture.setAlpha(x, y, (byte)value);
+	} else
+	    QueueDraw();
       }
     }
 
@@ -687,8 +702,8 @@ public static class Graphics {
   public class Shape {
     public Point center;
     public ICanvas window;
-    public double _direction; // radians
-    public double _scale; // radians
+    public double _rotation; // radians
+    public double _scale; // percent
     
     public Point [] points;
     // FIXME: when done debugging
@@ -702,7 +717,7 @@ public static class Graphics {
     private bool _has_pen;
 	
     public Shape(bool has_pen=true) {
-      _direction = 0;
+      _rotation = 0;
       _scale = 1.0;
       center = new Point(0,0);
       this.has_pen = has_pen;
@@ -721,6 +736,11 @@ public static class Graphics {
       return points[1];
     }
 
+    public Point getCenter()
+    {
+      return center;
+    }
+
     public bool has_pen {
 	  get {
 		return _has_pen;
@@ -729,12 +749,30 @@ public static class Graphics {
 	    _has_pen = value;
 	  }
 	}
-    public double direction {
+    public double rotation {
       get {
-	return _direction;
+	return _rotation;
       }
       set {
 	rotateTo(value);
+      }
+    }
+
+    public double x {
+      get {
+	return center.x;
+      }
+      set {
+	moveTo(value, center.y);
+      }
+    }
+	
+    public double y {
+      get {
+	return center.y;
+      }
+      set {
+	moveTo(center.x, value);
       }
     }
 	
@@ -743,7 +781,7 @@ public static class Graphics {
 	return _scale;
       }
       set {
-	scale_to(value);
+	scaleTo(value);
       }
     }
 	
@@ -875,7 +913,7 @@ public static class Graphics {
     }
 
     public void forward(double distance) {
-      double angle = screen_angle(_direction);
+      double angle = screen_angle(_rotation);
       double x = ((distance) * Math.Cos(angle) - (distance) * Math.Sin(angle));
       double y = ((distance) * Math.Sin(angle) + (distance) * Math.Cos(angle));
       center.x += x;
@@ -907,7 +945,7 @@ public static class Graphics {
 	g.LineWidth = line_width;
 	temp = screen_coord(center);
 	g.Translate(temp.x, temp.y);
-	g.Rotate(_direction);
+	g.Rotate(_rotation);
 	g.Scale(_scale, _scale);
 	temp = screen_coord(points[0]);
 	g.MoveTo(temp.x, temp.y);
@@ -937,16 +975,16 @@ public static class Graphics {
     }
     
     public void rotate(double degrees) {
-	  _direction -= (Math.PI / 180.0) * degrees;
+	  _rotation -= (Math.PI / 180.0) * degrees;
 	  QueueDraw();
 	}
     
     public void rotateTo(double degrees) {
-      _direction = degrees * (Math.PI) / 180.0;
+      _rotation = degrees * (Math.PI) / 180.0;
       QueueDraw();
     }
     
-    public void scale_to(double percent) {
+    public void scaleTo(double percent) {
       _scale = percent;
       QueueDraw();
     }
@@ -1057,7 +1095,7 @@ public static class Graphics {
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
-      g.Rotate(_direction);
+      g.Rotate(_rotation);
       g.Scale(_scale, _scale);
       if (_fill != null)
 	g.Color = _fill._cairo;
@@ -1179,7 +1217,7 @@ public static class Graphics {
 	  g.Save();
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
-	  g.Rotate(_direction);
+	  g.Rotate(_rotation);
 	  g.Scale(_scale, _scale);
 	  if (path != null) {
 	    g.LineWidth = line_width;
@@ -1205,60 +1243,60 @@ public static class Graphics {
   }
 
   public class Pixel {
-	private Picture picture;
+    private Picture picture;
     public int x;
-	public int y;
+    public int y;
     
-	public Pixel(Picture picture, int x, int y) {
-	  this.picture = picture;
-	  this.x = x;
-	  this.y = y;
-	}
+    public Pixel(Picture picture, int x, int y) {
+      this.picture = picture;
+      this.x = x;
+      this.y = y;
+    }
     
-	public Color getColor() {
-	  return picture.getColor(x, y);
-	}
-	public PythonTuple getRGB() {
-	  return picture.getRGB(x, y);
-	}
+    public Color getColor() {
+      return picture.getColor(x, y);
+    }
+    public PythonTuple getRGB() {
+      return picture.getRGB(x, y);
+    }
     public PythonTuple getRGBA() {
-	  return picture.getRGBA(x, y);
+      return picture.getRGBA(x, y);
     }
-	public int getGray() {
-	  return picture.getGray(x, y);
-	}
+    public int getGray() {
+      return picture.getGray(x, y);
+    }
     public int getRed() {
-	  return picture.getRed(x, y);
+      return picture.getRed(x, y);
     }
-	public int getGreen() {
-	  return picture.getGreen(x, y);
-	}
+    public int getGreen() {
+      return picture.getGreen(x, y);
+    }
     public int getBlue() {
-	  return picture.getBlue(x, y);
+      return picture.getBlue(x, y);
     }
-	public int getAlpha() {
-	  return picture.getAlpha(x, y);
-	}
+    public int getAlpha() {
+      return picture.getAlpha(x, y);
+    }
     public void setRGB(byte red, byte green, byte blue) {
-	  picture.setRGB(x, y, red, green, blue);
+      picture.setRGB(x, y, red, green, blue);
     }
-	public void setRGBA(byte red, byte green, byte blue, byte alpha) {
-	  picture.setRGBA(x, y, red, green, blue, alpha);
-	}
+    public void setRGBA(byte red, byte green, byte blue, byte alpha) {
+      picture.setRGBA(x, y, red, green, blue, alpha);
+    }
     public void setGray(byte value) {
-	  picture.setGray(x, y, value);
+      picture.setGray(x, y, value);
     }
-	public void setRed(byte value) {
-	  picture.setRed(x, y, value);
-	}
+    public void setRed(byte value) {
+      picture.setRed(x, y, value);
+    }
     public void setGreen(byte value) {
-	  picture.setGreen(x, y, value);
+      picture.setGreen(x, y, value);
     }
-	public void setBlue(byte value) {
-	  picture.setBlue(x, y, value);
-	}
+    public void setBlue(byte value) {
+      picture.setBlue(x, y, value);
+    }
     public void setAlpha(byte value) {
-	  picture.setAlpha(x, y, value);
+      picture.setAlpha(x, y, value);
     }
   }
   
@@ -1520,7 +1558,11 @@ public static class Graphics {
 
     public Color getColor(int x, int y) {
       // red, green, blue, alpha
-      return new Color(getRed(x, y), getGreen(x, y), getBlue(x, y));
+      Color temp = new Color(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
+      temp.picture = this;
+      temp.x = x;
+      temp.y = y;
+      return temp;
     }
     
     public PythonTuple getRGB(int x, int y) {
@@ -1636,7 +1678,7 @@ public static class Graphics {
 	  g.Save();
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
-	  g.Rotate(_direction);
+	  g.Rotate(_rotation);
 	  g.Scale(_scale, _scale);
 	  Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.Paint();
@@ -1714,35 +1756,11 @@ public static class Graphics {
       set_points(new Point(x,y));
     }
 
-    public double x
-    {
-      get
-	{
-	  return center.x;
-	}
-      set
-	{
-	  center.x = value;
-	}
-    }
-
-    public double y
-    {
-      get
-	{
-	  return center.y;
-	}
-      set
-	{
-	  center.y = value;
-	}
-    }
-
     public override void render(Cairo.Context g) {
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
-      g.Rotate(_direction);
+      g.Rotate(_rotation);
       g.Scale(_scale, _scale);
       if (points != null) {
         g.LineWidth = line_width;
