@@ -29,8 +29,7 @@ using System;
 
 public static class Graphics {
 
-  public static Color white = new Color(255, 255, 255);
-  public static Dictionary<string,Color> colors = 
+  public static readonly Dictionary<string,Color> colors = 
     new Dictionary<string,Color>(){
 	{"black",     new Color(  0,   0,   0)},
 	{"blue",      new Color(  0,   0, 255)},
@@ -598,18 +597,7 @@ public static class Graphics {
     }
   }
   
-  public class Button : Gtk.Button {
-    public Button(string label) : base(label) {
-    }
-    public new void Show() {
-      Gtk.Application.Invoke(delegate { base.Show(); });
-    }
-    public new void ShowAll() {
-      Gtk.Application.Invoke(delegate { base.ShowAll(); });
-    }
-  }
-  
-  public static void ShowAll(object o) {
+ public static void ShowAll(object o) {
     Gtk.Application.Invoke(delegate { ((Gtk.Widget)o).ShowAll(); });
   }
   
@@ -1756,7 +1744,10 @@ public static class Graphics {
   }
 
   public class Dot : Shape {
-    public Dot(double x, double y) : base(false) {
+    public Dot(int x, int y) : base(true) {
+      set_points(new Point(x,y));
+    }
+    public Dot(double x, double y) : base(true) {
       set_points(new Point(x,y));
     }
 
@@ -1780,6 +1771,50 @@ public static class Graphics {
     }
   }
 
+  public class Circle : Shape {
+    int _radius;
+    public int radius
+    {
+      get
+	{
+	  return _radius;
+	}
+      set
+	{
+	  _radius = value;
+	  QueueDraw();
+	}
+    }
+
+    public Circle(IList iterable, int radius) :  this(new Point(iterable[0], iterable[1]), radius) {
+    }
+
+    public Circle(Point point, int radius) : base(true) {
+      set_points(point);
+      _radius = radius;
+    }
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      // Center is in global screen coords, whatever they are
+      Point temp = screen_coord(center);
+      // Temp is in Gtk coordinate system
+      g.Translate(temp.x, temp.y);
+      g.Rotate(_rotation);
+      g.Scale(_scale, _scale);
+      // Now move to 0,0 as origin of shape
+      temp = screen_coord(points[0]);
+      g.LineWidth = line_width;
+      g.Arc(temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
+      g.Color = _fill._cairo;
+      g.ClosePath();
+      g.FillPreserve();
+      g.Color = _outline._cairo;
+      g.Stroke();
+      g.Restore();
+    }
+  }
+    
   public class Group {
     
     public List<Shape> items = new List<Shape>();
