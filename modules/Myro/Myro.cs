@@ -49,7 +49,7 @@ public static class Extensions {
 
 public static class Myro {
   public static Robot robot;
-  public static Computer computer = new Computer();
+  public readonly static Computer computer = new Computer();
   static string dialogResponse = null;
   static string REVISION = "$Revision: $";
   static string startup_path = null;
@@ -57,13 +57,17 @@ public static class Myro {
   static string speech_name = "default";
   static bool warn_missing_speak = true;
   static PythonDictionary voices = new PythonDictionary();
-  public static PythonDictionary frequencies = new PythonDictionary();
+  public readonly static PythonDictionary frequencies = new PythonDictionary();
 
   public class MyTexView : Gtk.TextView  {
 	public string MyString;
   }
 
   // Functional Interface
+
+  public static Robot getRobot() {
+    return robot;
+  }
 
   public static void init() {
     initialize(null);

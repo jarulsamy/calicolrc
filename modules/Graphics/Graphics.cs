@@ -656,6 +656,10 @@ public static class Graphics {
       return String.Format("<Point (x={0},y={1})>", x, y);
     }
 
+    public void draw(ICanvas canvas) {
+      throw new Exception("Can't draw a point; use Dot instead");
+    }
+
   }
   
   public class _Canvas : Gtk.DrawingArea {
