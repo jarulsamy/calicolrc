@@ -231,12 +231,16 @@ public static class Graphics {
   }
 
   public class Color {
-    public Cairo.Color _cairo;
+    internal Cairo.Color _cairo;
     public ICanvas window;
     public Picture picture;
     public int x;
     public int y;
 
+    public Cairo.Color getCairo() {
+      return _cairo;
+    }
+    
     public Color(string name) {
       if (colors.ContainsKey(name)) {
 	_cairo = colors[name]._cairo;
@@ -387,10 +391,10 @@ public static class Graphics {
 
   public class WindowClass : Gtk.Window, ICanvas {
     internal _Canvas _canvas;
-    private bool _dirty = false;
+    internal bool _dirty = false;
     private bool timer_running = false;
     private DateTime last_update = new DateTime(2000,1,1);
-    private uint _update_interval = 100; // how often, in ms, to auto update
+    internal uint _update_interval = 100; // how often, in ms, to auto update
     public List onClickCallbacks = new List();
     public PythonTuple lastClick;
     ManualResetEvent lastClickFlag = new ManualResetEvent(false);
@@ -606,26 +610,27 @@ public static class Graphics {
   }
   
   public class Point {
+    // FIXME: should call QueueDraw on change of x,y
     public double x;
     public double y;
     public Point(object x, object y) {
-	  if (x is int) 
-		this.x = (int)x;
-	  else if (x is float) 
-		this.x = (float)x;
-	  else if (x is double)
-		this.x = (double)x;
-	  else
-		throw new Exception("Point: cannot convert x to a number");
-	  if (y is int) 
-		this.y = (int)y;
-	  else if (y is float) 
-		this.y = (float)y;
-	  else if (y is double)
-		this.y = (double)y;
-	  else
-		throw new Exception("Point: cannot convert y to a number");
-	}
+      if (x is int) 
+	this.x = (int)x;
+      else if (x is float) 
+	this.x = (float)x;
+      else if (x is double)
+	this.x = (double)x;
+      else
+	throw new Exception("Point: cannot convert x to a number");
+      if (y is int) 
+	this.y = (int)y;
+      else if (y is float) 
+	this.y = (float)y;
+      else if (y is double)
+	this.y = (double)y;
+      else
+	throw new Exception("Point: cannot convert y to a number");
+    }
     public Point(int x, int y) {
       this.x = (double)x;
       this.y = (double)y;
@@ -694,15 +699,15 @@ public static class Graphics {
   public class Shape {
     public Point center;
     public ICanvas window;
-    public double _rotation; // radians
-    public double _scale; // percent
+    internal double _rotation; // radians
+    internal double _scaleFactor; // percent
     
     public Point [] points;
     // FIXME: when done debugging
     //internal Cairo.Color? _fill;
     //internal Cairo.Color? _outline;
-    public Color _fill;
-    public Color _outline;
+    internal Color _fill;
+    internal Color _outline;
     private int _border;
     
     private Pen _pen;
@@ -710,7 +715,7 @@ public static class Graphics {
 	
     public Shape(bool has_pen=true) {
       _rotation = 0;
-      _scale = 1.0;
+      _scaleFactor = 1.0;
       center = new Point(0,0);
       this.has_pen = has_pen;
       if (this.has_pen) 
@@ -719,6 +724,10 @@ public static class Graphics {
       border = 1;
     }
     
+    // FIXME: points are in relative to center coordinates
+    // FIXME: set x,y of points should go from screen_coords to relative
+    // FIXME: should call QueueDraw on set
+
     public Point getP1()
     {
       return points[0];
@@ -734,19 +743,29 @@ public static class Graphics {
     }
 
     public bool has_pen {
-	  get {
-		return _has_pen;
-	  }
-	  set {
-	    _has_pen = value;
-	  }
-	}
+      get {
+	return _has_pen;
+      }
+      set {
+	_has_pen = value;
+      }
+    }
+    
     public double rotation {
       get {
 	return _rotation;
       }
       set {
 	rotateTo(value);
+      }
+    }
+
+    public double scaleFactor {
+      get {
+	return _scaleFactor;
+      }
+      set {
+	scaleTo(value);
       }
     }
 
@@ -765,15 +784,6 @@ public static class Graphics {
       }
       set {
 	moveTo(center.x, value);
-      }
-    }
-	
-    public double scale {
-      get {
-	return _scale;
-      }
-      set {
-	scaleTo(value);
       }
     }
 	
@@ -887,20 +897,6 @@ public static class Graphics {
       }
     }
     
-    public void moveTo(double x, double y) {
-      double dx = x - center.x;
-      double dy = y - center.y;
-      move(dx, dy);
-    }
-    
-    public void move(double dx, double dy) {
-      if (has_pen && pen.down)
-	pen.append_path(new Point(center.x + dx, center.y + dy));
-      center.x += dx;
-      center.y += dy;
-      QueueDraw();
-    }
-    
     public double screen_angle(double dir) {
       // Screen coords are 45 degrees from system
       return dir - (45 * Math.PI/180.0);
@@ -940,7 +936,7 @@ public static class Graphics {
 	temp = screen_coord(center);
 	g.Translate(temp.x, temp.y);
 	g.Rotate(_rotation);
-	g.Scale(_scale, _scale);
+	g.Scale(_scaleFactor, _scaleFactor);
 	temp = screen_coord(points[0]);
 	g.MoveTo(temp.x, temp.y);
 	for (int p = 1; p < points.Length; p++) {
@@ -949,11 +945,11 @@ public static class Graphics {
 	}
 	g.ClosePath();
 	if (_fill != null) {
-	  g.Color = _fill._cairo;
+	  g.Color = _fill.getCairo();
 	  g.FillPreserve();
 	}
 	if (_outline != null) {
-	  g.Color = _outline._cairo;
+	  g.Color = _outline.getCairo();
 	  g.Stroke();
 	}
 	if (has_pen)
@@ -967,18 +963,37 @@ public static class Graphics {
       return point; // new Point(point.x - center.x, point.y - center.y);
     }
     
+    public void move(double dx, double dy) {
+      if (has_pen && pen.down)
+	pen.append_path(new Point(center.x + dx, center.y + dy));
+      center.x += dx;
+      center.y += dy;
+      QueueDraw();
+    }
+
+    public void moveTo(double x, double y) {
+      double dx = x - center.x;
+      double dy = y - center.y;
+      move(dx, dy);
+    }
+        
     public void rotate(double degrees) {
-	  _rotation -= (Math.PI / 180.0) * degrees;
-	  QueueDraw();
-	}
+      _rotation -= (Math.PI / 180.0) * degrees;
+      QueueDraw();
+    }
     
     public void rotateTo(double degrees) {
       _rotation = degrees * (Math.PI) / 180.0;
       QueueDraw();
     }
     
+    public void scale(double percent) {
+      _scaleFactor *= percent;
+      QueueDraw();
+    }
+	
     public void scaleTo(double percent) {
-      _scale = percent;
+      _scaleFactor = percent;
       QueueDraw();
     }
     
@@ -1089,7 +1104,7 @@ public static class Graphics {
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
-      g.Scale(_scale, _scale);
+      g.Scale(_scaleFactor, _scaleFactor);
       if (_fill != null)
 	g.Color = _fill._cairo;
       else
@@ -1135,6 +1150,70 @@ public static class Graphics {
     }
     public Line(bool has_pen, Point p1, Point p2) : base(has_pen) {
       set_points(p1, p2);
+    }
+  }
+
+  public class Curve : Shape {
+    public Curve(IList iterable0, 
+		 IList iterable1, 
+		 IList iterable2, 
+		 IList iterable3) :
+    this(new Point(iterable0[0], iterable0[1]), 
+	 new Point(iterable1[0], iterable1[1]), 
+	 new Point(iterable2[0], iterable2[1]),
+	 new Point(iterable3[0], iterable3[1])
+	 ) {
+    }
+    public Curve(Point p0, Point p1, Point p2, Point p3) : 
+    this(true, p0, p1, p2, p3) {
+    }
+    public Curve(bool has_pen, 
+		 IList iterable0, 
+		 IList iterable1, 
+		 IList iterable2, 
+		 IList iterable3) : 
+    this(has_pen, 
+	 new Point(iterable0[0], iterable0[1]), 
+	 new Point(iterable1[0], iterable1[1]), 
+	 new Point(iterable2[0], iterable2[1]),
+	 new Point(iterable3[0], iterable3[1])
+	 ) {
+    }
+    public Curve(bool has_pen, Point p0, Point p1, Point p2, Point p3) : 
+    base(has_pen) {
+      set_points(p0, p1, p2, p3);
+      fill = null;
+    }    
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      Point temp, p1, p2, p3;
+      if (points != null) {
+	g.LineWidth = border;
+	temp = screen_coord(center);
+	g.Translate(temp.x, temp.y);
+	g.Rotate(_rotation);
+	g.Scale(_scaleFactor, _scaleFactor);
+	temp = screen_coord(points[0]);
+	g.MoveTo(temp.x, temp.y);
+	for (int p = 1; p < points.Length; p += 3) {
+	  p1 = screen_coord(points[p]);
+	  p2 = screen_coord(points[p+1]);
+	  p3 = screen_coord(points[p+2]);
+	  g.CurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+	}
+	if (_fill != null) {
+	  g.Color = _fill._cairo;
+	  g.FillPreserve();
+	}
+	if (_outline != null) {
+	  g.Color = _outline._cairo;
+	  g.Stroke();
+	}
+	if (has_pen)
+	  pen.render(g);
+      }
+      g.Restore();
     }
   }
   
@@ -1211,7 +1290,7 @@ public static class Graphics {
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
 	  g.Rotate(_rotation);
-	  g.Scale(_scale, _scale);
+	  g.Scale(_scaleFactor, _scaleFactor);
 	  if (path != null) {
 	    g.LineWidth = border;
 	    temp = screen_coord(path[0]);
@@ -1293,8 +1372,8 @@ public static class Graphics {
   }
   
   public class Picture : Shape {
-    public Gdk.Pixbuf _pixbuf; // in memory rep of picture
-    public Cairo.Format format = Cairo.Format.Rgb24;
+    Gdk.Pixbuf _pixbuf; // in memory rep of picture
+    Cairo.Format format = Cairo.Format.Rgb24;
     public Cairo.Surface surface;
     public Cairo.Context context;
     
@@ -1671,7 +1750,7 @@ public static class Graphics {
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
 	  g.Rotate(_rotation);
-	  g.Scale(_scale, _scale);
+	  g.Scale(_scaleFactor, _scaleFactor);
 	  Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.Paint();
 	  g.LineWidth = border;
@@ -1722,7 +1801,7 @@ public static class Graphics {
 	}
     
   }
-  
+
   public class Polygon : Shape {
     
     public Polygon(params object [] points) : base(true) {
@@ -1758,7 +1837,7 @@ public static class Graphics {
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
-      g.Scale(_scale, _scale);
+      g.Scale(_scaleFactor, _scaleFactor);
       if (points != null) {
         g.LineWidth = border;
         temp = screen_coord(points[0]);
@@ -1800,11 +1879,71 @@ public static class Graphics {
       // Temp is in Gtk coordinate system
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
-      g.Scale(_scale, _scale);
+      g.Scale(_scaleFactor, _scaleFactor);
       // Now move to 0,0 as origin of shape
       temp = screen_coord(points[0]);
       g.LineWidth = border;
       g.Arc(temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
+      g.ClosePath();
+      if (_fill != null) {
+	g.Color = _fill._cairo;
+	g.FillPreserve();
+      }
+      if (_outline != null) {
+	g.Color = _outline._cairo;
+	g.Stroke();
+      }
+      g.Restore();
+    }
+  }
+
+  public class Oval : Shape {
+    int _xRadius;
+    int _yRadius;
+    
+    public int xRadius {
+      get {
+	return _xRadius;
+      }
+      set {
+	_xRadius = value;
+	QueueDraw();
+      }
+    }
+    
+    public int yRadius {
+      get {
+	return _yRadius;
+      }
+      set {
+	_yRadius = value;
+	QueueDraw();
+      }
+    }
+
+    public Oval(IList iterable, int xRadius, int yRadius) :  this(new Point(iterable[0], iterable[1]), xRadius, yRadius) {
+    }
+
+    public Oval(Point point, int xRadius, int yRadius) : base(true) {
+      set_points(point);
+      _xRadius = xRadius;
+      _yRadius = yRadius;
+    }
+    
+    public override void render(Cairo.Context g) {
+      g.Save();
+      // Center is in global screen coords, whatever they are
+      Point temp = screen_coord(center);
+      // Temp is in Gtk coordinate system
+      g.Translate(temp.x, temp.y);
+      g.Rotate(_rotation);
+      g.Scale(_scaleFactor, _scaleFactor);
+      // Now, turn into an Oval:
+      g.Scale(1.0, ((double)_yRadius)/((double)_xRadius));
+      // Now move to 0,0 as origin of shape
+      temp = screen_coord(points[0]);
+      g.LineWidth = border;
+      g.Arc(temp.x, temp.y, _xRadius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
       g.ClosePath();
       if (_fill != null) {
 	g.Color = _fill._cairo;
@@ -1841,7 +1980,7 @@ public static class Graphics {
       // Temp is in Gtk coordinate system
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
-      g.Scale(_scale, _scale);
+      g.Scale(_scaleFactor, _scaleFactor);
       // Now move to 0,0 as origin of shape
       temp = screen_coord(points[0]);
       g.LineWidth = border;
@@ -1916,7 +2055,7 @@ public static class Graphics {
       // Temp is in Gtk coordinate system
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
-      g.Scale(_scale, _scale);
+      g.Scale(_scaleFactor, _scaleFactor);
       // Now move to 0,0 as origin of shape
       temp = screen_coord(points[0]);
       g.LineWidth = border;

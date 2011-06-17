@@ -28,11 +28,38 @@ using IronPython.Runtime; // List
 using IronRuby.Builtins; // RubyArray
 using System.Collections.Generic; // IList
 using System.Collections; // IEnumerator
+using System.Runtime.InteropServices; // Marshal
+using Tao.Sdl;
 
 public static class Games {
 
+  public static bool Initialize() {
+    //If this is not here, the Mixer will not be properly initialized.
+    Video.Initialize(); 
+    if ((Sdl.SDL_WasInit(Sdl.SDL_INIT_AUDIO))
+	== (int)SdlFlag.FalseValue) {
+      if (Sdl.SDL_Init(Sdl.SDL_INIT_AUDIO) != (int)SdlFlag.Success) {
+	throw SdlException.Generate();
+      }
+    }
+    return true;
+  }
+
   public static void beep() {
-    
+    Sdl.SDL_AudioSpec spec = new Sdl.SDL_AudioSpec();
+    int offset = 0;
+    MemoryStream stream = createTone(1, 100);
+    IntPtr pSpec = Marshal.AllocHGlobal(Marshal.SizeOf(spec));
+    Marshal.StructureToPtr(spec, pSpec, false);
+    Sdl.SDL_OpenAudio(pSpec, IntPtr.Zero);
+    spec = (Sdl.SDL_AudioSpec)Marshal.PtrToStructure(pSpec,
+					     typeof(Sdl.SDL_AudioSpec));
+    if (((ushort)spec.format & 0x8000) == 0x8000) {
+      // signed
+      offset = 0;
+    } else {
+      offset = 2 << ((byte)spec.format - 2);
+    }
   }
   
   public static MemoryStream createTone(int length, int frequency) {
