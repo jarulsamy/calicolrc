@@ -172,10 +172,10 @@ public static class Graphics {
     Gtk.Application.Invoke( delegate {
 	Gdk.Drawable drawable = can.getDrawable();
 	Gdk.Colormap colormap = drawable.Colormap;
-	int width = 0;
-	int height = 0;
-	drawable.GetSize(out width, out height);
-	pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, width, height);
+	int _width = 0;
+	int _height = 0;
+	drawable.GetSize(out _width, out _height);
+	pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, _width, _height);
 	ev.Set();
       });
     ev.WaitOne();
@@ -419,15 +419,15 @@ public static class Graphics {
     }
     
     public int getWidth() {
-      int width, height;
-      this.GetSize(out width, out height);
+      int _width, _height;
+      this.GetSize(out _width, out _height);
       return height;
     }
     
     public int getHeight() {
-      int width, height;
-      this.GetSize(out width, out height);
-      return width;
+      int _width, _height;
+      this.GetSize(out _width, out _height);
+      return _width;
     }
     
     void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
@@ -462,16 +462,16 @@ public static class Graphics {
     
     public int height {
       get {
-	int width, height;
-	this.GetSize(out width, out height);
-	return height;
+	int _width, _height;
+	this.GetSize(out _width, out _height);
+	return _height;
       }
     }
     public int width {
       get {
-	int width, height;
-	this.GetSize(out width, out height);
-	return width;
+	int _width, _height;
+	this.GetSize(out _width, out _height);
+	return _width;
       }
     }
 
@@ -703,7 +703,7 @@ public static class Graphics {
     //internal Cairo.Color? _outline;
     public Color _fill;
     public Color _outline;
-    private int _line_width;
+    private int _border;
     
     private Pen _pen;
     private bool _has_pen;
@@ -716,7 +716,7 @@ public static class Graphics {
       if (this.has_pen) 
 	pen = new Pen(new Color(0, 0, 0), 1);
       color = new Color(0, 0, 0);
-      line_width = 1;
+      border = 1;
     }
     
     public Point getP1()
@@ -777,12 +777,13 @@ public static class Graphics {
       }
     }
 	
-    public int line_width {
+    public int border {
       get {
-	return _line_width;
+	return _border;
       }
       set {
-	_line_width = value;
+	_border = value;
+	QueueDraw();
       }
     }
     
@@ -795,6 +796,7 @@ public static class Graphics {
 	  _pen = value;
 	  _pen.center.x = center.x;
 	  _pen.center.y = center.y;
+	  QueueDraw();
 	} else
 	    throw new Exception("this shape cannot have a pen");
       }
@@ -934,7 +936,7 @@ public static class Graphics {
       g.Save();
       Point temp;
       if (points != null) {
-	g.LineWidth = line_width;
+	g.LineWidth = border;
 	temp = screen_coord(center);
 	g.Translate(temp.x, temp.y);
 	g.Rotate(_rotation);
@@ -945,13 +947,12 @@ public static class Graphics {
 	  temp = screen_coord(points[p]);
 	  g.LineTo(temp.x, temp.y);
 	}
+	g.ClosePath();
 	if (_fill != null) {
-	  g.ClosePath();
 	  g.Color = _fill._cairo;
 	  g.FillPreserve();
-	  g.Color = _outline._cairo;
-	  g.Stroke();
-	} else {
+	}
+	if (_outline != null) {
 	  g.Color = _outline._cairo;
 	  g.Stroke();
 	}
@@ -1165,16 +1166,16 @@ public static class Graphics {
     private List<Point> _path; // = new List<Point>();
 	public bool _down;
     
-    public Pen(Color color, int width) : base(false) {
+    public Pen(Color color, int border) : base(false) {
       down = false;
       this.color = color;
-      this.line_width = width;
+      this.border = border;
     }
     
-    public Pen(int width) : base(false) {
+    public Pen(int border) : base(false) {
       down = false;
       this.color = new Color(0, 0, 0);
-      this.line_width = width;
+      this.border = border;
     }
     
     public void reset_path() {
@@ -1194,7 +1195,7 @@ public static class Graphics {
 	    return _down;
 	  }
 	  set {
-		_down = value;
+	    _down = value;
 	  }
 	}
     
@@ -1212,23 +1213,22 @@ public static class Graphics {
 	  g.Rotate(_rotation);
 	  g.Scale(_scale, _scale);
 	  if (path != null) {
-	    g.LineWidth = line_width;
-		temp = screen_coord(path[0]);
-		g.MoveTo(temp.x, temp.y);
-		for (int p = 1; p < path.Count; p++) {
-		  temp = screen_coord(path[p]);
-		  g.LineTo(temp.x, temp.y);
-		}
-		if (_fill != null) {
-		  g.ClosePath();
-		  g.Color = _fill._cairo;
-		  g.FillPreserve();
-		  g.Color = _outline._cairo;
-		  g.Stroke();
-		} else {
-		  g.Color = _outline._cairo;
-		  g.Stroke();
-		}
+	    g.LineWidth = border;
+	    temp = screen_coord(path[0]);
+	    g.MoveTo(temp.x, temp.y);
+	    for (int p = 1; p < path.Count; p++) {
+	      temp = screen_coord(path[p]);
+	      g.LineTo(temp.x, temp.y);
+	    }
+	    g.ClosePath();
+	    if (_fill != null) {
+	      g.Color = _fill._cairo;
+	      g.FillPreserve();
+	    }
+	    if (_outline != null) {
+	      g.Color = _outline._cairo;
+	      g.Stroke();
+	    }
 	  }
 	  g.Restore();
 	}
@@ -1674,27 +1674,29 @@ public static class Graphics {
 	  g.Scale(_scale, _scale);
 	  Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.Paint();
-	  g.LineWidth = line_width;
+	  g.LineWidth = border;
 	  g.MoveTo(-_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.LineTo(_pixbuf.Width/2, -_pixbuf.Height/2);
 	  g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
 	  g.ClosePath();
-	  g.Color = _outline._cairo;
-	  g.Stroke();
+	  if (_outline != null) {
+	    g.Color = _outline._cairo;
+	    g.Stroke();
+	  }
 	  g.Restore();
 	  // FIXME: add pen
 	}
     
-	public int width {
-	  get {
-		return _pixbuf.Width;
-	  }
-	}
+    public int width {
+      get {
+	return _pixbuf.Width;
+      }
+    }
     public int height {
-	  get {
-	    return _pixbuf.Height;
-	  }
+      get {
+	return _pixbuf.Height;
+      }
     }
 
     public Pixel [] get_pixels() {
@@ -1758,7 +1760,7 @@ public static class Graphics {
       g.Rotate(_rotation);
       g.Scale(_scale, _scale);
       if (points != null) {
-        g.LineWidth = line_width;
+        g.LineWidth = border;
         temp = screen_coord(points[0]);
         g.MoveTo(temp.x, temp.y);
         g.LineTo(temp.x + 1, temp.y + 1);
@@ -1773,17 +1775,14 @@ public static class Graphics {
 
   public class Circle : Shape {
     int _radius;
-    public int radius
-    {
-      get
-	{
-	  return _radius;
-	}
-      set
-	{
-	  _radius = value;
-	  QueueDraw();
-	}
+    public int radius {
+      get {
+	return _radius;
+      }
+      set {
+	_radius = value;
+	QueueDraw();
+      }
     }
 
     public Circle(IList iterable, int radius) :  this(new Point(iterable[0], iterable[1]), radius) {
@@ -1804,14 +1803,165 @@ public static class Graphics {
       g.Scale(_scale, _scale);
       // Now move to 0,0 as origin of shape
       temp = screen_coord(points[0]);
-      g.LineWidth = line_width;
+      g.LineWidth = border;
       g.Arc(temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
-      g.Color = _fill._cairo;
       g.ClosePath();
-      g.FillPreserve();
-      g.Color = _outline._cairo;
-      g.Stroke();
+      if (_fill != null) {
+	g.Color = _fill._cairo;
+	g.FillPreserve();
+      }
+      if (_outline != null) {
+	g.Color = _outline._cairo;
+	g.Stroke();
+      }
       g.Restore();
+    }
+  }
+
+  public class Pie : Shape {
+    int _radius;
+    double _start;
+    double _stop;
+
+    public Pie(IList iterable, int radius, double start, double stop) 
+    :  this(new Point(iterable[0], iterable[1]), radius, start, stop) {
+    }
+
+    public Pie(Point point, int radius, double start, double stop) : base(true) {
+      set_points(point);
+      _radius = radius;
+      _start = start;
+      _stop = stop;
+    }
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      // Center is in global screen coords, whatever they are
+      Point temp = screen_coord(center);
+      // Temp is in Gtk coordinate system
+      g.Translate(temp.x, temp.y);
+      g.Rotate(_rotation);
+      g.Scale(_scale, _scale);
+      // Now move to 0,0 as origin of shape
+      temp = screen_coord(points[0]);
+      g.LineWidth = border;
+      double tstart = start * (Math.PI) / 180.0;
+      double tstop = stop * (Math.PI) / 180.0;
+      g.MoveTo(temp.x, temp.y);
+      g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
+      g.ClosePath();
+      if (_fill != null) {
+	g.Color = _fill._cairo;
+	g.FillPreserve();
+      }
+      if (_outline != null) {
+	g.Color = _outline._cairo;
+	g.Stroke();
+      }
+      g.Restore();
+    }
+
+    public int radius {
+      get {
+	return _radius;
+      }
+      set {
+	_radius = value;
+	QueueDraw();
+      }
+    }
+
+    public double start {
+      get {
+	return _start;
+      }
+      set {
+	_start = value;
+	QueueDraw();
+      }
+    }
+
+    public double stop {
+      get {
+	return _stop;
+      }
+      set {
+	_stop = value;
+	QueueDraw();
+      }
+    }
+  }
+
+  public class Arc : Shape {
+    int _radius;
+    double _start;
+    double _stop;
+
+    public Arc(IList iterable, int radius, double start, double stop) 
+    :  this(new Point(iterable[0], iterable[1]), radius, start, stop) {
+    }
+
+    public Arc(Point point, int radius, double start, double stop) : base(true) {
+      set_points(point);
+      fill = null;
+      _radius = radius;
+      _start = start;
+      _stop = stop;
+    }
+
+    public override void render(Cairo.Context g) {
+      g.Save();
+      // Center is in global screen coords, whatever they are
+      Point temp = screen_coord(center);
+      // Temp is in Gtk coordinate system
+      g.Translate(temp.x, temp.y);
+      g.Rotate(_rotation);
+      g.Scale(_scale, _scale);
+      // Now move to 0,0 as origin of shape
+      temp = screen_coord(points[0]);
+      g.LineWidth = border;
+      double tstart = start * (Math.PI) / 180.0;
+      double tstop = stop * (Math.PI) / 180.0;
+      g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
+      if (_fill != null) {
+	g.Color = _fill._cairo;
+	g.FillPreserve();
+      }
+      if (_outline != null) {
+	g.Color = _outline._cairo;
+	g.Stroke();
+      }
+      g.Restore();
+    }
+
+    public int radius {
+      get {
+	return _radius;
+      }
+      set {
+	_radius = value;
+	QueueDraw();
+      }
+    }
+
+    public double start {
+      get {
+	return _start;
+      }
+      set {
+	_start = value;
+	QueueDraw();
+      }
+    }
+
+    public double stop {
+      get {
+	return _stop;
+      }
+      set {
+	_stop = value;
+	QueueDraw();
+      }
     }
   }
     
