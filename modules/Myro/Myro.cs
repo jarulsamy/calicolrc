@@ -2452,6 +2452,12 @@ public static class Myro {
   public static PythonTuple getRGBA(Graphics.Pixel pixel) {
     return pixel.getRGBA();
   }
+  public static int getX(Graphics.Pixel pixel) {
+    return pixel.x;
+  }
+  public static int getY(Graphics.Pixel pixel) {
+    return pixel.y;
+  }
   public static int getGray(Graphics.Pixel pixel) {
     return pixel.getGray();
   }
@@ -2520,6 +2526,9 @@ public static class Myro {
   public static Graphics.Picture makePicture(string filename) {
     return new Graphics.Picture(filename);
   }
+  public static Graphics.Picture makePicture(Graphics.Picture picture) {
+    return new Graphics.Picture(picture);
+  }
 
   public static Graphics.Picture makePicture(Graphics.WindowClass window) { //, string filename) {
     return Graphics.makePicture(window);
@@ -2533,6 +2542,14 @@ public static class Myro {
       int width=300,
       int height=300) {
     return Graphics.makeWindow(title, width, height);
+  }
+
+  public static Graphics.WindowClass getWindow() {
+    return Graphics.getWindow();
+  }
+
+  public static PythonTuple getMouse() {
+    return Graphics.getWindow().getMouse();
   }
 
   public static Graphics.WindowClass getWindow(string title) {

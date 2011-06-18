@@ -29,6 +29,8 @@ using System;
 
 public static class Graphics {
 
+  private static WindowClass _lastWindow = null;
+
   public static readonly Dictionary<string,Color> colors = 
     new Dictionary<string,Color>(){
 	{"black",     new Color(  0,   0,   0)},
@@ -189,10 +191,20 @@ public static class Graphics {
       _windows[title]._canvas.shapes.Clear();
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
+      _windows[title].QueueDraw();
       return _windows[title];
     } else {
       _windows[title] = new Graphics.WindowClass(title, width, height);
+      _lastWindow = _windows[title];
       return _windows[title];
+    }
+  }
+
+  public static Graphics.WindowClass getWindow() {
+    if (_lastWindow != null) {
+      return _lastWindow;
+    } else {
+      throw new Exception("no windows exist yet");
     }
   }
   
@@ -232,10 +244,10 @@ public static class Graphics {
 
   public class Color {
     internal Cairo.Color _cairo;
-    public ICanvas window;
-    public Picture picture;
-    public int x;
-    public int y;
+    public ICanvas window;  // for setting color of a Window()
+    public Picture picture; // for setting color of Picture()
+    public int x = -1; // for use with picture, above
+    public int y = -1; // for use with picture, above
 
     public Cairo.Color getCairo() {
       return _cairo;
@@ -288,8 +300,14 @@ public static class Graphics {
       set {
 	_cairo.R = ToCairo(value);
 	if (picture is Picture) {
-	  picture.setRed(x, y, (byte)value);
-	} else 
+	  if (x >= 0 && y >= 0)
+	    picture.setRed(x, y, (byte)value);
+	  else {
+            foreach (Pixel pixel in picture.getPixels()) {
+	      pixel.setRed((byte)value);
+            }
+	  }
+	} else
 	    QueueDraw();
       }
     }
@@ -301,7 +319,13 @@ public static class Graphics {
       set {
 	_cairo.G = ToCairo(value);
 	if (picture is Picture) {
-	  picture.setGreen(x, y, (byte)value);
+	  if (x >= 0 && y >= 0)
+            picture.setGreen(x, y, (byte)value);
+	  else {
+            foreach (Pixel pixel in picture.getPixels()) {
+	      pixel.setGreen((byte)value);
+            }
+	  }
 	} else
 	    QueueDraw();
       }
@@ -314,7 +338,13 @@ public static class Graphics {
       set {
 	_cairo.B = ToCairo(value);
 	if (picture is Picture) {
-	  picture.setBlue(x, y, (byte)value);
+	  if (x >= 0 && y >= 0)
+            picture.setBlue(x, y, (byte)value);
+	  else {
+            foreach (Pixel pixel in picture.getPixels()) {
+	      pixel.setBlue((byte)value);
+            }
+	  }
 	} else
 	    QueueDraw();
       }
@@ -327,7 +357,13 @@ public static class Graphics {
       set {
 	_cairo.A = ToCairo(value);
 	if (picture is Picture) {
-	  picture.setAlpha(x, y, (byte)value);
+	  if (x >= 0 && y >= 0)
+            picture.setAlpha(x, y, (byte)value);
+	  else {
+            foreach (Pixel pixel in picture.getPixels()) {
+	      pixel.setAlpha((byte)value);
+            }
+	  }
 	} else
 	    QueueDraw();
       }
@@ -358,6 +394,8 @@ public static class Graphics {
     _Canvas getCanvas();
     //int getWidth();
     //int getHeight();
+    void stackOnTop(Shape shape);
+    void stackOnBottom(Shape shape);
     string getMode();
     Gdk.Drawable getDrawable();
     void update();
@@ -386,6 +424,10 @@ public static class Graphics {
       return _canvas.mode;
     }
     public void update() { 
+    }
+    public void stackOnTop(Shape shape) {
+    }
+    public void stackOnBottom(Shape shape) {
     }
   }
 
@@ -434,6 +476,35 @@ public static class Graphics {
       return _width;
     }
     
+    public void draw(Shape shape) {
+      shape.draw(this);
+    }
+
+    public void undraw(Shape shape) {
+      shape.undraw();
+    }
+
+    public void stackOnTop(Shape shape) {
+      // last drawn is on top
+      if (_canvas.shapes.Contains(shape)) {
+	_canvas.shapes.Remove(shape);
+	_canvas.shapes.Insert(_canvas.shapes.Count, shape);
+	QueueDraw();
+      } else {
+	throw new Exception("shape not drawn on window");
+      }
+    }
+    public void stackOnBottom(Shape shape) {
+      // first drawn is on bottom
+      if (_canvas.shapes.Contains(shape)) {
+	_canvas.shapes.Remove(shape);
+	_canvas.shapes.Insert(0, shape);
+	QueueDraw();
+      } else {
+	throw new Exception("shape not drawn on window");
+      }
+    }
+
     void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
       lastClick = PyTuple(args.Event.X, args.Event.Y);
       lastClickFlag.Set();
@@ -720,13 +791,26 @@ public static class Graphics {
       this.has_pen = has_pen;
       if (this.has_pen) 
 	pen = new Pen(new Color(0, 0, 0), 1);
-      color = new Color(0, 0, 0);
-      border = 1;
+      color = new Color("gray");
+      outline = new Color("black");
+      border = 3;
     }
     
     // FIXME: points are in relative to center coordinates
     // FIXME: set x,y of points should go from screen_coords to relative
     // FIXME: should call QueueDraw on set
+
+    public void stackOnTop() {
+      if (window != null) {
+	window.stackOnTop(this);
+      }
+    }
+
+    public void stackOnBottom() {
+      if (window != null) {
+	window.stackOnBottom(this);
+      }
+    }
 
     public Point getP1()
     {
@@ -1014,26 +1098,25 @@ public static class Graphics {
     public void undraw() {
       Gtk.Application.Invoke(delegate { 
 	  window.getCanvas().shapes.Remove(this);
+	  if (window is WindowClass)
+	    ((WindowClass)window).QueueDraw();
 	  window = null;
-	  QueueDraw();
 	});
     }
 
     public Color color {
       set {
-	if (value != null) {
-	  _fill = ((Color)value).Copy();
-	  _outline = _fill;
-	} else {
-	  _fill = null;
-	  _outline = null;
-	}
-	QueueDraw();
+	    if (value != null) {
+	        _fill = ((Color)value).Copy();
+	        _outline = _fill;
+	    } else {
+	        _fill = null;
+	        _outline = null;
+	    }
+	    QueueDraw();
       }
-      get
-	{
-	  if (_fill != null)
-	    {
+      get {
+	    if (_fill != null) {
 	      _fill.window = this.window;
 	      return _fill; // share!
 	    } 
@@ -1042,7 +1125,7 @@ public static class Graphics {
 	}
     }
     
-    public Color fill {
+    public virtual Color fill {
       set {
 	if (value == null) {
 	  _fill = null;
@@ -1377,7 +1460,7 @@ public static class Graphics {
     public Cairo.Surface surface;
     public Cairo.Context context;
     
-    public Picture(string filename) : base(true) {
+    public Picture(string filename) : this(true) {
       _pixbuf = new Gdk.Pixbuf(filename);
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
@@ -1390,8 +1473,12 @@ public static class Graphics {
 		 new Point(_pixbuf.Width, _pixbuf.Height), 
 		 new Point(0, _pixbuf.Height));
     }
-    
-    public Picture(Picture original) : base(true) {
+
+    public Picture(bool has_pen) : base(has_pen) {
+        this._fill.picture = this;
+    }
+
+    public Picture(Picture original) : this(true) {
       // Colorspace, has_alpha, bits_per_sample, width, height:
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, original.getWidth(), original.getHeight());
       if (!_pixbuf.HasAlpha) {
@@ -1402,6 +1489,7 @@ public static class Graphics {
           byte r = (byte)original.getRed(x, y);
           byte g = (byte)original.getGreen(x, y);
           byte b = (byte)original.getBlue(x, y);
+          byte a = (byte)original.getAlpha(x, y);
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 0, r);
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -1409,7 +1497,7 @@ public static class Graphics {
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 2, b);
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 3, 255);
+              x * _pixbuf.NChannels + 3, a);
         }
       }
       format = Cairo.Format.Argb32;
@@ -1418,60 +1506,60 @@ public static class Graphics {
       set_points(original.points);
     }
     
-	public Picture(Gdk.Pixbuf pixbuf) : base(true) {
-	  _pixbuf = pixbuf;
-	  if (!_pixbuf.HasAlpha) {
-	    _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-	  }
-	  format = Cairo.Format.Argb32;
-	  // Create a new ImageSurface
-	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  set_points(new Point(0, 0), 
-		     new Point(_pixbuf.Width, 0),
-		     new Point(_pixbuf.Width, _pixbuf.Height), 
-		     new Point(0, _pixbuf.Height));
-	}
-
-    public Picture(System.Drawing.Bitmap bitmap, int width, int height) : base(true) {
-      // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-	  if (!_pixbuf.HasAlpha) {
-	    _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-	  }
-	  for (int x=0; x < _pixbuf.Width; x += 2) {
-		for (int y=0; y < _pixbuf.Height; y++) {
-		  System.Drawing.Color pixel = bitmap.GetPixel(x/2, y);
-		  // First pixel
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x * _pixbuf.NChannels + 0, pixel.R);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x * _pixbuf.NChannels + 1, pixel.G);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x * _pixbuf.NChannels + 2, pixel.B);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x * _pixbuf.NChannels + 3, pixel.A);
-		  // Second pixel
-		  int x2 = x + 1;
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x2 * _pixbuf.NChannels + 0, pixel.R);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x2 * _pixbuf.NChannels + 1, pixel.G);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x2 * _pixbuf.NChannels + 2, pixel.B);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			  x2 * _pixbuf.NChannels + 3, pixel.A);
-		}
-	  }
-	  format = Cairo.Format.Argb32;
-	  // Create a new ImageSurface
-	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  set_points(new Point(0, 0), 
-		     new Point(_pixbuf.Width, 0),
-		     new Point(_pixbuf.Width, _pixbuf.Height), 
-		     new Point(0, _pixbuf.Height));
+    public Picture(Gdk.Pixbuf pixbuf) : this(true) {
+      _pixbuf = pixbuf;
+      if (!_pixbuf.HasAlpha) {
+	_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+      }
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+      set_points(new Point(0, 0), 
+		 new Point(_pixbuf.Width, 0),
+		 new Point(_pixbuf.Width, _pixbuf.Height), 
+		 new Point(0, _pixbuf.Height));
     }
 
-    public Picture(int width, int height, byte [] buffer, int depth) : base(true) {
+    public Picture(System.Drawing.Bitmap bitmap, int width, int height) : this(true) {
+      // Colorspace, has_alpha, bits_per_sample, width, height:
+      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
+      if (!_pixbuf.HasAlpha) {
+	_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+      }
+      for (int x=0; x < _pixbuf.Width; x += 2) {
+	for (int y=0; y < _pixbuf.Height; y++) {
+	  System.Drawing.Color pixel = bitmap.GetPixel(x/2, y);
+	  // First pixel
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 0, pixel.R);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 1, pixel.G);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 2, pixel.B);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 3, pixel.A);
+	  // Second pixel
+	  int x2 = x + 1;
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x2 * _pixbuf.NChannels + 0, pixel.R);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x2 * _pixbuf.NChannels + 1, pixel.G);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x2 * _pixbuf.NChannels + 2, pixel.B);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x2 * _pixbuf.NChannels + 3, pixel.A);
+	}
+      }
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+      set_points(new Point(0, 0), 
+		 new Point(_pixbuf.Width, 0),
+		 new Point(_pixbuf.Width, _pixbuf.Height), 
+		 new Point(0, _pixbuf.Height));
+    }
+    
+    public Picture(int width, int height, byte [] buffer, int depth) : this(true) {
       // depth should be 1
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
@@ -1502,7 +1590,7 @@ public static class Graphics {
 		     new Point(0, _pixbuf.Height));
     }
 
-    public Picture(int width, int height, byte [] buffer) : base(true) {
+    public Picture(int width, int height, byte [] buffer) : this(true) {
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
 	  if (!_pixbuf.HasAlpha) {
@@ -1532,7 +1620,7 @@ public static class Graphics {
 		     new Point(0, _pixbuf.Height));
     }
 
-    public Picture(int width, int height) : base(true) {
+    public Picture(int width, int height) : this(true) {
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
 	  if (!_pixbuf.HasAlpha) {
@@ -1561,35 +1649,35 @@ public static class Graphics {
 		     new Point(0, _pixbuf.Height));
     }
 
-    public Picture(int width, int height, Color color) : base(true) {
+    public Picture(int width, int height, Color color) : this(true) {
 	  // Colorspace, has_alpha, bits_per_sample, width, height:
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-	  if (!_pixbuf.HasAlpha) {
-	    _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-	  }
-	  // WORKAROUND: image needs alpha set to zero (full opacity/no
-	  // transparency). Might as well set default color, too:
-	  for (int x=0; x < _pixbuf.Width; x++) {
-		for (int y=0; y < _pixbuf.Height; y++) {
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				    x * _pixbuf.NChannels + 0, (byte)color.red);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				    x * _pixbuf.NChannels + 1, (byte)color.green);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				    x * _pixbuf.NChannels + 2, (byte)color.blue);
-		  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				    x * _pixbuf.NChannels + 3, (byte)color.alpha);
-		}
-	  }
-	  format = Cairo.Format.Argb32;
-	  // Create a new ImageSurface
-	  surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
-	  set_points(new Point(0, 0), 
-		     new Point(_pixbuf.Width, 0),
-		     new Point(_pixbuf.Width, _pixbuf.Height), 
-		     new Point(0, _pixbuf.Height));
+      if (!_pixbuf.HasAlpha) {
+	_pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
+      }
+      // WORKAROUND: image needs alpha set to zero (full opacity/no
+      // transparency). Might as well set default color, too:
+      for (int x=0; x < _pixbuf.Width; x++) {
+	for (int y=0; y < _pixbuf.Height; y++) {
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 0, (byte)color.red);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 1, (byte)color.green);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 2, (byte)color.blue);
+	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			    x * _pixbuf.NChannels + 3, (byte)color.alpha);
+	}
+      }
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
+      set_points(new Point(0, 0), 
+		 new Point(_pixbuf.Width, 0),
+		 new Point(_pixbuf.Width, _pixbuf.Height), 
+		 new Point(0, _pixbuf.Height));
     }
-
+    
     public Gdk.Pixbuf getPixbuf()
     {
       return _pixbuf;
@@ -1681,13 +1769,6 @@ public static class Graphics {
 				  x * _pixbuf.NChannels + 3);
 	}
     
-	public void setRed(int x, int y, byte value) {
-	  // red, green, blue, alpha
-	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
-			    x * _pixbuf.NChannels + 0, value);
-	  QueueDraw();
-	}
-
     public void setGray(int x, int y, byte value) {
 	  // red, green, blue, alpha
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -1699,6 +1780,13 @@ public static class Graphics {
       QueueDraw();
 	}
     
+    public void setRed(int x, int y, byte value) {
+      // red, green, blue, alpha
+      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+                x * _pixbuf.NChannels + 0, value);
+      QueueDraw();
+    }
+
 	public void setGreen(int x, int y, byte value) {
 	  // red, green, blue, alpha
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -1744,7 +1832,17 @@ public static class Graphics {
 		  x * _pixbuf.NChannels + 3, alpha);
 	  QueueDraw();
 	}
-    
+
+    public override Color fill {
+        // operate on picture
+        get {
+            return _fill;
+        }
+        set {
+            value.picture = this;
+        }
+    }
+
 	public override void render(Cairo.Context g) {
 	  g.Save();
 	  Point temp = screen_coord(center);

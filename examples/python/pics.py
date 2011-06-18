@@ -22,9 +22,9 @@ from Graphics import *
 from Myro import wait
 import random
 
-file = "../images/blankenship.jpg"
+filename = "../images/blankenship.jpg"
 win = Window("Laura")
-pic = Picture(file)
+pic = Picture(filename)
 pic.draw(win)
 pixels = list(pic.getPixels())
 

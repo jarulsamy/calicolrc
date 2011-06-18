@@ -19,14 +19,14 @@
 # $Id: $
 
 from Graphics import *
-win = Window("Mandelbrot", 150, 150)
+win = Window("Mandelbrot", 300, 300)
 pic = Picture(win.width, win.height)
 pic.draw(win)
 
-xa = 0.0 #-2.0
+xa = -2.0
 xb = 1.0
-ya = 0.0 #-1.5
-yb = 1.0 # 1.5
+ya = -1.5
+yb = 1.5
 maxIt = 255 # max iterations allowed
 
 for y in range(pic.height):
@@ -38,5 +38,7 @@ for y in range(pic.height):
         for i in range(maxIt):
             if abs(z) > 2.0: break 
             z = z * z + c
+        if i == maxIt - 1:
+            i = 0
         pic.setRGB(x, y, i % 4 * 64, i % 16 * 16, i % 8 * 32)
 
