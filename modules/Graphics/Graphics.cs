@@ -400,7 +400,12 @@ public static class Graphics {
     }
     
     public Color(string name) {
-      if (colors.ContainsKey(name.ToLower())) {
+      if (name.StartsWith("#")) {
+	int r = (int)System.Convert.ToUInt32(name.Substring(1, 2), 16);
+	int g = (int)System.Convert.ToUInt32(name.Substring(3, 2), 16);
+	int b = (int)System.Convert.ToUInt32(name.Substring(5, 2), 16);
+	_cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b));
+      } else if (colors.ContainsKey(name.ToLower())) {
 	_cairo = colors[name.ToLower()]._cairo;
       } else {
 	throw new Exception(String.Format("unknown colorname '{0}'", name));
