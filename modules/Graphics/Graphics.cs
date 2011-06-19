@@ -456,6 +456,18 @@ public static class Graphics {
       ShowAll();
     }
 
+    public void setBackground(Color color) {
+      Gtk.Application.Invoke(delegate { 
+	  Gdk.Color bg = new Gdk.Color((byte)color.red, 
+				       (byte)color.green, 
+				       (byte)color.blue);
+	  Gdk.Colormap colormap = Gdk.Colormap.System;
+	  colormap.AllocColor(ref bg, true, true);
+	  _canvas.GdkWindow.Background = bg;
+	  QueueDraw();
+	});
+    }
+    
     public Gdk.Drawable getDrawable() {
       return GdkWindow;
     }
