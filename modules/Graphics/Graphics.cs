@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Collections; // IEnumerable
 using System.Threading;
 using System.Drawing; // Image, Bitmap
+using System.Net; // WebRequest
 using System.IO; // MemoryStream
 using System;
 
@@ -32,19 +33,154 @@ public static class Graphics {
   private static WindowClass _lastWindow = null;
 
   public static readonly Dictionary<string,Color> colors = 
-    new Dictionary<string,Color>(){
-	{"black",     new Color(  0,   0,   0)},
-	{"blue",      new Color(  0,   0, 255)},
-	{"green",     new Color(  0, 255,   0)},
-        {"cyan",      new Color(  0, 255, 255)},
-        {"darkGray",  new Color( 64,  64,  64)},
-        {"gray",      new Color(128, 128, 128)},
-        {"lightGray", new Color(192, 192, 192)},
-	{"red",       new Color(255,   0,   0)},
-        {"magenta",   new Color(255,   0, 255)},
-        {"pink",      new Color(255, 175, 175)},
-	{"yellow",    new Color(255, 255,   0)},
-	{"white",     new Color(255, 255, 255)}
+    new Dictionary<string,Color>() {
+       {"black", new Color(0x00, 0x00, 0x00)}, 
+       {"navy", new Color(0x00, 0x00, 0x80)}, 
+       {"darkblue", new Color(0x00, 0x00, 0x8B)}, 
+       {"mediumblue", new Color(0x00, 0x00, 0xCD)}, 
+       {"blue", new Color(0x00, 0x00, 0xFF)}, 
+       {"darkgreen", new Color(0x00, 0x64, 0x00)}, 
+       {"green", new Color(0x00, 0x80, 0x00)}, 
+       {"teal", new Color(0x00, 0x80, 0x80)}, 
+       {"darkcyan", new Color(0x00, 0x8B, 0x8B)}, 
+       {"deepskyblue", new Color(0x00, 0xBF, 0xFF)}, 
+       {"darkturquoise", new Color(0x00, 0xCE, 0xD1)}, 
+       {"mediumspringgreen", new Color(0x00, 0xFA, 0x9A)}, 
+       {"lime", new Color(0x00, 0xFF, 0x00)}, 
+       {"springgreen", new Color(0x00, 0xFF, 0x7F)}, 
+       {"aqua", new Color(0x00, 0xFF, 0xFF)}, 
+       {"cyan", new Color(0x00, 0xFF, 0xFF)}, 
+       {"midnightblue", new Color(0x19, 0x19, 0x70)}, 
+       {"dodgerblue", new Color(0x1E, 0x90, 0xFF)}, 
+       {"lightseagreen", new Color(0x20, 0xB2, 0xAA)}, 
+       {"forestgreen", new Color(0x22, 0x8B, 0x22)}, 
+       {"seagreen", new Color(0x2E, 0x8B, 0x57)}, 
+       {"darkslategray", new Color(0x2F, 0x4F, 0x4F)}, 
+       {"darkslategrey", new Color(0x2F, 0x4F, 0x4F)}, 
+       {"limegreen", new Color(0x32, 0xCD, 0x32)}, 
+       {"mediumseagreen", new Color(0x3C, 0xB3, 0x71)}, 
+       {"turquoise", new Color(0x40, 0xE0, 0xD0)}, 
+       {"royalblue", new Color(0x41, 0x69, 0xE1)}, 
+       {"steelblue", new Color(0x46, 0x82, 0xB4)}, 
+       {"darkslateblue", new Color(0x48, 0x3D, 0x8B)}, 
+       {"mediumturquoise", new Color(0x48, 0xD1, 0xCC)}, 
+       {"indigo", new Color(0x4B, 0x00, 0x82)}, 
+       {"darkolivegreen", new Color(0x55, 0x6B, 0x2F)}, 
+       {"cadetblue", new Color(0x5F, 0x9E, 0xA0)}, 
+       {"cornflowerblue", new Color(0x64, 0x95, 0xED)}, 
+       {"mediumaquamarine", new Color(0x66, 0xCD, 0xAA)}, 
+       {"dimgray", new Color(0x69, 0x69, 0x69)}, 
+       {"dimgrey", new Color(0x69, 0x69, 0x69)}, 
+       {"slateblue", new Color(0x6A, 0x5A, 0xCD)}, 
+       {"olivedrab", new Color(0x6B, 0x8E, 0x23)}, 
+       {"slategray", new Color(0x70, 0x80, 0x90)}, 
+       {"slategrey", new Color(0x70, 0x80, 0x90)}, 
+       {"lightslategray", new Color(0x77, 0x88, 0x99)}, 
+       {"lightslategrey", new Color(0x77, 0x88, 0x99)}, 
+       {"mediumslateblue", new Color(0x7B, 0x68, 0xEE)}, 
+       {"lawngreen", new Color(0x7C, 0xFC, 0x00)}, 
+       {"chartreuse", new Color(0x7F, 0xFF, 0x00)}, 
+       {"aquamarine", new Color(0x7F, 0xFF, 0xD4)}, 
+       {"maroon", new Color(0x80, 0x00, 0x00)}, 
+       {"purple", new Color(0x80, 0x00, 0x80)}, 
+       {"olive", new Color(0x80, 0x80, 0x00)}, 
+       {"gray", new Color(0x80, 0x80, 0x80)}, 
+       {"grey", new Color(0x80, 0x80, 0x80)}, 
+       {"skyblue", new Color(0x87, 0xCE, 0xEB)}, 
+       {"lightskyblue", new Color(0x87, 0xCE, 0xFA)}, 
+       {"blueviolet", new Color(0x8A, 0x2B, 0xE2)}, 
+       {"darkred", new Color(0x8B, 0x00, 0x00)}, 
+       {"darkmagenta", new Color(0x8B, 0x00, 0x8B)}, 
+       {"saddlebrown", new Color(0x8B, 0x45, 0x13)}, 
+       {"darkseagreen", new Color(0x8F, 0xBC, 0x8F)}, 
+       {"lightgreen", new Color(0x90, 0xEE, 0x90)}, 
+       {"mediumpurple", new Color(0x93, 0x70, 0xD8)}, 
+       {"darkviolet", new Color(0x94, 0x00, 0xD3)}, 
+       {"palegreen", new Color(0x98, 0xFB, 0x98)}, 
+       {"darkorchid", new Color(0x99, 0x32, 0xCC)}, 
+       {"yellowgreen", new Color(0x9A, 0xCD, 0x32)}, 
+       {"sienna", new Color(0xA0, 0x52, 0x2D)}, 
+       {"brown", new Color(0xA5, 0x2A, 0x2A)}, 
+       {"darkgray", new Color(0xA9, 0xA9, 0xA9)}, 
+       {"darkgrey", new Color(0xA9, 0xA9, 0xA9)}, 
+       {"lightblue", new Color(0xAD, 0xD8, 0xE6)}, 
+       {"greenyellow", new Color(0xAD, 0xFF, 0x2F)}, 
+       {"paleturquoise", new Color(0xAF, 0xEE, 0xEE)}, 
+       {"lightsteelblue", new Color(0xB0, 0xC4, 0xDE)}, 
+       {"powderblue", new Color(0xB0, 0xE0, 0xE6)}, 
+       {"firebrick", new Color(0xB2, 0x22, 0x22)}, 
+       {"darkgoldenrod", new Color(0xB8, 0x86, 0x0B)}, 
+       {"mediumorchid", new Color(0xBA, 0x55, 0xD3)}, 
+       {"rosybrown", new Color(0xBC, 0x8F, 0x8F)}, 
+       {"darkkhaki", new Color(0xBD, 0xB7, 0x6B)}, 
+       {"silver", new Color(0xC0, 0xC0, 0xC0)}, 
+       {"mediumvioletred", new Color(0xC7, 0x15, 0x85)}, 
+       {"indianred", new Color(0xCD, 0x5C, 0x5C)}, 
+       {"peru", new Color(0xCD, 0x85, 0x3F)}, 
+       {"chocolate", new Color(0xD2, 0x69, 0x1E)}, 
+       {"tan", new Color(0xD2, 0xB4, 0x8C)}, 
+       {"lightgray", new Color(0xD3, 0xD3, 0xD3)}, 
+       {"lightgrey", new Color(0xD3, 0xD3, 0xD3)}, 
+       {"palevioletred", new Color(0xD8, 0x70, 0x93)}, 
+       {"thistle", new Color(0xD8, 0xBF, 0xD8)}, 
+       {"orchid", new Color(0xDA, 0x70, 0xD6)}, 
+       {"goldenrod", new Color(0xDA, 0xA5, 0x20)}, 
+       {"crimson", new Color(0xDC, 0x14, 0x3C)}, 
+       {"gainsboro", new Color(0xDC, 0xDC, 0xDC)}, 
+       {"plum", new Color(0xDD, 0xA0, 0xDD)}, 
+       {"burlywood", new Color(0xDE, 0xB8, 0x87)}, 
+       {"lightcyan", new Color(0xE0, 0xFF, 0xFF)}, 
+       {"lavender", new Color(0xE6, 0xE6, 0xFA)}, 
+       {"darksalmon", new Color(0xE9, 0x96, 0x7A)}, 
+       {"violet", new Color(0xEE, 0x82, 0xEE)}, 
+       {"palegoldenrod", new Color(0xEE, 0xE8, 0xAA)}, 
+       {"lightcoral", new Color(0xF0, 0x80, 0x80)}, 
+       {"khaki", new Color(0xF0, 0xE6, 0x8C)}, 
+       {"aliceblue", new Color(0xF0, 0xF8, 0xFF)}, 
+       {"honeydew", new Color(0xF0, 0xFF, 0xF0)}, 
+       {"azure", new Color(0xF0, 0xFF, 0xFF)}, 
+       {"sandybrown", new Color(0xF4, 0xA4, 0x60)}, 
+       {"wheat", new Color(0xF5, 0xDE, 0xB3)}, 
+       {"beige", new Color(0xF5, 0xF5, 0xDC)}, 
+       {"whitesmoke", new Color(0xF5, 0xF5, 0xF5)}, 
+       {"mintcream", new Color(0xF5, 0xFF, 0xFA)}, 
+       {"ghostwhite", new Color(0xF8, 0xF8, 0xFF)}, 
+       {"salmon", new Color(0xFA, 0x80, 0x72)}, 
+       {"antiquewhite", new Color(0xFA, 0xEB, 0xD7)}, 
+       {"linen", new Color(0xFA, 0xF0, 0xE6)}, 
+       {"lightgoldenrodyellow", new Color(0xFA, 0xFA, 0xD2)}, 
+       {"oldlace", new Color(0xFD, 0xF5, 0xE6)}, 
+       {"red", new Color(0xFF, 0x00, 0x00)}, 
+       {"fuchsia", new Color(0xFF, 0x00, 0xFF)}, 
+       {"magenta", new Color(0xFF, 0x00, 0xFF)}, 
+       {"deeppink", new Color(0xFF, 0x14, 0x93)}, 
+       {"orangered", new Color(0xFF, 0x45, 0x00)}, 
+       {"tomato", new Color(0xFF, 0x63, 0x47)}, 
+       {"hotpink", new Color(0xFF, 0x69, 0xB4)}, 
+       {"coral", new Color(0xFF, 0x7F, 0x50)}, 
+       {"darkorange", new Color(0xFF, 0x8C, 0x00)}, 
+       {"lightsalmon", new Color(0xFF, 0xA0, 0x7A)}, 
+       {"orange", new Color(0xFF, 0xA5, 0x00)}, 
+       {"lightpink", new Color(0xFF, 0xB6, 0xC1)}, 
+       {"pink", new Color(0xFF, 0xC0, 0xCB)}, 
+       {"gold", new Color(0xFF, 0xD7, 0x00)}, 
+       {"peachpuff", new Color(0xFF, 0xDA, 0xB9)}, 
+       {"navajowhite", new Color(0xFF, 0xDE, 0xAD)}, 
+       {"moccasin", new Color(0xFF, 0xE4, 0xB5)}, 
+       {"bisque", new Color(0xFF, 0xE4, 0xC4)}, 
+       {"mistyrose", new Color(0xFF, 0xE4, 0xE1)}, 
+       {"blanchedalmond", new Color(0xFF, 0xEB, 0xCD)}, 
+       {"papayawhip", new Color(0xFF, 0xEF, 0xD5)}, 
+       {"lavenderblush", new Color(0xFF, 0xF0, 0xF5)}, 
+       {"seashell", new Color(0xFF, 0xF5, 0xEE)}, 
+       {"cornsilk", new Color(0xFF, 0xF8, 0xDC)}, 
+       {"lemonchiffon", new Color(0xFF, 0xFA, 0xCD)}, 
+       {"floralwhite", new Color(0xFF, 0xFA, 0xF0)}, 
+       {"snow", new Color(0xFF, 0xFA, 0xFA)}, 
+       {"yellow", new Color(0xFF, 0xFF, 0x00)}, 
+       {"lightyellow", new Color(0xFF, 0xFF, 0xE0)}, 
+       {"ivory", new Color(0xFF, 0xFF, 0xF0)}, 
+       {"white", new Color(0xFF, 0xFF, 0xFF)}, 
     };
   
   public static List PyList(params object [] items) {
@@ -254,8 +390,8 @@ public static class Graphics {
     }
     
     public Color(string name) {
-      if (colors.ContainsKey(name)) {
-	_cairo = colors[name]._cairo;
+      if (colors.ContainsKey(name.ToLower())) {
+	_cairo = colors[name.ToLower()]._cairo;
       } else {
 	throw new Exception(String.Format("unknown colorname '{0}'", name));
       }
@@ -1479,7 +1615,16 @@ public static class Graphics {
     public Cairo.Context context;
     
     public Picture(string filename) : this(true) {
-      _pixbuf = new Gdk.Pixbuf(filename);
+      if (filename.StartsWith("http://")) {
+	HttpWebRequest req = (HttpWebRequest) WebRequest.Create(filename);
+	req.KeepAlive = false;
+	req.Timeout = 10000;	
+	WebResponse resp = req.GetResponse();
+	Stream s = resp.GetResponseStream();
+	_pixbuf = new Gdk.Pixbuf(s);
+      } else {
+	_pixbuf = new Gdk.Pixbuf(filename);
+      }
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
       }
