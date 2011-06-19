@@ -328,9 +328,19 @@ public static class Graphics {
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
       _windows[title].QueueDraw();
+      /*
+      Gtk.Application.Invoke(delegate { 
+	  _windows[title].GdkWindow.UrgencyHint = true;
+	});
+      */
       return _windows[title];
     } else {
       _windows[title] = new Graphics.WindowClass(title, width, height);
+      /*
+      Gtk.Application.Invoke(delegate { 
+	  _windows[title].GdkWindow.UrgencyHint = true;
+	});
+      */
       _lastWindow = _windows[title];
       return _windows[title];
     }
@@ -810,13 +820,19 @@ public static class Graphics {
       // doesn't update too fast.
       DateTime now = DateTime.Now;
       // diff is TimeSpan
-      double diff = (now - last_update).TotalMilliseconds * 100;
+      double diff = (now - last_update).TotalMilliseconds;
       if (diff < step_time) {
 	Thread.Sleep((int)(step_time - diff));
       }
       last_update = DateTime.Now;
       _dirty = false;
-      QueueDraw(); // gtk
+      ManualResetEvent ev = new ManualResetEvent(false);
+      Gtk.Application.Invoke(delegate { 
+	  QueueDraw();
+	  GdkWindow.ProcessUpdates(true);
+	  ev.Set();
+	});
+      ev.WaitOne();
     }
 
     public override string ToString()

@@ -48,6 +48,8 @@ public static class Extensions {
 }
 
 public static class Myro {
+  //public readonly static List __all__ = new List() {"robot"};
+
   public static Robot robot;
   public readonly static Computer computer = new Computer();
   static string dialogResponse = null;

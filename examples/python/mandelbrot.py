@@ -20,6 +20,7 @@
 
 from Graphics import *
 win = Window("Mandelbrot", 300, 300)
+win.mode = "manual"
 pic = Picture(win.width, win.height)
 pic.draw(win)
 
@@ -41,4 +42,4 @@ for y in range(pic.height):
         if i == maxIt - 1:
             i = 0
         pic.setRGB(x, y, i % 4 * 64, i % 16 * 16, i % 8 * 32)
-
+    win.step()
