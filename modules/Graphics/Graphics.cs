@@ -456,6 +456,12 @@ public static class Graphics {
       ShowAll();
     }
 
+    public void close() {
+      Gtk.Application.Invoke(delegate { 
+	  Hide();
+	});
+    }
+
     public void setBackground(Color color) {
       Gtk.Application.Invoke(delegate { 
 	  Gdk.Color bg = new Gdk.Color((byte)color.red, 
