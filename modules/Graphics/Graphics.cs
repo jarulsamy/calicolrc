@@ -815,14 +815,14 @@ public static class Graphics {
     public void step() { // Window
       step(0);
     }
-    public void step(int step_time) { // Window
+    public void step(double step_time) { // Window, in seconds
       // Same as update, but will make sure it 
       // doesn't update too fast.
       DateTime now = DateTime.Now;
-      // diff is TimeSpan
-      double diff = (now - last_update).TotalMilliseconds;
+      // diff is TimeSpan, converted to seconds:
+      double diff = (now - last_update).TotalMilliseconds / 1000.0;
       if (diff < step_time) {
-	Thread.Sleep((int)(step_time - diff));
+	Thread.Sleep((int)((step_time - diff) * 1000));
       }
       last_update = DateTime.Now;
       _dirty = false;

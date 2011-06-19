@@ -42,4 +42,4 @@ for y in range(pic.height):
         if i == maxIt - 1:
             i = 0
         pic.setRGB(x, y, i % 4 * 64, i % 16 * 16, i % 8 * 32)
-    win.step()
+    win.step(.01)
