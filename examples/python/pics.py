@@ -41,7 +41,7 @@ def spin():
     for times in range(3):
         for degrees in range(0, 360, 10):
             pic.rotate(10)
-            win.step(100)
+            win.step(.1)
 
 def sortem():
     pixels.sort(key=lambda p: p.x + p.y)

@@ -35,7 +35,7 @@ for x in range(36):
 win.mode = "manual"
 for x in range(36):
     pic.rotate(10)
-    win.step(100)
+    win.step(.1)
 
 def negative(pic):
     for pixel in getPixels(pic):

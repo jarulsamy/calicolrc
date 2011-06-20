@@ -67,4 +67,4 @@ def animate():
     win.mode = "manual"
     for i in range(20):
         g.rotate(10)
-        win.step(500)
+        win.step(.5)

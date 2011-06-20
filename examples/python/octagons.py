@@ -38,7 +38,7 @@ for rows in range(10):
         for x in range(8):
             turtle1.rotate(45)
             turtle1.forward(10)
-            win.step(100)
+            win.step(.1)
         s = turtle1.penUp()
         hexes.append(s)
         s.fill = makeColor(random.choice(["red", "black", "green", "white"]))
@@ -56,7 +56,7 @@ for x in range(100):
     random.shuffle(hexes)
     for s in hexes:
         s.color.alpha = min(max(s.color.alpha + random.random() * 128 - 64, 0), 255)
-    win.step(100)
+    win.step(.1)
 
 """
 win.mode = 'auto'
