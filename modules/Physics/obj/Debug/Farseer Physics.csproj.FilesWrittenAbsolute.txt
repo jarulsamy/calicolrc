@@ -1,0 +1,4 @@
+/home/dblank/Desktop/Farseer Physics Engine 3.3.1 Class/bin/Debug/FarseerPhysics.dll.mdb
+/home/dblank/Desktop/Farseer Physics Engine 3.3.1 Class/bin/Debug/FarseerPhysics.dll
+/home/dblank/Desktop/Farseer Physics Engine 3.3.1 Class/obj/Debug/FarseerPhysics.dll
+/home/dblank/Desktop/Farseer Physics Engine 3.3.1 Class/obj/Debug/FarseerPhysics.dll.mdb

@@ -827,7 +827,7 @@ public static class Graphics {
       // diff is TimeSpan, converted to seconds:
       double diff = (now - last_update).TotalMilliseconds / 1000.0;
       if (diff < step_time) {
-	Thread.Sleep((int)((step_time - diff) * 1000));
+	    Thread.Sleep((int)((step_time - diff) * 1000));
       }
       last_update = DateTime.Now;
       _dirty = false;
@@ -2081,7 +2081,14 @@ public static class Graphics {
 		     new Point(point2.x, point2.y),
 		     new Point(point1.x, point2.y));
 	}
-    
+
+    public double width {
+        get { return points[2].x - points[0].x;}
+    }
+    public double height {
+        get { return points[2].y - points[0].y;}
+    }
+
   }
 
   public class Polygon : Shape {
