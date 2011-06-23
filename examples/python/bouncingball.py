@@ -3,6 +3,11 @@ from Myro import pickOne
 
 win = Window("Bouncing Shapes", 300, 600)
 win.mode = "physics"
+
+p = Polygon((100, 100), (130, 100), (130, 150))
+p.draw(win)
+p.fill=Color("gold")
+
 for i in range(5):
     c = Rectangle((130 - i, 130 - i), (130 - i + 20, 130 - i + 20))
     c.fill = Color(pickOne(["red", "blue", "pink"]))

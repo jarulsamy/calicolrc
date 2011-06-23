@@ -1042,6 +1042,15 @@ public static class Graphics {
       rotateTo(rotation);
     }
 
+    public void updatePhysics()
+    {
+      // get from sprite, put in body
+      float MeterInPixels = 64.0f;
+      body.Position = new Vector2(((float)x)/MeterInPixels, 
+				  ((float)y)/MeterInPixels);
+      body.Rotation = (float)(rotation * Math.PI/180.0); 
+    }
+
     public void stackOnTop() {
       if (window != null) {
 	window.stackOnTop(this);
@@ -1295,6 +1304,7 @@ public static class Graphics {
 	pen.append_path(new Point(center.x + dx, center.y + dy));
       center.x += dx;
       center.y += dy;
+      // FIXME: update physics, when appropriate
       QueueDraw();
     }
 
@@ -1306,21 +1316,25 @@ public static class Graphics {
         
     public void rotate(double degrees) {
       _rotation -= (Math.PI / 180.0) * degrees;
+      // FIXME: update physics, when appropriate
       QueueDraw();
     }
     
     public void rotateTo(double degrees) {
       _rotation = degrees * (Math.PI) / 180.0;
+      // FIXME: update physics, when appropriate
       QueueDraw();
     }
     
     public void scale(double percent) {
       _scaleFactor *= percent;
+      // FIXME: update physics, when appropriate
       QueueDraw();
     }
 	
     public void scaleTo(double percent) {
       _scaleFactor = percent;
+      // FIXME: update physics
       QueueDraw();
     }
     
@@ -1329,7 +1343,7 @@ public static class Graphics {
       QueueDraw(); 
     }
     
-    public virtual void draw(WindowClass win) { // Shape
+    public void draw(WindowClass win) { // Shape
       // Add this shape to the _Canvas list.
       win.getCanvas().shapes.Add(this);
       window = win;
@@ -2182,23 +2196,45 @@ public static class Graphics {
   public class Polygon : Shape {
     
     public Polygon(params object [] points) : base(true) {
-	  Point [] temp = new Point [points.Length];
-	  int count = 0;
-	  foreach (object o in points) {
-	    if (o is Point)
-	      temp[count] = (Point)o ;
-	    else if (o is IList) {
-	      IList i = (IList)o;
-	      temp[count] = new Point(i[0], i[1]);
-	    } else {
-	      throw new Exception("Polygon: can't convert arg to a point");
-	    }
-	    count++;
-	  }
-	  set_points(temp);
-	  //FIXME: add color to list
-	  //this.color = color;
+      Point [] temp = new Point [points.Length];
+      int count = 0;
+      foreach (object o in points) {
+	if (o is Point)
+	  temp[count] = (Point)o ;
+	else if (o is IList) {
+	  IList i = (IList)o;
+	  temp[count] = new Point(i[0], i[1]);
+	} else {
+	  throw new Exception("Polygon: can't convert arg to a point");
 	}
+	count++;
+      }
+      set_points(temp);
+    }
+
+    public override void addToPhysics() { // Polygon
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices();
+      // Position is absolute:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      // Points should be relative to position:
+      foreach (Point point in points) {
+	vertices.Add( new Vector2((float)((point.x)/MeterInPixels), 
+				  (float)((point.y)/MeterInPixels)) );
+      }
+      body = FarseerPhysics.Factories.BodyFactory.CreatePolygon(
+		 world,
+		 vertices,           
+		 1.0f,
+		 position);
+      // Give it some bounce and friction
+      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      body.Restitution = 0.8f;
+      body.Friction = 0.5f;
+    }
   }
 
   public class Dot : Shape {
