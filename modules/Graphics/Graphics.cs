@@ -28,6 +28,8 @@ using System.Net; // WebRequest
 using System.IO; // MemoryStream
 using System;
 
+using Microsoft.Xna.Framework; // Vector2
+
 public static class Graphics {
 
   private static WindowClass _lastWindow = null;
@@ -304,11 +306,11 @@ public static class Graphics {
     Gtk.Application.Run();
   }
   
-  public static Picture makePicture(ICanvas can) { //, string filename) {
+  public static Picture makePicture(WindowClass window) { //, string filename) {
     ManualResetEvent ev = new ManualResetEvent(false);
     Gdk.Pixbuf pixbuf = null;
     Gtk.Application.Invoke( delegate {
-	Gdk.Drawable drawable = can.getDrawable();
+	Gdk.Drawable drawable = window.getDrawable();
 	Gdk.Colormap colormap = drawable.Colormap;
 	int _width = 0;
 	int _height = 0;
@@ -390,7 +392,7 @@ public static class Graphics {
 
   public class Color {
     internal Cairo.Color _cairo;
-    public ICanvas window;  // for setting color of a Window()
+    public WindowClass window;  // for setting color of a Window()
     public Picture picture; // for setting color of Picture()
     public int x = -1; // for use with picture, above
     public int y = -1; // for use with picture, above
@@ -437,8 +439,9 @@ public static class Graphics {
     }
 
     public void QueueDraw() { // color
-      if (window is ICanvas) {
-	if (window.getMode() == "auto")
+      if (window is WindowClass) {
+	if (window.getMode() == "auto" || 
+	    window.getMode() == "physics")
 	  window.update();
 	// else, manually call step()
       } 
@@ -539,50 +542,7 @@ public static class Graphics {
     
   }
 
-  public interface ICanvas {
-    // Interface for allowing drawing on Windows and Canvases.
-    // Canvases are for off-screen drawing.
-    _Canvas getCanvas();
-    //int getWidth();
-    //int getHeight();
-    void stackOnTop(Shape shape);
-    void stackOnBottom(Shape shape);
-    string getMode();
-    Gdk.Drawable getDrawable();
-    void update();
-  }
-
-  public class Canvas : ICanvas {
-    public int canvas_width = 0;
-    public int canvas_height = 0;
-    internal _Canvas _canvas;
-
-    public Canvas(int width=300, 
-		  int height=300) {
-      canvas_width = width;
-      canvas_height = height;
-      _canvas = new _Canvas("auto");
-    }
-
-    public Gdk.Drawable getDrawable() {
-      // canvas is a drawingarea
-      return _canvas.GdkWindow; // FIXME: get a Drawable from DrawingArea
-    }
-    public _Canvas getCanvas() {
-      return _canvas;
-    }
-    public string getMode() {
-      return _canvas.mode;
-    }
-    public void update() { 
-    }
-    public void stackOnTop(Shape shape) {
-    }
-    public void stackOnBottom(Shape shape) {
-    }
-  }
-
-  public class WindowClass : Gtk.Window, ICanvas {
+  public class WindowClass : Gtk.Window {
     internal _Canvas _canvas;
     internal bool _dirty = false;
     private bool timer_running = false;
@@ -806,10 +766,10 @@ public static class Graphics {
 	return _canvas.mode;
       }
       set {
-	if (value == "auto" || value == "manual")
+	if (value == "auto" || value == "manual" || value == "physics")
 	  _canvas.mode = value;
 	else
-	  throw new Exception("window mode must be 'auto' or 'manual'");
+	  throw new Exception("window mode must be 'auto', 'manual', or 'physics'");
       }
     }	  
 
@@ -823,6 +783,10 @@ public static class Graphics {
     public void step(double step_time) { // Window, in seconds
       // Same as update, but will make sure it 
       // doesn't update too fast.
+      // handle physics
+      if (mode == "physics")
+	stepPhysics();
+      // and now the update
       DateTime now = DateTime.Now;
       // diff is TimeSpan, converted to seconds:
       double diff = (now - last_update).TotalMilliseconds / 1000.0;
@@ -838,6 +802,14 @@ public static class Graphics {
 	  ev.Set();
 	});
       ev.WaitOne();
+    }
+
+    void stepPhysics() {
+      _canvas.world.Step(.01f);
+      // update the sprites
+      foreach (Shape shape in _canvas.shapes) {
+	shape.updateFromPhysics();
+      }
     }
 
     public override string ToString()
@@ -895,7 +867,7 @@ public static class Graphics {
       return String.Format("<Point (x={0},y={1})>", x, y);
     }
 
-    public void draw(ICanvas canvas) {
+    public void draw(WindowClass window) {
       throw new Exception("Can't draw a point; use Dot instead");
     }
 
@@ -906,19 +878,26 @@ public static class Graphics {
     // Shape.draw() will add them here:
     public List<Shape> shapes = new List<Shape>();
     private string _mode;
+    public FarseerPhysics.Dynamics.World world; 
     
     public string mode {
 	  get {
 	    return _mode;
 	  }
 	  set {
-		if (value == "manual" || value == "auto")
-		  _mode = value;
-		else
-		  throw new Exception("canvas mode must be 'manual' or 'auto'");
+	    if (value == "manual" || value == "auto" || value == "physics") {
+	      _mode = value;
+	      if (value == "physics")
+		initPhysics();
+	    } else
+		throw new Exception("canvas mode must be 'manual', 'auto', or 'physics'");
 	  }
     }
-	
+
+    void initPhysics() {
+      world = new FarseerPhysics.Dynamics.World(new Vector2(0.0f, 9.8f));
+    }
+
     public _Canvas(string mode) : base() {
 	  this.mode = mode;
     }
@@ -944,9 +923,11 @@ public static class Graphics {
   
   public class Shape {
     public Point center;
-    public ICanvas window;
+    public WindowClass window;
     internal double _rotation; // radians
     internal double _scaleFactor; // percent
+    public FarseerPhysics.Dynamics.World world;
+    public FarseerPhysics.Dynamics.Body item;
     
     public Point [] points;
     // FIXME: when done debugging
@@ -974,6 +955,10 @@ public static class Graphics {
     // FIXME: points are in relative to center coordinates
     // FIXME: set x,y of points should go from screen_coords to relative
     // FIXME: should call QueueDraw on set
+
+    public virtual void updateFromPhysics() {
+      
+    }
 
     public void stackOnTop() {
       if (window != null) {
@@ -1072,8 +1057,9 @@ public static class Graphics {
     }
     
     public void QueueDraw() { // shape
-      if (window is ICanvas) {
-	if (window.getMode() == "auto")
+      if (window is WindowClass) {
+	if (window.getMode() == "auto" ||
+	    window.getMode() == "physics")
 	  window.update();
 	// else, manually call step()
       }
@@ -1261,12 +1247,12 @@ public static class Graphics {
       QueueDraw(); 
     }
     
-    public void draw(ICanvas can) {
+    public virtual void draw(WindowClass win) {
       // Add this shape to the _Canvas list.
-      can.getCanvas().shapes.Add(this);
+      win.getCanvas().shapes.Add(this);
       // FIXME: QueueDrawRect
       // FIXME: invalidate from and to rects on move
-      window = can;
+      window = win;
       QueueDraw();
     }
     
@@ -2159,6 +2145,41 @@ public static class Graphics {
     public Circle(Point point, int radius) : base(true) {
       set_points(point);
       _radius = radius;
+    }
+
+    public override void updateFromPhysics()
+    {
+      // get from item from world, put in sprite
+      float MeterInPixels = 64.0f;
+      Vector2 position = item.Position * MeterInPixels;
+      float circleRotation = item.Rotation; // FIXME: radians?
+      // Draw circle
+      moveTo(position.X, position.Y);
+      rotateTo(circleRotation);
+    }
+
+    public override void draw(WindowClass win) {
+      // Add this shape to the _Canvas list.
+      win.getCanvas().shapes.Add(this);
+      window = win;
+      if (window._canvas.world != null) {
+	world = window._canvas.world;
+	float MeterInPixels = 64.0f;
+	// from x,y to meters of window
+	// arbitrary:
+	Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				       ((float)y)/MeterInPixels);
+	item = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		 world,
+		 radius / MeterInPixels,           // radius in meters
+		 1.0f,                             // mass
+		 position);                        // center
+	// Give it some bounce and friction
+	item.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+	item.Restitution = 0.8f;
+	item.Friction = 0.5f;
+      }
+      QueueDraw();
     }
 
     public override void render(Cairo.Context g) {

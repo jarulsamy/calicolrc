@@ -10,6 +10,7 @@ MONO_PATH=../../bin
 		-r:IronPython \
 		-r:System.Drawing \
 		-r:Mono.Cairo.dll \
+		-r:FarseerPhysics.dll \
 		-r:GifLib.dll \
 		-pkg:gtk-sharp-2.0 \
 		-out:../Graphics.dll 

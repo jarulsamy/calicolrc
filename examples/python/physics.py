@@ -31,7 +31,7 @@ for i in range(10):
                                  Vector2(2 - .25 * i, -2.0 + i * .05))
     # Create the circle fixture
     circle = CreateCircle(world,                           # world
-                          96.0 / (2.0 * MeterInPixels),    # ?
+                          47.0 / MeterInPixels,            # ?
                           1.0,                             # mass
                           circlePosition)                  # center
     circle.BodyType = BodyType.Dynamic                     # or
