@@ -784,8 +784,13 @@ public static class Graphics {
       // Same as update, but will make sure it 
       // doesn't update too fast.
       // handle physics
-      if (mode == "physics")
-	stepPhysics();
+      if (mode == "physics") {
+	_canvas.world.Step(.01f);
+	// update the sprites
+	foreach (Shape shape in _canvas.shapes) {
+	  shape.updateFromPhysics();
+	}
+      }
       // and now the update
       DateTime now = DateTime.Now;
       // diff is TimeSpan, converted to seconds:
@@ -802,14 +807,6 @@ public static class Graphics {
 	  ev.Set();
 	});
       ev.WaitOne();
-    }
-
-    void stepPhysics() {
-      _canvas.world.Step(.01f);
-      // update the sprites
-      foreach (Shape shape in _canvas.shapes) {
-	shape.updateFromPhysics();
-      }
     }
 
     public override string ToString()
@@ -928,6 +925,7 @@ public static class Graphics {
     internal double _scaleFactor; // percent
     public FarseerPhysics.Dynamics.World world;
     public FarseerPhysics.Dynamics.Body item;
+    FarseerPhysics.Dynamics.BodyType _bodyType;
     
     public Point [] points;
     // FIXME: when done debugging
@@ -956,8 +954,41 @@ public static class Graphics {
     // FIXME: set x,y of points should go from screen_coords to relative
     // FIXME: should call QueueDraw on set
 
+    public string bodyType // shape
+    {
+      get {
+	if (_bodyType == FarseerPhysics.Dynamics.BodyType.Dynamic) {
+	  return "dynamic";
+	} else if (_bodyType == FarseerPhysics.Dynamics.BodyType.Static) {
+	  return "static";
+	} else {
+	  return "unkown";
+	}
+      }
+      set {
+	if (value  == "dynamic") {
+	  _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+	  item.IsStatic = false;
+	} else if (value  == "static") {
+	  _bodyType = FarseerPhysics.Dynamics.BodyType.Static;
+	  item.IsStatic = true;
+	} else {
+	  throw new Exception("bodyType must be 'dynamic' or 'static'");
+	}
+      }
+    }
+
+    public virtual void addToPhysics() { // Shape
+    }
+
     public virtual void updateFromPhysics() {
-      
+      // get from item from world, put in sprite
+      float MeterInPixels = 64.0f;
+      Vector2 position = item.Position * MeterInPixels;
+      double rotation = item.Rotation * 180.0/Math.PI; // FIXME: radians?
+      // Move it
+      moveTo(position.X, position.Y);
+      rotateTo(rotation);
     }
 
     public void stackOnTop() {
@@ -1247,12 +1278,13 @@ public static class Graphics {
       QueueDraw(); 
     }
     
-    public virtual void draw(WindowClass win) {
+    public virtual void draw(WindowClass win) { // Shape
       // Add this shape to the _Canvas list.
       win.getCanvas().shapes.Add(this);
-      // FIXME: QueueDrawRect
-      // FIXME: invalidate from and to rects on move
       window = win;
+      if (window._canvas.world != null) {
+	addToPhysics();
+      }
       QueueDraw();
     }
     
@@ -2075,6 +2107,25 @@ public static class Graphics {
         get { return points[2].y - points[0].y;}
     }
 
+    public override void addToPhysics() { // Rectangle
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      // FIXME: set rotation in radians
+      item = FarseerPhysics.Factories.BodyFactory.CreateRectangle(
+		 world,
+		 (float)(width / MeterInPixels),   // radius in meters
+		 (float)(height / MeterInPixels),  // radius in meters
+		 1.0f,                             // mass
+		 position);                        // center
+      // Give it some bounce and friction
+      item.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      item.Restitution = 0.8f;
+      item.Friction = 0.5f;
+    }
   }
 
   public class Polygon : Shape {
@@ -2147,39 +2198,22 @@ public static class Graphics {
       _radius = radius;
     }
 
-    public override void updateFromPhysics()
-    {
-      // get from item from world, put in sprite
+    public override void addToPhysics() { // Circle
+      world = window._canvas.world;
       float MeterInPixels = 64.0f;
-      Vector2 position = item.Position * MeterInPixels;
-      float circleRotation = item.Rotation; // FIXME: radians?
-      // Draw circle
-      moveTo(position.X, position.Y);
-      rotateTo(circleRotation);
-    }
-
-    public override void draw(WindowClass win) {
-      // Add this shape to the _Canvas list.
-      win.getCanvas().shapes.Add(this);
-      window = win;
-      if (window._canvas.world != null) {
-	world = window._canvas.world;
-	float MeterInPixels = 64.0f;
-	// from x,y to meters of window
-	// arbitrary:
-	Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-				       ((float)y)/MeterInPixels);
-	item = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      item = FarseerPhysics.Factories.BodyFactory.CreateCircle(
 		 world,
 		 radius / MeterInPixels,           // radius in meters
 		 1.0f,                             // mass
 		 position);                        // center
-	// Give it some bounce and friction
-	item.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-	item.Restitution = 0.8f;
-	item.Friction = 0.5f;
-      }
-      QueueDraw();
+      // Give it some bounce and friction
+      item.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      item.Restitution = 0.8f;
+      item.Friction = 0.5f;
     }
 
     public override void render(Cairo.Context g) {
