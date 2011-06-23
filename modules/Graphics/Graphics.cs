@@ -1036,7 +1036,7 @@ public static class Graphics {
       // get from body, put in sprite
       float MeterInPixels = 64.0f;
       Vector2 position = body.Position * MeterInPixels;
-      double rotation = body.Rotation * 180.0/Math.PI; // FIXME: radians?
+      double rotation = body.Rotation * 180.0/Math.PI; 
       // Move it
       moveTo(position.X, position.Y);
       rotateTo(rotation);
@@ -2170,7 +2170,7 @@ public static class Graphics {
 		 world,
 		 (float)(width / MeterInPixels),   // radius in meters
 		 (float)(height / MeterInPixels),  // radius in meters
-		 1.0f,                             // mass
+		 1.0f,                             // density
 		 position);                        // center
       // Give it some bounce and friction
       body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
@@ -2259,7 +2259,7 @@ public static class Graphics {
       body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
 		 world,
 		 radius / MeterInPixels,           // radius in meters
-		 1.0f,                             // mass
+		 1.0f,                             // density
 		 position);                        // center
       // Give it some bounce and friction
       body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
@@ -2368,6 +2368,48 @@ public static class Graphics {
       _stop = stop;
     }
 
+    public override void addToPhysics() { // Circle
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		 world,
+		 radius / MeterInPixels,           // radius in meters
+		 1.0f,                             // density
+		 position);                        // center
+      // Give it some bounce and friction
+      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      body.Restitution = 0.8f;
+      body.Friction = 0.5f;
+    }
+
+    /*
+    public override void addToPhysics() { // Pie
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      // FIXME: set rotation in radians
+      body = FarseerPhysics.Factories.BodyFactory.CreateLineArc(
+		 world,
+		 (float)((stop - start) * Math.PI/ 180.0),   // radians
+		 10,                                         // sides
+		 (float)(radius / MeterInPixels),            // radius in meters
+		 position,                                   // position
+		 (float)(0 * Math.PI/ 180.0),                // angle
+		 true);                                      // close
+      // Give it some bounce and friction
+      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      body.Restitution = 0.8f;
+      body.Friction = 0.5f;
+    }
+    */
+
     public override void render(Cairo.Context g) {
       g.Save();
       // Center is in global screen coords, whatever they are
@@ -2441,6 +2483,24 @@ public static class Graphics {
       _radius = radius;
       _start = start;
       _stop = stop;
+    }
+
+    public override void addToPhysics() { // Circle
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		 world,
+		 radius / MeterInPixels,           // radius in meters
+		 1.0f,                             // density
+		 position);                        // center
+      // Give it some bounce and friction
+      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+      body.Restitution = 0.8f;
+      body.Friction = 0.5f;
     }
 
     public override void render(Cairo.Context g) {

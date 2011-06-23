@@ -10,7 +10,7 @@ for i in range(5):
     c.bounce = .1
 
 for i in range(5):
-    c = Circle((130 - i, 150 - i), 10)
+    c = Pie((130 - i, 150 - i), 10, 0, 360)
     c.fill = Color(pickOne(["red", "blue", "pink"]))
     c.draw(win)
 
