@@ -1,32 +1,33 @@
 from Graphics import *
-from Myro import pickOne
+from Myro import pickOne, randomNumber
 
 win = Window("Bouncing Shapes", 300, 600)
 win.mode = "physics"
 
 p = Polygon((100, 100), (130, 100), (130, 150))
-p.draw(win)
 p.fill=Color("gold")
+p.bounce = randomNumber() * .3
+p.draw(win)
 
 for i in range(5):
     c = Rectangle((130 - i, 130 - i), (130 - i + 20, 130 - i + 20))
-    c.fill = Color(pickOne(["red", "blue", "pink"]))
-    c.draw(win)
+    c.fill = Color(pickOne(getColorNames()))
     c.bounce = .1
+    c.draw(win)
 
 for i in range(5):
     c = Pie((130 - i, 150 - i), 10, 0, 360)
-    c.fill = Color(pickOne(["red", "blue", "pink"]))
+    c.fill = Color(pickOne(getColorNames()))
     c.draw(win)
 
 ground = Rectangle((0, 580), (200, 610))
-ground.draw(win)
 ground.bodyType = "static"
 ground.color = Color("green")
+ground.draw(win)
 
 wall = Rectangle((0, 500), (10, 580))
-wall.draw(win)
 wall.bodyType = "static"
+wall.draw(win)
 
 wall2 = Rectangle((180, 500), (190, 580))
 wall2.draw(win)

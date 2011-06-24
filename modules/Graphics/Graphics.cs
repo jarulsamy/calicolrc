@@ -184,6 +184,14 @@ public static class Graphics {
        {"ivory", new Color(0xFF, 0xFF, 0xF0)}, 
        {"white", new Color(0xFF, 0xFF, 0xFF)}, 
     };
+
+  public static List getColorNames() {
+    List retval = new List();
+    foreach (String key in colors.Keys) {
+      retval.append(key);
+    }
+    return retval;
+  }
   
   public static List PyList(params object [] items) {
     // make a list from an array
@@ -266,6 +274,12 @@ public static class Graphics {
   
   public static void savePicture(Picture picture, string filename) {
     picture.savePicture(filename);
+  }
+  public static void savePicture(List list, string filename) {
+    savePicture(list, filename, 10, false);
+  }
+  public static void savePicture(List list, string filename, short delay) {
+    savePicture(list, filename, delay, false);
   }
   public static void savePicture(List list, string filename, short delay, bool repeat) {
     List<GifLib.GifFrame> frameList = new List<GifLib.GifFrame>();
@@ -925,7 +939,10 @@ public static class Graphics {
     internal double _scaleFactor; // percent
     public FarseerPhysics.Dynamics.World world;
     public FarseerPhysics.Dynamics.Body body;
-    FarseerPhysics.Dynamics.BodyType _bodyType;
+    internal FarseerPhysics.Dynamics.BodyType _bodyType;
+    internal float _bounce;
+    internal float _friction;
+    internal float _density;
     
     public Point [] points;
     // FIXME: when done debugging
@@ -948,6 +965,10 @@ public static class Graphics {
       color = new Color("purple");
       outline = new Color("black");
       border = 1;
+      _bounce = 0.8f;
+      _friction = 0.5f;
+      _density = 1.0f;
+      _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
     }
     
     // FIXME: points are in relative to center coordinates
@@ -960,14 +981,14 @@ public static class Graphics {
 	  if (body != null)
 	    return body.Restitution;
 	  else
-	    throw new Exception("need to draw shape first");
+	    return _bounce;
 	}
       set
 	{
 	  if (body != null)
 	    body.Restitution = (float)value;
 	  else
-	    throw new Exception("need to draw shape first");
+	    _bounce = (float)value;
 	}
     }
 
@@ -977,14 +998,25 @@ public static class Graphics {
 	  if (body != null)
 	    return body.Friction;
 	  else
-	    throw new Exception("need to draw shape first");
+	    return _friction;
 	}
       set
 	{
 	  if (body != null)
 	    body.Friction = (float)value;
 	  else
-	    throw new Exception("need to draw shape first");
+	    _friction = (float)value;
+	}
+    }
+
+    public double density {
+      get
+	{
+	  return _density;
+	}
+      set
+	{
+	  _density = (float)value;
 	}
     }
 
@@ -1019,10 +1051,12 @@ public static class Graphics {
       set {
 	if (value  == "dynamic") {
 	  _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-	  body.IsStatic = false;
+	  if (body != null)
+	    body.IsStatic = false;
 	} else if (value  == "static") {
 	  _bodyType = FarseerPhysics.Dynamics.BodyType.Static;
-	  body.IsStatic = true;
+	  if (body != null)
+	    body.IsStatic = true;
 	} else {
 	  throw new Exception("bodyType must be 'dynamic' or 'static'");
 	}
@@ -2184,12 +2218,13 @@ public static class Graphics {
 		 world,
 		 (float)(width / MeterInPixels),   // radius in meters
 		 (float)(height / MeterInPixels),  // radius in meters
-		 1.0f,                             // density
+		 _density,                         // density
 		 position);                        // center
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.Restitution = _bounce;
+      body.Friction = _friction;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
     }
   }
 
@@ -2228,12 +2263,13 @@ public static class Graphics {
       body = FarseerPhysics.Factories.BodyFactory.CreatePolygon(
 		 world,
 		 vertices,           
-		 1.0f,
+		 _density,
 		 position);
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
   }
 
@@ -2295,12 +2331,13 @@ public static class Graphics {
       body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
 		 world,
 		 radius / MeterInPixels,           // radius in meters
-		 1.0f,                             // density
+		 _density,                         // density
 		 position);                        // center
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
 
     public override void render(Cairo.Context g) {
@@ -2414,12 +2451,13 @@ public static class Graphics {
       body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
 		 world,
 		 radius / MeterInPixels,           // radius in meters
-		 1.0f,                             // density
+		 _density,                         // density
 		 position);                        // center
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
 
     /*
@@ -2440,9 +2478,10 @@ public static class Graphics {
 		 (float)(0 * Math.PI/ 180.0),                // angle
 		 true);                                      // close
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
     */
 
@@ -2531,12 +2570,13 @@ public static class Graphics {
       body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
 		 world,
 		 radius / MeterInPixels,           // radius in meters
-		 1.0f,                             // density
+		 _density,                         // density
 		 position);                        // center
       // Give it some bounce and friction
-      body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-      body.Restitution = 0.8f;
-      body.Friction = 0.5f;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
 
     public override void render(Cairo.Context g) {
