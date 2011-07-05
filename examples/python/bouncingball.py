@@ -26,7 +26,7 @@ ground.color = Color("green")
 ground.draw(win)
 
 wall = Rectangle((0, 500), (10, 580))
-wall.bodyType = "static"
+wall.bodyType = "dynamic"
 wall.draw(win)
 
 wall2 = Rectangle((180, 500), (190, 580))
