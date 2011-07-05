@@ -709,6 +709,12 @@ public static class Graphics {
       return lastClick;
     }
     
+    public PythonTuple getMouseNow() {
+      int x, y;
+      GetPointer(out x, out y);
+      return PyTuple(x, y);
+    }
+    
     public new void Show() {
       Gtk.Application.Invoke(delegate { 
 	  DateTime now = DateTime.Now;

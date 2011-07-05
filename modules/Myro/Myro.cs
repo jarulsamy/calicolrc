@@ -2554,6 +2554,10 @@ public static class Myro {
     return Graphics.getWindow().getMouse();
   }
 
+  public static PythonTuple getMouseNow() {
+    return Graphics.getWindow().getMouseNow();
+  }
+
   public static Graphics.WindowClass getWindow(string title) {
     return Graphics.getWindow(title);
   }
