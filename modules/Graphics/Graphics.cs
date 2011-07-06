@@ -563,6 +563,10 @@ public static class Graphics {
     private DateTime last_update = new DateTime(2000,1,1);
     internal uint _update_interval = 100; // how often, in ms, to auto update
     public List onClickCallbacks = new List();
+    public List onMouseMovementCallbacks = new List();
+    public List onMouseUpCallbacks = new List();
+    public List onKeyPressCallbacks = new List();
+    public List onKeyReleaseCallbacks = new List();
     public PythonTuple lastClick;
     ManualResetEvent lastClickFlag = new ManualResetEvent(false);
     
@@ -574,8 +578,16 @@ public static class Graphics {
       AllowShrink = true;
       SetDefaultSize(width, height);
       AddEvents((int)Gdk.EventMask.ButtonPressMask);
-      ButtonPressEvent += HandleClickCallbacks;
-      ButtonPressEvent += saveLastClick;
+      AddEvents((int)Gdk.EventMask.ButtonReleaseMask);
+      AddEvents((int)Gdk.EventMask.PointerMotionMask);
+      AddEvents((int)Gdk.EventMask.KeyReleaseMask);
+      AddEvents((int)Gdk.EventMask.KeyPressMask);
+      ButtonPressEvent  += HandleClickCallbacks;
+      ButtonReleaseEvent  += HandleMouseUpCallbacks;
+      ButtonPressEvent  += saveLastClick;
+	  MotionNotifyEvent += HandleMouseMovementCallbacks;
+	  KeyPressEvent     += HandleKeyPressCallbacks;
+	  KeyReleaseEvent   += HandleKeyReleaseCallbacks;
       DeleteEvent += OnDelete;
       Add(_canvas);
       ShowAll();
@@ -653,20 +665,88 @@ public static class Graphics {
       lastClickFlag.Set();
     }
     
+	private void HandleMouseMovementCallbacks(object obj,
+		Gtk.MotionNotifyEventArgs args) {
+      foreach (object function in onMouseMovementCallbacks) {
+		if (function is PythonFunction) {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} else {
+		  Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
+		  f(obj, args);
+		}
+      }
+	}
+
     private void HandleClickCallbacks(object obj,
 				      Gtk.ButtonPressEventArgs args) {
       foreach (object function in onClickCallbacks) {
-	if (function is PythonFunction) {
-	  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-	} else {
-	  Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
-	  f(obj, args);
-	}
+		if (function is PythonFunction) {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} else {
+		  Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
+		  f(obj, args);
+		}
+      }
+    }
+    
+    private void HandleMouseUpCallbacks(object obj,
+				      Gtk.ButtonReleaseEventArgs args) {
+      foreach (object function in onMouseUpCallbacks) {
+		if (function is PythonFunction) {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} else {
+		  Func<object,Gtk.ButtonReleaseEventArgs,object> f = (Func<object,Gtk.ButtonReleaseEventArgs,object>)function;
+		  f(obj, args);
+		}
+      }
+    }
+    
+    private void HandleKeyPressCallbacks(object obj,
+				      Gtk.KeyPressEventArgs args) {
+      foreach (object function in onKeyPressCallbacks) {
+		if (function is PythonFunction) {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} else {
+		  Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
+		  f(obj, args);
+		}
+      }
+    }
+    
+    private void HandleKeyReleaseCallbacks(object obj,
+				      Gtk.KeyReleaseEventArgs args) {
+      foreach (object function in onKeyReleaseCallbacks) {
+		if (function is PythonFunction) {
+		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		} else {
+		  Func<object,Gtk.KeyReleaseEventArgs,object> f = (Func<object,Gtk.KeyReleaseEventArgs,object>)function;
+		  f(obj, args);
+		}
       }
     }
     
     public void onClick(PythonFunction function) {
       onClickCallbacks.Add(function);
+    }
+    
+    public void onMouseDown(PythonFunction function) {
+      onClickCallbacks.Add(function);
+    }
+    
+    public void onMouseUp(PythonFunction function) {
+      onMouseUpCallbacks.Add(function);
+    }
+    
+    public void onMouseMovement(PythonFunction function) {
+      onMouseMovementCallbacks.Add(function);
+    }
+    
+    public void onKeyPress(PythonFunction function) {
+      onKeyPressCallbacks.Add(function);
+    }
+    
+    public void onKeyRelease(PythonFunction function) {
+      onKeyReleaseCallbacks.Add(function);
     }
     
     public uint updateInterval {
