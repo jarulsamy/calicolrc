@@ -567,8 +567,11 @@ public static class Graphics {
     public List onMouseUpCallbacks = new List();
     public List onKeyPressCallbacks = new List();
     public List onKeyReleaseCallbacks = new List();
-    public PythonTuple lastClick;
-    ManualResetEvent lastClickFlag = new ManualResetEvent(false);
+    public PythonTuple _lastClick;
+    public string _lastKey = "";
+    public string _mouseState = "up";
+    public string _keyState = "up";
+    ManualResetEvent _lastClickFlag = new ManualResetEvent(false);
     
     public WindowClass(string title="Calico Graphics Window",
 		  int width=300, 
@@ -585,9 +588,10 @@ public static class Graphics {
       ButtonPressEvent  += HandleClickCallbacks;
       ButtonReleaseEvent  += HandleMouseUpCallbacks;
       ButtonPressEvent  += saveLastClick;
-	  MotionNotifyEvent += HandleMouseMovementCallbacks;
-	  KeyPressEvent     += HandleKeyPressCallbacks;
-	  KeyReleaseEvent   += HandleKeyReleaseCallbacks;
+      ButtonReleaseEvent  += updateMouseState;
+      MotionNotifyEvent += HandleMouseMovementCallbacks;
+      KeyPressEvent     += HandleKeyPressCallbacks;
+      KeyReleaseEvent   += HandleKeyReleaseCallbacks;
       DeleteEvent += OnDelete;
       Add(_canvas);
       ShowAll();
@@ -661,21 +665,26 @@ public static class Graphics {
     }
 
     void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
-      lastClick = PyTuple(args.Event.X, args.Event.Y);
-      lastClickFlag.Set();
+      _mouseState = "down";
+      _lastClick = PyTuple(args.Event.X, args.Event.Y);
+      _lastClickFlag.Set();
     }
     
-	private void HandleMouseMovementCallbacks(object obj,
+    void updateMouseState(object obj, Gtk.ButtonReleaseEventArgs args) {
+      _mouseState = "up";
+    }
+    
+    private void HandleMouseMovementCallbacks(object obj,
 		Gtk.MotionNotifyEventArgs args) {
       foreach (object function in onMouseMovementCallbacks) {
-		if (function is PythonFunction) {
-		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-		} else {
-		  Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
-		  f(obj, args);
-		}
-      }
+	if (function is PythonFunction) {
+	  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	} else {
+	  Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
+	  f(obj, args);
 	}
+      }
+    }
 
     private void HandleClickCallbacks(object obj,
 				      Gtk.ButtonPressEventArgs args) {
@@ -703,18 +712,21 @@ public static class Graphics {
     
     private void HandleKeyPressCallbacks(object obj,
 				      Gtk.KeyPressEventArgs args) {
+      _lastKey = args.Event.Key.ToString();
+      _keyState = "down";
       foreach (object function in onKeyPressCallbacks) {
-		if (function is PythonFunction) {
-		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-		} else {
-		  Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
-		  f(obj, args);
-		}
+	if (function is PythonFunction) {
+	  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	} else {
+	  Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
+	  f(obj, args);
+	}
       }
     }
     
     private void HandleKeyReleaseCallbacks(object obj,
 				      Gtk.KeyReleaseEventArgs args) {
+      _keyState = "up";
       foreach (object function in onKeyReleaseCallbacks) {
 		if (function is PythonFunction) {
 		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
@@ -784,15 +796,32 @@ public static class Graphics {
     }
     
     public PythonTuple getMouse() {
-      lastClickFlag = new ManualResetEvent(false);
-      lastClickFlag.WaitOne();
-      return lastClick;
+      _lastClickFlag = new ManualResetEvent(false);
+      _lastClickFlag.WaitOne();
+      return _lastClick;
     }
     
     public PythonTuple getMouseNow() {
-      int x, y;
-      GetPointer(out x, out y);
+      int x = 0, y = 0;
+      ManualResetEvent mre = new ManualResetEvent(false);
+      Gtk.Application.Invoke(delegate { 
+	  GetPointer(out x, out y);
+	  mre.Set();
+	});
+      mre.WaitOne();
       return PyTuple(x, y);
+    }
+    
+    public string getMouseState() {
+      return _mouseState;
+    }
+    
+    public string getKeyPressed() {
+      return _lastKey;
+    }
+    
+    public string getKeyState() {
+      return _keyState;
     }
     
     public new void Show() {

@@ -2558,6 +2558,10 @@ public static class Myro {
     return Graphics.getWindow().getMouseNow();
   }
 
+  public static string getMouseState() {
+    return Graphics.getWindow().getMouseState();
+  }
+
   public static Graphics.WindowClass getWindow(string title) {
     return Graphics.getWindow(title);
   }
