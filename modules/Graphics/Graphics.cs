@@ -744,7 +744,21 @@ public static class Graphics {
     public void onMouseDown(PythonFunction function) {
       onClickCallbacks.Add(function);
     }
-    
+
+    public void run(object function) {
+        if (function is PythonFunction) {
+          IronPython.Runtime.Operations.PythonCalls.Call(function);
+        } else {
+          Func<object> f = (Func<object>)function;
+          f();
+        }
+    }
+
+    public void run() {
+        while (true)
+            step(.01);
+    }
+
     public void onMouseUp(PythonFunction function) {
       onMouseUpCallbacks.Add(function);
     }

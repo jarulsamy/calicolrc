@@ -20,6 +20,7 @@
 
 import clr
 import traceback
+import exceptions
 import glob
 import os
 
@@ -157,6 +158,8 @@ class DLREngine(Engine):
                 return False
         try:
             source.Execute(self.manager.scope)
+        except exceptions.SystemError:
+            self.manager.calico.shell.message("Interrupted")
         except:
             traceback.print_exc()
             return False
@@ -172,6 +175,8 @@ class DLREngine(Engine):
             return False
         try:
             source.Execute(self.manager.scope)
+        except exceptions.SystemError:
+            self.manager.calico.shell.message("Interrupted")
         except:
             traceback.print_exc()
 

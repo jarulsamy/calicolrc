@@ -35,10 +35,14 @@ wall2.draw(win)
 wall3 = Rectangle((0, 400), (10, 500))
 wall3.draw(win)
 
-for x in range(600):
-    if win.getMouseState() == "down":
-        x, y = win.getMouseNow()
-        c = Pie((x, y), 10, 0, 360)
-        c.fill = Color("gray")
-        c.draw(win)
-    win.step(.01)
+def main():
+    while True:
+        if win.getMouseState() == "down":
+            x, y = win.getMouseNow()
+            c = Pie((x, y), 10, 0, 360)
+            c.fill = Color("gray")
+            c.draw(win)
+        win.step(.01)
+
+# win.run() or
+win.run(main)

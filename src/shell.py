@@ -467,8 +467,7 @@ class ShellWindow(Window):
         self.on_key_press(widget=self, event=None, force=True)
 
     def on_stop(self, obj, event):
-        if (self.executeThread and 
-            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+        if (self.executeThread):
             self.message(_("Stopping..."))
             self.executeThread.Abort()
             Gtk.Application.Invoke(self.stop_running)
