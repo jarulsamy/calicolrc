@@ -712,7 +712,7 @@ public static class Graphics {
     
     private void HandleKeyPressCallbacks(object obj,
 				      Gtk.KeyPressEventArgs args) {
-      _lastKey = args.Event.Key.ToString();
+	  _lastKey = args.Event.Key.ToString();
       _keyState = "down";
       foreach (object function in onKeyPressCallbacks) {
 	if (function is PythonFunction) {
