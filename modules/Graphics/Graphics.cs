@@ -710,6 +710,7 @@ public static class Graphics {
       }
     }
     
+	[GLib.ConnectBefore]
     private void HandleKeyPressCallbacks(object obj,
 				      Gtk.KeyPressEventArgs args) {
 	  _lastKey = args.Event.Key.ToString();
