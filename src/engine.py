@@ -158,8 +158,6 @@ class DLREngine(Engine):
                 return False
         try:
             source.Execute(self.manager.scope)
-        except exceptions.SystemError:
-            self.manager.calico.shell.message("Interrupted")
         except:
             traceback.print_exc()
             return False
@@ -175,8 +173,6 @@ class DLREngine(Engine):
             return False
         try:
             source.Execute(self.manager.scope)
-        except exceptions.SystemError:
-            self.manager.calico.shell.message("Interrupted")
         except:
             traceback.print_exc()
 
