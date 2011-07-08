@@ -18,6 +18,7 @@
 #
 # $Id$
 
+from __future__ import print_function
 import clr
 clr.AddReference("agsXMPP")
 clr.AddReference("Mono.Posix")
@@ -65,7 +66,7 @@ class ConsoleStream(System.IO.Stream):
 
     def Write(self, bytes, offset, count):
         text = System.Text.Encoding.UTF8.GetString(bytes, offset, count)
-        print text,
+        print(text, end="")
 
     @property
     def CanRead(self):
@@ -304,11 +305,11 @@ class Chat:
             self.send("admin", "[broadcast]\nroom: %s\n%s" % ("General",
                 "%s has joined the discussion" % self.user))
         if self.debug:
-            print "LOGIN:", self.user
+            print("LOGIN:", self.user)
             #self.client.SendMyPresence()
 
     def OnError(self, sender, exp):
-        print "ERROR in Chat:", self.user, exp
+        print("ERROR in Chat:", self.user, exp)
 
     def OnAuthError(self, sender, xml):
         self.status = _("rejected")
@@ -316,16 +317,16 @@ class Chat:
             self.calico.alert(_("You were not allowed to log in.") + "\n" +
                               _("Please check your ID and password."))
         if self.debug:
-            print "AUTHERROR:", self.user, xml
+            print("AUTHERROR:", self.user, xml)
 
     def OnReadXml(self, sender, xml):
         if self.debug:
-            print "READXML:", self.user, xml
+            print("READXML:", self.user, xml)
 
     def OnWriteXml(self, sender, xml):
         self.calico.update_status()
         if self.debug:
-            print "WRITEXML:", self.user, xml
+            print("WRITEXML:", self.user, xml)
 
     def OnMessage(self, sender, msg):
         """
@@ -333,7 +334,7 @@ class Chat:
         """
         mfrom = "%s@%s" % (msg.From.User, msg.From.Server)
         if self.debug:
-            print "MESSAGE:", self.user, msg
+            print("MESSAGE:", self.user, msg)
         if str(msg.Body).startswith("[broadcast]"):
             line0, rest = str(msg.Body).split("\n", 1) # [broadcast]
             if "\n" in rest:
@@ -607,7 +608,7 @@ class Plugin:
         from shell import ShellWindow
         from chat import ChatWindow
         from editor import EditorWindow
-        print "Plugin setup for window '%s'" % window
+        print("Plugin setup for window '%s'" % window)
         self.window = window                  # Main window object
         self.gtk_window = self.window.window  # Gtk.Window
         if isinstance(self.window, ShellWindow):

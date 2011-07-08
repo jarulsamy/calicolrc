@@ -18,6 +18,7 @@
 #
 # $Id: $
 
+from __future__ import print_function
 import sys
 import clr
 clr.AddReference("Boo.Lang.Interpreter.dll")
@@ -46,7 +47,7 @@ class BooEngine(Engine):
         error = False
         for e in compiler_context.Errors:
             if e.Code != 'BCE0034': # side-effects, don't report
-                print >> sys.stderr, e
+                print(e, file=sys.stderr)
                 error = True
         if error:
             return

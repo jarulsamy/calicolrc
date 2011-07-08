@@ -18,6 +18,7 @@
 #
 # $Id$
 
+from __future__ import print_function
 import Gtk
 import Gdk
 import GLib
@@ -430,9 +431,9 @@ class EditorWindow(Window):
                 self.calico.connection.send("admin", "[blast]\nto: %s\ntype: %s\nfilename: %s\n%s" %
                                             (to, type, basefilename, document.get_text()))
             else:
-                print _("You are not online")
+                print(_("You are not online"))
         else:
-            print _("You need to login")
+            print(_("You need to login"))
 
     def search(self):
         # set pattern:

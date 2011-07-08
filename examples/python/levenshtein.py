@@ -12,7 +12,7 @@ import time
 def timer(f, *args):
     start = time.time()
     retval = f(*args)
-    print "Time:", time.time() - start
+    print("Time:", time.time() - start)
     return retval
 
 def ld0(s1, s2):

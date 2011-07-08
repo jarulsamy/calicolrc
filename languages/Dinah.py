@@ -18,6 +18,7 @@
 #
 # $Id: $
 
+from __future__ import print_function
 import clr
 clr.AddReference('gtk-sharp')
 clr.AddReference('gdk-sharp')
@@ -195,17 +196,17 @@ class MyHPaned(Gtk.HPaned):
 class MyTreeView(Gtk.TreeView):
 
     def __init__(self, *args):
-        print "setting up"
+        print("setting up")
         self.DragDataGet += self.handler # self.OnDragDataGet
-        print "ok"
+        print("ok")
 
     def handler(self, widget, args):
-        print "handler:", args.Context.Targets
+        print("handler:", args.Context.Targets)
         #
         #'Args', 'Context', 'Empty', 'Info', 'RetVal', 'SelectionData'
 
     def OnDragBegin(self, *args):
-        print "OnDragBegin:", args
+        print("OnDragBegin:", args)
         return Gtk.TreeView.OnDragBegin(self, *args)
 
     #def OnDragDropGet(self, widget, context):
@@ -213,35 +214,35 @@ class MyTreeView(Gtk.TreeView):
     #    #return Gtk.TreeView.OnDragDropGet(self, *args)
 
     def OnDragDataDelete(self, *args):
-        print "OnDragDataDelete:", args
+        print("OnDragDataDelete:", args)
         return Gtk.TreeView.OnDragDataDelete(self, *args)
 
     def OnDragDataGet(self, context, selection, int1, int2):
-        print "OnDragDataGet:", context.Targets
+        print("OnDragDataGet:", context.Targets)
         return Gtk.TreeView.OnDragDataGet(self, context, selection, int1, int2)
 
     def OnDragDataReceived(self, *args):
-        print "OnDragDataReceived:", args
+        print("OnDragDataReceived:", args)
         return Gtk.TreeView.OnDragDataReceived(self, *args)
 
     def OnDragDrop(self, *args):
-        print "OnDragDrop:", args
+        print("OnDragDrop:", args)
         return Gtk.TreeView.OnDragDrop(self, *args)
 
     def OnDragEnd(self, context):
-        print "OnDragEnd:", context.Targets
+        print("OnDragEnd:", context.Targets)
         return Gtk.TreeView.OnDragEnd(self, context)
 
     def OnDragFailed(self, *args):
-        print "OnDragFailed:", args
+        print("OnDragFailed:", args)
         return Gtk.TreeView.OnDragFailed(self, *args)
 
     def OnDragLeave(self, *args):
-        print "OnDragLeave:", args
+        print("OnDragLeave:", args)
         return Gtk.TreeView.OnDragLeave(self, *args)
 
     def OnDragMotion(self, *args):
-        print "OnDragMotion:", args
+        print("OnDragMotion:", args)
         return Gtk.TreeView.OnDragMotion(self, *args)
 
 class DinahDocument(Document):
@@ -615,24 +616,24 @@ class DinahDocument(Document):
     def treeviewHandleSourceDragDataGet(self, obj, args):
         print "treeviewHandleSourceDragDataGet!"
         # DragDropGetArgs: args
-        print "dnd get", obj, args
+        print("dnd get", obj, args)
         targets = args.Context.Targets
         self.myargs = args
 
-        print "targets:", targets
+        print("targets:", targets)
         selected, treeiter = obj.Selection.GetSelected()
-        print "selected:", selected, "treeiter", treeiter
+        print("selected:", selected, "treeiter", treeiter)
         item = obj.Model.GetValue(treeiter, 1) # 0- text, 1-object
         if item:
-            print 1
+            print(1)
             data = "create:%s" % item.pid
-            print 2
+            print(2)
             self.lookup[data] = item
-            print 3
+            print(3)
             self.lookup[item.pid] = item
-            print 4
+            print(4)
             packed = System.Text.Encoding.UTF8.GetBytes(data)
-            print 5
+            print(5)
             #args.SelectionData.Set(targets[0], 8, packed)
 
     def beforeHandleDragDataReceived(self, obj, args):
@@ -649,7 +650,7 @@ class DinahDocument(Document):
 
     def typeDragDataReceived(self, obj, args):
         # obj is the dropped upon label to be replaced
-        print "Received onto a type place holder!"
+        print("Received onto a type place holder!")
         #print obj, str(id(obj))
         if str(id(obj)) in self.layouts:
             #print "Yes, label's layout found!"
@@ -667,11 +668,11 @@ class DinahDocument(Document):
                     layout.Parent.Parent.ModifyBg(Gtk.StateType.Normal, item.color)
                     layout.ShowAll()
                 else:
-                    print "Copy reference to variable here?"
+                    print("Copy reference to variable here?")
             else:
-                print "drop item not found"
+                print("drop item not found")
         else:
-            print "label not found"
+            print("label not found")
 
     def typeEnclosureDragDataReceived(self, obj, args):
         # FIXME: remove item [Integer] in the related hbox
@@ -694,11 +695,11 @@ class DinahDocument(Document):
                     layout.Parent.Parent.ModifyBg(Gtk.StateType.Normal, item.color)
                     layout.ShowAll()
                 else:
-                    print "Copy reference to variable here?"
+                    print("Copy reference to variable here?")
             else:
-                print "drop item not found"
+                print("drop item not found")
         else:
-            print "label not found"
+            print("label not found")
 
     def handleDragDataReceived(self, obj, args, where):
         #print "Received!", where
@@ -730,8 +731,8 @@ class DinahDocument(Document):
                 print "Move '%s'" % data
                 # Need to know if within same parent, or diff parents?
         else:
-            print "unknown object: '%s'" % data
-            print self.lookup
+            print("unknown object: '%s'" % data)
+            print(self.lookup)
 
     def handleSourceDragDataGet(self, obj, args):
         #print "handleSourceDragDropGet!"
@@ -751,7 +752,7 @@ class DinahDocument(Document):
             self.target_table = System.Array[Gtk.TargetEntry]([
                     Gtk.TargetEntry("application/x-dinah", 0, 0),
                     ])
-            print "making accepts targets:", self.target_table
+            print("making accepts targets:", self.target_table)
         return self.target_table
 
     def provides(self, item):
@@ -763,7 +764,7 @@ class DinahDocument(Document):
             self.source_table = System.Array[Gtk.TargetEntry]([
                     Gtk.TargetEntry("application/x-dinah", 0, 0),
                     ])
-            print "making provides targets:", self.source_table
+            print("making provides targets:", self.source_table)
         return self.source_table
 
     def make_drag_drop(self, name, item, color, widget_id):
@@ -974,7 +975,7 @@ class DinahEngine(Engine):
 
     def execute_file(self, filename):
         print("Run filename '%s'!" % filename)
-        print process_widget(self.layout)
+        print(process_widget(self.layout))
         #program = Ast.Utils.Lambda(type(object), "Test")
         #statements = []
         #clr.AddReference("System.Core")

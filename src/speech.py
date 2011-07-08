@@ -54,7 +54,7 @@ class TTSEngine:
 
     def speak(self, message, async=False):
         if self.echo:
-            print message
+            print(message)
 
     def stop(self):
         pass
@@ -78,7 +78,7 @@ class TTSEngine:
 class LinuxTTSEngine(TTSEngine):
     def speak(self, message, async=False):
         if self.echo:
-            print message
+            print(message)
         self.filename = "/tmp/%06d.wav" % random.randint(1,999999)
         message = message.replace('"', '\\"')
         # -eval "(voice_kal_diphone)"
@@ -97,7 +97,7 @@ class WindowsTTSEngine(TTSEngine):
 
     def speak(self, message, async = 0):
         if self.echo:
-            print message
+            print(message)
             self.tts.Speak(message, async) # 0 is default, 1 is async
 
     def setVoice(self, name):
@@ -129,7 +129,7 @@ class MacTTSEngine(TTSEngine):
 
     def speak(self, message, async=False):
         if self.echo:
-            print message
+            print(message)
 
         if async:
             background = "&"

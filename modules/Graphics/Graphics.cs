@@ -678,7 +678,9 @@ public static class Graphics {
 		Gtk.MotionNotifyEventArgs args) {
       foreach (object function in onMouseMovementCallbacks) {
 	if (function is PythonFunction) {
-	  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	  Gtk.Application.Invoke( delegate {
+	      IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	    });
 	} else {
 	  Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
 	  f(obj, args);
@@ -689,12 +691,14 @@ public static class Graphics {
     private void HandleClickCallbacks(object obj,
 				      Gtk.ButtonPressEventArgs args) {
       foreach (object function in onClickCallbacks) {
-		if (function is PythonFunction) {
-		  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-		} else {
-		  Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
-		  f(obj, args);
-		}
+	if (function is PythonFunction) {
+	  Gtk.Application.Invoke( delegate {
+	      IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	    });
+	} else {
+	  Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
+	  f(obj, args);
+	}
       }
     }
     

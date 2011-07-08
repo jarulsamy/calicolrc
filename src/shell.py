@@ -19,6 +19,7 @@
 # $Id$
 
 # Pure-Python modules:
+from __future__ import print_function
 import traceback
 import sys, os
 import re
@@ -88,9 +89,9 @@ class Shell(object):
 
     def message(self, text, newline=True):
         if newline:
-            print text
+            print(text)
         else:
-            print text,
+            print(text, end="")
 
     def execute_file(self, filename, language):
         self.message(_("Loading file '%s'...") % filename)
@@ -494,6 +495,7 @@ class ShellWindow(Window):
 
     def message(self, message, tag="purple", newline=True):
         # DO NOT PUT the ev, WaitOne stuff here!
+        message = str(message)
         if newline:
             message += "\n"
         def invoke(sender, args):

@@ -23,7 +23,7 @@ import Tao.Sdl
 import System
 
 def JoystickAxisChanged(sender, e):
-    print e
+    print(e)
 
 SdlDotNet.Input.Joysticks.Initialize()
 #SdlDotNet.Core.Events.JoystickButtonDown += JoystickAxisChanged
@@ -32,6 +32,6 @@ js = SdlDotNet.Input.Joysticks.OpenJoystick(0)
 for i in range(10000):
     Tao.Sdl.Sdl.SDL_PumpEvents()
     if js.GetButtonState(0):
-        print "Pressed!"
+        print("Pressed!")
     System.Threading.Thread.Sleep(100)
     

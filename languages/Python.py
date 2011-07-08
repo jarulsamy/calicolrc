@@ -18,6 +18,7 @@
 #
 # $Id: $
 
+from __future__ import print_function
 import clr
 clr.AddReference("IronPython")
 clr.AddReference("IronPython.Modules")
@@ -45,9 +46,10 @@ class PythonEngine(DLREngine):
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(IronPython.Hosting.Python).Assembly)
         # Execute startup script in Python
-        text = ("from __future__ import division, with_statement;" +
+        text = ("from __future__ import division, with_statement, print_function;" +
                 "from Myro import ask;" + 
                 "__builtins__['input'] = ask;" +
+                "__builtins__['print'] = calico.Print;" +
                 "del division, with_statement, ask;")
         sctype = Microsoft.Scripting.SourceCodeKind.Statements
         source = self.engine.CreateScriptSourceFromString(text, sctype)

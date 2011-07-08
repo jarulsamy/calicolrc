@@ -18,6 +18,7 @@
 #
 # $Id$
 
+from __future__ import print_function
 import os
 import sys
 import time
@@ -173,8 +174,9 @@ class ConfigManager(object):
                         elif type(value) == type(self.default[name][setting]):
                             self.data[name][setting] = value
                         else:
-                            print >> sys.stderr, ("WARNING: ignoring key with wrong type "
-                                   "'%s.%s'" % (name, setting))
+                            print("WARNING: ignoring key with wrong type "
+				  "'%s.%s'" % (name, setting), 
+				  file=sys.stderr)
                     else:
                         # this could be a third-party setting; add it:
                         self.data[name][setting] = value

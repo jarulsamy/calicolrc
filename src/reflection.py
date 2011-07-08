@@ -18,6 +18,7 @@
 #
 # $Id$
 
+from __future__ import print_function
 import clr
 import System
 import time
@@ -75,10 +76,10 @@ def get_items(dll_file, class_name, item_type):
             mtypes = manifest.GetTypes()
             if mtypes:
                 for c in mtypes:
-                    print "considering 1:", c.Name
+                    print("considering 1:", c.Name)
                     if c is not None and c.Name == class_name:
                         for member in c.GetMembers():
-                            print "considering 2:", member.Name
+                            print("considering 2:", member.Name)
                             if (member and 
                                 member.Name not in ["GetType"] and 
                                 (int(System.Reflection.MethodAttributes.VtableLayoutMask) & int(member.Attributes)) == 0 and 
@@ -115,14 +116,14 @@ if __name__ == "__main__":
     import sys
     for full_dll in sys.argv[1:]:
         clr.AddReference(full_dll)
-        print full_dll
+        print(full_dll)
         path, dll = os.path.split(full_dll)
         for class_name in get_class_names(dll):
-            print "   Class:", class_name
+            print("   Class:", class_name)
             for (c,item) in get_methods(dll, class_name):
-                print "      Method:", item.Name
+                print("      Method:", item.Name)
             for (c,item) in get_fields(dll, class_name):
-                print "      Field:", item.Name
+                print("      Field:", item.Name)
 
 #clr.AddReference("webkit-sharp")
 #import WebKit

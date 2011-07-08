@@ -12,6 +12,6 @@ def addem(x, y):
 
 # Call both of the functions, and display the results:
 
-print add1(4)
-print addem(42, 8)
+print(add1(4))
+print(addem(42, 8))
 

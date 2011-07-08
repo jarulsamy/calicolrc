@@ -58,7 +58,7 @@ class MyCanvas(Gtk.DrawingArea):
     #    print event
 
     def update(self, obj, args):
-        print "expose!", obj, args
+        print("expose!", obj, args)
 
 
 win = MyWindow("")

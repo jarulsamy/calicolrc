@@ -19,6 +19,7 @@
 # $Id: calico.py -1   $
 
 # Setup environment:
+from __future__ import print_function
 import sys
 import os
 import traceback
@@ -175,7 +176,7 @@ class CalicoProject(object):
             except:
                 plugin = None
                 traceback.print_exc()
-                print "Could not load plugin '%s'; skipping" % filename
+                print("Could not load plugin '%s'; skipping" % filename)
             if plugin:
                 self.plugins[base] = plugin
         # Ok, done with initialization, let's go back to where we came
@@ -252,7 +253,7 @@ class CalicoProject(object):
         return results
 
     def error_message(self, message):
-        print >> sys.stderr, message
+        print(message, file=sys.stderr)
 
     def load(self, filename):
         """
@@ -312,7 +313,7 @@ class CalicoProject(object):
                 return name
         return "python" # FIXME: default language come from config
 
-    def Print(self, message, tag="green"):
+    def Print(self, message, tag="black"):
         """
         Short-hand for message, but makes sure that the shell is up
         and running.
@@ -320,7 +321,7 @@ class CalicoProject(object):
         if self.shell:
             self.shell.message(message, tag)
         else:
-            print message
+            print(message)
 
     def get_window(self):
         if self.chat:
@@ -531,12 +532,12 @@ class CalicoProject(object):
         while len(messages) == 0 and count < 10:
             messages = ch.receive()
             System.Threading.Thread.Sleep(1000)
-            print _("   waiting for confirmation...")
+            print(_("   waiting for confirmation..."))
             count += 1
-        print _("received messages:")
+        print(_("received messages:"))
         for message in messages:
-            print message[1]
-            print
+            print(message[1])
+            print()
         ch.close()
 
     def login_dialog(self, window):
@@ -633,25 +634,25 @@ class CalicoProject(object):
 # Let's start!
 version = "0.5.1"
 if "--help" in args:
-    print
-    print _("Calico Project, Version %s, on %s") % (version,
-                                                 System.Environment.OSVersion.VersionString)
-    print "----------------------------------------------------------------------------"
-    print _("Start calico with the following options:")
-    print _("  calico                            Defaults to shell")
-    print _("  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs")
-    print _("  calico --shell                    Brings up shell window")
-    print _("  calico --editor                   Brings up editor window")
-    print _("  calico --chat                     Brings up chat window")
-    print _("  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics")
-    print _("  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics")
-    print _("  calico --version                  Displays the version number (%s)" % version)
-    print _("  calico --help                     Displays this message")
-    print _("  calico --debug                    Puts Calico in debugging mode")
-    print
+    print()
+    print(_("Calico Project, Version %s, on %s") % (version,
+                                                 System.Environment.OSVersion.VersionString))
+    print("----------------------------------------------------------------------------")
+    print(_("Start calico with the following options:"))
+    print(_("  calico                            Defaults to shell"))
+    print(_("  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"))
+    print(_("  calico --shell                    Brings up shell window"))
+    print(_("  calico --editor                   Brings up editor window"))
+    print(_("  calico --chat                     Brings up chat window"))
+    print(_("  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"))
+    print(_("  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"))
+    print(_("  calico --version                  Displays the version number (%s)" % version))
+    print(_("  calico --help                     Displays this message"))
+    print(_("  calico --debug                    Puts Calico in debugging mode"))
+    print()
     sys.exit(0)
 elif "--version" in args:
-    print version
+    print(version)
     sys.exit(0)
 
 messagesLocked = False

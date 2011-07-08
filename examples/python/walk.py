@@ -46,7 +46,7 @@ def walk(todo, depth=0, maxDepth=4):
         if "__" in items[-1] or items[-1] in ignore:
             pass
         else:
-            print obj
+            print(obj)
             try:
                 expand += ["%s.%s" % (obj,i) for i in dir(eval(obj))]
             except:
@@ -62,7 +62,7 @@ def search(todo, text, depth=0, maxDepth=4):
             pass
         else:
             if text in obj:
-                print "Found:", obj
+                print("Found:", obj)
             try:
                 expand += ["%s.%s" % (obj,i) for i in dir(eval(obj))]
             except:

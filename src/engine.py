@@ -18,6 +18,7 @@
 #
 # $Id$
 
+from __future__ import print_function
 import clr
 import traceback
 import exceptions

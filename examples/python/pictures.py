@@ -7,5 +7,5 @@ pic = Myro.takePicture()
 #pic.draw(win)
 Myro.show(pic)
 
-print "all", Myro.get("all")
-print "light", Myro.getLight()
+print("all", Myro.get("all"))
+print("light", Myro.getLight())
