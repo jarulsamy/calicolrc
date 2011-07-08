@@ -2562,6 +2562,40 @@ public static class Myro {
     return Graphics.getWindow().getMouseState();
   }
 
+  public static string getKeyState() {
+    return Graphics.getWindow().getKeyState();
+  }  
+
+  public static string getKeyPressed() {
+    return Graphics.getWindow().getKeyPressed();
+  }  
+
+  public static void run() {
+    Graphics.getWindow().run();
+  }
+
+  public static void run(PythonFunction function) {
+    Graphics.getWindow().run(function);
+  }
+
+  // Callbacks:
+
+  public static void onMouseUp(PythonFunction function) {
+    Graphics.getWindow().onMouseUp(function);
+  }
+
+  public static void onMouseDown(PythonFunction function) {
+    Graphics.getWindow().onMouseDown(function);
+  }
+
+  public static void onKeyPress(PythonFunction function) {
+    Graphics.getWindow().onKeyPress(function);
+  }
+
+  public static void onKeyRelease(PythonFunction function) {
+    Graphics.getWindow().onKeyRelease(function);
+  }
+
   public static Graphics.WindowClass getWindow(string title) {
     return Graphics.getWindow(title);
   }

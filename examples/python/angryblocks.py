@@ -34,7 +34,11 @@ wall.bodyType = "static"
 wall.color = Color("blue")
 wall.draw(win)
 
-for x in range(1000):
-    win.step(.01)
-    if x == 100:
-        ball.body.ApplyForce( Vector2(80,-42))
+def main():
+    while True:
+        win.step(.01)
+        if win.getMouseState() == "down":
+            x, y = win.getMouseNow()
+            ball.body.ApplyForce( Vector2(x,y))
+
+win.run(main)

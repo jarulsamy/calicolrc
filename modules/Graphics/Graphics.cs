@@ -1075,9 +1075,6 @@ public static class Graphics {
     internal float _density;
     
     public Point [] points;
-    // FIXME: when done debugging
-    //internal Cairo.Color? _fill;
-    //internal Cairo.Color? _outline;
     internal Color _fill;
     internal Color _outline;
     private int _border;
@@ -1202,8 +1199,16 @@ public static class Graphics {
       Vector2 position = body.Position * MeterInPixels;
       double rotation = body.Rotation * 180.0/Math.PI; 
       // Move it
-      moveTo(position.X, position.Y);
-      rotateTo(rotation);
+      _moveTo(position.X, position.Y);
+      _rotateTo(rotation);
+    }
+
+    public static Vector2 Vector(int x, int y) {
+      return new Vector2((float)x, (float)y);
+    }
+
+    public static Vector2 Vector(double x, double y) {
+      return new Vector2((float)x, (float)y);
     }
 
     public void updatePhysics()
@@ -1468,7 +1473,8 @@ public static class Graphics {
 	pen.append_path(new Point(center.x + dx, center.y + dy));
       center.x += dx;
       center.y += dy;
-      // FIXME: update physics, when appropriate
+      if (body != null)
+	updatePhysics();
       QueueDraw();
     }
 
@@ -1477,28 +1483,51 @@ public static class Graphics {
       double dy = y - center.y;
       move(dx, dy);
     }
+
+    public void _moveTo(double x, double y) {
+      double dx = x - center.x;
+      double dy = y - center.y;
+      _move(dx, dy);
+    }
         
+    public void _move(double dx, double dy) {
+      if (has_pen && pen.down)
+	pen.append_path(new Point(center.x + dx, center.y + dy));
+      center.x += dx;
+      center.y += dy;
+    }
+
     public void rotate(double degrees) {
       _rotation -= (Math.PI / 180.0) * degrees;
-      // FIXME: update physics, when appropriate
+      if (body != null)
+	updatePhysics();
       QueueDraw();
     }
     
     public void rotateTo(double degrees) {
       _rotation = degrees * (Math.PI) / 180.0;
-      // FIXME: update physics, when appropriate
+      if (body != null)
+	updatePhysics();
       QueueDraw();
+    }
+
+    public void _rotate(double degrees) {
+      _rotation -= (Math.PI / 180.0) * degrees;
+    }
+    
+    public void _rotateTo(double degrees) {
+      _rotation = degrees * (Math.PI) / 180.0;
     }
     
     public void scale(double percent) {
       _scaleFactor *= percent;
-      // FIXME: update physics, when appropriate
       QueueDraw();
     }
 	
     public void scaleTo(double percent) {
       _scaleFactor = percent;
-      // FIXME: update physics
+      if (body != null)
+	updatePhysics();
       QueueDraw();
     }
     
@@ -2343,7 +2372,6 @@ public static class Graphics {
       // arbitrary:
       Vector2 position = new Vector2(((float)x)/MeterInPixels, 
 				     ((float)y)/MeterInPixels);
-      // FIXME: set rotation in radians
       body = FarseerPhysics.Factories.BodyFactory.CreateRectangle(
 		 world,
 		 (float)(width / MeterInPixels),   // radius in meters
