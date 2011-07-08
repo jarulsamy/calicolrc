@@ -185,6 +185,52 @@ public static class Graphics {
        {"white", new Color(0xFF, 0xFF, 0xFF)}, 
     };
 
+  public static PythonTuple getMouse() {
+    return getWindow().getMouse();
+  }
+
+  public static PythonTuple getMouseNow() {
+    return getWindow().getMouseNow();
+  }
+
+  public static string getMouseState() {
+    return getWindow().getMouseState();
+  }
+
+  public static string getKeyState() {
+    return getWindow().getKeyState();
+  }  
+
+  public static string getKeyPressed() {
+    return getWindow().getKeyPressed();
+  }  
+
+  public static void run() {
+    getWindow().run();
+  }
+
+  public static void run(PythonFunction function) {
+    getWindow().run(function);
+  }
+
+  // Callbacks:
+
+  public static void onMouseUp(PythonFunction function) {
+    getWindow().onMouseUp(function);
+  }
+
+  public static void onMouseDown(PythonFunction function) {
+    getWindow().onMouseDown(function);
+  }
+
+  public static void onKeyPress(PythonFunction function) {
+    getWindow().onKeyPress(function);
+  }
+
+  public static void onKeyRelease(PythonFunction function) {
+    getWindow().onKeyRelease(function);
+  }
+
   public static List getColorNames() {
     List retval = new List();
     foreach (String key in colors.Keys) {
@@ -813,7 +859,7 @@ public static class Graphics {
 	return _canvas;
       }
     }
-    
+
     public PythonTuple getMouse() {
       _lastClickFlag = new ManualResetEvent(false);
       _lastClickFlag.WaitOne();
