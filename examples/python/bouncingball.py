@@ -37,8 +37,8 @@ wall3.draw(win)
 
 def main():
     while True:
-        if win.getMouseState() == "down":
-            x, y = win.getMouseNow()
+        if getMouseState() == "down":
+            x, y = getMouseNow()
             c = Pie((x, y), 10, 0, 360)
             c.fill = Color("gray")
             c.draw(win)
