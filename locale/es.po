@@ -3,559 +3,712 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-13 17:31-0400\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-06-28 14:27-0500\n"
+"PO-Revision-Date: 2011-06-28 14:52-0500\n"
+"Last-Translator: Jose S Becerra <josesaidb@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: src\n"
 
-#: ../src/calico.py:251
+#: src/calico.py:251
 #, python-format
 msgid "Cannot load language file '%s'"
-msgstr ""
+msgstr "No se puede cargar el archivo de lenguaje '%s'"
 
-#: ../src/calico.py:269
+#: src/calico.py:269
 #, python-format
 msgid "unknown file extension: '%s'"
-msgstr ""
+msgstr "extensión de archivo desconocida: '%s'"
 
-#: ../src/calico.py:278
+#: src/calico.py:278
 msgid "Do you want to run the script?"
-msgstr ""
+msgstr "Desea ejecutar la secuencia de comandos o script?"
 
-#: ../src/calico.py:280
+#: src/calico.py:280
 msgid "Do you want to open the script?"
-msgstr ""
+msgstr "Desea Abrir la secuencia de comandos o script?"
 
-#: ../src/calico.py:285
+#: src/calico.py:285
 #, python-format
 msgid ""
 "You have received a blast from '%(mfrom)s'.\n"
 "%(q)s"
 msgstr ""
+"Usted ha recibido un mensaje de '%(mfrom)s'.\n"
+"%(q)s "
 
-#: ../src/calico.py:403
+#: src/calico.py:403
 #, python-format
 msgid "Searching for %r in %s/%s..."
-msgstr ""
+msgstr "Buscando %r en %s/%s..."
 
-#: ../src/calico.py:424
+#: src/calico.py:424
 #, python-format
 msgid "  File \"%s\", line %d, %s\""
-msgstr ""
+msgstr "  Archivo \"%s\", línea %d, %s\""
 
-#: ../src/calico.py:432
+#: src/calico.py:432
 #, python-format
 msgid "Found %d match%s. Right-click file to open."
-msgstr ""
+msgstr "Encontro %d coincidencias%s. Botón Derecho para abrir el archivo."
 
-#: ../src/calico.py:434
+#: src/calico.py:434
 msgid "No matches found."
-msgstr ""
+msgstr "No se encontraron coincidencias."
 
-#: ../src/calico.py:497
+#: src/calico.py:497
 msgid "Scripting Environment"
-msgstr ""
+msgstr "Ambiente de desarrollo"
 
-#: ../src/calico.py:497
+#: src/calico.py:497
 #, python-format
 msgid "Running on %s"
-msgstr ""
+msgstr "Ejecutándose en %s"
 
-#: ../src/calico.py:499
+#: src/calico.py:499
 msgid "(c) 2011, Institute for Personal Robots in Education"
-msgstr ""
+msgstr "(c) 2011, Instituto de Robots Personales en la Educación"
 
-#: ../src/calico.py:504
+#: src/calico.py:504
 msgid "Calico Project"
-msgstr ""
+msgstr "Proyecto Calico"
 
-#: ../src/calico.py:534
+#: src/calico.py:534
 msgid "   waiting for confirmation..."
-msgstr ""
+msgstr "   esperando confirmación..."
 
-#: ../src/calico.py:536
+#: src/calico.py:536
 msgid "received messages:"
-msgstr ""
+msgstr "mensajes recibidos:"
 
-#: ../src/calico.py:544
+#: src/calico.py:544
 msgid "Calico Login"
-msgstr ""
+msgstr "Inicio de sesión Calico"
 
-#: ../src/calico.py:547 ../src/calico.py:569 ../src/calico.py:579
-#: ../src/calico.py:606
+#: src/calico.py:547
+#: src/calico.py:569
+#: src/calico.py:579
+#: src/calico.py:606
 msgid "Username"
-msgstr ""
+msgstr "Usuario"
 
-#: ../src/calico.py:547 ../src/calico.py:570 ../src/calico.py:581
-#: ../src/calico.py:608
+#: src/calico.py:547
+#: src/calico.py:570
+#: src/calico.py:581
+#: src/calico.py:608
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
-#: ../src/calico.py:564
+#: src/calico.py:564
 msgid "Login"
-msgstr ""
+msgstr "Iniciar Sesión"
 
-#: ../src/calico.py:565 ../src/calico.py:601 ../src/document.py:113
-#: ../src/editor.py:269 ../src/editor.py:409 ../src/utils.py:164
+#: src/calico.py:565
+#: src/calico.py:601
+#: src/document.py:113
+#: src/editor.py:269
+#: src/editor.py:409
+#: src/utils.py:164
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
-#: ../src/calico.py:576
+#: src/calico.py:576
 msgid "Calico Registration"
-msgstr ""
+msgstr "Registro Calico"
 
-#: ../src/calico.py:580 ../src/calico.py:607
+#: src/calico.py:580
+#: src/calico.py:607
 msgid "Email"
-msgstr ""
+msgstr "Correo electrónico"
 
-#: ../src/calico.py:582
+#: src/calico.py:582
 msgid "Password again"
-msgstr ""
+msgstr "nuevamente su contraseña"
 
-#: ../src/calico.py:583 ../src/calico.py:609
+#: src/calico.py:583
+#: src/calico.py:609
 msgid "Course keyword"
-msgstr ""
+msgstr "Palabra clave"
 
-#: ../src/calico.py:600
+#: src/calico.py:600
 msgid "Register"
-msgstr ""
+msgstr "Registrarse"
 
-#: ../src/calico.py:637
+#: src/calico.py:637
 #, python-format
 msgid "Calico Project, Version %s, on %s"
-msgstr ""
+msgstr "Proyecto Calico, Versión %s, de %s"
 
-#: ../src/calico.py:640
+#: src/calico.py:640
 msgid "Start calico with the following options:"
-msgstr ""
+msgstr "Calico comienza con las siguientes opciones:"
 
-#: ../src/calico.py:641
+#: src/calico.py:641
 msgid "  calico                            Defaults to shell"
-msgstr ""
+msgstr "  calico                            Valores por defecto del Shell"
 
-#: ../src/calico.py:642
-msgid ""
-"  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
-msgstr ""
+#: src/calico.py:642
+msgid "  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
+msgstr "  calico FILENAME:LINE ...           Editar NOMBREARCHIVOs, ubicándose en la LINEA"
 
-#: ../src/calico.py:643
+#: src/calico.py:643
 msgid "  calico --shell                    Brings up shell window"
-msgstr ""
+msgstr "  calico --Shell                    Muestra una ventana Shell"
 
-#: ../src/calico.py:644
+#: src/calico.py:644
 msgid "  calico --editor                   Brings up editor window"
-msgstr ""
+msgstr "  calico --editor                   Muestra la ventana Editor"
 
-#: ../src/calico.py:645
+#: src/calico.py:645
 msgid "  calico --chat                     Brings up chat window"
-msgstr ""
+msgstr "  calico --chat                     Muestra la ventana Chat"
 
-#: ../src/calico.py:646
-msgid ""
-"  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
-msgstr ""
+#: src/calico.py:646
+msgid "  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"
+msgstr "  calico --exec FILENAMEs           Ejecuta solamente el NOMBREARCHIVOs, con gráficos"
 
-#: ../src/calico.py:647
-msgid ""
-"  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
-msgstr ""
+#: src/calico.py:647
+msgid "  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"
+msgstr "  calico --exec --nogui FILENAMEs   Ejecuta solamente el NOMBREARCHIVO, sin gráficos"
 
-#: ../src/calico.py:648
+#: src/calico.py:648
 #, python-format
 msgid "  calico --version                  Displays the version number (%s)"
-msgstr ""
+msgstr "  calico --version                  Muestra el número de la versión (%s)"
 
-#: ../src/calico.py:649
+#: src/calico.py:649
 msgid "  calico --help                     Displays this message"
-msgstr ""
+msgstr "  calico --help                     Muestra este mensaje"
 
-#: ../src/calico.py:650
+#: src/calico.py:650
 msgid "  calico --debug                    Puts Calico in debugging mode"
-msgstr ""
+msgstr "  calico --debug                    Coloca Calico en modo depuración"
 
-#: ../src/chat.py:37
+#: src/chat.py:37
 #, python-format
 msgid "Calico Chat - %s"
-msgstr ""
+msgstr "Calico Chat - %s"
 
-#: ../src/chat.py:45 ../src/editor.py:44 ../src/shell.py:115
+#: src/chat.py:45
+#: src/editor.py:44
+#: src/shell.py:115
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
-#: ../src/chat.py:46 ../src/editor.py:45 ../src/shell.py:116
+#: src/chat.py:46
+#: src/editor.py:45
+#: src/shell.py:116
 msgid "Open Script..."
-msgstr ""
+msgstr "Abrir Script"
 
-#: ../src/chat.py:53 ../src/editor.py:58 ../src/shell.py:125
+#: src/chat.py:53
+#: src/editor.py:58
+#: src/shell.py:125
 msgid "Register..."
-msgstr ""
+msgstr "Registrarse..."
 
-#: ../src/chat.py:54 ../src/editor.py:59 ../src/shell.py:126
+#: src/chat.py:54
+#: src/editor.py:59
+#: src/shell.py:126
 msgid "Login..."
-msgstr ""
+msgstr "Iniciar Sesión"
 
-#: ../src/chat.py:56 ../src/editor.py:61 ../src/shell.py:128
+#: src/chat.py:56
+#: src/editor.py:61
+#: src/shell.py:128
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
-#: ../src/chat.py:58 ../src/editor.py:63 ../src/shell.py:130
+#: src/chat.py:58
+#: src/editor.py:63
+#: src/shell.py:130
 msgid "Quit"
-msgstr ""
+msgstr "Salir"
 
-#: ../src/chat.py:61 ../src/editor.py:66 ../src/shell.py:133
+#: src/chat.py:61
+#: src/editor.py:66
+#: src/shell.py:133
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
-#: ../src/chat.py:62 ../src/editor.py:67 ../src/shell.py:134
+#: src/chat.py:62
+#: src/editor.py:67
+#: src/shell.py:134
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
-#: ../src/chat.py:63 ../src/editor.py:68 ../src/shell.py:135
+#: src/chat.py:63
+#: src/editor.py:68
+#: src/shell.py:135
 msgid "Paste"
-msgstr ""
+msgstr "Pegar"
 
-#: ../src/chat.py:64 ../src/editor.py:69 ../src/shell.py:136
+#: src/chat.py:64
+#: src/editor.py:69
+#: src/shell.py:136
 msgid "Cut"
-msgstr ""
+msgstr "Cortar"
 
-#: ../src/chat.py:65 ../src/editor.py:70 ../src/shell.py:137
+#: src/chat.py:65
+#: src/editor.py:70
+#: src/shell.py:137
 msgid "Select all"
-msgstr ""
+msgstr "Seleccionar todo"
 
-#: ../src/chat.py:67 ../src/chat.py:71 ../src/editor.py:84 ../src/shell.py:143
+#: src/chat.py:67
+#: src/chat.py:71
+#: src/editor.py:84
+#: src/shell.py:143
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
-#: ../src/chat.py:68 ../src/editor.py:81 ../src/shell.py:140
+#: src/chat.py:68
+#: src/editor.py:81
+#: src/shell.py:140
 msgid "Windows"
-msgstr ""
+msgstr "Ventanas"
 
-#: ../src/chat.py:69 ../src/editor.py:82 ../src/shell.py:141
+#: src/chat.py:69
+#: src/editor.py:82
+#: src/shell.py:141
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
-#: ../src/chat.py:70 ../src/editor.py:83 ../src/shell.py:139
-#: ../src/shell.py:142
+#: src/chat.py:70
+#: src/editor.py:83
+#: src/shell.py:139
+#: src/shell.py:142
 msgid "Shell"
-msgstr "el Shell"
+msgstr "Shell"
 
-#: ../src/chat.py:73 ../src/editor.py:86 ../src/shell.py:145
+#: src/chat.py:73
+#: src/editor.py:86
+#: src/shell.py:145
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
-#: ../src/chat.py:74 ../src/editor.py:87 ../src/shell.py:146
+#: src/chat.py:74
+#: src/editor.py:87
+#: src/shell.py:146
 msgid "Make font larger"
-msgstr ""
+msgstr "Hacer la fuente más grande"
 
-#: ../src/chat.py:75 ../src/editor.py:88 ../src/shell.py:147
+#: src/chat.py:75
+#: src/editor.py:88
+#: src/shell.py:147
 msgid "Make font smaller"
-msgstr ""
+msgstr "Hacer la fuente más pequeña"
 
-#: ../src/chat.py:77 ../src/editor.py:90 ../src/shell.py:149
+#: src/chat.py:77
+#: src/editor.py:90
+#: src/shell.py:149
 msgid "Help"
-msgstr ""
+msgstr "Ayuda"
 
-#: ../src/chat.py:78 ../src/editor.py:91 ../src/shell.py:150
+#: src/chat.py:78
+#: src/editor.py:91
+#: src/shell.py:150
 msgid "About the Calico Project"
-msgstr ""
+msgstr "Acerca del Proyecto Calico"
 
-#: ../src/chat.py:81 ../src/editor.py:94 ../src/shell.py:153
+#: src/chat.py:81
+#: src/editor.py:94
+#: src/shell.py:153
 msgid "Create a new script"
-msgstr ""
+msgstr "Crear un nuevo script"
 
-#: ../src/chat.py:82 ../src/editor.py:95 ../src/shell.py:154
+#: src/chat.py:82
+#: src/editor.py:95
+#: src/shell.py:154
 msgid "Open an existing script"
-msgstr ""
+msgstr "Abrir un script existente"
 
-#: ../src/chat.py:86 ../src/chat.py:171 ../src/editor.py:108
-#: ../src/editor.py:247 ../src/shell.py:164 ../src/shell.py:305
-#: ../src/shell.py:308
+#: src/chat.py:86
+#: src/chat.py:171
+#: src/editor.py:108
+#: src/editor.py:247
+#: src/shell.py:164
+#: src/shell.py:305
+#: src/shell.py:308
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
-#: ../src/chat.py:91
+#: src/chat.py:91
 msgid "Chat: "
-msgstr ""
+msgstr "Chat"
 
-#: ../src/chat.py:93
+#: src/chat.py:93
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
-#: ../src/chat.py:130
+#: src/chat.py:130
 msgid "Calico Chat Window"
-msgstr ""
+msgstr "Ventana de Chat Calico"
 
-#: ../src/chat.py:132
+#: src/chat.py:132
 msgid "Enter /help for details"
-msgstr ""
+msgstr "Ingrese /help (ayuda) para más detalles"
 
-#: ../src/chat.py:139
+#: src/chat.py:139
 msgid ""
-"\r\n"
-"Chat commands:\r\n"
-"   MESSGE        - send a message to\r\n"
-"                   all in conference\r\n"
-"   @USER MESSAGE - send a message to\r\n"
-"                   USER\r\n"
-"   /join CONF    - join a conference\r\n"
-"   /list         - list conferences\r\n"
-"   /create CONF  - create conference\r\n"
-"   /help         - this help message\r\n"
-"\r\n"
+"\n"
+"Chat commands:\n"
+"   MESSGE        - send a message to\n"
+"                   all in conference\n"
+"   @USER MESSAGE - send a message to\n"
+"                   USER\n"
+"   /join CONF    - join a conference\n"
+"   /list         - list conferences\n"
+"   /create CONF  - create conference\n"
+"   /help         - this help message\n"
+"\n"
 msgstr ""
+"\n"
+"Comandos del Chat:\n"
+"   MESSGE        - envía un mensaje a\n"
+"                   todos en conferencia\n"
+"   @USER MESSAGE - envía un mensaje a\n"
+"                   USER\n"
+"   /join CONF    - unirse a la conferencia\n"
+"   /list         - lista de conferencias\n"
+"   /create CONF  - crea una conferencia\n"
+"   /help         - este mensaje de ayuda\n"
+"\n"
 
-#: ../src/chat.py:166
+#: src/chat.py:166
 msgid "You are not currently online"
-msgstr ""
+msgstr "Ud. no esta en línea"
 
-#: ../src/chat.py:168
+#: src/chat.py:168
 msgid "You need to login first"
-msgstr ""
+msgstr "Primero debe iniciar sesión"
 
-#: ../src/chat.py:177 ../src/editor.py:253 ../src/shell.py:314
-#: ../src/utils.py:254 ../src/utils.py:294
+#: src/chat.py:177
+#: src/editor.py:253
+#: src/shell.py:314
+#: src/utils.py:254
+#: src/utils.py:294
 msgid "offline"
-msgstr ""
+msgstr "fuera de línea"
 
-#: ../src/document.py:53 ../src/window.py:164
+#: src/document.py:53
+#: src/window.py:164
 #, python-format
 msgid "New %s Script"
-msgstr ""
+msgstr "Nueva Secuencia de Comandos %s"
 
-#: ../src/document.py:110
+#: src/document.py:110
 msgid "Enter the file to save"
-msgstr ""
+msgstr "Ingrese el nombre del archivo a guardar"
 
-#: ../src/document.py:114
+#: src/document.py:114
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
-#: ../src/editor.py:35 ../src/editor.py:171
+#: src/editor.py:35
+#: src/editor.py:171
 #, python-format
 msgid "Calico Editor - %s"
-msgstr ""
+msgstr "Editor Calico - %s"
 
-#: ../src/editor.py:53
+#: src/editor.py:53
 msgid "Save..."
-msgstr ""
+msgstr "Guardar..."
 
-#: ../src/editor.py:55
+#: src/editor.py:55
 msgid "Save as..."
-msgstr ""
+msgstr "Guardar como..."
 
-#: ../src/editor.py:72
+#: src/editor.py:72
 msgid "Search..."
-msgstr ""
+msgstr "Buscar..."
 
-#: ../src/editor.py:73
+#: src/editor.py:73
 msgid "Find next"
-msgstr ""
+msgstr "Buscar siguiente"
 
-#: ../src/editor.py:74
+#: src/editor.py:74
 msgid "Find previous"
-msgstr ""
+msgstr "Buscar anterior"
 
-#: ../src/editor.py:76
+#: src/editor.py:76
 msgid "Script"
-msgstr ""
+msgstr "Secuencia de comandos"
 
-#: ../src/editor.py:77 ../src/shell.py:290
+#: src/editor.py:77
+#: src/shell.py:290
 msgid "Run"
-msgstr ""
+msgstr "Ejecutar"
 
-#: ../src/editor.py:78
+#: src/editor.py:78
 msgid "Reset and run"
-msgstr ""
+msgstr "Reiniciar y ejecutar"
 
-#: ../src/editor.py:79
+#: src/editor.py:79
 msgid "Blast..."
-msgstr ""
+msgstr "Mensajes..."
 
-#: ../src/editor.py:96
+#: src/editor.py:96
 msgid "Save current script"
-msgstr ""
+msgstr "Guardar la secuencia de comandos actual"
 
-#: ../src/editor.py:97 ../src/shell.py:155
+#: src/editor.py:97
+#: src/shell.py:155
 msgid "Run script"
-msgstr ""
+msgstr "Ejecutar secuencia de comandos"
 
-#: ../src/editor.py:108 ../src/editor.py:158 ../src/editor.py:170
-#: ../src/shell.py:164 ../src/shell.py:304
+#: src/editor.py:108
+#: src/editor.py:158
+#: src/editor.py:170
+#: src/shell.py:164
+#: src/shell.py:304
 msgid "Language"
-msgstr ""
+msgstr "Lenguaje"
 
-#: ../src/editor.py:159
+#: src/editor.py:159
 msgid "Calico Editor"
-msgstr ""
+msgstr "Editor Calico"
 
-#: ../src/editor.py:266
+#: src/editor.py:266
 msgid "Select the file to open"
-msgstr ""
+msgstr "Seleccione el archivo a abrir"
 
-#: ../src/editor.py:270 ../src/utils.py:165
+#: src/editor.py:270
+#: src/utils.py:165
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
-#: ../src/editor.py:384
+#: src/editor.py:384
 msgid "Calico Script Blast"
-msgstr ""
+msgstr "Envío de mensajes en Calico"
 
-#: ../src/editor.py:387 ../src/editor.py:414 ../src/editor.py:416
+#: src/editor.py:387
+#: src/editor.py:414
+#: src/editor.py:416
 msgid "To"
-msgstr ""
+msgstr "A"
 
-#: ../src/editor.py:401
+#: src/editor.py:401
 msgid "Open script in their editor"
-msgstr ""
+msgstr "Abrir la secuencia de comandos en el editor"
 
-#: ../src/editor.py:402
+#: src/editor.py:402
 msgid "Run script on their computer"
-msgstr ""
+msgstr "Ejecutar la secuencia de comando en su computador"
 
-#: ../src/editor.py:408
+#: src/editor.py:408
 msgid "Blast!"
-msgstr ""
+msgstr "Enviar!"
 
-#: ../src/editor.py:423 ../src/utils.py:300
+#: src/editor.py:423
+#: src/utils.py:300
 msgid "online"
-msgstr ""
+msgstr "en línea"
 
-#: ../src/editor.py:433
+#: src/editor.py:433
 msgid "You are not online"
-msgstr ""
+msgstr "Ud. no esta en línea"
 
-#: ../src/editor.py:435
+#: src/editor.py:435
 msgid "You need to login"
-msgstr ""
+msgstr "Necesita iniciar sesión"
 
-#: ../src/shell.py:96 ../src/shell.py:526
+#: src/reflection.py:78
+msgid "considering 1:"
+msgstr "consideración 1:"
+
+#: src/reflection.py:81
+msgid "considering 2:"
+msgstr "consideración 2:"
+
+#: src/reflection.py:121
+msgid "   Class:"
+msgstr "   Clase:"
+
+#: src/reflection.py:123
+msgid "      Method:"
+msgstr "      Metodo:"
+
+#: src/shell.py:96
+#: src/shell.py:526
 #, python-format
 msgid "Loading file '%s'..."
-msgstr ""
+msgstr "Cargando archivo '%s'..."
 
-#: ../src/shell.py:98 ../src/shell.py:530
+#: src/shell.py:98
+#: src/shell.py:530
 msgid "Done loading file."
-msgstr ""
+msgstr "Carga de archivo exitosa."
 
-#: ../src/shell.py:105
+#: src/shell.py:105
 #, python-format
 msgid "Calico Shell - %s"
-msgstr "el Calico Shell - %s"
+msgstr "Calico Shell - %s"
 
-#: ../src/shell.py:121
+#: src/shell.py:121
 msgid "Search in files..."
-msgstr ""
+msgstr "Buscar en archivos"
 
-#: ../src/shell.py:156 ../src/shell.py:293
+#: src/shell.py:156
+#: src/shell.py:293
 msgid "Stop script"
-msgstr ""
+msgstr "Detener secuencia de comandos"
 
-#: ../src/shell.py:157
+#: src/shell.py:157
 msgid "Swap script and history areas"
-msgstr ""
+msgstr "Intercambiar secuencia de comandos e historial"
 
-#: ../src/shell.py:229
+#: src/shell.py:229
 #, python-format
 msgid "Calico Project %s"
-msgstr ""
+msgstr "Proyecto Calico %s"
 
-#: ../src/shell.py:286
+#: src/shell.py:286
 #, python-format
 msgid "Change to %s"
-msgstr ""
+msgstr "Cambiar a %s"
 
-#: ../src/shell.py:291
+#: src/shell.py:291
 msgid "Clear"
-msgstr ""
+msgstr "Limpiar"
 
-#: ../src/shell.py:292
+#: src/shell.py:292
 msgid "Restart shell"
-msgstr ""
+msgstr "Reiniciar el shell"
 
-#: ../src/shell.py:302
+#: src/shell.py:302
 #, python-format
 msgid "%s - Calico Shell - %s"
-msgstr "%s - el Calico Shell - %s"
+msgstr "%s - Calico Shell - %s"
 
-#: ../src/shell.py:417
+#: src/shell.py:417
 msgid ""
 "Possible completions:\n"
 "   "
 msgstr ""
+"Posibles coincidencias:\n"
+"   "
 
-#: ../src/shell.py:419
+#: src/shell.py:419
 #, python-format
 msgid "No completions found for '%s'\n"
-msgstr ""
+msgstr "No se encontraron coincidencias para '%s'\n"
 
-#: ../src/shell.py:472
+#: src/shell.py:472
 msgid "Stopping..."
-msgstr ""
+msgstr "Deteniedo la ejecución..."
 
-#: ../src/shell.py:493
+#: src/shell.py:493
 msgid "Reset shell"
-msgstr ""
+msgstr "Reinicie el Shell"
 
-#: ../src/shell.py:602
+#: src/shell.py:602
 msgid "Get help on error"
-msgstr ""
+msgstr "Obtener ayuda en caso de error"
 
-#: ../src/shell.py:641
+#: src/shell.py:641
 msgid "File \"(.*)\", line (\\d*)"
-msgstr ""
+msgstr "Archivo \"(.*)\", línea (\\d*)"
 
-#: ../src/shell.py:647
+#: src/shell.py:647
 #, python-format
 msgid "Edit %s"
-msgstr ""
+msgstr "Editar %s"
 
-#: ../src/utils.py:161
+#: src/speech.py:9
+msgid "This voice provides an American English male ..."
+msgstr "This voz corresponde a un hombre Inglés Americano ..."
+
+#: src/speech.py:159
+msgid "For each variable below, fill in a value:"
+msgstr "Para cada variable, ingrese un valor:"
+
+#: src/speech.py:185
+msgid "Which story?"
+msgstr "Que cuento?"
+
+#: src/speech.py:200
+#: src/speech.py:219
+msgid "Number"
+msgstr "Número"
+
+#: src/speech.py:201
+#: src/speech.py:220
+#, python-format
+msgid "Try #%d: Guess a number between 1 and %d"
+msgstr "Intenta #%d: Adivinar un número entre 1 y %d"
+
+#: src/speech.py:210
+#, python-format
+msgid "On try number %d you guessed %d and that is too low."
+msgstr "En el intento %d usted ingreso %d y es demasiado pequeño."
+
+#: src/speech.py:213
+#, python-format
+msgid "On try number %d you guessed %d and that is too high."
+msgstr "En el intento %d usted ingreso %d y es demasiado grande."
+
+#: src/speech.py:228
+#, python-format
+msgid "Sorry, but you didn't guess it in %d tries. My number was %d."
+msgstr "Lo siento, pero Usted no adivinó el número en %d intentos. Mi numero fue %d."
+
+#: src/speech.py:231
+#, python-format
+msgid "You guessed my secret number in %d tries! It was %d."
+msgstr "Adivinó mi número secreto en %d intentos! Este fue %d."
+
+#: src/utils.py:161
 msgid "Select a file"
-msgstr ""
+msgstr "Seleccione un archivo"
 
-#: ../src/utils.py:303
+#: src/utils.py:303
 #, python-format
 msgid "You are now logged in as '%s'."
-msgstr ""
+msgstr "Usted ha iniciado sesión como '%s'"
 
-#: ../src/utils.py:314
+#: src/utils.py:314
 msgid "rejected"
-msgstr ""
+msgstr "rechazado"
 
-#: ../src/utils.py:316
+#: src/utils.py:316
 msgid "You were not allowed to log in."
-msgstr ""
+msgstr "No le esta permitido conectarse."
 
-#: ../src/utils.py:317
+#: src/utils.py:317
 msgid "Please check your ID and password."
-msgstr ""
+msgstr "Por favor verifique su Usuario y contraseña."
 
-#: ../src/utils.py:429
+#: src/utils.py:429
 msgid "Search: "
-msgstr ""
+msgstr "Buscar:"
 
-#: ../src/utils.py:523
+#: src/utils.py:523
 msgid "Search in files:"
-msgstr ""
+msgstr "Buscar en archivos:"
 
-#: ../src/utils.py:578
+#: src/utils.py:578
 #, python-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
-#: ../src/window.py:171 ../src/window.py:175
+#: src/window.py:171
+#: src/window.py:175
 msgid "Recent files"
-msgstr ""
+msgstr "Archivos recientes"
 
-#: ../src/window.py:184 ../src/window.py:193
+#: src/window.py:184
+#: src/window.py:193
 msgid "Examples"
-msgstr ""
+msgstr "Ejemplos"
+
+#~ msgid "Print Test"
+#~ msgstr "Imprimir Prueba"
