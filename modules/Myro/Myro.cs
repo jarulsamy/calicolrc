@@ -484,6 +484,17 @@ public static class Myro {
     return retval;
   }
 
+  public static List getColorNames() {
+	return Graphics.getColorNames();
+  }
+
+  public static Graphics.WindowClass Window(
+	  string title="Calico Graphics Window",
+	  int width=300, 
+	  int height=300) {
+    return Graphics.makeWindow(title, width, height);
+  }
+
   public static Graphics.Color pickAColor() {
     ManualResetEvent ev = new ManualResetEvent(false);
     Graphics.Color retval = null;
@@ -678,6 +689,14 @@ public static class Myro {
 	return robot.takePicture(mode);
   }
 
+  public static void setSeed(int value) {
+	Random.seed = value;
+  }
+
+  public static int getSeed() {
+	return Random.seed;
+  }
+
   public class Randomizer {
 	int _seed; 
 	Random _random = new Random();
@@ -704,7 +723,7 @@ public static class Myro {
   }
 	
   // singleton
-  public static Randomizer Random = new Randomizer(); 
+  public readonly static Randomizer Random = new Randomizer(); 
   
   public class Robot {
     
