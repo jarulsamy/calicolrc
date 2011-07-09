@@ -38,7 +38,7 @@ for rows in range(10):
         for x in range(8):
             turtle1.rotate(45)
             turtle1.forward(10)
-            win.step(.1)
+            win.step(.01)
         s = turtle1.penUp()
         hexes.append(s)
         s.fill = makeColor(random.choice(["red", "black", "green", "white"]))

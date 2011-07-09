@@ -1474,12 +1474,12 @@ public static class Graphics {
     }
     
     public Polygon penUp() {
-      pen.down = false;
+      pen._down = false;
       return new Polygon(pen.path.ToArray()); //, new Color(0,0,0));
     }
     
     public void penDown() {
-      pen.down = true;
+      pen._down = true;
       pen.reset_path();
       pen.append_path(new Point(center.x, center.y));
     }
@@ -1512,10 +1512,10 @@ public static class Graphics {
 	  g.Color = _outline.getCairo();
 	  g.Stroke();
 	}
-	if (has_pen)
-	  pen.render(g);
       }
       g.Restore();
+      if (has_pen)
+	pen.render(g);
     }
     
     public Point screen_coord(Point point) {
@@ -1799,10 +1799,10 @@ public static class Graphics {
 	  g.Color = _outline._cairo;
 	  g.Stroke();
 	}
-	if (has_pen)
-	  pen.render(g);
       }
       g.Restore();
+      if (has_pen)
+	pen.render(g);
     }
   }
   
@@ -1835,15 +1835,19 @@ public static class Graphics {
 	public bool _down;
     
     public Pen(Color color, int border) : base(false) {
-      down = false;
+      _down = false;
       this.color = color;
       this.border = border;
     }
     
     public Pen(int border) : base(false) {
-      down = false;
+      _down = false;
       this.color = new Color(0, 0, 0);
       this.border = border;
+    }
+
+    public List<Point> getPath() {
+      return _path;
     }
     
     public void reset_path() {
@@ -1862,16 +1866,13 @@ public static class Graphics {
 	  get {
 	    return _down;
 	  }
-	  set {
-	    _down = value;
-	  }
 	}
     
-	public List<Point> path {
-	  get {
-		return _path;
-	  }
-	}
+    public List<Point> path {
+      get {
+	return _path;
+      }
+    }
     
 	public override void render(Cairo.Context g) {
 	  // render path
@@ -1887,11 +1888,6 @@ public static class Graphics {
 	    for (int p = 1; p < path.Count; p++) {
 	      temp = screen_coord(path[p]);
 	      g.LineTo(temp.x, temp.y);
-	    }
-	    g.ClosePath();
-	    if (_fill != null) {
-	      g.Color = _fill._cairo;
-	      g.FillPreserve();
 	    }
 	    if (_outline != null) {
 	      g.Color = _outline._cairo;
@@ -2507,10 +2503,10 @@ public static class Graphics {
         g.LineTo(temp.x + 1, temp.y + 1);
         g.ClosePath();
         g.Stroke();
-        if (has_pen)
-          pen.render(g);
       }
       g.Restore();
+      if (has_pen)
+	pen.render(g);
     }
   }
 

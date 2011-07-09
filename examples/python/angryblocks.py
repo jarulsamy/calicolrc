@@ -1,6 +1,5 @@
 from Graphics import *
 from Myro import pickOne, randomNumber
-from Microsoft.Xna.Framework import Vector2
 
 win = Window("Angry Blocks", 800, 300)
 win.mode = "physics"
@@ -39,6 +38,9 @@ def main():
         win.step(.01)
         if win.getMouseState() == "down":
             x, y = win.getMouseNow()
-            ball.body.ApplyForce( Vector2(x,y))
+            ball.body.ApplyForce( Vector(x,y))
+        if win.getKeyState() == "down":
+            ball.body.ResetDynamics()
+            ball.moveTo(50, 280)
 
 win.run(main)
