@@ -223,6 +223,10 @@ public static class Graphics {
     getWindow().onMouseDown(function);
   }
 
+  public static void onMouseMovement(PythonFunction function) {
+    getWindow().onMouseMovement(function);
+  }
+
   public static void onKeyPress(PythonFunction function) {
     getWindow().onKeyPress(function);
   }
@@ -2630,6 +2634,27 @@ public static class Graphics {
 	g.Stroke();
       }
       g.Restore();
+    }
+
+    public override void addToPhysics() { // Circle
+      world = window._canvas.world;
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      body = FarseerPhysics.Factories.BodyFactory.CreateEllipse(
+		 world,
+		 xRadius / MeterInPixels,           // x radius in meters
+		 yRadius / MeterInPixels,           // y radius in meters
+		 20,
+		 _density,                         // density
+		 position);                        // center
+      // Give it some bounce and friction
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.Restitution = _bounce;
+      body.Friction = _friction;
     }
   }
 

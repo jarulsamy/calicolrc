@@ -39,7 +39,7 @@ def main():
     while True:
         if getMouseState() == "down":
             x, y = getMouseNow()
-            c = Pie((x, y), 10, 0, 360)
+            c = Oval((x, y), 10, 20)
             c.fill = Color("gray")
             c.draw(win)
         win.step(.01)

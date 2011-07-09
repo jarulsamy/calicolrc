@@ -2570,49 +2570,53 @@ public static class Myro {
   }
 
   public static PythonTuple getMouse() {
-    return Graphics.getWindow().getMouse();
+    return Graphics.getMouse();
   }
 
   public static PythonTuple getMouseNow() {
-    return Graphics.getWindow().getMouseNow();
+    return Graphics.getMouseNow();
   }
 
   public static string getMouseState() {
-    return Graphics.getWindow().getMouseState();
+    return Graphics.getMouseState();
   }
 
   public static string getKeyState() {
-    return Graphics.getWindow().getKeyState();
+    return Graphics.getKeyState();
   }  
 
   public static string getKeyPressed() {
-    return Graphics.getWindow().getKeyPressed();
+    return Graphics.getKeyPressed();
   }  
 
   public static void run() {
-    Graphics.getWindow().run();
+    Graphics.run();
   }
 
   public static void run(PythonFunction function) {
-    Graphics.getWindow().run(function);
+    Graphics.run(function);
   }
 
   // Callbacks:
 
   public static void onMouseUp(PythonFunction function) {
-    Graphics.getWindow().onMouseUp(function);
+    Graphics.onMouseUp(function);
   }
 
   public static void onMouseDown(PythonFunction function) {
-    Graphics.getWindow().onMouseDown(function);
+    Graphics.onMouseDown(function);
+  }
+
+  public static void onMouseMovement(PythonFunction function) {
+    Graphics.onMouseMovement(function);
   }
 
   public static void onKeyPress(PythonFunction function) {
-    Graphics.getWindow().onKeyPress(function);
+    Graphics.onKeyPress(function);
   }
 
   public static void onKeyRelease(PythonFunction function) {
-    Graphics.getWindow().onKeyRelease(function);
+    Graphics.onKeyRelease(function);
   }
 
   public static Graphics.WindowClass getWindow(string title) {
