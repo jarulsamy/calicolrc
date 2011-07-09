@@ -344,6 +344,7 @@ public static class Graphics {
     }
     GifLib.GifHelper.Merge(frameList, filename, delay, repeat);
   }
+
   public static Picture makePicture(int x, int y) {
     return new Picture(x, y);
   }
@@ -1022,6 +1023,14 @@ public static class Graphics {
     Gtk.Application.Invoke(delegate { ((Gtk.Widget)o).Show(); });
   }
   
+  public static Vector2 Vector(int x, int y) {
+    return new Vector2((float)x, (float)y);
+  }
+  
+  public static Vector2 Vector(double x, double y) {
+    return new Vector2((float)x, (float)y);
+  }
+
   public class Point {
     // FIXME: should call QueueDraw on change of x,y
     public double x;
@@ -1255,14 +1264,6 @@ public static class Graphics {
       // Move it
       _moveTo(position.X, position.Y);
       _rotateTo(rotation);
-    }
-
-    public static Vector2 Vector(int x, int y) {
-      return new Vector2((float)x, (float)y);
-    }
-
-    public static Vector2 Vector(double x, double y) {
-      return new Vector2((float)x, (float)y);
     }
 
     public void updatePhysics()

@@ -2538,6 +2538,12 @@ public static class Myro {
   public static void savePicture(List list, string filename, short delay, bool repeat) {
     Graphics.savePicture(list, filename, delay, repeat);
   }
+  public static object Vector(int x, int y) {
+    return Graphics.Vector((float)x, (float)y);
+  }
+  public static object Vector(double x, double y) {
+    return Graphics.Vector((float)x, (float)y);
+  }
   public static Graphics.Picture makePicture(int x, int y) {
     return new Graphics.Picture(x, y);
   }
