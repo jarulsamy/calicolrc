@@ -1279,26 +1279,30 @@ public static class Graphics {
 
     public virtual void updateFromPhysics() {
       // get from body, put in sprite
-      float MeterInPixels = 64.0f;
-      if (wrap) {
-	float x = (float)wrap_width((float)(body.Position.X * MeterInPixels));
-	float y = (float)wrap_height((float)(body.Position.Y * MeterInPixels));
-	body.Position = new Vector2(x/MeterInPixels, y/MeterInPixels);
+      if (body != null) {
+	float MeterInPixels = 64.0f;
+	if (wrap) {
+	  float x = (float)wrap_width((float)(body.Position.X * MeterInPixels));
+	  float y = (float)wrap_height((float)(body.Position.Y * MeterInPixels));
+	  body.Position = new Vector2(x/MeterInPixels, y/MeterInPixels);
+	}
+	Vector2 position = body.Position * MeterInPixels;
+	double rotation = body.Rotation * 180.0/Math.PI; 
+	// Move it
+	_moveTo(position.X, position.Y);
+	_rotateTo(rotation);
       }
-      Vector2 position = body.Position * MeterInPixels;
-      double rotation = body.Rotation * 180.0/Math.PI; 
-      // Move it
-      _moveTo(position.X, position.Y);
-      _rotateTo(rotation);
     }
 
     public void updatePhysics()
     {
       // get from sprite, put in body
-      float MeterInPixels = 64.0f;
-      body.Position = new Vector2(((float)x)/MeterInPixels, 
-				  ((float)y)/MeterInPixels);
-      body.Rotation = (float)(rotation * Math.PI/180.0); 
+      if (body != null) {
+	float MeterInPixels = 64.0f;
+	body.Position = new Vector2(((float)x)/MeterInPixels, 
+				    ((float)y)/MeterInPixels);
+	body.Rotation = (float)(rotation * Math.PI/180.0); 
+      }
     }
 
     public void stackOnTop() {
@@ -1651,13 +1655,15 @@ public static class Graphics {
     
     public void undraw() {
       Gtk.Application.Invoke(delegate { 
-	  window.getCanvas().shapes.Remove(this);
-	  if (window is WindowClass)
-	    ((WindowClass)window).QueueDraw();
-	  window = null;
+	  if (window != null && window.getCanvas().shapes.Contains(this)) {
+	    window.getCanvas().shapes.Remove(this);
+	    if (window is WindowClass)
+	      ((WindowClass)window).QueueDraw();
+	    window = null;
+	  }
 	});
     }
-
+    
     public Color color {
       set {
 	    if (value != null) {
