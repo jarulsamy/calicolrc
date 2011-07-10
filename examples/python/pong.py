@@ -3,7 +3,7 @@ from Myro import pickOne, randomNumber, Random
 
 win = Window("Pong", 640, 480)
 win.mode = "physics"
-win.canvas.world.Gravity = Vector(0,0)
+win.gravity = Vector(0,0)
 
 top = Rectangle((0, 0), (640, 20))
 top.bodyType = "static"

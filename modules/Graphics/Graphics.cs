@@ -476,6 +476,19 @@ public static class Graphics {
     return new Color(r, g, b, a);
   }
 
+  public class Graph {
+
+    public WindowClass window;
+
+    public Graph(string title, int width, int height) {
+      window = new Graphics.WindowClass(title, width, height);
+      Rectangle rect = new Rectangle(new Point(100, 50), 
+				     new Point(width - 100, height - 100));
+    }
+  }
+
+
+
   public class Color {
     internal Cairo.Color _cairo;
     public WindowClass window;  // for setting color of a Window()
@@ -667,6 +680,15 @@ public static class Graphics {
       DeleteEvent += OnDelete;
       Add(_canvas);
       ShowAll();
+    }
+
+    public Microsoft.Xna.Framework.Vector2 gravity {
+      get {
+	return canvas.world.Gravity;
+      }
+      set {
+	canvas.world.Gravity = value;
+      }
     }
 
     public void close() {
@@ -1148,6 +1170,7 @@ public static class Graphics {
   
   public class Shape {
     public Point center;
+    public string tag;
     public WindowClass window;
     internal double _rotation; // radians
     internal double _scaleFactor; // percent
