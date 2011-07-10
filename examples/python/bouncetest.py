@@ -18,5 +18,4 @@ ground.draw(win)
 ground.bodyType = "static"
 ground.color = Color("green")
 
-for x in range(600):
-    win.step(.01)
+win.run()

@@ -313,11 +313,15 @@ class CalicoProject(object):
                 return name
         return "python" # FIXME: default language come from config
 
-    def Print(self, message="", end="\n", file=None, tag="black"):
+    def Print(self, *args, **kwargs):
         """
         Short-hand for message, but makes sure that the shell is up
         and running.
         """
+        message = " ".join([str(m) for m in args])
+        end = kwargs.get("end", "\n")
+        file = kwargs.get("file", None)
+        tag = kwargs.get("tag", "black")
         if self.shell:
             self.shell.message(message, tag)
         else:

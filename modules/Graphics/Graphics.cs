@@ -1161,6 +1161,7 @@ public static class Graphics {
     internal Color _fill;
     internal Color _outline;
     private int _border;
+    public bool wrap = false;
     
     private Pen _pen;
     private bool _has_pen;
@@ -1279,6 +1280,11 @@ public static class Graphics {
     public virtual void updateFromPhysics() {
       // get from body, put in sprite
       float MeterInPixels = 64.0f;
+      if (wrap) {
+	float x = (float)wrap_width((float)(body.Position.X * MeterInPixels));
+	float y = (float)wrap_height((float)(body.Position.Y * MeterInPixels));
+	body.Position = new Vector2(x/MeterInPixels, y/MeterInPixels);
+      }
       Vector2 position = body.Position * MeterInPixels;
       double rotation = body.Rotation * 180.0/Math.PI; 
       // Move it
@@ -1543,11 +1549,33 @@ public static class Graphics {
       return point; // new Point(point.x - center.x, point.y - center.y);
     }
     
+    internal double wrap_width(double x) {
+      if (x < 0)
+	return wrap_width(window.width + x);
+      else if (x >= window.width)
+	return wrap_width(x - window.width);
+      else
+	return x;
+    }
+
+    internal double wrap_height(double y) {
+      if (y < 0)
+	return wrap_height(window.height + y);
+      else if (y >= window.height)
+	return wrap_height(y - window.height);
+      else
+	return y;
+    }
+
     public void move(double dx, double dy) {
       if (has_pen && pen.down)
 	pen.append_path(new Point(center.x + dx, center.y + dy));
       center.x += dx;
       center.y += dy;
+      if (wrap) {
+	center.x = wrap_width(center.x);
+	center.y = wrap_height(center.y);
+      }
       if (body != null)
 	updatePhysics();
       QueueDraw();
@@ -1925,46 +1953,10 @@ public static class Graphics {
     
     public Pixel(Picture picture, int x, int y) {
       this.picture = picture;
-      this.x = x;
-      this.y = y;
+      this.x = picture.wrap_width(x);
+      this.y = picture.wrap_height(y);
     }
     
-    public int red {
-      get {
-	return getRed();
-      }
-      set {
-	setRed((byte)value);
-      }
-    }
-
-    public int green {
-      get {
-	return getGreen();
-      }
-      set {
-	setGreen((byte)value);
-      }
-    }
-
-    public int blue {
-      get {
-	return getBlue();
-      }
-      set {
-	setBlue((byte)value);
-      }
-    }
-
-    public int alpha {
-      get {
-	return getAlpha();
-      }
-      set {
-	setAlpha((byte)value);
-      }
-    }
-
     public Color getColor() {
       return picture.getColor(x, y);
     }
@@ -2279,10 +2271,10 @@ public static class Graphics {
     }
 
     public void setPixel(int x, int y, Pixel pixel) {
-      int red = pixel.red;
-      int green = pixel.green;
-      int blue = pixel.blue;
-      int alpha = pixel.alpha;
+      int red = pixel.getRed();
+      int green = pixel.getGreen();
+      int blue = pixel.getBlue();
+      int alpha = pixel.getAlpha();
       this.setRGBA(x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
     }
 
@@ -2321,8 +2313,28 @@ public static class Graphics {
 	  return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
 	}
 
+    internal int wrap_width(int x) {
+      if (x < 0)
+	return wrap_width((int)(width + x));
+      else if (x >= width)
+	return wrap_width((int)(x - width));
+      else
+	return x;
+    }
+
+    internal int wrap_height(int y) {
+      if (y < 0)
+	return wrap_height((int)(height + y));
+      else if (y >= height)
+	return wrap_height((int)(y - height));
+      else
+	return y;
+    }
+
     public int getGray(int x, int y) {
 	  // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       int r = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0);
       int g = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -2334,30 +2346,40 @@ public static class Graphics {
     
 	public int getRed(int x, int y) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				  x * _pixbuf.NChannels + 0);
 	}
     
 	public int getGreen(int x, int y) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				  x * _pixbuf.NChannels + 1);
 	}
     
 	public int getBlue(int x, int y) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				  x * _pixbuf.NChannels + 2);
 	}
     
 	public int getAlpha(int x, int y) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				  x * _pixbuf.NChannels + 3);
 	}
     
     public void setColor(int x, int y, Color color) {
       // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 			x * _pixbuf.NChannels + 0, (byte)color.red);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -2371,6 +2393,8 @@ public static class Graphics {
 
     public void setGray(int x, int y, byte value) {
 	  // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, value);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -2382,6 +2406,8 @@ public static class Graphics {
     
     public void setRed(int x, int y, byte value) {
       // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
                 x * _pixbuf.NChannels + 0, value);
       QueueDraw();
@@ -2389,6 +2415,8 @@ public static class Graphics {
 
 	public void setGreen(int x, int y, byte value) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 			    x * _pixbuf.NChannels + 1, value);
 	  QueueDraw();
@@ -2396,6 +2424,8 @@ public static class Graphics {
 
     public void setBlue(int x, int y, byte value) {
 	  // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 2, value);
       QueueDraw();
@@ -2403,6 +2433,8 @@ public static class Graphics {
     
 	public void setAlpha(int x, int y, byte value) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 			    x * _pixbuf.NChannels + 3, value);
 	  QueueDraw();
@@ -2410,6 +2442,8 @@ public static class Graphics {
 
     public void setRGB(int x, int y, byte red, byte green, byte blue) {
 	  // red, green, blue, alpha
+      x = wrap_width(x);
+      y = wrap_height(y);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, red);
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -2422,6 +2456,8 @@ public static class Graphics {
 	public void setRGBA(int x, int y, byte red, byte green, byte blue, 
 			    byte alpha) {
 	  // red, green, blue, alpha
+	  x = wrap_width(x);
+	  y = wrap_height(y);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
 		  x * _pixbuf.NChannels + 0, red);
 	  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +

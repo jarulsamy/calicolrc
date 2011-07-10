@@ -20,6 +20,7 @@ ball.draw(win)
 #ball.mass = .5
 ball.bounce = 0.5
 ball.friction = 0.05
+#ball.wrap = True
 
 ground = Rectangle((0, 281), (800, 310))
 ground.bodyType = "static"

@@ -1,5 +1,7 @@
 from Graphics import *
-from Myro import pickOne, randomNumber
+from Myro import pickOne, randomNumber, Random
+
+Random.seed = 247534
 
 win = Window("Bouncing Shapes", 300, 600)
 win.mode = "physics"
@@ -14,6 +16,7 @@ for i in range(5):
     c.fill = Color(pickOne(getColorNames()))
     c.bounce = .1
     c.draw(win)
+    c.wrap = True
 
 for i in range(5):
     c = Pie((130 - i, 150 - i), 10, 0, 360)
@@ -42,6 +45,7 @@ def main():
             c = Oval((x, y), 10, 20)
             c.fill = Color("gray")
             c.draw(win)
+            c.wrap = True
         win.step(.01)
 
 # win.run() or
