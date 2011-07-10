@@ -306,7 +306,10 @@ class EditorWindow(Window):
         doc = self.get_current_doc()
         if doc:
             doc.save()
-            self.calico.on_action("saved-document", filename=doc.filename)
+            if doc.filename:
+                self.changed_page(None, None)
+                self.update_recent_files(doc.filename)
+                self.calico.on_action("saved-document", filename=doc.filename)
 
     def on_save_file_as(self, obj, event):
         doc = self.get_current_doc()
