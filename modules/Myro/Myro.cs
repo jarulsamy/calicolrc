@@ -2436,6 +2436,10 @@ public static class Myro {
   }
   */
 
+  public static Graphics.Color getColor(Graphics.Picture picture, int x, int y) {
+    return picture.getColor(x, y);
+  }
+  
   public static IEnumerable getPixels(Graphics.Picture picture) {
     return Graphics.getPixels(picture);
   }

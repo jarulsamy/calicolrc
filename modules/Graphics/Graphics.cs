@@ -260,6 +260,14 @@ public static class Graphics {
   private static Dictionary<string, Graphics.WindowClass> _windows =
     new Dictionary<string, Graphics.WindowClass>();
   
+  public static Color getColor(Picture picture, int x, int y) {
+    return picture.getColor(x, y);
+  }
+  
+  public static Pixel getPixel(Picture picture, int x, int y) {
+    return picture.getPixel(x, y);
+  }
+  
   public static IEnumerable getPixels(Picture picture) {
     for (int x=0; x < picture.width; x++) {
       for (int y=0; y < picture.height; y++) {
@@ -267,8 +275,18 @@ public static class Graphics {
       }
     }
   }
+  public static void setPixels(Picture picture, Picture picture2) {
+    for (int x=0; x < picture.width; x++) {
+      for (int y=0; y < picture.height; y++) {
+	picture.setPixel(x, y, picture2.getPixel(x, y));
+      }
+    }
+  }
   public static Color getColor(Pixel pixel) {
     return pixel.getColor();
+  }
+  public static void setColor(Pixel pixel, Color color) {
+    pixel.setColor(color);
   }
   public static PythonTuple getRGB(Pixel pixel) {
     return pixel.getRGB();
@@ -395,6 +413,7 @@ public static class Graphics {
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
       _windows[title].QueueDraw();
+      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for redraw
       /*
       Gtk.Application.Invoke(delegate { 
 	  _windows[title].GdkWindow.UrgencyHint = true;
@@ -409,6 +428,7 @@ public static class Graphics {
 	});
       */
       _lastWindow = _windows[title];
+      _lastWindow.KeepAbove = true;
       return _windows[title];
     }
   }
@@ -1909,6 +1929,42 @@ public static class Graphics {
       this.y = y;
     }
     
+    public int red {
+      get {
+	return getRed();
+      }
+      set {
+	setRed((byte)value);
+      }
+    }
+
+    public int green {
+      get {
+	return getGreen();
+      }
+      set {
+	setGreen((byte)value);
+      }
+    }
+
+    public int blue {
+      get {
+	return getBlue();
+      }
+      set {
+	setBlue((byte)value);
+      }
+    }
+
+    public int alpha {
+      get {
+	return getAlpha();
+      }
+      set {
+	setAlpha((byte)value);
+      }
+    }
+
     public Color getColor() {
       return picture.getColor(x, y);
     }
@@ -1932,6 +1988,9 @@ public static class Graphics {
     }
     public int getAlpha() {
       return picture.getAlpha(x, y);
+    }
+    public void setColor(Color color) {
+      picture.setColor(x, y, color);
     }
     public void setRGB(byte red, byte green, byte blue) {
       picture.setRGB(x, y, red, green, blue);
@@ -2215,13 +2274,30 @@ public static class Graphics {
       int red = color.red;
       int green = color.green;
       int blue = color.blue;
-      this.setRGB(x, y, (byte)red, (byte)green, (byte)blue);
+      int alpha = color.alpha;
+      this.setRGBA(x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+    }
+
+    public void setPixel(int x, int y, Pixel pixel) {
+      int red = pixel.red;
+      int green = pixel.green;
+      int blue = pixel.blue;
+      int alpha = pixel.alpha;
+      this.setRGBA(x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
     }
 
     public IEnumerable getPixels() {
 	  for (int x=0; x < width; x++) {
 	    for (int y=0; y < height; y++) {
 		  yield return getPixel(x, y);
+	    }
+	  }
+    }
+
+    public void setPixels(Picture picture) {
+	  for (int x=0; x < width; x++) {
+	    for (int y=0; y < height; y++) {
+	      setPixel(x, y, picture.getPixel(x, y));
 	    }
 	  }
     }
@@ -2280,6 +2356,19 @@ public static class Graphics {
 				  x * _pixbuf.NChannels + 3);
 	}
     
+    public void setColor(int x, int y, Color color) {
+      // red, green, blue, alpha
+      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			x * _pixbuf.NChannels + 0, (byte)color.red);
+      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			x * _pixbuf.NChannels + 1, (byte)color.green);
+      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			x * _pixbuf.NChannels + 2, (byte)color.blue);
+      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			x * _pixbuf.NChannels + 3, (byte)color.alpha);
+      QueueDraw();
+    }
+
     public void setGray(int x, int y, byte value) {
 	  // red, green, blue, alpha
       Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
