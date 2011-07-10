@@ -429,6 +429,7 @@ public static class Graphics {
       */
       _lastWindow = _windows[title];
       _lastWindow.KeepAbove = true;
+      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for realize
       return _windows[title];
     }
   }
@@ -1734,8 +1735,8 @@ public static class Graphics {
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
     public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
     public double size = 18;
-    public string xJustification = "left"; // left, center, right
-    public string yJustification = "bottom"; // top, center, bottom
+    public string xJustification = "center"; // left, center, right
+    public string yJustification = "center"; // top, center, bottom
 
     public Text(IList iterable, string text):  
        this(new Point(iterable[0], iterable[1]), text) {
@@ -1780,6 +1781,35 @@ public static class Graphics {
       // Possible hints: see TextPath, GlyphPath, ShowGlyph
       g.ShowText(text);    
       g.Restore();
+    }
+
+    public override void addToPhysics() { // Text
+      world = window._canvas.world;
+      double width = 0;
+      double height = 0;
+      using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+	Cairo.TextExtents te = g.TextExtents(text);
+	// FIXME: need to adjust based on justification
+	// This works with x centered, y centered
+	width = te.Width * 2;
+	height = te.Height * 2;
+      }
+      float MeterInPixels = 64.0f;
+      // from x,y to meters of window
+      // arbitrary:
+      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
+				     ((float)y)/MeterInPixels);
+      body = FarseerPhysics.Factories.BodyFactory.CreateRectangle(
+		 world,
+		 (float)(width / MeterInPixels),   // radius in meters
+		 (float)(height / MeterInPixels),  // radius in meters
+		 _density,                         // density
+		 position);                        // center
+      // Give it some bounce and friction
+      body.Restitution = _bounce;
+      body.Friction = _friction;
+      body.BodyType = _bodyType;
+      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
     }
   }
 
