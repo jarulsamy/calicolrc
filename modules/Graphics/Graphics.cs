@@ -1737,6 +1737,10 @@ public static class Graphics {
     public string xJustification = "left"; // left, center, right
     public string yJustification = "bottom"; // top, center, bottom
 
+    public Text(IList iterable, string text):  
+       this(new Point(iterable[0], iterable[1]), text) {
+    }
+
     public Text(Point point, string text) {
       this.text = text;
       set_points(point);
