@@ -5,6 +5,10 @@ from Graphics import *
 from Myro import askQuestion
 import random
 
+plot = Plot("Sample Plot", 600, 300)
+plot.xLabel.text = "time"
+plot.yLabel.text = "balls in the air"
+
 size = 300
 win = Window("Mousetrap Model", size, size)
 
@@ -20,7 +24,7 @@ traps = [getMouse()]
 steps = 0
 while traps:
     steps += 1
-    print(len(traps))
+    plot.append(len(traps))
     next = []
     for x,y in traps:
         setColor(getPixel(picture,x,y), Color("red"))
@@ -29,5 +33,6 @@ while traps:
             if getRed(getPixel(picture, x, y)) != 255:
                 next.append((x,y))
     traps = next
+
 
 print("Took", steps, "steps")

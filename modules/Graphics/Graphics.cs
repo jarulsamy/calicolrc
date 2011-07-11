@@ -476,18 +476,60 @@ public static class Graphics {
     return new Color(r, g, b, a);
   }
 
-  public class Graph {
+  public class Plot {
 
     public WindowClass window;
+    public List data = new List();
+    public Line line = new Line();
+    int border = 50;
+    public Text xLabel;
+    public Text yLabel;
 
-    public Graph(string title, int width, int height) {
-      window = new Graphics.WindowClass(title, width, height);
-      Rectangle rect = new Rectangle(new Point(100, 50), 
-				     new Point(width - 100, height - 100));
+    public Plot(string title, int width, int height) {
+      window = makeWindow(title, width, height);
+      Rectangle rect = new Rectangle(new Point(border, border), 
+				     new Point(width - border, height - border));
+      rect.fill = null;
+      rect.outline = new Color("black");
+      rect.tag = "line";
+      rect.draw(window);
+      yLabel = new Text(new Point(border/2, height/2), "y legend");
+      yLabel.rotate(90);
+      yLabel.draw(window);
+      xLabel = new Text(new Point(width/2, height - border/2), "x legend");
+      xLabel.draw(window);
     }
+
+    public void append(int datum) {
+      line.undraw();
+      data.Add(datum);
+      if (data.Count > 1) {
+	line = new Line();
+	line.outline = new Color("red");
+	int col = 0;
+	double h;
+	int increment = (window.width - 2 * border) / (data.Count - 1);
+	double min = 10000;
+	double max = -10000;
+	foreach (int i in data) {
+	  min = Math.Min(min, i);
+	  max = Math.Max(max, i);
+	}
+	foreach (int i in data) {
+	  if (max != min) {
+	    h = (window.height - border * 2) * (i - min)/(max - min);
+	  } else {
+	    h = (window.height - border * 2) * .5;
+	  }
+	  line.append(new Point(border + col, window.height - border - h));
+	  col += increment;
+	}
+	line.set_points();
+	line.draw(window);
+      }
+    }
+    
   }
-
-
 
   public class Color {
     internal Cairo.Color _cairo;
@@ -1189,6 +1231,7 @@ public static class Graphics {
     
     private Pen _pen;
     private bool _has_pen;
+    internal bool close_path = true;
 	
     public Shape(bool has_pen=true) {
       _rotation = 0;
@@ -1510,6 +1553,41 @@ public static class Graphics {
 			      new_points[i].y - center.y);
       }
     }
+
+    public void append(Point p) {
+      // add a new point to list of points
+      // first copy old points
+      // FIXME: could make points a list
+      Point [] new_points = new Point [points.Length + 1];
+      for (int i = 0; i < points.Length; i++) {
+	new_points[i] = points[i];
+      }
+      // Now add new point:
+      new_points[points.Length] = p;
+      points = new_points;
+    }
+
+    public void set_points() {
+      // 1. set center to absolute
+      double sumx = 0.0;
+      double sumy = 0.0;
+      if (points.Length > 0) {
+	for (int i = 0; i < points.Length; i++) {
+	  sumx += points[i].x;
+	  sumy += points[i].y;
+	}
+	center.x = sumx/points.Length;
+	center.y = sumy/points.Length;
+      } else {
+	center.x = 0;
+	center.y = 0;
+      }
+      // 2. compute this.points in relative terms to center
+      for (int i = 0; i < points.Length; i++) {
+	points[i].x = points[i].x - center.x;
+	points[i].y = points[i].y - center.y;
+      }
+    }
     
     public double screen_angle(double dir) {
       // Screen coords are 45 degrees from system
@@ -1542,7 +1620,7 @@ public static class Graphics {
       forward(-distance);
     }
     
-    public virtual void render(Cairo.Context g) {
+    public virtual void render(Cairo.Context g) { // Shape
       g.Save();
       Point temp;
       if (points != null) {
@@ -1557,7 +1635,8 @@ public static class Graphics {
 	  temp = screen_coord(points[p]);
 	  g.LineTo(temp.x, temp.y);
 	}
-	g.ClosePath();
+	if (close_path)
+	  g.ClosePath();
 	if (_fill != null) {
 	  g.Color = _fill.getCairo();
 	  g.FillPreserve();
@@ -1850,6 +1929,13 @@ public static class Graphics {
     }
     public Line(bool has_pen, Point p1, Point p2) : base(has_pen) {
       set_points(p1, p2);
+      close_path = false;
+      fill = null;
+    }
+    public Line() : base(true) {
+      points = new Point[0];
+      close_path = false;
+      fill = null;
     }
   }
 
