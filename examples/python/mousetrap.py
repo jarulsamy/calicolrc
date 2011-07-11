@@ -5,9 +5,13 @@ from Graphics import *
 from Myro import askQuestion
 import random
 
-plot = Plot("Sample Plot", 600, 300)
+plot = Plot("Ping Pong Balls in the Air", 600, 300)
 plot.xLabel.text = "time"
-plot.yLabel.text = "balls in the air"
+plot.yLabel.text = "ping pong balls"
+
+coverage = Plot("Coverage", 600, 300)
+coverage.xLabel.text = "time"
+coverage.yLabel.text = "mousetraps"
 
 size = 300
 win = Window("Mousetrap Model", size, size)
@@ -22,9 +26,12 @@ askQuestion("Click on the window to begin", ["ok"])
 traps = [getMouse()]
 
 steps = 0
+sum = 0
 while traps:
     steps += 1
     plot.append(len(traps))
+    sum += len(traps)
+    coverage.append(sum)
     next = []
     for x,y in traps:
         setColor(getPixel(picture,x,y), Color("red"))

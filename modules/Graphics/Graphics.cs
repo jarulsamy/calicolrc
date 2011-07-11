@@ -420,6 +420,7 @@ public static class Graphics {
 	  _windows[title].GdkWindow.UrgencyHint = true;
 	});
       */
+      _lastWindow = _windows[title];
       return _windows[title];
     } else {
       _windows[title] = new Graphics.WindowClass(title, width, height);
@@ -523,6 +524,9 @@ public static class Graphics {
     }
 
     public void append(int datum) {
+      append((double) datum);
+    }
+    public void append(double datum) {
       line.undraw();
       data.Add(datum);
       if (data.Count > 1) {
@@ -533,11 +537,14 @@ public static class Graphics {
 	int increment = (window.width - 2 * border) / (data.Count - 1);
 	double min = 10000;
 	double max = -10000;
-	foreach (int i in data) {
+	foreach (double i in data) {
 	  min = Math.Min(min, i);
 	  max = Math.Max(max, i);
 	}
-	foreach (int i in data) {
+	if (increment == 0) {
+	  increment = 1;
+	}
+	foreach (double i in data) {
 	  if (max != min) {
 	    h = (window.height - border * 2) * (i - min)/(max - min);
 	  } else {
