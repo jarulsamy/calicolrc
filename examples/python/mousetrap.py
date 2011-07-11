@@ -1,4 +1,4 @@
-# Heatbugs Diffusion Model for Calico Python
+# Ping Pong Ball Model for Calico Python
 # Doug Blank <dblank@cs.brynmawr.edu>
 
 from Graphics import *
