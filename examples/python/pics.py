@@ -31,20 +31,33 @@ pixels = list(pic.getPixels())
 
 def reverse():
     win.mode = 'manual'
+    count = 0
     for p in pixels:
         p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
-        win.update()
-        wait(.0002)
+        if count % 100 == 0:
+            win.update()
+            wait(.001)
+        count += 1
+    win.mode = 'auto'
 
 def spin():
     win.mode = 'manual'
-    for times in range(3):
+    for times in range(1):
         for degrees in range(0, 360, 10):
-            pic.rotate(10)
+            pic.rotate(-10)
             win.step(.1)
+    win.mode = 'auto'
 
 def sortem():
     pixels.sort(key=lambda p: p.x + p.y)
 
 def shuffle():
     random.shuffle(pixels)
+
+reverse()
+shuffle()
+reverse()
+sortem()
+reverse()
+spin()
+reverse()

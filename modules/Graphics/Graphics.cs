@@ -410,6 +410,7 @@ public static class Graphics {
 					   int height=300) {
     if (_windows.ContainsKey(title)) {
       _windows[title]._canvas.shapes.Clear();
+      _windows[title].mode = "auto";
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
       _windows[title].QueueDraw();
@@ -487,16 +488,37 @@ public static class Graphics {
 
     public Plot(string title, int width, int height) {
       window = makeWindow(title, width, height);
+      Line tick;
       Rectangle rect = new Rectangle(new Point(border, border), 
 				     new Point(width - border, height - border));
       rect.fill = null;
       rect.outline = new Color("black");
       rect.tag = "line";
       rect.draw(window);
-      yLabel = new Text(new Point(border/2, height/2), "y legend");
+      // x ticks:
+      int interval = (width - border * 2) / 10;
+      for (int x = border; x <= width - border; x += interval) {
+	tick = new Line(new Point(x, height - border), 
+			new Point(x, height - border + 10));
+	tick.outline = new Color("black");
+	tick.tag = "line";
+	tick.draw(window);
+      }
+      // y ticks:
+      interval = (height - border * 2) / 10;
+      for (int y = height - border; y >= border; y -= interval) {
+	tick = new Line(new Point(border - 10, y), 
+			new Point(border, y));
+	tick.outline = new Color("black");
+	tick.tag = "line";
+	tick.draw(window);
+      }
+      yLabel = new Text(new Point(border/3, height/2), "y legend");
+      yLabel.fill = new Color("black");
       yLabel.rotate(90);
       yLabel.draw(window);
-      xLabel = new Text(new Point(width/2, height - border/2), "x legend");
+      xLabel = new Text(new Point(width/2, height - border/3), "x legend");
+      xLabel.fill = new Color("black");
       xLabel.draw(window);
     }
 
@@ -526,6 +548,43 @@ public static class Graphics {
 	}
 	line.set_points();
 	line.draw(window);
+
+	// remove previous tick numbers:
+	List to_remove = new List();
+	lock(window.canvas.shapes) {
+	  foreach (Shape shape in window.canvas.shapes) {
+	    if (shape.tag == "tick")
+	      to_remove.Add(shape);
+	  }
+	  foreach (Shape shape in to_remove) {
+	    window.canvas.shapes.Remove(shape);
+	  }
+	}
+	// x ticks:
+	int interval = (window.width - border * 2) / 10;
+	int int_value = data.Count / 10;
+	int count = 1;
+	Text text;
+	for (int x = border; x <= window.width - border; x += interval) {
+	  text = new Text(new Point(x, window.height - border + 20), count.ToString());
+	  text.outline = new Color("black");
+	  text.fontSize = 9;
+	  text.tag = "tick";
+	  text.draw(window);
+	  count += int_value;
+	}
+	// y ticks:
+	interval = (window.height - border * 2) / 10;
+	double interval_value = (max - min) / 10;
+	double sum = min;
+	for (int y = window.height - border; y >= border; y -= interval) {
+	  text = new Text(new Point(border - 20, y), sum.ToString());
+	  text.outline = new Color("black");
+	  text.fontSize = 9;
+	  text.tag = "tick";
+	  text.draw(window);
+	  sum += interval_value;
+	}
       }
     }
     
@@ -1071,9 +1130,11 @@ public static class Graphics {
       if (mode == "physics") {
 	_canvas.world.Step(.01f);
 	// update the sprites
-	foreach (Shape shape in _canvas.shapes) {
-	  shape.updateFromPhysics();
-	}
+    lock (_canvas.shapes) {
+    	foreach (Shape shape in _canvas.shapes) {
+    	  shape.updateFromPhysics();
+    	}
+     }
       }
       // and now the update
       DateTime now = DateTime.Now;
@@ -1197,13 +1258,10 @@ public static class Graphics {
 		g.Rectangle(args.Area.X, args.Area.Y,
 			    args.Area.Width, args.Area.Height);
 		g.Clip();
-		try {
+		lock(shapes) {
 		  foreach (Shape shape in shapes) {
 		    shape.render(g);
 		  }
-		} catch {
-		  // updating the window while someone changed the shapes
-		  // list.
 		}
 	  }
 	  return true;
@@ -1748,7 +1806,9 @@ public static class Graphics {
     
     public void draw(WindowClass win) { // Shape
       // Add this shape to the _Canvas list.
-      win.getCanvas().shapes.Add(this);
+      lock(win.getCanvas().shapes) {
+        win.getCanvas().shapes.Add(this);
+      }
       window = win;
       if (window._canvas.world != null) {
 	addToPhysics();
@@ -1757,13 +1817,17 @@ public static class Graphics {
     }
     
     public void undraw() {
-      Gtk.Application.Invoke(delegate { 
-	  if (window != null && window.getCanvas().shapes.Contains(this)) {
-	    window.getCanvas().shapes.Remove(this);
-	    if (window is WindowClass)
-	      ((WindowClass)window).QueueDraw();
-	    window = null;
-	  }
+      Gtk.Application.Invoke(delegate {
+	  if (window != null) {
+        lock(window.getCanvas().shapes) {
+            if (window.getCanvas().shapes.Contains(this)) {
+        	    window.getCanvas().shapes.Remove(this);
+        	    if (window is WindowClass)
+        	      ((WindowClass)window).QueueDraw();
+        	    window = null;
+    	    }
+        }
+      }
 	});
     }
     
@@ -1836,9 +1900,22 @@ public static class Graphics {
     public string fontFace = "Georgia";
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
     public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
-    public double size = 18;
+    double _fontSize = 18;
     public string xJustification = "center"; // left, center, right
     public string yJustification = "center"; // top, center, bottom
+
+    public double fontSize
+    {
+      get
+	{
+	  return _fontSize;
+	}
+      set
+	{
+	  _fontSize = value;
+	  QueueDraw();
+	}
+    }
 
     public Text(IList iterable, string text):  
        this(new Point(iterable[0], iterable[1]), text) {
@@ -1860,7 +1937,7 @@ public static class Graphics {
       else
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
       g.SelectFontFace(fontFace, fontSlant, fontWeight);
-      g.SetFontSize(size);
+      g.SetFontSize(fontSize);
       Cairo.TextExtents te = g.TextExtents(text);
       Point p = new Point(0,0);
       if (xJustification == "center") {
