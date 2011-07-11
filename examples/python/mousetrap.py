@@ -22,8 +22,11 @@ picture.draw(win)
 def pick(x, y):
     return (x + random.random() * 10 - 5, y + random.random() * 10 - 5)
 
-askQuestion("Click on the window to begin", ["ok"])
+text = Text((150, 150), "Click to drop ping pong ball")
+text.fill = Color("white")
+text.draw(win)
 traps = [getMouse()]
+text.undraw()
 
 steps = 0
 sum = 0

@@ -492,7 +492,7 @@ public static class Graphics {
       Line tick;
       Rectangle rect = new Rectangle(new Point(border, border), 
 				     new Point(width - border, height - border));
-      rect.fill = null;
+      rect.fill = new Color("white");
       rect.outline = new Color("black");
       rect.tag = "line";
       rect.draw(window);
