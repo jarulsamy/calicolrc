@@ -29,6 +29,8 @@ using IronRuby.Builtins; // RubyArray
 using System.Collections.Generic; // IList
 using System.Collections; // IEnumerator
 
+using Tao.Sdl;
+
 public static class Extensions {
   public static T[] Slice<T>(this T[] source, int start, int end) {
     if (start == 0 && end == source.Length)
@@ -61,6 +63,179 @@ public static class Myro {
   static PythonDictionary voices = new PythonDictionary();
   public readonly static PythonDictionary frequencies = new PythonDictionary();
 
+  public readonly static Joysticks joysticks = new Joysticks();
+
+  public class Joysticks {
+   
+    IntPtr [] handles;
+
+    public Joysticks() {
+      Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK);
+      handles = new IntPtr [Sdl.SDL_NumJoysticks()];
+      for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
+	handles[i] = Sdl.SDL_JoystickOpen(i);
+      }
+    }
+
+    public List getHatStates(int index) {
+      List retval = new List();
+      int num = Sdl.SDL_JoystickNumHats(handles[index]);
+      for (int button = 0; button < num; button++) {
+	retval.append(Sdl.SDL_JoystickGetHat(handles[index], button));
+      }
+      return retval;
+    }
+
+    public List getBallStates(int index) {
+      List retval = new List();
+      int num = Sdl.SDL_JoystickNumBalls(handles[index]);
+      for (int button = 0; button < num; button++) {
+	int x, y;
+	Sdl.SDL_JoystickGetBall(handles[index], button, out x, out y);
+	retval.append(Graphics.PyTuple(x, y));
+      }
+      return retval;
+    }
+
+    public List getButtonStates(int index) {
+      List retval = new List();
+      int num = Sdl.SDL_JoystickNumButtons(handles[index]);
+      for (int button = 0; button < num; button++) {
+	retval.append((int)Sdl.SDL_JoystickGetButton(handles[index], button));
+      }
+      return retval;
+    }
+
+    public List getAxisStates(int index) {
+      List retval = new List();
+      int num = Sdl.SDL_JoystickNumAxes(handles[index]);
+      for (int button = 0; button < num; button++) {
+	retval.append(Sdl.SDL_JoystickGetAxis(handles[index], button)/32767.0);
+      }
+      return retval;
+    }
+
+    public PythonDictionary getGamePadNow(int index, List whats) {
+	PythonDictionary retval =  new PythonDictionary();
+	foreach (string what in whats) {
+	  retval[what] = getGamePadNow(index, what);
+	}
+	return retval;
+    }
+
+    public object getGamePadNow(int index, string what) {
+      if (what == "all") {
+	return getGamePadNow(index, 
+			     Graphics.PyList("name", "axis", "ball", 
+					     "button", "hat", "count"));
+      } if (what == "button") {
+	return joysticks.getButtonStates(index);
+      } else if (what == "name") {
+	return Sdl.SDL_JoystickName(index);
+      } else if (what == "axis") {
+	return joysticks.getAxisStates(index);
+      } else if (what == "ball") {
+	return joysticks.getBallStates(index);
+      } else if (what == "hat") {
+	return joysticks.getHatStates(index);
+      } else if (what == "count") {
+	return Sdl.SDL_NumJoysticks();
+      } else {
+	throw new Exception(String.Format("unknown joystick component: '{0}'", what));
+      }
+    }
+
+    public static bool Same(object o1, object o2) {
+      if (o1 is PythonDictionary) {
+	PythonDictionary d1 = (PythonDictionary)o1;
+	PythonDictionary d2 = (PythonDictionary)o2;
+	foreach (string key in d1.Keys) {
+	  if (! Same(d1[key], d2[key]))
+	    return false;
+	}
+	foreach (string key in d2.Keys) {
+	  if (! Same(d1[key], d2[key]))
+	    return false;
+	}
+	return true;
+      } else if (o1 is List) {
+	List l1 = (List)o1;
+	List l2 = (List)o2;
+	if (l1.Count != l2.Count)
+	  return false;
+	for (int i = 0; i < l1.Count; i++) {
+	  if (! Same(l1[i], l2[i]))
+	    return false;
+	}
+	return true;
+      } else {
+	return o1.Equals(o2);
+      }
+    }
+
+    public object getGamePad(int index, string what) {
+      object initial = getGamePadNow(index, what);
+      Sdl.SDL_JoystickUpdate();
+      object current = getGamePadNow(index, what);
+      while (Same(initial, current)) {
+	Sdl.SDL_JoystickUpdate();
+	current = getGamePadNow(index, what);
+      }
+      return current;
+    }
+
+    public object getGamePad(int index, List whats) {
+      object initial = getGamePadNow(index, whats);
+      Sdl.SDL_JoystickUpdate();
+      object current = getGamePadNow(index, whats);
+      while (Same(initial, current)) {
+	Sdl.SDL_JoystickUpdate();
+	current = getGamePadNow(index, whats);
+      }
+      return current;
+    }
+  }
+
+  public static object getGamePadNow() {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePadNow(0, "all");
+  }
+
+  public static object getGamePadNow(int index) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePadNow(index, "all");
+  }
+  
+  public static object getGamePadNow(int index, string what) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePadNow(index, what);
+  }
+
+  public static object getGamePadNow(int index, List whats) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePadNow(index, whats);
+  }
+  
+  public static object getGamePad() {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePad(0, "all");
+  }
+
+  public static object getGamePad(int index) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePad(index, "all");
+  }
+  
+  public static object getGamePad(int index, string what) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePad(index, what);
+  }
+
+  public static object getGamePad(int index, List whats) {
+    Sdl.SDL_JoystickUpdate();
+    return joysticks.getGamePad(index, whats);
+  }
+  
   public class MyTexView : Gtk.TextView  {
 	public string MyString;
   }
