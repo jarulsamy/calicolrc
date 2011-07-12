@@ -9,7 +9,8 @@ MONO_LOG_LEVEL=debug calico --no-handler
 
 1) Could not make .config find libSDL.dll
 2) copied Calico/lib/SDL.dll to Calico/bin/libSDL.dll.so
-3) 
+
+Works with just Tao
 
 = Calico =
 
