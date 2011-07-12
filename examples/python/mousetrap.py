@@ -20,7 +20,8 @@ picture = Picture(size, size, Color("blue"))
 picture.draw(win)
 
 def pick(x, y):
-    return (x + random.random() * 10 - 5, y + random.random() * 10 - 5)
+    return (x + random.gauss(0, 1) * 5,
+            y + random.gauss(0, 1) * 5)
 
 text = Text((150, 150), "Click to drop ping pong ball")
 text.fill = Color("white")
@@ -43,6 +44,4 @@ while traps:
             if getRed(getPixel(picture, x, y)) != 255:
                 next.append((x,y))
     traps = next
-
-
 print("Took", steps, "steps")
