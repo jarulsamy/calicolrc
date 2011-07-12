@@ -53,6 +53,7 @@ public static class Myro {
   //public readonly static List __all__ = new List() {"robot"};
 
   public static Robot robot;
+  static Joystick _joystick;
   public readonly static Computer computer = new Computer();
   static string dialogResponse = null;
   static string REVISION = "$Revision: $";
@@ -733,6 +734,40 @@ public static class Myro {
     foreach (object choice in obj)
         list.append(choice.ToString());
     return list;
+  }
+
+  public static void joystick() {
+    _joystick = new Joystick();
+  }
+
+  class Joystick {
+    Graphics.WindowClass window;
+    double x, y;
+    string state = "up";
+
+    public Joystick() {
+      window = makeWindow("Myro Joystick", 400, 400);
+      window.ButtonPressEvent  += onMouseDown;
+      window.MotionNotifyEvent += onMouseMove;
+    }
+
+    void onMouseDown(object obj, Gtk.ButtonPressEventArgs args) {
+      state = "down";
+      x = args.Event.X;
+      y = args.Event.Y;
+      double translate = 0, rotate = 0;
+      getRobot().move(translate, rotate);
+    }
+    void onMouseUp(object obj, Gtk.ButtonPressEventArgs args) {
+      state = "up";
+      getRobot().stop();
+    }
+    void onMouseMove(object obj, Gtk.MotionNotifyEventArgs args) {
+      if (state == "down") {
+	double translate = 0, rotate = 0;
+	getRobot().move(translate, rotate);
+      }
+    }
   }
 
   public static string askQuestion(string question) {
