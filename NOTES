@@ -3,25 +3,13 @@ Problems, issues, features, and questions.
 Debugging:
 MONO_LOG_LEVEL=debug calico --no-handler 
 
-Bug:
-Ok:
------
-def callback(*args, **kwargs):
-    calico.shell.message("ok")
-    #print "ok"
-from Graphics import *
-win = Window()
-win.onClick(callback)
---------
-Not ok:
---------
-def callback(*args, **kwargs):
-    #calico.shell.message("ok")
-    print "ok"
-from Graphics import *
-win = Window()
-win.onClick(callback)
---------
+= Sdl =
+
+6.1.0
+
+1) Could not make .config find libSDL.dll
+2) copied Calico/lib/SDL.dll to Calico/bin/libSDL.dll.so
+3) 
 
 = Calico =
 

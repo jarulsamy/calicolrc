@@ -597,6 +597,60 @@ public static class Graphics {
     
   }
 
+  public class BarChart {
+
+    public WindowClass window;
+    public List data = new List();
+    int border = 50;
+    public Text xLabel;
+    public Text yLabel;
+
+    public BarChart(string title, int width, int height) {
+      window = makeWindow(title, width, height);
+      Line tick;
+      Rectangle rect = new Rectangle(new Point(border, border), 
+				     new Point(width - border, height - border));
+      rect.fill = new Color("white");
+      rect.outline = new Color("black");
+      rect.tag = "line";
+      rect.draw(window);
+      // x ticks:
+      int interval = (width - border * 2) / 10;
+      for (int x = border; x <= width - border; x += interval) {
+	tick = new Line(new Point(x, height - border), 
+			new Point(x, height - border + 10));
+	tick.outline = new Color("black");
+	tick.tag = "line";
+	tick.draw(window);
+      }
+      // y ticks:
+      interval = (height - border * 2) / 10;
+      for (int y = height - border; y >= border; y -= interval) {
+	tick = new Line(new Point(border - 10, y), 
+			new Point(border, y));
+	tick.outline = new Color("black");
+	tick.tag = "line";
+	tick.draw(window);
+      }
+      yLabel = new Text(new Point(border/3, height/2), "y legend");
+      yLabel.fill = new Color("black");
+      yLabel.rotate(90);
+      yLabel.draw(window);
+      xLabel = new Text(new Point(width/2, height - border/3), "x legend");
+      xLabel.fill = new Color("black");
+      xLabel.draw(window);
+    }
+
+    public void append(int datum) {
+      append((double) datum);
+    }
+    public void append(double datum) {
+      data.Add(datum);
+      foreach (double i in data) {
+      }
+    }
+  }
+
   public class Color {
     internal Cairo.Color _cairo;
     public WindowClass window;  // for setting color of a Window()
