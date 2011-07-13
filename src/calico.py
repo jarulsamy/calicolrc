@@ -636,7 +636,7 @@ class CalicoProject(object):
 
 
 # Let's start!
-version = "0.5.1"
+version = "0.5.2"
 if "--help" in args:
     print()
     print(_("Calico Project, Version %s, on %s") % (version,
