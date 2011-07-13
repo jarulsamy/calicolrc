@@ -2017,8 +2017,8 @@ public static class Graphics {
       }
       temp = screen_coord(p);
       g.MoveTo(temp.x, temp.y);
-      // FIXME: how to rotate text?
       // Possible hints: see TextPath, GlyphPath, ShowGlyph
+      // BETTER for Mac: Pango ShowLayout
       g.ShowText(text);    
       g.Restore();
     }

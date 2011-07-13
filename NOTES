@@ -12,6 +12,16 @@ MONO_LOG_LEVEL=debug calico --no-handler
 
 Works with just Tao
 
+= Ideas = 
+
+1) SpeechBubble((center), "text", (endpoint))
+
+2) Given a Text() object, need to know height, width:
+>>> text.width("w")
+16
+>>> text.width("i")
+8
+
 = Calico =
 
 IMMEDIATE

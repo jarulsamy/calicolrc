@@ -70,10 +70,14 @@ public static class Myro {
     IntPtr [] handles;
 
     public Gamepads() {
-      Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK);
-      handles = new IntPtr [Sdl.SDL_NumJoysticks()];
-      for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
-	handles[i] = Sdl.SDL_JoystickOpen(i);
+      try {
+	Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK);
+	handles = new IntPtr [Sdl.SDL_NumJoysticks()];
+	for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
+	  handles[i] = Sdl.SDL_JoystickOpen(i);
+	}
+      } catch {
+	Console.WriteLine("WARNING: SDL is not installed.");
       }
     }
 
@@ -134,6 +138,9 @@ public static class Myro {
 	return Sdl.SDL_JoystickName(index);
       } else if (what == "axis") {
 	return gamepads.getAxisStates(index);
+      } else if (what == "robot") {
+	List xy = gamepads.getAxisStates(index);
+	return Graphics.PyList(-((double)xy[1]), -((double)xy[0]));
       } else if (what == "ball") {
 	return gamepads.getBallStates(index);
       } else if (what == "hat") {
@@ -216,6 +223,30 @@ public static class Myro {
     return gamepads.getGamePadNow(index, whats);
   }
   
+  public static object getGamePadNow(IList iterable) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePadNow(index, "all"));
+    return retval;
+  }
+  
+  public static object getGamePadNow(IList iterable, string what) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePadNow(index, what));
+    return retval;
+  }
+  
+  public static object getGamePadNow(IList iterable, List whats) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePadNow(index, whats));
+    return retval;
+  }
+  
   public static object getGamePad() {
     Sdl.SDL_JoystickUpdate();
     return gamepads.getGamePad(0, "all");
@@ -234,6 +265,30 @@ public static class Myro {
   public static object getGamePad(int index, List whats) {
     Sdl.SDL_JoystickUpdate();
     return gamepads.getGamePad(index, whats);
+  }
+  
+  public static object getGamePad(IList iterable) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePad(index, "all"));
+    return retval;
+  }
+  
+  public static object getGamePad(IList iterable, string what) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePad(index, what));
+    return retval;
+  }
+  
+  public static object getGamePad(IList iterable, List whats) {
+    Sdl.SDL_JoystickUpdate();
+    List retval = new List();
+    foreach (int index in iterable)
+      retval.append(gamepads.getGamePad(index, whats));
+    return retval;
   }
   
   public class MyTexView : Gtk.TextView  {
