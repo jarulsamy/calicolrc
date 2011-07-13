@@ -808,7 +808,7 @@ public static class Graphics {
     internal bool _dirty = false;
     private bool timer_running = false;
     private DateTime last_update = new DateTime(2000,1,1);
-    internal uint _update_interval = 100; // how often, in ms, to auto update
+    internal uint _update_interval = .1; // how often, in seconds, to update
     public List onClickCallbacks = new List();
     public List onMouseMovementCallbacks = new List();
     public List onMouseUpCallbacks = new List();
@@ -1125,7 +1125,7 @@ public static class Graphics {
       _dirty = true;
       DateTime now = DateTime.Now;
       // diff is TimeSpan
-      if ((now - last_update).TotalMilliseconds < updateInterval) {
+      if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
 	// pass, too soon!
 	// but we need to make sure that someone checks
 	// in the future. 
@@ -1135,7 +1135,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(updateInterval, 
+	  GLib.Timeout.Add(updateInterval * 1000, 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       } else { // it is not too soon
@@ -1144,7 +1144,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(updateInterval, 
+	  GLib.Timeout.Add(updateInterval * 1000, 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       }
