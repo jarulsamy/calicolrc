@@ -3,6 +3,12 @@ Problems, issues, features, and questions.
 Debugging:
 MONO_LOG_LEVEL=debug calico --no-handler 
 
+May need:
+
+ <startup useLegacyV2RuntimeActivationPolicy="true">
+
+in calico.exe.config to allow different frameworks (2 vs 4).
+
 = Sdl =
 
 6.1.0
