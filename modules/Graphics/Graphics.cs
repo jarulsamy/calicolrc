@@ -1491,7 +1491,7 @@ public static class Graphics {
 	body.Position = new Vector2(((float)x)/MeterInPixels, 
 				    ((float)y)/MeterInPixels);
 	// FIXME: undo operation
-	body.Rotation = (float)rotation;
+	body.Rotation = (float)_rotation;
       }
     }
 
@@ -2051,6 +2051,7 @@ public static class Graphics {
 		 position);                        // center
       // Give it some bounce and friction
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
@@ -2847,6 +2848,7 @@ public static class Graphics {
 		 position);                        // center
       // Give it some bounce and friction
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
@@ -2894,6 +2896,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
     }
   }
@@ -2962,6 +2965,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
     }
 
@@ -3067,6 +3071,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
     }
   }
@@ -3103,6 +3108,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
     }
 
@@ -3222,6 +3228,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.Restitution = _bounce;
+      body.Rotation = (float)_rotation;
       body.Friction = _friction;
     }
 
