@@ -647,6 +647,7 @@ public static class Graphics {
     public void append(double datum) {
       data.Add(datum);
       foreach (double i in data) {
+	Console.WriteLine(i);
       }
     }
   }
@@ -808,7 +809,7 @@ public static class Graphics {
     internal bool _dirty = false;
     private bool timer_running = false;
     private DateTime last_update = new DateTime(2000,1,1);
-    internal uint _update_interval = .1; // how often, in seconds, to update
+    internal double _update_interval = .1; // how often, in seconds, to update
     public List onClickCallbacks = new List();
     public List onMouseMovementCallbacks = new List();
     public List onMouseUpCallbacks = new List();
@@ -1036,7 +1037,7 @@ public static class Graphics {
       onKeyReleaseCallbacks.Add(function);
     }
     
-    public uint updateInterval {
+    public double updateInterval {
       get {
 	return _update_interval;
       }
@@ -1135,7 +1136,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(updateInterval * 1000, 
+	  GLib.Timeout.Add((uint)(updateInterval * 1000), 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       } else { // it is not too soon
@@ -1144,7 +1145,7 @@ public static class Graphics {
 	} else {
 	  // let's spawn one to check in 100 ms or so
 	  timer_running = true;
-	  GLib.Timeout.Add(updateInterval * 1000, 
+	  GLib.Timeout.Add((uint)(updateInterval * 1000), 
 			   new GLib.TimeoutHandler(_redraw_now) );
 	}
       }
@@ -1333,7 +1334,7 @@ public static class Graphics {
     public Point center;
     public string tag;
     public WindowClass window;
-    internal double _rotation; // radians
+    internal double _rotation; // internally radians
     internal double _scaleFactor; // percent
     public FarseerPhysics.Dynamics.World world;
     public FarseerPhysics.Dynamics.Body body;
@@ -1487,7 +1488,8 @@ public static class Graphics {
 	float MeterInPixels = 64.0f;
 	body.Position = new Vector2(((float)x)/MeterInPixels, 
 				    ((float)y)/MeterInPixels);
-	body.Rotation = (float)(rotation * Math.PI/180.0); 
+	// FIXME: undo operation
+	body.Rotation = (float)rotation;
       }
     }
 
@@ -1528,7 +1530,7 @@ public static class Graphics {
     
     public double rotation {
       get {
-	return _rotation;
+	return _rotation * 180.0/Math.PI;
       }
       set {
 	rotateTo(value);
