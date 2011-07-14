@@ -1344,6 +1344,7 @@ public static class Graphics {
     internal float _bounce;
     internal float _friction;
     internal float _density;
+    public List<Shape> shapes = new List<Shape>();
     
     public Point [] points;
     internal Color _fill;
@@ -1768,6 +1769,9 @@ public static class Graphics {
 	  g.Color = _outline.getCairo();
 	  g.Stroke();
 	}
+	foreach (Shape shape in shapes) {
+	  shape.render(g);
+	}
       }
       g.Restore();
       if (has_pen)
@@ -1878,6 +1882,15 @@ public static class Graphics {
       if (window._canvas.world != null) {
 	addToPhysics();
       }
+      QueueDraw();
+    }
+    
+    public void draw(Shape shape) { // Shape
+      // Add this shape to the shape's list.
+      lock(shape.shapes) {
+        shape.shapes.Add(this);
+      }
+      //window = win;
       QueueDraw();
     }
     

@@ -41,6 +41,8 @@ for i in range(60):
     ball.fill = None
     ball.draw(win)
     balls.append(ball)
+    text = Text((0, 0), "Hello")
+    text.draw(ball)
 
 final_degrees = [
     17.8843602756,
