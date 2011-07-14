@@ -1093,7 +1093,9 @@ public static class Graphics {
     }
     
     public string getKeyPressed() {
-      return _lastKey;
+      string lk = _lastKey;
+      _lastKey = "";
+      return lk;
     }
     
     public string getKeyState() {
