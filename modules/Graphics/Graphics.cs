@@ -820,6 +820,8 @@ public static class Graphics {
     public string _mouseState = "up";
     public string _keyState = "up";
     ManualResetEvent _lastClickFlag = new ManualResetEvent(false);
+    public double time = 0.0;
+    public double simulationStepTime = 0.01;
     
     public WindowClass(string title="Calico Graphics Window",
 		  int width=300, 
@@ -1192,13 +1194,14 @@ public static class Graphics {
       // doesn't update too fast.
       // handle physics
       if (mode == "physics") {
-	_canvas.world.Step(.01f);
+	_canvas.world.Step((float)simulationStepTime); 
+	time += simulationStepTime; 
 	// update the sprites
-    lock (_canvas.shapes) {
-    	foreach (Shape shape in _canvas.shapes) {
-    	  shape.updateFromPhysics();
-    	}
-     }
+	lock (_canvas.shapes) {
+	  foreach (Shape shape in _canvas.shapes) {
+	    shape.updateFromPhysics();
+	  }
+	}
       }
       // and now the update
       DateTime now = DateTime.Now;
@@ -1769,9 +1772,9 @@ public static class Graphics {
 	  g.Color = _outline.getCairo();
 	  g.Stroke();
 	}
-	foreach (Shape shape in shapes) {
-	  shape.render(g);
-	}
+      }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
       }
       g.Restore();
       if (has_pen)
@@ -2037,6 +2040,9 @@ public static class Graphics {
       // Possible hints: see TextPath, GlyphPath, ShowGlyph
       // BETTER for Mac: Pango ShowLayout
       g.ShowText(text);    
+      foreach (Shape shape in shapes) {
+	shape.render(g);
+      }
       g.Restore();
     }
 
@@ -2153,6 +2159,9 @@ public static class Graphics {
 	  g.Stroke();
 	}
       }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
+      }
       g.Restore();
       if (has_pen)
 	pen.render(g);
@@ -2246,6 +2255,9 @@ public static class Graphics {
 	      g.Color = _outline._cairo;
 	      g.Stroke();
 	    }
+	  }
+	  foreach (Shape shape in shapes) {
+	    shape.render(g);
 	  }
 	  g.Restore();
 	}
@@ -2802,6 +2814,9 @@ public static class Graphics {
 	    g.Color = _outline._cairo;
 	    g.Stroke();
 	  }
+	  foreach (Shape shape in shapes) {
+	    shape.render(g);
+	  }
 	  g.Restore();
 	  // FIXME: add pen
 	}
@@ -2936,6 +2951,9 @@ public static class Graphics {
         g.ClosePath();
         g.Stroke();
       }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
+      }
       g.Restore();
       if (has_pen)
 	pen.render(g);
@@ -3003,6 +3021,9 @@ public static class Graphics {
 	g.Color = _outline._cairo;
 	g.Stroke();
       }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
+      }
       g.Restore();
     }
   }
@@ -3062,6 +3083,9 @@ public static class Graphics {
       if (_outline != null) {
 	g.Color = _outline._cairo;
 	g.Stroke();
+      }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
       }
       g.Restore();
     }
@@ -3174,6 +3198,9 @@ public static class Graphics {
 	g.Color = _outline._cairo;
 	g.Stroke();
       }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
+      }
       g.Restore();
     }
 
@@ -3266,6 +3293,9 @@ public static class Graphics {
       if (_outline != null) {
 	g.Color = _outline._cairo;
 	g.Stroke();
+      }
+      foreach (Shape shape in shapes) {
+	shape.render(g);
       }
       g.Restore();
     }
