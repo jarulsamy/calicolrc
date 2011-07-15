@@ -2556,6 +2556,31 @@ public static class Graphics {
 		 new Point(_pixbuf.Width, _pixbuf.Height), 
 		 new Point(0, _pixbuf.Height));
     }
+
+    public Picture getRegion(IList iterable, int width, int height, double degrees) {
+      return getRegion(new Point(iterable[0], iterable[1]), width, height, degrees);
+    }
+
+    public Picture getRegion(Point p, int width, int height, double degrees) {
+      Picture pic = new Picture(width, height);
+      double angle = degrees * Math.PI/180.0;
+      double px, py;
+      int ox = 0;
+      for (int x = -width/2; x < width/2; x++) {
+	int oy = 0;
+	for (int y = -height/2; y < height/2; y++) {
+	  // rotate that x,y:
+	  px = x * Math.Cos(angle) - y * Math.Sin(angle);
+	  py = x * Math.Sin(angle) + y * Math.Cos(angle);
+	  // set the color of the new image from the offset of this:
+	  pic.setColor(ox, oy, this.getPixel((int)(p.x + px), 
+					     (int)(p.y + py)).getColor());
+	  oy += 1;
+	}
+	ox += 1;
+      }
+      return pic;
+    }
     
     public Gdk.Pixbuf getPixbuf()
     {

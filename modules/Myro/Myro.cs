@@ -2972,6 +2972,15 @@ public static class Myro {
     return picture.getWidth();
   }
 
+  public static Graphics.Picture getRegion(Graphics.Picture picture, IList iterable, int width, int height, 
+				    double degrees) {
+    return picture.getRegion(new Graphics.Point(iterable[0], iterable[1]), width, height, degrees);
+  }
+  
+  public static Graphics.Picture getRegion(Graphics.Picture picture, Graphics.Point p, int width, int height, double degrees) {
+    return picture.getRegion(p, width, height, degrees);
+  }
+
   static Action functionInvoke(Func<object> func, List list, 
 				      int position) {
     // Take a function, return list, and position
