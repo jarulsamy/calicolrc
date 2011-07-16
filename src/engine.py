@@ -21,7 +21,6 @@
 from __future__ import print_function
 import clr
 import traceback
-import exceptions
 import glob
 import os
 
@@ -159,8 +158,11 @@ class DLREngine(Engine):
                 return False
         try:
             source.Execute(self.manager.scope)
-        except:
-            traceback.print_exc()
+        except Exception, e:
+            if "Thread was being aborted" in e.message:
+                self.manager.calico.shell.message("[Script stopped----------]")
+            else:
+                traceback.print_exc()
             return False
         self.manager.calico.shell.message("Ok")
         return True
@@ -174,6 +176,9 @@ class DLREngine(Engine):
             return False
         try:
             source.Execute(self.manager.scope)
-        except:
-            traceback.print_exc()
+        except Exception, e:
+            if "Thread was being aborted" in e.message:
+                self.manager.calico.shell.message("[Script stopped----------]")
+            else:
+                traceback.print_exc()
 

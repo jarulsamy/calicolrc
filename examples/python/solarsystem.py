@@ -1,7 +1,7 @@
 from Graphics import *
 
 win = Window()
-win.setBackground(Color("black"))
+win.setBackground(Color("darkgray"))
 
 sun = Circle((150, 150), 50)
 sun.fill = Color("yellow")
@@ -19,13 +19,15 @@ pen = Pen(Color("white"), True)
 pen.draw(win)
 pen.stackOnBottom()
 
+pics = []
 def main():
     win.mode = "manual"
-    while True:
+    for s in range(360):
         sun.rotate(1)
         earth.rotate(5)
         win.step(.1)
         pen.appendPath(Point(moon.gx, moon.gy))
+        pics.append(makePicture(win))
 
 getMouse()
 win.run(main)
