@@ -1294,7 +1294,6 @@ public static class Graphics {
   }
 
   public class Point {
-    // FIXME: should call QueueDraw on change of x,y
     public double x;
     public double y;
     public Point(object x, object y) {
@@ -1546,7 +1545,7 @@ public static class Graphics {
         float MeterInPixels = 64.0f;
         body.Position = new Vector2(((float)x)/MeterInPixels, 
                                     ((float)y)/MeterInPixels);
-        // FIXME: undo operation
+        // FIXME: undo operation; call rotateTo()?
         body.Rotation = (float)_rotation;
       }
     }
@@ -2688,6 +2687,7 @@ public static class Graphics {
           ty = (int)(p.y + py);
           this.getPixel(tx, ty).setColor(color);
           // FIXME: a lame way to not skip any pixels:
+	  // Need a region fill algorithm
           if ((int)px  < width/2) {
             this.getPixel(tx + 1, ty).setColor(color);
             if ((int)py + 1 < height/2) {
@@ -2965,7 +2965,8 @@ public static class Graphics {
 	    shape.updateGlobalPosition(g);
           }
           g.Restore();
-          // FIXME: add pen
+	  if (has_pen)
+	    pen.render(g);
         }
     
     public int width {
