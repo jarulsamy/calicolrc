@@ -1,4 +1,4 @@
-from examples.python.nehe.lesson01 import NeHe001, Events, Gl
+from lesson01 import NeHe001, Events, Gl
 
 class NeHe002(NeHe001):
 
