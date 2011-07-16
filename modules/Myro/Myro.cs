@@ -119,17 +119,17 @@ public static class Myro {
       return retval;
     }
 
-    public PythonDictionary getGamePadNow(int index, List whats) {
+    public PythonDictionary getGamepadNow(int index, List whats) {
 	PythonDictionary retval =  new PythonDictionary();
 	foreach (string what in whats) {
-	  retval[what] = getGamePadNow(index, what);
+	  retval[what] = getGamepadNow(index, what);
 	}
 	return retval;
     }
 
-    public object getGamePadNow(int index, string what) {
+    public object getGamepadNow(int index, string what) {
       if (what == "all") {
-	return getGamePadNow(index, 
+	return getGamepadNow(index, 
 			     Graphics.PyList("name", "axis", "ball", 
 					     "button", "hat", "count"));
       } if (what == "button") {
@@ -180,114 +180,114 @@ public static class Myro {
       }
     }
 
-    public object getGamePad(int index, string what) {
-      object initial = getGamePadNow(index, what);
+    public object getGamepad(int index, string what) {
+      object initial = getGamepadNow(index, what);
       Sdl.SDL_JoystickUpdate();
-      object current = getGamePadNow(index, what);
+      object current = getGamepadNow(index, what);
       while (Same(initial, current)) {
 	Sdl.SDL_JoystickUpdate();
-	current = getGamePadNow(index, what);
+	current = getGamepadNow(index, what);
       }
       return current;
     }
 
-    public object getGamePad(int index, List whats) {
-      object initial = getGamePadNow(index, whats);
+    public object getGamepad(int index, List whats) {
+      object initial = getGamepadNow(index, whats);
       Sdl.SDL_JoystickUpdate();
-      object current = getGamePadNow(index, whats);
+      object current = getGamepadNow(index, whats);
       while (Same(initial, current)) {
 	Sdl.SDL_JoystickUpdate();
-	current = getGamePadNow(index, whats);
+	current = getGamepadNow(index, whats);
       }
       return current;
     }
   }
 
-  public static object getGamePadNow() {
+  public static object getGamepadNow() {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePadNow(0, "all");
+    return gamepads.getGamepadNow(0, "all");
   }
 
-  public static object getGamePadNow(int index) {
+  public static object getGamepadNow(int index) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePadNow(index, "all");
+    return gamepads.getGamepadNow(index, "all");
   }
   
-  public static object getGamePadNow(int index, string what) {
+  public static object getGamepadNow(int index, string what) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePadNow(index, what);
+    return gamepads.getGamepadNow(index, what);
   }
 
-  public static object getGamePadNow(int index, List whats) {
+  public static object getGamepadNow(int index, List whats) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePadNow(index, whats);
+    return gamepads.getGamepadNow(index, whats);
   }
   
-  public static object getGamePadNow(IList iterable) {
+  public static object getGamepadNow(IList iterable) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePadNow(index, "all"));
+      retval.append(gamepads.getGamepadNow(index, "all"));
     return retval;
   }
   
-  public static object getGamePadNow(IList iterable, string what) {
+  public static object getGamepadNow(IList iterable, string what) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePadNow(index, what));
+      retval.append(gamepads.getGamepadNow(index, what));
     return retval;
   }
   
-  public static object getGamePadNow(IList iterable, List whats) {
+  public static object getGamepadNow(IList iterable, List whats) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePadNow(index, whats));
+      retval.append(gamepads.getGamepadNow(index, whats));
     return retval;
   }
   
-  public static object getGamePad() {
+  public static object getGamepad() {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePad(0, "all");
+    return gamepads.getGamepad(0, "all");
   }
 
-  public static object getGamePad(int index) {
+  public static object getGamepad(int index) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePad(index, "all");
+    return gamepads.getGamepad(index, "all");
   }
   
-  public static object getGamePad(int index, string what) {
+  public static object getGamepad(int index, string what) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePad(index, what);
+    return gamepads.getGamepad(index, what);
   }
 
-  public static object getGamePad(int index, List whats) {
+  public static object getGamepad(int index, List whats) {
     Sdl.SDL_JoystickUpdate();
-    return gamepads.getGamePad(index, whats);
+    return gamepads.getGamepad(index, whats);
   }
   
-  public static object getGamePad(IList iterable) {
+  public static object getGamepad(IList iterable) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePad(index, "all"));
+      retval.append(gamepads.getGamepad(index, "all"));
     return retval;
   }
   
-  public static object getGamePad(IList iterable, string what) {
+  public static object getGamepad(IList iterable, string what) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePad(index, what));
+      retval.append(gamepads.getGamepad(index, what));
     return retval;
   }
   
-  public static object getGamePad(IList iterable, List whats) {
+  public static object getGamepad(IList iterable, List whats) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
     foreach (int index in iterable)
-      retval.append(gamepads.getGamePad(index, whats));
+      retval.append(gamepads.getGamepad(index, whats));
     return retval;
   }
   
