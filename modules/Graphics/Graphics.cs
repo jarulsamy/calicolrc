@@ -2687,8 +2687,8 @@ public static class Graphics {
           ty = (int)(p.y + py);
           this.getPixel(tx, ty).setColor(color);
           // FIXME: a lame way to not skip any pixels:
-	  // Need a region fill algorithm
-          if ((int)px  < width/2) {
+          // Need a region fill algorithm
+          if ((int)px + 1 < width/2) {
             this.getPixel(tx + 1, ty).setColor(color);
             if ((int)py + 1 < height/2) {
               this.getPixel(tx + 1, ty + 1).setColor(color);

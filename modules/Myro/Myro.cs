@@ -2747,6 +2747,10 @@ public static class Myro {
     return Graphics.makeColor((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
 
+  public static Graphics.Color makeColor(string color) {
+    return Graphics.makeColor(color);
+  }
+
   /*
   public static List toList(IEnumerable enumumerator) {
     List retval = new List();
