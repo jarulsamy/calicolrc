@@ -1,264 +1,64 @@
 from Graphics import *
-from Myro import randomNumber, Random
+from Myro import randomNumber, Random, show, wait
 
 Random.seed = 3456
+
+pic = Picture("../images/Flathead_Lake.jpg")
 
 width, height = 640, 480
 win = Window("What are the Chances?", width, height)
 win.mode = "physics"
 
+background = Picture("missing.png")
+win.canvas.shapes.Add(background)
+
 thickness = 25
-wall = Rectangle((0, 0), (thickness, height - thickness))
+wall = Rectangle((0, -1000), (thickness, height - thickness))
 wall.bodyType = "static"
 wall.draw(win)
-wall = Rectangle((width - thickness, 0), (width, height - thickness))
+wall = Rectangle((width - thickness, -1000), (width, height - thickness))
 wall.bodyType = "static"
 wall.draw(win)
-
-ceil = Rectangle((0, 0), (width/2 - 20, thickness))
-ceil.bodyType = "static"
-ceil.draw(win)
-
-ceil = Rectangle((width/2 + 95, 0), (width, thickness))
-ceil.bodyType = "static"
-ceil.draw(win)
-
-#flipper = Rectangle((0, 0), (110, thickness))
-#flipper.rotateTo(60)
-#flipper.moveTo(width/2, 75)
-#flipper.bodyType = "static"
-#flipper.draw(win)
 
 ground = Rectangle((0, height - thickness), (width, height))
 ground.bodyType = "static"
 ground.draw(win)
 
-dict = {}
-
-
 balls = []
-for i in range(60):
+for i in range(250):
     ball = Rectangle((10, 10), (42, 42))
     ball.moveTo(width/2 + i, 0 - i * 40)
     ball.bounce = .98
-    ball.fill = None
+    ball.color = None
     ball.draw(win)
     balls.append(ball)
-    text = Text((0, 0), dict.get(str(i), str(i)))
+    #text = Text((0, 0), str(i))
     #text = Text((0, 0), str(i))
     #text.fontSize = 26
-    text.draw(ball)
-for i in range(60):
-    ball = Rectangle((10, 10), (42, 42))
-    ball.moveTo(width/2 + i, 0 - (i + 60) * 40)
-    ball.bounce = .98
-    ball.fill = None
-    ball.draw(win)
-    balls.append(ball)
-    text = Text((0, 0), dict.get(str(i+60), str(i+60)))
-    #text = Text((0, 0), str(i + 60))
-    #text.fontSize = 26
-    text.draw(ball)
-for i in range(60):
-    ball = Rectangle((10, 10), (42, 42))
-    ball.moveTo(width/2 + i, 0 - (i + 120) * 40)
-    ball.bounce = .98
-    ball.fill = None
-    ball.draw(win)
-    balls.append(ball)
-    text = Text((0, 0), dict.get(str(i+120), str(i+120)))
-    #text = Text((0, 0), str(i + 120))
-    #text.fontSize = 26
-    text.draw(ball)
+    #text.draw(ball)
+    try:
+        sect = Picture("sect-%s.png" % i)
+        sect.draw(ball)
+        sect.move(-16, -16)
+        # BUG:
+        #sect.outline = None
+        sect.outline = Color("white")
+    except:
+        print(i)
+        ball.outline = None
+        ball.fill = Color("white")
 
-final_degrees = [
--1706.10453798,
-384.127352733,
--379.678331432,
--996.940093972,
--1992.44595750,
-1654.47978258,
--1719.58274152,
-1806.89518070,
-1003.94032753,
--1720.16653145,
--266.604959534,
--1506.44248107,
-827.917883186,
-4258.08461931,
--493.880815562,
--2588.98418844,
--49.5844071477,
--89.5700420962,
--91.2822407476,
-371.483006013,
--513.093809848,
-5.61950441557,
--52.1669733898,
--931.236078384,
--557.936187410,
-204.944060764,
-802.460675319,
-445.758089387,
--2294.41769120,
-1731.52267717,
--239.462771319,
--679.362798701,
-7.96021579366,
-45.8981335621,
--18.9364689550,
-1354.68835455,
--1284.28549666,
-94.6997395591,
--248.992961589,
-274.397549678,
-1241.19530850,
--2124.14708576,
-16140.6484292,
-690.483166292,
-23239.8644345,
-287.197050976,
--1536.24953589,
--822.163148282,
-378.874691374,
-527.535288622,
-146.659064953,
--387.825927489,
--1620.66367992,
-26809.8908779,
--10714.6963195,
--3.13192027810,
-10077.0840629,
-21469.8081250,
-20880.6711963,
--902.377490951,
-402.038485642,
-474.919336162,
--38044.7228230,
-41425.9851314,
--768.215035727,
--77.4989531534,
--13888.4214175,
--750.996511320,
-27964.6242970,
-206.537858086,
-652.163619388,
-1301.40588491,
--739.941877469,
-551.524005817,
--1906.88805732,
--9986.17369867,
--1926.10198051,
-1003.39544236,
-778.780026976,
--316.591152559,
--237.701921230,
--32142.4951747,
-1389.86142454,
--169.557916183,
-23431.0310475,
--618.292438086,
--578.214090150,
-1260.04302427,
-899.690603815,
--960.499559430,
--546.698012716,
-3328.74591284,
--90.5361723543,
-1160.88987843,
--783.164953782,
--358.795437856,
-195.463976762,
--188.637612498,
-390.212013094,
--173.324765510,
--135.744463640,
-248.679893038,
--10.8948817026,
-1161.01085474,
--1749.09964990,
-1013.09693377,
--653.293605884,
--2034.55248913,
--354.853790327,
--1441.30859503,
--530.000549780,
--1033.52826988,
-349.542963078,
--700.572667093,
--786.279683968,
-633.721070440,
--15886.8355397,
--802.202111678,
-12110.2501876,
-886.236442546,
--13158.5331960,
-597.837005069,
-807.493377266,
-133.445367324,
--1708.29150992,
--470.213445107,
--24986.7387542,
--624.651125638,
-1545.14845276,
-765.635683088,
-1174.15738429,
-493.836009521,
-159.728030873,
-25258.5002879,
--193.014356737,
--451.046595579,
-229.011598342,
--598.003825610,
-764.848025673,
-336.714966232,
-30088.8485366,
--496.001999111,
-581.121346510,
-1401.46903051,
-798.112358328,
-1605.67638707,
-1455.76302385,
--1163.79505841,
-1268.91330899,
--24691.5014777,
--24551.5107947,
--345.923317988,
--4354.46875182,
-207.091636163,
--1028.32672566,
-582.548692122,
--763.604166263,
--866.309229039,
--462.908038695,
-464.908355216,
--988.074508430,
-281.731178432,
--1105.64654344,
--14877.0114140,
-166.418583656,
-1868.07378615,
--355.048478039,
--423.064813191,
-539.057708469,
--13.4268268515,
--646.992838337,
--148.866691376,
--168.224116842,
-3.91487532139,
--415.757904137,
-484.324615932,
-210.628922832,
--10551.4222320,
--7662.11976202,
-5892.73051609,
-]
-
-i = 0
-for ball in balls:
-    ball.rotateTo(-final_degrees[i])
-    i += 1
-
+def makePics():
+    i = 0
+    for ball in balls:
+        if 0 < ball.center.x < 640 and 0 < ball.center.y < 480:
+            sect = pic.getRegion(ball.center, ball.width, ball.height, ball.rotation)
+            pic.setRegion(ball.center, ball.width, ball.height, ball.rotation, Color("black"))
+            sect.savePicture("sect-%s.png" % i)
+        i += 1
+    pic.savePicture("missing.png")
 
 getMouse()
 win.run()
+
+

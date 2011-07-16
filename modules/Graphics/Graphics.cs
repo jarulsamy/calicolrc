@@ -2046,6 +2046,24 @@ public static class Graphics {
       g.Restore();
     }
 
+    public double width {
+      get {
+	using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+	  Cairo.TextExtents te = g.TextExtents(text);
+	  return te.Width * 2;
+	}
+      }
+    }
+
+    public double height {
+      get {
+	using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+	  Cairo.TextExtents te = g.TextExtents(text);
+	  return te.Height * 2;
+	}
+      }
+    }
+
     public override void addToPhysics() { // Text
       world = window._canvas.world;
       double width = 0;
@@ -2581,6 +2599,42 @@ public static class Graphics {
       }
       return pic;
     }
+
+    public void setRegion(IList iterable, int width, int height, double degrees,
+			  Color color) {
+      setRegion(new Point(iterable[0], iterable[1]), width, height, degrees, 
+		color);
+    }
+
+    public void setRegion(Point p, int width, int height, double degrees, 
+			  Color color) {
+      double angle = degrees * Math.PI/180.0;
+      double px, py;
+      int tx, ty;
+      for (int x = -width/2; x < width/2; x++) {
+	for (int y = -height/2; y < height/2; y++) {
+	  // rotate that x,y:
+	  px = x * Math.Cos(angle) - y * Math.Sin(angle);
+	  py = x * Math.Sin(angle) + y * Math.Cos(angle);
+	  // set the color of the new image from the offset of this:
+	  tx = (int)(p.x + px);
+	  ty = (int)(p.y + py);
+	  this.getPixel(tx, ty).setColor(color);
+	  // FIXME: a lame way to not skip any pixels:
+	  if ((int)px  < width/2) {
+	    this.getPixel(tx + 1, ty).setColor(color);
+	    if ((int)py + 1 < height/2) {
+	      this.getPixel(tx + 1, ty + 1).setColor(color);
+	      this.getPixel(tx, ty + 1).setColor(color);
+	    }
+	  } else {
+	    if ((int)py + 1 < height/2) {
+	      this.getPixel(tx, ty + 1).setColor(color);
+	    }
+	  }
+	}
+      }
+    }
     
     public Gdk.Pixbuf getPixbuf()
     {
@@ -2821,7 +2875,7 @@ public static class Graphics {
         }
     }
 
-	public override void render(Cairo.Context g) {
+	public override void render(Cairo.Context g) { // picture
 	  g.Save();
 	  Point temp = screen_coord(center);
 	  g.Translate(temp.x, temp.y);
@@ -2831,14 +2885,14 @@ public static class Graphics {
 	  g.Paint();
 	  g.LineWidth = border;
 	  g.MoveTo(-_pixbuf.Width/2, -_pixbuf.Height/2);
-	  g.LineTo(_pixbuf.Width/2, -_pixbuf.Height/2);
-	  g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
-	  g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
-	  g.ClosePath();
 	  if (_outline != null) {
+	    g.LineTo(_pixbuf.Width/2, -_pixbuf.Height/2);
+	    g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
+	    g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
+	    g.ClosePath();
 	    g.Color = _outline._cairo;
-	    g.Stroke();
 	  }
+	  g.Stroke();
 	  foreach (Shape shape in shapes) {
 	    shape.render(g);
 	  }
