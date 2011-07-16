@@ -77,7 +77,7 @@ public static class Myro {
 	  handles[i] = Sdl.SDL_JoystickOpen(i);
 	}
       } catch {
-	Console.WriteLine("WARNING: SDL is not installed.");
+	Console.Error.WriteLine("WARNING: SDL is not installed.");
       }
     }
 

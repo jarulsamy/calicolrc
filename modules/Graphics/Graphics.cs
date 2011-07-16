@@ -938,11 +938,19 @@ public static class Graphics {
       foreach (object function in onMouseMovementCallbacks) {
         if (function is PythonFunction) {
           Gtk.Application.Invoke( delegate {
-              IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	      try {
+		IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	      } catch {
+		Console.Error.WriteLine("Error in onMouseMove function");
+	      }	
             });
         } else {
-          Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
-          f(obj, args);
+	  try {
+	    Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
+	    f(obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onMouseMove function");
+	  }	
         }
       }
     }
@@ -952,11 +960,19 @@ public static class Graphics {
       foreach (object function in onClickCallbacks) {
         if (function is PythonFunction) {
           Gtk.Application.Invoke( delegate {
-              IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	      try {
+		IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	      } catch {
+		Console.Error.WriteLine("Error in onMouseDown function");
+	      }	
             });
         } else {
-          Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
-          f(obj, args);
+	  try {
+	    Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
+	    f(obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onMouseDown function");
+	  }	
         }
       }
     }
@@ -965,10 +981,19 @@ public static class Graphics {
                                       Gtk.ButtonReleaseEventArgs args) {
       foreach (object function in onMouseUpCallbacks) {
                 if (function is PythonFunction) {
-                  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		  try {
+		    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+		  } catch {
+		    Console.Error.WriteLine("Error in onMouseUp function");
+		  }	
+
                 } else {
-                  Func<object,Gtk.ButtonReleaseEventArgs,object> f = (Func<object,Gtk.ButtonReleaseEventArgs,object>)function;
-                  f(obj, args);
+		  try {
+		    Func<object,Gtk.ButtonReleaseEventArgs,object> f = (Func<object,Gtk.ButtonReleaseEventArgs,object>)function;
+		    f(obj, args);
+		  } catch {
+		    Console.Error.WriteLine("Error in onMouseUp function");
+		  }	
                 }
       }
     }
@@ -980,10 +1005,18 @@ public static class Graphics {
       _keyState = "down";
       foreach (object function in onKeyPressCallbacks) {
         if (function is PythonFunction) {
-          IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	  try {
+	    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onKeypress function");
+	  }	
         } else {
-          Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
-          f(obj, args);
+	  try {
+	    Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
+	    f(obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onKeypress function");
+	  }	
         }
       }
     }
@@ -992,12 +1025,20 @@ public static class Graphics {
                                       Gtk.KeyReleaseEventArgs args) {
       _keyState = "up";
       foreach (object function in onKeyReleaseCallbacks) {
-                if (function is PythonFunction) {
-                  IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-                } else {
-                  Func<object,Gtk.KeyReleaseEventArgs,object> f = (Func<object,Gtk.KeyReleaseEventArgs,object>)function;
-                  f(obj, args);
-                }
+	if (function is PythonFunction) {
+	  try {
+	    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onKeyRelease function");
+	  }	
+	} else {
+	  try {
+	    Func<object,Gtk.KeyReleaseEventArgs,object> f = (Func<object,Gtk.KeyReleaseEventArgs,object>)function;
+	    f(obj, args);
+	  } catch {
+	    Console.Error.WriteLine("Error in onKeyRelease function");
+	  }	
+	}
       }
     }
     
@@ -1011,10 +1052,18 @@ public static class Graphics {
 
     public void run(object function) {
         if (function is PythonFunction) {
-          IronPython.Runtime.Operations.PythonCalls.Call(function);
+	  try {
+	    IronPython.Runtime.Operations.PythonCalls.Call(function);
+	  } catch {
+	    Console.Error.WriteLine("Error in run function");
+	  }	
         } else {
-          Func<object> f = (Func<object>)function;
-          f();
+	  try {
+	    Func<object> f = (Func<object>)function;
+	    f();
+	  } catch {
+	    Console.Error.WriteLine("Error in run function");
+	  }	
         }
     }
 
