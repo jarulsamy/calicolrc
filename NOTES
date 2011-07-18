@@ -9,6 +9,10 @@ May need:
 
 in calico.exe.config to allow different frameworks (2 vs 4).
 
+= Math.NET =
+
+mathdotnet.com - numerics, symbolic, etc.
+
 = Sdl =
 
 6.1.0
