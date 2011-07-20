@@ -811,6 +811,34 @@ public static class Graphics {
     
   }
 
+  public class Gradient {
+    public string gtype;
+    public Color c1, c2;
+    public Point p1, p2;
+    public double radius1, radius2;
+    
+    // ("linear", (100, 200), Color("red"), (200, 100), Color("blue"))
+    public Gradient(string gtype, IList p1, Color c1, IList p2, Color c2) {
+      this.gtype = gtype;
+      this.p1 = new Point(p1[0], p1[1]);
+      this.p2 = new Point(p2[0], p2[1]);
+      this.c1 = c1;
+      this.c2 = c2;
+    }
+
+    public Gradient(string gtype, 
+		    IList p1, double radius1, Color c1, 
+		    IList p2, double radius2, Color c2) {
+      this.gtype = gtype;
+      this.p1 = new Point(p1[0], p1[1]);
+      this.radius1 = radius1;
+      this.c1 = c1;
+      this.p2 = new Point(p2[0], p2[1]);
+      this.radius2 = radius2;
+      this.c2 = c2;
+    }
+  }
+  
   public class WindowClass : Gtk.Window {
     internal _Canvas _canvas;
     internal bool _dirty = false;
@@ -1428,6 +1456,7 @@ public static class Graphics {
     public Point [] points;
     internal Color _fill;
     internal Color _outline;
+    public Gradient _gradient;
     private int _border;
     public bool wrap = false;
     
@@ -1851,7 +1880,26 @@ public static class Graphics {
         }
         if (close_path)
           g.ClosePath();
-        if (_fill != null) {
+	if (gradient != null) {
+	  Cairo.Gradient pat;
+	  if (gradient.gtype == "linear")
+	    pat = new Cairo.LinearGradient(gradient.p1.x,
+					   gradient.p1.y, 
+					   gradient.p2.x, 
+					   gradient.p2.y);
+	  else
+	    pat = new Cairo.RadialGradient(gradient.p1.x,
+					   gradient.p1.y, 
+					   gradient.radius1,
+					   gradient.p2.x, 
+					   gradient.p2.y,
+					   gradient.radius2);
+	  
+	  pat.AddColorStop (0, gradient.c1.getCairo());
+	  pat.AddColorStop (1, gradient.c2.getCairo());
+	  g.Pattern = pat;
+          g.FillPreserve();
+	} else if (_fill != null) {
           g.Color = _fill.getCairo();
           g.FillPreserve();
         }
@@ -1998,6 +2046,16 @@ public static class Graphics {
         });
     }
     
+    public Gradient gradient {
+      set {
+	_gradient = value;
+	QueueDraw();
+      }
+      get {
+	return _gradient;
+      } 
+    }
+
     public Color color {
       set {
             if (value != null) {
@@ -2099,10 +2157,29 @@ public static class Graphics {
       g.Translate(temp.x, temp.y);
       g.Rotate(_rotation);
       g.Scale(_scaleFactor, _scaleFactor);
-      if (_fill != null)
-        g.Color = _fill._cairo;
+      if (gradient != null) {
+	Cairo.Gradient pat;
+	if (gradient.gtype == "linear")
+	  pat = new Cairo.LinearGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.p2.x, 
+					 gradient.p2.y);
+	else
+	  pat = new Cairo.RadialGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.radius1,
+					 gradient.p2.x, 
+					 gradient.p2.y,
+					 gradient.radius2);
+	
+	pat.AddColorStop (0, gradient.c1.getCairo());
+	pat.AddColorStop (1, gradient.c2.getCairo());
+	g.Pattern = pat;
+	g.FillPreserve();
+      } else if (_fill != null)
+	  g.Color = _fill._cairo;
       else
-        g.Color = new Cairo.Color(0,0,0); // default color when none given
+	g.Color = new Cairo.Color(0,0,0); // default color when none given
       g.SelectFontFace(fontFace, fontSlant, fontWeight);
       g.SetFontSize(fontSize);
       Cairo.TextExtents te = g.TextExtents(text);
@@ -2255,7 +2332,26 @@ public static class Graphics {
           p3 = screen_coord(points[p+2]);
           g.CurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
         }
-        if (_fill != null) {
+	if (gradient != null) {
+	  Cairo.Gradient pat;
+	  if (gradient.gtype == "linear")
+	    pat = new Cairo.LinearGradient(gradient.p1.x,
+					   gradient.p1.y, 
+					   gradient.p2.x, 
+					   gradient.p2.y);
+	  else
+	    pat = new Cairo.RadialGradient(gradient.p1.x,
+					   gradient.p1.y, 
+					   gradient.radius1,
+					   gradient.p2.x, 
+					   gradient.p2.y,
+					   gradient.radius2);
+	  
+	  pat.AddColorStop (0, gradient.c1.getCairo());
+	  pat.AddColorStop (1, gradient.c2.getCairo());
+	  g.Pattern = pat;
+          g.FillPreserve();
+	} else if (_fill != null) {
           g.Color = _fill._cairo;
           g.FillPreserve();
         }
@@ -3187,8 +3283,27 @@ public static class Graphics {
       g.LineWidth = border;
       g.Arc(temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
       g.ClosePath();
-      if (_fill != null) {
-        g.Color = _fill._cairo;
+      if (gradient != null) {
+	Cairo.Gradient pat;
+	if (gradient.gtype == "linear")
+	  pat = new Cairo.LinearGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.p2.x, 
+					 gradient.p2.y);
+	else
+	  pat = new Cairo.RadialGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.radius1,
+					 gradient.p2.x, 
+					 gradient.p2.y,
+					 gradient.radius2);
+	
+	pat.AddColorStop (0, gradient.c1.getCairo());
+	pat.AddColorStop (1, gradient.c2.getCairo());
+	g.Pattern = pat;
+	g.FillPreserve();
+      } else if (_fill != null) {
+	g.Color = _fill._cairo;
         g.FillPreserve();
       }
       if (_outline != null) {
@@ -3251,7 +3366,26 @@ public static class Graphics {
       g.LineWidth = border;
       g.Arc(temp.x, temp.y, _xRadius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
       g.ClosePath();
-      if (_fill != null) {
+      if (gradient != null) {
+	Cairo.Gradient pat;
+	if (gradient.gtype == "linear")
+	  pat = new Cairo.LinearGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.p2.x, 
+					 gradient.p2.y);
+	else
+	  pat = new Cairo.RadialGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.radius1,
+					 gradient.p2.x, 
+					 gradient.p2.y,
+					 gradient.radius2);
+	
+	pat.AddColorStop (0, gradient.c1.getCairo());
+	pat.AddColorStop (1, gradient.c2.getCairo());
+	g.Pattern = pat;
+	g.FillPreserve();
+      } else if (_fill != null) {
         g.Color = _fill._cairo;
         g.FillPreserve();
       }
@@ -3366,7 +3500,26 @@ public static class Graphics {
       g.MoveTo(temp.x, temp.y);
       g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
       g.ClosePath();
-      if (_fill != null) {
+      if (gradient != null) {
+	Cairo.Gradient pat;
+	if (gradient.gtype == "linear")
+	  pat = new Cairo.LinearGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.p2.x, 
+					 gradient.p2.y);
+	else
+	  pat = new Cairo.RadialGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.radius1,
+					 gradient.p2.x, 
+					 gradient.p2.y,
+					 gradient.radius2);
+	
+	pat.AddColorStop (0, gradient.c1.getCairo());
+	pat.AddColorStop (1, gradient.c2.getCairo());
+	g.Pattern = pat;
+	g.FillPreserve();
+      } else if (_fill != null) {
         g.Color = _fill._cairo;
         g.FillPreserve();
       }
@@ -3463,7 +3616,26 @@ public static class Graphics {
       double tstart = start * (Math.PI) / 180.0;
       double tstop = stop * (Math.PI) / 180.0;
       g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
-      if (_fill != null) {
+      if (gradient != null) {
+	Cairo.Gradient pat;
+	if (gradient.gtype == "linear")
+	  pat = new Cairo.LinearGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.p2.x, 
+					 gradient.p2.y);
+	else
+	  pat = new Cairo.RadialGradient(gradient.p1.x,
+					 gradient.p1.y, 
+					 gradient.radius1,
+					 gradient.p2.x, 
+					 gradient.p2.y,
+					 gradient.radius2);
+	
+	pat.AddColorStop (0, gradient.c1.getCairo());
+	pat.AddColorStop (1, gradient.c2.getCairo());
+	g.Pattern = pat;
+	g.FillPreserve();
+      } else if (_fill != null) {
         g.Color = _fill._cairo;
         g.FillPreserve();
       }
