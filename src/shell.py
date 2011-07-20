@@ -361,13 +361,14 @@ class ShellWindow(Window):
                 elif self.ready_for_execute(text) or force:
                     self.history.last(text.rstrip())
                     self.history.add("")
-                    self.execute(text.rstrip(), self.language)
-                    def invoke(sender, args):
-                        self.textview.Document.Text = ''
-                        self.textview.GrabFocus()
-                        self.textview.Caret.Line = 0
-                        self.textview.Caret.Column = 0
-                    Gtk.Application.Invoke(invoke)
+                    results = self.execute(text.rstrip(), self.language)
+                    if results:
+                        def invoke(sender, args):
+                            self.textview.Document.Text = ''
+                            self.textview.GrabFocus()
+                            self.textview.Caret.Line = 0
+                            self.textview.Caret.Column = 0
+                        Gtk.Application.Invoke(invoke)
                     return True
             elif str(event.Key) == "Up":
                 text = self.textview.Document.Text
@@ -552,7 +553,7 @@ class ShellWindow(Window):
 
     def execute(self, text, language):
         if (self.executeThread):
-            return
+            return False
         prompt = "%s> " % (language + "------")[:6]
         MUTEX.WaitOne()
         count = 2
@@ -585,6 +586,7 @@ class ShellWindow(Window):
         self.language = language
         self.update_gui()
         self.execute_in_background(text)
+        return True
 
     def start_running(self, sender, args):
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
