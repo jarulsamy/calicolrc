@@ -114,7 +114,7 @@ from utils import _, Chat
 def handle_exception(arg):
     if pw.shell:
         Gtk.Application.Invoke(pw.shell.stop_running)
-        Gtk.Application.Invoke(lambda s,a: pw.shell.message("Crashed!"))
+        Gtk.Application.Invoke(lambda s,a: pw.shell.message("[Script has stopped------]"))
 
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 # Turn on Unhandled Exception Handled:

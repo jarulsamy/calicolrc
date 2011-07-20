@@ -471,6 +471,7 @@ class ShellWindow(Window):
         if (self.executeThread):
             self.message(_("Stopping..."))
             self.executeThread.Abort()
+            self.executeThread = None
             Gtk.Application.Invoke(self.stop_running)
         else:
             self.searchbar.search_off()
@@ -519,8 +520,7 @@ class ShellWindow(Window):
         self.message(self.prompt.Text, tag="purple")
 
     def execute_file(self, filename, language):
-        if (self.executeThread and
-            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+        if (self.executeThread):
             return
 
         def background():
@@ -541,8 +541,7 @@ class ShellWindow(Window):
         self.update_gui()
 
     def execute(self, text, language):
-        if (self.executeThread and 
-            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+        if (self.executeThread):
             return
         prompt = "%s> " % (language + "------")[:6]
         MUTEX.WaitOne()
@@ -579,6 +578,9 @@ class ShellWindow(Window):
 
     def start_running(self, sender, args):
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = True
+        self.toolbar_buttons[Gtk.Stock.Apply].Sensitive = False
+        if self.calico.editor:
+            self.calico.editor.toolbar_buttons[Gtk.Stock.Apply].Sensitive = False
 
     def make_error_url(self, language, message):
         # FIXME: need to format url based on language
@@ -595,7 +597,11 @@ class ShellWindow(Window):
         return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
 
     def stop_running(self, sender, args):
+        self.executeThread = None
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
+        self.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
+        if self.calico.editor:
+            self.calico.editor.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
         if self.calico.last_error != "":
             url = self.make_error_url(self.language, self.calico.last_error)
             def invoke(sender, args):
@@ -611,8 +617,7 @@ class ShellWindow(Window):
             self.calico.last_error = ""
 
     def execute_in_background(self, text):
-        if (self.executeThread and 
-            self.executeThread.ThreadState == System.Threading.ThreadState.Running):
+        if (self.executeThread):
             return
 
         def background():

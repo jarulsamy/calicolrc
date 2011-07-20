@@ -487,6 +487,13 @@ public static class Graphics {
     public Text xLabel;
     public Text yLabel;
 
+    public Plot(IList list) : this("Plot", 640, 480) {
+      foreach (double item in list)
+	{
+	  append(item);
+	}
+    }
+
     public Plot(string title, int width, int height) {
       window = makeWindow(title, width, height);
       Line tick;
@@ -940,16 +947,18 @@ public static class Graphics {
           Gtk.Application.Invoke( delegate {
 	      try {
 		IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-	      } catch {
+	      } catch (Exception e) {
 		Console.Error.WriteLine("Error in onMouseMove function");
+		Console.Error.WriteLine(e.Message);
 	      }	
             });
         } else {
 	  try {
 	    Func<object,Gtk.MotionNotifyEventArgs,object> f = (Func<object,Gtk.MotionNotifyEventArgs,object>)function;
 	    f(obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onMouseMove function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
         }
       }
@@ -962,16 +971,18 @@ public static class Graphics {
           Gtk.Application.Invoke( delegate {
 	      try {
 		IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-	      } catch {
+	      } catch (Exception e) {
 		Console.Error.WriteLine("Error in onMouseDown function");
+		Console.Error.WriteLine(e.Message);
 	      }	
             });
         } else {
 	  try {
 	    Func<object,Gtk.ButtonPressEventArgs,object> f = (Func<object,Gtk.ButtonPressEventArgs,object>)function;
 	    f(obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onMouseDown function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
         }
       }
@@ -983,16 +994,18 @@ public static class Graphics {
                 if (function is PythonFunction) {
 		  try {
 		    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-		  } catch {
+		  } catch (Exception e) {
 		    Console.Error.WriteLine("Error in onMouseUp function");
+		    Console.Error.WriteLine(e.Message);
 		  }	
 
                 } else {
 		  try {
 		    Func<object,Gtk.ButtonReleaseEventArgs,object> f = (Func<object,Gtk.ButtonReleaseEventArgs,object>)function;
 		    f(obj, args);
-		  } catch {
+		  } catch (Exception e) {
 		    Console.Error.WriteLine("Error in onMouseUp function");
+		    Console.Error.WriteLine(e.Message);
 		  }	
                 }
       }
@@ -1007,15 +1020,17 @@ public static class Graphics {
         if (function is PythonFunction) {
 	  try {
 	    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onKeypress function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
         } else {
 	  try {
 	    Func<object,Gtk.KeyPressEventArgs,object> f = (Func<object,Gtk.KeyPressEventArgs,object>)function;
 	    f(obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onKeypress function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
         }
       }
@@ -1028,15 +1043,17 @@ public static class Graphics {
 	if (function is PythonFunction) {
 	  try {
 	    IronPython.Runtime.Operations.PythonCalls.Call(function, obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onKeyRelease function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
 	} else {
 	  try {
 	    Func<object,Gtk.KeyReleaseEventArgs,object> f = (Func<object,Gtk.KeyReleaseEventArgs,object>)function;
 	    f(obj, args);
-	  } catch {
+	  } catch (Exception e) {
 	    Console.Error.WriteLine("Error in onKeyRelease function");
+	    Console.Error.WriteLine(e.Message);
 	  }	
 	}
       }
@@ -1054,15 +1071,23 @@ public static class Graphics {
         if (function is PythonFunction) {
 	  try {
 	    IronPython.Runtime.Operations.PythonCalls.Call(function);
-	  } catch {
-	    Console.Error.WriteLine("Error in run function");
+	  } catch (Exception e) {
+	    if (!e.Message.Contains("Thread was being aborted"))
+	      {
+		Console.Error.WriteLine("Error in run function");
+		Console.Error.WriteLine(e.Message);
+	      }
 	  }	
         } else {
 	  try {
 	    Func<object> f = (Func<object>)function;
 	    f();
-	  } catch {
-	    Console.Error.WriteLine("Error in run function");
+	  } catch (Exception e) {
+	    if (!e.Message.Contains("Thread was being aborted"))
+	      {
+		Console.Error.WriteLine("Error in run function");
+		Console.Error.WriteLine(e.Message);
+	      }
 	  }	
         }
     }
