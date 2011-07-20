@@ -533,6 +533,7 @@ class ShellWindow(Window):
 
         self.executeThread = System.Threading.Thread(
                                 System.Threading.ThreadStart(background))
+        self.executeThread.IsBackground = True
         self.executeThread.Start()
 
     def load_text(self, text, language):
