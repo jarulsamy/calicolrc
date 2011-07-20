@@ -25,6 +25,7 @@ import glob
 import os
 
 import Microsoft.Scripting
+import Gtk
 import System
 
 from utils import CustomStream
@@ -100,6 +101,7 @@ class Engine(object):
 
 class DLREngine(Engine):
     def setup(self):
+        self.last_retval = None
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)
         #Python.SetTrace(engine, OnTraceBack); 
         # Load mscorlib.dll:
@@ -144,6 +146,7 @@ class DLREngine(Engine):
         return lines[-1].strip() == ""
 
     def execute(self, text):
+        self.manager.calico.last_error = ""
         sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         try:
@@ -164,10 +167,25 @@ class DLREngine(Engine):
             else:
                 traceback.print_exc()
             return False
+        # What was last thing printed?
+        try:
+            retval = self.engine.Execute("_")
+        except:
+            retval = None
+        if retval != self.last_retval:
+            if (isinstance(retval, Gtk.Widget) and 
+                retval.Parent == None and 
+                not retval.IsTopLevel):
+                # errors here are terminal:
+                #self.manager.calico.shell.show_widget(retval)
+                #self.manager.calico.shell.message("") # newline
+                pass # too many issues: displaying, Invoke
+            self.last_retval = retval
         self.manager.calico.shell.message("Ok")
         return True
 
     def execute_file(self, filename):
+        self.manager.calico.last_error = ""
         source = self.engine.CreateScriptSourceFromFile(filename)
         try:
             source.Compile()

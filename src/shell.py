@@ -235,6 +235,15 @@ class ShellWindow(Window):
         # Setup plugins
         Window.__init__(self, calico)
 
+    def show_widget(self, widget):
+        def invoke(sender, args):
+            MUTEX.WaitOne()
+            widget.Show()
+            anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
+            self.history_textview.AddChildAtAnchor(widget, anchor_iter[0])
+            MUTEX.ReleaseMutex()
+        Gtk.Application.Invoke(invoke)
+
     def show_icon(self):
         def invoke(sender, args):
             MUTEX.WaitOne()
@@ -624,7 +633,7 @@ class ShellWindow(Window):
         def background():
             Gtk.Application.Invoke(self.start_running)
             self.calico.engine[self.language].execute(text)
-            #self.show_prompt()
+            ##self.show_prompt()
             Gtk.Application.Invoke(self.stop_running)
 
         self.executeThread = System.Threading.Thread(
