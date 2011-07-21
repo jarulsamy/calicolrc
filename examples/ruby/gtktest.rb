@@ -30,4 +30,4 @@ win.destroy do
     win.Hide
 end
 win.Add(button)
-win.ShowAll
+win.Show

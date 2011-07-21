@@ -44,6 +44,7 @@ for x in range(10):
     poly.rotate(36)
     win.step(.1)
 
-for x in range(360):
-    group.rotate(1)
-    win.step(.1)
+# FIXME BUG:
+#for x in range(360):
+#    group.rotate(1)
+#    win.step(.1)
