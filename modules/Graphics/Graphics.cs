@@ -817,12 +817,33 @@ public static class Graphics {
     public Point p1, p2;
     public double radius1, radius2;
     
+    public Gradient(string gtype, Point p1, Color c1, Point p2, Color c2)
+    {
+      this.gtype = gtype;
+      this.p1 = new Point(p1.x, p1.y);
+      this.p2 = new Point(p2.x, p2.y);
+      this.c1 = c1;
+      this.c2 = c2;      
+    }
+
     // ("linear", (100, 200), Color("red"), (200, 100), Color("blue"))
     public Gradient(string gtype, IList p1, Color c1, IList p2, Color c2) {
       this.gtype = gtype;
       this.p1 = new Point(p1[0], p1[1]);
       this.p2 = new Point(p2[0], p2[1]);
       this.c1 = c1;
+      this.c2 = c2;
+    }
+
+    public Gradient(string gtype, 
+		    Point p1, double radius1, Color c1, 
+		    Point p2, double radius2, Color c2) {
+      this.gtype = gtype;
+      this.p1 = new Point(p1.x, p1.y);
+      this.radius1 = radius1;
+      this.c1 = c1;
+      this.p2 = new Point(p2.x, p2.y);
+      this.radius2 = radius2;
       this.c2 = c2;
     }
 
