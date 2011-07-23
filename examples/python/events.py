@@ -1,5 +1,4 @@
 from Graphics import *
-from Myro import wait
 
 def handle_event(o, e):
     print(e)
