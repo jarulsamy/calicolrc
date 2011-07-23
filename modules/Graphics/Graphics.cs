@@ -482,39 +482,50 @@ public static class Graphics {
     public double x;
     public double y;
     public double time;
+    public string type;
+    public string key;
     
     public Event(Gtk.ButtonReleaseEventArgs args) {
+      type = "mouse-release";
       x = args.Event.X;
       y = args.Event.Y;
       time = args.Event.Time;
     }
 
     public Event(Gtk.KeyPressEventArgs args) {
+      type = "key-press";
       time = args.Event.Time;
+      key = args.Event.Key.ToString();
     }
 
     public Event(Gtk.KeyReleaseEventArgs args) {
+      type = "key-release";
       time = args.Event.Time;
+      key = args.Event.Key.ToString();
     }
 
     public Event(Gtk.ButtonPressEventArgs args) {
+      type = "mouse-press";
       x = args.Event.X;
       y = args.Event.Y;
       time = args.Event.Time;
     }
 
     public Event(Gtk.MotionNotifyEventArgs args) {
+      type = "mouse-motion";
       x = args.Event.X;
       y = args.Event.Y;
       time = args.Event.Time;
     }
 
     public override string ToString() {
-      return String.Format("<Event ({0},{1}) at {2}>", x, y, time);
+      return String.Format("<Event \"{0}\" ({1},{2}) at {3}>", 
+			   type, x, y, time);
     }
 
     public string __repr__() {
-      return String.Format("<Event ({0},{1}) at {2}>", x, y, time);
+      return String.Format("<Event \"{0}\" ({1},{2}) at {3}>", 
+			   type, x, y, time);
     }
 
   }
