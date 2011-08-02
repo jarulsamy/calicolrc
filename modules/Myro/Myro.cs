@@ -350,112 +350,112 @@ public static class Myro {
   public static void uninit() {
     if (Myro.robot is Scribbler) {
       if (((Scribbler)(Myro.robot)).serial is SerialPort) {
-	SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
-	lock(serial) {
-	  serial.Close(); // and need_port
-	}
+        SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+        lock(serial) {
+          serial.Close(); // and need_port
+        }
       } // not a serial port
     } // not a scribbler
   }
 
   public static string repeat(string s, int times) {
-	// repeat(" ", 10) => "          "
-	string retval = "";
-	for(int i = 0; i < times; i++) {
-	  retval += s;
-	}
-	return retval;
+    // repeat(" ", 10) => "          "
+    string retval = "";
+    for(int i = 0; i < times; i++) {
+      retval += s;
+    }
+    return retval;
   }
   
   public static string pad(string s, int length) {
-	// pad("hi", 3) => "hi "
-	if (length <= s.Length) { // trim
-	  return s.Substring(0, length);
-	} else {
-	  return (s + repeat(" ", length)).Substring(0, length);
-	}
+    // pad("hi", 3) => "hi "
+    if (length <= s.Length) { // trim
+      return s.Substring(0, length);
+    } else {
+      return (s + repeat(" ", length)).Substring(0, length);
+    }
   }
   
   public static List rgb2yuv(int R, int G, int B) {
     int Y = (int)(0.299 * R + 0.587 * G + 0.114 * B);
-	int U = (int)(-0.14713 * R - 0.28886 * G + 0.436 * B + 128);
+    int U = (int)(-0.14713 * R - 0.28886 * G + 0.436 * B + 128);
     int V = (int)( 0.615 * R - 0.51499* G - 0.10001 * B + 128);
     return Graphics.PyList(
-		Math.Max(Math.Min(Y,255),0),
-		Math.Max(Math.Min(U,255),0),
-		Math.Max(Math.Min(V,255),0));
+        Math.Max(Math.Min(Y,255),0),
+        Math.Max(Math.Min(U,255),0),
+        Math.Max(Math.Min(V,255),0));
   }
 
   public static void forward(double power=1) {
-	robot.forward(power);
+    robot.forward(power);
   }
   
   public static void forward(double power, double time) {
-	robot.forward(power, time);
+    robot.forward(power, time);
   }
   
   public static void translate(double power=1) {
-	robot.translate(power);
+    robot.translate(power);
   }
   
   public static void translate(double power, double time) {
-	robot.translate(power, time);
+    robot.translate(power, time);
   }
   
   public static void rotate(double power=1) {
-	robot.rotate(power);
+    robot.rotate(power);
   }
 
   public static void rotate(double power, double time) {
-	robot.rotate(power, time);
+    robot.rotate(power, time);
   }
 
   public static void backward(double power=1) {
-	robot.backward(power);
+    robot.backward(power);
   }
 
   public static void backward(double power, double time) {
-	robot.backward(power, time);
+    robot.backward(power, time);
   }
 
   public static void stop() {
-	robot.stop();
+    robot.stop();
   }
   
   public static void move(double translate, double rotate) {
-	robot.move(translate, rotate);
+    robot.move(translate, rotate);
   }
   
   public static void turnLeft(double power=1) {
-	robot.turnLeft(power);
+    robot.turnLeft(power);
   }
 
   public static void turnLeft(double power, double time) {
-	robot.turnLeft(power, time);
+    robot.turnLeft(power, time);
   }
 
   public static void turnRight(double power=1) {
-	robot.turnRight(power);
+    robot.turnRight(power);
   }
 
   public static void turnRight(double power, double time) {
-	robot.turnRight(power, time);
+    robot.turnRight(power, time);
   }
 
   public static void motors(double left, double right) {
-	robot.motors(left, right);
+    robot.motors(left, right);
   }
 
   public static void reboot() {
-	robot.reboot();
+    robot.reboot();
   }
 
   public static void beep(double duration, double frequency) {
-	robot.beep(duration, frequency);
+    robot.beep(duration, frequency);
   }
 
   public static void beep(double duration, double frequency, double frequency2) {
-	robot.beep(duration, frequency, frequency2);
+    robot.beep(duration, frequency, frequency2);
   }
 
   public static void beep(int duration, int frequency) {
@@ -475,21 +475,21 @@ public static class Myro {
   }
 
   public static void show(Graphics.Picture picture, 
-	  string title="Myro Camera") {
-	Graphics.WindowClass win = Graphics.makeWindow(title,
-		picture.width, picture.height);
-	picture.draw(win);
+      string title="Myro Camera") {
+    Graphics.WindowClass win = Graphics.makeWindow(title,
+        picture.width, picture.height);
+    picture.draw(win);
   }
 
   public static void setup() {
   }
 
   public static string getName() {
-	return robot.getName();
+    return robot.getName();
   }
 
   public static List getIRMessage() {
-	return robot.getIRMessage();
+    return robot.getIRMessage();
   }
 
   public static void sendIRMessage(string data) {
@@ -499,7 +499,7 @@ public static class Myro {
   }
 
   public static List getBlob() {
-	return robot.getBlob();
+    return robot.getBlob();
   }
 
   public static object getData(params int [] position) {
@@ -511,32 +511,32 @@ public static class Myro {
   }
 
   public static PythonDictionary getAll() {
-	return robot.getAll();
+    return robot.getAll();
   }
 
   public static PythonDictionary getInfo() {
-	return robot.getInfo();
+    return robot.getInfo();
   }
 
   public static object getObstacle(params object [] position) {
-	if (position == null || position.Length == 0)
-	  return robot.getObstacle();
-	else
-	  return robot.getObstacle(position);
+    if (position == null || position.Length == 0)
+      return robot.getObstacle();
+    else
+      return robot.getObstacle(position);
   }
 
   public static object getLight(params object [] position) {
-	if (position == null || position.Length == 0)
-	  return robot.getLight();
-	else
-	  return robot.getLight(position);
+    if (position == null || position.Length == 0)
+      return robot.getLight();
+    else
+      return robot.getLight(position);
   }
 
   public static object getIR(params object [] position) {
-	if (position == null || position.Length == 0)
-	  return robot.getIR();
-	else
-	  return robot.getIR(position);
+    if (position == null || position.Length == 0)
+      return robot.getIR();
+    else
+      return robot.getIR(position);
   }
 
   public static object getBright(string window=null) {
@@ -548,46 +548,46 @@ public static class Myro {
   }
 
   public static object getLine(params object [] position) {
-	if (position == null || position.Length == 0)
-	  return robot.getLine();
-	else
-	  return robot.getLine(position);
+    if (position == null || position.Length == 0)
+      return robot.getLine();
+    else
+      return robot.getLine(position);
   }
 
   public static object get(string sensor="all") {
-	return robot.get(sensor);
+    return robot.get(sensor);
   }
 
   public static object get(string sensor="all", params object [] position) {
-	return robot.get(sensor, position);
+    return robot.get(sensor, position);
   }
 
   public static string getPassword() {
-	return robot.getPassword();
+    return robot.getPassword();
   }
 
   public static double getBattery() {
-	return robot.getBattery();
+    return robot.getBattery();
   }
 
   public static PythonDictionary getConfig() {
-	return robot.getConfig();
+    return robot.getConfig();
   }
 
   public static int getStall() {
-	return robot.getStall();
+    return robot.getStall();
   }
 
   public static void setLED(string position, object value) {
-	robot.setLED(position, value);
+    robot.setLED(position, value);
   }
 
   public static void setLEDFront(object value) {
-	robot.setLEDFront(value);
+    robot.setLEDFront(value);
   }
 
   public static void setLEDBack(double value) {
-	robot.setLEDBack(value);
+    robot.setLEDBack(value);
   }
 
   public static void setEchoMode(int value) {
@@ -615,35 +615,35 @@ public static class Myro {
   }
 
   public static void setPassword(string password) {
-	robot.setPassword(password);
+    robot.setPassword(password);
   }
 
   public static string flipCoin() {
-	if (Random.random() < .5) {
-	  return "heads";
-	} else {
-	  return "tails";
-	}
+    if (Random.random() < .5) {
+      return "heads";
+    } else {
+      return "tails";
+    }
   }
 
   public static int randint(int start, int end) {
-	return (int)(Random.random() * (end - start + 1) + start);
+    return (int)(Random.random() * (end - start + 1) + start);
   }
 
   public static bool heads() {
-	return (flipCoin() == "heads");
+    return (flipCoin() == "heads");
   }
 
   public static bool tails() {
-	return (flipCoin() == "tails");
+    return (flipCoin() == "tails");
   }
 
   public static double randomNumber() {
-	return Random.random();
+    return Random.random();
   }
 
   public static double random() {
-	return Random.random();
+    return Random.random();
   }
 
   public static List getFilenames(string path) {
@@ -717,13 +717,13 @@ public static class Myro {
   }
 
   public static List getColorNames() {
-	return Graphics.getColorNames();
+    return Graphics.getColorNames();
   }
 
   public static Graphics.WindowClass Window(
-	  string title="Calico Graphics Window",
-	  int width=300, 
-	  int height=300) {
+      string title="Calico Graphics Window",
+      int width=300, 
+      int height=300) {
     return Graphics.makeWindow(title, width, height);
   }
 
@@ -734,10 +734,10 @@ public static class Myro {
         Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog("Select a color");
         fc.ShowAll();
         if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
-	  retval = new Graphics.Color(
+      retval = new Graphics.Color(
                (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Red))/Math.Pow(2,16) * 255.0),
-	       (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Green))/Math.Pow(2, 16) * 255.0),
-	       (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Blue))/Math.Pow(2, 16) * 255.0));
+           (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Green))/Math.Pow(2, 16) * 255.0),
+           (int)Math.Round(((double)((int)fc.ColorSelection.CurrentColor.Blue))/Math.Pow(2, 16) * 255.0));
         }
         fc.Destroy();
         ev.Set();
@@ -799,7 +799,7 @@ public static class Myro {
   class Joystick {
     Graphics.WindowClass window;
     Graphics.Line arrow = new Graphics.Line(new Graphics.Point(200, 200), 
-					    new Graphics.Point(200, 200));
+                        new Graphics.Point(200, 200));
     double x, y;
     double r, t;
     string state = "up";
@@ -812,29 +812,29 @@ public static class Myro {
       window.ButtonReleaseEvent  += onMouseUp;
       window.MotionNotifyEvent += onMouseMove;
       Graphics.Circle circle = new Graphics.Circle(
-			    new Graphics.Point(200, 200), radius);
+                new Graphics.Point(200, 200), radius);
       circle.fill = new Graphics.Color("white");
       circle.draw(window);
       circle = new Graphics.Circle(
-			    new Graphics.Point(200, 200), 10);
+                new Graphics.Point(200, 200), 10);
       circle.fill = new Graphics.Color("black");
       circle.draw(window);
       Graphics.Text text = new Graphics.Text(
-			new Graphics.Point(window.width/2, 
-					   12), "Forward");
+            new Graphics.Point(window.width/2, 
+                       12), "Forward");
       text.draw(window);
       text = new Graphics.Text(
-			new Graphics.Point(window.width/2, 
-					   window.height - 12), "Backward");
+            new Graphics.Point(window.width/2, 
+                       window.height - 12), "Backward");
       text.draw(window);
       text = new Graphics.Text(
-			new Graphics.Point(12, 
-					   window.height/2), "Left");
+            new Graphics.Point(12, 
+                       window.height/2), "Left");
       text.rotate(90);
       text.draw(window);
       text = new Graphics.Text(
-			new Graphics.Point(window.width - 12, 
-					   window.height/2), "Right");
+            new Graphics.Point(window.width - 12, 
+                       window.height/2), "Right");
       text.rotate(-90);
       text.draw(window);
       arrow.border = 5;
@@ -847,7 +847,7 @@ public static class Myro {
       arrow.points[1].y = 0;
       window.QueueDraw();
       if (getRobot() != null) {
-	getRobot().stop();
+    getRobot().stop();
       }
     }
 
@@ -865,26 +865,26 @@ public static class Myro {
       arrow.points[1].y = y - center_y;
       window.QueueDraw();
       if (getRobot() != null) {
-	getRobot().move(t, r);
+    getRobot().move(t, r);
       }
     }
 
     void onMouseMove(object obj, Gtk.MotionNotifyEventArgs args) {
       if (state == "down") {
-	x = args.Event.X;
-	y = args.Event.Y;
-	center_x = window.width/2;
-	center_y = window.height/2;
-	r = -(center_x - x) / (center_x - radius);
-	t = (center_y - y) / (center_y - radius);
-	r = Math.Min(Math.Max(r, -1), 1);
-	t = Math.Min(Math.Max(t, -1), 1);
-	arrow.points[1].x = x - center_x;
-	arrow.points[1].y = y - center_y;
-	window.QueueDraw();
-	if (getRobot() != null) {
-	  getRobot().move(t, r);
-	}
+    x = args.Event.X;
+    y = args.Event.Y;
+    center_x = window.width/2;
+    center_y = window.height/2;
+    r = -(center_x - x) / (center_x - radius);
+    t = (center_y - y) / (center_y - radius);
+    r = Math.Min(Math.Max(r, -1), 1);
+    t = Math.Min(Math.Max(t, -1), 1);
+    arrow.points[1].x = x - center_x;
+    arrow.points[1].y = y - center_y;
+    window.QueueDraw();
+    if (getRobot() != null) {
+      getRobot().move(t, r);
+    }
       }
     }
   }
@@ -982,75 +982,75 @@ public static class Myro {
   }
 
   public static object pickOne(params object [] items) {
-	if (items.Length == 1) {
-	  if (items[0] is int) {
-		return (int)(Random.random() * (int)items[0]);
-	  } else if (items[0] is IList<object>) {
-		int pos = (int)(Random.random() * ((IList<object>)items[0]).Count);
-		return ((IList<object>)items[0])[pos];
-	  } else {
-		throw new Exception("pickOne: unknown item type");
-	  }
-	} else {
-	  int pos = (int)(Random.random() * items.Length);
-	  return items[pos];
-	}
+    if (items.Length == 1) {
+      if (items[0] is int) {
+        return (int)(Random.random() * (int)items[0]);
+      } else if (items[0] is IList<object>) {
+        int pos = (int)(Random.random() * ((IList<object>)items[0]).Count);
+        return ((IList<object>)items[0])[pos];
+      } else {
+        throw new Exception("pickOne: unknown item type");
+      }
+    } else {
+      int pos = (int)(Random.random() * items.Length);
+      return items[pos];
+    }
   }
 
   public static void wait(double seconds) {
-	Thread.Sleep((int)(seconds * 1000));
+    Thread.Sleep((int)(seconds * 1000));
   }
 
   public static double currentTime() {
-	System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
-	return t.TotalSeconds;
+    System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
+    return t.TotalSeconds;
   }
 
   public static bool odd(int n) {
-	return ((n % 2) == 1);
+    return ((n % 2) == 1);
   }
 
   public static bool even(int n) {
-	return ((n % 2) == 0);
+    return ((n % 2) == 0);
   }
 
   public static Graphics.Picture takePicture(string mode="jpeg") {
-	return robot.takePicture(mode);
+    return robot.takePicture(mode);
   }
 
   public static void setSeed(int value) {
-	Random.seed = value;
+    Random.seed = value;
   }
 
   public static int getSeed() {
-	return Random.seed;
+    return Random.seed;
   }
 
   public class Randomizer {
-	int _seed; 
-	Random _random = new Random();
-	
-	public Randomizer(int seed=0) {
-	  if (seed != 0)
-		this.seed = seed;
-	}
+    int _seed; 
+    Random _random = new Random();
+    
+    public Randomizer(int seed=0) {
+      if (seed != 0)
+        this.seed = seed;
+    }
 
-	public int seed {
-	  get { 
-		return _seed; 
-	  }
-	  set { 
-		_seed = value; 
-		_random = new Random(_seed);
-	  }
-	}
+    public int seed {
+      get { 
+        return _seed; 
+      }
+      set { 
+        _seed = value; 
+        _random = new Random(_seed);
+      }
+    }
 
-	public double random() {
-	  return _random.NextDouble();
-	}
+    public double random() {
+      return _random.NextDouble();
+    }
 
   }
-	
+    
   // singleton
   public readonly static Randomizer Random = new Randomizer(); 
   
@@ -1196,16 +1196,16 @@ public static class Myro {
     
     public void playSong(List song, double speed) {
       foreach(IList tup in song) {
-	if (tup.Count == 2) {
-	  double f = (double)tup[0]; 
-	  double d = (double)tup[1];
-	  beep(d, f);
-	} else if (tup.Count == 3) {
-	  double f1 = (double)tup[0]; 
-	  double f2 = (double)tup[1]; 
-	  double d = (double)tup[2];
-	  beep(d * speed, f1, f2);
-	}
+    if (tup.Count == 2) {
+      double f = (double)tup[0]; 
+      double d = (double)tup[1];
+      beep(d, f);
+    } else if (tup.Count == 3) {
+      double f1 = (double)tup[0]; 
+      double f2 = (double)tup[1]; 
+      double d = (double)tup[2];
+      beep(d * speed, f1, f2);
+    }
       }
     }
     
@@ -1247,37 +1247,37 @@ public static class Myro {
       move(-speed, 0);
     }
     
-	public void backward(double speed, double interval) {
-	  move(-speed, 0);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
+    public void backward(double speed, double interval) {
+      move(-speed, 0);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
 
-	public void turnLeft(double speed) {
-	  move(0, speed);
-	}
+    public void turnLeft(double speed) {
+      move(0, speed);
+    }
 
-	public void turnLeft(double speed, double interval) {
-	  move(0, speed);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
+    public void turnLeft(double speed, double interval) {
+      move(0, speed);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
 
-	public void turnRight(double speed) {
-	  move(0, -speed);
-	}
-	
-	public void turnRight(double speed, double interval) {
-	  move(0, -speed);
-	  Thread.Sleep((int)(interval * 1000)); 
-	  stop();
-	}
-	
-	public void motors(double left, double right) {
-	  double trans = (right + left) / 2.0;
-      	  double rotate = (right - left) / 2.0;
-	  move(trans, rotate);
-	}
+    public void turnRight(double speed) {
+      move(0, -speed);
+    }
+    
+    public void turnRight(double speed, double interval) {
+      move(0, -speed);
+      Thread.Sleep((int)(interval * 1000)); 
+      stop();
+    }
+    
+    public void motors(double left, double right) {
+      double trans = (right + left) / 2.0;
+            double rotate = (right - left) / 2.0;
+      move(trans, rotate);
+    }
   }
 
   public static bool Contains(object item, params object[] items) {
@@ -1330,18 +1330,18 @@ public static class Myro {
     static byte GET_IMAGE=83 ; // the entire 256 x 192 image in YUYV format
     static byte GET_WINDOW=84 ; // the windowed image (followed by which window)
     static byte GET_DONGLE_L_IR=85 ; // number of returned pulses when
-									// left emitter is turned on
+                                    // left emitter is turned on
     static byte GET_DONGLE_C_IR=86 ; // number of returned pulses when
-									// center emitter is turned on
+                                    // center emitter is turned on
     static byte GET_DONGLE_R_IR=87 ; // number of returned pulses when
-									// right emitter is turned on
+                                    // right emitter is turned on
     static byte GET_WINDOW_LIGHT=88   ; // average intensity in the
-									   // user defined region
+                                       // user defined region
     static byte GET_BATTERY=89 ; // battery voltage
     static byte GET_SERIAL_MEM=90 ; // with the address returns the
-								   // value in serial memory
+                                   // value in serial memory
     //static byte GET_SCRIB_PROGRAM=91 ; // with offset, returns the
-									  // scribbler program buffer
+                                      // scribbler program buffer
     //static byte GET_CAM_PARAM=92; // with address, returns the camera parameter at that address
 
     static byte GET_BLOB=95;
@@ -1364,7 +1364,7 @@ public static class Myro {
     static byte SET_MOTORS=109 ;
     static byte SET_NAME1=110 ;
     static byte SET_NAME2=119;           // set name2 byte
-	static byte SET_LOUD=111;
+    static byte SET_LOUD=111;
     static byte SET_QUIET=112;
     static byte SET_SPEAKER=113;
     static byte SET_SPEAKER_2=114;
@@ -1376,7 +1376,7 @@ public static class Myro {
     //static byte SET_SERIAL_MEM=121;      // set serial memory byte
     //static byte SET_SCRIB_PROGRAM=122;   // set scribbler program memory byte
     //static byte SET_START_PROGRAM=123;   // initiate scribbler
-										// programming process 
+                                        // programming process 
     static byte SET_RESET_SCRIBBLER=124; // hard reset scribbler
     //static byte SET_SERIAL_ERASE=125;    // erase serial memory
     static byte SET_DIMMER_LED=126;      // set dimmer led
@@ -1384,13 +1384,13 @@ public static class Myro {
     static byte SET_FORWARDNESS=128;     // set direction of scribbler
     static byte SET_WHITE_BALANCE=129;   // turn on white balance on camera 
     static byte SET_NO_WHITE_BALANCE=130; // diable white balance on
-										 // camera (default)
+                                         // camera (default)
     static byte SET_CAM_PARAM=131;       // with address and value, 
-	                                    // sets the camera parameter
-	                                    // at that address
+                                        // sets the camera parameter
+                                        // at that address
 
     static byte GET_JPEG_GRAY_HEADER=135;
-	static byte GET_JPEG_GRAY_SCAN=136;
+    static byte GET_JPEG_GRAY_SCAN=136;
     static byte GET_JPEG_COLOR_HEADER=137;
     static byte GET_JPEG_COLOR_SCAN=138;
 
@@ -1405,26 +1405,26 @@ public static class Myro {
     static byte SET_IR_EMITTERS = 152;
 
     static byte PACKET_LENGTH     =  9;
-    	
-	// #### Camera Addresses ####
-	//static byte CAM_PID=0x0A;
-	//static byte CAM_PID_DEFAULT=0x76;
-	//static int	CAM_VER=0x0B;
-	//static byte CAM_VER_DEFAULT=0x48;
-	//static byte CAM_BRT=0x06;
-	//static byte CAM_BRT_DEFAULT=0x80;
-	//static byte CAM_EXP=0x10;
-	//static byte CAM_EXP_DEFAULT=0x41;
-	static byte CAM_COMA=0x12;
-	static byte CAM_COMA_DEFAULT=0x14;
-	static byte CAM_COMA_WHITE_BALANCE_ON= (byte)(CAM_COMA_DEFAULT |  (1 << 2));
-	//static byte CAM_COMA_WHITE_BALANCE_OFF=(byte)(CAM_COMA_DEFAULT & ~(1 << 2));
-	static byte CAM_COMB=0x13;
-	static byte CAM_COMB_DEFAULT=0xA3;
-	static byte CAM_COMB_GAIN_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 1));
-	//static byte CAM_COMB_GAIN_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 1));
-	static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
-	//static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
+        
+    // #### Camera Addresses ####
+    //static byte CAM_PID=0x0A;
+    //static byte CAM_PID_DEFAULT=0x76;
+    //static int    CAM_VER=0x0B;
+    //static byte CAM_VER_DEFAULT=0x48;
+    //static byte CAM_BRT=0x06;
+    //static byte CAM_BRT_DEFAULT=0x80;
+    //static byte CAM_EXP=0x10;
+    //static byte CAM_EXP_DEFAULT=0x41;
+    static byte CAM_COMA=0x12;
+    static byte CAM_COMA_DEFAULT=0x14;
+    static byte CAM_COMA_WHITE_BALANCE_ON= (byte)(CAM_COMA_DEFAULT |  (1 << 2));
+    //static byte CAM_COMA_WHITE_BALANCE_OFF=(byte)(CAM_COMA_DEFAULT & ~(1 << 2));
+    static byte CAM_COMB=0x13;
+    static byte CAM_COMB_DEFAULT=0xA3;
+    static byte CAM_COMB_GAIN_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 1));
+    //static byte CAM_COMB_GAIN_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 1));
+    static byte CAM_COMB_EXPOSURE_CONTROL_ON= (byte)(CAM_COMB_DEFAULT |  (1 << 0));
+    //static byte CAM_COMB_EXPOSURE_CONTROL_OFF=(byte)(CAM_COMB_DEFAULT & ~(1 << 0));
 
     public Scribbler(SerialPort serial) {
       setup();
@@ -1436,15 +1436,15 @@ public static class Myro {
     public Scribbler(string port, int baud) {
       serial = new SerialPort(port, baud);
       lock(serial) {
-	serial.ReadTimeout = 1000; // milliseconds
-	serial.WriteTimeout = 1000; // milliseconds
-	try {
-	  serial.Open();
-	} catch {
-	  Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
-					  port));
-	  return;
-	}
+        serial.ReadTimeout = 1000; // milliseconds
+        serial.WriteTimeout = 1000; // milliseconds
+        try {
+          serial.Open();
+        } catch {
+          Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+                  port));
+          return;
+        }
       }
       setup();
     }
@@ -1452,23 +1452,23 @@ public static class Myro {
     public override void setup() {
       PythonDictionary info = null;
       try {
-	info = getInfo();
+        info = getInfo();
       } catch {
-	Console.WriteLine("ERROR: unable to talk to Scribbler");
+        Console.WriteLine("ERROR: unable to talk to Scribbler");
       }
       if (info.Contains("fluke")) {
-	Console.WriteLine("You are using:\n   Fluke, version {0}", info["fluke"]);
-	if (info.Contains("robot") && info.Contains("robot-version")) {
-	  Console.WriteLine("   {0}, version {1}",
-			    (string)info["robot"], (string)info["robot-version"]);
-	}
+        Console.WriteLine("You are using:\n   Fluke, version {0}", info["fluke"]);
+    if (info.Contains("robot") && info.Contains("robot-version")) {
+      Console.WriteLine("   {0}, version {1}",
+                (string)info["robot"], (string)info["robot-version"]);
+    }
         dongle = (string)info["fluke"];
       } else if (info.Contains("dongle")) {
         dongle = (string)info["dongle"];
-	Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
+    Console.WriteLine("You are using:\n   Fluke, version {0}", info["dongle"]);
       } else {
-	dongle = null;
-	Console.WriteLine("You are using:\n   Scribbler without Fluke, version 0.0.0");
+    dongle = null;
+    Console.WriteLine("You are using:\n   Scribbler without Fluke, version 0.0.0");
       }
       flush();
       setEchoMode(0);
@@ -1486,7 +1486,7 @@ public static class Myro {
       if (dongle != null) {
         set_cam_param(Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
         set_cam_param(Scribbler.CAM_COMB,
-		      Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
+              Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
         // Config grayscale on window 0, 1, 2
         conf_gray_window(0, 2,   0, 128, 191, 1, 1);
         conf_gray_window(1, 64,  0, 190, 191, 1, 1);
@@ -1573,224 +1573,224 @@ public static class Myro {
         return Graphics.PyTuple(_fudge[0], _fudge[1], _fudge[2], _fudge[3]);
     }
 
-	// ------------------------------------------------------------
-	// Data structures:
-	public PythonDictionary dict(params object [] list) {
-	  // make a dictionary from a list
-	  PythonDictionary retval = new PythonDictionary();
-	  for (int i = 0; i < list.Length; i += 2) {
-		retval[list[i]] = list[i+1];
-	  }
-	  return retval;
-	}
-	
+    // ------------------------------------------------------------
+    // Data structures:
+    public PythonDictionary dict(params object [] list) {
+      // make a dictionary from a list
+      PythonDictionary retval = new PythonDictionary();
+      for (int i = 0; i < list.Length; i += 2) {
+        retval[list[i]] = list[i+1];
+      }
+      return retval;
+    }
+    
     public List list(params object [] items) {
-	  // make a list from an array
-	  List retval = new List();
-	  for (int i = 0; i < items.Length; i++) {
-		retval.append(items[i]);
-	  }
-	  return retval;
-	}
-	// ------------------------------------------------------------
+      // make a list from an array
+      List retval = new List();
+      for (int i = 0; i < items.Length; i++) {
+        retval.append(items[i]);
+      }
+      return retval;
+    }
+    // ------------------------------------------------------------
 
-	List bytes2ints(byte [] bytes) {
-	  List ints = new List();
-	  for (int i = 0; i < bytes.Length; i++) {
-		ints.append((int)bytes[i]);
-	  }
-	  return ints;
-	}
+    List bytes2ints(byte [] bytes) {
+      List ints = new List();
+      for (int i = 0; i < bytes.Length; i++) {
+        ints.append((int)bytes[i]);
+      }
+      return ints;
+    }
 
     byte [] GetBytes(byte value, int bytes=1) {
-	  byte [] retval = null;
-	  write_packet(value);
-	  read(Scribbler.PACKET_LENGTH); // read the echo
-	  retval = read(bytes);
-	  return retval;
-	}
+      byte [] retval = null;
+      write_packet(value);
+      read(Scribbler.PACKET_LENGTH); // read the echo
+      retval = read(bytes);
+      return retval;
+    }
 
     List GetWord(byte value, int bytes=1) {
-	  List retval = new List();
-	  write_packet(value);
-	  read(Scribbler.PACKET_LENGTH); // read the echo
-	  byte [] retvalBytes = read(bytes);
-	  for (int p = 0; p < retvalBytes.Length; p += 2) {
-	    retval.append(retvalBytes[p] << 8 | retvalBytes[p + 1]);
-	  }
-	  return retval;
-	}
+      List retval = new List();
+      write_packet(value);
+      read(Scribbler.PACKET_LENGTH); // read the echo
+      byte [] retvalBytes = read(bytes);
+      for (int p = 0; p < retvalBytes.Length; p += 2) {
+        retval.append(retvalBytes[p] << 8 | retvalBytes[p + 1]);
+      }
+      return retval;
+    }
 
     public override object get(string sensor="all") {
-	  return get(sensor, null);
-	}
+      return get(sensor, null);
+    }
 
     public override object get(string sensor="all", params object [] position) {
-	  object retval = null;
-	  sensor = sensor.ToLower();
-	  if (sensor == "config") {
-		if (dongle == null) {
-		  return dict("ir", 2, "line", 2, "stall", 1, "light", 3);
-		} else {
-		  return dict("ir", 2, "line", 2, "stall", 1, "light", 3,
-			  "battery", 1, "obstacle", 3, "bright", 3);
-		}
-	  } else if (sensor == "stall") {
-		// lastSensors are the single byte sensors
-		_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
-		// returned as bytes
-		return byte_to_int(_lastSensors[10]);
-	  } else if (sensor == "forwardness") {
-		if (read_mem(0, 0) != 0xDF) {
-		  retval = "fluke-forward";
-		} else {
-		  retval = "scribbler-forward";
-		}
-		return retval;
-	  } else if (sensor == "startsong") {
-		//TODO: need to get this from flash memory
-		return "close-encounters";
-	  } else if (sensor == "version") {
-		//TODO: just return this version for now; get from flash
-		return REVISION.Split()[1];
-	  } else if (sensor == "info") {
-		return getInfo();
-	  } else if (sensor == "name") {
-		string s = "";
-		byte [] c1 = GetBytes(Scribbler.GET_NAME1, 8);
-		byte [] c2 = GetBytes(Scribbler.GET_NAME2, 8);
-		foreach (char c in c1)
-		  if ((int)c >= (int)'0' & (int)c <= 'z')
-			s += c;
-		foreach (char c in c2)
-		  if ((int)c >= (int)'0' & (int)c <= 'z')
-			s += c;
-		//c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
-		return s;
-	  } else if (sensor == "password") {
-		string s = "";
-		byte [] c1 = GetBytes(Scribbler.GET_PASS1, 8);
-		byte [] c2 = GetBytes(Scribbler.GET_PASS2, 8);
-		foreach (char c in c1)
-		  if ((int)c >= (int)'0' & (int)c <= 'z')
-			s += c;
-		foreach (char c in c2)
-		  if ((int)c >= (int)'0' & (int)c <= 'z')
-			s += c;
-		return s;
-	  } else if (sensor == "volume") {
-		return volume;
-	  } else if (sensor == "battery") {
-		return getBattery();
-	  } else if (sensor == "blob") {
-		return getBlob();
-	  } else {
-		if (position == null) {
-		  if (sensor == "light") {
-			return GetWord(Scribbler.GET_LIGHT_ALL, 6);
-		  } else if (sensor == "line") {
-			return bytes2ints(GetBytes(Scribbler.GET_LINE_ALL, 2));
-		  } else if (sensor == "ir") {
-			return bytes2ints(GetBytes(Scribbler.GET_IR_ALL, 2));
-		  } else if (sensor == "obstacle") {
-			return list(getObstacle1("left"), 
-				getObstacle1("center"), 
-				getObstacle1("right"));
-		  } else if (sensor == "bright") {
-			return list(getBright("left"), 
-				getBright("middle"), 
-				getBright("right"));
+      object retval = null;
+      sensor = sensor.ToLower();
+      if (sensor == "config") {
+        if (dongle == null) {
+          return dict("ir", 2, "line", 2, "stall", 1, "light", 3);
+        } else {
+          return dict("ir", 2, "line", 2, "stall", 1, "light", 3,
+              "battery", 1, "obstacle", 3, "bright", 3);
+        }
+      } else if (sensor == "stall") {
+        // lastSensors are the single byte sensors
+        _lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
+        // returned as bytes
+        return byte_to_int(_lastSensors[10]);
+      } else if (sensor == "forwardness") {
+        if (read_mem(0, 0) != 0xDF) {
+          retval = "fluke-forward";
+        } else {
+          retval = "scribbler-forward";
+        }
+        return retval;
+      } else if (sensor == "startsong") {
+        //TODO: need to get this from flash memory
+        return "close-encounters";
+      } else if (sensor == "version") {
+        //TODO: just return this version for now; get from flash
+        return REVISION.Split()[1];
+      } else if (sensor == "info") {
+        return getInfo();
+      } else if (sensor == "name") {
+        string s = "";
+        byte [] c1 = GetBytes(Scribbler.GET_NAME1, 8);
+        byte [] c2 = GetBytes(Scribbler.GET_NAME2, 8);
+        foreach (char c in c1)
+          if ((int)c >= (int)'0' & (int)c <= 'z')
+            s += c;
+        foreach (char c in c2)
+          if ((int)c >= (int)'0' & (int)c <= 'z')
+            s += c;
+        //c = string.join([chr(x) for x in c if "0" <= chr(x) <= "z"], '').strip();
+        return s;
+      } else if (sensor == "password") {
+        string s = "";
+        byte [] c1 = GetBytes(Scribbler.GET_PASS1, 8);
+        byte [] c2 = GetBytes(Scribbler.GET_PASS2, 8);
+        foreach (char c in c1)
+          if ((int)c >= (int)'0' & (int)c <= 'z')
+            s += c;
+        foreach (char c in c2)
+          if ((int)c >= (int)'0' & (int)c <= 'z')
+            s += c;
+        return s;
+      } else if (sensor == "volume") {
+        return volume;
+      } else if (sensor == "battery") {
+        return getBattery();
+      } else if (sensor == "blob") {
+        return getBlob();
+      } else {
+        if (position == null) {
+          if (sensor == "light") {
+            return GetWord(Scribbler.GET_LIGHT_ALL, 6);
+          } else if (sensor == "line") {
+            return bytes2ints(GetBytes(Scribbler.GET_LINE_ALL, 2));
+          } else if (sensor == "ir") {
+            return bytes2ints(GetBytes(Scribbler.GET_IR_ALL, 2));
+          } else if (sensor == "obstacle") {
+            return list(getObstacle1("left"), 
+                getObstacle1("center"), 
+                getObstacle1("right"));
+          } else if (sensor == "bright") {
+            return list(getBright("left"), 
+                getBright("middle"), 
+                getBright("right"));
           } else if (sensor == "data") {
             return getData();
-		  } else if (sensor == "all") {
-			_lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
-			// returned as bytes
-			// single bit sensors
-			if (dongle == null) {
-			  return dict(
-				  "light", list(
-					  (int)(_lastSensors[2] << 8 | _lastSensors[3]), 
-					  (int)(_lastSensors[4] << 8 | _lastSensors[5]), 
-					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
-				  "ir", list((int)_lastSensors[0], (int)_lastSensors[1]), 
-				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
-				  "stall",byte_to_int(_lastSensors[10]));
-			} else {
-			  return dict(
-				  "light", list(
-					  (int)(_lastSensors[2] << 8 |_lastSensors[3]), 
-					  (int)(_lastSensors[4] << 8 |_lastSensors[5]), 
-					  (int)(_lastSensors[6] << 8 |_lastSensors[7])),
-				  "ir", list((int)_lastSensors[0],(int)_lastSensors[1]), 
-				  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
-				  "stall", byte_to_int(_lastSensors[10]),
-				  "obstacle", list(
-					  getObstacle1("left"), 
-					  getObstacle1("center"), 
-					  getObstacle1("right")),
-				  "bright", list(
-					  getBright("left"), 
-					  getBright("middle"), 
-					  getBright("right")),
-				  "blob", getBlob(),
-				  "battery", getBattery()
-						  );
-			}
-		  } else {
-			throw new Exception(String.Format("invalid sensor name: '{0}'", 
-					sensor));
-		  }
-		}
-		List retvals = list();
-		foreach (object pos in position) {
-		  //System.Console.WriteLine("pos = {0}", pos);
-		  if (sensor == "light") {
-			List values = GetWord(Scribbler.GET_LIGHT_ALL, 6);
-			if (Contains(pos, 0, "left")) {
-			  retvals.append((int)values[0]);
-			} else if (Contains(pos, 1, "middle", "center")) {
-			  retvals.append((int)values[1]);
-			} else if (Contains(pos, 2, "right")) {
-			  retvals.append((int)values[2]);
-			} else if (pos == null | (string)pos == "all") {
-			  retvals.append(values);
-			} 
-		  } else if (sensor == "ir") {
-			byte [] values = GetBytes(Scribbler.GET_IR_ALL, 2);
-			if (Contains(pos, 0, "left")) {
-			  retvals.append((int)values[0]);
-			} else if (Contains(pos, 1, "right")) {
-			  retvals.append((int)values[1]);
-			} else if (pos == null | (string)pos == "all") {
-			  retvals.append(values);
-			}
-		  } else if (sensor == "line") {
-			byte [] values = GetBytes(Scribbler.GET_LINE_ALL, 2);
-			if (Contains(pos, 0, "left")) {
-			  retvals.append((int)values[0]);
-			} else if (Contains(pos, 1, "right")) {
-			  retvals.append((int)values[1]);
-			}
+          } else if (sensor == "all") {
+            _lastSensors = GetBytes(Scribbler.GET_ALL, 11); 
+            // returned as bytes
+            // single bit sensors
+            if (dongle == null) {
+              return dict(
+                  "light", list(
+                      (int)(_lastSensors[2] << 8 | _lastSensors[3]), 
+                      (int)(_lastSensors[4] << 8 | _lastSensors[5]), 
+                      (int)(_lastSensors[6] << 8 |_lastSensors[7])),
+                  "ir", list((int)_lastSensors[0], (int)_lastSensors[1]), 
+                  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
+                  "stall",byte_to_int(_lastSensors[10]));
+            } else {
+              return dict(
+                  "light", list(
+                      (int)(_lastSensors[2] << 8 |_lastSensors[3]), 
+                      (int)(_lastSensors[4] << 8 |_lastSensors[5]), 
+                      (int)(_lastSensors[6] << 8 |_lastSensors[7])),
+                  "ir", list((int)_lastSensors[0],(int)_lastSensors[1]), 
+                  "line", list((int)_lastSensors[8],(int)_lastSensors[9]), 
+                  "stall", byte_to_int(_lastSensors[10]),
+                  "obstacle", list(
+                      getObstacle1("left"), 
+                      getObstacle1("center"), 
+                      getObstacle1("right")),
+                  "bright", list(
+                      getBright("left"), 
+                      getBright("middle"), 
+                      getBright("right")),
+                  "blob", getBlob(),
+                  "battery", getBattery()
+                          );
+            }
+          } else {
+            throw new Exception(String.Format("invalid sensor name: '{0}'", 
+                    sensor));
+          }
+        }
+        List retvals = list();
+        foreach (object pos in position) {
+          //System.Console.WriteLine("pos = {0}", pos);
+          if (sensor == "light") {
+            List values = GetWord(Scribbler.GET_LIGHT_ALL, 6);
+            if (Contains(pos, 0, "left")) {
+              retvals.append((int)values[0]);
+            } else if (Contains(pos, 1, "middle", "center")) {
+              retvals.append((int)values[1]);
+            } else if (Contains(pos, 2, "right")) {
+              retvals.append((int)values[2]);
+            } else if (pos == null | (string)pos == "all") {
+              retvals.append(values);
+            } 
+          } else if (sensor == "ir") {
+            byte [] values = GetBytes(Scribbler.GET_IR_ALL, 2);
+            if (Contains(pos, 0, "left")) {
+              retvals.append((int)values[0]);
+            } else if (Contains(pos, 1, "right")) {
+              retvals.append((int)values[1]);
+            } else if (pos == null | (string)pos == "all") {
+              retvals.append(values);
+            }
+          } else if (sensor == "line") {
+            byte [] values = GetBytes(Scribbler.GET_LINE_ALL, 2);
+            if (Contains(pos, 0, "left")) {
+              retvals.append((int)values[0]);
+            } else if (Contains(pos, 1, "right")) {
+              retvals.append((int)values[1]);
+            }
           } else if (sensor == "data") {
             retvals.append(getData((int)pos));
           } else if (sensor == "obstacle") {
             retvals.append(getObstacle1(pos));
-		  } else if (sensor == "bright") {
-			retvals.append(getBright((string)pos));
-		  } else {
-			throw new Exception(String.Format("invalid sensor name: '{0}'",
-					sensor));
-		  }
-		}
-		if (retvals.__len__() == 0) {
-		  return null;
-		} else if (retvals.__len__() == 1) {
-		  return retvals[0];
-		} else {
-		  return retvals;
-		}
-	  }
-	}
+          } else if (sensor == "bright") {
+            retvals.append(getBright((string)pos));
+          } else {
+            throw new Exception(String.Format("invalid sensor name: '{0}'",
+                    sensor));
+          }
+        }
+        if (retvals.__len__() == 0) {
+          return null;
+        } else if (retvals.__len__() == 1) {
+          return retvals[0];
+        } else {
+          return retvals;
+        }
+      }
+    }
 
     public object getData(int position) {
       int [] ints = new int[1];
@@ -1799,151 +1799,151 @@ public static class Myro {
     }
 
     public object getData(object [] position) {
-	  int [] ints = new int[position.Length];
-	  for (int i=0; i < position.Length; i++) {
-		ints[i] = (int)position[i];
-	  }
-	  return getData(ints);
-	}
-	
+      int [] ints = new int[position.Length];
+      for (int i=0; i < position.Length; i++) {
+        ints[i] = (int)position[i];
+      }
+      return getData(ints);
+    }
+    
     public override object getData(params int [] position) {
-	  if (position == null || position.Length == 0) {
-		position = new int[] {0, 1, 2, 3, 4, 5, 6, 7 };
-	  } 
-	  List retval = list();
-	  foreach (int p in position)
-		retval.append((int)GetBytes(Scribbler.GET_DATA, 8)[p]);
-	  if (retval.Count == 1) 
-		return (int)retval[0];
-	  else
-		return retval;
-	}
+      if (position == null || position.Length == 0) {
+        position = new int[] {0, 1, 2, 3, 4, 5, 6, 7 };
+      } 
+      List retval = list();
+      foreach (int p in position)
+        retval.append((int)GetBytes(Scribbler.GET_DATA, 8)[p]);
+      if (retval.Count == 1) 
+        return (int)retval[0];
+      else
+        return retval;
+    }
 
-	public override void setLED(string position, object value) {
-	  set("led", position, value);
-	}
+    public override void setLED(string position, object value) {
+      set("led", position, value);
+    }
 
-	public override void setLEDFront(object value) {
-	  if (isTrue(value)) {
-		write(Scribbler.SET_DONGLE_LED_ON);
-	  } else {
-		write(Scribbler.SET_DONGLE_LED_OFF);
-	  }
-	}
+    public override void setLEDFront(object value) {
+      if (isTrue(value)) {
+        write(Scribbler.SET_DONGLE_LED_ON);
+      } else {
+        write(Scribbler.SET_DONGLE_LED_OFF);
+      }
+    }
 
-	public override void setLEDBack(double value) {
-	  if (value > 1) {
-		value = 1;
-	  } else if (value <= 0) {
-		value = 0;
-	  } else {
-		value = (int)(value * (255 - 170) + 170); // scale
-	  }
-	  write(Scribbler.SET_DIMMER_LED);
-	  write((byte)value);
-	}
+    public override void setLEDBack(double value) {
+      if (value > 1) {
+        value = 1;
+      } else if (value <= 0) {
+        value = 0;
+      } else {
+        value = (int)(value * (255 - 170) + 170); // scale
+      }
+      write(Scribbler.SET_DIMMER_LED);
+      write((byte)value);
+    }
     public override void setVolume(object volume) {
         set("volume", volume, null);
     }
 
-	public override void setName(string name) {
-	  name = pad(name, 16);
-	  string name1 = name.Substring(0, 8);
-	  string name2 = name.Substring(8, 8);
-	  set(Scribbler.SET_NAME1, name1);
-	  set(Scribbler.SET_NAME2, name2);
-	}
-	
-	public override void setWhiteBalance(object value) {
-	  if (isTrue(value)) {
-		write(Scribbler.SET_WHITE_BALANCE);
-	  } else {
-		write(Scribbler.SET_NO_WHITE_BALANCE);
-	  }
-	}
+    public override void setName(string name) {
+      name = pad(name, 16);
+      string name1 = name.Substring(0, 8);
+      string name2 = name.Substring(8, 8);
+      set(Scribbler.SET_NAME1, name1);
+      set(Scribbler.SET_NAME2, name2);
+    }
+    
+    public override void setWhiteBalance(object value) {
+      if (isTrue(value)) {
+        write(Scribbler.SET_WHITE_BALANCE);
+      } else {
+        write(Scribbler.SET_NO_WHITE_BALANCE);
+      }
+    }
 
-	public override void setIRPower(int power) {
-	  write(Scribbler.SET_DONGLE_IR);
-	  write((byte)power);
-	}
+    public override void setIRPower(int power) {
+      write(Scribbler.SET_DONGLE_IR);
+      write((byte)power);
+    }
 
     public override void setEchoMode(int value) {
-	  if (isTrue(value)) {
-		set(Scribbler.SET_ECHO_MODE, 1);
-	  } else {
+      if (isTrue(value)) {
+        set(Scribbler.SET_ECHO_MODE, 1);
+      } else {
         set(Scribbler.SET_ECHO_MODE, 0);
-	  }
-	}
+      }
+    }
 
     byte [] _get(byte value, int bytes, string mode) {
-	  write(value);
-	  read(Scribbler.PACKET_LENGTH); // read the echo
-	  if (mode == "byte") {
-		return read(bytes);
-	  } else if (mode == "word") {
-		byte [] retvalBytes = read(bytes);
-		byte [] retval = new byte[retvalBytes.Length/2];
-		for (int p=0; p < retvalBytes.Length; p+=2) {
-		  retval[p/2] = (byte)(retvalBytes[p] << 8 | retvalBytes[p + 1]);
-		}
-		return retval;
-	  }
-	  return null;
-	}
+      write(value);
+      read(Scribbler.PACKET_LENGTH); // read the echo
+      if (mode == "byte") {
+        return read(bytes);
+      } else if (mode == "word") {
+        byte [] retvalBytes = read(bytes);
+        byte [] retval = new byte[retvalBytes.Length/2];
+        for (int p=0; p < retvalBytes.Length; p+=2) {
+          retval[p/2] = (byte)(retvalBytes[p] << 8 | retvalBytes[p + 1]);
+        }
+        return retval;
+      }
+      return null;
+    }
 
-	public override void setData(int position, int value) {
+    public override void setData(int position, int value) {
       byte [] data = GetBytes(Scribbler.GET_DATA, 8);
-	  data[position] = (byte)value;
-	  set(Scribbler.SET_DATA, data);
-	}
+      data[position] = (byte)value;
+      set(Scribbler.SET_DATA, data);
+    }
 
-	public override void setPassword(string password) {
-	  password = pad(password, 16);
-	  string pass1 = password.Substring(0, 8);
-	  string pass2 = password.Substring(8, 8);
-	  set(Scribbler.SET_PASS1, pass1);
-	  set(Scribbler.SET_PASS2, pass2);
-	}
+    public override void setPassword(string password) {
+      password = pad(password, 16);
+      string pass1 = password.Substring(0, 8);
+      string pass2 = password.Substring(8, 8);
+      set(Scribbler.SET_PASS1, pass1);
+      set(Scribbler.SET_PASS2, pass2);
+    }
 
     public override void setForwardness(object direction) {
-	  if (Contains(direction, "fluke-forward", 1)) {
-		direction = 1;
-	  } else if (Contains(direction, "scribbler-forward", 0)) {
-		direction = 0;
-	  } else {
-		throw new Exception("unknown direction: should be 'fluke-forward' or 'scribbler-forward'");
-	  }
-	  write(Scribbler.SET_FORWARDNESS);
-	  write((byte)direction);
-	}
+      if (Contains(direction, "fluke-forward", 1)) {
+        direction = 1;
+      } else if (Contains(direction, "scribbler-forward", 0)) {
+        direction = 0;
+      } else {
+        throw new Exception("unknown direction: should be 'fluke-forward' or 'scribbler-forward'");
+      }
+      write(Scribbler.SET_FORWARDNESS);
+      write((byte)direction);
+    }
 
-	public bool isTrue(object value) {
-	  if (value as string != null) {
-		return ((string)value == "on" ||
-			(string)value == "1");
-	  } else if (value as int? != null) {
-		return ((int)value == 1);
-	  } else 
-		return false;
-	}
+    public bool isTrue(object value) {
+      if (value as string != null) {
+        return ((string)value == "on" ||
+            (string)value == "1");
+      } else if (value as int? != null) {
+        return ((int)value == 1);
+      } else 
+        return false;
+    }
 
     public void set(byte value, string s) {
-	  byte [] buffer = new byte[s.Length + 1];
-	  buffer[0] = value;
-	  for (int i = 0; i < s.Length; i++) {
-		buffer[i + 1] = (byte)s[i];
-	  }
-	  set(buffer);
-	}
+      byte [] buffer = new byte[s.Length + 1];
+      buffer[0] = value;
+      for (int i = 0; i < s.Length; i++) {
+        buffer[i + 1] = (byte)s[i];
+      }
+      set(buffer);
+    }
 
     public void set(byte value, byte [] bytes) {
-	  byte [] buffer = new byte[bytes.Length + 1];
-	  buffer[0] = value;
-	  for (int i = 0; i < bytes.Length; i++) {
-		buffer[i + 1] = (byte)bytes[i];
-	  }
-	  set(buffer);
-	}
+      byte [] buffer = new byte[bytes.Length + 1];
+      buffer[0] = value;
+      for (int i = 0; i < bytes.Length; i++) {
+        buffer[i + 1] = (byte)bytes[i];
+      }
+      set(buffer);
+    }
 
     public void set(params byte [] values) {
       write_packet(values);
@@ -1953,71 +1953,71 @@ public static class Myro {
   
     public void set(string item, object position, object value) {
       if (item == "led") {
-	if ((string)position == "center") {
-	  if (isTrue(value))
-	    set(Scribbler.SET_LED_CENTER_ON);
-	  else
-	    set(Scribbler.SET_LED_CENTER_OFF);
-	} else if ((string)position == "left") {
-	  if (isTrue(value)) 
-	    set(Scribbler.SET_LED_LEFT_ON);
-	  else             
-	    set(Scribbler.SET_LED_LEFT_OFF);
-	} else if ((string)position == "right") {
-	  if (isTrue(value)) 
-	    set(Scribbler.SET_LED_RIGHT_ON);
-	  else
-	    set(Scribbler.SET_LED_RIGHT_OFF);
-	} else if ((string)position == "front") {
-	  setLEDFront(value);
-	} else if ((string)position == "back") {
-	  setLEDBack((double)value);
-	} else if ((string)position == "all") {
-	  if (isTrue(value)) 
-	    set(Scribbler.SET_LED_ALL_ON);
-	  else
-	    set(Scribbler.SET_LED_ALL_OFF);
-	} else {
-	  throw new Exception(String.Format("no such LED: '{0}'", position));
-	}
+    if ((string)position == "center") {
+      if (isTrue(value))
+        set(Scribbler.SET_LED_CENTER_ON);
+      else
+        set(Scribbler.SET_LED_CENTER_OFF);
+    } else if ((string)position == "left") {
+      if (isTrue(value)) 
+        set(Scribbler.SET_LED_LEFT_ON);
+      else             
+        set(Scribbler.SET_LED_LEFT_OFF);
+    } else if ((string)position == "right") {
+      if (isTrue(value)) 
+        set(Scribbler.SET_LED_RIGHT_ON);
+      else
+        set(Scribbler.SET_LED_RIGHT_OFF);
+    } else if ((string)position == "front") {
+      setLEDFront(value);
+    } else if ((string)position == "back") {
+      setLEDBack((double)value);
+    } else if ((string)position == "all") {
+      if (isTrue(value)) 
+        set(Scribbler.SET_LED_ALL_ON);
+      else
+        set(Scribbler.SET_LED_ALL_OFF);
+    } else {
+      throw new Exception(String.Format("no such LED: '{0}'", position));
+    }
       } else if (item == "name") {
-	setName((string)position);
+    setName((string)position);
       } else if (item == "whitebalance") {
-	setWhiteBalance((string)position);
+    setWhiteBalance((string)position);
       } else if (item == "irpower") {
-	setIRPower((int)position);
+    setIRPower((int)position);
       } else if (item == "volume") {
-	if (isTrue(position)){
-	  volume = 1;
-	  set(Scribbler.SET_LOUD);
-	} else {
-	  volume = 0;
-	  set(Scribbler.SET_QUIET);
-	}
+    if (isTrue(position)){
+      volume = 1;
+      set(Scribbler.SET_LOUD);
+    } else {
+      volume = 0;
+      set(Scribbler.SET_QUIET);
+    }
       } else if (item == "startsong") {
-	startsong = (string)position;
+    startsong = (string)position;
       } else if (item == "echomode") {
-		setEchoMode((int)position);
-	  } else if (item == "data") {
-		setData((int)position, (byte)value);
-	  } else if (item == "password") {
-		setPassword((string)position);
-	  } else if (item == "forwardness") {
-		setForwardness((string)position);
-	  } else {
-		throw new Exception(String.Format("invalid set item name: '{0}'", item));
-	  }
-	}
+        setEchoMode((int)position);
+      } else if (item == "data") {
+        setData((int)position, (byte)value);
+      } else if (item == "password") {
+        setPassword((string)position);
+      } else if (item == "forwardness") {
+        setForwardness((string)position);
+      } else {
+        throw new Exception(String.Format("invalid set item name: '{0}'", item));
+      }
+    }
 
-	public override object getObstacle(params object [] position) {
-	  if (position == null || position.Length == 0) {
-		return get("obstacle");
-	  } else {
-		return get("obstacle", position);
-	  }
-	}
+    public override object getObstacle(params object [] position) {
+      if (position == null || position.Length == 0) {
+        return get("obstacle");
+      } else {
+        return get("obstacle", position);
+      }
+    }
 
-	int getObstacle1(object position) {
+    int getObstacle1(object position) {
       if (position as string != null) {
         string value = (string)position;
         if (value == "left") {
@@ -2044,29 +2044,29 @@ public static class Myro {
       return read_2byte();
     }
 
-	public override object getLight(params object [] position) {
-	  if (position == null || position.Length == 0) {
-		return get("light");
-	  } else {
-		return get("light", position);
-	  }
-	}
+    public override object getLight(params object [] position) {
+      if (position == null || position.Length == 0) {
+        return get("light");
+      } else {
+        return get("light", position);
+      }
+    }
 
-	public override object getIR(params object [] position) {
-	  if (position == null || position.Length == 0) {
-		return get("ir");
-	  } else {
-		return get("ir", position);
-	  }
-	}
+    public override object getIR(params object [] position) {
+      if (position == null || position.Length == 0) {
+        return get("ir");
+      } else {
+        return get("ir", position);
+      }
+    }
 
-	public override object getLine(params object [] position) {
-	  if (position == null || position.Length == 0) {
-		return get("line");
-	  } else {
-		return get("line", position);
-	  }
-	}
+    public override object getLine(params object [] position) {
+      if (position == null || position.Length == 0) {
+        return get("line");
+      } else {
+        return get("line", position);
+      }
+    }
 
     public override object getBright(int window) {
       write(Scribbler.GET_WINDOW_LIGHT);
@@ -2074,106 +2074,115 @@ public static class Myro {
       return read_3byte(); // (63.0 * 192.0 * 255.0)
     }
 
-	public override object getBright(string window=null) {
+    public override object getBright(string window=null) {
       byte byte_window = 0;
-	  if (window == null || (string)window == "all") {
-		return get("bright");
-	  } else if (window as string != null) {
-		if ((string)window == "left") {
-		  byte_window = 0;
-		} else if ((string)window == "middle" || (string)window == "center") {
-		  byte_window = 1;
-		} else if ((string)window == "right") {
-		  byte_window = 2;
-		} else {
-		  throw new Exception();
-		}
-	  }
-	  write(Scribbler.GET_WINDOW_LIGHT);
-	  write(byte_window);
-	  return read_3byte(); // (63.0 * 192.0 * 255.0)
-	}
+      if (window == null || (string)window == "all") {
+        return get("bright");
+      } else if (window as string != null) {
+        if ((string)window == "left") {
+          byte_window = 0;
+        } else if ((string)window == "middle" || (string)window == "center") {
+          byte_window = 1;
+        } else if ((string)window == "right") {
+          byte_window = 2;
+        } else {
+          throw new Exception();
+        }
+      }
+      write(Scribbler.GET_WINDOW_LIGHT);
+      write(byte_window);
+      return read_3byte(); // (63.0 * 192.0 * 255.0)
+    }
 
-	public override List getBlob() {
-	  write(Scribbler.GET_BLOB);
-	  int numpixs = read_2byte();
-	  int xloc = (int)read_byte();
-	  int yloc = (int)read_byte();
-	  return list(numpixs, xloc, yloc);
-	}
+    public override List getBlob() {
+      write(Scribbler.GET_BLOB);
+      int numpixs = read_2byte();
+      int xloc = (int)read_byte();
+      int yloc = (int)read_byte();
+      return list(numpixs, xloc, yloc);
+    }
 
-	public int read_2byte() {
-	  byte hbyte = read_byte();
-	  byte lbyte = read_byte();
-	  return (int)((hbyte << 8) | lbyte);
-	}
+    public int read_2byte() {
+      byte hbyte = read_byte();
+      byte lbyte = read_byte();
+      return (int)((hbyte << 8) | lbyte);
+    }
 
-	public int read_3byte() {
-	  byte hbyte = read_byte();
-	  byte mbyte = read_byte();
-	  byte lbyte = read_byte();
-	  return (int)((hbyte << 16)| (mbyte << 8) | lbyte);
-	}
+    public int read_3byte() {
+      byte hbyte = read_byte();
+      byte mbyte = read_byte();
+      byte lbyte = read_byte();
+      return (int)((hbyte << 16)| (mbyte << 8) | lbyte);
+    }
 
     public override PythonDictionary getInfo() {
+	  Console.WriteLine("1");
       PythonDictionary retDict = new PythonDictionary();
       int old = serial.ReadTimeout; // milliseconds
+	  Console.WriteLine("2");
       string retval;
       // serial.setTimeout(4)
       lock(serial)
-	serial.ReadTimeout = 4000; // milliseconds
+        serial.ReadTimeout = 4000; // milliseconds
+	  Console.WriteLine("3");
       flush();
+	  Console.WriteLine("4");
       // have to do this twice since sometime the first echo isn't
       // echoed correctly (spaces) from the scribbler
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
+	  Console.WriteLine("5");
       lock(serial) {
-	try {
-	  retval = serial.ReadLine();
-	} catch {
-	  serial.ReadTimeout = old;
-	  return retDict;
-	}
+        try {
+          retval = serial.ReadLine();
+        } catch {
+          serial.ReadTimeout = old;
+          return retDict;
+        }
       }
       //#print "Got", retval
       
+	  Console.WriteLine("6");
       Thread.Sleep(100); 
       //time.sleep(.1)
-      
+	  Console.WriteLine("7");
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
       lock(serial) {
-	try {
-	  retval = serial.ReadLine();
-	} catch {
-	  serial.ReadTimeout = old;
-	  return retDict;
-	}
+        try {
+          retval = serial.ReadLine();
+        } catch {
+          serial.ReadTimeout = old;
+          return retDict;
+        }
       }
+	  Console.WriteLine("8");
       if (retval.Length == 0) {
-	lock(serial) 
-	  serial.ReadTimeout = old;
-	return retDict;
+        lock(serial) 
+          serial.ReadTimeout = old;
+        return retDict;
       }
       
       if (retval[0] == 'P' | retval[0] == 'p') {
-	retval = retval.Substring(1);
+        retval = retval.Substring(1);
       }
       
       if (retval[0] == 'P' | retval[0] == 'p') {
-	retval = retval.Substring(1);
+        retval = retval.Substring(1);
       }
       
       foreach (string pair in retval.Split(',')) {
-	if (pair.Contains(":")) {
-	  string [] split_pair = pair.Split(':');
-	  string it = split_pair[0]; string value = split_pair[1];
-	  retDict[it.ToLower().Trim()] = value.Trim();
-	}
+        if (pair.Contains(":")) {
+          string [] split_pair = pair.Split(':');
+          string it = split_pair[0]; string value = split_pair[1];
+          retDict[it.ToLower().Trim()] = value.Trim();
+        }
       }
+	  Console.WriteLine("9");
       lock(serial)
-	serial.ReadTimeout = old;
+        serial.ReadTimeout = old;
+	  Console.WriteLine("10");
       return retDict;
     }
-  
+    
     public override void move(double translate, double rotate) {
       _lastTranslate = translate;
       _lastRotate = rotate;
@@ -2181,16 +2190,16 @@ public static class Myro {
     }
     
     public void adjustSpeed() {
-	  double left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
-	  double right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
-	  byte leftPower = (byte)((left + 1.0) * 100.0);
-	  byte rightPower = (byte)((right + 1.0) * 100.0);
-	  set(Scribbler.SET_MOTORS, rightPower, leftPower);
-	}
+      double left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
+      double right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
+      byte leftPower = (byte)((left + 1.0) * 100.0);
+      byte rightPower = (byte)((right + 1.0) * 100.0);
+      set(Scribbler.SET_MOTORS, rightPower, leftPower);
+    }
 
     public override void reboot() {
-	  write(Scribbler.SET_RESET_SCRIBBLER);
-	}
+      write(Scribbler.SET_RESET_SCRIBBLER);
+    }
 
     public override void beep(double duration, double frequency) {
       set_speaker((int)frequency, (int)(duration * 1000));
@@ -2205,82 +2214,82 @@ public static class Myro {
     }
 
     public void set_speaker(int frequency, int duration) {
-	  write_packet(Scribbler.SET_SPEAKER, 
-		  (byte)(duration >> 8),
-		  (byte)(duration % 256),
-		  (byte)(frequency >> 8),
-		  (byte)(frequency % 256));
-	}
+      write_packet(Scribbler.SET_SPEAKER, 
+          (byte)(duration >> 8),
+          (byte)(duration % 256),
+          (byte)(frequency >> 8),
+          (byte)(frequency % 256));
+    }
         
     public void set_speaker_2(int freq1, int freq2, int duration) {
         write_packet(Scribbler.SET_SPEAKER_2, 
-			(byte)(duration >> 8),
-			(byte)(duration % 256),
-			(byte)(freq1 >> 8),
-			(byte)(freq1 % 256),
-			(byte)(freq2 >> 8),
-			(byte)(freq2 % 256));
-	}
+            (byte)(duration >> 8),
+            (byte)(duration % 256),
+            (byte)(freq1 >> 8),
+            (byte)(freq1 % 256),
+            (byte)(freq2 >> 8),
+            (byte)(freq2 % 256));
+    }
 
-	public override string getName() {
-	  return (string)get("name");
-	}
+    public override string getName() {
+      return (string)get("name");
+    }
 
-	public override PythonDictionary getAll() {
-	  return (PythonDictionary)get("all");
-	}
+    public override PythonDictionary getAll() {
+      return (PythonDictionary)get("all");
+    }
 
-	public override string getPassword() {
-	  return (string)get("password");
-	}
+    public override string getPassword() {
+      return (string)get("password");
+    }
 
-	public override double getBattery() {
-	  write(Scribbler.GET_BATTERY);
-	  double retval = read_2byte() / 20.9813;
-	  return retval;
-	}
+    public override double getBattery() {
+      write(Scribbler.GET_BATTERY);
+      double retval = read_2byte() / 20.9813;
+      return retval;
+    }
 
-	public override int getStall() {
-	  return (int)get("stall");
-	}
+    public override int getStall() {
+      return (int)get("stall");
+    }
 
-	public override PythonDictionary getConfig() {
-	  return (PythonDictionary)get("config");
-	}
+    public override PythonDictionary getConfig() {
+      return (PythonDictionary)get("config");
+    }
 
-	public byte read_byte() {
-	  byte [] bytes = new byte[1];
-	  lock(serial)
-	    serial.Read(bytes, 0, 1);
-	  return bytes[0];
-	}
+    public byte read_byte() {
+      byte [] bytes = new byte[1];
+      lock(serial)
+        serial.Read(bytes, 0, 1);
+      return bytes[0];
+    }
 
-	public void read(int bytes, byte [] buffer, int start) {
+    public void read(int bytes, byte [] buffer, int start) {
       int tries = 0;
-	  int count = 0;
-	  while (count < bytes && tries < 4) { // 4 seconds
-		byte [] retval = try_read(bytes-count);
+      int count = 0;
+      while (count < bytes && tries < 4) { // 4 seconds
+        byte [] retval = try_read(bytes-count);
         buffer_copy(retval, buffer, start, retval.Length);
-		count += retval.Length;
-		start += retval.Length;
-		if (retval.Length == 0)
-		  tries++;
-	  }
-	}
+        count += retval.Length;
+        start += retval.Length;
+        if (retval.Length == 0)
+          tries++;
+      }
+    }
 
-	public byte [] read(int bytes) {
-	  int count = 0;
+    public byte [] read(int bytes) {
+      int count = 0;
       int tries = 0;
-	  byte [] buffer = new byte[bytes];
-	  while (count < bytes && tries < 4) { // 4 seconds
-		byte [] retval = try_read(bytes-count);
+      byte [] buffer = new byte[bytes];
+      while (count < bytes && tries < 4) { // 4 seconds
+        byte [] retval = try_read(bytes-count);
         buffer_copy(retval, buffer, count, retval.Length);
-		count += retval.Length;
-		if (retval.Length == 0)
-		  tries++;
-	  }
-	  return buffer.Slice(0, count);
-	}
+        count += retval.Length;
+        if (retval.Length == 0)
+          tries++;
+      }
+      return buffer.Slice(0, count);
+    }
 
     static void buffer_copy(byte [] from_buf, byte [] to_buf, int start, int length) {
         int count = 0;
@@ -2290,124 +2299,124 @@ public static class Myro {
         }
     }
 
-	static byte [] buffer_add(byte [] buf1, byte [] buf2) {
-	  byte[] buffer = new byte[buf1.Length + buf2.Length];
-	  buffer_copy(buf1, buffer, 0, buf1.Length);
-	  buffer_copy(buf2, buffer, buf1.Length, buf2.Length);
-	  return buffer;
-	}
+    static byte [] buffer_add(byte [] buf1, byte [] buf2) {
+      byte[] buffer = new byte[buf1.Length + buf2.Length];
+      buffer_copy(buf1, buffer, 0, buf1.Length);
+      buffer_copy(buf2, buffer, buf1.Length, buf2.Length);
+      return buffer;
+    }
 
-	public byte [] try_read(int bytes) {
-	  byte[] buffer = new byte[bytes];
-	  int len = 0;
-	  try {
-	    lock(serial)
-	      len = serial.Read(buffer, 0, bytes);
-	  } catch {
-		Thread.Sleep(10); 
-	  }
-	  //if (len != bytes)
-	  //  Console.WriteLine("read: Wrong number of bytes read");
-	  if (dongle == null) {
-		// HACK! THIS SEEMS TO NEED TO BE HERE!
-		Thread.Sleep(10); 
-	  }
-	  return buffer.Slice(0, len);
-	}
+    public byte [] try_read(int bytes) {
+      byte[] buffer = new byte[bytes];
+      int len = 0;
+      try {
+        lock(serial)
+          len = serial.Read(buffer, 0, bytes);
+      } catch {
+        Thread.Sleep(10); 
+      }
+      //if (len != bytes)
+      //  Console.WriteLine("read: Wrong number of bytes read");
+      if (dongle == null) {
+        // HACK! THIS SEEMS TO NEED TO BE HERE!
+        Thread.Sleep(10); 
+      }
+      return buffer.Slice(0, len);
+    }
 
-	public int read_mem(int page, int offset) {
-	  write(Scribbler.GET_SERIAL_MEM);
-	  write_2byte(page);
-	  write_2byte(offset);
-	  return read_byte();
-	}
+    public int read_mem(int page, int offset) {
+      write(Scribbler.GET_SERIAL_MEM);
+      write_2byte(page);
+      write_2byte(offset);
+      return read_byte();
+    }
 
-	public void write(byte b) {
-	  byte [] buffer = new byte[1];
-	  buffer[0] = b;
-	  lock(serial)
-	    serial.Write(buffer, 0, 1);
-	}
+    public void write(byte b) {
+      byte [] buffer = new byte[1];
+      buffer[0] = b;
+      lock(serial)
+        serial.Write(buffer, 0, 1);
+    }
 
-	public void write(byte [] b) {
-	  lock(serial)
-	    serial.Write(b, 0, b.Length);
-	}
+    public void write(byte [] b) {
+      lock(serial)
+        serial.Write(b, 0, b.Length);
+    }
 
-	public void write_2byte(int value) {
-	  write((byte)((value >> 8) & 0xFF));
-	  write((byte)(value & 0xFF));
-	}
+    public void write_2byte(int value) {
+      write((byte)((value >> 8) & 0xFF));
+      write((byte)(value & 0xFF));
+    }
 
-	public void write_packet(params byte [] data) {
-	  byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
-	  lock(serial) {
-	    try {
-	      serial.Write(data, 0, data.Length);
-	    } catch {
-	      Console.WriteLine("ERROR: in write");
-	    }
-	    if (Scribbler.PACKET_LENGTH - data.Length > 0) {
-	      try {
-		serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
-	      } catch {
-		Console.WriteLine("ERROR: in write");
-	      }
-	    }
-	  } 
-	}
+    public void write_packet(params byte [] data) {
+      byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+      lock(serial) {
+        try {
+          serial.Write(data, 0, data.Length);
+        } catch {
+          Console.WriteLine("ERROR: in write");
+        }
+        if (Scribbler.PACKET_LENGTH - data.Length > 0) {
+          try {
+        serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
+          } catch {
+        Console.WriteLine("ERROR: in write");
+          }
+        }
+      } 
+    }
   
-	public void flush() { 
-	  lock(serial) {
-	    serial.DiscardInBuffer();
-	    serial.DiscardOutBuffer();
-	  }
-	}
+    public void flush() { 
+      lock(serial) {
+        serial.DiscardInBuffer();
+        serial.DiscardOutBuffer();
+      }
+    }
 
-	public override Graphics.Picture takePicture(string mode="jpeg") {
-	  int width = 256;
-	  int height = 192;
-	  Graphics.Picture p = null;
-	  if (mode == "color") {
-		byte [] a = grab_array_yuv();
-		if (a.Length == (width * height * 3))
-		  p = new Graphics.Picture(width, height, a);
-	  } else if (mode == "jpeg") {
-		byte [] buffer = grab_jpeg_color(1);
-		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap, 256, 192);
-	  } else if (mode == "jpeg-fast") {
-		byte [] buffer = grab_jpeg_color(0);
-		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap, 256, 192);
-	  } else if (mode == "gray" || mode == "grey") {
-		byte [] buffer = grab_jpeg_gray(1);
-		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap, 256, 192);
-	  } else if (mode == "grayjpeg") {
-		byte [] buffer = grab_jpeg_gray(1);
-		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap, 256, 192);
-	  } else if (mode == "grayjpeg-fast") {
-		byte [] buffer = grab_jpeg_gray(0);
-		System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-		System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
-		p = new Graphics.Picture(bitmap, 256, 192);
-	  } else if (mode == "grayraw" || mode == "greyraw") {
-		conf_window(0, 1, 0, 255, 191, 2, 2);
-		byte [] a = grab_gray_array();
-		conf_gray_window(0, 2, 0,    128, 191, 1, 1);
-		p = new Graphics.Picture(width, height, a, 1);
-	  } else if (mode == "blob") {
-		byte [] a = grab_blob_array(); 
-		p = new Graphics.Picture(width, height, a);
-	  }
-	  return p;
-	}
+    public override Graphics.Picture takePicture(string mode="jpeg") {
+      int width = 256;
+      int height = 192;
+      Graphics.Picture p = null;
+      if (mode == "color") {
+        byte [] a = grab_array_yuv();
+        if (a.Length == (width * height * 3))
+          p = new Graphics.Picture(width, height, a);
+      } else if (mode == "jpeg") {
+        byte [] buffer = grab_jpeg_color(1);
+        System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+        System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+        p = new Graphics.Picture(bitmap, 256, 192);
+      } else if (mode == "jpeg-fast") {
+        byte [] buffer = grab_jpeg_color(0);
+        System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+        System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+        p = new Graphics.Picture(bitmap, 256, 192);
+      } else if (mode == "gray" || mode == "grey") {
+        byte [] buffer = grab_jpeg_gray(1);
+        System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+        System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+        p = new Graphics.Picture(bitmap, 256, 192);
+      } else if (mode == "grayjpeg") {
+        byte [] buffer = grab_jpeg_gray(1);
+        System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+        System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+        p = new Graphics.Picture(bitmap, 256, 192);
+      } else if (mode == "grayjpeg-fast") {
+        byte [] buffer = grab_jpeg_gray(0);
+        System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
+        System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(ms);
+        p = new Graphics.Picture(bitmap, 256, 192);
+      } else if (mode == "grayraw" || mode == "greyraw") {
+        conf_window(0, 1, 0, 255, 191, 2, 2);
+        byte [] a = grab_gray_array();
+        conf_gray_window(0, 2, 0,    128, 191, 1, 1);
+        p = new Graphics.Picture(width, height, a, 1);
+      } else if (mode == "blob") {
+        byte [] a = grab_blob_array(); 
+        p = new Graphics.Picture(width, height, a);
+      }
+      return p;
+    }
   
   public byte [] grab_array_yuv() { // YUV color
     int width = 256;
@@ -2422,42 +2431,42 @@ public static class Myro {
     //create the image from the YUV layer
     for (int i=0; i < height; i++) {
       for (int j=0; j < width; j++) {
-	if (j >= 3) {
-	  // go to the left for other values
-	  vy = -1; vu = -2; y1v = -1; y1u = -3; uy = -1; uv = -2; y2u = -1; y2v = -3;
-	} else {
-	  // go to the right for other values
-	  vy = 1; vu = 2; y1v = 3; y1u = 1; uy = 1; uv = 2; y2u = 3; y2v = 1;
-	}
-	//   0123 0123 0123
-	if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
-	  V = line[i * width + j];
-	  Y = line[i * width + j + vy];
-	  U = line[i * width + j + vu];
-	} else if ((j % 4) == 1) { //0 #3
-	  Y = line[i * width + j];
-	  V = line[i * width + j + y1v];
-	  U = line[i * width + j + y1u];
-	} else if ((j % 4) == 2) { //1 #0
-	  U = line[i * width + j];
-	  Y = line[i * width + j + uy];
-	  V = line[i * width + j + uv];
-	} else if ((j % 4) == 3) { //2 #1
-	  Y = line[i * width + j];
-	  U = line[i * width + j + y2u];
-	  V = line[i * width + j + y2v];
-	}
-	U = U - 128;
-	V = V - 128;
-	// Y = Y;
-	buffer[(i * width + j) * 3 + 0] = (byte)Math.Max(Math.Min(Y + 1.13983 * V, 255), 0);
-	buffer[(i * width + j) * 3 + 1] = (byte)Math.Max(Math.Min(Y - 0.39466*U-0.58060*V, 255), 0);
-	buffer[(i * width + j) * 3 + 2] = (byte)Math.Max(Math.Min(Y + 2.03211*U, 255), 0);
+    if (j >= 3) {
+      // go to the left for other values
+      vy = -1; vu = -2; y1v = -1; y1u = -3; uy = -1; uv = -2; y2u = -1; y2v = -3;
+    } else {
+      // go to the right for other values
+      vy = 1; vu = 2; y1v = 3; y1u = 1; uy = 1; uv = 2; y2u = 3; y2v = 1;
+    }
+    //   0123 0123 0123
+    if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
+      V = line[i * width + j];
+      Y = line[i * width + j + vy];
+      U = line[i * width + j + vu];
+    } else if ((j % 4) == 1) { //0 #3
+      Y = line[i * width + j];
+      V = line[i * width + j + y1v];
+      U = line[i * width + j + y1u];
+    } else if ((j % 4) == 2) { //1 #0
+      U = line[i * width + j];
+      Y = line[i * width + j + uy];
+      V = line[i * width + j + uv];
+    } else if ((j % 4) == 3) { //2 #1
+      Y = line[i * width + j];
+      U = line[i * width + j + y2u];
+      V = line[i * width + j + y2v];
+    }
+    U = U - 128;
+    V = V - 128;
+    // Y = Y;
+    buffer[(i * width + j) * 3 + 0] = (byte)Math.Max(Math.Min(Y + 1.13983 * V, 255), 0);
+    buffer[(i * width + j) * 3 + 1] = (byte)Math.Max(Math.Min(Y - 0.39466*U-0.58060*V, 255), 0);
+    buffer[(i * width + j) * 3 + 2] = (byte)Math.Max(Math.Min(Y + 2.03211*U, 255), 0);
       }
     }            
     return buffer;
   }
-	
+    
   public byte [] read_jpeg_header() {
     byte [] buf = read(2);
     int len = buf[0] + buf[1] * 256;
@@ -2477,32 +2486,32 @@ public static class Myro {
     return jpeg;
   }
   
-	public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
-											  // (0=fast, 1=reg)
-	  if (gray_header == null) {
-		write(Scribbler.GET_JPEG_GRAY_HEADER);
-		gray_header = read_jpeg_header();
-	  }
-	  write(Scribbler.GET_JPEG_GRAY_SCAN);
-	  write((byte)mode);
-	  byte [] jpeg = buffer_add(gray_header, read_jpeg_scan());
-	  return jpeg;
-	}
-	
+    public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
+                                              // (0=fast, 1=reg)
+      if (gray_header == null) {
+        write(Scribbler.GET_JPEG_GRAY_HEADER);
+        gray_header = read_jpeg_header();
+      }
+      write(Scribbler.GET_JPEG_GRAY_SCAN);
+      write((byte)mode);
+      byte [] jpeg = buffer_add(gray_header, read_jpeg_scan());
+      return jpeg;
+    }
+    
     public byte [] read_jpeg_scan() {
       byte [] bytes = new byte[100000];
       byte last_byte = 0;
       int count = 0;
       lock(serial) {
-	while (true) {
-	  serial.Read(bytes, count, 1);
-	  if ((last_byte == 0xff) && (bytes[count] == 0xd9)) {
-	    // End-of-image marker
-	    break;
-	  }
-	  last_byte = bytes[count];
-	  count++;
-	}
+    while (true) {
+      serial.Read(bytes, count, 1);
+      if ((last_byte == 0xff) && (bytes[count] == 0xd9)) {
+        // End-of-image marker
+        break;
+      }
+      last_byte = bytes[count];
+      count++;
+    }
       }
       read_uint32();   // Start
       read_uint32();   // Read
@@ -2515,223 +2524,223 @@ public static class Myro {
         return buf[0] + buf[1] * 256 + buf[2] * 65536 + buf[3] * 16777216;
     }
 
-	public byte [] grab_blob_array() { // blob, RLE
-	  int width = 256;
-	  int height = 192;
+    public byte [] grab_blob_array() { // blob, RLE
+      int width = 256;
+      int height = 192;
       byte [] blobs = new byte[height * width * 3];  // RGB
-	  write(Scribbler.GET_RLE);
-	  int size=(int)read_byte();
-	  size = (size << 8) | read_byte();
-	  byte [] buffer = read(size);
-	  int px = 0;
-	  int counter = 0;
-	  int val = 128;
-	  bool inside = true;
-	  for (int i=0; i < height; i++) {
-		for (int j=0; j < width; j+=4) {
-		  if (counter < 1 && px < buffer.Length) {
-			counter = buffer[px];
-			px += 1;
-			counter = (counter << 8) | buffer[px];
-			px += 1;
-			if (inside) {
-			  val = 0;
-			  inside = false;
-			} else {
-			  val = 255;
-			  inside = true;
-			}
-		  }
-		  blobs[i * width * 3 + j + 0] = (byte)val; //red
-		  blobs[i * width * 3 + j + 1] = (byte)val; //green
-		  blobs[i * width * 3 + j + 2] = (byte)val; //blue
-		  counter -= 1;
-		}
-	  }
-	  return blobs;
-	}
-  	
-	public byte [] grab_gray_array() {
-	  int width = 128;
-	  int height = 96;
-	  int size= width * height; 
-	  write(Scribbler.GET_WINDOW);
-	  write((byte)0);
-	  byte [] line = read(size);
-	  return quadrupleSize(line, width);
-	}
+      write(Scribbler.GET_RLE);
+      int size=(int)read_byte();
+      size = (size << 8) | read_byte();
+      byte [] buffer = read(size);
+      int px = 0;
+      int counter = 0;
+      int val = 128;
+      bool inside = true;
+      for (int i=0; i < height; i++) {
+        for (int j=0; j < width; j+=4) {
+          if (counter < 1 && px < buffer.Length) {
+            counter = buffer[px];
+            px += 1;
+            counter = (counter << 8) | buffer[px];
+            px += 1;
+            if (inside) {
+              val = 0;
+              inside = false;
+            } else {
+              val = 255;
+              inside = true;
+            }
+          }
+          blobs[i * width * 3 + j + 0] = (byte)val; //red
+          blobs[i * width * 3 + j + 1] = (byte)val; //green
+          blobs[i * width * 3 + j + 2] = (byte)val; //blue
+          counter -= 1;
+        }
+      }
+      return blobs;
+    }
+      
+    public byte [] grab_gray_array() {
+      int width = 128;
+      int height = 96;
+      int size= width * height; 
+      write(Scribbler.GET_WINDOW);
+      write((byte)0);
+      byte [] line = read(size);
+      return quadrupleSize(line, width);
+    }
   
-	public byte [] quadrupleSize(byte [] line, int width) {
-	  byte [] retval = new byte[line.Length * 4]; 
-	  int col = 0;
-	  int row = 0;
-	  for (int i=0; i< line.Length; i++) {
-		byte c = line[i];
-		retval[row       * 2 * width + col]   = c;
-		retval[row       * 2 * width + col+1] = c;
-		retval[(row + 1) * 2 * width + col]   = c;
-		retval[(row + 1) * 2 * width + col+1] = c;
-		col += 2;
-		if (col == width * 2) {
-		  col = 0;
-		  row += 2;
-		}
-	  }
-	  return retval;
-	}
+    public byte [] quadrupleSize(byte [] line, int width) {
+      byte [] retval = new byte[line.Length * 4]; 
+      int col = 0;
+      int row = 0;
+      for (int i=0; i< line.Length; i++) {
+        byte c = line[i];
+        retval[row       * 2 * width + col]   = c;
+        retval[row       * 2 * width + col+1] = c;
+        retval[(row + 1) * 2 * width + col]   = c;
+        retval[(row + 1) * 2 * width + col+1] = c;
+        col += 2;
+        if (col == width * 2) {
+          col = 0;
+          row += 2;
+        }
+      }
+      return retval;
+    }
 
-	public void conf_gray_window(int window, int lx, int ly, int ux, int uy, 
-		int xstep, int ystep) {
-	  // Y's are on odd pixels
-	  if ((lx % 2) == 0) {
-		lx += 1;
-	  }
-	  if ((xstep % 2) == 1) {
+    public void conf_gray_window(int window, int lx, int ly, int ux, int uy, 
+        int xstep, int ystep) {
+      // Y's are on odd pixels
+      if ((lx % 2) == 0) {
+        lx += 1;
+      }
+      if ((xstep % 2) == 1) {
         xstep += 1;
-	  }
-	  conf_window(window, lx, ly, ux, uy, xstep, ystep);
-	}
+      }
+      conf_window(window, lx, ly, ux, uy, xstep, ystep);
+    }
   
-	public void conf_window(int window, int X_LOW, int Y_LOW, 
-		int X_HIGH, int Y_HIGH, int X_STEP, int Y_STEP) {
-	  write(Scribbler.SET_WINDOW);
-	  write((byte)window);
-	  write((byte)X_LOW);
-	  write((byte)Y_LOW);
-	  write((byte)X_HIGH);
-	  write((byte)Y_HIGH);
-	  write((byte)X_STEP);
-	  write((byte)Y_STEP);
-	}
+    public void conf_window(int window, int X_LOW, int Y_LOW, 
+        int X_HIGH, int Y_HIGH, int X_STEP, int Y_STEP) {
+      write(Scribbler.SET_WINDOW);
+      write((byte)window);
+      write((byte)X_LOW);
+      write((byte)Y_LOW);
+      write((byte)X_HIGH);
+      write((byte)Y_HIGH);
+      write((byte)X_STEP);
+      write((byte)Y_STEP);
+    }
 
-	public void setSingleData(int position, int value) {
-	  byte [] data = new byte[1]; 
-	  data[0] = (byte)position;
-	  data[1] = (byte)value;
-	  set(Scribbler.SET_SINGLE_DATA, data);
-	}
-	
-	public void set_cam_param(int addr, int b) {
-	  write(Scribbler.SET_CAM_PARAM);
-	  write((byte)addr);
-	  write((byte)b);
-	  wait(.15); // camera needs time to reconfigure
-	}
-	
-	public void set_ir_power(int power) {
-	  write(Scribbler.SET_DONGLE_IR);
-	  write((byte)power);
-	}
-	
-	public override List getIRMessage() {
-	  write(Scribbler.GET_IR_MESSAGE);
-	  int size = read_2byte();
-	  return bytes2ints(read(size));
-	}
-	
-	public override void sendIRMessage(string message) {
+    public void setSingleData(int position, int value) {
+      byte [] data = new byte[1]; 
+      data[0] = (byte)position;
+      data[1] = (byte)value;
+      set(Scribbler.SET_SINGLE_DATA, data);
+    }
+    
+    public void set_cam_param(int addr, int b) {
+      write(Scribbler.SET_CAM_PARAM);
+      write((byte)addr);
+      write((byte)b);
+      wait(.15); // camera needs time to reconfigure
+    }
+    
+    public void set_ir_power(int power) {
+      write(Scribbler.SET_DONGLE_IR);
+      write((byte)power);
+    }
+    
+    public override List getIRMessage() {
+      write(Scribbler.GET_IR_MESSAGE);
+      int size = read_2byte();
+      return bytes2ints(read(size));
+    }
+    
+    public override void sendIRMessage(string message) {
       byte [] data = new byte[message.Length];
       for (int i = 0; i < message.Length; i ++) {
         data[i] = (byte) message[i];
       }
-	  write(Scribbler.SEND_IR_MESSAGE);
-	  write((byte)data.Length);
-	  write(data);
-	}
-	
-	public override void setCommunicate() {
-	  write(Scribbler.SET_IR_EMITTERS);
-	  write(emitters);
-	}
-	
-	public PythonTuple set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
-	  int [] xs = new int[2]; //[x1,x2];
-	  int [] ys = new int[2]; //[y1,y2];
-	  xs[0] = Math.Min(x1, x2);
-	  xs[1] = Math.Max(x1, x2);
-	  ys[0] = Math.Min(y1, y2);
-	  ys[1] = Math.Max(y1, y2);
-	
-	  //set up variables to hold counts and accumulations:
-	  double totalY = 0.0;
-	  double totalU = 0.0;
-	  double totalV = 0.0;
+      write(Scribbler.SEND_IR_MESSAGE);
+      write((byte)data.Length);
+      write(data);
+    }
+    
+    public override void setCommunicate() {
+      write(Scribbler.SET_IR_EMITTERS);
+      write(emitters);
+    }
+    
+    public PythonTuple set_blob_yuv(Graphics.Picture picture, int x1, int y1, int x2, int y2) {
+      int [] xs = new int[2]; //[x1,x2];
+      int [] ys = new int[2]; //[y1,y2];
+      xs[0] = Math.Min(x1, x2);
+      xs[1] = Math.Max(x1, x2);
+      ys[0] = Math.Min(y1, y2);
+      ys[1] = Math.Max(y1, y2);
+    
+      //set up variables to hold counts and accumulations:
+      double totalY = 0.0;
+      double totalU = 0.0;
+      double totalV = 0.0;
        
-	  List ySamples = new List();
-	  List uSamples = new List();
-	  List vSamples = new List();
+      List ySamples = new List();
+      List uSamples = new List();
+      List vSamples = new List();
         
-	  for (int i=xs[0]; i < xs[1]; i++) {
-		for (int j=ys[0]; j < ys[1]; j++) {
-		  PythonTuple rgb = picture.getPixel(i,j).getRGB();
-		  List yuv = rgb2yuv((int)rgb[0], (int)rgb[1], (int)rgb[2]);
-		  totalY = totalY + (int)yuv[0];
-		  totalU = totalU + (int)yuv[1];
-		  totalV = totalV + (int)yuv[2];
-		  ySamples.append((int)yuv[0]);
-		  uSamples.append((int)yuv[1]);
-		  vSamples.append((int)yuv[2]);
-		}
-	  }
-	  
-	  int count = ySamples.Count;
-	  double yMean = totalY / count;
-	  double uMean = totalU / count;
-	  double vMean = totalV / count;
-	  
-	  // The standard deviation of a random variable with a normal 
-	  // distribution is the root-mean-square (RMS) deviation of its 
-	  // values from their mean.
-	  double sY = 0.0;
-	  double sU = 0.0;
-	  double sV = 0.0;
-	  
-	  for (int i=0; i < count; i ++) {
-		sY = sY + ((int)ySamples[i] - yMean) * ((int)ySamples[i] - yMean);
-		sU = sU + ((int)uSamples[i] - uMean) * ((int)uSamples[i] - uMean);
-		sV = sV + ((int)vSamples[i] - vMean) * ((int)vSamples[i] - vMean);
-	  }
+      for (int i=xs[0]; i < xs[1]; i++) {
+        for (int j=ys[0]; j < ys[1]; j++) {
+          PythonTuple rgb = picture.getPixel(i,j).getRGB();
+          List yuv = rgb2yuv((int)rgb[0], (int)rgb[1], (int)rgb[2]);
+          totalY = totalY + (int)yuv[0];
+          totalU = totalU + (int)yuv[1];
+          totalV = totalV + (int)yuv[2];
+          ySamples.append((int)yuv[0]);
+          uSamples.append((int)yuv[1]);
+          vSamples.append((int)yuv[2]);
+        }
+      }
+      
+      int count = ySamples.Count;
+      double yMean = totalY / count;
+      double uMean = totalU / count;
+      double vMean = totalV / count;
+      
+      // The standard deviation of a random variable with a normal 
+      // distribution is the root-mean-square (RMS) deviation of its 
+      // values from their mean.
+      double sY = 0.0;
+      double sU = 0.0;
+      double sV = 0.0;
+      
+      for (int i=0; i < count; i ++) {
+        sY = sY + ((int)ySamples[i] - yMean) * ((int)ySamples[i] - yMean);
+        sU = sU + ((int)uSamples[i] - uMean) * ((int)uSamples[i] - uMean);
+        sV = sV + ((int)vSamples[i] - vMean) * ((int)vSamples[i] - vMean);
+      }
 
-	  sY = Math.Sqrt( sY / count);
-	  sU = Math.Sqrt( sU / count);
-	  sV = Math.Sqrt( sV / count);
+      sY = Math.Sqrt( sY / count);
+      sU = Math.Sqrt( sU / count);
+      sV = Math.Sqrt( sV / count);
 
-	  // Select the U/V bounding box based upon stdMod stdDev
-	  // from the mean, with approripate
-	  // min/max values to fit in an 8 bit register.
-	  //
-	  double stdMod = 3.0;
+      // Select the U/V bounding box based upon stdMod stdDev
+      // from the mean, with approripate
+      // min/max values to fit in an 8 bit register.
+      //
+      double stdMod = 3.0;
 
-	  int minU = (int)Math.Max(0, (uMean - sU*stdMod)    );
-	  int maxU = (int)Math.Min(255, (uMean + sU*stdMod)  );
-	  int minV = (int)Math.Max(0, (vMean - sV*stdMod) );
-	  int maxV = (int)Math.Min(255, (vMean + sV*stdMod) );
-	  
-	  // Note that we use the default values for
-	  // several parameters, most importantly the Y value
-	  // defaults to a range of 0-254
-	  conf_rle(minU, maxU, minV, maxV);
+      int minU = (int)Math.Max(0, (uMean - sU*stdMod)    );
+      int maxU = (int)Math.Min(255, (uMean + sU*stdMod)  );
+      int minV = (int)Math.Max(0, (vMean - sV*stdMod) );
+      int maxV = (int)Math.Min(255, (vMean + sV*stdMod) );
+      
+      // Note that we use the default values for
+      // several parameters, most importantly the Y value
+      // defaults to a range of 0-254
+      conf_rle(minU, maxU, minV, maxV);
 
-	  // Return a tupal of parameters suitable for the configureBlob
-	  // function, to be shown to the user.
-	  
-	  return Graphics.PyTuple(0, 254, minU, maxU, minV, maxV);
-	}
-	
-	public void conf_rle(int delay = 90, int smooth_thresh = 4,
-		int y_low=0, int y_high=254,
-		int u_low=51, int u_high=136,
-		int v_low=190, int v_high=254) {
-	  write(Scribbler.SET_RLE);
-	  write((byte)delay);
-	  write((byte)smooth_thresh);
-	  write((byte)y_low);
-	  write((byte)y_high);
-	  write((byte)u_low);
-	  write((byte)u_high);
-	  write((byte)v_low);
-	  write((byte)v_high);
-	}
+      // Return a tupal of parameters suitable for the configureBlob
+      // function, to be shown to the user.
+      
+      return Graphics.PyTuple(0, 254, minU, maxU, minV, maxV);
+    }
+    
+    public void conf_rle(int delay = 90, int smooth_thresh = 4,
+        int y_low=0, int y_high=254,
+        int u_low=51, int u_high=136,
+        int v_low=190, int v_high=254) {
+      write(Scribbler.SET_RLE);
+      write((byte)delay);
+      write((byte)smooth_thresh);
+      write((byte)y_low);
+      write((byte)y_high);
+      write((byte)u_low);
+      write((byte)u_high);
+      write((byte)v_low);
+      write((byte)v_high);
+    }
   
   public static IEnumerable timer(double seconds) {
     double start = currentTime();
@@ -2977,7 +2986,7 @@ public static class Myro {
   }
 
   public static Graphics.Picture getRegion(Graphics.Picture picture, IList iterable, int width, int height, 
-				    double degrees) {
+                    double degrees) {
     return picture.getRegion(new Graphics.Point(iterable[0], iterable[1]), width, height, degrees);
   }
   
@@ -2986,20 +2995,20 @@ public static class Myro {
   }
 
   public static void setRegion(Graphics.Picture picture, IList iterable, 
-			       int width, int height, 
-			       double degrees, Graphics.Color color) {
+                   int width, int height, 
+                   double degrees, Graphics.Color color) {
     picture.setRegion(new Graphics.Point(iterable[0], iterable[1]), width, 
-		      height, degrees, color);
+              height, degrees, color);
   }
   
   public static void setRegion(Graphics.Picture picture, Graphics.Point p, 
-			       int width, int height, double degrees,
-			       Graphics.Color color) {
+                   int width, int height, double degrees,
+                   Graphics.Color color) {
     picture.setRegion(p, width, height, degrees, color);
   }
 
   static Action functionInvoke(Func<object> func, List list, 
-				      int position) {
+                      int position) {
     // Take a function, return list, and position
     // Call the function, and put the result in the
     // list in the given position.
@@ -3009,9 +3018,9 @@ public static class Myro {
   }
 
   static Action functionInvokeWithArgs(Func<object,Array> func, 
-				       object [] args,
-				       List list, 
-				      int position) {
+                       object [] args,
+                       List list, 
+                      int position) {
     // Take a function, return list, and position
     // Call the function, and put the result in the
     // list in the given position.
@@ -3071,7 +3080,7 @@ public static class Myro {
   }
 
   public static void initialize_module(string startup_path, 
-				       string os_name) {
+                       string os_name) {
     Myro.startup_path = startup_path;
     Myro.os_name = os_name;
     voices["af"] = "Afrikaans Male";
@@ -3347,8 +3356,8 @@ public static class Myro {
   public static void setVoiceName(string name) {
     foreach (string key in voices.keys()) {
       if ((string)voices[key] == name) {
-	speech_name = key;
-	return;
+    speech_name = key;
+    return;
       }
     }
     throw new Exception("voice name not found: " + name);
@@ -3365,7 +3374,7 @@ public static class Myro {
   public static string getVoiceName(string name) {
     foreach (string key in voices.keys()) {
       if (key == name) {
-	return (string)voices[key];
+    return (string)voices[key];
       }
     }
     return name;
@@ -3407,28 +3416,28 @@ public static class Myro {
     try {
       myProcess.StartInfo.UseShellExecute = false;
       if (os_name == "nt") {
-	string file = startup_path;
-	file = Path.Combine(file, "bin");
-	file = Path.Combine(file, "windows");
-	file = Path.Combine(file, "eSpeak");
-	myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
+    string file = startup_path;
+    file = Path.Combine(file, "bin");
+    file = Path.Combine(file, "windows");
+    file = Path.Combine(file, "eSpeak");
+    myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
       } else {
-	// assumes in path
-	myProcess.StartInfo.FileName = "espeak";
+    // assumes in path
+    myProcess.StartInfo.FileName = "espeak";
       }
       myProcess.StartInfo.CreateNoWindow = true;
       myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" \"" +
-				       text +
-				       "\"");
+                       text +
+                       "\"");
       myProcess.Start();
       if (async == 0)
-	myProcess.WaitForExit();
+    myProcess.WaitForExit();
 #pragma warning disable 0168
     } catch (Exception e) {
 #pragma warning restore 0168
       if (warn_missing_speak) {
-	Console.WriteLine("WARNING: missing speak command");
-	warn_missing_speak = false; // just once
+    Console.WriteLine("WARNING: missing speak command");
+    warn_missing_speak = false; // just once
       }
     }
   }
@@ -3443,8 +3452,8 @@ public static class Myro {
     string diffNote = "a";
     foreach(string key in frequencies.keys()) {
       if (Math.Abs(((double)frequencies[key]) - frequency) < diff) {
-	diff = (double) Math.Abs(((double)frequencies[key]) - frequency);
-	diffNote = key;
+    diff = (double) Math.Abs(((double)frequencies[key]) - frequency);
+    diffNote = key;
       }
     }
     return diffNote.Substring(0, 1).ToUpper() + 
@@ -3464,16 +3473,16 @@ public static class Myro {
     System.IO.StreamWriter fp = new System.IO.StreamWriter(filename, append); 
     foreach (IList tup in song) {
       if (tup.Count == 2) {
-	double f = (double)tup[0]; 
-	double d = (double)tup[1];
-	fp.WriteLine("{0} {1}", getNoteFromFrequency(f), d);
+    double f = (double)tup[0]; 
+    double d = (double)tup[1];
+    fp.WriteLine("{0} {1}", getNoteFromFrequency(f), d);
       } else if (tup.Count == 3) {
-	double f1 = (double)tup[0]; 
-	double f2 = (double)tup[1]; 
-	double d = (double)tup[2];
-	fp.WriteLine("{0} {1} {2}", getNoteFromFrequency(f1),
-		     getNoteFromFrequency(f2), d);
-	fp.Close();
+    double f1 = (double)tup[0]; 
+    double f2 = (double)tup[1]; 
+    double d = (double)tup[2];
+    fp.WriteLine("{0} {1} {2}", getNoteFromFrequency(f1),
+             getNoteFromFrequency(f2), d);
+    fp.Close();
       }
     }
   }
@@ -3487,7 +3496,7 @@ public static class Myro {
     while ((line = songFile.ReadLine()) != null) {
       Array notes = line.Split(';');
       foreach (string n in notes) {
-	parseSongLine(song, n, lineNumber, filename);
+    parseSongLine(song, n, lineNumber, filename);
       }
       lineNumber += 1;
     }
@@ -3500,16 +3509,16 @@ public static class Myro {
     string text = "";
     foreach(IList tup in song) {
       if (tup.Count == 2) {
-	double f = (double)tup[0]; 
-	double d = (double)tup[1];
-	text += String.Format("{0} {1}; ", getNoteFromFrequency(f), d);
+    double f = (double)tup[0]; 
+    double d = (double)tup[1];
+    text += String.Format("{0} {1}; ", getNoteFromFrequency(f), d);
       } else if (tup.Count == 3) {
-	double f1 = (double)tup[0]; 
-	double f2 = (double)tup[1]; 
-	double d = (double)tup[2];
-	text += String.Format("{0} {1} {2}; ", 
-			      getNoteFromFrequency(f1),
-			      getNoteFromFrequency(f2), d);
+    double f1 = (double)tup[0]; 
+    double f2 = (double)tup[1]; 
+    double d = (double)tup[2];
+    text += String.Format("{0} {1} {2}; ", 
+                  getNoteFromFrequency(f1),
+                  getNoteFromFrequency(f2), d);
       }
     }
     return text;
@@ -3529,7 +3538,7 @@ public static class Myro {
   }
 
   static void parseSongLine(List song, string line, 
-			    int lineNumber, string filename) {
+                int lineNumber, string filename) {
     line = line.Trim();
     Array lineList = line.Split(' ');
     // FIXME: remove duplicate spaces
@@ -3542,15 +3551,15 @@ public static class Myro {
       string name1 = (string)name1_dur.GetValue(0);
       string dur = (string)name1_dur.GetValue(1);
       song.append(Graphics.PyTuple(getFrequency(name1, lineNumber, line),
-				   getDuration(dur, lineNumber, line)));
+                   getDuration(dur, lineNumber, line)));
     } else if (lineList.Length == 3) {
       Array name1_name2_dur = line.Split(' ');
       string name1 = (string)name1_name2_dur.GetValue(0);
       string name2 = (string)name1_name2_dur.GetValue(1);
       string dur = (string)name1_name2_dur.GetValue(2);
       song.append( Graphics.PyTuple(getFrequency(name1, lineNumber, line),
-				    getFrequency(name2, lineNumber, line),
-				    getDuration(dur, lineNumber, line)) );
+                    getFrequency(name2, lineNumber, line),
+                    getDuration(dur, lineNumber, line)) );
     } else {
       throw new Exception(String.Format("song format error in '{0}' at line {1}: {2}", filename, lineNumber, line));
     }
@@ -3563,9 +3572,9 @@ public static class Myro {
       return (double)frequencies[s.ToLower()];
     } catch (Exception e1) {
       try {
-	return Double.Parse(s);
+    return Double.Parse(s);
       } catch (Exception e2) {
-	throw new Exception(String.Format("invalid note name/frequency '{0}' on line {1}: {2}", s, line, text));
+    throw new Exception(String.Format("invalid note name/frequency '{0}' on line {1}: {2}", s, line, text));
       }
     }
   }
@@ -3576,16 +3585,16 @@ public static class Myro {
     // note portion as float. 
     if (v.Contains("/")) {
       try {
-	Array numerator_denominator = v.Split('/');
-	double numerator = Double.Parse((string)numerator_denominator.GetValue(0));
-	double denominator = Double.Parse((string)numerator_denominator.GetValue(1));
-	return numerator/denominator;
+    Array numerator_denominator = v.Split('/');
+    double numerator = Double.Parse((string)numerator_denominator.GetValue(0));
+    double denominator = Double.Parse((string)numerator_denominator.GetValue(1));
+    return numerator/denominator;
 #pragma warning disable 0168
       } catch (Exception e) {
 #pragma warning restore 0168
-	throw new Exception(
-	   String.Format("invalid duration value '{0}' on line {1}: {2}",
-			 v, line, text));
+    throw new Exception(
+       String.Format("invalid duration value '{0}' on line {1}: {2}",
+             v, line, text));
       }
     } else {
       return Double.Parse(v);
