@@ -2115,6 +2115,16 @@ public static class Myro {
       return (int)((hbyte << 16)| (mbyte << 8) | lbyte);
     }
 
+	public string ReadLine() {
+	  // Replaces serial.ReadLine() as it doesn't stop on \n
+	  string retval = "";
+	  byte b = read_byte();
+	  while (b != 10) { // '\n' newline
+		retval += (char)b;
+	  }
+	  return (retval + "\n");
+	}
+
     public override PythonDictionary getInfo() {
 	  Console.WriteLine("1");
       PythonDictionary retDict = new PythonDictionary();
@@ -2134,7 +2144,7 @@ public static class Myro {
       lock(serial) {
 		Console.WriteLine("5.5");
         try {
-          retval = serial.ReadLine();
+          retval = ReadLine();
         } catch {
           serial.ReadTimeout = old;
           return retDict;
@@ -2150,7 +2160,7 @@ public static class Myro {
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
       lock(serial) {
         try {
-          retval = serial.ReadLine();
+          retval = ReadLine();
         } catch {
           serial.ReadTimeout = old;
           return retDict;
@@ -2360,9 +2370,9 @@ public static class Myro {
         }
         if (Scribbler.PACKET_LENGTH - data.Length > 0) {
           try {
-        serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
+			serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
           } catch {
-        Console.WriteLine("ERROR: in write");
+			Console.WriteLine("ERROR: in write");
           }
         }
       } 
