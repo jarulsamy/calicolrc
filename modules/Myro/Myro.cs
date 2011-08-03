@@ -2120,9 +2120,8 @@ public static class Myro {
 	  string retval = "";
 	  byte b = read_byte();
 	  int counter = 0;
-	  while (b != 10 && counter < 100) { // '\n' newline
+	  while (b != 10 && counter < 255) { // '\n' newline
 		retval += (char)b;
-		Console.WriteLine("ReadLine: " + retval);
 		b = read_byte();
 		counter++;
 	  }
@@ -2130,37 +2129,27 @@ public static class Myro {
 	}
 
     public override PythonDictionary getInfo() {
-	  Console.WriteLine("1");
       PythonDictionary retDict = new PythonDictionary();
       //int old = serial.ReadTimeout; // milliseconds
-	  Console.WriteLine("2");
       string retval;
       // serial.setTimeout(4)
       //lock(serial)
       //  serial.ReadTimeout = 4000; // milliseconds
-	  Console.WriteLine("3");
       flush();
-	  Console.WriteLine("4");
       // have to do this twice since sometime the first echo isn't
       // echoed correctly (spaces) from the scribbler
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
-	  Console.WriteLine("5");
       lock(serial) {
-		Console.WriteLine("5.5");
         try {
           retval = ReadLine();
         } catch {
           //serial.ReadTimeout = old;
           return retDict;
         }
-		Console.WriteLine("5.6");
       }
       //#print "Got", retval
-      
-	  Console.WriteLine("6");
       Thread.Sleep(100); 
       //time.sleep(.1)
-	  Console.WriteLine("7");
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
       lock(serial) {
         try {
