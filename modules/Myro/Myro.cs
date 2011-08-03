@@ -2119,7 +2119,7 @@ public static class Myro {
 	  // Replaces serial.ReadLine() as it doesn't stop on \n
 	  string retval = "";
 	  byte b = read_byte();
-	  while (b != 10) { // '\n' newline
+	  while (b != 10 && b != 255) { // '\n' newline
 		retval += (char)b;
 		Console.WriteLine("ReadLine: " + retval);
 	  }
