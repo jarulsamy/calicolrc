@@ -2121,6 +2121,7 @@ public static class Myro {
 	  byte b = read_byte();
 	  while (b != 10) { // '\n' newline
 		retval += (char)b;
+		Console.WriteLine("ReadLine: " + retval);
 	  }
 	  return (retval + "\n");
 	}
@@ -2128,12 +2129,12 @@ public static class Myro {
     public override PythonDictionary getInfo() {
 	  Console.WriteLine("1");
       PythonDictionary retDict = new PythonDictionary();
-      int old = serial.ReadTimeout; // milliseconds
+      //int old = serial.ReadTimeout; // milliseconds
 	  Console.WriteLine("2");
       string retval;
       // serial.setTimeout(4)
-      lock(serial)
-        serial.ReadTimeout = 4000; // milliseconds
+      //lock(serial)
+      //  serial.ReadTimeout = 4000; // milliseconds
 	  Console.WriteLine("3");
       flush();
 	  Console.WriteLine("4");
@@ -2146,7 +2147,7 @@ public static class Myro {
         try {
           retval = ReadLine();
         } catch {
-          serial.ReadTimeout = old;
+          //serial.ReadTimeout = old;
           return retDict;
         }
 		Console.WriteLine("5.6");
@@ -2162,14 +2163,14 @@ public static class Myro {
         try {
           retval = ReadLine();
         } catch {
-          serial.ReadTimeout = old;
+          //serial.ReadTimeout = old;
           return retDict;
         }
       }
 	  Console.WriteLine("8");
       if (retval.Length == 0) {
         lock(serial) 
-          serial.ReadTimeout = old;
+          //serial.ReadTimeout = old;
         return retDict;
       }
       
@@ -2189,8 +2190,8 @@ public static class Myro {
         }
       }
 	  Console.WriteLine("9");
-      lock(serial)
-        serial.ReadTimeout = old;
+      //lock(serial)
+	  //serial.ReadTimeout = old;
 	  Console.WriteLine("10");
       return retDict;
     }
