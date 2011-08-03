@@ -87,11 +87,8 @@ class Shell(object):
         for file in files:
             self.execute_file(file, self.calico.get_language_from_filename(file))
 
-    def message(self, text, newline=True):
-        if newline:
-            print(text)
-        else:
-            print(text, end="")
+    def message(self, text="", end="\n"):
+        print(text, end=end)
 
     def execute_file(self, filename, language):
         self.message(_("Loading file '%s'...") % filename)
@@ -504,11 +501,10 @@ class ShellWindow(Window):
         self.message(_("Reset shell"))
         self.message("-----------")
 
-    def message(self, message, tag="purple", newline=True):
+    def message(self, message="", tag="purple", end="\n"):
         # DO NOT PUT the ev, WaitOne stuff here!
         message = str(message)
-        if newline:
-            message += "\n"
+        message += end
         def invoke(sender, args):
             MUTEX.WaitOne()
             end = self.history_textview.Buffer.EndIter

@@ -248,12 +248,12 @@ Chat commands:
         else:
             color = choice(get_colors())
             self.colormap[name] = color
-        self.calico.chat.message("%s: " % name, color, newline=False)
+        self.calico.chat.message("%s: " % name, color, end="")
         self.calico.chat.message(message, "black")
 
-    def message(self, message, tag="purple", newline=True):
-        if newline:
-            message += "\n"
+    def message(self, message="", tag="purple", end="\n"):
+        message = str(message)
+        message += end
         # DO NOT PUT the ev, WaitOne stuff here!
         def invoke(sender, args):
             self.MUTEX.WaitOne()

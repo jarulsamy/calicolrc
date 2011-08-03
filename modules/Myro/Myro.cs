@@ -22,7 +22,7 @@ $Id: $
 using System;
 using System.Diagnostics; // Process
 using System.IO; // DirectoryInfo, FileInfo
-using System.IO.Ports;
+using System.IO.Ports; // SerialPort
 using System.Threading;
 using IronPython.Runtime; // List
 using IronRuby.Builtins; // RubyArray
@@ -2132,12 +2132,14 @@ public static class Myro {
       write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
 	  Console.WriteLine("5");
       lock(serial) {
+		Console.WriteLine("5.5");
         try {
           retval = serial.ReadLine();
         } catch {
           serial.ReadTimeout = old;
           return retDict;
         }
+		Console.WriteLine("5.6");
       }
       //#print "Got", retval
       
@@ -2757,6 +2759,14 @@ public static class Myro {
   }
 
   public static Graphics.Color makeColor(string color) {
+    return Graphics.makeColor(color);
+  }
+
+  public static Graphics.Color Color(PythonTuple rgb) {
+    return Graphics.makeColor((int)rgb[0], (int)rgb[1], (int)rgb[2]);
+  }
+
+  public static Graphics.Color Color(string color) {
     return Graphics.makeColor(color);
   }
 

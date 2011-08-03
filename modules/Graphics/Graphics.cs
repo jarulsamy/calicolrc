@@ -1752,6 +1752,22 @@ public static class Graphics {
       }
     }
         
+    public double getX() {
+	  return center.x;
+    }
+        
+    public double getY() {
+	  return center.y;
+    }
+        
+    public void setX(double value) {
+	  moveTo(value, center.y);
+    }
+        
+    public void setY(double value) {
+	  moveTo(center.x, value);
+    }
+        
     public double y {
       get {
         return center.y;
