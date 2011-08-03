@@ -2123,6 +2123,7 @@ public static class Myro {
 	  while (b != 10 && counter < 100) { // '\n' newline
 		retval += (char)b;
 		Console.WriteLine("ReadLine: " + retval);
+		b = read_byte();
 		counter++;
 	  }
 	  return (retval + "\n");
