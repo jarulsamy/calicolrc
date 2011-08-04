@@ -1703,32 +1703,28 @@ public static class Graphics {
     }
 
     public Point getP1() {
+	  return getScreenPoint(points[0]);
+	}
+
+    public Point getP2() {
+	  return getScreenPoint(points[1]);
+    }
+
+	public Point getScreenPoint(Point p) {
+	  // p is relative to center, rotate, and scale; returns
+	  // screen coordinate of p
 	  double px = 0, py = 0;
 	  using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
         Point temp = screen_coord(center);
         g.Translate(temp.x, temp.y);
         g.Rotate(_rotation);
         g.Scale(_scaleFactor, _scaleFactor);
-		px = points[0].x;
-		py = points[0].y;
+		px = p.x;
+		py = p.y;
 		g.UserToDevice(ref px, ref py);
 	  }
 	  return new Point(px, py);
 	}
-
-    public Point getP2() {
-	  double px = 0, py = 0;
-	  using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
-        Point temp = screen_coord(center);
-        g.Translate(temp.x, temp.y);
-        g.Rotate(_rotation);
-        g.Scale(_scaleFactor, _scaleFactor);
-		px = points[1].x;
-		py = points[1].y;
-		g.UserToDevice(ref px, ref py);
-	  }
-	  return new Point(px, py);
-    }
 
     public Point getCenter()
     {
