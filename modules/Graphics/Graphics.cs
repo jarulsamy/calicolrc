@@ -1705,6 +1705,10 @@ public static class Graphics {
     public Point getP1() {
 	  double px = 0, py = 0;
 	  using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+        Point temp = screen_coord(points[0]);
+        g.Translate(temp.x, temp.y);
+        g.Rotate(_rotation);
+        g.Scale(_scaleFactor, _scaleFactor);
 		px = points[0].x;
 		py = points[0].y;
 		g.UserToDevice(ref px, ref py);
@@ -1715,8 +1719,12 @@ public static class Graphics {
     public Point getP2() {
 	  double px = 0, py = 0;
 	  using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
-		px = points[0].x;
-		py = points[0].y;
+        Point temp = screen_coord(points[1]);
+        g.Translate(temp.x, temp.y);
+        g.Rotate(_rotation);
+        g.Scale(_scaleFactor, _scaleFactor);
+		px = points[1].x;
+		py = points[1].y;
 		g.UserToDevice(ref px, ref py);
 	  }
 	  return new Point(px, py);
