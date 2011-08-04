@@ -1466,6 +1466,16 @@ public static class Graphics {
       this.y = y;
     }
     
+    public Point(Point p) {
+      this.x = p.x;
+      this.y = p.y;
+    }
+    
+    public Point(Dot dot) {
+      this.x = dot.x;
+      this.y = dot.y;
+    }
+    
     public override string ToString()
     {
       return String.Format("<Point (x={0},y={1})>", x, y);
@@ -1790,6 +1800,11 @@ public static class Graphics {
       set {
         moveTo(center.x, value);
       }
+    }
+
+    public void setWidth(int value) {
+	  _border = value;
+	  QueueDraw();
     }
         
     public int border {
@@ -2193,6 +2208,15 @@ public static class Graphics {
             return null;
         }
     }
+
+	public void setFill(Color value) {
+	  if (value == null) {
+		_fill = null;
+	  } else {
+		_fill = ((Color)value).Copy();
+	  }
+	  QueueDraw();
+	}
     
     public virtual Color fill {
       set {
@@ -2214,6 +2238,15 @@ public static class Graphics {
             return null;
         }
     }
+
+    public void setOutline(Color value) {
+	  if (value == null) {
+		_outline = null;
+	  } else {
+		_outline = ((Color)value).Copy();
+	  }
+	  QueueDraw();
+	}
     
     public Color outline {
       set {
@@ -3319,10 +3352,19 @@ public static class Graphics {
     public Dot(int x, int y) : base(true) {
       set_points(new Point(x,y));
     }
+
     public Dot(double x, double y) : base(true) {
       set_points(new Point(x,y));
     }
 
+    public Dot(Point p) : base(true) {
+      set_points(new Point(p.x, p.y));
+    }
+    
+    public Dot(Dot dot) : base(true) {
+      set_points(new Point(dot.x, dot.y));
+    }
+	
     public override void render(Cairo.Context g) {
       g.Save();
       Point temp = screen_coord(center);
