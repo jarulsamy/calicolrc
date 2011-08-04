@@ -65,6 +65,163 @@ public static class Myro {
 
   public readonly static Gamepads gamepads = new Gamepads();
 
+  public static void gamepad() {
+	PythonDictionary results = (PythonDictionary)getGamepadNow();
+	List button = (List)results["button"];
+	string name = "Scribby";
+	try {
+	  name = getName();
+	} catch {
+	  // ignore
+	}
+	List phrases = Graphics.PyList(
+		String.Format("Hello. My name is {0}.", name),
+		"Ouch! I'm a sensitive robot.", 
+		"I'm hungry. Do you have any batteries?");
+
+    Console.WriteLine("        Pad   Action");
+	Console.WriteLine("     ------   -------");
+    Console.WriteLine(" Left/Right   turnLeft() and turnRight()");
+    Console.WriteLine("    Up/Down   forward() and backward()");
+    Console.WriteLine("");
+
+    if (button.Count > 0) {
+	  Console.WriteLine("     Button   Action");
+	  Console.WriteLine("     ------   -------");
+	  if (button.Count > 0) 
+		Console.WriteLine("          1   stop()");
+	  if (button.Count > 1) 
+		Console.WriteLine("          2   takePicture()");
+	  if (button.Count > 2) 
+		Console.WriteLine("          3   beep(.25, 523)");
+	  if (button.Count > 3) 
+		Console.WriteLine("          4   beep(.25, 587)");
+	  if (button.Count > 4) 
+		Console.WriteLine("          5   beep(.25, 659)");
+	  if (button.Count > 5) 
+		Console.WriteLine(String.Format("          6   speak('{0}')", 
+				phrases[0]));
+	  if (button.Count > 6) 
+		Console.WriteLine(String.Format("          7   speak('{0}')",
+				phrases[1]));
+	  if (button.Count > 7) 
+		Console.WriteLine(String.Format("          8   speak('{0}')",
+				phrases[2]));
+	  Console.WriteLine("");
+	}
+	
+	Console.WriteLine("Gamepad is now running... Press button 1 to stop.");
+
+    List lastMove = Graphics.PyList(0, 0);
+	List axis, freqs;
+    bool doneSpeaking = true;
+    PythonDictionary retval = (PythonDictionary)getGamepadNow();
+    button = (List)retval["button"];
+    int length = button.Count;
+    bool tryToMove = true;
+    while (true) {
+	  retval = (PythonDictionary)getGamepad();	// changed to blocking, JWS
+	  button = (List)retval["button"];
+	  axis = (List)retval["axis"];
+	  freqs = Graphics.PyList(null, null);
+	  if (length > 0 && (int)button[0] == 1) {
+		stop();
+		break;
+	  }
+	  if (length > 1 && (int)button[1] == 1) {
+		speak("Say cheese!", 1);
+		Graphics.Picture pic = takePicture();
+		show(pic);
+	  }
+	  if (length > 2 && (int)button[2] == 1) {
+		freqs[0] = 523;
+	  }
+	  if (length > 3 && (int)button[3] == 1) {
+		if (freqs[0] == null)
+		  freqs[0] = 587;
+		else
+		  freqs[1] = 587;
+	  }
+	  if (length > 4 && (int)button[4] == 1) {
+		if (freqs[0] == null)
+		  freqs[0] = 659;
+		else
+		  freqs[1] = 659;
+	  }
+	  // speak
+	  if (length > 5 && (int)button[5] == 1) {
+		if (doneSpeaking) {
+		  speak((string)phrases[0], 1);
+		  doneSpeaking = false;
+		} 
+	  } else if (length > 6 && (int)button[6] == 1) {
+		if (doneSpeaking) {
+		  speak((string)phrases[1], 1);
+		  doneSpeaking = false;
+		} else if (length > 7 && (int)button[7] == 1) {
+		  if (doneSpeaking) {
+			speak((string)phrases[2], 1);
+			doneSpeaking = false;
+		  }
+		}
+	  } else {
+		doneSpeaking = true;
+	  }
+	  
+	  if (tryToMove && 
+		  axis[0] != lastMove[0] &&
+		  axis[1] != lastMove[1]) {
+		try {
+		  move(-(double)axis[1], -(double)axis[0]);
+		  lastMove = Graphics.PyList(axis[0], axis[1]);
+		} catch {
+		  tryToMove = false;
+		}
+	  }
+	  if (freqs[0] != null || freqs[1] != null) {
+		if (freqs[1] == null) {
+		  try {
+			beep(.25, (int)freqs[0]);
+		  } catch {
+			computer.beep(.25, (int)freqs[0]);
+		  }
+		} else if (freqs[0] == null) {
+		  try {
+			beep(.25, (int)freqs[1]);
+		  } catch {
+			computer.beep(.25, (int)freqs[1]);
+		  }
+		} else {
+		  try {
+			beep(.25, (int)freqs[0], (int)freqs[1]);
+		  } catch {
+			computer.beep(.25, (int)freqs[0], (int)freqs[1]);
+		  }
+		}
+	  }
+	}
+  }
+
+  public static void senses() {
+    Gtk.Application.Invoke(delegate {
+		  Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
+		  fc.VBox.PackStart(new Gtk.Label("Item"));
+		  /*
+		  foreach (string choice in choices) {
+            Gtk.Button button = new Gtk.Button(choice);
+            button.Clicked += new System.EventHandler(DialogHandler);
+            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+		  }
+		  */
+		  fc.ShowAll();
+		  // update loop
+		  // query the robot
+		  // show sense: value
+		  //fc.Run();
+		  //fc.Destroy();
+        });
+  }
+  
   public class Gamepads {
    
     IntPtr [] handles;
