@@ -212,7 +212,12 @@ public static class Myro {
     Sdl.SDL_JoystickUpdate();
     return gamepads.getGamepadNow(index, "all");
   }
-  
+
+  public static object getGamepadNow(string what) {
+    Sdl.SDL_JoystickUpdate();
+    return gamepads.getGamepadNow(0, what);
+  }
+
   public static object getGamepadNow(int index, string what) {
     Sdl.SDL_JoystickUpdate();
     return gamepads.getGamepadNow(index, what);
@@ -226,8 +231,8 @@ public static class Myro {
   public static object getGamepadNow(IList iterable) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
-    foreach (int index in iterable)
-      retval.append(gamepads.getGamepadNow(index, "all"));
+    foreach (string what in iterable)
+      retval.append(gamepads.getGamepadNow(0, what));
     return retval;
   }
   
@@ -257,6 +262,11 @@ public static class Myro {
     return gamepads.getGamepad(index, "all");
   }
   
+  public static object getGamepad(string what) {
+    Sdl.SDL_JoystickUpdate();
+    return gamepads.getGamepad(0, what);
+  }
+
   public static object getGamepad(int index, string what) {
     Sdl.SDL_JoystickUpdate();
     return gamepads.getGamepad(index, what);
@@ -270,8 +280,8 @@ public static class Myro {
   public static object getGamepad(IList iterable) {
     Sdl.SDL_JoystickUpdate();
     List retval = new List();
-    foreach (int index in iterable)
-      retval.append(gamepads.getGamepad(index, "all"));
+    foreach (string what in iterable)
+      retval.append(gamepads.getGamepad(0, what));
     return retval;
   }
   
@@ -2799,6 +2809,10 @@ public static class Myro {
 
   public static void setPixel(Graphics.Picture picture, int col, int row, Graphics.Color color) {
     picture.setPixel(col, row, color);
+  }
+
+  public static void setPixel(Graphics.Picture picture, int col, int row, Graphics.Pixel pixel) {
+    picture.setPixel(col, row, pixel);
   }
 
   public static Graphics.Color makeColor(int r, int g, int b) {
