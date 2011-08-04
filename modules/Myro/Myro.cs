@@ -35,17 +35,17 @@ public static class Extensions {
   public static T[] Slice<T>(this T[] source, int start, int end) {
     if (start == 0 && end == source.Length)
         return source;
-	// Handles negative ends.
-	if (end < 0) {
-	  end = source.Length + end;
-	}
-	int len = end - start;
-	// Return new array.
-	T[] res = new T[len];
-	for (int i = 0; i < len; i++) {
-	  res[i] = source[i + start];
-	}
-	return res;
+        // Handles negative ends.
+        if (end < 0) {
+          end = source.Length + end;
+        }
+        int len = end - start;
+        // Return new array.
+        T[] res = new T[len];
+        for (int i = 0; i < len; i++) {
+          res[i] = source[i + start];
+        }
+        return res;
   }
 }
 
@@ -65,160 +65,203 @@ public static class Myro {
 
   public readonly static Gamepads gamepads = new Gamepads();
 
-  public static void gamepad() {
-	PythonDictionary results = (PythonDictionary)getGamepadNow();
-	List button = (List)results["button"];
-	string name = "Scribby";
-	try {
-	  name = getName();
-	} catch {
-	  // ignore
-	}
-	List phrases = Graphics.PyList(
-		String.Format("Hello. My name is {0}.", name),
-		"Ouch! I'm a sensitive robot.", 
-		"I'm hungry. Do you have any batteries?");
+  static void invoke_function(object function, object args) {
+    Gtk.Application.Invoke( delegate {
+        if (function is PythonFunction) {
+          try {
+            IronPython.Runtime.Operations.PythonCalls.Call(function, args);
+          } catch (Exception e) {
+            Console.Error.WriteLine("Error in function");
+            Console.Error.WriteLine(e.Message);
+          }        
+        } else {
+          try {
+            Func<object,object> f = (Func<object,object>)function;
+            f(args);
+          } catch (Exception e) {
+            Console.Error.WriteLine("Error in function");
+            Console.Error.WriteLine(e.Message);
+          }        
+        }
+      });
+  }
 
+  public static void gamepad(PythonDictionary dict) {
+    // everytime something (up/down) happens on the keys being
+    // watched, then args are sent to the associated function(s)
+    PythonDictionary results;
+    List keys = new List();
+    foreach (string key in dict.Keys) {
+      keys.append(key);
+    }
+    while (true) {
+      results = (PythonDictionary)getGamepad(keys);
+      foreach (string key in results.Keys) {
+	invoke_function(dict[key], results[key]);
+      }
+    }
+  }
+
+  public static void gamepad() {
+    // sample robot controller
+    PythonDictionary results = (PythonDictionary)getGamepadNow();
+    List button = (List)results["button"];
+    string name = "Scribby";
+    try {
+      name = getName();
+    } catch {
+      // ignore
+    }
+    List phrases = Graphics.PyList(
+		   String.Format("Hello. My name is {0}.", name),
+		                 "Ouch! I'm a sensitive robot.", 
+				 "I'm hungry. Do you have any batteries?");
+    
     Console.WriteLine("        Pad   Action");
-	Console.WriteLine("     ------   -------");
+    Console.WriteLine("     ------   -------");
     Console.WriteLine(" Left/Right   turnLeft() and turnRight()");
     Console.WriteLine("    Up/Down   forward() and backward()");
     Console.WriteLine("");
-
+    
     if (button.Count > 0) {
-	  Console.WriteLine("     Button   Action");
-	  Console.WriteLine("     ------   -------");
-	  if (button.Count > 0) 
-		Console.WriteLine("          1   stop()");
-	  if (button.Count > 1) 
-		Console.WriteLine("          2   takePicture()");
-	  if (button.Count > 2) 
-		Console.WriteLine("          3   beep(.25, 523)");
-	  if (button.Count > 3) 
-		Console.WriteLine("          4   beep(.25, 587)");
-	  if (button.Count > 4) 
-		Console.WriteLine("          5   beep(.25, 659)");
-	  if (button.Count > 5) 
-		Console.WriteLine(String.Format("          6   speak('{0}')", 
-				phrases[0]));
-	  if (button.Count > 6) 
-		Console.WriteLine(String.Format("          7   speak('{0}')",
-				phrases[1]));
-	  if (button.Count > 7) 
-		Console.WriteLine(String.Format("          8   speak('{0}')",
-				phrases[2]));
-	  Console.WriteLine("");
-	}
-	
-	Console.WriteLine("Gamepad is now running... Press button 1 to stop.");
-
+      Console.WriteLine("     Button   Action");
+      Console.WriteLine("     ------   -------");
+      Console.WriteLine("          1   stop()");
+      if (button.Count > 1) 
+	Console.WriteLine("          2   takePicture()");
+      if (button.Count > 2) 
+	Console.WriteLine("          3   beep(.25, 523)");
+      if (button.Count > 3) 
+	Console.WriteLine("          4   beep(.25, 587)");
+      if (button.Count > 4) 
+	Console.WriteLine("          5   beep(.25, 659)");
+      if (button.Count > 5) 
+	Console.WriteLine(String.Format("          6   speak('{0}')", 
+					phrases[0]));
+      if (button.Count > 6) 
+	Console.WriteLine(String.Format("          7   speak('{0}')",
+					phrases[1]));
+      if (button.Count > 7) 
+	Console.WriteLine(String.Format("          8   speak('{0}')",
+					phrases[2]));
+      Console.WriteLine("");
+    }
+    
+    Console.WriteLine("Gamepad is now running... Press button 1 to stop.");
+    
     List lastMove = Graphics.PyList(0, 0);
-	List axis, freqs;
+    List axis, freqs;
     bool doneSpeaking = true;
     PythonDictionary retval = (PythonDictionary)getGamepadNow();
     button = (List)retval["button"];
     int length = button.Count;
     bool tryToMove = true;
     while (true) {
-	  retval = (PythonDictionary)getGamepad();	// changed to blocking, JWS
-	  button = (List)retval["button"];
-	  axis = (List)retval["axis"];
-	  freqs = Graphics.PyList(null, null);
-	  if (length > 0 && (int)button[0] == 1) {
-		stop();
-		break;
+      retval = (PythonDictionary)getGamepad();  // changed to blocking, JWS
+      button = (List)retval["button"];
+      axis = (List)retval["axis"];
+      freqs = Graphics.PyList(null, null);
+      if (length > 0 && (int)button[0] == 1) {
+	try {
+	  stop();
+	} catch {
+	}
+	break;
+      }
+      if (length > 1 && (int)button[1] == 1) {
+	speak("Say cheese!", 1);
+	try {
+	  Graphics.Picture pic = takePicture();
+	  show(pic);
+	} catch {
+	}
+      }
+      if (length > 2 && (int)button[2] == 1) {
+	freqs[0] = 523;
+      }
+      if (length > 3 && (int)button[3] == 1) {
+	if (freqs[0] == null)
+	  freqs[0] = 587;
+	else
+	  freqs[1] = 587;
+      }
+      if (length > 4 && (int)button[4] == 1) {
+	if (freqs[0] == null)
+	  freqs[0] = 659;
+	else
+	  freqs[1] = 659;
+      }
+      // speak
+      if (length > 5 && (int)button[5] == 1) {
+	if (doneSpeaking) {
+	  speak((string)phrases[0], 1);
+	  doneSpeaking = false;
+	} 
+      } else if (length > 6 && (int)button[6] == 1) {
+	if (doneSpeaking) {
+	  speak((string)phrases[1], 1);
+	  doneSpeaking = false;
+	}
+      } else if (length > 7 && (int)button[7] == 1) {
+	if (doneSpeaking) {
+	  speak((string)phrases[2], 1);
+	  doneSpeaking = false;
+	}
+      } else {
+	doneSpeaking = true;
+      }
+      
+      if (tryToMove && 
+	  axis[0] != lastMove[0] &&
+	  axis[1] != lastMove[1]) {
+	try {
+	  move(-(double)axis[1], -(double)axis[0]);
+	  lastMove = Graphics.PyList(axis[0], axis[1]);
+	} catch {
+	  tryToMove = false;
+	}
+      }
+      if (freqs[0] != null || freqs[1] != null) {
+	if (freqs[1] == null) {
+	  try {
+	    beep(.25, (int)freqs[0]);
+	  } catch {
+	    computer.beep(.25, (int)freqs[0]);
 	  }
-	  if (length > 1 && (int)button[1] == 1) {
-		speak("Say cheese!", 1);
-		Graphics.Picture pic = takePicture();
-		show(pic);
+	} else if (freqs[0] == null) {
+	  try {
+	    beep(.25, (int)freqs[1]);
+	  } catch {
+	    computer.beep(.25, (int)freqs[1]);
 	  }
-	  if (length > 2 && (int)button[2] == 1) {
-		freqs[0] = 523;
-	  }
-	  if (length > 3 && (int)button[3] == 1) {
-		if (freqs[0] == null)
-		  freqs[0] = 587;
-		else
-		  freqs[1] = 587;
-	  }
-	  if (length > 4 && (int)button[4] == 1) {
-		if (freqs[0] == null)
-		  freqs[0] = 659;
-		else
-		  freqs[1] = 659;
-	  }
-	  // speak
-	  if (length > 5 && (int)button[5] == 1) {
-		if (doneSpeaking) {
-		  speak((string)phrases[0], 1);
-		  doneSpeaking = false;
-		} 
-	  } else if (length > 6 && (int)button[6] == 1) {
-		if (doneSpeaking) {
-		  speak((string)phrases[1], 1);
-		  doneSpeaking = false;
-		} else if (length > 7 && (int)button[7] == 1) {
-		  if (doneSpeaking) {
-			speak((string)phrases[2], 1);
-			doneSpeaking = false;
-		  }
-		}
-	  } else {
-		doneSpeaking = true;
-	  }
-	  
-	  if (tryToMove && 
-		  axis[0] != lastMove[0] &&
-		  axis[1] != lastMove[1]) {
-		try {
-		  move(-(double)axis[1], -(double)axis[0]);
-		  lastMove = Graphics.PyList(axis[0], axis[1]);
-		} catch {
-		  tryToMove = false;
-		}
-	  }
-	  if (freqs[0] != null || freqs[1] != null) {
-		if (freqs[1] == null) {
-		  try {
-			beep(.25, (int)freqs[0]);
-		  } catch {
-			computer.beep(.25, (int)freqs[0]);
-		  }
-		} else if (freqs[0] == null) {
-		  try {
-			beep(.25, (int)freqs[1]);
-		  } catch {
-			computer.beep(.25, (int)freqs[1]);
-		  }
-		} else {
-		  try {
-			beep(.25, (int)freqs[0], (int)freqs[1]);
-		  } catch {
-			computer.beep(.25, (int)freqs[0], (int)freqs[1]);
-		  }
-		}
+	} else {
+	  try {
+	    beep(.25, (int)freqs[0], (int)freqs[1]);
+	  } catch {
+	    computer.beep(.25, (int)freqs[0], (int)freqs[1]);
 	  }
 	}
+      }
+    }
   }
 
   public static void senses() {
     Gtk.Application.Invoke(delegate {
-		  Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
-		  fc.VBox.PackStart(new Gtk.Label("Item"));
-		  /*
-		  foreach (string choice in choices) {
+                  Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
+                  fc.VBox.PackStart(new Gtk.Label("Item"));
+                  /*
+                  foreach (string choice in choices) {
             Gtk.Button button = new Gtk.Button(choice);
             button.Clicked += new System.EventHandler(DialogHandler);
             fc.AddActionWidget(button, Gtk.ResponseType.Ok);
-		  }
-		  */
-		  fc.ShowAll();
-		  // update loop
-		  // query the robot
-		  // show sense: value
-		  //fc.Run();
-		  //fc.Destroy();
+                  }
+                  */
+                  fc.ShowAll();
+                  // update loop
+                  // query the robot
+                  // show sense: value
+                  //fc.Run();
+                  //fc.Destroy();
         });
   }
   
@@ -228,13 +271,13 @@ public static class Myro {
 
     public Gamepads() {
       try {
-	Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK);
-	handles = new IntPtr [Sdl.SDL_NumJoysticks()];
-	for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
-	  handles[i] = Sdl.SDL_JoystickOpen(i);
-	}
+        Sdl.SDL_Init(Sdl.SDL_INIT_JOYSTICK);
+        handles = new IntPtr [Sdl.SDL_NumJoysticks()];
+        for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
+          handles[i] = Sdl.SDL_JoystickOpen(i);
+        }
       } catch {
-	Console.Error.WriteLine("WARNING: SDL is not installed.");
+        Console.Error.WriteLine("WARNING: SDL is not installed.");
       }
     }
 
@@ -242,7 +285,7 @@ public static class Myro {
       List retval = new List();
       int num = Sdl.SDL_JoystickNumHats(handles[index]);
       for (int button = 0; button < num; button++) {
-	retval.append(Sdl.SDL_JoystickGetHat(handles[index], button));
+        retval.append(Sdl.SDL_JoystickGetHat(handles[index], button));
       }
       return retval;
     }
@@ -251,9 +294,9 @@ public static class Myro {
       List retval = new List();
       int num = Sdl.SDL_JoystickNumBalls(handles[index]);
       for (int button = 0; button < num; button++) {
-	int x, y;
-	Sdl.SDL_JoystickGetBall(handles[index], button, out x, out y);
-	retval.append(Graphics.PyTuple(x, y));
+        int x, y;
+        Sdl.SDL_JoystickGetBall(handles[index], button, out x, out y);
+        retval.append(Graphics.PyTuple(x, y));
       }
       return retval;
     }
@@ -262,7 +305,7 @@ public static class Myro {
       List retval = new List();
       int num = Sdl.SDL_JoystickNumButtons(handles[index]);
       for (int button = 0; button < num; button++) {
-	retval.append((int)Sdl.SDL_JoystickGetButton(handles[index], button));
+        retval.append((int)Sdl.SDL_JoystickGetButton(handles[index], button));
       }
       return retval;
     }
@@ -271,70 +314,91 @@ public static class Myro {
       List retval = new List();
       int num = Sdl.SDL_JoystickNumAxes(handles[index]);
       for (int button = 0; button < num; button++) {
-	retval.append(Sdl.SDL_JoystickGetAxis(handles[index], button)/32767.0);
+        retval.append(Sdl.SDL_JoystickGetAxis(handles[index], button)/32767.0);
       }
       return retval;
     }
 
     public PythonDictionary getGamepadNow(int index, List whats) {
-	PythonDictionary retval =  new PythonDictionary();
-	foreach (string what in whats) {
-	  retval[what] = getGamepadNow(index, what);
-	}
-	return retval;
+      PythonDictionary retval =  new PythonDictionary();
+      foreach (string what in whats) {
+	retval[what] = getGamepadNow(index, what);
+      }
+      return retval;
     }
 
     public object getGamepadNow(int index, string what) {
       if (what == "all") {
-	return getGamepadNow(index, 
-			     Graphics.PyList("name", "axis", "ball", 
-					     "button", "hat", "count"));
+        return getGamepadNow(index, 
+                             Graphics.PyList("name", "axis", "ball", 
+                                             "button", "hat", "count"));
       } if (what == "button") {
-	return gamepads.getButtonStates(index);
+        return gamepads.getButtonStates(index);
       } else if (what == "name") {
-	return Sdl.SDL_JoystickName(index);
+        return Sdl.SDL_JoystickName(index);
       } else if (what == "axis") {
-	return gamepads.getAxisStates(index);
+        return gamepads.getAxisStates(index);
       } else if (what == "robot") {
-	List xy = gamepads.getAxisStates(index);
-	return Graphics.PyList(-((double)xy[1]), -((double)xy[0]));
+        List xy = gamepads.getAxisStates(index);
+        return Graphics.PyList(-((double)xy[1]), -((double)xy[0]));
       } else if (what == "ball") {
-	return gamepads.getBallStates(index);
+        return gamepads.getBallStates(index);
       } else if (what == "hat") {
-	return gamepads.getHatStates(index);
+        return gamepads.getHatStates(index);
       } else if (what == "count") {
-	return Sdl.SDL_NumJoysticks();
+        return Sdl.SDL_NumJoysticks();
       } else {
-	throw new Exception(String.Format("unknown gamepad component: '{0}'", what));
+        throw new Exception(String.Format("unknown gamepad component: '{0}'", what));
       }
     }
 
     public static bool Same(object o1, object o2) {
       if (o1 is PythonDictionary) {
-	PythonDictionary d1 = (PythonDictionary)o1;
-	PythonDictionary d2 = (PythonDictionary)o2;
-	foreach (string key in d1.Keys) {
-	  if (! Same(d1[key], d2[key]))
-	    return false;
-	}
-	foreach (string key in d2.Keys) {
-	  if (! Same(d1[key], d2[key]))
-	    return false;
-	}
-	return true;
+        PythonDictionary d1 = (PythonDictionary)o1;
+        PythonDictionary d2 = (PythonDictionary)o2;
+        foreach (string key in d1.Keys) {
+          if (! Same(d1[key], d2[key]))
+            return false;
+        }
+        foreach (string key in d2.Keys) {
+          if (! Same(d1[key], d2[key]))
+            return false;
+        }
+        return true;
       } else if (o1 is List) {
-	List l1 = (List)o1;
-	List l2 = (List)o2;
-	if (l1.Count != l2.Count)
-	  return false;
-	for (int i = 0; i < l1.Count; i++) {
-	  if (! Same(l1[i], l2[i]))
-	    return false;
-	}
-	return true;
+        List l1 = (List)o1;
+        List l2 = (List)o2;
+        if (l1.Count != l2.Count)
+          return false;
+        for (int i = 0; i < l1.Count; i++) {
+          if (! Same(l1[i], l2[i]))
+            return false;
+        }
+        return true;
       } else {
-	return o1.Equals(o2);
+        return o1.Equals(o2);
       }
+    }
+
+    public object getGamepad(List indices, string what) {
+      List initials = new List();
+      foreach (int index in indices) {
+	initials.append(getGamepadNow(index, what));
+      }
+      Sdl.SDL_JoystickUpdate();
+      List currents = new List();
+      foreach (int index in indices) {
+	currents.append(getGamepadNow(index, what));
+      }
+      while (Same(initials, currents)) {
+	wait(.01);
+        Sdl.SDL_JoystickUpdate();
+	currents = new List();
+	foreach (int index in indices) {
+	  currents.append(getGamepadNow(index, what));
+	}
+      }
+      return currents;
     }
 
     public object getGamepad(int index, string what) {
@@ -342,10 +406,32 @@ public static class Myro {
       Sdl.SDL_JoystickUpdate();
       object current = getGamepadNow(index, what);
       while (Same(initial, current)) {
-	Sdl.SDL_JoystickUpdate();
-	current = getGamepadNow(index, what);
+	wait(.01);
+        Sdl.SDL_JoystickUpdate();
+        current = getGamepadNow(index, what);
       }
       return current;
+    }
+
+    public object getGamepad(List indices, List whats) {
+      List initials = new List();
+      foreach (int index in indices) {
+	initials.append(getGamepadNow(index, whats));
+      }
+      Sdl.SDL_JoystickUpdate();
+      List currents = new List();
+      foreach (int index in indices) {
+	currents.append(getGamepadNow(index, whats));
+      }
+      while (Same(initials, currents)) {
+	wait(.01);
+        Sdl.SDL_JoystickUpdate();
+	currents = new List();
+	foreach (int index in indices) {
+	  currents.append(getGamepadNow(index, whats));
+	}
+      }
+      return currents;
     }
 
     public object getGamepad(int index, List whats) {
@@ -353,8 +439,9 @@ public static class Myro {
       Sdl.SDL_JoystickUpdate();
       object current = getGamepadNow(index, whats);
       while (Same(initial, current)) {
-	Sdl.SDL_JoystickUpdate();
-	current = getGamepadNow(index, whats);
+	wait(.01);
+        Sdl.SDL_JoystickUpdate();
+        current = getGamepadNow(index, whats);
       }
       return current;
     }
@@ -434,32 +521,23 @@ public static class Myro {
     return gamepads.getGamepad(index, whats);
   }
   
-  public static object getGamepad(IList iterable) {
+  public static object getGamepad(List whats) {
     Sdl.SDL_JoystickUpdate();
-    List retval = new List();
-    foreach (string what in iterable)
-      retval.append(gamepads.getGamepad(0, what));
-    return retval;
+    return gamepads.getGamepad(0, whats);
   }
   
-  public static object getGamepad(IList iterable, string what) {
+  public static object getGamepad(List indices, string what) {
     Sdl.SDL_JoystickUpdate();
-    List retval = new List();
-    foreach (int index in iterable)
-      retval.append(gamepads.getGamepad(index, what));
-    return retval;
+    return gamepads.getGamepad(indices, what);
   }
   
-  public static object getGamepad(IList iterable, List whats) {
+  public static object getGamepad(List indices, List whats) {
     Sdl.SDL_JoystickUpdate();
-    List retval = new List();
-    foreach (int index in iterable)
-      retval.append(gamepads.getGamepad(index, whats));
-    return retval;
+    return gamepads.getGamepad(indices, whats);
   }
   
   public class MyTexView : Gtk.TextView  {
-	public string MyString;
+        public string MyString;
   }
 
   // Functional Interface
@@ -481,20 +559,20 @@ public static class Myro {
   }
 
   public static void initialize(string port, int baud=38400) {
-	bool need_port = true;
-	if (Myro.robot is Scribbler) {
-	  if (((Scribbler)(Myro.robot)).serial is SerialPort) {
-		SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
-		if (serial.IsOpen) {
-		  if (port == null) 
-			need_port = false;
-		  else if (serial.PortName == port && serial.BaudRate == baud) {
-			need_port = false;
-		  } else {
-			// It exists, but wrong port/baud, so close it:
-			serial.Close(); // and need_port
+        bool need_port = true;
+        if (Myro.robot is Scribbler) {
+          if (((Scribbler)(Myro.robot)).serial is SerialPort) {
+                SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+                if (serial.IsOpen) {
+                  if (port == null) 
+                        need_port = false;
+                  else if (serial.PortName == port && serial.BaudRate == baud) {
+                        need_port = false;
+                  } else {
+                        // It exists, but wrong port/baud, so close it:
+                        serial.Close(); // and need_port
           }
-		} else { // already closed
+                } else { // already closed
            if ((serial.PortName == port || port == null) && serial.BaudRate == baud) {
             need_port = false;
             serial.Open();
@@ -502,16 +580,16 @@ public static class Myro {
             need_port = true;
           }
         }
-	  } // not a serial port
-	} // not a scribbler
-	if (need_port) {
-	  if (port == null) {
-		port = (string)ask("Port");
-	  }
-	  robot = new Scribbler(port, baud);
-	} else {
-	  ((Scribbler)robot).setup();
-	}
+          } // not a serial port
+        } // not a scribbler
+        if (need_port) {
+          if (port == null) {
+                port = (string)ask("Port");
+          }
+          robot = new Scribbler(port, baud);
+        } else {
+          ((Scribbler)robot).setup();
+        }
   }
 
   public static void uninit() {
@@ -1225,10 +1303,14 @@ public static class Myro {
     
     public virtual void beep(double duration, double frequency, double frequency2) {
       // Override in subclassed robots
+      Console.WriteLine(String.Format("computer.beep({0},{1},{2})",
+				      duration, frequency, frequency2));
     }
     
     public virtual void beep(double duration, double frequency) {
       // Override in subclassed robots
+      Console.WriteLine(String.Format("computer.beep({0},{1})",
+				      duration, frequency));
     }
     
     public virtual void reboot() {
@@ -2282,18 +2364,18 @@ public static class Myro {
       return (int)((hbyte << 16)| (mbyte << 8) | lbyte);
     }
 
-	public string ReadLine() {
-	  // Replaces serial.ReadLine() as it doesn't stop on \n
-	  string retval = "";
-	  byte b = read_byte();
-	  int counter = 0;
-	  while (b != 10 && counter < 255) { // '\n' newline
-		retval += (char)b;
-		b = read_byte();
-		counter++;
-	  }
-	  return (retval + "\n");
-	}
+        public string ReadLine() {
+          // Replaces serial.ReadLine() as it doesn't stop on \n
+          string retval = "";
+          byte b = read_byte();
+          int counter = 0;
+          while (b != 10 && counter < 255) { // '\n' newline
+                retval += (char)b;
+                b = read_byte();
+                counter++;
+          }
+          return (retval + "\n");
+        }
 
     public override PythonDictionary getInfo() {
       PythonDictionary retDict = new PythonDictionary();
@@ -2326,7 +2408,6 @@ public static class Myro {
           return retDict;
         }
       }
-	  Console.WriteLine("8");
       if (retval.Length == 0) {
         lock(serial) 
           //serial.ReadTimeout = old;
@@ -2348,10 +2429,8 @@ public static class Myro {
           retDict[it.ToLower().Trim()] = value.Trim();
         }
       }
-	  Console.WriteLine("9");
       //lock(serial)
-	  //serial.ReadTimeout = old;
-	  Console.WriteLine("10");
+      //serial.ReadTimeout = old;
       return retDict;
     }
     
@@ -2530,9 +2609,9 @@ public static class Myro {
         }
         if (Scribbler.PACKET_LENGTH - data.Length > 0) {
           try {
-			serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
+	    serial.Write(buffer, 0, Scribbler.PACKET_LENGTH - data.Length);
           } catch {
-			Console.WriteLine("ERROR: in write");
+	    Console.WriteLine("ERROR: in write");
           }
         }
       } 
@@ -3219,7 +3298,6 @@ public static class Myro {
     int position = 0; 
     // For each function, make a return list, and thread list
     foreach (IList list in objects) {
-      Console.WriteLine(list[0]);
       // FIXME: what signature? Not: object [], IList, or Array
       Func<object,Array> function = (Func<object,Array>)list[0];
       object [] args = ((object [])list).Slice(1, list.Count);
