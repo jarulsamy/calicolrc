@@ -3062,13 +3062,13 @@ public static class Myro {
       write((byte)v_low);
       write((byte)v_high);
     }
-  
+  }
+
   public static IEnumerable timer(double seconds) {
     double start = currentTime();
     while (currentTime() - start < seconds) {
       yield return (currentTime() - start);
     }
-  }
   }
 
   // Graphics.cs
