@@ -2272,7 +2272,7 @@ public static class Graphics {
   
   public class Text : Shape {
     public string _text;
-    public string fontFace = "Georgia";
+    public string fontFace = "sans serif";
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
     public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
     double _fontSize = 18;
