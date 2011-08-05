@@ -2278,7 +2278,6 @@ public static class Graphics {
     double _fontSize = 18;
     public string xJustification = "center"; // left, center, right
     public string yJustification = "center"; // top, center, bottom
-    Cairo.TextExtents? text_extents = null;
 
     public double fontSize
     {
@@ -2302,7 +2301,6 @@ public static class Graphics {
       set
 	{
 	  _text = value;
-	  text_extents = null;
 	  QueueDraw();
 	}
     }
@@ -2345,32 +2343,34 @@ public static class Graphics {
 	  g.Color = _fill._cairo;
       else
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
-      g.SelectFontFace(fontFace, fontSlant, fontWeight);
-      g.SetFontSize(fontSize);
-      if (text_extents == null)
-	text_extents = g.TextExtents(text);
-      Cairo.TextExtents te = (Cairo.TextExtents)text_extents;
+      Pango.Layout layout;
+      layout = Pango.CairoHelper.CreateLayout(g);
+      Pango.FontDescription desc = Pango.FontDescription.FromString(String.Format("{0} {1}", fontFace, fontSize));
+      layout.FontDescription = desc;
+      layout.SetText(text);
+      layout.Alignment = Pango.Alignment.Center;
+      int layoutWidth, layoutHeight;
+      layout.GetSize (out layoutWidth, out layoutHeight);
+      double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+      double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
       Point p = new Point(0,0);
       if (xJustification == "center") {
-        p.x = points[0].x - te.Width  / 2 - te.XBearing;
+        p.x = points[0].x - teWidth  / 2; // - te.XBearing;
       } else if (xJustification == "left") {
         p.x = points[0].x;
       } else if (xJustification == "right") {
-        p.x = points[0].x + te.Width;
+        p.x = points[0].x + teWidth;
       }
       if (yJustification == "center") {
-        p.y = points[0].y - te.Height / 2 - te.YBearing;
+        p.y = points[0].y - teHeight / 2; // - te.YBearing;
       } else if (yJustification == "bottom") {
         p.y = points[0].y;
       } else if (yJustification == "top") {
-        p.y = points[0].y - te.Height;
+        p.y = points[0].y - teHeight;
       }
       temp = screen_coord(p);
       g.MoveTo(temp.x, temp.y);
-      // Possible hints: see TextPath, GlyphPath, ShowGlyph
-      // BETTER for Mac: Pango ShowLayout
-      lock(fontFace)
-	g.ShowText(text);    
+      Pango.CairoHelper.ShowLayout(g, layout);
       foreach (Shape shape in shapes) {
         shape.render(g);
 	shape.updateGlobalPosition(g);
