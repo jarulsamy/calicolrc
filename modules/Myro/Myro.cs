@@ -245,26 +245,75 @@ public static class Myro {
     }
   }
 
-  public static void senses() {
-    Gtk.Application.Invoke(delegate {
-                  Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
-                  fc.VBox.PackStart(new Gtk.Label("Item"));
-                  /*
-                  foreach (string choice in choices) {
-            Gtk.Button button = new Gtk.Button(choice);
-            button.Clicked += new System.EventHandler(DialogHandler);
-            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
-                  }
-                  */
-                  fc.ShowAll();
-                  // update loop
-                  // query the robot
-                  // show sense: value
-                  //fc.Run();
-                  //fc.Destroy();
-        });
+  public static void senses()
+  {
+    new Senses();
   }
-  
+
+  class Senses {
+    Gtk.Window win;
+    PythonDictionary dict_entry;
+    uint idle = 0;
+
+    public Senses() {
+      win = new Gtk.Window("Senses");
+      Gtk.VBox vbox = new Gtk.VBox();
+      //win.AllowGrow = true;
+      //win.AllowShrink = true;
+      //win.SetDefaultSize(width, height);
+      win.DeleteEvent += OnDelete;
+      win.Add(vbox);
+      Gtk.HBox hbox;
+      PythonDictionary items = new PythonDictionary();
+      items["Line:"] = 2;
+      items["Stall:"] = 1;
+      items["Bright:"] = 3;
+      items["Obstacle:"] = 3;
+      items["IR:"] = 2;
+      items["Light:"] = 3;
+      items["Battery:"] = 1;
+      dict_entry = new PythonDictionary();
+      List entries = new List();
+      foreach (string key in items.Keys) {
+	hbox = new Gtk.HBox();
+	Gtk.Label label = new Gtk.Label(key);
+	label.WidthRequest = 100;
+	hbox.PackStart(label, false, false, 0);
+	entries = new List();
+	for (int i= 0; i < (int)items[key]; i++) {
+	  Gtk.Entry entry = new Gtk.Entry();
+	  entries.append(entry);
+	  hbox.PackStart(entry);
+	  dict_entry[key] = entries;
+	}
+	vbox.PackStart(hbox);
+      }
+      Gtk.Application.Invoke(delegate {
+	  win.ShowAll();
+	});
+      idle = GLib.Idle.Add(new GLib.IdleHandler(update_entries));
+    }
+    
+    private void OnDelete(object obj, Gtk.DeleteEventArgs args)  {
+      if (idle != 0) {
+	GLib.Source.Remove(idle);
+      }
+      idle = 0;
+    }
+    
+    bool update_entries() {
+      Gtk.Application.Invoke(delegate {
+	  try {	  
+	    ((Gtk.Entry)((List)dict_entry["Light:"])[0]).Text = currentTime().ToString();
+	  } catch {
+	    
+	  }
+	});
+      wait(.1);
+      return true; // continue
+    }
+  }
+
   public class Gamepads {
    
     IntPtr [] handles;
