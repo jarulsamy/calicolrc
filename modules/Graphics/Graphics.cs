@@ -2271,13 +2271,14 @@ public static class Graphics {
   }
   
   public class Text : Shape {
-    public string text;
+    public string _text;
     public string fontFace = "Georgia";
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
     public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
     double _fontSize = 18;
     public string xJustification = "center"; // left, center, right
     public string yJustification = "center"; // top, center, bottom
+    Cairo.TextExtents? text_extents = null;
 
     public double fontSize
     {
@@ -2290,6 +2291,20 @@ public static class Graphics {
           _fontSize = value;
           QueueDraw();
         }
+    }
+
+    public string text
+    {
+      get
+	{
+	  return _text;
+	}
+      set
+	{
+	  _text = value;
+	  text_extents = null;
+	  QueueDraw();
+	}
     }
 
     public Text(IList iterable, string text):  
@@ -2332,7 +2347,9 @@ public static class Graphics {
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
       g.SelectFontFace(fontFace, fontSlant, fontWeight);
       g.SetFontSize(fontSize);
-      Cairo.TextExtents te = g.TextExtents(text);
+      if (text_extents == null)
+	text_extents = g.TextExtents(text);
+      Cairo.TextExtents te = (Cairo.TextExtents)text_extents;
       Point p = new Point(0,0);
       if (xJustification == "center") {
         p.x = points[0].x - te.Width  / 2 - te.XBearing;
