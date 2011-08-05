@@ -496,6 +496,9 @@ class ShellWindow(Window):
         self.calico.editor.select_or_open(filename, lineno, language)
 
     def reset_shell(self, obj, event):
+        self.on_stop(obj=None, event=None)
+        # Force stop button off, if necessary:
+        self.stop_running(sender=None, args=None)
         self.calico.engine.reset()
         self.message("-----------")
         self.message(_("Reset shell"))
