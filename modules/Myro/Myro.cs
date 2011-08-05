@@ -304,9 +304,30 @@ public static class Myro {
     bool update_entries() {
       Gtk.Application.Invoke(delegate {
 	  try {	  
-	    ((Gtk.Entry)((List)dict_entry["Light:"])[0]).Text = currentTime().ToString();
+	    List results = (List)getLight();
+	    for (int i=0; i < results.Count; i++) {
+	      ((Gtk.Entry)((List)dict_entry["Light:"])[i]).Text = results[i].ToString();
+	    }
+	    results = (List)getBright();
+	    for (int i=0; i < results.Count; i++) {
+	      ((Gtk.Entry)((List)dict_entry["Bright:"])[i]).Text = results[i].ToString();
+	    }
+	    results = (List)getObstacle();
+	    for (int i=0; i < results.Count; i++) {
+	      ((Gtk.Entry)((List)dict_entry["Obstacle:"])[i]).Text = results[i].ToString();
+	    }
+	    results = (List)getIR();
+	    for (int i=0; i < results.Count; i++) {
+	      ((Gtk.Entry)((List)dict_entry["IR:"])[i]).Text = results[i].ToString();
+	    }
+	    results = (List)getLine();
+	    for (int i=0; i < results.Count; i++) {
+	      ((Gtk.Entry)((List)dict_entry["Line:"])[i]).Text = results[i].ToString();
+	    }
+	    ((Gtk.Entry)((List)dict_entry["Battery:"])[0]).Text = getBattery().ToString();
+	    ((Gtk.Entry)((List)dict_entry["Stall:"])[0]).Text = getStall().ToString();	  
 	  } catch {
-	    
+	    // pass
 	  }
 	});
       wait(.1);
