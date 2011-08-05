@@ -2369,7 +2369,8 @@ public static class Graphics {
       g.MoveTo(temp.x, temp.y);
       // Possible hints: see TextPath, GlyphPath, ShowGlyph
       // BETTER for Mac: Pango ShowLayout
-      g.ShowText(text);    
+      lock(fontFace)
+	g.ShowText(text);    
       foreach (Shape shape in shapes) {
         shape.render(g);
 	shape.updateGlobalPosition(g);
