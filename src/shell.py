@@ -396,6 +396,16 @@ class ShellWindow(Window):
                         self.textview.Caret.Column = self.textview.Document.GetLine(0).Length
                     Gtk.Application.Invoke(invoke)
             elif str(event.Key) == "Tab":
+                # where are we?
+                text = self.textview.Document.Text[0:self.textview.Caret.Column]
+                retval = self.completion(text)
+                if retval:
+                    self.message(retval)
+                    return True
+                # Cases:
+                # to actually insert a tab at front
+                # to move a block
+                # command-line completition
                 return False
             return False
         else:
@@ -405,12 +415,12 @@ class ShellWindow(Window):
         variable = self.find_variable(text)
         items = []
         if variable:
-            parts = variable.split(".", 1)
-            root = parts[0]
-            if len(parts) == 1:
+            parts = variable.split(".")
+            if len(parts) == 1: # Easy, just get the vars that match:
+                root = parts[0]
                 items = [x for x in self.calico.engine.scope.GetVariableNames() if x.startswith(root)]
             else:
-                partial = parts[-1]
+                root = parts[0]
                 (found, value) = self.calico.engine.scope.TryGetVariable(root)
                 if found:
                     for part in parts[1:-1]:
@@ -420,11 +430,19 @@ class ShellWindow(Window):
                             value = None
                             break
                     if value:
+                        partial = parts[-1]
                         items = [x for x in dir(value) if x.startswith(partial) and not x.startswith("_")]
-        if items:           
-            return _("Possible completions:\n   ") + ("\n   ".join(items)) + "\n"
+        if items: 
+            retval = "----------------------\n" + _("Possible completions (%d):\n   " % len(items)) 
+            count = 0
+            for item in items:
+                if count % 3 == 0:
+                    retval += "\n"
+                retval += "%-25s" % item
+                count += 1
+            return retval + "\n----------------------\n"
         else:
-            return _("No completions found for '%s'\n") % text
+            return None
 
     def find_variable(self, text):
         """
