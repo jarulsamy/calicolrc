@@ -397,7 +397,10 @@ class ShellWindow(Window):
                     Gtk.Application.Invoke(invoke)
             elif str(event.Key) == "Tab":
                 # where are we?
-                text = self.textview.Document.Text[0:self.textview.Caret.Column]
+                lineNo = self.textview.Caret.Line
+                lines = self.textview.Document.Text.Split("\n")
+                line = lines[lineNo]
+                text = line[0:self.textview.Caret.Column]
                 if text.strip() != "": # something there!
                     retval = self.completion(text)
                     if retval:
@@ -430,7 +433,7 @@ class ShellWindow(Window):
                         partial = parts[-1]
                         items = [x for x in dir(value) if x.startswith(partial) and not x.startswith("_")]
         if items: 
-            retval = "----------------------\n" + _("Possible completions (%d):\n   " % len(items)) 
+            retval = "----------------------\n" + _("Possible completions for '%s' (%d):\n   " % (variable, len(items)))
             count = 0
             for item in items:
                 if count % 3 == 0:

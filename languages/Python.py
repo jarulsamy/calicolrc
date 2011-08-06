@@ -50,7 +50,7 @@ class PythonEngine(DLREngine):
                 "from Myro import ask;" + 
                 "__builtins__['input'] = ask;" +
                 "__builtins__['print'] = calico.Print;" +
-                "del division, with_statement, ask;")
+                "del division, with_statement, ask, print_function;")
         sctype = Microsoft.Scripting.SourceCodeKind.Statements
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         source.Compile()

@@ -636,14 +636,14 @@ public static class Myro {
                 if (serial.IsOpen) {
                   if (port == null) 
                         need_port = false;
-                  else if (serial.PortName == port && serial.BaudRate == baud) {
+                  else if (serial.PortName.Equals(port) && serial.BaudRate == baud) {
                         need_port = false;
                   } else {
                         // It exists, but wrong port/baud, so close it:
                         serial.Close(); // and need_port
           }
                 } else { // already closed
-           if ((serial.PortName == port || port == null) && serial.BaudRate == baud) {
+		  if ((serial.PortName.Equals(port) || port == null) && serial.BaudRate == baud) {
             need_port = false;
             serial.Open();
           } else {
