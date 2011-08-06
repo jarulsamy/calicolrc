@@ -398,14 +398,11 @@ class ShellWindow(Window):
             elif str(event.Key) == "Tab":
                 # where are we?
                 text = self.textview.Document.Text[0:self.textview.Caret.Column]
-                retval = self.completion(text)
-                if retval:
-                    self.message(retval)
-                    return True
-                # Cases:
-                # to actually insert a tab at front
-                # to move a block
-                # command-line completition
+                if text.strip() != "": # something there!
+                    retval = self.completion(text)
+                    if retval:
+                        self.message(retval) # show options
+                    return True # don't put in tab
                 return False
             return False
         else:

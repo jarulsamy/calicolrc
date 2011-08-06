@@ -25,6 +25,7 @@ import GLib
 import System
 
 from window import Window, MyWindow
+import printing
 from utils import _, StatusBar, SearchBar
 import os
 import re
@@ -55,6 +56,8 @@ class EditorWindow(Window):
                    None, self.on_save_file),
                   (_("Save as..."), Gtk.Stock.SaveAs,
                    None, self.on_save_file_as),
+                  None,
+                  (_("Print..."), Gtk.Stock.Print, None, self.printing),
                   None,
                   (_("Register..."), None, None, lambda o, e: self.calico.register_dialog(self.window)),
                   (_("Login..."), None, "<control>l", lambda o, e: self.calico.login_dialog(self.window)),
@@ -449,3 +452,11 @@ class EditorWindow(Window):
         # .SearchWrapped - if that is the end
         # next, increment Offset by 1, and SearchForward
         pass
+
+    def printing(self, obj, args):
+        """
+        Print dialog
+        """
+        doc = self.get_current_doc()
+        if doc:
+            printing.Printing(doc.title, doc.get_text()) # title, contents
