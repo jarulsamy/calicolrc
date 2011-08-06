@@ -791,7 +791,7 @@ public static class Myro {
 
   public static void show(Graphics.Picture picture, 
       string title="Myro Camera") {
-    Graphics.WindowClass win = Graphics.makeWindow(title,
+    Graphics.WindowClass win = Graphics.makeWindowFast(title,
         picture.width, picture.height);
     picture.draw(win);
   }

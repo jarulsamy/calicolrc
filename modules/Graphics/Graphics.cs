@@ -404,7 +404,26 @@ public static class Graphics {
     ev.WaitOne();
     return new Picture(pixbuf);
   }
-  
+
+  public static Graphics.WindowClass makeWindowFast(string title="Calico Graphics",
+                                           int width=300,
+                                           int height=300) {
+    if (_windows.ContainsKey(title)) {
+      _windows[title]._canvas.shapes.Clear();
+      _windows[title].mode = "auto";
+      _windows[title].Resize(width, height);
+      _lastWindow = _windows[title];
+      return _windows[title];
+    } else {
+      _windows[title] = new Graphics.WindowClass(title, width, height);
+      _lastWindow = _windows[title];
+      _lastWindow.KeepAbove = true;
+      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for realize
+      return _windows[title];
+    }
+  }
+
+
   public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
                                            int width=300, 
                                            int height=300) {
