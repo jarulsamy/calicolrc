@@ -18,28 +18,34 @@
 #
 # $Id: $
 
+import os
+
 import Gtk
 import System.Math as Math
+import System
 import Pango
 import System
 
 class Printing:
-    def __init__(self, title, text):
-        self.title = title
-        self.contents = text
-        self.headerHeight = (10*72/25.4)
-        self.headerGap = (3*72/25.4)
-        self.pangoScale = 1024
-        self.fontSize = 12.0
-        self.printop = Gtk.PrintOperation()
-        self.printop.BeginPrint += self.OnBeginPrint
-        self.printop.DrawPage += self.OnDrawPage
-        self.printop.EndPrint += self.OnEndPrint
+    def __init__(self, title, text, filename=None):
+        if System.Environment.OSVersion.Platform == System.PlatformID.Win32NT:
+            os.system("NOTEPAD /P %s" % filename)
+        else:
+            self.title = title
+            self.contents = text
+            self.headerHeight = (10*72/25.4)
+            self.headerGap = (3*72/25.4)
+            self.pangoScale = 1024
+            self.fontSize = 12.0
+            self.printop = Gtk.PrintOperation()
+            self.printop.BeginPrint += self.OnBeginPrint
+            self.printop.DrawPage += self.OnDrawPage
+            self.printop.EndPrint += self.OnEndPrint
 
-        def invoke(sender, args):
-            self.printop.Run(Gtk.PrintOperationAction.PrintDialog, None)
+            def invoke(sender, args):
+                self.printop.Run(Gtk.PrintOperationAction.PrintDialog, None)
 
-        Gtk.Application.Invoke(invoke)
+            Gtk.Application.Invoke(invoke)
 
     def OnBeginPrint(self, obj, args):
         context = args.Context

@@ -459,4 +459,7 @@ class EditorWindow(Window):
         """
         doc = self.get_current_doc()
         if doc:
-            printing.Printing(doc.title, doc.get_text()) # title, contents
+            doc.save()
+            if doc.filename:
+                printing.Printing(doc.title, doc.get_text(),
+                                  doc.filename) # title, contents
