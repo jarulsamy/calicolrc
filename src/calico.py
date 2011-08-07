@@ -214,9 +214,8 @@ class CalicoProject(object):
         currently available. The language name (lowercase) is the
         key in the dictionary pointing to a Language object.
         """
-        sys.path.append(os.path.abspath("languages"))
         results = {}
-        languages = glob.glob("languages/*.py")
+        languages = glob.glob("languages/*/*.py")
         for filename in languages: 
             path, basename = os.path.split(filename)
             base, ext = os.path.splitext(basename)
@@ -224,6 +223,7 @@ class CalicoProject(object):
                 "All" in self.config.get("calico.languages")):
                 if base in self.config.get("calico.languages_ignore"):
                     continue
+                sys.path.append(os.path.abspath(path))
                 try:
                     import_name, ext = os.path.basename(filename).rsplit(".")
                     exec("import %s as LanguageModule" % import_name)
