@@ -38,9 +38,8 @@ calicopath = os.path.join(fullpath, "..") # /src/..
 # change here to start
 os.chdir(calicopath)
 for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
-    path = os.path.join(fullpath, dir)
+    path = os.path.abspath(dir)
     sys.path.append(path)
-sys.path.append(os.path.abspath("modules"))
 
 # Add some paths for Windows:
 import Microsoft
