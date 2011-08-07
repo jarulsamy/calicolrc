@@ -41,33 +41,16 @@ for dir in ['.', './bin/Lib', './bin/DLLs', './modules', './src']:
     path = os.path.abspath(dir)
     sys.path.append(path)
 
-# Add some paths for Windows:
+# Needed for adding references to gtk, gdk, pango, and glib:
+# Starting with (at least) 2.10.3, gtk is in own directory:
+sys.path.append("C:\\Program Files (x86)\\GtkSharp\\2.12\\lib\\gtk-sharp-2.0")
+
+# Get mono_runtime version:
 import Microsoft
 import System
-mono_version = "?.?.?"
 mtype = System.Type.GetType("Mono.Runtime")
 method = mtype.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
 mono_runtime = method.Invoke(None, None)
-try:
-    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\")
-except:
-    registry = None
-# Get Mono Path    
-if registry:
-    mono_version = registry.GetValue("DefaultCLR") # '2.8', '2.8.1', etc
-    registry = Microsoft.Win32.Registry.LocalMachine.CreateSubKey("Software\\Novell\\Mono\\%s\\" % mono_version)
-    path = registry.GetValue("SdkInstallRoot") # Path to Mono
-    if path:
-        sys.path.append("%s\\lib\\mono\\gtk-sharp-2.0" % path)
-# Get SdlDotNet Path
-try:
-    registry = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software\\SdlDotNet\\")
-except:
-    registry = None
-if registry:
-    path = registry.GetValue("")
-    if path:
-        sys.path.append("%s\\bin" % path)
 
 # Bring in DLLs to import from:
 import clr
@@ -633,25 +616,25 @@ class CalicoProject(object):
         for actionHandler in self.actionHandlers:
             actionHandler(action, **data)
 
-
 # Let's start!
 version = "0.5.7"
 if "--help" in args:
     print()
     print(_("Calico Project, Version %s, on %s") % (version,
                                                  System.Environment.OSVersion.VersionString))
+    print("  " + _("Using Mono runtime version %s" % mono_runtime))
     print("----------------------------------------------------------------------------")
     print(_("Start calico with the following options:"))
-    print(_("  calico                            Defaults to shell"))
-    print(_("  calico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"))
-    print(_("  calico --shell                    Brings up shell window"))
-    print(_("  calico --editor                   Brings up editor window"))
-    print(_("  calico --chat                     Brings up chat window"))
-    print(_("  calico --exec FILENAMEs           Runs FILENAMEs standalone, with graphics"))
-    print(_("  calico --exec --nogui FILENAMEs   Runs FILENAMEs standalone, no graphics"))
-    print(_("  calico --version                  Displays the version number (%s)" % version))
-    print(_("  calico --help                     Displays this message"))
-    print(_("  calico --debug                    Puts Calico in debugging mode"))
+    print(_("  StartCalico                            Defaults to shell"))
+    print(_("  StartCalico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"))
+    print(_("  StartCalico --shell                    Brings up shell window"))
+    print(_("  StartCalico --editor                   Brings up editor window"))
+    print(_("  StartCalico --chat                     Brings up chat window"))
+    print(_("  StartCalico --exec FILENAMEs           Run FILENAMEs standalone with graphics"))
+    print(_("  StartCalico --exec --nogui FILENAMEs   Run FILENAMEs standalone no graphics"))
+    print(_("  StartCalico --version                  Displays the version number (%s)" % version))
+    print(_("  StartCalico --help                     Displays this message"))
+    print(_("  StartCalico --debug                    Puts Calico in debugging mode"))
     print()
     sys.exit(0)
 elif "--version" in args:

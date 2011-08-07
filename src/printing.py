@@ -103,4 +103,5 @@ class Printing:
     def OnEndPrint(self, obj, args):
         pass
 
-# p = Printing("Test.py", "this is a test")
+#if __name__ == "__main__":
+#    p = Printing("Test.py", "this is a test")

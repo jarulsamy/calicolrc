@@ -44,8 +44,11 @@ class EngineManager(object):
         return sorted(self.engine.keys())
 
     def register(self, EngineClass):
-        engine = EngineClass(self)
-        self.engine[engine.language] = engine
+        try:
+            engine = EngineClass(self)
+            self.engine[engine.language] = engine
+        except:
+            print("Skipping language %s" % EngineClass)
 
     def setup(self): 
         self.runtime = Microsoft.Scripting.Hosting.ScriptRuntime(
