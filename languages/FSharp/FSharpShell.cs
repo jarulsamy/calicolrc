@@ -18,8 +18,8 @@ public class FSharpShell {
          startInfo.FileName = "mono";
          startInfo.Arguments = ("\"" + fsi + "\" " +
 			 "--readline- " + 
-			 "--lib:\"" + path + "/../modules\" " +
-			 "--lib:\"" + path + "/../bin\" " +
+			 "--lib:\"" + path + "/../../modules\" " +
+			 "--lib:\"" + path + "/../../bin\" " +
 			 "--lib:\"" + gtk + "\" " +
 			 "--lib:\"" + gdk + "\" " +
 			 "--lib:\"" + glib + "\" " +

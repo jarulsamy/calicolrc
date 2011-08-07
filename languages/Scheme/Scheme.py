@@ -22,6 +22,10 @@ from __future__ import print_function
 import clr
 import System
 import sys
+import os
+
+print(os.path.abspath("./languages/Scheme/Scheme"))
+sys.path.append(os.path.abspath("./languages/Scheme/Scheme")) # lower dir, with PJScheme:
 clr.AddReference("PJScheme.dll")
 import PJScheme
 from engine import Engine
