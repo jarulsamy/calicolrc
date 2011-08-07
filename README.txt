@@ -3,20 +3,20 @@ Calico Scripting Environment
 
 For installation instructions, see:
 
-   http://calicoproject.org/CalicoDownload
+   http://calicoproject.org/Calico_Download
 
 Assuming that this README.txt is in a directory named Calico:
 
 Under Mac OSX and Linux, run the program with:
 
-   Calico/calico
+   Calico/StartCalico
 
 Under Windows, run the program with:
 
-   Calico\calico.bat
+   Calico\StartCalico.bat
 
 Try:
 
-   calico --help
+   StartCalico --help
 
 for more information.
