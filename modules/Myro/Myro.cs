@@ -2225,15 +2225,16 @@ public static class Myro {
     }
 
     public override void setForwardness(object direction) {
+      byte val = 0;
       if (Contains(direction, "fluke-forward", 1)) {
-        direction = 1;
+        val = 1;
       } else if (Contains(direction, "scribbler-forward", 0)) {
-        direction = 0;
+        val = 0;
       } else {
         throw new Exception("unknown direction: should be 'fluke-forward' or 'scribbler-forward'");
       }
       write(Scribbler.SET_FORWARDNESS);
-      write((byte)direction);
+      write(val);
     }
 
     public bool isTrue(object value) {
