@@ -2872,9 +2872,11 @@ public static class Myro {
               inside = true;
             }
           }
-          blobs[i * width * 3 + j + 0] = (byte)val; //red
-          blobs[i * width * 3 + j + 1] = (byte)val; //green
-          blobs[i * width * 3 + j + 2] = (byte)val; //blue
+          blobs[i * width * 3 + j + 0] = (byte)val;
+          blobs[i * width * 3 + j + 1] = (byte)val;
+          blobs[i * width * 3 + j + 2] = (byte)val;
+          blobs[i * width * 3 + j + 3] = (byte)val;
+
           counter -= 1;
         }
       }
