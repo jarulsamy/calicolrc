@@ -409,7 +409,8 @@ public static class Graphics {
                                            int width=300,
                                            int height=300) {
     if (_windows.ContainsKey(title)) {
-      _windows[title]._canvas.shapes.Clear();
+	  lock(_windows[title]._canvas.shapes)
+		_windows[title]._canvas.shapes.Clear();
       _windows[title].mode = "auto";
       _windows[title].Resize(width, height);
       _lastWindow = _windows[title];
@@ -428,7 +429,8 @@ public static class Graphics {
                                            int width=300, 
                                            int height=300) {
     if (_windows.ContainsKey(title)) {
-      _windows[title]._canvas.shapes.Clear();
+	  lock(_windows[title]._canvas.shapes)
+		_windows[title]._canvas.shapes.Clear();
       _windows[title].mode = "auto";
       _windows[title].ShowAll();
       _windows[title].Resize(width, height);
@@ -974,6 +976,11 @@ public static class Graphics {
       ShowAll();
     }
 
+	public void clear() {
+	  lock(_canvas.shapes)
+		_canvas.shapes.Clear();
+	}
+
     public Microsoft.Xna.Framework.Vector2 gravity {
       get {
         return canvas.world.Gravity;
@@ -1032,8 +1039,10 @@ public static class Graphics {
     public void stackOnTop(Shape shape) {
       // last drawn is on top
       if (_canvas.shapes.Contains(shape)) {
-        _canvas.shapes.Remove(shape);
-        _canvas.shapes.Insert(_canvas.shapes.Count, shape);
+		lock(_canvas.shapes) {
+		  _canvas.shapes.Remove(shape);
+		  _canvas.shapes.Insert(_canvas.shapes.Count, shape);
+		}
         QueueDraw();
       } else {
         throw new Exception("shape not drawn on window");
@@ -1042,8 +1051,10 @@ public static class Graphics {
     public void stackOnBottom(Shape shape) {
       // first drawn is on bottom
       if (_canvas.shapes.Contains(shape)) {
-        _canvas.shapes.Remove(shape);
-        _canvas.shapes.Insert(0, shape);
+		lock(_canvas.shapes) {
+		  _canvas.shapes.Remove(shape);
+		  _canvas.shapes.Insert(0, shape);
+		}
         QueueDraw();
       } else {
         throw new Exception("shape not drawn on window");
