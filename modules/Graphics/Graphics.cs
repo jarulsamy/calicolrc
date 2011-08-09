@@ -979,6 +979,7 @@ public static class Graphics {
 	public void clear() {
 	  lock(_canvas.shapes)
 		_canvas.shapes.Clear();
+	  QueueDraw();
 	}
 
     public Microsoft.Xna.Framework.Vector2 gravity {
