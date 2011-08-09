@@ -3748,31 +3748,45 @@ public static class Myro {
   public static void speak(string text, int async) {
     Console.WriteLine(text);
     Process myProcess = new Process();
+
+    // create a temporary file with the text to be spoken
+    var textpath = System.IO.Path.GetTempFileName();
+    using (TextWriter writer = File.CreateText(textpath)){
+        writer.WriteLine(text);
+    }
+
+
     try {
       myProcess.StartInfo.UseShellExecute = false;
+
       if (os_name == "nt") {
-    string file = startup_path;
-    file = Path.Combine(file, "bin");
-    file = Path.Combine(file, "windows");
-    file = Path.Combine(file, "eSpeak");
-    myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
+        string file = startup_path;
+        file = Path.Combine(file, "bin");
+        file = Path.Combine(file, "windows");
+        file = Path.Combine(file, "eSpeak");
+        myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
       } else {
-    // assumes in path
-    myProcess.StartInfo.FileName = "espeak";
+        if (File.Exists("/usr/bin/speak")){
+        // assumes espeak is in /usr/bin/ on macs
+            myProcess.StartInfo.FileName = "speak";
+        }
+        else{
+        // assumes in path
+            myProcess.StartInfo.FileName = "espeak";
+        }
       }
       myProcess.StartInfo.CreateNoWindow = true;
-      myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" \"" +
-                       text +
-                       "\"");
+      myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" -f " + textpath);
       myProcess.Start();
+
       if (async == 0)
-    myProcess.WaitForExit();
+        myProcess.WaitForExit();
 #pragma warning disable 0168
     } catch (Exception e) {
 #pragma warning restore 0168
       if (warn_missing_speak) {
-    Console.WriteLine("WARNING: missing speak command");
-    warn_missing_speak = false; // just once
+        Console.WriteLine("WARNING: missing speak command");
+        warn_missing_speak = false; // just once
       }
     }
   }
