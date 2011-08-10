@@ -2328,6 +2328,7 @@ public static class Graphics {
   }
   
   public class Text : Shape {
+    public Pango.Layout layout = null;
     public string _text;
     public string fontFace = "sans serif";
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
@@ -2335,6 +2336,8 @@ public static class Graphics {
     double _fontSize = 18;
     public string xJustification = "center"; // left, center, right
     public string yJustification = "center"; // top, center, bottom
+
+    // FIXME: add wrappers around justifications, weight, slant, face
 
     public double fontSize
     {
@@ -2345,6 +2348,7 @@ public static class Graphics {
       set
         {
           _fontSize = value;
+	  layout = null;
           QueueDraw();
         }
     }
@@ -2358,6 +2362,7 @@ public static class Graphics {
       set
 	{
 	  _text = value;
+	  layout = null;
 	  QueueDraw();
 	}
     }
@@ -2400,30 +2405,32 @@ public static class Graphics {
 	  g.Color = _fill._cairo;
       else
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
-      Pango.Layout layout;
-      layout = Pango.CairoHelper.CreateLayout(g);
-      Pango.FontDescription desc = Pango.FontDescription.FromString(String.Format("{0} {1}", fontFace, fontSize));
-      layout.FontDescription = desc;
-      layout.SetText(text);
-      layout.Alignment = Pango.Alignment.Center;
+      if (layout == null) {
+	layout = Pango.CairoHelper.CreateLayout(g);
+	Pango.FontDescription desc = Pango.FontDescription.FromString(
+				 String.Format("{0} {1}", fontFace, fontSize));
+	layout.FontDescription = desc;
+	layout.SetText(text);
+	layout.Alignment = Pango.Alignment.Center;
+      }
       int layoutWidth, layoutHeight;
-      layout.GetSize (out layoutWidth, out layoutHeight);
+      layout.GetSize(out layoutWidth, out layoutHeight);
       double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
       double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
       Point p = new Point(0,0);
       if (xJustification == "center") {
-        p.x = points[0].x - teWidth  / 2; // - te.XBearing;
+	p.x = points[0].x - teWidth  / 2; // - te.XBearing;
       } else if (xJustification == "left") {
-        p.x = points[0].x;
+	p.x = points[0].x;
       } else if (xJustification == "right") {
-        p.x = points[0].x + teWidth;
+	p.x = points[0].x + teWidth;
       }
       if (yJustification == "center") {
-        p.y = points[0].y - teHeight / 2; // - te.YBearing;
+	p.y = points[0].y - teHeight / 2; // - te.YBearing;
       } else if (yJustification == "bottom") {
-        p.y = points[0].y;
+	p.y = points[0].y;
       } else if (yJustification == "top") {
-        p.y = points[0].y - teHeight;
+	p.y = points[0].y - teHeight;
       }
       temp = screen_coord(p);
       g.MoveTo(temp.x, temp.y);
