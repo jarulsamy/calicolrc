@@ -1293,6 +1293,8 @@ public static class Graphics {
     }
 
     public PythonTuple getMouse() {
+      while (Gtk.Application.EventsPending())
+	Gtk.Application.RunIteration();
       _lastClickFlag = new ManualResetEvent(false);
       _lastClickFlag.WaitOne();
       return _lastClick;
@@ -1400,6 +1402,13 @@ public static class Graphics {
           throw new Exception("window mode must be 'auto', 'manual', or 'physics'");
       }
     }          
+
+    public void updateNow() { // Window
+      need_to_redraw();
+      // Manual call to update, let's update then:
+      while (Gtk.Application.EventsPending())
+	Gtk.Application.RunIteration();
+    }
 
     public void update() { // Window
       need_to_redraw();
@@ -2178,6 +2187,14 @@ public static class Graphics {
       lock(win.getCanvas().shapes) {
         win.getCanvas().shapes.Add(this);
       }
+      // Make sure each subshape is associated with this window
+      // so QueueDraw will redraw:
+      lock(shapes) {
+	foreach (Shape shape in shapes)
+	  {
+	    shape.window = win;
+	  }
+      }
       window = win;
       if (window._canvas.world != null) {
         addToPhysics();
@@ -2190,7 +2207,7 @@ public static class Graphics {
       lock(shape.shapes) {
         shape.shapes.Add(this);
       }
-      //window = win;
+      window = shape.window;
       QueueDraw();
     }
     
@@ -3886,6 +3903,20 @@ public static class Graphics {
         _stop = value;
         QueueDraw();
       }
+    }
+  }
+
+  public class Frame : Shape {
+    public Frame(int x, int y)
+    {
+      set_points(new Point(x, y));
+    }
+    public Frame(IList iterable):  
+       this(new Point(iterable[0], iterable[1])) {
+    }
+    public Frame(Point point)
+    {
+      set_points(point);
     }
   }
     
