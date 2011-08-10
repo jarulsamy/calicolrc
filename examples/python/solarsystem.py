@@ -19,15 +19,18 @@ pen = Pen(Color("white"), True)
 pen.draw(win)
 pen.stackOnBottom()
 
-pics = []
+#pics = []
 def main():
     win.mode = "manual"
     for s in range(360):
         sun.rotate(1)
         earth.rotate(5)
-        win.step(.1)
+        win.step(.05)
         pen.appendPath(Point(moon.gx, moon.gy))
-        pics.append(makePicture(win))
+        #pics.append(makePicture(win))
 
+t = Text((150, 150), "Click to begin...")
+t.draw(win)
 getMouse()
+t.undraw()
 win.run(main)
