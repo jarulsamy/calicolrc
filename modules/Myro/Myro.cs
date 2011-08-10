@@ -1607,6 +1607,62 @@ public static class Myro {
     
   }
 
+  public class Simulation : Robot {
+	public Graphics.WindowClass window;
+	public Graphics.Rectangle robotFrame;
+	public Thread thread;
+
+	public Simulation() {
+	  window = makeWindow("Myro Simulation", 640, 480);
+	  window.mode = "physics";
+	  window.gravity = Graphics.Vector(0,0); // turn off gravity
+	  robotFrame = new Graphics.Rectangle(new Graphics.Point(320 - 23, 240 - 23), 
+		  new Graphics.Point(320 + 23, 240 + 23));
+	  // Draw a body:
+	  Graphics.Polygon body = new Graphics.Polygon();
+
+	  double [] sx = new double[] {0.05, 0.05, 0.07, 0.07, 0.09, 0.09, 0.07, 0.07, 0.05, 0.05,
+								   -0.05, -0.05, -0.07, -0.08, -0.09, -0.09, -0.08, -0.07, -0.05, -0.05};
+	  double [] sy = new double[] {0.06, 0.08, 0.07, 0.06, 0.06, -0.06, -0.06, -0.07, -0.08, -0.06,
+								   -0.06, -0.08, -0.07, -0.06, -0.05, 0.05, 0.06, 0.07, 0.08, 0.06};
+
+	  for (int i =0; i < sx.Length; i++) {
+		body.append(new Graphics.Point(sx[i] * 250, sy[i] * 250));
+	  }
+	  body.fill = Color("red");
+	  body.draw(robotFrame);
+	  // Draw wheels:
+	  Graphics.Rectangle wheel1 = new Graphics.Rectangle(new Graphics.Point(-10, -23), 
+		  new Graphics.Point(10, -17));
+	  wheel1.color = Color("black");
+	  wheel1.draw(robotFrame);
+	  Graphics.Rectangle wheel2 = new Graphics.Rectangle(new Graphics.Point(-10, 23), 
+		  new Graphics.Point(10, 17));
+	  wheel2.color = Color("black");
+	  wheel2.draw(robotFrame);
+
+	  // Details
+	  Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 10);
+	  hole.fill = Color("black");
+	  hole.draw(robotFrame);
+
+	  Graphics.Rectangle fluke = new Graphics.Rectangle(new Graphics.Point(17, -10), 
+		  new Graphics.Point(23, 10));
+	  fluke.color = Color("green");
+	  fluke.draw(robotFrame);
+	  
+	  // Just the fill, to see outline of bounding box:
+	  robotFrame.fill = null;
+	  // FIXME: something not closing correctly in render when :
+	  //robotFrame.color = null;
+	  robotFrame.outline = Color("lightgrey");
+	  robotFrame.draw(window);
+	  thread = new Thread(new ThreadStart(window.run));
+	  thread.IsBackground = true;
+	  thread.Start();
+	}
+  }
+
   public class Scribbler: Robot {
     public SerialPort serial;
     double [] _fudge  = new double[4];

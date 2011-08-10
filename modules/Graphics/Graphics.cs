@@ -424,6 +424,14 @@ public static class Graphics {
     }
   }
 
+  public static void wait(double seconds) {
+	ManualResetEvent mre = new ManualResetEvent(false);
+	GLib.Timeout.Add(((uint)seconds * 1000), new GLib.TimeoutHandler( delegate {
+			  mre.Set();
+			  return false;
+	}));
+	mre.WaitOne();
+  }
 
   public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
                                            int width=300, 
@@ -1294,7 +1302,7 @@ public static class Graphics {
 
     public PythonTuple getMouse() {
       while (Gtk.Application.EventsPending())
-	Gtk.Application.RunIteration();
+		Gtk.Application.RunIteration();
       _lastClickFlag = new ManualResetEvent(false);
       _lastClickFlag.WaitOne();
       return _lastClick;
@@ -1436,7 +1444,8 @@ public static class Graphics {
       // diff is TimeSpan, converted to seconds:
       double diff = (now - last_update).TotalMilliseconds / 1000.0;
       if (diff < step_time) {
-            Thread.Sleep((int)((step_time - diff) * 1000));
+		Thread.Sleep((int)((step_time - diff) * 1000));
+		//wait(step_time - diff);
       }
       last_update = DateTime.Now;
       _dirty = false;
