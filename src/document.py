@@ -99,6 +99,13 @@ class Document(object):
         if not self.filename:
             self.save_as()
         if self.filename:
+            # if exists, make backup
+            if os.path.isfile(self.filename):
+                fp_out = open(self.filename + "~", "w")
+                oldtext = "".join(file(self.filename).xreadlines())
+                fp_out.write(oldtext)
+                fp_out.close()
+            # now save the new:
             fp = open(self.filename, "w")
             fp.write(self.get_text())
             fp.close()
