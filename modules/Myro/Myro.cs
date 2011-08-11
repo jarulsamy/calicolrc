@@ -3826,6 +3826,10 @@ public static class Myro {
         // assumes espeak is in /usr/bin/ on macs
             myProcess.StartInfo.FileName = "speak";
         }
+        else if (File.Exists("/usr/local/bin/speak")){
+	// or look for espeak is in /usr/local/bin/ on macs
+            myProcess.StartInfo.FileName = "speak";
+        }
         else{
         // assumes in path
             myProcess.StartInfo.FileName = "espeak";
