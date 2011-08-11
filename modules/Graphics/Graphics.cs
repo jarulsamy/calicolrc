@@ -2402,7 +2402,7 @@ public static class Graphics {
 	  g.Color = _fill._cairo;
       else
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
-      layout = Pango.CairoHelper.CreateLayout(g);
+      Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
       Pango.FontDescription desc = Pango.FontDescription.FromString(
 			    String.Format("{0} {1}", fontFace, fontSize));
       layout.FontDescription = desc;
