@@ -97,6 +97,7 @@ class Shell(object):
 
 class ShellWindow(Window):
     def __init__(self, calico):
+        self.completion = None
         self.calico = calico
         self.executeThread = None
         self.language = "python"
@@ -349,11 +350,13 @@ class ShellWindow(Window):
                 line = caret.Line
                 line_count = self.textview.Document.LineCount
                 if line != line_count - 1 and not force:
+                    self.completion = None
                     return False
                 # else, execute text
                 # extra line at end signals ready_to_execute:
                 text = self.textview.Document.Text
                 if text == "":
+                    self.completion = None
                     return True # nothing to do, but handled
                 elif self.ready_for_execute(text) or force:
                     self.history.last(text.rstrip())
@@ -366,6 +369,7 @@ class ShellWindow(Window):
                             self.textview.Caret.Line = 0
                             self.textview.Caret.Column = 0
                         Gtk.Application.Invoke(invoke)
+                    self.completion = None
                     return True
             elif str(event.Key) == "Up":
                 text = self.textview.Document.Text
@@ -402,62 +406,20 @@ class ShellWindow(Window):
                 line = lines[lineNo]
                 text = line[0:self.textview.Caret.Column]
                 if text.strip() != "": # something there!
-                    retval = self.completion(text)
-                    if retval:
-                        self.message(retval) # show options
+                    if self.completion is None:
+                        self.completion = TabCompletion(self.calico, self.textview, text)
+                        if self.completion.items: # first time:
+                            self.message(self.completion.format())
+                    if self.completion.items:
+                        self.completion.insertText()
                     return True # don't put in tab
+                self.completion = None
                 return False
+            self.completion = None
             return False
         else:
+            self.completion = None
             return False
-
-    def completion(self, text):
-        variable = self.find_variable(text)
-        items = []
-        if variable:
-            parts = variable.split(".")
-            if len(parts) == 1: # Easy, just get the vars that match:
-                root = parts[0]
-                items = [x for x in self.calico.engine.scope.GetVariableNames() if x.startswith(root)]
-            else:
-                root = parts[0]
-                (found, value) = self.calico.engine.scope.TryGetVariable(root)
-                if found:
-                    for part in parts[1:-1]:
-                        if hasattr(value, part):
-                            value = getattr(value, part)
-                        else:
-                            value = None
-                            break
-                    if value:
-                        partial = parts[-1]
-                        items = [x for x in dir(value) if x.startswith(partial) and not x.startswith("_")]
-        if items: 
-            retval = "----------------------\n" + _("Possible completions for '%s' (%d):\n   " % (variable, len(items)))
-            count = 0
-            for item in items:
-                if count % 3 == 0:
-                    retval += "\n"
-                retval += "%-25s" % item
-                count += 1
-            return retval + "\n----------------------\n"
-        else:
-            return None
-
-    def find_variable(self, text):
-        """
-        Finds variable-like characters in a text.
-        """
-        candidate = ""
-        for char in reversed(text):
-            if char.isalnum() or char in ["_", "."]:
-                candidate += char
-            else:
-                break
-        candidate = "".join(reversed(candidate))
-        if candidate.isdecimal() or candidate.isdigit() or candidate.isnumeric():
-            return None
-        return candidate
 
     def change_to_lang(self, language):
         self.language = language
@@ -700,3 +662,75 @@ class ShellWindow(Window):
             return "\n".join(lines)
         return text
         
+class TabCompletion:
+    """
+    Class to keep track of tab completions.
+    """
+    def __init__(self, calico, textview, text):
+        self.calico = calico
+        self.textview = textview
+        self.tab_position = 0
+        self.original_offset = textview.Caret.Offset
+        self.variable = self.find_variable(text)
+        self.partial = ""
+        self.items = []
+        if self.variable:
+            parts = self.variable.split(".")
+            if len(parts) == 1: # Easy, just get the vars that match:
+                root = parts[0]
+                self.partial = root
+                self.items = [x for x in self.calico.engine.scope.GetVariableNames() if x.startswith(root)]
+            else:
+                root = parts[0]
+                (found, value) = self.calico.engine.scope.TryGetVariable(root)
+                if found:
+                    for part in parts[1:-1]:
+                        if hasattr(value, part):
+                            value = getattr(value, part)
+                        else:
+                            value = None
+                            break
+                    if value:
+                        self.partial = parts[-1]
+                        self.items = [x for x in dir(value) if x.startswith(self.partial) and not x.startswith("_")]
+    
+    def insertText(self):
+        # Remove any stuff:
+        self.textview.Remove(self.original_offset, self.textview.Caret.Offset - self.original_offset)
+        # Move cursor:
+        self.textview.Caret.Offset = self.original_offset
+        if self.tab_position >= len(self.items):
+            self.tab_position = 0
+        # insert text:
+        word = self.items[self.tab_position][len(self.partial):]
+        self.textview.InsertAtCaret(word)
+        # get ready for next possible completion:
+        self.tab_position += 1
+
+    def format(self):
+        if self.items: 
+            retval = "----------------------\n" + _("Possible completions for '%s' (%d):\n   " % (self.variable, len(self.items)))
+            count = 0
+            for item in self.items:
+                if count % 3 == 0:
+                    retval += "\n"
+                retval += "%-25s" % item
+                count += 1
+            return retval + "\n----------------------\n"
+        else:
+            return None
+
+    def find_variable(self, text):
+        """
+        Finds variable-like characters in a text.
+        """
+        candidate = ""
+        for char in reversed(text):
+            if char.isalnum() or char in ["_", "."]:
+                candidate += char
+            else:
+                break
+        candidate = "".join(reversed(candidate))
+        if candidate.isdecimal() or candidate.isdigit() or candidate.isnumeric():
+            return None
+        return candidate
