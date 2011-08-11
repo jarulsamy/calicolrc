@@ -2328,7 +2328,6 @@ public static class Graphics {
   }
   
   public class Text : Shape {
-    public Pango.Layout layout = null;
     public string _text;
     public string fontFace = "sans serif";
     public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
@@ -2348,7 +2347,6 @@ public static class Graphics {
       set
         {
           _fontSize = value;
-	  layout = null;
           QueueDraw();
         }
     }
@@ -2362,7 +2360,6 @@ public static class Graphics {
       set
 	{
 	  _text = value;
-	  layout = null;
 	  QueueDraw();
 	}
     }
@@ -2405,14 +2402,12 @@ public static class Graphics {
 	  g.Color = _fill._cairo;
       else
 	g.Color = new Cairo.Color(0,0,0); // default color when none given
-      if (layout == null) {
-	layout = Pango.CairoHelper.CreateLayout(g);
-	Pango.FontDescription desc = Pango.FontDescription.FromString(
-				 String.Format("{0} {1}", fontFace, fontSize));
-	layout.FontDescription = desc;
-	layout.SetText(text);
-	layout.Alignment = Pango.Alignment.Center;
-      }
+      layout = Pango.CairoHelper.CreateLayout(g);
+      Pango.FontDescription desc = Pango.FontDescription.FromString(
+			    String.Format("{0} {1}", fontFace, fontSize));
+      layout.FontDescription = desc;
+      layout.SetText(text);
+      layout.Alignment = Pango.Alignment.Center;
       int layoutWidth, layoutHeight;
       layout.GetSize(out layoutWidth, out layoutHeight);
       double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
