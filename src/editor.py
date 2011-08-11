@@ -282,6 +282,20 @@ class EditorWindow(Window):
 
     def on_close_tab(self, page):
         page_num = self.notebook.PageNum(page)
+        if self.document.get_dirty():
+            response = "Yes"
+            # FIXME: this doesn't work, just crashes:
+            # import Myro
+            # response = Myro.askQuestion("Unsaved changes! Do you want to save?", 
+            #                              ["Yes", "No", "Cancel"])
+            if response == "Cancel":
+                return False
+            elif response == "No":
+                pass
+            elif response == "Yes":
+                saved = self.document.save()
+                if not saved:
+                    return False
         self.notebook.RemovePage(page_num)
 
     def on_new_file(self, obj, event, language="python"):
@@ -357,12 +371,45 @@ class EditorWindow(Window):
                     self.calico.shell.execute_file(doc.filename, doc.language)
 
     def on_close(self, obj, event):
+        for page_num in range(self.notebook.NPages):
+            npage = self.notebook.GetNthPage(page_num)
+            if npage.document.get_dirty():
+                response = "Yes"
+                # FIXME: this doesn't work, just crashes:
+                # import Myro
+                # response = Myro.askQuestion("Unsaved changes! Do you want to save?", 
+                #                              ["Yes", "No", "Cancel"])
+                if response == "Cancel":
+                    return False
+                elif response == "No":
+                    pass
+                elif response == "Yes":
+                    saved = self.document.save()
+                    #if not saved:
+                    #    return False
         retval = self.clean_up()
         if retval:
             self.calico.on_close("editor")
         return True
 
     def on_quit(self, obj, event):
+        for page_num in range(self.notebook.NPages):
+            npage = self.notebook.GetNthPage(page_num)
+            if npage.document.get_dirty():
+                response = "Yes"
+                # FIXME: this doesn't work, just crashes:
+                # import Myro
+                # response = Myro.askQuestion("Unsaved changes! Do you want to save?", 
+                #                              ["Yes", "No", "Cancel"])
+                if response == "Cancel":
+                    return False
+                elif response == "No":
+                    pass
+                elif response == "Yes":
+                    saved = self.document.save()
+                    # FIXME: need to not close window, too
+                    #if not saved:
+                    #    return False
         retval = self.clean_up()
         if retval:
             self.calico.on_close("all")
