@@ -1818,6 +1818,7 @@ public static class Myro {
         } catch {
           Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
                   port));
+		  serial = null;
           return;
         }
       }
