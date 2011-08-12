@@ -226,7 +226,7 @@ class ShellWindow(Window):
         self.clipboard = Gtk.Clipboard.Get(
               Gdk.Atom.Intern("CLIPBOARD", True))
         self.message(_("Calico Project %s") % self.calico.version)
-        self.message(("-" * 50))
+        self.message(("-" * 25))
         self.set_font()
         self.show_icon()
         self.message("")
@@ -679,7 +679,9 @@ class TabCompletion:
             if len(parts) == 1: # Easy, just get the vars that match:
                 root = parts[0]
                 self.partial = root
-                self.items = [x for x in self.calico.engine.scope.GetVariableNames() if x.startswith(root)]
+                self.items = [x for x in self.calico.engine.scope.GetVariableNames()
+                              if x.startswith(root)]
+                # and not hasattr(x, "DeclaringType")]
             else:
                 root = parts[0]
                 (found, value) = self.calico.engine.scope.TryGetVariable(root)
@@ -692,7 +694,10 @@ class TabCompletion:
                             break
                     if value:
                         self.partial = parts[-1]
-                        self.items = [x for x in dir(value) if x.startswith(self.partial) and not x.startswith("_")]
+                        self.items = [x for x in dir(value)
+                                      if x.startswith(self.partial) and
+                                      not x.startswith("_")]
+                        # and not hasattr(x, "DeclaringType")]
     
     def insertText(self):
         # Remove any stuff:
