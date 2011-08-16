@@ -89,6 +89,17 @@ class Engine(object):
     def execute_file(self, filename):
         raise NotImplemented
 
+    def ready_for_execute(self, text):
+        """
+        Is the text ready for executing?
+        """
+        # If more than one line in DLR, wait for a blank line
+        lines = text.split("\n")
+        line_count = len(lines)
+        if line_count == 1:
+            return False # no on first line
+        return lines[-1].strip() == "" # ok, if nothing
+
     def setup(self):
         pass
 
