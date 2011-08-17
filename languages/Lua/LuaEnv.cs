@@ -62,7 +62,7 @@ public static class LuaEnv {
       Gtk.Application.Invoke( delegate {
             IronPython.Runtime.Operations.PythonCalls.Call(calico_print, args);
           });
-      return new object[] {};
+      return new object[] {null};
     }
   }
   

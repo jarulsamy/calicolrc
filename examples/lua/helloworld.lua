@@ -1,2 +1,3 @@
 x = 42;
-print(x);
+print(print(x));
+

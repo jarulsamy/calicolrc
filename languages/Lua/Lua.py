@@ -76,7 +76,7 @@ class LuaEngine(Engine):
                 self.printit(*args)
             def readit(format):
                 self.readit(format)
-            LuaEnv.setPrint(self.engine, printit, readit)
+            LuaEnv.setEnvironment(self.engine, printit, readit)
             self.env_init = True
         try:
             self.engine.DoFile(filename)

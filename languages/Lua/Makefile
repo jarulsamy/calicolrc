@@ -11,3 +11,9 @@ LuaEnv.dll: LuaEnv.cs
 		-r:LuaSharp \
 		-pkg:gtk-sharp-2.0 \
 		-out:LuaEnv.dll 
+
+LuaTest.exe: LuaTest.cs 
+	MONO_PATH=$(MONO_PATH) gmcs -target:exe \
+		LuaTest.cs \
+		-r:LuaSharp \
+		-out:LuaTest.exe 
