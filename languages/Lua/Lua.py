@@ -33,6 +33,7 @@ class LuaEngine(Engine):
     def __init__(self, manager):
         super(LuaEngine, self).__init__(manager, "lua")
         self.engine = LuaSharp.Lua()
+        self.env_init = False
 
     def readit(self, what):
         # FIXME: can't call from the clib?
@@ -56,22 +57,26 @@ class LuaEngine(Engine):
             self.manager.calico.shell.message("")            
 
     def execute(self, text):
-        def printit(*args):
-            self.printit(*args)
-        def readit(format):
-            self.readit(format)
-        LuaEnv.setEnvironment(self.engine, printit, readit)
+        if not self.env_init:
+            def printit(*args):
+                self.printit(*args)
+            def readit(format):
+                self.readit(format)
+            LuaEnv.setEnvironment(self.engine, printit, readit)
+            self.env_init = True
         try:
             self.engine.DoString(text)
         except:
             traceback.print_exc()
 
     def execute_file(self, filename):
-        def printit(*args):
-            self.printit(*args)
-        def readit(format):
-            self.readit(format)
-        LuaEnv.setEnvironment(self.engine, printit, readit)
+        if not self.env_init:
+            def printit(*args):
+                self.printit(*args)
+            def readit(format):
+                self.readit(format)
+            LuaEnv.setPrint(self.engine, printit, readit)
+            self.env_init = True
         try:
             self.engine.DoFile(filename)
         except:
