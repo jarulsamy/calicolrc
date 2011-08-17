@@ -37,6 +37,7 @@ class LuaEngine(Engine):
 
     def readit(self, what):
         # FIXME: can't call from the clib?
+        # Same problem when trying to exit and ask to save?
         import Myro
         return Myro.ask(what)
 
