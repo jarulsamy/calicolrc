@@ -59,8 +59,8 @@ public static class LuaEnv {
       //Gtk.Application.Invoke( delegate {
 	  //IronPython.Runtime.Operations.PythonCalls.Call(calico_print, args);
 	  //});
-      return new object[] {};
-    }
+      return new object[] {"Test"};
+	}
   }
 
   // A Lua Function that calls a Python Function:
