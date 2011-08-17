@@ -1809,6 +1809,11 @@ public static class Myro {
     }  
     
     public Scribbler(string port, int baud) {
+
+      if (port.StartsWith("COM") || port.StartsWith("com")){
+        port = @"\\.\" + port;
+      }
+
       serial = new SerialPort(port, baud);
       lock(serial) {
         serial.ReadTimeout = 1000; // milliseconds
