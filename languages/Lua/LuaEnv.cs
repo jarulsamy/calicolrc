@@ -42,7 +42,7 @@ public static class LuaEnv {
 				    PythonFunction input_function) {
     state["cprint"] = state["print"]; // console print
     state["print"] = new MyPrint(print_function); // gui print
-    state["clr"] = new MyCLR(); // clr eval
+    // state["clr"] = new MyCLR(); // clr eval
     // FIXME: can't call a Gtk function from here?
     //((LuaSharp.LuaTable)state["io"])["read"] = new MyRead(input_function);
   }
