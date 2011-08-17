@@ -56,9 +56,9 @@ public static class LuaEnv {
     }
 
     protected override object[] OnInvoke(LuaSharp.Lua state, object[] args) {
-      Gtk.Application.Invoke( delegate {
-			//IronPython.Runtime.Operations.PythonCalls.Call(calico_print, args);
-	});
+      //Gtk.Application.Invoke( delegate {
+	  IronPython.Runtime.Operations.PythonCalls.Call(calico_print, args);
+	  //});
       return new object[] {};
     }
   }
