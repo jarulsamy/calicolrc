@@ -2,6 +2,7 @@
 // D.S. Blank
 
 using IronPython.Runtime; // PythonFunction
+using System.Runtime.InteropServices; // MarshalAs
 using System; // Func
 
 public static class Extensions {
@@ -55,7 +56,8 @@ public static class LuaEnv {
       calico_print = function;
     }
 
-    protected override object[] OnInvoke(LuaSharp.Lua state, object[] args) {
+	[return: MarshalAs( UnmanagedType.I4)]
+	protected override object[] OnInvoke(LuaSharp.Lua state, object[] args) {
       Gtk.Application.Invoke( delegate {
 			IronPython.Runtime.Operations.PythonCalls.Call(calico_print, args);
 		  });
