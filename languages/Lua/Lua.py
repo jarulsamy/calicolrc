@@ -21,7 +21,9 @@
 from __future__ import print_function
 import clr
 clr.AddReference('LuaSharp.dll')
+clr.AddReference('LuaEnv.dll')
 import LuaSharp
+import LuaEnv
 
 from utils import Language
 from engine import Engine
@@ -32,13 +34,44 @@ class LuaEngine(Engine):
         super(LuaEngine, self).__init__(manager, "lua")
         self.engine = LuaSharp.Lua()
 
+    def readit(self, what):
+        # FIXME: can't call from the clib?
+        import Myro
+        return Myro.ask(what)
+
+    def printit(self, *args):
+        if len(args) == 0:
+            self.manager.calico.shell.message("")
+        elif len(args) == 1:
+            value = args[0]
+            if isinstance(value, float) and value == int(value):
+                value = int(value)
+            self.manager.calico.shell.message(value)
+        else:
+            for arg in args:
+                value = arg
+                if isinstance(value, float) and value == int(value):
+                    value = int(value)
+                self.manager.calico.shell.message(value, end="\t")
+            self.manager.calico.shell.message("")            
+
     def execute(self, text):
+        def printit(*args):
+            self.printit(*args)
+        def readit(format):
+            self.readit(format)
+        LuaEnv.setEnvironment(self.engine, printit, readit)
         try:
             self.engine.DoString(text)
         except:
             traceback.print_exc()
 
     def execute_file(self, filename):
+        def printit(*args):
+            self.printit(*args)
+        def readit(format):
+            self.readit(format)
+        LuaEnv.setPrint(self.engine, printit, readit)
         try:
             self.engine.DoFile(filename)
         except:

@@ -97,7 +97,8 @@ class Engine(object):
         lines = text.split("\n")
         line_count = len(lines)
         if line_count == 1:
-            return False # no on first line
+            text = text.strip()
+            return (text and text[-1] == ";") # if there is text, and last char is ;
         return lines[-1].strip() == "" # ok, if nothing
 
     def setup(self):
