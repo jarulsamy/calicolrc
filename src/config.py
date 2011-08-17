@@ -164,7 +164,7 @@ class ConfigManager(object):
                 for opt in parser.options(sec):
                     raw_value = parser.get(sec, opt).strip()
                     setting = opt.lower()
-		    value = safe_eval(raw_value)
+                    value = safe_eval(raw_value)
                     ####################### Now, let's test and set:
                     if (name in self.default and 
                         setting in self.default[name]):
@@ -175,8 +175,8 @@ class ConfigManager(object):
                             self.data[name][setting] = value
                         else:
                             print("WARNING: ignoring key with wrong type "
-				  "'%s.%s'" % (name, setting), 
-				  file=sys.stderr)
+                                  "'%s.%s'" % (name, setting), 
+                                  file=sys.stderr)
                     else:
                         # this could be a third-party setting; add it:
                         self.data[name][setting] = value
@@ -409,4 +409,7 @@ config.register("calico.languages_ignore", ["Dinah", "Sympl"])
 config.register("shell.history", [])
 config.register("editor.load_last_files", True)
 config.register("editor.last_files", [])
-config.load()
+try:
+    config.load()
+except:
+    print("Invalid .calico/calico.ini file; ignored")
