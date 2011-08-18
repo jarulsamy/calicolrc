@@ -41,44 +41,22 @@ class LuaEngine(Engine):
         import Myro
         return Myro.ask(what)
 
-    def printit(self, *args):
-        if len(args) == 0:
-            self.manager.calico.shell.message("")
-        elif len(args) == 1:
-            value = args[0]
-            if isinstance(value, float) and value == int(value):
-                value = int(value)
-            self.manager.calico.shell.message(value)
-        else:
-            for arg in args:
-                value = arg
-                if isinstance(value, float) and value == int(value):
-                    value = int(value)
-                self.manager.calico.shell.message(value, end="\t")
-            self.manager.calico.shell.message("")            
-
     def execute(self, text):
         if not self.env_init:
-            def printit(*args):
-                self.printit(*args)
-            def readit(format):
-                self.readit(format)
-            LuaEnv.setEnvironment(self.engine, printit, readit)
+            LuaEnv.setEnvironment(self.engine)
             self.env_init = True
         try:
+            LuaEnv.resetEnvironment(self.engine)
             self.engine.DoString(text)
         except:
             traceback.print_exc()
 
     def execute_file(self, filename):
         if not self.env_init:
-            def printit(*args):
-                self.printit(*args)
-            def readit(format):
-                self.readit(format)
-            LuaEnv.setEnvironment(self.engine, printit, readit)
+            LuaEnv.setEnvironment(self.engine)
             self.env_init = True
         try:
+            LuaEnv.resetEnvironment(self.engine)
             self.engine.DoFile(filename)
         except:
             traceback.print_exc()
