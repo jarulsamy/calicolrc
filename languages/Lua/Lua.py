@@ -34,7 +34,7 @@ class LuaEngine(Engine):
         super(LuaEngine, self).__init__(manager, "lua")
 
     def setup(self):
-        self.engine = LuaSharp.Lua()
+        self.state = LuaSharp.Lua()
         self.env_init = False
 
     def readit(self, what):
@@ -45,21 +45,21 @@ class LuaEngine(Engine):
 
     def execute(self, text):
         if not self.env_init:
-            LuaEnv.setEnvironment(self.engine)
+            LuaEnv.setEnvironment(self.state)
             self.env_init = True
         try:
-            LuaEnv.resetEnvironment(self.engine)
-            self.engine.DoString(text)
+            LuaEnv.resetEnvironment(self.state)
+            self.state.DoString(text)
         except:
             traceback.print_exc()
 
     def execute_file(self, filename):
         if not self.env_init:
-            LuaEnv.setEnvironment(self.engine)
+            LuaEnv.setEnvironment(self.state)
             self.env_init = True
         try:
-            LuaEnv.resetEnvironment(self.engine)
-            self.engine.DoFile(filename)
+            LuaEnv.resetEnvironment(self.state)
+            self.state.DoFile(filename)
         except:
             traceback.print_exc()
 
