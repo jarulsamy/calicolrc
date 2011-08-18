@@ -32,6 +32,8 @@ import traceback
 class LuaEngine(Engine):
     def __init__(self, manager):
         super(LuaEngine, self).__init__(manager, "lua")
+
+    def setup(self):
         self.engine = LuaSharp.Lua()
         self.env_init = False
 
