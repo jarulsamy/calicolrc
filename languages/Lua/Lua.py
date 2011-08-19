@@ -39,6 +39,12 @@ class LuaEngine(Engine):
         self.state = LuaSharp.Lua()
         self.env_init = False
 
+    def ready_for_execute(self, text):
+        if super(LuaEngine, self).ready_for_execute(text):
+            return True
+        else:
+            return text.strip().startswith("=")
+
     def readit(self, what):
         # FIXME: can't call from the clib?
         # Same problem when trying to exit and ask to save?
@@ -56,7 +62,14 @@ class LuaEngine(Engine):
         try:
             if self.handleEnvironment():
                 LuaEnv.resetEnvironment(self.state)
+            if text.strip().startswith("="):
+                text = text.strip()
+                text = text[1:]
+                if text[-1] == ";":
+                    text = text[:-1]
+                text = "print(%s);" % text
             self.state.DoString(text)
+            self.manager.calico.shell.message("Ok")
         except:
             traceback.print_exc()
 

@@ -24,19 +24,23 @@ public static class LuaEnv {
     
     protected override object[] OnInvoke(LuaSharp.Lua state, object[] args) {
       try {
-	if (args.Length == 0) {
-	  System.Console.WriteLine("");
-	} else if (args.Length == 1) {
-	  System.Console.WriteLine(args[0]);
-	} else if (args.Length > 1) {
-	  foreach(object item in args) {
-	    System.Console.Write(item);
-	    System.Console.Write("\t");
-	  }
-	  System.Console.WriteLine("");
-	}
+		if (args.Length == 0) {
+		  System.Console.WriteLine("");
+		} else if (args.Length > 0) {
+		  int count = 0;
+		  foreach(object item in args) {
+			if (item == null)
+			  System.Console.Write("nil");
+			else 
+			  System.Console.Write(item);
+			if (count < args.Length - 1)
+			  System.Console.Write("\t");
+			count++;
+		  }
+		  System.Console.WriteLine("");
+		}
       } catch {
-	// pass
+		// pass
       }
       return new object[] {null};
     }
