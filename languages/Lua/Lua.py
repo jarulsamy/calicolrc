@@ -29,6 +29,8 @@ from utils import Language
 from engine import Engine
 import traceback
 
+import System
+
 class LuaEngine(Engine):
     def __init__(self, manager):
         super(LuaEngine, self).__init__(manager, "lua")
@@ -43,22 +45,29 @@ class LuaEngine(Engine):
         import Myro
         return Myro.ask(what)
 
+    def handleEnvironment(self):
+        return System.Environment.OSVersion.Platform != System.PlatformID.Win32NT
+
     def execute(self, text):
         if not self.env_init:
-            LuaEnv.setEnvironment(self.state)
+            if self.handleEnvironment():
+                LuaEnv.setEnvironment(self.state)
             self.env_init = True
         try:
-            LuaEnv.resetEnvironment(self.state)
+            if self.handleEnvironment():
+                LuaEnv.resetEnvironment(self.state)
             self.state.DoString(text)
         except:
             traceback.print_exc()
 
     def execute_file(self, filename):
         if not self.env_init:
-            LuaEnv.setEnvironment(self.state)
+            if self.handlEnvironment():
+                LuaEnv.setEnvironment(self.state)
             self.env_init = True
         try:
-            LuaEnv.resetEnvironment(self.state)
+            if self.handleEnvironment():
+                LuaEnv.resetEnvironment(self.state)
             self.state.DoFile(filename)
         except:
             traceback.print_exc()
