@@ -22,25 +22,43 @@ public static class LuaEnv {
     public MyPrint() {
     }
     
+    public static void print(object item) {
+      if (item == null) {
+	System.Console.Write("nil");
+      } else if (item is LuaSharp.LuaTable) {
+	System.Console.Write("{");
+	foreach (System.Collections.Generic.KeyValuePair<object,object> pair in (LuaSharp.LuaTable)item) {
+	  if (pair.Key is System.Double) {
+	    print(pair.Value);
+	  } else {
+	    print(pair.Key);
+	    print("=");
+	    print(pair.Value);
+	  }
+	  System.Console.Write(", ");
+	}
+	System.Console.Write("}");
+      } else {
+	System.Console.Write(item);
+      }
+    }
+    
     protected override object[] OnInvoke(LuaSharp.Lua state, object[] args) {
       try {
-		if (args.Length == 0) {
-		  System.Console.WriteLine("");
-		} else if (args.Length > 0) {
-		  int count = 0;
-		  foreach(object item in args) {
-			if (item == null)
-			  System.Console.Write("nil");
-			else 
-			  System.Console.Write(item);
-			if (count < args.Length - 1)
-			  System.Console.Write("\t");
-			count++;
-		  }
-		  System.Console.WriteLine("");
-		}
+	if (args.Length == 0) {
+	  System.Console.WriteLine("");
+	} else if (args.Length > 0) {
+	  int count = 0;
+	  foreach(object item in args) {
+	    print(item);
+	    if (count < args.Length - 1)
+	      System.Console.Write("\t");
+	    count++;
+	  }
+	  System.Console.WriteLine("");
+	}
       } catch {
-		// pass
+	// pass
       }
       return new object[] {null};
     }

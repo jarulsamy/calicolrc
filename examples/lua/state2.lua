@@ -21,4 +21,5 @@ function update()
 end
 
 function exit()
+    print("   Exit from 2");
 end

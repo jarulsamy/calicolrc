@@ -16,4 +16,5 @@ function update()
 end
 
 function exit()
+    print("   Exit from 1");
 end

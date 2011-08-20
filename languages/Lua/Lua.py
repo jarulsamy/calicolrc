@@ -75,7 +75,7 @@ class LuaEngine(Engine):
 
     def execute_file(self, filename):
         if not self.env_init:
-            if self.handlEnvironment():
+            if self.handleEnvironment():
                 LuaEnv.setEnvironment(self.state)
             self.env_init = True
         try:
