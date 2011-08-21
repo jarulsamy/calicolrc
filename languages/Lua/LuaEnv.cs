@@ -26,8 +26,13 @@ public static class LuaEnv {
       if (item == null) {
 	System.Console.Write("nil");
       } else if (item is LuaSharp.LuaTable) {
+	// FIXME: needs to be a safe_print, to handle self-recursive data structures
 	System.Console.Write("{");
+	bool needs_a_comma = false;
 	foreach (System.Collections.Generic.KeyValuePair<object,object> pair in (LuaSharp.LuaTable)item) {
+	  if (needs_a_comma)
+	    System.Console.Write(", ");
+	  needs_a_comma = true;
 	  if (pair.Key is System.Double) {
 	    print(pair.Value);
 	  } else {
@@ -35,7 +40,6 @@ public static class LuaEnv {
 	    print("=");
 	    print(pair.Value);
 	  }
-	  System.Console.Write(", ");
 	}
 	System.Console.Write("}");
       } else {
