@@ -124,6 +124,7 @@ class CalicoProject(object):
         self.editor = None
         self.chat = None
         self.connection = None
+        self.language = "python"         # will be overridden below
         self.version = version           # from global variable
         self.config = config             # from global variable
         self.mono_runtime = mono_runtime # from global variable
@@ -181,6 +182,9 @@ class CalicoProject(object):
             elif arg == "--exec":
                 self.standalone = True
                 request_shell = True
+            elif arg.startswith("--lang") or arg.startswith("--language"):
+                flag, lang = arg.split("=", 1)
+                self.language = lang.strip().lower()
             elif arg == "--debug":
                 self.debug = True
             else:
@@ -629,6 +633,7 @@ if "--help" in args:
     print(_("  StartCalico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"))
     print(_("  StartCalico --shell                    Brings up shell window"))
     print(_("  StartCalico --editor                   Brings up editor window"))
+    print(_("  StartCalico --lang=LANGUAGE            Sets default language (python, etc.)"))
     print(_("  StartCalico --chat                     Brings up chat window"))
     print(_("  StartCalico --exec FILENAMEs           Run FILENAMEs standalone with graphics"))
     print(_("  StartCalico --exec --nogui FILENAMEs   Run FILENAMEs standalone no graphics"))

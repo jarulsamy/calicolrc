@@ -100,7 +100,7 @@ class ShellWindow(Window):
         self.completion = None
         self.calico = calico
         self.executeThread = None
-        self.language = "python"
+        self.language = self.calico.language
         self.window = MyWindow(_("Calico Shell - %s") % System.Environment.UserName)
         self.window.add_key_press_handler(self.on_key_press)
         self.window.SetDefaultSize(700, 550)
@@ -163,7 +163,7 @@ class ShellWindow(Window):
         self.statusbar.init(_("Language"), _("Status"))
         self.command_area = Gtk.HBox()
         alignment = Gtk.Alignment( 0.5, 0.0, 0, 0)
-        self.prompt = Gtk.Label("python>")
+        self.prompt = Gtk.Label("%s>" % self.language)
         alignment.Add(self.prompt)
         self.command_area.PackStart(alignment, False, False, 0)
         self.scrolled_window = Gtk.ScrolledWindow()
