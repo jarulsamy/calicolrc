@@ -467,7 +467,7 @@ class ShellWindow(Window):
         else:
             self.searchbar.search_off()
 
-    def on_new_file(self, obj, event, language="python"):
+    def on_new_file(self, obj, event, language=None):
         self.calico.setup_editor()
         self.calico.editor.on_new_file(obj, event, language)
 
@@ -475,7 +475,7 @@ class ShellWindow(Window):
         self.calico.setup_editor()
         self.calico.editor.on_open_file(obj, event)
 
-    def select_or_open(self, filename, lineno=0, language="python"):
+    def select_or_open(self, filename, lineno=0, language=None):
         self.calico.setup_editor()
         self.calico.editor.select_or_open(filename, lineno, language)
 
@@ -522,6 +522,8 @@ class ShellWindow(Window):
             self.calico.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
             self.message(_("Done loading file."))
+            self.language = language
+            self.update_gui()
             #self.show_prompt()
 
         self.executeThread = System.Threading.Thread(

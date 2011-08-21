@@ -174,7 +174,7 @@ class EditorWindow(Window):
             self.statusbar.set(_("Language"), "")
             self.window.Title = _("Calico Editor - %s") % System.Environment.UserName
 
-    def select_or_open(self, filename, lineno=0, language="python"):
+    def select_or_open(self, filename, lineno=0, language=None):
         """
         Open, or select a file if already opened.
         lineno == 0 means don't care, otherwise go to
@@ -202,6 +202,13 @@ class EditorWindow(Window):
             if page is None:
                 page = self.make_document(filename) # make a new document with filename
         else: # make a no-named document of type language
+            if language is None:
+                if self.document:
+                    language = self.document.language
+                else:
+                    language = "python"
+            else:
+                language = "python"
             page = self.make_document(None, language)
         if add_it:
             self.calico.on_action("opened-document", filename=filename)
@@ -298,11 +305,11 @@ class EditorWindow(Window):
                     return False
         self.notebook.RemovePage(page_num)
 
-    def on_new_file(self, obj, event, language="python"):
+    def on_new_file(self, obj, event, language=None):
         self.select_or_open(None, language=language)
 
     # FIXME: get default type of file from config 
-    def make_document(self, filename, language="python"):
+    def make_document(self, filename, language=None):
         """
         Provide language if filename is not given.
         """
