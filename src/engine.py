@@ -114,6 +114,15 @@ class Engine(object):
     def stop(self):
         pass
 
+    def getVariables(self):
+        """
+        Get top-level variables.
+        """
+        return []
+
+    def tryGetVariable(self, variable):
+        return (False, None)
+
 class DLREngine(Engine):
     def setup(self):
         self.last_retval = None
@@ -215,3 +224,11 @@ class DLREngine(Engine):
             else:
                 traceback.print_exc()
 
+    def getVariables(self):
+        """
+        Get top-level variables.
+        """
+        return self.manager.scope.GetVariableNames()
+
+    def tryGetVariable(self, variable):
+        return self.manager.scope.TryGetVariable(variable)

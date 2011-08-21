@@ -38,7 +38,10 @@ public static class LuaEnv {
 	  } else {
 	    print(pair.Key);
 	    print("=");
-	    print(pair.Value);
+	    if (pair.Value is LuaSharp.LuaTable)
+	      print("{...}");
+	    else
+	      print(pair.Value);
 	  }
 	}
 	System.Console.Write("}");
@@ -66,5 +69,25 @@ public static class LuaEnv {
       }
       return new object[] {null};
     }
+  }
+  /*
+  public static System.Collections.Generic.List<string> ToList(LuaSharp.LuaTable table) {
+    System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
+    //foreach (object pair in table) {
+    //System.Collections.Generic.KeyValuePair<object,object> pair in table) {
+    //list.Add(pair.Key.ToString());
+    list.Add(table.ToString());
+    //}
+    return list;
+  }
+  */
+
+  public static System.Collections.Generic.List<object> ToList(LuaSharp.LuaTable table) {
+    System.Collections.Generic.List<object> list = new System.Collections.Generic.List<object>();
+    System.Collections.IDictionaryEnumerator ienum = (System.Collections.IDictionaryEnumerator)table.GetEnumerator();
+    while (ienum.MoveNext()) {
+      list.Add(ienum.Key); //, ienum.Value);
+    }
+    return list;
   }
 }

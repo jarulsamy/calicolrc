@@ -85,6 +85,22 @@ class LuaEngine(Engine):
         except:
             traceback.print_exc()
 
+    def getVariables(self):
+        """
+        Get top-level variables.
+        """
+        #self.state.DoString("_ = {}; for i in pairs(_G) do _[i] = true; end");
+        #return LuaEnv.ToList(self.state)
+        return ["string", "xpcall", "package", "tostring", "gcinfo", "os",
+                "table", "require", "getfenv", "debug", "next", "assert", "tonumber", "io",
+                "rawequal", "collectgarbage", "getmetatable", "module", "rawset",
+                "setmetatable", "math", "error", "pcall", "load", "setfenv", "type", "unpack",
+                "_VERSION", "select", "ipairs", "print", "rawget", "loadstring", "pairs",
+                "newproxy","dofile", "_G", "coroutine", "loadfile"]
+
+    def tryGetVariable(self, variable):
+        return (False, None)
+
 class Lua(Language):
     def get_engine_class(self):
         return LuaEngine
