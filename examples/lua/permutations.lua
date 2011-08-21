@@ -17,21 +17,11 @@ function permgen (a, n)
   end
 end
 
-
 function perm (a)
   local n = table.getn(a)
   return coroutine.wrap(function () permgen(a, n) end)
 end
 
-
-function printResult (a)
-  for i,v in ipairs(a) do
-    io.write(v, " ")
-  end
-  io.write("\n")
-end
-
-
 for p in perm{"a", "b", "c"} do
-  printResult(p)
+  print(p)
 end
