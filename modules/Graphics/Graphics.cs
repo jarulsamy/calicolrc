@@ -2719,7 +2719,7 @@ public static class Graphics {
       this.x = picture.wrap_width(x);
       this.y = picture.wrap_height(y);
     }
-    
+
     public Color getColor() {
       return picture.getColor(x, y);
     }
@@ -3333,12 +3333,12 @@ public static class Graphics {
     
     public int width {
       get {
-        return _pixbuf.Width;
+        return (int)(_pixbuf.Width*_scaleFactor);
       }
     }
     public int height {
       get {
-        return _pixbuf.Height;
+        return (int)(_pixbuf.Height*_scaleFactor);
       }
     }
 
