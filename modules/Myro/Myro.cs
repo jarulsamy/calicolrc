@@ -1811,7 +1811,7 @@ public static class Myro {
     public Scribbler(string port, int baud) {
 
       if (port.StartsWith("COM") || port.StartsWith("com")){
-        port = @"\\.\" + port;
+       port = @"\\.\" + port;
       }
 
       serial = new SerialPort(port, baud);
@@ -1852,6 +1852,8 @@ public static class Myro {
     Console.WriteLine("You are using:\n   Scribbler without Fluke, version 0.0.0");
       }
       flush();
+      // only ask to beep if there is a robot attached.
+      if (info.Contains("robot")){
       setEchoMode(0);
       wait(.25);
       flush();
@@ -1864,6 +1866,7 @@ public static class Myro {
       beep(.03, 349);
       beep(.03, 523);
       Console.WriteLine("Hello, my name is '{0}'!", getName());
+      }
       if (dongle != null) {
         set_cam_param(Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
         set_cam_param(Scribbler.CAM_COMB,
