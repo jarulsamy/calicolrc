@@ -120,6 +120,7 @@ class Document(object):
                                    Gtk.FileChooserAction.Save,
                                    _("Cancel"), Gtk.ResponseType.Cancel,
                                    _("Save"), Gtk.ResponseType.Accept)
+        fc.KeepAbove = True
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.filename = fc.Filename
             tooltips = Gtk.Tooltips()

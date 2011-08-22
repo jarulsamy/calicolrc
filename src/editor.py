@@ -278,6 +278,7 @@ class EditorWindow(Window):
                                    Gtk.FileChooserAction.Open,
                                    _("Cancel"), Gtk.ResponseType.Cancel,
                                    _("Open"), Gtk.ResponseType.Accept)
+        fc.KeepAbove = True
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.select_or_open(fc.Filename)
             path, base = os.path.split(fc.Filename)
@@ -445,6 +446,7 @@ class EditorWindow(Window):
         def invoke(sender, args):
             dialog = Gtk.Dialog(_("Calico Script Blast"), self.window,
                                 Gtk.DialogFlags.DestroyWithParent)
+            dialog.KeepAbove = True
             dialog.Modal = True
             items = [_("To")]
             table = Gtk.Table(len(items), 2, False)

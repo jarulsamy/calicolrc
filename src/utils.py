@@ -164,6 +164,7 @@ def pick_file():
                                Gtk.FileChooserAction.Open,
                                _("Cancel"), Gtk.ResponseType.Cancel,
                                _("Open"), Gtk.ResponseType.Accept)
+    fc.KeepAbove = True
     Gtk.Application.Invoke(lambda obj, args: fc.ShowAll())
     ev = ManualResetEvent(False)
     def get_filename_cb(obj, args):
