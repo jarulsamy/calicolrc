@@ -36,7 +36,10 @@ class LuaEngine(Engine):
         super(LuaEngine, self).__init__(manager, "lua")
 
     def setup(self):
-        self.state = LuaSharp.Lua()
+        try:
+            self.state = LuaSharp.Lua()
+        except:
+            print("Lua low-level .DLL not installed; Lua will not work...")
         self.env_init = False
 
     def ready_for_execute(self, text):
