@@ -1042,6 +1042,12 @@ public static class Myro {
     return Graphics.makeWindow(title, width, height);
   }
 
+
+  public static Graphics.WindowClass Window(int width,
+                                            int height) {
+    return makeWindow("", width, height);
+  }
+
   public static Graphics.Color pickAColor() {
     ManualResetEvent ev = new ManualResetEvent(false);
     Graphics.Color retval = null;

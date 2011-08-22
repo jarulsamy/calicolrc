@@ -496,6 +496,11 @@ public static class Graphics {
     return makeWindow(title, width, height);
   }
 
+  public static Graphics.WindowClass Window(int width,
+                                            int height) {
+    return makeWindow("", width, height);
+  }
+
   public static Color makeColor(string color) {
     return new Color(color);
   }
