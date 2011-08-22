@@ -204,7 +204,10 @@ class EditorWindow(Window):
         else: # make a no-named document of type language
             if language is None:
                 if self.document:
-                    language = self.document.language
+                    try:
+                        language = self.document.language
+                    except:
+                        language = "python"
                 else:
                     language = "python"
             else:
