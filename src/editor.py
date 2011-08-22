@@ -207,7 +207,7 @@ class EditorWindow(Window):
                 language = "python"
                 if self.document:
                     if self.document.language:
-                        language = self.documen.language
+                        language = self.document.language
             page = self.make_document(None, language)
         if add_it:
             self.calico.on_action("opened-document", filename=filename)
