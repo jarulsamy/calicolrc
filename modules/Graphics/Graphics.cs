@@ -282,6 +282,15 @@ public static class Graphics {
       }
     }
   }
+
+  public static void setPixel(Picture picture, int x, int y, Color color) {
+	picture.setPixel(x, y, color);
+  }
+
+  public static void setPixel(Picture picture, int x, int y, Pixel pixel) {
+	picture.setPixel(x, y, pixel);
+  }
+
   public static Color getColor(Pixel pixel) {
     return pixel.getColor();
   }
