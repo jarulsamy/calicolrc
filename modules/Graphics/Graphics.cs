@@ -1042,13 +1042,13 @@ public static class Graphics {
     public int getWidth() {
       int _width, _height;
       this.GetSize(out _width, out _height);
-      return height;
+      return width;
     }
     
     public int getHeight() {
       int _width, _height;
       this.GetSize(out _width, out _height);
-      return _width;
+      return _height;
     }
     
     public void draw(Shape shape) {
