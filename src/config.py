@@ -407,7 +407,7 @@ config.register("calico.recent_files", [])
 config.register("calico.languages", ["All"])
 config.register("calico.languages_ignore", ["Dinah", "Sympl"])
 config.register("shell.history", [])
-config.register("editor.load_last_files", True)
+config.register("editor.load_last_files", False)
 config.register("editor.last_files", [])
 try:
     config.load()
