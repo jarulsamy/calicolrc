@@ -1036,7 +1036,7 @@ public static class Myro {
   }
 
   public static Graphics.WindowClass Window(
-      string title="Calico Graphics Window",
+      string title="Calico Graphics",
       int width=300, 
       int height=300) {
     return Graphics.makeWindow(title, width, height);
@@ -1045,7 +1045,7 @@ public static class Myro {
 
   public static Graphics.WindowClass Window(int width,
                                             int height) {
-    return makeWindow("", width, height);
+    return makeWindow("Calico Graphics", width, height);
   }
 
   public static Graphics.Color pickAColor() {

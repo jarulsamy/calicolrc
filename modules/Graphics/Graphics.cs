@@ -490,7 +490,7 @@ public static class Graphics {
     }
   }
 
-  public static Graphics.WindowClass Window(string title="Calico Graphics Window",
+  public static Graphics.WindowClass Window(string title="Calico Graphics",
                                        int width=300, 
                                        int height=300) {
     return makeWindow(title, width, height);
@@ -498,7 +498,7 @@ public static class Graphics {
 
   public static Graphics.WindowClass Window(int width,
                                             int height) {
-    return makeWindow("", width, height);
+    return makeWindow("Calico Graphics", width, height);
   }
 
   public static Color makeColor(string color) {
@@ -974,7 +974,7 @@ public static class Graphics {
     public double time = 0.0;
     public double simulationStepTime = 0.01;
     
-    public WindowClass(string title="Calico Graphics Window",
+    public WindowClass(string title="Calico Graphics",
                   int width=300, 
                   int height=300) : base(title) {
       _canvas = new _Canvas("auto");
