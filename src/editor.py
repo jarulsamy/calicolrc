@@ -203,15 +203,11 @@ class EditorWindow(Window):
                 page = self.make_document(filename) # make a new document with filename
         else: # make a no-named document of type language
             if language is None:
-                if self.document:
-                    try:
-                        language = self.document.language
-                    except:
-                        language = "python"
-                else:
-                    language = "python"
-            else:
+                # FIXME: issue with getting document, before it is ready
                 language = "python"
+                if self.document:
+                    if self.document.language:
+                        language = self.documen.language
             page = self.make_document(None, language)
         if add_it:
             self.calico.on_action("opened-document", filename=filename)
@@ -326,6 +322,8 @@ class EditorWindow(Window):
                 if self.calico.languages[lang].extension == extension:
                     page = self.calico.languages[lang].get_document_class()(filename, self.calico, lang)
                     return page
+        if language is None:
+            language = "python"
         page = self.calico.languages[language].get_document_class()(filename, self.calico, language)
         return page
 
