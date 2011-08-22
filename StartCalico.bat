@@ -56,11 +56,6 @@ if errorlevel 1 (
    echo                                              .
    echo *** NEED HELP?? READ THE FOLLOWING ***
    echo                                              .
-   echo There are two reasons this might have 
-   echo happened:                                    .
-   echo 1) Calico may have crashed. 
-   echo 2) This file needs to be edited.
-   echo                                              .
    echo If you have run Calico successfully before
    echo then, please let your instructor know what 
    echo happened, and we'll try to fix it.
