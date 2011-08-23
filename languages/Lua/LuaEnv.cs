@@ -13,6 +13,7 @@ public static class LuaEnv {
   }
   
   public static void resetEnvironment(LuaSharp.Lua state) {
+    // FIXME: I think these keep getting garbage collected, so we reset them
     state["cprint"] = cprint_function; // console print, the old print
     state["print"] = print_function; // gui print
   }
@@ -22,9 +23,13 @@ public static class LuaEnv {
     public MyPrint() {
     }
     
-    public static void print(object item) {
+    public static void print(object item, bool use_quotes=false) {
       if (item == null) {
 	System.Console.Write("nil");
+      } else if (item is LuaSharp.LuaFunction) {
+	System.Console.Write("<LuaFunction>");
+      } else if (item is System.String && use_quotes) {
+	System.Console.Write(System.String.Format("\"{0}\"", item));
       } else if (item is LuaSharp.LuaTable) {
 	// FIXME: needs to be a safe_print, to handle self-recursive data structures
 	System.Console.Write("{");
@@ -37,11 +42,11 @@ public static class LuaEnv {
 	    print(pair.Value);
 	  } else {
 	    print(pair.Key);
-	    print("=");
+	    System.Console.Write("= ");
 	    if (pair.Value is LuaSharp.LuaTable)
-	      print("{...}");
+	      System.Console.Write("{...}");
 	    else
-	      print(pair.Value);
+	      print(pair.Value, true);
 	  }
 	}
 	System.Console.Write("}");
