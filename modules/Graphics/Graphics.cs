@@ -3333,12 +3333,14 @@ public static class Graphics {
     
     public int width {
       get {
-        return (int)(_pixbuf.Width*_scaleFactor);
+        //return (int)(_pixbuf.Width*_scaleFactor);
+		return _pixbuf.Width;
       }
     }
     public int height {
       get {
-        return (int)(_pixbuf.Height*_scaleFactor);
+        //return (int)(_pixbuf.Height*_scaleFactor);
+        return _pixbuf.Height;
       }
     }
 
