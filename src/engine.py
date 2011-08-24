@@ -60,8 +60,12 @@ class EngineManager(object):
         #self.runtime.Globals.SetVariable("goodname", badname)
         #[x for x in self.runtime.Globals.GetVariableNames()]
         # Set up language engines:
-        for engine in self.engine:
-            self.engine[engine].setup()
+        for engine in list(self.engine):
+            try:
+                self.engine[engine].setup()
+            except:
+                print("Engine failed to initialize: %s" % engine)
+                del self.engine[engine]
 
     def set_redirects(self, stdout, stderr, stdin): # textviews
         self.stderr, self.stdout, self.stdin = stderr, stdout, stdin
