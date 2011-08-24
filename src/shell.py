@@ -591,6 +591,7 @@ class ShellWindow(Window):
         error = error.replace("<", "")
         error = error.replace(">", "")
         error = error.replace("'", "")
+        error = error.replace("\"", "\\\"")
         return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
 
     def stop_running(self, sender, args):
