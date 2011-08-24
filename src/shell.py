@@ -588,10 +588,15 @@ class ShellWindow(Window):
                 break
         if ":" in error:
             error, details = error.rsplit(":", 1)
+        error = error.replace("%", "%25")
         error = error.replace("<", "")
         error = error.replace(">", "")
         error = error.replace("'", "")
         error = error.replace("\"", "\\\"")
+        error = error.replace("{", "") # invalid wiki title
+        error = error.replace("}", "") # invalid wiki title
+        error = error.replace("[", "") # invalid wiki title
+        error = error.replace("]", "") # invalid wiki title
         return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
 
     def stop_running(self, sender, args):
