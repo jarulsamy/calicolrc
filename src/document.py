@@ -101,14 +101,20 @@ class Document(object):
         if self.filename:
             # if exists, make backup
             if os.path.isfile(self.filename):
-                fp_out = open(self.filename + "~", "w")
-                oldtext = "".join(file(self.filename).xreadlines())
-                fp_out.write(oldtext)
-                fp_out.close()
+                try:
+                    fp_out = open(self.filename + "~", "w")
+                    oldtext = "".join(file(self.filename).xreadlines())
+                    fp_out.write(oldtext)
+                    fp_out.close()
+                except:
+                    print("Cannot write file: '%s~'" % self.filename)
             # now save the new:
-            fp = open(self.filename, "w")
-            fp.write(self.get_text())
-            fp.close()
+            try:
+                fp = open(self.filename, "w")
+                fp.write(self.get_text())
+                fp.close()
+            except:
+                print("Cannot write file: '%s'" % self.filename)
             self.set_clean()
             return True
         return False
