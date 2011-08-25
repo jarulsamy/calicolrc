@@ -13,7 +13,7 @@ for text in ["Hello", "World!", "Welcome", "to", "Calico"]:
         col += 10
     line += 16
 
-ground = Rectangle((100, 340), (500, 360))
+ground = Rectangle((100, 340), (400, 360))
 ground.draw(win)
 ground.bodyType = "static"
 ground.color = Color("green")

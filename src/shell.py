@@ -346,7 +346,7 @@ class ShellWindow(Window):
         if self.window.Focus == self.textview:
             if event is None or str(event.Key) == "Return":
                 # if control key is down, too, just insert a return
-                if int(event.State & Gdk.ModifierType.ControlMask) != 0:
+                if event and int(event.State & Gdk.ModifierType.ControlMask) != 0:
                     self.textview.InsertAtCaret("\n")
                     return True
                 # if cursor in middle, insert a Return
