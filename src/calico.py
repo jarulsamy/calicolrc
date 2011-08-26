@@ -714,6 +714,10 @@ else:
 #################################################
 
 if "--nogui" not in args:
+    # FIXME: thread safety:
+    # http://developer.gnome.org/gtk-faq/stable/x481.html
+    #g_thread_init(NULL);
+    #gdk_threads_init();
     Gtk.Application.Init()
 #------------------------------
 try:
