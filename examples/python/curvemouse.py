@@ -1,5 +1,6 @@
 from Graphics import *
 win = Window("Shapes", 200, 200)
+curve = None
 
 while True:
     mouse = Point(*getMouseNow())
