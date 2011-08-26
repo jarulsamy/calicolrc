@@ -5,7 +5,7 @@ win = Window("Clock")
 win.mode = "manual"
 
 face = Circle((150, 150), 125)
-face.fill = None
+face.fill = Color("white")
 face.draw(win)
 
 s = Frame(150, 150)
