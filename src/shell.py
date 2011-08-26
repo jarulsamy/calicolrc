@@ -309,11 +309,15 @@ class ShellWindow(Window):
             pass
         self.set_title(_("%s - Calico Shell - %s") % (self.language.title(), System.Environment.UserName))
         self.prompt.Text = "%s>" % (self.language + "------")[:6]
-        self.statusbar.set(_("Language"), self.language.title())
-        self.statusbar.set(_("Status"), self.get_status())
+        def invoke(s, a):
+            self.statusbar.set(_("Language"), self.language.title())
+            self.statusbar.set(_("Status"), self.get_status())
+        Gtk.Application.Invoke(invoke)
 
     def update_status(self):
-        self.statusbar.set(_("Status"), self.get_status())
+        def invoke(s, a):
+            self.statusbar.set(_("Status"), self.get_status())
+        Gtk.Application.Invoke(invoke)
 
     def get_status(self):
         if self.calico.connection:
@@ -428,7 +432,6 @@ class ShellWindow(Window):
     def change_to_lang(self, language):
         self.language = language
         self.update_gui()
-        #self.show_prompt()
 
     def on_save_file_as(self, obj, event):
         pass
@@ -522,8 +525,8 @@ class ShellWindow(Window):
             self.calico.engine[language].execute_file(filename)
             Gtk.Application.Invoke(self.stop_running)
             self.message(_("Done loading file."))
-            self.language = language
-            self.update_gui()
+            if language != self.language:
+                self.change_to_lang(language)
             #self.show_prompt()
 
         self.executeThread = System.Threading.Thread(
