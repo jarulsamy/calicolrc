@@ -3650,6 +3650,7 @@ public static class Graphics {
         shape.render(g);
 	shape.updateGlobalPosition(g);
       }
+      g.Stroke();
       g.Restore();
     }
 
