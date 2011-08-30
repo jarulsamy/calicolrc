@@ -18,7 +18,7 @@ namespace Jigsaw
 		public PropertyWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
 		{
 			this.Title = "Jigsaw Property Window";
-			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, ".\\plugin.png"));
+			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
 			this.Resize(300, 200);
 			this.KeepAbove = true;
 			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
@@ -149,7 +149,7 @@ namespace Jigsaw
 		public InspectorWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
 		{
 			this.Title = "Jigsaw Inspector";
-			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, ".\\plugin.png"));
+			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
 			this.Resize(300, 200);
 			this.KeepAbove = true;
 			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed

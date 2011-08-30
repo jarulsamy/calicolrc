@@ -8,7 +8,7 @@ public class MainWindow : Gtk.Window
 	{
 		// Main window
 		this.Title = "Jigsaw";
-		this.Icon = new global::Gdk.Pixbuf (global::System.IO.Path.Combine (global::System.AppDomain.CurrentDomain.BaseDirectory, ".\\plugin.png"));
+		this.Icon = new global::Gdk.Pixbuf (global::System.IO.Path.Combine (global::System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
 		this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 		this.DefaultWidth = 1000;
 		this.DefaultHeight = 700;
