@@ -216,7 +216,6 @@ class EditorWindow(Window):
             self.notebook.CurrentPage = page_num
             if filename:
                 self.update_recent_files(filename)
-            page.set_font()
         ###########################################################
         # Remove temp page, if one, and not same kind as one added:
         if self.notebook.NPages == 2:
@@ -322,10 +321,12 @@ class EditorWindow(Window):
             for lang in self.calico.languages:
                 if self.calico.languages[lang].extension == extension:
                     page = self.calico.languages[lang].get_document_class()(filename, self.calico, lang)
+                    page.set_font()
                     return page
         if language is None:
             language = "python"
         page = self.calico.languages[language].get_document_class()(filename, self.calico, language)
+        page.set_font()
         return page
 
     def on_save_file(self, obj, event):
