@@ -22,9 +22,9 @@ from __future__ import print_function
 import clr
 import os
 import sys
-sys.path.append(os.path.abspath("Jigsaw/bin/Debug"))
+sys.path.append(os.path.abspath("languages/Jigsaw/Jigsaw/bin/Debug"))
 clr.AddReference('gtk-sharp')
-clr.AddReference('Jigsaw.dll')
+clr.AddReference('Jigsaw.exe')
 import JigsawWidget
 import Gtk
 from utils import Language
@@ -33,8 +33,7 @@ from engine import Engine
 
 class JigsawDocument(Document):
     def make_widget(self):
-        self.top = JigsawWidget()
-        self.widget = self.top.scrolledwindow1
+        self.widget = JigsawWidget()
         self.widget.document = self
         self.widget.ShowAll()
 
