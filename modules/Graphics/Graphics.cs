@@ -219,7 +219,15 @@ public static class Graphics {
     getWindow().onMouseUp(function);
   }
 
+  public static void onMouseUp(Func<object,Event,object> function) {
+    getWindow().onMouseUp(function);
+  }
+
   public static void onMouseDown(PythonFunction function) {
+    getWindow().onMouseDown(function);
+  }
+
+  public static void onMouseDown(Func<object,Event,object> function) {
     getWindow().onMouseDown(function);
   }
 
@@ -227,11 +235,23 @@ public static class Graphics {
     getWindow().onMouseMovement(function);
   }
 
+  public static void onMouseMovement(Func<object,Event,object> function) {
+    getWindow().onMouseMovement(function);
+  }
+
   public static void onKeyPress(PythonFunction function) {
     getWindow().onKeyPress(function);
   }
 
+  public static void onKeyPress(Func<object,Event,object> function) {
+    getWindow().onKeyPress(function);
+  }
+
   public static void onKeyRelease(PythonFunction function) {
+    getWindow().onKeyRelease(function);
+  }
+
+  public static void onKeyRelease(Func<object,Event,object> function) {
     getWindow().onKeyRelease(function);
   }
 
@@ -1234,6 +1254,10 @@ public static class Graphics {
       onClickCallbacks.Add(function);
     }
 
+    public void onMouseDown(Func<object,Event,object> function) {
+      onClickCallbacks.Add(function);
+    }
+
     public void run(object function) {
         if (function is PythonFunction) {
 	  try {
@@ -1268,7 +1292,15 @@ public static class Graphics {
       onMouseUpCallbacks.Add(function);
     }
     
+    public void onMouseUp(Func<object,Event,object> function) {
+      onMouseUpCallbacks.Add(function);
+    }
+    
     public void onMouseMovement(PythonFunction function) {
+      onMouseMovementCallbacks.Add(function);
+    }
+    
+    public void onMouseMovement(Func<object,Event,object> function) {
       onMouseMovementCallbacks.Add(function);
     }
     
@@ -1276,7 +1308,15 @@ public static class Graphics {
       onKeyPressCallbacks.Add(function);
     }
     
+    public void onKeyPress(Func<object,Event,object> function) {
+      onKeyPressCallbacks.Add(function);
+    }
+    
     public void onKeyRelease(PythonFunction function) {
+      onKeyReleaseCallbacks.Add(function);
+    }
+    
+    public void onKeyRelease(Func<object,Event,object> function) {
       onKeyReleaseCallbacks.Add(function);
     }
     
@@ -1643,6 +1683,29 @@ public static class Graphics {
     // FIXME: set x,y of points should go from screen_coords to relative
     // FIXME: should call QueueDraw on set
 
+    public virtual bool hit(double x, double y)
+    {
+      return false;
+    }
+
+    public void connect(string signal, PythonFunction function) {
+      if (signal == "click") {
+	window.onMouseDown(
+          delegate (object obj, Event evt) {
+	    if (hit(evt.x, evt.y)) {
+	      try {
+		IronPython.Runtime.Operations.PythonCalls.Call(function, obj, evt);
+	      } catch (Exception e) {
+		Console.Error.WriteLine("Error in connect('click') function");
+		Console.Error.WriteLine(e.Message);
+	      }	
+	      return true;
+	    }
+	    return false;
+	  });
+      }
+    }
+
     public double bounce {
       get
         {
@@ -1904,11 +1967,11 @@ public static class Graphics {
       }
     }
     
-    public bool hit(IList iterable) {
-      return hit(new Point(iterable[0], iterable[1]));
+    public bool contains(IList iterable) {
+      return contains(new Point(iterable[0], iterable[1]));
     }
 
-    public bool hit(Point p) {
+    public bool contains(Point p) {
           int counter = 0;
           double xinters;
           Point p1, p2;
@@ -3354,6 +3417,44 @@ public static class Graphics {
     }
 
   } // -- end of Picture class
+
+  public class Button : Shape {
+    Text label;
+    Rectangle rectangle;
+    string text;
+    Point point;
+    public Button(Point point, string text) : base(true) {
+      this.point = point;
+      this.text = text;
+      set_points(point);
+    }
+    
+    public new void draw(WindowClass win) { // Button
+      window = win;
+      label = new Text(point, text);
+      label.draw(win);
+      rectangle = new Rectangle(new Point(point.x - width/2 - 10, 
+					  point.y - height/2 - 10),
+				new Point(point.x + width/2 + 10, 
+					  point.y + height/2 + 10));
+      rectangle.fill = new Color("white");
+      rectangle.outline = new Color("gray");
+      rectangle.draw(win);
+      win.stackOnTop(label);
+    }
+
+    public override bool hit(double px, double py) {
+      return ((x - width <= px && px <= x + width) &&
+	      (y - height <= py && py <= y + height));
+    }
+
+    public double width {
+      get { return label.width; }
+    }
+    public double height {
+      get { return label.height;}
+    }
+  }
 
   public class Rectangle : Shape {
         public Rectangle(IList iterable1, IList iterable2) :
