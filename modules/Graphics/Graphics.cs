@@ -3420,7 +3420,8 @@ public static class Graphics {
 
   public class Button : Shape {
     Text label;
-    Rectangle rectangle;
+    double padding = 5;
+    RoundedRectangle rectangle;
     string text;
     Point point;
     public Button(Point point, string text) : base(true) {
@@ -3432,11 +3433,15 @@ public static class Graphics {
     public new void draw(WindowClass win) { // Button
       window = win;
       label = new Text(point, text);
+      label.fontSize = 12;
+      label.fill = new Color("black");
+      // Draw label first, in order that width will be defined:
       label.draw(win);
-      rectangle = new Rectangle(new Point(point.x - width/2 - 10, 
-					  point.y - height/2 - 10),
-				new Point(point.x + width/2 + 10, 
-					  point.y + height/2 + 10));
+      rectangle = new RoundedRectangle(new Point(point.x - width/2 - padding, 
+						 point.y - height/2 - padding),
+				       new Point(point.x + width/2 + padding, 
+						 point.y + height/2 + padding),
+				       padding);
       rectangle.fill = new Color("white");
       rectangle.outline = new Color("gray");
       rectangle.draw(win);
@@ -3444,8 +3449,8 @@ public static class Graphics {
     }
 
     public override bool hit(double px, double py) {
-      return ((x - width <= px && px <= x + width) &&
-	      (y - height <= py && py <= y + height));
+      return (((x - width/2 - padding) <= px && px <= (x + width/2 + padding)) &&
+	      ((y - height/2 - padding) <= py && py <= (y + height/2 + padding)));
     }
 
     public double width {
@@ -3494,6 +3499,61 @@ public static class Graphics {
       body.Friction = _friction;
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+    }
+  }
+
+  public class RoundedRectangle : Shape {
+    public double radius = 0.0;
+    public RoundedRectangle(IList iterable1, IList iterable2, double radius) :
+    this(new Point(iterable1[0], iterable1[1]), 
+	 new Point(iterable2[0], iterable2[1]), 
+	 radius) {
+    }
+    public RoundedRectangle(Point point1, Point point2, double radius) : base(true) {
+      set_points(new Point(point1.x, point1.y),
+		 new Point(point2.x, point1.y),
+		 new Point(point2.x, point2.y),
+		 new Point(point1.x, point2.y));
+      this.radius = radius;
+    }
+    
+    public override void render(Cairo.Context g) {
+      // draws rectangles with rounded (circular arc) corners 
+      g.Save();
+      Point temp = screen_coord(center);
+      g.Translate(temp.x, temp.y);
+      g.Rotate(_rotation);
+      g.Scale(_scaleFactor, _scaleFactor);
+      if (points != null) {
+        g.LineWidth = border;
+	double top = points[0].y + radius;
+	double bottom = points[2].y - radius;
+	double left = points[0].x + radius;
+	double right = points[2].x - radius;
+
+        //g.MoveTo(p1.x, p2.y);
+	g.Arc(left, top, radius, .50 * (Math.PI * 2.0), .75 * (Math.PI * 2.0));
+	g.Arc(right, top, radius, .75 * (Math.PI * 2.0), 1.0 * (Math.PI * 2.0));
+	g.Arc(right, bottom, radius, 1.0 * (Math.PI * 2.0), .25 * (Math.PI * 2.0));
+	g.Arc(left, bottom, radius, .25 * (Math.PI * 2.0), .50 * (Math.PI * 2.0));
+
+        g.ClosePath();
+	if (_fill != null) {
+	  g.Color = _fill._cairo;
+	  g.FillPreserve();
+	}
+	if (_outline != null) {
+	  g.Color = _outline._cairo;
+	  g.Stroke();
+	}
+	foreach (Shape shape in shapes) {
+	  shape.render(g);
+	  shape.updateGlobalPosition(g);
+	}
+	g.Restore();
+	if (has_pen)
+	  pen.render(g);
+      }
     }
   }
 
