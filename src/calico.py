@@ -111,12 +111,11 @@ class CalicoProject(object):
     This class is meant to be created as a singleton instance
     to hold all of the components of one user together.
     """
-    def __init__(self, mutex, argv):
+    def __init__(self, argv):
         """
         Constructor for the singleton Calico instance. argv is the
         command-line files and flags.
         """
-        self.mutex = mutex
         self.last_error = ""
         self.actionHandlers = []
         self.debug = False
@@ -688,9 +687,22 @@ def handleMessages(sender, args):
 
 #################################################
 # Single Instance Application
+alreadyRunning = False
+for process in System.Diagnostics.Process.GetProcessesByName("mono"):
+    for module in process.Modules:
+        if module.ModuleName == "Myro.dll":
+            alreadyRunning = True
 messages = os.path.join(calico_user, "messages")
-(mutex, locked) = System.Threading.Mutex(True, r"Global\CalicoProject/%s" % System.Environment.UserName, None)
-if locked:
+if alreadyRunning:
+    # Not allowed! We'll send command line to running Calico through
+    # message file. Append args to command line:
+    print("Calico is already running...")
+    fp = file(messages, "a")
+    fp.write("\n".join(args) + "\n")
+    fp.close()
+    # Exit; message has been sent
+    sys.exit(0)
+else:
     # We are the "server"; clean the messages file:
     fp = file(messages, "w")
     fp.close()
@@ -702,14 +714,6 @@ if locked:
     watcher.Changed += handleMessages
     watcher.EnableRaisingEvents = True
     # and continue loading...
-else:
-    # Not allowed! We'll send command line to running Calico through
-    # message file. Append args to command line:
-    fp = file(messages, "a")
-    fp.write("\n".join(args) + "\n")
-    fp.close()
-    # Exit; message has been sent
-    sys.exit(0)
 # end of Single Instance logic
 #################################################
 
@@ -721,7 +725,7 @@ if "--nogui" not in args:
     Gtk.Application.Init()
 #------------------------------
 try:
-    pw = CalicoProject(mutex, args)
+    pw = CalicoProject(args)
 except:
     traceback.print_exc()
     sys.exit()
