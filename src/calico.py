@@ -687,8 +687,11 @@ def handleMessages(sender, args):
 
 #################################################
 # Single Instance Application
+current = System.Diagnostics.Process.GetCurrentProcess()
 alreadyRunning = False
 for process in System.Diagnostics.Process.GetProcessesByName("mono"):
+    if process.Id == current.Id:
+        continue
     for module in process.Modules:
         if module.ModuleName == "Myro.dll":
             alreadyRunning = True
