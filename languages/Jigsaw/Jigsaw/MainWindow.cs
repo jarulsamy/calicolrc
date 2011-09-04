@@ -1,5 +1,5 @@
 using System;
-using System.Drawing;
+//using System.Drawing;
 using System.Collections.Generic;
 
 public class JigsawWidget : Gtk.ScrolledWindow
@@ -46,8 +46,6 @@ public class MainWindow : Gtk.Window
 		cvsFixed.Put(cvs, 0,0);
 		sw.AddWithViewport(cvsFixed);
 
-		
-		
 		// Let it rip
 		this.ShowAll();
 	}

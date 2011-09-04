@@ -2,15 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+//using System.Drawing;
+//using System.Drawing.Drawing2D;
 using System.Text;
 using System.Xml;
 using System.IO;
+using Cairo;
 //using System.Reflection;
 
 // TODO:
-// Deactivate lasso. Cannot be used on Jigsaw canvas.
 // Allow the out-edge of a complete stack (not just single blocks) being dragged
 //   to activate and connect to unconnected in-edges of stationary blocks/stacks.
 // Stop Script blocks should not attach to inner blocks
@@ -83,8 +83,8 @@ namespace Jigsaw
 		public Canvas(int width, int height) : base(width, height) 
 		{
 			// Setup some colors
-			BackColor = Color.LightSlateGray;
-			this.lasso.LineColor = Color.WhiteSmoke;
+			BackColor = Diagram.Colors.LightSlateGray;
+			this.lasso.LineColor = Diagram.Colors.WhiteSmoke;
 			
 			// Properties window shared by all blocks
 			_inspector = new Jigsaw.InspectorWindow(this);
@@ -106,15 +106,15 @@ namespace Jigsaw
 			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 166, 100, 30, "Myro");
 			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 199, 100, 30, "Graphics");
 			Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools");
-			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes");
-			 
-			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbShapes, tbGraphics});
-			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbShapes, tbGraphics});
-			tbVars.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbShapes, tbGraphics});
-			tbMyro.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbCtrl, tbVars, tbTools,  tbShapes, tbGraphics});
-			tbGraphics.AddTabs( new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbTools,  tbShapes});
-			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbShapes, tbGraphics});
-			tbShapes.AddTabs(   new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,   tbGraphics});
+			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes");
+			
+			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbNotes, tbGraphics});
+			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbNotes, tbGraphics});
+			tbVars.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbNotes, tbGraphics});
+			tbMyro.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbCtrl, tbVars, tbTools,  tbNotes, tbGraphics});
+			tbGraphics.AddTabs( new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbTools,  tbNotes});
+			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics});
+			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,   tbGraphics});
 			
 			// Add tabs to the canvas
 			this.AddShape(tbCtrl);
@@ -123,13 +123,13 @@ namespace Jigsaw
 			this.AddShape(tbMyro);
 			this.AddShape(tbGraphics);
 			this.AddShape(tbTools);
-			this.AddShape(tbShapes);
+			this.AddShape(tbNotes);
 			
 			// Add block panel background to canvas
 			Diagram.CRectangle pnlBlock = new Diagram.CRectangle(
 			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 1200.0)}, 
-				"", Color.Transparent, Color.Honeydew, 1, System.Drawing.Drawing2D.DashStyle.Solid, 
-				Color.Honeydew, true, false, false, false, false);
+				"", Diagram.Colors.Transparent, Diagram.Colors.Honeydew, 1, Diagram.Colors.Honeydew, 
+				true, false, false, false, false);
 			this.AddShape(pnlBlock);
 			
 			// Factory Blocks for block area
@@ -162,44 +162,42 @@ namespace Jigsaw
 			
 			// Shapes
 			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
-			_shrect.FillColor = Color.LightYellow;
-			_shrect.LineColor = Color.Gray;
+			_shrect.FillColor = Diagram.Colors.LightYellow;
+			_shrect.LineColor = Diagram.Colors.Gray;
 			_shrect.LineWidth = 2;
 			_shrect._isFactory = true;
 			this.AddShape(_shrect);
-			tbShapes.AddShape(_shrect);
+			tbNotes.AddShape(_shrect);
 
 			Diagram.CRoundedRectangle _shrrect = new Diagram.CRoundedRectangle(130, 115, 135, 30);
-			_shrrect.FillColor = Color.LightYellow;
-			_shrrect.LineColor = Color.Gray;
+			_shrrect.FillColor = Diagram.Colors.LightYellow;
+			_shrrect.LineColor = Diagram.Colors.Gray;
 			_shrrect.LineWidth = 2;
 			_shrrect.Radius = 8;
 			_shrrect._isFactory = true;
 			this.AddShape(_shrrect);
-			tbShapes.AddShape(_shrrect);
+			tbNotes.AddShape(_shrrect);
 			
-			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
-			_shellipse.FillColor = Color.LightYellow;
-			_shellipse.LineColor = Color.Gray;
-			_shellipse.LineWidth = 2;
-			_shellipse._isFactory = true;
-			this.AddShape(_shellipse);
-			tbShapes.AddShape(_shellipse);
-			
-			Diagram.CConnector _shconn = new Diagram.CConnector(
-			                             	new List<Diagram.CPoint>() { 
-												new Diagram.CPoint(130, 210), 
-												new Diagram.CPoint(198, 210),
-												new Diagram.CPoint(198, 230),
-												new Diagram.CPoint(266, 230) } );
-			_shconn.LineColor = Color.LightBlue;
-			_shconn.LineWidth = 2;
-			_shconn._isFactory = true;
-			this.AddShape(_shconn);
-			tbShapes.AddShape(_shconn);
+//			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
+//			_shellipse.FillColor = Diagram.Colors.LightYellow;
+//			_shellipse.LineColor = Diagram.Colors.Gray;
+//			_shellipse.LineWidth = 2;
+//			_shellipse._isFactory = true;
+//			this.AddShape(_shellipse);
+//			tbNotes.AddShape(_shellipse);
+//			
+//			Diagram.CConnector _shconn = new Diagram.CConnector(
+//			                             	new List<Diagram.CPoint>() { 
+//												new Diagram.CPoint(130, 210), 
+//												new Diagram.CPoint(198, 210),
+//												new Diagram.CPoint(198, 230),
+//												new Diagram.CPoint(266, 230) } );
+//			_shconn.LineColor = Diagram.Colors.LightBlue;
+//			_shconn.LineWidth = 2;
+//			_shconn._isFactory = true;
+//			this.AddShape(_shconn);
+//			tbNotes.AddShape(_shconn);
 
-			
-			
 			// Myro
 			CRobot block1 = new CRobot(110, 70, true);
 			block1.Text = "init robot on [COM]";
@@ -728,7 +726,7 @@ namespace Jigsaw
 		public CReadOnlyProperty TextProp = null;		// Just a property to reflect text into Inspector
 		public CReadOnlyProperty MsgProp = null;		// All blocks have a Message property
 
-		protected int textYOffset = 3;					// Y offset for when a block's text
+		protected int textYOffset = 0;					// Y offset for when a block's text
 		
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
 		
@@ -744,7 +742,7 @@ namespace Jigsaw
 		public CBlock(List<Diagram.CPoint> pts) : base(pts) {
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
-			this.AlignVertical = StringAlignment.Near;		// Change text vertical alignment to start from top
+			//this.AlignVertical = StringAlignment.Near;		// Change text vertical alignment to start from top
 			
 			// Default edges
 			InEdge = new CEdge(this, "In", EdgeType.In, null, offsetX, 0.0, 0.0, 0.0, this.Width);
@@ -970,85 +968,91 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// All blocks follow the same pattern for drawing.
 		// Block subclasses only need to define the graphics path, fill color and text.
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {	// Draw block on the canvas
-			Brush b;
-			Pen p;
 			
             // Cannot draw with negative width or height, 
             // so use bounding box points to draw
-            float x = (float)(this.left);
-            float y = (float)(this.top);
-            float w = (float)(this.width);
-            float h = (float)(this.height);
+            double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
 
             // Block outline			
-			GraphicsPath path = Figure(x, y, w, h);
-
-			// Set brush based on block state
-			//Color tFillColor = this.FillColor;
+			SetPath(g, x, y, w, h);
+			
+			// Set fill color based on block state
 			if (this._state == BlockState.Running) {
-				//tFillColor = Color.White;
-				b = new SolidBrush(Color.White);
+				g.Color = Diagram.Colors.White;
 			}
 			else if (this._state == BlockState.Error) {
-				//tFillColor = Color.White;
-				b = new HatchBrush(HatchStyle.DiagonalCross, Color.LightPink, Color.White);
+				//b = new HatchBrush(HatchStyle.DiagonalCross, Color.LightPink, Color.White);
+				g.Color = Diagram.Colors.LightPink;
 			} else {
-				b = new SolidBrush(this.FillColor);
+				g.Color = this.FillColor;
 			}
 			
-			// Draw shape
-			p = new Pen(this.LineColor, (float)this.LineWidth);
-            p.DashStyle = this.LineStyle;
-			//b = new SolidBrush(tFillColor);
-			g.FillPath(b, path);
-			g.DrawPath(p, path);
-			b.Dispose();
-			p.Dispose();
+			// Fill
+			g.FillPreserve();
 			
-            // Draw label
+			// Stroke
+			g.Color = this.LineColor;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
+
+			// Text
             if (this.Text.Length > 0)
             {
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;      // Vertical text alignment
-                frmt.LineAlignment = this.AlignVertical;  	// Horizontal text alignment
-                //frmt.FormatFlags = StringFormatFlags.NoWrap;
-                b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)this.fontSize, this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y+textYOffset, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				double cx = x + 0.5*w;
+				double cy = y + 0.5*20;
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
+				g.SetFontSize(12.0);
+				Cairo.TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing + textYOffset); 
+				g.ShowText(this.Text);
             }
-			
+
 			// Draw breakpoint, if necessary
 			if (this._hasBreakPoint) {
-				b = new SolidBrush(Color.Crimson);
-				g.FillEllipse(b, x, y, 10, 10);
-				b.Dispose();
+				g.Color = Diagram.Colors.Red;
+				g.MoveTo(x+2, y+7);
+				g.Arc(x+7, y+7, 5, 0.0, 2.0*Math.PI);
+				g.ClosePath();
+				g.Fill();
 			}
-			
+
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
         }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Base block outline graphics path figure
-		protected virtual GraphicsPath Figure(float x, float y, float w, float h) 
+		protected virtual void SetPath(Cairo.Context g, double x, double y, double w, double h) 
 		{
-			GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
-			path.AddArc(x, y, 6F, 6F, 180F, 90F);
-			path.AddLine(x+11, y, x+14, y+4);
-			path.AddLine(x+24, y+4, x+27, y);
-			path.AddArc(x+w-6, y, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+h-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27, y+h, x+24, y+h+4);
-			path.AddLine(x+14, y+h+4, x+11, y+h);
-			path.AddArc(x, y+h-6, 6F, 6F, 90F, 90F);
-            path.CloseFigure();
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
 			
-			return path;
+			g.Save();
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+11, y );
+			g.LineTo( x+14, y+4 );
+			g.LineTo( x+24, y+4 );
+			g.LineTo( x+27, y );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+27, y+h );
+			g.LineTo( x+24, y+h+4 );
+			g.LineTo( x+14, y+h+4 );
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+			g.Restore();
 		}
 		
 		/// <summary>
@@ -1379,9 +1383,9 @@ namespace Jigsaw
             // Add the outline to the top of the canvas annotation list
 			this.Outline = this.Clone(this.Left, this.Top, false);
 			
-			this.Outline.TextColor = Color.FromArgb(100, this.TextColor);
-			this.Outline.LineColor = Color.FromArgb(100, this.LineColor);
-			this.Outline.FillColor = Color.FromArgb(100, this.FillColor);
+			this.Outline.TextColor = new Color(this.TextColor.R, this.TextColor.G, this.TextColor.B, 0.4); //  Color.FromArgb(100, this.TextColor);
+			this.Outline.LineColor = new Color(this.LineColor.R, this.LineColor.G, this.LineColor.B, 0.4); //Color.FromArgb(100, this.LineColor);
+			this.Outline.FillColor = new Color(this.FillColor.R, this.FillColor.G, this.FillColor.B, 0.4); //Color.FromArgb(100, this.FillColor);
 			this.Outline.Visible = true;
 			this.Outline.Draggable = false;
 			this.Outline.Sizable = false;
@@ -1547,9 +1551,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 20)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkRed;
-			this.FillColor = Color.LightPink;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkRed;
+			this.FillColor = Diagram.Colors.LightPink;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 		}
 		
@@ -1570,9 +1574,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 20)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkBlue;
-			this.FillColor = Color.LightBlue;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkBlue;
+			this.FillColor = Diagram.Colors.LightBlue;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 		}
 		
@@ -1774,9 +1778,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 50)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkGoldenrod;
-			this.FillColor = Color.PaleGoldenrod;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkGoldenrod;
+			this.FillColor = Diagram.Colors.PaleGoldenrod;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			//textYOffset = 5;						// Block text offset
 			
@@ -1984,30 +1988,48 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override GraphicsPath Figure(float x, float y, float w, float h) 
+		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
 		{
-			GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
-			path.AddArc(x, y, 6F, 6F, 180F, 90F);
-			path.AddLine(x+11, y, x+14, y+4);
-			path.AddLine(x+24, y+4, x+27, y);
-			path.AddArc(x+w-6, y, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+20-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27+20, y+20, x+24+20, y+20+4);
-			path.AddLine(x+14+20, y+20+4, x+11+20, y+20);
-			path.AddArc(x+20, y+20, 6F, 6F, 270F, -90F);
-			path.AddArc(x+20, y+h-20-6, 6F, 6F, 180F, -90F);
-			path.AddLine(x+11+20, y+h-20, x+14+20, y+h-20+4);
-			path.AddLine(x+24+20, y+h-20+4, x+27+20, y+h-20);
-			path.AddArc(x+w-6, y+h-20, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+h-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27, y+h, x+24, y+h+4);
-			path.AddLine(x+14, y+h+4, x+11, y+h);
-			path.AddArc(x, y+h-6, 6F, 6F, 90F, 90F);
-			path.CloseFigure();
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
 			
-			return path;
-		}
+			g.Save();
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+11, y );
+			g.LineTo( x+14, y+4 );
+			g.LineTo( x+24, y+4 );
+			g.LineTo( x+27, y );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+20-r );
+			g.Arc(    x+w-r, y+20-r, r, 0.0, hpi );
+			g.LineTo( x+27+20, y+20 );
+			g.LineTo( x+24+20, y+20+4 );
+			g.LineTo( x+14+20, y+20+4 );
+			g.LineTo( x+11+20, y+20 );
+			g.LineTo( x+20+r, y+20 );
+			g.ArcNegative(    x+20+r, y+20+r, r, -hpi, Math.PI );
+			g.LineTo( x+20, y+h-20-r );
+			g.ArcNegative(    x+20+r, y+h-20-r, r, Math.PI, hpi);
+			g.LineTo( x+11+20, y+h-20);
+			g.LineTo( x+14+20, y+h-20+4);
+			g.LineTo( x+24+20, y+h-20+4);
+			g.LineTo( x+27+20, y+h-20);
+			g.LineTo( x+w-r, y+h-20 );
+			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+27, y+h );
+			g.LineTo( x+24, y+h+4 );
+			g.LineTo( x+14, y+h+4 );
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+			g.Restore();
+		}		
     }
 
 	// -----------------------------------------------------------------------
@@ -2027,9 +2049,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 50)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkGoldenrod;
-			this.FillColor = Color.PaleGoldenrod;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkGoldenrod;
+			this.FillColor = Diagram.Colors.PaleGoldenrod;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			
 			// Create inner edge to connect if-block stack
@@ -2228,29 +2250,47 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override GraphicsPath Figure(float x, float y, float w, float h) 
+		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
 		{
-			GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
-			path.AddArc(x, y, 6F, 6F, 180F, 90F);
-			path.AddLine(x+11, y, x+14, y+4);
-			path.AddLine(x+24, y+4, x+27, y);
-			path.AddArc(x+w-6, y, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+20-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27+20, y+20, x+24+20, y+20+4);
-			path.AddLine(x+14+20, y+20+4, x+11+20, y+20);
-			path.AddArc(x+20, y+20, 6F, 6F, 270F, -90F);
-			path.AddArc(x+20, y+h-20-6, 6F, 6F, 180F, -90F);
-			path.AddLine(x+11+20, y+h-20, x+14+20, y+h-20+4);
-			path.AddLine(x+24+20, y+h-20+4, x+27+20, y+h-20);
-			path.AddArc(x+w-6, y+h-20, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+h-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27, y+h, x+24, y+h+4);
-			path.AddLine(x+14, y+h+4, x+11, y+h);
-			path.AddArc(x, y+h-6, 6F, 6F, 90F, 90F);
-			path.CloseFigure();
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
 			
-			return path;
+			g.Save();
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+11, y );
+			g.LineTo( x+14, y+4 );
+			g.LineTo( x+24, y+4 );
+			g.LineTo( x+27, y );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+20-r );
+			g.Arc(    x+w-r, y+20-r, r, 0.0, hpi );
+			g.LineTo( x+27+20, y+20 );
+			g.LineTo( x+24+20, y+20+4 );
+			g.LineTo( x+14+20, y+20+4 );
+			g.LineTo( x+11+20, y+20 );
+			g.LineTo( x+20+r, y+20 );
+			g.ArcNegative(    x+20+r, y+20+r, r, -hpi, Math.PI );
+			g.LineTo( x+20, y+h-20-r );
+			g.ArcNegative(    x+20+r, y+h-20-r, r, Math.PI, hpi);
+			g.LineTo( x+11+20, y+h-20);
+			g.LineTo( x+14+20, y+h-20+4);
+			g.LineTo( x+24+20, y+h-20+4);
+			g.LineTo( x+27+20, y+h-20);
+			g.LineTo( x+w-r, y+h-20 );
+			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+27, y+h );
+			g.LineTo( x+24, y+h+4 );
+			g.LineTo( x+14, y+h+4 );
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+			g.Restore();
 		}
     }
 	
@@ -2265,12 +2305,12 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 30)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkGoldenrod;
-			this.FillColor = Color.PaleGoldenrod;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkGoldenrod;
+			this.FillColor = Diagram.Colors.PaleGoldenrod;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			this.Text = "when program starts";
-			textYOffset = 13;							// Block text offset
+			textYOffset = 10;							// Block text offset
 		}
 		
 		public CControlStart(Double X, Double Y, bool isFactory) : this(X, Y)
@@ -2286,27 +2326,30 @@ namespace Jigsaw
 				return new List<CEdge>() { this.OutEdge };
 			}
 		}
-
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Block outline graphics path figure
-		protected override GraphicsPath Figure(float x, float y, float w, float h) 
+		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
 		{
-			GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
 			
-			path.AddBezier(new Point((int)x, (int)y+10), 
-			               new Point((int)x+55, (int)y-20),
-			               new Point((int)x+100, (int)y+10),
-			               new Point((int)x+110, (int)y+10) );
-			path.AddLine(x+110, y+10, x+w-6, y+10);
-			path.AddArc(x+w-6, y+10, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+h-6, 6F, 6F, 0F, 90F);
-			path.AddLine(x+27, y+h, x+24, y+h+4);
-			path.AddLine(x+14, y+h+4, x+11, y+h);
-			path.AddArc(x, y+h-6, 6F, 6F, 90F, 90F);
-			path.CloseFigure();
+			g.Save();
 			
-			return path;
+			g.MoveTo(x, y+10);
+			g.Arc(x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
+			g.LineTo(x+w-r, y+10);
+			g.Arc(x+w-r, y+10+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+27, y+h );
+			g.LineTo( x+24, y+h+4 );
+			g.LineTo( x+14, y+h+4 );
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+10 );
+            g.ClosePath();
+			g.Restore();
 		}
     }
 
@@ -2321,9 +2364,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 20)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkGoldenrod;
-			this.FillColor = Color.PaleGoldenrod;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkGoldenrod;
+			this.FillColor = Diagram.Colors.PaleGoldenrod;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			this.Text = "stop script";
 		}
@@ -2343,19 +2386,28 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override GraphicsPath Figure(float x, float y, float w, float h) 
+		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
 		{
-			GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
-			path.AddArc(x, y, 6F, 6F, 180F, 90F);
-			path.AddLine(x+11, y, x+14, y+4);
-			path.AddLine(x+24, y+4, x+27, y);
-			path.AddArc(x+w-6, y, 6F, 6F, 270F, 90F);
-			path.AddArc(x+w-6, y+h-6, 6F, 6F, 0F, 90F);
-			path.AddArc(x, y+h-6, 6F, 6F, 90F, 90F);
-            path.CloseFigure();
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
 			
-			return path;
+			g.Save();
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+11, y );
+			g.LineTo( x+14, y+4 );
+			g.LineTo( x+24, y+4 );
+			g.LineTo( x+27, y );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+			g.Restore();
 		}
     }
 	
@@ -2374,9 +2426,9 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 20)
 			})) {
 			this.LineWidth = 2;
-			this.LineColor = Color.DarkGreen;
-			this.FillColor = Color.LightGreen;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;
+			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			
 			// Properties
@@ -2609,9 +2661,9 @@ namespace Jigsaw
 				
 				// Activate this edge and display activation zone
 				List<Diagram.CPoint> pts = new List<Diagram.CPoint>() { new Diagram.CPoint( l, t ), new Diagram.CPoint( r, b ) };
-				Color clr = Color.FromArgb(180, Color.White);
-	            this._activationZone = new Diagram.CRectangle(pts, "", Color.Transparent, clr, 1, DashStyle.Solid,
-	                                            clr, true, false, false, false, false);
+				Color clr = new Color(1.0, 1.0, 1.0, 0.7);
+	            this._activationZone = new Diagram.CRectangle(pts, "", Diagram.Colors.Transparent, clr, 1, clr,
+	                                             true, false, false, false, false);
 	            cvs.AddAnnotation(this._activationZone);
 				
 				// Save ref to this edge as being activated by given edge

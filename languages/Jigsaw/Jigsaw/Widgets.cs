@@ -1,5 +1,6 @@
 using System;
-using System.Drawing;
+using Cairo;
+//using System.Drawing;
 using System.Collections.Generic;
 
 // This Namespace contains various user-drawn widgets based on shapes in the Diagram namespace.
@@ -12,12 +13,12 @@ namespace Widgets
 	{
 		private bool _Enabled = true;
 		
-		private Color _FillColor = Color.LightGray;
-		private Color _DisabledFillColor = Color.LightGray;
-		private Color _LineColor = Color.DarkSlateGray;
-		private Color _DisabledLineColor = Color.SlateGray;
-		private Color _TextColor = Color.Black;
-		private Color _DisabledTextColor = Color.Gray;
+		private Color _FillColor = Diagram.Colors.LightGray;
+		private Color _DisabledFillColor = Diagram.Colors.LightGray;
+		private Color _LineColor = Diagram.Colors.DarkSlateGray;
+		private Color _DisabledLineColor = Diagram.Colors.SlateGray;
+		private Color _TextColor = Diagram.Colors.Black;
+		private Color _DisabledTextColor = Diagram.Colors.Gray;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CRoundedButton (double x, double y, double w, double h, string label)
@@ -25,11 +26,11 @@ namespace Widgets
 		{
 			this.Text = label;
 			this.Radius = 5;
-			this.LineWidth = 5;
-//			this.LineColor = Color.DarkSlateGray;
-//			this.FillColor = Color.LightGray;
-//			this.TextColor = Color.Black;
-			this.FontStyle = FontStyle.Bold;
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkSlateGray;
+			this.FillColor = Diagram.Colors.LightGray;
+			this.TextColor = Diagram.Colors.Black;
+			//this.FontStyle = FontStyle.Bold;
 			this.Selectable = false;
 			this.Enabled = true;
 		}
@@ -42,8 +43,7 @@ namespace Widgets
 			
 			// If within shape, change fill color
 			if (this.ContainsPoint(e.X, e.Y, cvs)) {
-				//Console.WriteLine("CRoundedButton.OnMouseDown");
-				this.FillColor = Color.SlateGray;
+				this.FillColor = Diagram.Colors.SlateGray;
 				cvs.Invalidate();
 				this.RaiseMouseDown(cvs);
 			}
@@ -60,7 +60,7 @@ namespace Widgets
         {	// Handle mouse up event
 			if (this.Enabled == false) return;
 			
-			this.FillColor = Color.LightGray;
+			this.FillColor = Diagram.Colors.LightGray;
 			cvs.Invalidate();
 			if (this.ContainsPoint(e.X, e.Y, cvs)) this.RaiseMouseUp(cvs);
 			cvs.handler = cvs;
@@ -161,9 +161,9 @@ namespace Widgets
 			this.Text = label;
 			this.Radius = 5;
 			this.LineWidth = 0;
-			this.LineColor = Color.Silver;
-			this.FillColor = Color.Silver;
-			this.FontStyle = FontStyle.Bold;
+			this.LineColor = Diagram.Colors.Silver;
+			this.FillColor = Diagram.Colors.Silver;
+			//this.FontStyle = FontStyle.Bold;
 			this.Selectable = false;
 			this.SetToggle(null, false);
 		}
@@ -240,8 +240,8 @@ namespace Widgets
 		public void SetToggle(Diagram.Canvas cvs, bool val) {
 			// Set this tab state
 			_toggled = val;
-			if (_toggled) this.FillColor = Color.Honeydew;
-			else		  this.FillColor = Color.Silver;
+			if (_toggled) this.FillColor = Diagram.Colors.Honeydew;
+			else		  this.FillColor = Diagram.Colors.Silver;
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes

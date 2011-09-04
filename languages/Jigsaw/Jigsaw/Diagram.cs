@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+//using System.Drawing;
+//using System.Drawing.Drawing2D;
 using System.Text;
 using System.Xml;
 using System.IO;
 using System.Reflection;
+using Cairo;
 
 // Notes:
 
@@ -28,7 +29,7 @@ namespace Diagram
         Editing,  Drawing, 
 		
 		// Following modes are reserved for EditMode and DrawMode. Both start as Idle.
-		Idle, 						
+		Idle,
         DragLeftStart,  DragLeft,
         DrawLeftStart,  DrawLeft,
         SizeLeftStart,  SizeLeft,
@@ -87,6 +88,44 @@ namespace Diagram
 		}
 	}
 	
+	// -----------------------------------------------------------------------
+	public static class DashStyle {
+		public static double[] Solid = null;
+		public static double[] Dot = new double[] { 4.0, 4.0 };
+		public static double[] Dash = new double[] { 8.0, 8.0 };
+	}
+	
+	// -----------------------------------------------------------------------
+	public static class Colors {
+		public static readonly Color Transparent = new Color(0.0, 0.0, 0.0, 0.0);
+		public static readonly Color White = new Color(1.0, 1.0, 1.0);
+		public static readonly Color Silver = new Color( 0.75, 0.75, 0.75);
+		public static readonly Color Gray = new Color(0.5, 0.5, 0.5);
+		public static readonly Color LightGray = new Color(0.8242, 0.8242, 0.8242);
+		public static readonly Color DarkGray = new Color(0.6601, 0.6601, 0.6601);
+		public static readonly Color SlateGray = new Color(0.4375, 0.5, 0.5625);
+		public static readonly Color DarkSlateGray = new Color(0.1562, 0.3086, 0.3086);
+		public static readonly Color LightSlateGray = new Color(0.4648, 0.5312, 0.5977);
+		public static readonly Color WhiteSmoke = new Color(0.9570, 0.9570, 0.9570);
+		public static readonly Color Black = new Color(0.0, 0.0, 0.0);
+
+		public static readonly Color Yellow = new Color(1.0, 1.0, 0.0);
+		public static readonly Color LightYellow = new Color( 1.0, 1.0, 0.875);
+		public static readonly Color DarkGoldenrod = new Color( 0.7187, 0.5234, 0.0430);
+		public static readonly Color PaleGoldenrod = new Color( 0.9297, 0.9062, 0.6641);
+		public static readonly Color Honeydew = new Color(0.9375, 1.0, 0.9375);
+		
+		public static readonly Color LightBlue = new Color( 0.6758, 0.8437, 0.8984);
+		public static readonly Color DarkBlue = new Color( 0.0, 0.0, 0.5430);
+
+		public static readonly Color Red = new Color( 1.0, 0.0, 0.0);
+		public static readonly Color DarkRed = new Color( 0.5430, 0.0, 0.0);
+		public static readonly Color LightPink = new Color( 1.0, 0.7109, 0.7539);
+		
+		public static readonly Color DarkGreen = new Color( 0.0, 0.3910, 0.0);
+		public static readonly Color LightGreen = new Color( 0.5625, 0.9297, 0.5625);
+	}
+	
     // -----------------------------------------------------------------------
     // This interface is to be implemented by all Canvas shapes that will handle mouse events.
     public interface ICanvasEventHandler
@@ -109,7 +148,7 @@ namespace Diagram
     public class Canvas : Gtk.DrawingArea, ICanvasEventHandler
     {
 		// Public properties
-		public Color BackColor = Color.DarkGray;				// Back color
+		public Color BackColor = Colors.LightSlateGray;			// Back color
         public List<CShape> shapes;                             // List of shapes on shape layer
         public List<CShape> connectors;                         // List of shapes on the connector layer
 		
@@ -168,7 +207,7 @@ namespace Diagram
 			this.ButtonPressEvent += new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
 			this.MotionNotifyEvent += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
-			this.ExposeEvent += new Gtk.ExposeEventHandler( this.OnPaint );
+			//this.ExposeEvent += new Gtk.ExposeEventHandler( this.OnPaint );
 //			this.DragBegin += new Gtk.DragBeginHandler( this.OnDragEnter );
 //			this.DragDrop += new Gtk.DragDropHandler( this.OnDragDrop );
 			
@@ -191,8 +230,7 @@ namespace Diagram
             List<CPoint> lassopts = new List<CPoint>();
             lassopts.Add(new CPoint(0.0,0.0));
             lassopts.Add(new CPoint(1.0,1.0));
-            this.lasso = new CRectangle(lassopts, "", Color.Black, Color.Gray, 1, 
-			                            DashStyle.Dash, Color.Transparent,
+            this.lasso = new CRectangle(lassopts, "", Colors.Black, Colors.Gray, 1, Colors.Transparent,
                                         false, false, false, false, false);
             this.annotation.Add(this.lasso);
 			
@@ -241,32 +279,50 @@ namespace Diagram
         // Handle the Paint event by drawing all shapes and annotations
         //void Canvas_Paint(object sender, PaintEventArgs e)
         //protected override void OnPaint(PaintEventArgs e)
-		private void OnPaint(object o, Gtk.ExposeEventArgs args)
-        {   // Call the OnPaint method of the base class.
-            //base.OnPaint(e);
-			//Graphics g = e.Graphics;
-            Graphics g = Gtk.DotNet.Graphics.FromDrawable(this.GdkWindow, true);
-			this.Draw(g);
-        }
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public void Draw(Graphics g)
+		//private void OnPaint(object o, Gdk.EventExpose args)
+		protected override bool OnExposeEvent(Gdk.EventExpose args)
         {
-            // Always draw in antialias mode.
-            // Caution: this smears single pixels into small blurs.
-            g.SmoothingMode = SmoothingMode.AntiAlias;
+			using (Context g = Gdk.CairoHelper.Create( args.Window )) {
+                //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
+                //g.Clip();
+				Draw( g );
+			}
+			return true;
+			
+			//base.OnPaint(e);
+			//Graphics g = e.Graphics;
+            
+//			Graphics g = Gtk.DotNet.Graphics.FromDrawable(this.GdkWindow, true);
+//			this.Draw(g);
+			
+//	        	// clip to the visible part
+//	            g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
+//	            g.Clip();
+				
+//	            lock(shapes) {
+//	            	foreach (Shape shape in shapes) {
+//	                    shape.render(g);
+//			    		shape.updateGlobalPosition(g);
+//	                }
+//	            }
+//			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public void Draw(Cairo.Context g)
+        {
+			g.Save();
 			
 			// Clear background
-		    Brush b = new SolidBrush(this.BackColor);
-			int w, h;	// Canvas width and height
-			this.GdkWindow.GetSize(out w, out h);
-            g.FillRectangle(b, 0, 0, w, h );
-            b.Dispose();
+			g.Color = this.BackColor;
+			g.Paint();
 			
-			//g.Clip = new Region(new Rectangle(0, 0, 200, 200));
-
+            // Always draw in antialias mode.
+            // Caution: this smears single pixels into small blurs.
+            g.Antialias = Antialias.Subpixel;
+			
 			// Scale the diagram to the zoom factor
-			g.ScaleTransform((float)this.zoom, (float)this.zoom);
+			g.Scale(this.zoom, this.zoom);
 			
             // Draw all visible connectors (bottom layer)
             foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
@@ -278,9 +334,9 @@ namespace Diagram
             foreach (CShape o in this.annotation) if (o.Visible == true) o.Draw(g);
 			
 			// Reset transform
-			g.ResetTransform();
-        }
-
+			g.Restore();
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Handle DrawingArea mouse events
         protected void OnMouseDown(object o, Gtk.ButtonPressEventArgs e)
@@ -1478,11 +1534,6 @@ namespace Diagram
             this.X = (double)pt.X;
             this.Y = (double)pt.Y;
         }
-        public CPoint(PointF pt)
-        {
-            this.X = (double)pt.X;
-            this.Y = (double)pt.Y;
-        }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CPoint Clone()
@@ -1511,16 +1562,20 @@ namespace Diagram
                                                                 // It is used as shape refs by connectors when serialized to Xml.
         private String name = "";                               // Code name of this object
         protected String text = "";                             // Text to be drawn in shape
-        private Color textColor = Color.Black;                  // Color of text
-        private Color lineColor = Color.Black;
+        private Cairo.Color textColor = Colors.Black;                  // Color of text
+        private Cairo.Color lineColor = Colors.Black;
         private int lineWidth = 1;
-        private StringAlignment horizontalAlign = StringAlignment.Center;
-        private StringAlignment verticalAlign = StringAlignment.Center;
-        private DashStyle lineStyle = DashStyle.Solid;
-        private Color fillColor = Color.White;
-        internal String fontName = "Arial";
-        internal float fontSize = 8.0F;
-        internal FontStyle fontStyle = FontStyle.Regular;
+//        private StringAlignment horizontalAlign = StringAlignment.Center;
+//        private StringAlignment verticalAlign = StringAlignment.Center;
+//        private Pango.Alignment horizontalAlign = Pango.Alignment.Center;
+//        private Pango.Alignment verticalAlign = Pango.Alignment.Center;
+//        private DashStyle lineStyle = DashStyle.Solid;
+		private double[] lineStyle = DashStyle.Solid;
+        private Cairo.Color fillColor = Colors.White;
+		internal String fontDescription = "sans bold 8";
+//        internal String fontName = "Arial";
+//        internal float fontSize = 8.0F;
+//        internal FontStyle fontStyle = FontStyle.Regular;
         protected Boolean selected = false;
         private System.Object tag = null;                       // An arbitrary object that tags this object
 
@@ -1558,10 +1613,9 @@ namespace Diagram
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors
         public CShape(List<CPoint> points, String text, Color textColor, 
-                      Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor, 
-                      String fontName, float fontSize, FontStyle fontStyle,
+                      Color lineColor, int lineWidth, Color fillColor,
                       Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable )
-        {
+		{
             // Copy the actual points from the given list to the internal list.
             // use the actual points rather than creating new ones in case another
             // object has a reference to these points.
@@ -1571,11 +1625,12 @@ namespace Diagram
             this.textColor = textColor;
             this.lineColor = lineColor;
             this.lineWidth = lineWidth;
-            this.lineStyle = lineStyle;
+            //this.lineStyle = lineStyle;
             this.fillColor = fillColor;
-            this.fontName = fontName;
-            this.fontSize = fontSize;
-            this.fontStyle = fontStyle;
+			//this.fontDescription = fontDescription;
+            //this.fontName = fontName;
+            //this.fontSize = fontSize;
+            //this.fontStyle = fontStyle;
             this.visible = visible;
             this.Draggable = draggable;
             this.Sizable = sizable;
@@ -1587,8 +1642,8 @@ namespace Diagram
         }
 
         public CShape(List<CPoint> points):
-            this(points, "", Color.Black, Color.Black, 1, DashStyle.Solid, Color.White, 
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) {}
+            this(points, "", Colors.Black, Colors.Black, 1, Colors.White, 
+                 true, true, true, true, true) {}
 
         public CShape(double X, double Y, double W, double H)
             : this(new List<CPoint>(new CPoint[] { new CPoint(X, Y), new CPoint(X + W, Y + H) })) { }
@@ -1611,10 +1666,10 @@ namespace Diagram
             if (parms.ContainsKey("lineColor") == true) this.lineColor = (Color)parms["lineColor"];
             if (parms.ContainsKey("fillColor") == true) this.fillColor = (Color)parms["fillColor"];
             if (parms.ContainsKey("lineWidth") == true) this.lineWidth = (int)parms["lineWidth"];
-            if (parms.ContainsKey("lineStyle") == true) this.lineStyle = (DashStyle)parms["lineStyle"];
-            if (parms.ContainsKey("fontName") == true) this.fontName = (String)parms["fontName"];
-            if (parms.ContainsKey("fontSize") == true) this.fontSize = (float)parms["fontSize"];
-            if (parms.ContainsKey("fontStyle") == true) this.fontStyle = (FontStyle)parms["fontStyle"];
+//            if (parms.ContainsKey("lineStyle") == true) this.lineStyle = (DashStyle)parms["lineStyle"];
+            if (parms.ContainsKey("fontName") == true) this.fontDescription = (String)parms["fontName"];
+//            if (parms.ContainsKey("fontSize") == true) this.fontSize = (float)parms["fontSize"];
+//            if (parms.ContainsKey("fontStyle") == true) this.fontStyle = (FontStyle)parms["fontStyle"];
             if (parms.ContainsKey("visible") == true) this.Visible = (Boolean)parms["visible"];
             if (parms.ContainsKey("draggable") == true) this.Draggable = (Boolean)parms["draggable"];
             if (parms.ContainsKey("sizable") == true) this.Sizable = (Boolean)parms["sizable"];
@@ -1927,19 +1982,6 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Size"), CategoryAttribute("Layout"), BrowsableAttribute(true)]
-        public virtual Size Size
-        {
-            get { return new Size((int)this.width, (int)this.height); }
-            set
-            {
-                this.MorphTo(this.left, this.top, 
-                             this.left + value.Width, 
-                             this.top + value.Height);
-            }
-        }
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Location"), CategoryAttribute("Layout"), BrowsableAttribute(true)]
         public virtual Point Location
         {
@@ -1959,52 +2001,66 @@ namespace Diagram
             get { return this.name; }
             set { this.name = value; }
         }
-
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Text Font"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public virtual Font Font
-        {
-            get { return new Font(this.fontName, this.fontSize, this.fontStyle); }
-            set
-            {
-                this.fontName = value.Name;
-                this.fontSize = value.Size;
-                this.fontStyle = value.Style;
-            }
-        }
+//		// Build and sve a new FontDescription given the string
+//		public virtual void SetFont(string description) {
+//			this.fontDescription = Pango.FontDescription.FromString(description);
+//		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Text Font"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public virtual Pango.FontDescription Font
+//        {
+//            get { return this.fontDescription; }
+//			set { this.fontDescription = value; }
+//        }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Text Font Name"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public virtual string FontName
-        {
-            get { return this.fontName; }
-            set
-            {
-                this.fontName = value;
-            }
-        }
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Text Font Size"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public virtual double FontSize
-        {
-            get { return (double)this.fontSize; }
-            set
-            {
-                this.fontSize = (float)value;
-            }
-        }
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Text Font Style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public virtual FontStyle FontStyle
-        {
-            get { return this.fontStyle; }
-            set
-            {
-                this.fontStyle = value;
-            }
-        }
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Text Font"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public virtual Font Font
+//        {
+//            get { return new Font(this.fontName, this.fontSize, this.fontStyle); }
+//            set
+//            {
+//                this.fontName = value.Name;
+//                this.fontSize = value.Size;
+//                this.fontStyle = value.Style;
+//            }
+//        }
+		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Text Font Name"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public virtual string FontName
+//        {
+//            get { return this.fontName; }
+//            set
+//            {
+//                this.fontName = value;
+//            }
+//        }
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Text Font Size"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public virtual double FontSize
+//        {
+//            get { return (double)this.fontSize; }
+//            set
+//            {
+//                this.fontSize = (float)value;
+//            }
+//        }
+//
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Text Font Style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public virtual FontStyle FontStyle
+//        {
+//            get { return this.fontStyle; }
+//            set
+//            {
+//                this.fontStyle = value;
+//            }
+//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Shape text"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
@@ -2040,12 +2096,20 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Line style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public DashStyle LineStyle
+        public double[] LineStyle
         {
             get { return this.lineStyle; }
             set { this.lineStyle = value; }
         }
 
+//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Line style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public DashStyle LineStyle
+//        {
+//            get { return this.lineStyle; }
+//            set { this.lineStyle = value; }
+//        }
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Brush color"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
         public virtual Color FillColor
@@ -2054,31 +2118,47 @@ namespace Diagram
             set { this.fillColor = value; }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Horizontal text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public StringAlignment AlignHorizontal
-        {
-            get { return this.horizontalAlign; }
-            set { this.horizontalAlign = value; }
-        }
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Horizontal text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public Pango.Alignment AlignHorizontal
+//        {
+//            get { return this.horizontalAlign; }
+//            set { this.horizontalAlign = value; }
+//        }
+//
+//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Vertical text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public Pango.Alignment AlignVertical
+//        {
+//            get { return this.verticalAlign; }
+//            set { this.verticalAlign = value; }
+//        }
+		
+//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Horizontal text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public StringAlignment AlignHorizontal
+//        {
+//            get { return this.horizontalAlign; }
+//            set { this.horizontalAlign = value; }
+//        }
+//
+//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        [DescriptionAttribute("Vertical text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+//        public StringAlignment AlignVertical
+//        {
+//            get { return this.verticalAlign; }
+//            set { this.verticalAlign = value; }
+//        }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        [DescriptionAttribute("Vertical text alignment"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public StringAlignment AlignVertical
-        {
-            get { return this.verticalAlign; }
-            set { this.verticalAlign = value; }
-        }
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public virtual void Draw(Graphics g)
+        public virtual void Draw(Cairo.Context g)
         {
             // Draw of this instance must be implemented by subclasses
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw all CShape Decorators, if any
-        public virtual void DrawDecorators(Graphics g)
+        public virtual void DrawDecorators(Cairo.Context g)
         {
             foreach (CDecorator s in this.Decorators.Values) s.Draw(g);
         }
@@ -2642,9 +2722,9 @@ namespace Diagram
 			if (this.Outline != null) return;
 			
 			this.Outline = this.Clone(this.left, this.top);
-			this.Outline.TextColor = Color.FromArgb(100, this.TextColor);
-			this.Outline.LineColor = Color.FromArgb(100, this.LineColor);
-			this.Outline.FillColor = Color.FromArgb(100, this.FillColor);
+			this.Outline.TextColor = new Color(this.TextColor.R, this.TextColor.G, this.TextColor.B, 0.4); //  Color.FromArgb(100, this.TextColor);
+			this.Outline.LineColor = new Color(this.LineColor.R, this.LineColor.G, this.LineColor.B, 0.4); //Color.FromArgb(100, this.LineColor);
+			this.Outline.FillColor = new Color(this.FillColor.R, this.FillColor.G, this.FillColor.B, 0.4); //Color.FromArgb(100, this.FillColor);
 			this.Outline.Visible = true;
 			this.Outline.Draggable = false;
 			this.Outline.Sizable = false;
@@ -2754,14 +2834,14 @@ namespace Diagram
             w.WriteAttributeString("typeName", String.Format("{0};{1}", AsmName, FullName));
             w.WriteAttributeString("name", this.Name);
             w.WriteAttributeString("text", this.Text);
-            w.WriteAttributeString("textColor", ColorTranslator.ToHtml(this.TextColor));
-            w.WriteAttributeString("lineColor", ColorTranslator.ToHtml(this.LineColor));
+            //w.WriteAttributeString("textColor", ColorTranslator.ToHtml(this.TextColor));
+            //w.WriteAttributeString("lineColor", ColorTranslator.ToHtml(this.LineColor));
             w.WriteAttributeString("lineWidth", this.LineWidth.ToString());
-            w.WriteAttributeString("lineStyle", this.LineStyle.ToString());
-            w.WriteAttributeString("fillColor", ColorTranslator.ToHtml(this.FillColor));
-            w.WriteAttributeString("fontName", this.fontName);
-            w.WriteAttributeString("fontSize", this.fontSize.ToString());
-            w.WriteAttributeString("fontStyle", this.fontStyle.ToString());
+            //w.WriteAttributeString("lineStyle", this.LineStyle.ToString());
+            //w.WriteAttributeString("fillColor", ColorTranslator.ToHtml(this.FillColor));
+            //w.WriteAttributeString("fontName", this.fontName);
+            //w.WriteAttributeString("fontSize", this.fontSize.ToString());
+            //w.WriteAttributeString("fontStyle", this.fontStyle.ToString());
             w.WriteAttributeString("visible", this.Visible.ToString());
             w.WriteAttributeString("draggable", this.Draggable.ToString());
             w.WriteAttributeString("sizable", this.Sizable.ToString());
@@ -2800,27 +2880,19 @@ namespace Diagram
         public CRectangle(List<CPoint> points) : base(points) { }
 
         public CRectangle(List<CPoint> points, Color lineColor, Color fillColor) :
-            base(points, "", Color.Black, lineColor, 1, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, "", Colors.Black, lineColor, 1, fillColor,
+                 true, true, true, true, true) { }
 
         public CRectangle(List<CPoint> points, String text, Color textColor, 
                             Color lineColor, int lineWidth, Color fillColor) :
-            base(points, text, textColor, lineColor, lineWidth, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 true, true, true, true, true) { }
 
         public CRectangle(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
+                Color lineColor, int lineWidth, Color fillColor,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, visible, draggable, sizable, selectable, connectable)
-        { }
-
-        public CRectangle(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
-                String fontName, float fontSize, FontStyle fontStyle, 
-                Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 fontName, fontSize, fontStyle, visible, draggable, sizable, selectable, connectable)
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 visible, draggable, sizable, selectable, connectable)
         { }
 		
 		public CRectangle(Double X, Double Y, Double W, Double H) : base(X, Y, W, H) { }
@@ -2840,44 +2912,61 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the rectangle shape on the canvas
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {
             // Cannot draw a rectangle with negative width or height, 
             // so use bounding box points to draw
-            float x = (float)(this.left);
-            float y = (float)(this.top);
-            float w = (float)(this.width);
-            float h = (float)(this.height);
+            double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
+			double cx = x + 0.5*w;
+			double cy = y + 0.5*h;
+			
+			g.Save();
+			
+			// Path
+			g.MoveTo(x, y);
+			g.LineTo(x+w, y);
+			g.LineTo(x+w, y+h);
+			g.LineTo(x, y+h);
+			g.LineTo(x, y);
+			g.ClosePath();
+			
+			g.Restore();
 
-            // Draw outline
-            Pen p = new Pen(this.LineColor, (float)this.LineWidth);
-            p.DashStyle = this.LineStyle;
-            g.DrawRectangle(p, x, y, w, h );
-            p.Dispose();
-
-            // Draw fill
-            if (this.FillColor != Color.Transparent)
-            {
-                Brush b = new SolidBrush(this.FillColor);
-                g.FillRectangle(b, x, y, w, h );
-                b.Dispose();
-            }
-
-            // Draw label
+			// Fill
+			g.Color = this.FillColor;
+			g.FillPreserve();
+			
+			// Stroke
+			g.Color = this.LineColor;
+			//g.DashStyle = this.LineStyle;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
+			
+            // Draw text
             if (this.Text.Length > 0)
             {
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;      // Vertical text alignment
-                frmt.LineAlignment = this.AlignVertical;  	// Horizontal text alignment
-                //frmt.FormatFlags = StringFormatFlags.NoWrap;
-                Brush b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
+				g.SetFontSize(12.0);
+				TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height - te.YBearing); 
+				g.ShowText(this.Text);
             }
+			
+//                StringFormat frmt = new StringFormat();
+//                frmt.Alignment = this.AlignHorizontal;      // Vertical text alignment
+//                frmt.LineAlignment = this.AlignVertical;  	// Horizontal text alignment
+//                //frmt.FormatFlags = StringFormatFlags.NoWrap;
+//                Brush b = new SolidBrush(this.TextColor);
+//                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
+//                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
+//                fnt.Dispose();
+//                b.Dispose();
 
-            // Finally, draw any shape decorator shapes
+			// Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
         }
 
@@ -2929,25 +3018,24 @@ namespace Diagram
         public CEllipse(List<CPoint> points) : base(points) { }
 
         public CEllipse(List<CPoint> points, Color lineColor, Color fillColor) :
-            base(points, "", Color.Black, lineColor, 1, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, "", Colors.Black, lineColor, 1, fillColor,
+                  true, true, true, true, true) { }
 
         public CEllipse(List<CPoint> points, String text, Color textColor, Color lineColor, int lineWidth, Color fillColor) :
-            base(points, text, textColor, lineColor, lineWidth, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 true, true, true, true, true) { }
 
         public CEllipse(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
+                Color lineColor, int lineWidth, Color fillColor,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, visible, draggable, sizable, selectable, connectable) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                  visible, draggable, sizable, selectable, connectable) { }
 
         public CEllipse(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
-                String fontName, float fontSize, FontStyle fontStyle,
+                Color lineColor, int lineWidth, Color fillColor, String fontDescription,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 fontName, fontSize, fontStyle, visible, draggable, sizable, selectable, connectable) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 visible, draggable, sizable, selectable, connectable) { }
 		
 		public CEllipse(double X, double Y, double W, double H) : base(X, Y, W, H) { }
 		
@@ -2966,41 +3054,64 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the ellipse shape on the canvas
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {
             // Note that an ellipse can have negative width or height and draw correctly.
             // The CBoundingBox is not strictly necessary to reorient points.
-            float x = (float)(this.left);
-            float y = (float)(this.top);
-            float w = (float)(this.width);
-            float h = (float)(this.height);
+            double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
+			double hw = 0.5*w;
+			double hh = 0.5*h;
+			double cx = x + hw;
+			double cy = y + hh;
+			
+			g.Save();
+			
+			// Path
+			//g.Scale(1.0, h/w); //w/h);
+			g.MoveTo(cx+hw, cy);
+			g.Arc(cx, cy, hw, 0.0, 2.0 * Math.PI);
+			g.ClosePath();
+			
+			// Must return to uniform device space before stroking in order to prevent 
+			// lines from being deformed by scaling.
+			g.Restore();
+			
+			// Fill
+			g.Color = this.FillColor;
+			g.FillPreserve();
+			
+			// Stroke
+			g.Color = this.LineColor;
+			//p.DashStyle = this.LineStyle;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
 
-            // Draw outline
-            Pen p = new Pen(this.LineColor, (float)this.LineWidth);
-            p.DashStyle = this.LineStyle;
-            g.DrawEllipse(p, x, y, w, h);
-            p.Dispose();
-
-            // Draw fill
-            if (this.FillColor != Color.Transparent)
-            {
-                Brush b = new SolidBrush(this.FillColor);
-                g.FillEllipse(b, x, y, w, h);
-                b.Dispose();
-            }
-
-            // Draw label
+			// Draw text
             if (this.Text.Length > 0)
             {
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;
-                frmt.LineAlignment = this.AlignVertical;
-                Brush b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
+				g.SetFontSize(12.0);
+				TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height - te.YBearing); 
+				g.ShowText(this.Text);
             }
+
+//            // Draw label
+//            if (this.Text.Length > 0)
+//            {
+//                StringFormat frmt = new StringFormat();
+//                frmt.Alignment = this.AlignHorizontal;
+//                frmt.LineAlignment = this.AlignVertical;
+//                Brush b = new SolidBrush(this.TextColor);
+//                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
+//                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
+//                fnt.Dispose();
+//                b.Dispose();
+//            }
 
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
@@ -3058,8 +3169,7 @@ namespace Diagram
             List<CPoint> pts = new List<CPoint>();
             foreach (CPoint p in this.points) pts.Add( new CPoint(p.X, p.Y));
 
-            this.Outline = new CEllipse(pts, "", Color.Black, Color.Gray, 1,
-                                         DashStyle.Dash, Color.Transparent,
+            this.Outline = new CEllipse(pts, "", Colors.Black, Colors.Gray, 1, Colors.Transparent,
                                          true, false, false, false, false);
             cvs.AddAnnotation(this.Outline);
         }
@@ -3115,26 +3225,25 @@ namespace Diagram
         public CRoundedRectangle(List<CPoint> points) : base(points) { }
 
         public CRoundedRectangle(List<CPoint> points, Color lineColor, Color fillColor) :
-            base(points, "", Color.Black, lineColor, 1, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, "", Colors.Black, lineColor, 1, fillColor,
+                 true, true, true, true, true) { }
 
         public CRoundedRectangle(List<CPoint> points, String text, Color textColor,
                                 Color lineColor, int lineWidth, Color fillColor) :
-            base(points, text, textColor, lineColor, lineWidth, DashStyle.Solid, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 true, true, true, true, true) { }
 
         public CRoundedRectangle(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
+                Color lineColor, int lineWidth, Color fillColor,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 "Arial", 8.0F, FontStyle.Regular, visible, draggable, sizable, selectable, connectable) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 visible, draggable, sizable, selectable, connectable) { }
 
         public CRoundedRectangle(List<CPoint> points, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle, Color fillColor,
-                String fontName, float fontSize, FontStyle fontStyle,
+                Color lineColor, int lineWidth, Color fillColor, String fontDescription,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, fillColor,
-                 fontName, fontSize, fontStyle, visible, draggable, sizable, selectable, connectable) { }
+            base(points, text, textColor, lineColor, lineWidth, fillColor,
+                 visible, draggable, sizable, selectable, connectable) { }
 
         public CRoundedRectangle(double X, double Y, double W, double H) : base(X, Y, W, H) { }
 
@@ -3169,65 +3278,56 @@ namespace Diagram
 		}
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the rounded rectangle shape on the canvas
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {
             // Note that an ellipse can have negative width or height and draw correctly.
             // The CBoundingBox is not strictly necessary to reorient points.
-            float x = (float)(this.left);
-            float y = (float)(this.top);
-            float w = (float)(this.width);
-            float h = (float)(this.height);
-			float r = (float)(this.radius);
+            double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
+			double hh = 0.5*h;
+			double hw = 0.5*w;
+			double cx = x + hw;
+			double cy = y + hh;
+			double r = this.radius;
+			double hpi = 0.5*Math.PI;
 			
-            // Create a GraphicsPath object
-            GraphicsPath gp = new GraphicsPath();
+			if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 
-            // Calculate some intermediate values
-            float r2 = 2 * r;
-            float xpw = x + w;
-            float xpr = x + r;
-            float xpwm2r = x + w - 2 * r;
-            float yph = y + h;
-            float ypr = y + r;
-            float yphm2r = y + h - 2 * r;
+			g.Save();
+						
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.ClosePath();
+			
+			g.Restore();
 
-            // Build the GraphicsPath
-            gp.AddLine(xpr, y, xpwm2r, y);
-            if (r2 > 0.0) gp.AddArc(xpwm2r, y, r2, r2, 270, 90);
-            gp.AddLine(xpw, ypr, xpw, yphm2r);
-            if (r2 > 0.0) gp.AddArc(xpwm2r, yphm2r, r2, r2, 0, 90);
-            gp.AddLine(xpwm2r, yph, xpr, yph);
-            if (r2 > 0.0) gp.AddArc(x, yphm2r, r2, r2, 90, 90);
-            gp.AddLine(x, yphm2r, x, ypr);
-            if (r2 > 0.0) gp.AddArc(x, y, r2, r2, 180, 90);
-            gp.CloseFigure();
-
-            // Draw GraphicsPath outline
-            Pen p = new Pen(this.LineColor, (float)this.LineWidth);
-            p.DashStyle = this.LineStyle;
-            g.DrawPath(p, gp);
-
-            // Fill GraphicsPath
-            if (this.FillColor != Color.Transparent)
-            {
-                Brush b = new SolidBrush(this.FillColor);
-                g.FillPath(b, gp);
-                b.Dispose();
-            }
-            gp.Dispose();
-            p.Dispose();
-
-            // Draw label
+			// Fill
+			g.Color = this.FillColor;
+			g.FillPreserve();
+			
+			// Stroke
+			g.Color = this.LineColor;
+			//g.DashStyle = this.LineStyle;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
+			
+            // Draw text
             if (this.Text.Length > 0)
             {
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;
-                frmt.LineAlignment = this.AlignVertical;
-                Brush b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)this.fontSize, this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
+				g.SetFontSize(12.0);
+				TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height/2.0 - te.YBearing); 
+				g.ShowText(this.Text);
             }
 
             // Finally, draw any shape decorator shapes
@@ -3276,32 +3376,24 @@ namespace Diagram
     // -----------------------------------------------------------------------
     // line shape class
     public class CLine : CShape
-    {
+    {		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors
         public CLine(List<CPoint> points) : base(points) { }
 
         public CLine(List<CPoint> points, Color lineColor) :
-            base(points, "", Color.Black, lineColor, 1, DashStyle.Solid, Color.Transparent,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, "", Colors.Black, lineColor, 1, Colors.Transparent,
+                 true, true, true, true, true) { }
 
         public CLine(List<CPoint> points, String text, Color textColor, Color lineColor, int lineWidth) :
-            base(points, text, textColor, lineColor, lineWidth, DashStyle.Solid, Color.Transparent,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            base(points, text, textColor, lineColor, lineWidth, Colors.Transparent,
+                 true, true, true, true, true) { }
 
         public CLine(List<CPoint> points, String text, Color textColor,
-                 Color lineColor, int lineWidth, DashStyle lineStyle,
-                 String fontName, float fontSize, FontStyle fontStyle,
+                 Color lineColor, int lineWidth,
                  Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, Color.Transparent,
-                 fontName, fontSize, fontStyle,
+            base(points, text, textColor, lineColor, lineWidth, Colors.Transparent,
                  visible, draggable, sizable, selectable, connectable) { }
-
-        public CLine(List<CPoint> points, String text, Color textColor,
-                 Color lineColor, int lineWidth, DashStyle lineStyle,
-                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, Color.Transparent,
-                 "Arial", 8.0F, FontStyle.Regular, visible, draggable, sizable, selectable, connectable) { }
 
         // This constructor is primarily for drag and drop creation of shapes.
         public CLine(Double X, Double Y) : base(X, Y) { }
@@ -3374,36 +3466,36 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the line shape on the canvas
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {
             // Draw the line
-            float x1 = (float)(this.points[0].X);
-            float y1 = (float)(this.points[0].Y);
-            float x2 = (float)(this.points[1].X);
-            float y2 = (float)(this.points[1].Y);
-
-            // Draw outline
-            Pen p = new Pen(this.LineColor, (float)this.LineWidth);
-            p.DashStyle = this.LineStyle;
-            g.DrawLine(p, x1, y1, x2, y2);
-            p.Dispose();
-
-            // Draw label
+            double x1 = this.points[0].X;
+            double y1 = this.points[0].Y;
+            double x2 = this.points[1].X;
+            double y2 = this.points[1].Y;
+			
+			g.Save();
+			
+			g.MoveTo(x1, y1);
+			g.LineTo(x2, y2);
+			
+			g.Restore();
+			
+			// Stroke
+			g.Color = this.LineColor;
+			//g.DashStyle = this.LineStyle;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
+			
+            // Draw text
             if (this.Text.Length > 0)
             {
-                float x = (float)(this.left);
-                float y = (float)(this.top);
-                float w = (float)(this.width);
-                float h = (float)(this.height);
-
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;
-                frmt.LineAlignment = this.AlignVertical;
-                Brush b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)this.fontSize, this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Normal);
+				g.SetFontSize(8.0);
+				TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(this.Left - te.Width/2.0 - te.XBearing, this.Top - te.Height - te.YBearing); 
+				g.ShowText(this.Text);
             }
 
             // Finally, draw any shape decorator shapes
@@ -3418,8 +3510,8 @@ namespace Diagram
             List<CPoint> pts = new List<CPoint>();
             foreach (CPoint p in this.points) pts.Add( new CPoint(p.X, p.Y) );
 
-            this.Outline = new CLine( pts, "", Color.Black,
-                                      Color.Gray, 1, DashStyle.Dash,
+            this.Outline = new CLine( pts, "", Colors.Black,
+                                      Colors.Gray, 1,
                                       true, false, false, false, false);
             cvs.AddAnnotation(this.Outline);
         }
@@ -3547,7 +3639,7 @@ namespace Diagram
         [BrowsableAttribute(false)]
         public override Color FillColor
         {
-            get { return Color.Transparent; }
+            get { return Colors.Transparent; }
         }
     }
 
@@ -3555,38 +3647,41 @@ namespace Diagram
     // A spline shape
     public class CSpline : CShape
     {
-        private double tension = 0.0;       // Tension of the spline
-
+        private double tension = 0.0;       	// Tension of the spline
+		
+		private Cairo.Context _context = null;
+		private Cairo.Path _path = null;		// Local cache of most current path used for hit testing
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors
         public CSpline(List<CPoint> points)
-            : this(points, 0.5, Color.Black) { }
+            : this(points, 0.5, Colors.Black) { }
 
         public CSpline(List<CPoint> points, double tension)
-            : this(points, tension, Color.Black) { }
+            : this(points, tension, Colors.Black) { }
 
         public CSpline(List<CPoint> points, double tension, Color lineColor)
-            : this(points, tension, "", Color.Black, lineColor, 1)
+            : this(points, tension, "", Colors.Black, lineColor, 1)
         { }
 
         public CSpline(List<CPoint> points, double tension, String text, Color textColor, 
                        Color lineColor, int lineWidth) :
-            this(points, tension, text, textColor, lineColor, lineWidth, DashStyle.Solid,
-                 "Arial", 8.0F, FontStyle.Regular, true, true, true, true, true) { }
+            this(points, tension, text, textColor, lineColor, lineWidth,
+                  true, true, true, true, true) { }
 
         public CSpline(List<CPoint> points, double tension, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle,
+                Color lineColor, int lineWidth, 
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            this(points, tension, text, textColor, lineColor, lineWidth, lineStyle,
-                 "Arial", 8.0F, FontStyle.Regular, visible, draggable, sizable, selectable, connectable)
+            this(points, tension, text, textColor, lineColor, lineWidth, 
+                 "sans normal 8", visible, draggable, sizable, selectable, connectable)
         { }
 
         public CSpline(List<CPoint> points, double tension, String text, Color textColor,
-                Color lineColor, int lineWidth, DashStyle lineStyle,
-                String fontName, float fontSize, FontStyle fontStyle,
+                Color lineColor, int lineWidth,
+                String fontDescription,
                 Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            base(points, text, textColor, lineColor, lineWidth, lineStyle, Color.Transparent,
-                 fontName, fontSize, fontStyle, visible, draggable, sizable, selectable, connectable)
+            base(points, text, textColor, lineColor, lineWidth, Colors.Transparent,
+                 visible, draggable, sizable, selectable, connectable)
         {
             this.tension = tension;
         }
@@ -3616,38 +3711,34 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the line shape on the canvas
-        public override void Draw(Graphics g)
+        public override void Draw(Cairo.Context g)
         {
-            // Build array of points for drawing function
-            PointF[] pts = new PointF[this.points.Count];
-            for (int i=0; i< this.points.Count; i++)
+			g.Save();
+			CPoint pt = this.points[0];
+			g.MoveTo(pt.X, pt.Y);
+            for (int i=1; i< this.points.Count; i++)
             {
-                CPoint pt = this.points[i];
-                pts[i] = new PointF((float)(pt.X), (float)(pt.Y));
+                pt = this.points[i];
+				g.LineTo(pt.X, pt.Y);
+				// TODO: What to use for control points?
+				//http://stackoverflow.com/questions/2534786/drawing-a-clamped-uniform-cubic-b-spline-using-cairo
+                // g.RelCurveTo( ...
             }
-
-            // Draw spline
-            Pen p = new Pen(this.LineColor, this.LineWidth);
-            p.DashStyle = this.LineStyle;
-            g.DrawCurve(p, pts, (float)this.tension);
-            p.Dispose();
-
-            // Draw label
+			g.Restore();
+			
+			// Copy path for possible later hit testing
+			this._context = g;
+			this._path = g.CopyPathFlat();
+			
+            // Draw text
             if (this.Text.Length > 0)
             {
-                float x = (float)(this.left);
-                float y = (float)(this.top);
-                float w = (float)(this.width);
-                float h = (float)(this.height);
-
-                StringFormat frmt = new StringFormat();
-                frmt.Alignment = this.AlignHorizontal;
-                frmt.LineAlignment = this.AlignVertical;
-                Brush b = new SolidBrush(this.TextColor);
-                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
-                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-                fnt.Dispose();
-                b.Dispose();
+				g.Color = this.TextColor;
+				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Normal);
+				g.SetFontSize(8.0);
+				TextExtents te = g.TextExtents(this.Text);
+				g.MoveTo(this.Left - te.Width/2.0 - te.XBearing, this.Top - te.Height - te.YBearing); 
+				g.ShowText(this.Text);
             }
 
             // Finally, draw any shape decorator shapes
@@ -3670,8 +3761,8 @@ namespace Diagram
             List<CPoint> pts = new List<CPoint>();          // Copy points
             foreach (CPoint p in this.points) pts.Add( new CPoint(p.X, p.Y));
             
-            this.Outline = new CSpline( pts, this.tension, "", Color.Black,
-                                        Color.Gray, 1, DashStyle.Dash, 
+            this.Outline = new CSpline( pts, this.tension, "", Colors.Black,
+                                        Colors.Gray, 1, 
                                         true, false, false, false, false);
             cvs.AddAnnotation(this.Outline);
         }
@@ -3725,34 +3816,41 @@ namespace Diagram
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override Boolean ContainsPoint(CPoint pnt, Canvas cvs)
         {
-            //Return True if given point hits this curve
-            // This seems very odd to me, but apparently it is the standard way to do it.
-            // See http://www.bobpowell.net/hittestlines.htm
-            
             // If not visible can't be hit
             if (this.Visible == false) return false;
-
-            Pen p = new Pen(this.LineColor, this.LineWidth+3);
-            p.DashStyle = DashStyle.Solid; // this.LineStyle;   // Always use solid for hit detection
-
-            // Copy and scale all points, and create an Array object
-            double z  = cvs.Zoom;
-            int npts = this.points.Count;
-            PointF[] pts = new PointF[npts];
-            for (int i=0; i<npts; i++)
-            {
-                pts[i] = new PointF( (float)(z*this.points[i].X), (float)(z*this.points[i].Y) );
-            }
-
-            // Create a GraphicsPath
-            GraphicsPath pth = new GraphicsPath();
-            pth.AddCurve(pts, (float)this.tension);
-            pth.Widen(p);
-            p.Dispose();
-
-            // Use the GraphicsPath IsVisible method to see if the point hits the curve.
-            if (pth.IsVisible(new PointF((float)(z * pnt.X), (float)(z * pnt.Y)))) return true;
-            return false;
+			
+			// http://cairographics.org/hittestpython/28,128,128 
+			this._context.AppendPath(this._path);
+			return this._context.InStroke(pnt.X, pnt.Y);
+			
+//            //Return True if given point hits this curve
+//            // This seems very odd to me, but apparently it is the standard way to do it.
+//            // See http://www.bobpowell.net/hittestlines.htm
+//            
+//            // If not visible can't be hit
+//            if (this.Visible == false) return false;
+//
+//            Pen p = new Pen(this.LineColor, this.LineWidth+3);
+//            p.DashStyle = DashStyle.Solid; // this.LineStyle;   // Always use solid for hit detection
+//
+//            // Copy and scale all points, and create an Array object
+//            double z  = cvs.Zoom;
+//            int npts = this.points.Count;
+//            PointF[] pts = new PointF[npts];
+//            for (int i=0; i<npts; i++)
+//            {
+//                pts[i] = new PointF( (float)(z*this.points[i].X), (float)(z*this.points[i].Y) );
+//            }
+//
+//            // Create a GraphicsPath
+//            GraphicsPath pth = new GraphicsPath();
+//            pth.AddCurve(pts, (float)this.tension);
+//            pth.Widen(p);
+//            p.Dispose();
+//
+//            // Use the GraphicsPath IsVisible method to see if the point hits the curve.
+//            if (pth.IsVisible(new PointF((float)(z * pnt.X), (float)(z * pnt.Y)))) return true;
+//            return false;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3760,7 +3858,7 @@ namespace Diagram
         [BrowsableAttribute(false)]
         public override Color FillColor
         {
-            get { return Color.Transparent; }
+            get { return Colors.Transparent; }
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3783,15 +3881,15 @@ namespace Diagram
         public CConnector(CShape begin, CShape end) : this(begin, end, new List<CPoint>()) { }
 
         public CConnector(CShape begin, CShape end, List<CPoint> points)
-            : this( begin, end, points, 0.5, "", Color.Black, Color.Black, 1, DashStyle.Solid,
+            : this( begin, end, points, 0.5, "", Colors.Black, Colors.Black, 1,
                     true, true, true, true)
         { }
 
         public CConnector(CShape begin, CShape end, List<CPoint> points, double tension, String text, Color textColor,
-                        Color lineColor, int lineWidth, DashStyle lineStyle,
+                        Color lineColor, int lineWidth, 
                         Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable)
             : base(new List<CPoint>(new CPoint[] { new CPoint(0.0,0.0), new CPoint(0.0,0.0) }),
-                                    tension, text, textColor, lineColor, lineWidth, lineStyle,
+                                    tension, text, textColor, lineColor, lineWidth,
                                     visible, draggable, sizable, selectable, false)
         {   // Add all internal points
             int count = 1;
@@ -3827,21 +3925,21 @@ namespace Diagram
         // Constructors with begin connected shape and additional points
         public CConnector(CShape begin, CPoint pnt)
             : this(begin, null, new List<CPoint>(new CPoint[] {pnt}),
-                   0.5, "", Color.Black, Color.Black, 1, DashStyle.Solid,
+                   0.5, "", Colors.Black, Colors.Black, 1,
                    true, true, true, true)
         { }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors with no connected shapes, only points
         public CConnector(List<CPoint> points)
-            : this(points, 0.5, "", Color.Black, Color.Black, 1, DashStyle.Solid,
+            : this(points, 0.5, "", Colors.Black, Colors.Black, 1,
                    true, true, true, true)
         { }
 
         public CConnector(List<CPoint> points, double tension, String text, Color textColor,
-                          Color lineColor, int lineWidth, DashStyle lineStyle,
+                          Color lineColor, int lineWidth, 
                           Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable)
-            : base(points, tension, text, textColor, lineColor, lineWidth, lineStyle,
+            : base(points, tension, text, textColor, lineColor, lineWidth, 
                                     visible, draggable, sizable, selectable, false)
         { }
 
@@ -3910,8 +4008,8 @@ namespace Diagram
             // Check if end points are connected and modify color
             int lpnt = this.points.Count - 1;
             string spnt = lpnt.ToString();
-            if (this.begin != null) this.handles["0"].FillColor = Color.Yellow;
-            if (this.end != null) this.handles[spnt].FillColor = Color.Yellow;
+            if (this.begin != null) this.handles["0"].FillColor = Colors.Yellow;
+            if (this.end != null) this.handles[spnt].FillColor = Colors.Yellow;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3924,7 +4022,7 @@ namespace Diagram
             if (this.Selected == true)
             {
                 this.handles["0"].point = shp.center;
-                this.handles["0"].FillColor = Color.Yellow;
+                this.handles["0"].FillColor = Colors.Yellow;
             }
         }
 
@@ -3955,7 +4053,7 @@ namespace Diagram
             if (this.Selected == true)
             {
                 this.handles["0"].point = this.points[0];
-                this.handles["0"].FillColor = Color.White;
+                this.handles["0"].FillColor = Colors.White;
             }
         }
 
@@ -3972,7 +4070,7 @@ namespace Diagram
             {
                 String spnt = lpnt.ToString();
                 this.handles[spnt].point = shp.center;
-                this.handles[spnt].FillColor = Color.Yellow;
+                this.handles[spnt].FillColor = Colors.Yellow;
             }
         }
 
@@ -4000,7 +4098,7 @@ namespace Diagram
             if (this.Selected == true)
             {
                 this.handles[spnt].point = this.points[lpnt];
-                this.handles[spnt].FillColor = Color.White;
+                this.handles[spnt].FillColor = Colors.White;
             }
         }
 
@@ -4159,7 +4257,7 @@ namespace Diagram
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CHandle(CPoint pnt, CShape shp, String name, Color fillColor)
             : base(new List<CPoint>( new CPoint[] {new CPoint(pnt.X-3, pnt.Y-3), new CPoint(pnt.X+3, pnt.Y+3)} ),
-             "", Color.Black, Color.Black, 1, DashStyle.Solid, fillColor, true, false, false, false, false)
+             "", Colors.Black, Colors.Black, 1, fillColor, true, false, false, false, false)
         {
             this.point = pnt;   
             this.shape = shp;
@@ -4192,7 +4290,7 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CSizeHandle(CPoint pnt, CShape shp, String name, Boolean sizex, Boolean sizey)
-            : base(pnt, shp, name, Color.White)
+            : base(pnt, shp, name, Colors.White)
         {
             this.sizex = sizex;
             this.sizey = sizey;
@@ -4397,7 +4495,7 @@ namespace Diagram
     {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CEditHandle(CPoint pnt, CShape shp, String name) 
-            : this(pnt, shp, name, Color.White) { }
+            : this(pnt, shp, name, Colors.White) { }
         public CEditHandle(CPoint pnt, CShape shp, String name, Color fillColor)
             : base(pnt, shp, name, fillColor)
         {
@@ -5206,7 +5304,7 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Draw the decorator shape using position information
-        public void Draw(Graphics g)
+        public void Draw(Cairo.Context g)
         {
             this.shape.Draw(g);
         }
