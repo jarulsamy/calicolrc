@@ -93,7 +93,7 @@ from config import config
 from utils import _, Chat
 
 # Setup Runtime environment:
-def handle_exception(arg):
+def handle_exception(*args, **kwargs):
     if pw.shell:
         Gtk.Application.Invoke(pw.shell.stop_running)
         Gtk.Application.Invoke(lambda s,a: pw.shell.message("[Script has stopped------]"))
@@ -101,7 +101,7 @@ def handle_exception(arg):
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
-if "--no-handler" not in args:
+if "--debug" not in args:
     GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
