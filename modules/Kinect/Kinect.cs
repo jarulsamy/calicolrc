@@ -140,6 +140,12 @@ public static class Kinect {
 	  return(depth);
 	}
 
+    public byte [] readRGB() {
+	  write(CMD_READRGB);
+	  byte [] data = readData();
+	  return data;
+    }
+
     public int[] readRGBImageArray() {
 	  write(CMD_READRGB);
 	  byte [] data = readData();
