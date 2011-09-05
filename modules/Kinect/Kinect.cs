@@ -98,20 +98,15 @@ public static class Kinect {
 	  timestamp = l0 | (l1<<8) | (l2<<16) | (l3<<24);
 	  
 	  // read bytestream
-	  byte [] dataB = new byte[length];
-	  int totalRead = 0;
-	  while (totalRead < length){
-		totalRead  += stream.Read(dataB, totalRead, length - totalRead);
-	  }
-	  return dataB;
+	  return read(length);
 	}
 	
 	public int[,] readDepth(){
 	  write(CMD_READDEPTH);
-	  byte []buffer = readData();
+	  byte [] buffer = readData();
 	  // convert to color
-	  int [,]depth = new int[buffer.Length/2,2];
-	  for (int i=0; i<depth.Length; i++){
+	  int [,] depth = new int[buffer.Length/2,2];
+	  for (int i=0; i<depth.Length/2; i++){
 		depth[i,0] = buffer[2*i] +  ((buffer[2*i+1] & 0x1f)*256);
 		depth[i,1] = (buffer[2*i+1] & 0xe0) >> 8;
 	  }
