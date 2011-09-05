@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-//using System.Drawing;
-//using System.Drawing.Drawing2D;
 using System.Text;
 using System.Xml;
 using System.IO;
@@ -178,14 +176,14 @@ namespace Jigsaw
 			this.AddShape(_shrrect);
 			tbNotes.AddShape(_shrrect);
 			
-//			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
-//			_shellipse.FillColor = Diagram.Colors.LightYellow;
-//			_shellipse.LineColor = Diagram.Colors.Gray;
-//			_shellipse.LineWidth = 2;
-//			_shellipse._isFactory = true;
-//			this.AddShape(_shellipse);
-//			tbNotes.AddShape(_shellipse);
-//			
+			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
+			_shellipse.FillColor = Diagram.Colors.LightYellow;
+			_shellipse.LineColor = Diagram.Colors.Gray;
+			_shellipse.LineWidth = 2;
+			_shellipse._isFactory = true;
+			this.AddShape(_shellipse);
+			tbNotes.AddShape(_shellipse);
+			
 //			Diagram.CConnector _shconn = new Diagram.CConnector(
 //			                             	new List<Diagram.CPoint>() { 
 //												new Diagram.CPoint(130, 210), 
@@ -194,6 +192,7 @@ namespace Jigsaw
 //												new Diagram.CPoint(266, 230) } );
 //			_shconn.LineColor = Diagram.Colors.LightBlue;
 //			_shconn.LineWidth = 2;
+//			_shconn.FillColor = Diagram.Colors.Transparent;
 //			_shconn._isFactory = true;
 //			this.AddShape(_shconn);
 //			tbNotes.AddShape(_shconn);
@@ -977,17 +976,15 @@ namespace Jigsaw
             double y = this.top;
             double w = this.width;
             double h = this.height;
-
+			
+			g.Save();
+			
             // Block outline			
 			SetPath(g, x, y, w, h);
 			
 			// Set fill color based on block state
 			if (this._state == BlockState.Running) {
 				g.Color = Diagram.Colors.White;
-			}
-			else if (this._state == BlockState.Error) {
-				//b = new HatchBrush(HatchStyle.DiagonalCross, Color.LightPink, Color.White);
-				g.Color = Diagram.Colors.LightPink;
 			} else {
 				g.Color = this.FillColor;
 			}
@@ -997,6 +994,7 @@ namespace Jigsaw
 			
 			// Stroke
 			g.Color = this.LineColor;
+			if (this.DashStyle != null) g.SetDash(this.DashStyle, 0.0);
 			g.LineWidth = this.LineWidth;
 			g.Stroke();
 
@@ -1006,13 +1004,25 @@ namespace Jigsaw
 				double cx = x + 0.5*w;
 				double cy = y + 0.5*20;
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
-				g.SetFontSize(12.0);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 				Cairo.TextExtents te = g.TextExtents(this.Text);
 				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing + textYOffset); 
 				g.ShowText(this.Text);
             }
-
+			
+			// If in an error state, x-out
+			if (this._state == BlockState.Error) {
+				g.Color = new Color(1.0, 0.0, 0.0, 0.5);
+				g.LineWidth = 5;
+				g.MoveTo(x, y);
+				g.LineTo(x+w, y+h);
+				g.MoveTo(x+w, y);
+				g.LineTo(x, y+h);
+				g.Stroke();
+				g.Color = Diagram.Colors.LightPink;
+			}
+			
 			// Draw breakpoint, if necessary
 			if (this._hasBreakPoint) {
 				g.Color = Diagram.Colors.Red;
@@ -1021,7 +1031,9 @@ namespace Jigsaw
 				g.ClosePath();
 				g.Fill();
 			}
-
+			
+			g.Restore();
+			
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
         }
@@ -1033,7 +1045,6 @@ namespace Jigsaw
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
-			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+11, y );
@@ -1052,7 +1063,6 @@ namespace Jigsaw
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+r );
             g.ClosePath();
-			g.Restore();
 		}
 		
 		/// <summary>
@@ -1780,9 +1790,8 @@ namespace Jigsaw
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.FontStyle = FontStyle.Bold;
+			//this.DashStyle = Diagram.DashStyle.Dash;
 			this.Sizable = false;
-			//textYOffset = 5;						// Block text offset
 			
 			// Create inner edge to connect loop stack
 			double offsetX = 0.5*this.Width + 10.0;
@@ -1993,7 +2002,6 @@ namespace Jigsaw
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
-			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+11, y );
@@ -2028,7 +2036,6 @@ namespace Jigsaw
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+r );
             g.ClosePath();
-			g.Restore();
 		}		
     }
 
@@ -2255,7 +2262,6 @@ namespace Jigsaw
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
-			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+11, y );
@@ -2271,9 +2277,9 @@ namespace Jigsaw
 			g.LineTo( x+14+20, y+20+4 );
 			g.LineTo( x+11+20, y+20 );
 			g.LineTo( x+20+r, y+20 );
-			g.ArcNegative(    x+20+r, y+20+r, r, -hpi, Math.PI );
+			g.ArcNegative( x+20+r, y+20+r, r, -hpi, Math.PI );
 			g.LineTo( x+20, y+h-20-r );
-			g.ArcNegative(    x+20+r, y+h-20-r, r, Math.PI, hpi);
+			g.ArcNegative( x+20+r, y+h-20-r, r, Math.PI, hpi);
 			g.LineTo( x+11+20, y+h-20);
 			g.LineTo( x+14+20, y+h-20+4);
 			g.LineTo( x+24+20, y+h-20+4);
@@ -2290,7 +2296,6 @@ namespace Jigsaw
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+r );
             g.ClosePath();
-			g.Restore();
 		}
     }
 	
@@ -2307,7 +2312,6 @@ namespace Jigsaw
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			this.Text = "when program starts";
 			textYOffset = 10;							// Block text offset
@@ -2333,12 +2337,10 @@ namespace Jigsaw
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
-			g.Save();
-			
-			g.MoveTo(x, y+10);
-			g.Arc(x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
-			g.LineTo(x+w-r, y+10);
-			g.Arc(x+w-r, y+10+r, r, -hpi, 0.0 );
+			g.MoveTo( x, y+10);
+			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
+			g.LineTo( x+w-r, y+10);
+			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
 			g.LineTo( x+w, y+h-r );
 			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
 			g.LineTo( x+27, y+h );
@@ -2349,7 +2351,6 @@ namespace Jigsaw
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+10 );
             g.ClosePath();
-			g.Restore();
 		}
     }
 
@@ -2366,7 +2367,7 @@ namespace Jigsaw
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.FontStyle = FontStyle.Bold;
+			//this.DashStyle = Diagram.DashStyle.Dot;
 			this.Sizable = false;
 			this.Text = "stop script";
 		}
@@ -2391,7 +2392,6 @@ namespace Jigsaw
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
-			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+11, y );
@@ -2407,7 +2407,6 @@ namespace Jigsaw
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+r );
             g.ClosePath();
-			g.Restore();
 		}
     }
 	

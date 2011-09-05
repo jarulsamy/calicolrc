@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-//using System.Drawing;
-//using System.Drawing.Drawing2D;
 using System.Text;
 using System.Xml;
 using System.IO;
@@ -20,7 +18,38 @@ using Cairo;
 // This causes a runtime error when attempting to draw with only one point.
 
 namespace Diagram
-{
+{	
+	// -----------------------------------------------------------------------
+	public static class Colors {
+		public static readonly Color Transparent = new Color(0.0, 0.0, 0.0, 0.0);
+		public static readonly Color White = new Color(1.0, 1.0, 1.0);
+		public static readonly Color Silver = new Color( 0.75, 0.75, 0.75);
+		public static readonly Color Gray = new Color(0.5, 0.5, 0.5);
+		public static readonly Color LightGray = new Color(0.8242, 0.8242, 0.8242);
+		public static readonly Color DarkGray = new Color(0.6601, 0.6601, 0.6601);
+		public static readonly Color SlateGray = new Color(0.4375, 0.5, 0.5625);
+		public static readonly Color DarkSlateGray = new Color(0.1562, 0.3086, 0.3086);
+		public static readonly Color LightSlateGray = new Color(0.4648, 0.5312, 0.5977);
+		public static readonly Color WhiteSmoke = new Color(0.9570, 0.9570, 0.9570);
+		public static readonly Color Black = new Color(0.0, 0.0, 0.0);
+
+		public static readonly Color Yellow = new Color(1.0, 1.0, 0.0);
+		public static readonly Color LightYellow = new Color( 1.0, 1.0, 0.875);
+		public static readonly Color DarkGoldenrod = new Color( 0.7187, 0.5234, 0.0430);
+		public static readonly Color PaleGoldenrod = new Color( 0.9297, 0.9062, 0.6641);
+		public static readonly Color Honeydew = new Color(0.9375, 1.0, 0.9375);
+		
+		public static readonly Color LightBlue = new Color( 0.6758, 0.8437, 0.8984);
+		public static readonly Color DarkBlue = new Color( 0.0, 0.0, 0.5430);
+
+		public static readonly Color Red = new Color( 1.0, 0.0, 0.0);
+		public static readonly Color DarkRed = new Color( 0.5430, 0.0, 0.0);
+		public static readonly Color LightPink = new Color( 1.0, 0.7109, 0.7539);
+		
+		public static readonly Color DarkGreen = new Color( 0.0, 0.3910, 0.0);
+		public static readonly Color LightGreen = new Color( 0.5625, 0.9297, 0.5625);
+	}
+	
     // -----------------------------------------------------------------------
     // Current operational modes for the Canvas object
     public enum EMode
@@ -93,37 +122,6 @@ namespace Diagram
 		public static double[] Solid = null;
 		public static double[] Dot = new double[] { 4.0, 4.0 };
 		public static double[] Dash = new double[] { 8.0, 8.0 };
-	}
-	
-	// -----------------------------------------------------------------------
-	public static class Colors {
-		public static readonly Color Transparent = new Color(0.0, 0.0, 0.0, 0.0);
-		public static readonly Color White = new Color(1.0, 1.0, 1.0);
-		public static readonly Color Silver = new Color( 0.75, 0.75, 0.75);
-		public static readonly Color Gray = new Color(0.5, 0.5, 0.5);
-		public static readonly Color LightGray = new Color(0.8242, 0.8242, 0.8242);
-		public static readonly Color DarkGray = new Color(0.6601, 0.6601, 0.6601);
-		public static readonly Color SlateGray = new Color(0.4375, 0.5, 0.5625);
-		public static readonly Color DarkSlateGray = new Color(0.1562, 0.3086, 0.3086);
-		public static readonly Color LightSlateGray = new Color(0.4648, 0.5312, 0.5977);
-		public static readonly Color WhiteSmoke = new Color(0.9570, 0.9570, 0.9570);
-		public static readonly Color Black = new Color(0.0, 0.0, 0.0);
-
-		public static readonly Color Yellow = new Color(1.0, 1.0, 0.0);
-		public static readonly Color LightYellow = new Color( 1.0, 1.0, 0.875);
-		public static readonly Color DarkGoldenrod = new Color( 0.7187, 0.5234, 0.0430);
-		public static readonly Color PaleGoldenrod = new Color( 0.9297, 0.9062, 0.6641);
-		public static readonly Color Honeydew = new Color(0.9375, 1.0, 0.9375);
-		
-		public static readonly Color LightBlue = new Color( 0.6758, 0.8437, 0.8984);
-		public static readonly Color DarkBlue = new Color( 0.0, 0.0, 0.5430);
-
-		public static readonly Color Red = new Color( 1.0, 0.0, 0.0);
-		public static readonly Color DarkRed = new Color( 0.5430, 0.0, 0.0);
-		public static readonly Color LightPink = new Color( 1.0, 0.7109, 0.7539);
-		
-		public static readonly Color DarkGreen = new Color( 0.0, 0.3910, 0.0);
-		public static readonly Color LightGreen = new Color( 0.5625, 0.9297, 0.5625);
 	}
 	
     // -----------------------------------------------------------------------
@@ -1562,7 +1560,7 @@ namespace Diagram
                                                                 // It is used as shape refs by connectors when serialized to Xml.
         private String name = "";                               // Code name of this object
         protected String text = "";                             // Text to be drawn in shape
-        private Cairo.Color textColor = Colors.Black;                  // Color of text
+        private Cairo.Color textColor = Colors.Black;           // Color of text
         private Cairo.Color lineColor = Colors.Black;
         private int lineWidth = 1;
 //        private StringAlignment horizontalAlign = StringAlignment.Center;
@@ -1570,12 +1568,12 @@ namespace Diagram
 //        private Pango.Alignment horizontalAlign = Pango.Alignment.Center;
 //        private Pango.Alignment verticalAlign = Pango.Alignment.Center;
 //        private DashStyle lineStyle = DashStyle.Solid;
-		private double[] lineStyle = DashStyle.Solid;
+		private double[] dashStyle = null; //new double[] {1.0};
         private Cairo.Color fillColor = Colors.White;
-		internal String fontDescription = "sans bold 8";
-//        internal String fontName = "Arial";
-//        internal float fontSize = 8.0F;
-//        internal FontStyle fontStyle = FontStyle.Regular;
+        internal String fontFace = "Arial";
+        internal double fontSize = 12.0;
+        internal FontSlant fontSlant = FontSlant.Normal;
+		internal FontWeight fontWeight = FontWeight.Bold;
         protected Boolean selected = false;
         private System.Object tag = null;                       // An arbitrary object that tags this object
 
@@ -1627,10 +1625,6 @@ namespace Diagram
             this.lineWidth = lineWidth;
             //this.lineStyle = lineStyle;
             this.fillColor = fillColor;
-			//this.fontDescription = fontDescription;
-            //this.fontName = fontName;
-            //this.fontSize = fontSize;
-            //this.fontStyle = fontStyle;
             this.visible = visible;
             this.Draggable = draggable;
             this.Sizable = sizable;
@@ -1667,9 +1661,10 @@ namespace Diagram
             if (parms.ContainsKey("fillColor") == true) this.fillColor = (Color)parms["fillColor"];
             if (parms.ContainsKey("lineWidth") == true) this.lineWidth = (int)parms["lineWidth"];
 //            if (parms.ContainsKey("lineStyle") == true) this.lineStyle = (DashStyle)parms["lineStyle"];
-            if (parms.ContainsKey("fontName") == true) this.fontDescription = (String)parms["fontName"];
-//            if (parms.ContainsKey("fontSize") == true) this.fontSize = (float)parms["fontSize"];
-//            if (parms.ContainsKey("fontStyle") == true) this.fontStyle = (FontStyle)parms["fontStyle"];
+            if (parms.ContainsKey("fontFace") == true) this.fontFace = (String)parms["fontFace"];
+            if (parms.ContainsKey("fontSize") == true) this.fontSize = (float)parms["fontSize"];
+            if (parms.ContainsKey("fontSlant") == true) this.fontSlant = (FontSlant)parms["fontSlant"];
+            if (parms.ContainsKey("fontWeight") == true) this.fontWeight = (FontWeight)parms["fontWeight"];
             if (parms.ContainsKey("visible") == true) this.Visible = (Boolean)parms["visible"];
             if (parms.ContainsKey("draggable") == true) this.Draggable = (Boolean)parms["draggable"];
             if (parms.ContainsKey("sizable") == true) this.Sizable = (Boolean)parms["sizable"];
@@ -1798,7 +1793,7 @@ namespace Diagram
 			clone.FillColor = this.FillColor;
 			clone.LineWidth = this.LineWidth;
 			clone.LineColor = this.LineColor;
-			clone.LineStyle = this.LineStyle;
+			clone.DashStyle = this.DashStyle;
 			clone.Width = this.Width;
 			clone.Height = this.Height;
 			return clone;
@@ -2001,66 +1996,38 @@ namespace Diagram
             get { return this.name; }
             set { this.name = value; }
         }
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		// Build and sve a new FontDescription given the string
-//		public virtual void SetFont(string description) {
-//			this.fontDescription = Pango.FontDescription.FromString(description);
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        [DescriptionAttribute("Text Font"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-//        public virtual Pango.FontDescription Font
-//        {
-//            get { return this.fontDescription; }
-//			set { this.fontDescription = value; }
-//        }
 
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        [DescriptionAttribute("Text Font"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-//        public virtual Font Font
-//        {
-//            get { return new Font(this.fontName, this.fontSize, this.fontStyle); }
-//            set
-//            {
-//                this.fontName = value.Name;
-//                this.fontSize = value.Size;
-//                this.fontStyle = value.Style;
-//            }
-//        }
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        [DescriptionAttribute("Text Font Name"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-//        public virtual string FontName
-//        {
-//            get { return this.fontName; }
-//            set
-//            {
-//                this.fontName = value;
-//            }
-//        }
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        [DescriptionAttribute("Text Font Size"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-//        public virtual double FontSize
-//        {
-//            get { return (double)this.fontSize; }
-//            set
-//            {
-//                this.fontSize = (float)value;
-//            }
-//        }
-//
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        [DescriptionAttribute("Text Font Style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-//        public virtual FontStyle FontStyle
-//        {
-//            get { return this.fontStyle; }
-//            set
-//            {
-//                this.fontStyle = value;
-//            }
-//        }
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        [DescriptionAttribute("Font Face"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+        public virtual string FontFace
+        {
+            get { return this.fontFace; }
+            set { this.fontFace = value; }
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        [DescriptionAttribute("Font Face"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+        public virtual FontWeight FontWeight
+        {
+            get { return this.fontWeight; }
+            set { this.fontWeight = value; }
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        [DescriptionAttribute("Font Slant"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+        public virtual FontSlant FontSlant
+        {
+            get { return this.fontSlant; }
+            set { this.fontSlant = value; }
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        [DescriptionAttribute("Font Size"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+        public virtual double FontSize
+        {
+            get { return this.fontSize; }
+            set { this.fontSize = value; }
+        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Shape text"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
@@ -2096,10 +2063,10 @@ namespace Diagram
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Line style"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
-        public double[] LineStyle
+        public double[] DashStyle
         {
-            get { return this.lineStyle; }
-            set { this.lineStyle = value; }
+            get { return this.dashStyle; }
+            set { this.dashStyle = value; }
         }
 
 //        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2264,8 +2231,7 @@ namespace Diagram
             // Translate anchor to origin.
             // Scale shape points.
             // Translate back to anchor.
-            for (int i = 0; i < this.points.Count; i++)
-            {
+            for (int i = 0; i < this.points.Count; i++) {
                 this.points[i].X = (wrt.points[i].X - ax) * sx + ax;
                 this.points[i].Y = (wrt.points[i].Y - ay) * sy + ay;
             }
@@ -2839,9 +2805,9 @@ namespace Diagram
             w.WriteAttributeString("lineWidth", this.LineWidth.ToString());
             //w.WriteAttributeString("lineStyle", this.LineStyle.ToString());
             //w.WriteAttributeString("fillColor", ColorTranslator.ToHtml(this.FillColor));
-            //w.WriteAttributeString("fontName", this.fontName);
-            //w.WriteAttributeString("fontSize", this.fontSize.ToString());
-            //w.WriteAttributeString("fontStyle", this.fontStyle.ToString());
+            w.WriteAttributeString("fontFace", this.fontFace);
+            w.WriteAttributeString("fontSize", this.fontSize.ToString());
+            w.WriteAttributeString("fontSlant", this.fontSlant.ToString());
             w.WriteAttributeString("visible", this.Visible.ToString());
             w.WriteAttributeString("draggable", this.Draggable.ToString());
             w.WriteAttributeString("sizable", this.Sizable.ToString());
@@ -2941,7 +2907,7 @@ namespace Diagram
 			
 			// Stroke
 			g.Color = this.LineColor;
-			//g.DashStyle = this.LineStyle;
+			if (this.DashStyle != null) g.SetDash( this.DashStyle, 0.0 );
 			g.LineWidth = this.LineWidth;
 			g.Stroke();
 			
@@ -2949,22 +2915,12 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
-				g.SetFontSize(12.0);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height - te.YBearing); 
+				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
 				g.ShowText(this.Text);
             }
-			
-//                StringFormat frmt = new StringFormat();
-//                frmt.Alignment = this.AlignHorizontal;      // Vertical text alignment
-//                frmt.LineAlignment = this.AlignVertical;  	// Horizontal text alignment
-//                //frmt.FormatFlags = StringFormatFlags.NoWrap;
-//                Brush b = new SolidBrush(this.TextColor);
-//                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
-//                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-//                fnt.Dispose();
-//                b.Dispose();
 
 			// Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
@@ -3070,9 +3026,10 @@ namespace Diagram
 			g.Save();
 			
 			// Path
-			//g.Scale(1.0, h/w); //w/h);
-			g.MoveTo(cx+hw, cy);
-			g.Arc(cx, cy, hw, 0.0, 2.0 * Math.PI);
+			g.Translate(cx, cy);
+			g.Scale(1.0, h/w);
+			g.MoveTo(hw, 0.0);
+			g.Arc(0.0, 0.0, hw, 0.0, 2.0 * Math.PI);
 			g.ClosePath();
 			
 			// Must return to uniform device space before stroking in order to prevent 
@@ -3093,25 +3050,12 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
-				g.SetFontSize(12.0);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height - te.YBearing); 
+				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
 				g.ShowText(this.Text);
             }
-
-//            // Draw label
-//            if (this.Text.Length > 0)
-//            {
-//                StringFormat frmt = new StringFormat();
-//                frmt.Alignment = this.AlignHorizontal;
-//                frmt.LineAlignment = this.AlignVertical;
-//                Brush b = new SolidBrush(this.TextColor);
-//                Font fnt = new Font(this.fontName, (float)(this.fontSize), this.fontStyle);
-//                g.DrawString(this.Text, fnt, b, new RectangleF(x, y, w, h), frmt);
-//                fnt.Dispose();
-//                b.Dispose();
-//            }
 
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
@@ -3323,10 +3267,10 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Bold);
-				g.SetFontSize(12.0);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - te.Width/2.0 - te.XBearing, cy - te.Height/2.0 - te.YBearing); 
+				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
 				g.ShowText(this.Text);
             }
 
@@ -3649,8 +3593,8 @@ namespace Diagram
     {
         private double tension = 0.0;       	// Tension of the spline
 		
-		private Cairo.Context _context = null;
-		private Cairo.Path _path = null;		// Local cache of most current path used for hit testing
+		//private Cairo.Context _context = null;
+		//private Cairo.Path _path = null;		// Local cache of most current path used for hit testing
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors
@@ -3664,22 +3608,14 @@ namespace Diagram
             : this(points, tension, "", Colors.Black, lineColor, 1)
         { }
 
-        public CSpline(List<CPoint> points, double tension, String text, Color textColor, 
-                       Color lineColor, int lineWidth) :
+        public CSpline(List<CPoint> points, double tension, String text, 
+		               Color textColor, Color lineColor, int lineWidth) :
             this(points, tension, text, textColor, lineColor, lineWidth,
                   true, true, true, true, true) { }
 
-        public CSpline(List<CPoint> points, double tension, String text, Color textColor,
-                Color lineColor, int lineWidth, 
-                Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
-            this(points, tension, text, textColor, lineColor, lineWidth, 
-                 "sans normal 8", visible, draggable, sizable, selectable, connectable)
-        { }
-
-        public CSpline(List<CPoint> points, double tension, String text, Color textColor,
-                Color lineColor, int lineWidth,
-                String fontDescription,
-                Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
+        public CSpline(List<CPoint> points, double tension, String text, 
+		               Color textColor, Color lineColor, int lineWidth,
+                	   Boolean visible, Boolean draggable, Boolean sizable, Boolean selectable, Boolean connectable) :
             base(points, text, textColor, lineColor, lineWidth, Colors.Transparent,
                  visible, draggable, sizable, selectable, connectable)
         {
@@ -3727,22 +3663,86 @@ namespace Diagram
 			g.Restore();
 			
 			// Copy path for possible later hit testing
-			this._context = g;
-			this._path = g.CopyPathFlat();
+			//this._context = g;
+			//this._path = g.CopyPathFlat();
 			
+			g.Color = this.LineColor;
+			g.LineWidth = this.LineWidth;
+			g.Stroke();
+
             // Draw text
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Normal);
-				g.SetFontSize(8.0);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(this.Left - te.Width/2.0 - te.XBearing, this.Top - te.Height - te.YBearing); 
+				g.MoveTo(this.Left - 0.5*te.Width - te.XBearing, this.Top - 0.5*te.Height - te.YBearing); 
 				g.ShowText(this.Text);
             }
 
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
+        }
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override Boolean ContainsPoint(CPoint pnt, Canvas cvs)
+        {
+            // If not visible can't be hit
+            if (this.Visible == false) return false;
+			
+			// http://cairographics.org/hittestpython/
+//			this._context.AppendPath(this._path);
+//			return this._context.InStroke(pnt.X, pnt.Y);
+			
+			using(ImageSurface draw = new ImageSurface(Format.A1, 1000, 1000)) {
+				using (Context g = new Context(draw)) {
+					
+					CPoint pt = this.points[0];
+					g.MoveTo(pt.X, pt.Y);
+		            for (int i=1; i< this.points.Count; i++) {
+		                pt = this.points[i];
+						g.LineTo(pt.X, pt.Y);
+		            }
+					
+					g.LineWidth = this.LineWidth+2000;
+					g.Color = Colors.Black;
+					g.Stroke();
+					
+					bool rslt = g.InStroke(pnt.X, pnt.Y);
+					//Console.WriteLine(rslt);
+					return rslt;
+				}
+			}
+
+//            //Return True if given point hits this curve
+//            // This seems very odd to me, but apparently it is the standard way to do it.
+//            // See http://www.bobpowell.net/hittestlines.htm
+//            
+//            // If not visible can't be hit
+//            if (this.Visible == false) return false;
+//
+//            Pen p = new Pen(this.LineColor, this.LineWidth+3);
+//            p.DashStyle = DashStyle.Solid; // this.LineStyle;   // Always use solid for hit detection
+//
+//            // Copy and scale all points, and create an Array object
+//            double z  = cvs.Zoom;
+//            int npts = this.points.Count;
+//            PointF[] pts = new PointF[npts];
+//            for (int i=0; i<npts; i++)
+//            {
+//                pts[i] = new PointF( (float)(z*this.points[i].X), (float)(z*this.points[i].Y) );
+//            }
+//
+//            // Create a GraphicsPath
+//            GraphicsPath pth = new GraphicsPath();
+//            pth.AddCurve(pts, (float)this.tension);
+//            pth.Widen(p);
+//            p.Dispose();
+//
+//            // Use the GraphicsPath IsVisible method to see if the point hits the curve.
+//            if (pth.IsVisible(new PointF((float)(z * pnt.X), (float)(z * pnt.Y)))) return true;
+//            return false;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3813,45 +3813,6 @@ namespace Diagram
             this.selected = true;
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override Boolean ContainsPoint(CPoint pnt, Canvas cvs)
-        {
-            // If not visible can't be hit
-            if (this.Visible == false) return false;
-			
-			// http://cairographics.org/hittestpython/28,128,128 
-			this._context.AppendPath(this._path);
-			return this._context.InStroke(pnt.X, pnt.Y);
-			
-//            //Return True if given point hits this curve
-//            // This seems very odd to me, but apparently it is the standard way to do it.
-//            // See http://www.bobpowell.net/hittestlines.htm
-//            
-//            // If not visible can't be hit
-//            if (this.Visible == false) return false;
-//
-//            Pen p = new Pen(this.LineColor, this.LineWidth+3);
-//            p.DashStyle = DashStyle.Solid; // this.LineStyle;   // Always use solid for hit detection
-//
-//            // Copy and scale all points, and create an Array object
-//            double z  = cvs.Zoom;
-//            int npts = this.points.Count;
-//            PointF[] pts = new PointF[npts];
-//            for (int i=0; i<npts; i++)
-//            {
-//                pts[i] = new PointF( (float)(z*this.points[i].X), (float)(z*this.points[i].Y) );
-//            }
-//
-//            // Create a GraphicsPath
-//            GraphicsPath pth = new GraphicsPath();
-//            pth.AddCurve(pts, (float)this.tension);
-//            pth.Widen(p);
-//            p.Dispose();
-//
-//            // Use the GraphicsPath IsVisible method to see if the point hits the curve.
-//            if (pth.IsVisible(new PointF((float)(z * pnt.X), (float)(z * pnt.Y)))) return true;
-//            return false;
-        }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Hide the CShape FillColor property because splines have no brush color

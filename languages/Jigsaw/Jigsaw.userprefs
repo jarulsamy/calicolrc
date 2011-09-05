@@ -1,20 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Diagram.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
       <File FileName="Jigsaw\Engine.cs" Line="245" Column="66" />
-      <File FileName="Jigsaw\Diagram.cs" Line="5310" Column="10" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="2768" Column="1" />
+      <File FileName="Jigsaw\Diagram.cs" Line="2067" Column="10" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="2360" Column="3" />
       <File FileName="Jigsaw\InspectWin.cs" Line="49" Column="1" />
-      <File FileName="Jigsaw\Widgets.cs" Line="15" Column="3" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="45" Column="1" />
-      <File FileName="Jigsaw\Main.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Widgets.cs" Line="10" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="Diagram.cs" selected="True" />
+            <Node name="UserInterface" expanded="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>
