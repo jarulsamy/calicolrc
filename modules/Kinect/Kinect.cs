@@ -56,6 +56,7 @@ public static class Kinect {
 	public Client(string server, int port) {
 	  client = new TcpClient(server, port);
 	  stream = client.GetStream();
+	  stream.ReadTimeout = 1000;
 	  hello();
 	}
 
