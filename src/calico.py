@@ -308,7 +308,7 @@ class CalicoProject(object):
         file = kwargs.get("file", None)
         tag = kwargs.get("tag", "black")
         if self.shell:
-            self.shell.message(message, tag)
+            self.shell.message(message, tag, end=end)
         else:
             print(message, end=end) # FIXME: file=file?
 

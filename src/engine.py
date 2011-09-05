@@ -130,6 +130,7 @@ class Engine(object):
 class DLREngine(Engine):
     def setup(self):
         self.last_retval = None
+        self.compiler_options = None
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)
         #Python.SetTrace(engine, OnTraceBack); 
         # Load mscorlib.dll:
@@ -178,12 +179,12 @@ class DLREngine(Engine):
         sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         try:
-            source.Compile()
+            source.Compile(self.compiler_options)
         except:
             sctype = Microsoft.Scripting.SourceCodeKind.Statements
             source = self.engine.CreateScriptSourceFromString(text, sctype)
             try:
-                source.Compile()
+                source.Compile(self.compiler_options)
             except:
                 traceback.print_exc()
                 return False
@@ -216,7 +217,7 @@ class DLREngine(Engine):
         self.manager.calico.last_error = ""
         source = self.engine.CreateScriptSourceFromFile(filename)
         try:
-            source.Compile()
+            source.Compile(self.compiler_options)
         except:
             traceback.print_exc()
             return False

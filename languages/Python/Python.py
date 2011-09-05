@@ -53,6 +53,10 @@ class PythonEngine(DLREngine):
                 "del division, with_statement, ask, print_function;")
         sctype = Microsoft.Scripting.SourceCodeKind.Statements
         source = self.engine.CreateScriptSourceFromString(text, sctype)
+        options = self.engine.GetCompilerOptions()
+        options.PrintFunction = True
+        options.AllowWithStatement = True
+        self.compiler_options = options
         source.Compile()
         source.Execute(self.manager.scope)
 
