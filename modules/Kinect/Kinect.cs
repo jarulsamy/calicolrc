@@ -56,7 +56,7 @@ public static class Kinect {
 	public Client(string server, int port) {
 	  client = new TcpClient(server, port);
 	  stream = client.GetStream();
-	  stream.ReadTimeout = 1000;
+	  stream.ReadTimeout = 100;
 	  hello();
 	}
 
@@ -120,7 +120,12 @@ public static class Kinect {
 	  timestamp = l0 | (l1<<8) | (l2<<16) | (l3<<24);
 	  
 	  // read bytestream
-	  return read(length);
+	  byte [] dataB = new byte[length];
+	  int totalRead = 0;
+	  while (totalRead < length){
+		totalRead  += stream.Read(dataB, totalRead, length - totalRead);
+	  }
+	  return dataB;
 	}
 	
 	public int[,] readDepth(){
