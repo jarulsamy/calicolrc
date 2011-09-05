@@ -324,11 +324,11 @@ public static class Kinect {
 
 	public static int [] convertDepthToImageArray(int [,] depth){
 	  // convert to color
-	  int [] pixels = new int[depth.Length];
+	  int [] pixels = new int[depth.GetUpperBound(0) + 1];
 	  // color table for index (detected humans)
 	  int [,] col = new int [6,3] {{200,0,0},{0,200,0},{0,0,200},{200,200,0},{0,200,200},{200,0,200}};
 
-	  for (int i=0; i<pixels.Length; i++){
+	  for (int i=0; i<=depth.GetUpperBound(0); i++){
 		int distance = depth[i,0];
 		int red,green,blue;
 		int index = depth[i,1];
