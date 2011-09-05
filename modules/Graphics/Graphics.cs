@@ -2951,37 +2951,43 @@ public static class Graphics {
 
 	public void fromArray(Byte [] buffer, string format) {
 	  if (format == "BGRX") { // b, r, g, ignore
-		for (int i=0; x < buffer.Length; i+=4) {
+		int count = 0;
+		for (int i=0; i < buffer.Length; i+=4) {
 		  byte b = buffer[i];
 		  byte g = buffer[i + 1];
 		  byte r = buffer[i + 2];
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 0, r);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 1, g);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 2, b);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 3, 255);
-		}
-	  } else if (format == "RGBA") { 
-		for (int i=0; x < buffer.Length; i+=4) {
-		  byte r = buffer[i];
-		  byte g = buffer[i + 1];
-		  byte b = buffer[i + 2];
-		  byte a = buffer[i + 3];
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 0, r);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 1, g);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 2, b);
-		  Marshal.WriteByte(_pixbuf.Pixels, i + 3, a);
+		  int x = _pixbuf.Width - count % _pixbuf.Width;
+		  int y = count/_pixbuf.Width;
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 0, r);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 1, g);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 2, b);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 3, 255);
+		  count++;
 		}
 	  } else if (format == "GRAY") { 
 		int count = 0;
-		for (int i=0; x < buffer.Length; i++) {
+		for (int i=0; i < buffer.Length; i++) {
 		  byte g = buffer[i];
-		  Marshal.WriteByte(_pixbuf.Pixels, count + 0, g);
-		  Marshal.WriteByte(_pixbuf.Pixels, count + 1, g);
-		  Marshal.WriteByte(_pixbuf.Pixels, count + 2, g);
-		  Marshal.WriteByte(_pixbuf.Pixels, count + 3, 255);
-		  count += 4;
+		  int x = _pixbuf.Width - count % _pixbuf.Width;
+		  int y = count/_pixbuf.Width;
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 0, g);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 1, g);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 2, g);
+          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+              x * _pixbuf.NChannels + 3, 255);
+		  count++;
 		}
+	  } else {
+		throw new Exception("Picture.fromArray(array, format): invalid format");
 	  }
+	  QueueDraw();
 	}
     
     public Picture(int width, int height, byte [] buffer, int depth) : this(true) {
