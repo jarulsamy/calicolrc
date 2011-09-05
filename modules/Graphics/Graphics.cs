@@ -3144,7 +3144,11 @@ public static class Graphics {
 
     public void savePicture(string filename) {
       // png, and jpg
-      _pixbuf.Save(filename, filename.Substring(filename.Length - 3, 3));
+      String format = "jpeg";
+      if (filename.Substring(filename.Length - 3, 3) == "png"){
+       format = "png";
+      }
+      _pixbuf.Save(filename, format);
     }
     
     public Pixel getPixel(int x, int y) {
