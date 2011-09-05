@@ -124,7 +124,7 @@ public static class Kinect {
 	
 	public int[,] readDepth(){
 	  write(CMD_READDEPTH);
-	  byte [] buffer = readData();
+	  byte [] buffer = readData(); // 200k more so far
 	  // convert to color
 	  int [,] depth = new int[buffer.Length/2,2];
 	  for (int i=0; i<depth.Length/2; i++){
@@ -326,7 +326,12 @@ public static class Kinect {
 	  // convert to color
 	  int [] pixels = new int[depth.GetUpperBound(0) + 1];
 	  // color table for index (detected humans)
-	  int [,] col = new int [6,3] {{200,0,0},{0,200,0},{0,0,200},{200,200,0},{0,200,200},{200,0,200}};
+	  int [,] col = new int [6,3] {{200,0,0},
+								   {0,200,0},
+								   {0,0,200},
+								   {200,200,0},
+								   {0,200,200},
+								   {200,0,200}};
 
 	  for (int i=0; i<=depth.GetUpperBound(0); i++){
 		int distance = depth[i,0];
@@ -356,13 +361,22 @@ public static class Kinect {
     }
 	
 	public void write(params Byte[] data) {
-	  stream.Write(data, 0, data.Length);
+	  try {
+		stream.Write(data, 0, data.Length);
+	  } catch {
+		Console.WriteLine("Kinect.Client: write failed!");		
+	  }
 	}
 	
 	public Byte[] read(int count) {
 	  // Buffer to store the response bytes.
 	  Byte[] data = new Byte[count];
-	  stream.Read(data, 0, count);
+	  try {
+		stream.Read(data, 0, count);
+	  } catch {
+		Console.WriteLine("Kinect.Client: read failed!");
+		return null;
+	  }
 	  return data;
 	}
 	
