@@ -2948,7 +2948,6 @@ public static class Graphics {
                  new Point(0, _pixbuf.Height));
     }
 
-
 	public void fromArray(Byte [] buffer, string format) {
 	  if (format == "BGRX") { // b, r, g, ignore
 		int count = 0;
@@ -2956,6 +2955,7 @@ public static class Graphics {
 		  byte b = buffer[i];
 		  byte g = buffer[i + 1];
 		  byte r = buffer[i + 2];
+		  // NOTE: x is from the other side
 		  int x = _pixbuf.Width - count % _pixbuf.Width;
 		  int y = count/_pixbuf.Width;
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -2972,6 +2972,7 @@ public static class Graphics {
 		int count = 0;
 		for (int i=0; i < buffer.Length; i++) {
 		  byte g = buffer[i];
+		  // NOTE: x is from the other side
 		  int x = _pixbuf.Width - count % _pixbuf.Width;
 		  int y = count/_pixbuf.Width;
           Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
