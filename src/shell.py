@@ -22,6 +22,7 @@
 from __future__ import print_function
 import traceback
 import sys, os
+import time
 import re
 
 # Bring .NET References into IronPython scope:
@@ -502,6 +503,7 @@ class ShellWindow(Window):
             MUTEX.ReleaseMutex()
             GLib.Timeout.Add(100, self.goto_end)
         Gtk.Application.Invoke(invoke)
+        time.sleep(.01)
 
     def goto_end(self):
         MUTEX.WaitOne()
