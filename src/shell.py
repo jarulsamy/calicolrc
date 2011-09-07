@@ -605,6 +605,9 @@ class ShellWindow(Window):
         return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
 
     def stop_running(self, sender, args):
+        import Myro
+        if Myro.robot:
+            Myro.robot.flush()
         self.executeThread = None
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
         self.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
