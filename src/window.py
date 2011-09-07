@@ -171,7 +171,7 @@ class Window(object):
         retval = []
         retval.append(_("Recent files")) # submenu
         for file in self.calico.config.get("calico.recent_files"):
-            if file:
+            if file and os.path.isfile(file):
                 menufile = file.replace("_", "__")
                 retval.append((_("Recent files"),
                                (menufile, None, None,
