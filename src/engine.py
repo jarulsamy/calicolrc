@@ -168,6 +168,7 @@ class DLREngine(Engine):
         lines = text.split("\n")
         line_count = len(lines)
         if line_count == 1:
+            text = "from __future__ import print_function; " + text
             sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
             source = self.engine.CreateScriptSourceFromString(text, sctype)
             return (source.GetCodeProperties() == 
