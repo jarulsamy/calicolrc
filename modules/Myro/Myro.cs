@@ -1817,7 +1817,7 @@ public static class Myro {
     public Scribbler(string port, int baud) {
 
       if (port.StartsWith("COM") || port.StartsWith("com")){
-       port = @"\\.\" + port;
+       port = @"\\.\" + port;             // "comment
       }
 
       serial = new SerialPort(port, baud);
@@ -1994,17 +1994,22 @@ public static class Myro {
 
     byte [] GetBytes(byte value, int bytes=1) {
       byte [] retval = null;
-      write_packet(value);
-      read(Scribbler.PACKET_LENGTH); // read the echo
-      retval = read(bytes);
+      lock (this) { // lock robot
+	write_packet(value);
+	read(Scribbler.PACKET_LENGTH); // read the echo
+	retval = read(bytes);
+      }
       return retval;
     }
 
     List GetWord(byte value, int bytes=1) {
       List retval = new List();
-      write_packet(value);
-      read(Scribbler.PACKET_LENGTH); // read the echo
-      byte [] retvalBytes = read(bytes);
+      byte [] retvalBytes;
+      lock (this) { // lock robot
+	write_packet(value);
+	read(Scribbler.PACKET_LENGTH); // read the echo
+	retvalBytes = read(bytes);
+      }
       for (int p = 0; p < retvalBytes.Length; p += 2) {
         retval.append(retvalBytes[p] << 8 | retvalBytes[p + 1]);
       }
@@ -2266,19 +2271,21 @@ public static class Myro {
     }
 
     byte [] _get(byte value, int bytes, string mode) {
-      write(value);
-      read(Scribbler.PACKET_LENGTH); // read the echo
-      if (mode == "byte") {
-        return read(bytes);
-      } else if (mode == "word") {
-        byte [] retvalBytes = read(bytes);
-        byte [] retval = new byte[retvalBytes.Length/2];
-        for (int p=0; p < retvalBytes.Length; p+=2) {
-          retval[p/2] = (byte)(retvalBytes[p] << 8 | retvalBytes[p + 1]);
-        }
-        return retval;
+      lock (this) { // lock robot
+	write(value);
+	read(Scribbler.PACKET_LENGTH); // read the echo
+	if (mode == "byte") {
+	  return read(bytes);
+	} else if (mode == "word") {
+	  byte [] retvalBytes = read(bytes);
+	  byte [] retval = new byte[retvalBytes.Length/2];
+	  for (int p=0; p < retvalBytes.Length; p+=2) {
+	    retval[p/2] = (byte)(retvalBytes[p] << 8 | retvalBytes[p + 1]);
+	  }
+	  return retval;
+	}
+	return null;
       }
-      return null;
     }
 
     public override void setData(int position, int value) {
@@ -2337,9 +2344,11 @@ public static class Myro {
     }
 
     public void set(params byte [] values) {
-      write_packet(values);
-      read(Scribbler.PACKET_LENGTH); // read echo
-      _lastSensors = read(11); // single bit sensors
+      lock (this) { // lock robot
+	write_packet(values);
+	read(Scribbler.PACKET_LENGTH); // read echo
+	_lastSensors = read(11); // single bit sensors
+      }
     }
   
     public void set(string item, object position, object value) {
@@ -2529,33 +2538,34 @@ public static class Myro {
       flush();
       // have to do this twice since sometime the first echo isn't
       // echoed correctly (spaces) from the scribbler
-      write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
-      lock(serial) {
-        try {
-          retval = ReadLine();
-        } catch {
-          //serial.ReadTimeout = old;
-          return retDict;
-        }
+      lock (this) { // lock robot
+	write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
+	lock(serial) {
+	  try {
+	    retval = ReadLine();
+	  } catch {
+	    //serial.ReadTimeout = old;
+	    return retDict;
+	  }
+	}
+	//#print "Got", retval
+	Thread.Sleep(100); 
+	//time.sleep(.1)
+	write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
+	lock(serial) {
+	  try {
+	    retval = ReadLine();
+	  } catch {
+	    //serial.ReadTimeout = old;
+	    return retDict;
+	  }
+	}
+	if (retval.Length == 0) {
+	  lock(serial) 
+	    //serial.ReadTimeout = old;
+	    return retDict;
+	}
       }
-      //#print "Got", retval
-      Thread.Sleep(100); 
-      //time.sleep(.1)
-      write_packet(Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
-      lock(serial) {
-        try {
-          retval = ReadLine();
-        } catch {
-          //serial.ReadTimeout = old;
-          return retDict;
-        }
-      }
-      if (retval.Length == 0) {
-        lock(serial) 
-          //serial.ReadTimeout = old;
-        return retDict;
-      }
-      
       if (retval[0] == 'P' | retval[0] == 'p') {
         retval = retval.Substring(1);
       }
@@ -2595,9 +2605,11 @@ public static class Myro {
     }
 
     public override void beep(double duration, double frequency) {
-      set_speaker((int)frequency, (int)(duration * 1000));
-      Thread.Sleep((int)(duration * 1000));
-      read(Scribbler.PACKET_LENGTH + 11);
+      lock (this) { // lock robot
+	set_speaker((int)frequency, (int)(duration * 1000));
+	Thread.Sleep((int)(duration * 1000));
+	read(Scribbler.PACKET_LENGTH + 11);
+      }
     }
 
     public override void beep(double duration, double frequency, double frequency2) {
@@ -2608,20 +2620,20 @@ public static class Myro {
 
     public void set_speaker(int frequency, int duration) {
       write_packet(Scribbler.SET_SPEAKER, 
-          (byte)(duration >> 8),
-          (byte)(duration % 256),
-          (byte)(frequency >> 8),
-          (byte)(frequency % 256));
+		   (byte)(duration >> 8),
+		   (byte)(duration % 256),
+		   (byte)(frequency >> 8),
+		   (byte)(frequency % 256));
     }
         
     public void set_speaker_2(int freq1, int freq2, int duration) {
-        write_packet(Scribbler.SET_SPEAKER_2, 
-            (byte)(duration >> 8),
-            (byte)(duration % 256),
-            (byte)(freq1 >> 8),
-            (byte)(freq1 % 256),
-            (byte)(freq2 >> 8),
-            (byte)(freq2 % 256));
+      write_packet(Scribbler.SET_SPEAKER_2, 
+		   (byte)(duration >> 8),
+		   (byte)(duration % 256),
+		   (byte)(freq1 >> 8),
+		   (byte)(freq1 % 256),
+		   (byte)(freq2 >> 8),
+		   (byte)(freq2 % 256));
     }
 
     public override string getName() {
@@ -2818,8 +2830,11 @@ public static class Myro {
     byte [] buffer = new byte [size * 3];
     int vy, vu, y1v, y1u, uy, uv, y2u, y2v;
     int Y = 0, U = 0, V = 0;
-    write(Scribbler.GET_IMAGE);
-    byte [] line = read(size); //BufferedRead(self.ser, size,
+    byte [] line;
+    lock (this) { // lock robot
+      write(Scribbler.GET_IMAGE);
+      line = read(size); //BufferedRead(self.ser, size,
+    }
     //start = 0);
     //create the image from the YUV layer
     for (int i=0; i < height; i++) {
@@ -2869,25 +2884,31 @@ public static class Myro {
   public byte [] grab_jpeg_color(int mode) { // new color,
     // compressed (0=fast,
     // 1=reg)
-    if (color_header == null) {
-      write(Scribbler.GET_JPEG_COLOR_HEADER);
-      color_header = read_jpeg_header();
+    byte [] jpeg;
+    lock (this) { // lock robot
+      if (color_header == null) {
+	write(Scribbler.GET_JPEG_COLOR_HEADER);
+	color_header = read_jpeg_header();
+      }
+      write(GET_JPEG_COLOR_SCAN);
+      write((byte)mode);
+      jpeg = buffer_add(color_header, read_jpeg_scan());
     }
-    write(GET_JPEG_COLOR_SCAN);
-    write((byte)mode);
-    byte [] jpeg = buffer_add(color_header, read_jpeg_scan());
     return jpeg;
   }
   
     public byte [] grab_jpeg_gray(int mode) { // new gray, compressed
                                               // (0=fast, 1=reg)
-      if (gray_header == null) {
-        write(Scribbler.GET_JPEG_GRAY_HEADER);
-        gray_header = read_jpeg_header();
+      byte [] jpeg;
+      lock (this) { // lock robot
+	if (gray_header == null) {
+	  write(Scribbler.GET_JPEG_GRAY_HEADER);
+	  gray_header = read_jpeg_header();
+	}
+	write(Scribbler.GET_JPEG_GRAY_SCAN);
+	write((byte)mode);
+	jpeg = buffer_add(gray_header, read_jpeg_scan());
       }
-      write(Scribbler.GET_JPEG_GRAY_SCAN);
-      write((byte)mode);
-      byte [] jpeg = buffer_add(gray_header, read_jpeg_scan());
       return jpeg;
     }
     
@@ -2921,20 +2942,23 @@ public static class Myro {
       int width = 256;
       int height = 192;
       byte [] blobs = new byte[height * width * 3];  // RGB
-      write(Scribbler.GET_RLE);
-      int size=(int)read_byte();
-      size = (size << 8) | read_byte();
-      byte [] buffer = read(size);
+      byte [] buffer;
+      lock (this) { // lock robot
+	write(Scribbler.GET_RLE);
+	int size=(int)read_byte();
+	size = (size << 8) | read_byte();
+	buffer = read(size);
+      }
       int px = 0;
       int counter = 0;
       int val = 128;
       bool inside = true;
       for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j+=4) {
-          if (counter < 1 && px < buffer.Length) {
-            counter = buffer[px];
-            px += 1;
-            counter = (counter << 8) | buffer[px];
+	for (int j=0; j < width; j+=4) {
+	  if (counter < 1 && px < buffer.Length) {
+	    counter = buffer[px];
+	    px += 1;
+	    counter = (counter << 8) | buffer[px];
             px += 1;
             if (inside) {
               val = 0;
@@ -2948,7 +2972,7 @@ public static class Myro {
           blobs[i * width * 3 + j + 1] = (byte)val;
           blobs[i * width * 3 + j + 2] = (byte)val;
           blobs[i * width * 3 + j + 3] = (byte)val;
-
+	  
           counter -= 1;
         }
       }
@@ -2956,12 +2980,15 @@ public static class Myro {
     }
       
     public byte [] grab_gray_array() {
+      byte [] line;
       int width = 128;
       int height = 96;
       int size= width * height; 
-      write(Scribbler.GET_WINDOW);
-      write((byte)0);
-      byte [] line = read(size);
+      lock (this) { // lock robot
+	write(Scribbler.GET_WINDOW);
+	write((byte)0);
+	line = read(size);
+      }
       return quadrupleSize(line, width);
     }
   
@@ -3028,9 +3055,11 @@ public static class Myro {
     }
     
     public override List getIRMessage() {
-      write(Scribbler.GET_IR_MESSAGE);
-      int size = read_2byte();
-      return bytes2ints(read(size));
+      lock (this) { // lock robot
+	write(Scribbler.GET_IR_MESSAGE);
+	int size = read_2byte();
+	return bytes2ints(read(size));
+      }
     }
     
     public override void sendIRMessage(string message) {
