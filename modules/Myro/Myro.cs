@@ -3446,8 +3446,11 @@ public static class Myro {
       Func<object,Array> function = (Func<object,Array>)list[0];
       object [] args = ((object [])list).Slice(1, list.Count);
       retval.append(null);
-      threads.append(new Thread( 
-        new ThreadStart(functionInvokeWithArgs(function, args, retval, position))));
+      Thread thread = new Thread( 
+           new ThreadStart(
+                functionInvokeWithArgs(function, args, retval, position)));
+      thread.IsBackground = true;
+      threads.append(thread);
       position++;
     }
     // Start each thread
@@ -3469,8 +3472,10 @@ public static class Myro {
     // For each function, make a return list, and thread list
     foreach (Func<object> function in functions) {
       retval.append(null);
-      threads.append(new Thread( 
-           new ThreadStart(functionInvoke(function, retval, position))));
+      Thread thread = new Thread( 
+           new ThreadStart(functionInvoke(function, retval, position)));
+      thread.IsBackground = true;
+      threads.append(thread);
       position++;
     }
     // Start each thread
@@ -3478,8 +3483,18 @@ public static class Myro {
       t.Start();
     }
     // Wait for them all to finish
-    foreach (Thread t in threads) {
-      t.Join();
+    try {
+       foreach (Thread t in threads) {
+         t.Join();
+       }
+    } catch { 
+      // error in joining, probably an abort
+    } finally {
+       foreach (Thread t in threads) {
+         try {
+            t.Abort();
+         } catch {}
+       }
     }
     // return
     return retval;
