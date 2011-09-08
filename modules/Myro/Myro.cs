@@ -384,7 +384,7 @@ public static class Myro {
       List retval = new List();
       int num = Sdl.SDL_JoystickNumAxes(handles[index]);
       for (int button = 0; button < num; button++) {
-        retval.append(Sdl.SDL_JoystickGetAxis(handles[index], button)/32767.0);
+        retval.append(Math.Round(Sdl.SDL_JoystickGetAxis(handles[index], button)/32767.0, 2));
       }
       return retval;
     }
