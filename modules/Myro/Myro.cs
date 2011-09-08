@@ -2650,7 +2650,7 @@ public static class Myro {
 
     public override double getBattery() {
       write(Scribbler.GET_BATTERY);
-      double retval = read_2byte() / 20.9813;
+      double retval = Math.Round(read_2byte() / 20.9813, 2);
       return retval;
     }
 
