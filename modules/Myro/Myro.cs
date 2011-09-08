@@ -2772,12 +2772,13 @@ public static class Myro {
     }
   
     public void flush() { 
+      byte [] bytes = new byte[1];
       lock(serial) {
         serial.DiscardInBuffer();
         serial.DiscardOutBuffer();
 	while (true) {
 	  try {
-	    read_byte();
+	    serial.Read(bytes, 0, 1);
 	  } catch {
 	    // timeout, default is one second
 	    // no data, so we're done
