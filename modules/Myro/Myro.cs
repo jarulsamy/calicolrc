@@ -2775,6 +2775,17 @@ public static class Myro {
       lock(serial) {
         serial.DiscardInBuffer();
         serial.DiscardOutBuffer();
+	while (true) {
+	  try {
+	    read_byte();
+	  } catch {
+	    // timeout, default is one second
+	    // no data, so we're done
+	    break;
+	  }
+	  serial.DiscardInBuffer();
+	  serial.DiscardOutBuffer();
+	}
       }
     }
 
