@@ -22,6 +22,7 @@ from __future__ import print_function
 import Gtk
 import GLib
 import Pango
+import System
 import os
 from Mono.TextEditor import TextEditor, Highlighting, TextEditorOptions
 path, filename = os.path.split(__file__)
@@ -97,8 +98,16 @@ class Document(object):
         """
         """
         if not self.filename:
-            self.save_as()
+            return self.save_as()
         if self.filename:
+            # first, let's make sure the directory is writable
+            proposed_dir, basename = os.path.split(os.path.abspath(self.filename))
+            if not self.is_writable(proposed_dir):
+                # if not, let's change dirs
+                personal = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal)
+                self.filename = os.path.join(personal, basename)
+                return self.save_as()
             # if exists, make backup
             if os.path.isfile(self.filename):
                 try:
@@ -119,13 +128,38 @@ class Document(object):
             return True
         return False
 
+    def is_writable(self, directory):
+        tempfile = os.path.join(directory, "tempfile.tmp")
+        retval = True
+        try:
+            fp = open(tempfile, "w")
+            fp.close()
+            os.remove(tempfile)
+        except:
+            retval = False
+        return retval
+
     def save_as(self):
+        if self.filename:
+            proposed_dir, basename = os.path.split(os.path.abspath(self.filename))
+        else:
+            proposed_dir = os.getcwd()
+            basename = "Untitled." + self.calico.languages[self.language].extension
+        # first, let's make sure the directory is writable
+        if not self.is_writable(proposed_dir):
+            # if not, let's change dirs
+            proposed_dir = System.Environment.GetFolderPath(
+                System.Environment.SpecialFolder.Personal)
+        if os.getcwd() != proposed_dir:
+            os.chdir(proposed_dir)
         retval = False
         fc = Gtk.FileChooserDialog(_("Enter the file to save"),
                                    self.calico.editor.window,
                                    Gtk.FileChooserAction.Save,
                                    _("Cancel"), Gtk.ResponseType.Cancel,
                                    _("Save"), Gtk.ResponseType.Accept)
+        fc.CurrentName = basename      # the file: entry text box
+        fc.SelectFilename(basename)    # the file selection, if it exists
         fc.KeepAbove = True
         if (fc.Run() == int(Gtk.ResponseType.Accept)):
             self.filename = fc.Filename
