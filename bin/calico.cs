@@ -26,6 +26,7 @@ using System.Diagnostics;
 using Mono.Unix;
 
 public class Calico {
+  [STAThread]
   static void Main(string[] args) {
     string path = System.IO.Path.GetDirectoryName(
                        System.Reflection.Assembly.GetExecutingAssembly()
