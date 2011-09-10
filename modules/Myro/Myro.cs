@@ -3803,8 +3803,88 @@ public static class Myro {
     frequencies["c8"] = 4186.0;
   }
 
+  /*
+  public class StringComparer: IComparer<string> {
+    public int Compare(string x, string y) {
+      if (x == null) {
+	if (y == null) {
+	  return 0;
+	} else {
+	  return -1;
+	}
+      } else {
+	if (y == null) {
+	  return 1;
+	} else {
+	  int retval = x.Length.CompareTo(y.Length);
+	  if (retval != 0) {
+	    return retval;
+	  } else {
+	    return x.CompareTo(y);
+	  }
+	}
+      }
+    }
+  }
+  */
+
+  static int getPivotPoint(List input, int begPoint, int endPoint) {
+    int pivot = begPoint/2;
+    int m = begPoint+1;
+    int n = endPoint;
+    while ((m < endPoint) && 
+	   (((string)input[pivot]).CompareTo((string)input[m]) >= 0)) {
+      m++;
+    }
+    
+    while ((n > begPoint) && 
+	   (((string)input[pivot]).CompareTo((string)input[n]) <= 0)) {
+      n--;
+    }
+    while (m < n) {
+      string temp = (string)input[m];
+      input[m] = input[n];
+      input[n] = temp;
+      while ((m < endPoint) && 
+	     (((string)input[pivot]).CompareTo((string)input[m]) >= 0)) {
+	m++;
+      }
+      while ((n > begPoint) && 
+	     (((string)input[pivot]).CompareTo((string)input[n]) <= 0)) {
+	n--;
+      }
+    }
+    if (pivot != n) {
+      string temp2 = (string)input[n];
+      input[n] = input[pivot];
+      input[pivot] = temp2;
+      
+    }
+    return n;
+  }
+
+  static void QuickSort(List input, int beg, int end) {
+    // In-place string sort
+    if (end == beg) {
+      return;
+    } else {
+      int pivot = getPivotPoint(input, beg, end);
+      if (pivot > beg)
+	QuickSort(input, beg, pivot-1);
+      if (pivot < end)
+	QuickSort(input, pivot+1, end);
+    }
+    return;
+  }
+  
+  static List Sort(List list) {
+    // in-place String sort
+    QuickSort(list, 0, list.Count - 1);
+    return list;
+  }
+
   public static List getVoiceNames() {
-    return voices.values();
+    return Sort(voices.values());
   }
 
   public static List getVoices() {
