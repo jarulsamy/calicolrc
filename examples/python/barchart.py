@@ -1,59 +1,130 @@
 from Graphics import *
 import Myro
 
-def barchart(title, width, height, data):
-    left, right, top, bottom = 100, 100, 100, 100
-    win = Window(title, width, height)
-    background = Rectangle((left, top), (width - right, height - bottom))
-    background.fill = Color("white")
-    background.draw(win)
+class BarChart:
+    def __init__(self, title, width, height, data, x_label=None, y_label="Count"):
+        self.title = title
+        self.x_label = x_label
+        self.y_label = y_label
+        self.width = width
+        self.height = height
+        self.data = data
+        self.left, self.right, self.top, self.bottom = 100, 50, 100, 100
+        self.rotate = 45
+        self.use_height = .90
+        self.use_width = .75
+        self.win = Window(self.title, self.width, self.height)
+        self.background = Rectangle((self.left, self.top),
+                               (self.width - self.right, self.height - self.bottom))
+        self.background.fill = Color("white")
+        self.background.draw(self.win)
+        self.draw()
 
-    bins = {}
-    for datum in data:
-        bins[datum] = bins.get(datum, 0) + 1
+    def animate(self, new_data):
+        # First, get old info:
+        max_count = max(self.bins.values())
+        columns = len(self.bins)
+        # Columns are 95% of span
+        col_width = (self.width - self.right - self.left) /columns
+        # Offset from left:
+        col_off = (self.width - self.right - self.left) * (1.0 - self.use_width) / (columns)
+        # now, new diffs:
+        new_bins = {}
+        for datum in new_data:
+            new_bins[datum] = new_bins.get(datum, 0) + 1
+        diffs = {}
+        for bin in self.bins.keys():
+            diffs[datum] = new_bins.get(datum, 0) - self.bins.get(datum, 0)
+        # Now, redraw:
+        print(diffs)
+        for scale in range(10):
+            count = 0
+            for bin in sorted(self.bins.keys()):
+                # Bottom left:
+                x1 = self.left + (count * col_width) + col_off/2
+                y1 = self.height - self.bottom
+                # Top right:
+                x2 = self.left + (count * col_width) + col_off/2 + col_width - col_off
+                # Height is 90% of available
+                y2 = self.height - self.bottom - ((self.bins.get(bin, 0) - scale/100 * diffs.get(bin, 0))/max_count * (self.height - self.top - self.bottom) * self.use_height)
+                self.bars[bin].set_points(Point(x1, y1), Point(x1, y2), Point(x2, y2), Point(x2, y1))
+                self.win.step()
+                Myro.wait(.1)
+                count += 1
 
-    max_count = max(bins.values())
+    def draw(self):
+        bins = {}
+        for datum in self.data:
+            bins[datum] = bins.get(datum, 0) + 1
+        max_count = max(bins.values())
+        columns = len(bins)
+        # Columns are 95% of span
+        col_width = (self.width - self.right - self.left) /columns
+        # Offset from left:
+        col_off = (self.width - self.right - self.left) * (1.0 - self.use_width) / (columns)
 
-    use_height = .90
-    use_width = .98
+        title = Text((self.width/2,self.top/2), self.title)
+        title.color = Color("black")
+        title.draw(self.win)
 
-    columns = len(bins)
-    # Columns are 95% of span
-    col_width = (width - right - left) * use_width /columns
-    # Offset from left:
-    col_off = (width - right - left) * (1.0 - use_width) / (columns + 1)
+        if self.y_label:
+            y_label = Text((self.left/2, self.height/2), self.y_label)
+            y_label.fontSize = 12
+            y_label.rotate(90)
+            y_label.color = Color("black")
+            y_label.draw(self.win)
 
-    count = 0
-    for bin in sorted(bins.keys()):
-        # Bottom left:
-        x1 = left + count * col_width + col_off * (columns + 1)
-        y1 = height - bottom
-        # Top right:
-        x2 = left + count * col_width + col_off + col_width - col_off
-        # Height is 90% of available
-        y2 = height - bottom - (bins[bin]/max_count * (height - top - bottom) * use_height)
-        bar = Rectangle((x1, y1), (x2, y2))
-        bar.fill = Color(Myro.pickOne(Myro.getColorNames()))
-        bar.draw(win)
-        count += 1
+        if self.x_label:
+            x_label = Text((self.left + (self.width - self.left - self.right)/2,
+                           (self.height - self.bottom) + self.bottom/2), self.x_label)
+            x_label.fontSize = 12
+            x_label.color = Color("black")
+            x_label.draw(self.win)
 
-    count = 0
-    for bin in sorted(bins.keys()):
-        # Bottom left:
-        x1 = left + count * col_width + col_off * (columns + 1) + col_width * .45
-        y1 = height - bottom * .75
-        text = Text((x1, y1), str(bin))
-        text.fontSize = 12
-        text.rotate(45)
-        text.color = Color("black")
-        text.draw(win)
-        count += 1
+        count = 0
+        self.bins = bins
+        self.bars = {}
+        for bin in sorted(bins.keys()):
+            # Bottom left:
+            x1 = self.left + (count * col_width) + col_off/2
+            y1 = self.height - self.bottom
+            # Top right:
+            x2 = self.left + (count * col_width) + col_off/2 + col_width - col_off
+            # Height is 90% of available
+            y2 = self.height - self.bottom - (bins[bin]/max_count * (self.height - self.top - self.bottom) * self.use_height)
+            bar = Rectangle((x1, y1), (x2, y2))
+            self.bars[bin] = bar
+            bar.fill = Color(Myro.pickOne(Myro.getColorNames()))
+            bar.draw(self.win)
+            text = Text((x1 + 10, y1 - 10), str(bins[bin]))
+            text.fontSize = 8
+            text.draw(self.win)
+            count += 1
+
+        count = 0
+        for bin in sorted(bins.keys()):
+            # Bottom left:
+            x1 = self.left + (count * col_width) + col_off/2 + col_width * .45
+            y1 = self.height - self.bottom * .75
+            text = Text((x1, y1), str(bin))
+            text.fontSize = 12
+            text.rotate(self.rotate)
+            text.color = Color("black")
+            text.draw(self.win)
+            count += 1
+
+        for percent in range(0, 110, 10):
+            x = self.left
+            y = self.height - self.bottom - (percent/100 * (self.height - self.top - self.bottom) * self.use_height)
+            tick = Line((x - 10, y), (x, y))
+            tick.draw(self.win)
+            text = Text((x - 25, y), str(percent/100 * max_count))
+            text.fontSize = 8
+            text.color = Color("black")
+            text.draw(self.win)
 
 
-barchart("test 1", 800, 600, ["1", "2", "3", "2", "3", "4", "1", "1", "2", "3", "4",
-                    "2", "2", "2", "1", "2", "2", "1"])
+bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
+#BarChart("test 2", 800, 600, ["1", "2"])
+#BarChart("test 3", 640, 480, range(10))
 
-barchart("test 2", 800, 600, ["1", "2"])
-
-barchart("test 3", 640, 480, range(10))
-barchart("test 4", 640, 480, [y for y in [x for x in range(20)]])

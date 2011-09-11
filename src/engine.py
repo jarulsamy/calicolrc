@@ -192,7 +192,7 @@ class DLREngine(Engine):
         try:
             source.Execute(self.manager.scope)
         except Exception, e:
-            if "Thread was being aborted" in e.message:
+            if "Thread was being aborted" in str(e.message):
                 self.manager.calico.shell.message("[Script stopped----------]")
             else:
                 traceback.print_exc()
@@ -225,7 +225,7 @@ class DLREngine(Engine):
         try:
             source.Execute(self.manager.scope)
         except Exception, e:
-            if "Thread was being aborted" in e.message:
+            if "Thread was being aborted" in str(e.message):
                 self.manager.calico.shell.message("[Script stopped----------]")
             else:
                 traceback.print_exc()
