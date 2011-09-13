@@ -1,5 +1,5 @@
 import Kinect
-client = Kinect.Client("127.0.0.1", 8001)
+client = Kinect.Client("165.106.10.93", 8001)
 
 depthWidth, depthHeight = 320, 240
 rgbWidth, rgbHeight = 640, 480

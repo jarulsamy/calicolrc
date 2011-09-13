@@ -630,6 +630,9 @@ public static class Myro {
 
   public static void initialize(string port, int baud=38400) {
         bool need_port = true;
+        if (port.StartsWith("COM") || port.StartsWith("com")) {
+            port = @"\\.\" + port;             // "comment
+        }
         if (Myro.robot is Scribbler) {
           if (((Scribbler)(Myro.robot)).serial is SerialPort) {
                 SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
