@@ -450,30 +450,50 @@ class CalicoProject(object):
         pangofont = Pango.FontDescription.FromString("%s %d" % (font, fontsize))
         return pangofont
 
+    def select_font(self, obj, event):
+        def invoke(s, e):
+            d = Gtk.FontSelectionDialog("Select Calico Font")
+            d.SetFontName(str(self.get_fontname()))
+            response = d.Run()
+            if response == int(Gtk.ResponseType.Ok):
+                fontName, fontSize = d.FontName.rsplit(" ", 1)
+                self.config.set("calico.font", fontName)
+                self.config.set("calico.fontsize", int(fontSize))
+                if self.shell:
+                    self.shell.set_font()
+                if self.editor:
+                    self.editor.set_font()
+                if self.chat:
+                    self.chat.set_font()
+            d.Destroy()
+        Gtk.Application.Invoke(invoke)
+
     def increase_fontsize(self, obj, event):
-        self.config.set("calico.fontsize",
-                        min(self.config.get("calico.fontsize") + 1, 36))
         def invoke(sender, args):
             pangofont = self.get_fontname()
+            fontName, fontSize = pangofont(" ", 1)
+            self.config.set("calico.font", fontName)
+            self.config.set("calico.fontsize", min(int(fontSize) + 1, 36))
             if self.shell:
-                self.shell.increase_font_size(pangofont)
+                self.shell.set_font()
             if self.editor:
-                self.editor.increase_font_size(pangofont)
+                self.editor.set_font()
             if self.chat:
-                self.chat.increase_font_size(pangofont)
+                self.chat.set_font()
         Gtk.Application.Invoke(invoke)
 
     def decrease_fontsize(self, obj, event):
-        self.config.set("calico.fontsize",
-                        max(self.config.get("calico.fontsize") - 1, 5))
         def invoke(sender, args):
             pangofont = self.get_fontname()
+            fontName, fontSize = pangofont(" ", 1)
+            self.config.set("calico.font", fontName)
+            self.config.set("calico.fontsize", max(int(fontSize) - 1, 5))
             if self.shell:
-                self.shell.decrease_font_size(pangofont)
+                self.shell.set_font()
             if self.editor:
-                self.editor.decrease_font_size(pangofont)
+                self.editor.set_font()
             if self.chat:
-                self.chat.decrease_font_size(pangofont)
+                self.chat.set_font()
         Gtk.Application.Invoke(invoke)
 
     def about(self, obj, event):

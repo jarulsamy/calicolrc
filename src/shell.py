@@ -143,6 +143,7 @@ class ShellWindow(Window):
                     (_("Chat"), None, "F8", self.calico.setup_chat),
                     ]),
                 (_("Options"), [
+                    (_("Select font..."), None, None, self.calico.select_font),
                     (_("Make font larger"), None, "<control>equal", self.calico.increase_fontsize),
                     (_("Make font smaller"), None, "<control>minus", self.calico.decrease_fontsize),
                     ]),
@@ -263,14 +264,6 @@ class ShellWindow(Window):
             self.textview.Options.FontName = str(fontname) + " " + str(fontsize)
             self.history_textview.ModifyFont(font)
         Gtk.Application.Invoke(invoke)
-
-    def decrease_font_size(self, font):
-        self.history_textview.ModifyFont(font)
-        self.textview.Options.ZoomOut()
-
-    def increase_font_size(self, font):
-        self.history_textview.ModifyFont(font)
-        self.textview.Options.ZoomIn()
 
     def on_copy(self, obj, event):
         focused = self.window.Focus

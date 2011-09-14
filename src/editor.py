@@ -88,6 +88,7 @@ class EditorWindow(Window):
                     (_("Chat"), None, "F8", self.calico.setup_chat),
                     ]),
                 (_("Options"), [
+                    (_("Select font..."), None, None, self.calico.select_font),
                     (_("Make font larger"), None, "<control>equal", self.calico.increase_fontsize),
                     (_("Make font smaller"), None, "<control>minus", self.calico.decrease_fontsize),
                     ]),
@@ -434,14 +435,6 @@ class EditorWindow(Window):
     def set_font(self, font = None):
         for doc in self.get_docs():
             doc.set_font(font)
-
-    def increase_font_size(self, font):
-        for doc in self.get_docs():
-            doc.increase_font_size(font)
-
-    def decrease_font_size(self, font):
-        for doc in self.get_docs():
-            doc.decrease_font_size(font)
 
     def blast_dialog(self, obj, event):
         def invoke(sender, args):
