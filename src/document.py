@@ -273,6 +273,8 @@ class TextEditorDocument(Document):
         self.texteditor.Options.TabsToSpaces = True
         self.texteditor.Options.HighlightCaretLine = True
         self.texteditor.Options.HighlightMatchingBracket = True
+        self.texteditor.Options.OverrideDocumentEolMarker = True
+        self.texteditor.Options.DefaultEolMarker = "\n"
         #self.texteditor.Options.ShowRuler
         #self.texteditor.Options.ShowSpaces
         #self.texteditor.Options.ShowTabs

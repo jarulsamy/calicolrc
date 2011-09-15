@@ -142,3 +142,6 @@ bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in ra
 #BarChart("test 2", 800, 600, ["1", "2"])
 #BarChart("test 3", 640, 480, range(10))
 
+def animate():
+    while True:
+        bc.animate([Myro.pickOne(*range(4)) for x in range(100)])
