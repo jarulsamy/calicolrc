@@ -597,6 +597,10 @@ class ShellWindow(Window):
         error = error.replace("]", "") # invalid wiki title
         return "http://wiki.roboteducation.org/Error:%s:%s" % (language.title(), error.strip())
 
+    def get_error_text(self, text):
+        retval = "\n".join(reversed(text.split("\n")))
+        return retval
+
     def stop_running(self, sender, args):
         import Myro
         if Myro.robot:
@@ -608,6 +612,17 @@ class ShellWindow(Window):
             self.calico.editor.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
         if self.calico.last_error != "":
             url = self.make_error_url(self.language, self.calico.last_error)
+            error_button_text = None
+            text = self.get_error_text(self.calico.last_error)
+            match = re.search(_('File \"(.*)\", line (\d*)'), text)
+            if match: # 'File "<string>", line 167'
+                filename, lineno = match.groups()
+                lineno = int(lineno)
+                basename = os.path.basename(filename)
+                filename = os.path.abspath(filename)
+                if basename != "<string>":
+                    error_button_text = _("Go to error in %s") % basename
+                    error_button_func = lambda w, e: self.goto_file(filename, lineno)
             def invoke(sender, args):
                 MUTEX.WaitOne()
                 button = Gtk.Button(_("Get help on error"))
@@ -615,6 +630,12 @@ class ShellWindow(Window):
                 button.Show()
                 anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
                 self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
+                if error_button_text:
+                    button = Gtk.Button(error_button_text)
+                    button.Clicked += error_button_func
+                    button.Show()
+                    anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
+                    self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
                 MUTEX.ReleaseMutex()
             Gtk.Application.Invoke(invoke)
             self.message("")
