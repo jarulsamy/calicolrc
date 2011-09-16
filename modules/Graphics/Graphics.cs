@@ -1616,20 +1616,16 @@ public static class Graphics {
         
     protected override bool OnExposeEvent (Gdk.EventExpose args) {
 	  using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
-		// clip to the visible part
-		g.Rectangle(args.Area.X, args.Area.Y,
-			args.Area.Width, args.Area.Height);
-		g.Clip();
 		lock(shapes) {
 		  foreach (Shape shape in shapes) {
 			shape.render(g);
-		    shape.updateGlobalPosition(g);
+			shape.updateGlobalPosition(g);
 		  }
 		}
 	  }
 	  return base.OnExposeEvent(args);
     }
-  } 
+  }
   
   public class Shape {
     public Point center;
