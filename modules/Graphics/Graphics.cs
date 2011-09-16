@@ -3456,47 +3456,23 @@ public static class Graphics {
 
   } // -- end of Picture class
 
-  public class Button : Shape {
-    Text label;
-    double padding = 5;
-    RoundedRectangle rectangle;
-    string text;
-    Point point;
-    public Button(Point point, string text) : base(true) {
-      this.point = point;
-      this.text = text;
-      set_points(point);
-    }
-    
-    public new void draw(WindowClass win) { // Button
-      window = win;
-      label = new Text(point, text);
-      label.fontSize = 12;
-      label.fill = new Color("black");
-      // Draw label first, in order that width will be defined:
-      label.draw(win);
-      rectangle = new RoundedRectangle(new Point(point.x - width/2 - padding, 
-						 point.y - height/2 - padding),
-				       new Point(point.x + width/2 + padding, 
-						 point.y + height/2 + padding),
-				       padding);
-      rectangle.fill = new Color("white");
-      rectangle.outline = new Color("gray");
-      rectangle.draw(win);
-      win.stackOnTop(label);
+  public class Button : Gtk.Button {
+	
+	public Button(string label) : base(label) {
+	}
+	
+    public void draw(WindowClass win, IList list) { // button
+	  Show();
+	  win.getCanvas().Put(this, (int)list[0], (int)list[1]);
+	  win.QueueDraw();
     }
 
-    public override bool hit(double px, double py) {
-      return (((x - width/2 - padding) <= px && px <= (x + width/2 + padding)) &&
-	      ((y - height/2 - padding) <= py && py <= (y + height/2 + padding)));
-    }
+	public void connect(string signal, object callback) {
+	  Gtk.Application.Invoke( delegate {
+			Console.WriteLine(callback);
+		  });
+	}
 
-    public double width {
-      get { return label.width; }
-    }
-    public double height {
-      get { return label.height;}
-    }
   }
 
   public class Rectangle : Shape {
