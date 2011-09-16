@@ -1257,13 +1257,34 @@ public static class Myro {
     return ask(question, "Information Request");
   }
 
+  public class MessageDialog : Gtk.MessageDialog {
+
+	public MessageDialog(Gtk.Window window,
+		Gtk.DialogFlags dialogFlags, 
+		Gtk.MessageType messageType,
+		Gtk.ButtonsType buttonsType,
+		string title) : base(window, dialogFlags, messageType, buttonsType, 
+			title) {
+	  KeyPressEvent += MyKeyPressEventHandler;
+	}
+	
+	[GLib.ConnectBefore]
+	public void MyKeyPressEventHandler (object obj, 
+		Gtk.KeyPressEventArgs args) {
+	  if (args.Event.Key == Gdk.Key.Return) {
+		Respond(Gtk.ResponseType.Ok);
+		args.RetVal = true;
+	  }
+	}
+  }
+
   public static object ask(object question, string title) {
     ManualResetEvent ev = new ManualResetEvent(false);
     object retval = null;
     Gtk.Entry myentry = null;
     PythonDictionary responses = new PythonDictionary();
     Gtk.Application.Invoke(delegate {
-        Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+        Gtk.MessageDialog fc = new MessageDialog(null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.OkCancel,
                                title);
