@@ -976,7 +976,7 @@ public static class Graphics {
   }
   
   public class WindowClass : Gtk.Window {
-    internal _Canvas _canvas;
+    internal Canvas _canvas;
     internal bool _dirty = false;
     private bool timer_running = false;
     private DateTime last_update = new DateTime(2000,1,1);
@@ -997,7 +997,7 @@ public static class Graphics {
     public WindowClass(string title="Calico Graphics",
                   int width=300, 
                   int height=300) : base(title) {
-      _canvas = new _Canvas("auto");
+      _canvas = new Canvas("auto");
       AllowGrow = true;
       AllowShrink = true;
       SetDefaultSize(width, height);
@@ -1339,11 +1339,11 @@ public static class Graphics {
       }
     }
 
-    public _Canvas getCanvas() {
+    public Canvas getCanvas() {
       return _canvas;
     }
     
-    public _Canvas canvas {
+    public Canvas canvas {
       get {
         return _canvas;
       }
@@ -1585,7 +1585,7 @@ public static class Graphics {
 
   }
   
-  public class _Canvas : Gtk.Layout {
+  public class Canvas : Gtk.Layout {
     
     // Shape.draw() will add them here:
     public List<Shape> shapes = new List<Shape>();
@@ -1610,7 +1610,7 @@ public static class Graphics {
       world = new FarseerPhysics.Dynamics.World(new Vector2(0.0f, 9.8f));
     }
 
-    public _Canvas(string mode) : base(null, null) {
+    public Canvas(string mode) : base(null, null) {
           this.mode = mode;
     }
         
@@ -2264,7 +2264,7 @@ public static class Graphics {
     }
     
     public void draw(WindowClass win) { // Shape
-      // Add this shape to the _Canvas list.
+      // Add this shape to the Canvas list.
       lock(win.getCanvas().shapes) {
         win.getCanvas().shapes.Add(this);
       }
