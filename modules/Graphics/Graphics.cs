@@ -1040,16 +1040,11 @@ public static class Graphics {
     }
 
     public void setBackground(Color color) {
-      Gtk.Application.Invoke(delegate { 
-          Gdk.Color bg = new Gdk.Color((byte)color.red, 
-                                       (byte)color.green, 
-                                       (byte)color.blue);
-          Gdk.Colormap colormap = Gdk.Colormap.System;
-          colormap.AllocColor(ref bg, true, true);
-          _canvas.GdkWindow.Background = bg;
-          QueueDraw();
-        });
-    }
+	  Gdk.Color bg = new Gdk.Color((byte)color.red, 
+		  (byte)color.green, 
+		  (byte)color.blue);
+	  _canvas.ModifyBg(Gtk.StateType.Normal, bg);
+	}
     
     public Gdk.Drawable getDrawable() {
       return GdkWindow;
@@ -1590,7 +1585,7 @@ public static class Graphics {
 
   }
   
-  public class _Canvas : Gtk.DrawingArea {
+  public class _Canvas : Gtk.Layout {
     
     // Shape.draw() will add them here:
     public List<Shape> shapes = new List<Shape>();
@@ -1615,24 +1610,24 @@ public static class Graphics {
       world = new FarseerPhysics.Dynamics.World(new Vector2(0.0f, 9.8f));
     }
 
-    public _Canvas(string mode) : base() {
+    public _Canvas(string mode) : base(null, null) {
           this.mode = mode;
     }
         
     protected override bool OnExposeEvent (Gdk.EventExpose args) {
-          using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
-            // clip to the visible part
-                g.Rectangle(args.Area.X, args.Area.Y,
-                            args.Area.Width, args.Area.Height);
-                g.Clip();
-                lock(shapes) {
-                  foreach (Shape shape in shapes) {
-                    shape.render(g);
+	  using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
+		// clip to the visible part
+		g.Rectangle(args.Area.X, args.Area.Y,
+			args.Area.Width, args.Area.Height);
+		g.Clip();
+		lock(shapes) {
+		  foreach (Shape shape in shapes) {
+			shape.render(g);
 		    shape.updateGlobalPosition(g);
-                  }
-                }
-          }
-          return true;
+		  }
+		}
+	  }
+	  return base.OnExposeEvent(args);
     }
   } 
   
