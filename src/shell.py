@@ -709,12 +709,11 @@ class TabCompletion:
         self.partial = ""
         self.items = []
         if self.variable:
-            parts = self.variable.split(".")
+            parts = self.calico.engine[self.calico.shell.language].getVariableParts(self.variable)
             if len(parts) == 1: # Easy, just get the vars that match:
                 root = parts[0]
                 self.partial = root
-                self.items = [x for x in self.calico.engine[self.calico.shell.language].getVariables()
-                              if x.startswith(root)]
+                self.items = self.calico.engine[self.calico.shell.language].getCompletions(root)
                 # and not hasattr(x, "DeclaringType")]
             else:
                 root = parts[0]

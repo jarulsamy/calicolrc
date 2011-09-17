@@ -118,11 +118,11 @@ class Engine(object):
     def stop(self):
         pass
 
-    def getVariables(self):
-        """
-        Get top-level variables.
-        """
+    def getCompletions(self, starts_with):
         return []
+
+    def getVariableParts(self, variable):
+        return variable.split(".")
 
     def tryGetVariable(self, variable):
         return (False, None)
@@ -230,11 +230,8 @@ class DLREngine(Engine):
             else:
                 traceback.print_exc()
 
-    def getVariables(self):
-        """
-        Get top-level variables.
-        """
-        return self.manager.scope.GetVariableNames()
+    def getCompletions(self, starts_with):
+        return [x for x in self.manager.scope.GetVariableNames() if x.startswith(starts_with)]
 
     def tryGetVariable(self, variable):
         return self.manager.scope.TryGetVariable(variable)
