@@ -642,7 +642,7 @@ public static class Graphics {
     }
 
     public void append(int datum) {
-      append((double) datum);
+      append(System.Convert.ToDouble(datum));
     }
     public void append(double datum) {
       line.undraw();
@@ -760,7 +760,7 @@ public static class Graphics {
     }
 
     public void append(int datum) {
-      append((double) datum);
+      append(System.Convert.ToDouble(datum));
     }
     public void append(double datum) {
       data.Add(datum);
@@ -1433,54 +1433,13 @@ public static class Graphics {
   public class Point : IList {
     public double x;
     public double y;
-    public Point(object x, object y) {
-      if (x is int) 
-        this.x = (int)x;
-      else if (x is float) 
-        this.x = (float)x;
-      else if (x is double)
-        this.x = (double)x;
-      else
-        throw new Exception("Point: cannot convert x to a number");
-      if (y is int) 
-        this.y = (int)y;
-      else if (y is float) 
-        this.y = (float)y;
-      else if (y is double)
-        this.y = (double)y;
-      else
-        throw new Exception("Point: cannot convert y to a number");
-    }
-    public Point(int x, int y) {
-      this.x = (double)x;
-      this.y = (double)y;
-    }
-    public Point(float x, float y) {
-      this.x = (double)x;
-      this.y = (double)y;
-    }
-    public Point(double x, double y) {
-      this.x = x;
-      this.y = y;
+
+    public Point(IList iterable): this(iterable[0], iterable[1]) {
     }
     
-    public Point(IList iterable) {
-      if (iterable[0] is double)
-	this.x = (double)iterable[0];
-      else if (iterable[0] is float)
-	this.x = (double)(float)iterable[0];
-      else if (iterable[0] is int)
-	this.x = (double)(int)iterable[0];
-      else
-	throw new Exception("cannot convert x to double");
-      if (iterable[1] is double)
-	this.y = (double)iterable[1];
-      else if (iterable[1] is float)
-	this.y = (double)(float)iterable[1];
-      else if (iterable[1] is int)
-	this.y = (double)(int)iterable[1];
-      else
-	throw new Exception("cannot convert y to double");
+    public Point(object x, object y) {
+      this.x = System.Convert.ToDouble(x);
+      this.y = System.Convert.ToDouble(y);
     }
     
     public Point(Dot dot) {
@@ -1561,9 +1520,9 @@ public static class Graphics {
       }
       set { // value is the item
 	if (index == 0) {
-	  x = (double)value;
+	  x = System.Convert.ToDouble(value);
 	} else if (index == 1) {
-	  y = (double)value;
+	  y = System.Convert.ToDouble(value);
 	}
       }
     }
@@ -1843,8 +1802,8 @@ public static class Graphics {
         g.Translate(temp.x, temp.y);
         g.Rotate(_rotation);
         g.Scale(_scaleFactor, _scaleFactor);
-	px = (double)iterable[0];
-	py = (double)iterable[1];
+	px = System.Convert.ToDouble(iterable[0]);
+	py = System.Convert.ToDouble(iterable[1]);
 	g.UserToDevice(ref px, ref py);
       }
       return new Point(px, py);
@@ -2616,14 +2575,16 @@ public static class Graphics {
   }
   
   public class Arrow : Shape {
+    public Arrow(IList iterable) :  this(iterable, 0) {
+    }
     public Arrow(IList iterable, double degrees) :  base(true) {
       set_points(new Point(  0,  0),
 		 new Point( -5, -5), 
 		 new Point(  5,  0),
 		 new Point( -5,  5) 
 		 );
-      center.x = (double)iterable[0];
-      center.y = (double)iterable[1];
+      center.x = System.Convert.ToDouble(iterable[0]);
+      center.y = System.Convert.ToDouble(iterable[1]);
       rotate(degrees);
     }
   }

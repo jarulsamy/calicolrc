@@ -400,7 +400,8 @@ public static class Myro {
         return gamepads.getAxisStates(index);
       } else if (what == "robot") {
         List xy = gamepads.getAxisStates(index);
-        return Graphics.PyList(-((double)xy[1]), -((double)xy[0]));
+        return Graphics.PyList(-System.Convert.ToDouble(xy[1]), 
+			       -System.Convert.ToDouble(xy[0]));
       } else if (what == "ball") {
         return gamepads.getBallStates(index);
       } else if (what == "hat") {
@@ -1536,13 +1537,13 @@ public static class Myro {
     public void playSong(List song, double speed) {
       foreach(IList tup in song) {
     if (tup.Count == 2) {
-      double f = (double)tup[0]; 
-      double d = (double)tup[1];
+      double f = System.Convert.ToDouble(tup[0]); 
+      double d = System.Convert.ToDouble(tup[1]);
       beep(d, f);
     } else if (tup.Count == 3) {
-      double f1 = (double)tup[0]; 
-      double f2 = (double)tup[1]; 
-      double d = (double)tup[2];
+      double f1 = System.Convert.ToDouble(tup[0]); 
+      double f2 = System.Convert.ToDouble(tup[1]); 
+      double d = System.Convert.ToDouble(tup[2]);
       beep(d * speed, f1, f2);
     }
       }
@@ -2385,7 +2386,7 @@ public static class Myro {
     } else if ((string)position == "front") {
       setLEDFront(value);
     } else if ((string)position == "back") {
-      setLEDBack((double)value);
+      setLEDBack(System.Convert.ToDouble(value));
     } else if ((string)position == "all") {
       if (isTrue(value)) 
         set(Scribbler.SET_LED_ALL_ON);
@@ -4017,7 +4018,7 @@ public static class Myro {
   }
 
   public static string getNoteFromFrequency(int frequency) {
-    return getNoteFromFrequency((double)frequency);
+    return getNoteFromFrequency(System.Convert.ToDouble(frequency));
   }
 
   public static string getNoteFromFrequency(double frequency) {
@@ -4047,13 +4048,13 @@ public static class Myro {
     System.IO.StreamWriter fp = new System.IO.StreamWriter(filename, append); 
     foreach (IList tup in song) {
       if (tup.Count == 2) {
-    double f = (double)tup[0]; 
-    double d = (double)tup[1];
+	double f = System.Convert.ToDouble(tup[0]); 
+	double d = System.Convert.ToDouble(tup[1]);
     fp.WriteLine("{0} {1}", getNoteFromFrequency(f), d);
       } else if (tup.Count == 3) {
-    double f1 = (double)tup[0]; 
-    double f2 = (double)tup[1]; 
-    double d = (double)tup[2];
+	double f1 = System.Convert.ToDouble(tup[0]); 
+	double f2 = System.Convert.ToDouble(tup[1]); 
+	double d = System.Convert.ToDouble(tup[2]);
     fp.WriteLine("{0} {1} {2}", getNoteFromFrequency(f1),
              getNoteFromFrequency(f2), d);
     fp.Close();
@@ -4083,13 +4084,13 @@ public static class Myro {
     string text = "";
     foreach(IList tup in song) {
       if (tup.Count == 2) {
-    double f = (double)tup[0]; 
-    double d = (double)tup[1];
+	double f = System.Convert.ToDouble(tup[0]); 
+	double d = System.Convert.ToDouble(tup[1]);
     text += String.Format("{0} {1}; ", getNoteFromFrequency(f), d);
       } else if (tup.Count == 3) {
-    double f1 = (double)tup[0]; 
-    double f2 = (double)tup[1]; 
-    double d = (double)tup[2];
+	double f1 = System.Convert.ToDouble(tup[0]); 
+	double f2 = System.Convert.ToDouble(tup[1]); 
+	double d = System.Convert.ToDouble(tup[2]);
     text += String.Format("{0} {1} {2}; ", 
                   getNoteFromFrequency(f1),
                   getNoteFromFrequency(f2), d);
