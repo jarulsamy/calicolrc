@@ -3379,6 +3379,19 @@ public static class Graphics {
 	}
     }
 
+    public double y
+    {
+      get
+	{
+	  return _y;
+	}
+      set
+	{
+	  moveTo(_x, value);
+	  window.QueueDraw();
+	}
+    }
+
     public void moveTo(object x, object y) {
       _x = System.Convert.ToDouble(x);
       _y = System.Convert.ToDouble(y);
@@ -3421,6 +3434,8 @@ public static class Graphics {
       ValuePos = Gtk.PositionType.Top;
       DrawValue = true;    
       this.width = System.Convert.ToDouble(width);
+      _x = System.Convert.ToDouble(iterable[0]);
+      _y = System.Convert.ToDouble(iterable[1]);
     }
     
     public double x
@@ -3432,6 +3447,19 @@ public static class Graphics {
       set
 	{
 	  moveTo(value, _y);
+	  window.QueueDraw();
+	}
+    }
+
+    public double y
+    {
+      get
+	{
+	  return _y;
+	}
+      set
+	{
+	  moveTo(_x, value);
 	  window.QueueDraw();
 	}
     }
@@ -3455,7 +3483,7 @@ public static class Graphics {
       // FIXME: actually move it
     }
 
-    public void draw(WindowClass win) { // button
+    public void draw(WindowClass win) { // hslider
       window = win;
       Gtk.Application.Invoke( delegate {
 	  Show();
@@ -3467,7 +3495,7 @@ public static class Graphics {
     public void connect(string signal, Func<object,Event,object> function) {
       if (signal.Equals("change-value")) {
 	ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
-             Event evt = new Event(signal, Value, Graphics.currentTime());
+             Event evt = new Event(signal, (object)Value, Graphics.currentTime());
         	    try {
         	      Gtk.Application.Invoke( delegate {
         		  function(obj, evt);
