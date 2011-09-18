@@ -2767,7 +2767,7 @@ public static class Graphics {
 
     public Picture(Picture original) : this(true) {
       // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, original.getWidth(), original.getHeight());
+      _pixbuf = new Gdk.Pixbuf(original._pixbuf.Colorspace, true, 8, original.getWidth(), original.getHeight());
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
       }
@@ -2809,6 +2809,7 @@ public static class Graphics {
 
     public Picture(System.Drawing.Bitmap bitmap, int width, int height) : this(true) {
       // Colorspace, has_alpha, bits_per_sample, width, height:
+      // FIXME: convert bitmap.palette to colormap
       _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
