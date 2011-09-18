@@ -522,6 +522,7 @@ public static class Graphics {
   public class Event {
     public double x;
     public double y;
+    public object value;
     public double time;
     public string type;
     public string key;
@@ -569,6 +570,12 @@ public static class Graphics {
 
     public Event(string args, double time) {
       type = args;
+      this.time = time;
+    }
+
+    public Event(string args, object value, double time) {
+      type = args;
+      this.value = value;
       this.time = time;
     }
 
@@ -1650,6 +1657,8 @@ public static class Graphics {
             }
             return false;
 	  });
+      } else {
+	throw new Exception("invalid signal for this object");
       }
     }
 
@@ -3349,18 +3358,42 @@ public static class Graphics {
   }
 
   public class Button : Gtk.Button {
+    public double _x, _y;
+    public WindowClass window;
     
-    public Button(string label) : base(label) {
+    public Button(IList iterable, string label) : base(label) {
+      _x = System.Convert.ToDouble(iterable[0]);
+      _y = System.Convert.ToDouble(iterable[1]);
     }
     
-    public void draw(WindowClass win, IList list) { // button
+    public double x
+    {
+      get
+	{
+	  return _x;
+	}
+      set
+	{
+	  moveTo(value, _y);
+	  window.QueueDraw();
+	}
+    }
+
+    public void moveTo(object x, object y) {
+      _x = System.Convert.ToDouble(x);
+      _y = System.Convert.ToDouble(y);
+      // FIXME: actually move it
+    }
+
+    public void draw(WindowClass win) { // button
+      window = win;
       Gtk.Application.Invoke( delegate {
 	  Show();
-	  win.getCanvas().Put(this, (int)list[0], (int)list[1]);
-	  win.QueueDraw();
+	  window.getCanvas().Put(this, (int)_x, (int)_y);
+	  window.QueueDraw();
 	});
     }
-    
+
     public void connect(string signal, Func<object,Event,object> function) {
       Clicked += delegate(object obj, System.EventArgs args) {
             Event evt = new Event("click", Graphics.currentTime());
@@ -3373,6 +3406,80 @@ public static class Graphics {
 	      Console.Error.WriteLine(e.Message);
 	    }        
        };
+    }
+  }
+
+  public class HSlider : Gtk.HScale {
+    public WindowClass window;
+    public double _width;
+    public double _x, _y;
+    
+    public HSlider(IList iterable, object width) : 
+      base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0)) {
+      UpdatePolicy = Gtk.UpdateType.Continuous;
+      Digits = 0;
+      ValuePos = Gtk.PositionType.Top;
+      DrawValue = true;    
+      this.width = System.Convert.ToDouble(width);
+    }
+    
+    public double x
+    {
+      get
+	{
+	  return _x;
+	}
+      set
+	{
+	  moveTo(value, _y);
+	  window.QueueDraw();
+	}
+    }
+
+    public double width
+    {
+      get
+	{
+	  return _width;
+	}
+      set
+	{
+	  _width = value;
+	  SetSizeRequest((int)_width, -1);
+	}
+    }
+
+    public void moveTo(object x, object y) {
+      _x = System.Convert.ToDouble(x);
+      _y = System.Convert.ToDouble(y);
+      // FIXME: actually move it
+    }
+
+    public void draw(WindowClass win) { // button
+      window = win;
+      Gtk.Application.Invoke( delegate {
+	  Show();
+	  window.getCanvas().Put(this, (int)_x, (int)_y);
+	  window.QueueDraw();
+	});
+    }
+
+    public void connect(string signal, Func<object,Event,object> function) {
+      if (signal.Equals("change-value")) {
+	ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
+             Event evt = new Event(signal, Value, Graphics.currentTime());
+        	    try {
+        	      Gtk.Application.Invoke( delegate {
+        		  function(obj, evt);
+        		});
+        	    } catch (Exception e) {
+        	      Console.Error.WriteLine("Error in connected function");
+        	      Console.Error.WriteLine(e.Message);
+        	    }        
+        };
+      } else {
+	throw new Exception("invalid signal for this object");
+      }
     }
   }
   
