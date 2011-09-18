@@ -359,6 +359,9 @@ public static class Graphics {
     savePicture(list, filename, delay, false);
   }
   public static void savePicture(List list, string filename, short delay, bool repeat) {
+    if (filename.Substring(filename.Length - 3, 3) != "gif"){
+        throw new Exception("saving a list of pictures creates an animated gif; use the gif extension");
+    }
     List<GifLib.GifFrame> frameList = new List<GifLib.GifFrame>();
     foreach (Graphics.Picture picture in list) {
       Gdk.Pixbuf pixbuf = picture.getPixbuf();
@@ -3081,7 +3084,7 @@ public static class Graphics {
        format = "jpeg";
       } else if (filename.Substring(filename.Length - 3, 3) == "gif") {
        //format = "png";
-       // FIXME: use LibGif 
+       // FIXME: use LibGif
        throw new Exception("not implemented yet; use jpg or png");
       } else {
        //format = "png";
