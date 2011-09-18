@@ -1,7 +1,7 @@
 from Graphics import *
 win = Window()
-button = Button(Point(150, 150), "Press me!")
-button.draw(win)
+button = Button("Press me!")
+button.draw(win, (120, 140))
 
 def printit(o, e):
     print(e)

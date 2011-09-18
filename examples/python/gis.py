@@ -180,3 +180,5 @@ def demo():
         drawStates(win)
         drawCapitals(win)
         displayControls(win)
+
+demo()

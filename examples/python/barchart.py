@@ -22,8 +22,8 @@ class BarChart:
                                (self.width - self.right, self.height - self.bottom))
         self.background.fill = Color("white")
         self.background.draw(self.win)
-        self.button = Button(Point(self.width - 50, self.height - 20), "Rescale")
-        self.button.draw(self.win)
+        self.button = Button("Rescale")
+        self.button.draw(self.win, (self.width - 70, self.height - 50))
         self.button.connect("click", draw)
 
         title = Text((self.width/2,self.top/2), self.title)
@@ -138,10 +138,11 @@ class BarChart:
             text.draw(self.win)
 
 
-bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
-#BarChart("test 2", 800, 600, ["1", "2"])
-#BarChart("test 3", 640, 480, range(10))
-
-def animate():
-    while True:
-        bc.animate([Myro.pickOne(*range(4)) for x in range(100)])
+if __name__ == "<module>":
+    #BarChart("test 2", 800, 600, ["1", "2"])
+    #BarChart("test 3", 640, 480, range(10))
+    bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
+    def animate():
+        while True:
+            bc.animate([Myro.pickOne(*range(4)) for x in range(100)])
+    animate()

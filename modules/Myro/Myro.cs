@@ -65,25 +65,15 @@ public static class Myro {
 
   public readonly static Gamepads gamepads = new Gamepads();
 
-  static void invoke_function(object function, object args) {
-    Gtk.Application.Invoke( delegate {
-        if (function is PythonFunction) {
-          try {
-            IronPython.Runtime.Operations.PythonCalls.Call(function, args);
-          } catch (Exception e) {
-            Console.Error.WriteLine("Error in function");
-            Console.Error.WriteLine(e.Message);
-          }        
-        } else {
-          try {
-            Func<object,object> f = (Func<object,object>)function;
-            f(args);
-          } catch (Exception e) {
-            Console.Error.WriteLine("Error in function");
-            Console.Error.WriteLine(e.Message);
-          }        
-        }
-      });
+  static void invoke_function(Func<object,object> function, object args) {
+    try {
+      Gtk.Application.Invoke( delegate {
+	  function(args);
+	});
+    } catch (Exception e) {
+      Console.Error.WriteLine("Error in function");
+      Console.Error.WriteLine(e.Message);
+    }        
   }
 
   public static void gamepad(PythonDictionary dict) {
@@ -97,7 +87,7 @@ public static class Myro {
     while (true) {
       results = (PythonDictionary)getGamepad(keys);
       foreach (string key in results.Keys) {
-	invoke_function(dict[key], results[key]);
+	invoke_function((Func<object,object>)dict[key], results[key]);
       }
     }
   }
@@ -3411,29 +3401,29 @@ public static class Myro {
     Graphics.run();
   }
 
-  public static void run(PythonFunction function) {
+  public static void run(Func<object> function) {
     Graphics.run(function);
   }
 
   // Callbacks:
 
-  public static void onMouseUp(PythonFunction function) {
+  public static void onMouseUp(Func<object,Graphics.Event,object> function) {
     Graphics.onMouseUp(function);
   }
 
-  public static void onMouseDown(PythonFunction function) {
+  public static void onMouseDown(Func<object,Graphics.Event,object> function) {
     Graphics.onMouseDown(function);
   }
 
-  public static void onMouseMovement(PythonFunction function) {
+  public static void onMouseMovement(Func<object,Graphics.Event,object> function) {
     Graphics.onMouseMovement(function);
   }
 
-  public static void onKeyPress(PythonFunction function) {
+  public static void onKeyPress(Func<object,Graphics.Event,object> function) {
     Graphics.onKeyPress(function);
   }
 
-  public static void onKeyRelease(PythonFunction function) {
+  public static void onKeyRelease(Func<object,Graphics.Event,object> function) {
     Graphics.onKeyRelease(function);
   }
 
