@@ -3074,9 +3074,18 @@ public static class Graphics {
 
     public void savePicture(string filename) {
       // png, and jpg
-      String format = "jpeg";
-      if (filename.Substring(filename.Length - 3, 3) == "png"){
+      String format;
+      if (filename.Substring(filename.Length - 3, 3) == "png") {
        format = "png";
+      } else if (filename.Substring(filename.Length - 3, 3) == "jpg") {
+       format = "jpeg";
+      } else if (filename.Substring(filename.Length - 3, 3) == "gif") {
+       //format = "png";
+       // FIXME: use LibGif 
+       throw new Exception("not implemented yet; use jpg or png");
+      } else {
+       //format = "png";
+       throw new Exception("unknown image type; use jpg or png");
       }
       _pixbuf.Save(filename, format);
     }
