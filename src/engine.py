@@ -235,3 +235,4 @@ class DLREngine(Engine):
 
     def tryGetVariable(self, variable):
         return self.manager.scope.TryGetVariable(variable)
+
