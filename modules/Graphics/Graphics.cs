@@ -2791,6 +2791,7 @@ public static class Graphics {
       // Create a new ImageSurface
       surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(original.points);
+	  center = original.center;
     }
     
     public Picture(Gdk.Pixbuf pixbuf) : this(true) {
@@ -4201,3 +4202,4 @@ public static class Graphics {
     }
   }
 }
+
