@@ -1,0 +1,6 @@
+Put libmono-profiler-py.so and Profiler.dll in cwd
+
+Start:  LD_LIBRARY_PATH=. mono --profile=py file.exe
+
+where LD_LIBRARY_PATH dir has the libmono-profiler-py.so file.
+

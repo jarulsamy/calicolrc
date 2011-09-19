@@ -22,8 +22,8 @@ class BarChart:
                                (self.width - self.right, self.height - self.bottom))
         self.background.fill = Color("white")
         self.background.draw(self.win)
-        self.button = Button("Rescale")
-        self.button.draw(self.win, (self.width - 70, self.height - 50))
+        self.button = Button((self.width - 70, self.height - 50), "Rescale")
+        self.button.draw(self.win)
         self.button.connect("click", draw)
 
         title = Text((self.width/2,self.top/2), self.title)

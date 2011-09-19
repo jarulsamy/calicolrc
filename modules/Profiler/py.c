@@ -28,7 +28,7 @@ pyprof_load (MonoAssembly *assembly, gpointer user_data)
     if (!strcmp (mono_image_get_name (image), "IronPython")) {
         prof->pma = mono_class_from_name (
             image, "IronPython.Runtime", "PythonModuleAttribute");
-        g_print ("PythonModuleAttribute loaded\n");
+        printf ("PythonModuleAttribute loaded\n");
         g_hash_table_insert (prof->hash, assembly, (gpointer)-1);
     }
 }
@@ -47,12 +47,13 @@ pyprof_method_get_assembly (MonoMethod *method)
 static gboolean
 pyprof_filter_assembly (MonoProfiler *prof, MonoAssembly *assembly)
 {
-    int flag;
+  long flag; // 64-bit long
     MonoDomain *domain;
     MonoObject *object;
     MonoCustomAttrInfo *cinfo;
 
-    flag = (int)g_hash_table_lookup (prof->hash, assembly);
+    // 64-bit long:
+    flag = (long)g_hash_table_lookup (prof->hash, assembly);
 
     if (!flag) {
         /* cinfo = mono_custom_attrs_from_assembly (assembly); */
@@ -130,7 +131,7 @@ pyprof_enter (MonoProfiler *prof, MonoMethod *method)
 
     name = pyprof_format_method (method);
     indent = g_strnfill (prof->depth, ' ');
-    g_print ("%sENTER: %s\n", indent, name);
+    printf ("%sENTER: %s\n", indent, name);
     g_free (name);
     g_free (indent);
 
@@ -161,7 +162,7 @@ pyprof_leave (MonoProfiler *prof, MonoMethod *method)
 
     name = pyprof_format_method (method);
     indent = g_strnfill (prof->depth, ' ');
-    g_print ("%sLEAVE: %s\n", indent, name);
+    printf ("%sLEAVE: %s\n", indent, name);
     g_free (name);
     g_free (indent);
 }
@@ -201,7 +202,7 @@ mono_profiler_startup (const char *desc)
     pyprof_profiler = prof;
 
     g_set_print_handler (pyprof_print);
-    g_print ("pyprof startup\n");
+    printf ("pyprof startup\n");
 
     mono_install_assembly_load_hook (pyprof_load, prof);
 

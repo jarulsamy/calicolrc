@@ -1,5 +1,5 @@
 import clr
-clr.AddReference('Profiler.dll')
+clr.AddReference('../Profiler.dll')
 
 from System.IO import StreamReader
 from FePy import Profiler
@@ -20,7 +20,9 @@ class ProfilerThread(threading.Thread):
             line = self.reader.ReadLine()
             if not line:
                 break
-            print line
+            print(line)
 
 thread = ProfilerThread()
 thread.start()
+
+

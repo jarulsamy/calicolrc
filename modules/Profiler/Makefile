@@ -3,7 +3,7 @@ MONO = mono
 IPY = ../../bin/ipy.exe
 
 PYPROF = $(PYTHON) prof.py
-IPYPROF = LD_LIBRARY_PATH=. $(MONO) --profile=py $(IPY) -S
+IPYPROF = MONO_PATH=../../bin LD_LIBRARY_PATH=. $(MONO) --profile=py $(IPY) -S
 
 SRC = py.c
 OBJ = libmono-profiler-py.so
