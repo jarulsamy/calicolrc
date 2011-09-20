@@ -1663,7 +1663,7 @@ public static class Myro {
       wheel2.draw(frame);
 
       // Details
-      Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 10);
+      Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 2);
       hole.fill = Color("black");
       hole.draw(frame);
 
@@ -1680,18 +1680,46 @@ public static class Myro {
       frame.draw(simulation.window);
 	  Myro.robot = this;
     }
-
+	
 	public new void forward(double power) {
 	  velocity = power;
 	}
-
-    public void flush() { 
+		
+	public new void forward(double power, double time) {
+	  velocity = power;
+	  Thread.Sleep((int)(time * 1000)); 
+	  stop();
 	}
-
+		
+	public new void stop() {
+	  velocity = 0.0;
+	  frame.body.AngularVelocity = 0.0f;
+	}
+		
+	public void flush() { 
+	  
+	}
+	
 	public new void turnRight(double power) {
 	  frame.body.AngularVelocity = (float)(power * 2);
 	}
-
+		
+	public new void turnRight(double power, double time) {
+	  frame.body.AngularVelocity = (float)(power * 2);
+	  Thread.Sleep((int)(time * 1000)); 
+	  stop();
+	}
+		
+	public new void turnLeft(double power) {
+	  frame.body.AngularVelocity = (float)(-power * 2);
+	}
+		
+	public new void turnLeft(double power, double time) {
+	  frame.body.AngularVelocity = (float)(-power * 2);
+	  Thread.Sleep((int)(time * 1000)); 
+	  stop();
+	}
+		
   }
 
   public class Simulation {
