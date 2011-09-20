@@ -2045,14 +2045,18 @@ public static class Graphics {
       g.UserToDevice(ref gx, ref gy);
     }
 
-    public Polygon penUp() {
+    public List penUp() {
       pen._down = false;
-      return new Polygon(pen.path.ToArray()); //, new Color(0,0,0));
+	  List retval = new List();
+	  foreach (IList item in pen.path) {
+		retval.Add(item);
+	  }
+      pen.resetPath();
+	  return retval;
     }
     
     public void penDown() {
       pen._down = true;
-      pen.resetPath();
       pen.appendPath(new Point(center.x, center.y));
     }
     
