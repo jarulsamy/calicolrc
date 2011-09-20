@@ -181,4 +181,5 @@ def demo():
         drawCapitals(win)
         displayControls(win)
 
-demo()
+if __name__ == "<module>":
+    demo()

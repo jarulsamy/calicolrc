@@ -12,12 +12,13 @@ def drawIrene(win):
     line = Line()
     for (x,y) in dots:
         x, y = gis.ll2xy(x, y)
-        c = Circle(Point(x, y), 10)
+        c = Circle(Point(x, y), (1.8 ** gis.zoom))
         line.append(Point(x,y))
         c.fill = Color(255, 255, 0, 62)
         c.draw(win)
     line.draw(win)
-    line.border = 5
+    line.outline = Color(0, 0, 0, 62)
+    line.border = 1.8 ** gis.zoom
 
 def main():
     win = Window("Calico GIS", gis.width, gis.height)
@@ -41,3 +42,6 @@ def main():
         gis.drawCapitals(win)
         gis.displayControls(win)
         drawIrene(win)
+
+if __name__ == "<module>":
+    main()
