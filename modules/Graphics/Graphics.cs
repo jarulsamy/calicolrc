@@ -28,7 +28,7 @@ using System.Net; // WebRequest
 using System.IO; // MemoryStream
 using System;
 
-using Microsoft.Xna.Framework; // Vector2
+using Microsoft.Xna.Framework; // Vector2, Matrix
 
 public static class Graphics {
 
@@ -1402,9 +1402,10 @@ public static class Graphics {
       DateTime now = DateTime.Now;
       // diff is TimeSpan, converted to seconds:
       double diff = (now - last_update).TotalMilliseconds / 1000.0;
-      if (diff < step_time) {
-                Thread.Sleep((int)((step_time - diff) * 1000));
-                //wait(step_time - diff);
+      while (diff < step_time) {
+        Thread.Sleep((int)(diff/10 * 1000)); // 10 times per diff
+		now = DateTime.Now;
+		diff = (now - last_update).TotalMilliseconds / 1000.0;
       }
       last_update = DateTime.Now;
       _dirty = false;
@@ -1432,6 +1433,11 @@ public static class Graphics {
     Gtk.Application.Invoke(delegate { ((Gtk.Widget)o).Show(); });
   }
   
+  public static Vector2 VectorRotate(Vector2 v, double angle) {
+    Microsoft.Xna.Framework.Matrix m = Microsoft.Xna.Framework.Matrix.CreateRotationZ((float)angle);
+    return Vector2.Transform(v, m );
+  }
+
   public static Vector2 Vector(int x, int y) {
     return new Vector2((float)x, (float)y);
   }
