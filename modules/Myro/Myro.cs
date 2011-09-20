@@ -695,7 +695,7 @@ public static class Myro {
         Math.Max(Math.Min(V,255),0));
   }
 
-  public static void forward(double power=1) {
+  public static void forward(double power) {
     robot.forward(power);
   }
   
@@ -703,7 +703,7 @@ public static class Myro {
     robot.forward(power, time);
   }
   
-  public static void translate(double power=1) {
+  public static void translate(double power) {
     robot.translate(power);
   }
   
@@ -711,7 +711,7 @@ public static class Myro {
     robot.translate(power, time);
   }
   
-  public static void rotate(double power=1) {
+  public static void rotate(double power) {
     robot.rotate(power);
   }
 
@@ -719,7 +719,7 @@ public static class Myro {
     robot.rotate(power, time);
   }
 
-  public static void backward(double power=1) {
+  public static void backward(double power) {
     robot.backward(power);
   }
 
@@ -735,7 +735,7 @@ public static class Myro {
     robot.move(translate, rotate);
   }
   
-  public static void turnLeft(double power=1) {
+  public static void turnLeft(double power) {
     robot.turnLeft(power);
   }
 
@@ -743,7 +743,7 @@ public static class Myro {
     robot.turnLeft(power, time);
   }
 
-  public static void turnRight(double power=1) {
+  public static void turnRight(double power) {
     robot.turnRight(power);
   }
 
@@ -1365,8 +1365,11 @@ public static class Myro {
   public class Randomizer {
     int _seed; 
     Random _random = new Random();
+
+    public Randomizer() : this(0) {
+	}
     
-    public Randomizer(int seed=0) {
+    public Randomizer(int seed) {
       if (seed != 0)
         this.seed = seed;
     }
@@ -2044,7 +2047,7 @@ public static class Myro {
       return ints;
     }
 
-    byte [] GetBytes(byte value, int bytes=1) {
+    byte [] GetBytes(byte value, int bytes) {
       byte [] retval = null;
       lock (this) { // lock robot
 	write_packet(value);
@@ -2054,7 +2057,7 @@ public static class Myro {
       return retval;
     }
 
-    List GetWord(byte value, int bytes=1) {
+    List GetWord(byte value, int bytes) {
       List retval = new List();
       byte [] retvalBytes;
       lock (this) { // lock robot
