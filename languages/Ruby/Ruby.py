@@ -56,6 +56,23 @@ class RubyEngine(DLREngine):
             System.Type.GetType(
              IronRuby.StandardLibrary.BigDecimal.Fraction).Assembly)
 
+    def execute_file(self, filename):
+        self.manager.calico.last_error = ""
+        source = self.engine.CreateScriptSourceFromFile(filename)
+        try:
+            source.Compile()
+        except:
+            traceback.print_exc()
+            return False
+        try:
+            source.Execute(self.manager.scope)
+        except Exception, e:
+            if "Thread was being aborted" in str(e.message):
+                self.manager.calico.shell.message("[Script stopped----------]")
+            else:
+                traceback.print_exc()
+
+
 
 class Ruby(Language):
     def get_engine_class(self):
