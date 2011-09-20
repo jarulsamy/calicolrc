@@ -20,6 +20,16 @@ public class Method {
   }
 }
 
+public class MethodNeedsArgs {
+  public object classobj;
+  public string name;
+  
+  public MethodNeedsArgs(object classobj, string name) {
+    this.classobj = classobj;
+    this.name = name;
+  }
+}
+
 public class Config {
   public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
@@ -628,10 +638,16 @@ public class Scheme {
   public static object get_external_member(object obj, string name) {
     //printf("get_external_member: {0}, {1}\n", obj, name);
     Type type = obj.GetType();
-    MethodInfo method = type.GetMethod(name);
+    MethodInfo method;
+    try {
+      method = type.GetMethod(name);
+    } catch (System.Reflection.AmbiguousMatchException) {
+      // wait till you have more info from args
+      return (object)new MethodNeedsArgs(obj, name);
+    }
     if (method != null) {
       //printf("GetMethod: {0}\n", method);
-	  return new Method(obj, method);
+      return new Method(obj, method);
     }
     FieldInfo field = type.GetField(name);
     if (field != null) {
@@ -641,11 +657,11 @@ public class Scheme {
     PropertyInfo property = type.GetProperty(name);
     if (property != null) {
       //printf("GetProperty: {0}\n", property);
-	  return property;
-	  //return IronPython.Runtime.Types.DynamicHelpers.
-	  //GetPythonTypeFromType(property.GetType());
+      return property;
+      //return IronPython.Runtime.Types.DynamicHelpers.
+      //GetPythonTypeFromType(property.GetType());
     }
-	return null;
+    return null;
   }
 
   public static object call_external_proc(object obj, object path, object args) {
@@ -1198,11 +1214,30 @@ public class Scheme {
 	return (! pair_q(rator));
   }
   
+  public static Type[] get_types(object [] objects) {
+    Type [] retval = new Type[objects.Length];
+    int count = 0;
+    foreach (object obj in objects) {
+      retval[count] = obj.GetType();
+      count++;
+    }
+    return retval;
+  }
+
   public static object dlr_apply(object proc, object args) {
 	//printf("dlr_apply({0}, {1})\n", proc, args);
 	if (proc is Method) {
 	  return ((Method)proc).method.Invoke(((Method)proc).classobj, 
 		  list_to_array(args));
+	} else if (proc is MethodNeedsArgs) {
+	  // get the method based on args
+	  Type type = ((MethodNeedsArgs)proc).classobj.GetType();
+	  MethodInfo method;
+	  method = type.GetMethod(((MethodNeedsArgs)proc).name, 
+				  get_types(list_to_array(args)));
+	  // then invoke
+	  return method.Invoke(((MethodNeedsArgs)proc).classobj, 
+			       list_to_array(args));
 	} else {
       try {
         return _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
@@ -1248,11 +1283,13 @@ public class Scheme {
     object retobj = result;
     while (pair_q(parts_list)) {
       //printf("...loop: {0}\n", parts_list);
+      // fixme: needs to use args to get method
       try{
         retobj = _dlr_runtime.Operations.GetMember(retobj, 
             car(parts_list).ToString());
       } catch {
-        return make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+	object binding = make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+        return binding;
       }
       parts_list = cdr(parts_list);
     }
@@ -1372,7 +1409,6 @@ public class Scheme {
 	Type t = obj.GetType();
     MethodInfo[] mi = t.GetMethods();
     foreach(MethodInfo m in mi) {
-	  System.Console.WriteLine("{0}", m.Name);
 	  if (m.Name == method_name) {
 		return m;
 	  }
