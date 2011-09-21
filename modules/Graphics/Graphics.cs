@@ -2631,6 +2631,7 @@ public static class Graphics {
   public class Pen : Shape {
     private List<Point> _path; // = new List<Point>();
     public bool _down;
+    public double minDistance = 1;
     
     public Pen(Color color, int border) : base(false) {
       _down = false;
@@ -2659,7 +2660,7 @@ public static class Graphics {
     public void appendPath(IList iterable) {
       Point temp = new Point(iterable);
       if (_path.Count > 0) {
-	if (_path[_path.Count - 1].distance(temp) > 2)
+	if (_path[_path.Count - 1].distance(temp) > minDistance)
 	  _path.Add(temp);
       } else {
 	_path.Add(temp);

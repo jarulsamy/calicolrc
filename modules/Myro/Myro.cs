@@ -626,14 +626,7 @@ public static class Myro {
 
   public static void initialize(string port, int baud=38400) {
         bool need_port = true;
-        if (port != null && port.StartsWith("sim")) {
-	  if (simulation == null) {
-	    simulation = new Simulation();
-	    Thread.Sleep((int)(1 * 1000));
-	  }
-	  robot = new SimScribbler(simulation);
-	  return;
-        } else if (port != null && (port.StartsWith("COM") || port.StartsWith("com"))) {
+        if (port != null && (port.StartsWith("COM") || port.StartsWith("com"))) {
             port = @"\\.\" + port;             // "comment
         }
         if (Myro.robot is Scribbler) {
@@ -657,18 +650,29 @@ public static class Myro {
           }
         }
           } // not a serial port
-        } // not a scribbler
+        } else if (Myro.robot is SimScribbler) {
+	  // do nothing if simulator
+	  need_port = false;
+	}
         if (need_port) {
           if (port == null) {
-                port = (string)ask("Port");
+	    port = (string)ask("Port");
           }
           if (port != null) {
-	    robot = new Scribbler(port, baud);
+	    if (port.StartsWith("sim")) {
+	      if (simulation == null) {
+		simulation = new Simulation();
+		Thread.Sleep((int)(1 * 1000));
+	      }
+	      robot = new SimScribbler(simulation);
+	    } else {
+	      robot = new Scribbler(port, baud);
+	    }
 	  } else {
 	    Console.WriteLine("init() cancelled");
 	  }
         } else {
-          ((Scribbler)robot).setup();
+          robot.setup();
         }
   }
 
@@ -804,7 +808,7 @@ public static class Myro {
     robot.penDown();
   }
   
-  public static void penDown(Graphics.Color color) {
+  public static void penDown(string color) {
     robot.penDown(color);
   }
   
@@ -872,6 +876,7 @@ public static class Myro {
   }
 
   public static void setup() {
+    robot.setup();
   }
 
   public static string getName() {
@@ -1625,11 +1630,12 @@ public static class Myro {
     }
 
     public void penDown() {
-      penDown(new Graphics.Color("black"));
+      penDown("black");
     }
 
-    public virtual void penDown(Graphics.Color color)
+    public virtual void penDown(string color)
     {
+      ask(String.Format("Please put a {0} pen in the robot.", color));
     }
 
     public virtual Graphics.Line penUp()
@@ -1753,6 +1759,7 @@ public static class Myro {
       this.simulation = simulation;
       frame = new Graphics.Rectangle(new Graphics.Point(320 - 23, 240 - 23),
 				     new Graphics.Point(320 + 23, 240 + 23));
+      frame.pen.minDistance = 10; // minimum distance from last point
       // Draw a body:
       Graphics.Polygon body = new Graphics.Polygon();
 
@@ -1816,8 +1823,8 @@ public static class Myro {
       //
     }   
 
-    public override void penDown(Graphics.Color color) { 
-      frame.outline = color;
+    public override void penDown(string color) { 
+      frame.outline = new Graphics.Color(color);
       frame.penDown();
     }   
 
