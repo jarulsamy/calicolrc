@@ -718,6 +718,7 @@ public static class Myro {
       while (true) {
 	foreach(SimScribbler robot in robots) {
 	  lock(robot) {
+		robot.stall = false;
 	    robot.frame.body.LinearVelocity = Graphics.VectorRotate(
                   Graphics.Vector(robot.velocity, 0), 
 		  robot.frame.body.Rotation);
@@ -1754,6 +1755,9 @@ public static class Myro {
     public Simulation simulation;
     public double velocity = 0;
     public double rate = 8.0;
+	public bool stall = false;
+	public string name = "Scribby";
+	public double battery = 7.6;
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -1809,6 +1813,7 @@ public static class Myro {
     bool SetStall(FarseerPhysics.Dynamics.Fixture fixture1,
 		  FarseerPhysics.Dynamics.Fixture ficture2,
 		  FarseerPhysics.Dynamics.Contacts.Contact contact) {
+	  stall = true;
       return true;
     }
 	
@@ -1832,6 +1837,126 @@ public static class Myro {
       return frame.penUp();
     }   
 
+    public override Graphics.Picture takePicture(string mode="jpeg") {
+      // Override in subclassed robots
+      return null;
+    }
+    
+    public override void setup() {
+    }
+    
+    public override string getName() {
+      return name;
+    }
+    
+    public override List getIRMessage() {
+      return null;
+    }
+    
+    public override void setCommunicate() {
+    }
+    
+    public override void sendIRMessage(string data) {
+    }
+    
+    public override List getBlob() {
+      return null;
+    }
+    
+    public override object getData(params int [] position) {
+      return null;
+    }
+    
+    public override void setData(int position, int value) {
+    }
+    
+    public override PythonDictionary getAll() {
+      return null;
+    }
+    
+    public override PythonDictionary getInfo() {
+      return null;
+    }
+    
+    public override object getObstacle(params object [] position) {
+      return null;
+    }
+    
+    public override object getLight(params object [] position) {
+      return null;
+    }
+    
+    public override object getIR(params object [] position) {
+      return null;
+    }
+    
+    public override object getBright(string window = null) {
+      return null;
+    }
+    
+    public override object getBright(int window) {
+      return null;
+    }
+    
+    public override object getLine(params object [] position) {
+      return null;
+    }
+    
+    public override object get(string sensor="all") {
+      return null;
+    }
+    
+    public override object get(string sensor="all", params object [] position) {
+      return null;
+    }
+    
+    public override string getPassword() {
+      return "";
+    }
+    
+    public override PythonDictionary getConfig() {
+      return new PythonDictionary();
+    }
+    
+    public override int getStall() {
+      return stall ? 1 : 0; 
+    }
+    
+    public override double getBattery() {
+      return battery;
+    }
+    
+    public override void setLED(string position, object value) {
+    }
+    
+    public override void setLEDFront(object value) {
+    }
+    
+    public override void setLEDBack(double value) {
+    }
+    
+    public override void setEchoMode(int value) {
+    }
+    
+    public override void setName(string name) {
+	  this.name = name;
+    }
+    
+    public override void setIRPower(int power) {
+    }
+    
+    public override void setWhiteBalance(object value) {
+    }
+    
+    public override void setForwardness(object value) {
+    }
+    
+    public override void setVolume(object volume) {
+    }
+    
+    public override void setPassword(string password) {
+    }
+    
   }
 
   public class Scribbler: Robot {
