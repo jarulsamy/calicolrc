@@ -5,7 +5,7 @@ all: modules/Graphics.dll modules/Myro.dll languages/Scheme/Scheme/PJScheme.dll 
 	modules/Conx.dll bin/calico.exe
 
 build: clean-build all 
-	cd ..; zip -r Calico/Calico-$(BUILD).zip Calico/* -x \*/.svn/\* \*~ 
+	cd ..; zip -r trunk/Calico-$(BUILD).zip trunk/* -x \*/.svn/\* \*~ 
 	scp Calico-$(BUILD).zip dblank@myro.roboteducation.org:html/download/
 
 modules/Graphics.dll:
