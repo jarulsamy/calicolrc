@@ -1463,6 +1463,10 @@ public static class Graphics {
       this.y = dot.y;
     }
     
+    public double distance(Point p) {
+      return Math.Sqrt(Math.Pow(x - p.x, 2) + Math.Pow(y - p.y, 2));
+    }
+
     public override string ToString()
     {
       return String.Format("<Point (x={0},y={1})>", x, y);
@@ -2045,14 +2049,9 @@ public static class Graphics {
       g.UserToDevice(ref gx, ref gy);
     }
 
-    public List penUp() {
+    public Line penUp() {
       pen._down = false;
-	  List retval = new List();
-	  foreach (IList item in pen.path) {
-		retval.Add(item);
-	  }
-      pen.resetPath();
-	  return retval;
+      return pen.resetPath();
     }
     
     public void penDown() {
@@ -2651,12 +2650,20 @@ public static class Graphics {
       return _path;
     }
     
-    public void resetPath() {
+    public Line resetPath() {
+      Line temp = new Line(_path.ToArray());
       _path = new List<Point>();
+      return temp;
     }
 
     public void appendPath(IList iterable) {
-      _path.Add(new Point(iterable));
+      Point temp = new Point(iterable);
+      if (_path.Count > 0) {
+	if (_path[_path.Count - 1].distance(temp) > 2)
+	  _path.Add(temp);
+      } else {
+	_path.Add(temp);
+      }
     }
     
     public bool down {
@@ -3643,6 +3650,7 @@ public static class Graphics {
   public class Polygon : Shape {
 
     public Polygon(Line line) : this(line.points) {
+      center = line.center;
     }
     
     public Polygon(params object [] points) : base(true) {

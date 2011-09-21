@@ -53,6 +53,7 @@ public static class Myro {
   //public readonly static List __all__ = new List() {"robot"};
 
   public static Robot robot;
+  public static Simulation simulation;
   public readonly static Computer computer = new Computer();
   static string dialogResponse = null;
   static string REVISION = "$Revision: $";
@@ -615,13 +616,24 @@ public static class Myro {
     initialize(null);
   }
 
-  public static void init(string port, int baud=38400) {
+  public static void init(string port) {
+    initialize(port, 38400);
+  }
+
+  public static void init(string port, int baud) {
     initialize(port, baud);
   }
 
   public static void initialize(string port, int baud=38400) {
         bool need_port = true;
-        if (port != null && (port.StartsWith("COM") || port.StartsWith("com"))) {
+        if (port != null && port.StartsWith("sim")) {
+	  if (simulation == null) {
+	    simulation = new Simulation();
+	    Thread.Sleep((int)(1 * 1000));
+	  }
+	  robot = new SimScribbler(simulation);
+	  return;
+        } else if (port != null && (port.StartsWith("COM") || port.StartsWith("com"))) {
             port = @"\\.\" + port;             // "comment
         }
         if (Myro.robot is Scribbler) {
@@ -659,6 +671,36 @@ public static class Myro {
           ((Scribbler)robot).setup();
         }
   }
+
+  public class Simulation {
+    public Graphics.WindowClass window;
+    public Thread thread;
+    public List<Robot> robots = new List<Robot>();
+
+    public Simulation() {
+      window = makeWindow("Myro Simulation", 640, 480);
+      window.mode = "physics";
+      window.gravity = Graphics.Vector(0,0); // turn off gravity
+      
+      thread = new Thread(new ThreadStart(loop));
+      thread.IsBackground = true;
+      thread.Start();
+    }
+    
+    public void loop() {
+      while (true) {
+	foreach(SimScribbler robot in robots) {
+	  lock(robot) {
+	    robot.frame.body.LinearVelocity = Graphics.VectorRotate(
+                  Graphics.Vector(robot.velocity, 0), 
+		  robot.frame.body.Rotation);
+	  }
+	}
+	window.step(.1);
+      }
+    }
+  }
+
 
   public static void uninit() {
     if (Myro.robot is Scribbler) {
@@ -733,6 +775,18 @@ public static class Myro {
 
   public static void stop() {
     robot.stop();
+  }
+  
+  public static void penDown() {
+    robot.penDown();
+  }
+  
+  public static void penDown(Graphics.Color color) {
+    robot.penDown(color);
+  }
+  
+  public static Graphics.Line penUp() {
+    return robot.penUp();
   }
   
   public static void move(double translate, double rotate) {
@@ -1398,6 +1452,8 @@ public static class Myro {
   public readonly static Randomizer Random = new Randomizer(); 
   
   public class Robot {
+    internal double _lastTranslate = 0;
+    internal double _lastRotate = 0;
     
     public virtual void beep(double duration, double frequency, double frequency2) {
       // Override in subclassed robots
@@ -1533,36 +1589,59 @@ public static class Myro {
     public virtual void setPassword(string password) {
     }
     
-    public virtual void move(double translate, double rotate) {
-      // Override in subclassed robots
+    public virtual void adjustSpeed() {
     }
 
-    public virtual bool isConnected() {
-      // Override in subclassed robots
-      return false;
+    public virtual bool isConnected()
+    {
+      return true;
     }
 
+    public virtual void flush()
+    {
+    }
+
+    public void penDown() {
+      penDown(new Graphics.Color("black"));
+    }
+
+    public virtual void penDown(Graphics.Color color)
+    {
+    }
+
+    public virtual Graphics.Line penUp()
+    {
+      return null;
+    }
+
+    public void move(double translate, double rotate) {
+      _lastTranslate = translate;
+      _lastRotate = rotate;
+      adjustSpeed();
+    }
+    
     public void playSong(List song) {
       playSong(song, 1.0);
     }
     
     public void playSong(List song, double speed) {
       foreach(IList tup in song) {
-    if (tup.Count == 2) {
-      double f = System.Convert.ToDouble(tup[0]); 
-      double d = System.Convert.ToDouble(tup[1]);
-      beep(d, f);
-    } else if (tup.Count == 3) {
-      double f1 = System.Convert.ToDouble(tup[0]); 
-      double f2 = System.Convert.ToDouble(tup[1]); 
-      double d = System.Convert.ToDouble(tup[2]);
-      beep(d * speed, f1, f2);
-    }
+	if (tup.Count == 2) {
+	  double f = System.Convert.ToDouble(tup[0]); 
+	  double d = System.Convert.ToDouble(tup[1]);
+	  beep(d, f);
+	} else if (tup.Count == 3) {
+	  double f1 = System.Convert.ToDouble(tup[0]); 
+	  double f2 = System.Convert.ToDouble(tup[1]); 
+	  double d = System.Convert.ToDouble(tup[2]);
+	  beep(d * speed, f1, f2);
+	}
       }
     }
     
     public void stop() {
-      if (! isConnected()) return;
+      if (! isConnected()) 
+	return;
       move(0, 0);
     }
     
@@ -1644,19 +1723,23 @@ public static class Myro {
   public class SimScribbler : Robot {
     public Graphics.Rectangle frame;
     public Simulation simulation;
-	public double velocity = 0;
+    public double velocity = 0;
+    public double rate = 8.0;
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
       frame = new Graphics.Rectangle(new Graphics.Point(320 - 23, 240 - 23),
-                                          new Graphics.Point(320 + 23, 240 + 23));
+				     new Graphics.Point(320 + 23, 240 + 23));
       // Draw a body:
       Graphics.Polygon body = new Graphics.Polygon();
 
-      double [] sx = new double[] {0.05, 0.05, 0.07, 0.07, 0.09, 0.09, 0.07, 0.07, 0.05, 0.05,
-                                   -0.05, -0.05, -0.07, -0.08, -0.09, -0.09, -0.08, -0.07, -0.05, -0.05};
-      double [] sy = new double[] {0.06, 0.08, 0.07, 0.06, 0.06, -0.06, -0.06, -0.07, -0.08, -0.06,
-                                   -0.06, -0.08, -0.07, -0.06, -0.05, 0.05, 0.06, 0.07, 0.08, 0.06};
+      double [] sx = new double[] {0.05, 0.05, 0.07, 0.07, 0.09, 0.09, 0.07, 
+				   0.07, 0.05, 0.05, -0.05, -0.05, -0.07, 
+				   -0.08, -0.09, -0.09, -0.08, -0.07, -0.05, 
+				   -0.05};
+      double [] sy = new double[] {0.06, 0.08, 0.07, 0.06, 0.06, -0.06, -0.06, 
+				   -0.07, -0.08, -0.06, -0.06, -0.08, -0.07, 
+				   -0.06, -0.05, 0.05, 0.06, 0.07, 0.08, 0.06};
       for (int i =0; i < sx.Length; i++) {
         body.append(new Graphics.Point(sx[i] * 250, sy[i] * 250));
       }
@@ -1664,101 +1747,52 @@ public static class Myro {
       body.draw(frame);
       // Draw wheels:
       Graphics.Rectangle wheel1 = new Graphics.Rectangle(new Graphics.Point(-10, -23),
-          new Graphics.Point(10, -17));
+							 new Graphics.Point(10, -17));
       wheel1.color = Color("black");
       wheel1.draw(frame);
       Graphics.Rectangle wheel2 = new Graphics.Rectangle(new Graphics.Point(-10, 23),
-          new Graphics.Point(10, 17));
+							 new Graphics.Point(10, 17));
       wheel2.color = Color("black");
       wheel2.draw(frame);
-
+      
       // Details
       Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 2);
       hole.fill = Color("black");
       hole.draw(frame);
-
+      
       Graphics.Rectangle fluke = new Graphics.Rectangle(new Graphics.Point(17, -10),
-          new Graphics.Point(23, 10));
+							new Graphics.Point(23, 10));
       fluke.color = Color("green");
       fluke.draw(frame);
-
+      
       // Just the fill, to see outline of bounding box:
       frame.fill = null;
       // FIXME: something not closing correctly in render when :
       //frame.color = null;
       frame.outline = Color("lightgrey");
       frame.draw(simulation.window);
-	  Myro.robot = this;
+      this.simulation.robots.Add(this);
     }
 	
-	public new void forward(double power) {
-	  velocity = power;
-	}
-		
-	public new void forward(double power, double time) {
-	  velocity = power;
-	  Thread.Sleep((int)(time * 1000)); 
-	  stop();
-	}
-		
-	public new void stop() {
-	  velocity = 0.0;
-	  frame.body.AngularVelocity = 0.0f;
-	}
-		
-	public void flush() { 
-	  
-	}
-	
-	public new void turnRight(double power) {
-	  frame.body.AngularVelocity = (float)(power * 2);
-	}
-		
-	public new void turnRight(double power, double time) {
-	  frame.body.AngularVelocity = (float)(power * 2);
-	  Thread.Sleep((int)(time * 1000)); 
-	  stop();
-	}
-		
-	public new void turnLeft(double power) {
-	  frame.body.AngularVelocity = (float)(-power * 2);
-	}
-		
-	public new void turnLeft(double power, double time) {
-	  frame.body.AngularVelocity = (float)(-power * 2);
-	  Thread.Sleep((int)(time * 1000)); 
-	  stop();
-	}
-		
-  }
+    public override void adjustSpeed() {
+      lock(this) {
+	velocity = _lastTranslate * rate;
+	frame.body.AngularVelocity = (float)(-_lastRotate * rate);
+      }
+    }
+    
+    public override void flush() { 
+      //
+    }   
 
-  public class Simulation {
-	public Graphics.WindowClass window;
-	public Thread thread;
-    public List<Robot> robots = new List<Robot>();
+    public override void penDown(Graphics.Color color) { 
+      frame.outline = color;
+      frame.penDown();
+    }   
 
-	public Simulation() {
-	  window = makeWindow("Myro Simulation", 640, 480);
-	  window.mode = "physics";
-	  window.gravity = Graphics.Vector(0,0); // turn off gravity
-
-      Robot scribbler = new SimScribbler(this);
-      robots.Add(scribbler);
-
-	  thread = new Thread(new ThreadStart(loop));
-	  thread.IsBackground = true;
-	  thread.Start();
-	}
-
-	public void loop() {
-	  while (true) {
-		foreach(SimScribbler robot in robots) {
-		  robot.frame.body.LinearVelocity = Graphics.VectorRotate(Graphics.Vector(robot.velocity, 0), 
-			                                                      robot.frame.body.Rotation);
-		}
-		window.step(.01);
-	  }
-	}
+    public override Graphics.Line penUp() { 
+      return frame.penUp();
+    }   
 
   }
 
@@ -1773,8 +1807,6 @@ public static class Myro {
     public byte [] gray_header = null;
     public byte emitters = 0x1 | 0x2 | 0x4;
     
-    private double _lastTranslate;
-    private double _lastRotate;
     private byte [] _lastSensors;
     
     //static byte SOFT_RESET=33;
@@ -1920,7 +1952,7 @@ public static class Myro {
         try {
           serial.Open();
         } catch {
-          Console.Error.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+          Console.Error.WriteLine(String.Format("ERROR: unable to open port '{0}'", 
 						port));
 	  serial = null;
         }
@@ -2679,13 +2711,7 @@ public static class Myro {
       return retDict;
     }
     
-    public override void move(double translate, double rotate) {
-      _lastTranslate = translate;
-      _lastRotate = rotate;
-      adjustSpeed();
-    }
-    
-    public void adjustSpeed() {
+    public override void adjustSpeed() {
       double left  = Math.Min(Math.Max(_lastTranslate - _lastRotate, -1), 1);
       double right  = Math.Min(Math.Max(_lastTranslate + _lastRotate, -1), 1);
       byte leftPower = (byte)((left + 1.0) * 100.0);
@@ -2866,12 +2892,14 @@ public static class Myro {
 
     public override bool isConnected()
     {
-      if (serial == null) return false;
+      if (serial == null) 
+	return false;
       return serial.IsOpen;
     }
-  
-    public void flush() { 
-      if (! isConnected()) return;
+
+    public override void flush() { 
+      if (! isConnected()) 
+	return;
       byte [] bytes = new byte[1];
       lock(serial) {
         serial.DiscardInBuffer();
@@ -3461,6 +3489,10 @@ public static class Myro {
 
   public static Graphics.WindowClass getWindow() {
     return Graphics.getWindow();
+  }
+
+  public static Simulation getSimulation() {
+    return Myro.simulation;
   }
 
   public static PythonTuple getMouse() {

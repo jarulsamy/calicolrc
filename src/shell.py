@@ -456,10 +456,14 @@ class ShellWindow(Window):
         self.on_key_press(widget=self, event=None, force=True)
 
     def on_stop(self, obj, event):
+        import Myro
         if (self.executeThread):
             self.message(_("Stopping..."))
             self.executeThread.Abort()
             self.executeThread = None
+            if Myro.robot:
+                Myro.robot.flush()
+                Myro.robot.stop()
             Gtk.Application.Invoke(self.stop_running)
         else:
             self.searchbar.search_off()
@@ -602,10 +606,6 @@ class ShellWindow(Window):
         return retval
 
     def stop_running(self, sender, args):
-        import Myro
-        if Myro.robot:
-            Myro.robot.flush()
-            Myro.robot.stop()
         self.executeThread = None
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
         self.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
