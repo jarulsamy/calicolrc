@@ -621,7 +621,7 @@ public static class Myro {
 
   public static void initialize(string port, int baud=38400) {
         bool need_port = true;
-        if (port.StartsWith("COM") || port.StartsWith("com")) {
+        if (port != null && (port.StartsWith("COM") || port.StartsWith("com"))) {
             port = @"\\.\" + port;             // "comment
         }
         if (Myro.robot is Scribbler) {
@@ -650,7 +650,11 @@ public static class Myro {
           if (port == null) {
                 port = (string)ask("Port");
           }
-          robot = new Scribbler(port, baud);
+          if (port != null) {
+	    robot = new Scribbler(port, baud);
+	  } else {
+	    Console.WriteLine("init() cancelled");
+	  }
         } else {
           ((Scribbler)robot).setup();
         }
@@ -1533,6 +1537,11 @@ public static class Myro {
       // Override in subclassed robots
     }
 
+    public virtual bool isConnected() {
+      // Override in subclassed robots
+      return false;
+    }
+
     public void playSong(List song) {
       playSong(song, 1.0);
     }
@@ -1553,6 +1562,7 @@ public static class Myro {
     }
     
     public void stop() {
+      if (! isConnected()) return;
       move(0, 0);
     }
     
@@ -1753,7 +1763,7 @@ public static class Myro {
   }
 
   public class Scribbler: Robot {
-    public SerialPort serial;
+    public SerialPort serial = null;
     double [] _fudge  = new double[4];
     double [] _oldFudge = new double[4];
     public string dongle;
@@ -1910,13 +1920,13 @@ public static class Myro {
         try {
           serial.Open();
         } catch {
-          Console.WriteLine(String.Format("ERROR: unable to open '{0}'", 
-                  port));
-		  serial = null;
-          return;
+          Console.Error.WriteLine(String.Format("ERROR: unable to open '{0}'", 
+						port));
+	  serial = null;
         }
       }
-      setup();
+      if (serial != null)
+	setup();
     }
     
     public override void setup() {
@@ -2853,8 +2863,15 @@ public static class Myro {
         }
       } 
     }
+
+    public override bool isConnected()
+    {
+      if (serial == null) return false;
+      return serial.IsOpen;
+    }
   
     public void flush() { 
+      if (! isConnected()) return;
       byte [] bytes = new byte[1];
       lock(serial) {
         serial.DiscardInBuffer();

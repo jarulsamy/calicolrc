@@ -605,6 +605,7 @@ class ShellWindow(Window):
         import Myro
         if Myro.robot:
             Myro.robot.flush()
+            Myro.robot.stop()
         self.executeThread = None
         self.toolbar_buttons[Gtk.Stock.Stop].Sensitive = False
         self.toolbar_buttons[Gtk.Stock.Apply].Sensitive = True
