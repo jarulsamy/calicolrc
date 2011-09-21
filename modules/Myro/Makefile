@@ -12,6 +12,7 @@ MONO_PATH=../../bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mon
 		-r:System.Drawing \
 		-r:IronPython \
 	        -r:IronRuby \
+		-r:FarseerPhysics.dll \
 		-out:../Myro.dll \
 		-pkg:gtk-sharp-2.0 \
 		-r:Mono.Cairo.dll \

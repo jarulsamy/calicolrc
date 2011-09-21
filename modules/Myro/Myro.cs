@@ -677,11 +677,34 @@ public static class Myro {
     public Thread thread;
     public List<Robot> robots = new List<Robot>();
 
-    public Simulation() {
-      window = makeWindow("Myro Simulation", 640, 480);
+    public Simulation() : this(640, 480) {
+    }
+
+    public Simulation(int width, int height) {
+      window = makeWindow("Myro Simulation", width, height);
       window.mode = "physics";
       window.gravity = Graphics.Vector(0,0); // turn off gravity
       
+      Graphics.Rectangle wall = new Graphics.Rectangle(new Graphics.Point(0, 0), 
+						       new Graphics.Point(5, height));
+      wall.bodyType = "static";
+      wall.draw(window);
+
+      wall = new Graphics.Rectangle(new Graphics.Point(5, 0), 
+				    new Graphics.Point(width - 5, 5));
+      wall.bodyType = "static";
+      wall.draw(window);
+
+      wall = new Graphics.Rectangle(new Graphics.Point(width - 5, 0), 
+				    new Graphics.Point(width, height));
+      wall.bodyType = "static";
+      wall.draw(window);
+
+      wall = new Graphics.Rectangle(new Graphics.Point(0, height - 5), 
+				    new Graphics.Point(width - 5, height));
+      wall.bodyType = "static";
+      wall.draw(window);
+
       thread = new Thread(new ThreadStart(loop));
       thread.IsBackground = true;
       thread.Start();
@@ -1770,8 +1793,16 @@ public static class Myro {
       // FIXME: something not closing correctly in render when :
       //frame.color = null;
       frame.outline = Color("lightgrey");
+      // set collision
       frame.draw(simulation.window);
+      frame.body.OnCollision += SetStall;
       this.simulation.robots.Add(this);
+    }
+
+    bool SetStall(FarseerPhysics.Dynamics.Fixture fixture1,
+		  FarseerPhysics.Dynamics.Fixture ficture2,
+		  FarseerPhysics.Dynamics.Contacts.Contact contact) {
+      return true;
     }
 	
     public override void adjustSpeed() {
