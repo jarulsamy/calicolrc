@@ -3455,6 +3455,9 @@ public static class Myro {
     // make a tuple from an array
     return new PythonTuple(items);
   }
+  public static void setColor(Graphics.Pixel pixel, Graphics.Color c) {
+    pixel.setColor(c);
+  }
   public static void setRGB(Graphics.Pixel pixel, PythonTuple rgb) {
     pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
   }
