@@ -2505,6 +2505,24 @@ public static class Graphics {
   }
 
   public class Line : Shape {
+
+    public Line(params object [] points) : base(true) {
+      Point [] temp = new Point [points.Length];
+      int count = 0;
+      foreach (object o in points) {
+        if (o is Point)
+          temp[count] = (Point)o ;
+        else if (o is IList) {
+          IList i = (IList)o;
+          temp[count] = new Point(i[0], i[1]);
+        } else {
+          throw new Exception("Line: can't convert arg to a point");
+        }
+        count++;
+      }
+      set_points(temp);
+    }
+
     public Line(IList iterable1, IList iterable2) :
        this(true, iterable1, iterable2) {
     }
@@ -3623,6 +3641,9 @@ public static class Graphics {
   }
 
   public class Polygon : Shape {
+
+    public Polygon(Line line) : this(line.points) {
+    }
     
     public Polygon(params object [] points) : base(true) {
       Point [] temp = new Point [points.Length];
