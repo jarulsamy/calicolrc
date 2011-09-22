@@ -1571,7 +1571,7 @@ namespace Diagram
 		private double[] dashStyle = null; //new double[] {1.0};
         private Cairo.Color fillColor = Colors.White;
         internal String fontFace = "Arial";
-        internal double fontSize = 12.0;
+        internal double fontSize = 10.0;
         internal FontSlant fontSlant = FontSlant.Normal;
 		internal FontWeight fontWeight = FontWeight.Bold;
         protected Boolean selected = false;
@@ -2915,11 +2915,25 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
-				g.SetFontSize(this.fontSize);
-				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
-				g.ShowText(this.Text);
+				//g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				//g.SetFontSize(this.fontSize);
+				//TextExtents te = g.TextExtents(this.Text);
+
+				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+				Pango.FontDescription desc = Pango.FontDescription.FromString(
+						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+				layout.FontDescription = desc;
+				layout.SetText(text);
+				layout.Alignment = Pango.Alignment.Center;
+				int layoutWidth, layoutHeight;
+				layout.GetSize(out layoutWidth, out layoutHeight);
+				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight); 
+				Pango.CairoHelper.ShowLayout(g, layout);
+
+				//g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
+				//g.ShowText(this.Text);
             }
 
 			// Finally, draw any shape decorator shapes
@@ -3267,11 +3281,25 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
-				g.SetFontSize(this.fontSize);
-				TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
-				g.ShowText(this.Text);
+				
+				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+				Pango.FontDescription desc = Pango.FontDescription.FromString(
+						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+				layout.FontDescription = desc;
+				layout.SetText(text);
+				layout.Alignment = Pango.Alignment.Center;
+				int layoutWidth, layoutHeight;
+				layout.GetSize(out layoutWidth, out layoutHeight);
+				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight); 
+				Pango.CairoHelper.ShowLayout(g, layout);
+				
+//				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+//				g.SetFontSize(this.fontSize);
+//				TextExtents te = g.TextExtents(this.Text);
+//				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing); 
+//				g.ShowText(this.Text);
             }
 
             // Finally, draw any shape decorator shapes

@@ -132,7 +132,7 @@ namespace Jigsaw
 			
 			// Factory Blocks for block area
 			
-			// Control
+			// --- Control
 			CControlStart block20 = new CControlStart(110, 70, true);
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
@@ -149,7 +149,7 @@ namespace Jigsaw
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
 			
-			// IO
+			// --- IO
 			CIOPrint _cioprint = new CIOPrint(110, 70, true);
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
@@ -158,7 +158,7 @@ namespace Jigsaw
 			this.AddShape(_ciowritefile);
 			tbInOut.AddShape(_ciowritefile);
 			
-			// Shapes
+			// --- Shapes
 			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
 			_shrect.FillColor = Diagram.Colors.LightYellow;
 			_shrect.LineColor = Diagram.Colors.Gray;
@@ -197,7 +197,7 @@ namespace Jigsaw
 //			this.AddShape(_shconn);
 //			tbNotes.AddShape(_shconn);
 
-			// Myro
+			// --- Myro
 			CRobot block1 = new CRobot(110, 70, true);
 			block1.Text = "init robot on [COM]";
 			this.AddShape(block1);
@@ -247,12 +247,25 @@ namespace Jigsaw
 //			block10.Text = "speak [message]";
 //			cvs.AddShape(block10);
 			
-			// Variable Blocks
+			// --- Variable Blocks
 			CAssignment vblock1 = new CAssignment(110, 70, true);
 			this.AddShape(vblock1);
 			tbVars.AddShape(vblock1);
+
+			// --- Graphics Blocks
+			CGfxWindow gblock1 = new CGfxWindow(110, 70, true);
+			this.AddShape(gblock1);
+			tbGraphics.AddShape(gblock1);
+
+			CGfxLine gblock2 = new CGfxLine(110, 110, true);
+			this.AddShape(gblock2);
+			tbGraphics.AddShape(gblock2);
+
+			CGfxCircle gblock3 = new CGfxCircle(110, 150, true);
+			this.AddShape(gblock3);
+			tbGraphics.AddShape(gblock3);
 			
-			// Run tab
+			// --- Run tab
 			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
 			bRun.MouseDown += OnRunMouseDown;
 			this.AddShape(bRun);
@@ -1004,11 +1017,25 @@ namespace Jigsaw
 				double cx = x + 0.5*w;
 				double cy = y + 0.5*20;
 				g.Color = this.TextColor;
-				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
-				g.SetFontSize(this.fontSize);
-				Cairo.TextExtents te = g.TextExtents(this.Text);
-				g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing + textYOffset); 
-				g.ShowText(this.Text);
+				//g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				//g.SetFontSize(this.fontSize);
+				//Cairo.TextExtents te = g.TextExtents(this.Text);
+
+				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+				Pango.FontDescription desc = Pango.FontDescription.FromString(
+						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+				layout.FontDescription = desc;
+				layout.SetText(text);
+				layout.Alignment = Pango.Alignment.Center;
+				int layoutWidth, layoutHeight;
+				layout.GetSize(out layoutWidth, out layoutHeight);
+				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset); 
+				Pango.CairoHelper.ShowLayout(g, layout);
+
+				//g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing + textYOffset); 
+				//g.ShowText(this.Text);
             }
 			
 			// If in an error state, x-out
@@ -1528,11 +1555,11 @@ namespace Jigsaw
 			
 			// Then, recursively reposition all blocks 
 			// that are not connected through the entry edge.
-			foreach (CEdge prt in this.Edges) {
-				if (entryEdge != prt && prt.IsConnected) {
-					linkedEdge = prt.LinkedTo;
-					linkedBlk = linkedEdge.Block;
-					linkedBlk.RepositionBlocks(linkedEdge);
+			foreach (CEdge edg in this.Edges) {				// Loop over all edges in this block
+				if (entryEdge != edg && edg.IsConnected) {	// Skip the entry edge of this block
+					linkedEdge = edg.LinkedTo;				// Get the edge linked to this edge
+					linkedBlk = linkedEdge.Block;			// Get the block linked through this edge
+					linkedBlk.RepositionBlocks(linkedEdge);	// Reposition all other blocks
 				}
 			}
 		}
@@ -2414,7 +2441,7 @@ namespace Jigsaw
     public class CAssignment : CBlock
     {	// Variable assignment block shape class
 		
-		// These should not be public, but set up to modify Text when changed
+		// TODO: These should not be public, but set up to modify Text when changed
 		public CVarNameProperty VarName = null;
 		public CExpressionProperty RHS = null;
 		
@@ -2426,8 +2453,7 @@ namespace Jigsaw
 			})) {
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;
-			//this.FontStyle = FontStyle.Bold;
+			this.FillColor = Diagram.Colors.LightGreen;;
 			this.Sizable = false;
 			
 			// Properties
@@ -2503,7 +2529,7 @@ namespace Jigsaw
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Do the assignment
 			// TODO: Allow access to global namespace
@@ -2541,7 +2567,443 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
-	
+
+	// -----------------------------------------------------------------------
+    public class CGfxWindow : CBlock
+    {	// Block to create a new window
+		// Stores Window object as varable named 'win' locals
+		
+		// These should not be public, but set up to modify Text when changed
+		public CStringProperty _Title;
+		public CIntegerProperty _Width;
+		public CIntegerProperty _Height;
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CGfxWindow(Double X, Double Y) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)
+			})) {
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;
+			this.Sizable = false;
+			
+			// Properties
+			_Title = new CStringProperty("Title", "Gfx1");
+			_Width = new CIntegerProperty("Width", 300);
+			_Height = new CIntegerProperty("Height", 300);
+			
+			_Title.PropertyChanged += OnPropertyChanged;
+			_Width.PropertyChanged += OnPropertyChanged;
+			_Height.PropertyChanged += OnPropertyChanged;
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CGfxWindow(Double X, Double Y, bool isFactory) : this(X, Y)
+		{
+			this._isFactory = isFactory;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Returns a list of all block properties
+		public override List<CProperty> Properties 
+		{
+			get {
+				List<CProperty> props = base.Properties;
+				props.Add(this._Title);
+				props.Add(this._Width);
+				props.Add(this._Height);
+				return props;
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Write custom tags for this block
+        protected override void WriteXmlTags(XmlWriter w)
+        {
+			base.WriteXmlTags(w);
+			this.WriteXmlProperty(w, "Title", _Title.Text);
+			this.WriteXmlProperty(w, "Width", _Width.Text);
+			this.WriteXmlProperty(w, "Height", _Height.Text);
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal override bool SetProperty(string name, string val) {
+			string lname = name.ToLower();
+			switch(lname) {
+			case "title":
+				_Title.Text = val;
+				break;
+			case "width":
+				_Width.Value = int.Parse(val);
+				break;
+			case "height":
+				_Height.Value = int.Parse(val);
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Update text when property changes
+		public void OnPropertyChanged(object sender, EventArgs e){
+			this.Text = String.Format("gfx window ({0})", _Title.Text);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Execute a variable assignment
+		public override IEnumerator<RunnerResponse> 
+			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the assignment
+			// TODO: Allow access to global namespace
+
+			try {
+				string t = (string)_Title.Text;
+				int w = (int)_Width.Value;
+				int h = (int)_Height.Value;
+				locals["win"] = new Graphics.WindowClass(t, w, h);
+				//locals["win"] = new Graphics.Window((string)_Title.Text, (int)_Width.Value, (int)_Height.Value);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				MsgProp.Text = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.NoAction;
+				rr.Runner = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Runner = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
+
+	// -----------------------------------------------------------------------
+    public class CGfxLine : CBlock
+    {	// Block to create a new line and add it to the window
+		
+		// These should not be public, but set up to modify Text when changed
+		public CIntegerProperty _X1;
+		public CIntegerProperty _Y1;
+		public CIntegerProperty _X2;
+		public CIntegerProperty _Y2;
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CGfxLine(Double X, Double Y) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)
+			})) {
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;
+			this.Sizable = false;
+			
+			// Properties
+			_X1 = new CIntegerProperty("X1", 50);
+			_Y1 = new CIntegerProperty("Y1", 50);
+			_X2 = new CIntegerProperty("X2", 150);
+			_Y2 = new CIntegerProperty("Y2", 150);
+			
+			_X1.PropertyChanged += OnPropertyChanged;
+			_Y1.PropertyChanged += OnPropertyChanged;
+			_X2.PropertyChanged += OnPropertyChanged;
+			_Y2.PropertyChanged += OnPropertyChanged;
+			
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CGfxLine(Double X, Double Y, bool isFactory) : this(X, Y)
+		{
+			this._isFactory = isFactory;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Returns a list of all block properties
+		public override List<CProperty> Properties 
+		{
+			get {
+				List<CProperty> props = base.Properties;
+				props.Add(this._X1);
+				props.Add(this._Y1);
+				props.Add(this._X2);
+				props.Add(this._Y2);
+				return props;
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Write custom tags for this block
+        protected override void WriteXmlTags(XmlWriter w)
+        {
+			base.WriteXmlTags(w);
+			this.WriteXmlProperty(w, "X1", _X1.Text);
+			this.WriteXmlProperty(w, "Y1", _Y1.Text);
+			this.WriteXmlProperty(w, "X2", _X2.Text);
+			this.WriteXmlProperty(w, "Y2", _Y2.Text);
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal override bool SetProperty(string name, string val) {
+			string lname = name.ToLower();
+			switch(lname) {
+			case "x1":
+				_X1.Value = int.Parse(val);
+				break;
+			case "y1":
+				_Y1.Value = int.Parse(val);
+				break;
+			case "x2":
+				_X2.Value = int.Parse(val);
+				break;
+			case "y2":
+				_Y2.Value = int.Parse(val);
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Update text when property changes
+		public void OnPropertyChanged(object sender, EventArgs e){
+			this.Text = String.Format("create line ({0},{1})-({2},{3})", _X1.Text, _Y1.Text, _X2.Text, _Y2.Text);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Execute a variable assignment
+		public override IEnumerator<RunnerResponse> 
+			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the assignment
+			// TODO: Allow access to global namespace
+
+			try {
+				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
+				Graphics.Point pt1 = new Graphics.Point( (double)_X1.Value, (double)_Y1.Value );
+				Graphics.Point pt2 = new Graphics.Point( (double)_X2.Value, (double)_Y2.Value );
+				Graphics.Line l = new Graphics.Line(pt1, pt2);
+				l.draw(win);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				MsgProp.Text = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.NoAction;
+				rr.Runner = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Runner = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
+
+	// -----------------------------------------------------------------------
+    public class CGfxCircle : CBlock
+    {	// Block to create a new line and add it to the window
+		
+		// These should not be public, but set up to modify Text when changed
+		public CIntegerProperty _X1;
+		public CIntegerProperty _Y1;
+		public CIntegerProperty _Diameter;
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CGfxCircle(Double X, Double Y) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)
+			})) {
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;
+			this.Sizable = false;
+			
+			// Properties
+			_X1 = new CIntegerProperty("X", 50);
+			_Y1 = new CIntegerProperty("Y", 50);
+			_Diameter = new CIntegerProperty("Diameter", 50);
+			
+			_X1.PropertyChanged += OnPropertyChanged;
+			_Y1.PropertyChanged += OnPropertyChanged;
+			_Diameter.PropertyChanged += OnPropertyChanged;
+			
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CGfxCircle(Double X, Double Y, bool isFactory) : this(X, Y)
+		{
+			this._isFactory = isFactory;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Returns a list of all block properties
+		public override List<CProperty> Properties 
+		{
+			get {
+				List<CProperty> props = base.Properties;
+				props.Add(this._X1);
+				props.Add(this._Y1);
+				props.Add(this._Diameter);
+				return props;
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Write custom tags for this block
+        protected override void WriteXmlTags(XmlWriter w)
+        {
+			base.WriteXmlTags(w);
+			this.WriteXmlProperty(w, "X", _X1.Text);
+			this.WriteXmlProperty(w, "Y", _Y1.Text);
+			this.WriteXmlProperty(w, "Diameter", _Diameter.Text);
+        }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal override bool SetProperty(string name, string val) {
+			string lname = name.ToLower();
+			switch(lname) {
+			case "x1":
+				_X1.Value = int.Parse(val);
+				break;
+			case "y1":
+				_Y1.Value = int.Parse(val);
+				break;
+			case "diameter":
+				_Diameter.Value = int.Parse(val);
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Update text when property changes
+		public void OnPropertyChanged(object sender, EventArgs e){
+			this.Text = String.Format("create circle ({0},{1}) {2}", _X1.Text, _Y1.Text, _Diameter.Text);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Execute a variable assignment
+		public override IEnumerator<RunnerResponse> 
+			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the assignment
+			// TODO: Allow access to global namespace
+
+			try {
+				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
+				Graphics.Point pt1 = new Graphics.Point( (double)_X1.Value, (double)_Y1.Value );
+				Graphics.Circle c = new Graphics.Circle(pt1, (int)_Diameter.Value);
+				c.draw(win);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				MsgProp.Text = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.NoAction;
+				rr.Runner = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Runner = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
+
 	// -----------------------------------------------------------------------
     public class CEdge
 	{	// Class that holds details of a place to link CBlocks

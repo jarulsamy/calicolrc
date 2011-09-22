@@ -41,7 +41,8 @@ namespace Jigsaw
 		private Dictionary<string, object> _builtins = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CallStack(Dictionary<string, object> globals, Dictionary<string, object> builtins) {
+		public CallStack(Dictionary<string, object> globals, 
+						 Dictionary<string, object> builtins) {
 			_stack = new List<IEnumerator<RunnerResponse>>();
 			_locals = new Dictionary<string, object>();
 			_globals = globals;

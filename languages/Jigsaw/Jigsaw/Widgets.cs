@@ -1,6 +1,5 @@
 using System;
 using Cairo;
-//using System.Drawing;
 using System.Collections.Generic;
 
 // This Namespace contains various user-drawn widgets based on shapes in the Diagram namespace.

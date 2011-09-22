@@ -7,6 +7,9 @@ using System.Collections.Generic;
 // This includes the window itself and all property classes.
 // The namespace remains Jigsaw.
 
+// TODO:
+// Add a message console to the properties window and show errors there when property values cannot be parsed. See Text properties.
+
 namespace Jigsaw
 {
 	public class PropertyWindow : Gtk.Window
@@ -475,6 +478,21 @@ namespace Jigsaw
 		public CIntegerProperty(string name, int val) : base(name, val.ToString()) 
 		{
 			this.Value = val;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Setting/getting Text parses and updates integer
+		public override string Text {
+			get { return _val.ToString(); }
+			set {
+				try {
+					_val = int.Parse(value);
+					this.RaisePropertyChanged();
+				} catch (Exception ex) {
+					// TODO: Add a message window to the Properties Dialog and show this message there
+					Console.WriteLine("Err: " + ex.Message);
+				}
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
