@@ -718,10 +718,26 @@ public static class Myro {
       while (true) {
 	foreach(SimScribbler robot in robots) {
 	  lock(robot) {
-		robot.stall = false;
+	    robot.stall = false;
 	    robot.frame.body.LinearVelocity = Graphics.VectorRotate(
                   Graphics.Vector(robot.velocity, 0), 
 		  robot.frame.body.Rotation);
+
+	// Get sensor readings
+	Microsoft.Xna.Framework.Vector2 v = Graphics.VectorRotate(
+                       Graphics.Vector(100, 0), 
+		       robot.frame.body.Rotation);
+            new Graphics.Line(new Graphics.Point(robot.frame.x, robot.frame.y), 
+	    		  new Graphics.Point(robot.frame.x + v.X, 
+					     robot.frame.y + v.Y)).draw(window);
+
+	window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+            Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
+            //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
+  	    return 0; // keep looking
+        }, Graphics.Vector(robot.frame.x, robot.frame.y), 
+	  Graphics.Vector(robot.frame.x + v.X, robot.frame.y + v.Y));
+	// end get sensor
 	  }
 	}
 	window.step(.1);

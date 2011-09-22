@@ -1566,6 +1566,7 @@ public static class Graphics {
     public List<Shape> shapes = new List<Shape>();
     private string _mode;
     public FarseerPhysics.Dynamics.World world; 
+    public object document;
     
     public string mode {
           get {
@@ -2226,6 +2227,17 @@ public static class Graphics {
       }
       window = win;
       if (window._canvas.world != null) {
+        addToPhysics();
+      }
+      QueueDraw();
+    }
+
+    public void draw(Canvas canvas) { // Shape
+      // Add this shape to the Canvas list.
+      lock(canvas.shapes) {
+        canvas.shapes.Add(this);
+      }
+      if (canvas.world != null) {
         addToPhysics();
       }
       QueueDraw();
