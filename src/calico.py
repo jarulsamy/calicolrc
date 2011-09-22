@@ -254,7 +254,8 @@ class CalicoProject(object):
             if ext in self.languages[name].extensions:
                 if self.shell:
                     self.shell.change_to_lang(name)
-                return self.engine[name].execute_file(filename)
+                if name in self.engine:
+                    return self.engine[name].execute_file(filename)
         raise AttributeError(_("unknown file extension: '%s'") % filename)
 
     def blast(self, mfrom, type, filename, code):

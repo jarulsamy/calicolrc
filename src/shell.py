@@ -92,9 +92,10 @@ class Shell(object):
         print(text, end=end)
 
     def execute_file(self, filename, language):
-        self.message(_("Loading file '%s'...") % filename)
-        self.calico.engine[language].execute_file(filename)
-        self.message(_("Done loading file."))
+        if language in self.calico.engine.get_languages():
+            self.message(_("Loading file '%s'...") % filename)
+            self.calico.engine[language].execute_file(filename)
+            self.message(_("Done loading file."))
 
 class ShellWindow(Window):
     def __init__(self, calico):
@@ -515,6 +516,8 @@ class ShellWindow(Window):
         self.message(self.prompt.Text, tag="purple")
 
     def execute_file(self, filename, language):
+        if language not in self.calico.engine.get_languages():
+            return
         if (self.executeThread):
             return
 
@@ -643,6 +646,8 @@ class ShellWindow(Window):
             self.calico.last_error = ""
 
     def execute_in_background(self, text):
+        if self.language not in self.calico.engine.get_languages():
+            return
         if (self.executeThread):
             return
 
@@ -657,7 +662,9 @@ class ShellWindow(Window):
         self.executeThread.Start()
 
     def ready_for_execute(self, text):
-        return self.calico.engine[self.language].ready_for_execute(text)
+        if self.language in self.calico.engine.get_languages():
+            return self.calico.engine[self.language].ready_for_execute(text)
+        return False
 
     def goto_file(self, filename, lineno):
         self.calico.setup_editor()
@@ -773,3 +780,4 @@ class TabCompletion:
         if candidate.isdecimal() or candidate.isdigit() or candidate.isnumeric():
             return None
         return candidate
+
