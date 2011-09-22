@@ -3086,6 +3086,18 @@ public static class Graphics {
       return pic;
     }
 
+    public Picture getRegion(IList iterable, int width, int height) {
+      Point p = new Point(iterable);
+      Picture pic = new Picture(width, height);
+      for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+          pic.setColor(x, y, this.getPixel((int)(p.x + x), 
+					   (int)(p.y + y)).getColor());
+        }
+      }
+      return pic;
+    }
+
     public void setRegion(IList iterable, int width, int height, double degrees,
                           Picture picture) {
       Point p = new Point(iterable);
