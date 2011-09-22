@@ -2500,6 +2500,7 @@ public static class Graphics {
       body.Friction = _friction;
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.UserData = this; // point back to this shape
     }
   }
 
@@ -3595,6 +3596,7 @@ public static class Graphics {
       body.Friction = _friction;
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+      body.UserData = this; // point back to this shape
     }
   }
 
@@ -3695,6 +3697,7 @@ public static class Graphics {
       body.Restitution = _bounce;
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
+      body.UserData = this; // point back to this shape
     }
   }
 
@@ -3774,6 +3777,7 @@ public static class Graphics {
       body.Restitution = _bounce;
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
+      body.UserData = this; // point back to this shape
     }
 
     public override void render(Cairo.Context g) {
@@ -3924,6 +3928,7 @@ public static class Graphics {
       body.Restitution = _bounce;
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
+      body.UserData = this; // point back to this shape
     }
   }
 
@@ -3957,6 +3962,7 @@ public static class Graphics {
       body.Restitution = _bounce;
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
+      body.UserData = this; // point back to this shape
     }
 
     /*
@@ -4097,6 +4103,7 @@ public static class Graphics {
       body.Restitution = _bounce;
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
+      body.UserData = this; // point back to this shape
     }
 
     public override void render(Cairo.Context g) {
