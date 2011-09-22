@@ -3087,6 +3087,39 @@ public static class Graphics {
     }
 
     public void setRegion(IList iterable, int width, int height, double degrees,
+                          Picture picture) {
+      Point p = new Point(iterable);
+      double angle = degrees * Math.PI/180.0;
+      double px, py;
+      int tx, ty;
+      for (int x = -width/2; x < width/2; x++) {
+        for (int y = -height/2; y < height/2; y++) {
+          // rotate that x,y:
+          px = x * Math.Cos(angle) - y * Math.Sin(angle);
+          py = x * Math.Sin(angle) + y * Math.Cos(angle);
+          // set the color of the new image from the offset of this:
+          tx = (int)(p.x + px);
+          ty = (int)(p.y + py);
+          this.getPixel(tx, ty).setColor(color);
+          // FIXME: a lame way to not skip any pixels:
+          // Need a region fill algorithm
+          if ((int)px + 1 < width/2) {
+            this.getPixel(tx + 1, ty).setColor(color);
+            if ((int)py + 1 < height/2) {
+              this.getPixel(tx + 1, ty + 1).setColor(color);
+              this.getPixel(tx, ty + 1).setColor(color);
+            }
+          } else {
+            if ((int)py + 1 < height/2) {
+              this.getPixel(tx, ty + 1).setColor(picture.getColor(x + width/2, 
+								  y + height/2));
+            }
+          }
+        }
+      }
+    }
+
+    public void setRegion(IList iterable, int width, int height, double degrees,
                           Color color) {
       Point p = new Point(iterable);
       double angle = degrees * Math.PI/180.0;
