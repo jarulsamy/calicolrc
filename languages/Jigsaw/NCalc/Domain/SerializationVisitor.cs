@@ -141,9 +141,11 @@ namespace NCalc.Domain
             switch (expression.Type)
             {
                 case ValueType.Boolean:
+					// MFR: ---
 					//Result.Append(expression.Value.ToString()).Append(" ");
-					// Added ToLower because parser does not recognize True or False as a boolean, only true and false
+					// Added ToLower because parser does not recognize 'True' or 'False' as a booleans, only 'true' and 'false'
                     Result.Append(expression.Value.ToString().ToLower()).Append(" ");
+					// ---
                     break;
 
                 case ValueType.DateTime:
@@ -188,16 +190,25 @@ namespace NCalc.Domain
         }
 
         public override void Visit(Identifier parameter)
-        {
-            Result.Append("[").Append(parameter.Name).Append("] ");
+        {	// ---
+			// MFR:
+            //Result.Append("[").Append(parameter.Name).Append("] ");
+			Result.Append(parameter.Name);
+			// ---
         }
-
+		
         protected void EncapsulateNoValue(LogicalExpression expression)
         {
             if (expression is ValueExpression)
             {
                 expression.Accept(this);
             }
+			// ---
+			// MFR:
+			else if (expression is Identifier) {
+				expression.Accept(this);
+			}
+			// ---
             else
             {
                 Result.Append("(");

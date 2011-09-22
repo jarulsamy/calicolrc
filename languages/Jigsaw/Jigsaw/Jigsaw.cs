@@ -290,6 +290,13 @@ namespace Jigsaw
 			// Select first tab
 			tbCtrl.SetToggle(this, true);
 		}
+
+		public Engine engine {
+		
+			get {
+				return _engine;
+			}
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Manage the current path to the Jigsaw program
@@ -332,6 +339,12 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnRunMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
+		{
+			if (_engine.IsRunning == false) _engine.Reset(this, _inspector);
+			_engine.Run();
+		}
+		
+		public void Run()
 		{
 			if (_engine.IsRunning == false) _engine.Reset(this, _inspector);
 			_engine.Run();
@@ -412,7 +425,7 @@ namespace Jigsaw
 				cvs.DeleteShape(b);
 			}
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {
@@ -553,6 +566,17 @@ namespace Jigsaw
 			
 			if (fc.Run() == (int)Gtk.ResponseType.Accept) 
 			{
+			  ReadFile(fc.Filename);
+			}
+			
+			// Must call Destroy() to close FileChooserDialog window.
+			fc.Destroy();
+			
+			// Update screen
+			this.Invalidate();
+		}
+		
+		public bool ReadFile(string filename) {
 				// Temp vars to hold parse vals
 				string name;
 				string val;
@@ -567,7 +591,7 @@ namespace Jigsaw
 				
 				// Start by wiping out what's there
 				this.DeleteAllBlocks();
-				CurrentPath = fc.Filename;
+				CurrentPath = filename;
 				
 				// === First Step : Read XML and ceate all blocks 
 				//     and build dictionaries of CBlock and CEdge references
@@ -576,7 +600,7 @@ namespace Jigsaw
 				
 				XmlReader xr = null;
 
-				xr = new XmlTextReader(fc.Filename);
+				xr = new XmlTextReader(filename);
 				
 				while (xr.Read()) {
 					
@@ -641,7 +665,7 @@ namespace Jigsaw
 				xr = null;
 				
 				// === Second step : Reread XML and link up edges
-				xr = new XmlTextReader(fc.Filename);
+				xr = new XmlTextReader(filename);
 
 				while (xr.Read()) {
 					
@@ -675,14 +699,7 @@ namespace Jigsaw
 					if (!b.InEdge.IsConnected)
 						b.RepositionBlocks(null);
 				}
-			
-			}
-			
-			// Must call Destroy() to close FileChooserDialog window.
-			fc.Destroy();
-			
-			// Update screen
-			this.Invalidate();
+				return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2675,11 +2692,10 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 
 			try {
-				string t = (string)_Title.Text;
-				int w = (int)_Width.Value;
-				int h = (int)_Height.Value;
-				locals["win"] = new Graphics.WindowClass(t, w, h);
-				//locals["win"] = new Graphics.Window((string)_Title.Text, (int)_Width.Value, (int)_Height.Value);
+//				string t = (string)_Title.Text;
+//				int w = (int)_Width.Value;
+//				int h = (int)_Height.Value;
+				locals["win"] = Graphics.makeWindow((string)_Title.Text, (int)_Width.Value, (int)_Height.Value);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -2716,10 +2732,10 @@ namespace Jigsaw
     {	// Block to create a new line and add it to the window
 		
 		// These should not be public, but set up to modify Text when changed
-		public CIntegerProperty _X1;
-		public CIntegerProperty _Y1;
-		public CIntegerProperty _X2;
-		public CIntegerProperty _Y2;
+		public CExpressionProperty _X1;
+		public CExpressionProperty _Y1;
+		public CExpressionProperty _X2;
+		public CExpressionProperty _Y2;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CGfxLine(Double X, Double Y) 
@@ -2733,10 +2749,10 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			_X1 = new CIntegerProperty("X1", 50);
-			_Y1 = new CIntegerProperty("Y1", 50);
-			_X2 = new CIntegerProperty("X2", 150);
-			_Y2 = new CIntegerProperty("Y2", 150);
+			_X1 = new CExpressionProperty("X1", "50");
+			_Y1 = new CExpressionProperty("Y1", "50");
+			_X2 = new CExpressionProperty("X2", "150");
+			_Y2 = new CExpressionProperty("Y2", "150");
 			
 			_X1.PropertyChanged += OnPropertyChanged;
 			_Y1.PropertyChanged += OnPropertyChanged;
@@ -2781,16 +2797,16 @@ namespace Jigsaw
 			string lname = name.ToLower();
 			switch(lname) {
 			case "x1":
-				_X1.Value = int.Parse(val);
+				_X1.Text = val;
 				break;
 			case "y1":
-				_Y1.Value = int.Parse(val);
+				_Y1.Text = val;
 				break;
 			case "x2":
-				_X2.Value = int.Parse(val);
+				_X2.Text = val;
 				break;
 			case "y2":
-				_Y2.Value = int.Parse(val);
+				_Y2.Text = val;
 				break;
 			default:
 				return false;
@@ -2827,10 +2843,23 @@ namespace Jigsaw
 
 			try {
 				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
-				Graphics.Point pt1 = new Graphics.Point( (double)_X1.Value, (double)_Y1.Value );
-				Graphics.Point pt2 = new Graphics.Point( (double)_X2.Value, (double)_Y2.Value );
-				Graphics.Line l = new Graphics.Line(pt1, pt2);
-				l.draw(win);
+				
+				_X1.Expr.Parameters = locals;
+				double dx1 = Convert.ToDouble( _X1.Expr.Evaluate() );
+				
+				_Y1.Expr.Parameters = locals;
+				double dy1 = Convert.ToDouble( _Y1.Expr.Evaluate() );
+
+				_X2.Expr.Parameters = locals;
+				double dx2 = Convert.ToDouble( _X2.Expr.Evaluate() );
+
+				_Y2.Expr.Parameters = locals;
+				double dy2 = Convert.ToDouble( _Y2.Expr.Evaluate() );
+				
+				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
+				Graphics.Point pt2 = new Graphics.Point( dx2, dy2 );
+				Graphics.Line ln = new Graphics.Line(pt1, pt2);
+				ln.draw(win);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -2867,9 +2896,9 @@ namespace Jigsaw
     {	// Block to create a new line and add it to the window
 		
 		// These should not be public, but set up to modify Text when changed
-		public CIntegerProperty _X1;
-		public CIntegerProperty _Y1;
-		public CIntegerProperty _Diameter;
+		public CExpressionProperty _X1;
+		public CExpressionProperty _Y1;
+		public CExpressionProperty _Diameter;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CGfxCircle(Double X, Double Y) 
@@ -2883,9 +2912,9 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			_X1 = new CIntegerProperty("X", 50);
-			_Y1 = new CIntegerProperty("Y", 50);
-			_Diameter = new CIntegerProperty("Diameter", 50);
+			_X1 = new CExpressionProperty("X", "50");
+			_Y1 = new CExpressionProperty("Y", "50");
+			_Diameter = new CExpressionProperty("Diameter", "50");
 			
 			_X1.PropertyChanged += OnPropertyChanged;
 			_Y1.PropertyChanged += OnPropertyChanged;
@@ -2926,14 +2955,14 @@ namespace Jigsaw
 		internal override bool SetProperty(string name, string val) {
 			string lname = name.ToLower();
 			switch(lname) {
-			case "x1":
-				_X1.Value = int.Parse(val);
+			case "x":
+				_X1.Text = val;
 				break;
-			case "y1":
-				_Y1.Value = int.Parse(val);
+			case "y":
+				_Y1.Text = val;
 				break;
 			case "diameter":
-				_Diameter.Value = int.Parse(val);
+				_Diameter.Text = val;
 				break;
 			default:
 				return false;
@@ -2969,11 +2998,24 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 
 			try {
+				// Access window. This should have already been created with a previous block
 				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
-				Graphics.Point pt1 = new Graphics.Point( (double)_X1.Value, (double)_Y1.Value );
-				Graphics.Circle c = new Graphics.Circle(pt1, (int)_Diameter.Value);
+				
+				// Evaluate position and diameter
+				_X1.Expr.Parameters = locals;
+				double dx1 = Convert.ToDouble(_X1.Expr.Evaluate());
+				_Y1.Expr.Parameters = locals;
+				double dy1 = Convert.ToDouble(_Y1.Expr.Evaluate());
+				_Diameter.Expr.Parameters = locals;
+				int idiam = Convert.ToInt32(_Diameter.Expr.Evaluate());
+				
+				// Create Circle object
+				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
+				Graphics.Circle c = new Graphics.Circle(pt1, idiam);
+				
+				// Draw circle
 				c.draw(win);
-
+				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				MsgProp.Text = ex.Message;

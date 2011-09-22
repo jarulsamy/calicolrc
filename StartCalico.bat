@@ -37,10 +37,10 @@ REM **       ADD REM TO ONE LINE BELOW &        **
 REM **   REMOVE REM FROM ANOTHER LINE BELOW     **
 REM **********************************************
 
-"C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\calico.exe %*
+REM "C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\calico.exe %*
 REM "C:\Program Files (x86)\Mono-2.8.2\bin\mono" bin\calico.exe %*
 REM "C:\Program Files (x86)\Mono-2.10.3\bin\mono" bin\calico.exe %*
-REM "C:\Program Files\Mono-2.6.7\bin\mono" bin\calico.exe %*
+"C:\Program Files\Mono-2.6.7\bin\mono" bin\calico.exe %*
 REM "C:\Program Files\Mono-2.8.2\bin\mono" bin\calico.exe %*
 REM "C:\Program Files\Mono-2.10.3\bin\mono" bin\calico.exe %*
 

@@ -47,7 +47,7 @@ class JigsawDocument(Document):
         pass
 
     def open(self):
-        pass
+        self.widget.cvs.ReadFile(self.filename)
 
     def get_text(self):
         return "ok"
@@ -71,7 +71,7 @@ class JigsawEngine(Engine):
         #    clr.AddReference(full_path)
 
     def execute_file(self, filename):
-        print("Run filename '%s'!" % filename)
+        self.manager.calico.editor.document.widget.cvs.Run()
 
 class Jigsaw(Language):
     def get_engine_class(self):

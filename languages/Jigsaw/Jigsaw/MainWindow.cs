@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class JigsawWidget : Gtk.ScrolledWindow
 {
-  Jigsaw.Canvas cvs = null;
+  public Jigsaw.Canvas cvs = null;
   Gtk.Fixed cvsFixed = null;
   public object document = null;
 
