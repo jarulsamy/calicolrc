@@ -1589,6 +1589,11 @@ public static class Graphics {
     public Canvas(string mode) : base(null, null) {
           this.mode = mode;
     }
+
+    public Canvas(string mode, Gtk.Adjustment h, Gtk.Adjustment v) : 
+       base(h, v) {
+          this.mode = mode;
+    }
         
     protected override bool OnExposeEvent (Gdk.EventExpose args) {
           using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
