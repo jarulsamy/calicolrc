@@ -8,6 +8,9 @@ for line in fp:
     x, y = (float(data[1]), float(data[2]))
     dots.append((x, y))
 
+print(dots)
+print("hello")
+
 def drawIrene(win):
     line = Line()
     for (x,y) in dots:

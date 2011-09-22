@@ -614,7 +614,7 @@ class DinahDocument(Document):
         return True
 
     def treeviewHandleSourceDragDataGet(self, obj, args):
-        print "treeviewHandleSourceDragDataGet!"
+        print("treeviewHandleSourceDragDataGet!")
         # DragDropGetArgs: args
         print("dnd get", obj, args)
         targets = args.Context.Targets
@@ -728,7 +728,7 @@ class DinahDocument(Document):
                         layout.ReorderChild(widget, 0) 
                 layout.ShowAll()
             else: # Move!
-                print "Move '%s'" % data
+                print("Move '%s'" % data)
                 # Need to know if within same parent, or diff parents?
         else:
             print("unknown object: '%s'" % data)
