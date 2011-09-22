@@ -79,4 +79,4 @@ class BooLanguage(Language):
         return BooEngine
 
 def register_language():
-    return BooLanguage("boo", "boo")
+    return BooLanguage("boo", ["boo"])

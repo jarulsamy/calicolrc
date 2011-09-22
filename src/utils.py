@@ -43,13 +43,19 @@ def Array(*list):
     return System.Array.CreateInstance(Type, *dimensions)
 
 class Language(object):
-    def __init__(self, language, extension):
+    def __init__(self, language, extensions):
         self.language = language
-        self.extension = extension
+        self.extensions = extensions
+
+    def get_document_type(self):
+        return "Script"
 
     def get_document_class(self):
         from document import MakeDocument
         return MakeDocument
+
+    def get_engine_class(self):
+        raise NotImplementedError()
 
 class ConsoleStream(System.IO.Stream):
     def __init__(self, tag=None):

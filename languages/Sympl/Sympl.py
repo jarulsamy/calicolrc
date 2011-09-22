@@ -63,6 +63,6 @@ class Sympl(Language):
         return SymplEngine
 
 def register_language():
-    return Sympl("sympl", "sympl")
+    return Sympl("sympl", ["sympl"])
 
 

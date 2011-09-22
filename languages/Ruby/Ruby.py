@@ -79,4 +79,4 @@ class Ruby(Language):
         return RubyEngine
 
 def register_language():
-    return Ruby("ruby", "rb")
+    return Ruby("ruby", ["rb"])

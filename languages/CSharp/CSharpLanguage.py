@@ -102,4 +102,4 @@ class CSharpLanguage(Language):
         return CSharpEngine
 
 def register_language():
-    return CSharpLanguage("csharp", "cs")
+    return CSharpLanguage("csharp", ["cs"])

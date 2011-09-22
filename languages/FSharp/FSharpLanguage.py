@@ -76,4 +76,4 @@ class FSharpLanguage(Language):
         return FSharpEngine
 
 def register_language():
-    return FSharpLanguage("fsharp", "fs")
+    return FSharpLanguage("fsharp", ["fs"])

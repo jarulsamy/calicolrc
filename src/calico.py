@@ -249,8 +249,9 @@ class CalicoProject(object):
         """
         # force into a Python string:
         filename = str(filename.ToString())
+        base, ext = filename.rsplit(".")
         for name in self.languages:
-            if filename.endswith("." + self.languages[name].extension):
+            if ext in self.languages[name].extensions:
                 if self.shell:
                     self.shell.change_to_lang(name)
                 return self.engine[name].execute_file(filename)
@@ -295,8 +296,9 @@ class CalicoProject(object):
         Get the language string (lower-case) based on a filename
         extension.
         """
+        base, ext = filename.rsplit(".")
         for name in self.languages:
-            if filename.endswith("." + self.languages[name].extension):
+            if ext in self.languages[name].extensions:
                 return name
         return "python" # FIXME: default language come from config
 
@@ -758,3 +760,4 @@ except:
 if "--nogui" not in args:
     Gtk.Application.Run()
 sys.exit(0)
+

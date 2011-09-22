@@ -992,4 +992,4 @@ class Dinah(Language):
         return DinahDocument
 
 def register_language():
-    return Dinah("dinah", "dnh")
+    return Dinah("dinah", ["dnh"])

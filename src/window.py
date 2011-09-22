@@ -162,7 +162,9 @@ class Window(object):
         retval = []
         for lang in sorted(self.calico.languages):
             retval.append(
-                (_("New %s Script") % lang.title(), None,
+                (_("New %s %s") % (
+                        lang.title(), 
+                        self.calico.languages[lang].get_document_type()), None,
                  None, lambda o,e,lang=lang: self.on_new_file(o, e, lang))
                 )
         return retval

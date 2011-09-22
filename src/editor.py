@@ -44,7 +44,7 @@ class EditorWindow(Window):
         # ---------------------
         # make menu:
         menu = [(_("File"), 
-                 [(_("Open Script..."), Gtk.Stock.Open, None, self.on_open_file),
+                 [(_("Open..."), Gtk.Stock.Open, None, self.on_open_file),
                   ] +
                   self.make_recents_menu() +
                   self.make_examples_menu() +
@@ -320,7 +320,7 @@ class EditorWindow(Window):
             else:
                 pathname, extension = filename, ""
             for lang in self.calico.languages:
-                if self.calico.languages[lang].extension == extension:
+                if extension in self.calico.languages[lang].extensions:
                     page = self.calico.languages[lang].get_document_class()(filename, self.calico, lang)
                     page.set_font()
                     return page

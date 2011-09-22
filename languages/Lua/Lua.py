@@ -109,4 +109,4 @@ class Lua(Language):
         return LuaEngine
 
 def register_language():
-    return Lua("lua", "lua")
+    return Lua("lua", ["lua"])

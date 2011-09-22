@@ -81,4 +81,4 @@ class Jigsaw(Language):
         return JigsawDocument
 
 def register_language():
-    return Jigsaw("jigsaw", "xml")
+    return Jigsaw("jigsaw", ["jig", "xml"])

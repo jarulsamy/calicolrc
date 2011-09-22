@@ -144,7 +144,7 @@ class Document(object):
             proposed_dir, basename = os.path.split(os.path.abspath(self.filename))
         else:
             proposed_dir = os.getcwd()
-            basename = "Untitled." + self.calico.languages[self.language].extension
+            basename = "Untitled." + self.calico.languages[self.language].extensions[0]
         # first, let's make sure the directory is writable
         if not self.is_writable(proposed_dir):
             # if not, let's change dirs

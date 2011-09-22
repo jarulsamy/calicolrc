@@ -89,5 +89,5 @@ class Python(Language):
         return PythonEngine
 
 def register_language():
-    return Python("python", "py")
+    return Python("python", ["py", "pyw"])
 

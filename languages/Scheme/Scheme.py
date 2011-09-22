@@ -69,5 +69,5 @@ class Scheme(Language):
         return SchemeEngine
 
 def register_language():
-    return Scheme("scheme", "ss")
+    return Scheme("scheme", ["ss", "scm", "s"])
 
