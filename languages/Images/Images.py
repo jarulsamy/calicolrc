@@ -75,4 +75,4 @@ class Images(Language):
         return ImagesDocument
 
 def register_language():
-    return Images("images", ["gif", "jpg"])
+    return Images("images", ["png", "jpg", "gif"])
