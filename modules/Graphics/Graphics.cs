@@ -2788,9 +2788,6 @@ public static class Graphics {
   
   public class Picture : Shape {
     Gdk.Pixbuf _pixbuf; // in memory rep of picture
-    Cairo.Format format = Cairo.Format.Rgb24;
-    public Cairo.Surface surface;
-    public Cairo.Context context;
     
     public Picture(string filename) : this(true) {
       if (filename.StartsWith("http://")) {
@@ -2806,9 +2803,6 @@ public static class Graphics {
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
       }
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(new Point(0, 0), 
                  new Point(_pixbuf.Width, 0),
                  new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -2841,9 +2835,6 @@ public static class Graphics {
               x * _pixbuf.NChannels + 3, a);
         }
       }
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(original.points);
 	  center = original.center;
     }
@@ -2853,9 +2844,6 @@ public static class Graphics {
       if (!_pixbuf.HasAlpha) {
         _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
       }
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(new Point(0, 0), 
                  new Point(_pixbuf.Width, 0),
                  new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -2893,9 +2881,6 @@ public static class Graphics {
                             x2 * _pixbuf.NChannels + 3, pixel.A);
         }
       }
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(new Point(0, 0), 
                  new Point(_pixbuf.Width, 0),
                  new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -2967,9 +2952,6 @@ public static class Graphics {
                                     x * _pixbuf.NChannels + 3, 255);
                 }
           }
-          format = Cairo.Format.Argb32;
-          // Create a new ImageSurface
-          surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
           set_points(new Point(0, 0), 
                      new Point(_pixbuf.Width, 0),
                      new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -2997,9 +2979,6 @@ public static class Graphics {
                                     x * _pixbuf.NChannels + 3, 255);
                 }
           }
-          format = Cairo.Format.Argb32;
-          // Create a new ImageSurface
-          surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
           set_points(new Point(0, 0), 
                      new Point(_pixbuf.Width, 0),
                      new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -3026,9 +3005,6 @@ public static class Graphics {
                           x * _pixbuf.NChannels + 3, 255);
                 }
           }
-          format = Cairo.Format.Argb32;
-          // Create a new ImageSurface
-          surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
           set_points(new Point(0, 0), 
                      new Point(_pixbuf.Width, 0),
                      new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -3055,9 +3031,6 @@ public static class Graphics {
                             x * _pixbuf.NChannels + 3, (byte)color.alpha);
         }
       }
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      surface = new Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height);
       set_points(new Point(0, 0), 
                  new Point(_pixbuf.Width, 0),
                  new Point(_pixbuf.Width, _pixbuf.Height), 
@@ -3464,6 +3437,62 @@ public static class Graphics {
     }
 
   } // -- end of Picture class
+
+  public class Pixmap {
+    public Cairo.ImageSurface surface;
+    public Cairo.Context context;
+    public byte [] bytes;
+    public Cairo.Format format;
+    public int width;
+    public int height;
+
+    public Pixmap(int width, int height) {
+      this.width = width;
+      this.height = height;
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      bytes = new byte[width * height * 4];
+      surface = new Cairo.ImageSurface(bytes, format, width, height, 0);
+      context= new Cairo.Context(surface);
+    }
+
+    public Pixmap(Picture picture) {
+      this.width = picture.width;
+      this.height = picture.height;
+      format = Cairo.Format.Argb32;
+      // Create a new ImageSurface
+      bytes = new byte[picture.width * picture.height * 4];
+      for (int x=0; x < picture.width; x++) {
+        for (int y=0; y < picture.height; y++) {
+	  bytes[y * 4 + x + 0] = (byte)picture.getRed(x, y);
+	  bytes[y * 4 + x + 1] = (byte)picture.getGreen(x, y);
+	  bytes[y * 4 + x + 2] = (byte)picture.getBlue(x, y);
+	  bytes[y * 4 + x + 3] = (byte)picture.getAlpha(x, y);
+	}
+      }
+      Cairo.ImageSurface surface = new Cairo.ImageSurface(bytes, format, 
+						     picture.width, 
+						     picture.height, 0);
+      context= new Cairo.Context(surface);
+    }
+
+    public void drawFromShape(Shape shape) {
+      shape.render(context);
+    }
+
+    public void draw(Picture picture) {
+      //byte [] bytes = surface.Data;
+      for (int x=0; x < width; x++) {
+        for (int y=0; y < height; y++) {
+	  picture.setRed(x, y, bytes[y * 4 + x + 0]);
+	  picture.setGreen(x, y, bytes[y * 4 + x + 1]);
+	  picture.setBlue(x, y, bytes[y * 4 + x + 2]);
+	  picture.setAlpha(x, y, bytes[y * 4 + x + 3]);
+	}
+      }
+      picture.QueueDraw();
+    }
+  }
 
   private static double currentTime() {
     System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
