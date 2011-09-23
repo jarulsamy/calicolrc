@@ -831,6 +831,7 @@ public static class Graphics {
     public void QueueDraw() { // color
       if (window is WindowClass) {
         if (window.getMode() == "auto" || 
+	    window.getMode() == "bitmap" || 
             window.getMode() == "physics")
           window.update();
         // else, manually call step()
@@ -1004,6 +1005,11 @@ public static class Graphics {
     }
 
         public void clear() {
+	  _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+						   // FIXME: w,h of Window?
+						   (int)800, 
+						   (int)600);
+	  _canvas.need_to_draw_surface = false;
           lock(_canvas.shapes)
                 _canvas.shapes.Clear();
 	  Gtk.Application.Invoke( delegate {
@@ -1363,10 +1369,11 @@ public static class Graphics {
         return _canvas.mode;
       }
       set {
-        if (value == "auto" || value == "manual" || value == "physics")
-          _canvas.mode = value;
+        if (value == "auto" || value == "manual" || value == "physics" || 
+	    value == "bitmap")
+          canvas.mode = value;
         else
-          throw new Exception("window mode must be 'auto', 'manual', or 'physics'");
+          throw new Exception("window mode must be 'auto', 'manual', 'bitmap', or 'physics'");
       }
     }          
 
@@ -1567,18 +1574,24 @@ public static class Graphics {
     private string _mode;
     public FarseerPhysics.Dynamics.World world; 
     public object document;
+    public Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+							       // FIXME: w,h of Window?
+							       (int)800, 
+							       (int)600);
+    public bool need_to_draw_surface = false;
     
     public string mode {
           get {
             return _mode;
           }
           set {
-            if (value == "manual" || value == "auto" || value == "physics") {
+            if (value == "manual" || value == "auto" || value == "physics" || 
+		value == "bitmap") {
               _mode = value;
               if (value == "physics")
                 initPhysics();
             } else
-                throw new Exception("canvas mode must be 'manual', 'auto', or 'physics'");
+                throw new Exception("canvas mode must be 'manual', 'auto', 'bitmap', or 'physics'");
           }
     }
 
@@ -1596,15 +1609,21 @@ public static class Graphics {
     }
         
     protected override bool OnExposeEvent (Gdk.EventExpose args) {
-          using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
-                lock(shapes) {
-                  foreach (Shape shape in shapes) {
-                        shape.render(g);
-                        shape.updateGlobalPosition(g);
-                  }
-                }
-          }
-          return base.OnExposeEvent(args);
+      using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
+	if (need_to_draw_surface) {
+	  g.Save();
+	  g.SetSourceSurface(surface, 0, 0);
+	  g.Paint();
+	  g.Restore();
+	}
+	lock(shapes) {
+	  foreach (Shape shape in shapes) {
+	    shape.render(g);
+	    shape.updateGlobalPosition(g);
+	  }
+	}
+      }
+      return base.OnExposeEvent(args);
     }
   }
   
@@ -1936,6 +1955,7 @@ public static class Graphics {
     public void QueueDraw() { // shape
       if (window is WindowClass) {
         if (window.getMode() == "auto" ||
+	    window.getMode() == "bitmap" || 
             window.getMode() == "physics")
           window.update();
         // else, manually call step()
@@ -2219,16 +2239,23 @@ public static class Graphics {
     
     public void draw(WindowClass win) { // Shape
       // Add this shape to the Canvas list.
-      lock(win.getCanvas().shapes) {
-        win.getCanvas().shapes.Add(this);
-      }
-      // Make sure each subshape is associated with this window
-      // so QueueDraw will redraw:
-      lock(shapes) {
-        foreach (Shape shape in shapes)
-          {
-            shape.window = win;
-          }
+      if (win.mode == "bitmap") {
+	using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
+	  render(g);
+	}
+	win.canvas.need_to_draw_surface = true;
+      } else {
+	lock(win.getCanvas().shapes) {
+	  win.getCanvas().shapes.Add(this);
+	}
+	// Make sure each subshape is associated with this window
+	// so QueueDraw will redraw:
+	lock(shapes) {
+	  foreach (Shape shape in shapes)
+	    {
+	      shape.window = win;
+	    }
+	}
       }
       window = win;
       if (window._canvas.world != null) {
@@ -2239,11 +2266,18 @@ public static class Graphics {
 
     public void draw(Canvas canvas) { // Shape
       // Add this shape to the Canvas list.
-      lock(canvas.shapes) {
-        canvas.shapes.Add(this);
+      if (canvas.mode == "bitmap") {
+	using (Cairo.Context g = new Cairo.Context(canvas.surface)) {
+	  render(g);
+	}
+	canvas.need_to_draw_surface = true;
+      } else {
+	lock(canvas.shapes) {
+	  canvas.shapes.Add(this);
+	}
       }
       if (canvas.world != null) {
-        addToPhysics();
+	addToPhysics();
       }
       QueueDraw();
     }
@@ -2789,6 +2823,14 @@ public static class Graphics {
   public class Picture : Shape {
     Gdk.Pixbuf _pixbuf; // in memory rep of picture
     
+    public Gdk.Pixbuf pixbuf
+    {
+      get
+	{
+	  return _pixbuf;
+	}
+    }
+
     public Picture(string filename) : this(true) {
       if (filename.StartsWith("http://")) {
         HttpWebRequest req = (HttpWebRequest) WebRequest.Create(filename);
@@ -3438,61 +3480,6 @@ public static class Graphics {
 
   } // -- end of Picture class
 
-  public class Pixmap {
-    public Cairo.ImageSurface surface;
-    public Cairo.Context context;
-    public byte [] bytes;
-    public Cairo.Format format;
-    public int width;
-    public int height;
-
-    public Pixmap(int width, int height) {
-      this.width = width;
-      this.height = height;
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      bytes = new byte[width * height * 4];
-      surface = new Cairo.ImageSurface(bytes, format, width, height, 0);
-      context= new Cairo.Context(surface);
-    }
-
-    public Pixmap(Picture picture) {
-      this.width = picture.width;
-      this.height = picture.height;
-      format = Cairo.Format.Argb32;
-      // Create a new ImageSurface
-      bytes = new byte[picture.width * picture.height * 4];
-      for (int x=0; x < picture.width; x++) {
-        for (int y=0; y < picture.height; y++) {
-	  bytes[y * 4 + x + 0] = (byte)picture.getRed(x, y);
-	  bytes[y * 4 + x + 1] = (byte)picture.getGreen(x, y);
-	  bytes[y * 4 + x + 2] = (byte)picture.getBlue(x, y);
-	  bytes[y * 4 + x + 3] = (byte)picture.getAlpha(x, y);
-	}
-      }
-      Cairo.ImageSurface surface = new Cairo.ImageSurface(bytes, format, 
-						     picture.width, 
-						     picture.height, 0);
-      context= new Cairo.Context(surface);
-    }
-
-    public void drawFromShape(Shape shape) {
-      shape.render(context);
-    }
-
-    public void draw(Picture picture) {
-      //byte [] bytes = surface.Data;
-      for (int x=0; x < width; x++) {
-        for (int y=0; y < height; y++) {
-	  picture.setRed(x, y, bytes[y * 4 + x + 0]);
-	  picture.setGreen(x, y, bytes[y * 4 + x + 1]);
-	  picture.setBlue(x, y, bytes[y * 4 + x + 2]);
-	  picture.setAlpha(x, y, bytes[y * 4 + x + 3]);
-	}
-      }
-      picture.QueueDraw();
-    }
-  }
 
   private static double currentTime() {
     System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
