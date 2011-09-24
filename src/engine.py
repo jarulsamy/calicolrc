@@ -22,6 +22,7 @@ from __future__ import print_function
 import clr
 import traceback
 import glob
+import sys
 import os
 
 import Microsoft.Scripting
@@ -132,7 +133,6 @@ class DLREngine(Engine):
         self.last_retval = None
         self.compiler_options = None
         self.engine = self.manager.runtime.GetEngine(self.dlr_name)
-        #Python.SetTrace(engine, OnTraceBack); 
         # Load mscorlib.dll:
         self.engine.Runtime.LoadAssembly(
             System.Type.GetType(System.String).Assembly)
@@ -145,6 +145,10 @@ class DLREngine(Engine):
         # ---------------------------------------
         self.engine.Runtime.LoadAssembly(System.Type.GetType(
                 System.Diagnostics.Debug).Assembly)
+
+    def onTraceback(self, frame, result, payload):
+        print(frame.f_code.co_filename, frame.f_lineno, result, payload)
+        return self.onTraceback
 
     def set_redirects(self, stdout, stderr, stdin): # textviews
         super(DLREngine, self).set_redirects(stdout, stderr, stdin)
@@ -180,12 +184,18 @@ class DLREngine(Engine):
         sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
         source = self.engine.CreateScriptSourceFromString(text, sctype)
         try:
-            source.Compile(self.compiler_options)
+            if self.compiler_options:
+                source.Compile(self.compiler_options)
+            else:
+                source.Compile()
         except:
             sctype = Microsoft.Scripting.SourceCodeKind.Statements
             source = self.engine.CreateScriptSourceFromString(text, sctype)
             try:
-                source.Compile(self.compiler_options)
+                if self.compiler_options:
+                    source.Compile(self.compiler_options)
+                else:
+                    source.Compile()
             except:
                 traceback.print_exc()
                 return False
@@ -218,7 +228,10 @@ class DLREngine(Engine):
         self.manager.calico.last_error = ""
         source = self.engine.CreateScriptSourceFromFile(filename)
         try:
-            source.Compile(self.compiler_options)
+            if self.compiler_options:
+                source.Compile(self.compiler_options)
+            else:
+                source.Compile()
         except:
             traceback.print_exc()
             return False
