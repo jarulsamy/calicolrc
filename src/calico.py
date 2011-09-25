@@ -710,29 +710,9 @@ def handleMessages(sender, args):
         fp.close()
         messagesLocked = False
 
-trace_level = 0
-def systrace(frame, result, payload):
-    global trace_level
-    # result is 'call', 'line', 'return', 'exception', 'c_call', 'c_return', 
-    # or 'c_exception'
-    indent = " " * trace_level
-    if result == "line":
-        print(indent, "Line:", frame.f_lineno)
-    elif result == "return":
-        if payload:
-            print(indent, "Return:", repr(payload))
-        trace_level -= 1
-    elif result == "call":
-        print(indent, "Call:", frame.f_code.co_filename, frame.f_lineno)
-        print(indent, "%s(...)" % (frame.f_code.co_name,)) 
-        trace_level += 1
-    else:
-        print(indent, result, frame.f_lineno)
-        trace_level -= 1
-    return systrace
-
 if "--debug" in args:
-    sys.settrace(systrace)
+    from debugger import Debugger
+    Debugger(None, interactive=False, show_trace=True).set_trace()
 
 #################################################
 # Single Instance Application
@@ -785,4 +765,3 @@ except:
 if "--nogui" not in args:
     Gtk.Application.Run()
 sys.exit(0)
-

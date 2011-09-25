@@ -172,7 +172,8 @@ class DLREngine(Engine):
         lines = text.split("\n")
         line_count = len(lines)
         if line_count == 1:
-            text = "from __future__ import print_function; " + text
+            if self.dlr_name == "py":
+                text = "from __future__ import print_function; " + text
             sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode
             source = self.engine.CreateScriptSourceFromString(text, sctype)
             return (source.GetCodeProperties() == 
@@ -226,6 +227,7 @@ class DLREngine(Engine):
 
     def execute_file(self, filename):
         self.manager.calico.last_error = ""
+        #IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
         source = self.engine.CreateScriptSourceFromFile(filename)
         try:
             if self.compiler_options:
@@ -236,6 +238,13 @@ class DLREngine(Engine):
             traceback.print_exc()
             return False
         try:
+            #IronPython.Modules.SysModule.settrace(self.trace)
+            #self.engine.GetSysModule().settrace(trace)
+            #self.engine.Execute("import sys; s = sys.settrace", 
+            #                    self.manager.scope)
+            #settrace = self.manager.scope.GetVariable("s")
+            #settrace(self.trace)
+            #self.engine.GetSysModule().settrace(self.trace)
             source.Execute(self.manager.scope)
         except Exception, e:
             if "Thread was being aborted" in str(e.message):
