@@ -48,7 +48,7 @@ class Debugger(bdb.Bdb):
     def user_exception(self, frame, (exc_type, exc_value, exc_traceback)):
         indent = " " * self.trace_level
         if self.show_trace:
-            print(indent, result, frame.f_lineno)
+            print(indent, frame.f_lineno)
         self.interact(frame)
         self.trace_level -= 1
 

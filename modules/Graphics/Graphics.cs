@@ -772,11 +772,9 @@ public static class Graphics {
     public void append(int datum) {
       append(System.Convert.ToDouble(datum));
     }
+
     public void append(double datum) {
       data.Add(datum);
-      foreach (double i in data) {
-        Console.WriteLine(i);
-      }
     }
   }
 
@@ -979,6 +977,7 @@ public static class Graphics {
     ManualResetEvent _lastClickFlag = new ManualResetEvent(false);
     public double time = 0.0;
     public double simulationStepTime = 0.01;
+    public string state = "init";
     
     public WindowClass(string title="Calico Graphics",
                   int width=300, 
@@ -999,12 +998,20 @@ public static class Graphics {
       MotionNotifyEvent += HandleMouseMovementCallbacks;
       KeyPressEvent     += HandleKeyPressCallbacks;
       KeyReleaseEvent   += HandleKeyReleaseCallbacks;
+      ConfigureEvent += configureEventBefore;
       DeleteEvent += OnDelete;
       Add(_canvas);
       ShowAll();
     }
 
-        public void clear() {
+    [GLib.ConnectBefore]
+    public void configureEventBefore(object widget, Gtk.ConfigureEventArgs args)
+    {
+      // FIXME: This can't happen while the window is being moved!
+      state = "moved";
+    }
+
+    public void clear() {
 	  _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
 						   // FIXME: w,h of Window?
 						   (int)800, 
@@ -1844,11 +1851,12 @@ public static class Graphics {
       // p is relative to center, rotate, and scale; returns
       // screen coordinate of p
       double px = 0, py = 0;
+      // FIXME: This can't happen while the window is being moved!
       using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
-        Point temp = screen_coord(center);
-        g.Translate(temp.x, temp.y);
-        g.Rotate(_rotation);
-        g.Scale(_scaleFactor, _scaleFactor);
+	Point temp = screen_coord(center);
+	g.Translate(temp.x, temp.y);
+	g.Rotate(_rotation);
+	g.Scale(_scaleFactor, _scaleFactor);
 	px = System.Convert.ToDouble(iterable[0]);
 	py = System.Convert.ToDouble(iterable[1]);
 	g.UserToDevice(ref px, ref py);

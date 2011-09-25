@@ -8,6 +8,6 @@ for i in range(4):
     print("stall", getRobot().stall)
 
 forward(1)
-while True:
+while getSimulation().window.state == "run":
     if getRobot().stall:
         print("stall", getRobot().stall)

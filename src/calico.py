@@ -121,6 +121,7 @@ class CalicoProject(object):
         self.last_error = ""
         self.actionHandlers = []
         self.debug = False
+        self.trace = False
         self.shell = None
         self.editor = None
         self.chat = None
@@ -165,7 +166,7 @@ class CalicoProject(object):
                 self.plugins[base] = plugin
         # Ok, done with initialization, let's go back to where we came
         os.chdir(self.startpath)
-        request_shell = False
+        request_shell = True # needed because running would hang otherwise; and will be one window soon
         request_editor = False
         request_chat = False
         files = []
@@ -188,6 +189,8 @@ class CalicoProject(object):
                 self.language = lang.strip().lower()
             elif arg == "--debug":
                 self.debug = True
+            elif arg == "--trace":
+                self.trace = True
             else:
                 files.append(os.path.abspath(arg))
                 request_editor = True
@@ -664,6 +667,7 @@ if "--help" in args:
     print(_("  StartCalico --version                  Displays the version number (%s)" % version))
     print(_("  StartCalico --help                     Displays this message"))
     print(_("  StartCalico --debug                    Puts Calico in debugging mode"))
+    print(_("  StartCalico --trace                    Puts Calico in tracing mode"))
     print()
     sys.exit(0)
 elif "--version" in args:
@@ -710,7 +714,7 @@ def handleMessages(sender, args):
         fp.close()
         messagesLocked = False
 
-if "--debug" in args:
+if "--trace" in args:
     from debugger import Debugger
     Debugger(None, interactive=False, show_trace=True).set_trace()
 

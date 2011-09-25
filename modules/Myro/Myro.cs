@@ -663,6 +663,8 @@ public static class Myro {
 	      if (simulation == null) {
 		simulation = new Simulation();
 		Thread.Sleep((int)(1 * 1000));
+	      } else {
+		simulation.setup();
 	      }
 	      robot = new SimScribbler(simulation);
 	    } else {
@@ -674,6 +676,8 @@ public static class Myro {
         } else {
           robot.setup();
         }
+	if (simulation != null)
+	  simulation.setup();
   }
 
   public class Simulation {
@@ -707,44 +711,60 @@ public static class Myro {
       wall = new Graphics.Rectangle(new Graphics.Point(0, height - 5), 
 				    new Graphics.Point(width - 5, height));
       wall.bodyType = "static";
-      wall.draw(window);
-
-      thread = new Thread(new ThreadStart(loop));
-      thread.IsBackground = true;
-      thread.Start();
+      wall.draw(window);      
     }
     
+    public void setup()
+    {
+      if (window.state != "run") {
+	thread = new Thread(new ThreadStart(loop));
+	thread.IsBackground = true;
+	thread.Start();
+      }      
+    }
+
     public void loop() {
-      while (true) {
+      window.state = "run";
+      while (window.state == "run") {
 	foreach(SimScribbler robot in robots) {
 	  lock(robot) {
 	    robot.stall = false;
 	    robot.frame.body.LinearVelocity = Graphics.VectorRotate(
                   Graphics.Vector(robot.velocity, 0), 
 		  robot.frame.body.Rotation);
-
-	// Get sensor readings
-	Microsoft.Xna.Framework.Vector2 v = Graphics.VectorRotate(
-                       Graphics.Vector(100, 0), 
-		       robot.frame.body.Rotation);
-            new Graphics.Line(new Graphics.Point(robot.frame.x, robot.frame.y), 
-	    		  new Graphics.Point(robot.frame.x + v.X, 
-					     robot.frame.y + v.Y)).draw(window);
-
-	window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
-            Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
-            //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
-  	    return 0; // keep looking
-        }, Graphics.Vector(robot.frame.x, robot.frame.y), 
-	  Graphics.Vector(robot.frame.x + v.X, robot.frame.y + v.Y));
-	// end get sensor
+	    // Get sensor readings
+	    lock (window.canvas.shapes) {
+	      foreach (Graphics.Line line in robot.sensors) {
+		Graphics.Point p1 = robot.frame.getScreenPoint(line.getP1());
+		Graphics.Point p2 = robot.frame.getScreenPoint(line.getP2());
+		window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+                        Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
+                       //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
+  	               return 1; // keep looking
+                   }, 
+		  Graphics.Vector(p1.x, p1.y), 
+		  Graphics.Vector(p2.x, p2.y));
+	      }
+	    }
+	    /*
+	      Microsoft.Xna.Framework.Vector2 v = Graphics.VectorRotate(
+	      Graphics.Vector(100, 0), 
+	      robot.frame.body.Rotation);
+	      window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+	      Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
+	      //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
+	      return 1; // keep looking
+	      }, Graphics.Vector(robot.frame.x, robot.frame.y), 
+	      Graphics.Vector(robot.frame.x + v.X, robot.frame.y + v.Y));
+	      // end get sensor
+	      }
+	    */
 	  }
 	}
 	window.step(.1);
       }
     }
   }
-
 
   public static void uninit() {
     if (Myro.robot is Scribbler) {
@@ -1771,9 +1791,10 @@ public static class Myro {
     public Simulation simulation;
     public double velocity = 0;
     public double rate = 8.0;
-	public bool stall = false;
-	public string name = "Scribby";
-	public double battery = 7.6;
+    public bool stall = false;
+    public string name = "Scribby";
+    public double battery = 7.6;
+    public List sensors = new List();
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -1815,6 +1836,14 @@ public static class Myro {
       fluke.color = Color("green");
       fluke.draw(frame);
       
+      // sensors
+      Microsoft.Xna.Framework.Vector2 v2 = Graphics.VectorRotate(
+                       Graphics.Vector(100, 0), 
+		       0);
+      Graphics.Line line = new Graphics.Line(new Graphics.Point(23, -12), 
+					     new Graphics.Point(v2.X, v2.Y));
+      line.draw(frame);
+      sensors.append(line);
       // Just the fill, to see outline of bounding box:
       frame.fill = null;
       // FIXME: something not closing correctly in render when :
@@ -1823,6 +1852,7 @@ public static class Myro {
       // set collision
       frame.draw(simulation.window);
       frame.body.OnCollision += SetStall;
+
       this.simulation.robots.Add(this);
     }
 

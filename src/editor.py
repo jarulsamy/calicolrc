@@ -23,6 +23,7 @@ import Gtk
 import Gdk
 import GLib
 import System
+import Myro
 
 from window import Window, MyWindow
 import printing
