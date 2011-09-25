@@ -34,12 +34,15 @@ class PythonEngine(DLREngine):
     def __init__(self, manager): 
         super(PythonEngine, self).__init__(manager, "python")
         self.dlr_name = "py"
-        self.manager.scriptRuntimeSetup.LanguageSetups.Add(
-            Microsoft.Scripting.Hosting.LanguageSetup(
-                "IronPython.Runtime.PythonContext, IronPython",
-                "IronPython",
-                ["IronPython", "Python", "python", "py"],
-                [".py"]))
+        self.language_setup = IronPython.Hosting.Python.CreateLanguageSetup(None)
+        self.language_setup.Options["FullFrames"] = True
+        # BUG? Options was read-only:
+        #self.language_setup = Microsoft.Scripting.Hosting.LanguageSetup(
+        #        "IronPython.Runtime.PythonContext, IronPython",
+        #        "IronPython",
+        #        ["IronPython", "Python", "python", "py"],
+        #        [".py"])
+        self.manager.scriptRuntimeSetup.LanguageSetups.Add(self.language_setup)
 
     def setup(self):
         super(PythonEngine, self).setup()
@@ -56,6 +59,7 @@ class PythonEngine(DLREngine):
         options = self.engine.GetCompilerOptions()
         options.PrintFunction = True
         options.AllowWithStatement = True
+        #options.FullFrames = True
         self.compiler_options = options
         source.Compile()
         source.Execute(self.manager.scope)
@@ -83,6 +87,11 @@ class PythonEngine(DLREngine):
         for folder in ["modules", "src"]:
             paths.Add(os.path.abspath(folder))
         self.engine.SetSearchPaths(paths)
+        # Now that search paths are set:
+        text = ("from debugger import Debugger;" + 
+                "debug = Debugger(calico, True, True);" +
+                "del Debugger;")
+        self.engine.Execute(text, self.manager.scope)
 
 class Python(Language):
     def get_engine_class(self):
