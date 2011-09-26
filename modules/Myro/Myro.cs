@@ -712,6 +712,10 @@ public static class Myro {
 				    new Graphics.Point(width - 5, height));
       wall.bodyType = "static";
       wall.draw(window);      
+
+      Graphics.Circle ball = new Graphics.Circle(new Graphics.Point(200, 200), 25);
+      ball.fill = makeColor("pink");
+      ball.draw(window);      
     }
     
     public void setup()
@@ -724,6 +728,7 @@ public static class Myro {
     }
 
     public void loop() {
+      float MeterInPixels = 64.0f;
       window.state = "run";
       while (window.state == "run") {
 	foreach(SimScribbler robot in robots) {
@@ -733,32 +738,27 @@ public static class Myro {
                   Graphics.Vector(robot.velocity, 0), 
 		  robot.frame.body.Rotation);
 	    // Get sensor readings
+	    robot.readings = new PythonDictionary();
 	    lock (window.canvas.shapes) {
+	      int count = 0;
 	      foreach (Graphics.Line line in robot.sensors) {
 		Graphics.Point p1 = robot.frame.getScreenPoint(line.getP1());
 		Graphics.Point p2 = robot.frame.getScreenPoint(line.getP2());
 		window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
-                        Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
-                       //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
-  	               return 1; // keep looking
+                       List reading = new List();
+                       reading.append(line);
+                       reading.append(fixture);
+                       reading.append(v1);
+                       reading.append(v2);
+                       reading.append(hit);
+                       robot.readings[count] = reading;
+  	               return 1; 
                    }, 
-		  Graphics.Vector(p1.x, p1.y), 
-		  Graphics.Vector(p2.x, p2.y));
+		  Graphics.Vector(((float)p1.x)/MeterInPixels, ((float)p1.y)/MeterInPixels), 
+		  Graphics.Vector(((float)p2.x)/MeterInPixels, ((float)p2.y)/MeterInPixels));
+		count++;
 	      }
 	    }
-	    /*
-	      Microsoft.Xna.Framework.Vector2 v = Graphics.VectorRotate(
-	      Graphics.Vector(100, 0), 
-	      robot.frame.body.Rotation);
-	      window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
-	      Console.WriteLine("{0}{1}{2}{3}", fixture.UserData, v1, v2, hit);
-	      //Graphics.Shape shape = (Graphics.Shape)fixture.UserData;
-	      return 1; // keep looking
-	      }, Graphics.Vector(robot.frame.x, robot.frame.y), 
-	      Graphics.Vector(robot.frame.x + v.X, robot.frame.y + v.Y));
-	      // end get sensor
-	      }
-	    */
 	  }
 	}
 	window.step(.1);
@@ -1795,6 +1795,7 @@ public static class Myro {
     public string name = "Scribby";
     public double battery = 7.6;
     public List sensors = new List();
+    public PythonDictionary readings;
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -1840,8 +1841,8 @@ public static class Myro {
       Microsoft.Xna.Framework.Vector2 v2 = Graphics.VectorRotate(
                        Graphics.Vector(100, 0), 
 		       0);
-      Graphics.Line line = new Graphics.Line(new Graphics.Point(23, -12), 
-					     new Graphics.Point(v2.X, v2.Y));
+      Graphics.Line line = new Graphics.Line(new Graphics.Point(25, -12), 
+					     new Graphics.Point(25 + v2.X, -12 + v2.Y));
       line.draw(frame);
       sensors.append(line);
       // Just the fill, to see outline of bounding box:
@@ -1883,9 +1884,38 @@ public static class Myro {
       return frame.penUp();
     }   
 
-    public override Graphics.Picture takePicture(string mode="jpeg") {
-      // Override in subclassed robots
-      return null;
+    public override Graphics.Picture takePicture(string mode="jpeg") { // simscribbler
+      double view_angle = 60.0; // degrees
+      double max_distance = 20.0;
+      float MeterInPixels = 64.0f;
+      Graphics.Picture picture = new Graphics.Picture(256, 192, makeColor(0, 0, 0));
+      lock (robot) {
+	double [] distance = new double[256];
+	Graphics.Color [] colors = new Graphics.Color[256];
+	Graphics.Point p1 = frame.getScreenPoint(new Graphics.Point(25, 0));
+	for (int i = 0; i < 256; i++) {
+	  var v = Graphics.VectorRotate(Graphics.Vector(max_distance * MeterInPixels, 0), 
+				(float)(((i/256.0) * view_angle) - view_angle/2.0) * Math.PI/180.0);
+	  Graphics.Point p2 = frame.getScreenPoint(new Graphics.Point(25 + v.X, v.Y));
+	  simulation.window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+                       distance[i] = Math.Min(hit, max_distance)/max_distance; /// 10 x car
+                       //colors[i] = ((Graphics.Shape)fixture.UserData).fill;
+  	               return 1; 
+                   }, 
+	    Graphics.Vector((float)(p1.x/MeterInPixels), (float)(p1.y/MeterInPixels)), 
+	    Graphics.Vector((float)(p2.x/MeterInPixels), (float)(p2.y/MeterInPixels)));
+	}
+	for (int i = 0; i < 256; i++) {
+	  if (distance[i] > 0) {
+	    for (int j = 0; j < 192; j++) {
+	      //Console.WriteLine(colors[i]);
+	      int g = 256 - (int)Math.Min(distance[i] * 12500, 256);
+	      picture.setColor(i, j, new Graphics.Color(g, g, g));
+	    }
+	  }
+	}
+      }
+      return picture;
     }
     
     public override void setup() {
@@ -1932,7 +1962,16 @@ public static class Myro {
       return null;
     }
     
-    public override object getIR(params object [] position) {
+    public override object getIR(params object [] positions) {
+      lock (this) {
+	foreach (object position in positions) {
+	  if (position is int) {
+	    if (readings.Contains((int)position)) {
+	      return readings[position];
+	    }
+	  }
+	}
+      }
       return null;
     }
     
