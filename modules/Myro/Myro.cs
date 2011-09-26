@@ -1888,7 +1888,7 @@ public static class Myro {
       double view_angle = 60.0; // degrees
       double max_distance = 20.0;
       float MeterInPixels = 64.0f;
-      Graphics.Picture picture = new Graphics.Picture(256, 192, makeColor(0, 0, 0));
+      Graphics.Picture picture = new Graphics.Picture(256, 192);
       lock (robot) {
 	double [] distance = new double[256];
 	Graphics.Color [] colors = new Graphics.Color[256];
@@ -1898,19 +1898,32 @@ public static class Myro {
 				(float)(((i/256.0) * view_angle) - view_angle/2.0) * Math.PI/180.0);
 	  Graphics.Point p2 = frame.getScreenPoint(new Graphics.Point(25 + v.X, v.Y));
 	  simulation.window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
-                       distance[i] = Math.Min(hit, max_distance)/max_distance; /// 10 x car
-                       //colors[i] = ((Graphics.Shape)fixture.UserData).fill;
+                       distance[i] = 1.0 - Math.Min(hit * max_distance, max_distance)/max_distance; /// 10 x car
+                       colors[i] = ((Graphics.Shape)fixture.UserData).fill;
   	               return 1; 
                    }, 
 	    Graphics.Vector((float)(p1.x/MeterInPixels), (float)(p1.y/MeterInPixels)), 
 	    Graphics.Vector((float)(p2.x/MeterInPixels), (float)(p2.y/MeterInPixels)));
 	}
+	Graphics.Color c;
+	double g = 1.0;
+	Graphics.Color sky = new Graphics.Color("deepskyblue");
+	Graphics.Color grass = new Graphics.Color("lawngreen");
 	for (int i = 0; i < 256; i++) {
 	  if (distance[i] > 0) {
-	    for (int j = 0; j < 192; j++) {
-	      //Console.WriteLine(colors[i]);
-	      int g = 256 - (int)Math.Min(distance[i] * 12500, 256);
-	      picture.setColor(i, j, new Graphics.Color(g, g, g));
+	    c = colors[i];
+	    g = distance[i];
+	  } else {
+	    c = new Graphics.Color("gray");
+	    g = 1.0;
+	  }
+	  for (int h = 0; h < 192; h++) {
+	    if (h >= (int)(192/2.0 - g * 192/2.0) && h <= (int)(192/2.0 + g * 192/2.0)) {
+	      picture.setColor(i, h, new Graphics.Color(c.red * g, c.green * g, c.blue * g));
+	    } else if (h < (int)(192/2.0 - g * 192/2.0)) {
+	      picture.setColor(i, h, sky);
+	    } else {
+	      picture.setColor(i, h, grass);
 	    }
 	  }
 	}

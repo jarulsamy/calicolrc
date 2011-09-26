@@ -2560,6 +2560,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
   }
 
@@ -3683,6 +3684,7 @@ public static class Graphics {
       body.BodyType = _bodyType;
       body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
   }
 
@@ -3784,6 +3786,7 @@ public static class Graphics {
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
   }
 
@@ -3864,6 +3867,7 @@ public static class Graphics {
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
 
     public override void render(Cairo.Context g) {
@@ -4015,6 +4019,7 @@ public static class Graphics {
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
   }
 
@@ -4049,6 +4054,7 @@ public static class Graphics {
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
 
     /*
@@ -4190,6 +4196,7 @@ public static class Graphics {
       body.Rotation = (float)_rotation;
       body.Friction = _friction;
       body.UserData = this; // point back to this shape
+      body.FixtureList[0].UserData = this; // point back to this shape
     }
 
     public override void render(Cairo.Context g) {
