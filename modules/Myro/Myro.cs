@@ -1889,7 +1889,7 @@ public static class Myro {
       double max_distance = 20.0;
       float MeterInPixels = 64.0f;
       Graphics.Picture picture = new Graphics.Picture(256, 192);
-      lock (robot) {
+      lock (this) {
 	double [] distance = new double[256];
 	Graphics.Color [] colors = new Graphics.Color[256];
 	Graphics.Point p1 = frame.getScreenPoint(new Graphics.Point(25, 0));
@@ -1899,7 +1899,8 @@ public static class Myro {
 	  Graphics.Point p2 = frame.getScreenPoint(new Graphics.Point(25 + v.X, v.Y));
 	  simulation.window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
                        distance[i] = 1.0 - Math.Min(hit * max_distance, max_distance)/max_distance; /// 10 x car
-                       colors[i] = ((Graphics.Shape)fixture.UserData).fill;
+                       if (fixture.UserData is Graphics.Shape)
+			 colors[i] = ((Graphics.Shape)fixture.UserData).fill;
   	               return 1; 
                    }, 
 	    Graphics.Vector((float)(p1.x/MeterInPixels), (float)(p1.y/MeterInPixels)), 
@@ -1911,7 +1912,10 @@ public static class Myro {
 	Graphics.Color grass = new Graphics.Color("lawngreen");
 	for (int i = 0; i < 256; i++) {
 	  if (distance[i] > 0) {
-	    c = colors[i];
+	    if (colors[i] != null)
+	      c = colors[i];
+	    else
+	      c = new Graphics.Color("black");
 	    g = distance[i];
 	  } else {
 	    c = new Graphics.Color("gray");
