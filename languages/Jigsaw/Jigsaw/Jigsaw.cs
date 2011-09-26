@@ -768,9 +768,10 @@ namespace Jigsaw
 		/// <param name="pts">
 		/// A <see cref="List<CPoint>"/>
 		/// </param>
-		public CBlock(List<Diagram.CPoint> pts) : base(pts) {
+		public CBlock(List<Diagram.CPoint> pts, bool isFactory) : base(pts) {
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
+			this._isFactory = isFactory;
 			//this.AlignVertical = StringAlignment.Near;		// Change text vertical alignment to start from top
 			
 			// Default edges
@@ -1599,22 +1600,19 @@ namespace Jigsaw
     {	// Robot block shape class
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CRobot(Double X, Double Y) 
+        public CRobot(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				isFactory) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkRed;
 			this.FillColor = Diagram.Colors.LightPink;
-			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 		}
 		
-		public CRobot(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;;
-		}
+		public CRobot(Double X, Double Y) : this(X, Y, false) { }
     }
 	
 	// -----------------------------------------------------------------------
@@ -1622,22 +1620,19 @@ namespace Jigsaw
     {	// Input/Output block shape class
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CInputOutput(Double X, Double Y) 
+        public CInputOutput(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				isFactory )
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkBlue;
 			this.FillColor = Diagram.Colors.LightBlue;
-			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 		}
 		
-		public CInputOutput(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CInputOutput(Double X, Double Y) : this(X, Y, false) { }
     }
 	
 	// -----------------------------------------------------------------------
@@ -1647,16 +1642,16 @@ namespace Jigsaw
 		public CExpressionProperty Expr = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOPrint(Double X, Double Y) : base(X, Y) {
+		public CIOPrint(Double X, Double Y, bool isFactory) 
+			: base(X, Y, isFactory )
+		{
 			// Properties
 			Expr = new CExpressionProperty("Expression", "X");
 			Expr.PropertyChanged += OnPropertyChanged;
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CIOPrint(Double X, Double Y, bool isFactory) : this(X, Y) {
-			this._isFactory = isFactory;
-		}
+		public CIOPrint(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -1759,7 +1754,9 @@ namespace Jigsaw
 		public CExpressionProperty Path = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOWriteToFile(Double X, Double Y) : base(X, Y) {
+		public CIOWriteToFile(Double X, Double Y, bool isFactory) 
+			: base(X, Y, isFactory )
+		{
 			// Properties
 			Expr = new CExpressionProperty("Expression", "expr");
 			Path = new CExpressionProperty("File Path", "file");
@@ -1767,9 +1764,8 @@ namespace Jigsaw
 			Path.PropertyChanged += OnPropertyChanged;
 			this.OnPropertyChanged(null, null);
 		}
-		public CIOWriteToFile(Double X, Double Y, bool isFactory) : this(X, Y) {
-			this._isFactory = isFactory;
-		}
+		
+		public CIOWriteToFile(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -1826,15 +1822,15 @@ namespace Jigsaw
 		public CExpressionProperty Repetitions = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlRepeat(Double X, Double Y) 
+        public CControlRepeat(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 50) }),
+				isFactory) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.DashStyle = Diagram.DashStyle.Dash;
 			this.Sizable = false;
 			
 			// Create inner edge to connect loop stack
@@ -1847,10 +1843,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CControlRepeat(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CControlRepeat(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -2094,15 +2087,15 @@ namespace Jigsaw
 		public CExpressionProperty IfTest = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlIf(Double X, Double Y) 
+        public CControlIf(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 50)}),
+				isFactory) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.FontStyle = FontStyle.Bold;
 			this.Sizable = false;
 			
 			// Create inner edge to connect if-block stack
@@ -2115,10 +2108,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CControlIf(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CControlIf(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -2348,11 +2338,12 @@ namespace Jigsaw
     {	// Control start block shape class
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlStart(Double X, Double Y) 
+        public CControlStart(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 30)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 30) }),
+				isFactory) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
@@ -2361,10 +2352,7 @@ namespace Jigsaw
 			textYOffset = 10;							// Block text offset
 		}
 		
-		public CControlStart(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CControlStart(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override List<CEdge> Edges 
@@ -2403,23 +2391,20 @@ namespace Jigsaw
     {	// Control end block shape class
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlEnd(Double X, Double Y) 
+        public CControlEnd(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				isFactory) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			//this.DashStyle = Diagram.DashStyle.Dot;
 			this.Sizable = false;
 			this.Text = "stop script";
 		}
 		
-		public CControlEnd(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CControlEnd(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override List<CEdge> Edges 
@@ -2463,11 +2448,12 @@ namespace Jigsaw
 		public CExpressionProperty RHS = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CAssignment(Double X, Double Y) 
+        public CAssignment(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)	}),
+				isFactory ) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
 			this.FillColor = Diagram.Colors.LightGreen;;
@@ -2482,10 +2468,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CAssignment(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CAssignment(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -2596,11 +2579,11 @@ namespace Jigsaw
 		public CIntegerProperty _Height;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxWindow(Double X, Double Y) 
+        public CGfxWindow(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)}),
+			isFactory) {
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
 			this.FillColor = Diagram.Colors.LightGreen;
@@ -2617,10 +2600,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CGfxWindow(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CGfxWindow(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -2737,12 +2717,15 @@ namespace Jigsaw
 		public CExpressionProperty _X2;
 		public CExpressionProperty _Y2;
 		
+		//private Dictionary<String, CProperty> _properties;
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxLine(Double X, Double Y) 
+        public CGfxLine(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20) }),
+				isFactory )
+			{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
 			this.FillColor = Diagram.Colors.LightGreen;
@@ -2759,13 +2742,15 @@ namespace Jigsaw
 			_X2.PropertyChanged += OnPropertyChanged;
 			_Y2.PropertyChanged += OnPropertyChanged;
 			
+//			_properties["X1"] = _X1;
+//			_properties["Y1"] = _Y1;
+//			_properties["X2"] = _X2;
+//			_properties["Y2"] = _Y2;
+			
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CGfxLine(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CGfxLine(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
@@ -2901,11 +2886,12 @@ namespace Jigsaw
 		public CExpressionProperty _Diameter;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxCircle(Double X, Double Y) 
+        public CGfxCircle(Double X, Double Y, bool isFactory) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)
-			})) {
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				isFactory ) 
+		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
 			this.FillColor = Diagram.Colors.LightGreen;
@@ -2923,10 +2909,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CGfxCircle(Double X, Double Y, bool isFactory) : this(X, Y)
-		{
-			this._isFactory = isFactory;
-		}
+		public CGfxCircle(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties

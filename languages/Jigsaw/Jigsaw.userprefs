@@ -1,20 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
       <File FileName="Jigsaw\Engine.cs" Line="165" Column="34" />
-      <File FileName="Jigsaw\Diagram.cs" Line="6" Column="17" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="42" Column="3" />
-      <File FileName="Jigsaw\Widgets.cs" Line="10" Column="1" />
-      <File FileName="NCalc\Expression.cs" Line="192" Column="33" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="44" Column="40" />
+      <File FileName="Jigsaw\Diagram.cs" Line="1560" Column="31" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="2745" Column="30" />
+      <File FileName="Jigsaw\InspectWin.cs" Line="64" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
+          <Node name="NCalc" expanded="True" />
         </State>
       </Pad>
     </Pads>
