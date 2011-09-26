@@ -720,7 +720,7 @@ public static class Myro {
     
     public void setup()
     {
-      if (window.state != "run") {
+      if (thread == null || !thread.IsAlive) {
 	thread = new Thread(new ThreadStart(loop));
 	thread.IsBackground = true;
 	thread.Start();
@@ -729,8 +729,7 @@ public static class Myro {
 
     public void loop() {
       float MeterInPixels = 64.0f;
-      window.state = "run";
-      while (window.state == "run") {
+      while (window.IsRealized) {
 	foreach(SimScribbler robot in robots) {
 	  lock(robot) {
 	    robot.stall = false;
@@ -739,11 +738,13 @@ public static class Myro {
 		  robot.frame.body.Rotation);
 	    // Get sensor readings
 	    robot.readings = new PythonDictionary();
+	    if (!window.IsRealized) return;
 	    lock (window.canvas.shapes) {
 	      int count = 0;
 	      foreach (Graphics.Line line in robot.sensors) {
 		Graphics.Point p1 = robot.frame.getScreenPoint(line.getP1());
 		Graphics.Point p2 = robot.frame.getScreenPoint(line.getP2());
+		if (!window.IsRealized) return;
 		window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
                        List reading = new List();
                        reading.append(line);
@@ -761,6 +762,7 @@ public static class Myro {
 	    }
 	  }
 	}
+	if (!window.IsRealized) return;
 	window.step(.1);
       }
     }
@@ -1889,6 +1891,7 @@ public static class Myro {
       double max_distance = 20.0;
       float MeterInPixels = 64.0f;
       Graphics.Picture picture = new Graphics.Picture(256, 192);
+      if (!simulation.window.IsRealized) return picture;
       lock (this) {
 	double [] distance = new double[256];
 	Graphics.Color [] colors = new Graphics.Color[256];

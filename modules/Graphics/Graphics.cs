@@ -421,7 +421,7 @@ public static class Graphics {
                                            int width=300,
                                            int height=300) {
     if (_windows.ContainsKey(title)) {
-      _windows[title].clear();
+      _windows[title].clear(false);
       _windows[title].mode = "auto";
       _windows[title].Resize(width, height);
       _lastWindow = _windows[title];
@@ -998,20 +998,17 @@ public static class Graphics {
       MotionNotifyEvent += HandleMouseMovementCallbacks;
       KeyPressEvent     += HandleKeyPressCallbacks;
       KeyReleaseEvent   += HandleKeyReleaseCallbacks;
-      ConfigureEvent += configureEventBefore;
+      //ConfigureEvent += configureEventBefore;
       DeleteEvent += OnDelete;
       Add(_canvas);
       ShowAll();
     }
 
-    [GLib.ConnectBefore]
-    public void configureEventBefore(object widget, Gtk.ConfigureEventArgs args)
-    {
-      // FIXME: This can't happen while the window is being moved!
-      state = "moved";
+    public void clear() {
+      clear(true);
     }
 
-    public void clear() {
+    public void clear(bool redraw) {
 	  _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
 						   // FIXME: w,h of Window?
 						   (int)800, 
@@ -1024,7 +1021,8 @@ public static class Graphics {
 		_canvas.Remove(child);
 	      }
 	    });
-          QueueDraw();
+	  if (redraw)
+	    QueueDraw();
         }
 
     public Microsoft.Xna.Framework.Vector2 gravity {
@@ -1851,8 +1849,7 @@ public static class Graphics {
       // p is relative to center, rotate, and scale; returns
       // screen coordinate of p
       double px = 0, py = 0;
-      // FIXME: This can't happen while the window is being moved!
-      using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+      using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 	Point temp = screen_coord(center);
 	g.Translate(temp.x, temp.y);
 	g.Rotate(_rotation);
@@ -2515,7 +2512,7 @@ public static class Graphics {
 
     public double width {
       get {
-        using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+        using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
           Cairo.TextExtents te = g.TextExtents(text);
           return te.Width * 2;
         }
@@ -2524,7 +2521,7 @@ public static class Graphics {
 
     public double height {
       get {
-        using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+        using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
           Cairo.TextExtents te = g.TextExtents(text);
           return te.Height * 2;
         }
@@ -2535,7 +2532,7 @@ public static class Graphics {
       world = window._canvas.world;
       double width = 0;
       double height = 0;
-      using (Cairo.Context g = Gdk.CairoHelper.Create(window.GdkWindow)) {
+      using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
         Cairo.TextExtents te = g.TextExtents(text);
         // FIXME: need to adjust based on justification
         // This works with x centered, y centered
