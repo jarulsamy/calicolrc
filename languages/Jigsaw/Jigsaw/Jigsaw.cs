@@ -265,6 +265,10 @@ namespace Jigsaw
 			this.AddShape(gblock3);
 			tbGraphics.AddShape(gblock3);
 			
+			CGfxText gblock4 = new CGfxText(110, 190, true);
+			this.AddShape(gblock4);
+			tbGraphics.AddShape(gblock4);
+			
 			// --- Run tab
 			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
 			bRun.MouseDown += OnRunMouseDown;
@@ -634,7 +638,8 @@ namespace Jigsaw
 							// Add a property to the block
 							name = xr.GetAttribute("name");
 							val = xr.GetAttribute("value");
-							tBlock.SetProperty(name, val);
+							tBlock[name] = val;
+							//tBlock.SetProperty(name, val);
 							break;
 						}
 						
@@ -742,32 +747,25 @@ namespace Jigsaw
 	}
 	
 	// -----------------------------------------------------------------------
-
-	/// <summary>
-	/// Base block class
-	/// </summary>
+	// Base block class
 	public class CBlock : Diagram.CShape
 	{
 		protected BlockState _state = BlockState.Idle;	// Current state of this block
 		public CEdge InEdge;							// By default, all Blocks have one main input edge and one main output edge
 		public CEdge OutEdge;		
 		
-		public CReadOnlyProperty TextProp = null;		// Just a property to reflect text into Inspector
-		public CReadOnlyProperty MsgProp = null;		// All blocks have a Message property
+		//public CReadOnlyProperty TextProp = null;		// Just a property to reflect text into Inspector
+		//public CReadOnlyProperty MsgProp = null;		// All blocks have a Message property
 
 		protected int textYOffset = 0;					// Y offset for when a block's text
-		
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
 		
 		protected Gtk.Window _propDialog = null;
 		protected Gtk.Window _contextMenu = null;
+
+		protected Dictionary<String, CProperty> _properties;
 		
-		/// <summary>
-		/// CBlock constructor. 
-		/// </summary>
-		/// <param name="pts">
-		/// A <see cref="List<CPoint>"/>
-		/// </param>
+		// Constructor
 		public CBlock(List<Diagram.CPoint> pts, bool isFactory) : base(pts) {
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
@@ -779,50 +777,27 @@ namespace Jigsaw
 			OutEdge = new CEdge(this, "Out", EdgeType.Out, null, offsetX, offsetY, 0.0, this.Height, this.Width);
 			
 			// Default properties
-			TextProp = new CReadOnlyProperty("Label", "");
-			MsgProp = new CReadOnlyProperty("Message", "");
+			CReadOnlyProperty TextProp = new CReadOnlyProperty("Label", "");
+			CReadOnlyProperty MsgProp = new CReadOnlyProperty("Message", "");
+			
+			_properties = new Dictionary<String, CProperty>();
+			_properties["Label"] = TextProp;
+			_properties["Message"] = MsgProp;
 		}
 		
-		/// <summary>
-		/// State getter/setter 
-		/// </summary>
+		// State getter/setter 
 		public BlockState State {
 			get { return _state;  }
 			set { _state = value; }
 		}
 		
-		/// <summary>
-		/// Method to clone a CBlock at X,Y
-		/// </summary>
-		/// <param name="X">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="Y">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="CBlock"/>
-		/// </returns>
+		// Method to clone a CBlock at X,Y
 		public override Diagram.CShape Clone(double X, double Y) 
 		{	// Clone this CBlock
 			return this.Clone(X, Y, true);
 		}
 
-		/// <summary>
-		/// Method to clone a CBlock at X,Y with option to clone edges. 
-		/// </summary>
-		/// <param name="X">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="Y">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="cloneEdges">
-		/// A <see cref="System.Boolean"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="CBlock"/>
-		/// </returns>
+		// Method to clone a CBlock at X,Y with option to clone edges. 
 		public virtual CBlock Clone(double X, double Y, bool cloneEdges) 
 		{	// Clone this block. Optionally clone edges.
 			CBlock clone = (CBlock)base.Clone(X, Y);
@@ -841,6 +816,13 @@ namespace Jigsaw
 			return clone;
 		}
 		
+		// Access property values
+		public string this[string key]
+		{
+			get { return _properties[key].Text;  }
+			set	{ _properties[key].Text = value; }
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Override Text property of blocks to also set the TextProp value when assigned
         public override String Text
@@ -848,24 +830,26 @@ namespace Jigsaw
             get { return this.text; }
             set {
 				this.text = value;
-				this.TextProp.Text = value;
+				this["Label"] = value;
+				//this.TextProp.Text = value;
 			}
         }
 		
 		// This is a special internal method used when a program file is opened.
 		// Each block subclass should override and handle their special properties by name.
-		internal virtual bool SetProperty(string name, string val)
-		{
-			string lname = name.ToLower();
-			switch(lname) {
-			case "text":
-				TextProp.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		internal virtual bool SetProperty(string name, string val)
+//		{
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "text":
+//				this["Label"] = val;
+//				//TextProp.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 
 		// This is a special internal method used when a program file is openned.
 		// Each block subclass should override and handle their special properties by name.
@@ -896,21 +880,11 @@ namespace Jigsaw
 			}
 		}
 		
-		/// <summary>
-		/// All blocks need a Block Runner, which is an IEnumerator that executes the block's behavior.
-		/// Block Runner IEnumerators return a RunnerResponse object.
-		/// Block Runners are provided the local scope and builtin scope in which they run. 
-		/// Base behavior only calls output blocks and manages state.  
-		/// </summary>
-		/// <param name="locals">
-		/// A <see cref="Dictionary<System.String, System.Object>"/>
-		/// </param>
-		/// <param name="builtins">
-		/// A <see cref="Dictionary<System.String, System.Object>"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="IEnumerator<RunnerResponse>"/>
-		/// </returns>
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// All blocks need a Block Runner, which is an IEnumerator that executes the block's behavior.
+		// Block Runner IEnumerators return a RunnerResponse object.
+		// Block Runners are provided the local scope and builtin scope in which they run. 
+		// Base behavior only calls output blocks and manages state. 
 		public virtual IEnumerator<RunnerResponse> Runner(
 								    	Dictionary<string, object> locals, 
 								        Dictionary<string, object> builtins) 
@@ -930,8 +904,6 @@ namespace Jigsaw
 				rr.Runner = null;
 				yield return rr;
 			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Custom behavior will occur 
 			
@@ -984,16 +956,17 @@ namespace Jigsaw
         // Override to write custom Xml content of a shape.
         protected override void WriteXmlTags(XmlWriter w)
         {
-			foreach(CEdge e in this.Edges) e.ToXml(w);
+			foreach (CEdge e in this.Edges) e.ToXml(w);
+			foreach (CProperty p in this.Properties) p.ToXml(w);
         }
 		
-	 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected virtual void WriteXmlProperty(XmlWriter w, string name, string val) {
-	        w.WriteStartElement("property");
-			w.WriteAttributeString("name", name);
-			w.WriteAttributeString("value", val);
-			w.WriteEndElement();	
-		}
+//	 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		protected virtual void WriteXmlProperty(XmlWriter w, string name, string val) {
+//	        w.WriteStartElement("property");
+//			w.WriteAttributeString("name", name);
+//			w.WriteAttributeString("value", val);
+//			w.WriteEndElement();	
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// All blocks follow the same pattern for drawing.
@@ -1125,7 +1098,8 @@ namespace Jigsaw
 		public virtual List<CProperty> Properties 
 		{
 			get {
-				return new List<CProperty>() { this.TextProp, this.MsgProp };
+				return new List<CProperty>( _properties.Values );
+				//return new List<CProperty>() { this.TextProp, this.MsgProp };
 			}
 		}
 		
@@ -1639,15 +1613,16 @@ namespace Jigsaw
     public class CIOPrint : CInputOutput
     {	// Print block shape class
 
-		public CExpressionProperty Expr = null;
+		//public CExpressionProperty Expr = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CIOPrint(Double X, Double Y, bool isFactory) 
 			: base(X, Y, isFactory )
 		{
 			// Properties
-			Expr = new CExpressionProperty("Expression", "X");
+			CExpressionProperty Expr = new CExpressionProperty("Expression", "X");
 			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Expression"] = Expr;
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -1655,35 +1630,35 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this.Expr);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this.Expr);
+//				return props;
+//			}
+//		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "expression":
-				Expr.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "expression":
+//				Expr.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "Expression", Expr.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "Expression", Expr.Text);
+//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Execute print statement
@@ -1706,6 +1681,7 @@ namespace Jigsaw
 			// Do the print
 			// TODO: Allow access to global namespace
 			try {
+				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
 				Expr.Expr.Parameters = locals;
 				object o = Expr.Expr.Evaluate();
 				string toPrint = o.ToString();
@@ -1742,7 +1718,8 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("print {0}", Expr.Text);
+			this.Text = String.Format("print {0}", this["Expression"]);
+			//.Text = String.Format("print {0}", Expr.Text);
 		}
 	}
 
@@ -1750,18 +1727,20 @@ namespace Jigsaw
     public class CIOWriteToFile : CInputOutput
     {	// Write an item to a file path
 		
-		public CExpressionProperty Expr = null;
-		public CExpressionProperty Path = null;
+//		public CExpressionProperty Expr = null;
+//		public CExpressionProperty Path = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CIOWriteToFile(Double X, Double Y, bool isFactory) 
 			: base(X, Y, isFactory )
 		{
 			// Properties
-			Expr = new CExpressionProperty("Expression", "expr");
-			Path = new CExpressionProperty("File Path", "file");
+			CExpressionProperty Expr = new CExpressionProperty("Expression", "expr");
+			CExpressionProperty Path = new CExpressionProperty("FilePath", "file");
 			Expr.PropertyChanged += OnPropertyChanged;
 			Path.PropertyChanged += OnPropertyChanged;
+			_properties["Expression"] = Expr;
+			_properties["FilePath"] = Path;
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -1769,46 +1748,47 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this.Expr);
-				props.Add(this.Path);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this.Expr);
+//				props.Add(this.Path);
+//				return props;
+//			}
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs E){
-			this.Text = String.Format("write {0} to {1}", Expr.Text, Path.Text);
+			this.Text = String.Format("write {0} to {1}", this["Expression"], this["FilePath"]);
+			//this.Text = String.Format("write {0} to {1}", Expr.Text, Path.Text);
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "expression":
-				Expr.Text = val;
-				break;
-			case "path":
-				Path.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "expression":
+//				Expr.Text = val;
+//				break;
+//			case "path":
+//				Path.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "Path", Path.Text);
-			this.WriteXmlProperty(w, "Expression", Expr.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "Path", Path.Text);
+//			this.WriteXmlProperty(w, "Expression", Expr.Text);
+//        }
 	}
 	
 	// -----------------------------------------------------------------------
@@ -1819,7 +1799,7 @@ namespace Jigsaw
 		public CEdge LoopEdge = null;
 		
 		// Properties
-		public CExpressionProperty Repetitions = null;
+		//public CExpressionProperty Repetitions = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CControlRepeat(Double X, Double Y, bool isFactory) 
@@ -1838,8 +1818,9 @@ namespace Jigsaw
 			LoopEdge = new CEdge(this, "Loop", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
 			
 			// Properties
-			Repetitions = new CExpressionProperty("Repetitions", "3");
+			CExpressionProperty Repetitions = new CExpressionProperty("Repetitions", "3");
 			Repetitions.PropertyChanged += OnPropertyChanged;
+			_properties["Repetitions"] = Repetitions;
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -1847,14 +1828,14 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this.Repetitions);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this.Repetitions);
+//				return props;
+//			}
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
@@ -1886,17 +1867,17 @@ namespace Jigsaw
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "repetitions":
-				Repetitions.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "repetitions":
+//				Repetitions.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		internal override CEdge GetEdgeByName(string name)
@@ -1916,16 +1897,17 @@ namespace Jigsaw
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "Repetitions", Repetitions.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "Repetitions", Repetitions.Text);
+//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("repeat {0} times", Repetitions.Text);
+			this.Text = String.Format("repeat {0} times", this["Repetitions"]);
+			//this.Text = String.Format("repeat {0} times", Repetitions.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1953,12 +1935,14 @@ namespace Jigsaw
 			// Start by getting the number of repetitions as an integer
 			// TODO: Allow access to global namespace
 			try {
+				CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
 				Repetitions.Expr.Parameters = locals;
 				object oreps = Repetitions.Expr.Evaluate();
 				maxreps = (int)oreps;
 
 			} catch (Exception ex) {
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -2084,7 +2068,7 @@ namespace Jigsaw
 		public CEdge IfEdge = null;
 		
 		// Properties
-		public CExpressionProperty IfTest = null;
+		//public CExpressionProperty IfTest = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CControlIf(Double X, Double Y, bool isFactory) 
@@ -2103,8 +2087,11 @@ namespace Jigsaw
 			IfEdge = new CEdge(this, "If", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
 			
 			// Properties
-			IfTest = new CExpressionProperty("If-test", "true");
+			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "true");
 			IfTest.PropertyChanged += OnPropertyChanged;
+			
+			_properties["IfTest"] = IfTest;
+			
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -2112,14 +2099,14 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this.IfTest);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this.IfTest);
+//				return props;
+//			}
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
@@ -2151,17 +2138,17 @@ namespace Jigsaw
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "if":
-				IfTest.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "if":
+//				IfTest.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		internal override CEdge GetEdgeByName(string name)
@@ -2181,16 +2168,17 @@ namespace Jigsaw
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "if", IfTest.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "if", IfTest.Text);
+//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("if {0}", IfTest.Text);
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = String.Format("if {0}", this["IfTest"]);
+			//this.Text = String.Format("if {0}", IfTest.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2216,12 +2204,14 @@ namespace Jigsaw
 			// Start by evaluating the if expression
 			// TODO: Allow access to global namespace
 			try {
+				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
 				IfTest.Expr.Parameters = locals;
 				object otest = IfTest.Expr.Evaluate();
 				doIf = (bool)otest;
 
 			} catch (Exception ex) {
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -2443,9 +2433,8 @@ namespace Jigsaw
     public class CAssignment : CBlock
     {	// Variable assignment block shape class
 		
-		// TODO: These should not be public, but set up to modify Text when changed
-		public CVarNameProperty VarName = null;
-		public CExpressionProperty RHS = null;
+		//public CVarNameProperty VarName = null;
+		//public CExpressionProperty RHS = null;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CAssignment(Double X, Double Y, bool isFactory) 
@@ -2460,57 +2449,60 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			VarName = new CVarNameProperty("Variable", "X");
-			RHS = new CExpressionProperty("Expression", "0");
+			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
+			CExpressionProperty RHS = new CExpressionProperty("Expression", "0");
 			
 			VarName.PropertyChanged += OnPropertyChanged;
 			RHS.PropertyChanged += OnPropertyChanged;
+			
+			_properties["Variable"] = VarName;
+			_properties["Expression"] = RHS;
 			this.OnPropertyChanged(null, null);
 		}
 		
 		public CAssignment(Double X, Double Y) : this(X, Y, false) { }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this.VarName);
-				props.Add(this.RHS);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{	// Returns a list of all block properties
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this.VarName);
+//				props.Add(this.RHS);
+//				return props;
+//			}
+//		}
 		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "Variable", VarName.Text);
-			this.WriteXmlProperty(w, "Expression", RHS.Text);
-        }
+//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        // Write custom tags for this block
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "Variable", VarName.Text);
+//			this.WriteXmlProperty(w, "Expression", RHS.Text);
+//        }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "variable":
-				VarName.Text = val;
-				break;
-			case "expression":
-				RHS.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "variable":
+//				VarName.Text = val;
+//				break;
+//			case "expression":
+//				RHS.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("let {0} = {1}", VarName.Text, RHS.Text);
+			this.Text = String.Format("let {0} = {1}", this["Variable"], this["Expression"]);
+			//this.Text = String.Format("let {0} = {1}", VarName.Text, RHS.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2520,7 +2512,7 @@ namespace Jigsaw
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			//this.State = BlockState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -2535,12 +2527,16 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 
 			try {
+				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
+				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
+				
 				RHS.Expr.Parameters = locals;
 				locals[VarName.Text] = RHS.Expr.Evaluate();
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -2574,9 +2570,9 @@ namespace Jigsaw
 		// Stores Window object as varable named 'win' locals
 		
 		// These should not be public, but set up to modify Text when changed
-		public CStringProperty _Title;
-		public CIntegerProperty _Width;
-		public CIntegerProperty _Height;
+//		public CStringProperty _Title;
+//		public CIntegerProperty _Width;
+//		public CIntegerProperty _Height;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CGfxWindow(Double X, Double Y, bool isFactory) 
@@ -2590,13 +2586,18 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			_Title = new CStringProperty("Title", "Gfx1");
-			_Width = new CIntegerProperty("Width", 300);
-			_Height = new CIntegerProperty("Height", 300);
+			CStringProperty _Title = new CStringProperty("Title", "Gfx1");
+			CIntegerProperty _Width = new CIntegerProperty("Width", 300);
+			CIntegerProperty _Height = new CIntegerProperty("Height", 300);
 			
 			_Title.PropertyChanged += OnPropertyChanged;
 			_Width.PropertyChanged += OnPropertyChanged;
 			_Height.PropertyChanged += OnPropertyChanged;
+			
+			_properties["Title"] = _Title;
+			_properties["Width"] = _Width;
+			_properties["Height"] = _Height;
+			
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -2604,50 +2605,51 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this._Title);
-				props.Add(this._Width);
-				props.Add(this._Height);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this._Title);
+//				props.Add(this._Width);
+//				props.Add(this._Height);
+//				return props;
+//			}
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "Title", _Title.Text);
-			this.WriteXmlProperty(w, "Width", _Width.Text);
-			this.WriteXmlProperty(w, "Height", _Height.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "Title", _Title.Text);
+//			this.WriteXmlProperty(w, "Width", _Width.Text);
+//			this.WriteXmlProperty(w, "Height", _Height.Text);
+//        }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "title":
-				_Title.Text = val;
-				break;
-			case "width":
-				_Width.Value = int.Parse(val);
-				break;
-			case "height":
-				_Height.Value = int.Parse(val);
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "title":
+//				_Title.Text = val;
+//				break;
+//			case "width":
+//				_Width.Value = int.Parse(val);
+//				break;
+//			case "height":
+//				_Height.Value = int.Parse(val);
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("gfx window ({0})", _Title.Text);
+			this.Text = String.Format("gfx window ({0})", this["Title"]);
+			//this.Text = String.Format("gfx window ({0})", _Title.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2672,14 +2674,14 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 
 			try {
-//				string t = (string)_Title.Text;
-//				int w = (int)_Width.Value;
-//				int h = (int)_Height.Value;
-				locals["win"] = Graphics.makeWindow((string)_Title.Text, (int)_Width.Value, (int)_Height.Value);
+				CIntegerProperty _Width = (CIntegerProperty)_properties["Width"];
+				CIntegerProperty _Height = (CIntegerProperty)_properties["Height"];
+				locals["win"] = Graphics.makeWindow(this["Title"], (int)_Width.Value, (int)_Height.Value);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -2711,13 +2713,10 @@ namespace Jigsaw
     public class CGfxLine : CBlock
     {	// Block to create a new line and add it to the window
 		
-		// These should not be public, but set up to modify Text when changed
-		public CExpressionProperty _X1;
-		public CExpressionProperty _Y1;
-		public CExpressionProperty _X2;
-		public CExpressionProperty _Y2;
-		
-		//private Dictionary<String, CProperty> _properties;
+		//public CExpressionProperty _X1;
+		//public CExpressionProperty _Y1;
+		//public CExpressionProperty _X2;
+		//public CExpressionProperty _Y2;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CGfxLine(Double X, Double Y, bool isFactory) 
@@ -2732,77 +2731,84 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			_X1 = new CExpressionProperty("X1", "50");
-			_Y1 = new CExpressionProperty("Y1", "50");
-			_X2 = new CExpressionProperty("X2", "150");
-			_Y2 = new CExpressionProperty("Y2", "150");
+			CExpressionProperty _X1 = new CExpressionProperty("X1", "50");
+			CExpressionProperty _Y1 = new CExpressionProperty("Y1", "50");
+			CExpressionProperty _X2 = new CExpressionProperty("X2", "150");
+			CExpressionProperty _Y2 = new CExpressionProperty("Y2", "150");
 			
 			_X1.PropertyChanged += OnPropertyChanged;
 			_Y1.PropertyChanged += OnPropertyChanged;
 			_X2.PropertyChanged += OnPropertyChanged;
 			_Y2.PropertyChanged += OnPropertyChanged;
 			
-//			_properties["X1"] = _X1;
-//			_properties["Y1"] = _Y1;
-//			_properties["X2"] = _X2;
-//			_properties["Y2"] = _Y2;
+			_properties["X1"] = _X1;
+			_properties["Y1"] = _Y1;
+			_properties["X2"] = _X2;
+			_properties["Y2"] = _Y2;
 			
+			// Go ahead and trigger updates
 			this.OnPropertyChanged(null, null);
 		}
 		
 		public CGfxLine(Double X, Double Y) : this(X, Y, false) { }
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this._X1);
-				props.Add(this._Y1);
-				props.Add(this._X2);
-				props.Add(this._Y2);
-				return props;
-			}
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		// Returns a list of all block properties
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this._X1);
+//				props.Add(this._Y1);
+//				props.Add(this._X2);
+//				props.Add(this._Y2);
+//				return props;
+//			}
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "X1", _X1.Text);
-			this.WriteXmlProperty(w, "Y1", _Y1.Text);
-			this.WriteXmlProperty(w, "X2", _X2.Text);
-			this.WriteXmlProperty(w, "Y2", _Y2.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "X1", _X1.Text);
+//			this.WriteXmlProperty(w, "Y1", _Y1.Text);
+//			this.WriteXmlProperty(w, "X2", _X2.Text);
+//			this.WriteXmlProperty(w, "Y2", _Y2.Text);
+//        }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "x1":
-				_X1.Text = val;
-				break;
-			case "y1":
-				_Y1.Text = val;
-				break;
-			case "x2":
-				_X2.Text = val;
-				break;
-			case "y2":
-				_Y2.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "x1":
+//				this["X1"] = val;
+//				//_X1.Text = val;
+//				break;
+//			case "y1":
+//				this["Y1"] = val;
+//				//_Y1.Text = val;
+//				break;
+//			case "x2":
+//				this["X2"] = val;
+//				//_X2.Text = val;
+//				break;
+//			case "y2":
+//				this["Y2"] = val;
+//				//_Y2.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("create line ({0},{1})-({2},{3})", _X1.Text, _Y1.Text, _X2.Text, _Y2.Text);
+			
+			this.Text = String.Format("create line ({0},{1})-({2},{3})", this["X1"], this["Y1"], this["X2"], this["Y2"]);
+			//this.Text = String.Format("create line ({0},{1})-({2},{3})", _X1.Text, _Y1.Text, _X2.Text, _Y2.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2828,6 +2834,10 @@ namespace Jigsaw
 
 			try {
 				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
+				CExpressionProperty _X1 = (CExpressionProperty)_properties["X1"];
+				CExpressionProperty _Y1 = (CExpressionProperty)_properties["Y1"];
+				CExpressionProperty _X2 = (CExpressionProperty)_properties["X2"];
+				CExpressionProperty _Y2 = (CExpressionProperty)_properties["Y2"];
 				
 				_X1.Expr.Parameters = locals;
 				double dx1 = Convert.ToDouble( _X1.Expr.Evaluate() );
@@ -2848,7 +2858,8 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -2881,9 +2892,9 @@ namespace Jigsaw
     {	// Block to create a new line and add it to the window
 		
 		// These should not be public, but set up to modify Text when changed
-		public CExpressionProperty _X1;
-		public CExpressionProperty _Y1;
-		public CExpressionProperty _Diameter;
+		//public CExpressionProperty _X1;
+		//public CExpressionProperty _Y1;
+		//public CExpressionProperty _Diameter;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CGfxCircle(Double X, Double Y, bool isFactory) 
@@ -2898,13 +2909,17 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			_X1 = new CExpressionProperty("X", "50");
-			_Y1 = new CExpressionProperty("Y", "50");
-			_Diameter = new CExpressionProperty("Diameter", "50");
+			CExpressionProperty _X1 = new CExpressionProperty("X", "50");
+			CExpressionProperty _Y1 = new CExpressionProperty("Y", "50");
+			CExpressionProperty _Diameter = new CExpressionProperty("Diameter", "50");
 			
 			_X1.PropertyChanged += OnPropertyChanged;
 			_Y1.PropertyChanged += OnPropertyChanged;
 			_Diameter.PropertyChanged += OnPropertyChanged;
+			
+			_properties["X"] = _X1;
+			_properties["Y"] = _Y1;
+			_properties["Diameter"] = _Diameter;
 			
 			this.OnPropertyChanged(null, null);
 		}
@@ -2913,50 +2928,51 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Returns a list of all block properties
-		public override List<CProperty> Properties 
-		{
-			get {
-				List<CProperty> props = base.Properties;
-				props.Add(this._X1);
-				props.Add(this._Y1);
-				props.Add(this._Diameter);
-				return props;
-			}
-		}
+//		public override List<CProperty> Properties 
+//		{
+//			get {
+//				List<CProperty> props = base.Properties;
+//				props.Add(this._X1);
+//				props.Add(this._Y1);
+//				props.Add(this._Diameter);
+//				return props;
+//			}
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Write custom tags for this block
-        protected override void WriteXmlTags(XmlWriter w)
-        {
-			base.WriteXmlTags(w);
-			this.WriteXmlProperty(w, "X", _X1.Text);
-			this.WriteXmlProperty(w, "Y", _Y1.Text);
-			this.WriteXmlProperty(w, "Diameter", _Diameter.Text);
-        }
+//        protected override void WriteXmlTags(XmlWriter w)
+//        {
+//			base.WriteXmlTags(w);
+//			this.WriteXmlProperty(w, "X", _X1.Text);
+//			this.WriteXmlProperty(w, "Y", _Y1.Text);
+//			this.WriteXmlProperty(w, "Diameter", _Diameter.Text);
+//        }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override bool SetProperty(string name, string val) {
-			string lname = name.ToLower();
-			switch(lname) {
-			case "x":
-				_X1.Text = val;
-				break;
-			case "y":
-				_Y1.Text = val;
-				break;
-			case "diameter":
-				_Diameter.Text = val;
-				break;
-			default:
-				return false;
-			}
-			return true;
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		internal override bool SetProperty(string name, string val) {
+//			string lname = name.ToLower();
+//			switch(lname) {
+//			case "x":
+//				_X1.Text = val;
+//				break;
+//			case "y":
+//				_Y1.Text = val;
+//				break;
+//			case "diameter":
+//				_Diameter.Text = val;
+//				break;
+//			default:
+//				return false;
+//			}
+//			return true;
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Update text when property changes
 		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("create circle ({0},{1}) {2}", _X1.Text, _Y1.Text, _Diameter.Text);
+			this.Text = String.Format("create circle ({0},{1}) {2}", this["X"], this["Y"], this["Diameter"]);
+			//this.Text = String.Format("create circle ({0},{1}) {2}", _X1.Text, _Y1.Text, _Diameter.Text);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2983,6 +2999,9 @@ namespace Jigsaw
 			try {
 				// Access window. This should have already been created with a previous block
 				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
+				CExpressionProperty _X1 = (CExpressionProperty)_properties["X"];
+				CExpressionProperty _Y1 = (CExpressionProperty)_properties["Y"];
+				CExpressionProperty _Diameter = (CExpressionProperty)_properties["Diameter"];
 				
 				// Evaluate position and diameter
 				_X1.Expr.Parameters = locals;
@@ -3001,7 +3020,8 @@ namespace Jigsaw
 				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
-				MsgProp.Text = ex.Message;
+				this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
@@ -3028,7 +3048,119 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
+	
+	// -----------------------------------------------------------------------
+    public class CGfxText : CBlock
+    {	// Block to create a new Text object and add it to the window
 
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CGfxText(Double X, Double Y, bool isFactory) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				isFactory ) 
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;
+			this.Sizable = false;
+			
+			// Properties
+			CExpressionProperty _X = new CExpressionProperty("X", "50");
+			CExpressionProperty _Y = new CExpressionProperty("Y", "50");
+			CExpressionProperty _Text = new CExpressionProperty("Text", "'Hello'");
+			
+			_X.PropertyChanged += OnPropertyChanged;
+			_Y.PropertyChanged += OnPropertyChanged;
+			_Text.PropertyChanged += OnPropertyChanged;
+			
+			_properties["X"] = _X;
+			_properties["Y"] = _Y;
+			_properties["Text"] = _Text;
+			
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CGfxText(Double X, Double Y) : this(X, Y, false) { }
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Update text when property changes
+		public void OnPropertyChanged(object sender, EventArgs e){
+			this.Text = String.Format("draw text ({0},{1}) {2}", this["X"], this["Y"], this["Text"]);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Execute a variable assignment
+		public override IEnumerator<RunnerResponse> 
+			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the assignment
+			// TODO: Allow access to global namespace
+
+			try {
+				// Access window. This should have already been created with a previous block
+				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
+				CExpressionProperty _X = (CExpressionProperty)_properties["X"];
+				CExpressionProperty _Y = (CExpressionProperty)_properties["Y"];
+				CExpressionProperty _Text = (CExpressionProperty)_properties["Text"];
+				
+				// Evaluate position and diameter
+				_X.Expr.Parameters = locals;
+				double dx1 = Convert.ToDouble(_X.Expr.Evaluate());
+				_Y.Expr.Parameters = locals;
+				double dy1 = Convert.ToDouble(_Y.Expr.Evaluate());
+				_Text.Expr.Parameters = locals;
+				string txt = Convert.ToString(_Text.Expr.Evaluate());
+				
+				// Create Text object
+				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
+				Graphics.Text t = new Graphics.Text(pt1, txt);
+				
+				// Draw text
+				t.draw(win);
+				
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.NoAction;
+				rr.Runner = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Runner = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
+	
 	// -----------------------------------------------------------------------
     public class CEdge
 	{	// Class that holds details of a place to link CBlocks

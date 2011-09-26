@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -394,6 +395,14 @@ namespace Jigsaw
 				this.RaisePropertyChanged();
 			}
 		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void ToXml(XmlWriter w) {
+	        w.WriteStartElement("property");
+			w.WriteAttributeString("name", _Name);
+			w.WriteAttributeString("value", _Text);
+			w.WriteEndElement();	
+		}
 	}
 	
 	/// <summary>
@@ -425,6 +434,14 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public NCalc.Expression Expr {
 			get { return _Expr; }
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void ToXml(XmlWriter w) {
+	        w.WriteStartElement("property");
+			w.WriteAttributeString("name", _Name);
+			w.WriteAttributeString("value", _Expr.ParsedExpression.ToString());
+			w.WriteEndElement();	
 		}
 	}
 	
@@ -504,6 +521,14 @@ namespace Jigsaw
 				_Text = _val.ToString();
 				this.RaisePropertyChanged();
 			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void ToXml(XmlWriter w) {
+	        w.WriteStartElement("property");
+			w.WriteAttributeString("name", _Name);
+			w.WriteAttributeString("value", _val.ToString());
+			w.WriteEndElement();	
 		}
 	}
 	

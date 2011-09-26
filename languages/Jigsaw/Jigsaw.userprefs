@@ -2,10 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw\Engine.cs" Line="165" Column="34" />
+      <File FileName="Jigsaw\Engine.cs" Line="163" Column="6" />
       <File FileName="Jigsaw\Diagram.cs" Line="1560" Column="31" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="2745" Column="30" />
-      <File FileName="Jigsaw\InspectWin.cs" Line="64" Column="4" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="150" Column="29" />
+      <File FileName="Jigsaw\InspectWin.cs" Line="504" Column="9" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -13,7 +13,6 @@
           <Node name="Jigsaw" expanded="True">
             <Node name="Jigsaw.cs" selected="True" />
           </Node>
-          <Node name="NCalc" expanded="True" />
         </State>
       </Pad>
     </Pads>

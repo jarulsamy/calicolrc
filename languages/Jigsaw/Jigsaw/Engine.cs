@@ -158,7 +158,8 @@ namespace Jigsaw
 				if (s is CBlock) {
 					CBlock b = (CBlock)s;
 					b.State = BlockState.Idle;	// Move these statements to a CBlock method called Reset()
-					b.MsgProp.Text = "";
+					b["Message"] = "";
+					//b.MsgProp.Text = "";
 				}
 				if (s is CControlStart) {
 					CControlStart cs = (CControlStart)s;
