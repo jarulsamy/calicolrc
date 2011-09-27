@@ -684,15 +684,33 @@ public static class Myro {
     public Graphics.WindowClass window;
     public Thread thread;
     public List<Robot> robots = new List<Robot>();
+    public List<Graphics.Shape> lights = new List<Graphics.Shape>();
+    public Graphics.Color groundColor = new Graphics.Color(24,155,28);
 
     public Simulation() : this(640, 480) {
     }
 
     public Simulation(int width, int height) {
       window = makeWindow("Myro Simulation", width, height);
+      window.setBackground(groundColor);
+      // Non-physical things here:
+      Graphics.Circle light = new Graphics.Circle(
+	       new Graphics.Point(width - 100, 
+				  height - 100), 50);
+      light.gradient = new Graphics.Gradient("radial", 
+					 new Graphics.Point(0, 0), 
+					 10, 
+					 new Graphics.Color("yellow"),
+					 new Graphics.Point(0, 0), 
+					 50, 
+					 groundColor);
+      light.outline = groundColor;
+      lights.Add(light);
+      light.draw(window);
+      
       window.mode = "physics";
       window.gravity = Graphics.Vector(0,0); // turn off gravity
-      
+
       Graphics.Rectangle wall = new Graphics.Rectangle(new Graphics.Point(0, 0), 
 						       new Graphics.Point(5, height));
       wall.bodyType = "static";
@@ -713,8 +731,18 @@ public static class Myro {
       wall.bodyType = "static";
       wall.draw(window);      
 
-      Graphics.Circle ball = new Graphics.Circle(new Graphics.Point(200, 200), 25);
-      ball.fill = makeColor("#ffba00");
+      Graphics.Rectangle pyramid = new Graphics.Rectangle(
+		  new Graphics.Point(100, 100), 
+		  new Graphics.Point(150, 150));
+      pyramid.color = makeColor("orange");
+      pyramid.rotate(45);
+      pyramid.bodyType = "static";
+      pyramid.draw(window);      
+
+      Graphics.Circle ball = new Graphics.Circle(
+		  new Graphics.Point(200, height - 150), 
+		  25);
+      ball.color = makeColor("blue");
       ball.draw(window);      
     }
     
@@ -741,7 +769,6 @@ public static class Myro {
 	    robot.readings.clear();
 	    if (!window.IsRealized) return;
 	    lock (window.canvas.shapes) {
-	      int count = 0;
 	      foreach (KeyValuePair<object,object> kvp in robot.sensors) {
 		string key = (string)kvp.Key;
 		Graphics.Line line = (Graphics.Line)kvp.Value;
@@ -752,9 +779,32 @@ public static class Myro {
                        robot.readings[key] = hit;
   	               return 1; 
                    }, 
-		  Graphics.Vector(((float)p1.x)/MeterInPixels, ((float)p1.y)/MeterInPixels), 
-		  Graphics.Vector(((float)p2.x)/MeterInPixels, ((float)p2.y)/MeterInPixels));
-		count++;
+		  Graphics.Vector(((float)p1.x)/MeterInPixels, 
+				  ((float)p1.y)/MeterInPixels), 
+		  Graphics.Vector(((float)p2.x)/MeterInPixels, 
+				  ((float)p2.y)/MeterInPixels));
+	      }
+	      foreach (Graphics.Shape light in simulation.lights) {
+		foreach(Graphics.Shape light_sensor in robot.light_sensors) {
+		  Graphics.Point c = new Graphics.Point(light_sensor.center);
+		  c.x -= 6; // hack to get outside of bounding box
+		  Graphics.Point p1 = robot.frame.getScreenPoint(c);
+		  Graphics.Point p2 = light.center;
+		  if (!window.IsRealized) return;
+		  window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+                       robot.readings[light_sensor.tag] = hit;
+  	               return 1; 
+                   }, 
+		    Graphics.Vector(((float)p1.x)/MeterInPixels, 
+				    ((float)p1.y)/MeterInPixels), 
+		    Graphics.Vector(((float)p2.x)/MeterInPixels, 
+				    ((float)p2.y)/MeterInPixels));
+		  if (robot.readings.Contains(light_sensor.tag)) {
+		    robot.readings[light_sensor.tag] = (float)5000.0; // blocked
+		  } else {
+		    robot.readings[light_sensor.tag] = ((float)Math.Min(Math.Pow(p1.distance(p2)/10.0, 2), 5000));
+		  }
+		}
 	      }
 	    }
 	  }
@@ -1795,6 +1845,7 @@ public static class Myro {
     public double battery = 7.6;
     public PythonDictionary sensors = new PythonDictionary();
     public PythonDictionary readings = new PythonDictionary();
+    public List<Graphics.Shape> light_sensors = new List<Graphics.Shape>();
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -1827,7 +1878,7 @@ public static class Myro {
       wheel2.draw(frame);
       
       // Details
-      Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 2);
+      Graphics.Circle hole = new Graphics.Circle(new Graphics.Point(0,0), 3);
       hole.fill = Color("black");
       hole.draw(frame);
       
@@ -1836,7 +1887,31 @@ public static class Myro {
       fluke.color = Color("green");
       fluke.draw(frame);
       
+      // light sensors
+      Graphics.Circle light = new Graphics.Circle(new Graphics.Point(-18, -9), 
+						  1);
+      light.color = new Graphics.Color("black");
+      light.draw(frame);
+      light.tag = "light-right";
+      light_sensors.Add(light);
+
+      light = new Graphics.Circle(new Graphics.Point(-18, 0), 
+				  1);
+      light.color = new Graphics.Color("black");
+      light.draw(frame);
+      light.tag = "light-center";
+      light_sensors.Add(light);
+
+      light = new Graphics.Circle(new Graphics.Point(-18, 9), 
+				  1);
+      light.color = new Graphics.Color("black");
+      light.draw(frame);
+      light.tag = "light-left";
+      light_sensors.Add(light);
+
+      // ray casting sensors:
       Microsoft.Xna.Framework.Vector2 v2;
+
       // sensors getObstacle("left")
       int ir_range = 25;
       v2 = Graphics.VectorRotate(Graphics.Vector(ir_range, 0), -45 * Math.PI/180);
@@ -1912,7 +1987,7 @@ public static class Myro {
       frame.fill = null;
       // FIXME: something not closing correctly in render when :
       //frame.color = null;
-      frame.outline = Color("lightgrey");
+      frame.outline = simulation.groundColor;
       // set collision
       frame.draw(simulation.window);
       frame.body.OnCollision += SetStall;
@@ -1974,7 +2049,6 @@ public static class Myro {
 	Graphics.Color c;
 	double g = 1.0;
 	Graphics.Color sky = new Graphics.Color("deepskyblue");
-	Graphics.Color grass = new Graphics.Color("lawngreen");
 	for (int i = 0; i < 256; i++) {
 	  if (distance[i] > 0) {
 	    if (colors[i] != null)
@@ -1992,7 +2066,7 @@ public static class Myro {
 	    } else if (h < (int)(192/2.0 - g * 192/2.0)) {
 	      picture.setColor(i, h, sky);
 	    } else {
-	      picture.setColor(i, h, grass);
+	      picture.setColor(i, h, simulation.groundColor);
 	    }
 	  }
 	}
@@ -2081,7 +2155,7 @@ public static class Myro {
 	    throw new Exception("invalid position in getObstacle()");
 	  }
 	  if (readings.Contains(key)) {
-	    retval.append((int)(5000 - ((float)readings[key]) * 5000));
+	    retval.append((int)(((float)readings[key]) * 5000.0));
 	  } else {
 	    retval.append(0);
 	  }
@@ -2093,8 +2167,59 @@ public static class Myro {
 	return retval;
     }
     
-    public override object getLight(params object [] position) {
-      return Graphics.PyList(0, 0, 0);
+    public override object getLight(params object [] positions) {
+      string key = null; 
+      List retval = new List();
+      if (positions.Length == 0)
+	positions = new object[3] {0, 1, 2};
+      else if ((positions.Length == 1) && (positions[0] is string) && ((string)(positions[0]) == "all"))
+	positions = new object[3] {0, 1, 2};
+      lock (this) {
+	foreach (object position in positions) {
+	  if (position is int)  {
+	    if (((int)position) == 0) {
+	      key = "light-left";
+	    } else if (((int)position) == 1) {
+	      key = "light-center";
+	    } else if (((int)position) == 2) {
+	      key = "light-right";
+	    } else {
+	      throw new Exception("invalid position in getLight()");
+	    }
+	  } else if (position is double)  {
+	    if (((double)position) == 0) {
+	      key = "light-left";
+	    } else if (((double)position) == 1) {
+	      key = "light-center";
+	    } else if (((double)position) == 2) {
+	      key = "light-right";
+	    } else {
+	      throw new Exception("invalid position in getLight()");
+	    }
+	  } else if (position is string)  {
+	    if (((string)position) == "left") {
+	      key = "light-left";
+	    } else if (((string)position) == "center") {
+	      key = "light-center";
+	    } else if (((string)position) == "right") {
+	      key = "light-right";
+	    } else {
+	      throw new Exception("invalid position in getLight()");
+	    }
+	  } else {
+	    throw new Exception("invalid position in getLight()");
+	  }
+	  if (readings.Contains(key)) {
+	    retval.append(readings[key]);
+	  } else {
+	    retval.append(null);
+	  }
+	}
+      }
+      if (retval.Count == 1)
+	return retval[0];
+      else 
+	return retval;
     }
     
     public override object getIR(params object [] positions) {
