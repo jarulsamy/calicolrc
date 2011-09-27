@@ -720,6 +720,7 @@ public static class Myro {
     
     public void setup()
     {
+      Console.WriteLine("You are using:\n   SimFluke, version 0.0.0");
       if (thread == null || !thread.IsAlive) {
 	thread = new Thread(new ThreadStart(loop));
 	thread.IsBackground = true;
@@ -737,22 +738,18 @@ public static class Myro {
                   Graphics.Vector(robot.velocity, 0), 
 		  robot.frame.body.Rotation);
 	    // Get sensor readings
-	    robot.readings = new PythonDictionary();
+	    robot.readings.clear();
 	    if (!window.IsRealized) return;
 	    lock (window.canvas.shapes) {
 	      int count = 0;
-	      foreach (Graphics.Line line in robot.sensors) {
+	      foreach (KeyValuePair<object,object> kvp in robot.sensors) {
+		string key = (string)kvp.Key;
+		Graphics.Line line = (Graphics.Line)kvp.Value;
 		Graphics.Point p1 = robot.frame.getScreenPoint(line.getP1());
 		Graphics.Point p2 = robot.frame.getScreenPoint(line.getP2());
 		if (!window.IsRealized) return;
 		window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
-                       List reading = new List();
-                       reading.append(line);
-                       reading.append(fixture);
-                       reading.append(v1);
-                       reading.append(v2);
-                       reading.append(hit);
-                       robot.readings[count] = reading;
+                       robot.readings[key] = hit;
   	               return 1; 
                    }, 
 		  Graphics.Vector(((float)p1.x)/MeterInPixels, ((float)p1.y)/MeterInPixels), 
@@ -1796,8 +1793,8 @@ public static class Myro {
     public bool stall = false;
     public string name = "Scribby";
     public double battery = 7.6;
-    public List sensors = new List();
-    public PythonDictionary readings;
+    public PythonDictionary sensors = new PythonDictionary();
+    public PythonDictionary readings = new PythonDictionary();
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -1839,14 +1836,78 @@ public static class Myro {
       fluke.color = Color("green");
       fluke.draw(frame);
       
-      // sensors
-      Microsoft.Xna.Framework.Vector2 v2 = Graphics.VectorRotate(
-                       Graphics.Vector(100, 0), 
-		       0);
+      Microsoft.Xna.Framework.Vector2 v2;
+      // sensors getObstacle("left")
+      int ir_range = 25;
+      v2 = Graphics.VectorRotate(Graphics.Vector(ir_range, 0), -45 * Math.PI/180);
       Graphics.Line line = new Graphics.Line(new Graphics.Point(25, -12), 
 					     new Graphics.Point(25 + v2.X, -12 + v2.Y));
+      line.outline = new Graphics.Color(0, 0, 255, 64);
       line.draw(frame);
-      sensors.append(line);
+      sensors["obstacle-left"] = line;
+
+      // sensors getObstacle("center")
+      line = new Graphics.Line(new Graphics.Point(25, 0), 
+			       new Graphics.Point(25 + ir_range, 0));
+      line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.draw(frame);
+      sensors["obstacle-center"] = line;
+
+      // sensors getObstacle("right")
+      v2 = Graphics.VectorRotate(Graphics.Vector(ir_range, 0), 45 * Math.PI/180);
+      line = new Graphics.Line(new Graphics.Point(25, 12), 
+			       new Graphics.Point(25 + v2.X, 12 + v2.Y));
+      line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.draw(frame);
+      sensors["obstacle-right"] = line;
+
+      // sensors getIR("right")
+      v2 = Graphics.VectorRotate(Graphics.Vector(ir_range, 0), -180 * Math.PI/180);
+      line = new Graphics.Line(new Graphics.Point(-25, -12), 
+			       new Graphics.Point(-25 + v2.X, -12 + v2.Y));
+      line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.draw(frame);
+      sensors["ir-right"] = line;
+
+      // sensors getIR("left")
+      v2 = Graphics.VectorRotate(Graphics.Vector(ir_range, 0), -180 * Math.PI/180);
+      line = new Graphics.Line(new Graphics.Point(-25, 12), 
+			       new Graphics.Point(-25 + v2.X, 12 + v2.Y));
+      line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.draw(frame);
+      sensors["ir-left"] = line;
+
+      // Visualization of sensor, getObstacle("left")
+      Graphics.Pie pie = new Graphics.Pie(new Graphics.Point(25, -12), ir_range, -75, -15);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      // FIXME: outline can't be null
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(frame);
+
+      // Visualization of sensor, getObstacle("center")
+      pie = new Graphics.Pie(new Graphics.Point(25, 0), ir_range, -30, 30);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(frame);
+
+      // Visualization of sensor, getObstacle("left")
+      pie = new Graphics.Pie(new Graphics.Point(25, 12), ir_range, 15, 75);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(frame);
+
+      // Visualization of sensor, getIR(1)
+      pie = new Graphics.Pie(new Graphics.Point(-25, -12), ir_range, 150, 210);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(frame);
+
+      // Visualization of sensor, getIR(0)
+      pie = new Graphics.Pie(new Graphics.Point(-25, 12), ir_range, 150, 210);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(frame);
+
       // Just the fill, to see outline of bounding box:
       frame.fill = null;
       // FIXME: something not closing correctly in render when :
@@ -1974,45 +2035,132 @@ public static class Myro {
       return null;
     }
     
-    public override object getObstacle(params object [] position) {
-      return null;
-    }
-    
-    public override object getLight(params object [] position) {
-      return null;
-    }
-    
-    public override object getIR(params object [] positions) {
+    public override object getObstacle(params object [] positions) {
+      string key = null; 
+      List retval = new List();
+      if (positions.Length == 0)
+	positions = new object[3] {0, 1, 2};
+      else if ((positions.Length == 1) && (positions[0] is string) && ((string)(positions[0]) == "all"))
+	positions = new object[3] {0, 1, 2};
       lock (this) {
 	foreach (object position in positions) {
-	  if (position is int) {
-	    if (readings.Contains((int)position)) {
-	      return readings[position];
+	  if (position is int)  {
+	    if (((int)position) == 0) {
+	      key = "obstacle-left";
+	    } else if (((int)position) == 1) {
+	      key = "obstacle-center";
+	    } else if (((int)position) == 2) {
+	      key = "obstacle-right";
+	    } else {
+	      throw new Exception("invalid position in getObstacle()");
 	    }
+	  } else if (position is double)  {
+	    if (((double)position) == 0) {
+	      key = "obstacle-left";
+	    } else if (((double)position) == 1) {
+	      key = "obstacle-center";
+	    } else if (((double)position) == 2) {
+	      key = "obstacle-right";
+	    } else {
+	      throw new Exception("invalid position in getObstacle()");
+	    }
+	  } else if (position is string)  {
+	    if (((string)position) == "left") {
+	      key = "obstacle-left";
+	    } else if (((string)position) == "center") {
+	      key = "obstacle-center";
+	    } else if (((string)position) == "right") {
+	      key = "obstacle-right";
+	    } else {
+	      throw new Exception("invalid position in getObstacle()");
+	    }
+	  } else {
+	    throw new Exception("invalid position in getObstacle()");
+	  }
+	  if (readings.Contains(key)) {
+	    retval.append((int)(5000 - ((float)readings[key]) * 5000));
+	  } else {
+	    retval.append(0);
 	  }
 	}
       }
-      return null;
+      if (retval.Count == 1)
+	return retval[0];
+      else 
+	return retval;
+    }
+    
+    public override object getLight(params object [] position) {
+      return Graphics.PyList(0, 0, 0);
+    }
+    
+    public override object getIR(params object [] positions) {
+      string key = null; 
+      List retval = new List();
+      if (positions.Length == 0)
+	positions = new object[2] {0, 1};
+      else if ((positions.Length == 1) && (positions[0] is string) && ((string)(positions[0]) == "all"))
+	positions = new object[2] {0, 1};
+      lock (this) {
+	foreach (object position in positions) {
+	  if (position is int)  {
+	    if (((int)position) == 0) {
+	      key = "ir-left";
+	    } else if (((int)position) == 1) {
+	      key = "ir-right";
+	    } else {
+	      throw new Exception("invalid position in getIR()");
+	    }
+	  } else if (position is double)  {
+	    if (((double)position) == 0) {
+	      key = "ir-left";
+	    } else if (((double)position) == 1) {
+	      key = "ir-right";
+	    } else {
+	      throw new Exception("invalid position in getIR()");
+	    }
+	  } else if (position is string)  {
+	    if (((string)position) == "left") {
+	      key = "ir-left";
+	    } else if (((string)position) == "right") {
+	      key = "ir-right";
+	    } else {
+	      throw new Exception("invalid position in getIR()");
+	    }
+	  } else {
+	    throw new Exception("invalid position in getIR()");
+	  }
+	  if (readings.Contains(key)) {
+	    retval.append(0);
+	  } else {
+	    retval.append(1);
+	  }
+	}
+      }
+      if (retval.Count == 1)
+	return retval[0];
+      else 
+	return retval;
     }
     
     public override object getBright(string window = null) {
-      return null;
+      return Graphics.PyList(0, 0, 0);
     }
     
     public override object getBright(int window) {
-      return null;
+      return Graphics.PyList(0, 0, 0);
     }
     
     public override object getLine(params object [] position) {
-      return null;
+      return Graphics.PyList(0, 0);
     }
     
     public override object get(string sensor="all") {
-      return null;
+      return new List();
     }
     
     public override object get(string sensor="all", params object [] position) {
-      return null;
+      return new List();
     }
     
     public override string getPassword() {
