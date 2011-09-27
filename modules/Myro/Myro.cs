@@ -714,7 +714,7 @@ public static class Myro {
       wall.draw(window);      
 
       Graphics.Circle ball = new Graphics.Circle(new Graphics.Point(200, 200), 25);
-      ball.fill = makeColor("pink");
+      ball.fill = makeColor("#ffba00");
       ball.draw(window);      
     }
     
@@ -1947,7 +1947,8 @@ public static class Myro {
       return frame.penUp();
     }   
 
-    public override Graphics.Picture takePicture(string mode="jpeg") { // simscribbler
+    public override Graphics.Picture takePicture(string mode="jpeg") { 
+      // simscribbler camera
       double view_angle = 60.0; // degrees
       double max_distance = 20.0;
       float MeterInPixels = 64.0f;
@@ -1996,6 +1997,8 @@ public static class Myro {
 	  }
 	}
       }
+      //Graphics.Picture pic = makePicture("/home/dblank/Calico-dev/trunk/examples/images/pyramid.png");
+      //picture.setRegion(new Graphics.Point(10, 10), pic);
       return picture;
     }
     

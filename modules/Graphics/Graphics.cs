@@ -3119,6 +3119,28 @@ public static class Graphics {
       return pic;
     }
 
+    public void setRegion(IList iterable, Picture picture) {
+      // FIXME: better way would use Context to draw the image onto
+      // another image. Also, consider making this pic.draw(picture)
+      // This doesn't respect the color pallette of picture.
+      Point p = new Point(iterable);
+      for (int x = 0; x < picture.width; x++) {
+        for (int y = 0; y < picture.height; y++) {
+	  Color c1 = this.getPixel((int)(p.x + x), 
+				   (int)(p.y + y)).getColor();
+	  Color c2 = picture.getPixel((int)(x), 
+				      (int)(y)).getColor();
+	  int t2 = c2.alpha;
+	  int t1 = Math.Max(Math.Min(255 - t2, 255), 0);
+          this.setColor((int)(p.x + x), 
+			(int)(p.y + y), 
+			new Color(t1 * c1.red + t2 * c2.red,
+				  t1 * c1.green + t2 * c2.green,
+				  t1 * c1.blue + t2 * c2.blue));
+	}
+      }
+    }
+
     public void setRegion(IList iterable, int width, int height, double degrees,
                           Picture picture) {
       Point p = new Point(iterable);
