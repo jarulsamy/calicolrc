@@ -748,7 +748,10 @@ public static class Myro {
     
     public void setup()
     {
-      Console.WriteLine("You are using:\n   SimFluke, version 0.0.0");
+      Console.WriteLine("You are using:");
+      Console.WriteLine("   Simulated Fluke, version 1.0.0");
+      Console.WriteLine("   Simulated Scribbler 2, version 1.0.0");
+      Console.WriteLine("Hello, my name is '{0}'!", getName());
       if (thread == null || !thread.IsAlive) {
 	thread = new Thread(new ThreadStart(loop));
 	thread.IsBackground = true;
@@ -1572,6 +1575,9 @@ public static class Myro {
   public class Robot {
     internal double _lastTranslate = 0;
     internal double _lastRotate = 0;
+
+    public virtual void set(string key, object value) {
+    }
     
     public virtual void beep(double duration, double frequency, double frequency2) {
       // Override in subclassed robots
@@ -1854,6 +1860,7 @@ public static class Myro {
     public PythonDictionary sensors = new PythonDictionary();
     public PythonDictionary readings = new PythonDictionary();
     public List<Graphics.Shape> light_sensors = new List<Graphics.Shape>();
+    public bool show_sensors = false;
 
     public SimScribbler(Simulation simulation) {
       this.simulation = simulation;
@@ -2016,7 +2023,13 @@ public static class Myro {
 	frame.body.AngularVelocity = (float)(-_lastRotate * rate);
       }
     }
-    
+
+    public override void set(string key, object value) {
+      if (key == "show sensors") {
+	show_sensors = (bool)value;
+      }
+    }
+
     public override void flush() { 
       //
     }   
@@ -3347,6 +3360,9 @@ public static class Myro {
 
     public override void reboot() {
       write(Scribbler.SET_RESET_SCRIBBLER);
+    }
+
+    public override void set(string key, object value) {
     }
 
     public override void beep(double duration, double frequency) {
