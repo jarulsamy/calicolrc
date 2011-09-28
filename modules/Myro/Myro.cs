@@ -1020,7 +1020,11 @@ public static class Myro {
       return robot.getIR(position);
   }
 
-  public static object getBright(string window=null) {
+  public static object getBright() {
+    return robot.getBright();
+  }
+
+  public static object getBright(string window) {
     return robot.getBright(window);
   }
 
@@ -1637,7 +1641,11 @@ public static class Myro {
       return null;
     }
     
-    public virtual object getBright(string window = null) {
+    public virtual object getBright() {
+      return null;
+    }
+    
+    public virtual object getBright(string window) {
       return null;
     }
     
@@ -2270,13 +2278,83 @@ public static class Myro {
       else 
 	return retval;
     }
-    
-    public override object getBright(string window = null) {
-      return Graphics.PyList(0, 0, 0);
+
+    public override object getBright(string window) {
+      if (window == "left")
+	return ((List)getBright())[0];
+      else if (window == "center")
+	return ((List)getBright())[1];
+      else if (window == "right")
+	return ((List)getBright())[2];
+      else if (window == "all")
+	return getBright();
+      else
+	throw new Exception("invalid argument to getBright()");
+    }
+
+    public override object getBright() {
+      // simscribbler camera
+      double view_angle = 60.0; // degrees
+      double max_distance = 20.0;
+      float MeterInPixels = 64.0f;
+      List counts = Graphics.PyList(0, 0, 0);
+      if (!simulation.window.IsRealized) return counts;
+      lock (this) {
+	double [] distance = new double[256];
+	Graphics.Color [] colors = new Graphics.Color[256];
+	Graphics.Point p1 = frame.getScreenPoint(new Graphics.Point(25, 0));
+	for (int i = 0; i < 256; i++) {
+	  var v = Graphics.VectorRotate(Graphics.Vector(max_distance * MeterInPixels, 0), 
+				(float)(((i/256.0) * view_angle) - view_angle/2.0) * Math.PI/180.0);
+	  Graphics.Point p2 = frame.getScreenPoint(new Graphics.Point(25 + v.X, v.Y));
+	  simulation.window.canvas.world.RayCast((fixture, v1, v2, hit) => {  
+                       distance[i] = 1.0 - Math.Min(hit * max_distance, max_distance)/max_distance; /// 10 x car
+                       if (fixture.UserData is Graphics.Shape)
+			 colors[i] = ((Graphics.Shape)fixture.UserData).fill;
+  	               return 1; 
+                   }, 
+	    Graphics.Vector((float)(p1.x/MeterInPixels), (float)(p1.y/MeterInPixels)), 
+	    Graphics.Vector((float)(p2.x/MeterInPixels), (float)(p2.y/MeterInPixels)));
+	}
+	Graphics.Color c;
+	double g = 1.0;
+	Graphics.Color sky = new Graphics.Color("deepskyblue");
+	for (int i = 0; i < 256; i++) {
+	  if (distance[i] > 0) {
+	    if (colors[i] != null)
+	      c = colors[i];
+	    else
+	      c = new Graphics.Color("black");
+	    g = distance[i];
+	  } else {
+	    c = new Graphics.Color("gray");
+	    g = 1.0;
+	  }
+	  double red, green, blue;
+	  for (int h = 0; h < 192; h++) {
+	    if (h >= (int)(192/2.0 - g * 192/2.0) && h <= (int)(192/2.0 + g * 192/2.0)) {
+	      red = c.red * g;
+	      green = c.green * g;
+	      blue = c.blue * g;
+	    } else if (h < (int)(192/2.0 - g * 192/2.0)) {
+	      red = sky.red;
+	      green = sky.green;
+	      blue = sky.blue;
+	    } else {
+	      red = simulation.groundColor.red;
+	      green = simulation.groundColor.green;
+	      blue = simulation.groundColor.blue;
+	    }
+	    if (Math.Max(Math.Max(red, green), blue) > 180)
+	      counts[Math.Min(i/(256/3), 2)] = ((int)counts[Math.Min(i/(256/3), 2)]) + 1;
+	  }
+	}
+      }
+      return counts;
     }
     
     public override object getBright(int window) {
-      return Graphics.PyList(0, 0, 0);
+      return ((List)getBright())[window];
     }
     
     public override object getLine(params object [] position) {
@@ -3137,13 +3215,17 @@ public static class Myro {
       }
     }
 
+    public override object getBright() {
+      return getBright("all");
+    }
+
     public override object getBright(int window) {
       write(Scribbler.GET_WINDOW_LIGHT);
       write((byte)window);
       return read_3byte(); // (63.0 * 192.0 * 255.0)
     }
 
-    public override object getBright(string window=null) {
+    public override object getBright(string window) {
       byte byte_window = 0;
       if (window == null || (string)window == "all") {
         return get("bright");
