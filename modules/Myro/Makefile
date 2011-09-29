@@ -7,8 +7,10 @@ MONO_PATH=../../bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mon
 	MONO_PATH=$(MONO_PATH) gmcs -target:library \
 		Myro.cs \
 		-lib:../ \
+		-unsafe \
 		-r:Graphics.dll \
 		-r:Tao.Sdl.dll \
+		-r:SdlDotNet \
 		-r:System.Drawing \
 		-r:IronPython \
 	        -r:IronRuby \

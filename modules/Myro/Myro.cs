@@ -20,6 +20,7 @@ $Id: $
 */
 
 using System;
+using System.Runtime.InteropServices; // Marshal
 using System.Diagnostics; // Process
 using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports; // SerialPort
@@ -65,6 +66,7 @@ public static class Myro {
   public readonly static PythonDictionary frequencies = new PythonDictionary();
 
   public readonly static Gamepads gamepads = new Gamepads();
+  public readonly static AudioManager audio_manager = new AudioManager();
 
   static void invoke_function(Func<object,object> function, object args) {
     try {
@@ -323,6 +325,88 @@ public static class Myro {
 	});
       wait(.1);
       return true; // continue
+    }
+  }
+
+  public class AudioManager: IDisposable {
+    public delegate void AudioSpecCallbackDelegate(IntPtr userData, 
+						   IntPtr stream, int length);
+    Sdl.SDL_AudioSpec desired = new Sdl.SDL_AudioSpec();
+    AudioSpecCallbackDelegate audioCallback;
+    public double frequency = 100;
+    public double angle = 0.0 ;
+    private bool disposed = false;
+
+    public AudioManager() {
+      try {
+	Sdl.SDL_Init(Sdl.SDL_INIT_AUDIO);
+      } catch {
+        Console.Error.WriteLine("WARNING: SDL is not installed.");
+      }
+      audioCallback = DoCallback;
+      desired.freq = 22050; //11025; //8000; //22050; 
+      desired.format = Sdl.AUDIO_S16LSB; 
+      desired.channels = 0;
+      desired.samples = (short)1000; 
+      desired.callback = Marshal.GetFunctionPointerForDelegate(audioCallback);
+      desired.userdata = null;
+      IntPtr specPtr= Marshal.AllocHGlobal(Marshal.SizeOf(desired));
+      try {
+	Marshal.StructureToPtr(desired, specPtr, false);
+	IntPtr obtained = IntPtr.Zero;
+	if (Sdl.SDL_OpenAudio((IntPtr)specPtr, obtained) < 0) {
+	  Console.WriteLine("Error opening sdl_audio (1)");
+	  Console.WriteLine(Sdl.SDL_GetError());
+	}
+      } catch {
+	Console.WriteLine("Error opening sdl_audio (2)");
+	return;
+      } finally {
+	Marshal.FreeHGlobal(specPtr);
+      }
+    }
+
+    public void beep(double duration, double frequency) {
+      // Pulse, which runs callback
+      this.frequency = frequency;
+      this.angle = 0;
+      Sdl.SDL_PauseAudio(0);
+      Sdl.SDL_Delay((int)(duration * 1000));
+      Sdl.SDL_PauseAudio(1);
+      //Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+    }
+
+    unsafe void DoCallback(IntPtr userData, IntPtr stream, int len) {
+      //void create_tone( void *userdata, Uint8 *stream, int len ) {
+      int i = 0 ;
+      System.Byte *buffer = (System.Byte *)stream;
+      for(i=0;i<len;i++) {
+	buffer[i] = (System.Byte)(255*Math.Cos(angle)); 
+	angle += 3.14159/frequency;
+	if( angle > 2.0*3.14159 ) {
+	  angle -= 2.0*3.14159 ;
+	}
+      }
+    }
+
+    public void Dispose() {
+      Console.WriteLine("Dispose()");
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing) {
+      Console.WriteLine("Dispose({0})", disposing);
+      if (!disposed) {
+	Console.WriteLine("Myro: Shutting down audio...");
+	Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+	disposed = true;
+      }
+    }
+
+    ~AudioManager() {
+      Console.WriteLine("~AudioManager()");
+      Dispose(false);
     }
   }
 
@@ -955,6 +1039,12 @@ public static class Myro {
 
   public static void beep(double duration, int frequency, int frequency2) {
     robot.beep(duration, frequency, frequency2);
+  }
+
+  public static void play(string filename) {
+    // play audio file
+    SdlDotNet.Audio.Music music = new SdlDotNet.Audio.Music(filename);
+    music.Play();
   }
 
   public static void show(Graphics.Picture picture, 
@@ -1850,7 +1940,9 @@ public static class Myro {
   }
 
   public class Computer: Robot {
-    
+    public override void beep(double duration, double frequency) {
+      Myro.audio_manager.beep(duration, frequency);
+    }
   }
 
   public class SimScribbler : Robot {
