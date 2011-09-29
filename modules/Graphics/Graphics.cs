@@ -1647,6 +1647,7 @@ public static class Graphics {
     public List<Shape> shapes = new List<Shape>();
     public double gx = 0.0;
     public double gy = 0.0;
+    public bool visible = true;
     
     public Point [] points;
     internal Color _fill;
@@ -2095,6 +2096,7 @@ public static class Graphics {
     }
     
     public virtual void render(Cairo.Context g) { // Shape
+      if (!visible) return;
       g.Save();
       Point temp;
       if (points != null) {
@@ -2446,6 +2448,7 @@ public static class Graphics {
     }
 
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
@@ -2617,6 +2620,7 @@ public static class Graphics {
     }    
 
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       Point temp, p1, p2, p3;
       if (points != null) {
@@ -2738,6 +2742,7 @@ public static class Graphics {
     }
     
         public override void render(Cairo.Context g) {
+	  if (!visible) return;
           // render path
           g.Save();
           Point temp = screen_coord(center);
@@ -3459,6 +3464,7 @@ public static class Graphics {
     }
 
         public override void render(Cairo.Context g) { // picture
+	  if (!visible) return;
           g.Save();
           Point temp = screen_coord(center);
           g.Translate(temp.x, temp.y);
@@ -3718,6 +3724,7 @@ public static class Graphics {
     }
     
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       // draws rectangles with rounded (circular arc) corners 
       g.Save();
       Point temp = screen_coord(center);
@@ -3827,6 +3834,7 @@ public static class Graphics {
     }
         
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       Point temp = screen_coord(center);
       g.Translate(temp.x, temp.y);
@@ -3890,6 +3898,7 @@ public static class Graphics {
     }
 
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       // Center is in global screen coords, whatever they are
       Point temp = screen_coord(center);
@@ -3968,6 +3977,7 @@ public static class Graphics {
     }
     
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       // Center is in global screen coords, whatever they are
       Point temp = screen_coord(center);
@@ -4102,6 +4112,7 @@ public static class Graphics {
     */
 
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       // Center is in global screen coords, whatever they are
       Point temp = screen_coord(center);
@@ -4219,6 +4230,7 @@ public static class Graphics {
     }
 
     public override void render(Cairo.Context g) {
+      if (!visible) return;
       g.Save();
       // Center is in global screen coords, whatever they are
       Point temp = screen_coord(center);

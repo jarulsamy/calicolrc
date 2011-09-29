@@ -964,6 +964,10 @@ public static class Myro {
     picture.draw(win);
   }
 
+  public static void setOption(string key, object value) {
+    robot.setOption(key, value);
+  }
+
   public static void setup() {
     robot.setup();
   }
@@ -1576,7 +1580,7 @@ public static class Myro {
     internal double _lastTranslate = 0;
     internal double _lastRotate = 0;
 
-    public virtual void set(string key, object value) {
+    public virtual void setOption(string key, object value) {
     }
     
     public virtual void beep(double duration, double frequency, double frequency2) {
@@ -1897,8 +1901,8 @@ public static class Myro {
       hole.fill = Color("black");
       hole.draw(frame);
       
-      Graphics.Rectangle fluke = new Graphics.Rectangle(new Graphics.Point(17, -10),
-							new Graphics.Point(23, 10));
+      Graphics.Rectangle fluke = new Graphics.Rectangle(new Graphics.Point(15, -10),
+							new Graphics.Point(19, 10));
       fluke.color = Color("green");
       fluke.draw(frame);
       
@@ -1933,6 +1937,17 @@ public static class Myro {
       Graphics.Line line = new Graphics.Line(new Graphics.Point(25, -12), 
 					     new Graphics.Point(25 + v2.X, -12 + v2.Y));
       line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.visible = false;
+
+      // Visualization of sensor
+      Graphics.Pie pie = new Graphics.Pie(line.points[0],
+					  ir_range, -30, 30);
+      pie.rotate(45);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      // FIXME: outline can't be null
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(line);
+
       line.draw(frame);
       sensors["obstacle-left"] = line;
 
@@ -1940,6 +1955,17 @@ public static class Myro {
       line = new Graphics.Line(new Graphics.Point(25, 0), 
 			       new Graphics.Point(25 + ir_range, 0));
       line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.visible = false;
+
+      // Visualization of sensor
+      pie = new Graphics.Pie(line.points[0],
+			     ir_range, -30, 30);
+      //pie.rotate(0);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      // FIXME: outline can't be null
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(line);
+
       line.draw(frame);
       sensors["obstacle-center"] = line;
 
@@ -1948,6 +1974,15 @@ public static class Myro {
       line = new Graphics.Line(new Graphics.Point(25, 12), 
 			       new Graphics.Point(25 + v2.X, 12 + v2.Y));
       line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.visible = false;
+      // Visualization of sensor
+      pie = new Graphics.Pie(line.points[0],
+			     ir_range, -30, 30);
+      pie.rotate(-45);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      // FIXME: outline can't be null
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(line);
       line.draw(frame);
       sensors["obstacle-right"] = line;
 
@@ -1956,6 +1991,15 @@ public static class Myro {
       line = new Graphics.Line(new Graphics.Point(-25, -12), 
 			       new Graphics.Point(-25 + v2.X, -12 + v2.Y));
       line.outline = new Graphics.Color(0, 0, 255, 64);
+      line.visible = false;
+      // Visualization of sensor
+      pie = new Graphics.Pie(line.points[0],
+			     ir_range, -30, 30);
+      pie.rotate(180);
+      pie.fill = new Graphics.Color(0, 0, 255, 64);
+      // FIXME: outline can't be null
+      pie.outline = new Graphics.Color(0, 0, 255, 64);
+      pie.draw(line);
       line.draw(frame);
       sensors["ir-right"] = line;
 
@@ -1964,39 +2008,17 @@ public static class Myro {
       line = new Graphics.Line(new Graphics.Point(-25, 12), 
 			       new Graphics.Point(-25 + v2.X, 12 + v2.Y));
       line.outline = new Graphics.Color(0, 0, 255, 64);
-      line.draw(frame);
-      sensors["ir-left"] = line;
-
-      // Visualization of sensor, getObstacle("left")
-      Graphics.Pie pie = new Graphics.Pie(new Graphics.Point(25, -12), ir_range, -75, -15);
+      line.visible = false;
+      // Visualization of sensor
+      pie = new Graphics.Pie(line.points[0],
+			     ir_range, -30, 30);
+      pie.rotate(180);
       pie.fill = new Graphics.Color(0, 0, 255, 64);
       // FIXME: outline can't be null
       pie.outline = new Graphics.Color(0, 0, 255, 64);
-      pie.draw(frame);
-
-      // Visualization of sensor, getObstacle("center")
-      pie = new Graphics.Pie(new Graphics.Point(25, 0), ir_range, -30, 30);
-      pie.fill = new Graphics.Color(0, 0, 255, 64);
-      pie.outline = new Graphics.Color(0, 0, 255, 64);
-      pie.draw(frame);
-
-      // Visualization of sensor, getObstacle("left")
-      pie = new Graphics.Pie(new Graphics.Point(25, 12), ir_range, 15, 75);
-      pie.fill = new Graphics.Color(0, 0, 255, 64);
-      pie.outline = new Graphics.Color(0, 0, 255, 64);
-      pie.draw(frame);
-
-      // Visualization of sensor, getIR(1)
-      pie = new Graphics.Pie(new Graphics.Point(-25, -12), ir_range, 150, 210);
-      pie.fill = new Graphics.Color(0, 0, 255, 64);
-      pie.outline = new Graphics.Color(0, 0, 255, 64);
-      pie.draw(frame);
-
-      // Visualization of sensor, getIR(0)
-      pie = new Graphics.Pie(new Graphics.Point(-25, 12), ir_range, 150, 210);
-      pie.fill = new Graphics.Color(0, 0, 255, 64);
-      pie.outline = new Graphics.Color(0, 0, 255, 64);
-      pie.draw(frame);
+      pie.draw(line);
+      line.draw(frame);
+      sensors["ir-left"] = line;
 
       // Just the fill, to see outline of bounding box:
       frame.fill = null;
@@ -2024,9 +2046,13 @@ public static class Myro {
       }
     }
 
-    public override void set(string key, object value) {
-      if (key == "show sensors") {
+    public override void setOption(string key, object value) {
+      if (key == "show-sensors") {
 	show_sensors = (bool)value;
+	foreach (KeyValuePair<object,object> kvp in sensors) {
+	  Graphics.Shape shape = (Graphics.Shape)kvp.Value;
+	  shape.visible = show_sensors;
+	}
       }
     }
 
@@ -3362,7 +3388,7 @@ public static class Myro {
       write(Scribbler.SET_RESET_SCRIBBLER);
     }
 
-    public override void set(string key, object value) {
+    public override void setOption(string key, object value) {
     }
 
     public override void beep(double duration, double frequency) {
