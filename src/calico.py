@@ -354,6 +354,7 @@ class CalicoProject(object):
                 pw.connection.close()
             for engine in self.engine.get_languages():
                 self.engine[engine].stop()
+            Myro.close_module()
             Gtk.Application.Quit()
 
     def setup_chat(self, *args, **kwargs):

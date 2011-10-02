@@ -328,13 +328,16 @@ public static class Myro {
     }
   }
 
-  public class AudioManager: IDisposable {
+  public class AudioManager : IDisposable {
+
     public delegate void AudioSpecCallbackDelegate(IntPtr userData, 
 						   IntPtr stream, int length);
     Sdl.SDL_AudioSpec desired = new Sdl.SDL_AudioSpec();
     AudioSpecCallbackDelegate audioCallback;
-    public double frequency = 100;
-    public double angle = 0.0 ;
+    public double frequency1 = -1;
+    public double frequency2 = -1;
+    public double angle1 = 0.0 ;
+    public double angle2 = 0.0 ;
     private bool disposed = false;
 
     public AudioManager() {
@@ -347,7 +350,7 @@ public static class Myro {
       desired.freq = 22050; //11025; //8000; //22050; 
       desired.format = Sdl.AUDIO_S16LSB; 
       desired.channels = 0;
-      desired.samples = (short)1000; 
+      desired.samples = (short)1000; //(short)2205; 
       desired.callback = Marshal.GetFunctionPointerForDelegate(audioCallback);
       desired.userdata = null;
       IntPtr specPtr= Marshal.AllocHGlobal(Marshal.SizeOf(desired));
@@ -368,44 +371,70 @@ public static class Myro {
 
     public void beep(double duration, double frequency) {
       // Pulse, which runs callback
-      this.frequency = frequency;
-      this.angle = 0;
-      Sdl.SDL_PauseAudio(0);
-      Sdl.SDL_Delay((int)(duration * 1000));
-      Sdl.SDL_PauseAudio(1);
-      //Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+      this.frequency1 = frequency;
+      this.frequency2 = -1;
+      this.angle1 = 0;
+      try {
+	Sdl.SDL_PauseAudio(0);
+	Sdl.SDL_Delay((int)(duration * 1000));
+      } finally	{
+	Sdl.SDL_PauseAudio(1);
+	//Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+      }
+    }
+
+    public void beep(double duration, double frequency1, double frequency2) {
+      // Pulse, which runs callback
+      this.frequency1 = frequency1;
+      this.frequency2 = frequency2;
+      this.angle1 = 0;
+      try {
+	Sdl.SDL_PauseAudio(0);
+	Sdl.SDL_Delay((int)(duration * 1000));
+      } finally	{
+	Sdl.SDL_PauseAudio(1);
+	//Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+      }
     }
 
     unsafe void DoCallback(IntPtr userData, IntPtr stream, int len) {
-      //void create_tone( void *userdata, Uint8 *stream, int len ) {
-      int i = 0 ;
-      System.Byte *buffer = (System.Byte *)stream;
-      for(i=0;i<len;i++) {
-	buffer[i] = (System.Byte)(255*Math.Cos(angle)); 
-	angle += 3.14159/frequency;
-	if( angle > 2.0*3.14159 ) {
-	  angle -= 2.0*3.14159 ;
+      // Obtained through experimentation:
+      double slice = 6.3352272727272731e-05;
+      System.Byte *_buffer = (System.Byte *)stream;
+      for(int i=0; i<len; i++) {
+	if (angle2 == -1) // only one tone
+	  _buffer[i] = (System.Byte)(128*Math.Cos(angle1)); 
+	else {
+	  _buffer[i] = (System.Byte)((128*Math.Cos(angle1) + 128*Math.Cos(angle2))/2.0);
+	  angle2 += this.frequency2 * 6.3352272727272731e-05;
+	  if (angle2 > 2.0 * Math.PI) {
+	    angle2 -= 2.0 * Math.PI;
+	  }
+	}
+	angle1 += this.frequency1 * slice;
+	if (angle1 > 2.0 * Math.PI) {
+	  angle1 -= 2.0 * Math.PI;
 	}
       }
     }
 
     public void Dispose() {
-      Console.WriteLine("Dispose()");
+      //Console.WriteLine("Dispose()");
       Dispose(true);
       GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing) {
-      Console.WriteLine("Dispose({0})", disposing);
+      //Console.WriteLine("Dispose({0})", disposing);
       if (!disposed) {
-	Console.WriteLine("Myro: Shutting down audio...");
-	Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
+	//Console.WriteLine("Myro: Shutting down audio...");
+	Sdl.SDL_AudioQuit(); 
 	disposed = true;
       }
     }
 
     ~AudioManager() {
-      Console.WriteLine("~AudioManager()");
+      //Console.WriteLine("~AudioManager()");
       Dispose(false);
     }
   }
@@ -1018,27 +1047,45 @@ public static class Myro {
   }
 
   public static void beep(double duration, double frequency) {
-    robot.beep(duration, frequency);
+    if (robot != null)
+      robot.beep(duration, frequency);
+    else
+      computer.beep(duration, frequency);
   }
 
   public static void beep(double duration, double frequency, double frequency2) {
-    robot.beep(duration, frequency, frequency2);
+    if (robot != null)
+      robot.beep(duration, frequency, frequency2);
+    else
+      computer.beep(duration, frequency, frequency2);
   }
 
   public static void beep(int duration, int frequency) {
-    robot.beep(duration, frequency);
+    if (robot != null)
+      robot.beep(duration, frequency);
+    else
+      computer.beep(duration, frequency);
   }
 
   public static void beep(int duration, int frequency, int frequency2) {
-    robot.beep(duration, frequency, frequency2);
+    if (robot != null)
+      robot.beep(duration, frequency, frequency2);
+    else
+      computer.beep(duration, frequency, frequency2);
   }
 
   public static void beep(double duration, int frequency) {
-    robot.beep(duration, frequency);
+    if (robot != null)
+      robot.beep(duration, frequency);
+    else
+      computer.beep(duration, frequency);
   }
 
   public static void beep(double duration, int frequency, int frequency2) {
-    robot.beep(duration, frequency, frequency2);
+    if (robot != null)
+      robot.beep(duration, frequency, frequency2);
+    else
+      computer.beep(duration, frequency, frequency2);
   }
 
   public static void play(string filename) {
@@ -1675,14 +1722,12 @@ public static class Myro {
     
     public virtual void beep(double duration, double frequency, double frequency2) {
       // Override in subclassed robots
-      Console.WriteLine(String.Format("computer.beep({0},{1},{2})",
-				      duration, frequency, frequency2));
+      computer.beep(duration, frequency, frequency2);
     }
     
     public virtual void beep(double duration, double frequency) {
       // Override in subclassed robots
-      Console.WriteLine(String.Format("computer.beep({0},{1})",
-				      duration, frequency));
+      computer.beep(duration, frequency);
     }
     
     public virtual void reboot() {
@@ -1942,6 +1987,9 @@ public static class Myro {
   public class Computer: Robot {
     public override void beep(double duration, double frequency) {
       Myro.audio_manager.beep(duration, frequency);
+    }
+    public override void beep(double duration, double frequency1, double frequency2) {
+      Myro.audio_manager.beep(duration, frequency1, frequency2);
     }
   }
 
@@ -4698,6 +4746,10 @@ public static class Myro {
     frequencies["c8"] = 4186.0;
   }
 
+  public static void close_module()
+  {
+    audio_manager.Dispose();
+  }
   /*
   public class StringComparer: IComparer<string> {
     public int Compare(string x, string y) {
