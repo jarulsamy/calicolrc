@@ -829,6 +829,7 @@ public static class Myro {
     public List<Robot> robots = new List<Robot>();
     public List<Graphics.Shape> lights = new List<Graphics.Shape>();
     public Graphics.Color groundColor = new Graphics.Color(24,155,28);
+	public double extra_simulation_time = 0.1;
 
     public Simulation() : this(640, 480) {
     }
@@ -957,6 +958,7 @@ public static class Myro {
 	}
 	if (!window.IsRealized) return;
 	window.step(.1);
+	wait(extra_simulation_time);
       }
     }
   }
