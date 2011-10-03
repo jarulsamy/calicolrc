@@ -339,12 +339,14 @@ public static class Myro {
     public double angle1 = 0.0 ;
     public double angle2 = 0.0 ;
     private bool disposed = false;
+	private bool initialized = false;
     // buffer => void
     public Func<int[],double,double,object> function = null;
 
     public AudioManager() {
       try {
-	Sdl.SDL_Init(Sdl.SDL_INIT_AUDIO);
+		Sdl.SDL_Init(Sdl.SDL_INIT_AUDIO);
+		initialized = true;
       } catch {
         Console.Error.WriteLine("WARNING: SDL is not installed.");
       }
@@ -457,9 +459,11 @@ public static class Myro {
     protected virtual void Dispose(bool disposing) {
       //Console.WriteLine("Dispose({0})", disposing);
       if (!disposed) {
-	//Console.WriteLine("Myro: Shutting down audio...");
-	Sdl.SDL_AudioQuit(); 
-	disposed = true;
+		//Console.WriteLine("Myro: Shutting down audio...");
+		if (initialized) {
+		  Sdl.SDL_AudioQuit(); 
+		}
+		disposed = true;
       }
     }
 
