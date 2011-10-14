@@ -15,7 +15,7 @@ for x in range(5):
         c.draw(win)
         c.bounce = 0
 
-ball = Circle((50, 280), 10)
+ball = Circle((50, 270), 10)
 ball.draw(win)
 #ball.mass = .5
 ball.bounce = 0.5
@@ -34,14 +34,15 @@ wall.bodyType = "static"
 wall.color = Color("blue")
 wall.draw(win)
 
-def main():
-    while True:
-        win.step(.01)
-        if win.getMouseState() == "down":
-            x, y = win.getMouseNow()
-            ball.body.ApplyForce( Vector(x,y))
-        if win.getKeyState() == "down":
-            ball.body.ResetDynamics()
-            ball.moveTo(50, 280)
+def fireCallback(obj, event):
+    vec = Vector(event.x - ball.x, ball.y - event.y)
+    ball.body.ApplyForce(vec)
 
-win.run(main)
+def resetCallback(obj, event):
+    ball.body.ResetDynamics()
+    ball.moveTo(50, 270)
+
+win.onMouseDown(fireCallback)
+win.onKeyPress(resetCallback)
+
+win.run()
