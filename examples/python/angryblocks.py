@@ -36,10 +36,7 @@ wall.color = Color("blue")
 wall.draw(win)
 
 arrow = Line((0, 0), (0, 0))
-arrow.draw(win)
-
 head = Arrow((0, 0))
-head.draw(win)
 
 dragging = False
 
@@ -48,6 +45,8 @@ def mouseMove(obj, event):
         head.moveTo(event.x, event.y)
         vec = Vector(event.x - ball.x, ball.y - event.y)
         arrow.set_points(Point(ball.x, ball.y), Point(event.x, event.y))
+        arrow.draw(win)
+        head.draw(win)
         dx = event.x - ball.x
         dy = event.y - ball.y
         if dx == 0:
@@ -58,8 +57,8 @@ def mouseMove(obj, event):
 def mouseUp(obj, event):
     global dragging
     if dragging:
-        arrow.set_points(Point(0, 0), Point(0, 0))
-        head.moveTo(-10, -10)
+        arrow.undraw()
+        head.undraw()
         dragging = False
         vec = Vector(event.x - ball.x, ball.y - event.y)
         ball.body.ApplyForce(vec)
