@@ -2253,7 +2253,8 @@ public static class Graphics {
 	win.canvas.need_to_draw_surface = true;
       } else {
 	lock(win.getCanvas().shapes) {
-	  win.getCanvas().shapes.Add(this);
+	  if (! win.getCanvas().shapes.Contains(this)) 
+	    win.getCanvas().shapes.Add(this);
 	}
 	// Make sure each subshape is associated with this window
 	// so QueueDraw will redraw:
@@ -2280,7 +2281,8 @@ public static class Graphics {
 	canvas.need_to_draw_surface = true;
       } else {
 	lock(canvas.shapes) {
-	  canvas.shapes.Add(this);
+	  if (! canvas.shapes.Contains(this)) 
+	    canvas.shapes.Add(this);
 	}
       }
       if (canvas.world != null) {
@@ -2292,7 +2294,8 @@ public static class Graphics {
     public void draw(Shape shape) { // Shape
       // Add this shape to the shape's list.
       lock(shape.shapes) {
-        shape.shapes.Add(this);
+	if (! shape.shapes.Contains(this)) 
+	  shape.shapes.Add(this);
       }
       window = shape.window;
       QueueDraw();
