@@ -1,5 +1,6 @@
 from Graphics import *
 from Myro import pickOne, randomNumber
+import math
 
 win = Window("Angry Blocks", 800, 300)
 win.mode = "physics"
@@ -14,8 +15,8 @@ for x in range(5):
         c.fill = Color(pickOne(getColorNames()))
         c.draw(win)
         c.bounce = 0
-
-ball = Circle((50, 270), 10)
+radius = 10
+ball = Circle((50, 270), radius)
 ball.draw(win)
 #ball.mass = .5
 ball.bounce = 0.5
@@ -34,15 +35,48 @@ wall.bodyType = "static"
 wall.color = Color("blue")
 wall.draw(win)
 
-def fireCallback(obj, event):
-    vec = Vector(event.x - ball.x, ball.y - event.y)
-    ball.body.ApplyForce(vec)
+arrow = Line((0, 0), (0, 0))
+arrow.draw(win)
+
+head = Arrow((0, 0))
+head.draw(win)
+
+dragging = False
+
+def mouseMove(obj, event):
+    if dragging:
+        head.moveTo(event.x, event.y)
+        vec = Vector(event.x - ball.x, ball.y - event.y)
+        arrow.set_points(Point(ball.x, ball.y), Point(event.x, event.y))
+        dx = event.x - ball.x
+        dy = event.y - ball.y
+        if dx == 0:
+            head.rotation = 90 if dy > 0 else 270
+        else:
+            head.rotation = math.atan(dy/dx) * 180/math.pi + (180 if dx < 0 else 0)
+
+def mouseUp(obj, event):
+    global dragging
+    if dragging:
+        arrow.set_points(Point(0, 0), Point(0, 0))
+        head.moveTo(-10, -10)
+        dragging = False
+        vec = Vector(event.x - ball.x, ball.y - event.y)
+        ball.body.ApplyForce(vec)
+
+def mouseDown(obj, event):
+    global dragging
+    if Point(event.x, event.y).distance(Point(ball.x, ball.y)) < radius:
+        dragging = True
+        mouseMove(obj, event)
 
 def resetCallback(obj, event):
     ball.body.ResetDynamics()
     ball.moveTo(50, 270)
 
-win.onMouseDown(fireCallback)
+win.onMouseDown(mouseDown)
+win.onMouseUp(mouseUp)
+win.onMouseMovement(mouseMove)
 win.onKeyPress(resetCallback)
 
 win.run()

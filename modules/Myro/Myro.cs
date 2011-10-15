@@ -338,10 +338,11 @@ public static class Myro {
     public double frequency2 = -1;
     public double angle1 = 0.0 ;
     public double angle2 = 0.0 ;
+    public int index = 0;    
     private bool disposed = false;
 	private bool initialized = false;
     // buffer => void
-    public Func<int[],double,double,object> function = null;
+    public Func<int[],int,object> function = null;
 
     public AudioManager() {
       try {
@@ -373,14 +374,15 @@ public static class Myro {
       }
     }
 
-    public void play(double duration, Func<int[],double,double,object> function) {
+    public void play(double duration, Func<int[],int,object> function) {
+      // Buffer, start index, return int
       this.function = function;
+      this.index = 0;
       try {
 	Sdl.SDL_PauseAudio(0);
 	Sdl.SDL_Delay((int)(duration * 1000));
       } finally	{
 	Sdl.SDL_PauseAudio(1);
-	this.function = null;
       }
     }
 
@@ -389,12 +391,12 @@ public static class Myro {
       this.frequency1 = frequency;
       this.frequency2 = -1;
       this.angle1 = 0;
+      function = null;
       try {
 	Sdl.SDL_PauseAudio(0);
 	Sdl.SDL_Delay((int)(duration * 1000));
       } finally	{
 	Sdl.SDL_PauseAudio(1);
-	//Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
       }
     }
 
@@ -403,41 +405,40 @@ public static class Myro {
       this.frequency1 = frequency1;
       this.frequency2 = frequency2;
       this.angle1 = 0;
+      this.angle2 = 0;
+      function = null;
       try {
 	Sdl.SDL_PauseAudio(0);
 	Sdl.SDL_Delay((int)(duration * 1000));
       } finally	{
 	Sdl.SDL_PauseAudio(1);
-	//Sdl.SDL_AudioQuit(); // FIXME: this works: put in destructor
       }
     }
 
     unsafe void DoCallback(IntPtr userData, IntPtr stream, int len) {
       // Obtained through experimentation:
-      double slice = 6.3352272727272731e-05;
       System.Byte *_buffer = (System.Byte *)stream;
+      double slice = 1.0/100000.0 * 360 * Math.PI/180; // 6.3352272727272731e-05;
       if (function != null) {
 	int [] buffer = new int[len];
 	try {
-	  angle1 = (double)function(buffer, angle1, slice);
+	  function(buffer, index);
+	  index += len;
 	} catch (Exception e) {
 	  Console.Error.WriteLine("Error in function");
 	  Console.Error.WriteLine(e.Message);
-	  return;
 	}
-	for (int i =0; i < len; i++)
+	for (int i =0; i < len; i++) {
 	  _buffer[i] = (System.Byte)buffer[i];
-	if (angle1 > 2.0 * Math.PI) {
-	  angle1 -= 2.0 * Math.PI;
-	}
+	} 
 	return;
       }
       // else, handle the tone
       for(int i=0; i<len; i++) {
-	if (angle2 == -1) // only one tone
-	  _buffer[i] = (System.Byte)(128*Math.Cos(angle1)); 
+	if (frequency2 == -1) // only one tone
+	  _buffer[i] = (System.Byte)(127*Math.Cos(angle1)); 
 	else {
-	  _buffer[i] = (System.Byte)((128*Math.Cos(angle1) + 128*Math.Cos(angle2))/2.0);
+	  _buffer[i] = (System.Byte)((127*Math.Cos(angle1) + 127*Math.Cos(angle2))/2.0);
 	  angle2 += this.frequency2 * slice;
 	  if (angle2 > 2.0 * Math.PI) {
 	    angle2 -= 2.0 * Math.PI;
@@ -1130,10 +1131,22 @@ public static class Myro {
     music.Play();
   }
 
-  public static void play(double duration, Func<int[],double,double,object> function) {
+  public static void play(double duration, Func<int[],int,object> function) {
     // play a function
     audio_manager.play(duration, function);
   }
+
+  /*
+  public static void play(double duration, Func<int[],double,double,object> function) {
+    // play a function
+    //audio_manager.play(duration, function);
+  }
+
+  public static void play(double duration, Func<int,object> function) {
+    // play a function
+    audio_manager.play(duration, function);
+  }
+  */
 
   public static void show(Graphics.Picture picture, 
       string title="Myro Camera") {
