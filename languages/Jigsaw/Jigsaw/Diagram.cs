@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
@@ -18,7 +18,7 @@ using Cairo;
 // This causes a runtime error when attempting to draw with only one point.
 
 namespace Diagram
-{	
+{
 	// -----------------------------------------------------------------------
 	public static class Colors {
 		public static readonly Color Transparent = new Color(0.0, 0.0, 0.0, 0.0);
@@ -51,9 +51,8 @@ namespace Diagram
 	}
 	
     // -----------------------------------------------------------------------
-    // Current operational modes for the Canvas object
     public enum EMode
-    {
+    {	// Current operational modes for the Canvas object
 		// Canvas modes. Starts out in Editing mode.
         Editing,  Drawing, 
 		
@@ -62,10 +61,18 @@ namespace Diagram
         DragLeftStart,  DragLeft,
         DrawLeftStart,  DrawLeft,
         SizeLeftStart,  SizeLeft,
-        PEditLeftStart, PEditLeft,
+        PEditLeftStart, PEditLeft, 
+		TranslatingStart, Translating,
         LassoLeftStart, LassoLeft
     }
 	
+	// -----------------------------------------------------------------------
+	public enum DockSide
+	{	// Define the side of the diagram to which the shape should be docked
+		Left, Right, Top, Bottom, None
+	}
+	
+	// -----------------------------------------------------------------------
 	public enum MouseButtons
 	{
 		Left = 1,
@@ -92,25 +99,25 @@ namespace Diagram
 			this.Button = Button;
 		}
 		
-		public MouseEventArgs(Gtk.ButtonPressEventArgs e) {
-			this.X = e.Event.X;
-			this.Y = e.Event.Y;
+		public MouseEventArgs(double X, double Y, Gtk.ButtonPressEventArgs e) {
+			this.X = X;
+			this.Y = Y;
 			this.Button = (MouseButtons)e.Event.Button;
 			this.ShiftKey = (e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
 			this.ControlKey = (e.Event.State & Gdk.ModifierType.ControlMask) != 0;
 		}
 
-		public MouseEventArgs(Gtk.ButtonReleaseEventArgs e) {
-			this.X = e.Event.X;
-			this.Y = e.Event.Y;
+		public MouseEventArgs(double X, double Y, Gtk.ButtonReleaseEventArgs e) {
+			this.X = X;
+			this.Y = Y;
 			this.Button = (MouseButtons)e.Event.Button;
 			this.ShiftKey = (e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
 			this.ControlKey = (e.Event.State & Gdk.ModifierType.ControlMask) != 0;
 		}
 		
-		public MouseEventArgs(Gtk.MotionNotifyEventArgs e) {
-			this.X = e.Event.X;
-			this.Y = e.Event.Y;
+		public MouseEventArgs(double X, double Y, Gtk.MotionNotifyEventArgs e) {
+			this.X = X;
+			this.Y = Y;
 			//this.Button = (MouseButtons)e.Event.Button;
 			this.ShiftKey = (e.Event.State & Gdk.ModifierType.ShiftMask) != 0;
 			this.ControlKey = (e.Event.State & Gdk.ModifierType.ControlMask) != 0;
@@ -125,9 +132,8 @@ namespace Diagram
 	}
 	
     // -----------------------------------------------------------------------
-    // This interface is to be implemented by all Canvas shapes that will handle mouse events.
     public interface ICanvasEventHandler
-    {
+    {	// This interface is to be implemented by all Canvas shapes that will handle mouse events.
         void OnMouseDown(Canvas cvs, MouseEventArgs e);
         void OnMouseMove(Canvas cvs, MouseEventArgs e);
         void OnMouseUp(Canvas cvs, MouseEventArgs e);
@@ -142,7 +148,6 @@ namespace Diagram
 	public delegate void MouseEventHandler(Canvas cvs, MouseEventArgs e);
 
     // -----------------------------------------------------------------------
-    //public partial class Canvas : UserControl, ICanvasEventHandler
     public class Canvas : Gtk.DrawingArea, ICanvasEventHandler
     {
 		// Public properties
@@ -164,9 +169,16 @@ namespace Diagram
         internal EMode Mode = EMode.Editing;                  	// Init in editing mode
         internal EMode EditMode = EMode.Idle;                	// Edit mode starts idle
         internal EMode DrawMode = EMode.Idle;                	// Draw mode starts idle
-
-        private double zoom = 1.0;                              // Drawing scale (zoom) factor
-        private double gridsize = 5.0;                          // Size of the drawing grid in pixels
+		
+        internal double scale = 1.0;                            // Drawing scale (zoom) factor
+		internal double scaleCenterX = 0.0;						// The point about which scaling is performed (screen coordinates)
+		internal double scaleCenterY = 0.0;
+		internal double offsetX = 0.0;							// The current translation amount
+		internal double offsetY = 0.0;
+		internal double _scaleOffsetX = 0.0;
+		internal double _scaleOffsetY = 0.0;
+		
+		private double gridsize = 5.0;                          // Size of the drawing grid in pixels
         private Boolean modified = false;                       // True if canvas has been modified and should be saved
 		
 		internal Gdk.ModifierType ModifierKeys = 0;				// State of modifier keys
@@ -205,6 +217,7 @@ namespace Diagram
 			this.ButtonPressEvent += new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
 			this.MotionNotifyEvent += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
+			this.ScrollEvent += new Gtk.ScrollEventHandler( this.OnScroll );
 			//this.ExposeEvent += new Gtk.ExposeEventHandler( this.OnPaint );
 //			this.DragBegin += new Gtk.DragBeginHandler( this.OnDragEnter );
 //			this.DragDrop += new Gtk.DragDropHandler( this.OnDragDrop );
@@ -272,39 +285,6 @@ namespace Diagram
 		internal void Invalidate() {
 			this.QueueDraw();
 		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle the Paint event by drawing all shapes and annotations
-        //void Canvas_Paint(object sender, PaintEventArgs e)
-        //protected override void OnPaint(PaintEventArgs e)
-		//private void OnPaint(object o, Gdk.EventExpose args)
-		protected override bool OnExposeEvent(Gdk.EventExpose args)
-        {
-			using (Context g = Gdk.CairoHelper.Create( args.Window )) {
-                //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
-                //g.Clip();
-				Draw( g );
-			}
-			return true;
-			
-			//base.OnPaint(e);
-			//Graphics g = e.Graphics;
-            
-//			Graphics g = Gtk.DotNet.Graphics.FromDrawable(this.GdkWindow, true);
-//			this.Draw(g);
-			
-//	        	// clip to the visible part
-//	            g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
-//	            g.Clip();
-				
-//	            lock(shapes) {
-//	            	foreach (Shape shape in shapes) {
-//	                    shape.render(g);
-//			    		shape.updateGlobalPosition(g);
-//	                }
-//	            }
-//			}
-		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void Draw(Cairo.Context g)
@@ -319,8 +299,19 @@ namespace Diagram
             // Caution: this smears single pixels into small blurs.
             g.Antialias = Antialias.Subpixel;
 			
-			// Scale the diagram to the zoom factor
-			g.Scale(this.zoom, this.zoom);
+			// Scale the diagram to the zoom factor at center point
+			g.Translate( this.scaleCenterX,  this.scaleCenterY);
+			g.Scale(     this.scale,         this.scale);
+			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
+//			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
+//			g.Translate( this.offsetX,     this.offsetY);
+			
+//			g.Translate( this.translateX1, this.translateY1 );
+//			g.Scale(this.scale, this.scale);
+//			g.Translate( -this.translateX, -this.translateY );
+//			this.translateX1 = this.translateX;
+//			this.translateY1 = this.translateY;
+//			this.scale1 = this.scale;
 			
             // Draw all visible connectors (bottom layer)
             foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
@@ -335,15 +326,95 @@ namespace Diagram
 			g.Restore();
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Handle the Paint event by drawing all shapes and annotations
+        //void Canvas_Paint(object sender, PaintEventArgs e)
+        //protected override void OnPaint(PaintEventArgs e)
+		//private void OnPaint(object o, Gdk.EventExpose args)
+		protected override bool OnExposeEvent(Gdk.EventExpose args)
+        {
+			using (Context g = Gdk.CairoHelper.Create( args.Window )) {
+                //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
+                //g.Clip();
+				Draw( g );
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnZoomIn(object sender, EventArgs e)
+		{
+			this.scale = this.scale * 1.05;
+			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
+			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+			this.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnZoomOut(object sender, EventArgs e)
+		{
+			this.scale = this.scale / 1.05;
+			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
+			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnResetZoom(object sender, EventArgs e)
+		{
+			this.scale = 1.0;
+			this.offsetX = 0.0;
+			this.offsetY = 0.0;
+			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
+			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Handle DrawingArea wheel scroll events
+        protected void OnScroll(object o, Gtk.ScrollEventArgs e)
+        {
+			Gdk.EventScroll scl = (Gdk.EventScroll)e.Event;
+
+			if (scl.Direction == Gdk.ScrollDirection.Up) {
+				this.scale *= 1.05;
+			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
+				this.scale /= 1.05;
+			}
+			
+//			this._scaleOffsetX = (scl.X-this.scaleCenterX)/(1.0-this.scale)/this.scale;
+//			this._scaleOffsetY = (scl.Y-this.scaleCenterY)/(1.0-this.scale)/this.scale;
+			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
+			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+			
+			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal void screenToWorld(double sx, double sy, out double wx, out double wy) {;
+			wx = (sx - this.scaleCenterX)/this.scale + this.scaleCenterX - this.offsetX;
+			wy = (sy - this.scaleCenterY)/this.scale + this.scaleCenterY - this.offsetY;
+//			Console.WriteLine("screenToWorld this.offsetX: {0} this.offsetY: {1}", this.offsetX, this.offsetY);
+//			Console.WriteLine("screenToWorld sx: {0} sy: {1} wx: {2} wy: {3}", sx, sy, wx, wy);
+		}
+		
+		internal void worldToScreen(double wx, double wy, out double sx, out double sy) {
+			sx = 0.0;
+			sy = 0.0;
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Handle DrawingArea mouse events
         protected void OnMouseDown(object o, Gtk.ButtonPressEventArgs e)
         {
-            // Update mouse down location and route event to current handler
-            double z = this.zoom;       // Get zoom factor
-            double ex = e.Event.X / z;        // Scale point coordinates
-            double ey = e.Event.Y / z;
-			
+			// Update mouse down location and route event to current handler
+			// Scale and translate point coordinates
+			double ex = 0.0;
+			double ey = 0.0;
+			double sx = (double)e.Event.X;
+			double sy = (double)e.Event.Y;
+			this.screenToWorld(sx, sy, out ex, out ey);
+
             this.mouseDownExact = new CPoint(ex, ey); // Save the exact and snapped mousedown points
             this.mouseDownGrid = this.SnapToGrid(this.mouseDownExact);
 			
@@ -361,12 +432,13 @@ namespace Diagram
             if (ho != null) this.handler = ho;
 			
             // Route proper event to event handler
+			MouseEventArgs mev = new MouseEventArgs(ex, ey, e);
 			switch (e.Event.Type) {
 			case Gdk.EventType.ButtonPress:
-				this.handler.OnMouseDown(this, new MouseEventArgs(e));
+				this.handler.OnMouseDown(this, mev);
 				break;
 			case Gdk.EventType.TwoButtonPress:
-				this.handler.OnDoubleClick(this, new MouseEventArgs(e));
+				this.handler.OnDoubleClick(this, mev);
 				break;
 			default:
 				break;
@@ -378,9 +450,12 @@ namespace Diagram
         protected void OnMouseMove(object o, Gtk.MotionNotifyEventArgs e)
         {
             // Update mouse location and route event to current handler
-            double z = this.zoom;        // Get zoom factor
-            double ex = e.Event.X / z;         // Scale point coordinates
-            double ey = e.Event.Y / z;
+			double ex = 0.0;
+			double ey = 0.0;
+			double sx = (double)e.Event.X;
+			double sy = (double)e.Event.Y;
+			this.screenToWorld(sx, sy, out ex, out ey);
+			//Console.WriteLine("OnMouseMove(A) sx: {0} sy: {1} ex: {2} ey: {3}", sx, sy, ex, ey);
 			
             this.mouseExact = new CPoint(ex, ey); // Save the exact and snapped mouse position
             this.mouseGrid = this.SnapToGrid(this.mouseExact);
@@ -389,7 +464,9 @@ namespace Diagram
 			this.ModifierKeys = e.Event.State;
 			
             // Route event to current handler
-            this.handler.OnMouseMove(this, new MouseEventArgs(e));
+			MouseEventArgs mev = new MouseEventArgs(ex, ey, e);
+			//Console.WriteLine("OnMouseMove(A) ex: {0} ey: {1}", ex, ey);
+            this.handler.OnMouseMove(this, mev);
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -397,9 +474,11 @@ namespace Diagram
         protected void OnMouseUp(object o, Gtk.ButtonReleaseEventArgs e)
         {
             // Update mouse up location and route event to current handler
-            double z = this.zoom;        // Get zoom factor
-            double ex = e.Event.X / z;         // Scale point coordinates
-            double ey = e.Event.Y / z;
+			double ex = 0.0;
+			double ey = 0.0;
+			double sx = (double)e.Event.X;
+			double sy = (double)e.Event.Y;
+			this.screenToWorld(sx, sy, out ex, out ey);
 
             this.mouseUpExact = new CPoint(ex, ey);       // Save the exact and snapped mouse up location
             this.mouseUpGrid = this.SnapToGrid(this.mouseExact);
@@ -408,7 +487,7 @@ namespace Diagram
 			this.ModifierKeys = e.Event.State;
 			
             // Route event to current handler
-            this.handler.OnMouseUp(this, new MouseEventArgs(e));
+            this.handler.OnMouseUp(this, new MouseEventArgs(ex, ey, e));
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -419,6 +498,7 @@ namespace Diagram
 			{
 	            // Deselect all if click on canvas with no shift key
 	            int ndeselected = 0;
+				
 	            //if (Control.ModifierKeys != Keys.Shift) ndeselected = this.DeselectAll();
 				if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
 	            
@@ -444,9 +524,6 @@ namespace Diagram
             {
                 if (this.EditMode == EMode.LassoLeftStart)
                 {
-                    //this.Capture = true;
-					//Gdk.Pointer.Grab(;
-					
                     this.lasso.MorphTo( this.mouseDownExact, this.mouseExact );
                     this.lasso.Visible = true;          // Make sure that this does not mark canvas as being modified
                     this.EditMode = EMode.LassoLeft;
@@ -469,9 +546,6 @@ namespace Diagram
             {
                 if (this.EditMode == EMode.LassoLeft || this.EditMode == EMode.LassoLeftStart)
                 {
-                    //if (this.Capture == true) this.Capture = false;
-					//if (Gdk.Pointer.IsGrabbed) Gdk.Pointer.Ungrab();
-                    
                     // Select any shape contained within the lasso bounds
                     Boolean sel_changed = false;
                     foreach (CShape s in this.shapes)
@@ -1240,8 +1314,8 @@ namespace Diagram
         // Drawing zoom factor. A number greater than 0.
         public double Zoom
         {
-            get { return this.zoom; }
-            set { this.zoom = value; }
+            get { return this.scale; }
+            set { this.scale = value; }
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1588,7 +1662,9 @@ namespace Diagram
         internal double top;
         internal double width;
         internal double height;
-
+		
+		internal DockSide Dock = DockSide.None;					// Default to no docking
+		
         // Maintain a center point
         internal CPoint center = null;
 
@@ -2884,6 +2960,11 @@ namespace Diagram
             // so use bounding box points to draw
             double x = this.left;
             double y = this.top;
+			
+//			if (this.Dock == DockSide.Left) {
+//				g.InverseTransformPoint(ref x, ref y);
+//			}
+			
             double w = this.width;
             double h = this.height;
 			double cx = x + 0.5*w;
@@ -3240,8 +3321,13 @@ namespace Diagram
         {
             // Note that an ellipse can have negative width or height and draw correctly.
             // The CBoundingBox is not strictly necessary to reorient points.
-            double x = this.left;
-            double y = this.top;
+			double x = this.left;
+			double y = this.top;
+			
+//			if (this.Dock == DockSide.Left) {
+//				g.InverseTransformPoint(ref x, ref y);
+//			}
+
             double w = this.width;
             double h = this.height;
 			double hh = 0.5*h;

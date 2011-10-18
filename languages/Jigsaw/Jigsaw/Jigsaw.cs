@@ -42,12 +42,9 @@ namespace Jigsaw
 	}
 	
 	// -----------------------------------------------------------------------
-	
-	/// <summary>
-	/// Subclass of Canvas that adds custom behavior 
-	/// </summary>
 	public class Canvas : Diagram.Canvas
-	{	
+	{	// Subclass of Canvas that adds custom behavior 
+		
 		// _currentPath holds the path to the currently open program file.
 		// If _currentPath holds a value of null, no file is open.
 		// _isModified is set to true whenever something is done that requires the 
@@ -65,19 +62,11 @@ namespace Jigsaw
 		
 		internal int _X;		// Cache
 		internal int _Y;
-		
+				
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
 		
-		/// <summary>
-		/// Constructor 
-		/// </summary>
-		/// <param name="width">
-		/// A <see cref="System.Int32"/>
-		/// </param>
-		/// <param name="height">
-		/// A <see cref="System.Int32"/>
-		/// </param>
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(int width, int height) : base(width, height) 
 		{
 			// Setup some colors
@@ -114,6 +103,15 @@ namespace Jigsaw
 			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics});
 			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,   tbGraphics});
 			
+			// Dock all tabs to left
+			tbInOut.Dock = Diagram.DockSide.Left;
+			tbCtrl.Dock = Diagram.DockSide.Left;
+			tbVars.Dock = Diagram.DockSide.Left;
+			tbMyro.Dock = Diagram.DockSide.Left;
+			tbGraphics.Dock = Diagram.DockSide.Left;
+			tbTools.Dock = Diagram.DockSide.Left;
+			tbNotes.Dock = Diagram.DockSide.Left;
+			
 			// Add tabs to the canvas
 			this.AddShape(tbCtrl);
 			this.AddShape(tbVars);
@@ -130,6 +128,8 @@ namespace Jigsaw
 				true, false, false, false, false);
 			this.AddShape(pnlBlock);
 			
+			pnlBlock.Dock = Diagram.DockSide.Left;
+			
 			// Factory Blocks for block area
 			
 			// --- Control
@@ -141,13 +141,21 @@ namespace Jigsaw
 			this.AddShape(block21);
 			tbCtrl.AddShape(block21);
 
-			CControlRepeat block22 = new CControlRepeat(110, 190, true);
+			CControlIfElse block22 = new CControlIfElse(110, 190, true);
 			this.AddShape(block22);
 			tbCtrl.AddShape(block22);
 			
-			CControlEnd block23 = new CControlEnd(110, 260, true);
+			CControlWhile block23 = new CControlWhile(110, 290, true);
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
+			
+			CControlRepeat block24 = new CControlRepeat(110, 360, true);
+			this.AddShape(block24);
+			tbCtrl.AddShape(block24);
+			
+			CControlEnd block25 = new CControlEnd(110, 430, true);
+			this.AddShape(block25);
+			tbCtrl.AddShape(block25);
 			
 			// --- IO
 			CIOPrint _cioprint = new CIOPrint(110, 70, true);
@@ -438,9 +446,41 @@ namespace Jigsaw
 			{
 				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 				return;
+			} else {
+            	if (this.Mode == Diagram.EMode.Editing)
+            	{
+					this.EditMode = Diagram.EMode.TranslatingStart;
+				}
 			}
 			
-			base.OnMouseDown(cvs, e);
+			//base.OnMouseDown(cvs, e);
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Canvas mouse move handler
+        public override void OnMouseMove(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+        {
+            if (this.Mode == Diagram.EMode.Editing)
+            {
+				if (this.EditMode == Diagram.EMode.TranslatingStart || this.EditMode == Diagram.EMode.Translating) 
+				{
+					this.offsetX += (e.X - this.mouseDownExact.X);
+					this.offsetY += (e.Y - this.mouseDownExact.Y);
+//					Console.WriteLine("OnMouseMove(B) ex: {0} ey: {1} offsetX: {2} offsetY: {3}", e.X, e.Y, this.offsetX, this.offsetY);
+					this.EditMode = Diagram.EMode.Translating;
+					this.Invalidate();
+				}
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override void OnMouseUp(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+        {
+			if (this.Mode == Diagram.EMode.Editing)
+            {
+				this.EditMode = Diagram.EMode.Idle;
+				this.Invalidate();
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -464,6 +504,12 @@ namespace Jigsaw
 			mnuSaveAs.Activated += OnSaveAs;
 			Gtk.MenuItem mnuProps = new Gtk.MenuItem("Inspect");
 			mnuProps.Activated += OnInspectorShow;
+			Gtk.MenuItem mnuZoomIn = new Gtk.MenuItem("Zoom in");
+			mnuZoomIn.Activated += OnZoomIn;
+			Gtk.MenuItem mnuZoomOut = new Gtk.MenuItem("Zoom out");
+			mnuZoomOut.Activated += OnZoomOut;
+			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Reset");
+			mnuResetZoom.Activated += OnResetZoom;
 			
 			mnu.Append(mnuNew);
 			mnu.Append(mnuOpen);
@@ -472,6 +518,10 @@ namespace Jigsaw
 			mnu.Append(mnuSaveAs);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuProps);
+			mnu.Append( new Gtk.SeparatorMenuItem() );
+			mnu.Append(mnuZoomIn);
+			mnu.Append(mnuZoomOut);
+			mnu.Append(mnuResetZoom);
 			
 			mnu.ShowAll();
 			mnu.Popup();
@@ -492,7 +542,7 @@ namespace Jigsaw
 			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
 			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnSave(object sender, EventArgs e)
 		{	// Save to current file
@@ -984,7 +1034,7 @@ namespace Jigsaw
 			g.Save();
 			
             // Block outline			
-			SetPath(g, x, y, w, h);
+			SetPath(g);
 			
 			// Set fill color based on block state
 			if (this._state == BlockState.Running) {
@@ -1003,33 +1053,9 @@ namespace Jigsaw
 			g.Stroke();
 
 			// Text
-            if (this.Text.Length > 0)
-            {
-				double cx = x + 0.5*w;
-				double cy = y + 0.5*20;
-				g.Color = this.TextColor;
-				//g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
-				//g.SetFontSize(this.fontSize);
-				//Cairo.TextExtents te = g.TextExtents(this.Text);
-
-				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
-				Pango.FontDescription desc = Pango.FontDescription.FromString(
-						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
-				layout.FontDescription = desc;
-				layout.SetText(text);
-				layout.Alignment = Pango.Alignment.Center;
-				int layoutWidth, layoutHeight;
-				layout.GetSize(out layoutWidth, out layoutHeight);
-				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset); 
-				Pango.CairoHelper.ShowLayout(g, layout);
-
-				//g.MoveTo(cx - 0.5*te.Width - te.XBearing, cy - 0.5*te.Height - te.YBearing + textYOffset); 
-				//g.ShowText(this.Text);
-            }
+			DrawLabels(g);
 			
-			// If in an error state, x-out
+			// If in an error state, add an x to the block
 			if (this._state == BlockState.Error) {
 				g.Color = new Color(1.0, 0.0, 0.0, 0.5);
 				g.LineWidth = 5;
@@ -1055,11 +1081,45 @@ namespace Jigsaw
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
         }
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected virtual void DrawLabels(Cairo.Context g) {
+			if (this.Text.Length > 0)
+            {
+	            double x = this.left;
+	            double y = this.top;
+	            double w = this.width;
+	            //double h = this.height;
+				double cx = x + 0.5*w;
+				double cy = y + 0.5*20;
 
+				int layoutWidth, layoutHeight;
+				
+				g.Color = this.TextColor;
+
+				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+				Pango.FontDescription desc = Pango.FontDescription.FromString(
+						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+				layout.FontDescription = desc;
+				layout.Alignment = Pango.Alignment.Center;
+				
+				layout.SetText(text);
+				layout.GetSize(out layoutWidth, out layoutHeight);
+				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset); 
+				Pango.CairoHelper.ShowLayout(g, layout);
+            }
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Base block outline graphics path figure
-		protected virtual void SetPath(Cairo.Context g, double x, double y, double w, double h) 
+		protected virtual void SetPath(Cairo.Context g) 
 		{
+			double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
 			
@@ -1570,1606 +1630,14 @@ namespace Jigsaw
 	}
 
 	// -----------------------------------------------------------------------
-    public class CRobot : CBlock
-    {	// Robot block shape class
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CRobot(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkRed;
-			this.FillColor = Diagram.Colors.LightPink;
-			this.Sizable = false;
-		}
-		
-		public CRobot(Double X, Double Y) : this(X, Y, false) { }
-    }
-	
-	// -----------------------------------------------------------------------
-    public class CInputOutput : CBlock
-    {	// Input/Output block shape class
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CInputOutput(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory )
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkBlue;
-			this.FillColor = Diagram.Colors.LightBlue;
-			this.Sizable = false;
-		}
-		
-		public CInputOutput(Double X, Double Y) : this(X, Y, false) { }
-    }
-	
-	// -----------------------------------------------------------------------
-    public class CIOPrint : CInputOutput
-    {	// Print block shape class
-
-		//public CExpressionProperty Expr = null;
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOPrint(Double X, Double Y, bool isFactory) 
-			: base(X, Y, isFactory )
-		{
-			// Properties
-			CExpressionProperty Expr = new CExpressionProperty("Expression", "X");
-			Expr.PropertyChanged += OnPropertyChanged;
-			_properties["Expression"] = Expr;
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CIOPrint(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this.Expr);
-//				return props;
-//			}
-//		}
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "expression":
-//				Expr.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "Expression", Expr.Text);
-//        }
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute print statement
-		public override IEnumerator<RunnerResponse> 
-		Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) {
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the print
-			// TODO: Allow access to global namespace
-			try {
-				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				Expr.Expr.Parameters = locals;
-				object o = Expr.Expr.Evaluate();
-				string toPrint = o.ToString();
-				//Console.WriteLine(toPrint);
-				((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
-				
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("print {0}", this["Expression"]);
-			//.Text = String.Format("print {0}", Expr.Text);
-		}
-	}
-
-	// -----------------------------------------------------------------------
-    public class CIOWriteToFile : CInputOutput
-    {	// Write an item to a file path
-		
-//		public CExpressionProperty Expr = null;
-//		public CExpressionProperty Path = null;
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOWriteToFile(Double X, Double Y, bool isFactory) 
-			: base(X, Y, isFactory )
-		{
-			// Properties
-			CExpressionProperty Expr = new CExpressionProperty("Expression", "expr");
-			CExpressionProperty Path = new CExpressionProperty("FilePath", "file");
-			Expr.PropertyChanged += OnPropertyChanged;
-			Path.PropertyChanged += OnPropertyChanged;
-			_properties["Expression"] = Expr;
-			_properties["FilePath"] = Path;
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CIOWriteToFile(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this.Expr);
-//				props.Add(this.Path);
-//				return props;
-//			}
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs E){
-			this.Text = String.Format("write {0} to {1}", this["Expression"], this["FilePath"]);
-			//this.Text = String.Format("write {0} to {1}", Expr.Text, Path.Text);
-		}
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "expression":
-//				Expr.Text = val;
-//				break;
-//			case "path":
-//				Path.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "Path", Path.Text);
-//			this.WriteXmlProperty(w, "Expression", Expr.Text);
-//        }
-	}
-	
-	// -----------------------------------------------------------------------
-    public class CControlRepeat : CBlock
-    {	// Repeat control block shape class
-		
-		// Internal edge
-		public CEdge LoopEdge = null;
-		
-		// Properties
-		//public CExpressionProperty Repetitions = null;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlRepeat(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
-				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50) }),
-				isFactory) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGoldenrod;
-			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			this.Sizable = false;
-			
-			// Create inner edge to connect loop stack
-			double offsetX = 0.5*this.Width + 10.0;
-			LoopEdge = new CEdge(this, "Loop", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
-			
-			// Properties
-			CExpressionProperty Repetitions = new CExpressionProperty("Repetitions", "3");
-			Repetitions.PropertyChanged += OnPropertyChanged;
-			_properties["Repetitions"] = Repetitions;
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CControlRepeat(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this.Repetitions);
-//				return props;
-//			}
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
-        {	// If this block is hit, return a self reference.
-        	
-			double X = pt.X;
-			double Y = pt.Y;
-			double Ymin = this.Top;
-			double Xmin = this.Left;
-			double Ymax = Ymin + this.Height;
-			double Xmax = Xmin + this.Width;
-			
-			// If point in outer bounding box...
-			if (X >= Xmin && X <= Xmax && Y >= Ymin && Y <= Ymax)
-			{	// ...and also in inner bounding box
-				if (X >= (Xmin + 20) && Y >= (Ymin + 20) && Y <= (Ymax - 20))
-				{	// ...then not hit
-					return null;
-				}
-				else
-				{	// Otherwise, hit
-					return this;
-				}
-			}
-			else
-			{	// Not hit if outside outer bounding box
-				return null;
-			}
-        }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "repetitions":
-//				Repetitions.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override CEdge GetEdgeByName(string name)
-		{
-			// First try base class behavior.
-			// If edge not found, look for custom edges.
-			string tname = name.ToLower();
-			
-			CEdge e = base.GetEdgeByName(tname);
-			if (e == null) {
-				if (tname == "loop") {
-					e = LoopEdge;
-				}
-			}
-			return e;
-		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "Repetitions", Repetitions.Text);
-//        }
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("repeat {0} times", this["Repetitions"]);
-			//this.Text = String.Format("repeat {0} times", Repetitions.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a simple repetition
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the repetition
-			int count = 1;
-			int maxreps = 0;
-
-			// Start by getting the number of repetitions as an integer
-			// TODO: Allow access to global namespace
-			try {
-				CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
-				Repetitions.Expr.Parameters = locals;
-				object oreps = Repetitions.Expr.Evaluate();
-				maxreps = (int)oreps;
-
-			} catch (Exception ex) {
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-			
-			// Execute the repetition
-			while ( count <= maxreps )
-			{
-				// Next perform one iteration of the enclosed stack
-				if (this.LoopEdge.IsConnected) {
-					rr.Action = EngineAction.Add;
-					rr.Runner = this.LoopEdge.LinkedTo.Block.Runner(locals, builtins);
-					yield return rr;
-				}
-				
-				// At this point the body of the loop has completed
-				// Increment counter
-				count++;
-			}			
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-				
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void RepositionBlocks(CEdge entryEdge)
-		{	// Reposition this block wrt the entry edge
-			
-			// If the LoopEdge is connected, prior to repositiion the block wrt to
-			// the rest of the diagram, calculate the LoopEdge stack and resize this block
-			// This way, the remaining repositioning of embedded blocks fits nicely.
-			
-			if (this.LoopEdge.IsConnected) {
-				CEdge linkedEdge = this.LoopEdge.LinkedTo;
-				CBlock linkedBlock = linkedEdge.Block;
-				linkedBlock.RepositionBlocks(linkedEdge);
-				this.Height = linkedBlock.StackHeight + 40.0;
-				
-			} else {
-				this.Height = 50.0;
-			}
-			
-			base.RepositionBlocks(entryEdge);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override List<CEdge> Edges 
-		{	// Return a list of all edges
-			get {
-				List<CEdge> prts = base.Edges;
-				prts.Add(this.LoopEdge);			// Add special LoopEdge to the standard edges
-				return prts;
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
-		{
-			double r = 6.0;
-			double hpi = 0.5*Math.PI;
-			
-			g.MoveTo( x, y+r );
-			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
-			g.LineTo( x+11, y );
-			g.LineTo( x+14, y+4 );
-			g.LineTo( x+24, y+4 );
-			g.LineTo( x+27, y );
-			g.LineTo( x+w-r, y );
-			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
-			g.LineTo( x+w, y+20-r );
-			g.Arc(    x+w-r, y+20-r, r, 0.0, hpi );
-			g.LineTo( x+27+20, y+20 );
-			g.LineTo( x+24+20, y+20+4 );
-			g.LineTo( x+14+20, y+20+4 );
-			g.LineTo( x+11+20, y+20 );
-			g.LineTo( x+20+r, y+20 );
-			g.ArcNegative(    x+20+r, y+20+r, r, -hpi, Math.PI );
-			g.LineTo( x+20, y+h-20-r );
-			g.ArcNegative(    x+20+r, y+h-20-r, r, Math.PI, hpi);
-			g.LineTo( x+11+20, y+h-20);
-			g.LineTo( x+14+20, y+h-20+4);
-			g.LineTo( x+24+20, y+h-20+4);
-			g.LineTo( x+27+20, y+h-20);
-			g.LineTo( x+w-r, y+h-20 );
-			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
-			g.LineTo( x+w, y+h-r );
-			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+27, y+h );
-			g.LineTo( x+24, y+h+4 );
-			g.LineTo( x+14, y+h+4 );
-			g.LineTo( x+11, y+h );
-			g.LineTo( x+r, y+h );
-			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
-			g.LineTo( x, y+r );
-            g.ClosePath();
-		}		
-    }
-
-	// -----------------------------------------------------------------------
-    public class CControlIf : CBlock
-    {	// Execute inner block if conditional evaluates to true
-		
-		// Internal edge
-		public CEdge IfEdge = null;
-		
-		// Properties
-		//public CExpressionProperty IfTest = null;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlIf(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
-				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50)}),
-				isFactory) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGoldenrod;
-			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			this.Sizable = false;
-			
-			// Create inner edge to connect if-block stack
-			double offsetX = 0.5*this.Width + 10.0;
-			IfEdge = new CEdge(this, "If", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
-			
-			// Properties
-			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "true");
-			IfTest.PropertyChanged += OnPropertyChanged;
-			
-			_properties["IfTest"] = IfTest;
-			
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CControlIf(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this.IfTest);
-//				return props;
-//			}
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
-        {	// If this block is hit, return a self reference.
-        	
-			double X = pt.X;
-			double Y = pt.Y;
-			double Ymin = this.Top;
-			double Xmin = this.Left;
-			double Ymax = Ymin + this.Height;
-			double Xmax = Xmin + this.Width;
-			
-			// If point in outer bounding box...
-			if (X >= Xmin && X <= Xmax && Y >= Ymin && Y <= Ymax)
-			{	// ...and also in inner bounding box
-				if (X >= (Xmin + 20) && Y >= (Ymin + 20) && Y <= (Ymax - 20))
-				{	// ...then not hit
-					return null;
-				}
-				else
-				{	// Otherwise, hit
-					return this;
-				}
-			}
-			else
-			{	// Not hit if outside outer bounding box
-				return null;
-			}
-        }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "if":
-//				IfTest.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal override CEdge GetEdgeByName(string name)
-		{
-			// First try base class behavior.
-			// If edge not found, look for custom edges.
-			string tname = name.ToLower();
-			
-			CEdge e = base.GetEdgeByName(tname);
-			if (e == null) {
-				if (tname == "if") {
-					e = IfEdge;
-				}
-			}
-			return e;
-		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "if", IfTest.Text);
-//        }
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void OnPropertyChanged(object sender, EventArgs e)
-		{	// Update text when property changes
-			this.Text = String.Format("if {0}", this["IfTest"]);
-			//this.Text = String.Format("if {0}", IfTest.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a simple repetition
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// Do the if-test
-			bool doIf = false;
-
-			// Start by evaluating the if expression
-			// TODO: Allow access to global namespace
-			try {
-				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
-				IfTest.Expr.Parameters = locals;
-				object otest = IfTest.Expr.Evaluate();
-				doIf = (bool)otest;
-
-			} catch (Exception ex) {
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-			
-			// Execute the repetition
-			if ( doIf )
-			{	// Execute enclosed stack
-				if (this.IfEdge.IsConnected) {
-					rr.Action = EngineAction.Add;
-					rr.Runner = this.IfEdge.LinkedTo.Block.Runner(locals, builtins);
-					yield return rr;
-				}
-			}			
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-				
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void RepositionBlocks(CEdge entryEdge)
-		{	// Reposition this block wrt the entry edge
-			
-			// If the IfEdge is connected, prior to repositiion the block wrt to
-			// the rest of the diagram, calculate the IfEdge stack and resize this block
-			// This way, the remaining repositioning of embedded blocks fits nicely.
-			
-			if (this.IfEdge.IsConnected) {
-				CEdge linkedEdge = this.IfEdge.LinkedTo;
-				CBlock linkedBlock = linkedEdge.Block;
-				linkedBlock.RepositionBlocks(linkedEdge);
-				this.Height = linkedBlock.StackHeight + 40.0;
-				
-			} else {
-				this.Height = 50.0;
-			}
-			
-			base.RepositionBlocks(entryEdge);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override List<CEdge> Edges 
-		{	// Return a list of all edges
-			get {
-				List<CEdge> prts = base.Edges;
-				prts.Add(this.IfEdge);			// Add special IfEdge to the standard edges
-				return prts;
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
-		{
-			double r = 6.0;
-			double hpi = 0.5*Math.PI;
-			
-			g.MoveTo( x, y+r );
-			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
-			g.LineTo( x+11, y );
-			g.LineTo( x+14, y+4 );
-			g.LineTo( x+24, y+4 );
-			g.LineTo( x+27, y );
-			g.LineTo( x+w-r, y );
-			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
-			g.LineTo( x+w, y+20-r );
-			g.Arc(    x+w-r, y+20-r, r, 0.0, hpi );
-			g.LineTo( x+27+20, y+20 );
-			g.LineTo( x+24+20, y+20+4 );
-			g.LineTo( x+14+20, y+20+4 );
-			g.LineTo( x+11+20, y+20 );
-			g.LineTo( x+20+r, y+20 );
-			g.ArcNegative( x+20+r, y+20+r, r, -hpi, Math.PI );
-			g.LineTo( x+20, y+h-20-r );
-			g.ArcNegative( x+20+r, y+h-20-r, r, Math.PI, hpi);
-			g.LineTo( x+11+20, y+h-20);
-			g.LineTo( x+14+20, y+h-20+4);
-			g.LineTo( x+24+20, y+h-20+4);
-			g.LineTo( x+27+20, y+h-20);
-			g.LineTo( x+w-r, y+h-20 );
-			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
-			g.LineTo( x+w, y+h-r );
-			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+27, y+h );
-			g.LineTo( x+24, y+h+4 );
-			g.LineTo( x+14, y+h+4 );
-			g.LineTo( x+11, y+h );
-			g.LineTo( x+r, y+h );
-			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
-			g.LineTo( x, y+r );
-            g.ClosePath();
-		}
-    }
-	
-	// -----------------------------------------------------------------------
-    public class CControlStart : CBlock
-    {	// Control start block shape class
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlStart(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 30) }),
-				isFactory) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGoldenrod;
-			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			this.Sizable = false;
-			this.Text = "when program starts";
-			textYOffset = 10;							// Block text offset
-		}
-		
-		public CControlStart(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override List<CEdge> Edges 
-		{	// Return a list of all edges
-			// Control start blocks only have an output edge
-			get {
-				return new List<CEdge>() { this.OutEdge };
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
-		{
-			double r = 6.0;
-			double hpi = 0.5*Math.PI;
-			
-			g.MoveTo( x, y+10);
-			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
-			g.LineTo( x+w-r, y+10);
-			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
-			g.LineTo( x+w, y+h-r );
-			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+27, y+h );
-			g.LineTo( x+24, y+h+4 );
-			g.LineTo( x+14, y+h+4 );
-			g.LineTo( x+11, y+h );
-			g.LineTo( x+r, y+h );
-			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
-			g.LineTo( x, y+10 );
-            g.ClosePath();
-		}
-    }
-
-	// -----------------------------------------------------------------------
-    public class CControlEnd : CBlock
-    {	// Control end block shape class
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CControlEnd(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGoldenrod;
-			this.FillColor = Diagram.Colors.PaleGoldenrod;
-			this.Sizable = false;
-			this.Text = "stop script";
-		}
-		
-		public CControlEnd(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override List<CEdge> Edges 
-		{	// Return a list of all edges
-			// Control end blocks only have an input edge
-			get {
-				return new List<CEdge>() { this.InEdge };
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override void SetPath(Cairo.Context g, double x, double y, double w, double h) 
-		{
-			double r = 6.0;
-			double hpi = 0.5*Math.PI;
-			
-			g.MoveTo( x, y+r );
-			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
-			g.LineTo( x+11, y );
-			g.LineTo( x+14, y+4 );
-			g.LineTo( x+24, y+4 );
-			g.LineTo( x+27, y );
-			g.LineTo( x+w-r, y );
-			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
-			g.LineTo( x+w, y+h-r );
-			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+11, y+h );
-			g.LineTo( x+r, y+h );
-			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
-			g.LineTo( x, y+r );
-            g.ClosePath();
-		}
-    }
-	
-	// -----------------------------------------------------------------------
-    public class CAssignment : CBlock
-    {	// Variable assignment block shape class
-		
-		//public CVarNameProperty VarName = null;
-		//public CExpressionProperty RHS = null;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CAssignment(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
-				isFactory ) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;;
-			this.Sizable = false;
-			
-			// Properties
-			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
-			CExpressionProperty RHS = new CExpressionProperty("Expression", "0");
-			
-			VarName.PropertyChanged += OnPropertyChanged;
-			RHS.PropertyChanged += OnPropertyChanged;
-			
-			_properties["Variable"] = VarName;
-			_properties["Expression"] = RHS;
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CAssignment(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public override List<CProperty> Properties 
-//		{	// Returns a list of all block properties
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this.VarName);
-//				props.Add(this.RHS);
-//				return props;
-//			}
-//		}
-		
-//        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "Variable", VarName.Text);
-//			this.WriteXmlProperty(w, "Expression", RHS.Text);
-//        }
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "variable":
-//				VarName.Text = val;
-//				break;
-//			case "expression":
-//				RHS.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("let {0} = {1}", this["Variable"], this["Expression"]);
-			//this.Text = String.Format("let {0} = {1}", VarName.Text, RHS.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a variable assignment
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			//this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the assignment
-			// TODO: Allow access to global namespace
-
-			try {
-				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
-				
-				RHS.Expr.Parameters = locals;
-				locals[VarName.Text] = RHS.Expr.Evaluate();
-
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-    }
-
-	// -----------------------------------------------------------------------
-    public class CGfxWindow : CBlock
-    {	// Block to create a new window
-		// Stores Window object as varable named 'win' locals
-		
-		// These should not be public, but set up to modify Text when changed
-//		public CStringProperty _Title;
-//		public CIntegerProperty _Width;
-//		public CIntegerProperty _Height;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxWindow(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
-			isFactory) {
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;
-			this.Sizable = false;
-			
-			// Properties
-			CStringProperty _Title = new CStringProperty("Title", "Gfx1");
-			CIntegerProperty _Width = new CIntegerProperty("Width", 300);
-			CIntegerProperty _Height = new CIntegerProperty("Height", 300);
-			
-			_Title.PropertyChanged += OnPropertyChanged;
-			_Width.PropertyChanged += OnPropertyChanged;
-			_Height.PropertyChanged += OnPropertyChanged;
-			
-			_properties["Title"] = _Title;
-			_properties["Width"] = _Width;
-			_properties["Height"] = _Height;
-			
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CGfxWindow(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this._Title);
-//				props.Add(this._Width);
-//				props.Add(this._Height);
-//				return props;
-//			}
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "Title", _Title.Text);
-//			this.WriteXmlProperty(w, "Width", _Width.Text);
-//			this.WriteXmlProperty(w, "Height", _Height.Text);
-//        }
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "title":
-//				_Title.Text = val;
-//				break;
-//			case "width":
-//				_Width.Value = int.Parse(val);
-//				break;
-//			case "height":
-//				_Height.Value = int.Parse(val);
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("gfx window ({0})", this["Title"]);
-			//this.Text = String.Format("gfx window ({0})", _Title.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a variable assignment
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the assignment
-			// TODO: Allow access to global namespace
-
-			try {
-				CIntegerProperty _Width = (CIntegerProperty)_properties["Width"];
-				CIntegerProperty _Height = (CIntegerProperty)_properties["Height"];
-				locals["win"] = Graphics.makeWindow(this["Title"], (int)_Width.Value, (int)_Height.Value);
-
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-    }
-
-	// -----------------------------------------------------------------------
-    public class CGfxLine : CBlock
-    {	// Block to create a new line and add it to the window
-		
-		//public CExpressionProperty _X1;
-		//public CExpressionProperty _Y1;
-		//public CExpressionProperty _X2;
-		//public CExpressionProperty _Y2;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxLine(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20) }),
-				isFactory )
-			{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;
-			this.Sizable = false;
-			
-			// Properties
-			CExpressionProperty _X1 = new CExpressionProperty("X1", "50");
-			CExpressionProperty _Y1 = new CExpressionProperty("Y1", "50");
-			CExpressionProperty _X2 = new CExpressionProperty("X2", "150");
-			CExpressionProperty _Y2 = new CExpressionProperty("Y2", "150");
-			
-			_X1.PropertyChanged += OnPropertyChanged;
-			_Y1.PropertyChanged += OnPropertyChanged;
-			_X2.PropertyChanged += OnPropertyChanged;
-			_Y2.PropertyChanged += OnPropertyChanged;
-			
-			_properties["X1"] = _X1;
-			_properties["Y1"] = _Y1;
-			_properties["X2"] = _X2;
-			_properties["Y2"] = _Y2;
-			
-			// Go ahead and trigger updates
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CGfxLine(Double X, Double Y) : this(X, Y, false) { }
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this._X1);
-//				props.Add(this._Y1);
-//				props.Add(this._X2);
-//				props.Add(this._Y2);
-//				return props;
-//			}
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "X1", _X1.Text);
-//			this.WriteXmlProperty(w, "Y1", _Y1.Text);
-//			this.WriteXmlProperty(w, "X2", _X2.Text);
-//			this.WriteXmlProperty(w, "Y2", _Y2.Text);
-//        }
-
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "x1":
-//				this["X1"] = val;
-//				//_X1.Text = val;
-//				break;
-//			case "y1":
-//				this["Y1"] = val;
-//				//_Y1.Text = val;
-//				break;
-//			case "x2":
-//				this["X2"] = val;
-//				//_X2.Text = val;
-//				break;
-//			case "y2":
-//				this["Y2"] = val;
-//				//_Y2.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			
-			this.Text = String.Format("create line ({0},{1})-({2},{3})", this["X1"], this["Y1"], this["X2"], this["Y2"]);
-			//this.Text = String.Format("create line ({0},{1})-({2},{3})", _X1.Text, _Y1.Text, _X2.Text, _Y2.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a variable assignment
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the assignment
-			// TODO: Allow access to global namespace
-
-			try {
-				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
-				CExpressionProperty _X1 = (CExpressionProperty)_properties["X1"];
-				CExpressionProperty _Y1 = (CExpressionProperty)_properties["Y1"];
-				CExpressionProperty _X2 = (CExpressionProperty)_properties["X2"];
-				CExpressionProperty _Y2 = (CExpressionProperty)_properties["Y2"];
-				
-				_X1.Expr.Parameters = locals;
-				double dx1 = Convert.ToDouble( _X1.Expr.Evaluate() );
-				
-				_Y1.Expr.Parameters = locals;
-				double dy1 = Convert.ToDouble( _Y1.Expr.Evaluate() );
-
-				_X2.Expr.Parameters = locals;
-				double dx2 = Convert.ToDouble( _X2.Expr.Evaluate() );
-
-				_Y2.Expr.Parameters = locals;
-				double dy2 = Convert.ToDouble( _Y2.Expr.Evaluate() );
-				
-				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
-				Graphics.Point pt2 = new Graphics.Point( dx2, dy2 );
-				Graphics.Line ln = new Graphics.Line(pt1, pt2);
-				ln.draw(win);
-
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-    }
-
-	// -----------------------------------------------------------------------
-    public class CGfxCircle : CBlock
-    {	// Block to create a new line and add it to the window
-		
-		// These should not be public, but set up to modify Text when changed
-		//public CExpressionProperty _X1;
-		//public CExpressionProperty _Y1;
-		//public CExpressionProperty _Diameter;
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxCircle(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory ) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;
-			this.Sizable = false;
-			
-			// Properties
-			CExpressionProperty _X1 = new CExpressionProperty("X", "50");
-			CExpressionProperty _Y1 = new CExpressionProperty("Y", "50");
-			CExpressionProperty _Diameter = new CExpressionProperty("Diameter", "50");
-			
-			_X1.PropertyChanged += OnPropertyChanged;
-			_Y1.PropertyChanged += OnPropertyChanged;
-			_Diameter.PropertyChanged += OnPropertyChanged;
-			
-			_properties["X"] = _X1;
-			_properties["Y"] = _Y1;
-			_properties["Diameter"] = _Diameter;
-			
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CGfxCircle(Double X, Double Y) : this(X, Y, false) { }
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
-//		public override List<CProperty> Properties 
-//		{
-//			get {
-//				List<CProperty> props = base.Properties;
-//				props.Add(this._X1);
-//				props.Add(this._Y1);
-//				props.Add(this._Diameter);
-//				return props;
-//			}
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write custom tags for this block
-//        protected override void WriteXmlTags(XmlWriter w)
-//        {
-//			base.WriteXmlTags(w);
-//			this.WriteXmlProperty(w, "X", _X1.Text);
-//			this.WriteXmlProperty(w, "Y", _Y1.Text);
-//			this.WriteXmlProperty(w, "Diameter", _Diameter.Text);
-//        }
-
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		internal override bool SetProperty(string name, string val) {
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "x":
-//				_X1.Text = val;
-//				break;
-//			case "y":
-//				_Y1.Text = val;
-//				break;
-//			case "diameter":
-//				_Diameter.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("create circle ({0},{1}) {2}", this["X"], this["Y"], this["Diameter"]);
-			//this.Text = String.Format("create circle ({0},{1}) {2}", _X1.Text, _Y1.Text, _Diameter.Text);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a variable assignment
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the assignment
-			// TODO: Allow access to global namespace
-
-			try {
-				// Access window. This should have already been created with a previous block
-				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
-				CExpressionProperty _X1 = (CExpressionProperty)_properties["X"];
-				CExpressionProperty _Y1 = (CExpressionProperty)_properties["Y"];
-				CExpressionProperty _Diameter = (CExpressionProperty)_properties["Diameter"];
-				
-				// Evaluate position and diameter
-				_X1.Expr.Parameters = locals;
-				double dx1 = Convert.ToDouble(_X1.Expr.Evaluate());
-				_Y1.Expr.Parameters = locals;
-				double dy1 = Convert.ToDouble(_Y1.Expr.Evaluate());
-				_Diameter.Expr.Parameters = locals;
-				int idiam = Convert.ToInt32(_Diameter.Expr.Evaluate());
-				
-				// Create Circle object
-				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
-				Graphics.Circle c = new Graphics.Circle(pt1, idiam);
-				
-				// Draw circle
-				c.draw(win);
-				
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				//MsgProp.Text = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-    }
-	
-	// -----------------------------------------------------------------------
-    public class CGfxText : CBlock
-    {	// Block to create a new Text object and add it to the window
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CGfxText(Double X, Double Y, bool isFactory) 
-			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
-				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory ) 
-		{
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;
-			this.Sizable = false;
-			
-			// Properties
-			CExpressionProperty _X = new CExpressionProperty("X", "50");
-			CExpressionProperty _Y = new CExpressionProperty("Y", "50");
-			CExpressionProperty _Text = new CExpressionProperty("Text", "'Hello'");
-			
-			_X.PropertyChanged += OnPropertyChanged;
-			_Y.PropertyChanged += OnPropertyChanged;
-			_Text.PropertyChanged += OnPropertyChanged;
-			
-			_properties["X"] = _X;
-			_properties["Y"] = _Y;
-			_properties["Text"] = _Text;
-			
-			this.OnPropertyChanged(null, null);
-		}
-		
-		public CGfxText(Double X, Double Y) : this(X, Y, false) { }
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("draw text ({0},{1}) {2}", this["X"], this["Y"], this["Text"]);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Execute a variable assignment
-		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
-		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
-			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-			yield return rr;
-			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
-				yield return rr;
-			}
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Do the assignment
-			// TODO: Allow access to global namespace
-
-			try {
-				// Access window. This should have already been created with a previous block
-				Graphics.WindowClass win = (Graphics.WindowClass)locals["win"];
-				CExpressionProperty _X = (CExpressionProperty)_properties["X"];
-				CExpressionProperty _Y = (CExpressionProperty)_properties["Y"];
-				CExpressionProperty _Text = (CExpressionProperty)_properties["Text"];
-				
-				// Evaluate position and diameter
-				_X.Expr.Parameters = locals;
-				double dx1 = Convert.ToDouble(_X.Expr.Evaluate());
-				_Y.Expr.Parameters = locals;
-				double dy1 = Convert.ToDouble(_Y.Expr.Evaluate());
-				_Text.Expr.Parameters = locals;
-				string txt = Convert.ToString(_Text.Expr.Evaluate());
-				
-				// Create Text object
-				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
-				Graphics.Text t = new Graphics.Text(pt1, txt);
-				
-				// Draw text
-				t.draw(win);
-				
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				
-				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
-			}
-
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
-
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
-			yield return rr;
-		}
-    }
-	
-	// -----------------------------------------------------------------------
     public class CEdge
 	{	// Class that holds details of a place to link CBlocks
 		internal CBlock _block = null;				// The CBlock to which this edge is attached
 		internal string _name = null;				// Name of edge
 		private EdgeType _type = EdgeType.Out;		// The type of this edge
 		private CEdge _linkedTo = null;				// The edge this one is linked to, if any
-		private double _offsetX = 0.0;				// Offset from the block's Left to activating point
-		private double _offsetY = 0.0;				// Offset from the block's Top to activating point
+		internal double _offsetX = 0.0;				// Offset from the block's Left to activating point
+		internal double _offsetY = 0.0;				// Offset from the block's Top to activating point
 		internal double _azX = 0.0;					// Offset from block's left to left of activating zone
 		internal double _azY = 0.0;					// Offset from block's top to top of activation zone
 		internal double _azW = 100.0;				// Width of activation zone
@@ -3210,7 +1678,6 @@ namespace Jigsaw
             w.WriteStartElement("edge");
 			w.WriteAttributeString("id", _id.ToString());
 			w.WriteAttributeString("name", _name);
-			//w.WriteAttributeString("type", _type.ToString());
 			if (this.IsConnected == true) 
 				w.WriteAttributeString("linkedTo", _linkedTo._id.ToString());
 			else

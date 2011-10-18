@@ -212,7 +212,7 @@ namespace Widgets
         /// </param>
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {	// Handle mouse down event
-			
+						
 			// If within shape, change fill color
 			if (this.ContainsPoint(e.X, e.Y, cvs)) {
 				this.SetToggle(cvs, true);
