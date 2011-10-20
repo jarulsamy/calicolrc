@@ -111,6 +111,67 @@ namespace Relfection {
       return type.GetMethod(methodName, args);
     }
 
+
+    public static List<string> getMemberNames(Type type) {
+      List<string> retval = new List<string>();
+      foreach (MemberInfo mi in type.GetMembers() ) {
+	retval.Add(mi.Name);
+      }
+      return retval;
+    }
+
+    public static List<string> getMethodNames(string aname, string tname) {
+      Type type = getType(aname, tname);
+      return getMethodNames(type);
+    }
+
+    public static List<string> getMethodNames(Type type) {
+      List<string> retval = new List<string>();
+      foreach (MemberInfo mi in type.GetMembers() ) {
+	if (mi.MemberType==MemberTypes.Method) {
+	  retval.Add(mi.Name);
+	}
+      }
+      return retval;
+    }
+
+    public static MemberInfo getMemberInfo(Type type, string mname) {
+      foreach (MemberInfo mi in type.GetMembers() ) {
+	if (String.Compare(mi.Name, mname) == 0) {
+	  return mi;
+	}
+      }
+      return null;
+    }
+
+    public static MethodInfo getMethodInfo(Type type, string mname) {
+      foreach (MethodInfo mi in type.GetMethods() ) {
+	if (String.Compare(mi.Name, mname) == 0) {
+	  return mi;
+	}
+      }
+      return null;
+    }
+
+    public static List<string> getPropertyNames(Type type, string mname) {
+      List<string> retval = new List<string>();
+      MemberInfo mi = getMemberInfo(type, mname);
+      foreach (MethodInfo am in ((PropertyInfo) mi).GetAccessors() ) {
+	retval.Add(am.Name);
+      }
+      return retval;
+    }
+
+    public static List<string> getParameterNames(string aname, string tname, string mname) {
+      Type type = getType(aname, tname);
+      MethodInfo mi = getMethodInfo(type, mname);
+      List<string> retval = new List<string>();
+      foreach (ParameterInfo pi in mi.GetParameters() ) {
+	retval.Add(pi.Name);
+      }
+      return retval;
+    }
+
     public static int add1(int i) {
       return i + 1;
     }
