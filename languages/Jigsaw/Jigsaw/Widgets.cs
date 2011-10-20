@@ -29,7 +29,6 @@ namespace Widgets
 			this.LineColor = Diagram.Colors.DarkSlateGray;
 			this.FillColor = Diagram.Colors.LightGray;
 			this.TextColor = Diagram.Colors.Black;
-			//this.FontStyle = FontStyle.Bold;
 			this.Selectable = false;
 			this.Enabled = true;
 		}

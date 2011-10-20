@@ -6,7 +6,6 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using Cairo;
-//using System.Reflection;
 
 // TODO:
 // Allow the out-edge of a complete stack (not just single blocks) being dragged
@@ -172,6 +171,7 @@ namespace Jigsaw
 			_shrect.LineColor = Diagram.Colors.Gray;
 			_shrect.LineWidth = 2;
 			_shrect._isFactory = true;
+			_shrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrect);
 			tbNotes.AddShape(_shrect);
 
@@ -181,6 +181,7 @@ namespace Jigsaw
 			_shrrect.LineWidth = 2;
 			_shrrect.Radius = 8;
 			_shrrect._isFactory = true;
+			_shrrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrrect);
 			tbNotes.AddShape(_shrrect);
 			
@@ -189,6 +190,7 @@ namespace Jigsaw
 			_shellipse.LineColor = Diagram.Colors.Gray;
 			_shellipse.LineWidth = 2;
 			_shellipse._isFactory = true;
+			_shellipse.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shellipse);
 			tbNotes.AddShape(_shellipse);
 			
@@ -279,22 +281,26 @@ namespace Jigsaw
 			
 			// --- Run tab
 			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
+			bRun.Dock = Diagram.DockSide.Left;
 			bRun.MouseDown += OnRunMouseDown;
 			this.AddShape(bRun);
 			tbTools.AddShape(bRun);
 			
 			bStop = new Widgets.CRoundedButton(150, 110, 100, 25, "Stop");
+			bStop.Dock = Diagram.DockSide.Left;
 			bStop.Enabled = false;
 			bStop.MouseDown += OnStopMouseDown;
 			this.AddShape(bStop);
 			tbTools.AddShape(bStop);
 			
 			Widgets.CRoundedButton bReset = new Widgets.CRoundedButton(150, 150, 100, 25, "Reset");
+			bReset.Dock = Diagram.DockSide.Left;
 			bReset.MouseDown += OnResetMouseDown;
 			this.AddShape(bReset);
 			tbTools.AddShape(bReset);
 			
 			Widgets.CRoundedButton bStep = new Widgets.CRoundedButton(150, 190, 100, 25, "Step");
+			bStep.Dock = Diagram.DockSide.Left;
 			bStep.MouseDown += OnStepMouseDown;
 			this.AddShape(bStep);
 			tbTools.AddShape(bStep);
@@ -446,14 +452,17 @@ namespace Jigsaw
 			{
 				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 				return;
+				
 			} else {
             	if (this.Mode == Diagram.EMode.Editing)
             	{
-					this.EditMode = Diagram.EMode.TranslatingStart;
+		            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
+					if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
+		            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
+					this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
+					this.Invalidate();										// Redraw
 				}
 			}
-			
-			//base.OnMouseDown(cvs, e);
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -466,8 +475,10 @@ namespace Jigsaw
 				{
 					this.offsetX += (e.X - this.mouseDownExact.X);
 					this.offsetY += (e.Y - this.mouseDownExact.Y);
-//					Console.WriteLine("OnMouseMove(B) ex: {0} ey: {1} offsetX: {2} offsetY: {3}", e.X, e.Y, this.offsetX, this.offsetY);
 					this.EditMode = Diagram.EMode.Translating;
+					
+					// TODO: Find all docked shapes and untranslate them?
+					
 					this.Invalidate();
 				}
 			}
@@ -820,7 +831,7 @@ namespace Jigsaw
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
 			this._isFactory = isFactory;
-			//this.AlignVertical = StringAlignment.Near;		// Change text vertical alignment to start from top
+			if (isFactory) this.Dock = Diagram.DockSide.Left;
 			
 			// Default edges
 			InEdge = new CEdge(this, "In", EdgeType.In, null, offsetX, 0.0, 0.0, 0.0, this.Width);
@@ -1031,6 +1042,8 @@ namespace Jigsaw
             double w = this.width;
             double h = this.height;
 			
+			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
+			
 			g.Save();
 			
             // Block outline			
@@ -1090,6 +1103,9 @@ namespace Jigsaw
 	            double y = this.top;
 	            double w = this.width;
 	            //double h = this.height;
+				
+				//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
+				
 				double cx = x + 0.5*w;
 				double cy = y + 0.5*20;
 
@@ -1122,6 +1138,8 @@ namespace Jigsaw
             double h = this.height;
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
+			
+			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
 			
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );

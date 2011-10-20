@@ -21,33 +21,33 @@ namespace Diagram
 {
 	// -----------------------------------------------------------------------
 	public static class Colors {
-		public static readonly Color Transparent = new Color(0.0, 0.0, 0.0, 0.0);
-		public static readonly Color White = new Color(1.0, 1.0, 1.0);
-		public static readonly Color Silver = new Color( 0.75, 0.75, 0.75);
-		public static readonly Color Gray = new Color(0.5, 0.5, 0.5);
-		public static readonly Color LightGray = new Color(0.8242, 0.8242, 0.8242);
-		public static readonly Color DarkGray = new Color(0.6601, 0.6601, 0.6601);
-		public static readonly Color SlateGray = new Color(0.4375, 0.5, 0.5625);
-		public static readonly Color DarkSlateGray = new Color(0.1562, 0.3086, 0.3086);
+		public static readonly Color Transparent    = new Color(0.0,    0.0,    0.0,    0.0);
+		public static readonly Color White          = new Color(1.0,    1.0,    1.0);
+		public static readonly Color Silver         = new Color(0.75,   0.75,   0.75);
+		public static readonly Color Gray           = new Color(0.5,    0.5,    0.5);
+		public static readonly Color LightGray      = new Color(0.8242, 0.8242, 0.8242);
+		public static readonly Color DarkGray       = new Color(0.6601, 0.6601, 0.6601);
+		public static readonly Color SlateGray      = new Color(0.4375, 0.5,    0.5625);
+		public static readonly Color DarkSlateGray  = new Color(0.1562, 0.3086, 0.3086);
 		public static readonly Color LightSlateGray = new Color(0.4648, 0.5312, 0.5977);
-		public static readonly Color WhiteSmoke = new Color(0.9570, 0.9570, 0.9570);
-		public static readonly Color Black = new Color(0.0, 0.0, 0.0);
+		public static readonly Color WhiteSmoke     = new Color(0.9570, 0.9570, 0.9570);
+		public static readonly Color Black          = new Color(0.0,    0.0,    0.0);
 
-		public static readonly Color Yellow = new Color(1.0, 1.0, 0.0);
-		public static readonly Color LightYellow = new Color( 1.0, 1.0, 0.875);
-		public static readonly Color DarkGoldenrod = new Color( 0.7187, 0.5234, 0.0430);
-		public static readonly Color PaleGoldenrod = new Color( 0.9297, 0.9062, 0.6641);
-		public static readonly Color Honeydew = new Color(0.9375, 1.0, 0.9375);
+		public static readonly Color Yellow         = new Color(1.0,    1.0,    0.0);
+		public static readonly Color LightYellow    = new Color(1.0,    1.0,    0.875);
+		public static readonly Color DarkGoldenrod  = new Color(0.7187, 0.5234, 0.0430);
+		public static readonly Color PaleGoldenrod  = new Color(0.9297, 0.9062, 0.6641);
+		public static readonly Color Honeydew       = new Color(0.9375, 1.0,    0.9375);
 		
-		public static readonly Color LightBlue = new Color( 0.6758, 0.8437, 0.8984);
-		public static readonly Color DarkBlue = new Color( 0.0, 0.0, 0.5430);
+		public static readonly Color LightBlue      = new Color(0.6758, 0.8437, 0.8984);
+		public static readonly Color DarkBlue       = new Color(0.0,    0.0,    0.5430);
 
-		public static readonly Color Red = new Color( 1.0, 0.0, 0.0);
-		public static readonly Color DarkRed = new Color( 0.5430, 0.0, 0.0);
-		public static readonly Color LightPink = new Color( 1.0, 0.7109, 0.7539);
+		public static readonly Color Red            = new Color(1.0,    0.0,    0.0);
+		public static readonly Color DarkRed        = new Color(0.5430, 0.0,    0.0);
+		public static readonly Color LightPink      = new Color(1.0,    0.7109, 0.7539);
 		
-		public static readonly Color DarkGreen = new Color( 0.0, 0.3910, 0.0);
-		public static readonly Color LightGreen = new Color( 0.5625, 0.9297, 0.5625);
+		public static readonly Color DarkGreen      = new Color(0.0,    0.3910, 0.0);
+		public static readonly Color LightGreen     = new Color(0.5625, 0.9297, 0.5625);
 	}
 	
     // -----------------------------------------------------------------------
@@ -58,12 +58,12 @@ namespace Diagram
 		
 		// Following modes are reserved for EditMode and DrawMode. Both start as Idle.
 		Idle,
-        DragLeftStart,  DragLeft,
-        DrawLeftStart,  DrawLeft,
-        SizeLeftStart,  SizeLeft,
-        PEditLeftStart, PEditLeft, 
+        DragLeftStart,    DragLeft,
+        DrawLeftStart,    DrawLeft,
+        SizeLeftStart,    SizeLeft,
+        PEditLeftStart,   PEditLeft, 
 		TranslatingStart, Translating,
-        LassoLeftStart, LassoLeft
+        LassoLeftStart,   LassoLeft
     }
 	
 	// -----------------------------------------------------------------------
@@ -151,12 +151,11 @@ namespace Diagram
     public class Canvas : Gtk.DrawingArea, ICanvasEventHandler
     {
 		// Public properties
-		public Color BackColor = Colors.LightSlateGray;			// Back color
-        public List<CShape> shapes;                             // List of shapes on shape layer
-        public List<CShape> connectors;                         // List of shapes on the connector layer
-		
-        // Private properties
+        public  List<CShape> shapes;                            // List of shapes on shape layer
+        public  List<CShape> connectors;                        // List of shapes on the connector layer
         private List<CShape> annotation;                        // List of shapes on annotation layer
+		
+		public Color BackColor = Colors.LightSlateGray;			// Back color
         internal CShape lasso;                                  // Shapes used as lasso
 
         internal CPoint mouseDownExact;                         // Exact location of last mouse down event
@@ -166,7 +165,7 @@ namespace Diagram
         internal CPoint mouseUpExact;                           // Exact location of last mouse up event
         internal CPoint mouseUpGrid;                            // Grid-snapped of last mouse up event
 
-        internal EMode Mode = EMode.Editing;                  	// Init in editing mode
+        internal EMode Mode     = EMode.Editing;                // Init in editing mode
         internal EMode EditMode = EMode.Idle;                	// Edit mode starts idle
         internal EMode DrawMode = EMode.Idle;                	// Draw mode starts idle
 		
@@ -175,8 +174,6 @@ namespace Diagram
 		internal double scaleCenterY = 0.0;
 		internal double offsetX = 0.0;							// The current translation amount
 		internal double offsetY = 0.0;
-		internal double _scaleOffsetX = 0.0;
-		internal double _scaleOffsetY = 0.0;
 		
 		private double gridsize = 5.0;                          // Size of the drawing grid in pixels
         private Boolean modified = false;                       // True if canvas has been modified and should be saved
@@ -214,10 +211,10 @@ namespace Diagram
 			// Set up events
 			this.AddEvents ((int)Gdk.EventMask.AllEventsMask);
 			
-			this.ButtonPressEvent += new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
+			this.ButtonPressEvent   += new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
-			this.MotionNotifyEvent += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
-			this.ScrollEvent += new Gtk.ScrollEventHandler( this.OnScroll );
+			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
+			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
 			//this.ExposeEvent += new Gtk.ExposeEventHandler( this.OnPaint );
 //			this.DragBegin += new Gtk.DragBeginHandler( this.OnDragEnter );
 //			this.DragDrop += new Gtk.DragDropHandler( this.OnDragDrop );
@@ -230,7 +227,7 @@ namespace Diagram
             // - The shapes layer holds all managed blocks on the canvas
             // - The annotation layer holds all handles and other objects
             //   that are used to manipulate shapes
-            this.shapes = new List<CShape>();
+            this.shapes     = new List<CShape>();
             this.connectors = new List<CShape>();
             this.annotation = new List<CShape>();
 
@@ -268,8 +265,8 @@ namespace Diagram
         {
             this.CanvasMouseDown = null;
             this.CanvasMouseMove = null;
-            this.CanvasMouseUp = null;
-            this.CanvasClick = null;
+            this.CanvasMouseUp   = null;
+            this.CanvasClick     = null;
         }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -306,21 +303,13 @@ namespace Diagram
 //			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
 //			g.Translate( this.offsetX,     this.offsetY);
 			
-//			g.Translate( this.translateX1, this.translateY1 );
-//			g.Scale(this.scale, this.scale);
-//			g.Translate( -this.translateX, -this.translateY );
-//			this.translateX1 = this.translateX;
-//			this.translateY1 = this.translateY;
-//			this.scale1 = this.scale;
-			
-            // Draw all visible connectors (bottom layer)
+            // Draw all visible 
+			// connectors (bottom layer), then
+			// shapes (middle layer), and finally
+			// annotations (top layer)
             foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
-
-            // Draw all visible shapes (middle layer)
-            foreach (CShape o in this.shapes) if (o.Visible == true) o.Draw(g);
-
-            // Draw all visible annotations (top layer)
-            foreach (CShape o in this.annotation) if (o.Visible == true) o.Draw(g);
+            foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
+            foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
 			
 			// Reset transform
 			g.Restore();
@@ -382,8 +371,6 @@ namespace Diagram
 				this.scale /= 1.05;
 			}
 			
-//			this._scaleOffsetX = (scl.X-this.scaleCenterX)/(1.0-this.scale)/this.scale;
-//			this._scaleOffsetY = (scl.Y-this.scaleCenterY)/(1.0-this.scale)/this.scale;
 			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
 			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
 			
@@ -391,16 +378,14 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal void screenToWorld(double sx, double sy, out double wx, out double wy) {;
+		internal void TransformPoint(double sx, double sy, out double wx, out double wy) {;
 			wx = (sx - this.scaleCenterX)/this.scale + this.scaleCenterX - this.offsetX;
 			wy = (sy - this.scaleCenterY)/this.scale + this.scaleCenterY - this.offsetY;
-//			Console.WriteLine("screenToWorld this.offsetX: {0} this.offsetY: {1}", this.offsetX, this.offsetY);
-//			Console.WriteLine("screenToWorld sx: {0} sy: {1} wx: {2} wy: {3}", sx, sy, wx, wy);
 		}
 		
-		internal void worldToScreen(double wx, double wy, out double sx, out double sy) {
-			sx = 0.0;
-			sy = 0.0;
+		internal void InverseTransformPoint(double wx, double wy, out double sx, out double sy) {
+			sx = this.scale*(wx + this.offsetX - this.scaleCenterX) + this.scaleCenterX;
+			sy = this.scale*(wy + this.offsetY - this.scaleCenterY) + this.scaleCenterY;
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -413,7 +398,8 @@ namespace Diagram
 			double ey = 0.0;
 			double sx = (double)e.Event.X;
 			double sy = (double)e.Event.Y;
-			this.screenToWorld(sx, sy, out ex, out ey);
+			
+			this.TransformPoint(sx, sy, out ex, out ey);
 
             this.mouseDownExact = new CPoint(ex, ey); // Save the exact and snapped mousedown points
             this.mouseDownGrid = this.SnapToGrid(this.mouseDownExact);
@@ -431,7 +417,7 @@ namespace Diagram
 			if (ho == null) ho = this.HitConnector(this.mouseDownExact);
             if (ho != null) this.handler = ho;
 			
-            // Route proper event to event handler
+            // Route event to event handler
 			MouseEventArgs mev = new MouseEventArgs(ex, ey, e);
 			switch (e.Event.Type) {
 			case Gdk.EventType.ButtonPress:
@@ -454,7 +440,7 @@ namespace Diagram
 			double ey = 0.0;
 			double sx = (double)e.Event.X;
 			double sy = (double)e.Event.Y;
-			this.screenToWorld(sx, sy, out ex, out ey);
+			this.TransformPoint(sx, sy, out ex, out ey);
 			//Console.WriteLine("OnMouseMove(A) sx: {0} sy: {1} ex: {2} ey: {3}", sx, sy, ex, ey);
 			
             this.mouseExact = new CPoint(ex, ey); // Save the exact and snapped mouse position
@@ -478,7 +464,7 @@ namespace Diagram
 			double ey = 0.0;
 			double sx = (double)e.Event.X;
 			double sy = (double)e.Event.Y;
-			this.screenToWorld(sx, sy, out ex, out ey);
+			this.TransformPoint(sx, sy, out ex, out ey);
 
             this.mouseUpExact = new CPoint(ex, ey);       // Save the exact and snapped mouse up location
             this.mouseUpGrid = this.SnapToGrid(this.mouseExact);
@@ -2416,14 +2402,8 @@ namespace Diagram
             // Simple behavior is to use ContainsPoint.
             // More complex overridden bahavior may return a
             // part of a composite shape.
-            if (this.ContainsPoint(pt, cvs) == true)
-            {
-                return this;
-            }
-            else
-            {
-                return null;
-            }
+            if (this.ContainsPoint(pt, cvs) == true) return this;
+            else return null;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2623,8 +2603,8 @@ namespace Diagram
             // Create size handles.
             double x1 = this.left;
             double y1 = this.top;
-            double x2 = this.left + this.width;
-            double y2 = this.top + this.height;
+            double x2 = x1 + this.width;
+            double y2 = y1 + this.height;
             double xm = this.center.X;
             double ym = this.center.Y;
             
@@ -2719,7 +2699,10 @@ namespace Diagram
         public virtual Boolean ContainsPoint(double X, double Y, Canvas cvs)
         {
             if (this.Visible == false) return false;
-
+			
+			// if absolute positioning, convert point back to absolute coordinates
+			//if (this.Dock == DockSide.Left) cvs.InverseTransformPoint(X, Y, out X, out Y);
+			
             // If in bounding box, then true
             if (this.left <= X && this.top <= Y 
                 && (this.left + this.width) >= X 
@@ -2961,9 +2944,7 @@ namespace Diagram
             double x = this.left;
             double y = this.top;
 			
-//			if (this.Dock == DockSide.Left) {
-//				g.InverseTransformPoint(ref x, ref y);
-//			}
+			//if (this.Dock == DockSide.Left) g.InverseTransformPoint(ref x, ref y);
 			
             double w = this.width;
             double h = this.height;
@@ -3111,8 +3092,11 @@ namespace Diagram
             // The CBoundingBox is not strictly necessary to reorient points.
             double x = this.left;
             double y = this.top;
-            double w = this.width;
-            double h = this.height;
+			
+			//if (this.Dock == DockSide.Left) g.InverseTransformPoint(ref x, ref y);
+			
+            double w  = this.width;
+            double h  = this.height;
 			double hw = 0.5*w;
 			double hh = 0.5*h;
 			double cx = x + hw;
@@ -3190,6 +3174,10 @@ namespace Diagram
 
             double x = pnt.X;
             double y = pnt.Y;
+			
+			// if absolute positioning, convert point back to absolute coordinates
+			//if (this.Dock == DockSide.Left) cvs.InverseTransformPoint(x, y, out x, out y);
+			
             double x0 = this.center.X;
             double y0 = this.center.Y;
             double a = 0.5 * this.width;
@@ -3324,9 +3312,7 @@ namespace Diagram
 			double x = this.left;
 			double y = this.top;
 			
-//			if (this.Dock == DockSide.Left) {
-//				g.InverseTransformPoint(ref x, ref y);
-//			}
+			//if (this.Dock == DockSide.Left) g.InverseTransformPoint(ref x, ref y);
 
             double w = this.width;
             double h = this.height;
@@ -3646,6 +3632,9 @@ namespace Diagram
             double x = pt.X;
             double y = pt.Y;
 
+			// if absolute positioning, convert point back to absolute coordinates
+			//if (this.Dock == DockSide.Left) cvs.InverseTransformPoint(x, y, out x, out y);
+			
             // Rule out the point if it is outside the bounding box
             double bx1 = this.left;
             double by1 = this.top;
@@ -3808,6 +3797,11 @@ namespace Diagram
 			// http://cairographics.org/hittestpython/
 //			this._context.AppendPath(this._path);
 //			return this._context.InStroke(pnt.X, pnt.Y);
+
+			// if absolute positioning, convert point back to absolute coordinates
+			double x = pnt.X;
+			double y = pnt.Y;
+			//if (this.Dock == DockSide.Left) cvs.InverseTransformPoint(x, y, out x, out y);
 			
 			using(ImageSurface draw = new ImageSurface(Format.A1, 1000, 1000)) {
 				using (Context g = new Context(draw)) {
@@ -3823,8 +3817,7 @@ namespace Diagram
 					g.Color = Colors.Black;
 					g.Stroke();
 					
-					bool rslt = g.InStroke(pnt.X, pnt.Y);
-					//Console.WriteLine(rslt);
+					bool rslt = g.InStroke(x, y);
 					return rslt;
 				}
 			}
