@@ -1,12 +1,65 @@
+// Relfection.Utils
+// D.S. Blank <dblank@cs.brynmawr.edu>
+// GPL, version 2
+
 using System; // Type
 using System.Reflection; // Method...
 using System.Collections.Generic; // List
 using System.Threading; // Thread
 
-namespace Relfection {
+/*
+  To get all types in an assembly:
+  >>> Reflection.Utils.getTypeNames("Myro")
+  ['AudioManager', 'AudioSpecCallbackDelegate', 'Computer', 'Extensions', 
+   'Gamepads', 'MessageDialog', 'Myro', 'MyTexView', 'Randomizer', 'Robot', 
+   'Scribbler', 'SimScribbler', 'Simulation']
 
+  To get parameter names of those types:
+  >>> type = Reflection.Utils.getType("Myro", "Scribbler")
+  >>> Reflection.Utils.getConstructorParameterNames(type)
+  [['serial'], ['port'], ['port', 'baud']]
+
+  To get types of those parameters:
+  >>> type = Reflection.Utils.getType("Myro", "Scribbler")
+  >>> Reflection.Utils.getConstructorParameterTypes(type)
+  [[<System.IO.Ports.SerialPort>], 
+   [<System.String>], [<System.String>, <System.Int32>]]
+
+  To get static methods of Assembly:
+  >>> Reflection.Utils.getStaticMethodNames("Myro")
+  ['CreateQualifiedName', 'GetAssembly', 'GetCallingAssembly', 
+   'GetEntryAssembly', 'GetExecutingAssembly', 'Load', 'Load', 'Load', 'Load', 
+   'Load', 'Load', 'Load', 'LoadFile', 'LoadFile', 'LoadFrom', 'LoadFrom', 
+   'LoadFrom', 'LoadWithPartialName', 'LoadWithPartialName', 
+   'ReflectionOnlyLoad', 'ReflectionOnlyLoad', 'ReflectionOnlyLoadFrom']
+
+  To get static methods of Assembly Class:
+  >>> Reflection.Utils.getStaticMethodNames("Myro", "Myro")
+  ['ask', 'ask', 'ask', 'askQuestion', 'askQuestion', 'askQuestion', 
+   'backward', 'backward', 'beep', 'beep', 'beep', 'beep', 'beep', 'beep', 
+   'close_module', 'Color', 'Color', 'Contains', 'copyPicture', 
+   'currentTime', ...]
+
+  #NOTE: there is a name for each different signature.
+
+  To get the parameters for an Assembly Class method:
+  >>> Reflection.Utils.getParameterNames("Myro", "Myro", "beep")
+  [['duration', 'frequency'], ['duration', 'frequency', 'frequency2'], 
+   ['duration', 'frequency'], ['duration', 'frequency', 'frequency2'], 
+   ['duration', 'frequency'], ['duration', 'frequency', 'frequency2']]
+
+  #NOTE: there is a list for each set of types
+  >>> Reflection.Utils.getParameterTypes("Myro", "Myro", "beep")
+  [[<System.Double>, <System.Double>], ...]
+
+  Finally, to call a method from a type:
+  func = Reflection.Utils.getMethodFromArgValues(Myro, "beep", 1, 440)
+  func.Invoke(Myro, new object [] {1, 440});
+
+ */
+
+namespace Reflection {
   public class Utils {
-
 
     public static List<string> getAssemblyNames() {
       return getAssemblyNames(Assembly.GetExecutingAssembly());
@@ -18,6 +71,7 @@ namespace Relfection {
       foreach (AssemblyName an in assembly.GetReferencedAssemblies() ) {
 	retval.Add(an.Name);
       }
+      retval.Sort();
       return retval;
     }
 
@@ -38,17 +92,22 @@ namespace Relfection {
       return null;
     }
 
-    public static List<string> getTypeNames() {
-      return getTypeNames(Assembly.GetExecutingAssembly());
+    public static List<string> getTypeNames(Assembly assembly) {
+      List<string> retval = new List<string>();
+      foreach (Type type in assembly.GetExportedTypes()) {
+	retval.Add(type.Name);
+      }
+      retval.Sort();
+      return retval;
     }
 
-    public static List<string> getTypeNames(Assembly assembly) {
-      // Classes
-      List<string> retval = new List<string>();
-      foreach (Type t in assembly.GetExportedTypes() ) {
-	retval.Add(t.Name);
-      }
-      return retval;
+    public static List<string> getTypeNames(string assembly_name) {
+      Assembly assembly = getAssembly(assembly_name);
+      return getTypeNames(assembly);
+    }
+
+    public static List<string> getTypeNames() {
+      return getTypeNames(Assembly.GetExecutingAssembly());
     }
 
     public static Type getType(string assembly_name, string type_name) {
@@ -65,11 +124,7 @@ namespace Relfection {
       return null;
     }
 
-    public static Type[] getTypes(Assembly assembly) {
-      return assembly.GetExportedTypes();
-    }
-
-    public static Type[] getTypes(object [] objects) {
+    public static Type[] getTypesOfArgs(object [] objects) {
       Type [] retval = new Type[objects.Length];
       int count = 0;
       foreach (object obj in objects) {
@@ -79,20 +134,11 @@ namespace Relfection {
       return retval;
     }
 
-    public static void getMethods(object cls) {
-      Type type = cls.GetType();
-      // get the methods of a Class (cls) given these flags:
-      MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public |
-						 BindingFlags.Static);
-      // sort methods by name:
-      Array.Sort(methodInfos,
-		 delegate(MethodInfo methodInfo1, MethodInfo methodInfo2)
-		 { return methodInfo1.Name.CompareTo(methodInfo2.Name); });
-      
-      // print them out:
-      foreach (MethodInfo methodInfo in methodInfos) {
-	Console.WriteLine(methodInfo.Name);
-      }
+    public static MethodInfo getMethodFromArgValues(Type type,
+						    string methodName, 
+						    params object [] args) {
+      // get a method given arg values
+      return type.GetMethod(methodName, getTypesOfArgs(args));
     }
 
     public static MethodInfo getMethodFromArgValues(object cls, 
@@ -100,7 +146,14 @@ namespace Relfection {
 						    params object [] args) {
       // get a method given arg values
       Type type = cls.GetType();
-      return type.GetMethod(methodName, getTypes(args));
+      return type.GetMethod(methodName, getTypesOfArgs(args));
+    }
+
+    public static MethodInfo getMethodFromArgTypes(Type type,
+						   string methodName, 
+						   Type [] args) {
+      // get a method given types
+      return type.GetMethod(methodName, args);
     }
 
     public static MethodInfo getMethodFromArgTypes(object cls, 
@@ -111,13 +164,47 @@ namespace Relfection {
       return type.GetMethod(methodName, args);
     }
 
-
     public static List<string> getMemberNames(Type type) {
       List<string> retval = new List<string>();
       foreach (MemberInfo mi in type.GetMembers() ) {
 	retval.Add(mi.Name);
       }
+      retval.Sort();
       return retval;
+    }
+
+    public static List<string> getStaticMethodNames(string aname) {
+      Assembly assembly = getAssembly(aname);
+      List<string> retval = new List<string>();
+      foreach (MethodInfo mi in 
+	       assembly.GetType().GetMethods(BindingFlags.Public |
+					     BindingFlags.Static)) {
+	retval.Add(mi.Name);
+      }
+      retval.Sort();
+      return retval;
+    }
+
+    public static List<string> getStaticMethodNames(string aname, string tname) {
+      Type type = getType(aname, tname);
+      List<string> retval = new List<string>();
+      foreach (MethodInfo mi in type.GetMethods(BindingFlags.Public |
+						BindingFlags.Static)) {
+	retval.Add(mi.Name);
+      }
+      retval.Sort();
+      return retval;
+    }
+
+    public static MethodInfo[] getStaticMethods(Type type) {
+      // get the methods of a Class (cls) given these flags:
+      MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public |
+						 BindingFlags.Static);
+      // sort methods by name:
+      Array.Sort(methodInfos,
+		 delegate(MethodInfo methodInfo1, MethodInfo methodInfo2)
+		 { return methodInfo1.Name.CompareTo(methodInfo2.Name); });
+      return methodInfos;
     }
 
     public static List<string> getMethodNames(string aname, string tname) {
@@ -132,6 +219,7 @@ namespace Relfection {
 	  retval.Add(mi.Name);
 	}
       }
+      retval.Sort();
       return retval;
     }
 
@@ -144,13 +232,22 @@ namespace Relfection {
       return null;
     }
 
-    public static MethodInfo getMethodInfo(Type type, string mname) {
+    public static List<ConstructorInfo> getConstructorInfos(Type type) {
+      List<ConstructorInfo> infos = new List<ConstructorInfo>();
+      foreach (ConstructorInfo ci in type.GetConstructors() ) {
+	infos.Add(ci);
+      }
+      return infos;
+    }
+
+    public static List<MethodInfo> getMethodInfos(Type type, string mname) {
+      List<MethodInfo> methodinfos = new List<MethodInfo>();
       foreach (MethodInfo mi in type.GetMethods() ) {
 	if (String.Compare(mi.Name, mname) == 0) {
-	  return mi;
+	  methodinfos.Add(mi);
 	}
       }
-      return null;
+      return methodinfos;
     }
 
     public static List<string> getPropertyNames(Type type, string mname) {
@@ -159,15 +256,58 @@ namespace Relfection {
       foreach (MethodInfo am in ((PropertyInfo) mi).GetAccessors() ) {
 	retval.Add(am.Name);
       }
+      retval.Sort();
       return retval;
     }
 
-    public static List<string> getParameterNames(string aname, string tname, string mname) {
+    public static List<List<string>> getConstructorParameterNames(Type type) {
+      List<List<string>> retval = new List<List<string>>();
+      foreach (ConstructorInfo mi in getConstructorInfos(type)) {
+	List<string> parameters = new List<string>();
+	foreach (ParameterInfo pi in mi.GetParameters() ) {
+	  parameters.Add(pi.Name);
+	}
+	retval.Add(parameters);
+      }
+	return retval;
+    }
+
+    public static List<List<Type>> getConstructorParameterTypes(Type type) {
+      List<List<Type>> retval = new List<List<Type>>();
+      foreach (ConstructorInfo mi in getConstructorInfos(type)) {
+	List<Type> parameters = new List<Type>();
+	foreach (ParameterInfo pi in mi.GetParameters() ) {
+	  parameters.Add(pi.ParameterType);
+	}
+	retval.Add(parameters);
+      }
+	return retval;
+    }
+
+    public static List<List<string>> getParameterNames(string aname, 
+						 string tname, 
+						 string mname) {
+      List<List<string>> retval = new List<List<string>>();
       Type type = getType(aname, tname);
-      MethodInfo mi = getMethodInfo(type, mname);
-      List<string> retval = new List<string>();
-      foreach (ParameterInfo pi in mi.GetParameters() ) {
-	retval.Add(pi.Name);
+      foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+	List<string> parameters = new List<string>();
+	foreach (ParameterInfo pi in mi.GetParameters() ) {
+	  parameters.Add(pi.Name);
+	}
+	retval.Add(parameters);
+      }
+      return retval;
+    }
+
+    public static List<List<Type>> getParameterTypes(string aname, string tname, string mname) {
+      List<List<Type>> retval = new List<List<Type>>();
+      Type type = getType(aname, tname);
+      foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+	List<Type> types = new List<Type>();
+	foreach (ParameterInfo pi in mi.GetParameters() ) {
+	  types.Add(pi.ParameterType);
+	}
+	retval.Add(types);
       }
       return retval;
     }
@@ -178,15 +318,12 @@ namespace Relfection {
 
     public static void Main(string [] args) {
       Utils cls = new Utils();
-      Assembly assembly = getAssembly();
-      getAssemblyNames(assembly);
       List<string> assemblies = getAssemblyNames();
       foreach (string aname in assemblies) {
 	Assembly ass = getAssembly(aname);
-	getTypes(ass);
 	List<string> type_names = getTypeNames(ass);
 	foreach (string tname in type_names) {
-	  getType(aname, tname);
+	  Console.WriteLine("Assembly {0}, Class {1}, Object: {2}", aname, tname, getType(aname, tname));
 	}
       }
       
