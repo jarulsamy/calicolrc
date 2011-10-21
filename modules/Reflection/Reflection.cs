@@ -89,13 +89,23 @@ namespace Reflection {
 	if (String.Compare(assemblies[i].GetName().Name, name) == 0)
 	  return assemblies[i];
       }      
-      return null;
+      // else, try to load it:
+      Assembly assembly = null;
+      try {
+	assembly = Assembly.LoadFrom(name);
+      } catch (System.IO.FileNotFoundException) {
+#pragma warning disable 612
+	assembly = Assembly.LoadWithPartialName(name);
+#pragma warning restore 612
+      }
+      return assembly;
     }
 
     public static List<string> getTypeNames(Assembly assembly) {
       List<string> retval = new List<string>();
       foreach (Type type in assembly.GetExportedTypes()) {
-	retval.Add(type.Name);
+		if (!retval.Contains(type.Name))
+			retval.Add(type.Name);
       }
       retval.Sort();
       return retval;
@@ -190,7 +200,8 @@ namespace Reflection {
       List<string> retval = new List<string>();
       foreach (MethodInfo mi in type.GetMethods(BindingFlags.Public |
 						BindingFlags.Static)) {
-	retval.Add(mi.Name);
+		if (!retval.Contains(mi.Name))
+			retval.Add(mi.Name);
       }
       retval.Sort();
       return retval;
@@ -243,9 +254,9 @@ namespace Reflection {
     public static List<MethodInfo> getMethodInfos(Type type, string mname) {
       List<MethodInfo> methodinfos = new List<MethodInfo>();
       foreach (MethodInfo mi in type.GetMethods() ) {
-	if (String.Compare(mi.Name, mname) == 0) {
-	  methodinfos.Add(mi);
-	}
+		if (String.Compare(mi.Name, mname) == 0) {
+	  		methodinfos.Add(mi);
+		}
       }
       return methodinfos;
     }
@@ -289,13 +300,13 @@ namespace Reflection {
 						 string mname) {
       List<List<string>> retval = new List<List<string>>();
       Type type = getType(aname, tname);
-      foreach (MethodInfo mi in getMethodInfos(type, mname)) {
-	List<string> parameters = new List<string>();
-	foreach (ParameterInfo pi in mi.GetParameters() ) {
-	  parameters.Add(pi.Name);
-	}
-	retval.Add(parameters);
-      }
+      	foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+			List<string> parameters = new List<string>();
+			foreach (ParameterInfo pi in mi.GetParameters() ) {
+	  			parameters.Add(pi.Name);
+			}
+			retval.Add(parameters);
+      	}
       return retval;
     }
 
@@ -314,21 +325,6 @@ namespace Reflection {
 
     public static int add1(int i) {
       return i + 1;
-    }
-
-    public static void Main(string [] args) {
-      Utils cls = new Utils();
-      List<string> assemblies = getAssemblyNames();
-      foreach (string aname in assemblies) {
-	Assembly ass = getAssembly(aname);
-	List<string> type_names = getTypeNames(ass);
-	foreach (string tname in type_names) {
-	  Console.WriteLine("Assembly {0}, Class {1}, Object: {2}", aname, tname, getType(aname, tname));
-	}
-      }
-      
-      MethodInfo func = getMethodFromArgValues(cls, "add1", 1);
-      func.Invoke(cls, new object [] {1});
     }
   }
 }
