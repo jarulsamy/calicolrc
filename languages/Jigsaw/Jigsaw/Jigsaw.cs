@@ -64,6 +64,32 @@ namespace Jigsaw
 				
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
+
+		public static List<CBlock> makeBlocksFromString(string path, int y=70) {
+			//"Myro/Myro.beep(int duration, int frequency)"
+			return null;
+		}
+
+		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70) {
+		  List<CBlock> retval = new List<CBlock>();
+		  List<string> blocknames = new List<string>();
+		  foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name)) {
+			  foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name)) {
+					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
+					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
+					for (int n = 0; n < names.Count; n++) {
+		    			CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, names[n], types[n], true);
+						//property.PropertyChanged += block.OnPropertyChanged;
+						if (! blocknames.Contains(block.Text)) {
+		    				retval.Add(block);
+							blocknames.Add(block.Text);
+							y += 40;
+						}
+					}							
+				}
+		  }
+		  return retval;
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(int width, int height) : base(width, height) 
@@ -208,6 +234,11 @@ namespace Jigsaw
 //			tbNotes.AddShape(_shconn);
 
 			// --- Myro
+			foreach (CBlock cblock in makeBlocksFromDll("Myro")) {
+			  this.AddShape(cblock);
+			  tbMyro.AddShape(cblock);
+			}
+			/*
 			CRobot block1 = new CRobot(110, 70, true);
 			block1.Text = "init robot on [COM]";
 			this.AddShape(block1);
@@ -232,7 +263,8 @@ namespace Jigsaw
 			block5.Text = "turn right [by] for [secs]";
 			this.AddShape(block5);
 			tbMyro.AddShape(block5);
-		
+			*/
+
 //			Widgets.CTextBox tb1 = new Widgets.CTextBox(110, 70, 100, 25, "Blah", cvsFixed);
 //			cvs.AddShape(tb1);
 //			tbProp.AddShape(tb1);
@@ -278,6 +310,12 @@ namespace Jigsaw
 			CGfxText gblock4 = new CGfxText(110, 190, true);
 			this.AddShape(gblock4);
 			tbGraphics.AddShape(gblock4);
+
+			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 230)) {
+			  this.AddShape(cblock);
+			  tbGraphics.AddShape(cblock);
+			}
+
 			
 			// --- Run tab
 			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
