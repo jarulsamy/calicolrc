@@ -19,9 +19,7 @@ def ld0(s1, s2):
     if len(s1) == 0: return len(s2)
     if len(s2) == 0: return len(s1)
     if s1[0] == s2[0]:
-        return min( ld0(s1[1:], s2[1:]) + 0,
-                    ld0(s1, s2[1:]) + 1,
-                    ld0(s1[1:], s2) + 1)
+        return ld0(s1[1:], s2[1:]) + 0
     else:
         return min( ld0(s1[1:], s2[1:]) + 1,
                     ld0(s1, s2[1:]) + 1,
