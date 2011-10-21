@@ -67,7 +67,7 @@ namespace Jigsaw
 				_properties["Variable"] = new CVarNameProperty("Variable", String.Format("{0}{1}", method_name.ToUpper(), 1));
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
-						_properties[names[n]] = new CExpressionProperty(names[n], types[n].ToString()); // FIXME: get default
+						_properties[names[n]] = new CExpressionProperty(names[n], "X"); // FIXME: get default
 						if (parameter_list == "")
 							parameter_list = names[n];
 						else
@@ -103,6 +103,7 @@ namespace Jigsaw
 					// First, get the expressions from the properties and evaluate them:
 					List<object> args = new List<object>();
 					List<Type> arg_types = new List<Type>();
+					System.Reflection.MethodInfo method = null;
 					foreach (string name in names) {
 						CExpressionProperty prop = (CExpressionProperty)_properties[name];
 						prop.Expr.Parameters = locals;
@@ -112,20 +113,26 @@ namespace Jigsaw
 					}
 					// Next, get the type and correct method based on the args above
 					Type type = Reflection.Utils.getType(assembly_name, type_name);
-					System.Reflection.MethodInfo method = Reflection.Utils.getMethodFromArgTypes(type, method_name, arg_types.ToArray());
-					// and call it, if it is valid:
-					if (method != null) {
-						CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-						locals[VarName.Text] = method.Invoke(type, args.ToArray());
+				    if (type != null) {
+						method = Reflection.Utils.getMethodFromArgTypes(type, method_name, arg_types.ToArray());
+						// and call it, if it is valid:
+						if (method != null) {
+							CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
+							locals[VarName.Text] = method.Invoke(type, args.ToArray());
+						} else {
+							Console.WriteLine("No matching method for these argument types");
+							this.State = BlockState.Error;
+							rr.Action = EngineAction.NoAction;
+							rr.Runner = null;
+						}
 					} else {
-						Console.WriteLine("No matching method for these argument types");
+						Console.WriteLine("Can't find assembly");
 						this.State = BlockState.Error;
 						rr.Action = EngineAction.NoAction;
 						rr.Runner = null;
 					}
 				} catch (Exception ex) {
 					Console.WriteLine(ex.Message);
-					
 					this.State = BlockState.Error;
 					rr.Action = EngineAction.NoAction;
 					rr.Runner = null;

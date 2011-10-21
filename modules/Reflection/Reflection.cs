@@ -80,7 +80,11 @@ namespace Reflection {
     }
 
     public static Assembly getAssembly(String name) {
-      return getAssembly(name, Thread.GetDomain().GetAssemblies());
+		try {
+      		return getAssembly(name, Thread.GetDomain().GetAssemblies());
+		} catch {
+			return null;
+		}
     }
 
     public static Assembly getAssembly(String name, Assembly [] assemblies) {
@@ -122,7 +126,11 @@ namespace Reflection {
 
     public static Type getType(string assembly_name, string type_name) {
       Assembly assembly = getAssembly(assembly_name);
-      return getType(assembly, type_name);
+	  if (assembly != null)
+      	return getType(assembly, type_name);
+	  else {
+	  	return null;
+	  }
     }
 
     public static Type getType(Assembly assembly, string type_name) {
