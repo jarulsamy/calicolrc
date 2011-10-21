@@ -186,8 +186,8 @@ namespace Jigsaw
 				_Y2.Expr.Parameters = locals;
 				double dy2 = Convert.ToDouble( _Y2.Expr.Evaluate() );
 				
-				Graphics.Point pt1 = new Graphics.Point( dx1, dy1 );
-				Graphics.Point pt2 = new Graphics.Point( dx2, dy2 );
+				Graphics.Point pt1 = new Graphics.Point( _X1.Expr.Evaluate(), _Y1.Expr.Evaluate() );
+				Graphics.Point pt2 = new Graphics.Point( _X2.Expr.Evaluate(), _Y2.Expr.Evaluate() );
 				Graphics.Line ln = new Graphics.Line(pt1, pt2);
 				ln.draw(win);
 
