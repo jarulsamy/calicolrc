@@ -107,11 +107,13 @@ namespace Reflection {
 
     public static List<string> getTypeNames(Assembly assembly) {
       List<string> retval = new List<string>();
-      foreach (Type type in assembly.GetExportedTypes()) {
-		if (!retval.Contains(type.Name))
-			retval.Add(type.Name);
+	  if (assembly != null) {
+	      foreach (Type type in assembly.GetExportedTypes()) {
+			if (!retval.Contains(type.Name))
+				retval.Add(type.Name);
+	      }
+	      retval.Sort();
       }
-      retval.Sort();
       return retval;
     }
 
