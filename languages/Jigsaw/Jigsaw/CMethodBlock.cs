@@ -67,13 +67,19 @@ namespace Jigsaw
 				_properties["Variable"] = new CVarNameProperty("Variable", String.Format("{0}{1}", method_name.ToUpper(), 1));
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
-						_properties[names[n]] = new CExpressionProperty(names[n], "X"); // FIXME: get default
-						if (parameter_list == "")
-							parameter_list = names[n];
-						else
-							parameter_list += "," + names[n];
-					}
-					block_text = String.Format("{0}({1})", method_name, parameter_list);
+					  if (types[n].ToString().Equals("System.String")) {
+					    _properties[names[n]] = new CExpressionProperty(names[n], 
+											    String.Format("'{0}'", names[n])); // FIXME: get default
+					  } else {
+					    _properties[names[n]] = new CExpressionProperty(names[n], 
+											    String.Format("{0}", names[n].ToUpper())); // FIXME: get default
+					  }
+					  if (parameter_list == "")
+					    parameter_list = names[n];
+					  else
+					    parameter_list += "," + names[n];
+				}
+				        block_text = String.Format("{0}({1})", method_name, parameter_list);
 				} else {
 					block_text = String.Format("method");
 				}
@@ -121,25 +127,25 @@ namespace Jigsaw
 							try {
 								locals[VarName.Text] = method.Invoke(type, args.ToArray());
 							} catch {
-								Console.WriteLine("No matching method for these argument types");
+							  this["Message"] = "No matching method for these argument types";
 								this.State = BlockState.Error;
 								rr.Action = EngineAction.NoAction;
 								rr.Runner = null;
 							}
 						} else {
-							Console.WriteLine("No matching method for these argument types");
+							this["Message"] = "No matching method for these argument types";
 							this.State = BlockState.Error;
 							rr.Action = EngineAction.NoAction;
 							rr.Runner = null;
 						}
 					} else {
-						Console.WriteLine("Can't find assembly");
+						this["Message"] = "Can't find assembly";
 						this.State = BlockState.Error;
 						rr.Action = EngineAction.NoAction;
 						rr.Runner = null;
 					}
 				} catch (Exception ex) {
-					Console.WriteLine(ex.Message);
+					this["Message"] = ex.Message;
 					this.State = BlockState.Error;
 					rr.Action = EngineAction.NoAction;
 					rr.Runner = null;
