@@ -5,12 +5,14 @@ using System.Collections.Generic;
 namespace Jigsaw
 {
 		public class CMethodBlock : CBlock
-	    {	
-			string assembly_name;
-			string type_name;
-			string method_name;
-			List<string> names;
-			List<Type> types;
+		{	
+		  string assembly_name;
+		  string type_name;
+		  string method_name;
+		  List<string> names;
+		  List<Type> types;
+		  List<object> defaults;
+		  Type return_type;
 			
 	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	        public CMethodBlock(Double X, Double Y, bool isFactory) : 
@@ -25,54 +27,74 @@ namespace Jigsaw
 		}
 		
 		public CMethodBlock(Double X, Double Y, 
-			               string assembly_name, 
-			               string type_name, 
-			               string method_name, 
-						   List<string> names,
-						   List<Type> types,
-			               bool isFactory) 
+				    string assembly_name, 
+				    string type_name, 
+				    string method_name, 
+				    List<string> names,
+				    List<Type> types,
+				    List<object> defaults,
+				    Type return_type,
+				    bool isFactory) 
 				: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 					new Diagram.CPoint(X, Y),
 					new Diagram.CPoint(X + 175, Y + 20)}),
 					isFactory )
 		{
-			setValues(assembly_name, type_name, method_name, names, types);
+		  setValues(assembly_name, type_name, method_name, names, types, defaults, return_type);
 		}
 
 		public override CBlock Clone(double X, double Y, bool cloneEdges) 
 		{	// Clone this block. Optionally clone edges.
 				CBlock clone = (CBlock)base.Clone(X, Y, cloneEdges);
-				((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.names, this.types);
+				((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.names, 
+								this.types, this.defaults, this.return_type);
 				return clone;
 		    }	
 
 	    public void setValues(string assembly_name, 
-			               		  string type_name, 
-			               		  string method_name, 
-						   		  List<string> names,
-						   		  List<Type> types)
-
-		{
+				  string type_name, 
+				  string method_name, 
+				  List<string> names,
+				  List<Type> types,
+				  List<object> defaults,
+				  Type return_type)
+		  {
 				this.assembly_name = assembly_name;
 				this.type_name = type_name;
 				this.method_name = method_name;
 				this.names = names;
 				this.types = types;
+				this.defaults = defaults;
+				this.return_type = return_type;
 				this.LineWidth = 2;
 				this.LineColor = Diagram.Colors.DarkBlue;
 				this.FillColor = Diagram.Colors.LightBlue;
 				this.Sizable = false;
 				string parameter_list = "";
 				string block_text;
-				_properties["Variable"] = new CVarNameProperty("Variable", String.Format("{0}{1}", method_name.ToUpper(), 1));
+				if (! return_type.ToString().Equals("System.Void")) {
+				  _properties["Variable"] = new CVarNameProperty("Variable", 
+										 String.Format("{0}", method_name.ToUpper()));
+				}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
 					  if (types[n].ToString().Equals("System.String")) {
-					    _properties[names[n]] = new CExpressionProperty(names[n], 
-											    String.Format("'{0}'", names[n])); // FIXME: get default
+					    if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
+					      _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("'{0}'", 
+													    defaults[n])); 
+					    else
+					      _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("'{0}'", 
+													    names[n])); 
 					  } else {
-					    _properties[names[n]] = new CExpressionProperty(names[n], 
-											    String.Format("{0}", names[n].ToUpper())); // FIXME: get default
+					    if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
+					      _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", defaults[n]));
+					    else
+					      // FIXME: make a default of the appropriate type
+					      _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", 0));
 					  }
 					  if (parameter_list == "")
 					    parameter_list = names[n];
@@ -119,36 +141,40 @@ namespace Jigsaw
 					}
 					// Next, get the type and correct method based on the args above
 					Type type = Reflection.Utils.getType(assembly_name, type_name);
-				    if (type != null) {
-						method = Reflection.Utils.getMethodFromArgTypes(type, method_name, arg_types.ToArray());
-						// and call it, if it is valid:
-						if (method != null) {
-							CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-							try {
-								locals[VarName.Text] = method.Invoke(type, args.ToArray());
-							} catch {
-							  this["Message"] = "No matching method for these argument types";
-								this.State = BlockState.Error;
-								rr.Action = EngineAction.NoAction;
-								rr.Runner = null;
-							}
-						} else {
-							this["Message"] = "No matching method for these argument types";
-							this.State = BlockState.Error;
-							rr.Action = EngineAction.NoAction;
-							rr.Runner = null;
-						}
+					if (type != null) {
+					  method = Reflection.Utils.getMethodFromArgTypes(type, method_name, arg_types.ToArray());
+					  // and call it, if it is valid:
+					  object result = null;
+					  if (method != null) {
+					    try {
+					      result = method.Invoke(type, args.ToArray());
+					    } catch (Exception ex) {
+					      this["Message"] = ex.Message;
+					      this.State = BlockState.Error;
+					      rr.Action = EngineAction.NoAction;
+					      rr.Runner = null;
+					    }
+					    if (!(return_type is System.Void)) {
+					      CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
+					      locals[VarName.Text] = result;
+					    }
+					  } else {
+					    this["Message"] = "No matching method for these argument types";
+					    this.State = BlockState.Error;
+					    rr.Action = EngineAction.NoAction;
+					    rr.Runner = null;
+					  }
 					} else {
-						this["Message"] = "Can't find assembly";
-						this.State = BlockState.Error;
-						rr.Action = EngineAction.NoAction;
-						rr.Runner = null;
+					  this["Message"] = "Can't find assembly";
+					  this.State = BlockState.Error;
+					  rr.Action = EngineAction.NoAction;
+					  rr.Runner = null;
 					}
 				} catch (Exception ex) {
-					this["Message"] = ex.Message;
-					this.State = BlockState.Error;
-					rr.Action = EngineAction.NoAction;
-					rr.Runner = null;
+				  this["Message"] = ex.Message;
+				  this.State = BlockState.Error;
+				  rr.Action = EngineAction.NoAction;
+				  rr.Runner = null;
 				}
 				// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
