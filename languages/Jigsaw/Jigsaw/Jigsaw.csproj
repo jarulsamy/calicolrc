@@ -38,22 +38,83 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glade-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gtk-dotnet, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-dotnet-2.0</Package>
+    </Reference>
     <Reference Include="Mono.Posix" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Drawing" />
-    <Reference Include="IronPython">
+    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <HintPath>..\..\..\bin\IronPython.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Graphics">
+    <Reference Include="Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\modules\Graphics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Myro, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\Myro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SdlDotNet, Version=6.1.0.0, Culture=neutral, PublicKeyToken=26ad4f7e10c61408">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\SdlDotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\Tao.Sdl.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GifLib, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\GifLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FarseerPhysics, Version=3.3.4187.31515, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\FarseerPhysics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IronRuby, Version=1.1.4.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\IronRuby.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IronRuby.Libraries, Version=1.1.4.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\IronRuby.Libraries.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IronRuby.Rack, Version=0.0.9.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\IronRuby.Rack.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IronRuby.Libraries.Yaml, Version=1.1.4.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\bin\IronRuby.Libraries.Yaml.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +140,10 @@
     <Compile Include="GfxBlocks.cs" />
     <Compile Include="MyroBlocks.cs" />
     <Compile Include="StatementBlocks.cs" />
+    <Compile Include="..\..\..\modules\Reflection\Reflection.cs">
+      <Link>Reflection.cs</Link>
+    </Compile>
+    <Compile Include="CMethodBlock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
