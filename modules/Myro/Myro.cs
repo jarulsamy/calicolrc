@@ -55,6 +55,7 @@ public static class Myro {
 
   public static Robot robot;
   public static Simulation simulation;
+  public static int gui_thread_id = -1;
   public readonly static Computer computer = new Computer();
   static string dialogResponse = null;
   static string REVISION = "$Revision: $";
@@ -67,6 +68,28 @@ public static class Myro {
 
   public readonly static Gamepads gamepads = new Gamepads();
   public readonly static AudioManager audio_manager = new AudioManager();
+
+  public static void set_gui_thread_id(int gui_thread_id) {
+    Myro.gui_thread_id = gui_thread_id;
+  }
+
+  public delegate void InvokeDelegate();
+  public static void Invoke(InvokeDelegate invoke) {
+    if (needInvoke())
+      Gtk.Application.Invoke(delegate {invoke();});
+    else
+      invoke();
+  }
+
+  public static bool needInvoke() {
+    if (Myro.gui_thread_id == -1) {
+      return false; // direcly in GUI thread
+    } else if (Myro.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
+      return false; // you are already in the GUI thread
+    } else {
+      return true; // need to invoke!
+    }
+  }
 
   static void invoke_function(Func<object,object> function, object args) {
     try {
@@ -281,7 +304,7 @@ public static class Myro {
 	}
 	vbox.PackStart(hbox);
       }
-      Gtk.Application.Invoke(delegate {
+      Invoke(delegate {
 	  win.ShowAll();
 	});
       idle = GLib.Idle.Add(new GLib.IdleHandler(update_entries));
@@ -295,7 +318,7 @@ public static class Myro {
     }
     
     bool update_entries() {
-      Gtk.Application.Invoke(delegate {
+      Invoke(delegate {
 	  try {	  
 	    List results = (List)getLight();
 	    for (int i=0; i < results.Count; i++) {
@@ -1360,9 +1383,9 @@ public static class Myro {
   }
 
   public static string pickAFile() {
-    ManualResetEvent ev = new ManualResetEvent(false);
     string retval = null;
-    Gtk.Application.Invoke(delegate {
+    ManualResetEvent ev = new ManualResetEvent(false);
+    Invoke(delegate {
         Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Select a file",
                                null,
                                Gtk.FileChooserAction.Open,
@@ -1374,7 +1397,7 @@ public static class Myro {
         }
         fc.Destroy();
         ev.Set();
-        });
+      });
     ev.WaitOne();
     return retval;
   }
@@ -1382,7 +1405,7 @@ public static class Myro {
   public static string pickAFolder() {
     ManualResetEvent ev = new ManualResetEvent(false);
     string retval = null;
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Select a file",
                                null,
                                Gtk.FileChooserAction.SelectFolder,
@@ -1394,7 +1417,7 @@ public static class Myro {
         }
         fc.Destroy();
         ev.Set();
-        });
+      });
     ev.WaitOne();
     return retval;
   }
@@ -1419,7 +1442,7 @@ public static class Myro {
   public static Graphics.Color pickAColor() {
     ManualResetEvent ev = new ManualResetEvent(false);
     Graphics.Color retval = null;
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog("Select a color");
         fc.ShowAll();
         if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
@@ -1438,7 +1461,7 @@ public static class Myro {
   public static string pickAFont() {
     ManualResetEvent ev = new ManualResetEvent(false);
     string retval = null;
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog("Select a font");
         fc.ShowAll();
         if (fc.Run() == (int)(Gtk.ResponseType.Ok)) {
@@ -1454,7 +1477,7 @@ public static class Myro {
   public static bool yesno(string question) {
     ManualResetEvent ev = new ManualResetEvent(false);
     bool retval = false;
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.YesNo,
@@ -1589,7 +1612,7 @@ public static class Myro {
   public static string askQuestion(string question, List choices) {
     ManualResetEvent ev = new ManualResetEvent(false);
     dialogResponse = null;
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.Dialog fc = new Gtk.Dialog("Information Request", null, 0);
         fc.VBox.PackStart(new Gtk.Label(question));
         foreach (string choice in choices) {
@@ -1648,7 +1671,7 @@ public static class Myro {
     object retval = null;
     Gtk.Entry myentry = null;
     PythonDictionary responses = new PythonDictionary();
-    Gtk.Application.Invoke(delegate {
+    Invoke(delegate {
         Gtk.MessageDialog fc = new MessageDialog(null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.OkCancel,

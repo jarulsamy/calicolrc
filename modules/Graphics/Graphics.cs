@@ -32,6 +32,28 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 
 public static class Graphics {
 
+  public static int gui_thread_id = -1;
+  public delegate void InvokeDelegate();
+  public static void Invoke(InvokeDelegate invoke) {
+    if (needInvoke())
+      Gtk.Application.Invoke(delegate {invoke();});
+    else
+      invoke();
+  }
+  public static bool needInvoke() {
+    if (Graphics.gui_thread_id == -1) {
+      return false; // direcly in GUI thread
+    } else if (Graphics.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
+      return false; // you are already in the GUI thread
+    } else {
+      return true; // need to invoke!
+    }
+  }
+
+  public static void set_gui_thread_id(int gui_thread_id) {
+    Graphics.gui_thread_id = gui_thread_id;
+  }
+
   private static WindowClass _lastWindow = null;
 
   public static readonly Dictionary<string,Color> colors = 
@@ -404,7 +426,7 @@ public static class Graphics {
   public static Picture makePicture(WindowClass window) { //, string filename) {
     ManualResetEvent ev = new ManualResetEvent(false);
     Gdk.Pixbuf pixbuf = null;
-    Gtk.Application.Invoke( delegate {
+    Invoke( delegate {
         Gdk.Drawable drawable = window.getDrawable();
         Gdk.Colormap colormap = drawable.Colormap;
         int _width = 0;
@@ -1016,7 +1038,7 @@ public static class Graphics {
 	  _canvas.need_to_draw_surface = false;
           lock(_canvas.shapes)
                 _canvas.shapes.Clear();
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      foreach (Gtk.Widget child in _canvas.Children) {
 		_canvas.Remove(child);
 	      }
@@ -1035,7 +1057,7 @@ public static class Graphics {
     }
 
     public void close() {
-      Gtk.Application.Invoke(delegate { 
+      Invoke(delegate { 
           Hide();
         });
     }
@@ -1115,7 +1137,7 @@ public static class Graphics {
       Event evt = new Event(args);
       foreach (Func<object,Event,object> function in onMouseMovementCallbacks) {
 	try {
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      Func<object,Event,object> f = (Func<object,Event,object>)function;
 	      f(obj, evt);
 	    });
@@ -1131,7 +1153,7 @@ public static class Graphics {
       Event evt = new Event(args);
       foreach (Func<object,Event,object> function in onClickCallbacks) {
 	try {
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      Func<object,Event,object> f = (Func<object,Event,object>)function;
 	      f(obj, evt);
 	    });
@@ -1147,7 +1169,7 @@ public static class Graphics {
       Event evt = new Event(args);
       foreach (Func<object,Event,object> function in onMouseUpCallbacks) {
 	try {
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      Func<object,Event,object> f = (Func<object,Event,object>)function;
 	      f(obj, evt);
 	    });
@@ -1166,7 +1188,7 @@ public static class Graphics {
       Event evt = new Event(args);
       foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
 	try {
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      Func<object,Event,object> f = (Func<object,Event,object>)function;
 	      f(obj, evt);
 	    });
@@ -1183,7 +1205,7 @@ public static class Graphics {
       Event evt = new Event(args);
       foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
 	try {
-	  Gtk.Application.Invoke( delegate {
+	  Invoke( delegate {
 	      Func<object,Event,object> f = (Func<object,Event,object>)function;
 	      f(obj, evt);
 	    });
@@ -1281,7 +1303,7 @@ public static class Graphics {
     public PythonTuple getMouseNow() {
       int x = 0, y = 0;
       ManualResetEvent mre = new ManualResetEvent(false);
-      Gtk.Application.Invoke(delegate { 
+      Invoke(delegate { 
           GetPointer(out x, out y);
           mre.Set();
         });
@@ -1304,7 +1326,7 @@ public static class Graphics {
     }
     
     public new void Show() {
-      Gtk.Application.Invoke(delegate { 
+      Invoke(delegate { 
           DateTime now = DateTime.Now;
           last_update = now;
           _dirty = false;
@@ -1312,7 +1334,7 @@ public static class Graphics {
         });
     }
     public new void ShowAll() {
-      Gtk.Application.Invoke(delegate { 
+      Invoke(delegate { 
           DateTime now = DateTime.Now;
           last_update = now;
           _dirty = false;
@@ -1320,7 +1342,7 @@ public static class Graphics {
         });
     }
     public new void Resize(int width, int height) {
-      Gtk.Application.Invoke(delegate {
+      Invoke(delegate {
           base.Resize(width, height);
         });
     }
@@ -1422,7 +1444,7 @@ public static class Graphics {
       last_update = DateTime.Now;
       _dirty = false;
       ManualResetEvent ev = new ManualResetEvent(false);
-      Gtk.Application.Invoke(delegate { 
+      Invoke(delegate { 
           QueueDraw();
           GdkWindow.ProcessUpdates(true);
           ev.Set();
@@ -1438,11 +1460,11 @@ public static class Graphics {
   }
   
  public static void ShowAll(object o) {
-    Gtk.Application.Invoke(delegate { ((Gtk.Widget)o).ShowAll(); });
+    Invoke(delegate { ((Gtk.Widget)o).ShowAll(); });
   }
   
   public static void Show(object o) {
-    Gtk.Application.Invoke(delegate { ((Gtk.Widget)o).Show(); });
+    Invoke(delegate { ((Gtk.Widget)o).Show(); });
   }
   
   public static Vector2 VectorRotate(Vector2 v, double angle) {
@@ -1690,7 +1712,7 @@ public static class Graphics {
         window.onMouseDown( delegate (object obj, Event evt) {
 	    if (hit(evt.x, evt.y)) {
 	      try {
-		Gtk.Application.Invoke( delegate {
+		Invoke( delegate {
 		    function(obj, evt);
 		  });
 	      } catch (Exception e) {
@@ -2302,7 +2324,7 @@ public static class Graphics {
     }
     
     public void undraw() {
-      Gtk.Application.Invoke(delegate {
+      Invoke(delegate {
           if (window != null) {
         lock(window.getCanvas().shapes) {
             if (window.getCanvas().shapes.Contains(this)) {
@@ -3566,7 +3588,7 @@ public static class Graphics {
 
     public void draw(WindowClass win) { // button
       window = win;
-      Gtk.Application.Invoke( delegate {
+      Invoke( delegate {
 	  Show();
 	  window.getCanvas().Put(this, (int)_x, (int)_y);
 	  window.QueueDraw();
@@ -3577,7 +3599,7 @@ public static class Graphics {
       Clicked += delegate(object obj, System.EventArgs args) {
             Event evt = new Event("click", Graphics.currentTime());
 	    try {
-	      Gtk.Application.Invoke( delegate {
+	      Invoke( delegate {
 		  function(obj, evt);
 		});
 	    } catch (Exception e) {
@@ -3651,7 +3673,7 @@ public static class Graphics {
 
     public void draw(WindowClass win) { // hslider
       window = win;
-      Gtk.Application.Invoke( delegate {
+      Invoke( delegate {
 	  Show();
 	  window.getCanvas().Put(this, (int)_x, (int)_y);
 	  window.QueueDraw();
@@ -3663,7 +3685,7 @@ public static class Graphics {
 	ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
              Event evt = new Event(signal, (object)Value, Graphics.currentTime());
         	    try {
-        	      Gtk.Application.Invoke( delegate {
+        	      Invoke( delegate {
         		  function(obj, evt);
         		});
         	    } catch (Exception e) {
