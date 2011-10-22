@@ -118,7 +118,14 @@ namespace Jigsaw
 						// and call it, if it is valid:
 						if (method != null) {
 							CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-							locals[VarName.Text] = method.Invoke(type, args.ToArray());
+							try {
+								locals[VarName.Text] = method.Invoke(type, args.ToArray());
+							} catch {
+								Console.WriteLine("No matching method for these argument types");
+								this.State = BlockState.Error;
+								rr.Action = EngineAction.NoAction;
+								rr.Runner = null;
+							}
 						} else {
 							Console.WriteLine("No matching method for these argument types");
 							this.State = BlockState.Error;
