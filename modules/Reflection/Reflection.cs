@@ -271,6 +271,27 @@ namespace Reflection {
       return methodinfos;
     }
 
+    public static Type getMethodReturnType(Type type, string mname) {
+      foreach (MethodInfo mi in type.GetMethods() ) {
+	if (String.Compare(mi.Name, mname) == 0) {
+	  return mi.ReturnType;
+	}
+      }
+      return null;
+    }
+
+    public static Type getMethodReturnType(string aname, 
+					   string tname, 
+					   string mname) {
+      Type type = getType(aname, tname);
+      foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+	if (String.Compare(mi.Name, mname) == 0) {
+	  return mi.ReturnType;
+	}
+      }
+      return null;
+    }
+
     public static List<string> getPropertyNames(Type type, string mname) {
       List<string> retval = new List<string>();
       MemberInfo mi = getMemberInfo(type, mname);
@@ -330,6 +351,21 @@ namespace Reflection {
 	}
 	retval.Add(types);
       }
+      return retval;
+    }
+
+    public static List<List<object>> getParameterDefaults(string aname, 
+						 string tname, 
+						 string mname) {
+      List<List<object>> retval = new List<List<object>>();
+      Type type = getType(aname, tname);
+      	foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+			List<object> parameters = new List<object>();
+			foreach (ParameterInfo pi in mi.GetParameters() ) {
+			  parameters.Add(pi.DefaultValue);
+			}
+			retval.Add(parameters);
+      	}
       return retval;
     }
 
