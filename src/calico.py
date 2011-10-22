@@ -727,7 +727,7 @@ for process in System.Diagnostics.Process.GetProcessesByName("mono"):
     if process.Id == current.Id:
         continue
     for module in process.Modules:
-        if module.ModuleName in ["Myro.dll", "mono"]:
+        if module.ModuleName in ["Myro.dll"]: # look for "mono" if darwin
             alreadyRunning = True
 messages = os.path.join(calico_user, "messages")
 if alreadyRunning:
