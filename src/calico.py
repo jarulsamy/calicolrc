@@ -73,8 +73,10 @@ import GLib
 from Mono.TextEditor import Highlighting
 # Send paths to DLLs:
 clr.AddReference("Myro.dll")
+clr.AddReference("Graphics.dll")
 import Myro
 Myro.initialize_module(calicopath, os.name)
+import Graphics
 
 # Initialize text highlighting
 path, filename = os.path.split(__file__)
@@ -103,7 +105,7 @@ def handle_exception(arg):
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 # Turn on Unhandled Exception Handled:
 # EXCEPTION HANDLER
-if "--debug" not in args:
+if "--debug-handler" not in args:
     GLib.ExceptionManager.UnhandledException += handle_exception
 
 # Define local functions and classes
@@ -118,6 +120,7 @@ class CalicoProject(object):
         Constructor for the singleton Calico instance. argv is the
         command-line files and flags.
         """
+        self.gui_thread_id = -1
         self.last_error = ""
         self.actionHandlers = []
         self.debug = False
@@ -768,5 +771,10 @@ except:
     sys.exit()
 #------------------------------
 if "--nogui" not in args:
+    def invoke(sender, args):
+        pw.gui_thread_id = System.Threading.Thread.CurrentThread.ManagedThreadId
+        Myro.set_gui_thread_id(pw.gui_thread_id)
+        Graphics.set_gui_thread_id(pw.gui_thread_id)
+    Gtk.Application.Invoke(invoke)
     Gtk.Application.Run()
 sys.exit(0)
