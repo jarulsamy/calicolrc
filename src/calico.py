@@ -227,9 +227,17 @@ class CalicoProject(object):
         else:
             return True; ## need to invoke!
 
-    def Invoke(self, delegate):
+    def Invoke(self, delegate, wait=False):
         if self.NeedsInvoke():
-            Gtk.Application.Invoke(delegate)
+            if wait:
+                ev = System.Threading.ManualResetEvent(False)
+                def invoke(s, a):
+                    delegate(s, a)
+                    ev.Set()
+                Gtk.Application.Invoke(invoke)
+                ev.WaitOne()
+            else:
+                Gtk.Application.Invoke(delegate)
         else:
             delegate(None, None)
 

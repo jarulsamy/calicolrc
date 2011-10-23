@@ -201,7 +201,7 @@ class DLREngine(Engine):
                 traceback.print_exc()
                 return False
         try:
-            source.Execute(self.manager.scope)
+            self.manager.calico.Invoke(lambda s,a: source.Execute(self.manager.scope), wait=True)
         except Exception, e:
             if "Thread was being aborted" in str(e.message):
                 self.manager.calico.shell.message("[Script stopped----------]")
