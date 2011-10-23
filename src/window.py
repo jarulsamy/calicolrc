@@ -209,7 +209,7 @@ class Window(object):
             size = drawable.GetSize()
             pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, size[0], size[1])
             pixbuf.Save(filename, filename.rsplit(".", 1)[-1])
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
 def make_barchart(title, labels, data):
     win = Graphics.Window(title, 600, 300)

@@ -136,7 +136,7 @@ class CustomStream(System.IO.Stream):
             self.goto_end()
             ev.Set()
             MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
         ev.WaitOne()
 
     @property
@@ -160,29 +160,6 @@ class CustomStream(System.IO.Stream):
     @property
     def Position(self):
         return 0
-
-def pick_file():
-    global retval
-    retval = None
-    Gtk.Application.Init()
-    fc = Gtk.FileChooserDialog(_("Select a file"),
-                               None,
-                               Gtk.FileChooserAction.Open,
-                               _("Cancel"), Gtk.ResponseType.Cancel,
-                               _("Open"), Gtk.ResponseType.Accept)
-    fc.KeepAbove = True
-    Gtk.Application.Invoke(lambda obj, args: fc.ShowAll())
-    ev = ManualResetEvent(False)
-    def get_filename_cb(obj, args):
-        global retval
-        if (fc.Run() == int(Gtk.ResponseType.Accept)):
-            retval = fc.Filename
-        fc.Destroy()
-        ev.Set()
-    Gtk.Application.Invoke(get_filename_cb)
-    ev.WaitOne()
-    return retval
-
 
 def zipfiles(files_and_dirs, filename):
     import clr
@@ -393,7 +370,7 @@ class MySearchInFilesEntry(Gtk.Entry):
                 self.searchbar.Hide()
                 if self.searchbar.shell:
                     self.searchbar.shell.GrabFocus()
-            Gtk.Application.Invoke(invoke)
+            self.calico.Invoke(invoke)
             return True
         elif event.Key == Gdk.Key.Up:
             return True
@@ -423,7 +400,7 @@ class MyEntry(Gtk.Entry):
                 self.searchbar.Hide()
                 if self.searchbar.editor.document:
                     self.searchbar.editor.document.texteditor.GrabFocus()
-            Gtk.Application.Invoke(invoke)
+            self.calico.Invoke(invoke)
             return True
         else:
             retval = Gtk.Entry.OnKeyPressEvent(self, event)
@@ -483,7 +460,7 @@ class SearchBar(Gtk.HBox):
                     self.editor.document.texteditor.SetSelection(offset, 
                                                                  offset + length)
                     self.editor.document.texteditor.ScrollToCaret()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def prev(self, obj=None, event=None):
         def invoke(sender, args):
@@ -503,7 +480,7 @@ class SearchBar(Gtk.HBox):
                     self.editor.document.texteditor.SetSelection(offset, 
                                                                  offset + length)
                     self.editor.document.texteditor.ScrollToCaret()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def open(self, obj, event):
         self.search_on()
@@ -513,7 +490,7 @@ class SearchBar(Gtk.HBox):
             self.entry.GrabFocus()
             self.entry.SelectRegion(0, len(self.entry.Text))
             self.ShowAll()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def close(self, obj, event):
         self.search_off()
@@ -523,7 +500,7 @@ class SearchBar(Gtk.HBox):
             self.Hide()
             if self.editor.document:
                 self.editor.document.texteditor.GrabFocus()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
 class SearchInFilesBar(Gtk.HBox):
     def __init__(self, *args, **kwargs):
@@ -552,7 +529,7 @@ class SearchInFilesBar(Gtk.HBox):
             self.entry.GrabFocus()
             self.entry.SelectRegion(0, len(self.entry.Text))
             self.ShowAll()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def close(self, obj, event):
         self.search_off()
@@ -562,7 +539,7 @@ class SearchInFilesBar(Gtk.HBox):
             self.Hide()
             if self.shell.textview:
                 self.shell.textview.GrabFocus()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
 class StatusBar(Gtk.VBox):
     def init(self, *labels):

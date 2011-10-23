@@ -160,7 +160,7 @@ class ShellWindow(Window):
                    ]
         self.prompt_at_top = True
         self.make_gui(menu, toolbar)
-        Gtk.Application.Invoke(self.stop_running)
+        self.calico.Invoke(self.stop_running)
         self.history = History(self.calico.config)
         self.statusbar = StatusBar()
         self.statusbar.init(_("Language"), _("Status"))
@@ -243,7 +243,7 @@ class ShellWindow(Window):
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(widget, anchor_iter[0])
             MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def show_icon(self):
         def invoke(sender, args):
@@ -253,7 +253,7 @@ class ShellWindow(Window):
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(image, anchor_iter[0])
             MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def set_font(self, font=None):
         if font is None:
@@ -264,7 +264,7 @@ class ShellWindow(Window):
             fontsize = self.calico.config.get("calico.fontsize")
             self.textview.Options.FontName = str(fontname) + " " + str(fontsize)
             self.history_textview.ModifyFont(font)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def on_copy(self, obj, event):
         focused = self.window.Focus
@@ -307,12 +307,12 @@ class ShellWindow(Window):
         def invoke(s, a):
             self.statusbar.set(_("Language"), self.language.title())
             self.statusbar.set(_("Status"), self.get_status())
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def update_status(self):
         def invoke(s, a):
             self.statusbar.set(_("Status"), self.get_status())
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def get_status(self):
         if self.calico.connection:
@@ -333,7 +333,7 @@ class ShellWindow(Window):
             self.vpane.Remove(c2)
             self.vpane.Add1(c2)
             self.vpane.Add2(c1)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def on_key_press(self, widget, event, force=False):
         # FIXME: this should be handled in textview, but if we subclass
@@ -371,7 +371,7 @@ class ShellWindow(Window):
                             self.textview.GrabFocus()
                             self.textview.Caret.Line = 0
                             self.textview.Caret.Column = 0
-                        Gtk.Application.Invoke(invoke)
+                        self.calico.Invoke(invoke)
                     self.completion = None
                     return True
             elif str(event.Key) == "Up":
@@ -387,7 +387,7 @@ class ShellWindow(Window):
                         self.textview.Caret.Line = 0
                         col = self.textview.Document.GetLine(0).Length
                         self.textview.Caret.Column = col
-                    Gtk.Application.Invoke(invoke)
+                    self.calico.Invoke(invoke)
             elif str(event.Key) == "Down":
                 text = self.textview.Document.Text
                 caret = self.textview.Caret
@@ -401,7 +401,7 @@ class ShellWindow(Window):
                         self.textview.GrabFocus()
                         self.textview.Caret.Line = self.textview.Document.LineCount - 1
                         self.textview.Caret.Column = self.textview.Document.GetLine(0).Length
-                    Gtk.Application.Invoke(invoke)
+                    self.calico.Invoke(invoke)
             elif str(event.Key) == "Tab":
                 # where are we?
                 lineNo = self.textview.Caret.Line
@@ -436,7 +436,7 @@ class ShellWindow(Window):
             MUTEX.WaitOne()
             self.history_textview.Buffer.Text = ""
             MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke_clear)
+        self.calico.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
         self.clean_up()
@@ -465,7 +465,7 @@ class ShellWindow(Window):
             if Myro.robot:
                 Myro.robot.flush()
                 Myro.robot.stop()
-            Gtk.Application.Invoke(self.stop_running)
+            self.calico.Invoke(self.stop_running)
         else:
             self.searchbar.search_off()
 
@@ -500,7 +500,7 @@ class ShellWindow(Window):
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
             MUTEX.ReleaseMutex()
             GLib.Timeout.Add(100, self.goto_end)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
         time.sleep(.01)
 
     def goto_end(self):
@@ -523,9 +523,9 @@ class ShellWindow(Window):
 
         def background():
             self.message(_("Loading file '%s'...") % filename)
-            Gtk.Application.Invoke(self.start_running)
+            self.calico.Invoke(self.start_running)
             self.calico.engine[language].execute_file(filename)
-            Gtk.Application.Invoke(self.stop_running)
+            self.calico.Invoke(self.stop_running)
             self.message(_("Done loading file."))
             if language != self.language:
                 self.change_to_lang(language)
@@ -571,7 +571,7 @@ class ShellWindow(Window):
                 self.update_gui()
                 return True
             else:
-                Gtk.Application.Invoke(lambda s, a: exec_invoke(text))
+                self.calico.Invoke(lambda s, a: exec_invoke(text))
                 return True
         self.language = language
         self.update_gui()
@@ -641,7 +641,7 @@ class ShellWindow(Window):
                     anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
                     self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
                 MUTEX.ReleaseMutex()
-            Gtk.Application.Invoke(invoke)
+            self.calico.Invoke(invoke)
             self.message("")
             self.calico.last_error = ""
 
@@ -652,10 +652,10 @@ class ShellWindow(Window):
             return
 
         def background():
-            Gtk.Application.Invoke(self.start_running)
+            self.calico.Invoke(self.start_running)
             self.calico.engine[self.language].execute(text)
             ##self.show_prompt()
-            Gtk.Application.Invoke(self.stop_running)
+            self.calico.Invoke(self.stop_running)
 
         self.executeThread = System.Threading.Thread(
                                 System.Threading.ThreadStart(background))
@@ -684,7 +684,7 @@ class ShellWindow(Window):
             basename = os.path.basename(filename)
             filename = os.path.abspath(filename)
             menuitem = Gtk.MenuItem(_("Edit %s") % basename)
-            Gtk.Application.Invoke(lambda s, a: menuitem.Show())
+            self.calico.Invoke(lambda s, a: menuitem.Show())
             menuitem.Activated += lambda w, e: self.goto_file(filename, lineno)
             popup_args.Menu.Append(menuitem)
 

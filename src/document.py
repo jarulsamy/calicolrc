@@ -342,7 +342,7 @@ class TextEditorDocument(Document):
             self.texteditor.Caret.Column = 0
             self.texteditor.GrabFocus()
             GLib.Timeout.Add(100, self.texteditor.CenterToCaret)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def scroll_to_line(self, lineno):
         def invoke(sender, args):
@@ -350,7 +350,7 @@ class TextEditorDocument(Document):
             self.texteditor.Caret.Column = 0
             self.texteditor.GrabFocus()
             GLib.Timeout.Add(100, self.texteditor.ScrollToCaret)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def get_dirty(self):
         return self.texteditor.Document.IsDirty

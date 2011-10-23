@@ -475,7 +475,7 @@ class EditorWindow(Window):
                     self.blast_script(data[_("To")].Text, "edit", self.document)
             dialog.Destroy()
             # FIXME: report results
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def blast_script(self, to, type, document):
         if self.calico.connection:

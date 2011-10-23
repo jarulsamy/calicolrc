@@ -97,10 +97,10 @@ from utils import _, Chat
 # Setup Runtime environment:
 def handle_exception(arg):
     if pw.shell:
-        Gtk.Application.Invoke(pw.shell.stop_running)
-        Gtk.Application.Invoke(lambda s,a: pw.shell.message(
+        pw.Invoke(pw.shell.stop_running)
+        pw.Invoke(lambda s,a: pw.shell.message(
                 str(arg.ExceptionObject).split("\n")[0]))
-        Gtk.Application.Invoke(lambda s,a: pw.shell.message("[Script has stopped------]"))
+        pw.Invoke(lambda s,a: pw.shell.message("[Script has stopped------]"))
 
 args = sys.argv[1:] or list(System.Environment.GetCommandLineArgs())[1:]
 # Turn on Unhandled Exception Handled:
@@ -219,6 +219,20 @@ class CalicoProject(object):
                 from chat import ChatWindow
                 self.chat = ChatWindow(self)
 
+    def NeedsInvoke(self):
+        if (self.gui_thread_id == -1):
+            return False  ## in another thread
+        elif (self.gui_thread_id == System.Threading.Thread.CurrentThread.ManagedThreadId):
+            return False; ## you are already in the GUI thread
+        else:
+            return True; ## need to invoke!
+
+    def Invoke(self, delegate):
+        if self.NeedsInvoke():
+            Gtk.Application.Invoke(delegate)
+        else:
+            delegate(None, None)
+
     def get_registered_languages(self):
         """
         Return a dictionary of Language objects for each language
@@ -296,7 +310,7 @@ class CalicoProject(object):
                     fp.write(code)
                     fp.close()
                     self.editor.select_or_open(temp, language=language)
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def get_language_from_filename(self, filename):
         """
@@ -366,7 +380,7 @@ class CalicoProject(object):
             self.chat = ChatWindow(self)
         def invoke(sender, args):
             self.chat.window.Present()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def setup_shell(self, *args, **kwargs):
         if self.shell is None:
@@ -374,7 +388,7 @@ class CalicoProject(object):
             self.shell = ShellWindow(self)
         def invoke(sender, args):
             self.shell.window.Present()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def setup_editor(self, *args, **kwargs):
         if self.editor is None:
@@ -382,7 +396,7 @@ class CalicoProject(object):
             self.editor = EditorWindow(self)
         def invoke(sender, args):
             self.editor.window.Present()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def update_status(self):
         def invoke(sender, args):
@@ -392,7 +406,7 @@ class CalicoProject(object):
                 self.editor.update_status()
             if self.chat:
                 self.chat.update_status()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def grep(self, pattern, file_pat="*.py", dir=".", 
              flags=re.IGNORECASE, recursive=True):
@@ -478,7 +492,7 @@ class CalicoProject(object):
                 if self.chat:
                     self.chat.set_font()
             d.Destroy()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def increase_fontsize(self, obj, event):
         def invoke(sender, args):
@@ -492,7 +506,7 @@ class CalicoProject(object):
                 self.editor.set_font()
             if self.chat:
                 self.chat.set_font()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def decrease_fontsize(self, obj, event):
         def invoke(sender, args):
@@ -506,7 +520,7 @@ class CalicoProject(object):
                 self.editor.set_font()
             if self.chat:
                 self.chat.set_font()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def about(self, obj, event):
         def invoke(sender, args):
@@ -531,7 +545,7 @@ class CalicoProject(object):
             aboutDialog.WrapLicense = True
             aboutDialog.Run()
             aboutDialog.Destroy()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def login(self, user=None, password=None, debug=False):
         self.connection = Chat(self, user, password, debug)
@@ -591,7 +605,7 @@ class CalicoProject(object):
                 self.login(data[_("Username")].Text,
                            data[_("Password")].Text)
             dialog.Destroy()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def register_dialog(self, window):
         def invoke(sender, args):
@@ -631,7 +645,7 @@ class CalicoProject(object):
                               data[_("Course keyword")].Text)
             dialog.Destroy()
             # FIXME: report results
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def alert(self, message):
         def invoke(sender, args):
@@ -642,7 +656,7 @@ class CalicoProject(object):
                                   message)
             md.Run()
             md.Destroy()
-        Gtk.Application.Invoke(invoke)
+        self.Invoke(invoke)
 
     def on_action(self, action, **data):
         """
@@ -698,22 +712,22 @@ def handleMessages(sender, args):
                 if word == "--exec":
                     execute = True
                 elif word == "--chat":
-                    Gtk.Application.Invoke(lambda s,a: pw.setup_chat())
+                    self.Invoke(lambda s,a: pw.setup_chat())
                 elif word == "--editor":
                     execute = False
-                    Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
+                    self.Invoke(lambda s,a: pw.setup_editor())
                 elif word == "--shell":
-                    Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
+                    self.Invoke(lambda s,a: pw.setup_shell())
                 continue
             if word:
                 filename = os.path.abspath(word)
                 if execute:
                     import time
-                    Gtk.Application.Invoke(lambda s,a: pw.setup_shell())
-                    Gtk.Application.Invoke(lambda s,a: pw.load(filename))
+                    self.Invoke(lambda s,a: pw.setup_shell())
+                    self.Invoke(lambda s,a: pw.load(filename))
                 else:
-                    Gtk.Application.Invoke(lambda s,a: pw.setup_editor())
-                    Gtk.Application.Invoke(lambda s,a: pw.editor.select_or_open(filename))
+                    self.Invoke(lambda s,a: pw.setup_editor())
+                    self.Invoke(lambda s,a: pw.editor.select_or_open(filename))
         fp = file(messages, "w")
         fp.close()
         messagesLocked = False

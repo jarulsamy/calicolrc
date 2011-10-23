@@ -131,7 +131,7 @@ class ChatWindow(Window):
             self.message(_("Calico Chat Window") + "\n" +
                          "-------------------\n" +
                          _("Enter /help for details") + "\n")
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def send_clicked(self, obj=None, event=None):
         text = str(self.entry.Text)
@@ -215,7 +215,7 @@ Chat commands:
             self.MUTEX.WaitOne()
             self.textview.Buffer.Text = ""
             self.MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke_clear)
+        self.calico.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
         self.clean_up()
@@ -261,7 +261,7 @@ Chat commands:
             self.textview.Buffer.InsertWithTagsByName(end, message, tag)
             self.MUTEX.ReleaseMutex()
             GLib.Timeout.Add(100, self.goto_end)
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def goto_end(self):
         def invoke(sender, args):
@@ -269,7 +269,7 @@ Chat commands:
             end = self.textview.Buffer.EndIter
             self.textview.ScrollToIter(end, 0.0, True, 0, 0.5)
             self.MUTEX.ReleaseMutex()
-        Gtk.Application.Invoke(invoke)
+        self.calico.Invoke(invoke)
 
     def set_title(self, text):
         self.window.Title = text
