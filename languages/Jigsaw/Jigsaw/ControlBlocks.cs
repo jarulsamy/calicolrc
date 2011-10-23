@@ -702,7 +702,7 @@ namespace Jigsaw
 			ElseEdge = new CEdge(this, "Else", EdgeType.Out, null, offsetX, 50.0, 20.0, 50.0, this.Width-20.0);
 			
 			// Properties
-			CExpressionProperty IfTest = new CExpressionProperty("If-test", "true");
+			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "true");
 			IfTest.PropertyChanged += OnPropertyChanged;
 			
 			_properties["IfTest"] = IfTest;
