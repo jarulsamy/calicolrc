@@ -122,9 +122,7 @@ class CustomStream(System.IO.Stream):
         """
         Method for use by the lower-level CLR language.
         """
-        ev = ManualResetEvent(False)
         def invoke(sender, args):
-            MUTEX.WaitOne()
             text = System.Text.Encoding.UTF8.GetString(bytes, offset, count)
             if self.tag:
                 end = self.textview.Buffer.EndIter
@@ -133,11 +131,11 @@ class CustomStream(System.IO.Stream):
                     self.calico.last_error += text
             else:
                 self.textview.Buffer.InsertAtCursor(text)
-            self.goto_end()
-            ev.Set()
-            MUTEX.ReleaseMutex()
-        self.calico.Invoke(invoke)
-        ev.WaitOne()
+            insert_mark = self.textview.Buffer.InsertMark 
+            end = self.textview.Buffer.EndIter
+            self.textview.Buffer.PlaceCursor(end)
+            self.textview.ScrollToMark(insert_mark, 0.0, True, 0, 0.5)
+        self.calico.Invoke(invoke, wait=True)
 
     @property
     def CanRead(self):
