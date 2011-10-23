@@ -82,8 +82,9 @@ public static class Myro {
   }
 
   public static bool needInvoke() {
+    //Console.WriteLine("gui_thread_id: {0}", Myro.gui_thread_id);
     if (Myro.gui_thread_id == -1) {
-      return false; // direcly in GUI thread
+      return false; // in another thread
     } else if (Myro.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
       return false; // you are already in the GUI thread
     } else {
