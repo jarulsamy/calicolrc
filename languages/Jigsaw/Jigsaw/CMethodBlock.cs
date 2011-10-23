@@ -80,11 +80,10 @@ namespace Jigsaw
 				this.Sizable = false;
 				string parameter_list = "";
 				string block_text;
-				// FIXME: need to get right type from XML
-				//if (! return_type.ToString().Equals("System.Void")) {
-				_properties["Variable"] = new CVarNameProperty("Variable", 
-									       String.Format("{0}", method_name.ToUpper()));
-				  //}
+				if (! return_type.ToString().Equals("System.Void")) {
+				  _properties["Variable"] = new CVarNameProperty("Variable", 
+										 String.Format("{0}", method_name.ToUpper()));
+				}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
 					  if (types[n].ToString().Equals("System.String")) {
@@ -229,9 +228,7 @@ namespace Jigsaw
 	    assembly_name = xr.GetAttribute("assembly_name");
 	    type_name = xr.GetAttribute("type_name");
 	    method_name = xr.GetAttribute("method_name");
-	    // FIXME: how to find esoteric types?
-	    //return_type = System.Type.GetType(xr.GetAttribute("return_type"));
-	    return_type = System.Type.GetType("System.Void");
+	    return_type = System.Type.GetType(xr.GetAttribute("return_type"));
 	  } else if (xr.Name == "parameter") {
 	    //<parameter name="question" type="System.String" default="" />
 	    //<parameter name="choices" type="IronRuby.Builtins.RubyArray" default="" />
@@ -239,12 +236,12 @@ namespace Jigsaw
 	    string parameter_type = xr.GetAttribute("type");
 	    string parameter_default = xr.GetAttribute("default");
 	    names.Add(parameter_name);
-	    // FIXME: how to find esoteric types?
-	    //types.Add(System.Type.GetType(parameter_type));
-	    types.Add(System.Type.GetType("System.String"));
-	    // FIXME: how to find esoteric types?
-	    //if (!parameter_default.Equals(""))
-	    defaults.Add(System.Type.GetType("System.DBNull"));
+	    types.Add(System.Type.GetType(parameter_type));
+	    if (!parameter_default.Equals(""))
+	      defaults.Add(System.Type.GetType(parameter_default));
+	    else {
+	      defaults.Add(System.DBNull.Value);
+	    }
 	  }
 	}
 			
@@ -256,11 +253,11 @@ namespace Jigsaw
   	    xw.WriteAttributeString("assembly_name", assembly_name);
 	    xw.WriteAttributeString("type_name", type_name);
 	    xw.WriteAttributeString("method_name", method_name);
-	    xw.WriteAttributeString("return_type", return_type.ToString());
+	    xw.WriteAttributeString("return_type", return_type.AssemblyQualifiedName);
 	    for (int n = 0; n < names.Count; n++) {
 	      xw.WriteStartElement("parameter");
 	      xw.WriteAttributeString("name", names[n]);
-	      xw.WriteAttributeString("type", types[n].ToString());
+	      xw.WriteAttributeString("type", types[n].AssemblyQualifiedName);
 	      xw.WriteAttributeString("default", defaults[n].ToString());
 	      xw.WriteEndElement();
 	    }
