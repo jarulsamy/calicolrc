@@ -162,7 +162,7 @@ namespace Jigsaw
 					      rr.Action = EngineAction.NoAction;
 					      rr.Runner = null;
 					    }
-					    if (!(return_type is System.Void)) {
+					    if (!(return_type.ToString().Equals("System.Void"))) {
 					      CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 					      locals[VarName.Text] = result;
 					    }
