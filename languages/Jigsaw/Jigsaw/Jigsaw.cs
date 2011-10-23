@@ -77,8 +77,11 @@ namespace Jigsaw
 			  foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name)) {
 					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
 					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
+					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name);
+					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
 					for (int n = 0; n < names.Count; n++) {
-		    			CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, names[n], types[n], true);
+		    			CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+									names[n], types[n], defaults[n], return_type, true);
 						//property.PropertyChanged += block.OnPropertyChanged;
 						if (! blocknames.Contains(block.Text)) {
 		    				retval.Add(block);
@@ -704,7 +707,7 @@ namespace Jigsaw
 				XmlReader xr = null;
 
 				xr = new XmlTextReader(filename);
-				
+				// FIXME: add a unserialize to Block to get additional info
 				while (xr.Read()) {
 					
 					switch (xr.NodeType) {
@@ -740,6 +743,9 @@ namespace Jigsaw
 							tBlock[name] = val;
 							//tBlock.SetProperty(name, val);
 							break;
+						default:
+						        tBlock.ReadXmlTag(xr);
+							break;
 						}
 						
 						break;
@@ -759,6 +765,9 @@ namespace Jigsaw
 						case "block":
 							tBlock = null;
 							break;
+						default:
+						  tBlock.ReadXmlEndElement(xr);
+						  break;
 						}
 						
 						break;
@@ -919,7 +928,7 @@ namespace Jigsaw
 		public string this[string key]
 		{
 			get { return _properties[key].Text;  }
-			set	{ _properties[key].Text = value; }
+			set { _properties[key].Text = value; }
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1051,6 +1060,20 @@ namespace Jigsaw
 			w.WriteAttributeString("top", this.Top.ToString());
         }
 		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Virtual to read custom Xml tags
+        public virtual void ReadXmlTag(XmlReader r)
+        {
+	  // nothing to do
+	}
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Virtual to read custom Xml content end of an element
+        public virtual void ReadXmlEndElement(XmlReader r)
+	{
+	  // nothing to do
+	}
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Override to write custom Xml content of a shape.
         protected override void WriteXmlTags(XmlWriter w)

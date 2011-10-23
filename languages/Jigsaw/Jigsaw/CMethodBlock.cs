@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Jigsaw
 {
@@ -21,6 +22,13 @@ namespace Jigsaw
 				new Diagram.CPoint(X + 175, Y + 20)}),
 				isFactory)
 			{
+			  assembly_name = "";
+			  type_name = "";
+			  method_name = "";
+			  names = new List<string>();
+			  types = new List<Type>();
+			  defaults = new List<object>();
+			  return_type = System.Type.GetType("System.Void");
 		}
 		
 		public CMethodBlock(Double X, Double Y) : this(X, Y, false) {
@@ -72,10 +80,11 @@ namespace Jigsaw
 				this.Sizable = false;
 				string parameter_list = "";
 				string block_text;
-				if (! return_type.ToString().Equals("System.Void")) {
-				  _properties["Variable"] = new CVarNameProperty("Variable", 
-										 String.Format("{0}", method_name.ToUpper()));
-				}
+				// FIXME: need to get right type from XML
+				//if (! return_type.ToString().Equals("System.Void")) {
+				_properties["Variable"] = new CVarNameProperty("Variable", 
+									       String.Format("{0}", method_name.ToUpper()));
+				  //}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
 					  if (types[n].ToString().Equals("System.String")) {
@@ -194,7 +203,69 @@ namespace Jigsaw
 				// Indicate that the block is no longer running
 				this.State = BlockState.Idle;
 				yield return rr;
-			}			
-			
+			}
+
+        // end of the element
+        // handle end of method by calling SetValues, to realize full CMethodBlock
+        public override void ReadXmlEndElement(XmlReader r)
+	{
+	  // end of method, call SetValues, even though we have all of the info; we need
+	  // to do the constructing
+	  if (r.Name == "method") {
+	    //Console.WriteLine("assembly_name: {0}, type_name: {1}, method_name: {2}, return_type: {3}", assembly_name, type_name, method_name, return_type);
+	    //for (int n = 0; n < names.Count; n++) {
+	    //Console.WriteLine("   pname: {0}, ptype: {1}, pdefault: {2}", names[n], types[n], defaults[n]);
+	    //}
+	    setValues(assembly_name, type_name, method_name, names, types, defaults, return_type);
+	  } 
 	}
+
+        public override void ReadXmlTag(XmlReader xr)
+	{
+	  //</method>
+	  if (xr.Name == "method") {
+	    //<method assembly_name="Myro" type_name="Myro" method_name="askQuestion" return_type="System.String">
+	    //Console.WriteLine("ok ReadXmlTag save item");
+	    assembly_name = xr.GetAttribute("assembly_name");
+	    type_name = xr.GetAttribute("type_name");
+	    method_name = xr.GetAttribute("method_name");
+	    // FIXME: how to find esoteric types?
+	    //return_type = System.Type.GetType(xr.GetAttribute("return_type"));
+	    return_type = System.Type.GetType("System.Void");
+	  } else if (xr.Name == "parameter") {
+	    //<parameter name="question" type="System.String" default="" />
+	    //<parameter name="choices" type="IronRuby.Builtins.RubyArray" default="" />
+	    string parameter_name = xr.GetAttribute("name");
+	    string parameter_type = xr.GetAttribute("type");
+	    string parameter_default = xr.GetAttribute("default");
+	    names.Add(parameter_name);
+	    // FIXME: how to find esoteric types?
+	    //types.Add(System.Type.GetType(parameter_type));
+	    types.Add(System.Type.GetType("System.String"));
+	    // FIXME: how to find esoteric types?
+	    //if (!parameter_default.Equals(""))
+	    defaults.Add(System.Type.GetType("System.DBNull"));
+	  }
+	}
+			
+        protected override void WriteXmlTags(XmlWriter xw)
+        {
+	  // Write the method tag first, so when we read it first
+	  // and make the full CMethodBlock before the variables
+	  xw.WriteStartElement("method");
+  	    xw.WriteAttributeString("assembly_name", assembly_name);
+	    xw.WriteAttributeString("type_name", type_name);
+	    xw.WriteAttributeString("method_name", method_name);
+	    xw.WriteAttributeString("return_type", return_type.ToString());
+	    for (int n = 0; n < names.Count; n++) {
+	      xw.WriteStartElement("parameter");
+	      xw.WriteAttributeString("name", names[n]);
+	      xw.WriteAttributeString("type", types[n].ToString());
+	      xw.WriteAttributeString("default", defaults[n].ToString());
+	      xw.WriteEndElement();
+	    }
+	  xw.WriteEndElement();
+	  base.WriteXmlTags(xw);
+        }
+     }
 }
