@@ -379,6 +379,9 @@ class MySearchInFilesEntry(Gtk.Entry):
             return retval
 
 class MyEntry(Gtk.Entry):
+    def set_calico(self, calico):
+        self.calico = calico
+
     def set_searchbar(self, searchbar):
         self.searchbar = searchbar
 
@@ -407,6 +410,9 @@ class MyEntry(Gtk.Entry):
             return retval
 
 class SearchBar(Gtk.HBox):
+    def set_calico(self, calico):
+        self.calico = calico
+
     def __init__(self, *args, **kwargs):
         self.editor = None
         self.label = Gtk.Label(_("Search: "))
@@ -501,6 +507,10 @@ class SearchBar(Gtk.HBox):
         self.calico.Invoke(invoke)
 
 class SearchInFilesBar(Gtk.HBox):
+    def set_calico(self, calico):
+        self.calico = calico
+        self.entry.set_calico(self.calico)
+
     def __init__(self, *args, **kwargs):
         self.shell = None
         self.label = Gtk.Label(_("Search in files:"))

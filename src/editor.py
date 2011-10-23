@@ -42,6 +42,7 @@ class EditorWindow(Window):
         self.vbox = Gtk.VBox()
         # Define here so as to connect signals to it
         self.searchbar = SearchBar()
+        self.searchbar.set_calico(self.calico)
         # ---------------------
         # make menu:
         menu = [(_("File"), 

@@ -38,7 +38,7 @@ import System.Threading
 
 # Calico modules:
 from window import Window, MyWindow
-from utils import (_, CustomStream, MUTEX, ConsoleStream, StatusBar,
+from utils import (_, CustomStream, ConsoleStream, StatusBar,
                    SearchInFilesBar, OpenUrl)
 
 def exec_invoke(text):
@@ -111,6 +111,7 @@ class ShellWindow(Window):
         self.vbox = Gtk.VBox()
         self.searchbar = SearchInFilesBar()
         self.searchbar.set_shell(self)
+        self.searchbar.set_calico(self.calico)
         # ---------------------
         # make menu:
         menu = [(_("File"),
@@ -238,21 +239,17 @@ class ShellWindow(Window):
 
     def show_widget(self, widget):
         def invoke(sender, args):
-            MUTEX.WaitOne()
             widget.Show()
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(widget, anchor_iter[0])
-            MUTEX.ReleaseMutex()
         self.calico.Invoke(invoke)
 
     def show_icon(self):
         def invoke(sender, args):
-            MUTEX.WaitOne()
             image = Gtk.Image(os.path.join(self.calico.calico_root, "examples", "images", "abstract-butterfly-sm.gif"))
             image.Show()
             anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
             self.history_textview.AddChildAtAnchor(image, anchor_iter[0])
-            MUTEX.ReleaseMutex()
         self.calico.Invoke(invoke)
 
     def set_font(self, font=None):
@@ -433,9 +430,7 @@ class ShellWindow(Window):
 
     def clear(self, obj, event):
         def invoke_clear(sender, args):
-            MUTEX.WaitOne()
             self.history_textview.Buffer.Text = ""
-            MUTEX.ReleaseMutex()
         self.calico.Invoke(invoke_clear)
 
     def on_quit(self, obj, event):
@@ -495,19 +490,16 @@ class ShellWindow(Window):
         message = str(message)
         message += end
         def invoke(sender, args):
-            MUTEX.WaitOne()
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
-            MUTEX.ReleaseMutex()
             GLib.Timeout.Add(100, self.goto_end)
         self.calico.Invoke(invoke)
-        time.sleep(.01)
 
     def goto_end(self):
-        MUTEX.WaitOne()
-        end = self.history_textview.Buffer.EndIter
-        self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0)
-        MUTEX.ReleaseMutex()
+        def invoke(s, a):
+            end = self.history_textview.Buffer.EndIter
+            self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0)
+        self.calico.Invoke(invoke)
 
     def set_title(self, text):
         self.window.Title = text
@@ -545,21 +537,12 @@ class ShellWindow(Window):
         if (self.executeThread):
             return False
         prompt = "%s> " % (language + "------")[:6]
-        MUTEX.WaitOne()
         count = 2
         for line in text.split("\n"):
-            end = self.history_textview.Buffer.EndIter
-            self.history_textview.Buffer.InsertWithTagsByName(end, 
-                             "%s" % prompt,
-                             "black")
-            end = self.history_textview.Buffer.EndIter
-            self.history_textview.Buffer.InsertWithTagsByName(end, 
-                             "%s\n" % line,
-                             "blue")
+            self.message("%s" % prompt, end="") # black
+            self.message("%s" % line) # blue
             prompt = ((".....%d" % count)[-6:]) + "> "
             count += 1
-        MUTEX.ReleaseMutex()
-        self.goto_end()
         # pragma/meta commands, start with #;
         if text == "":
             return False
@@ -628,7 +611,6 @@ class ShellWindow(Window):
                     error_button_text = _("Go to error in %s") % basename
                     error_button_func = lambda w, e: self.goto_file(filename, lineno)
             def invoke(sender, args):
-                MUTEX.WaitOne()
                 button = Gtk.Button(_("Get help on error"))
                 button.Clicked += lambda o, e: OpenUrl(url)
                 button.Show()
@@ -640,7 +622,6 @@ class ShellWindow(Window):
                     button.Show()
                     anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
                     self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
-                MUTEX.ReleaseMutex()
             self.calico.Invoke(invoke)
             self.message("")
             self.calico.last_error = ""
