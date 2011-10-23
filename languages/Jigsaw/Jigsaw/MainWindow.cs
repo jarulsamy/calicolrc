@@ -15,7 +15,7 @@ public class JigsawWidget : Gtk.ScrolledWindow
 	
 	// Add the Canvas and other utility widgets
 	cvsFixed = new Gtk.Fixed();
-	cvs = new Jigsaw.Canvas(1200, 900);
+	cvs = new Jigsaw.Canvas(1200, 10000);
 	cvsFixed.Put(cvs, 0,0);
 	this.AddWithViewport(cvsFixed);
   }
