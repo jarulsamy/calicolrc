@@ -101,6 +101,7 @@ class ShellWindow(Window):
     def __init__(self, calico):
         self.completion = None
         self.calico = calico
+        self.need_runner = True
         self.executeThread = None
         self.language = self.calico.language
         self.window = MyWindow(_("Calico Shell - %s") % System.Environment.UserName)
@@ -492,13 +493,17 @@ class ShellWindow(Window):
         def invoke(sender, args):
             end = self.history_textview.Buffer.EndIter
             self.history_textview.Buffer.InsertWithTagsByName(end, message, tag)
-            GLib.Timeout.Add(100, self.goto_end)
+            if self.need_runner:
+                GLib.Timeout.Add(100, self.goto_end)
+                self.need_runner = False
         self.calico.Invoke(invoke)
 
     def goto_end(self):
         def invoke(s, a):
+            self.need_to_go_to_end = False
             end = self.history_textview.Buffer.EndIter
             self.history_textview.ScrollToIter(end, 0.4, True, 0, 1.0)
+            self.need_runner = True
         self.calico.Invoke(invoke)
 
     def set_title(self, text):
