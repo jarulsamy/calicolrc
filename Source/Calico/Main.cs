@@ -11,7 +11,6 @@ namespace Calico
 	{
 		public static string Version = "2.0.0";
 		
-		
 		[STAThread]
 		public static void Main (string [] args)
 		{

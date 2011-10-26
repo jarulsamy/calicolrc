@@ -6,17 +6,36 @@ using System.Collections.Generic;
 
 public partial class MainWindow: Gtk.Window
 {	
-	
+	public Clipboard clipboard; 
 	public Dictionary<Gtk.Widget,Calico.Document> DocumentMap = new Dictionary<Gtk.Widget,Calico.Document>();
 	private Calico.Document current_document = null;
 	public Calico.Document CurrentDocument {
 		get {return current_document;}
 		set {current_document = value;}
 	}
+	public Mono.TextEditor.TextEditor CommandTextArea {
+		get {return texteditor2;}
+	}
 	
 	public MainWindow (string [] args): base (Gtk.WindowType.Toplevel)
 	{
 		Build ();
+		clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
+		DocumentNotebook.CurrentPage = 0;
+        //options = TextEditorOptions()
+        //self.textview = TextEditor(Options=options)
+        CommandTextArea.Options.ShowFoldMargin = false;
+        CommandTextArea.Options.ShowIconMargin = false;
+        CommandTextArea.Options.ShowInvalidLines = false;
+        CommandTextArea.Options.ShowLineNumberMargin = false; // option
+        CommandTextArea.Options.TabsToSpaces = true;
+        CommandTextArea.Options.HighlightMatchingBracket = true;
+        try {
+            CommandTextArea.Document.MimeType = String.Format("text/x-{0}", "python");
+		} catch {
+            // pass
+		}
+		
 		List<string> files = new List<string>();
 		foreach (string arg in args) {
 			if (arg.StartsWith("--")) {
@@ -53,8 +72,8 @@ public partial class MainWindow: Gtk.Window
         // if already open, select it
         bool add_it = true;
         if (filename != "") {
-			// Page 0 is the Help page
-            for (int page_num = 1; page_num < DocumentNotebook.NPages; page_num++) {
+			// Page 0 is the Help page; Page 1 is Shell
+            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
 				Calico.Document npage_document = DocumentMap[npage];
                 if (npage_document.Filename == filename) {
@@ -91,10 +110,12 @@ public partial class MainWindow: Gtk.Window
 		}
         //###########################################################
         // Remove temp page, if one, and not same kind as one added:
-        if (DocumentNotebook.NPages == 3) {
-            Calico.Document doc0 = DocumentMap[DocumentNotebook.GetNthPage(1)];
-            if (doc0.Filename == "" && ! doc0.IsDirty) {
-                DocumentNotebook.RemovePage(1);
+        if (DocumentNotebook.NPages == 4) {
+			if (DocumentMap.ContainsKey(DocumentNotebook.GetNthPage(2))) {
+	            Calico.Document doc0 = DocumentMap[DocumentNotebook.GetNthPage(2)];
+	            if (doc0.Filename == "" && ! doc0.IsDirty) {
+	                DocumentNotebook.RemovePage(1);
+				}
 			}
 		}
         if (page != null && lineno != 0) {
@@ -114,13 +135,26 @@ public partial class MainWindow: Gtk.Window
 		return new Calico.TextDocument(filename);
 	}
 
+	public bool Close() {
+		// Delete Window
+		// FIXME: ask to save files, or cancel
+		return true;
+	}
+	
 	protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 	{
-		Application.Quit ();
-		a.RetVal = true;
+		if (Close()) {
+			Application.Quit ();
+			a.RetVal = true;
+		}
 	}
 	
 	protected virtual void OnNewAction1Activated (object sender, System.EventArgs e)
+	{
+		SelectOrOpen("");
+	}
+	
+	protected virtual void OnOpenAction1Activated (object sender, System.EventArgs e)
 	{
 		bool retval = false;
         Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Select the file to open"),
@@ -138,6 +172,64 @@ public partial class MainWindow: Gtk.Window
         fc.Destroy();
         //e.retval;
 	}
+	
+	protected virtual void OnNewActionActivated (object sender, System.EventArgs e)
+	{
+		SelectOrOpen("");
+	}
+	
+	protected virtual void OnOpenActionActivated (object sender, System.EventArgs e)
+	{
+		OnOpenAction1Activated(sender, e);
+	}
+	
+	protected virtual void OnSaveActionActivated (object sender, System.EventArgs e)
+	{
+	}
+	
+	protected virtual void OnSaveAsActionActivated (object sender, System.EventArgs e)
+	{
+	}
+	
+	protected virtual void OnQuitActionActivated (object sender, System.EventArgs e)
+	{
+		if (Close()) {
+			Application.Quit ();
+		}
+	}
+	
+	protected virtual void OnNotebookDocsSwitchPage (object o, Gtk.SwitchPageArgs args)
+	{
+		Console.WriteLine("SwitchPage fired!");
+	}
+	
+	protected virtual void OnButton2Clicked (object sender, System.EventArgs e)
+	{
+		OnOpenAction1Activated(sender, e);
+	}
+	
+	protected virtual void OnButton3Clicked (object sender, System.EventArgs e)
+	{
+		SelectOrOpen("");
+	}
+	
+	protected virtual void OnCopyActionActivated (object sender, System.EventArgs e)
+	{
+		Focus.GetClipboard(Gdk.Atom.Intern("CLIPBOARD", false)).WaitForText();
+	}
+	
+	protected virtual void OnPasteActionActivated (object sender, System.EventArgs e)
+	{
+		//if (Focus is Gtk.TextView) 
+			//((Gtk.TextView)Focus) = clipboard.WaitForText();
+	}
+	
+	protected virtual void OnSelectAllActionActivated (object sender, System.EventArgs e)
+	{
+		//
+	}
+	
+	
 	
 	
 	public Gtk.Notebook DocumentNotebook {
