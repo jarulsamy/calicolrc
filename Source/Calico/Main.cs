@@ -1,10 +1,10 @@
-using Mono.Addins;
+//using Mono.Addins;
 using System;
 using Gtk;
 using System.Collections.Generic; // IList
 using Mono.Unix; 
 
-[assembly:AddinRoot ("Calico", "1.0")]
+//[assembly:AddinRoot ("Calico", "1.0")]
 namespace Calico
 {
 	class MainClass
@@ -24,19 +24,22 @@ namespace Calico
     		}
 			Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
 			
-			
+			/*
 			// Addins:
 			AddinManager.Initialize();
 			// Detect changes in add-ins
 			AddinManager.Registry.Update(); 			
 			foreach (ICommand cmd in AddinManager.GetExtensionObjects(typeof(ICommand)))
 				cmd.Run();
-			
+			*/
 			if (((IList<string>)args).Contains("--help")) {
 				Usage();
 			} else if (((IList<string>)args).Contains("--version")) {
 			    Print("{0}", Version);
 			} else {
+				if (! ((IList<string>)args).Contains("--debug-handler")) {
+					GLib.ExceptionManager.UnhandledException += HandleException;
+				}
 				// If Gui, let's go:
 				Application.Init();
 				MainWindow win = new MainWindow(args);
@@ -45,6 +48,10 @@ namespace Calico
 			}
 		}
 	
+		public static void HandleException(GLib.UnhandledExceptionArgs args) {
+			Console.WriteLine("Unhandled exception: {0}", args);
+		}
+		
 		public static void Print(string message, params object [] args) {
 			Console.WriteLine(String.Format(message, args));
 		}
@@ -81,9 +88,11 @@ namespace Calico
 		}
 	}
 
+	/*
 	[TypeExtensionPoint]
 	public interface ICommand
 	{
 		void Run ();
 	}
+	*/
 }

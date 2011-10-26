@@ -3,11 +3,16 @@ using System.IO; // Path
 using Gtk;
 using System.Collections.Generic;
 
+
 public partial class MainWindow: Gtk.Window
 {	
 	
-	public Dictionary<Gtk.Widget,Calico.Document> DocumentMap= new Dictionary<Gtk.Widget,Calico.Document>();
-
+	public Dictionary<Gtk.Widget,Calico.Document> DocumentMap = new Dictionary<Gtk.Widget,Calico.Document>();
+	private Calico.Document current_document = null;
+	public Calico.Document CurrentDocument {
+		get {return current_document;}
+		set {current_document = value;}
+	}
 	
 	public MainWindow (string [] args): base (Gtk.WindowType.Toplevel)
 	{
@@ -28,6 +33,10 @@ public partial class MainWindow: Gtk.Window
 		return SelectOrOpen(filename, "");
 	}
 
+	public static string _(string message) {
+		return global::Mono.Unix.Catalog.GetString(message);
+	}
+	
 	public bool SelectOrOpen(string filename, string language) {
         // First, check for filename:N format:
 		int lineno = 0;
@@ -44,11 +53,13 @@ public partial class MainWindow: Gtk.Window
         // if already open, select it
         bool add_it = true;
         if (filename != "") {
-            for (int page_num = 0; page_num < DocumentNotebook.NPages; page_num++) {
+			// Page 0 is the Help page
+            for (int page_num = 1; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
-                if (npage.Document.Filename == filename) {
+				Calico.Document npage_document = DocumentMap[npage];
+                if (npage_document.Filename == filename) {
                     DocumentNotebook.CurrentPage = page_num;
-                    page = npage; // reselect opened filename
+                    page = npage_document; // reselect opened filename
                     add_it = false;
                     break;
 				}
@@ -70,9 +81,9 @@ public partial class MainWindow: Gtk.Window
 		}
         if (add_it) {
             //self.calico.on_action("opened-document", filename=filename);
-			DocumentMap[page.widget] = page;
-            page_num = DocumentNotebook.AppendPage(page.widget, page.tab);
-            DocumentNotebook.SetTabReorderable(page.widget, true);
+			DocumentMap[page.Widget] = page;
+            int page_num = DocumentNotebook.AppendPage(page.Widget, page.Label);
+            DocumentNotebook.SetTabReorderable(page.Widget, true);
             DocumentNotebook.CurrentPage = page_num;
             if (filename != "") {
                 UpdateRecentFiles(filename);
@@ -80,14 +91,14 @@ public partial class MainWindow: Gtk.Window
 		}
         //###########################################################
         // Remove temp page, if one, and not same kind as one added:
-        if (DocuementNotebook.NPages == 2) {
-            Docuemnt doc0 = DocumentNotebook.GetNthPage(0).document;
+        if (DocumentNotebook.NPages == 3) {
+            Calico.Document doc0 = DocumentMap[DocumentNotebook.GetNthPage(1)];
             if (doc0.Filename == "" && ! doc0.IsDirty) {
-                DocumentNotebook.RemovePage(0);
+                DocumentNotebook.RemovePage(1);
 			}
 		}
         if (page != null && lineno != 0) {
-            return Document.GotoLine(lineno);
+            return page.GotoLine(lineno);
 		}
 		return false;
 	}
@@ -96,14 +107,38 @@ public partial class MainWindow: Gtk.Window
 	}
 	
 	public Calico.Document MakeDocument(string filename) {
-		return new TextDocument(filename);
+		return new Calico.TextDocument(filename);
 	}
-	
+
+	public Calico.Document MakeDocument(string filename, string language) {
+		return new Calico.TextDocument(filename);
+	}
+
 	protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 	{
 		Application.Quit ();
 		a.RetVal = true;
 	}
+	
+	protected virtual void OnNewAction1Activated (object sender, System.EventArgs e)
+	{
+		bool retval = false;
+        Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Select the file to open"),
+                                   							this,
+						                                   	Gtk.FileChooserAction.Open,
+						                                   _("Cancel"), Gtk.ResponseType.Cancel,
+						                                   _("Open"), Gtk.ResponseType.Accept);
+	    fc.KeepAbove = true;
+        if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
+            SelectOrOpen(fc.Filename);
+            //path, base = os.path.split(fc.Filename)
+            //os.chdir(path)
+            retval = true;
+		}
+        fc.Destroy();
+        //e.retval;
+	}
+	
 	
 	public Gtk.Notebook DocumentNotebook {
 		get {return notebook_docs; }

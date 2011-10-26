@@ -4,22 +4,43 @@
 public partial class MainWindow
 {
 	private global::Gtk.UIManager UIManager;
+
 	private global::Gtk.Action FileAction;
+
 	private global::Gtk.Action newAction1;
+
 	private global::Gtk.Action newAction;
+
+	private global::Gtk.Action openAction;
+
+	private global::Gtk.Action yesAction;
+
+	private global::Gtk.Action stopAction;
+
+	private global::Gtk.Action goForwardAction;
+
 	private global::Gtk.VBox vbox1;
+
 	private global::Gtk.MenuBar menubar2;
+
 	private global::Gtk.Toolbar toolbar1;
+
 	private global::Gtk.VPaned vpaned2;
+
 	private global::Gtk.Notebook notebook_docs;
-	private global::Gtk.ScrolledWindow scrolledwindow3;
+
 	private global::Gtk.Label label2;
+
 	private global::Gtk.Notebook notebook_tools;
+
 	private global::Gtk.ScrolledWindow GtkScrolledWindow;
+
 	private global::Gtk.TextView textview1;
+
 	private global::Gtk.Label label3;
+
 	private global::Gtk.Statusbar statusbar1;
-    
+
 	protected virtual void Build ()
 	{
 		global::Stetic.Gui.Initialize (this);
@@ -34,6 +55,14 @@ public partial class MainWindow
 		w1.Add (this.newAction1, null);
 		this.newAction = new global::Gtk.Action ("newAction", null, null, "gtk-new");
 		w1.Add (this.newAction, null);
+		this.openAction = new global::Gtk.Action ("openAction", null, null, "gtk-open");
+		w1.Add (this.openAction, null);
+		this.yesAction = new global::Gtk.Action ("yesAction", null, null, "gtk-yes");
+		w1.Add (this.yesAction, null);
+		this.stopAction = new global::Gtk.Action ("stopAction", null, null, "gtk-stop");
+		w1.Add (this.stopAction, null);
+		this.goForwardAction = new global::Gtk.Action ("goForwardAction", null, null, "gtk-go-forward");
+		w1.Add (this.goForwardAction, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -47,17 +76,17 @@ public partial class MainWindow
 		this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 		this.menubar2.Name = "menubar2";
 		this.vbox1.Add (this.menubar2);
-		global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.menubar2]));
+		global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.menubar2]));
 		w2.Position = 0;
 		w2.Expand = false;
 		w2.Fill = false;
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/></toolbar></ui>");
+		this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/><toolitem name='openAction' action='openAction'/><toolitem name='yesAction' action='yesAction'/><toolitem name='stopAction' action='stopAction'/><toolitem name='goForwardAction' action='goForwardAction'/></toolbar></ui>");
 		this.toolbar1 = ((global::Gtk.Toolbar)(this.UIManager.GetWidget ("/toolbar1")));
 		this.toolbar1.Name = "toolbar1";
 		this.toolbar1.ShowArrow = false;
 		this.vbox1.Add (this.toolbar1);
-		global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.toolbar1]));
+		global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.toolbar1]));
 		w3.Position = 1;
 		w3.Expand = false;
 		w3.Fill = false;
@@ -65,26 +94,23 @@ public partial class MainWindow
 		this.vpaned2 = new global::Gtk.VPaned ();
 		this.vpaned2.CanFocus = true;
 		this.vpaned2.Name = "vpaned2";
-		this.vpaned2.Position = 323;
+		this.vpaned2.Position = 223;
 		// Container child vpaned2.Gtk.Paned+PanedChild
 		this.notebook_docs = new global::Gtk.Notebook ();
 		this.notebook_docs.CanFocus = true;
 		this.notebook_docs.Name = "notebook_docs";
 		this.notebook_docs.CurrentPage = 0;
-		// Container child notebook_docs.Gtk.Notebook+NotebookChild
-		this.scrolledwindow3 = new global::Gtk.ScrolledWindow ();
-		this.scrolledwindow3.CanFocus = true;
-		this.scrolledwindow3.Name = "scrolledwindow3";
-		this.scrolledwindow3.ShadowType = ((global::Gtk.ShadowType)(1));
-		this.notebook_docs.Add (this.scrolledwindow3);
 		// Notebook tab
+		global::Gtk.Label w4 = new global::Gtk.Label ();
+		w4.Visible = true;
+		this.notebook_docs.Add (w4);
 		this.label2 = new global::Gtk.Label ();
 		this.label2.Name = "label2";
 		this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Home");
-		this.notebook_docs.SetTabLabel (this.scrolledwindow3, this.label2);
+		this.notebook_docs.SetTabLabel (w4, this.label2);
 		this.label2.ShowAll ();
 		this.vpaned2.Add (this.notebook_docs);
-		global::Gtk.Paned.PanedChild w5 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.notebook_docs]));
+		global::Gtk.Paned.PanedChild w5 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.notebook_docs]));
 		w5.Resize = false;
 		// Container child vpaned2.Gtk.Paned+PanedChild
 		this.notebook_tools = new global::Gtk.Notebook ();
@@ -112,14 +138,14 @@ public partial class MainWindow
 		this.label3.ShowAll ();
 		this.vpaned2.Add (this.notebook_tools);
 		this.vbox1.Add (this.vpaned2);
-		global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.vpaned2]));
+		global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.vpaned2]));
 		w9.Position = 2;
 		// Container child vbox1.Gtk.Box+BoxChild
 		this.statusbar1 = new global::Gtk.Statusbar ();
 		this.statusbar1.Name = "statusbar1";
 		this.statusbar1.Spacing = 6;
 		this.vbox1.Add (this.statusbar1);
-		global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.statusbar1]));
+		global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.statusbar1]));
 		w10.Position = 3;
 		w10.Expand = false;
 		w10.Fill = false;
@@ -127,9 +153,10 @@ public partial class MainWindow
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
 		}
-		this.DefaultWidth = 590;
-		this.DefaultHeight = 618;
+		this.DefaultWidth = 500;
+		this.DefaultHeight = 503;
 		this.Show ();
 		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
+		this.newAction1.Activated += new global::System.EventHandler (this.OnNewAction1Activated);
 	}
 }

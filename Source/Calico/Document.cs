@@ -4,8 +4,8 @@ namespace Calico
 {
 	public class Document
 	{
-		public Gtk.Widget widget;
-		public Gtk.Widget tab; // label
+		public Gtk.Widget Widget; // widget to add to notebook
+		public Gtk.Widget Label; // label for notebook page
 		public string Language;
 		public string Filename;
 		
@@ -14,7 +14,7 @@ namespace Calico
 			Filename = filename;
 		}
 		
-		public bool GoToLine(int lineno) {
+		public bool GotoLine(int lineno) {
 			return true;
 		}
 		
@@ -32,7 +32,10 @@ namespace Calico
 			//Mono.TextEditor.TextEditorOptions options = new Mono.TextEditor.TextEditorOptions();
 			texteditor = new Mono.TextEditor.TextEditor();
 			texteditor.ShowAll();
-			widget = texteditor;
+			Widget = texteditor;
+			string name = System.IO.Path.GetFileName(filename);
+			Label = new Gtk.Label(name);
+			Label.TooltipText = filename;
 			//texteditor.Document.MimeType = "text/x-sql";
 		}
 	}
