@@ -27,7 +27,7 @@ def getJoints():
         segments = client.getJointSegments(s, index)
 
         z = joints[1,3]
-        zscale = z/500.0
+        zscale = z/500.0 + 1
 
         bodies[index] = bodies.get(index, {})
 
