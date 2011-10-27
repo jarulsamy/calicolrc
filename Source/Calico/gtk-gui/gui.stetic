@@ -9,7 +9,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="MainWindow" design-size="500 558">
+  <widget class="Gtk.Window" id="MainWindow" design-size="529 558">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -38,14 +38,13 @@
       <action id="yesAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes" />
-        <property name="Sensitive">False</property>
         <property name="StockId">gtk-yes</property>
       </action>
-      <action id="stopAction">
+      <action id="noAction1">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes" />
         <property name="Sensitive">False</property>
-        <property name="StockId">gtk-stop</property>
+        <property name="StockId">gtk-no</property>
       </action>
       <action id="goForwardAction">
         <property name="Type">Action</property>
@@ -173,15 +172,10 @@
         <property name="ShortLabel" translatable="yes">_About</property>
         <property name="StockId">gtk-about</property>
       </action>
-      <action id="ShellAction">
+      <action id="ScriptAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Shell</property>
+        <property name="Label" translatable="yes">Script</property>
         <property name="ShortLabel" translatable="yes">Shell</property>
-      </action>
-      <action id="Action">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">--</property>
-        <property name="ShortLabel" translatable="yes">--</property>
       </action>
       <action id="LanguageAction">
         <property name="Type">Action</property>
@@ -224,11 +218,48 @@
         <property name="Value">0</property>
         <property name="Group">group1</property>
       </action>
+      <action id="yesAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Execute Script</property>
+        <property name="ShortLabel" translatable="yes">Execute Script</property>
+        <property name="StockId">gtk-yes</property>
+      </action>
+      <action id="noAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Stop Script</property>
+        <property name="Sensitive">False</property>
+        <property name="ShortLabel" translatable="yes">Stop Script</property>
+        <property name="StockId">gtk-no</property>
+      </action>
+      <action id="OptionsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Options</property>
+        <property name="ShortLabel" translatable="yes">Options</property>
+      </action>
+      <action id="zoomInAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Zoom _In</property>
+        <property name="ShortLabel" translatable="yes">Zoom _In</property>
+        <property name="StockId">gtk-zoom-in</property>
+      </action>
+      <action id="zoomOutAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Zoom _Out</property>
+        <property name="ShortLabel" translatable="yes">Zoom _Out</property>
+        <property name="StockId">gtk-zoom-out</property>
+      </action>
+      <action id="selectFontAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Change _Font...</property>
+        <property name="ShortLabel" translatable="yes">Change _Font...</property>
+        <property name="StockId">gtk-select-font</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
     <property name="WindowPosition">CenterOnParent</property>
     <signal name="DeleteEvent" handler="OnDeleteEvent" />
+    <signal name="KeyPressEvent" handler="OnKeyPressEvent" />
     <child>
       <widget class="Gtk.VBox" id="vbox1">
         <property name="MemberName" />
@@ -260,15 +291,22 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="CommentRegionAction" />
                 <node type="Menuitem" action="UncommentRegionAction" />
-                <node type="Menuitem" action="Action" />
               </node>
-              <node type="Menu" action="ShellAction">
+              <node type="Menu" action="ScriptAction">
                 <node type="Menu" action="LanguageAction">
                   <node type="Menuitem" action="PythonAction" />
                   <node type="Menuitem" action="RubyAction" />
                   <node type="Menuitem" action="SchemeAction" />
                   <node type="Menuitem" action="JigsawAction" />
                 </node>
+                <node type="Menuitem" action="yesAction1" />
+                <node type="Menuitem" action="noAction" />
+              </node>
+              <node type="Menu" action="OptionsAction">
+                <node type="Menuitem" action="zoomInAction" />
+                <node type="Menuitem" action="zoomOutAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="selectFontAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="helpAction" />
@@ -291,7 +329,7 @@
               <node type="Toolitem" action="newAction" />
               <node type="Toolitem" action="openAction" />
               <node type="Toolitem" action="yesAction" />
-              <node type="Toolitem" action="stopAction" />
+              <node type="Toolitem" action="noAction1" />
               <node type="Toolitem" action="goForwardAction" />
             </node>
           </widget>
@@ -311,7 +349,8 @@
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
+                <property name="Scrollable">True</property>
                 <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                 <child>
                   <widget class="Gtk.HBox" id="hbox1">
@@ -320,7 +359,7 @@
                     <child>
                       <widget class="Gtk.VButtonBox" id="vbuttonbox1">
                         <property name="MemberName" />
-                        <property name="Size">3</property>
+                        <property name="Size">4</property>
                         <property name="LayoutStyle">Spread</property>
                         <child>
                           <widget class="Gtk.Button" id="button4">
@@ -330,7 +369,6 @@
                             <property name="Icon">stock:gtk-help LargeToolbar</property>
                             <property name="Label" translatable="yes">Getting started...</property>
                             <property name="UseUnderline">True</property>
-                            <signal name="ButtonPressEvent" handler="OnButton4ButtonPressEvent" />
                             <signal name="Clicked" handler="OnButton4Clicked" />
                           </widget>
                           <packing>
@@ -366,6 +404,21 @@
                           </widget>
                           <packing>
                             <property name="Position">2</property>
+                            <property name="Expand">False</property>
+                            <property name="Fill">False</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Button" id="button100">
+                            <property name="MemberName" />
+                            <property name="Sensitive">False</property>
+                            <property name="CanFocus">True</property>
+                            <property name="Type">TextOnly</property>
+                            <property name="Label" translatable="yes">Load Last Script...</property>
+                            <property name="UseUnderline">True</property>
+                          </widget>
+                          <packing>
+                            <property name="Position">3</property>
                             <property name="Expand">False</property>
                             <property name="Fill">False</property>
                           </packing>
@@ -579,7 +632,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="label5">
+              <widget class="Gtk.Label" id="status_langauge">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">&lt;i&gt;Python&lt;/i&gt;</property>
                 <property name="UseMarkup">True</property>

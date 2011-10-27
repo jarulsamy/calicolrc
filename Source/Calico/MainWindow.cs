@@ -2,46 +2,67 @@ using System;
 using System.IO; // Path
 using Gtk;
 using System.Collections.Generic;
+using Calico;
+
+public static class Extensions 
+{
+	public static string ToTitleCase(string aString) 
+	{ 
+		try { 
+			return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(aString); 
+		} catch { 
+			return aString; 
+		} 
+	}
+}
 
 
 public partial class MainWindow: Gtk.Window
 {	
 	public Clipboard clipboard;
-	private Mono.TextEditor.TextEditor texteditor;
-	public Dictionary<Gtk.Widget,Calico.Document> DocumentMap = new Dictionary<Gtk.Widget,Calico.Document>();
-	private Calico.Document current_document = null;
-	public Calico.Document CurrentDocument {
-		get {return current_document;}
-		set {current_document = value;}
+	private Mono.TextEditor.TextEditor _shell;
+	public Dictionary<Gtk.Widget,Document> DocumentMap = new Dictionary<Gtk.Widget,Document>();
+	public Document CurrentDocument {
+		get {
+			int page_num = DocumentNotebook.Page;
+			if (page_num > 1) {
+				Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+				if (DocumentMap.ContainsKey(widget))
+					return DocumentMap[widget];
+				else
+					return null;
+			} else
+				return null;
+		}
 	}
 	public Gtk.ScrolledWindow ScrolledWindow {
 		get {return scrolledwindow1;}
 		set {scrolledwindow1 = value;}
 	}
-	public Mono.TextEditor.TextEditor CommandTextEditor {
-		get {return texteditor;}
+	public Mono.TextEditor.TextEditor Shell {
+		get {return _shell;}
 	}
 	
 	public MainWindow (string [] args): base (Gtk.WindowType.Toplevel)
 	{
 		Build ();
 		// Had to add this here, as Setic didn't like it
-		texteditor = new Mono.TextEditor.TextEditor();
-		ScrolledWindow.Add(texteditor);
+		_shell = new Mono.TextEditor.TextEditor();
+		ScrolledWindow.Add(_shell);
 		ScrolledWindow.ShowAll();
 		// Setup clipboard, and Gui:
 		clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
 		DocumentNotebook.CurrentPage = 0;
 		// Set optional items of TextArea
-        CommandTextEditor.Options.ShowFoldMargin = false;
-        CommandTextEditor.Options.ShowIconMargin = false;
-        CommandTextEditor.Options.ShowInvalidLines = false;
-        CommandTextEditor.Options.ShowLineNumberMargin = false; // option
-        CommandTextEditor.Options.TabsToSpaces = true;
-        CommandTextEditor.Options.HighlightMatchingBracket = true;
+        Shell.Options.ShowFoldMargin = false;
+        Shell.Options.ShowIconMargin = false;
+        Shell.Options.ShowInvalidLines = false;
+        Shell.Options.ShowLineNumberMargin = false; // option
+        Shell.Options.TabsToSpaces = true;
+        Shell.Options.HighlightMatchingBracket = true;
         
         try {
-            CommandTextEditor.Document.MimeType = String.Format("text/x-{0}", "python");
+            Shell.Document.MimeType = String.Format("text/x-{0}", "python");
 		} catch {
             // pass
 		}
@@ -58,8 +79,12 @@ public partial class MainWindow: Gtk.Window
 		}
 	}
 
+	public bool SelectOrOpen() {
+		return SelectOrOpen(null, null);
+	}
+
 	public bool SelectOrOpen(string filename) {
-		return SelectOrOpen(filename, "");
+		return SelectOrOpen(filename, null);
 	}
 
 	public static string _(string message) {
@@ -69,7 +94,7 @@ public partial class MainWindow: Gtk.Window
 	public bool SelectOrOpen(string filename, string language) {
         // First, check for filename:N format:
 		int lineno = 0;
-        if (filename != "") {
+        if (filename != null) {
 			 System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(filename, "(.*)\\:(\\d+)$");
             if (match.Success) {
 				filename = (string)match.Groups[0].Captures[0].Value;
@@ -78,54 +103,45 @@ public partial class MainWindow: Gtk.Window
 		}
         // FIXME: can attempt to open bogus path/filename
         // but this is useful for file creation
-        Calico.Document page = null;
+        Document page = null;
         // if already open, select it
         bool add_it = true;
-        if (filename != "") {
+        if (filename != null) {
 			// Page 0 is the Help page; Page 1 is Shell
             for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
-				Calico.Document npage_document = DocumentMap[npage];
-                if (npage_document.Filename == filename) {
-                    DocumentNotebook.CurrentPage = page_num;
-                    page = npage_document; // reselect opened filename
-                    add_it = false;
-                    break;
+				if (DocumentMap.ContainsKey(npage)) {
+					Document npage_document = DocumentMap[npage];
+	                if (npage_document.Filename == filename) {
+	                    DocumentNotebook.CurrentPage = page_num;
+	                    add_it = false;
+	                    break;
+					}
 				}
 			}
             if (page == null) {
                 page = MakeDocument(filename);  // make a new document with filename
 			}
 		} else { // make a no-named document of type language
-            if (language == "") {
+            if (language == null) {
                 // FIXME: issue with getting document, before it is ready
                 language = "python";
                 if (CurrentDocument != null) {
-                    if (CurrentDocument.Language != "") {
+                    if (CurrentDocument.Language != null) {
                         language = CurrentDocument.Language;
 					}
 				}
 			}
-            page = MakeDocument("", language);
+            page = MakeDocument(null, language);
 		}
         if (add_it) {
             //self.calico.on_action("opened-document", filename=filename);
-			DocumentMap[page.Widget] = page;
-            int page_num = DocumentNotebook.AppendPage(page.Widget, page.Label);
+            int page_num = DocumentNotebook.AppendPage(page.Widget, page.Tab);
             DocumentNotebook.SetTabReorderable(page.Widget, true);
             DocumentNotebook.CurrentPage = page_num;
-            if (filename != "") {
+			page.CloseButton.Clicked += delegate {TryToClose(page);};
+            if (filename != null) {
                 UpdateRecentFiles(filename);
-			}
-		}
-        //###########################################################
-        // Remove temp page, if one, and not same kind as one added:
-        if (DocumentNotebook.NPages == 4) {
-			if (DocumentMap.ContainsKey(DocumentNotebook.GetNthPage(2))) {
-	            Calico.Document doc0 = DocumentMap[DocumentNotebook.GetNthPage(2)];
-	            if (doc0.Filename == "" && ! doc0.IsDirty) {
-	                DocumentNotebook.RemovePage(1);
-				}
 			}
 		}
         if (page != null && lineno != 0) {
@@ -134,15 +150,33 @@ public partial class MainWindow: Gtk.Window
 		return false;
 	}
 	
-	public void UpdateRecentFiles(string filename) {
+	public void TryToClose(Document document) {
+		if (document.Close()) {
+			int page_num = DocumentNotebook.PageNum(document.Widget);
+			DocumentNotebook.RemovePage(page_num);
+		}
 	}
 	
-	public Calico.Document MakeDocument(string filename) {
-		return new Calico.TextDocument(filename);
+	public void UpdateRecentFiles(string filename) {
+	}
+		
+	public Document MakeDocument(string filename) {
+		// FIXME: get language from defaults
+		string language = "python";
+		if (filename == null) {
+			filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
+		}
+		return new TextDocument(filename, language);
 	}
 
-	public Calico.Document MakeDocument(string filename, string language) {
-		return new Calico.TextDocument(filename);
+	public Document MakeDocument(string filename, string language) {
+		if (language == null) {
+			language = "python";
+		}
+		if (filename == null) {
+			filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
+		}
+		return new TextDocument(filename, language);
 	}
 
 	public bool Close() {
@@ -161,12 +195,11 @@ public partial class MainWindow: Gtk.Window
 	
 	protected virtual void OnNewAction1Activated (object sender, System.EventArgs e)
 	{
-		SelectOrOpen("");
+		SelectOrOpen();
 	}
 	
 	protected virtual void OnOpenAction1Activated (object sender, System.EventArgs e)
 	{
-		bool retval = false;
         Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Select the file to open"),
                                    							this,
 						                                   	Gtk.FileChooserAction.Open,
@@ -177,15 +210,13 @@ public partial class MainWindow: Gtk.Window
             SelectOrOpen(fc.Filename);
             //path, base = os.path.split(fc.Filename)
             //os.chdir(path)
-            retval = true;
 		}
         fc.Destroy();
-        //e.retval;
 	}
 	
 	protected virtual void OnNewActionActivated (object sender, System.EventArgs e)
 	{
-		SelectOrOpen("");
+		SelectOrOpen();
 	}
 	
 	protected virtual void OnOpenActionActivated (object sender, System.EventArgs e)
@@ -210,7 +241,12 @@ public partial class MainWindow: Gtk.Window
 	
 	protected virtual void OnNotebookDocsSwitchPage (object o, Gtk.SwitchPageArgs args)
 	{
-		Console.WriteLine("SwitchPage fired!");
+		if (CurrentDocument is Document) {
+			prompt.Text = CurrentDocument.Language;
+			status_langauge.Text = Extensions.ToTitleCase(prompt.Text);
+		} else { // Home, and Shell
+			Console.WriteLine(((Gtk.Notebook)o).Page);
+		}
 	}
 	
 	protected virtual void OnButton2Clicked (object sender, System.EventArgs e)
@@ -220,7 +256,7 @@ public partial class MainWindow: Gtk.Window
 	
 	protected virtual void OnButton3Clicked (object sender, System.EventArgs e)
 	{
-		SelectOrOpen("");
+		SelectOrOpen();
 	}
 	
 	protected virtual void OnCopyActionActivated (object sender, System.EventArgs e)
@@ -261,21 +297,21 @@ public partial class MainWindow: Gtk.Window
 	protected virtual void OnUndoActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.Undo(CommandTextEditor.GetTextEditorData());
+			Mono.TextEditor.MiscActions.Undo(Shell.GetTextEditorData());
 		}
 	}
 	
 	protected virtual void OnRedoActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.Redo(CommandTextEditor.GetTextEditorData());
+			Mono.TextEditor.MiscActions.Redo(Shell.GetTextEditorData());
 		}
 	}
 	
 	protected virtual void OnSelectAllActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.SelectionActions.SelectAll(CommandTextEditor.GetTextEditorData());
+			Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
 		} else if (Focus is Gtk.TextView) {
 			Gtk.TextView textview = (Gtk.TextView)Focus;
 			textview.Buffer.SelectRange(textview.Buffer.StartIter, textview.Buffer.EndIter);
@@ -285,14 +321,14 @@ public partial class MainWindow: Gtk.Window
 	protected virtual void OnIndentActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.IndentSelection(CommandTextEditor.GetTextEditorData());
+			Mono.TextEditor.MiscActions.IndentSelection(Shell.GetTextEditorData());
 		} 
 	}
 	
 	protected virtual void OnUnindentActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.RemoveIndentSelection(CommandTextEditor.GetTextEditorData());
+			Mono.TextEditor.MiscActions.RemoveIndentSelection(Shell.GetTextEditorData());
 		} 
 	}
 	
@@ -304,20 +340,16 @@ public partial class MainWindow: Gtk.Window
 	{
 	}
 	
-	protected virtual void OnButton4ButtonPressEvent (object o, Gtk.ButtonPressEventArgs args)
-	{
-	}
-	
 	protected virtual void OnButton4Clicked (object sender, System.EventArgs e)
 	{
 		System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
 	}
 	
-	
-	
-	
-	
-	
+	protected virtual void OnKeyPressEvent (object o, Gtk.KeyPressEventArgs args)
+	{
+		// FIXME: on escape, if running stop; clear command entry if focus
+		// FIXME: if in command entry shell
+	}
 	
 	public Gtk.Notebook DocumentNotebook {
 		get {return notebook_docs; }

@@ -1,10 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/Document.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="314" Column="1" />
-      <File FileName="Calico/Document.cs" Line="40" Column="17" />
-      <File FileName="Calico/Main.cs" Line="46" Column="1" />
+      <File FileName="Calico/MainWindow.cs" Line="120" Column="6" />
+      <File FileName="Calico/Document.cs" Line="28" Column="34" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -12,7 +11,7 @@
           <Node name="Calico" expanded="True">
             <Node name="References" expanded="True" />
             <Node name="UserInterface" expanded="True" />
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="Document.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -26,7 +25,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Calico/Source/Calico/MainWindow.cs" line="96" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
 </Properties>
