@@ -21,20 +21,6 @@ public partial class MainWindow
 
 	private global::Gtk.Action EditAction;
 
-	private global::Gtk.Action copyAction;
-
-	private global::Gtk.Action pasteAction;
-
-	private global::Gtk.Action cutAction;
-
-	private global::Gtk.Action selectAllAction;
-
-	private global::Gtk.Action deleteAction;
-
-	private global::Gtk.Action undoAction;
-
-	private global::Gtk.Action redoAction;
-
 	private global::Gtk.Action openAction1;
 
 	private global::Gtk.Action saveAction;
@@ -42,6 +28,46 @@ public partial class MainWindow
 	private global::Gtk.Action saveAsAction;
 
 	private global::Gtk.Action quitAction;
+
+	private global::Gtk.Action copyAction;
+
+	private global::Gtk.Action pasteAction;
+
+	private global::Gtk.Action cutAction;
+
+	private global::Gtk.Action undoAction;
+
+	private global::Gtk.Action redoAction;
+
+	private global::Gtk.Action selectAllAction;
+
+	private global::Gtk.Action indentAction;
+
+	private global::Gtk.Action unindentAction;
+
+	private global::Gtk.Action CommentRegionAction;
+
+	private global::Gtk.Action UncommentRegionAction;
+
+	private global::Gtk.Action HelpAction;
+
+	private global::Gtk.Action helpAction;
+
+	private global::Gtk.Action aboutAction;
+
+	private global::Gtk.Action ShellAction;
+
+	private global::Gtk.Action Action;
+
+	private global::Gtk.Action LanguageAction;
+
+	private global::Gtk.RadioAction PythonAction;
+
+	private global::Gtk.RadioAction RubyAction;
+
+	private global::Gtk.RadioAction SchemeAction;
+
+	private global::Gtk.RadioAction JigsawAction;
 
 	private global::Gtk.VBox vbox1;
 
@@ -73,7 +99,7 @@ public partial class MainWindow
 
 	private global::Gtk.VBox vbox3;
 
-	private global::Gtk.Label label4;
+	private global::Gtk.Label prompt;
 
 	private global::Gtk.HBox hbox3;
 
@@ -82,8 +108,6 @@ public partial class MainWindow
 	private global::Gtk.Button button11;
 
 	private global::Gtk.ScrolledWindow scrolledwindow1;
-
-	private global::Mono.TextEditor.TextEditor texteditor2;
 
 	private global::Gtk.Label label1;
 
@@ -96,6 +120,10 @@ public partial class MainWindow
 	private global::Gtk.Label label3;
 
 	private global::Gtk.Statusbar statusbar1;
+
+	private global::Gtk.Label label4;
+
+	private global::Gtk.Label label5;
 
 	protected virtual void Build ()
 	{
@@ -125,24 +153,6 @@ public partial class MainWindow
 		this.EditAction = new global::Gtk.Action ("EditAction", global::Mono.Unix.Catalog.GetString ("Edit"), null, null);
 		this.EditAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Edit");
 		w1.Add (this.EditAction, null);
-		this.copyAction = new global::Gtk.Action ("copyAction", global::Mono.Unix.Catalog.GetString ("_Copy"), null, "gtk-copy");
-		this.copyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Copy");
-		w1.Add (this.copyAction, null);
-		this.pasteAction = new global::Gtk.Action ("pasteAction", null, null, "gtk-paste");
-		w1.Add (this.pasteAction, null);
-		this.cutAction = new global::Gtk.Action ("cutAction", null, null, "gtk-cut");
-		w1.Add (this.cutAction, null);
-		this.selectAllAction = new global::Gtk.Action ("selectAllAction", global::Mono.Unix.Catalog.GetString ("Select _All"), null, "gtk-select-all");
-		this.selectAllAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Select _All");
-		w1.Add (this.selectAllAction, null);
-		this.deleteAction = new global::Gtk.Action ("deleteAction", null, null, "gtk-delete");
-		w1.Add (this.deleteAction, null);
-		this.undoAction = new global::Gtk.Action ("undoAction", global::Mono.Unix.Catalog.GetString ("_Undo"), null, "gtk-undo");
-		this.undoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Undo");
-		w1.Add (this.undoAction, null);
-		this.redoAction = new global::Gtk.Action ("redoAction", global::Mono.Unix.Catalog.GetString ("_Redo"), null, "gtk-redo");
-		this.redoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Redo");
-		w1.Add (this.redoAction, null);
 		this.openAction1 = new global::Gtk.Action ("openAction1", global::Mono.Unix.Catalog.GetString ("_Open"), null, "gtk-open");
 		this.openAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Open");
 		w1.Add (this.openAction1, null);
@@ -155,6 +165,69 @@ public partial class MainWindow
 		this.quitAction = new global::Gtk.Action ("quitAction", global::Mono.Unix.Catalog.GetString ("_Quit"), null, "gtk-quit");
 		this.quitAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Quit");
 		w1.Add (this.quitAction, null);
+		this.copyAction = new global::Gtk.Action ("copyAction", global::Mono.Unix.Catalog.GetString ("_Copy"), null, "gtk-copy");
+		this.copyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Copy");
+		w1.Add (this.copyAction, null);
+		this.pasteAction = new global::Gtk.Action ("pasteAction", global::Mono.Unix.Catalog.GetString ("_Paste"), null, "gtk-paste");
+		this.pasteAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Paste");
+		w1.Add (this.pasteAction, null);
+		this.cutAction = new global::Gtk.Action ("cutAction", global::Mono.Unix.Catalog.GetString ("Cu_t"), null, "gtk-cut");
+		this.cutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Cu_t");
+		w1.Add (this.cutAction, null);
+		this.undoAction = new global::Gtk.Action ("undoAction", global::Mono.Unix.Catalog.GetString ("_Undo"), null, "gtk-undo");
+		this.undoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Undo");
+		w1.Add (this.undoAction, "<Control><Mod2>z");
+		this.redoAction = new global::Gtk.Action ("redoAction", global::Mono.Unix.Catalog.GetString ("_Redo"), null, "gtk-redo");
+		this.redoAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Redo");
+		w1.Add (this.redoAction, "<Control><Shift>z");
+		this.selectAllAction = new global::Gtk.Action ("selectAllAction", global::Mono.Unix.Catalog.GetString ("Select _All"), null, "gtk-select-all");
+		this.selectAllAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Select _All");
+		w1.Add (this.selectAllAction, "<Control><Mod2>a");
+		this.indentAction = new global::Gtk.Action ("indentAction", global::Mono.Unix.Catalog.GetString ("Indent Region"), null, "gtk-indent");
+		this.indentAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Indent Region");
+		w1.Add (this.indentAction, null);
+		this.unindentAction = new global::Gtk.Action ("unindentAction", global::Mono.Unix.Catalog.GetString ("Unindent Region"), null, "gtk-unindent");
+		this.unindentAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Unindent Region");
+		w1.Add (this.unindentAction, null);
+		this.CommentRegionAction = new global::Gtk.Action ("CommentRegionAction", global::Mono.Unix.Catalog.GetString ("Comment Region"), null, null);
+		this.CommentRegionAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Comment Region");
+		w1.Add (this.CommentRegionAction, null);
+		this.UncommentRegionAction = new global::Gtk.Action ("UncommentRegionAction", global::Mono.Unix.Catalog.GetString ("Uncomment Region"), null, null);
+		this.UncommentRegionAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Uncomment Region");
+		w1.Add (this.UncommentRegionAction, null);
+		this.HelpAction = new global::Gtk.Action ("HelpAction", global::Mono.Unix.Catalog.GetString ("Help"), null, null);
+		this.HelpAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Help");
+		w1.Add (this.HelpAction, null);
+		this.helpAction = new global::Gtk.Action ("helpAction", null, null, "gtk-help");
+		w1.Add (this.helpAction, null);
+		this.aboutAction = new global::Gtk.Action ("aboutAction", global::Mono.Unix.Catalog.GetString ("_About"), null, "gtk-about");
+		this.aboutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_About");
+		w1.Add (this.aboutAction, null);
+		this.ShellAction = new global::Gtk.Action ("ShellAction", global::Mono.Unix.Catalog.GetString ("Shell"), null, null);
+		this.ShellAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Shell");
+		w1.Add (this.ShellAction, null);
+		this.Action = new global::Gtk.Action ("Action", global::Mono.Unix.Catalog.GetString ("--"), null, null);
+		this.Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("--");
+		w1.Add (this.Action, null);
+		this.LanguageAction = new global::Gtk.Action ("LanguageAction", global::Mono.Unix.Catalog.GetString ("Language"), null, null);
+		this.LanguageAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Language");
+		w1.Add (this.LanguageAction, null);
+		this.PythonAction = new global::Gtk.RadioAction ("PythonAction", global::Mono.Unix.Catalog.GetString ("Python"), null, null, 0);
+		this.PythonAction.Group = new global::GLib.SList (global::System.IntPtr.Zero);
+		this.PythonAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Python");
+		w1.Add (this.PythonAction, null);
+		this.RubyAction = new global::Gtk.RadioAction ("RubyAction", global::Mono.Unix.Catalog.GetString ("Ruby"), null, null, 0);
+		this.RubyAction.Group = this.PythonAction.Group;
+		this.RubyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Ruby");
+		w1.Add (this.RubyAction, null);
+		this.SchemeAction = new global::Gtk.RadioAction ("SchemeAction", global::Mono.Unix.Catalog.GetString ("Scheme"), null, null, 0);
+		this.SchemeAction.Group = this.RubyAction.Group;
+		this.SchemeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Scheme");
+		w1.Add (this.SchemeAction, null);
+		this.JigsawAction = new global::Gtk.RadioAction ("JigsawAction", global::Mono.Unix.Catalog.GetString ("Jigsaw"), null, null, 0);
+		this.JigsawAction.Group = this.RubyAction.Group;
+		this.JigsawAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Jigsaw");
+		w1.Add (this.JigsawAction, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -164,7 +237,7 @@ public partial class MainWindow
 		this.vbox1 = new global::Gtk.VBox ();
 		this.vbox1.Name = "vbox1";
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='newAction1' action='newAction1'/><menuitem name='openAction1' action='openAction1'/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><menuitem name='selectAllAction' action='selectAllAction'/><menuitem name='deleteAction' action='deleteAction'/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='newAction1' action='newAction1'/><menuitem name='openAction1' action='openAction1'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/><menuitem name='Action' action='Action'/></menu><menu name='ShellAction' action='ShellAction'><menu name='LanguageAction' action='LanguageAction'><menuitem name='PythonAction' action='PythonAction'/><menuitem name='RubyAction' action='RubyAction'/><menuitem name='SchemeAction' action='SchemeAction'/><menuitem name='JigsawAction' action='JigsawAction'/></menu></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 		this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 		this.menubar2.Name = "menubar2";
 		this.vbox1.Add (this.menubar2);
@@ -191,7 +264,7 @@ public partial class MainWindow
 		this.notebook_docs = new global::Gtk.Notebook ();
 		this.notebook_docs.CanFocus = true;
 		this.notebook_docs.Name = "notebook_docs";
-		this.notebook_docs.CurrentPage = 1;
+		this.notebook_docs.CurrentPage = 0;
 		// Container child notebook_docs.Gtk.Notebook+NotebookChild
 		this.hbox1 = new global::Gtk.HBox ();
 		this.hbox1.Name = "hbox1";
@@ -309,11 +382,12 @@ public partial class MainWindow
 		this.vbox3.Name = "vbox3";
 		this.vbox3.Spacing = 6;
 		// Container child vbox3.Gtk.Box+BoxChild
-		this.label4 = new global::Gtk.Label ();
-		this.label4.Name = "label4";
-		this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("python>");
-		this.vbox3.Add (this.label4);
-		global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.label4]));
+		this.prompt = new global::Gtk.Label ();
+		this.prompt.Name = "prompt";
+		this.prompt.LabelProp = global::Mono.Unix.Catalog.GetString ("python>");
+		this.prompt.Justify = ((global::Gtk.Justification)(1));
+		this.vbox3.Add (this.prompt);
+		global::Gtk.Box.BoxChild w34 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.prompt]));
 		w34.Position = 0;
 		w34.Expand = false;
 		w34.Fill = false;
@@ -389,25 +463,12 @@ public partial class MainWindow
 		this.scrolledwindow1.CanFocus = true;
 		this.scrolledwindow1.Name = "scrolledwindow1";
 		this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
-		// Container child scrolledwindow1.Gtk.Container+ContainerChild
-		global::Gtk.Viewport w56 = new global::Gtk.Viewport ();
-		w56.ShadowType = ((global::Gtk.ShadowType)(0));
-		// Container child GtkViewport.Gtk.Container+ContainerChild
-		this.texteditor2 = new global::Mono.TextEditor.TextEditor ();
-		this.texteditor2.Events = ((global::Gdk.EventMask)(256));
-		this.texteditor2.Name = "texteditor2";
-		this.texteditor2.SelectionAnchor = 0;
-		this.texteditor2.HighlightSearchPattern = false;
-		this.texteditor2.IsCaseSensitive = false;
-		this.texteditor2.IsWholeWordOnly = false;
-		w56.Add (this.texteditor2);
-		this.scrolledwindow1.Add (w56);
 		this.hbox2.Add (this.scrolledwindow1);
-		global::Gtk.Box.BoxChild w59 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.scrolledwindow1]));
-		w59.Position = 1;
+		global::Gtk.Box.BoxChild w56 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.scrolledwindow1]));
+		w56.Position = 1;
 		this.notebook_docs.Add (this.hbox2);
-		global::Gtk.Notebook.NotebookChild w60 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs[this.hbox2]));
-		w60.Position = 1;
+		global::Gtk.Notebook.NotebookChild w57 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs[this.hbox2]));
+		w57.Position = 1;
 		// Notebook tab
 		this.label1 = new global::Gtk.Label ();
 		this.label1.Name = "label1";
@@ -415,8 +476,8 @@ public partial class MainWindow
 		this.notebook_docs.SetTabLabel (this.hbox2, this.label1);
 		this.label1.ShowAll ();
 		this.vpaned2.Add (this.notebook_docs);
-		global::Gtk.Paned.PanedChild w61 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.notebook_docs]));
-		w61.Resize = false;
+		global::Gtk.Paned.PanedChild w58 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.notebook_docs]));
+		w58.Resize = false;
 		// Container child vpaned2.Gtk.Paned+PanedChild
 		this.notebook_tools = new global::Gtk.Notebook ();
 		this.notebook_tools.CanFocus = true;
@@ -444,17 +505,36 @@ public partial class MainWindow
 		this.label3.ShowAll ();
 		this.vpaned2.Add (this.notebook_tools);
 		this.vbox1.Add (this.vpaned2);
-		global::Gtk.Box.BoxChild w65 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.vpaned2]));
-		w65.Position = 2;
+		global::Gtk.Box.BoxChild w62 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.vpaned2]));
+		w62.Position = 2;
 		// Container child vbox1.Gtk.Box+BoxChild
 		this.statusbar1 = new global::Gtk.Statusbar ();
 		this.statusbar1.Name = "statusbar1";
 		this.statusbar1.Spacing = 6;
+		// Container child statusbar1.Gtk.Box+BoxChild
+		this.label4 = new global::Gtk.Label ();
+		this.label4.Name = "label4";
+		this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Language:");
+		this.statusbar1.Add (this.label4);
+		global::Gtk.Box.BoxChild w63 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label4]));
+		w63.Position = 0;
+		w63.Expand = false;
+		w63.Fill = false;
+		// Container child statusbar1.Gtk.Box+BoxChild
+		this.label5 = new global::Gtk.Label ();
+		this.label5.Name = "label5";
+		this.label5.LabelProp = global::Mono.Unix.Catalog.GetString ("<i>Python</i>");
+		this.label5.UseMarkup = true;
+		this.statusbar1.Add (this.label5);
+		global::Gtk.Box.BoxChild w64 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label5]));
+		w64.Position = 1;
+		w64.Expand = false;
+		w64.Fill = false;
 		this.vbox1.Add (this.statusbar1);
-		global::Gtk.Box.BoxChild w66 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.statusbar1]));
-		w66.Position = 3;
-		w66.Expand = false;
-		w66.Fill = false;
+		global::Gtk.Box.BoxChild w65 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.statusbar1]));
+		w65.Position = 3;
+		w65.Expand = false;
+		w65.Fill = false;
 		this.Add (this.vbox1);
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
@@ -466,14 +546,23 @@ public partial class MainWindow
 		this.newAction1.Activated += new global::System.EventHandler (this.OnNewAction1Activated);
 		this.newAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
 		this.openAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
-		this.copyAction.Activated += new global::System.EventHandler (this.OnCopyActionActivated);
-		this.pasteAction.Activated += new global::System.EventHandler (this.OnPasteActionActivated);
-		this.selectAllAction.Activated += new global::System.EventHandler (this.OnSelectAllActionActivated);
 		this.openAction1.Activated += new global::System.EventHandler (this.OnOpenAction1Activated);
 		this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 		this.saveAsAction.Activated += new global::System.EventHandler (this.OnSaveAsActionActivated);
 		this.quitAction.Activated += new global::System.EventHandler (this.OnQuitActionActivated);
+		this.copyAction.Activated += new global::System.EventHandler (this.OnCopyActionActivated);
+		this.pasteAction.Activated += new global::System.EventHandler (this.OnPasteActionActivated);
+		this.cutAction.Activated += new global::System.EventHandler (this.OnCutActionActivated);
+		this.undoAction.Activated += new global::System.EventHandler (this.OnUndoActionActivated);
+		this.redoAction.Activated += new global::System.EventHandler (this.OnRedoActionActivated);
+		this.selectAllAction.Activated += new global::System.EventHandler (this.OnSelectAllActionActivated);
+		this.indentAction.Activated += new global::System.EventHandler (this.OnIndentActionActivated);
+		this.unindentAction.Activated += new global::System.EventHandler (this.OnUnindentActionActivated);
+		this.CommentRegionAction.Activated += new global::System.EventHandler (this.OnCommentRegionActionActivated);
+		this.UncommentRegionAction.Activated += new global::System.EventHandler (this.OnUncommentRegionActionActivated);
 		this.notebook_docs.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebookDocsSwitchPage);
+		this.button4.ButtonPressEvent += new global::Gtk.ButtonPressEventHandler (this.OnButton4ButtonPressEvent);
+		this.button4.Clicked += new global::System.EventHandler (this.OnButton4Clicked);
 		this.button3.Clicked += new global::System.EventHandler (this.OnButton3Clicked);
 		this.button2.Clicked += new global::System.EventHandler (this.OnButton2Clicked);
 	}

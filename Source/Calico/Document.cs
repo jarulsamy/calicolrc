@@ -23,6 +23,9 @@ namespace Calico
 			set {}
 		}
 		
+		public virtual void Configure () {
+		}
+		
 	}
 	
 	public class TextDocument : Document {
@@ -31,13 +34,25 @@ namespace Calico
 		public TextDocument(string filename) : base(filename) {
 			//Mono.TextEditor.TextEditorOptions options = new Mono.TextEditor.TextEditorOptions();
 			texteditor = new Mono.TextEditor.TextEditor();
-			texteditor.ShowAll();
-			Widget = texteditor;
+			Widget = new Gtk.ScrolledWindow();
+			((Gtk.ScrolledWindow)Widget).Add(texteditor);
 			string name = System.IO.Path.GetFileName(filename);
+			Widget.ShowAll();
 			Label = new Gtk.Label(name);
 			Label.TooltipText = filename;
-			//texteditor.Document.MimeType = "text/x-sql";
+			texteditor.Document.MimeType = "text/x-python";
 		}
+		
+		public override void Configure() {
+			texteditor.Options.ShowInvalidLines = false;
+        	texteditor.Options.ShowLineNumberMargin = true;
+        	texteditor.Options.TabsToSpaces = true;
+        	texteditor.Options.HighlightCaretLine = true;
+        	texteditor.Options.HighlightMatchingBracket = true;
+        	texteditor.Options.OverrideDocumentEolMarker = true;
+        	texteditor.Options.DefaultEolMarker = "\n";
+		}
+		
 	}
 	
 	

@@ -6,32 +6,42 @@ using System.Collections.Generic;
 
 public partial class MainWindow: Gtk.Window
 {	
-	public Clipboard clipboard; 
+	public Clipboard clipboard;
+	private Mono.TextEditor.TextEditor texteditor;
 	public Dictionary<Gtk.Widget,Calico.Document> DocumentMap = new Dictionary<Gtk.Widget,Calico.Document>();
 	private Calico.Document current_document = null;
 	public Calico.Document CurrentDocument {
 		get {return current_document;}
 		set {current_document = value;}
 	}
-	public Mono.TextEditor.TextEditor CommandTextArea {
-		get {return texteditor2;}
+	public Gtk.ScrolledWindow ScrolledWindow {
+		get {return scrolledwindow1;}
+		set {scrolledwindow1 = value;}
+	}
+	public Mono.TextEditor.TextEditor CommandTextEditor {
+		get {return texteditor;}
 	}
 	
 	public MainWindow (string [] args): base (Gtk.WindowType.Toplevel)
 	{
 		Build ();
+		// Had to add this here, as Setic didn't like it
+		texteditor = new Mono.TextEditor.TextEditor();
+		ScrolledWindow.Add(texteditor);
+		ScrolledWindow.ShowAll();
+		// Setup clipboard, and Gui:
 		clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
 		DocumentNotebook.CurrentPage = 0;
-        //options = TextEditorOptions()
-        //self.textview = TextEditor(Options=options)
-        CommandTextArea.Options.ShowFoldMargin = false;
-        CommandTextArea.Options.ShowIconMargin = false;
-        CommandTextArea.Options.ShowInvalidLines = false;
-        CommandTextArea.Options.ShowLineNumberMargin = false; // option
-        CommandTextArea.Options.TabsToSpaces = true;
-        CommandTextArea.Options.HighlightMatchingBracket = true;
+		// Set optional items of TextArea
+        CommandTextEditor.Options.ShowFoldMargin = false;
+        CommandTextEditor.Options.ShowIconMargin = false;
+        CommandTextEditor.Options.ShowInvalidLines = false;
+        CommandTextEditor.Options.ShowLineNumberMargin = false; // option
+        CommandTextEditor.Options.TabsToSpaces = true;
+        CommandTextEditor.Options.HighlightMatchingBracket = true;
+        
         try {
-            CommandTextArea.Document.MimeType = String.Format("text/x-{0}", "python");
+            CommandTextEditor.Document.MimeType = String.Format("text/x-{0}", "python");
 		} catch {
             // pass
 		}
@@ -215,19 +225,96 @@ public partial class MainWindow: Gtk.Window
 	
 	protected virtual void OnCopyActionActivated (object sender, System.EventArgs e)
 	{
-		Focus.GetClipboard(Gdk.Atom.Intern("CLIPBOARD", false)).WaitForText();
+		if (Focus is Mono.TextEditor.TextEditor) {
+			string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+			if (text != null)
+				clipboard.Text = text;
+		} else if (Focus is Gtk.TextView) {
+			((Gtk.TextView)Focus).Buffer.CopyClipboard(clipboard);
+		}
 	}
 	
 	protected virtual void OnPasteActionActivated (object sender, System.EventArgs e)
 	{
-		//if (Focus is Gtk.TextView) 
-			//((Gtk.TextView)Focus) = clipboard.WaitForText();
+		if (Focus is Mono.TextEditor.TextEditor) {
+			string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+			if (text != null)
+				((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+			((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(clipboard.WaitForText());
+		} else if (Focus is Gtk.TextView) {
+			((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
+		}
+	}
+	
+	protected virtual void OnCutActionActivated (object sender, System.EventArgs e)
+	{
+		if (Focus is Mono.TextEditor.TextEditor) {
+			string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+			if (text != null)
+				clipboard.Text = text;
+			((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+		} else if (Focus is Gtk.TextView) {
+			((Gtk.TextView)Focus).Buffer.CutClipboard(clipboard, true);
+		}
+	}
+	
+	protected virtual void OnUndoActionActivated (object sender, System.EventArgs e)
+	{
+		if (Focus is Mono.TextEditor.TextEditor) {
+			Mono.TextEditor.MiscActions.Undo(CommandTextEditor.GetTextEditorData());
+		}
+	}
+	
+	protected virtual void OnRedoActionActivated (object sender, System.EventArgs e)
+	{
+		if (Focus is Mono.TextEditor.TextEditor) {
+			Mono.TextEditor.MiscActions.Redo(CommandTextEditor.GetTextEditorData());
+		}
 	}
 	
 	protected virtual void OnSelectAllActionActivated (object sender, System.EventArgs e)
 	{
-		//
+		if (Focus is Mono.TextEditor.TextEditor) {
+			Mono.TextEditor.SelectionActions.SelectAll(CommandTextEditor.GetTextEditorData());
+		} else if (Focus is Gtk.TextView) {
+			Gtk.TextView textview = (Gtk.TextView)Focus;
+			textview.Buffer.SelectRange(textview.Buffer.StartIter, textview.Buffer.EndIter);
+		}
 	}
+	
+	protected virtual void OnIndentActionActivated (object sender, System.EventArgs e)
+	{
+		if (Focus is Mono.TextEditor.TextEditor) {
+			Mono.TextEditor.MiscActions.IndentSelection(CommandTextEditor.GetTextEditorData());
+		} 
+	}
+	
+	protected virtual void OnUnindentActionActivated (object sender, System.EventArgs e)
+	{
+		if (Focus is Mono.TextEditor.TextEditor) {
+			Mono.TextEditor.MiscActions.RemoveIndentSelection(CommandTextEditor.GetTextEditorData());
+		} 
+	}
+	
+	protected virtual void OnCommentRegionActionActivated (object sender, System.EventArgs e)
+	{
+	}
+	
+	protected virtual void OnUncommentRegionActionActivated (object sender, System.EventArgs e)
+	{
+	}
+	
+	protected virtual void OnButton4ButtonPressEvent (object o, Gtk.ButtonPressEventArgs args)
+	{
+	}
+	
+	protected virtual void OnButton4Clicked (object sender, System.EventArgs e)
+	{
+		System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
+	}
+	
+	
+	
 	
 	
 	
