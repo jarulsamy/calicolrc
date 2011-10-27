@@ -4,30 +4,30 @@ namespace Calico
 {
 	public class Document
 	{
-		public string Language;
-		public string Filename;
-		public Document document;		
-		public Gtk.ScrolledWindow Widget;
-		public Gtk.Widget Tab; // label for notebook page
-		public Gtk.Button CloseButton; // tab close button
+		public string language;
+		public string filename;
+		public Document document;
+		public Gtk.ScrolledWindow widget;
+		public Gtk.Widget tab_label; // label for notebook page
+		public Gtk.Button close_button; // tab close button
 		
 		public Document (string filename, string language) : base() 
 		{
-			Filename = filename;
-			Language = language;
-			Widget = new Gtk.ScrolledWindow();
-			string name = System.IO.Path.GetFileName(Filename);
-			Tab = new Gtk.HBox();			
+			this.filename = filename;
+			this.language = language;
+			widget = new Gtk.ScrolledWindow();
+			string name = System.IO.Path.GetFileName(filename);
+			tab_label = new Gtk.HBox();			
 			Gtk.Label myLabel = new Gtk.Label(name);
-			((Gtk.HBox)Tab).Add(myLabel);
-			CloseButton = new Gtk.Button();
+			((Gtk.HBox)tab_label).Add(myLabel);
+			close_button = new Gtk.Button();
 			Gtk.Image img = new Gtk.Image();
-	        CloseButton.Relief = Gtk.ReliefStyle.None;
+	        close_button.Relief = Gtk.ReliefStyle.None;
         	img = new Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu);
-			CloseButton.Add(img);
-			((Gtk.HBox)Tab).Add(CloseButton);
-			myLabel.TooltipText = Filename;
-			Tab.ShowAll();
+			close_button.Add(img);
+			((Gtk.HBox)tab_label).Add(close_button);
+			myLabel.TooltipText = filename;
+			tab_label.ShowAll();
 		}		
 		public bool GotoLine(int lineno) {
 			return true;
@@ -56,9 +56,9 @@ namespace Calico
 
 			//Mono.TextEditor.TextEditorOptions options = new Mono.TextEditor.TextEditorOptions();
 			texteditor = new Mono.TextEditor.TextEditor();
-			texteditor.Document.MimeType = String.Format("text/x-{0}", Language);
-			Widget.Add(texteditor);
-			Widget.ShowAll();
+			texteditor.Document.MimeType = String.Format("text/x-{0}", language);
+			widget.Add(texteditor);
+			widget.ShowAll();
 		}
 		
 		public override void Configure() {

@@ -22,6 +22,9 @@ public partial class MainWindow: Gtk.Window
 	public Clipboard clipboard;
 	private Mono.TextEditor.TextEditor _shell;
 	public Dictionary<Gtk.Widget,Document> DocumentMap = new Dictionary<Gtk.Widget,Document>();
+	public Dictionary<string,Engine> EngineMap;
+	public string CurrentLanguage = "python";
+	public bool Debug = false;
 	public Document CurrentDocument {
 		get {
 			int page_num = DocumentNotebook.Page;
@@ -42,9 +45,14 @@ public partial class MainWindow: Gtk.Window
 	public Mono.TextEditor.TextEditor Shell {
 		get {return _shell;}
 	}
+	public Gtk.TextView Output {
+		get {return textview1;}
+	}
 	
-	public MainWindow (string [] args): base (Gtk.WindowType.Toplevel)
+	public MainWindow (string [] args, Dictionary<string,Engine> EngineMap, bool Debug): base (Gtk.WindowType.Toplevel)
 	{
+		this.EngineMap = EngineMap;
+		this.Debug = Debug;
 		Build ();
 		// Had to add this here, as Setic didn't like it
 		_shell = new Mono.TextEditor.TextEditor();
@@ -62,7 +70,7 @@ public partial class MainWindow: Gtk.Window
         Shell.Options.HighlightMatchingBracket = true;
         
         try {
-            Shell.Document.MimeType = String.Format("text/x-{0}", "python");
+            Shell.Document.MimeType = String.Format("text/x-{0}", CurrentLanguage);
 		} catch {
             // pass
 		}
@@ -112,7 +120,7 @@ public partial class MainWindow: Gtk.Window
                 Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
 				if (DocumentMap.ContainsKey(npage)) {
 					Document npage_document = DocumentMap[npage];
-	                if (npage_document.Filename == filename) {
+	                if (npage_document.filename == filename) {
 	                    DocumentNotebook.CurrentPage = page_num;
 	                    add_it = false;
 	                    break;
@@ -125,10 +133,10 @@ public partial class MainWindow: Gtk.Window
 		} else { // make a no-named document of type language
             if (language == null) {
                 // FIXME: issue with getting document, before it is ready
-                language = "python";
+                language = CurrentLanguage;
                 if (CurrentDocument != null) {
-                    if (CurrentDocument.Language != null) {
-                        language = CurrentDocument.Language;
+                    if (CurrentDocument.language != null) {
+                        language = CurrentDocument.language;
 					}
 				}
 			}
@@ -136,10 +144,11 @@ public partial class MainWindow: Gtk.Window
 		}
         if (add_it) {
             //self.calico.on_action("opened-document", filename=filename);
-            int page_num = DocumentNotebook.AppendPage(page.Widget, page.Tab);
-            DocumentNotebook.SetTabReorderable(page.Widget, true);
+            int page_num = DocumentNotebook.AppendPage(page.widget, page.tab_label);
+			DocumentMap[page.widget] = page;
+            DocumentNotebook.SetTabReorderable(page.widget, true);
             DocumentNotebook.CurrentPage = page_num;
-			page.CloseButton.Clicked += delegate {TryToClose(page);};
+			page.close_button.Clicked += delegate {TryToClose(page);};
             if (filename != null) {
                 UpdateRecentFiles(filename);
 			}
@@ -152,7 +161,7 @@ public partial class MainWindow: Gtk.Window
 	
 	public void TryToClose(Document document) {
 		if (document.Close()) {
-			int page_num = DocumentNotebook.PageNum(document.Widget);
+			int page_num = DocumentNotebook.PageNum(document.widget);
 			DocumentNotebook.RemovePage(page_num);
 		}
 	}
@@ -162,7 +171,7 @@ public partial class MainWindow: Gtk.Window
 		
 	public Document MakeDocument(string filename) {
 		// FIXME: get language from defaults
-		string language = "python";
+		string language = CurrentLanguage;
 		if (filename == null) {
 			filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
 		}
@@ -171,7 +180,7 @@ public partial class MainWindow: Gtk.Window
 
 	public Document MakeDocument(string filename, string language) {
 		if (language == null) {
-			language = "python";
+			language = CurrentLanguage;
 		}
 		if (filename == null) {
 			filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
@@ -236,16 +245,6 @@ public partial class MainWindow: Gtk.Window
 	{
 		if (Close()) {
 			Application.Quit ();
-		}
-	}
-	
-	protected virtual void OnNotebookDocsSwitchPage (object o, Gtk.SwitchPageArgs args)
-	{
-		if (CurrentDocument is Document) {
-			prompt.Text = CurrentDocument.Language;
-			status_langauge.Text = Extensions.ToTitleCase(prompt.Text);
-		} else { // Home, and Shell
-			Console.WriteLine(((Gtk.Notebook)o).Page);
 		}
 	}
 	
@@ -345,10 +344,128 @@ public partial class MainWindow: Gtk.Window
 		System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
 	}
 	
+	[GLib.ConnectBeforeAttribute]
 	protected virtual void OnKeyPressEvent (object o, Gtk.KeyPressEventArgs args)
 	{
-		// FIXME: on escape, if running stop; clear command entry if focus
-		// FIXME: if in command entry shell
+		if (Focus == Shell) { // Shell handler
+			// control+c, if nothing is selected, else it is a copy
+			if (args.Event.Key == Gdk.Key.c && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+				string text = Shell.SelectedText;
+				if (text == null) {
+					Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+					Shell.DeleteSelectedText();
+					args.RetVal = true;
+				}
+			} else if (args.Event.Key == Gdk.Key.Escape) { // escape with selected, delete; else delete all
+				string text = Shell.SelectedText;
+				if (text == null) {
+					Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+				}
+				Shell.DeleteSelectedText();
+				args.RetVal = true;
+			} else if (args.Event.Key == Gdk.Key.Return) {
+                // if control key is down, too, just insert a return
+				bool force = false;
+				string completion = "";
+                if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                    Shell.InsertAtCaret("\n");
+                    args.RetVal = true;
+					return;
+				}
+                // if cursor in middle, insert a Return
+                Mono.TextEditor.Caret caret = Shell.Caret;
+                int line = caret.Line;
+                int line_count = Shell.Document.LineCount;
+                if (line != line_count - 1 && ! force) {
+                    completion = null;
+                    args.RetVal = false;
+				}
+                // else, execute text
+                // extra line at end signals ready_to_execute:
+                string text = Shell.Document.Text;
+                if (text == "") {
+                    completion = null;
+                    args.RetVal = true; // nothing to do, but handled
+				} else if (EngineMap[CurrentLanguage].ReadyToExecute(text) || force) {
+                    //history.last(text.rstrip());
+                    //history.add("");
+                    bool results = Execute(text.TrimEnd(), CurrentLanguage);
+                    if (results) {
+						Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+                        Mono.TextEditor.DeleteActions.DeleteSelection(Shell.GetTextEditorData());
+                        Shell.GrabFocus();
+                        Shell.Caret.Line = 0;
+                        Shell.Caret.Column = 0;
+					}
+                    completion = null;
+                    args.RetVal = true;
+				}
+			}
+		} else if (Focus is Mono.TextEditor.TextEditor) { // Editor, handle : on end of line
+		}
+	}
+	
+	public bool Execute(string text, string language) {
+        //if (executeThread) {
+        //    return false;
+		//}
+        string prompt = String.Format("{0}> ", CurrentLanguage);
+        int count = 2;
+        foreach (string line in text.Split('\n')) {
+            Write("{0}", prompt); // black
+            WriteLine("{0}", line); // blue
+            prompt = String.Format(".....{0}>", count);
+            count += 1;
+		}
+        // pragma/meta commands, start with #;
+        if (text == "") {
+            return false;
+		} 
+        this.CurrentLanguage = language;
+        //self.execute_in_background(text);
+        return true;
+	}
+	
+	public void Write(string format, params object [] args) {
+		if (Debug) {
+			Console.Write(format, args);
+		} else {
+			Output.Buffer.InsertAtCursor(String.Format(format, args));
+			ScrollToEnd();
+		}
+	}
+	
+	public void WriteLine(string format, params object [] args) {
+		if (Debug) {
+			Console.WriteLine(format, args);
+		} else {
+			Output.Buffer.InsertAtCursor(String.Format(format, args) + "\n");
+			ScrollToEnd();
+		}
+	}
+	
+	public void ScrollToEnd() {
+		Gtk.TextIter end = Output.Buffer.EndIter;
+		Gtk.TextMark mark = Output.Buffer.GetMark("insert");
+		Output.Buffer.MoveMark(mark, end);
+		Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+	}
+	
+	protected virtual void OnNotebookDocsSwitchPage (object o, Gtk.SwitchPageArgs args)
+	{
+		if (CurrentDocument != null) {
+			// FIXME: Turn some things on
+			prompt.Text = CurrentDocument.language;
+			status_langauge.Text = Extensions.ToTitleCase(prompt.Text);
+			CurrentDocument.widget.Child.GrabFocus();
+		} else if (DocumentNotebook.Page == 0) { // Home
+			// FIXME: Turn some things off
+		} else if (DocumentNotebook.Page == 1) { // Shell
+			// FIXME: Turn some things off
+			Shell.GrabFocus();
+		} else { // Some other page
+			// FIXME: Turn some things off
+		}
 	}
 	
 	public Gtk.Notebook DocumentNotebook {

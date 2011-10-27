@@ -31,17 +31,28 @@ namespace Calico
 			foreach (ICommand cmd in AddinManager.GetExtensionObjects(typeof(ICommand)))
 				cmd.Run();
 			*/
+			
+			Dictionary<string,Engine> EngineMap = new Dictionary<string,Engine>();
+			// for language in directory, load languages:
+			EngineMap["python"] = new Engine();
+
+			
 			if (((IList<string>)args).Contains("--help")) {
 				Usage();
 			} else if (((IList<string>)args).Contains("--version")) {
 			    Print("{0}", Version);
 			} else {
+				// Ok, we are going to run this thing!
+				bool Debug = false;
 				if (! ((IList<string>)args).Contains("--debug-handler")) {
 					GLib.ExceptionManager.UnhandledException += HandleException;
 				}
+				if (((IList<string>)args).Contains("--debug")) {
+					Debug = true;
+				}
 				// If Gui, let's go:
 				Application.Init();
-				MainWindow win = new MainWindow(args);
+				MainWindow win = new MainWindow(args, EngineMap, Debug);
 				win.Show();
 				Application.Run();
 			}

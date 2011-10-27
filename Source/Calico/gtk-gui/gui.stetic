@@ -263,6 +263,7 @@
     <child>
       <widget class="Gtk.VBox" id="vbox1">
         <property name="MemberName" />
+        <property name="BorderWidth">5</property>
         <child>
           <widget class="Gtk.MenuBar" id="menubar2">
             <property name="MemberName" />
@@ -482,13 +483,14 @@
                                 <property name="MemberName" />
                                 <property name="Spacing">6</property>
                                 <child>
-                                  <widget class="Gtk.Button" id="button10">
+                                  <widget class="Gtk.Button" id="history_up">
                                     <property name="MemberName" />
-                                    <property name="CanFocus">True</property>
+                                    <property name="Sensitive">False</property>
                                     <property name="Type">TextAndIcon</property>
                                     <property name="Icon">stock:gtk-go-up Menu</property>
                                     <property name="Label" translatable="yes" />
                                     <property name="UseUnderline">True</property>
+                                    <property name="FocusOnClick">False</property>
                                   </widget>
                                   <packing>
                                     <property name="Position">0</property>
@@ -498,13 +500,14 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="Gtk.Button" id="button11">
+                                  <widget class="Gtk.Button" id="history_down">
                                     <property name="MemberName" />
-                                    <property name="CanFocus">True</property>
+                                    <property name="Sensitive">False</property>
                                     <property name="Type">TextAndIcon</property>
                                     <property name="Icon">stock:gtk-go-down Menu</property>
                                     <property name="Label" translatable="yes" />
                                     <property name="UseUnderline">True</property>
+                                    <property name="FocusOnClick">False</property>
                                   </widget>
                                   <packing>
                                     <property name="Position">1</property>
@@ -593,7 +596,8 @@
                         <property name="ShowScrollbars">True</property>
                         <property name="Editable">False</property>
                         <property name="AcceptsTab">False</property>
-                        <property name="Text" translatable="yes">The Calico Project, Version 2.0.0</property>
+                        <property name="Text" translatable="yes">The Calico Project, Version 2.0.0
+</property>
                       </widget>
                     </child>
                   </widget>
