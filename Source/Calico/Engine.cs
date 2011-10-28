@@ -18,6 +18,10 @@ namespace Calico
 			return true;
 		}
 		
+		public virtual bool execute(string text) {
+			return true;
+		}
+		
 		public virtual void setup() {
 		}
 		

@@ -432,8 +432,12 @@ public partial class MainWindow: Gtk.Window
             return false;
 		} 
         this.CurrentLanguage = language;
-        //self.execute_in_background(text);
+        ExecuteInBackground(text);
         return true;
+	}
+	
+	public void ExecuteInBackground(string text) {
+		manager.engines[CurrentLanguage].execute(text);
 	}
 	
 	public void Write(string format, params object [] args) {

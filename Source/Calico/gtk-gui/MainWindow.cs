@@ -163,11 +163,11 @@ public partial class MainWindow
 		this.RubyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Ruby");
 		w1.Add (this.RubyAction, null);
 		this.SchemeAction = new global::Gtk.RadioAction ("SchemeAction", global::Mono.Unix.Catalog.GetString ("Scheme"), null, null, 0);
-		this.SchemeAction.Group = this.PythonAction.Group;
+		this.SchemeAction.Group = this.RubyAction.Group;
 		this.SchemeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Scheme");
 		w1.Add (this.SchemeAction, null);
 		this.JigsawAction = new global::Gtk.RadioAction ("JigsawAction", global::Mono.Unix.Catalog.GetString ("Jigsaw"), null, null, 0);
-		this.JigsawAction.Group = this.PythonAction.Group;
+		this.JigsawAction.Group = this.SchemeAction.Group;
 		this.JigsawAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Jigsaw");
 		w1.Add (this.JigsawAction, null);
 		this.yesAction1 = new global::Gtk.Action ("yesAction1", global::Mono.Unix.Catalog.GetString ("Execute Script"), null, "gtk-yes");

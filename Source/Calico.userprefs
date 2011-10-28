@@ -2,11 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="../languages/Python/CalicoPython.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="52" Column="2" />
+      <File FileName="Calico/MainWindow.cs" Line="440" Column="50" />
       <File FileName="Calico/Document.cs" Line="17" Column="15" />
-      <File FileName="Calico/Engine.cs" Line="95" Column="7" />
+      <File FileName="Calico/Engine.cs" Line="22" Column="16" />
       <File FileName="Calico/Main.cs" Line="50" Column="66" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="27" Column="86" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="76" Column="19" />
+      <File FileName="Calico/DLRLanguage.cs" Line="6" Column="42" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -30,8 +31,8 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/home/dblank/Calico/Source/Calico/MainWindow.cs" line="96" />
-      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="22" />
-      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="64" />
+      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="77" />
+      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="119" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
