@@ -1,10 +1,10 @@
-//using Mono.Addins;
 using System;
 using Gtk;
 using System.Collections.Generic; // IList
 using Mono.Unix; 
+using System.IO;
+using System.Reflection;
 
-//[assembly:AddinRoot ("Calico", "1.0")]
 namespace Calico
 {
 	class MainClass
@@ -23,36 +23,52 @@ namespace Calico
     		}
 			Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
 			
-			/*
-			// Addins:
-			AddinManager.Initialize();
-			// Detect changes in add-ins
-			AddinManager.Registry.Update(); 			
-			foreach (ICommand cmd in AddinManager.GetExtensionObjects(typeof(ICommand)))
-				cmd.Run();
-			*/
-			
-			Dictionary<string,Engine> EngineMap = new Dictionary<string,Engine>();
+			Dictionary<string,Language> languages = new Dictionary<string,Language>();
 			// for language in directory, load languages:
-			EngineMap["python"] = new Engine();
-
+			/*
+		    DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "../languages"));
+        	foreach (DirectoryInfo d in dir.GetDirectories("*"))
+        	{
+	        	foreach (FileInfo f in d.GetFiles("Calico*.dll"))
+    	    	{
+					Print("Loading {0}...", f.FullName);
+					Assembly assembly = Assembly.LoadFrom(f.FullName);
+					if (assembly != null) {
+						foreach (Type type in assembly.GetTypes()) {
+							MethodInfo method = type.GetMethod("RegisterLanguage");
+							if (method != null) {
+								Language language = (Language)method.Invoke(type, new object[]{});
+								languages[language.name] = language;
+								Print("Registering language...'{0}'", language.name);
+								break;
+							}
+						}
+					}
+				}
+        	}
+        	*/
+			languages["python"] = CalicoPythonLanguage.RegisterLanguage();
 			
+
+			// Global settings:
+			bool Debug = false;
+			if (! ((IList<string>)args).Contains("--debug-handler")) {
+				GLib.ExceptionManager.UnhandledException += HandleException;
+			} 
+			if (((IList<string>)args).Contains("--debug")) {
+				Debug = true;
+			}
+			// Process some commands here:
 			if (((IList<string>)args).Contains("--help")) {
 				Usage();
 			} else if (((IList<string>)args).Contains("--version")) {
-			    Print("{0}", Version);
+			    Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
+			    Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
 			} else {
 				// Ok, we are going to run this thing!
-				bool Debug = false;
-				if (! ((IList<string>)args).Contains("--debug-handler")) {
-					GLib.ExceptionManager.UnhandledException += HandleException;
-				}
-				if (((IList<string>)args).Contains("--debug")) {
-					Debug = true;
-				}
 				// If Gui, let's go:
 				Application.Init();
-				MainWindow win = new MainWindow(args, EngineMap, Debug);
+				MainWindow win = new MainWindow(args, languages, Debug);
 				win.Show();
 				Application.Run();
 			}
@@ -80,7 +96,7 @@ namespace Calico
 		
 		public static void Usage() {
 		    Print("");
-		    Print(_("Calico Project, Version {0}, on {1}"), 
+		    Print(_("Calico Project, version {0} on {1}"), 
 				  Version,
 		          System.Environment.OSVersion.VersionString);
 		    Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
@@ -97,12 +113,4 @@ namespace Calico
 		    Print("");
 		}
 	}
-
-	/*
-	[TypeExtensionPoint]
-	public interface ICommand
-	{
-		void Run ();
-	}
-	*/
 }

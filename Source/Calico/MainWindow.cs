@@ -22,7 +22,8 @@ public partial class MainWindow: Gtk.Window
 	public Clipboard clipboard;
 	private Mono.TextEditor.TextEditor _shell;
 	public Dictionary<Gtk.Widget,Document> DocumentMap = new Dictionary<Gtk.Widget,Document>();
-	public Dictionary<string,Engine> EngineMap;
+	public Dictionary<string,Language> LanguageMap;
+	public EngineManager manager;
 	public string CurrentLanguage = "python";
 	public bool Debug = false;
 	public Document CurrentDocument {
@@ -49,11 +50,11 @@ public partial class MainWindow: Gtk.Window
 		get {return textview1;}
 	}
 	
-	public MainWindow (string [] args, Dictionary<string,Engine> EngineMap, bool Debug): base (Gtk.WindowType.Toplevel)
+	public MainWindow (string [] args, Dictionary<string,Language> LanguageMap, bool Debug): base (Gtk.WindowType.Toplevel)
 	{
-		this.EngineMap = EngineMap;
 		this.Debug = Debug;
-		Build ();
+		this.LanguageMap = LanguageMap;
+		Build();
 		// Had to add this here, as Setic didn't like it
 		_shell = new Mono.TextEditor.TextEditor();
 		ScrolledWindow.Add(_shell);
@@ -74,6 +75,15 @@ public partial class MainWindow: Gtk.Window
 		} catch {
             // pass
 		}
+		
+		// Now, let's load engines
+		manager = new EngineManager(new Project());
+		foreach (string name in LanguageMap.Keys) {
+			manager.register(LanguageMap[name]);
+			manager.engines[name].set_manager(manager);
+		}
+		manager.setup();
+		manager.start();
 		
 		List<string> files = new List<string>();
 		foreach (string arg in args) {
@@ -386,7 +396,7 @@ public partial class MainWindow: Gtk.Window
                 if (text == "") {
                     completion = null;
                     args.RetVal = true; // nothing to do, but handled
-				} else if (EngineMap[CurrentLanguage].ReadyToExecute(text) || force) {
+				} else if (manager.engines[CurrentLanguage].ReadyToExecute(text) || force) {
                     //history.last(text.rstrip());
                     //history.add("");
                     bool results = Execute(text.TrimEnd(), CurrentLanguage);
