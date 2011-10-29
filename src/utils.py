@@ -412,6 +412,7 @@ class MyEntry(Gtk.Entry):
 class SearchBar(Gtk.HBox):
     def set_calico(self, calico):
         self.calico = calico
+        self.entry.set_calico(self.calico)
 
     def __init__(self, *args, **kwargs):
         self.editor = None
