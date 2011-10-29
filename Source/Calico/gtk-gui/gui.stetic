@@ -9,7 +9,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="MainWindow" design-size="529 558">
+  <widget class="Gtk.Window" id="MainWindow" design-size="607 558">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -261,6 +261,15 @@
         <property name="ShortLabel" translatable="yes">Shell</property>
         <signal name="Activated" handler="OnShellActionActivated" />
       </action>
+      <action id="PythonAction1">
+        <property name="Type">Radio</property>
+        <property name="Label" translatable="yes">Python</property>
+        <property name="ShortLabel" translatable="yes">Python</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <property name="Value">0</property>
+        <property name="Group">group1</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -301,12 +310,7 @@
                 <node type="Menuitem" action="UncommentRegionAction" />
               </node>
               <node type="Menu" action="ScriptAction">
-                <node type="Menu" action="LanguageAction">
-                  <node type="Menuitem" action="PythonAction" />
-                  <node type="Menuitem" action="RubyAction" />
-                  <node type="Menuitem" action="SchemeAction" />
-                  <node type="Menuitem" action="JigsawAction" />
-                </node>
+                <node type="Menu" action="LanguageAction" />
                 <node type="Menuitem" action="yesAction1" />
                 <node type="Menuitem" action="noAction" />
                 <node type="Menuitem" action="ShellAction" />

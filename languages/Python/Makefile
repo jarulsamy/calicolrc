@@ -1,5 +1,5 @@
 
-CalicoPython.dll: CalicoPython.cs 
+CalicoPython.dll: CalicoPython.cs ../../bin/Calico.exe
 	gmcs CalicoPython.cs \
 		-lib:../../bin \
 		-r:Calico.exe \

@@ -81,6 +81,8 @@ public partial class MainWindow
 
 	private global::Gtk.Action ShellAction;
 
+	private global::Gtk.RadioAction PythonAction1;
+
 	private global::Gtk.VBox vbox1;
 
 	private global::Gtk.MenuBar menubar2;
@@ -235,7 +237,7 @@ public partial class MainWindow
 		this.SchemeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Scheme");
 		w1.Add (this.SchemeAction, null);
 		this.JigsawAction = new global::Gtk.RadioAction ("JigsawAction", global::Mono.Unix.Catalog.GetString ("Jigsaw"), null, null, 0);
-		this.JigsawAction.Group = this.PythonAction.Group;
+		this.JigsawAction.Group = this.SchemeAction.Group;
 		this.JigsawAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Jigsaw");
 		w1.Add (this.JigsawAction, null);
 		this.yesAction1 = new global::Gtk.Action ("yesAction1", global::Mono.Unix.Catalog.GetString ("Execute Script"), null, "gtk-yes");
@@ -260,6 +262,10 @@ public partial class MainWindow
 		this.ShellAction = new global::Gtk.Action ("ShellAction", global::Mono.Unix.Catalog.GetString ("Shell"), null, null);
 		this.ShellAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Shell");
 		w1.Add (this.ShellAction, "<Mod2>F7");
+		this.PythonAction1 = new global::Gtk.RadioAction ("PythonAction1", global::Mono.Unix.Catalog.GetString ("Python"), null, null, 0);
+		this.PythonAction1.Group = this.SchemeAction.Group;
+		this.PythonAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("Python");
+		w1.Add (this.PythonAction1, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -270,7 +276,7 @@ public partial class MainWindow
 		this.vbox1.Name = "vbox1";
 		this.vbox1.BorderWidth = ((uint)(5));
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='newAction1' action='newAction1'/><menuitem name='openAction1' action='openAction1'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'><menuitem name='PythonAction' action='PythonAction'/><menuitem name='RubyAction' action='RubyAction'/><menuitem name='SchemeAction' action='SchemeAction'/><menuitem name='JigsawAction' action='JigsawAction'/></menu><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='newAction1' action='newAction1'/><menuitem name='openAction1' action='openAction1'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 		this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 		this.menubar2.Name = "menubar2";
 		this.vbox1.Add (this.menubar2);
@@ -587,7 +593,7 @@ public partial class MainWindow
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
 		}
-		this.DefaultWidth = 529;
+		this.DefaultWidth = 607;
 		this.DefaultHeight = 558;
 		this.Show ();
 		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);

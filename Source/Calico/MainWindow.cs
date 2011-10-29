@@ -39,18 +39,19 @@ public static class Extensions {
 public partial class MainWindow : Gtk.Window {
     public Clipboard clipboard;
     private Mono.TextEditor.TextEditor _shell;
-    public Dictionary<Gtk.Widget, Document> DocumentMap = new Dictionary<Gtk.Widget, Document>();
-    public Dictionary<string, Language> LanguageMap;
+    public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
+    public Dictionary<string, Language> languages;
+    public Dictionary<string, Gtk.RadioAction> actions = new Dictionary<string, Gtk.RadioAction>();
     public EngineManager manager;
-    public string CurrentLanguage = "python";
+    public string CurrentLanguage = "python"; // FIXME: get from defaults
     public bool Debug = false;
     public Document CurrentDocument {
         get {
             int page_num = DocumentNotebook.Page;
             if (page_num > 1) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                if (DocumentMap.ContainsKey(widget))
-                    return DocumentMap[widget];
+                if (documents.ContainsKey(widget))
+                    return documents[widget];
                 else
                     return null;
             } else
@@ -70,7 +71,7 @@ public partial class MainWindow : Gtk.Window {
 
     public MainWindow(string[] args, Dictionary<string, Language> LanguageMap, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
-        this.LanguageMap = LanguageMap;
+        this.languages = LanguageMap;
         Build();
         // Had to add this here, as Setic didn't like it
         _shell = new Mono.TextEditor.TextEditor();
@@ -79,6 +80,25 @@ public partial class MainWindow : Gtk.Window {
         // Setup clipboard, and Gui:
         clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
+        // Languages to menu items:
+        GLib.SList actiongroup =null;
+        Gtk.ActionGroup w1 = new global::Gtk.ActionGroup ("Default");
+        foreach (KeyValuePair<string,Language> pair in LanguageMap) {
+            string name = pair.Key;
+            Language language = pair.Value;
+            actions[name] = new Gtk.RadioAction("PythonAction",
+                                                Mono.Unix.Catalog.GetString (language.proper_name),
+                                                null, null, 0);
+            if (actiongroup == null)
+                actiongroup = new global::GLib.SList (global::System.IntPtr.Zero);
+            actions[name].Group = actiongroup;
+            actions[name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
+            w1.Add(actions[name], null);
+        }
+        // FIXME: add dynamic menus
+        //UIManager.InsertActionGroup(w1, 0);
+        //UIManager.GetAction("/LanguageAction");
+        //AddAccelGroup (UIManager.AccelGroup);
         // Set optional items of TextArea
         Shell.Options.ShowFoldMargin = false;
         Shell.Options.ShowIconMargin = false;
@@ -145,8 +165,8 @@ public partial class MainWindow : Gtk.Window {
             // Page 0 is the Help page; Page 1 is Shell
             for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
-                if (DocumentMap.ContainsKey(npage)) {
-                    Document npage_document = DocumentMap[npage];
+                if (documents.ContainsKey(npage)) {
+                    Document npage_document = documents[npage];
                     if (npage_document.filename == filename) {
                         DocumentNotebook.CurrentPage = page_num;
                         add_it = false;
@@ -174,7 +194,7 @@ public partial class MainWindow : Gtk.Window {
         if (add_it) {
             //self.calico.on_action("opened-document", filename=filename);
             int page_num = DocumentNotebook.AppendPage(page.widget, page.tab_label);
-            DocumentMap[page.widget] = page;
+            documents[page.widget] = page;
             DocumentNotebook.SetTabReorderable(page.widget, true);
             DocumentNotebook.CurrentPage = page_num;
             page.close_button.Clicked += delegate { TryToClose(page); };

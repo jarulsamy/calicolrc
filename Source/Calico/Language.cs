@@ -23,10 +23,12 @@ namespace Calico {
 
     public class Language {
         public string name;
+        public string proper_name;
         public string[] extensions;
 
-        public Language(string language, string[] extensions) {
+        public Language(string language, string proper, string[] extensions) {
             this.name = language;
+            this.proper_name = proper;
             this.extensions = extensions;
         }
 

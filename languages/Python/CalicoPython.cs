@@ -130,7 +130,9 @@ public class CalicoPythonEngine : DLREngine {
 
 public class CalicoPythonLanguage : Language {
 
-    public CalicoPythonLanguage(string name, string [] extensions) : base(name, extensions) {
+    public CalicoPythonLanguage(string name, string proper, 
+				string [] extensions) : 
+    base(name, proper, extensions) {
     }
 
     public override Engine make_engine(EngineManager manager) {
@@ -138,6 +140,8 @@ public class CalicoPythonLanguage : Language {
     }
 
     public static new Language RegisterLanguage() {
-        return new CalicoPythonLanguage("python", new string[] { "py", "pyw" });
+        return new CalicoPythonLanguage("python", 
+					"Python",
+					new string[] { "py", "pyw" });
     }
 }
