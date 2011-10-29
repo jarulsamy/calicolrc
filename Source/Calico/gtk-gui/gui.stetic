@@ -16,12 +16,10 @@
         <property name="Label" translatable="yes">File</property>
         <property name="ShortLabel" translatable="yes">File</property>
       </action>
-      <action id="newAction1">
+      <action id="NewAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes" />
+        <property name="Label" translatable="yes">New</property>
         <property name="ShortLabel" translatable="yes">Open</property>
-        <property name="StockId">gtk-new</property>
-        <signal name="Activated" handler="OnNewAction1Activated" />
       </action>
       <action id="newAction">
         <property name="Type">Action</property>
@@ -270,6 +268,11 @@
         <property name="Value">0</property>
         <property name="Group">group1</property>
       </action>
+      <action id="DummyAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Dummy</property>
+        <property name="ShortLabel" translatable="yes">Dummy</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -285,7 +288,7 @@
             <property name="MemberName" />
             <node name="menubar2" type="Menubar">
               <node type="Menu" action="FileAction">
-                <node type="Menuitem" action="newAction1" />
+                <node type="Menu" action="NewAction" />
                 <node type="Menuitem" action="openAction1" />
                 <node type="Separator" />
                 <node type="Menuitem" action="saveAction" />

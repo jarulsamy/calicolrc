@@ -41,7 +41,8 @@ public partial class MainWindow : Gtk.Window {
     private Mono.TextEditor.TextEditor _shell;
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<string, Language> languages;
-    public Dictionary<string, Gtk.RadioAction> actions = new Dictionary<string, Gtk.RadioAction>();
+    public Dictionary<string, Gtk.RadioAction> radio_actions = new Dictionary<string, Gtk.RadioAction>();
+    public Dictionary<string, Gtk.Action> file_actions = new Dictionary<string, Gtk.Action>();
     public EngineManager manager;
     public string CurrentLanguage = "python"; // FIXME: get from defaults
     public bool Debug = false;
@@ -81,24 +82,39 @@ public partial class MainWindow : Gtk.Window {
         clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
         // Languages to menu items:
-        GLib.SList actiongroup =null;
-        Gtk.ActionGroup w1 = new global::Gtk.ActionGroup ("Default");
+        GLib.SList lang_actiongroup =null;
+        GLib.SList file_actiongroup =null;
+        Gtk.ActionGroup w1 = new global::Gtk.ActionGroup("Default");
+        // FIXME: add dynamic menus
+        Gtk.MenuItem lang_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
+        lang_menu.Submenu = new Gtk.Menu();
+        Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
+        file_menu.Submenu = new Gtk.Menu();
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
-            string name = pair.Key;
             Language language = pair.Value;
-            actions[name] = new Gtk.RadioAction("PythonAction",
+            // Language menu:
+            string lang_name = String.Format("{0}LanguageAction", language.name);
+            radio_actions[lang_name] = new Gtk.RadioAction(lang_name,
                                                 Mono.Unix.Catalog.GetString (language.proper_name),
                                                 null, null, 0);
-            if (actiongroup == null)
-                actiongroup = new global::GLib.SList (global::System.IntPtr.Zero);
-            actions[name].Group = actiongroup;
-            actions[name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
-            w1.Add(actions[name], null);
+            if (lang_actiongroup == null)
+                lang_actiongroup = new global::GLib.SList (global::System.IntPtr.Zero);
+            radio_actions[lang_name].Group = lang_actiongroup;
+            radio_actions[lang_name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
+            w1.Add(radio_actions[lang_name], null);
+            Gtk.RadioMenuItem menu = new Gtk.RadioMenuItem(lang_actiongroup, language.proper_name);
+            ((Gtk.Menu)lang_menu.Submenu).Add(menu);
+            // New file menu:
+            string file_name = String.Format("{0}NewAction", language.name);
+            file_actions[file_name] = new Gtk.Action(file_name,
+                                                Mono.Unix.Catalog.GetString (language.proper_name));
+            file_actions[file_name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
+            w1.Add(file_actions[file_name], null);
+            Gtk.MenuItem menu2 = new Gtk.MenuItem(language.proper_name);
+            ((Gtk.Menu)file_menu.Submenu).Add(menu2);
         }
-        // FIXME: add dynamic menus
-        //UIManager.InsertActionGroup(w1, 0);
-        //UIManager.GetAction("/LanguageAction");
-        //AddAccelGroup (UIManager.AccelGroup);
+        lang_menu.Submenu.ShowAll();
+        file_menu.Submenu.ShowAll();
         // Set optional items of TextArea
         Shell.Options.ShowFoldMargin = false;
         Shell.Options.ShowIconMargin = false;
