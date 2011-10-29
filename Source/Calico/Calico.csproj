@@ -130,9 +130,6 @@
     <Compile Include="Document.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Language.cs" />
-    <Compile Include="..\..\languages\Python\CalicoPython.cs">
-      <Link>CalicoPython.cs</Link>
-    </Compile>
     <Compile Include="EngineManager.cs" />
     <Compile Include="DLREngine.cs" />
   </ItemGroup>

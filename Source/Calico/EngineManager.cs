@@ -20,27 +20,26 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-// IList, Dictionary
+using System.Collections.Generic; // IList, Dictionary
+
 namespace Calico {
     public class EngineManager {
         public Project calico;
-        //public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
-        public Dictionary<string, Engine> engines;
-        //public Microsoft.Scripting.Hosting.ScriptRuntime runtime;
-        //public Microsoft.Scripting.Hosting.ScriptScope scope;
+        private Dictionary<string, Engine> engines;
+        public Microsoft.Scripting.Hosting.ScriptScope scope = null;
         public string stderr;
         public string stdout;
         public string stdin;
-
 
         public EngineManager(Project calico) {
             this.calico = calico;
             engines = new Dictionary<string, Engine>();
         }
 
-        //def __getitem__(self, name):
-        //return self.engine[name]
+        public Engine this[string name] {
+            get {return engines[name];}
+            set {engines[name] = value;}
+        }
 
         public string[] get_languages() {
             // FIXME: sort
@@ -51,7 +50,7 @@ namespace Calico {
 
         public void register(Language language) {
             try {
-                engines[language.name] = language.make_engine();
+                engines[language.name] = language.make_engine(this);
             } catch {
                 Console.WriteLine("Skipping language {0}", language.name);
             }
@@ -59,12 +58,12 @@ namespace Calico {
 
         public void setup() {
             foreach (string engine in engines.Keys) {
-                try {
+                //try {
                     engines[engine].setup();
-                } catch {
-                    Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
-                    engines.Remove(engine);
-                }
+                //} catch {
+                //    Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
+                //    engines.Remove(engine);
+                //}
             }
         }
 

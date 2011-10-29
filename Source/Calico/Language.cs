@@ -30,8 +30,8 @@ namespace Calico {
             this.extensions = extensions;
         }
 
-        public virtual Engine make_engine() {
-            return new Engine();
+        public virtual Engine make_engine(EngineManager manager) {
+            return new Engine(manager);
         }
 
         public static Language RegisterLanguage() {

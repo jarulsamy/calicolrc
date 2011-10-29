@@ -42,7 +42,6 @@ namespace Calico {
             
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
-                        /*
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "../languages"));
             foreach (DirectoryInfo d in dir.GetDirectories("*"))
             {
@@ -63,9 +62,8 @@ namespace Calico {
                     }
                 }
             }
-            */
-languages["python"] = CalicoPythonLanguage.RegisterLanguage();
-            
+            // Or load directly:
+            //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
             
             // Global settings:
             bool Debug = false;

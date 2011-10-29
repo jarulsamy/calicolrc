@@ -25,7 +25,10 @@ namespace Calico {
     }
 
     public class Engine {
-        public Engine() {
+        public EngineManager manager;
+
+        public Engine(EngineManager manager) {
+            this.manager = manager;
         }
 
         public virtual bool ReadyToExecute(string text) {
@@ -45,9 +48,6 @@ namespace Calico {
         public virtual void set_redirects(string stdout, string stderr, string stdin) {
         }
 
-        public virtual void set_manager(EngineManager manager) {
-        }
-        
     }
     
 }

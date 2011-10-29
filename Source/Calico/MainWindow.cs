@@ -36,7 +36,6 @@ public static class Extensions {
     }
 }
 
-
 public partial class MainWindow : Gtk.Window {
     public Clipboard clipboard;
     private Mono.TextEditor.TextEditor _shell;
@@ -99,7 +98,6 @@ public partial class MainWindow : Gtk.Window {
         manager = new EngineManager(new Project());
         foreach (string name in LanguageMap.Keys) {
             manager.register(LanguageMap[name]);
-            manager.engines[name].set_manager(manager);
         }
         manager.setup();
         manager.start();
@@ -402,7 +400,7 @@ public partial class MainWindow : Gtk.Window {
                     completion = null;
                     args.RetVal = true;
                     // nothing to do, but handled
-                } else if (manager.engines[CurrentLanguage].ReadyToExecute(text) || force) {
+                } else if (manager[CurrentLanguage].ReadyToExecute(text) || force) {
                     //history.last(text.rstrip());
                     //history.add("");
                     bool results = Execute(text.TrimEnd(), CurrentLanguage);
@@ -446,7 +444,8 @@ public partial class MainWindow : Gtk.Window {
     }
 
     public void ExecuteInBackground(string text) {
-        manager.engines[CurrentLanguage].execute(text);
+        // This is the only approved method of running code
+        manager[CurrentLanguage].execute(text);
     }
 
     public void Write(string format, params object[] args) {
@@ -494,10 +493,8 @@ public partial class MainWindow : Gtk.Window {
     }
 
     protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
-        DocumentNotebook.Page = 1;
-        // Shell
+        DocumentNotebook.Page = 1; // Shell
     }
-
 
     public Gtk.Notebook DocumentNotebook {
         get { return notebook_docs; }
