@@ -1,4 +1,4 @@
-//  
+//
 //  Engine.cs
 //  
 //  Author:
@@ -19,38 +19,35 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace Calico
-{
-	
-	public class Project {
-	}
-	
-	public class Engine
-	{
-		public Engine ()
-		{
-		}
-		
-		public virtual bool ReadyToExecute(string text) {
-			return true;
-		}
-		
-		public virtual bool execute(string text) {
-			return true;
-		}
-		
-		public virtual void setup() {
-		}
-		
-		public virtual void start() {
-		}
-		
-		public virtual void set_redirects(string stdout, string stderr, string stdin) {
-		}
-		
-	    public virtual void set_manager(EngineManager manager) {
-	  	}
-		
-	}
-	
+namespace Calico {
+
+    public class Project {
+    }
+
+    public class Engine {
+        public Engine() {
+        }
+
+        public virtual bool ReadyToExecute(string text) {
+            return true;
+        }
+
+        public virtual bool execute(string text) {
+            return true;
+        }
+
+        public virtual void setup() {
+        }
+
+        public virtual void start() {
+        }
+
+        public virtual void set_redirects(string stdout, string stderr, string stdin) {
+        }
+
+        public virtual void set_manager(EngineManager manager) {
+        }
+        
+    }
+    
 }

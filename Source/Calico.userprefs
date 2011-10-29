@@ -1,24 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
-    <Files>
-      <File FileName="Calico/MainWindow.cs" Line="25" Column="12" />
-      <File FileName="Calico/Document.cs" Line="22" Column="1" />
-      <File FileName="Calico/Main.cs" Line="22" Column="1" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="22" Column="1" />
-      <File FileName="Calico/DLRLanguage.cs" Line="22" Column="1" />
-      <File FileName="Calico/Engine.cs" Line="22" Column="1" />
-      <File FileName="Calico/EngineManager.cs" Line="22" Column="1" />
-      <File FileName="Calico/Language.cs" Line="22" Column="1" />
-      <File FileName="Calico/AssemblyInfo.cs" Line="22" Column="1" />
-    </Files>
+  <MonoDevelop.Ide.Workbench ctype="Workbench">
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="References" expanded="True" />
             <Node name="UserInterface" expanded="True" />
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="CalicoPython.cs" selected="True" />
           </Node>
         </State>
       </Pad>
