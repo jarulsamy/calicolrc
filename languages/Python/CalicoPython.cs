@@ -15,6 +15,61 @@ public class CalicoPythonEngine : Calico.DLREngine {
     language.Options["FullFrames"] = true;
 	scriptRuntimeSetup.LanguageSetups.Add(language);
   }
+	
+	
+	public override bool execute(string text) {
+		//manager.calico.last_error = ""
+        Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+        Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+        try {
+            //if self.compiler_options:
+            //    source.Compile(self.compiler_options)
+            //else:
+            source.Compile();
+		} catch {
+            sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+            source = engine.CreateScriptSourceFromString(text, sctype);
+            try {
+                //if self.compiler_options:
+                //    source.Compile(self.compiler_options)
+                //else:
+                source.Compile();
+			} catch {
+                //traceback.print_exc()
+                return false;
+			}
+		}
+        try {
+            source.Execute(scope);
+		} catch {
+		}
+		return true;
+	}
+			/*
+			except Exception, e:
+            if "Thread was being aborted" in str(e.message):
+                self.manager.calico.shell.message("[Script stopped----------]")
+            else:
+                traceback.print_exc()
+            return False
+        # What was last thing printed?
+        try:
+            retval = self.engine.Execute("_")
+        except:
+            retval = None
+        if retval != self.last_retval:
+            if (isinstance(retval, Gtk.Widget) and 
+                retval.Parent == None and 
+                not retval.IsTopLevel):
+                # errors here are terminal:
+                #self.manager.calico.shell.show_widget(retval)
+                #self.manager.calico.shell.message("") # newline
+                pass # too many issues: displaying, Invoke
+            self.last_retval = retval
+        self.manager.calico.shell.message("Ok")
+        return True
+	 */
+	
 
   public override void setup() {
     Console.WriteLine("setup!");
