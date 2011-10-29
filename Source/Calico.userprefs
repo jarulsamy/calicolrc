@@ -1,13 +1,16 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../languages/Python/CalicoPython.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="440" Column="50" />
-      <File FileName="Calico/Document.cs" Line="17" Column="15" />
-      <File FileName="Calico/Engine.cs" Line="22" Column="16" />
-      <File FileName="Calico/Main.cs" Line="50" Column="66" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="76" Column="19" />
-      <File FileName="Calico/DLRLanguage.cs" Line="6" Column="42" />
+      <File FileName="Calico/MainWindow.cs" Line="25" Column="12" />
+      <File FileName="Calico/Document.cs" Line="22" Column="1" />
+      <File FileName="Calico/Main.cs" Line="22" Column="1" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="22" Column="1" />
+      <File FileName="Calico/DLRLanguage.cs" Line="22" Column="1" />
+      <File FileName="Calico/Engine.cs" Line="22" Column="1" />
+      <File FileName="Calico/EngineManager.cs" Line="22" Column="1" />
+      <File FileName="Calico/Language.cs" Line="22" Column="1" />
+      <File FileName="Calico/AssemblyInfo.cs" Line="22" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -15,7 +18,7 @@
           <Node name="Calico" expanded="True">
             <Node name="References" expanded="True" />
             <Node name="UserInterface" expanded="True" />
-            <Node name="CalicoPython.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -29,11 +32,8 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/dblank/Calico/Source/Calico/MainWindow.cs" line="96" />
-      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="77" />
-      <Breakpoint file="/home/dblank/Calico/trunk/languages/Python/CalicoPython.cs" line="119" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
+  <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" ctype="AuthorInformation" />
 </Properties>

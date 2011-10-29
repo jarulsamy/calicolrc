@@ -254,6 +254,13 @@
         <property name="ShortLabel" translatable="yes">Change _Font...</property>
         <property name="StockId">gtk-select-font</property>
       </action>
+      <action id="ShellAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Mod2&gt;F7</property>
+        <property name="Label" translatable="yes">Shell</property>
+        <property name="ShortLabel" translatable="yes">Shell</property>
+        <signal name="Activated" handler="OnShellActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -302,6 +309,7 @@
                 </node>
                 <node type="Menuitem" action="yesAction1" />
                 <node type="Menuitem" action="noAction" />
+                <node type="Menuitem" action="ShellAction" />
               </node>
               <node type="Menu" action="OptionsAction">
                 <node type="Menuitem" action="zoomInAction" />
@@ -329,7 +337,7 @@
             <node name="toolbar1" type="Toolbar">
               <node type="Toolitem" action="newAction" />
               <node type="Toolitem" action="openAction" />
-              <node type="Toolitem" action="yesAction" />
+              <node type="Toolitem" action="yesAction1" />
               <node type="Toolitem" action="noAction1" />
               <node type="Toolitem" action="goForwardAction" />
             </node>

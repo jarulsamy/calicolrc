@@ -1,3 +1,24 @@
+//  
+//  MainWindow.cs
+//  
+//  Author:
+//       Douglas S. Blank <dblank@cs.brynmawr.edu>
+// 
+//  Copyright (c) 2011 The Calico Project
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.IO; // Path
 using Gtk;
@@ -271,7 +292,8 @@ public partial class MainWindow: Gtk.Window
 	protected virtual void OnCopyActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+			string text = editor.SelectedText;
 			if (text != null)
 				clipboard.Text = text;
 		} else if (Focus is Gtk.TextView) {
@@ -306,21 +328,25 @@ public partial class MainWindow: Gtk.Window
 	protected virtual void OnUndoActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.Undo(Shell.GetTextEditorData());
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+			Mono.TextEditor.MiscActions.Undo(editor.GetTextEditorData());
 		}
 	}
 	
 	protected virtual void OnRedoActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.Redo(Shell.GetTextEditorData());
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+			Mono.TextEditor.MiscActions.Redo(editor.GetTextEditorData());
 		}
 	}
 	
 	protected virtual void OnSelectAllActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+
+			Mono.TextEditor.SelectionActions.SelectAll(editor.GetTextEditorData());
 		} else if (Focus is Gtk.TextView) {
 			Gtk.TextView textview = (Gtk.TextView)Focus;
 			textview.Buffer.SelectRange(textview.Buffer.StartIter, textview.Buffer.EndIter);
@@ -330,14 +356,17 @@ public partial class MainWindow: Gtk.Window
 	protected virtual void OnIndentActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.IndentSelection(Shell.GetTextEditorData());
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+
+			Mono.TextEditor.MiscActions.IndentSelection(editor.GetTextEditorData());
 		} 
 	}
 	
 	protected virtual void OnUnindentActionActivated (object sender, System.EventArgs e)
 	{
 		if (Focus is Mono.TextEditor.TextEditor) {
-			Mono.TextEditor.MiscActions.RemoveIndentSelection(Shell.GetTextEditorData());
+			Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+			Mono.TextEditor.MiscActions.RemoveIndentSelection(editor.GetTextEditorData());
 		} 
 	}
 	
@@ -481,6 +510,12 @@ public partial class MainWindow: Gtk.Window
 			// FIXME: Turn some things off
 		}
 	}
+	
+	protected virtual void OnShellActionActivated (object sender, System.EventArgs e)
+	{
+		DocumentNotebook.Page = 1; // Shell
+	}
+	
 	
 	public Gtk.Notebook DocumentNotebook {
 		get {return notebook_docs; }
