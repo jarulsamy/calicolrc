@@ -180,42 +180,6 @@
         <property name="Label" translatable="yes">Language</property>
         <property name="ShortLabel" translatable="yes">Language</property>
       </action>
-      <action id="PythonAction">
-        <property name="Type">Radio</property>
-        <property name="Label" translatable="yes">Python</property>
-        <property name="ShortLabel" translatable="yes">Python</property>
-        <property name="DrawAsRadio">False</property>
-        <property name="Active">False</property>
-        <property name="Value">0</property>
-        <property name="Group">group1</property>
-      </action>
-      <action id="RubyAction">
-        <property name="Type">Radio</property>
-        <property name="Label" translatable="yes">Ruby</property>
-        <property name="ShortLabel" translatable="yes">Ruby</property>
-        <property name="DrawAsRadio">False</property>
-        <property name="Active">False</property>
-        <property name="Value">0</property>
-        <property name="Group">group1</property>
-      </action>
-      <action id="SchemeAction">
-        <property name="Type">Radio</property>
-        <property name="Label" translatable="yes">Scheme</property>
-        <property name="ShortLabel" translatable="yes">Scheme</property>
-        <property name="DrawAsRadio">False</property>
-        <property name="Active">False</property>
-        <property name="Value">0</property>
-        <property name="Group">group1</property>
-      </action>
-      <action id="JigsawAction">
-        <property name="Type">Radio</property>
-        <property name="Label" translatable="yes">Jigsaw</property>
-        <property name="ShortLabel" translatable="yes">Jigsaw</property>
-        <property name="DrawAsRadio">False</property>
-        <property name="Active">False</property>
-        <property name="Value">0</property>
-        <property name="Group">group1</property>
-      </action>
       <action id="yesAction1">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Execute Script</property>
@@ -259,19 +223,28 @@
         <property name="ShortLabel" translatable="yes">Shell</property>
         <signal name="Activated" handler="OnShellActionActivated" />
       </action>
-      <action id="PythonAction1">
+      <action id="SelectAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Select</property>
+        <property name="ShortLabel" translatable="yes">Select</property>
+      </action>
+      <action id="Option1Action">
         <property name="Type">Radio</property>
-        <property name="Label" translatable="yes">Python</property>
-        <property name="ShortLabel" translatable="yes">Python</property>
+        <property name="Label" translatable="yes">Option 1</property>
+        <property name="ShortLabel" translatable="yes">Option 1</property>
         <property name="DrawAsRadio">False</property>
         <property name="Active">False</property>
         <property name="Value">0</property>
         <property name="Group">group1</property>
       </action>
-      <action id="DummyAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Dummy</property>
-        <property name="ShortLabel" translatable="yes">Dummy</property>
+      <action id="Option2Action">
+        <property name="Type">Radio</property>
+        <property name="Label" translatable="yes">Option 2</property>
+        <property name="ShortLabel" translatable="yes">Option 2</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <property name="Value">0</property>
+        <property name="Group">group1</property>
       </action>
     </action-group>
     <property name="MemberName" />
@@ -327,6 +300,10 @@
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="helpAction" />
                 <node type="Menuitem" action="aboutAction" />
+                <node type="Menu" action="SelectAction">
+                  <node type="Menuitem" action="Option1Action" />
+                  <node type="Menuitem" action="Option2Action" />
+                </node>
               </node>
             </node>
           </widget>

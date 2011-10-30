@@ -59,14 +59,6 @@ public partial class MainWindow
 
 	private global::Gtk.Action LanguageAction;
 
-	private global::Gtk.RadioAction PythonAction;
-
-	private global::Gtk.RadioAction RubyAction;
-
-	private global::Gtk.RadioAction SchemeAction;
-
-	private global::Gtk.RadioAction JigsawAction;
-
 	private global::Gtk.Action yesAction1;
 
 	private global::Gtk.Action noAction;
@@ -81,9 +73,11 @@ public partial class MainWindow
 
 	private global::Gtk.Action ShellAction;
 
-	private global::Gtk.RadioAction PythonAction1;
+	private global::Gtk.Action SelectAction;
 
-	private global::Gtk.Action DummyAction;
+	private global::Gtk.RadioAction Option1Action;
+
+	private global::Gtk.RadioAction Option2Action;
 
 	private global::Gtk.VBox vbox1;
 
@@ -226,22 +220,6 @@ public partial class MainWindow
 		this.LanguageAction = new global::Gtk.Action ("LanguageAction", global::Mono.Unix.Catalog.GetString ("Language"), null, null);
 		this.LanguageAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Language");
 		w1.Add (this.LanguageAction, null);
-		this.PythonAction = new global::Gtk.RadioAction ("PythonAction", global::Mono.Unix.Catalog.GetString ("Python"), null, null, 0);
-		this.PythonAction.Group = new global::GLib.SList (global::System.IntPtr.Zero);
-		this.PythonAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Python");
-		w1.Add (this.PythonAction, null);
-		this.RubyAction = new global::Gtk.RadioAction ("RubyAction", global::Mono.Unix.Catalog.GetString ("Ruby"), null, null, 0);
-		this.RubyAction.Group = this.PythonAction.Group;
-		this.RubyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Ruby");
-		w1.Add (this.RubyAction, null);
-		this.SchemeAction = new global::Gtk.RadioAction ("SchemeAction", global::Mono.Unix.Catalog.GetString ("Scheme"), null, null, 0);
-		this.SchemeAction.Group = this.RubyAction.Group;
-		this.SchemeAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Scheme");
-		w1.Add (this.SchemeAction, null);
-		this.JigsawAction = new global::Gtk.RadioAction ("JigsawAction", global::Mono.Unix.Catalog.GetString ("Jigsaw"), null, null, 0);
-		this.JigsawAction.Group = this.RubyAction.Group;
-		this.JigsawAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Jigsaw");
-		w1.Add (this.JigsawAction, null);
 		this.yesAction1 = new global::Gtk.Action ("yesAction1", global::Mono.Unix.Catalog.GetString ("Execute Script"), null, "gtk-yes");
 		this.yesAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("Execute Script");
 		w1.Add (this.yesAction1, null);
@@ -264,13 +242,17 @@ public partial class MainWindow
 		this.ShellAction = new global::Gtk.Action ("ShellAction", global::Mono.Unix.Catalog.GetString ("Shell"), null, null);
 		this.ShellAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Shell");
 		w1.Add (this.ShellAction, "<Mod2>F7");
-		this.PythonAction1 = new global::Gtk.RadioAction ("PythonAction1", global::Mono.Unix.Catalog.GetString ("Python"), null, null, 0);
-		this.PythonAction1.Group = this.RubyAction.Group;
-		this.PythonAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("Python");
-		w1.Add (this.PythonAction1, null);
-		this.DummyAction = new global::Gtk.Action ("DummyAction", global::Mono.Unix.Catalog.GetString ("Dummy"), null, null);
-		this.DummyAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Dummy");
-		w1.Add (this.DummyAction, null);
+		this.SelectAction = new global::Gtk.Action ("SelectAction", global::Mono.Unix.Catalog.GetString ("Select"), null, null);
+		this.SelectAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Select");
+		w1.Add (this.SelectAction, null);
+		this.Option1Action = new global::Gtk.RadioAction ("Option1Action", global::Mono.Unix.Catalog.GetString ("Option 1"), null, null, 0);
+		this.Option1Action.Group = new global::GLib.SList (global::System.IntPtr.Zero);
+		this.Option1Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("Option 1");
+		w1.Add (this.Option1Action, null);
+		this.Option2Action = new global::Gtk.RadioAction ("Option2Action", global::Mono.Unix.Catalog.GetString ("Option 2"), null, null, 0);
+		this.Option2Action.Group = this.Option1Action.Group;
+		this.Option2Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("Option 2");
+		w1.Add (this.Option2Action, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -281,7 +263,7 @@ public partial class MainWindow
 		this.vbox1.Name = "vbox1";
 		this.vbox1.BorderWidth = ((uint)(5));
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menu name='NewAction' action='NewAction'/><menuitem name='openAction1' action='openAction1'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menu name='NewAction' action='NewAction'/><menuitem name='openAction1' action='openAction1'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/><menu name='SelectAction' action='SelectAction'><menuitem name='Option1Action' action='Option1Action'/><menuitem name='Option2Action' action='Option2Action'/></menu></menu></menubar></ui>");
 		this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 		this.menubar2.Name = "menubar2";
 		this.vbox1.Add (this.menubar2);

@@ -83,27 +83,28 @@ public partial class MainWindow : Gtk.Window {
         DocumentNotebook.CurrentPage = 0;
         // Languages to menu items:
         GLib.SList lang_actiongroup =null;
-        GLib.SList file_actiongroup =null;
         Gtk.ActionGroup w1 = new global::Gtk.ActionGroup("Default");
         // FIXME: add dynamic menus
         Gtk.MenuItem lang_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
         lang_menu.Submenu = new Gtk.Menu();
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
         file_menu.Submenu = new Gtk.Menu();
+        int value = 0;
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
             Language language = pair.Value;
             // Language menu:
             string lang_name = String.Format("{0}LanguageAction", language.name);
             radio_actions[lang_name] = new Gtk.RadioAction(lang_name,
                                                 Mono.Unix.Catalog.GetString (language.proper_name),
-                                                null, null, 0);
+                                                null, null, value++);
             if (lang_actiongroup == null)
                 lang_actiongroup = new global::GLib.SList (global::System.IntPtr.Zero);
             radio_actions[lang_name].Group = lang_actiongroup;
             radio_actions[lang_name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
-            w1.Add(radio_actions[lang_name], null);
             Gtk.RadioMenuItem menu = new Gtk.RadioMenuItem(lang_actiongroup, language.proper_name);
             ((Gtk.Menu)lang_menu.Submenu).Add(menu);
+            menu.Activated += delegate { switchLanguage(language.name); };
+            w1.Add(radio_actions[lang_name], null);
             // New file menu:
             string file_name = String.Format("{0}NewAction", language.name);
             file_actions[file_name] = new Gtk.Action(file_name,
@@ -112,7 +113,9 @@ public partial class MainWindow : Gtk.Window {
             w1.Add(file_actions[file_name], null);
             Gtk.MenuItem menu2 = new Gtk.MenuItem(language.proper_name);
             ((Gtk.Menu)file_menu.Submenu).Add(menu2);
+            menu2.Activated += delegate { makeNewFile(language.name); };
         }
+        UIManager.InsertActionGroup (w1, 0);
         lang_menu.Submenu.ShowAll();
         file_menu.Submenu.ShowAll();
         // Set optional items of TextArea
@@ -160,6 +163,14 @@ public partial class MainWindow : Gtk.Window {
 
     public static string _(string message) {
         return global::Mono.Unix.Catalog.GetString(message);
+    }
+
+    public void makeNewFile(string lang_name) {
+        Console.WriteLine("makeNewFile: {0}", lang_name);
+    }
+
+    public void switchLanguage(string lang_name) {
+        Console.WriteLine("switchLanguage: {0}", lang_name);
     }
 
     public bool SelectOrOpen(string filename, string language) {
