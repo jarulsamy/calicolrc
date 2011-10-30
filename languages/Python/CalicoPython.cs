@@ -48,9 +48,7 @@ public class CalicoPythonEngine : DLREngine {
         options.TrueDivision = true;
         Console.WriteLine("engine: {0}", engine);
         // If the manager.scope environment is not set yet, set it here:
-        if (manager.scope == null) {
-            manager.scope = runtime.CreateScope();
-        }
+        scope = runtime.CreateScope();
         // Otherwise, we can use one created by another language
     }
 
@@ -96,10 +94,10 @@ public class CalicoPythonEngine : DLREngine {
                 return false;
             }
         }
-        try {
-            source.Execute(manager.scope);
-        } catch {
-        }
+        //try {
+            source.Execute(scope);
+        //} catch {
+        //}
         return true;
     }
     /*

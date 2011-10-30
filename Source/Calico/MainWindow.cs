@@ -29,6 +29,7 @@ public partial class MainWindow : Gtk.Window {
     public Gtk.Clipboard clipboard;
     private Mono.TextEditor.TextEditor _shell;
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
+    public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
     public Dictionary<string, Language> languages;
     public EngineManager manager;
     public string CurrentLanguage = "python"; // FIXME: get from defaults
@@ -69,7 +70,7 @@ public partial class MainWindow : Gtk.Window {
         clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
 
-	// New file menu:
+	    // New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
         file_menu.Submenu = new Gtk.Menu();
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
@@ -81,29 +82,35 @@ public partial class MainWindow : Gtk.Window {
         file_menu.Submenu.ShowAll();
 
         // Languages to menu items:
-	    //uint mergeId = UIManager.NewMergeId();
-    	int count = 0;
-        GLib.SList actiongroup = new GLib.SList(System.IntPtr.Zero);
         Gtk.MenuItem switch_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
         switch_menu.Submenu = new Gtk.Menu();
+    	int count = 0;
+        Gtk.RadioMenuItem group = null;
+        Gtk.RadioMenuItem radioitem;
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
             Language language = pair.Value;
 	        // FIXME: select default language initially
     	    // unique name, label, mnemonic, accel, tooltip, user data
-	        string name = String.Format("{0}-new-script", language.name);
-    	    Gtk.RadioAction radioAction = new Gtk.RadioAction(
-    	            name,
-		            language.proper_name,
-        		    String.Format("<control>{0}", (count + 1)),
-        		    "Switch language to " + language.proper_name,
-        		    count);
-            radioAction.Group = actiongroup;
-            Gtk.MenuItem menu = (Gtk.MenuItem)radioAction.CreateMenuItem();
-            ((Gtk.Menu)switch_menu.Submenu).Add(menu);
-            menu.Activated += OnSwitchLanguage;
-            menu.ShowAll();
+	        string name = String.Format("Switch to {0}", language.proper_name);
+            if (count == 0) {
+    	        radioitem = new Gtk.RadioMenuItem(name);
+                group = radioitem;
+            } else {
+                radioitem = new Gtk.RadioMenuItem(group, name);
+            }
+            ((Gtk.Menu)switch_menu.Submenu).Add(radioitem);
+            uint key;
+            Gdk.ModifierType mod;
+            Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
+            radioitem.AddAccelerator("activate",
+                                     UIManager.AccelGroup,
+                                     new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
+            languages_by_count[count + 1] = language;
+            radioitem.ButtonReleaseEvent += OnSwitchLanguage;
+            radioitem.Data["id"] = count + 1;
 	        count++;
     	}
+        switch_menu.Submenu.ShowAll();
 
         // Set optional items of TextArea
         Shell.Options.ShowFoldMargin = false;
@@ -156,9 +163,22 @@ public partial class MainWindow : Gtk.Window {
         Console.WriteLine("makeNewFile: {0}", lang_name);
     }
 
-    public void OnSwitchLanguage(object obj, System.EventArgs args) {
-        Console.WriteLine(obj);
-        Console.WriteLine(args);
+    public void OnSwitchLanguage(object obj, Gtk.ButtonReleaseEventArgs args) {
+        Gtk.RadioMenuItem radioitem = (Gtk.RadioMenuItem)obj;
+        OnSwitchLanguage((int)radioitem.Data["id"]);
+    }
+
+    public void OnSwitchLanguage(int lang_count) {
+        if (languages_by_count.ContainsKey(lang_count)) {
+            Language language = languages_by_count[lang_count];
+            CurrentLanguage = language.name;
+            if (CurrentDocument != null) {
+                prompt.Text = CurrentDocument.language;
+            } else {
+                prompt.Text = CurrentLanguage;
+            }
+            status_langauge.Text = prompt.Text;
+        }
     }
 
     public bool SelectOrOpen(string filename, string language) {
@@ -391,6 +411,16 @@ public partial class MainWindow : Gtk.Window {
 
     [GLib.ConnectBeforeAttribute]
     protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
+        // FIXME: handle control+1 language switch here
+        // not sure why accelerators didn't work
+        int key_0 = (int)Gdk.Key.Key_0;
+        if (((((int)args.Event.Key) > key_0) &&
+              ((int)args.Event.Key) < (key_0 + 10))
+            && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+            OnSwitchLanguage(((int)args.Event.Key) - key_0);
+            args.RetVal = true;
+            return;
+        }
         if (Focus == Shell) {
             // Shell handler
             // control+c, if nothing is selected, else it is a copy
@@ -510,8 +540,7 @@ public partial class MainWindow : Gtk.Window {
         if (CurrentDocument != null) {
 	  // FIXME: Turn some things on
 	  // FIXME: get proper language name
-            prompt.Text = CurrentDocument.language;
-            status_langauge.Text = prompt.Text;
+            OnSwitchLanguage(1); // FIXME
             CurrentDocument.widget.Child.GrabFocus();
         } else if (DocumentNotebook.Page == 0) {
             // Home

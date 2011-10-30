@@ -26,7 +26,6 @@ namespace Calico {
     public class EngineManager {
         public Project calico;
         private Dictionary<string, Engine> engines;
-        public Microsoft.Scripting.Hosting.ScriptScope scope = null;
         public string stderr;
         public string stdout;
         public string stdin;

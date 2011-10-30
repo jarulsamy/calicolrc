@@ -302,10 +302,6 @@
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="helpAction" />
                 <node type="Menuitem" action="aboutAction" />
-                <node type="Menu" action="SelectAction">
-                  <node type="Menuitem" action="Option1Action" />
-                  <node type="Menuitem" action="Option2Action" />
-                </node>
               </node>
             </node>
           </widget>

@@ -2,8 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="99" Column="68" />
-      <File FileName="Calico/gtk-gui/MainWindow.cs" Line="256" Column="21" />
+      <File FileName="Calico/MainWindow.cs" Line="470" Column="1" />
+      <File FileName="Calico/Main.cs" Line="46" Column="42" />
+      <File FileName="Calico/EngineManager.cs" Line="2" Column="19" />
+      <File FileName="Calico/DLREngine.cs" Line="31" Column="61" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="51" Column="39" />
+      <File FileName="../languages/Ruby/CalicoRuby.cs" Line="46" Column="33" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,7 +27,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Calico/languages/Python/CalicoPython.cs" line="75" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" ctype="AuthorInformation" />

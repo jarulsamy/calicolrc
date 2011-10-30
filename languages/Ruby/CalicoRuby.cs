@@ -43,11 +43,10 @@ public class CalicoRubyEngine : DLREngine {
         // Set the compiler options here:
         compiler_options = engine.GetCompilerOptions();
         IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
+        // set some ruby options
         Console.WriteLine("engine: {0}", engine);
         // If the manager.scope environment is not set yet, set it here:
-        if (manager.scope == null) {
-            manager.scope = runtime.CreateScope();
-        }
+        scope = runtime.CreateScope();
         // Otherwise, we can use one created by another language
     }
 
@@ -80,7 +79,7 @@ public class CalicoRubyEngine : DLREngine {
             }
         }
         try {
-            source.Execute(manager.scope);
+            source.Execute(scope);
         } catch {
         }
         return true;

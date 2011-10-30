@@ -28,6 +28,7 @@ namespace Calico {
         public Microsoft.Scripting.Hosting.LanguageSetup language_setup;
         public Microsoft.Scripting.CompilerOptions compiler_options;
         public Microsoft.Scripting.Hosting.ScriptEngine engine;
+        public Microsoft.Scripting.Hosting.ScriptScope scope;
 
         public DLREngine(EngineManager manager) : base(manager) {
         }
