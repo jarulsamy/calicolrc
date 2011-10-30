@@ -230,6 +230,7 @@
       </action>
       <action id="Option1Action">
         <property name="Type">Radio</property>
+        <property name="Accelerator">&lt;Control&gt;1</property>
         <property name="Label" translatable="yes">Option 1</property>
         <property name="ShortLabel" translatable="yes">Option 1</property>
         <property name="DrawAsRadio">False</property>
@@ -239,6 +240,7 @@
       </action>
       <action id="Option2Action">
         <property name="Type">Radio</property>
+        <property name="Accelerator">&lt;Control&gt;2</property>
         <property name="Label" translatable="yes">Option 2</property>
         <property name="ShortLabel" translatable="yes">Option 2</property>
         <property name="DrawAsRadio">False</property>

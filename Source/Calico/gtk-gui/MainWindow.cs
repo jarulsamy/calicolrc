@@ -248,11 +248,11 @@ public partial class MainWindow
 		this.Option1Action = new global::Gtk.RadioAction ("Option1Action", global::Mono.Unix.Catalog.GetString ("Option 1"), null, null, 0);
 		this.Option1Action.Group = new global::GLib.SList (global::System.IntPtr.Zero);
 		this.Option1Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("Option 1");
-		w1.Add (this.Option1Action, null);
+		w1.Add (this.Option1Action, "<Control>1");
 		this.Option2Action = new global::Gtk.RadioAction ("Option2Action", global::Mono.Unix.Catalog.GetString ("Option 2"), null, null, 0);
 		this.Option2Action.Group = this.Option1Action.Group;
 		this.Option2Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("Option 2");
-		w1.Add (this.Option2Action, null);
+		w1.Add (this.Option2Action, "<Control>2");
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";

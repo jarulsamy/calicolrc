@@ -22,27 +22,14 @@
 using System;
 using System.IO;
 // Path
-using Gtk;
 using System.Collections.Generic;
 using Calico;
 
-public static class Extensions {
-    public static string ToTitleCase(string aString) {
-        try {
-            return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(aString);
-        } catch {
-            return aString;
-        }
-    }
-}
-
 public partial class MainWindow : Gtk.Window {
-    public Clipboard clipboard;
+    public Gtk.Clipboard clipboard;
     private Mono.TextEditor.TextEditor _shell;
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<string, Language> languages;
-    public Dictionary<string, Gtk.RadioAction> radio_actions = new Dictionary<string, Gtk.RadioAction>();
-    public Dictionary<string, Gtk.Action> file_actions = new Dictionary<string, Gtk.Action>();
     public EngineManager manager;
     public string CurrentLanguage = "python"; // FIXME: get from defaults
     public bool Debug = false;
@@ -79,45 +66,45 @@ public partial class MainWindow : Gtk.Window {
         ScrolledWindow.Add(_shell);
         ScrolledWindow.ShowAll();
         // Setup clipboard, and Gui:
-        clipboard = Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
+        clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
-        // Languages to menu items:
-        GLib.SList lang_actiongroup =null;
-        Gtk.ActionGroup w1 = new global::Gtk.ActionGroup("Default");
-        // FIXME: add dynamic menus
-        Gtk.MenuItem lang_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
-        lang_menu.Submenu = new Gtk.Menu();
+
+	// New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
         file_menu.Submenu = new Gtk.Menu();
-        int value = 0;
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
             Language language = pair.Value;
-            // Language menu:
-            string lang_name = String.Format("{0}LanguageAction", language.name);
-            radio_actions[lang_name] = new Gtk.RadioAction(lang_name,
-                                                Mono.Unix.Catalog.GetString (language.proper_name),
-                                                null, null, value++);
-            if (lang_actiongroup == null)
-                lang_actiongroup = new global::GLib.SList (global::System.IntPtr.Zero);
-            radio_actions[lang_name].Group = lang_actiongroup;
-            radio_actions[lang_name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
-            Gtk.RadioMenuItem menu = new Gtk.RadioMenuItem(lang_actiongroup, language.proper_name);
-            ((Gtk.Menu)lang_menu.Submenu).Add(menu);
-            menu.Activated += delegate { switchLanguage(language.name); };
-            w1.Add(radio_actions[lang_name], null);
-            // New file menu:
-            string file_name = String.Format("{0}NewAction", language.name);
-            file_actions[file_name] = new Gtk.Action(file_name,
-                                                Mono.Unix.Catalog.GetString (language.proper_name));
-            file_actions[file_name].ShortLabel = global::Mono.Unix.Catalog.GetString (language.proper_name);
-            w1.Add(file_actions[file_name], null);
-            Gtk.MenuItem menu2 = new Gtk.MenuItem(language.proper_name);
-            ((Gtk.Menu)file_menu.Submenu).Add(menu2);
-            menu2.Activated += delegate { makeNewFile(language.name); };
+            Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
+            ((Gtk.Menu)file_menu.Submenu).Add(menu);
+            menu.Activated += delegate { makeNewFile(language.name); };
         }
-        UIManager.InsertActionGroup (w1, 0);
-        lang_menu.Submenu.ShowAll();
         file_menu.Submenu.ShowAll();
+
+        // Languages to menu items:
+	    //uint mergeId = UIManager.NewMergeId();
+    	int count = 0;
+        GLib.SList actiongroup = new GLib.SList(System.IntPtr.Zero);
+        Gtk.MenuItem switch_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
+        switch_menu.Submenu = new Gtk.Menu();
+        foreach (KeyValuePair<string,Language> pair in LanguageMap) {
+            Language language = pair.Value;
+	        // FIXME: select default language initially
+    	    // unique name, label, mnemonic, accel, tooltip, user data
+	        string name = String.Format("{0}-new-script", language.name);
+    	    Gtk.RadioAction radioAction = new Gtk.RadioAction(
+    	            name,
+		            language.proper_name,
+        		    String.Format("<control>{0}", (count + 1)),
+        		    "Switch language to " + language.proper_name,
+        		    count);
+            radioAction.Group = actiongroup;
+            Gtk.MenuItem menu = (Gtk.MenuItem)radioAction.CreateMenuItem();
+            ((Gtk.Menu)switch_menu.Submenu).Add(menu);
+            menu.Activated += OnSwitchLanguage;
+            menu.ShowAll();
+	        count++;
+    	}
+
         // Set optional items of TextArea
         Shell.Options.ShowFoldMargin = false;
         Shell.Options.ShowIconMargin = false;
@@ -169,8 +156,9 @@ public partial class MainWindow : Gtk.Window {
         Console.WriteLine("makeNewFile: {0}", lang_name);
     }
 
-    public void switchLanguage(string lang_name) {
-        Console.WriteLine("switchLanguage: {0}", lang_name);
+    public void OnSwitchLanguage(object obj, System.EventArgs args) {
+        Console.WriteLine(obj);
+        Console.WriteLine(args);
     }
 
     public bool SelectOrOpen(string filename, string language) {
@@ -246,21 +234,19 @@ public partial class MainWindow : Gtk.Window {
     }
 
     public Document MakeDocument(string filename) {
-        // FIXME: get language from defaults
         string language = CurrentLanguage;
-        if (filename == null) {
-            filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
-        }
-        return new TextDocument(filename, language);
+        return MakeDocument(filename, language);
     }
 
     public Document MakeDocument(string filename, string language) {
         if (language == null) {
             language = CurrentLanguage;
         }
+	// FIXME: get proper name from language:
         if (filename == null) {
-            filename = String.Format("New {0} Script", Extensions.ToTitleCase(language));
+            filename = String.Format("New {0} Script", language);
         }
+	// FIXME: get document from language
         return new TextDocument(filename, language);
     }
 
@@ -270,9 +256,9 @@ public partial class MainWindow : Gtk.Window {
         return true;
     }
 
-    protected void OnDeleteEvent(object sender, DeleteEventArgs a) {
+    protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
         if (Close()) {
-            Application.Quit();
+            Gtk.Application.Quit();
             a.RetVal = true;
         }
     }
@@ -308,7 +294,7 @@ public partial class MainWindow : Gtk.Window {
 
     protected virtual void OnQuitActionActivated(object sender, System.EventArgs e) {
         if (Close()) {
-            Application.Quit();
+            Gtk.Application.Quit();
         }
     }
 
@@ -522,9 +508,10 @@ public partial class MainWindow : Gtk.Window {
 
     protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
         if (CurrentDocument != null) {
-            // FIXME: Turn some things on
+	  // FIXME: Turn some things on
+	  // FIXME: get proper language name
             prompt.Text = CurrentDocument.language;
-            status_langauge.Text = Extensions.ToTitleCase(prompt.Text);
+            status_langauge.Text = prompt.Text;
             CurrentDocument.widget.Child.GrabFocus();
         } else if (DocumentNotebook.Page == 0) {
             // Home
