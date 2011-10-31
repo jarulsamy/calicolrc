@@ -33,6 +33,8 @@ public partial class MainWindow : Gtk.Window {
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
     public Dictionary<string, Language> languages;
+    public static Dictionary<Tag, Gtk.TextTag> colors = new Dictionary<Tag,Gtk.TextTag>();
+    public static Dictionary<Tag, string> colornames = new Dictionary<Tag,string>();
     public EngineManager manager;
     public string CurrentLanguage = "python"; // FIXME: get from defaults
     public string ShellLanguage = "python";
@@ -74,6 +76,25 @@ public partial class MainWindow : Gtk.Window {
     public MainWindow(string[] args, Dictionary<string, Language> LanguageMap, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
         this.languages = LanguageMap;
+        // Colors by name:
+        // FIXME: load from defaults
+        colornames[Tag.Error] = "error";
+        colors[Tag.Error] = new Gtk.TextTag("error");
+        colors[Tag.Error].Foreground = "red";
+        colors[Tag.Error].Weight = Pango.Weight.Bold;
+
+        colornames[Tag.Warning] = "warning";
+        colors[Tag.Warning] = new Gtk.TextTag("warning");
+        colors[Tag.Warning].Foreground = "orange";
+
+        colornames[Tag.Info] = "info";
+        colors[Tag.Info] = new Gtk.TextTag("info");
+        colors[Tag.Info].Foreground = "purple";
+
+        colornames[Tag.Normal] = "normal";
+        colors[Tag.Normal] = new Gtk.TextTag("normal");
+        colors[Tag.Normal].Foreground = "black";
+        // Build the GUI:
         Build();
         Gtk.Application.Invoke(delegate {
                 gui_thread_id = Thread.CurrentThread.ManagedThreadId;
@@ -82,6 +103,9 @@ public partial class MainWindow : Gtk.Window {
         _shell = new Mono.TextEditor.TextEditor();
         ScrolledWindow.Add(_shell);
         ScrolledWindow.ShowAll();
+        foreach (Gtk.TextTag tag in colors.Values) {
+            Output.Buffer.TagTable.Add(tag); // TextView
+         }
         // Setup clipboard, and Gui:
         clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
@@ -150,8 +174,8 @@ public partial class MainWindow : Gtk.Window {
         }
         manager.setup();
         manager.start();
-        manager.set_redirects(new CustomStream(this, "black"),
-                              new CustomStream(this, "red"));
+        manager.set_redirects(new CustomStream(this, Tag.Normal),
+                              new CustomStream(this, Tag.Error));
         SetLanguage(CurrentLanguage);
         
         List<string> files = new List<string>();
@@ -533,9 +557,9 @@ public partial class MainWindow : Gtk.Window {
         string prompt = String.Format("{0}> ", CurrentLanguage);
         int count = 2;
         foreach (string line in text.Split('\n')) {
-            Write("{0}", prompt);
+            Print(Tag.Info, "{0}", prompt);
             // black
-            WriteLine("{0}", line);
+            Print("{0}\n", line);
             // blue
             prompt = String.Format(".....{0}>", count);
             count += 1;
@@ -553,31 +577,28 @@ public partial class MainWindow : Gtk.Window {
         manager[CurrentLanguage].execute(text);
     }
 
-    public void Write(string format, params object[] args) {
+    public static Gtk.TextTag TagColor(Tag tag) {
+        return colors[tag];
+    }
+
+    public void Print(string format, params object[] args) {
+            Print(Tag.Normal, format, args);
+    }
+
+    public void Print(Tag tag, string format, params object[] args) {
         // These Write functions are the only approved methods of output
         if (Debug) {
             Console.Write(format, args);
         } else {
             Invoke( delegate {
                 lock(Output) {
-                    Output.Buffer.InsertAtCursor(String.Format(format, args));
                     Gtk.TextIter end = Output.Buffer.EndIter;
-                    Gtk.TextMark mark = Output.Buffer.GetMark("insert");
-                    Output.Buffer.MoveMark(mark, end);
-                    Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
-                    }
-                });
-        }
-    }
-
-    public void WriteLine(string format, params object[] args) {
-        if (Debug) {
-            Console.WriteLine(format, args);
-        } else {
-            Invoke( delegate {
-                lock(Output) {
-                    Output.Buffer.InsertAtCursor(String.Format(format, args) + "\n");
-                    Gtk.TextIter end = Output.Buffer.EndIter;
+                    string colorname = MainWindow.colornames[tag];
+                    Output.Buffer.InsertWithTagsByName(ref end,
+                                                 String.Format(format, args),
+                                                 colorname);
+                    //Output.Buffer.InsertAtCursor(String.Format(format, args));
+                    end = Output.Buffer.EndIter;
                     Gtk.TextMark mark = Output.Buffer.GetMark("insert");
                     Output.Buffer.MoveMark(mark, end);
                     Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);

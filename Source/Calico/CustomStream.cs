@@ -22,18 +22,28 @@ using System;
 using System.IO;
 
 namespace Calico {
+    public enum Tag {Error, Warning, Info, Normal}
+
     public class CustomStream : Stream {
-        string tag;
+        public Calico.Tag tag;
         Calico.MainWindow window;
 
-        public CustomStream(Calico.MainWindow window, string tag) : base() {
+        public CustomStream(Calico.MainWindow window, Tag tag) : base() {
             this.window = window;
             this.tag = tag;
         }
 
         public override void Write(Byte [] bytes, int offset, int count) {
             string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
-            window.Write(text);
+            window.Print(tag, text);
+        }
+
+        public void Print(string text, params object [] args) {
+            window.Print(tag, text, args);
+        }
+
+        public void Print(Calico.Tag mytag, string text, params object [] args) {
+            window.Print(mytag, text, args);
         }
 
         public override int Read(Byte [] bytes, int offset, int count) {

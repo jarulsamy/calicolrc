@@ -1,18 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/Engine.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="557" Column="73" />
-      <File FileName="Calico/CustomStream.cs" Line="36" Column="28" />
+      <File FileName="Calico/MainWindow.cs" Line="80" Column="37" />
+      <File FileName="Calico/CustomStream.cs" Line="27" Column="16" />
       <File FileName="Calico/EngineManager.cs" Line="86" Column="41" />
       <File FileName="Calico/Engine.cs" Line="31" Column="14" />
-      <File FileName="Calico/Main.cs" Line="1" Column="1" />
+      <File FileName="Calico/Main.cs" Line="88" Column="67" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="Engine.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -21,11 +21,20 @@
           <Node name="Calico" expanded="True" />
         </State>
       </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>this.&lt;&gt;f__this</Value>
+          <Value>tag</Value>
+          <Value>this</Value>
+          <Value>MainWindow.colornames</Value>
+        </State>
+      </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/dblank/Calico/languages/Python/CalicoPython.cs" line="75" />
+      <Breakpoint enabled="false" file="/home/dblank/Calico/languages/Python/CalicoPython.cs" line="75" />
+      <Breakpoint file="/home/dblank/Calico/Source/Calico/MainWindow.cs" line="596" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />

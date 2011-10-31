@@ -95,15 +95,33 @@ public class CalicoPythonEngine : DLREngine {
                 } else {
                     source.Compile();
                 }
-            } catch {
+            } catch (Exception e) {
+	      manager.stderr.Print(e.Message);
                 //traceback.print_exc()
                 return false;
             }
         }
-        //try {
+        try {
             source.Execute(scope);
-        //} catch {
-        //}
+        } catch (Exception e) {
+	  if (e.Message.Contains("Thread was being aborted")) {
+	    manager.stderr.Print("[Script stopped----------]\n");
+	  } else {
+	      manager.stderr.Print(e.Message);
+	    //traceback.print_exc();
+	  }
+	  return false;
+	}
+	return true;
+    }
+}
+	/*
+        # What was last thing printed?
+        try:
+            retval = self.engine.Execute("_")
+        except:
+            retval = None
+        }
         return true;
     }
     /*
@@ -130,7 +148,6 @@ public class CalicoPythonEngine : DLREngine {
         self.manager.calico.shell.message("Ok")
         return True
      */
-}
 
 public class CalicoPythonLanguage : Language {
 
