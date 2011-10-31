@@ -4202,7 +4202,7 @@ public static class Myro {
 
   // Graphics.cs
 
-  public static Graphics.Color makeColor(PythonTuple rgb) {
+  public static Graphics.Color makeColor(IList rgb) {
     return Graphics.makeColor((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
 
@@ -4210,7 +4210,7 @@ public static class Myro {
     return Graphics.makeColor(color);
   }
 
-  public static Graphics.Color Color(PythonTuple rgb) {
+  public static Graphics.Color Color(IList rgb) {
     return Graphics.makeColor((int)rgb[0], (int)rgb[1], (int)rgb[2]);
   }
 
@@ -4296,7 +4296,7 @@ public static class Myro {
   public static int getAlpha(Graphics.Pixel pixel) {
     return pixel.getAlpha();
   }
-  public static object get(PythonTuple tuple, int position) {
+  public static object get(IList tuple, int position) {
     return tuple[position];
   }
   public static PythonTuple makeTuple(params object [] items) {
@@ -4306,7 +4306,7 @@ public static class Myro {
   public static void setColor(Graphics.Pixel pixel, Graphics.Color c) {
     pixel.setColor(c);
   }
-  public static void setRGB(Graphics.Pixel pixel, PythonTuple rgb) {
+  public static void setRGB(Graphics.Pixel pixel, IList rgb) {
     pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
   }
   public static void setRGB(Graphics.Pixel pixel, byte red, byte green, byte blue) {
