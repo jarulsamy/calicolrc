@@ -343,7 +343,7 @@ public static class Graphics {
   public static void setRGB(Pixel pixel, int red, int green, int blue) {
     pixel.setRGB((byte)red, (byte)green, (byte)blue);
   }
-  public static void setRGB(Pixel pixel, PythonTuple rgb) {
+  public static void setRGB(Pixel pixel, IList rgb) {
     pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
   }
   public static void setRGB(Pixel pixel, float red, float green, float blue) {
