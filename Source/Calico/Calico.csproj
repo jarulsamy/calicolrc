@@ -124,7 +124,6 @@
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="MainWindow.cs" />
-    <Compile Include="gtk-gui\MainWindow.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Document.cs" />
@@ -132,6 +131,8 @@
     <Compile Include="Language.cs" />
     <Compile Include="EngineManager.cs" />
     <Compile Include="DLREngine.cs" />
+    <Compile Include="CustomStream.cs" />
+    <Compile Include="gtk-gui\Calico.MainWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

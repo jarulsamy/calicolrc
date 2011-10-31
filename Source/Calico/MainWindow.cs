@@ -25,6 +25,8 @@ using System.Threading;
 using System.Collections.Generic;
 using Calico;
 
+namespace Calico {
+
 public partial class MainWindow : Gtk.Window {
     public Gtk.Clipboard clipboard;
     private Mono.TextEditor.TextEditor _shell;
@@ -148,6 +150,8 @@ public partial class MainWindow : Gtk.Window {
         }
         manager.setup();
         manager.start();
+        manager.set_redirects(new CustomStream(this, "black"),
+                              new CustomStream(this, "red"));
         SetLanguage(CurrentLanguage);
         
         List<string> files = new List<string>();
@@ -550,11 +554,19 @@ public partial class MainWindow : Gtk.Window {
     }
 
     public void Write(string format, params object[] args) {
+        // These Write functions are the only approved methods of output
         if (Debug) {
             Console.Write(format, args);
         } else {
-            Output.Buffer.InsertAtCursor(String.Format(format, args));
-            ScrollToEnd();
+            Invoke( delegate {
+                lock(Output) {
+                    Output.Buffer.InsertAtCursor(String.Format(format, args));
+                    Gtk.TextIter end = Output.Buffer.EndIter;
+                    Gtk.TextMark mark = Output.Buffer.GetMark("insert");
+                    Output.Buffer.MoveMark(mark, end);
+                    Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+                    }
+                });
         }
     }
 
@@ -562,8 +574,15 @@ public partial class MainWindow : Gtk.Window {
         if (Debug) {
             Console.WriteLine(format, args);
         } else {
-            Output.Buffer.InsertAtCursor(String.Format(format, args) + "\n");
-            ScrollToEnd();
+            Invoke( delegate {
+                lock(Output) {
+                    Output.Buffer.InsertAtCursor(String.Format(format, args) + "\n");
+                    Gtk.TextIter end = Output.Buffer.EndIter;
+                    Gtk.TextMark mark = Output.Buffer.GetMark("insert");
+                    Output.Buffer.MoveMark(mark, end);
+                    Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+                    }
+                });
         }
     }
 
@@ -607,4 +626,5 @@ public partial class MainWindow : Gtk.Window {
         get { return notebook_docs; }
     }
     
+  }
 }

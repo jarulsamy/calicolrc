@@ -26,9 +26,8 @@ namespace Calico {
     public class EngineManager {
         public Project calico;
         private Dictionary<string, Engine> engines;
-        public string stderr;
-        public string stdout;
-        public string stdin;
+        public CustomStream stderr;
+        public CustomStream stdout;
 
         public EngineManager(Project calico) {
             this.calico = calico;
@@ -66,13 +65,12 @@ namespace Calico {
             }
         }
 
-        public void set_redirects(string stdout, string stderr, string stdin) {
+        public void set_redirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
             this.stderr = stderr;
             this.stdout = stdout;
-            this.stdin = stdin;
             foreach (string engine in engines.Keys) {
-                engines[engine].set_redirects(this.stdout, this.stderr, this.stdin);
+                engines[engine].set_redirects(this.stdout, this.stderr);
             }
         }
 
@@ -85,7 +83,7 @@ namespace Calico {
         public void reset() {
             setup();
             start();
-            set_redirects(stdout, stderr, stdin);
+            set_redirects(stdout, stderr);
         }
     }
 }

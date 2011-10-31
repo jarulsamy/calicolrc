@@ -69,6 +69,12 @@ public class CalicoPythonEngine : DLREngine {
   }
   */
 
+    public override void set_redirects(CustomStream stdout, 
+				       CustomStream stderr) {
+      engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
+      engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
+    }
+
     public override bool execute(string text) {
         // This is called by RunInBackground() in the MainWindow
         //manager.calico.last_error = ""

@@ -45,7 +45,7 @@ namespace Calico {
         public virtual void start() {
         }
 
-        public virtual void set_redirects(string stdout, string stderr, string stdin) {
+        public virtual void set_redirects(CustomStream stdout, CustomStream stderr) {
         }
 
     }

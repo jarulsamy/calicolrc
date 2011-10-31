@@ -84,6 +84,13 @@ public class CalicoRubyEngine : DLREngine {
         }
         return true;
     }
+
+    public override void set_redirects(CustomStream stdout, 
+				       CustomStream stderr) {
+      engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
+      engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
+    }
+
     /*
             except Exception, e:
             if "Thread was being aborted" in str(e.message):
