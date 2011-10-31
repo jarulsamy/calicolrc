@@ -424,7 +424,6 @@ public partial class MainWindow
 		this.prompt = new global::Gtk.Label ();
 		this.prompt.Name = "prompt";
 		this.prompt.LabelProp = global::Mono.Unix.Catalog.GetString ("python>");
-		this.prompt.Justify = ((global::Gtk.Justification)(1));
 		this.vbox3.Add (this.prompt);
 		global::Gtk.Box.BoxChild w35 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.prompt]));
 		w35.Position = 0;

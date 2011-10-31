@@ -25,6 +25,7 @@ namespace Calico {
     public class Document {
         public string language;
         public string filename;
+        public string basename;
         public Document document;
         public Gtk.ScrolledWindow widget;
         public Gtk.Widget tab_label;
@@ -35,9 +36,9 @@ namespace Calico {
             this.filename = filename;
             this.language = language;
             widget = new Gtk.ScrolledWindow();
-            string name = System.IO.Path.GetFileName(filename);
+            basename = System.IO.Path.GetFileName(filename);
             tab_label = new Gtk.HBox();
-            Gtk.Label myLabel = new Gtk.Label(name);
+            Gtk.Label myLabel = new Gtk.Label(basename);
             ((Gtk.HBox)tab_label).Add(myLabel);
             close_button = new Gtk.Button();
             Gtk.Image img = new Gtk.Image();

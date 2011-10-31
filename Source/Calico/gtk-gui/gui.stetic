@@ -459,7 +459,6 @@
                               <widget class="Gtk.Label" id="prompt">
                                 <property name="MemberName" />
                                 <property name="LabelProp" translatable="yes">python&gt;</property>
-                                <property name="Justify">Right</property>
                               </widget>
                               <packing>
                                 <property name="Position">0</property>

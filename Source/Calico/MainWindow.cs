@@ -20,8 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.IO;
-// Path
+using System.IO; // Path
+using System.Threading;
 using System.Collections.Generic;
 using Calico;
 
@@ -33,7 +33,11 @@ public partial class MainWindow : Gtk.Window {
     public Dictionary<string, Language> languages;
     public EngineManager manager;
     public string CurrentLanguage = "python"; // FIXME: get from defaults
+    public string ShellLanguage = "python";
     public bool Debug = false;
+    public static int gui_thread_id = -1;
+    public static int SHELL = 1;
+    public static int HOME = 0;
     public Document CurrentDocument {
         get {
             int page_num = DocumentNotebook.Page;
@@ -57,19 +61,29 @@ public partial class MainWindow : Gtk.Window {
     public Gtk.TextView Output {
         get { return textview1; }
     }
+    public string CurrentProperLanguage {
+        get {
+            if (CurrentLanguage != null && languages.ContainsKey(CurrentLanguage))
+                return languages[CurrentLanguage].proper_name;
+            return null;
+        }
+    }
 
     public MainWindow(string[] args, Dictionary<string, Language> LanguageMap, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
         this.languages = LanguageMap;
         Build();
-        // Had to add this here, as Setic didn't like it
+        Gtk.Application.Invoke(delegate {
+                gui_thread_id = Thread.CurrentThread.ManagedThreadId;
+        });
+        // Had to add this here, as Stetic didn't like it
         _shell = new Mono.TextEditor.TextEditor();
         ScrolledWindow.Add(_shell);
         ScrolledWindow.ShowAll();
         // Setup clipboard, and Gui:
         clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
-
+        Title = String.Format("Calico - {0}", System.Environment.UserName);
 	    // New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
         file_menu.Submenu = new Gtk.Menu();
@@ -77,7 +91,7 @@ public partial class MainWindow : Gtk.Window {
             Language language = pair.Value;
             Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
             ((Gtk.Menu)file_menu.Submenu).Add(menu);
-            menu.Activated += delegate { makeNewFile(language.name); };
+            menu.Activated += delegate { SelectOrOpen(null, language.name); };
         }
         file_menu.Submenu.ShowAll();
 
@@ -134,6 +148,7 @@ public partial class MainWindow : Gtk.Window {
         }
         manager.setup();
         manager.start();
+        SetLanguage(CurrentLanguage);
         
         List<string> files = new List<string>();
         foreach (string arg in args) {
@@ -145,6 +160,25 @@ public partial class MainWindow : Gtk.Window {
         foreach (string filename in files) {
             SelectOrOpen(filename);
         }
+    }
+
+    public static bool needInvoke() {
+        //Console.WriteLine("gui_thread_id: {0}", Myro.gui_thread_id);
+        if (MainWindow.gui_thread_id == -1) {
+          return false; // in another thread
+        } else if (MainWindow.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
+          return false; // you are already in the GUI thread
+        } else {
+          return true; // need to invoke!
+        }
+    }
+
+    public delegate void InvokeDelegate();
+    public static void Invoke(InvokeDelegate invoke) {
+        if (needInvoke())
+          Gtk.Application.Invoke(delegate {invoke();});
+        else
+          invoke();
     }
 
     public bool SelectOrOpen() {
@@ -168,16 +202,21 @@ public partial class MainWindow : Gtk.Window {
         OnSwitchLanguage((int)radioitem.Data["id"]);
     }
 
+    public void SetLanguage(string language) {
+        CurrentLanguage = language;
+        Invoke(delegate {
+            prompt.Text = String.Format("{0}>", CurrentLanguage);
+            status_langauge.Text = String.Format("<i>{0}</i> ", CurrentProperLanguage);
+            status_langauge.UseMarkup = true;
+        });
+    }
+
     public void OnSwitchLanguage(int lang_count) {
-        if (languages_by_count.ContainsKey(lang_count)) {
-            Language language = languages_by_count[lang_count];
-            CurrentLanguage = language.name;
-            if (CurrentDocument != null) {
-                prompt.Text = CurrentDocument.language;
-            } else {
-                prompt.Text = CurrentLanguage;
-            }
-            status_langauge.Text = prompt.Text;
+    if (languages_by_count.ContainsKey(lang_count)) {
+        Language language = languages_by_count[lang_count];
+        SetLanguage(language.name);
+        ShellLanguage = language.name;
+        DocumentNotebook.Page = SHELL;
         }
     }
 
@@ -264,7 +303,7 @@ public partial class MainWindow : Gtk.Window {
         }
 	// FIXME: get proper name from language:
         if (filename == null) {
-            filename = String.Format("New {0} Script", language);
+            filename = String.Format("New {0} Script", languages[language].proper_name);
         }
 	// FIXME: get document from language
         return new TextDocument(filename, language);
@@ -478,7 +517,7 @@ public partial class MainWindow : Gtk.Window {
                     args.RetVal = true;
                 }
             }
-        } else if (Focus is Mono.TextEditor.TextEditor) {
+        } else if (Focus is Mono.TextEditor.TextEditor) { // not shell
             // Editor, handle : on end of line
         }
     }
@@ -497,7 +536,6 @@ public partial class MainWindow : Gtk.Window {
             prompt = String.Format(".....{0}>", count);
             count += 1;
         }
-        // pragma/meta commands, start with #;
         if (text == "") {
             return false;
         }
@@ -530,33 +568,39 @@ public partial class MainWindow : Gtk.Window {
     }
 
     public void ScrollToEnd() {
-        Gtk.TextIter end = Output.Buffer.EndIter;
-        Gtk.TextMark mark = Output.Buffer.GetMark("insert");
-        Output.Buffer.MoveMark(mark, end);
-        Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+        Invoke(delegate {
+            Gtk.TextIter end = Output.Buffer.EndIter;
+            Gtk.TextMark mark = Output.Buffer.GetMark("insert");
+            Output.Buffer.MoveMark(mark, end);
+            Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+        });
     }
 
     protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
         if (CurrentDocument != null) {
-	  // FIXME: Turn some things on
-	  // FIXME: get proper language name
-            OnSwitchLanguage(1); // FIXME
+    	  // FIXME: Turn some things on
+            SetLanguage(CurrentDocument.language);
             CurrentDocument.widget.Child.GrabFocus();
-        } else if (DocumentNotebook.Page == 0) {
+            Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.filename, System.Environment.UserName);
+        } else if (DocumentNotebook.Page == HOME) {
             // Home
             // FIXME: Turn some things off
-        } else if (DocumentNotebook.Page == 1) {
+            Title = String.Format("Calico - {0}", System.Environment.UserName);
+        } else if (DocumentNotebook.Page == SHELL) {
             // Shell
             // FIXME: Turn some things off
+            SetLanguage(ShellLanguage);
             Shell.GrabFocus();
+            Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
         } else {
             // Some other page
             // FIXME: Turn some things off
+            Title = String.Format("Calico - {0}", System.Environment.UserName);
         }
     }
 
     protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
-        DocumentNotebook.Page = 1; // Shell
+        DocumentNotebook.Page = SHELL; // Shell
     }
 
     public Gtk.Notebook DocumentNotebook {
