@@ -38,8 +38,18 @@ namespace Calico {
             window.Print(tag, text);
         }
 
+        public void PrintLine(string text, params object [] args) {
+            window.Print(tag, text, args);
+            window.Print(tag, "\n", args);
+        }
+
         public void Print(string text, params object [] args) {
             window.Print(tag, text, args);
+        }
+
+        public void PrintLine(Calico.Tag mytag, string text, params object [] args) {
+            window.Print(mytag, text, args);
+            window.Print(mytag, "\n", args);
         }
 
         public void Print(Calico.Tag mytag, string text, params object [] args) {

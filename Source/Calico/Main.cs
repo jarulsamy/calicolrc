@@ -30,6 +30,7 @@ using System.Reflection;
 namespace Calico {
     class MainClass {
         public static string Version = "2.0.0";
+        public static bool IsLoadModules = true;
 
         [STAThread]
         public static void Main(string[] args) {
@@ -44,20 +45,22 @@ namespace Calico {
             // for language in directory, load languages:
 
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "../languages"));
-            foreach (DirectoryInfo d in dir.GetDirectories("*"))
-            {
-                foreach (FileInfo f in d.GetFiles("Calico*.dll"))
+            if (IsLoadModules) {
+                foreach (DirectoryInfo d in dir.GetDirectories("*"))
                 {
-                    Print("Loading {0}...", f.FullName);
-                    Assembly assembly = Assembly.LoadFrom(f.FullName);
-                    if (assembly != null) {
-                        foreach (Type type in assembly.GetTypes()) {
-                            MethodInfo method = type.GetMethod("RegisterLanguage");
-                            if (method != null) {
-                                Language language = (Language)method.Invoke(type, new object[]{});
-                                languages[language.name] = language;
-                                Print("Registering language...'{0}'", language.name);
-                                break;
+                    foreach (FileInfo f in d.GetFiles("Calico*.dll"))
+                    {
+                        Print("Loading {0}...", f.FullName);
+                        Assembly assembly = Assembly.LoadFrom(f.FullName);
+                        if (assembly != null) {
+                            foreach (Type type in assembly.GetTypes()) {
+                                MethodInfo method = type.GetMethod("RegisterLanguage");
+                                if (method != null) {
+                                    Language language = (Language)method.Invoke(type, new object[]{});
+                                    languages[language.name] = language;
+                                    Print("Registering language...'{0}'", language.name);
+                                    break;
+                                }
                             }
                         }
                     }

@@ -96,64 +96,32 @@ public class CalicoPythonEngine : DLREngine {
                     source.Compile();
                 }
             } catch (Exception e) {
-	      manager.stderr.Print(e.Message);
-                //traceback.print_exc()
+                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                manager.stderr.PrintLine(eo.FormatException(e));
                 return false;
             }
         }
         try {
             source.Execute(scope);
         } catch (Exception e) {
-	  if (e.Message.Contains("Thread was being aborted")) {
-	    manager.stderr.Print("[Script stopped----------]\n");
-	  } else {
-	      manager.stderr.Print(e.Message);
-	    //traceback.print_exc();
-	  }
-	  return false;
-	}
-	return true;
+    	  if (e.Message.Contains("Thread was being aborted")) {
+    	    manager.stderr.Print("[Script stopped----------]\n");
+    	  } else {
+            Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+            manager.stderr.PrintLine(eo.FormatException(e));
+    	  }
+    	  return false;
+	    }
+        manager.stderr.PrintLine(Tag.Info, "Ok");
+	    return true;
     }
 }
-	/*
-        # What was last thing printed?
-        try:
-            retval = self.engine.Execute("_")
-        except:
-            retval = None
-        }
-        return true;
-    }
-    /*
-            except Exception, e:
-            if "Thread was being aborted" in str(e.message):
-                self.manager.calico.shell.message("[Script stopped----------]")
-            else:
-                traceback.print_exc()
-            return False
-        # What was last thing printed?
-        try:
-            retval = self.engine.Execute("_")
-        except:
-            retval = None
-        if retval != self.last_retval:
-            if (isinstance(retval, Gtk.Widget) and 
-                retval.Parent == None and 
-                not retval.IsTopLevel):
-                # errors here are terminal:
-                #self.manager.calico.shell.show_widget(retval)
-                #self.manager.calico.shell.message("") # newline
-                pass # too many issues: displaying, Invoke
-            self.last_retval = retval
-        self.manager.calico.shell.message("Ok")
-        return True
-     */
 
 public class CalicoPythonLanguage : Language {
 
     public CalicoPythonLanguage(string name, string proper, 
 				string [] extensions) : 
-    base(name, proper, extensions) {
+        base(name, proper, extensions) {
     }
 
     public override Engine make_engine(EngineManager manager) {
