@@ -1,7 +1,7 @@
 BUILD=2.0.0
 MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
 
-all: modules/Graphics.dll modules/Myro.dll languages/Scheme/Scheme/PJScheme.dll \
+all: modules/Graphics.dll modules/Myro.dll \
 	modules/Conx.dll bin/calico.exe
 
 build: clean-build all 
@@ -31,7 +31,7 @@ clean:
 bin/calico.exe: bin/calico.cs
 	MONO_PATH=$(MONO_PATH) gmcs -target:exe \
 		bin/calico.cs \
-		-r:IronPython \
+		-r:IronPython.dll \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Dynamic \
 		-r:Mono.Posix \

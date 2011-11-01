@@ -36,8 +36,8 @@ public partial class MainWindow : Gtk.Window {
     public static Dictionary<Tag, Gtk.TextTag> colors = new Dictionary<Tag,Gtk.TextTag>();
     public static Dictionary<Tag, string> colornames = new Dictionary<Tag,string>();
     public EngineManager manager;
-    public string CurrentLanguage = "python"; // FIXME: get from defaults
-    public string ShellLanguage = "python";
+    public string CurrentLanguage = null;
+    public string ShellLanguage = null;
     public bool Debug = false;
     public static int gui_thread_id = -1;
     public static int SHELL = 1;
@@ -129,6 +129,15 @@ public partial class MainWindow : Gtk.Window {
         Gtk.RadioMenuItem radioitem;
         foreach (KeyValuePair<string,Language> pair in LanguageMap) {
             Language language = pair.Value;
+            if (CurrentLanguage == null) {
+                CurrentLanguage = language.name;
+                ShellLanguage = language.name;
+            }
+            if (CurrentLanguage == "python") { // FIXME: get from defaults, preferred lang
+                CurrentLanguage = language.name;
+                ShellLanguage = language.name;
+            }
+
 	        // FIXME: select default language initially
     	    // unique name, label, mnemonic, accel, tooltip, user data
 	        string name = String.Format("Switch to {0}", language.proper_name);
@@ -168,7 +177,7 @@ public partial class MainWindow : Gtk.Window {
         }
         
         // Now, let's load engines
-        manager = new EngineManager(new Project());
+        manager = new EngineManager(this);
         foreach (string name in LanguageMap.Keys) {
             manager.register(LanguageMap[name]);
         }

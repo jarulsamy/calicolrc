@@ -24,12 +24,16 @@ using System.Collections.Generic; // IList, Dictionary
 
 namespace Calico {
     public class EngineManager {
-        public Project calico;
+        // FIXME: make MainWindow a general interface (without Gtk)
+        public MainWindow calico;
         private Dictionary<string, Engine> engines;
         public CustomStream stderr;
         public CustomStream stdout;
+        public Microsoft.Scripting.Hosting.ScriptRuntime scriptRuntime;
+        public Microsoft.Scripting.Hosting.ScriptScope scope;
+        public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
 
-        public EngineManager(Project calico) {
+        public EngineManager(MainWindow calico) {
             this.calico = calico;
             engines = new Dictionary<string, Engine>();
         }
@@ -55,15 +59,20 @@ namespace Calico {
         }
 
         public void setup() {
+            scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string engine in engines.Keys) {
-                //try {
+                try {
                     engines[engine].setup();
-                //} catch {
-                //    Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
-                //    engines.Remove(engine);
-                //}
+                } catch {
+                    Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
+                    // FIXME: can you remove while foreach?
+                    //engines.Remove(engine);
+                }
             }
-        }
+            // Language neutral scope:
+            scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+            scope = scriptRuntime.CreateScope();
+      }
 
         public void set_redirects(CustomStream stdout, CustomStream stderr) {
             // textviews:

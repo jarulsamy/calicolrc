@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/Main.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="44" Column="32" />
+      <File FileName="Calico/MainWindow.cs" Line="30" Column="35" />
       <File FileName="Calico/CustomStream.cs" Line="52" Column="36" />
       <File FileName="Calico/EngineManager.cs" Line="86" Column="41" />
       <File FileName="Calico/Engine.cs" Line="31" Column="14" />
@@ -13,7 +13,8 @@
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="Main.cs" selected="True" />
+            <Node name="References" expanded="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -37,6 +38,6 @@
       <Breakpoint enabled="false" file="/home/dblank/Calico/languages/Python/CalicoPython.cs" line="75" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" ctype="AuthorInformation" />
 </Properties>

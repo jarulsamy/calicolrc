@@ -30,7 +30,7 @@ using System.Reflection;
 namespace Calico {
     class MainClass {
         public static string Version = "2.0.0";
-        public static bool IsLoadModules = true;
+        public static bool IsLoadModules = false;
 
         [STAThread]
         public static void Main(string[] args) {
@@ -68,7 +68,7 @@ namespace Calico {
             }
             //  Or load directly:
             //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
-            //languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
+            languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
             
             // Global settings:
             bool Debug = false;

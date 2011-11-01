@@ -29,14 +29,15 @@ public class CalicoPythonEngine : DLREngine {
     public CalicoPythonEngine(EngineManager manager) : base(manager) {
         dlr_name = "py";
         scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-        Microsoft.Scripting.Hosting.LanguageSetup language = IronPython.Hosting.Python.CreateLanguageSetup(null);
+        languageSetup = IronPython.Hosting.Python.CreateLanguageSetup(null);
         // Set LanguageSetup options here:
-        language.Options["FullFrames"] = true; // for debugging
-        scriptRuntimeSetup.LanguageSetups.Add(language);
+        languageSetup.Options["FullFrames"] = true; // for debugging
+        scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
     }
 
     public override void setup() {
         Console.WriteLine("setup!");
+        manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
         runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
         Console.WriteLine("runtime: {0}", runtime);
         engine = runtime.GetEngine(dlr_name);
@@ -47,9 +48,8 @@ public class CalicoPythonEngine : DLREngine {
         options.AllowWithStatement = true;
         options.TrueDivision = true;
         Console.WriteLine("engine: {0}", engine);
-        // If the manager.scope environment is not set yet, set it here:
+        // Create a Python-only scope:
         scope = runtime.CreateScope();
-        // Otherwise, we can use one created by another language
     }
 
     public override void start() {
@@ -102,7 +102,10 @@ public class CalicoPythonEngine : DLREngine {
             }
         }
         try {
-            source.Execute(scope);
+            if (UseManagerScope)
+                source.Execute(manager.scope);
+            else
+                source.Execute(scope);
         } catch (Exception e) {
     	  if (e.Message.Contains("Thread was being aborted")) {
     	    manager.stderr.Print("[Script stopped----------]\n");

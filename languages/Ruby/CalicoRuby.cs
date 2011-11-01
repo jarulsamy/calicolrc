@@ -29,20 +29,21 @@ public class CalicoRubyEngine : DLREngine {
     public CalicoRubyEngine(EngineManager manager) : base(manager) {
         dlr_name = "rb";
         scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-        Microsoft.Scripting.Hosting.LanguageSetup language = IronRuby.Ruby.CreateRubySetup();
+        languageSetup = IronRuby.Ruby.CreateRubySetup();
         // Set LanguageSetup options here:
-        language.Options["FullFrames"] = true; // for debugging
-        scriptRuntimeSetup.LanguageSetups.Add(language);
+        // languageSetup.Options["FullFrames"] = true; // for debugging Python only?
+        scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
     }
 
     public override void setup() {
         Console.WriteLine("setup!");
+        manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
         runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
         Console.WriteLine("runtime: {0}", runtime);
         engine = runtime.GetEngine(dlr_name);
         // Set the compiler options here:
         compiler_options = engine.GetCompilerOptions();
-        IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
+        //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
         // set some ruby options
         Console.WriteLine("engine: {0}", engine);
         // If the manager.scope environment is not set yet, set it here:
@@ -79,7 +80,10 @@ public class CalicoRubyEngine : DLREngine {
             }
         }
         try {
-            source.Execute(scope);
+            if (UseManagerScope)
+                source.Execute(manager.scope);
+            else
+                source.Execute(scope);
         } catch {
         }
         return true;

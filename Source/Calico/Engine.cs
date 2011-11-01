@@ -21,9 +21,6 @@
 
 namespace Calico {
 
-    public class Project {
-    }
-
     public class Engine {
         public EngineManager manager;
 
