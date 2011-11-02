@@ -1,20 +1,21 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/EngineManager.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="30" Column="35" />
+      <File FileName="Calico/MainWindow.cs" Line="67" Column="6" />
       <File FileName="Calico/CustomStream.cs" Line="52" Column="36" />
-      <File FileName="Calico/EngineManager.cs" Line="86" Column="41" />
+      <File FileName="Calico/EngineManager.cs" Line="73" Column="72" />
       <File FileName="Calico/Engine.cs" Line="31" Column="14" />
-      <File FileName="Calico/Main.cs" Line="33" Column="47" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="60" Column="10" />
+      <File FileName="Calico/Main.cs" Line="51" Column="64" />
+      <File FileName="../languages/Ruby/CalicoRuby.cs" Line="83" Column="17" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="35" Column="61" />
+      <File FileName="Calico/DLREngine.cs" Line="32" Column="29" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="EngineManager.cs" selected="True" />
           </Node>
         </State>
       </Pad>

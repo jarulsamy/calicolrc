@@ -133,7 +133,7 @@ public partial class MainWindow : Gtk.Window {
                 CurrentLanguage = language.name;
                 ShellLanguage = language.name;
             }
-            if (CurrentLanguage == "python") { // FIXME: get from defaults, preferred lang
+            if (language.name == "python") { // FIXME: get from defaults, preferred lang
                 CurrentLanguage = language.name;
                 ShellLanguage = language.name;
             }

@@ -32,7 +32,7 @@ namespace Calico {
         public bool UseManagerScope;
 
         public DLREngine(EngineManager manager) : base(manager) {
-            UseManagerScope = true;
+            UseManagerScope = false;
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Calico {
                 }
             }
             //  Or load directly:
-            //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
+            languages["python"] = CalicoPythonLanguage.RegisterLanguage();
             languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
             
             // Global settings:

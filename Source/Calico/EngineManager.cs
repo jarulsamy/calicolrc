@@ -70,6 +70,7 @@ namespace Calico {
                 }
             }
             // Language neutral scope:
+            //scriptRuntimeSetup.LanguageSetups.Add( FIXME: in progress
             scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
             scope = scriptRuntime.CreateScope();
       }
