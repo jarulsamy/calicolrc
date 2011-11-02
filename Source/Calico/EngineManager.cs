@@ -65,8 +65,7 @@ namespace Calico {
                     engines[engine].setup();
                 } catch {
                     Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
-                    // FIXME: can you remove while foreach?
-                    //engines.Remove(engine);
+                    engines.Remove(engine);
                 }
             }
             // Language neutral scope:

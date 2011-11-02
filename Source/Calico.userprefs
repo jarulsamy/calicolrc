@@ -2,9 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/EngineManager.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="67" Column="6" />
-      <File FileName="Calico/CustomStream.cs" Line="52" Column="36" />
-      <File FileName="Calico/EngineManager.cs" Line="73" Column="72" />
+      <File FileName="Calico/MainWindow.cs" Line="144" Column="42" />
+      <File FileName="Calico/CustomStream.cs" Line="27" Column="16" />
+      <File FileName="Calico/EngineManager.cs" Line="64" Column="17" />
       <File FileName="Calico/Engine.cs" Line="31" Column="14" />
       <File FileName="Calico/Main.cs" Line="51" Column="64" />
       <File FileName="../languages/Ruby/CalicoRuby.cs" Line="83" Column="17" />
@@ -40,5 +40,5 @@
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" ctype="AuthorInformation" />
+  <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" />
 </Properties>
