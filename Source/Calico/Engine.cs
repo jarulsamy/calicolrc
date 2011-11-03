@@ -118,6 +118,35 @@ namespace Calico {
             manager.stderr.PrintLine(Tag.Info, "Ok");
             return true;
         }
-    }
+
+        public override bool ExecuteFile(string filename) {
+            //manager.calico.last_error = ""
+            //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
+            Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromFile(filename);
+            try {
+                if (compiler_options != null) {
+                    source.Compile(compiler_options);
+                } else {
+                    source.Compile();
+                }
+            } catch (Exception e) {
+                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                manager.stderr.PrintLine(eo.FormatException(e));
+                return false;
+            }
+            try {
+                source.Execute(manager.scope);
+            } catch (Exception e) {
+                if (e.Message.ToString().Contains("Thread was being aborted")) {
+                    manager.calico.Print("[Script stopped----------]");
+                } else {
+                    Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                    manager.stderr.PrintLine(eo.FormatException(e));
+                }
+                return false;
+            }
+            return true;
+        }
+      }
 }
 

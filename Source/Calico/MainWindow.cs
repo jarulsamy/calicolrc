@@ -393,6 +393,9 @@ public partial class MainWindow : Gtk.Window {
     }
 
     protected virtual void OnSaveAsActionActivated(object sender, System.EventArgs e) {
+        if (CurrentDocument != null) {
+            CurrentDocument.SaveAs();
+        }
     }
 
     protected virtual void OnQuitActionActivated(object sender, System.EventArgs e) {
@@ -704,6 +707,11 @@ public partial class MainWindow : Gtk.Window {
         manager[CurrentLanguage].engine.Execute(text);
     }
 
+    public void ExecuteFileInBackground(string filename) {
+        // This is the only approved method of running code
+        manager[CurrentLanguage].engine.ExecuteFile(filename);
+    }
+
     public static Gtk.TextTag TagColor(Tag tag) {
         return tags[tag];
     }
@@ -768,6 +776,19 @@ public partial class MainWindow : Gtk.Window {
 
     protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
         DocumentNotebook.Page = SHELL; // Shell
+    }
+
+    protected virtual void OnToolbar1ButtonReleaseEvent (object o, Gtk.ButtonReleaseEventArgs args)
+    {
+        if (CurrentDocument != null)
+            ExecuteFileInBackground(CurrentDocument.filename);
+    }
+
+    protected virtual void OnYesAction1Activated (object sender, System.EventArgs e)
+    {
+        if (CurrentDocument != null)
+            ExecuteFileInBackground(CurrentDocument.filename);
+
     }
 
     public Gtk.Notebook DocumentNotebook {

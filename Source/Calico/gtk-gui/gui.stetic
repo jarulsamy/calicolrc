@@ -71,6 +71,7 @@
       </action>
       <action id="saveAsAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Alt&gt;&lt;Mod2&gt;a</property>
         <property name="Label" translatable="yes">Save _As</property>
         <property name="ShortLabel" translatable="yes">Save _As</property>
         <property name="StockId">gtk-save-as</property>
@@ -130,6 +131,7 @@
       </action>
       <action id="indentAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;bracketleft</property>
         <property name="Label" translatable="yes">Indent Region</property>
         <property name="ShortLabel" translatable="yes">Indent Region</property>
         <property name="StockId">gtk-indent</property>
@@ -137,6 +139,7 @@
       </action>
       <action id="unindentAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;bracketright</property>
         <property name="Label" translatable="yes">Unindent Region</property>
         <property name="ShortLabel" translatable="yes">Unindent Region</property>
         <property name="StockId">gtk-unindent</property>
@@ -144,12 +147,14 @@
       </action>
       <action id="CommentRegionAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;braceleft</property>
         <property name="Label" translatable="yes">Comment Region</property>
         <property name="ShortLabel" translatable="yes">Comment Region</property>
         <signal name="Activated" handler="OnCommentRegionActionActivated" />
       </action>
       <action id="UncommentRegionAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;braceright</property>
         <property name="Label" translatable="yes">Uncomment Region</property>
         <property name="ShortLabel" translatable="yes">Uncomment Region</property>
         <signal name="Activated" handler="OnUncommentRegionActionActivated" />
@@ -166,6 +171,7 @@
       </action>
       <action id="aboutAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Mod2&gt;F10</property>
         <property name="Label" translatable="yes">_About</property>
         <property name="ShortLabel" translatable="yes">_About</property>
         <property name="StockId">gtk-about</property>
@@ -182,12 +188,15 @@
       </action>
       <action id="yesAction1">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Mod2&gt;F5</property>
         <property name="Label" translatable="yes">Execute Script</property>
         <property name="ShortLabel" translatable="yes">Execute Script</property>
         <property name="StockId">gtk-yes</property>
+        <signal name="Activated" handler="OnYesAction1Activated" />
       </action>
       <action id="noAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Mod2&gt;Escape</property>
         <property name="Label" translatable="yes">Stop Script</property>
         <property name="Sensitive">False</property>
         <property name="ShortLabel" translatable="yes">Stop Script</property>
@@ -200,12 +209,14 @@
       </action>
       <action id="zoomInAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;plus</property>
         <property name="Label" translatable="yes">Zoom _In</property>
         <property name="ShortLabel" translatable="yes">Zoom _In</property>
         <property name="StockId">gtk-zoom-in</property>
       </action>
       <action id="zoomOutAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;minus</property>
         <property name="Label" translatable="yes">Zoom _Out</property>
         <property name="ShortLabel" translatable="yes">Zoom _Out</property>
         <property name="StockId">gtk-zoom-out</property>
@@ -316,6 +327,7 @@
           <widget class="Gtk.Toolbar" id="toolbar1">
             <property name="MemberName" />
             <property name="ShowArrow">False</property>
+            <signal name="ButtonReleaseEvent" handler="OnToolbar1ButtonReleaseEvent" />
             <node name="toolbar1" type="Toolbar">
               <node type="Toolitem" action="newAction" />
               <node type="Toolitem" action="openAction" />

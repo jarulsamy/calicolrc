@@ -55,6 +55,11 @@ namespace Calico {
             tab_label.TooltipText = filename;
             tab_widget.ShowAll();
         }
+
+        public static string _(string message) {
+            return global::Mono.Unix.Catalog.GetString(message);
+        }
+
         public virtual bool GotoLine(int lineno) {
             return true;
         }
@@ -154,10 +159,11 @@ namespace Calico {
             bool retval = false;
             string proposed_dir = "";
             if (filename != null) {
-                //proposed_dir, basename = os.path.split(os.path.abspath(self.filename));
+                proposed_dir = System.IO.Path.GetDirectoryName(filename);
+                basename = System.IO.Path.GetFileName(filename);
             } else {
-                //proposed_dir = os.getcwd();
-                //basename = "Untitled." + self.calico.languages[self.language].extensions[0];
+                proposed_dir = System.IO.Directory.GetCurrentDirectory();
+                basename = "Untitled." + calico.manager[language].extensions[0];
             }
             // first, let's make sure the directory is writable
             if (! IsWritable(proposed_dir)) {
@@ -165,30 +171,30 @@ namespace Calico {
                 proposed_dir = System.Environment.GetFolderPath(
                     System.Environment.SpecialFolder.Personal);
             }
-            /*
-            if (os.getcwd() != proposed_dir:) {
-                os.chdir(proposed_dir);
+            if (System.IO.Directory.GetCurrentDirectory() != proposed_dir) {
+                System.IO.Directory.SetCurrentDirectory(proposed_dir);
             }
-            fc = Gtk.FileChooserDialog(_("Enter the file to save"),
+            Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Enter the file to save"),
                                        calico,
                                        Gtk.FileChooserAction.Save,
                                        _("Cancel"), Gtk.ResponseType.Cancel,
                                        _("Save"), Gtk.ResponseType.Accept);
             fc.CurrentName = basename;      // the file: entry text box
             fc.SelectFilename(basename);    // the file selection, if it exists
-            fc.KeepAbove = True;
-            if (fc.Run() == int(Gtk.ResponseType.Accept)) {
-                self.filename = fc.Filename;
-                tooltips = Gtk.Tooltips();
-                tooltips.SetTip(self.label, self.filename, None);
-                self.save();
-                self.title = os.path.basename(self.filename);
-                self.label.Text = self.title;
-                self.on_change_file();
-                retval = True;
+            fc.KeepAbove = true;
+            if (fc.Run() == (int)Gtk.ResponseType.Accept) {
+                // FIXME: check to see if already exists
+                // ask to overwrite
+                filename = fc.Filename;
+                Gtk.Tooltips tooltips = new Gtk.Tooltips();
+                tooltips.SetTip(tab_label, filename, null);
+                Save();
+                basename = System.IO.Path.GetFileName(filename);
+                tab_label.Text = basename;
+                //self.on_change_file();
+                retval = true;
             }
             fc.Destroy();
-            */
             return retval;
         }
 
