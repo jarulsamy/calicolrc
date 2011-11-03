@@ -344,11 +344,8 @@ public partial class MainWindow : Gtk.Window {
         if (language == null) {
             language = CurrentLanguage;
         }
-        if (filename == null) {
-            filename = String.Format("New {0} Script", manager.languages[language].proper_name);
-        }
 	    // FIXME: get document from language
-        Document document = manager.languages[language].MakeDocument(filename);
+        Document document = manager.languages[language].MakeDocument(this, filename);
         document.Configure();
         return document;
     }

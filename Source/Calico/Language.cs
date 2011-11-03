@@ -37,7 +37,7 @@ namespace Calico {
             engine = new Engine(manager);
         }
 
-        public virtual Document MakeDocument(string filename) {
+        public virtual Document MakeDocument(MainWindow calico, string filename) {
             return null;
         }
 

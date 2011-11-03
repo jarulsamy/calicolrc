@@ -23,6 +23,7 @@ using System;
 
 namespace Calico {
     public class Document {
+        public MainWindow calico;
         public string language;
         public string filename;
         public string basename;
@@ -33,11 +34,15 @@ namespace Calico {
         // label for notebook page
         public Gtk.Button close_button;
         // tab close button
-        public Document(string filename, string language) : base() {
+        public Document(MainWindow calico, string filename, string language) : base() {
+            this.calico = calico;
             this.filename = filename;
             this.language = language;
             widget = new Gtk.ScrolledWindow();
-            basename = System.IO.Path.GetFileName(filename);
+            if (filename != null)
+                basename = System.IO.Path.GetFileName(filename);
+            else
+               basename = String.Format("New {0} Script", calico.manager.languages[language].proper_name);
             tab_widget = new Gtk.HBox();
             tab_label = new Gtk.Label(basename);
             ((Gtk.HBox)tab_widget).Add(tab_label);
@@ -87,7 +92,8 @@ namespace Calico {
         public Mono.TextEditor.TextEditor texteditor;
         public Mono.TextEditor.TextEditorOptions options;
 
-        public TextDocument(string filename, string language, string mimetype) : base(filename, language) {
+        public TextDocument(MainWindow calico, string filename, string language, string mimetype) :
+        base(calico, filename, language) {
             options = new Mono.TextEditor.TextEditorOptions();
             Mono.TextEditor.Document document = new Mono.TextEditor.Document();
             if (System.IO.File.Exists(filename)) {

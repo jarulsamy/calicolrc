@@ -61,8 +61,8 @@ public class CalicoRubyLanguage : Language {
         engine = new CalicoRubyEngine(manager);
     }
 
-    public override Document MakeDocument(string filename) {
-        return new TextDocument(filename, name, mimetype);
+    public override Document MakeDocument(MainWindow calico, string filename) {
+      return new TextDocument(calico, filename, name, mimetype);
 		
     }
 

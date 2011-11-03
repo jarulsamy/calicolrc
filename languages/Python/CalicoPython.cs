@@ -70,8 +70,8 @@ public class CalicoPythonLanguage : Language {
         engine = new CalicoPythonEngine(manager);
     }
 
-    public override Document MakeDocument(string filename) {
-        return new TextDocument(filename, name, mimetype);
+    public override Document MakeDocument(MainWindow calico, string filename) {
+      return new TextDocument(calico, filename, name, mimetype);
     }
 
     public static new Language MakeLanguage() {
