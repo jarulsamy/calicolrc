@@ -293,7 +293,7 @@ public partial class MainWindow : Gtk.Window {
         }
         if (add_it) {
             //self.calico.on_action("opened-document", filename=filename);
-            int page_num = DocumentNotebook.AppendPage(page.widget, page.tab_label);
+            int page_num = DocumentNotebook.AppendPage(page.widget, page.tab_widget);
             documents[page.widget] = page;
             DocumentNotebook.SetTabReorderable(page.widget, true);
             DocumentNotebook.CurrentPage = page_num;

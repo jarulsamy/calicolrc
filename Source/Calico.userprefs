@@ -1,16 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/Document.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="102" Column="17" />
-      <File FileName="Calico/Main.cs" Line="33" Column="47" />
-      <File FileName="Calico/Document.cs" Line="78" Column="76" />
+      <File FileName="Calico/MainWindow.cs" Line="306" Column="29" />
+      <File FileName="Calico/Main.cs" Line="29" Column="19" />
+      <File FileName="Calico/CustomStream.cs" Line="41" Column="35" />
+      <File FileName="Calico/Document.cs" Line="108" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="Document.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>

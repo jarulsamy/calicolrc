@@ -41,7 +41,7 @@ namespace Calico {
             return null;
         }
 
-        public static Language RegisterLanguage() {
+        public static Language MakeLanguage() {
             return null;
         }
     }

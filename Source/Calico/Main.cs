@@ -21,8 +21,7 @@
 
 using System;
 using Gtk;
-using System.Collections.Generic;
-// IList
+using System.Collections.Generic; // IList
 using Mono.Unix;
 using System.IO;
 using System.Reflection;
@@ -50,13 +49,13 @@ namespace Calico {
                 {
                     foreach (FileInfo f in d.GetFiles("Calico*.dll"))
                     {
-                        Print("Loading {0}...", f.FullName);
+                        //Print("Loading {0}...", f.FullName);
                         Assembly assembly = Assembly.LoadFrom(f.FullName);
                         if (assembly != null) {
                             foreach (Type type in assembly.GetTypes()) {
                                 MethodInfo method;
                                 try {
-                                    method = type.GetMethod("RegisterLanguage");
+                                    method = type.GetMethod("MakeLanguage");
                                 } catch (Exception e) {
                                     Print("Failure; skipping language file...'{0}'", f.FullName);
                                     continue;
@@ -64,7 +63,7 @@ namespace Calico {
                                 if (method != null) {
                                     Language language = (Language)method.Invoke(type, new object[]{});
                                     languages[language.name] = language;
-                                    Print("Registering language...'{0}'", language.name);
+                                    //Print("Registering language...'{0}'", language.name);
                                     break;
                                 }
                             }
@@ -73,8 +72,8 @@ namespace Calico {
                 }
             }
             //  Or load directly:
-            //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
-            //languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
+            //languages["python"] = CalicoPythonLanguage.MakeLanguage();
+            //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager(languages);
            // Global settings:

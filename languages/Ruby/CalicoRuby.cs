@@ -122,10 +122,12 @@ public class CalicoRubyEngine : DLREngine {
 }
 
 public class CalicoRubyLanguage : Language {
+	string mimetype;
 
     public CalicoRubyLanguage(string name, string proper, 
-				string [] extensions) : 
+				string [] extensions, string mimetype) : 
     base(name, proper, extensions) {
+		this.mimetype = mimetype;
     }
 
     public override void MakeEngine(LanguageManager manager) {
@@ -133,13 +135,14 @@ public class CalicoRubyLanguage : Language {
     }
 
     public override Document MakeDocument(string filename) {
-        return new TextDocument(filename, name);
+        return new TextDocument(filename, name, mimetype);
+		
     }
 
-
-    public static new Language RegisterLanguage() {
+    public static new Language MakeLanguage() {
         return new CalicoRubyLanguage("ruby", 
 					"Ruby",
-					new string[] { "rb"});
+					new string[] { "rb"},
+					"text/x-ruby");
     }
 }
