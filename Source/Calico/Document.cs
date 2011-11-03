@@ -70,11 +70,12 @@ namespace Calico {
 
     public class TextDocument : Document {
         public Mono.TextEditor.TextEditor texteditor;
+        public Mono.TextEditor.TextEditorOptions options;
 
         public TextDocument(string filename, string language) : base(filename, language) {
-            
-            //Mono.TextEditor.TextEditorOptions options = new Mono.TextEditor.TextEditorOptions();
-            texteditor = new Mono.TextEditor.TextEditor();
+            options = new Mono.TextEditor.TextEditorOptions();
+            Mono.TextEditor.Document document = new Mono.TextEditor.Document();
+            texteditor = new Mono.TextEditor.TextEditor(document, options);
             texteditor.Document.MimeType = String.Format("text/x-{0}", language);
             widget.Add(texteditor);
             widget.ShowAll();
