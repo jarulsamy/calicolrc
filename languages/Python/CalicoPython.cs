@@ -36,24 +36,22 @@ public class CalicoPythonEngine : DLREngine {
     }
 
     public override void setup() {
-        Console.WriteLine("setup!");
         manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
-        runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-        Console.WriteLine("runtime: {0}", runtime);
-        engine = runtime.GetEngine(dlr_name);
+    }
+
+    public override void start() {
+        engine = manager.scriptRuntime.GetEngine(dlr_name);  
         // Set the compiler options here:
         compiler_options = engine.GetCompilerOptions();
         IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
         options.PrintFunction = true;
         options.AllowWithStatement = true;
         options.TrueDivision = true;
-        Console.WriteLine("engine: {0}", engine);
         // Create a Python-only scope:
-        scope = runtime.CreateScope();
-    }
-
-    public override void start() {
-        ICollection<string> paths = engine.GetSearchPaths();
+		scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+        scope = scriptRuntime.CreateScope();
+		// Set paths:
+		ICollection<string> paths = engine.GetSearchPaths();
         // Let users find Calico modules:
         foreach (string folder in new string[] { "modules", "src" }) {
             paths.Add(Path.GetFullPath(folder));
@@ -102,7 +100,7 @@ public class CalicoPythonEngine : DLREngine {
             }
         }
         try {
-            if (UseManagerScope)
+            if (manager.UseSharedScope)
                 source.Execute(manager.scope);
             else
                 source.Execute(scope);

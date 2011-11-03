@@ -36,22 +36,18 @@ public class CalicoRubyEngine : DLREngine {
     }
 
     public override void setup() {
-        Console.WriteLine("setup!");
         manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
-        runtime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-        Console.WriteLine("runtime: {0}", runtime);
-        engine = runtime.GetEngine(dlr_name);
+    }
+
+    public override void start() {
+		engine = manager.scriptRuntime.GetEngine(dlr_name);
         // Set the compiler options here:
         compiler_options = engine.GetCompilerOptions();
         //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
         // set some ruby options
-        Console.WriteLine("engine: {0}", engine);
-        // If the manager.scope environment is not set yet, set it here:
-        scope = runtime.CreateScope();
-        // Otherwise, we can use one created by another language
-    }
-
-    public override void start() {
+        // Ruby-only scope:
+        scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+        scope = scriptRuntime.CreateScope();
     }
 
     public override bool execute(string text) {
@@ -81,7 +77,7 @@ public class CalicoRubyEngine : DLREngine {
             }
         }
         try {
-            if (UseManagerScope)
+            if (manager.UseSharedScope)
                 source.Execute(manager.scope);
             else
                 source.Execute(scope);

@@ -75,7 +75,7 @@ namespace Calico {
             //  Or load directly:
             //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
             //languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
-             // Now, let's load engines
+            // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager(languages);
            // Global settings:
             bool Debug = false;

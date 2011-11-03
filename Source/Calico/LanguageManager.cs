@@ -32,6 +32,7 @@ namespace Calico {
         public Microsoft.Scripting.Hosting.ScriptRuntime scriptRuntime;
         public Microsoft.Scripting.Hosting.ScriptScope scope;
         public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
+        public bool UseSharedScope = true;
 
         public LanguageManager(Dictionary<string,Language> langs) {
             languages = new Dictionary<string, Language>();
@@ -40,6 +41,27 @@ namespace Calico {
             }
             setup();
             start();
+        }
+
+        public void setup() {
+            // In case it needs it for DLR languages
+            scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
+            foreach (string language in getLanguages()) {
+                try {
+                    languages[language].engine.setup();
+                } catch {
+                    Console.Error.WriteLine("Language failed to initialize: {0}", language);
+                    languages.Remove(language);
+                }
+            }
+            // Language neutral scope:
+            try {
+                scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+                scope = scriptRuntime.CreateScope();
+            } catch {
+                Console.Error.WriteLine("No DLR languages were loaded.");
+            }
+
         }
 
         public Language this[string name] {
@@ -63,26 +85,6 @@ namespace Calico {
             }
             languages[language.name] = language; // ok, save it
         }
-
-        public void setup() {
-            // In case it needs it:
-            scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-            foreach (string language in getLanguages()) {
-                try {
-                    languages[language].engine.setup();
-                } catch {
-                    Console.Error.WriteLine("Language failed to initialize: {0}", language);
-                    languages.Remove(language);
-                }
-            }
-            // Language neutral scope:
-            try {
-                scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-                scope = scriptRuntime.CreateScope();
-            } catch {
-                Console.Error.WriteLine("No DLR languages were loaded.");
-            }
-      }
 
         public void set_redirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
