@@ -62,6 +62,10 @@ namespace Calico {
             // For setting defaults
         }
 
+        public virtual bool SaveAs() {
+            return true;
+        }
+
         public virtual bool Save() {
             return true;
         }
@@ -126,11 +130,73 @@ namespace Calico {
             return true;
         }
 
+        public bool IsWritable(string filename) {
+            string directory = System.IO.Path.GetDirectoryName(filename);
+            string tempfile = System.IO.Path.Combine(directory, "tempfile.tmp");
+            bool retval = true;
+            try {
+                System.IO.FileStream fp = System.IO.File.OpenWrite(tempfile);
+                fp.Close();
+                System.IO.File.Delete(tempfile);
+            } catch {
+                retval = false;
+            }
+            return retval;
+        }
+
+        public override bool SaveAs() {
+            bool retval = false;
+            string proposed_dir = "";
+            if (filename != null) {
+                //proposed_dir, basename = os.path.split(os.path.abspath(self.filename));
+            } else {
+                //proposed_dir = os.getcwd();
+                //basename = "Untitled." + self.calico.languages[self.language].extensions[0];
+            }
+            // first, let's make sure the directory is writable
+            if (! IsWritable(proposed_dir)) {
+                // if not, let's change dirs
+                proposed_dir = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal);
+            }
+            /*
+            if (os.getcwd() != proposed_dir:) {
+                os.chdir(proposed_dir);
+            }
+            fc = Gtk.FileChooserDialog(_("Enter the file to save"),
+                                       calico,
+                                       Gtk.FileChooserAction.Save,
+                                       _("Cancel"), Gtk.ResponseType.Cancel,
+                                       _("Save"), Gtk.ResponseType.Accept);
+            fc.CurrentName = basename;      // the file: entry text box
+            fc.SelectFilename(basename);    // the file selection, if it exists
+            fc.KeepAbove = True;
+            if (fc.Run() == int(Gtk.ResponseType.Accept)) {
+                self.filename = fc.Filename;
+                tooltips = Gtk.Tooltips();
+                tooltips.SetTip(self.label, self.filename, None);
+                self.save();
+                self.title = os.path.basename(self.filename);
+                self.label.Text = self.title;
+                self.on_change_file();
+                retval = True;
+            }
+            fc.Destroy();
+            */
+            return retval;
+        }
+
         public override bool Save() {
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-            sw.Write(texteditor.Document.Text);
-            sw.Close();
-            texteditor.Document.SetNotDirtyState();
+            if (filename != null) {
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+                sw.Write(texteditor.Document.Text);
+                sw.Close();
+                texteditor.Document.SetNotDirtyState();
+            } else {
+                bool retval = SaveAs();
+                // if successful
+                // change name of tab/filename/basefile
+            }
             return true;
         }
     }

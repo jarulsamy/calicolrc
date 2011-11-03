@@ -22,6 +22,7 @@
 using System;
 using System.IO; // Path
 using System.Threading;
+using System.Text;
 using System.Collections.Generic;
 using Calico;
 
@@ -422,12 +423,52 @@ public partial class MainWindow : Gtk.Window {
         }
     }
 
+    protected virtual string CommentText(string text) {
+        // FIXME: this right... need to get entire lines
+        text = "## " + text.Replace("\n", "\n## ");
+        return text;
+    }
+
+    protected virtual string UnCommentText(string text) {
+            return text;
+    }
+
+    protected virtual string CleanUpText(string text) {
+        // Prevent weird characters like Word smart quotes.
+        // First, replace all of those that we know about:
+        text = text.Replace('\u2013', '-');
+        text = text.Replace('\u2014', '-');
+        text = text.Replace('\u2015', '-');
+        text = text.Replace('\u2017', '_');
+        text = text.Replace('\u2018', '\'');
+        text = text.Replace('\u2019', '\'');
+        text = text.Replace('\u201a', ',');
+        text = text.Replace('\u201b', '\'');
+        text = text.Replace('\u201c', '\"');
+        text = text.Replace('\u201d', '\"');
+        text = text.Replace('\u201e', '\"');
+        text = text.Replace("\u2026", "...");
+        text = text.Replace('\u2032', '\'');
+        text = text.Replace('\u2033', '\"');
+        // And then replace the rest with '':
+        byte [] bytes = Encoding.Convert(
+                    Encoding.UTF8,
+                    Encoding.GetEncoding(
+                        Encoding.ASCII.EncodingName,
+                        new EncoderReplacementFallback(string.Empty),
+                        new DecoderExceptionFallback()
+                        ),
+                    Encoding.UTF8.GetBytes(text)
+                );
+        return Encoding.ASCII.GetString(bytes);
+    }
+
     protected virtual void OnPasteActionActivated(object sender, System.EventArgs e) {
         if (Focus is Mono.TextEditor.TextEditor) {
             string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
             if (text != null)
                 ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
-            ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(clipboard.WaitForText());
+            ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
         } else if (Focus is Gtk.TextView) {
             ((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
         }
@@ -484,10 +525,81 @@ public partial class MainWindow : Gtk.Window {
         }
     }
 
+    public static int CommentLine(Mono.TextEditor.TextEditorData data, Mono.TextEditor.LineSegment line) {
+        // FIXME: get comment string from language
+        data.Insert(line.Offset, "## ");
+        return 1;
+    }
+
+    public static int UnCommentLine(Mono.TextEditor.TextEditorData data, Mono.TextEditor.LineSegment line) {
+        // FIXME: get comment string from language
+        if (data.Document.GetCharAt(line.Offset) == '#' &&
+            data.Document.GetCharAt(line.Offset + 1) == '#' &&
+            data.Document.GetCharAt(line.Offset + 2) == ' ') {
+            data.Remove(line.Offset, 3);
+            return 1;
+         } else {
+            return 0;
+         }
+    }
+
+    static void SelectLineBlock (Mono.TextEditor.TextEditorData data, int endLineNr, int startLineNr) {
+      Mono.TextEditor.LineSegment endLine = data.Document.GetLine (endLineNr);
+      data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 0, endLineNr, endLine.Length);
+    }
+
     protected virtual void OnCommentRegionActionActivated(object sender, System.EventArgs e) {
+        if (Focus is Mono.TextEditor.TextEditor) {
+            Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
+            Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
+            int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
+            int endLineNr   = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
+            data.Document.BeginAtomicUndo();
+            int first = -1;
+            int last  = 0;
+            foreach(Mono.TextEditor.LineSegment line in data.SelectedLines) {
+                last = CommentLine(data, line);
+                if (first < 0)
+                    first = last;
+            }
+            if (data.IsSomethingSelected)
+                SelectLineBlock(data, endLineNr, startLineNr);
+            if (data.Caret.Column != 0) {
+                data.Caret.PreserveSelection = true;
+                data.Caret.Column = System.Math.Max (0, data.Caret.Column - last);
+                data.Caret.PreserveSelection = false;
+            }
+            data.Document.EndAtomicUndo();
+            data.Document.RequestUpdate (new Mono.TextEditor.MultipleLineUpdate(startLineNr, endLineNr));
+            data.Document.CommitDocumentUpdate();
+        }
     }
 
     protected virtual void OnUncommentRegionActionActivated(object sender, System.EventArgs e) {
+        if (Focus is Mono.TextEditor.TextEditor) {
+            Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
+            Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
+            int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
+            int endLineNr   = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
+            data.Document.BeginAtomicUndo();
+            int first = -1;
+            int last  = 0;
+            foreach(Mono.TextEditor.LineSegment line in data.SelectedLines) {
+                last = UnCommentLine(data, line);
+                if (first < 0)
+                    first = last;
+            }
+            if (data.IsSomethingSelected)
+                SelectLineBlock(data, endLineNr, startLineNr);
+            if (data.Caret.Column != 0) {
+                data.Caret.PreserveSelection = true;
+                data.Caret.Column = System.Math.Max (0, data.Caret.Column - last);
+                data.Caret.PreserveSelection = false;
+            }
+            data.Document.EndAtomicUndo();
+            data.Document.RequestUpdate (new Mono.TextEditor.MultipleLineUpdate(startLineNr, endLineNr));
+            data.Document.CommitDocumentUpdate();
+        }
     }
 
     protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {

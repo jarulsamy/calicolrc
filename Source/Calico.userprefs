@@ -1,18 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/DLREngine.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="52" Column="33" />
+      <File FileName="Calico/MainWindow.cs" Line="520" Column="1" />
       <File FileName="Calico/LanguageManager.cs" Line="67" Column="42" />
-      <File FileName="Calico/Document.cs" Line="117" Column="39" />
-      <File FileName="Calico/Engine.cs" Line="33" Column="10" />
-      <File FileName="Calico/DLREngine.cs" Line="54" Column="44" />
+      <File FileName="Calico/Document.cs" Line="160" Column="33" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="DLREngine.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -32,10 +30,7 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/dblank/Calico/trunk/Source/Calico/MainWindow.cs" line="267" />
-      <Breakpoint file="/home/dblank/Calico/trunk/Source/Calico/MainWindow.cs" line="392" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" />
