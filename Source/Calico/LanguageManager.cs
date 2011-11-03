@@ -1,5 +1,5 @@
 //
-//  EngineManager.cs
+//  LanguageManager.cs
 //  
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
@@ -23,69 +23,79 @@ using System;
 using System.Collections.Generic; // IList, Dictionary
 
 namespace Calico {
-    public class EngineManager {
+    public class LanguageManager {
         // FIXME: make MainWindow a general interface (without Gtk)
         public MainWindow calico;
-        private Dictionary<string, Engine> engines;
+        public Dictionary<string, Language> languages;
         public CustomStream stderr;
         public CustomStream stdout;
         public Microsoft.Scripting.Hosting.ScriptRuntime scriptRuntime;
         public Microsoft.Scripting.Hosting.ScriptScope scope;
         public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
 
-        public EngineManager(MainWindow calico) {
-            this.calico = calico;
-            engines = new Dictionary<string, Engine>();
+        public LanguageManager(Dictionary<string,Language> langs) {
+            languages = new Dictionary<string, Language>();
+            foreach (string name in langs.Keys) {
+                register(langs[name]); // This may fail, which won't add language
+            }
+            setup();
+            start();
         }
 
-        public Engine this[string name] {
-            get {return engines[name];}
-            set {engines[name] = value;}
+        public Language this[string name] {
+            get {return languages[name];}
+            set {languages[name] = value;}
         }
 
-        public string[] get_languages() {
+        public string[] getLanguages() {
             // FIXME: sort
-            string[] keys = new string[engines.Count];
-            engines.Keys.CopyTo(keys, 0);
+            string[] keys = new string[languages.Count];
+            languages.Keys.CopyTo(keys, 0);
             return keys;
         }
 
         public void register(Language language) {
             try {
-                engines[language.name] = language.make_engine(this);
+                language.MakeEngine(this); // Makes a default engine
             } catch {
-                Console.WriteLine("Skipping language {0}", language.name);
+                Console.WriteLine("Register failed; skipping language {0}", language.name);
+                return;
             }
+            languages[language.name] = language; // ok, save it
         }
 
         public void setup() {
+            // In case it needs it:
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-            foreach (string engine in engines.Keys) {
+            foreach (string language in getLanguages()) {
                 try {
-                    engines[engine].setup();
+                    languages[language].engine.setup();
                 } catch {
-                    Console.Error.WriteLine("Engine failed to initialize: {0}", engine);
-                    engines.Remove(engine);
+                    Console.Error.WriteLine("Language failed to initialize: {0}", language);
+                    languages.Remove(language);
                 }
             }
             // Language neutral scope:
-            //scriptRuntimeSetup.LanguageSetups.Add( FIXME: in progress
-            scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-            scope = scriptRuntime.CreateScope();
+            try {
+                scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+                scope = scriptRuntime.CreateScope();
+            } catch {
+                Console.Error.WriteLine("No DLR languages were loaded.");
+            }
       }
 
         public void set_redirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
             this.stderr = stderr;
             this.stdout = stdout;
-            foreach (string engine in engines.Keys) {
-                engines[engine].set_redirects(this.stdout, this.stderr);
+            foreach (string language in languages.Keys) {
+                languages[language].engine.set_redirects(this.stdout, this.stderr);
             }
         }
 
         public void start() {
-            foreach (string engine in engines.Keys) {
-                engines[engine].start();
+            foreach (string language in languages.Keys) {
+                languages[language].engine.start();
             }
         }
 

@@ -30,7 +30,7 @@ using System.Reflection;
 namespace Calico {
     class MainClass {
         public static string Version = "2.0.0";
-        public static bool IsLoadModules = false;
+        public static bool IsLoadModules = true;
 
         [STAThread]
         public static void Main(string[] args) {
@@ -54,7 +54,13 @@ namespace Calico {
                         Assembly assembly = Assembly.LoadFrom(f.FullName);
                         if (assembly != null) {
                             foreach (Type type in assembly.GetTypes()) {
-                                MethodInfo method = type.GetMethod("RegisterLanguage");
+                                MethodInfo method;
+                                try {
+                                    method = type.GetMethod("RegisterLanguage");
+                                } catch (Exception e) {
+                                    Print("Failure; skipping language file...'{0}'", f.FullName);
+                                    continue;
+                                }
                                 if (method != null) {
                                     Language language = (Language)method.Invoke(type, new object[]{});
                                     languages[language.name] = language;
@@ -67,10 +73,11 @@ namespace Calico {
                 }
             }
             //  Or load directly:
-            languages["python"] = CalicoPythonLanguage.RegisterLanguage();
-            languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
-            
-            // Global settings:
+            //languages["python"] = CalicoPythonLanguage.RegisterLanguage();
+            //languages["ruby"] = CalicoRubyLanguage.RegisterLanguage();
+             // Now, let's load engines
+            Calico.LanguageManager manager = new Calico.LanguageManager(languages);
+           // Global settings:
             bool Debug = false;
             if (!((IList<string>)args).Contains("--debug-handler")) {
                 GLib.ExceptionManager.UnhandledException += HandleException;
@@ -88,7 +95,7 @@ namespace Calico {
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
-                MainWindow win = new MainWindow(args, languages, Debug);
+                MainWindow win = new MainWindow(args, manager, Debug);
                 win.Show();
                 Application.Run();
             }

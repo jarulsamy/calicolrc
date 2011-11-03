@@ -23,6 +23,7 @@ namespace Calico {
 
     public class Language {
         public string name;
+        public Engine engine;
         public string proper_name;
         public string[] extensions;
 
@@ -32,8 +33,12 @@ namespace Calico {
             this.extensions = extensions;
         }
 
-        public virtual Engine make_engine(EngineManager manager) {
-            return new Engine(manager);
+        public virtual void MakeEngine(LanguageManager manager) {
+            engine = new Engine(manager);
+        }
+
+        public virtual Document MakeDocument(string filename) {
+            return null;
         }
 
         public static Language RegisterLanguage() {

@@ -31,7 +31,7 @@ namespace Calico {
         public Microsoft.Scripting.Hosting.ScriptScope scope;
         public bool UseManagerScope;
 
-        public DLREngine(EngineManager manager) : base(manager) {
+        public DLREngine(LanguageManager manager) : base(manager) {
             UseManagerScope = false;
         }
     }

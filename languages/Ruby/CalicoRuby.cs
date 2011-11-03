@@ -26,7 +26,7 @@ using Calico;
 
 public class CalicoRubyEngine : DLREngine {
 
-    public CalicoRubyEngine(EngineManager manager) : base(manager) {
+    public CalicoRubyEngine(LanguageManager manager) : base(manager) {
         dlr_name = "rb";
         scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
         languageSetup = IronRuby.Ruby.CreateRubySetup();
@@ -74,8 +74,9 @@ public class CalicoRubyEngine : DLREngine {
                 } else {
                     source.Compile();
                 }
-            } catch {
-                //traceback.print_exc()
+            } catch (Exception e) {
+                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                manager.stderr.PrintLine(eo.FormatException(e));
                 return false;
             }
         }
@@ -84,7 +85,10 @@ public class CalicoRubyEngine : DLREngine {
                 source.Execute(manager.scope);
             else
                 source.Execute(scope);
-        } catch {
+        } catch (Exception e) {
+            Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+            manager.stderr.PrintLine(eo.FormatException(e));
+            return false;
         }
         return true;
     }
@@ -128,9 +132,14 @@ public class CalicoRubyLanguage : Language {
     base(name, proper, extensions) {
     }
 
-    public override Engine make_engine(EngineManager manager) {
-        return new CalicoRubyEngine(manager);
+    public override void MakeEngine(LanguageManager manager) {
+        engine = new CalicoRubyEngine(manager);
     }
+
+    public override Document MakeDocument(string filename) {
+        return new TextDocument(filename, name);
+    }
+
 
     public static new Language RegisterLanguage() {
         return new CalicoRubyLanguage("ruby", 

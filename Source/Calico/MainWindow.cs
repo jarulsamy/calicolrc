@@ -32,10 +32,9 @@ public partial class MainWindow : Gtk.Window {
     private Mono.TextEditor.TextEditor _shell;
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
-    public Dictionary<string, Language> languages;
     public static Dictionary<Tag, Gtk.TextTag> colors = new Dictionary<Tag,Gtk.TextTag>();
     public static Dictionary<Tag, string> colornames = new Dictionary<Tag,string>();
-    public EngineManager manager;
+    public LanguageManager manager;
     public string CurrentLanguage = null;
     public string ShellLanguage = null;
     public bool Debug = false;
@@ -67,15 +66,15 @@ public partial class MainWindow : Gtk.Window {
     }
     public string CurrentProperLanguage {
         get {
-            if (CurrentLanguage != null && languages.ContainsKey(CurrentLanguage))
-                return languages[CurrentLanguage].proper_name;
+            if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
+                return manager.languages[CurrentLanguage].proper_name;
             return null;
         }
     }
 
-    public MainWindow(string[] args, Dictionary<string, Language> LanguageMap, bool Debug) : base(Gtk.WindowType.Toplevel) {
+    public MainWindow(string[] args, LanguageManager manager, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
-        this.languages = LanguageMap;
+        this.manager = manager;
         // Colors by name:
         // FIXME: load from defaults
         colornames[Tag.Error] = "error";
@@ -110,10 +109,14 @@ public partial class MainWindow : Gtk.Window {
         clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
         Title = String.Format("Calico - {0}", System.Environment.UserName);
+
+        manager.set_redirects(new CustomStream(this, Tag.Normal),
+                              new CustomStream(this, Tag.Error));
+
 	    // New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
         file_menu.Submenu = new Gtk.Menu();
-        foreach (KeyValuePair<string,Language> pair in LanguageMap) {
+        foreach (KeyValuePair<string,Language> pair in manager.languages) {
             Language language = pair.Value;
             Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
             ((Gtk.Menu)file_menu.Submenu).Add(menu);
@@ -127,7 +130,7 @@ public partial class MainWindow : Gtk.Window {
     	int count = 0;
         Gtk.RadioMenuItem group = null;
         Gtk.RadioMenuItem radioitem;
-        foreach (KeyValuePair<string,Language> pair in LanguageMap) {
+        foreach (KeyValuePair<string,Language> pair in manager.languages) {
             Language language = pair.Value;
             if (CurrentLanguage == null) {
                 CurrentLanguage = language.name;
@@ -176,26 +179,12 @@ public partial class MainWindow : Gtk.Window {
             // pass
         }
         
-        // Now, let's load engines
-        manager = new EngineManager(this);
-        foreach (string name in LanguageMap.Keys) {
-            manager.register(LanguageMap[name]);
-        }
-        manager.setup();
-        manager.start();
-        manager.set_redirects(new CustomStream(this, Tag.Normal),
-                              new CustomStream(this, Tag.Error));
         SetLanguage(CurrentLanguage);
-        
-        List<string> files = new List<string>();
+        // Load files:
         foreach (string arg in args) {
-            if (arg.StartsWith("--")) {
-            } else {
-                files.Add(System.IO.Path.GetFullPath(arg));
+            if (! arg.StartsWith("--")) {
+                SelectOrOpen(arg);
             }
-        }
-        foreach (string filename in files) {
-            SelectOrOpen(filename);
         }
     }
 
@@ -339,10 +328,10 @@ public partial class MainWindow : Gtk.Window {
             language = CurrentLanguage;
         }
         if (filename == null) {
-            filename = String.Format("New {0} Script", languages[language].proper_name);
+            filename = String.Format("New {0} Script", manager.languages[language].proper_name);
         }
 	    // FIXME: get document from language
-        return new TextDocument(filename, language);
+        return manager.languages[language].MakeDocument(filename);
     }
 
     public bool Close() {
@@ -538,7 +527,7 @@ public partial class MainWindow : Gtk.Window {
                     completion = null;
                     args.RetVal = true;
                     // nothing to do, but handled
-                } else if (manager[CurrentLanguage].ReadyToExecute(text) || force) {
+                } else if (manager[CurrentLanguage].engine.ReadyToExecute(text) || force) {
                     //history.last(text.rstrip());
                     //history.add("");
                     bool results = Execute(text.TrimEnd(), CurrentLanguage);
@@ -582,7 +571,7 @@ public partial class MainWindow : Gtk.Window {
 
     public void ExecuteInBackground(string text) {
         // This is the only approved method of running code
-        manager[CurrentLanguage].execute(text);
+        manager[CurrentLanguage].engine.execute(text);
     }
 
     public static Gtk.TextTag TagColor(Tag tag) {

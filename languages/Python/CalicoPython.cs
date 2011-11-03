@@ -26,7 +26,7 @@ using Calico;
 
 public class CalicoPythonEngine : DLREngine {
 
-    public CalicoPythonEngine(EngineManager manager) : base(manager) {
+    public CalicoPythonEngine(LanguageManager manager) : base(manager) {
         dlr_name = "py";
         scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
         languageSetup = IronPython.Hosting.Python.CreateLanguageSetup(null);
@@ -127,8 +127,12 @@ public class CalicoPythonLanguage : Language {
         base(name, proper, extensions) {
     }
 
-    public override Engine make_engine(EngineManager manager) {
-        return new CalicoPythonEngine(manager);
+    public override void MakeEngine(LanguageManager manager) {
+        engine = new CalicoPythonEngine(manager);
+    }
+
+    public override Document MakeDocument(string filename) {
+        return new TextDocument(filename, name);
     }
 
     public static new Language RegisterLanguage() {

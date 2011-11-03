@@ -22,9 +22,9 @@
 namespace Calico {
 
     public class Engine {
-        public EngineManager manager;
+        public LanguageManager manager;
 
-        public Engine(EngineManager manager) {
+        public Engine(LanguageManager manager) {
             this.manager = manager;
         }
 

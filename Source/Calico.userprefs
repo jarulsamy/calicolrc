@@ -1,21 +1,21 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/EngineManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/Main.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="144" Column="42" />
+      <File FileName="Calico/MainWindow.cs" Line="71" Column="25" />
       <File FileName="Calico/CustomStream.cs" Line="27" Column="16" />
-      <File FileName="Calico/EngineManager.cs" Line="64" Column="17" />
       <File FileName="Calico/Engine.cs" Line="31" Column="14" />
-      <File FileName="Calico/Main.cs" Line="51" Column="64" />
-      <File FileName="../languages/Ruby/CalicoRuby.cs" Line="83" Column="17" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="35" Column="61" />
-      <File FileName="Calico/DLREngine.cs" Line="32" Column="29" />
+      <File FileName="Calico/Main.cs" Line="61" Column="54" />
+      <File FileName="Calico/DLREngine.cs" Line="34" Column="36" />
+      <File FileName="Calico/LanguageManager.cs" Line="1" Column="1" />
+      <File FileName="Calico/Document.cs" Line="1" Column="1" />
+      <File FileName="Calico/Language.cs" Line="36" Column="32" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="EngineManager.cs" selected="True" />
+            <Node name="Main.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -39,6 +39,6 @@
       <Breakpoint enabled="false" file="/home/dblank/Calico/languages/Python/CalicoPython.cs" line="75" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" />
 </Properties>
