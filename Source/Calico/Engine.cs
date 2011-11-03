@@ -32,17 +32,21 @@ namespace Calico {
             return true;
         }
 
-        public virtual bool execute(string text) {
+        public virtual bool Execute(string text) {
             return true;
         }
 
-        public virtual void setup() {
+        public virtual bool ExecuteFile(string filename) {
+            return true;
         }
 
-        public virtual void start() {
+        public virtual void Setup() {
         }
 
-        public virtual void set_redirects(CustomStream stdout, CustomStream stderr) {
+        public virtual void Start() {
+        }
+
+        public virtual void SetRedirects(CustomStream stdout, CustomStream stderr) {
         }
 
     }

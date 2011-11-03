@@ -33,13 +33,13 @@ public class CalicoPythonEngine : DLREngine {
         // Set LanguageSetup options here:
         languageSetup.Options["FullFrames"] = true; // for debugging
         scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
+        // Create a Python-only scope:
+	scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+        scope = scriptRuntime.CreateScope();
     }
 
-    public override void setup() {
-        manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
-    }
-
-    public override void start() {
+    public override void Start() {
+        // Get engine from manager:
         engine = manager.scriptRuntime.GetEngine(dlr_name);  
         // Set the compiler options here:
         compiler_options = engine.GetCompilerOptions();
@@ -47,74 +47,13 @@ public class CalicoPythonEngine : DLREngine {
         options.PrintFunction = true;
         options.AllowWithStatement = true;
         options.TrueDivision = true;
-        // Create a Python-only scope:
-		scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-        scope = scriptRuntime.CreateScope();
-		// Set paths:
-		ICollection<string> paths = engine.GetSearchPaths();
+	// Set paths:
+	ICollection<string> paths = engine.GetSearchPaths();
         // Let users find Calico modules:
         foreach (string folder in new string[] { "modules", "src" }) {
-            paths.Add(Path.GetFullPath(folder));
+	  paths.Add(Path.GetFullPath(folder));
         }
         engine.SetSearchPaths(paths);
-    }
-    /*
-    // Now that search paths are set:
-    string text = "from debugger import Debugger;" +
-      "debug = Debugger(calico, True, True);" +
-      "del Debugger;";
-    engine.Execute(text, scope);
-  }
-  */
-
-    public override void set_redirects(CustomStream stdout, 
-				       CustomStream stderr) {
-      engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
-      engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
-    }
-
-    public override bool execute(string text) {
-        // This is called by RunInBackground() in the MainWindow
-        //manager.calico.last_error = ""
-        Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
-        Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-        try {
-            if (compiler_options != null) {
-                source.Compile(compiler_options);
-            } else {
-                source.Compile();
-            }
-        } catch {
-            sctype = Microsoft.Scripting.SourceCodeKind.Statements;
-            source = engine.CreateScriptSourceFromString(text, sctype);
-            try {
-                if (compiler_options != null) {
-                    source.Compile(compiler_options);
-                } else {
-                    source.Compile();
-                }
-            } catch (Exception e) {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                manager.stderr.PrintLine(eo.FormatException(e));
-                return false;
-            }
-        }
-        try {
-            if (manager.UseSharedScope)
-                source.Execute(manager.scope);
-            else
-                source.Execute(scope);
-        } catch (Exception e) {
-    	  if (e.Message.Contains("Thread was being aborted")) {
-    	    manager.stderr.Print("[Script stopped----------]\n");
-    	  } else {
-            Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-            manager.stderr.PrintLine(eo.FormatException(e));
-    	  }
-    	  return false;
-	    }
-        manager.stderr.PrintLine(Tag.Info, "Ok");
-	    return true;
     }
 }
 

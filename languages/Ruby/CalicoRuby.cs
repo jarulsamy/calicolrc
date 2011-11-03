@@ -33,92 +33,19 @@ public class CalicoRubyEngine : DLREngine {
         // Set LanguageSetup options here:
         // languageSetup.Options["FullFrames"] = true; // for debugging Python only?
         scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
-    }
-
-    public override void setup() {
-        manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
-    }
-
-    public override void start() {
-		engine = manager.scriptRuntime.GetEngine(dlr_name);
-        // Set the compiler options here:
-        compiler_options = engine.GetCompilerOptions();
-        //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
-        // set some ruby options
         // Ruby-only scope:
         scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
         scope = scriptRuntime.CreateScope();
     }
 
-    public override bool execute(string text) {
-        // This is called by RunInBackground() in the MainWindow
-        //manager.calico.last_error = ""
-        Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
-        Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-        try {
-            if (compiler_options != null) {
-                source.Compile(compiler_options);
-            } else {
-                source.Compile();
-            }
-        } catch {
-            sctype = Microsoft.Scripting.SourceCodeKind.Statements;
-            source = engine.CreateScriptSourceFromString(text, sctype);
-            try {
-                if (compiler_options != null) {
-                    source.Compile(compiler_options);
-                } else {
-                    source.Compile();
-                }
-            } catch (Exception e) {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                manager.stderr.PrintLine(eo.FormatException(e));
-                return false;
-            }
-        }
-        try {
-            if (manager.UseSharedScope)
-                source.Execute(manager.scope);
-            else
-                source.Execute(scope);
-        } catch (Exception e) {
-            Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-            manager.stderr.PrintLine(eo.FormatException(e));
-            return false;
-        }
-        return true;
+    public override void Start() {
+        // Get engine from manager:
+	engine = manager.scriptRuntime.GetEngine(dlr_name);
+        // Set the compiler options here:
+        compiler_options = engine.GetCompilerOptions();
+        //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
+        // set some ruby options
     }
-
-    public override void set_redirects(CustomStream stdout, 
-				       CustomStream stderr) {
-      engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
-      engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
-    }
-
-    /*
-            except Exception, e:
-            if "Thread was being aborted" in str(e.message):
-                self.manager.calico.shell.message("[Script stopped----------]")
-            else:
-                traceback.print_exc()
-            return False
-        # What was last thing printed?
-        try:
-            retval = self.engine.Execute("_")
-        except:
-            retval = None
-        if retval != self.last_retval:
-            if (isinstance(retval, Gtk.Widget) and 
-                retval.Parent == None and 
-                not retval.IsTopLevel):
-                # errors here are terminal:
-                #self.manager.calico.shell.show_widget(retval)
-                #self.manager.calico.shell.message("") # newline
-                pass # too many issues: displaying, Invoke
-            self.last_retval = retval
-        self.manager.calico.shell.message("Ok")
-        return True
-     */
 }
 
 public class CalicoRubyLanguage : Language {

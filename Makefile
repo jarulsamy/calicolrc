@@ -17,10 +17,10 @@ modules/Conx.dll:
 modules/Myro.dll: 
 	cd modules/Myro; make ../Myro.dll
 
-languages/Python/CalicoPython.dll: bin/Calico.exe
+languages/Python/CalicoPython.dll: bin/Calico.exe languages/Python/CalicoPython.cs
 	cd languages/Python; make
 
-languages/Ruby/CalicoRuby.dll: bin/Calico.exe
+languages/Ruby/CalicoRuby.dll: bin/Calico.exe languages/Ruby/CalicoRuby.cs
 	cd languages/Ruby; make
 
 languages/Scheme/Scheme/PJScheme.dll:

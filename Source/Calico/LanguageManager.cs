@@ -48,7 +48,7 @@ namespace Calico {
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string language in getLanguages()) {
                 try {
-                    languages[language].engine.setup();
+                    languages[language].engine.Setup();
                 } catch {
                     Console.Error.WriteLine("Language failed to initialize: {0}", language);
                     languages.Remove(language);
@@ -76,6 +76,11 @@ namespace Calico {
             return keys;
         }
 
+        public string GetLanguageFromFilename(string basename) {
+            // FIXME: go through, find a supported file, or fallback to text
+            return "python";
+        }
+
         public void register(Language language) {
             try {
                 language.MakeEngine(this); // Makes a default engine
@@ -86,18 +91,23 @@ namespace Calico {
             languages[language.name] = language; // ok, save it
         }
 
+        public void set_calico(MainWindow calico) {
+            this.calico = calico;
+            scope.SetVariable("calico", calico);
+        }
+
         public void set_redirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
             this.stderr = stderr;
             this.stdout = stdout;
             foreach (string language in languages.Keys) {
-                languages[language].engine.set_redirects(this.stdout, this.stderr);
+                languages[language].engine.SetRedirects(this.stdout, this.stderr);
             }
         }
 
         public void start() {
             foreach (string language in languages.Keys) {
-                languages[language].engine.start();
+                languages[language].engine.Start();
             }
         }
 

@@ -32,7 +32,7 @@ public partial class MainWindow : Gtk.Window {
     private Mono.TextEditor.TextEditor _shell;
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
-    public static Dictionary<Tag, Gtk.TextTag> colors = new Dictionary<Tag,Gtk.TextTag>();
+    public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag,Gtk.TextTag>();
     public static Dictionary<Tag, string> colornames = new Dictionary<Tag,string>();
     public LanguageManager manager;
     public string CurrentLanguage = null;
@@ -54,6 +54,19 @@ public partial class MainWindow : Gtk.Window {
                 return null;
         }
     }
+    public Document this[int page_num] {
+        get {
+            if (page_num > 1) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))
+                    return documents[widget];
+                else
+                    return null;
+            } else
+                return null;
+        }
+    }
+
     public Gtk.ScrolledWindow ScrolledWindow {
         get { return scrolledwindow1; }
         set { scrolledwindow1 = value; }
@@ -78,21 +91,21 @@ public partial class MainWindow : Gtk.Window {
         // Colors by name:
         // FIXME: load from defaults
         colornames[Tag.Error] = "error";
-        colors[Tag.Error] = new Gtk.TextTag("error");
-        colors[Tag.Error].Foreground = "red";
-        colors[Tag.Error].Weight = Pango.Weight.Bold;
+        tags[Tag.Error] = new Gtk.TextTag("error");
+        tags[Tag.Error].Foreground = "red";
+        tags[Tag.Error].Weight = Pango.Weight.Bold;
 
         colornames[Tag.Warning] = "warning";
-        colors[Tag.Warning] = new Gtk.TextTag("warning");
-        colors[Tag.Warning].Foreground = "orange";
+        tags[Tag.Warning] = new Gtk.TextTag("warning");
+        tags[Tag.Warning].Foreground = "orange";
 
         colornames[Tag.Info] = "info";
-        colors[Tag.Info] = new Gtk.TextTag("info");
-        colors[Tag.Info].Foreground = "purple";
+        tags[Tag.Info] = new Gtk.TextTag("info");
+        tags[Tag.Info].Foreground = "purple";
 
         colornames[Tag.Normal] = "normal";
-        colors[Tag.Normal] = new Gtk.TextTag("normal");
-        colors[Tag.Normal].Foreground = "black";
+        tags[Tag.Normal] = new Gtk.TextTag("normal");
+        tags[Tag.Normal].Foreground = "black";
         // Build the GUI:
         Build();
         Gtk.Application.Invoke(delegate {
@@ -102,7 +115,7 @@ public partial class MainWindow : Gtk.Window {
         _shell = new Mono.TextEditor.TextEditor();
         ScrolledWindow.Add(_shell);
         ScrolledWindow.ShowAll();
-        foreach (Gtk.TextTag tag in colors.Values) {
+        foreach (Gtk.TextTag tag in tags.Values) {
             Output.Buffer.TagTable.Add(tag); // TextView
          }
         // Setup clipboard, and Gui:
@@ -110,6 +123,7 @@ public partial class MainWindow : Gtk.Window {
         DocumentNotebook.CurrentPage = 0;
         Title = String.Format("Calico - {0}", System.Environment.UserName);
 
+        manager.set_calico(this);
         manager.set_redirects(new CustomStream(this, Tag.Normal),
                               new CustomStream(this, Tag.Error));
 
@@ -252,8 +266,9 @@ public partial class MainWindow : Gtk.Window {
         if (filename != null) {
             System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(filename, "(.*)\\:(\\d+)$");
             if (match.Success) {
-                filename = (string)match.Groups[0].Captures[0].Value;
-                lineno = Convert.ToInt32(match.Groups[0].Captures[1].Value);
+                // Groups[0] is entire string
+                filename = (string)match.Groups[1].Captures[0].Value;
+                lineno = Convert.ToInt32(match.Groups[2].Captures[0].Value);
             }
         }
         // FIXME: can attempt to open bogus path/filename
@@ -275,8 +290,9 @@ public partial class MainWindow : Gtk.Window {
                 }
             }
             if (page == null) {
-                page = MakeDocument(filename);
-                // make a new document with filename
+                page = MakeDocument(filename); // make a new document with filename
+                if (language == null)
+                    language = manager.GetLanguageFromFilename(page.basename);
             }
         } else {
             // make a no-named document of type language
@@ -373,6 +389,9 @@ public partial class MainWindow : Gtk.Window {
     }
 
     protected virtual void OnSaveActionActivated(object sender, System.EventArgs e) {
+        if (CurrentDocument != null) {
+            CurrentDocument.Save();
+        }
     }
 
     protected virtual void OnSaveAsActionActivated(object sender, System.EventArgs e) {
@@ -573,11 +592,11 @@ public partial class MainWindow : Gtk.Window {
 
     public void ExecuteInBackground(string text) {
         // This is the only approved method of running code
-        manager[CurrentLanguage].engine.execute(text);
+        manager[CurrentLanguage].engine.Execute(text);
     }
 
     public static Gtk.TextTag TagColor(Tag tag) {
-        return colors[tag];
+        return tags[tag];
     }
 
     public void Print(string format, params object[] args) {
@@ -620,7 +639,7 @@ public partial class MainWindow : Gtk.Window {
     	  // FIXME: Turn some things on
             SetLanguage(CurrentDocument.language);
             CurrentDocument.widget.Child.GrabFocus();
-            Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.filename, System.Environment.UserName);
+            Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
         } else if (DocumentNotebook.Page == HOME) {
             // Home
             // FIXME: Turn some things off

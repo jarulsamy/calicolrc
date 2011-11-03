@@ -62,6 +62,10 @@ namespace Calico {
             // For setting defaults
         }
 
+        public virtual bool Save() {
+            return true;
+        }
+
         public virtual bool Close() {
             // Close document, and return successful close status
             return true;
@@ -85,6 +89,7 @@ namespace Calico {
             if (System.IO.File.Exists(filename)) {
                 System.IO.TextReader reader = new System.IO.StreamReader(filename);
                 document.Text = reader.ReadToEnd();
+                reader.Close();
             } else {
                 // FIXME: new file? invalid path? no longer exists?
             }
@@ -107,8 +112,9 @@ namespace Calico {
         }
 
         public override bool GotoLine(int lineno) {
-            texteditor.GrabFocus();
-            texteditor.ScrollTo(lineno);
+            texteditor.Caret.Line = lineno - 1;
+            texteditor.Caret.Column = 0;
+            texteditor.CenterToCaret();
             return true;
         }
 
@@ -117,6 +123,14 @@ namespace Calico {
         }
 
         public override bool Close() {
+            return true;
+        }
+
+        public override bool Save() {
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+            sw.Write(texteditor.Document.Text);
+            sw.Close();
+            texteditor.Document.SetNotDirtyState();
             return true;
         }
     }
