@@ -2,9 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="96" Column="6" />
+      <File FileName="Calico/MainWindow.cs" Line="368" Column="10" />
       <File FileName="Calico/Main.cs" Line="37" Column="95" />
-      <File FileName="Calico/Document.cs" Line="200" Column="1" />
+      <File FileName="Calico/Document.cs" Line="175" Column="56" />
       <File FileName="Calico/LanguageManager.cs" Line="95" Column="19" />
     </Files>
     <Pads>

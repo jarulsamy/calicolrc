@@ -158,8 +158,9 @@ public partial class MainWindow : Gtk.Window {
             foreach (FileInfo f in dir.GetFiles("*.*")) {
                 if (! f.Name.EndsWith("~") &&
                         Contains(System.IO.Path.GetExtension(f.Name).Substring(1),
-                                 language.extensions)) {
-                    Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name);
+                                 language.extensions) &&
+                     ! f.Name.StartsWith("_")) {
+                    Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
                     ((Gtk.Menu)menu.Submenu).Add(fmenu);
                     var fullname = f.FullName;
                     fmenu.Activated += delegate { SelectOrOpen(fullname); };
@@ -167,7 +168,6 @@ public partial class MainWindow : Gtk.Window {
             }
             menu.Submenu.ShowAll();
          }
-         // menufile = menufile.replace("_", "__")
          examples_menu.Submenu.ShowAll();
 
 	    // New file menu:
@@ -361,6 +361,8 @@ public partial class MainWindow : Gtk.Window {
                 UpdateRecentFiles(filename);
             }
         }
+        string dir  = System.IO.Path.GetDirectoryName(filename);
+        System.IO.Directory.SetCurrentDirectory(dir);
         if (page != null && lineno != 0) {
             return page.GotoLine(lineno);
         }
@@ -414,8 +416,6 @@ public partial class MainWindow : Gtk.Window {
         fc.KeepAbove = true;
         if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
             SelectOrOpen(fc.Filename);
-            //path, base = os.path.split(fc.Filename)
-            //os.chdir(path)
         }
         fc.Destroy();
     }
