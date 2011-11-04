@@ -3,15 +3,14 @@ uname=`uname`
 if [ -L $0 ] ; then
     if [[ "$uname" == 'Darwin' ]]; then
         DIR=$(dirname $(readlink "$0")) ;
+	export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$LD_LIBRARY_PATH    
     else
         DIR=$(dirname $(readlink -f "$0")) ;
     fi
 else
     DIR=$(dirname "$0") ;
 fi ;
-export LD_LIBRARY_PATH=$DIR/modules/Profiler:$LD_LIBRARY_PATH
 
 # requires language-pack-es and language-pack-gnome-es
 # export LANGUAGE=es_ES.utf8
-#/usr/bin/env mono $MONO_OPTIONS --profile=py "$DIR/bin/calico.exe" "$@"
-/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/calico.exe" "$@"
+/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/Calico.exe" "$@"

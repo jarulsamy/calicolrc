@@ -235,7 +235,7 @@ public partial class MainWindow : Gtk.Window {
         } catch {
             // pass
         }
-        
+        Print(Tag.Info, "The Calico Project, Version {0}\n", MainClass.Version);
         SetLanguage(CurrentLanguage);
         // Load files:
         foreach (string arg in args) {

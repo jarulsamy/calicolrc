@@ -28,7 +28,7 @@ using System.Reflection;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.0";
+        public static string Version = "2.0.0-alpha";
         public static bool IsLoadModules = true;
 
         [STAThread]

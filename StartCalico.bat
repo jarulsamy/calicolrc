@@ -4,7 +4,7 @@ REM --------------------------------------------------
 echo Loading Calico...
 REM Change to the directory holding this batch file:
 cd /d "%~dp0"
-REM Run calico.exe with mono in a particular language:
+REM Run Calico.exe with mono in a particular language:
 REM SET LANGUAGE=es_ES.UTF8
 REM SET LANG=es_ES.UTF8
 SET PATH=%PATH%;%CD%\bin
@@ -37,12 +37,12 @@ REM **       ADD REM TO ONE LINE BELOW &        **
 REM **   REMOVE REM FROM ANOTHER LINE BELOW     **
 REM **********************************************
 
-"C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\calico.exe %*
-REM "C:\Program Files (x86)\Mono-2.8.2\bin\mono" bin\calico.exe %*
-REM "C:\Program Files (x86)\Mono-2.10.3\bin\mono" bin\calico.exe %*
-REM "C:\Program Files\Mono-2.6.7\bin\mono" bin\calico.exe %*
-REM "C:\Program Files\Mono-2.8.2\bin\mono" bin\calico.exe %*
-REM "C:\Program Files\Mono-2.10.3\bin\mono" bin\calico.exe %*
+"C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files (x86)\Mono-2.8.2\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files (x86)\Mono-2.10.3\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files\Mono-2.6.7\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files\Mono-2.8.2\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files\Mono-2.10.3\bin\mono" bin\Calico.exe %*
 
 REM **********************************************
 REM **       ADD REM TO ONE LINE ABOVE &        **
