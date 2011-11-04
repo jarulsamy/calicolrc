@@ -215,13 +215,10 @@ namespace Diagram
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
 			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
 			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
-			//this.ExposeEvent += new Gtk.ExposeEventHandler( this.OnPaint );
-//			this.DragBegin += new Gtk.DragBeginHandler( this.OnDragEnter );
-//			this.DragDrop += new Gtk.DragDropHandler( this.OnDragDrop );
+
 			
-			// No longer necessary as mouse events set ModifierKeys property
 			// Snoop on all key events
-			//Gtk.Key.SnooperInstall(this.SnoopKey);
+			Gtk.Key.SnooperInstall(this.SnoopKey);
 			
             // The Canvas object maintains two layers (collections):
             // - The shapes layer holds all managed blocks on the canvas
@@ -260,6 +257,22 @@ namespace Diagram
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal int SnoopKey(Gtk.Widget o, Gdk.EventKey k) {
+			switch(k.Key)
+			{
+				case Gdk.Key.Up:
+					this.DoZoom(1.05);
+					break;
+				case Gdk.Key.Down:
+					this.DoZoom(1.0/1.05);
+					break;
+			}
+			
+			// Return unique id
+			return 1;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Clear all delegates that have registed to handle this class's events
         public void ClearEventHandlers()
         {
@@ -293,35 +306,38 @@ namespace Diagram
 			g.Paint();
 			
             // Always draw in antialias mode.
-            // Caution: this smears single pixels into small blurs.
+            // Caution: this smears single pixels into small blurs on pixel boundaries.
             g.Antialias = Antialias.Subpixel;
 			
 			// Scale the diagram to the zoom factor at center point
 			g.Translate( this.scaleCenterX,  this.scaleCenterY);
 			g.Scale(     this.scale,         this.scale);
-			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
-//			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
-//			g.Translate( this.offsetX,     this.offsetY);
+			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
+			g.Translate( this.offsetX,       this.offsetY);
+//			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
 			
             // Draw all visible 
 			// connectors (bottom layer), then
 			// shapes (middle layer), and finally
 			// annotations (top layer)
-            foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
-            foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
-            foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
+            foreach (CConnector o in this.connectors) {
+				if (o.Visible == true) o.Draw(g);
+			}
+            foreach (CShape     o in this.shapes    ) {
+				o._cvs = this;
+				if (o.Visible == true) o.Draw(g);
+			}
+            foreach (CShape     o in this.annotation) {
+				if (o.Visible == true) o.Draw(g);
+			}
 			
 			// Reset transform
 			g.Restore();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle the Paint event by drawing all shapes and annotations
-        //void Canvas_Paint(object sender, PaintEventArgs e)
-        //protected override void OnPaint(PaintEventArgs e)
-		//private void OnPaint(object o, Gdk.EventExpose args)
 		protected override bool OnExposeEvent(Gdk.EventExpose args)
-        {
+        {	// Handle the Paint event by drawing all shapes and annotations
 			using (Context g = Gdk.CairoHelper.Create( args.Window )) {
                 //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
                 //g.Clip();
@@ -330,22 +346,27 @@ namespace Diagram
 			return true;
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DoZoom(double factor)
+		{	// Perform the zoom
+			this.scale = this.scale * factor;
+			//this.scaleCenterX = 0.5*this.Allocation.Width;
+			//this.scaleCenterY = 0.5*this.Allocation.Height;
+			this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
+			this.scaleCenterY = 0.0; //0.5*this.Allocation.Height;
+			this.Invalidate();	
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnZoomIn(object sender, EventArgs e)
 		{
-			this.scale = this.scale * 1.05;
-			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
-			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
-			this.Invalidate();
+			this.DoZoom (1.05);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnZoomOut(object sender, EventArgs e)
 		{
-			this.scale = this.scale / 1.05;
-			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
-			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
-			this.Invalidate();
+			this.DoZoom(1.0/1.05);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -360,21 +381,22 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle DrawingArea wheel scroll events
         protected void OnScroll(object o, Gtk.ScrollEventArgs e)
-        {
+        {	// Handle DrawingArea wheel scroll events
 			Gdk.EventScroll scl = (Gdk.EventScroll)e.Event;
 
 			if (scl.Direction == Gdk.ScrollDirection.Up) {
-				this.scale *= 1.05;
+				//this.scale *= 1.05;
+				this.DoZoom(1.05);
 			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
-				this.scale /= 1.05;
+				//this.scale /= 1.05;
+				this.DoZoom(1.0/1.05);
 			}
-			
-			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
-			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
-			
-			this.Invalidate();
+//			
+//			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
+//			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+//			
+//			this.Invalidate();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -389,9 +411,9 @@ namespace Diagram
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle DrawingArea mouse events
         protected void OnMouseDown(object o, Gtk.ButtonPressEventArgs e)
-        {
+        {	// Handle DrawingArea mouse events
+			
 			// Update mouse down location and route event to current handler
 			// Scale and translate point coordinates
 			double ex = 0.0;
@@ -1249,12 +1271,26 @@ namespace Diagram
 
             return null;
         }
-
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ReDockShapes(double dx, double dy) 
+		{	// Move docked shapes so that they remain docked
+			
+            foreach (CShape s in this.shapes)
+            {
+                if (s.Dock == DockSide.Left)
+                {
+					s.Left -= dx;
+					s.Top  -= dy;
+                }
+            }
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // This method searches through the connectors on the list from top down
-        // and returns the first connector that was hit.
         public CShape HitConnector(CPoint pt)
-        {
+        {	// This method searches through the connectors on the list from top down
+        	// and returns the first connector that was hit.
+			
             // Check connectors
             for (int i = this.connectors.Count - 1; i >= 0; i--)
             {
@@ -1297,13 +1333,15 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Drawing zoom factor. A number greater than 0.
         public double Zoom
-        {
+        {	// Set drawing zoom factor. A number greater than 0.
             get { return this.scale; }
-            set { this.scale = value; }
+            set {
+				if (value < 0.0) value = 1.0;
+				this.scale = value;
+			}
         }
-
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void BringSelectedForward()
         {
@@ -1666,7 +1704,7 @@ namespace Diagram
         // A list of shapes that decorate this one
         public Dictionary<String, CDecorator> Decorators = new Dictionary<String, CDecorator>(); 
 		
-		protected Diagram.Canvas _cvs = null;
+		internal Diagram.Canvas _cvs = null;
 		protected int _X;								// Cache
 		protected int _Y;
 		
@@ -2703,6 +2741,12 @@ namespace Diagram
 			// if absolute positioning, convert point back to absolute coordinates
 			//if (this.Dock == DockSide.Left) cvs.InverseTransformPoint(X, Y, out X, out Y);
 			
+			// If docked, undo translate
+//			if (this.Dock == DockSide.Left) {
+//				X = X + cvs.offsetX;
+//				Y = Y + cvs.offsetY;
+//			}
+			
             // If in bounding box, then true
             if (this.left <= X && this.top <= Y 
                 && (this.left + this.width) >= X 
@@ -2900,7 +2944,6 @@ namespace Diagram
     // Rectangle shape class
     public class CRectangle : CShape
     {
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Constructors
         public CRectangle(List<CPoint> points) : base(points) { }
 
@@ -2960,8 +3003,6 @@ namespace Diagram
 			g.LineTo(x, y+h);
 			g.LineTo(x, y);
 			g.ClosePath();
-			
-			g.Restore();
 
 			// Fill
 			g.Color = this.FillColor;
@@ -3000,6 +3041,8 @@ namespace Diagram
 
 			// Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
+			
+			g.Restore();
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3093,8 +3136,6 @@ namespace Diagram
             double x = this.left;
             double y = this.top;
 			
-			//if (this.Dock == DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-			
             double w  = this.width;
             double h  = this.height;
 			double hw = 0.5*w;
@@ -3110,10 +3151,6 @@ namespace Diagram
 			g.MoveTo(hw, 0.0);
 			g.Arc(0.0, 0.0, hw, 0.0, 2.0 * Math.PI);
 			g.ClosePath();
-			
-			// Must return to uniform device space before stroking in order to prevent 
-			// lines from being deformed by scaling.
-			g.Restore();
 			
 			// Fill
 			g.Color = this.FillColor;
@@ -3138,6 +3175,10 @@ namespace Diagram
 
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
+			
+			// Must return to uniform device space before stroking in order to prevent 
+			// lines from being deformed by scaling.
+			g.Restore();
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3312,8 +3353,6 @@ namespace Diagram
 			double x = this.left;
 			double y = this.top;
 			
-			//if (this.Dock == DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-
             double w = this.width;
             double h = this.height;
 			double hh = 0.5*h;
@@ -3326,7 +3365,10 @@ namespace Diagram
 			if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 
 			g.Save();
-						
+			
+			//if (this.Dock == DockSide.Left) g.Translate( -_cvs.offsetX, -_cvs.offsetY);
+			//g.InverseTransformPoint(ref x, ref y);
+
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+w-r, y );
@@ -3337,8 +3379,6 @@ namespace Diagram
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.ClosePath();
 			
-			g.Restore();
-
 			// Fill
 			g.Color = this.FillColor;
 			g.FillPreserve();
@@ -3376,6 +3416,8 @@ namespace Diagram
 
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
+
+			g.Restore();
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

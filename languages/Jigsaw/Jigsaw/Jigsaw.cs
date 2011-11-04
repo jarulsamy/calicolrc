@@ -494,31 +494,36 @@ namespace Jigsaw
 				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 				return;
 				
-			} else {
+			} 
+			else {
             	if (this.Mode == Diagram.EMode.Editing)
             	{
 		            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
 					if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
 		            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
-					this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
+					//this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
+					
 					this.Invalidate();										// Redraw
 				}
 			}
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Canvas mouse move handler
         public override void OnMouseMove(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
-        {
+        {	// Canvas mouse move handler
             if (this.Mode == Diagram.EMode.Editing)
             {
 				if (this.EditMode == Diagram.EMode.TranslatingStart || this.EditMode == Diagram.EMode.Translating) 
 				{
-					this.offsetX += (e.X - this.mouseDownExact.X);
-					this.offsetY += (e.Y - this.mouseDownExact.Y);
+					double dx = (e.X - this.mouseDownExact.X);
+					double dy = (e.Y - this.mouseDownExact.Y);
+					
+					this.offsetX += dx;
+					this.offsetY += dy;
 					this.EditMode = Diagram.EMode.Translating;
 					
-					// TODO: Find all docked shapes and untranslate them?
+					// Find all docked shapes and redock them
+					this.ReDockShapes(dx, dy);
 					
 					this.Invalidate();
 				}
@@ -1103,11 +1108,9 @@ namespace Jigsaw
             double w = this.width;
             double h = this.height;
 			
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-			
 			g.Save();
 			
-            // Block outline			
+            // Block outline
 			SetPath(g);
 			
 			// Set fill color based on block state
@@ -1149,11 +1152,11 @@ namespace Jigsaw
 				g.ClosePath();
 				g.Fill();
 			}
-			
-			g.Restore();
-			
+						
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
+			
+			g.Restore();
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -461,6 +461,12 @@ namespace Jigsaw
 			double Ymax = Ymin + this.Height;
 			double Xmax = Xmin + this.Width;
 			
+			// If docked, undo translate
+//			if (this.Dock == Diagram.DockSide.Left) {
+//				X = X + cvs.offsetX;
+//				Y = Y + cvs.offsetY;
+//			}
+			
 			// If point in outer bounding box...
 			if (X >= Xmin && X <= Xmax && Y >= Ymin && Y <= Ymax)
 			{	// ...and also in inner bounding box
