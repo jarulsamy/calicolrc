@@ -87,6 +87,14 @@ public partial class MainWindow : Gtk.Window {
         }
     }
 
+    public static bool Contains(string ext, string [] extensions) {
+        foreach(string lext in extensions) {
+            if (lext == ext)
+                return true;
+        }
+        return false;
+    }
+
     public MainWindow(string[] args, LanguageManager manager, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
         this.manager = manager;
@@ -134,6 +142,33 @@ public partial class MainWindow : Gtk.Window {
         manager.SetRedirects(new CustomStream(this, Tag.Normal),
                               new CustomStream(this, Tag.Error));
         manager.PostSetup(this);
+
+        // Examples menu:
+        Gtk.MenuItem examples_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/ExamplesAction");
+        examples_menu.Submenu = new Gtk.Menu();
+        foreach (string lang in manager.getLanguages()) {
+            Language language = manager[lang];
+            DirectoryInfo dir = new DirectoryInfo(
+                 System.IO.Path.Combine(path,
+                     System.IO.Path.Combine("..",
+                        System.IO.Path.Combine("examples", language.name))));
+            Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
+            ((Gtk.Menu)examples_menu.Submenu).Add(menu);
+            menu.Submenu = new Gtk.Menu();
+            foreach (FileInfo f in dir.GetFiles("*.*")) {
+                if (! f.Name.EndsWith("~") &&
+                        Contains(System.IO.Path.GetExtension(f.Name).Substring(1),
+                                 language.extensions)) {
+                    Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name);
+                    ((Gtk.Menu)menu.Submenu).Add(fmenu);
+                    var fullname = f.FullName;
+                    fmenu.Activated += delegate { SelectOrOpen(fullname); };
+                }
+            }
+            menu.Submenu.ShowAll();
+         }
+         // menufile = menufile.replace("_", "__")
+         examples_menu.Submenu.ShowAll();
 
 	    // New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
@@ -205,7 +240,7 @@ public partial class MainWindow : Gtk.Window {
         // Load files:
         foreach (string arg in args) {
             if (! arg.StartsWith("--")) {
-                SelectOrOpen(arg);
+                SelectOrOpen(System.IO.Path.GetFullPath(arg));
             }
         }
     }

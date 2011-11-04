@@ -259,6 +259,11 @@
         <property name="Value">0</property>
         <property name="Group">group1</property>
       </action>
+      <action id="ExamplesAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Examples</property>
+        <property name="ShortLabel" translatable="yes">Examples</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -276,6 +281,7 @@
               <node type="Menu" action="FileAction">
                 <node type="Menu" action="NewAction" />
                 <node type="Menuitem" action="openAction1" />
+                <node type="Menu" action="ExamplesAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="saveAction" />
                 <node type="Menuitem" action="saveAsAction" />
