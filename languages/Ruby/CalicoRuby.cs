@@ -49,27 +49,16 @@ public class CalicoRubyEngine : DLREngine {
 }
 
 public class CalicoRubyLanguage : Language {
-	string mimetype;
 
-    public CalicoRubyLanguage(string name, string proper, 
-				string [] extensions, string mimetype) : 
-    base(name, proper, extensions) {
-		this.mimetype = mimetype;
-    }
+    public CalicoRubyLanguage() :
+	    base("ruby", "Ruby", new string[] { "rb"}, "text/x-ruby") {
+	}
 
     public override void MakeEngine(LanguageManager manager) {
         engine = new CalicoRubyEngine(manager);
     }
 
-    public override Document MakeDocument(MainWindow calico, string filename) {
-      return new TextDocument(calico, filename, name, mimetype);
-		
-    }
-
     public static new Language MakeLanguage() {
-        return new CalicoRubyLanguage("ruby", 
-					"Ruby",
-					new string[] { "rb"},
-					"text/x-ruby");
+        return new CalicoRubyLanguage();
     }
 }

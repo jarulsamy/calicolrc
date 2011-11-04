@@ -6,7 +6,7 @@ all: modules/Graphics.dll modules/Myro.dll languages/Python/CalicoPython.dll \
 
 build: clean-build all 
 	cd ..; zip -r trunk/Calico-$(BUILD).zip trunk/* -x \*/.svn/\* \*~ 
-	scp Calico-$(BUILD).zip dblank@myro.roboteducation.org:html/download/
+	scp Calico-$(BUILD).zip dblank@myro.roboteducation.org:html/download/unstable/
 
 modules/Graphics.dll:
 	cd modules/Graphics; make

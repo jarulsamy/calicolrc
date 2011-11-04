@@ -58,26 +58,15 @@ public class CalicoPythonEngine : DLREngine {
 }
 
 public class CalicoPythonLanguage : Language {
-	string mimetype;
-
-    public CalicoPythonLanguage(string name, string proper, 
-				string [] extensions, string mimetype) : 
-        base(name, proper, extensions) {
-		this.mimetype = mimetype;
+	public CalicoPythonLanguage() : 
+		base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python") {
     }
-
-    public override void MakeEngine(LanguageManager manager) {
+	
+	public override void MakeEngine(LanguageManager manager) {
         engine = new CalicoPythonEngine(manager);
     }
 
-    public override Document MakeDocument(MainWindow calico, string filename) {
-      return new TextDocument(calico, filename, name, mimetype);
-    }
-
     public static new Language MakeLanguage() {
-        return new CalicoPythonLanguage("python", 
-					"Python",
-					new string[] { "py", "pyw" },
-					"text/x-python");
+        return new CalicoPythonLanguage();
     }
 }

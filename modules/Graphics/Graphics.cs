@@ -444,10 +444,8 @@ public static class Graphics {
                                            int height=300) {
     if (_windows.ContainsKey(title)) {
       _windows[title].clear(false);
-      _windows[title].mode = "auto";
-      _windows[title].Resize(width, height);
       _lastWindow = _windows[title];
-      return _windows[title];
+      _lastWindow.KeepAbove = true;
     } else {
       _windows[title] = new Graphics.WindowClass(title, width, height);
       _lastWindow = _windows[title];
@@ -1036,8 +1034,24 @@ public static class Graphics {
 						   (int)800, 
 						   (int)600);
 	  _canvas.need_to_draw_surface = false;
+	  mode = "auto";
+	  Resize(width, height);
+	  timer_running = false;
+	  last_update = new DateTime(2000,1,1);
+	  _update_interval = .1; // how often, in seconds, to update
+	  onClickCallbacks = new List();
+	  onMouseMovementCallbacks = new List();
+	  onMouseUpCallbacks = new List();
+	  onKeyPressCallbacks = new List();
+	  onKeyReleaseCallbacks = new List();
+	  _lastKey = "";
+	  _mouseState = "up";
+	  _keyState = "up";
+	  time = 0.0;
+	  simulationStepTime = 0.01;
+	  state = "init";
           lock(_canvas.shapes)
-                _canvas.shapes.Clear();
+	    _canvas.shapes.Clear();
 	  Invoke( delegate {
 	      foreach (Gtk.Widget child in _canvas.Children) {
 		_canvas.Remove(child);

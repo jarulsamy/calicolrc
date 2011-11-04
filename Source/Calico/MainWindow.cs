@@ -43,6 +43,7 @@ public partial class MainWindow : Gtk.Window {
     public static int SHELL = 1;
     public static int HOME = 0;
     public string path;
+    public System.Threading.Thread executeThread = null;
     public Document CurrentDocument {
         get {
             int page_num = DocumentNotebook.Page;
@@ -69,6 +70,14 @@ public partial class MainWindow : Gtk.Window {
         }
     }
 
+    public string OS {
+            get {
+                string retval = System.Environment.OSVersion.Platform.ToString();
+                if (retval.StartsWith("Win"))
+                    retval = "Windows";
+                return retval; // "Unix" or "Windows" are two common retvals
+            }
+    }
     public Gtk.ScrolledWindow ScrolledWindow {
         get { return scrolledwindow1; }
         set { scrolledwindow1 = value; }
@@ -141,7 +150,10 @@ public partial class MainWindow : Gtk.Window {
         manager.SetCalico(this);
         manager.SetRedirects(new CustomStream(this, Tag.Normal),
                               new CustomStream(this, Tag.Error));
-        manager.PostSetup(this);
+        // Run this in in the GUI thread, after we start:
+        Gtk.Application.Invoke(delegate {
+            manager.PostSetup(this);
+            });
 
         // Examples menu:
         Gtk.MenuItem examples_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/ExamplesAction");
@@ -725,9 +737,9 @@ public partial class MainWindow : Gtk.Window {
     }
 
     public bool Execute(string text, string language) {
-        //if (executeThread) {
-        //    return false;
-        //}
+        if (executeThread != null) {
+            return false;
+        }
         string prompt = String.Format("{0}> ", CurrentLanguage);
         int count = 2;
         foreach (string line in text.Split('\n')) {
@@ -748,7 +760,25 @@ public partial class MainWindow : Gtk.Window {
 
     public void ExecuteInBackground(string text) {
         // This is the only approved method of running code
-        manager[CurrentLanguage].engine.Execute(text);
+        executeThread = new System.Threading.Thread(
+                                new System.Threading.ThreadStart(
+            delegate {
+                Invoke(start_running);
+                manager[CurrentLanguage].engine.Execute(text);
+                Invoke(stop_running);
+            }));
+        executeThread.Start();
+    }
+
+    public void start_running() {
+            // turn off some things
+            // turn on some things
+    }
+
+    public void stop_running() {
+            // turn off some things
+            // turn on some things
+        executeThread = null;
     }
 
     public void ExecuteFileInBackground(string filename, string language) {

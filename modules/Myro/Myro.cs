@@ -4991,7 +4991,7 @@ public static class Myro {
     try {
       myProcess.StartInfo.UseShellExecute = false;
 
-      if (os_name == "nt") {
+      if (os_name == "Windows") {
         string file = startup_path;
         file = Path.Combine(file, "bin");
         file = Path.Combine(file, "windows");

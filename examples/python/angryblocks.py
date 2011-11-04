@@ -78,4 +78,4 @@ win.onMouseUp(mouseUp)
 win.onMouseMovement(mouseMove)
 win.onKeyPress(resetCallback)
 
-win.run()
+#win.run()

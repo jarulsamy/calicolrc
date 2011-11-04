@@ -82,9 +82,6 @@ namespace Calico {
         public override void PostSetup(MainWindow calico) {
             System.Reflection.Assembly assembly;
             // ---------------------------------------
-            //engine.Runtime.LoadAssembly(System.Type.GetType(
-            //        "System.Diagnostics.Debug").Assembly);
-            //engine.Runtime.LoadAssembly(System.Type.GetType("System.String").Assembly);
             foreach (System.Reflection.AssemblyName aname in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
                 assembly = System.Reflection.Assembly.Load(aname);
                     engine.Runtime.LoadAssembly(assembly);
@@ -100,20 +97,20 @@ namespace Calico {
                         System.Reflection.MethodInfo method;
                         try {
                             method = type.GetMethod("initialize_module");
-                            method.Invoke(type, new object [] {calico.path, "nt"}); //FIXME
-                            Console.WriteLine("ok! called initialize_module in {0} for {1}", assembly_name, dlr_name);
-                            break;
+                            method.Invoke(type, new object [] {calico.path, calico.OS});
                         } catch {
                         }
                         try {
                             method = type.GetMethod("set_gui_thread_id");
-                            method.Invoke(type, new object [] {1}); // FIXME: MainWindow.gui_thread_id hasn't been run in delegate yet
-                            Console.WriteLine("ok! called set_gui_thread_id in {0} for {1}, {2}", assembly_name, dlr_name, MainWindow.gui_thread_id);
-                            break;
+                            method.Invoke(type, new object [] {MainWindow.gui_thread_id});
                         } catch {
                         }
                     }
+                    try {
                     engine.Runtime.LoadAssembly(assembly);
+                    } catch {
+                        Console.WriteLine("Failed to load assembly {0}", assembly);
+                    }
                 }
             }
         }

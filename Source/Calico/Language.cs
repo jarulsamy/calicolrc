@@ -26,11 +26,16 @@ namespace Calico {
         public Engine engine;
         public string proper_name;
         public string[] extensions;
+        public string mimetype;
 
-        public Language(string language, string proper, string[] extensions) {
+        public Language() {
+        }
+
+        public Language(string language, string proper, string[] extensions, string mimetype) {
             this.name = language;
             this.proper_name = proper;
             this.extensions = extensions;
+            this.mimetype = mimetype;
         }
 
         public virtual void MakeEngine(LanguageManager manager) {
@@ -38,7 +43,7 @@ namespace Calico {
         }
 
         public virtual Document MakeDocument(MainWindow calico, string filename) {
-            return null;
+          return new TextDocument(calico, filename, name, mimetype);
         }
 
         public static Language MakeLanguage() {
