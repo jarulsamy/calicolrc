@@ -34,7 +34,7 @@ public partial class MainWindow : Gtk.Window {
     public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
     public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
     public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag,Gtk.TextTag>();
-    public static Dictionary<Tag, string> colornames = new Dictionary<Tag,string>();
+    public static Dictionary<Tag, string> tagnames = new Dictionary<Tag,string>();
     public LanguageManager manager;
     public string CurrentLanguage = null;
     public string ShellLanguage = null;
@@ -42,6 +42,7 @@ public partial class MainWindow : Gtk.Window {
     public static int gui_thread_id = -1;
     public static int SHELL = 1;
     public static int HOME = 0;
+    public string path;
     public Document CurrentDocument {
         get {
             int page_num = DocumentNotebook.Page;
@@ -89,22 +90,26 @@ public partial class MainWindow : Gtk.Window {
     public MainWindow(string[] args, LanguageManager manager, bool Debug) : base(Gtk.WindowType.Toplevel) {
         this.Debug = Debug;
         this.manager = manager;
+        path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+        if (path.StartsWith("\\")) {
+            path = path.Substring(1);
+        }
         // Colors by name:
         // FIXME: load from defaults
-        colornames[Tag.Error] = "error";
+        tagnames[Tag.Error] = "error";
         tags[Tag.Error] = new Gtk.TextTag("error");
         tags[Tag.Error].Foreground = "red";
         tags[Tag.Error].Weight = Pango.Weight.Bold;
 
-        colornames[Tag.Warning] = "warning";
+        tagnames[Tag.Warning] = "warning";
         tags[Tag.Warning] = new Gtk.TextTag("warning");
         tags[Tag.Warning].Foreground = "orange";
 
-        colornames[Tag.Info] = "info";
+        tagnames[Tag.Info] = "info";
         tags[Tag.Info] = new Gtk.TextTag("info");
         tags[Tag.Info].Foreground = "purple";
 
-        colornames[Tag.Normal] = "normal";
+        tagnames[Tag.Normal] = "normal";
         tags[Tag.Normal] = new Gtk.TextTag("normal");
         tags[Tag.Normal].Foreground = "black";
         // Build the GUI:
@@ -118,15 +123,17 @@ public partial class MainWindow : Gtk.Window {
         ScrolledWindow.ShowAll();
         foreach (Gtk.TextTag tag in tags.Values) {
             Output.Buffer.TagTable.Add(tag); // TextView
-         }
+        }
+        Output.WrapMode = Gtk.WrapMode.Char;
         // Setup clipboard, and Gui:
         clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
         DocumentNotebook.CurrentPage = 0;
         Title = String.Format("Calico - {0}", System.Environment.UserName);
 
-        manager.set_calico(this);
-        manager.set_redirects(new CustomStream(this, Tag.Normal),
+        manager.SetCalico(this);
+        manager.SetRedirects(new CustomStream(this, Tag.Normal),
                               new CustomStream(this, Tag.Error));
+        manager.PostSetup(this);
 
 	    // New file menu:
         Gtk.MenuItem file_menu = (Gtk.MenuItem) UIManager.GetWidget("/menubar2/FileAction/NewAction");
@@ -291,9 +298,9 @@ public partial class MainWindow : Gtk.Window {
                 }
             }
             if (page == null) {
-                page = MakeDocument(filename); // make a new document with filename
                 if (language == null)
-                    language = manager.GetLanguageFromFilename(page.basename);
+                    language = manager.GetLanguageFromExtension(filename);
+                page = MakeDocument(filename, language); // make a new document with filename
             }
         } else {
             // make a no-named document of type language
@@ -389,12 +396,14 @@ public partial class MainWindow : Gtk.Window {
     protected virtual void OnSaveActionActivated(object sender, System.EventArgs e) {
         if (CurrentDocument != null) {
             CurrentDocument.Save();
+            SetLanguage(CurrentLanguage);
         }
     }
 
     protected virtual void OnSaveAsActionActivated(object sender, System.EventArgs e) {
         if (CurrentDocument != null) {
             CurrentDocument.SaveAs();
+            SetLanguage(CurrentLanguage);
         }
     }
 
@@ -707,9 +716,12 @@ public partial class MainWindow : Gtk.Window {
         manager[CurrentLanguage].engine.Execute(text);
     }
 
-    public void ExecuteFileInBackground(string filename) {
+    public void ExecuteFileInBackground(string filename, string language) {
         // This is the only approved method of running code
+        Print(Tag.Info, "Running '{0}'...\n", filename);
+        CurrentLanguage = language;
         manager[CurrentLanguage].engine.ExecuteFile(filename);
+        Print(Tag.Info, "Ok\n");
     }
 
     public static Gtk.TextTag TagColor(Tag tag) {
@@ -728,7 +740,7 @@ public partial class MainWindow : Gtk.Window {
             Invoke( delegate {
                 lock(Output) {
                     Gtk.TextIter end = Output.Buffer.EndIter;
-                    string colorname = MainWindow.colornames[tag];
+                    string colorname = MainWindow.tagnames[tag];
                     Output.Buffer.InsertWithTagsByName(ref end,
                                                  String.Format(format, args),
                                                  colorname);
@@ -780,14 +792,24 @@ public partial class MainWindow : Gtk.Window {
 
     protected virtual void OnToolbar1ButtonReleaseEvent (object o, Gtk.ButtonReleaseEventArgs args)
     {
-        if (CurrentDocument != null)
-            ExecuteFileInBackground(CurrentDocument.filename);
+        if (CurrentDocument != null) {
+            bool retval = CurrentDocument.Save();
+            if (retval) {
+                SetLanguage(CurrentLanguage);
+                ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+            }
+        }
     }
 
     protected virtual void OnYesAction1Activated (object sender, System.EventArgs e)
     {
-        if (CurrentDocument != null)
-            ExecuteFileInBackground(CurrentDocument.filename);
+        if (CurrentDocument != null) {
+            bool retval = CurrentDocument.Save();
+            if (retval) {
+                SetLanguage(CurrentLanguage);
+                ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+            }
+        }
 
     }
 

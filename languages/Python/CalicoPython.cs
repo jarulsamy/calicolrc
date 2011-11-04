@@ -34,7 +34,7 @@ public class CalicoPythonEngine : DLREngine {
         languageSetup.Options["FullFrames"] = true; // for debugging
         scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
         // Create a Python-only scope:
-	scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+		scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
         scope = scriptRuntime.CreateScope();
     }
 
@@ -47,11 +47,11 @@ public class CalicoPythonEngine : DLREngine {
         options.PrintFunction = true;
         options.AllowWithStatement = true;
         options.TrueDivision = true;
-	// Set paths:
-	ICollection<string> paths = engine.GetSearchPaths();
+		// Set paths:
+		ICollection<string> paths = engine.GetSearchPaths();
         // Let users find Calico modules:
         foreach (string folder in new string[] { "modules", "src" }) {
-	  paths.Add(Path.GetFullPath(folder));
+	  		paths.Add(Path.GetFullPath(folder));
         }
         engine.SetSearchPaths(paths);
     }

@@ -37,13 +37,13 @@ namespace Calico {
         public LanguageManager(Dictionary<string,Language> langs) {
             languages = new Dictionary<string, Language>();
             foreach (string name in langs.Keys) {
-                register(langs[name]); // This may fail, which won't add language
+                Register(langs[name]); // This may fail, which won't add language
             }
-            setup();
-            start();
+            Setup();
+            Start();
         }
 
-        public void setup() {
+        public void Setup() {
             // In case it needs it for DLR languages
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string language in getLanguages()) {
@@ -76,12 +76,7 @@ namespace Calico {
             return keys;
         }
 
-        public string GetLanguageFromFilename(string basename) {
-            // FIXME: go through, find a supported file, or fallback to text
-            return "python";
-        }
-
-        public void register(Language language) {
+        public void Register(Language language) {
             try {
                 language.MakeEngine(this); // Makes a default engine
             } catch {
@@ -91,12 +86,12 @@ namespace Calico {
             languages[language.name] = language; // ok, save it
         }
 
-        public void set_calico(MainWindow calico) {
+        public void SetCalico(MainWindow calico) {
             this.calico = calico;
             scope.SetVariable("calico", calico);
         }
 
-        public void set_redirects(CustomStream stdout, CustomStream stderr) {
+        public void SetRedirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
             this.stderr = stderr;
             this.stdout = stdout;
@@ -105,16 +100,35 @@ namespace Calico {
             }
         }
 
-        public void start() {
+        public void Start() {
             foreach (string language in languages.Keys) {
                 languages[language].engine.Start();
             }
         }
 
-        public void reset() {
-            setup();
-            start();
-            set_redirects(stdout, stderr);
+        public void PostSetup(MainWindow calico) {
+            foreach (string language in languages.Keys) {
+                languages[language].engine.PostSetup(calico);
+            }
+        }
+
+        public void Reset(MainWindow calico) {
+            Setup();
+            Start();
+            SetRedirects(stdout, stderr);
+            PostSetup(calico);
+        }
+
+        public string GetLanguageFromExtension(string filename) {
+            string file_ext = System.IO.Path.GetExtension(filename).Substring(1);
+            foreach (string language in languages.Keys) {
+                foreach (string ext in languages[language].extensions) {
+                    if (ext == file_ext) {
+                        return language;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

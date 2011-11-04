@@ -163,7 +163,7 @@ namespace Calico {
                 basename = System.IO.Path.GetFileName(filename);
             } else {
                 proposed_dir = System.IO.Directory.GetCurrentDirectory();
-                basename = "Untitled." + calico.manager[language].extensions[0];
+                basename = "Untitled." + calico.manager[language].extensions[0]; // default
             }
             // first, let's make sure the directory is writable
             if (! IsWritable(proposed_dir)) {
@@ -186,13 +186,15 @@ namespace Calico {
                 // FIXME: check to see if already exists
                 // ask to overwrite
                 filename = fc.Filename;
-                Gtk.Tooltips tooltips = new Gtk.Tooltips();
-                tooltips.SetTip(tab_label, filename, null);
-                Save();
-                basename = System.IO.Path.GetFileName(filename);
-                tab_label.Text = basename;
-                //self.on_change_file();
-                retval = true;
+                tab_label.TooltipText = filename;
+                retval = Save();
+                if (retval) {
+                    language = calico.manager.GetLanguageFromExtension(filename);
+                    basename = System.IO.Path.GetFileName(filename);
+                    tab_label.Text = basename;
+                    tab_label.TooltipText = filename;
+                    //self.on_change_file();
+                }
             }
             fc.Destroy();
             return retval;
@@ -200,16 +202,25 @@ namespace Calico {
 
         public override bool Save() {
             if (filename != null) {
-                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-                sw.Write(texteditor.Document.Text);
-                sw.Close();
-                texteditor.Document.SetNotDirtyState();
-            } else {
-                bool retval = SaveAs();
-                // if successful
-                // change name of tab/filename/basefile
+                try {
+                    System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+                    sw.Write(texteditor.Document.Text);
+                    sw.Close();
+                    texteditor.Document.SetNotDirtyState();
+                    return true;
+                } catch {
+                    // fail.. let's try SaveAs...
+                }
             }
-            return true;
+            bool retval = SaveAs();
+            // if successful
+            if (retval) {
+                // change name of tab/filename/basefile
+                basename = System.IO.Path.GetFileName(filename);
+                tab_label.TooltipText = filename;
+                tab_label.Text = basename;
+            }
+            return retval;
         }
     }
 }

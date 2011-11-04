@@ -2,11 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="793" Column="1" />
-      <File FileName="Calico/LanguageManager.cs" Line="67" Column="42" />
-      <File FileName="Calico/Document.cs" Line="45" Column="56" />
-      <File FileName="Calico/Engine.cs" Line="131" Column="18" />
-      <File FileName="Calico/Language.cs" Line="43" Column="1" />
+      <File FileName="Calico/MainWindow.cs" Line="398" Column="33" />
+      <File FileName="Calico/Main.cs" Line="37" Column="95" />
+      <File FileName="Calico/Document.cs" Line="200" Column="1" />
+      <File FileName="Calico/LanguageManager.cs" Line="95" Column="19" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,16 +22,17 @@
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>
-          <Value>this.&lt;&gt;f__this</Value>
-          <Value>tag</Value>
-          <Value>this</Value>
-          <Value>MainWindow.colornames</Value>
+          <Value>f.Name</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Calico/Source/Calico/MainWindow.cs" line="302" />
+      <Breakpoint file="/home/dblank/Calico/Source/Calico/Document.cs" line="159" />
+      <Breakpoint file="/home/dblank/Calico/Source/Calico/Document.cs" line="204" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" />

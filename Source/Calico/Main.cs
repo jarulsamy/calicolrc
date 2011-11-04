@@ -56,7 +56,7 @@ namespace Calico {
                                 MethodInfo method;
                                 try {
                                     method = type.GetMethod("MakeLanguage");
-                                } catch (Exception e) {
+                                } catch {
                                     Print("Failure; skipping language file...'{0}'", f.FullName);
                                     continue;
                                 }

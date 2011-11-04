@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
 
 namespace Calico {
 
@@ -51,6 +52,9 @@ namespace Calico {
         public virtual void SetRedirects(CustomStream stdout, CustomStream stderr) {
         }
 
+        public virtual void PostSetup(MainWindow calico) {
+        }
+
     }
     
     public class DLREngine : Engine {
@@ -73,6 +77,45 @@ namespace Calico {
                       CustomStream stderr) {
             engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
             engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
+        }
+
+        public override void PostSetup(MainWindow calico) {
+            System.Reflection.Assembly assembly;
+            // ---------------------------------------
+            //engine.Runtime.LoadAssembly(System.Type.GetType(
+            //        "System.Diagnostics.Debug").Assembly);
+            //engine.Runtime.LoadAssembly(System.Type.GetType("System.String").Assembly);
+            foreach (System.Reflection.AssemblyName aname in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
+                assembly = System.Reflection.Assembly.Load(aname);
+                    engine.Runtime.LoadAssembly(assembly);
+            }
+            // ---------------------------------------
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "../modules"));
+            foreach (FileInfo f in dir.GetFiles("*.dll")) {
+                string assembly_name = f.FullName;
+                assembly = System.Reflection.Assembly.LoadFile(assembly_name);
+                if (assembly != null) {
+                    // initialize_module if possible
+                    foreach (Type type in assembly.GetTypes()) {
+                        System.Reflection.MethodInfo method;
+                        try {
+                            method = type.GetMethod("initialize_module");
+                            method.Invoke(type, new object [] {calico.path, "nt"}); //FIXME
+                            Console.WriteLine("ok! called initialize_module in {0} for {1}", assembly_name, dlr_name);
+                            break;
+                        } catch {
+                        }
+                        try {
+                            method = type.GetMethod("set_gui_thread_id");
+                            method.Invoke(type, new object [] {1}); // FIXME: MainWindow.gui_thread_id hasn't been run in delegate yet
+                            Console.WriteLine("ok! called set_gui_thread_id in {0} for {1}, {2}", assembly_name, dlr_name, MainWindow.gui_thread_id);
+                            break;
+                        } catch {
+                        }
+                    }
+                    engine.Runtime.LoadAssembly(assembly);
+                }
+            }
         }
 
         public override bool Execute(string text) {
