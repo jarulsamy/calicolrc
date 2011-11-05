@@ -44,6 +44,7 @@ namespace Calico {
         public static int SHELL = 1;
         public static int HOME = 0;
         public string path;
+        Gtk.ListStore EnvironmentList;
         public System.Threading.Thread executeThread = null;
         public Document CurrentDocument {
             get {
@@ -79,6 +80,9 @@ namespace Calico {
                 return retval;
                 // "Unix" or "Windows" are two common retvals
             }
+        }
+        public Gtk.TreeView EnvironmentTreeView {
+            get { return treeview1; }
         }
         public Gtk.ScrolledWindow ScrolledWindow {
             get { return scrolledwindow1; }
@@ -140,11 +144,7 @@ namespace Calico {
             // Build the GUI:
             Build();
             Gtk.Application.Invoke(delegate { gui_thread_id = Thread.CurrentThread.ManagedThreadId; });
-            // Had to add this here, as Stetic didn't like it
-            _shell = new Mono.TextEditor.TextEditor();
-            _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
-            ScrolledWindow.Add(_shell);
-            ScrolledWindow.ShowAll();
+            PostBuild();
             foreach (Gtk.TextTag tag in tags.Values) {
                 Output.Buffer.TagTable.Add(tag);
                 // TextView
@@ -248,6 +248,22 @@ namespace Calico {
                     SelectOrOpen(System.IO.Path.GetFullPath(arg));
                 }
             }
+            GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+        }
+
+        public void PostBuild() {
+            // Had to add this here, as Stetic didn't like it
+            _shell = new Mono.TextEditor.TextEditor();
+            _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
+            ScrolledWindow.Add(_shell);
+            ScrolledWindow.ShowAll();
+            // Environment table:
+            EnvironmentTreeView.AppendColumn("Variable", new Gtk.CellRendererText(), "text", 0);
+            EnvironmentTreeView.AppendColumn("Value", new Gtk.CellRendererText(), "text", 1);
+            // Create a ListStore as the Model
+            EnvironmentList = new Gtk.ListStore(typeof(string), typeof(string));
+            EnvironmentTreeView.Model = EnvironmentList;
+            EnvironmentTreeView.ShowAll();
         }
 
         [GLib.ConnectBeforeAttribute]
@@ -919,6 +935,38 @@ namespace Calico {
             } else if (Focus == Shell) {
                 ExecuteShell();
             }
+        }
+
+        public bool TreeModelForeachFunc (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
+            string vname = (string)model.GetValue(iter, 0);
+            try {
+                model.SetValue(iter, 1, manager.scope.GetVariable(vname).ToString());
+            } catch {
+                model.SetValue(iter, 1, "<undefined>");
+            }
+            return false;
+        }
+
+        public bool UpdateEnvironment() {
+            // update tree in Environment tab
+            // update the ones that already exist:
+            EnvironmentList.Foreach(TreeModelForeachFunc);
+            // now, add those that aren't in it:
+            foreach (string vname in manager.scope.GetVariableNames()) {
+                if (vname.StartsWith("_") || vname == "calico")
+                    continue;
+                bool contains = false;
+                foreach(object [] row in EnvironmentList) {
+                    if (((string)row[0]).CompareTo(vname) == 0) {
+                        contains = true;
+                        break;
+                    }
+                }
+                if (! contains) { // in list
+                    EnvironmentList.AppendValues(vname, manager.scope.GetVariable(vname).ToString());
+                }
+            }
+            return true; // keep doing
         }
 
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)
