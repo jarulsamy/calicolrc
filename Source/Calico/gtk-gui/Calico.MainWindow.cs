@@ -16,7 +16,7 @@ namespace Calico
 
 		private global::Gtk.Action yesAction;
 
-		private global::Gtk.Action noAction1;
+		private global::Gtk.Action noAction;
 
 		private global::Gtk.Action goForwardAction;
 
@@ -62,7 +62,7 @@ namespace Calico
 
 		private global::Gtk.Action yesAction1;
 
-		private global::Gtk.Action noAction;
+		private global::Gtk.Action noAction11;
 
 		private global::Gtk.Action OptionsAction;
 
@@ -81,6 +81,8 @@ namespace Calico
 		private global::Gtk.RadioAction Option2Action;
 
 		private global::Gtk.Action ExamplesAction;
+
+		private global::Gtk.Action RecentScriptsAction;
 
 		private global::Gtk.VBox vbox1;
 
@@ -134,9 +136,15 @@ namespace Calico
 
 		private global::Gtk.Label label3;
 
-		private global::Gtk.Statusbar statusbar1;
+		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
+
+		private global::Gtk.TreeView treeview1;
 
 		private global::Gtk.Label label4;
+
+		private global::Gtk.Statusbar statusbar1;
+
+		private global::Gtk.Label label5;
 
 		private global::Gtk.Label status_langauge;
 
@@ -158,9 +166,10 @@ namespace Calico
 			w1.Add (this.openAction, null);
 			this.yesAction = new global::Gtk.Action ("yesAction", null, null, "gtk-yes");
 			w1.Add (this.yesAction, null);
-			this.noAction1 = new global::Gtk.Action ("noAction1", null, null, "gtk-no");
-			this.noAction1.Sensitive = false;
-			w1.Add (this.noAction1, null);
+			this.noAction = new global::Gtk.Action ("noAction", global::Mono.Unix.Catalog.GetString ("Stop Script"), null, "gtk-no");
+			this.noAction.Sensitive = false;
+			this.noAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Stop Script");
+			w1.Add (this.noAction, "<Mod2>Escape");
 			this.goForwardAction = new global::Gtk.Action ("goForwardAction", null, null, "gtk-go-forward");
 			this.goForwardAction.Sensitive = false;
 			w1.Add (this.goForwardAction, null);
@@ -224,12 +233,13 @@ namespace Calico
 			this.LanguageAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Language");
 			w1.Add (this.LanguageAction, null);
 			this.yesAction1 = new global::Gtk.Action ("yesAction1", global::Mono.Unix.Catalog.GetString ("Execute Script"), null, "gtk-yes");
+			this.yesAction1.Sensitive = false;
 			this.yesAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("Execute Script");
 			w1.Add (this.yesAction1, "<Mod2>F5");
-			this.noAction = new global::Gtk.Action ("noAction", global::Mono.Unix.Catalog.GetString ("Stop Script"), null, "gtk-no");
-			this.noAction.Sensitive = false;
-			this.noAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Stop Script");
-			w1.Add (this.noAction, "<Mod2>Escape");
+			this.noAction11 = new global::Gtk.Action ("noAction11", global::Mono.Unix.Catalog.GetString ("Stop Script"), null, "gtk-no");
+			this.noAction11.Sensitive = false;
+			this.noAction11.ShortLabel = global::Mono.Unix.Catalog.GetString ("Stop Script");
+			w1.Add (this.noAction11, "<Mod2>Escape");
 			this.OptionsAction = new global::Gtk.Action ("OptionsAction", global::Mono.Unix.Catalog.GetString ("Options"), null, null);
 			this.OptionsAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Options");
 			w1.Add (this.OptionsAction, null);
@@ -259,6 +269,9 @@ namespace Calico
 			this.ExamplesAction = new global::Gtk.Action ("ExamplesAction", global::Mono.Unix.Catalog.GetString ("Examples"), null, null);
 			this.ExamplesAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Examples");
 			w1.Add (this.ExamplesAction, null);
+			this.RecentScriptsAction = new global::Gtk.Action ("RecentScriptsAction", global::Mono.Unix.Catalog.GetString ("Recent Scripts"), null, null);
+			this.RecentScriptsAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Recent Scripts");
+			w1.Add (this.RecentScriptsAction, null);
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "Calico.MainWindow";
@@ -269,7 +282,7 @@ namespace Calico
 			this.vbox1.Name = "vbox1";
 			this.vbox1.BorderWidth = ((uint)(5));
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menu name='NewAction' action='NewAction'/><menuitem name='openAction1' action='openAction1'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentScriptsAction' action='RecentScriptsAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add (this.menubar2);
@@ -278,7 +291,7 @@ namespace Calico
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/><toolitem name='openAction' action='openAction'/><toolitem name='yesAction1' action='yesAction1'/><toolitem name='noAction1' action='noAction1'/><toolitem name='goForwardAction' action='goForwardAction'/></toolbar></ui>");
+			this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/><toolitem name='openAction' action='openAction'/><toolitem name='yesAction1' action='yesAction1'/><toolitem name='noAction' action='noAction'/><toolitem name='goForwardAction' action='goForwardAction'/></toolbar></ui>");
 			this.toolbar1 = ((global::Gtk.Toolbar)(this.UIManager.GetWidget ("/toolbar1")));
 			this.toolbar1.Name = "toolbar1";
 			this.toolbar1.ShowArrow = false;
@@ -528,7 +541,7 @@ namespace Calico
 			this.notebook_tools = new global::Gtk.Notebook ();
 			this.notebook_tools.CanFocus = true;
 			this.notebook_tools.Name = "notebook_tools";
-			this.notebook_tools.CurrentPage = 0;
+			this.notebook_tools.CurrentPage = 1;
 			this.notebook_tools.Scrollable = true;
 			// Container child notebook_tools.Gtk.Notebook+NotebookChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
@@ -548,38 +561,56 @@ namespace Calico
 			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Output");
 			this.notebook_tools.SetTabLabel (this.GtkScrolledWindow, this.label3);
 			this.label3.ShowAll ();
+			// Container child notebook_tools.Gtk.Notebook+NotebookChild
+			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
+			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
+			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
+			// Container child GtkScrolledWindow1.Gtk.Container+ContainerChild
+			this.treeview1 = new global::Gtk.TreeView ();
+			this.treeview1.CanFocus = true;
+			this.treeview1.Name = "treeview1";
+			this.GtkScrolledWindow1.Add (this.treeview1);
+			this.notebook_tools.Add (this.GtkScrolledWindow1);
+			global::Gtk.Notebook.NotebookChild w63 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]));
+			w63.Position = 1;
+			// Notebook tab
+			this.label4 = new global::Gtk.Label ();
+			this.label4.Name = "label4";
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Environment");
+			this.notebook_tools.SetTabLabel (this.GtkScrolledWindow1, this.label4);
+			this.label4.ShowAll ();
 			this.vpaned2.Add (this.notebook_tools);
 			this.vbox1.Add (this.vpaned2);
-			global::Gtk.Box.BoxChild w63 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.vpaned2]));
-			w63.Position = 2;
+			global::Gtk.Box.BoxChild w65 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.vpaned2]));
+			w65.Position = 2;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.statusbar1 = new global::Gtk.Statusbar ();
 			this.statusbar1.Name = "statusbar1";
 			this.statusbar1.Spacing = 6;
 			// Container child statusbar1.Gtk.Box+BoxChild
-			this.label4 = new global::Gtk.Label ();
-			this.label4.Name = "label4";
-			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Language:");
-			this.statusbar1.Add (this.label4);
-			global::Gtk.Box.BoxChild w64 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label4]));
-			w64.Position = 0;
-			w64.Expand = false;
-			w64.Fill = false;
+			this.label5 = new global::Gtk.Label ();
+			this.label5.Name = "label5";
+			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString ("Language:");
+			this.statusbar1.Add (this.label5);
+			global::Gtk.Box.BoxChild w66 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label5]));
+			w66.Position = 0;
+			w66.Expand = false;
+			w66.Fill = false;
 			// Container child statusbar1.Gtk.Box+BoxChild
 			this.status_langauge = new global::Gtk.Label ();
 			this.status_langauge.Name = "status_langauge";
 			this.status_langauge.LabelProp = global::Mono.Unix.Catalog.GetString ("<i>Python</i>");
 			this.status_langauge.UseMarkup = true;
 			this.statusbar1.Add (this.status_langauge);
-			global::Gtk.Box.BoxChild w65 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.status_langauge]));
-			w65.Position = 1;
-			w65.Expand = false;
-			w65.Fill = false;
+			global::Gtk.Box.BoxChild w67 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.status_langauge]));
+			w67.Position = 1;
+			w67.Expand = false;
+			w67.Fill = false;
 			this.vbox1.Add (this.statusbar1);
-			global::Gtk.Box.BoxChild w66 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.statusbar1]));
-			w66.Position = 3;
-			w66.Expand = false;
-			w66.Fill = false;
+			global::Gtk.Box.BoxChild w68 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.statusbar1]));
+			w68.Position = 3;
+			w68.Expand = false;
+			w68.Fill = false;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
@@ -591,6 +622,7 @@ namespace Calico
 			this.KeyPressEvent += new global::Gtk.KeyPressEventHandler (this.OnKeyPressEvent);
 			this.newAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
 			this.openAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
+			this.noAction.Activated += new global::System.EventHandler (this.OnNoActionActivated);
 			this.openAction1.Activated += new global::System.EventHandler (this.OnOpenAction1Activated);
 			this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
 			this.saveAsAction.Activated += new global::System.EventHandler (this.OnSaveAsActionActivated);

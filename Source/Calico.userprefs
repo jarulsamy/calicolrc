@@ -2,10 +2,11 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="767" Column="40" />
+      <File FileName="Calico/MainWindow.cs" Line="809" Column="10" />
       <File FileName="Calico/Engine.cs" Line="121" Column="1" />
       <File FileName="Calico/LanguageManager.cs" Line="68" Column="1" />
       <File FileName="Calico/CustomStream.cs" Line="55" Column="1" />
+      <File FileName="Calico/Document.cs" Line="94" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -28,11 +29,7 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/dblank/Calico/Source/Calico/Document.cs" line="159" />
-      <Breakpoint file="/home/dblank/Calico/Source/Calico/Document.cs" line="204" />
-      <Breakpoint file="/home/dblank/Calico/trunk/Source/Calico/MainWindow.cs" line="763" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" />

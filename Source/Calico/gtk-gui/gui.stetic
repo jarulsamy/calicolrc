@@ -38,11 +38,14 @@
         <property name="Label" translatable="yes" />
         <property name="StockId">gtk-yes</property>
       </action>
-      <action id="noAction1">
+      <action id="noAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes" />
+        <property name="Accelerator">&lt;Mod2&gt;Escape</property>
+        <property name="Label" translatable="yes">Stop Script</property>
         <property name="Sensitive">False</property>
+        <property name="ShortLabel" translatable="yes">Stop Script</property>
         <property name="StockId">gtk-no</property>
+        <signal name="Activated" handler="OnNoActionActivated" />
       </action>
       <action id="goForwardAction">
         <property name="Type">Action</property>
@@ -190,11 +193,12 @@
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Mod2&gt;F5</property>
         <property name="Label" translatable="yes">Execute Script</property>
+        <property name="Sensitive">False</property>
         <property name="ShortLabel" translatable="yes">Execute Script</property>
         <property name="StockId">gtk-yes</property>
         <signal name="Activated" handler="OnYesAction1Activated" />
       </action>
-      <action id="noAction">
+      <action id="noAction11">
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Mod2&gt;Escape</property>
         <property name="Label" translatable="yes">Stop Script</property>
@@ -264,6 +268,11 @@
         <property name="Label" translatable="yes">Examples</property>
         <property name="ShortLabel" translatable="yes">Examples</property>
       </action>
+      <action id="RecentScriptsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Recent Scripts</property>
+        <property name="ShortLabel" translatable="yes">Recent Scripts</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -279,8 +288,10 @@
             <property name="MemberName" />
             <node name="menubar2" type="Menubar">
               <node type="Menu" action="FileAction">
-                <node type="Menu" action="NewAction" />
                 <node type="Menuitem" action="openAction1" />
+                <node type="Menu" action="NewAction" />
+                <node type="Separator" />
+                <node type="Menu" action="RecentScriptsAction" />
                 <node type="Menu" action="ExamplesAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="saveAction" />
@@ -338,7 +349,7 @@
               <node type="Toolitem" action="newAction" />
               <node type="Toolitem" action="openAction" />
               <node type="Toolitem" action="yesAction1" />
-              <node type="Toolitem" action="noAction1" />
+              <node type="Toolitem" action="noAction" />
               <node type="Toolitem" action="goForwardAction" />
             </node>
           </widget>
@@ -590,7 +601,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -617,6 +628,31 @@
                     <property name="type">tab</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
+                    <property name="MemberName" />
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.TreeView" id="treeview1">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="ShowScrollbars">True</property>
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label4">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Environment</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
               </widget>
             </child>
           </widget>
@@ -630,7 +666,7 @@
             <property name="MemberName" />
             <property name="Spacing">6</property>
             <child>
-              <widget class="Gtk.Label" id="label4">
+              <widget class="Gtk.Label" id="label5">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Language:</property>
               </widget>
