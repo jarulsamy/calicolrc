@@ -64,6 +64,10 @@ namespace Calico {
             return true;
         }
 
+        public virtual bool HasContent {
+            get {return false;}
+        }
+
         public virtual bool IsDirty {
             get { return true; }
         }
@@ -131,6 +135,10 @@ namespace Calico {
             texteditor.Caret.Column = 0;
             texteditor.CenterToCaret();
             return true;
+        }
+
+        public override bool HasContent {
+            get { return texteditor.Document.Text != ""; }
         }
 
         public override bool IsDirty {

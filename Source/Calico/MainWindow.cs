@@ -868,24 +868,23 @@ namespace Calico {
         }
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
+            StopButton.Sensitive = (executeThread != null);
             if (CurrentDocument != null) {
-                // FIXME: Turn some things on
+                StartButton.Sensitive = (CurrentDocument.HasContent);
                 SetLanguage(CurrentDocument.language);
                 CurrentDocument.widget.Child.GrabFocus();
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
-                // Home
-                // FIXME: Turn some things off
+                StartButton.Sensitive = false;
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
-                // Shell
-                // FIXME: Turn some things off
+                StartButton.Sensitive = (Shell.Document.Text != "");
                 SetLanguage(ShellLanguage);
                 Shell.GrabFocus();
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
+                StartButton.Sensitive = false;
                 // Some other page
-                // FIXME: Turn some things off
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             }
         }
