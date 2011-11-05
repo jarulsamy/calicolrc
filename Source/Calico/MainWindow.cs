@@ -142,7 +142,7 @@ namespace Calico {
             Gtk.Application.Invoke(delegate { gui_thread_id = Thread.CurrentThread.ManagedThreadId; });
             // Had to add this here, as Stetic didn't like it
             _shell = new Mono.TextEditor.TextEditor();
-            _shell.Document.DocumentUpdated += OnModifiedShell;
+            _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
             ScrolledWindow.Add(_shell);
             ScrolledWindow.ShowAll();
             foreach (Gtk.TextTag tag in tags.Values) {
@@ -239,12 +239,7 @@ namespace Calico {
             // option
             Shell.Options.TabsToSpaces = true;
             Shell.Options.HighlightMatchingBracket = true;
-            
-            try {
-                Shell.Document.MimeType = String.Format("text/x-{0}", CurrentLanguage);
-            } catch {
-                // pass
-            }
+
             Print(Tag.Info, "The Calico Project, Version {0}\n", MainClass.Version);
             SetLanguage(CurrentLanguage);
             // Load files:
@@ -255,8 +250,10 @@ namespace Calico {
             }
         }
 
-        public void OnModifiedShell(object obj, System.EventArgs args) {
-            if (_shell.Document.Text.Length == 0)
+        [GLib.ConnectBeforeAttribute]
+        public void ShellKeyReleaseEvent(object obj, System.EventArgs args) {
+            // This code was interacting with OnKeyPress
+            if (_shell.Document.Text == "")
                 StartButton.Sensitive = false;
             else
                 StartButton.Sensitive = true;
@@ -307,6 +304,18 @@ namespace Calico {
 
         public void SetLanguage(string language) {
             CurrentLanguage = language;
+            if (CurrentLanguage != null) {
+                if (Shell.Document.MimeType != String.Format("text/x-{0}", CurrentLanguage)) {
+                    try {
+                        Shell.Document.MimeType = String.Format("text/x-{0}", CurrentLanguage);
+                        // Force an update; works nicely as it keeps cursor in same place:
+                        // FIXME: Interaction with ShellOnKeyPress?
+                        Shell.Document.Text = Shell.Document.Text;
+                    } catch {
+                        // pass
+                    }
+                }
+            }
             Invoke(delegate {
                 prompt.Text = String.Format("{0}>", CurrentLanguage);
                 status_langauge.Text = String.Format("<i>{0}</i> ", CurrentProperLanguage);
@@ -718,14 +727,7 @@ namespace Calico {
                     } else if (manager[CurrentLanguage].engine.ReadyToExecute(text) || force) {
                         //history.last(text.rstrip());
                         //history.add("");
-                        bool results = Execute(text.TrimEnd(), CurrentLanguage);
-                        if (results) {
-                            Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
-                            Mono.TextEditor.DeleteActions.DeleteSelection(Shell.GetTextEditorData());
-                            Shell.GrabFocus();
-                            Shell.Caret.Line = 0;
-                            Shell.Caret.Column = 0;
-                        }
+                        ExecuteShell();
                         completion = null;
                         args.RetVal = true;
                     }
@@ -734,6 +736,19 @@ namespace Calico {
                 // not shell
                 // Editor, handle : on end of line
             }
+        }
+
+        public bool ExecuteShell() {
+            string text = Shell.Document.Text;
+            bool results = Execute(text.TrimEnd(), CurrentLanguage);
+            if (results) {
+                Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+                Mono.TextEditor.DeleteActions.DeleteSelection(Shell.GetTextEditorData());
+                Shell.GrabFocus();
+                Shell.Caret.Line = 0;
+                Shell.Caret.Column = 0;
+            }
+            return true;
         }
 
         public bool Execute(string text, string language) {
@@ -894,16 +909,6 @@ namespace Calico {
             // Shell
         }
 
-        protected virtual void OnToolbar1ButtonReleaseEvent(object o, Gtk.ButtonReleaseEventArgs args) {
-            if (CurrentDocument != null) {
-                bool retval = CurrentDocument.Save();
-                if (retval) {
-                    SetLanguage(CurrentLanguage);
-                    ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
-                }
-            }
-        }
-
         protected virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
@@ -911,8 +916,9 @@ namespace Calico {
                     SetLanguage(CurrentLanguage);
                     ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
                 }
+            } else if (Focus == Shell) {
+                ExecuteShell();
             }
-            
         }
 
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)

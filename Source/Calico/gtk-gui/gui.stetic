@@ -344,7 +344,6 @@
           <widget class="Gtk.Toolbar" id="toolbar1">
             <property name="MemberName" />
             <property name="ShowArrow">False</property>
-            <signal name="ButtonReleaseEvent" handler="OnToolbar1ButtonReleaseEvent" />
             <node name="toolbar1" type="Toolbar">
               <node type="Toolitem" action="newAction" />
               <node type="Toolitem" action="openAction" />
