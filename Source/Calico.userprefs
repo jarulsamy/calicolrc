@@ -1,16 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/TabCompletion.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs" ctype="Workbench">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="802" Column="1" />
+      <File FileName="Calico/MainWindow.cs" Line="943" Column="50" />
       <File FileName="Calico/TabCompletion.cs" Line="26" Column="1" />
-      <File FileName="Calico/Engine.cs" Line="70" Column="23" />
+      <File FileName="Calico/Engine.cs" Line="93" Column="39" />
+      <File FileName="Calico/History.cs" Line="1" Column="1" />
+      <File FileName="Calico/CustomStream.cs" Line="34" Column="10" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="TabCompletion.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>

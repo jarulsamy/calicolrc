@@ -43,6 +43,8 @@ namespace Calico {
         public static int SHELL = 1;
         public static int HOME = 0;
         public string path;
+        bool IsUpdateEnvironment = false; // FIXME: get from user options
+        Dictionary<string,bool> EnvironmentVariables = new Dictionary<string, bool>();
         Gtk.ListStore EnvironmentList;
         public System.Threading.Thread executeThread = null;
         public History history = new History();
@@ -59,6 +61,15 @@ namespace Calico {
                 } else
                     return null;
             }
+        }
+        public Gtk.Notebook.NotebookChild EnvironmentPage {
+            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
+        }
+        public Gtk.Notebook DocumentNotebook {
+            get { return notebook_docs; }
+        }
+        public Gtk.Notebook ToolNotebook {
+            get { return notebook_tools; }
         }
         public Document this[int page_num] {
             get {
@@ -251,7 +262,11 @@ namespace Calico {
                     SelectOrOpen(System.IO.Path.GetFullPath(arg));
                 }
             }
+            // Set EnvironmentPage to match displayed state:
+            IsUpdateEnvironment = true;
+            EnvironmentTabAction.Active = true;
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+            // End of GUI setup
         }
 
         public void PostBuild() {
@@ -924,6 +939,8 @@ namespace Calico {
             } else {
                 Invoke(delegate {
                     lock (Output) {
+                        if (tag == Tag.Error)
+                            ToolNotebook.Page = 0; // show output page
                         Gtk.TextIter end = Output.Buffer.EndIter;
                         string colorname = MainWindow.tagnames[tag];
                         Output.Buffer.InsertWithTagsByName(ref end, String.Format(format, args), colorname);
@@ -1002,18 +1019,14 @@ namespace Calico {
             foreach (string vname in manager.scope.GetVariableNames()) {
                 if (vname.StartsWith("_") || vname == "calico")
                     continue;
-                bool contains = false;
-                foreach(object [] row in EnvironmentList) {
-                    if (((string)row[0]).CompareTo(vname) == 0) {
-                        contains = true;
-                        break;
-                    }
-                }
-                if (! contains) { // in list
-                    EnvironmentList.AppendValues(vname, manager.scope.GetVariable(vname).ToString());
+                if (! EnvironmentVariables.ContainsKey(vname)) {
+                    Gtk.TreeIter iter = EnvironmentList.AppendValues(vname, manager.scope.GetVariable(vname).ToString());
+                    Gtk.TreePath treepath = EnvironmentList.GetPath(iter);
+                    EnvironmentTreeView.SetCursor(treepath, null, false);
+                    EnvironmentVariables[vname] = true;
                 }
             }
-            return true; // keep doing
+            return IsUpdateEnvironment; // keep doing
         }
 
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)
@@ -1021,9 +1034,20 @@ namespace Calico {
             AbortThread();
         }
 
-        public Gtk.Notebook DocumentNotebook {
-            get { return notebook_docs; }
+        protected virtual void OnEnvironmentTabActionActivated (object sender, System.EventArgs e)
+        {
+            // show environment tab if active
+            if (! EnvironmentTabAction.Active) {
+                IsUpdateEnvironment = false;
+                EnvironmentPage.Child.Hide();
+            } else {
+                IsUpdateEnvironment = true;
+                GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+                EnvironmentPage.Child.Show();
+                ToolNotebook.Page = 1;
+            }
         }
+        
         
     }
 }

@@ -206,9 +206,9 @@
         <property name="ShortLabel" translatable="yes">Stop Script</property>
         <property name="StockId">gtk-no</property>
       </action>
-      <action id="OptionsAction">
+      <action id="ViewAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Options</property>
+        <property name="Label" translatable="yes">View</property>
         <property name="ShortLabel" translatable="yes">Options</property>
       </action>
       <action id="zoomInAction">
@@ -273,6 +273,20 @@
         <property name="Label" translatable="yes">Recent Scripts</property>
         <property name="ShortLabel" translatable="yes">Recent Scripts</property>
       </action>
+      <action id="ShowAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Show</property>
+        <property name="ShortLabel" translatable="yes">Show</property>
+      </action>
+      <action id="EnvironmentTabAction">
+        <property name="Type">Toggle</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;e</property>
+        <property name="Label" translatable="yes">Environment Tab</property>
+        <property name="ShortLabel" translatable="yes">Environment Tab</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">True</property>
+        <signal name="Activated" handler="OnEnvironmentTabActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -315,17 +329,20 @@
                 <node type="Menuitem" action="CommentRegionAction" />
                 <node type="Menuitem" action="UncommentRegionAction" />
               </node>
+              <node type="Menu" action="ViewAction">
+                <node type="Menuitem" action="zoomInAction" />
+                <node type="Menuitem" action="zoomOutAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="selectFontAction" />
+                <node type="Menu" action="ShowAction">
+                  <node type="Menuitem" action="EnvironmentTabAction" />
+                </node>
+              </node>
               <node type="Menu" action="ScriptAction">
                 <node type="Menu" action="LanguageAction" />
                 <node type="Menuitem" action="yesAction1" />
                 <node type="Menuitem" action="noAction" />
                 <node type="Menuitem" action="ShellAction" />
-              </node>
-              <node type="Menu" action="OptionsAction">
-                <node type="Menuitem" action="zoomInAction" />
-                <node type="Menuitem" action="zoomOutAction" />
-                <node type="Separator" />
-                <node type="Menuitem" action="selectFontAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="helpAction" />
@@ -486,6 +503,7 @@
                             <child>
                               <widget class="Gtk.Label" id="prompt">
                                 <property name="MemberName" />
+                                <property name="Xalign">0</property>
                                 <property name="LabelProp" translatable="yes">python&gt;</property>
                               </widget>
                               <packing>
