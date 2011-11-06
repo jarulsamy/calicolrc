@@ -21,6 +21,7 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Calico {
 
@@ -55,6 +56,19 @@ namespace Calico {
         public virtual void PostSetup(MainWindow calico) {
         }
 
+        public virtual bool tryGetVariable(string variable, out object value) {
+            // Return found or not; value gets the variable's value
+            value = null;
+            return false;
+        }
+
+        public string [] getVariableParts(string variable) {
+            return variable.Split('.');
+        }
+
+        public List<string> getCompletions(string root) {
+            return null;
+        }
     }
     
     public class DLREngine : Engine {

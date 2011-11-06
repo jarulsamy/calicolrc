@@ -131,6 +131,8 @@
     <Compile Include="CustomStream.cs" />
     <Compile Include="gtk-gui\Calico.MainWindow.cs" />
     <Compile Include="LanguageManager.cs" />
+    <Compile Include="History.cs" />
+    <Compile Include="TabCompletion.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

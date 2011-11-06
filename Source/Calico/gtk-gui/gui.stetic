@@ -600,7 +600,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">1</property>
+                <property name="CurrentPage">0</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">

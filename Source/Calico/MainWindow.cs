@@ -20,8 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.IO;
-// Path
+using System.IO; // Path
 using System.Threading;
 using System.Text;
 using System.Collections.Generic;
@@ -46,6 +45,8 @@ namespace Calico {
         public string path;
         Gtk.ListStore EnvironmentList;
         public System.Threading.Thread executeThread = null;
+        public History history = new History();
+        public TabCompletion completion = null;
         public Document CurrentDocument {
             get {
                 int page_num = DocumentNotebook.Page;
@@ -119,6 +120,7 @@ namespace Calico {
         public MainWindow(string[] args, LanguageManager manager, bool Debug) : base(Gtk.WindowType.Toplevel) {
             this.Debug = Debug;
             this.manager = manager;
+            completion = null;
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
@@ -226,6 +228,7 @@ namespace Calico {
                 radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                 languages_by_count[count + 1] = language;
                 radioitem.ButtonReleaseEvent += OnSwitchLanguage;
+                //DragDataReceived += SelectionReceived;
                 radioitem.Data["id"] = count + 1;
                 count++;
             }
@@ -690,8 +693,6 @@ namespace Calico {
 
         [GLib.ConnectBeforeAttribute]
         protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-            // FIXME: handle control+1 language switch here
-            // not sure why accelerators didn't work
             int key_0 = (int)Gdk.Key.Key_0;
             if (((((int)args.Event.Key) > key_0) && ((int)args.Event.Key) < (key_0 + 10)) && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
                 OnSwitchLanguage(((int)args.Event.Key) - key_0);
@@ -719,7 +720,6 @@ namespace Calico {
                 } else if (args.Event.Key == Gdk.Key.Return) {
                     // if control key is down, too, just insert a return
                     bool force = false;
-                    string completion = "";
                     if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
                         Shell.InsertAtCaret("\n");
                         args.RetVal = true;
@@ -741,12 +741,59 @@ namespace Calico {
                         args.RetVal = true;
                         // nothing to do, but handled
                     } else if (manager[CurrentLanguage].engine.ReadyToExecute(text) || force) {
-                        //history.last(text.rstrip());
-                        //history.add("");
+                        history.last(text.TrimEnd());
+                        history.add("");
                         ExecuteShell();
                         completion = null;
                         args.RetVal = true;
                     }
+                } else if (args.Event.Key == Gdk.Key.Up) {
+                    string text = Shell.Document.Text;
+                    var caret = Shell.Caret;
+                    int line = caret.Line;
+                    if (line == 0) {
+                        history.update(text.TrimEnd());
+                        text = history.up();
+                        Shell.Document.Text = text;
+                        Shell.GrabFocus();
+                        Shell.Caret.Line = 0;
+                        int col = Shell.Document.GetLine(0).Length;
+                        Shell.Caret.Column = col;
+                    }
+                } else if (args.Event.Key == Gdk.Key.Down) {
+                    string text = Shell.Document.Text;
+                    var caret = Shell.Caret;
+                    int line = caret.Line;
+                    int line_count = Shell.Document.LineCount;
+                    if (line == (line_count - 1)) {
+                        history.update(text.TrimEnd());
+                        text = history.down();
+                        Shell.Document.Text = text;
+                        Shell.GrabFocus();
+                        Shell.Caret.Line = Shell.Document.LineCount - 1;
+                        Shell.Caret.Column = Shell.Document.GetLine(0).Length;
+                     }
+                } else if (args.Event.Key == Gdk.Key.Tab) {
+                    // where are we?
+                    int lineNo = Shell.Caret.Line;
+                    string [] lines = Shell.Document.Text.Split('\n');
+                    string line = lines[lineNo];
+                    string text = line.Substring(0, Shell.Caret.Column);
+                    if (text.Trim() != "") { // something there!
+                        if (completion == null) {
+                            completion = new TabCompletion(this, Shell, text);
+                            if (completion.items != null) { // first time:
+                                Print(completion.format());
+                            }
+                        }
+                        if (completion.items != null) {
+                            completion.insertText();
+                        }
+                        args.RetVal = true; // don't put in tab
+                    }
+                    completion = null;
+                } else {
+                    completion = null;
                 }
             } else if (Focus is Mono.TextEditor.TextEditor) {
                 // not shell
@@ -840,7 +887,7 @@ namespace Calico {
         }
 
         public void AbortThread() {
-            // Myro
+            // FIXME: import Myro
             if (executeThread != null) {
                 Print(Tag.Warning, _("Stopping...\n"));
                 executeThread.Abort();
@@ -973,8 +1020,7 @@ namespace Calico {
         {
             AbortThread();
         }
-        
-        
+
         public Gtk.Notebook DocumentNotebook {
             get { return notebook_docs; }
         }
