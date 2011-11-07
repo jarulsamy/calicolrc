@@ -1,3 +1,22 @@
+Calico2
+
+1. Recent Files
+2. Reset shell
+3. Tab completion (for all expressions?)
+4. Loop in Graphics, win.run()
+5. Font
+6. Chat stuff (register, login, blast, chat)
+7. About
+8. Print (and newline issue on Windows)
+9. Search/replace in Editor
+10. Languages, Jigsaw, Scheme
+11. Debug/trace
+12. Goto file:line on right-click
+13. Config save/load
+14. Ask to overwrite
+15. Ask to abort changes, save
+16. click in output to get history somehow
+
 Problems, issues, features, and questions.
 
 Debugging:
