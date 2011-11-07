@@ -34,6 +34,7 @@ namespace Calico {
         // label for notebook page
         public Gtk.Button close_button;
         // tab close button
+
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
             this.filename = filename;

@@ -1,16 +1,18 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/TabCompletion.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/TabCompletion.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="780" Column="46" />
-      <File FileName="Calico/TabCompletion.cs" Line="77" Column="60" />
+      <File FileName="Calico/MainWindow.cs" Line="459" Column="13" />
+      <File FileName="Calico/TabCompletion.cs" Line="61" Column="31" />
       <File FileName="Calico/Main.cs" Line="98" Column="1" />
       <File FileName="Calico/Engine.cs" Line="228" Column="34" />
+      <File FileName="Calico/Document.cs" Line="121" Column="30" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Calico" expanded="True">
+            <Node name="References" expanded="True" />
             <Node name="TabCompletion.cs" selected="True" />
           </Node>
         </State>
@@ -33,13 +35,13 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/dblank/Calico/trunk/Source/Calico/MainWindow.cs" line="983" />
+      <Breakpoint file="/home/dblank/Calico/trunk/Source/Calico/MainWindow.cs" line="459" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <AuthorInfo Name="Douglas S. Blank" Email="dblank@cs.brynmawr.edu" Copyright="The Calico Project" ctype="AuthorInformation" />
-  <MonoDevelop.Ide.ItemProperties.Calico ctype="Properties">
-    <MonoDevelop.Ide.CustomExecutionModes ctype="CustomExecutionModes">
+  <MonoDevelop.Ide.ItemProperties.Calico>
+    <MonoDevelop.Ide.CustomExecutionModes>
       <Data Name="Debug Handler" Id="c3a3f0d4-894b-4508-880d-ae191517f67d" ModeId="Default" PromptForParameters="True">
         <CommandData>
           <Item Key="MonoDevelop.Ide.Execution.CustomArgsCustomizer">
