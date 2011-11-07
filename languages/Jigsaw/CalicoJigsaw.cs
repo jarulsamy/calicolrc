@@ -30,25 +30,27 @@ public class CalicoJigsawEngine : Engine {
 }
 
 public class CalicoJigsawDocument : Document {
-	public Jigsaw.Canvas cvs = null;
-	
-	public CalicoJigsawDocument(Calico.MainWindow calico, string filename) : base(calico, filename, "jigsaw") {
-		cvs = new Jigsaw.Canvas(900, 600);
-		widget.AddWithViewport(cvs);
-        widget.ShowAll();
-	}
+    public Jigsaw.Canvas cvs = null;
+    
+    public CalicoJigsawDocument(Calico.MainWindow calico, string filename) : base(calico, filename, "jigsaw") {
+      cvs = new Jigsaw.Canvas(900, 600);
+      widget.AddWithViewport(cvs);
+      if (filename != null)
+	cvs.ReadFile(filename);
+      widget.ShowAll();
+    }
 }
 
 public class CalicoJigsawLanguage : Language {
-	public CalicoJigsawLanguage() : 
-		base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null) {
+    public CalicoJigsawLanguage() : 
+        base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null) {
     }
-	
-	public override void MakeEngine(LanguageManager manager) {
+    
+    public override void MakeEngine(LanguageManager manager) {
         engine = new CalicoJigsawEngine(manager);
     }
 
-	public override Document MakeDocument(Calico.MainWindow calico, string filename) {
+    public override Document MakeDocument(Calico.MainWindow calico, string filename) {
           return new CalicoJigsawDocument(calico, filename);
     }
 
