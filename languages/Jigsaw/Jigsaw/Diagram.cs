@@ -216,9 +216,6 @@ namespace Diagram
 			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
 			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
 			
-			// Snoop on all key events
-			Gtk.Key.SnooperInstall(this.SnoopKey);
-			
             // The Canvas object maintains two layers (collections):
             // - The shapes layer holds all managed blocks on the canvas
             // - The annotation layer holds all handles and other objects
@@ -254,23 +251,7 @@ namespace Diagram
 			Console.WriteLine("Annotation:");
 			foreach (CShape s in this.annotation) Console.WriteLine(s);
 		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		internal int SnoopKey(Gtk.Widget o, Gdk.EventKey k) {
-			switch(k.Key)
-			{
-				case Gdk.Key.Up:
-					this.DoZoom(1.05);
-					break;
-				case Gdk.Key.Down:
-					this.DoZoom(1.0/1.05);
-					break;
-			}
-			
-			// Return unique id
-			return 1;
-		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Clear all delegates that have registed to handle this class's events
         public void ClearEventHandlers()

@@ -29,8 +29,11 @@ public class JigsawWidget : Gtk.ScrolledWindow
 // -----------------------------------------------------------------------
 public class MainWindow : Gtk.Window
 {
+	Jigsaw.Canvas cvs;
+
 	public MainWindow () : base(Gtk.WindowType.Toplevel)
 	{
+
 		// Main window
 		this.Title = "Jigsaw";
 		this.Icon = new global::Gdk.Pixbuf (global::System.IO.Path.Combine (global::System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
@@ -52,9 +55,10 @@ public class MainWindow : Gtk.Window
 //		cvsFixed.Put(cvs, 0,0);
 //		sw.AddWithViewport(cvsFixed);
 		
-		Jigsaw.Canvas cvs = new Jigsaw.Canvas(900, 600);
+		cvs = new Jigsaw.Canvas(900, 600);
 		this.Add(cvs);
-		
+		this.KeyPressEvent    += new Gtk.KeyPressEventHandler( this.OnKeyPressEvent);
+
 		// Let it rip
 		this.ShowAll();
 	}
@@ -64,5 +68,15 @@ public class MainWindow : Gtk.Window
 	{	// Close the application when the main window is closed 
 		Gtk.Application.Quit ();
 		a.RetVal = true;
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	[GLib.ConnectBeforeAttribute]
+	protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
+        if (args.Event.Key == Gdk.Key.Up) {
+			cvs.DoZoom(1.05);
+        } else if (args.Event.Key == Gdk.Key.Down) {
+			cvs.DoZoom(1.0/1.05);
+		}
 	}
 }
