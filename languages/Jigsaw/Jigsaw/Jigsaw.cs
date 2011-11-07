@@ -151,7 +151,7 @@ namespace Jigsaw
 			
 			// Add block panel background to canvas
 			Diagram.CRectangle pnlBlock = new Diagram.CRectangle(
-			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 1200.0)}, 
+			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 10000.0)}, 
 				"", Diagram.Colors.Transparent, Diagram.Colors.Honeydew, 1, Diagram.Colors.Honeydew, 
 				true, false, false, false, false);
 			this.AddShape(pnlBlock);
@@ -318,7 +318,6 @@ namespace Jigsaw
 			  this.AddShape(cblock);
 			  tbGraphics.AddShape(cblock);
 			}
-
 			
 			// --- Run tab
 			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
@@ -493,15 +492,13 @@ namespace Jigsaw
 			{
 				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 				return;
-				
-			} 
-			else {
+			} else {
             	if (this.Mode == Diagram.EMode.Editing)
             	{
 		            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
 					if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
 		            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
-					//this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
+					this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
 					
 					this.Invalidate();										// Redraw
 				}
@@ -522,8 +519,22 @@ namespace Jigsaw
 					this.offsetY += dy;
 					this.EditMode = Diagram.EMode.Translating;
 					
+					// Get the size of the window
+					int w, h;
+					this.GdkWindow.GetSize(out w, out h);
+					
+					double maxOffsetX = this.scaleCenterX-(this.scaleCenterX/this.scale);
+					double maxOffsetY = this.scaleCenterY-(this.scaleCenterY/this.scale);
+					double minOffsetX = -((w+this.scaleCenterX)/this.scale-this.scaleCenterX);
+					double minOffsetY = -((h+this.scaleCenterY)/this.scale-this.scaleCenterY);
+					
+					if (this.offsetX > maxOffsetX) this.offsetX = maxOffsetX;
+					if (this.offsetY > maxOffsetY) this.offsetY = maxOffsetY;
+					if (this.offsetX < minOffsetX) this.offsetX = minOffsetX;
+					if (this.offsetY < minOffsetY) this.offsetY = minOffsetY;
+					
 					// Find all docked shapes and redock them
-					this.ReDockShapes(dx, dy);
+					//this.ReDockShapes(dx, dy);
 					
 					this.Invalidate();
 				}

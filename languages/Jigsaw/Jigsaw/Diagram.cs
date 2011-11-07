@@ -215,7 +215,6 @@ namespace Diagram
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
 			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
 			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
-
 			
 			// Snoop on all key events
 			Gtk.Key.SnooperInstall(this.SnoopKey);
@@ -301,6 +300,13 @@ namespace Diagram
         {
 			g.Save();
 			
+			// Scale the diagram to the zoom factor at center point
+			g.Translate( this.scaleCenterX,  this.scaleCenterY);
+			g.Scale(     this.scale,         this.scale);
+			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
+			g.Translate( this.offsetX,       this.offsetY);
+//			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
+			
 			// Clear background
 			g.Color = this.BackColor;
 			g.Paint();
@@ -309,32 +315,113 @@ namespace Diagram
             // Caution: this smears single pixels into small blurs on pixel boundaries.
             g.Antialias = Antialias.Subpixel;
 			
-			// Scale the diagram to the zoom factor at center point
-			g.Translate( this.scaleCenterX,  this.scaleCenterY);
-			g.Scale(     this.scale,         this.scale);
-			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
-			g.Translate( this.offsetX,       this.offsetY);
-//			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
+            // Draw all visible 
+			// connectors (bottom layer), then
+			// shapes (middle layer), and finally
+			// annotations (top layer)
+            foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
+            foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
+            foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
+			
+//            foreach (CConnector o in this.connectors) {
+//				if (o.Visible == true) o.Draw(g);
+//			}
+//            foreach (CShape     o in this.shapes    ) {
+//				o._cvs = this;
+//				if (o.Visible == true) o.Draw(g);
+//			}
+//            foreach (CShape     o in this.annotation) {
+//				if (o.Visible == true) o.Draw(g);
+//			}
+			
+			// Reset transform
+			g.Restore();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public void DrawNav(Cairo.Context g)
+        {	// Draw the inset navigation thumbnail
+			g.Save();
+			
+			// Get the size of the window
+			int w, h;
+			this.GdkWindow.GetSize (out w, out h);
+			
+			// Translate to a point in the upper right corner
+			// Leave a border of 10 pixels
+			g.Translate( w-310,  10);
+			
+			// Set up a clip region into which a small version of diagram will be drawn
+			g.Rectangle(-1.0, -1.0, 302.0, 202.0);
+			g.Clip();
+			
+			// Draw background in clip region
+			g.MoveTo(-1.0, -1.0);
+			g.LineTo(301.0, -1.0);
+			g.LineTo(301.0, 201.0);
+			g.LineTo(-1.0, 201.0);
+			g.LineTo(-1.0, -1.0);
+			g.ClosePath();
+			
+			// Fill the rectangle
+			g.Color = new Color(1.0, 1.0, 1.0, 0.3);
+			g.Fill();
+			
+			// Save coordinate system
+			g.Save();
+
+			// Scale down so small version of diagram will fit
+			g.Scale(0.15, 0.15);
+			
+            // Always draw in antialias mode.
+            // Caution: this smears single pixels into small blurs on pixel boundaries.
+            //g.Antialias = Antialias.Subpixel;
 			
             // Draw all visible 
 			// connectors (bottom layer), then
 			// shapes (middle layer), and finally
 			// annotations (top layer)
-            foreach (CConnector o in this.connectors) {
-				if (o.Visible == true) o.Draw(g);
-			}
-            foreach (CShape     o in this.shapes    ) {
-				o._cvs = this;
-				if (o.Visible == true) o.Draw(g);
-			}
-            foreach (CShape     o in this.annotation) {
-				if (o.Visible == true) o.Draw(g);
-			}
+            foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
+            foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
+            //foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
+			
+			// Transform from world coordinates to screen coordinates
+			g.Translate(-(this.offsetX-this.scaleCenterX), -(this.offsetY-this.scaleCenterY));
+			g.Scale(    1.0/this.scale,       1.0/this.scale);
+			g.Translate( -this.scaleCenterX,  -this.scaleCenterY);
+			
+			// Draw the rectangle that frames the current viewport
+			g.MoveTo(0.0, 0.0);
+			g.LineTo(w, 0.0);
+			g.LineTo(w, h);
+			g.LineTo(0.0, h);
+			g.LineTo(0.0, 0.0);
+			g.ClosePath();
+			
+			// Stroke the viewport rectangle
+			g.Color = Colors.Black;
+			g.LineWidth = 1;
+			g.Stroke();
 			
 			// Reset transform
 			g.Restore();
+			
+			// Draw a border around the clip region
+			g.MoveTo(-1.0, -1.0);
+			g.LineTo(301.0, -1.0);
+			g.LineTo(301.0, 201.0);
+			g.LineTo(-1.0, 201.0);
+			g.LineTo(-1.0, -1.0);
+			g.ClosePath();
+			
+			// Stroke the outer rectangle
+			g.Color = Colors.Black;
+			g.LineWidth = 2;
+			g.Stroke();
+						
+			g.Restore();
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override bool OnExposeEvent(Gdk.EventExpose args)
         {	// Handle the Paint event by drawing all shapes and annotations
@@ -342,6 +429,8 @@ namespace Diagram
                 //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
                 //g.Clip();
 				Draw( g );
+				
+				DrawNav(g);
 			}
 			return true;
 		}
@@ -350,10 +439,12 @@ namespace Diagram
 		public void DoZoom(double factor)
 		{	// Perform the zoom
 			this.scale = this.scale * factor;
-			//this.scaleCenterX = 0.5*this.Allocation.Width;
-			//this.scaleCenterY = 0.5*this.Allocation.Height;
-			this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
-			this.scaleCenterY = 0.0; //0.5*this.Allocation.Height;
+			if (this.scale < 0.1) this.scale = 0.1;
+			if (this.scale > 20.0) this.scale = 20.0;
+			this.scaleCenterX = 0.5*this.Allocation.Width;
+			this.scaleCenterY = 0.5*this.Allocation.Height;
+			//this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
+			//this.scaleCenterY = 0.0; //0.5*this.Allocation.Height;
 			this.Invalidate();	
 		}
 		
@@ -1272,19 +1363,19 @@ namespace Diagram
             return null;
         }
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ReDockShapes(double dx, double dy) 
-		{	// Move docked shapes so that they remain docked
-			
-            foreach (CShape s in this.shapes)
-            {
-                if (s.Dock == DockSide.Left)
-                {
-					s.Left -= dx;
-					s.Top  -= dy;
-                }
-            }
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void ReDockShapes(double dx, double dy) 
+//		{	// Move docked shapes so that they remain docked
+//			
+//            foreach (CShape s in this.shapes)
+//            {
+//                if (s.Dock == DockSide.Left)
+//                {
+//					s.Left -= dx;
+//					s.Top  -= dy;
+//                }
+//            }
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CShape HitConnector(CPoint pt)
