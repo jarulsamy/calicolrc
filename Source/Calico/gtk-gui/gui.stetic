@@ -52,6 +52,7 @@
         <property name="Label" translatable="yes" />
         <property name="Sensitive">False</property>
         <property name="StockId">gtk-go-forward</property>
+        <signal name="Activated" handler="OnGoForwardActionActivated" />
       </action>
       <action id="EditAction">
         <property name="Type">Action</property>
@@ -287,6 +288,13 @@
         <property name="Active">True</property>
         <signal name="Activated" handler="OnEnvironmentTabActionActivated" />
       </action>
+      <action id="LocalsTabAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Locals Tab</property>
+        <property name="ShortLabel" translatable="yes">Locals Tab</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">True</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -336,6 +344,7 @@
                 <node type="Menuitem" action="selectFontAction" />
                 <node type="Menu" action="ShowAction">
                   <node type="Menuitem" action="EnvironmentTabAction" />
+                  <node type="Menuitem" action="LocalsTabAction" />
                 </node>
               </node>
               <node type="Menu" action="ScriptAction">
@@ -620,7 +629,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -672,7 +681,36 @@
                     <property name="type">tab</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="scrolledwindow2">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.TreeView" id="treeview2">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label5">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">Locals</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
               </widget>
+              <packing>
+                <property name="Resize">False</property>
+                <property name="Shrink">False</property>
+              </packing>
             </child>
           </widget>
           <packing>
@@ -685,7 +723,7 @@
             <property name="MemberName" />
             <property name="Spacing">6</property>
             <child>
-              <widget class="Gtk.Label" id="label5">
+              <widget class="Gtk.Label" id="label6">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Language:</property>
               </widget>

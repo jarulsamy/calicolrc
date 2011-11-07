@@ -22,11 +22,14 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using IronPython.Hosting;
 
 namespace Calico {
 
     public class Engine {
         public LanguageManager manager;
+        public MainWindow calico;
+        public bool trace = false;
 
         public Engine(LanguageManager manager) {
             this.manager = manager;
@@ -75,6 +78,16 @@ namespace Calico {
         public virtual List<string> getCompletions(string root) {
             return new List<string>();
         }
+
+        public virtual void SetTraceOn(MainWindow calico) {
+            this.calico = calico;
+            trace = true;
+        }
+
+        public virtual void SetTraceOff() {
+            trace = false;
+        }
+
     }
     
     public class DLREngine : Engine {
@@ -194,6 +207,13 @@ namespace Calico {
             return true;
         }
 
+        public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
+            //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
+            Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
+            System.Threading.Thread.Sleep(1000);
+            return OnTraceBack;
+        }
+
         public override bool ExecuteFile(string filename) {
             //manager.calico.last_error = ""
             //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
@@ -209,6 +229,8 @@ namespace Calico {
                 manager.stderr.PrintLine(eo.FormatException(e));
                 return false;
             }
+            if (trace)
+                engine.SetTrace(OnTraceBack);
             try {
                 source.Execute(manager.scope);
             } catch (Exception e) {

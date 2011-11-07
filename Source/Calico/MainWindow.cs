@@ -109,6 +109,9 @@ namespace Calico {
         public Gtk.Action StartButton {
             get { return yesAction1; }
         }
+        public Gtk.Action DebugButton {
+            get { return goForwardAction; }
+        }
         public Gtk.Action StopButton {
             get { return noAction; }
         }
@@ -889,18 +892,23 @@ namespace Calico {
 
         public void OnStartRunning() {
             StartButton.Sensitive = false;
+            DebugButton.Sensitive = false;
             StopButton.Sensitive = true;
         }
 
         public void OnStopRunning() {
             StopButton.Sensitive = false;
             if (CurrentDocument != null) { // Editor
-                if (CurrentDocument.HasContent)
+                if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true; // need something to execute
-                else
+                    DebugButton.Sensitive = true; // need something to execute
+                } else {
                     StartButton.Sensitive = false; // need something to execute
+                    DebugButton.Sensitive = false; // need something to execute
+                }
             } else { // Shell
                 StartButton.Sensitive = false; // need something to execute
+                DebugButton.Sensitive = false; // need something to execute
             }
             executeThread = null;
             /*
@@ -1003,19 +1011,23 @@ namespace Calico {
             StopButton.Sensitive = (executeThread != null);
             if (CurrentDocument != null) {
                 StartButton.Sensitive = (CurrentDocument.HasContent);
+                DebugButton.Sensitive = (CurrentDocument.HasContent);
                 SetLanguage(CurrentDocument.language);
                 CurrentDocument.widget.Child.GrabFocus();
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
                 StartButton.Sensitive = false;
+                DebugButton.Sensitive = false;
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
                 StartButton.Sensitive = (Shell.Document.Text != "");
+                DebugButton.Sensitive = false; // only on documents
                 SetLanguage(ShellLanguage);
                 Shell.GrabFocus();
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
                 StartButton.Sensitive = false;
+                DebugButton.Sensitive = false;
                 // Some other page
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             }
@@ -1031,6 +1043,7 @@ namespace Calico {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
                     SetLanguage(CurrentLanguage);
+                    manager[CurrentLanguage].engine.SetTraceOff();
                     ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
                 }
             } else if (Focus == Shell) {
@@ -1079,7 +1092,7 @@ namespace Calico {
                 EnvironmentPage.Child.Hide();
             } else {
                 IsUpdateEnvironment = true;
-                GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+                GLib.Timeout.Add(250, new GLib.TimeoutHandler( UpdateEnvironment ));
                 EnvironmentPage.Child.Show();
                 ToolNotebook.Page = 1;
             }
@@ -1094,8 +1107,17 @@ namespace Calico {
         {
             KeyDown(true);
         }
-        
-        
 
+        protected void OnGoForwardActionActivated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                bool retval = CurrentDocument.Save();
+                if (retval) {
+                    SetLanguage(CurrentLanguage);
+                    manager[CurrentLanguage].engine.SetTraceOn(this);
+                    ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+                }
+            }
+        }
     }
 }
