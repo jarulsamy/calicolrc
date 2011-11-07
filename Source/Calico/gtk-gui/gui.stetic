@@ -526,6 +526,7 @@
                                     <property name="Label" translatable="yes" />
                                     <property name="UseUnderline">True</property>
                                     <property name="FocusOnClick">False</property>
+                                    <signal name="Clicked" handler="OnHistoryUpClicked" />
                                   </widget>
                                   <packing>
                                     <property name="Position">0</property>
@@ -543,6 +544,7 @@
                                     <property name="Label" translatable="yes" />
                                     <property name="UseUnderline">True</property>
                                     <property name="FocusOnClick">False</property>
+                                    <signal name="Clicked" handler="OnHistoryDownClicked" />
                                   </widget>
                                   <packing>
                                     <property name="Position">1</property>

@@ -656,6 +656,8 @@ namespace Calico
 			this.button4.Clicked += new global::System.EventHandler (this.OnButton4Clicked);
 			this.button3.Clicked += new global::System.EventHandler (this.OnButton3Clicked);
 			this.button2.Clicked += new global::System.EventHandler (this.OnButton2Clicked);
+			this.history_up.Clicked += new global::System.EventHandler (this.OnHistoryUpClicked);
+			this.history_down.Clicked += new global::System.EventHandler (this.OnHistoryDownClicked);
 		}
 	}
 }

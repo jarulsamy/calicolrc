@@ -162,7 +162,8 @@ namespace Calico {
                 Output.Buffer.TagTable.Add(tag);
                 // TextView
             }
-            Output.WrapMode = Gtk.WrapMode.Char;
+            Output.WrapMode = Gtk.WrapMode.Char; // FIXME: config
+            //Output.CopyClipboard += OutputCopiedText;
             // Setup clipboard, and Gui:
             clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
             DocumentNotebook.CurrentPage = 0;
@@ -762,32 +763,11 @@ namespace Calico {
                         completion = null;
                         args.RetVal = true;
                     }
+                    UpdateUpDownArrows();
                 } else if (args.Event.Key == Gdk.Key.Up) {
-                    string text = Shell.Document.Text;
-                    var caret = Shell.Caret;
-                    int line = caret.Line;
-                    if (line == 0) {
-                        history.update(text.TrimEnd());
-                        text = history.up();
-                        Shell.Document.Text = text;
-                        Shell.GrabFocus();
-                        Shell.Caret.Line = 0;
-                        int col = Shell.Document.GetLine(0).Length;
-                        Shell.Caret.Column = col;
-                    }
+                    KeyUp(false); // look at cursor (don't force)
                 } else if (args.Event.Key == Gdk.Key.Down) {
-                    string text = Shell.Document.Text;
-                    var caret = Shell.Caret;
-                    int line = caret.Line;
-                    int line_count = Shell.Document.LineCount;
-                    if (line == (line_count - 1)) {
-                        history.update(text.TrimEnd());
-                        text = history.down();
-                        Shell.Document.Text = text;
-                        Shell.GrabFocus();
-                        Shell.Caret.Line = Shell.Document.LineCount - 1;
-                        Shell.Caret.Column = Shell.Document.GetLine(0).Length;
-                     }
+                    KeyDown(false); // look at cursor (don't force)
                 } else if (args.Event.Key == Gdk.Key.Tab) {
                     // where are we?
                     int lineNo = Shell.Caret.Line;
@@ -801,7 +781,7 @@ namespace Calico {
                                 Print(completion.format());
                             }
                         }
-                        if (completion.items != null) {
+                        if (completion.items != null && completion.items.Count > 0) {
                             completion.insertText();
                         }
                         args.RetVal = true; // don't put in tab
@@ -813,6 +793,51 @@ namespace Calico {
             } else if (Focus is Mono.TextEditor.TextEditor) {
                 // not shell
                 // Editor, handle : on end of line
+            }
+        }
+
+        public void KeyDown(bool force) {
+            string text = Shell.Document.Text;
+            var caret = Shell.Caret;
+            int line = caret.Line;
+            int line_count = Shell.Document.LineCount;
+            if (force || line == (line_count - 1)) {
+                history.update(text.TrimEnd());
+                text = history.down();
+                Shell.Document.Text = text;
+                Shell.GrabFocus();
+                Shell.Caret.Line = Shell.Document.LineCount - 1;
+                Shell.Caret.Column = Shell.Document.GetLine(0).Length;
+             }
+            UpdateUpDownArrows();
+        }
+
+        public void KeyUp(bool force) {
+            string text = Shell.Document.Text;
+            var caret = Shell.Caret;
+            int line = caret.Line;
+            if (force || line == 0) {
+                history.update(text.TrimEnd());
+                text = history.up();
+                Shell.Document.Text = text;
+                Shell.GrabFocus();
+                Shell.Caret.Line = 0;
+                int col = Shell.Document.GetLine(0).Length;
+                Shell.Caret.Column = col;
+            }
+            UpdateUpDownArrows();
+        }
+
+        public void UpdateUpDownArrows() {
+            if (history.Position == 0) {
+                history_up.Sensitive = false;
+            } else {
+                history_up.Sensitive = true;
+            }
+            if (history.Position == history.Last) {
+                history_down.Sensitive = false;
+            } else {
+                history_down.Sensitive = true;
             }
         }
 
@@ -868,8 +893,15 @@ namespace Calico {
         }
 
         public void OnStopRunning() {
-            StartButton.Sensitive = false; // need something to execute
             StopButton.Sensitive = false;
+            if (CurrentDocument != null) { // Editor
+                if (CurrentDocument.HasContent)
+                    StartButton.Sensitive = true; // need something to execute
+                else
+                    StartButton.Sensitive = false; // need something to execute
+            } else { // Shell
+                StartButton.Sensitive = false; // need something to execute
+            }
             executeThread = null;
             /*
        if self.calico.last_error != "":
@@ -918,9 +950,14 @@ namespace Calico {
         public void ExecuteFileInBackground(string filename, string language) {
             // This is the only approved method of running code
             Print(Tag.Info, "Running '{0}'...\n", filename);
-            CurrentLanguage = language;
-            manager[CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
-            Print(Tag.Info, "Ok\n");
+            executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
+                Invoke(OnStartRunning);
+                CurrentLanguage = language;
+                manager[CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
+                Invoke(OnStopRunning);
+            }));
+            executeThread.IsBackground = true;
+            executeThread.Start();
         }
 
         public static Gtk.TextTag TagColor(Tag tag) {
@@ -1048,6 +1085,17 @@ namespace Calico {
             }
         }
         
+        protected virtual void OnHistoryUpClicked (object sender, System.EventArgs e)
+        {
+            KeyUp(true); // force it regardless of cursor location
+        }
+
+        protected virtual void OnHistoryDownClicked (object sender, System.EventArgs e)
+        {
+            KeyDown(true);
+        }
         
+        
+
     }
 }

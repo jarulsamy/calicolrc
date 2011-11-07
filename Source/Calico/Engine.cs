@@ -33,7 +33,14 @@ namespace Calico {
         }
 
         public virtual bool ReadyToExecute(string text) {
-            return true;
+            // If more than one line in DLR, wait for a blank line
+            string [] lines = text.Split('\n');
+            int line_count = lines.Length;
+            if (line_count == 1) {
+                text = text.Trim();
+                return (text != "" && text.EndsWith(";")); // if there is text, and last char is ;
+            }
+            return lines[lines.Length - 1].Trim() == ""; // ok, if nothing
         }
 
         public virtual bool Execute(string text) {
@@ -57,7 +64,6 @@ namespace Calico {
         }
 
         public virtual bool tryGetVariable(string variable, out object value) {
-            // Return found or not; value gets the variable's value
             value = null;
             return false;
         }
@@ -66,8 +72,8 @@ namespace Calico {
             return variable.Split('.');
         }
 
-        public List<string> getCompletions(string root) {
-            return null;
+        public virtual List<string> getCompletions(string root) {
+            return new List<string>();
         }
     }
     
@@ -127,6 +133,21 @@ namespace Calico {
                     }
                 }
             }
+        }
+
+        public override bool ReadyToExecute(string text) {
+            // If more than one line in DLR, wait for a blank line
+            string [] lines = text.Split('\n');
+            int line_count = lines.Length;
+            if (line_count == 1) {
+                //if self.dlr_name == "py":
+                //    text = "from __future__ import print_function; " + text
+                var sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+                var source = engine.CreateScriptSourceFromString(text, sctype);
+                return (source.GetCodeProperties() ==
+                        Microsoft.Scripting.ScriptCodeParseResult.Complete);
+            }
+            return lines[lines.Length - 1].Trim() == ""; // ok, if nothing
         }
 
         public override bool Execute(string text) {
@@ -192,14 +213,27 @@ namespace Calico {
                 source.Execute(manager.scope);
             } catch (Exception e) {
                 if (e.Message.ToString().Contains("Thread was being aborted")) {
-                    manager.calico.Print("[Script stopped----------]");
+                    manager.stderr.Print("[Script stopped----------]\n");
                 } else {
                     Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
                     manager.stderr.PrintLine(eo.FormatException(e));
                 }
                 return false;
             }
+            manager.stderr.PrintLine(Tag.Info, "Done");
             return true;
+        }
+
+        public override bool tryGetVariable(string variable, out object value) {
+            return manager.scope.TryGetVariable(variable, out value);
+        }
+        public override List<string> getCompletions(string root) {
+            List<string> retval = new List<string>();
+            foreach (string x in manager.scope.GetVariableNames()) {
+                if (x.StartsWith(root))
+                    retval.Add(x);
+            }
+            return retval;
         }
       }
 }

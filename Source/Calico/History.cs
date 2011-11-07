@@ -66,10 +66,14 @@ namespace Calico {
         }
 
         public void update(string text) {
+            if (text != "")
+                text = text.TrimEnd() + "\n";
             history[Position] = text;
         }
 
         public void add(string text) {
+            if (text != "")
+                text = text.TrimEnd() + "\n";
             if (history[Last] != text) { // different
                 history.Add(text);
             }
@@ -77,6 +81,8 @@ namespace Calico {
         }
 
         public void last(string text) {
+            if (text != "")
+                text = text.TrimEnd() + "\n";
             // turns space into last command
             if (history.Count > 1 && history[Last - 1] == text) {
                 // pass // same, skip it!

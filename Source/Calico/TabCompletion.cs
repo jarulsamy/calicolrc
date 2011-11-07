@@ -26,18 +26,42 @@ namespace Calico {
 
     public class TabCompletion {
         public List<string> items = null;
-        MainWindow calico;
         Mono.TextEditor.TextEditor shell;
         int tab_position;
         int original_offset;
         string variable;
         string partial;
 
-        public TabCompletion(MainWindow calico,
-                               Mono.TextEditor.TextEditor shell,
-                               string text) {
+        public static string [] ArrayRange(string [] array, int start, int stop) {
+            List<string> temp = new List<string>();
+            if (stop == -1)
+                stop = array.Length - 1;
+            int pos = 0;
+            foreach (string s in array) {
+                if (pos >= start && pos <= stop)
+                    temp.Add(s);
+                pos++;
+            }
+            return temp.ToArray();
+        }
 
-            this.calico = calico;
+        public static bool hasattr(object value, string part) {
+            // FIXME:
+            Console.WriteLine("hasattr({0}, {1})", value, part);
+            return false;
+        }
+
+        public static object getattr(object value, string part) {
+            // FIXME:
+            return null;
+        }
+
+        public List<string> dir(object obj) {
+            // FIXME: is this all? Constructors, other members?
+            return Reflection.Utils.getMethodNames(obj.GetType());
+        }
+
+        public TabCompletion(MainWindow calico, Mono.TextEditor.TextEditor shell, string text) {
             this.shell = shell;
             tab_position = 0;
             original_offset = shell.Caret.Offset;
@@ -57,23 +81,22 @@ namespace Calico {
                     object value = null;
                     found = calico.manager[calico.CurrentLanguage].engine.tryGetVariable(root, out value);
                     if (found) {
-                        /*
-                        foreach (part in parts[1:-1]) {
-                            if hasattr(value, part) {
+                        foreach (string part in ArrayRange(parts, 1, -1)) {
+                            if (hasattr(value, part)) {
                                 value = getattr(value, part);
                             } else {
-                                value = None;
+                                value = null;
                                 break;
                             }
                         }
-                        if (value) {
-                            self.partial = parts[-1];
-                            self.items = [x for x in dir(value)
-                                          if x.startswith(self.partial) and
-                                          not x.startswith("_")]
-                            // and not hasattr(x, "DeclaringType")]
+                        if (value != null) {
+                            partial = parts[parts.Length - 1];
+                            items = new List<string>();
+                            foreach(string x in dir(value)) {
+                                if (x.StartsWith(partial) && ! x.StartsWith("_"))
+                                    items.Add(x);
+                            }
                         }
-                        */
                     }
                 }
             }
@@ -88,8 +111,7 @@ namespace Calico {
                 tab_position = 0;
             }
             // insert text:
-            //word = items[self.tab_position][len(partial):];
-            string word = "FIXME";
+            string word = items[tab_position].Substring(partial.Length);
             shell.InsertAtCaret(word);
             // get ready for next possible completion:
             tab_position += 1;
@@ -109,8 +131,24 @@ namespace Calico {
                 }
                 return retval + "\n----------------------\n";
             } else {
-                return null;
+                return "";
             }
+        }
+
+        public static string reversed(string text) {
+            string retval = "";
+            foreach (char c in text) {
+                retval = c + retval;
+            }
+            return retval;
+        }
+
+        public static bool IsNumber(string text) {
+            foreach (char c in text) {
+                if (! char.IsNumber(c))
+                    return false;
+            }
+            return true;
         }
 
         public string find_variable(string text) {
@@ -118,19 +156,17 @@ namespace Calico {
             // Finds variable-like characters in a text.
             //
             string candidate = "";
-            /*
-            foreach (char in reversed(text)) {
-                if (char.isalnum() or char in ["_", "."]) {
-                    candidate += char;
+            foreach (char c in reversed(text)) {
+                if (char.IsLetterOrDigit(c) || c == '_' || c == '.') {
+                    candidate += c;
                 } else {
                     break;
                 }
             }
-            candidate = "".join(reversed(candidate));
-            if (candidate.isdecimal() or candidate.isdigit() or candidate.isnumeric()) {
-                return None;
+            candidate = reversed(candidate);
+            if (IsNumber(candidate)) {
+                return "";
             }
-            */
             return candidate;
         }
     }

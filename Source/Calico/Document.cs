@@ -89,7 +89,7 @@ namespace Calico {
             return true;
         }
 
-        public virtual void OnModified(object obj, System.EventArgs args) {
+        public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {
             if (IsDirty)
                 tab_label.Text = String.Format("*{0}", basename);
             else
@@ -115,8 +115,17 @@ namespace Calico {
             texteditor = new Mono.TextEditor.TextEditor(document, options);
             texteditor.Document.MimeType = mimetype;
             widget.Add(texteditor);
-            texteditor.Document.DocumentUpdated += OnModified;
+            texteditor.Document.DocumentUpdated += OnDocumentUpdated;
+            texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
             widget.ShowAll();
+        }
+
+        public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
+            if (texteditor.Document.Text == "") {
+                calico.StartButton.Sensitive = false;
+            } else {
+                calico.StartButton.Sensitive = true;
+            }
         }
 
         public override void Configure() {
