@@ -1,24 +1,29 @@
 using System;
-//using System.Drawing;
 using System.Collections.Generic;
 
 public class JigsawWidget : Gtk.ScrolledWindow
 {
   public Jigsaw.Canvas cvs = null;
-  Gtk.Fixed cvsFixed = null;
+  //Gtk.Fixed cvsFixed = null;
   public object document = null;
 
   public JigsawWidget() {
-    this.CanFocus = true;
-	this.VscrollbarPolicy = Gtk.PolicyType.Always; //Gtk.PolicyType.Never; //((global::Gtk.PolicyType)(0));
-	this.HscrollbarPolicy = Gtk.PolicyType.Always; //Gtk.PolicyType.Never; //((global::Gtk.PolicyType)(0));
-	
-	// Add the Canvas and other utility widgets
-	cvsFixed = new Gtk.Fixed();
-	cvs = new Jigsaw.Canvas(1200, 10000);
-	cvsFixed.Put(cvs, 0,0);
-	this.AddWithViewport(cvsFixed);
+	this.CanFocus = true;
+	cvs = new Jigsaw.Canvas(900, 600);
+	this.Add (cvs);
   }
+	
+//  public JigsawWidget() {
+//    this.CanFocus = true;
+//	this.VscrollbarPolicy = Gtk.PolicyType.Always; //Gtk.PolicyType.Never; //((global::Gtk.PolicyType)(0));
+//	this.HscrollbarPolicy = Gtk.PolicyType.Always; //Gtk.PolicyType.Never; //((global::Gtk.PolicyType)(0));
+//	
+//	// Add the Canvas and other utility widgets
+//	cvsFixed = new Gtk.Fixed();
+//	cvs = new Jigsaw.Canvas(900, 600);
+//	cvsFixed.Put(cvs, 0,0);
+//	this.AddWithViewport(cvsFixed);
+//  }
 }
 
 // -----------------------------------------------------------------------
@@ -47,7 +52,7 @@ public class MainWindow : Gtk.Window
 //		cvsFixed.Put(cvs, 0,0);
 //		sw.AddWithViewport(cvsFixed);
 		
-		Jigsaw.Canvas cvs = new Jigsaw.Canvas(1000, 600);
+		Jigsaw.Canvas cvs = new Jigsaw.Canvas(900, 600);
 		this.Add(cvs);
 		
 		// Let it rip
