@@ -174,6 +174,10 @@ namespace Diagram
 		internal double scaleCenterY = 0.0;
 		internal double offsetX = 0.0;							// The current translation amount
 		internal double offsetY = 0.0;
+		internal double maxOffsetX = 0.0;						// Range of valid offset values
+		internal double minOffsetX = 0.0;
+		internal double maxOffsetY = 0.0;
+		internal double minOffsetY = 0.0;
 		
 		private double gridsize = 5.0;                          // Size of the drawing grid in pixels
         private Boolean modified = false;                       // True if canvas has been modified and should be saved
@@ -203,19 +207,26 @@ namespace Diagram
 		// Reference to single PropertiesWindow object
 		private Jigsaw.PropertyWindow _propertyWin = null;
 		
+		// Boolean indicating whether or not to draw inset
+		internal bool _showInset = true;
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public Canvas(int width, int height)
         {
 			this.SetSizeRequest(width, height);
 			
 			// Set up events
-			this.AddEvents ((int)Gdk.EventMask.AllEventsMask);
+			this.AddEvents ((int)Gdk.EventMask.AllEventsMask );
+			this.CanFocus = true;		// Required to receive KeyPressEvents
 			
-			this.ButtonPressEvent   += new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
-			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
-			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
-			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
-			this.KeyPressEvent      += new Gtk.KeyPressEventHandler( this.OnKeyPressEvent);
+			this.ButtonPressEvent   += this.OnMouseDown; //new Gtk.ButtonPressEventHandler ( this.OnMouseDown );
+			this.ButtonReleaseEvent += this.OnMouseUp; //new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
+			this.MotionNotifyEvent  += this.OnMouseMove; //new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
+			this.ScrollEvent        += this.OnScroll; //new Gtk.ScrollEventHandler( this.OnScroll );
+			this.KeyPressEvent      += this.OnKeyPress; //new Gtk.KeyPressEventHandler( this.OnKeyPress );
+			
+			// Snoop on all key events
+			//Gtk.Key.SnooperInstall(this.SnoopKey);
 			
             // The Canvas object maintains two layers (collections):
             // - The shapes layer holds all managed blocks on the canvas
@@ -224,7 +235,10 @@ namespace Diagram
             this.shapes     = new List<CShape>();
             this.connectors = new List<CShape>();
             this.annotation = new List<CShape>();
-
+			
+			// Init scrolling offset limits
+			this.UpdateOffsetLimits(width, height);
+			
             // Init editing states
             this.BeginEditing();
 
@@ -244,7 +258,8 @@ namespace Diagram
             this.handler = this;        // Init to the Canvas itself
         }
 		
-		public void PrintDump() {
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal void PrintDump() {
 			Console.WriteLine("Shapes:");
 			foreach (CShape s in this.shapes) Console.WriteLine(s);
 			Console.WriteLine("Connectors:");
@@ -252,7 +267,23 @@ namespace Diagram
 			Console.WriteLine("Annotation:");
 			foreach (CShape s in this.annotation) Console.WriteLine(s);
 		}
-
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		internal int SnoopKey(Gtk.Widget o, Gdk.EventKey k) {
+//			switch(k.Key)
+//			{
+//				case Gdk.Key.Up:
+//					this.DoZoom(1.05);
+//					break;
+//				case Gdk.Key.Down:
+//					this.DoZoom(1.0/1.05);
+//					break;
+//			}
+//			
+//			// Return unique id
+//			return 1;
+//		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Clear all delegates that have registed to handle this class's events
         public void ClearEventHandlers()
@@ -281,12 +312,13 @@ namespace Diagram
         public void Draw(Cairo.Context g)
         {
 			g.Save();
-			
+
 			// Scale the diagram to the zoom factor at center point
 			g.Translate( this.scaleCenterX,  this.scaleCenterY);
 			g.Scale(     this.scale,         this.scale);
 			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
 			g.Translate( this.offsetX,       this.offsetY);
+			
 //			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
 			
 			// Clear background
@@ -305,24 +337,14 @@ namespace Diagram
             foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
             foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
 			
-//            foreach (CConnector o in this.connectors) {
-//				if (o.Visible == true) o.Draw(g);
-//			}
-//            foreach (CShape     o in this.shapes    ) {
-//				o._cvs = this;
-//				if (o.Visible == true) o.Draw(g);
-//			}
-//            foreach (CShape     o in this.annotation) {
-//				if (o.Visible == true) o.Draw(g);
-//			}
-			
 			// Reset transform
 			g.Restore();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public void DrawNav(Cairo.Context g)
-        {	// Draw the inset navigation thumbnail
+        public void DrawInset(Cairo.Context g)
+        {	// Draw the inset navigation thumbnail in upper right corner of window
+			// Hard-coded to a size of 300x200, with a 10-pixel buffer
 			g.Save();
 			
 			// Get the size of the window
@@ -353,7 +375,9 @@ namespace Diagram
 			g.Save();
 
 			// Scale down so small version of diagram will fit
-			g.Scale(0.15, 0.15);
+			// Scaling world down to 10% into a box of 300x200
+			// Assumes original world size is 3000x2000
+			g.Scale(0.1, 0.1);
 			
             // Always draw in antialias mode.
             // Caution: this smears single pixels into small blurs on pixel boundaries.
@@ -412,21 +436,63 @@ namespace Diagram
                 //g.Clip();
 				Draw( g );
 				
-				DrawNav(g);
+				if (_showInset) DrawInset(g);
 			}
 			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal void UpdateOffsetLimits()
+		{
+			if (this.GdkWindow == null) return;
+			
+			// Get the size of the window
+			int w, h;
+			this.GdkWindow.GetSize(out w, out h);
+			
+			this.UpdateOffsetLimits(w, h);
+		}
+		
+		internal void UpdateOffsetLimits(int w, int h)
+		{	// Recompute the offset limits when dependent values change, such as scale
+			
+			// Compute the range of allowable offsets
+			this.maxOffsetX = this.scaleCenterX-(this.scaleCenterX/this.scale);
+			this.maxOffsetY = this.scaleCenterY-(this.scaleCenterY/this.scale);
+			this.minOffsetX = w-3000.0-this.maxOffsetX;
+			this.minOffsetY = h-2000.0-this.maxOffsetY;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal void ClipOffsets()
+		{	// Clip offsets to current limits
+			if (this.offsetX > this.maxOffsetX) this.offsetX = this.maxOffsetX;
+			if (this.offsetY > this.maxOffsetY) this.offsetY = this.maxOffsetY;
+			if (this.offsetX < this.minOffsetX) this.offsetX = this.minOffsetX;
+			if (this.offsetY < this.minOffsetY) this.offsetY = this.minOffsetY;	
+		}
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoZoom(double factor)
 		{	// Perform the zoom
 			this.scale = this.scale * factor;
-			if (this.scale < 0.1) this.scale = 0.1;
+			
+			// Compute the minimum zoom factor
+			int w, h;
+			this.GdkWindow.GetSize(out w, out h);
+			double minZoom = Math.Max(w/3000.0, h/2000.0);
+			
+			// Clip zoom factor
+			if (this.scale < minZoom) this.scale = minZoom;
 			if (this.scale > 20.0) this.scale = 20.0;
 			this.scaleCenterX = 0.5*this.Allocation.Width;
 			this.scaleCenterY = 0.5*this.Allocation.Height;
+			
 			//this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
 			//this.scaleCenterY = 0.0; //0.5*this.Allocation.Height;
+			
+			// Update and clip offsets
+			this.UpdateOffsetLimits();
+			this.ClipOffsets();
 			this.Invalidate();	
 		}
 		
@@ -450,7 +516,21 @@ namespace Diagram
 			this.offsetY = 0.0;
 			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
 			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
+			this.UpdateOffsetLimits();
+			this.ClipOffsets ();
 			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnToggleInset(object sender, EventArgs e)
+		{
+			this.ToggleInset();
+			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ToggleInset() {
+			this._showInset = !this._showInset;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -459,10 +539,8 @@ namespace Diagram
 			Gdk.EventScroll scl = (Gdk.EventScroll)e.Event;
 
 			if (scl.Direction == Gdk.ScrollDirection.Up) {
-				//this.scale *= 1.05;
 				this.DoZoom(1.05);
-			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
-				//this.scale /= 1.05;
+			} else if (scl.Direction == Gdk.ScrollDirection.Down) {;
 				this.DoZoom(1.0/1.05);
 			}
 //			
@@ -470,6 +548,20 @@ namespace Diagram
 //			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
 //			
 //			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		//[GLib.ConnectBefore]
+		protected void OnKeyPress(object o, Gtk.KeyPressEventArgs e) {
+			switch(e.Event.Key)
+			{
+				case Gdk.Key.Up:
+					this.DoZoom(1.05);
+					break;
+				case Gdk.Key.Down:
+					this.DoZoom(1.0/1.05);
+					break;
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -526,16 +618,6 @@ namespace Diagram
 			}
         }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-		[GLib.ConnectBeforeAttribute]
-		protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-	        if (args.Event.Key == Gdk.Key.Up) {
-				this.DoZoom(1.05);
-	        } else if (args.Event.Key == Gdk.Key.Down) {
-				this.DoZoom(1.0/1.05);
-			}
-		}
-		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Handle MouseMove events
         protected void OnMouseMove(object o, Gtk.MotionNotifyEventArgs e)

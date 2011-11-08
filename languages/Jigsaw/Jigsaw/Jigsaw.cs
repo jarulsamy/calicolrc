@@ -357,9 +357,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Manage the current path to the Jigsaw program
-		public string CurrentPath {
-		
+		public string CurrentPath
+		{	// Manage the current path to the Jigsaw program
 			get {
 				return _currentPath;
 			}
@@ -437,13 +436,9 @@ namespace Jigsaw
 			this.Invalidate();
 		}
 		
-		/// <summary>
-		/// Return a list of all non-factory blocks  
-		/// </summary>
-		/// <returns>
-		/// A <see cref="List<CBlock>"/>
-		/// </returns>
-		public List<CBlock> AllBlocks(){
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public List<CBlock> AllBlocks()
+		{	// Return a list of all non-factory blocks  
 			List<CBlock> blocks = new List<CBlock>();
 			
 			foreach (Diagram.CShape s in this.AllShapes()) {
@@ -457,13 +452,9 @@ namespace Jigsaw
 			return blocks;
 		}
 		
-		/// <summary>
-		/// Properly delete given block 
-		/// </summary>
-		/// <param name="b">
-		/// A <see cref="CBlock"/>
-		/// </param>
-		public void DeleteBlock(CBlock b) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DeleteBlock(CBlock b) 
+		{	// Properly delete given block 
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			b.Deselect(cvs);
 			b.Deactivate(cvs);
@@ -471,10 +462,9 @@ namespace Jigsaw
 			cvs.DeleteShape(b);
 		}
 		
-		/// <summary>
-		/// Delete all blocks in preparation for a new program 
-		/// </summary>
-		public void DeleteAllBlocks() {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DeleteAllBlocks() 
+		{	// Delete all blocks in preparation for a new program 
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			foreach (CBlock b in AllBlocks()) {
 				b.Deselect(cvs);
@@ -519,19 +509,8 @@ namespace Jigsaw
 					this.offsetY += dy;
 					this.EditMode = Diagram.EMode.Translating;
 					
-					// Get the size of the window
-					int w, h;
-					this.GdkWindow.GetSize(out w, out h);
-					
-					double maxOffsetX = this.scaleCenterX-(this.scaleCenterX/this.scale);
-					double maxOffsetY = this.scaleCenterY-(this.scaleCenterY/this.scale);
-					double minOffsetX = -((w+this.scaleCenterX)/this.scale-this.scaleCenterX);
-					double minOffsetY = -((h+this.scaleCenterY)/this.scale-this.scaleCenterY);
-					
-					if (this.offsetX > maxOffsetX) this.offsetX = maxOffsetX;
-					if (this.offsetY > maxOffsetY) this.offsetY = maxOffsetY;
-					if (this.offsetX < minOffsetX) this.offsetX = minOffsetX;
-					if (this.offsetY < minOffsetY) this.offsetY = minOffsetY;
+					// Clip offsets
+					this.ClipOffsets();
 					
 					// Find all docked shapes and redock them
 					//this.ReDockShapes(dx, dy);
@@ -576,8 +555,10 @@ namespace Jigsaw
 			mnuZoomIn.Activated += OnZoomIn;
 			Gtk.MenuItem mnuZoomOut = new Gtk.MenuItem("Zoom out");
 			mnuZoomOut.Activated += OnZoomOut;
-			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Reset");
+			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Zoom reset");
 			mnuResetZoom.Activated += OnResetZoom;
+			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle inset");
+			mnuToggleInset.Activated += OnToggleInset;
 			
 			mnu.Append(mnuNew);
 			mnu.Append(mnuOpen);
@@ -590,6 +571,8 @@ namespace Jigsaw
 			mnu.Append(mnuZoomIn);
 			mnu.Append(mnuZoomOut);
 			mnu.Append(mnuResetZoom);
+			mnu.Append( new Gtk.SeparatorMenuItem() );
+			mnu.Append(mnuToggleInset);
 			
 			mnu.ShowAll();
 			mnu.Popup();
