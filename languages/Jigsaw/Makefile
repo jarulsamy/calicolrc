@@ -1,8 +1,8 @@
 
 CalicoJigsaw.dll: CalicoJigsaw.cs ../../bin/Calico.exe
 	gmcs CalicoJigsaw.cs \
+		-lib:Jigsaw/obj/x86/Debug \
 		-lib:../../bin \
-		-lib:Jigsaw/bin/Debug \
 		-r:Jigsaw.exe \
 		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
