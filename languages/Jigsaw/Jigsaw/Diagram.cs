@@ -215,6 +215,7 @@ namespace Diagram
 			this.ButtonReleaseEvent += new Gtk.ButtonReleaseEventHandler ( this.OnMouseUp );
 			this.MotionNotifyEvent  += new Gtk.MotionNotifyEventHandler ( this.OnMouseMove );
 			this.ScrollEvent        += new Gtk.ScrollEventHandler( this.OnScroll );
+			this.KeyPressEvent      += new Gtk.KeyPressEventHandler( this.OnKeyPressEvent);
 			
             // The Canvas object maintains two layers (collections):
             // - The shapes layer holds all managed blocks on the canvas
@@ -525,6 +526,16 @@ namespace Diagram
 			}
         }
 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+		[GLib.ConnectBeforeAttribute]
+		protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
+	        if (args.Event.Key == Gdk.Key.Up) {
+				this.DoZoom(1.05);
+	        } else if (args.Event.Key == Gdk.Key.Down) {
+				this.DoZoom(1.0/1.05);
+			}
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Handle MouseMove events
         protected void OnMouseMove(object o, Gtk.MotionNotifyEventArgs e)

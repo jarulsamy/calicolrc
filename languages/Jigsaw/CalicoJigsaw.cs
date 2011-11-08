@@ -39,6 +39,15 @@ public class CalicoJigsawDocument : Document {
 	cvs.ReadFile(filename);
       widget.ShowAll();
     }
+
+  public override void ZoomIn() {
+    cvs.DoZoom(1.05);
+  }
+
+  public override void ZoomOut() {
+    cvs.DoZoom(1.0/1.05);
+  }
+
 }
 
 public class CalicoJigsawLanguage : Language {
