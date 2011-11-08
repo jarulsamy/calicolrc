@@ -96,6 +96,13 @@ namespace Calico {
             else
                 tab_label.Text = basename;
         }
+
+        public virtual void ZoomIn() {
+        }
+
+        public virtual void ZoomOut() {
+        }
+
     }
 
     public class TextDocument : Document {

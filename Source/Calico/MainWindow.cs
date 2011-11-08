@@ -1119,5 +1119,18 @@ namespace Calico {
                 }
             }
         }
+
+        protected void OnZoomInActionActivated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null)
+                CurrentDocument.ZoomIn();
+        }
+
+        protected void OnZoomOutActionActivated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null)
+                CurrentDocument.ZoomOut();
+        }
+
     }
 }

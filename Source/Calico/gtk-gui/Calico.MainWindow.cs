@@ -608,6 +608,8 @@ namespace Calico
 			this.CommentRegionAction.Activated += new global::System.EventHandler (this.OnCommentRegionActionActivated);
 			this.UncommentRegionAction.Activated += new global::System.EventHandler (this.OnUncommentRegionActionActivated);
 			this.yesAction1.Activated += new global::System.EventHandler (this.OnYesAction1Activated);
+			this.zoomInAction.Activated += new global::System.EventHandler (this.OnZoomInActionActivated);
+			this.zoomOutAction.Activated += new global::System.EventHandler (this.OnZoomOutActionActivated);
 			this.ShellAction.Activated += new global::System.EventHandler (this.OnShellActionActivated);
 			this.EnvironmentTabAction.Activated += new global::System.EventHandler (this.OnEnvironmentTabActionActivated);
 			this.notebook_docs.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebookDocsSwitchPage);
