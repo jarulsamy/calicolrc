@@ -73,21 +73,24 @@ namespace Jigsaw
 		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70) {
 		  List<CBlock> retval = new List<CBlock>();
 		  List<string> blocknames = new List<string>();
+		  Reflection.Utils.Mapping mapping = new Reflection.Utils.Mapping(assembly_name, "level-1");
 		  foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name)) {
-			  foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name)) {
+		    foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) {
 					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
 					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
 					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name);
 					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
 					for (int n = 0; n < names.Count; n++) {
-		    			CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
-									names[n], types[n], defaults[n], return_type, true);
-						//property.PropertyChanged += block.OnPropertyChanged;
-						if (! blocknames.Contains(block.Text)) {
-		    				retval.Add(block);
-							blocknames.Add(block.Text);
-							y += 40;
-						}
+					  if (mapping.CheckSignature(type_name, method_name, types[n])) {
+					    CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+									    names[n], types[n], defaults[n], return_type, true);
+					    //property.PropertyChanged += block.OnPropertyChanged;
+					    if (! blocknames.Contains(block.Text)) {
+					      retval.Add(block);
+					      blocknames.Add(block.Text);
+					      y += 40;
+					    }
+					  }
 					}							
 				}
 		  }

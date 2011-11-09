@@ -41,22 +41,20 @@ namespace Calico {
             window.Print(tag, text);
         }
 
-        public void PrintLine(string text, params object [] args) {
-            window.Print(tag, text, args);
-            window.Print(tag, "\n", args);
+        public void PrintLine(string text) {
+            window.Print(tag, text + "\n");
         }
 
-        public void Print(string text, params object [] args) {
-            window.Print(tag, text, args);
+        public void Print(string text) {
+            window.Print(tag, text);
         }
 
-        public void PrintLine(Calico.Tag mytag, string text, params object [] args) {
-            window.Print(mytag, text, args);
-            window.Print(mytag, "\n", args);
+        public void PrintLine(Calico.Tag mytag, string text) {
+            window.Print(mytag, text + "\n");
         }
 
-        public void Print(Calico.Tag mytag, string text, params object [] args) {
-            window.Print(mytag, text, args);
+        public void Print(Calico.Tag mytag, string text) {
+            window.Print(mytag, text);
         }
 
         public override int Read(Byte [] bytes, int offset, int count) {

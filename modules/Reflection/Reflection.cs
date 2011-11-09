@@ -5,6 +5,7 @@
 using System; // Type
 using System.Reflection; // Method...
 using System.Collections.Generic; // List
+using System.Collections; // List
 using System.Threading;// Thread
 using System.Xml;
 
@@ -76,38 +77,36 @@ namespace Reflection
 			public Dictionary<string,bool> types;
 			string map;
 
-			public Mapping(string assembly_name) {
-				Load(assembly_name);
+			public Mapping(string assembly_name) : this(assembly_name, null) {
 			}
 
 			public Mapping(string assembly_name, string map) {
 				this.assembly_name = assembly_name;
 				this.map = map;
-				assembly = getAssembly(assembly_name);
-				if (assembly != null) {
-					fullPath = assembly.Location;
-					directory = System.IO.Path.GetDirectoryName( fullPath );
-					dllname = System.IO.Path.GetFileNameWithoutExtension(fullPath);
-					mapfile = System.IO.Path.Combine(directory, String.Format("{0}.{1}", dllname, this.map));
-					Load();
-				} else {
-					Console.Error.WriteLine("Assembly not found: '{0}'", assembly_name);
-				}
+                if (this.assembly_name != null) {
+    				assembly = getAssembly(assembly_name);
+    				if (assembly != null) {
+                        fullPath = assembly.Location;
+                        directory = System.IO.Path.GetDirectoryName( fullPath );
+                        dllname = System.IO.Path.GetFileNameWithoutExtension(fullPath);
+                        if (this.map != null) {
+    					    mapfile = System.IO.Path.Combine(directory, String.Format("{0}.dll.{1}", dllname, this.map));
+    					    Load();
+                        }
+    				} else {
+    					Console.Error.WriteLine("Assembly not found: '{0}'", assembly_name);
+    				}
+                }
 			}
 
-			public void Load(string assembly_name) {
-				this.assembly_name = assembly_name;
-				assembly = getAssembly(assembly_name);
-				fullPath = assembly.Location;
-				directory = System.IO.Path.GetDirectoryName( fullPath );
-				dllname = System.IO.Path.GetFileNameWithoutExtension(fullPath);
-			}
-			
-			public void Load() {
+			private void Load() {
 				if (System.IO.File.Exists(mapfile)) {
 					signatures = new Dictionary<string,bool>();
 					types = new Dictionary<string,bool>();
-                    XmlReader xr = new XmlTextReader(mapfile);
+                    string type_name = "";
+                    string method_name = "";
+					List<string> parameters = new List<string>();
+					XmlReader xr = new XmlTextReader(mapfile);
                     while (xr.Read()) {
                         switch (xr.NodeType) {
                         case XmlNodeType.Element:
@@ -115,22 +114,29 @@ namespace Reflection
                             switch (name) {
                             case "map":
                                 break;
-                            case "type":
-                                break;
                             case "parameter":
-                                string type = xr.GetAttribute("type");
-                                Console.WriteLine(type);
+                                string parameter_type = xr.GetAttribute("type");
+								parameters.Add(parameter_type);
                                 break;
                             case "method":
-                                string assembly_name = xr.GetAttribute("assembly_name");
-                                string type_name = xr.GetAttribute("type_name");
-                                string method_name = xr.GetAttribute("method_name");
-                                string key = String.Format("{0}.{1}", type_name, method_name);
-                                Console.WriteLine(key);
-                                    //types.ToString());
+                                type_name = xr.GetAttribute("type_name");
+                                method_name = xr.GetAttribute("method_name");
+                                string types_key = String.Format("{0}.{1}", type_name, method_name);
+                                types[types_key] = true;
+								parameters = new List<string>();
                                 break;
                             }
                             break;
+						case XmlNodeType.EndElement:
+							name = xr.Name.ToLower();
+							switch (name) {
+                            case "method":
+                                string key = String.Format("{0}.{1}({2})", 
+									type_name, method_name, ListToString(parameters));
+								signatures[key] = true;
+								break;
+							}
+							break;							
                         }
                     }
                     xr.Close();
@@ -144,36 +150,37 @@ namespace Reflection
 				// This will make a full map file from a DLL
 				this.map = map;
 				mapfile = System.IO.Path.Combine(directory, String.Format("{0}.dll.{1}", dllname, this.map));
-				XmlWriter xw = new XmlTextWriter(mapfile, System.Text.Encoding.ASCII);
-				xw.WriteStartElement("map");
-				foreach (string type_name in getTypeNames(assembly)) {
-					Type type = getType(assembly, type_name);
-					xw.WriteStartElement("type");
-					foreach (MethodInfo mi in getStaticMethods(type)) {
-						// write it
-						xw.WriteStartElement("method");
-				  	    xw.WriteAttributeString("assembly_name", assembly_name);
-					    xw.WriteAttributeString("type_name", type_name);
-					    xw.WriteAttributeString("method_name", mi.Name);
-					    foreach (ParameterInfo pi in mi.GetParameters()) {
-					      xw.WriteStartElement("parameter");
-					      xw.WriteAttributeString("type", pi.ParameterType.AssemblyQualifiedName);
-					      xw.WriteEndElement();
-					    }
-					  	xw.WriteEndElement();
-					}
-	   		        xw.WriteEndElement();
-				}
-   		        xw.WriteEndElement();
-                xw.Close();
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+                settings.IndentChars = ("    ");
+                using (XmlWriter xw = XmlWriter.Create(mapfile, settings)) {
+    				xw.WriteStartElement("map");
+    				foreach (string type_name in getTypeNames(assembly)) {
+    					Type type = getType(assembly, type_name);
+    					foreach (MethodInfo mi in getStaticMethods(type)) {
+    						// write it
+    						xw.WriteStartElement("method");
+    				  	    xw.WriteAttributeString("assembly_name", assembly_name);
+    					    xw.WriteAttributeString("type_name", type_name);
+    					    xw.WriteAttributeString("method_name", mi.Name);
+    					    foreach (ParameterInfo pi in mi.GetParameters()) {
+    					      xw.WriteStartElement("parameter");
+    					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+    					      xw.WriteEndElement();
+    					    }
+    					  	xw.WriteEndElement();
+    					}
+    				}
+       		        xw.WriteEndElement();
+                }
 			}
-			
-			public bool CheckSignature(string type_name, string method_name, List<List<Type>> types) {
+					
+			public bool CheckSignature(string type_name, string method_name, List<Type> types) {
+				string key = String.Format("{0}.{1}({2})", type_name, method_name, ListToString(types));
+				Console.WriteLine("CheckSignature: key={0}", key);
 				if (signatures == null) { // no map file
 					return true;
 				} else {
-					string key = String.Format("{0}.{1}({2})", type_name, method_name, types.ToString());
-					Console.WriteLine("CheckSignature: key={0}", key);
 					return signatures.ContainsKey(key);
 				}
 			}
@@ -378,7 +385,18 @@ namespace Reflection
 			retval.Sort ();
 			return retval;
 		}
-
+		
+		public static string ListToString(IList args) {
+			string retval = "";
+            int count = args.Count;
+            for (int i = 0; i < count; i++) {
+	            if (retval != "")
+	                retval += ", ";
+	            retval += args[i];
+            }
+            return retval;
+        }
+		
 		public static MethodInfo[] getStaticMethods (Type type)
 		{
 			// get the methods of a Class (cls) given these flags:

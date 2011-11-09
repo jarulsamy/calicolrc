@@ -258,19 +258,30 @@ namespace Calico {
             Shell.Options.TabsToSpaces = true;
             Shell.Options.HighlightMatchingBracket = true;
 
-            Print(Tag.Info, "The Calico Project, Version {0}\n", MainClass.Version);
+            Print(Tag.Info, String.Format("The Calico Project, Version {0}\n", MainClass.Version));
             SetLanguage(CurrentLanguage);
             // Load files:
+            bool debug_handler = true;
             foreach (string arg in args) {
-                if (!arg.StartsWith("--")) {
+                if (arg.StartsWith("--")) {
+                    if (arg == "--debug-handler") {
+                        debug_handler = false;
+                    }
+                } else {
                     SelectOrOpen(System.IO.Path.GetFullPath(arg));
                 }
             }
+            if (debug_handler)
+                GLib.ExceptionManager.UnhandledException += HandleException;
             // Set EnvironmentPage to match displayed state:
             IsUpdateEnvironment = true;
             EnvironmentTabAction.Active = true;
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
             // End of GUI setup
+        }
+
+        public void HandleException(GLib.UnhandledExceptionArgs args) {
+            Print(Tag.Error, String.Format("Exception: {0}", args.ExceptionObject.ToString()));
         }
 
         public void PostBuild() {
@@ -329,10 +340,6 @@ namespace Calico {
 
         public static string _(string message) {
             return global::Mono.Unix.Catalog.GetString(message);
-        }
-
-        public void makeNewFile(string lang_name) {
-            Console.WriteLine("makeNewFile: {0}", lang_name);
         }
 
         public void OnSwitchLanguage(object obj, Gtk.ButtonReleaseEventArgs args) {
@@ -864,9 +871,9 @@ namespace Calico {
             string prompt = String.Format("{0}> ", CurrentLanguage);
             int count = 2;
             foreach (string line in text.Split('\n')) {
-                Print(Tag.Info, "{0}", prompt);
+                Print(Tag.Info, prompt);
                 // black
-                Print("{0}\n", line);
+                Print(line + "\n");
                 // blue
                 prompt = String.Format(".....{0}>", count);
                 count += 1;
@@ -957,7 +964,7 @@ namespace Calico {
 
         public void ExecuteFileInBackground(string filename, string language) {
             // This is the only approved method of running code
-            Print(Tag.Info, "Running '{0}'...\n", filename);
+            Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 Invoke(OnStartRunning);
                 CurrentLanguage = language;
@@ -972,15 +979,15 @@ namespace Calico {
             return tags[tag];
         }
 
-        public void Print(string format, params object[] args) {
-            Print(Tag.Normal, format, args);
+        public void Print(string format) {
+            Print(Tag.Normal, format);
         }
 
-        public void Print(Tag tag, string format, params object[] args) {
+        public void Print(Tag tag, string format) {
             // These Write functions are the only approved methods of output
             Thread.Sleep(1); // Force a context switch, even for an instant
             if (Debug) {
-                Console.Write(format, args);
+                Console.Write(format);
             } else {
                 Invoke(delegate {
                     lock (Output) {
@@ -988,7 +995,7 @@ namespace Calico {
                             ToolNotebook.Page = 0; // show output page
                         Gtk.TextIter end = Output.Buffer.EndIter;
                         string colorname = MainWindow.tagnames[tag];
-                        Output.Buffer.InsertWithTagsByName(ref end, String.Format(format, args), colorname);
+                        Output.Buffer.InsertWithTagsByName(ref end, format, colorname);
                         end = Output.Buffer.EndIter;
                         Gtk.TextMark mark = Output.Buffer.GetMark("insert");
                         Output.Buffer.MoveMark(mark, end);
@@ -1054,11 +1061,46 @@ namespace Calico {
         public bool TreeModelForeachFunc (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
             string vname = (string)model.GetValue(iter, 0);
             try {
-                model.SetValue(iter, 1, manager.scope.GetVariable(vname).ToString());
+                model.SetValue(iter, 1, Repr(manager.scope.GetVariable(vname)));
             } catch {
                 model.SetValue(iter, 1, "<undefined>");
             }
             return false;
+        }
+
+        public static string ArrayToString(object[] args) {
+            string retval = "";
+            if (args != null) {
+              int count = ((Array)args).Length;
+              for (int i = 0; i < count; i++) {
+                      if (args[i] is object[]) {
+                            retval += ArrayToString((object[])args[i]);
+                      } else {
+                            if (retval != "")
+                              retval += ", ";
+                            retval += args[i];
+                      }
+              }
+            }
+            return "[" + retval + "]";
+        }
+
+        public static string Repr(object obj) {
+            string repr;
+            if (obj is IronPython.Runtime.List) {
+              repr = ((IronPython.Runtime.List)obj).__repr__(
+                      IronPython.Runtime.DefaultContext.Default);
+            } else if (obj is IronPython.Runtime.PythonDictionary) {
+              repr = ((IronPython.Runtime.PythonDictionary)obj).__repr__(
+                      IronPython.Runtime.DefaultContext.Default);
+            } else if (obj is IronPython.Runtime.PythonTuple) {
+              repr = obj.ToString();
+            } else if (obj is Array) {
+              repr = (string)ArrayToString((object[]) obj);
+            } else {
+                repr = obj.ToString();
+            }
+            return repr;
         }
 
         public bool UpdateEnvironment() {
@@ -1070,7 +1112,8 @@ namespace Calico {
                 if (vname.StartsWith("_") || vname == "calico")
                     continue;
                 if (! EnvironmentVariables.ContainsKey(vname)) {
-                    Gtk.TreeIter iter = EnvironmentList.AppendValues(vname, manager.scope.GetVariable(vname).ToString());
+                    string repr = Repr(manager.scope.GetVariable(vname));
+                    Gtk.TreeIter iter = EnvironmentList.AppendValues(vname, repr);
                     Gtk.TreePath treepath = EnvironmentList.GetPath(iter);
                     EnvironmentTreeView.SetCursor(treepath, null, false);
                     EnvironmentVariables[vname] = true;

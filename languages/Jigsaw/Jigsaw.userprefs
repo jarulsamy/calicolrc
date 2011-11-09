@@ -1,28 +1,35 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Diagram.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw/Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw\Diagram.cs" Line="218" Column="20" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="1" Column="1" />
+      <File FileName="CalicoJigsaw.cs" Line="16" Column="10" />
+      <File FileName="../Python/CalicoPython.cs" Line="28" Column="2" />
+      <File FileName="Jigsaw/Jigsaw.cs" Line="73" Column="32" />
+      <File FileName="Jigsaw/Diagram.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw/CMethodBlock.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw/ControlBlocks.cs" Line="192" Column="20" />
+      <File FileName="../../Source/Calico/MainWindow.cs" Line="1087" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="Diagram.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
-        <State expanded="True">
-          <Node name="Jigsaw" expanded="True">
-            <Node name="Diagram" expanded="True">
-              <Node name="Diagram.CShape" expanded="True">
-                <Node name="ContainsPoint" selected="True" />
-              </Node>
-            </Node>
-          </Node>
+        <State expanded="True" selected="True">
+          <Node name="Jigsaw" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>vname</Value>
+          <Value>row[0]</Value>
+          <Value>row</Value>
+          <Value>contains</Value>
+          <Value>row[0] == vname</Value>
         </State>
       </Pad>
     </Pads>

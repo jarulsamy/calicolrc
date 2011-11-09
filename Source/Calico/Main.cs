@@ -78,9 +78,6 @@ namespace Calico {
             Calico.LanguageManager manager = new Calico.LanguageManager(languages);
            // Global settings:
             bool Debug = false;
-            if (!((IList<string>)args).Contains("--debug-handler")) {
-                GLib.ExceptionManager.UnhandledException += HandleException;
-            }
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;
             }
@@ -98,10 +95,6 @@ namespace Calico {
                 win.Show();
                 Application.Run();
             }
-        }
-
-        public static void HandleException(GLib.UnhandledExceptionArgs args) {
-            Console.WriteLine("Unhandled exception: {0}", args);
         }
 
         public static void Print(string message, params object[] args) {

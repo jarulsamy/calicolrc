@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="copyPicture">
+        <parameter type="Graphics+Picture" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getAlpha">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getBlue">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColor">
+        <parameter type="Graphics+Picture" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColor">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColorNames" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getGray">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getGreen">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getKeyPressed" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getKeyState" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouse" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouseNow" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouseState" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getPixel">
+        <parameter type="Graphics+Picture" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getPixels">
+        <parameter type="Graphics+Picture" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRed">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRGB">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRGBA">
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getWindow">
+        <parameter type="System.String" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getWindow" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="GraphicsLoop" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Init" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Invoke">
+        <parameter type="Graphics+InvokeDelegate" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor">
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor">
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor">
+        <parameter type="System.String" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture">
+        <parameter type="Graphics+WindowClass" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="Graphics+Color" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture">
+        <parameter type="System.String" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindow">
+        <parameter type="System.String" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindowFast">
+        <parameter type="System.String" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="needInvoke" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onKeyPress">
+        <parameter type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onKeyRelease">
+        <parameter type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseDown">
+        <parameter type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseMovement">
+        <parameter type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseUp">
+        <parameter type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="PyList">
+        <parameter type="System.Object[]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="PyTuple">
+        <parameter type="System.Object[]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="run">
+        <parameter type="System.Func`1[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="run" />
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture">
+        <parameter type="IronPython.Runtime.List" />
+        <parameter type="System.String" />
+        <parameter type="System.Int16" />
+        <parameter type="System.Boolean" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture">
+        <parameter type="IronPython.Runtime.List" />
+        <parameter type="System.String" />
+        <parameter type="System.Int16" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture">
+        <parameter type="Graphics+Picture" />
+        <parameter type="System.String" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture">
+        <parameter type="IronPython.Runtime.List" />
+        <parameter type="System.String" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="set_gui_thread_id">
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setAlpha">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setBlue">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setColor">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="Graphics+Color" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setGray">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setGreen">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixel">
+        <parameter type="Graphics+Picture" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="Graphics+Color" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixel">
+        <parameter type="Graphics+Picture" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="Graphics+Pixel" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixels">
+        <parameter type="Graphics+Picture" />
+        <parameter type="Graphics+Picture" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRed">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Single" />
+        <parameter type="System.Single" />
+        <parameter type="System.Single" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+        <parameter type="System.Byte" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Collections.IList" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGBA">
+        <parameter type="Graphics+Pixel" />
+        <parameter type="System.Byte" />
+        <parameter type="System.Byte" />
+        <parameter type="System.Byte" />
+        <parameter type="System.Byte" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Show">
+        <parameter type="System.Object" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="ShowAll">
+        <parameter type="System.Object" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Vector">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Vector">
+        <parameter type="System.Double" />
+        <parameter type="System.Double" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="VectorRotate">
+        <parameter type="Microsoft.Xna.Framework.Vector2" />
+        <parameter type="System.Double" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="wait">
+        <parameter type="System.Double" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Window">
+        <parameter type="System.String" />
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Window">
+        <parameter type="System.Int32" />
+        <parameter type="System.Int32" />
+    </method>
+</map>
