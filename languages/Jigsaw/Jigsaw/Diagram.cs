@@ -11,7 +11,6 @@ using Cairo;
 
 // Be able to add/remove intermediate points on Splines and Connectors
 // Modify Decorators - set Anchor and Offset (Anchor: TopLeft, MiddleLeft, BottomLeft, TopCenter, MiddleCenter, BottomCenter, TopRight, MiddleRight, BottomRight)
-
 // There is a problem with creating splines or connectors.
 // It is possible to create them with only one point.
 // (Start drawing and then hit Esc or right-mouse)
@@ -169,6 +168,8 @@ namespace Diagram
         internal EMode EditMode = EMode.Idle;                	// Edit mode starts idle
         internal EMode DrawMode = EMode.Idle;                	// Draw mode starts idle
 		
+		internal double worldWidth = 3000.0;					// Size of underlying canvas world
+		internal double worldHeight = 2000.0;
         internal double scale = 1.0;                            // Drawing scale (zoom) factor
 		internal double scaleCenterX = 0.0;						// The point about which scaling is performed (screen coordinates)
 		internal double scaleCenterY = 0.0;
@@ -211,9 +212,11 @@ namespace Diagram
 		internal bool _showInset = true;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public Canvas(int width, int height)
+        public Canvas(int width, int height, double worldWidth, double worldHeight)
         {
 			this.SetSizeRequest(width, height);
+			this.worldWidth = worldWidth;
+			this.worldHeight = worldHeight;
 			
 			// Set up events
 			this.AddEvents ((int)Gdk.EventMask.AllEventsMask );
@@ -453,14 +456,15 @@ namespace Diagram
 			this.UpdateOffsetLimits(w, h);
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		internal void UpdateOffsetLimits(int w, int h)
 		{	// Recompute the offset limits when dependent values change, such as scale
 			
 			// Compute the range of allowable offsets
 			this.maxOffsetX = this.scaleCenterX-(this.scaleCenterX/this.scale);
 			this.maxOffsetY = this.scaleCenterY-(this.scaleCenterY/this.scale);
-			this.minOffsetX = w-3000.0-this.maxOffsetX;
-			this.minOffsetY = h-2000.0-this.maxOffsetY;
+			this.minOffsetX = w-this.worldWidth-this.maxOffsetX;
+			this.minOffsetY = h-this.worldHeight-this.maxOffsetY;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -471,24 +475,38 @@ namespace Diagram
 			if (this.offsetX < this.minOffsetX) this.offsetX = this.minOffsetX;
 			if (this.offsetY < this.minOffsetY) this.offsetY = this.minOffsetY;	
 		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DoTranslate(double deltaX, double deltaY)
+		{
+			this.offsetX += deltaX;
+			this.offsetY += deltaY;
+			
+			// Update and clip offsets
+			this.UpdateOffsetLimits();
+			this.ClipOffsets();
+			this.Invalidate();
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoZoom(double factor)
 		{	// Perform the zoom
-			this.scale = this.scale * factor;
+			this.scale *= factor;
 			
 			// Compute the minimum zoom factor
 			int w, h;
 			this.GdkWindow.GetSize(out w, out h);
-			double minZoom = Math.Max(w/3000.0, h/2000.0);
+			double minZoom = Math.Max(w/this.worldWidth, h/this.worldHeight);
 			
 			// Clip zoom factor
 			if (this.scale < minZoom) this.scale = minZoom;
 			if (this.scale > 20.0) this.scale = 20.0;
-			this.scaleCenterX = 0.5*this.Allocation.Width;
-			this.scaleCenterY = 0.5*this.Allocation.Height;
 			
-			//this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
-			//this.scaleCenterY = 0.0; //0.5*this.Allocation.Height;
+			//this.scaleCenterX = 0.5*this.Allocation.Width;
+			//this.scaleCenterY = 0.5*this.Allocation.Height;
+
+			this.scaleCenterX = 0.0; //0.5*this.Allocation.Width;
+			this.scaleCenterY = 0.0; //0.5*this.Allocation.Height
 			
 			// Update and clip offsets
 			this.UpdateOffsetLimits();
@@ -552,15 +570,22 @@ namespace Diagram
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		//[GLib.ConnectBefore]
-		protected void OnKeyPress(object o, Gtk.KeyPressEventArgs e) {
-			switch(e.Event.Key)
-			{
-				case Gdk.Key.Up:
+		protected void OnKeyPress(object o, Gtk.KeyPressEventArgs e) 
+		{
+			if (e.Event.Key == Gdk.Key.Up) {
+				this.DoTranslate(0.0, 5.0);
+			} else if (e.Event.Key == Gdk.Key.Down) {
+				this.DoTranslate(0.0, -5.0);
+			} else if (e.Event.Key == Gdk.Key.Left) {
+				this.DoTranslate(5.0, 0.0);
+			} else if (e.Event.Key == Gdk.Key.Right) {
+				this.DoTranslate(-5.0, 0.0);
+			} else if ((e.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+				if ( e.Event.Key == Gdk.Key.plus ) {
 					this.DoZoom(1.05);
-					break;
-				case Gdk.Key.Down:
+				} else if (e.Event.Key == Gdk.Key.minus ) {
 					this.DoZoom(1.0/1.05);
-					break;
+				}
 			}
 		}
 		

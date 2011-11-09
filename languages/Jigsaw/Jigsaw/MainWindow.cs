@@ -9,7 +9,7 @@ public class JigsawWidget : Gtk.ScrolledWindow
 
   public JigsawWidget() {
 	this.CanFocus = true;
-	cvs = new Jigsaw.Canvas(900, 600);
+	cvs = new Jigsaw.Canvas(900, 600, 3000, 2000);
 	this.Add (cvs);
   }
 	
@@ -55,9 +55,9 @@ public class MainWindow : Gtk.Window
 //		cvsFixed.Put(cvs, 0,0);
 //		sw.AddWithViewport(cvsFixed);
 		
-		cvs = new Jigsaw.Canvas(900, 600);
+		cvs = new Jigsaw.Canvas(900, 600, 3000, 2000);
 		this.Add(cvs);
-		this.KeyPressEvent    += new Gtk.KeyPressEventHandler( this.OnKeyPressEvent);
+		//this.KeyPressEvent    += new Gtk.KeyPressEventHandler( this.OnKeyPressEvent);
 
 		// Let it rip
 		this.ShowAll();
@@ -70,13 +70,13 @@ public class MainWindow : Gtk.Window
 		a.RetVal = true;
 	}
 	
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	[GLib.ConnectBeforeAttribute]
-	protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-        if (args.Event.Key == Gdk.Key.Up) {
-			cvs.DoZoom(1.05);
-        } else if (args.Event.Key == Gdk.Key.Down) {
-			cvs.DoZoom(1.0/1.05);
-		}
-	}
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//	[GLib.ConnectBeforeAttribute]
+//	protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
+//        if (args.Event.Key == Gdk.Key.Up) {
+//			cvs.DoZoom(1.05);
+//        } else if (args.Event.Key == Gdk.Key.Down) {
+//			cvs.DoZoom(1.0/1.05);
+//		}
+//	}
 }

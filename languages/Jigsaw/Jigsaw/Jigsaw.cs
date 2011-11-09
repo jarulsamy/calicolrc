@@ -98,7 +98,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public Canvas(int width, int height) : base(width, height) 
+		public Canvas(int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
 			// Setup some colors
 			BackColor = Diagram.Colors.LightSlateGray;
