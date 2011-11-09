@@ -35,8 +35,8 @@ namespace Calico {
 
         public override void Write(Byte [] bytes, int offset, int count) {
             // FIXME: Ruby generates \r\n 13 10
-            if (bytes[0] == 13)
-                return;
+            //if (bytes[0] == 13)
+            //    return;
             string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
             window.Print(tag, text);
         }
