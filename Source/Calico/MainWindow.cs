@@ -1085,19 +1085,31 @@ namespace Calico {
             return "[" + retval + "]";
         }
 
+        public static bool HasMethod(object obj, string methodName) {
+	        Type type = obj.GetType();
+	        return type.GetMethod(methodName) != null;
+	    }
+
+        public static string InvokeMethod(object obj, string methodName, params object [] args) {
+	        var type = obj.GetType();
+            try {
+                System.Reflection.MethodInfo mi = type.GetMethod(methodName);
+	            return (string)mi.Invoke(obj, args);
+            } catch {
+                return null;
+            }
+	    }
+
         public static string Repr(object obj) {
-            string repr;
-            if (obj is IronPython.Runtime.List) {
-              repr = ((IronPython.Runtime.List)obj).__repr__(
-                      IronPython.Runtime.DefaultContext.Default);
-            } else if (obj is IronPython.Runtime.PythonDictionary) {
-              repr = ((IronPython.Runtime.PythonDictionary)obj).__repr__(
-                      IronPython.Runtime.DefaultContext.Default);
-            } else if (obj is IronPython.Runtime.PythonTuple) {
-              repr = obj.ToString();
+            string repr = null;
+    	    if (HasMethod(obj, "__repr__")) {
+                repr = InvokeMethod(obj, "__repr__", IronPython.Runtime.DefaultContext.Default);
+    	    } else if (HasMethod(obj, "to_s")) {
+                repr = InvokeMethod(obj, "to_s");
             } else if (obj is Array) {
-              repr = (string)ArrayToString((object[]) obj);
-            } else {
+                repr = (string)ArrayToString((object[]) obj);
+            }
+            if (repr == null) {
                 repr = obj.ToString();
             }
             return repr;
