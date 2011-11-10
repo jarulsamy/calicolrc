@@ -62,6 +62,9 @@ namespace Jigsaw
 					Process(s, true);
 				}
 			}
+			WriteLine("");
+			WriteLine("main()");
+			WriteLine("");
 		}
 		
 		public static string Py(string exp) {
@@ -84,10 +87,15 @@ namespace Jigsaw
 				// Write body:
 				indentLevel++;
 				endBlock = false;
+				bool pass = true;
 				foreach (CEdge edge in cs.Edges) {
-					if ( edge.Type != EdgeType.In && edge.IsConnected ) 
+					if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 						Process((Diagram.CShape)edge.LinkedTo.Block, write);
+						pass = false;
+					}
 				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 				return;
 			} else if (s is CControlIf) {
@@ -96,8 +104,13 @@ namespace Jigsaw
 					WriteFormatLine("if {0}:", Py(c["IfTest"])); 
 				indentLevel++;
 				CEdge edge = c.IfEdge;
-				if ( edge.Type != EdgeType.In && edge.IsConnected ) 
+				bool pass = true;
+				if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 					Process(edge.LinkedTo.Block, write);
+					pass = false;
+				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 			} else if (s is CAssignment) {
 				CAssignment c = (CAssignment)s;
@@ -142,9 +155,13 @@ namespace Jigsaw
 					WriteFormatLine("for {0} in range({1}):", GetNextIncr(), Py(c["Repetitions"])); 
 				indentLevel++;
 				CEdge edge = c.LoopEdge;
+				bool pass = true;
 				if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 					Process(edge.LinkedTo.Block, write);
+					pass = false;
 				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 			} else if (s is CControlIfElse) {
 				CControlIfElse c = (CControlIfElse)s;
@@ -152,15 +169,25 @@ namespace Jigsaw
 					WriteFormatLine("if {0}:", Py(c["IfTest"])); 
 				indentLevel++;
 				CEdge edge = c.IfEdge;
-				if ( edge.Type != EdgeType.In && edge.IsConnected ) 
+				bool pass = true;
+				if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 					Process(edge.LinkedTo.Block, write);
+					pass = false;
+				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 				if (write)
 					WriteLine("else:"); 
 				indentLevel++;
 				edge = c.ElseEdge;
-				if ( edge.Type != EdgeType.In && edge.IsConnected ) 
+				pass = true;
+				if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 					Process(edge.LinkedTo.Block, write);
+					pass = false;
+				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 			} else if (s is CControlWhile) {
 				CControlWhile c = (CControlWhile)s;
@@ -168,9 +195,13 @@ namespace Jigsaw
 					WriteFormatLine("while {1}:", GetNextIncr(), Py(c["WhileTest"])); 
 				indentLevel++;
 				CEdge edge = c.LoopEdge;
+				bool pass = true;
 				if ( edge.Type != EdgeType.In && edge.IsConnected ) {
 					Process(edge.LinkedTo.Block, write);
+					pass = false;
 				}
+				if (pass && write)
+				  WriteLine("pass");
 				indentLevel--;
 			} else if (s is CIOPrint) {
 				CIOPrint c = (CIOPrint)s;
