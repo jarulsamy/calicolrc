@@ -1,11 +1,40 @@
 
+// FIXME: recursion of Process() is not correct... revisits some edges.
+
 
 using System;
 using Jigsaw;
 using System.Collections.Generic;
-
+using NCalc.Domain;
+using Antlr.Runtime;
+	
 namespace Jigsaw
 {
+	public class PythonVisitor : SerializationVisitor {
+		
+		public PythonVisitor() : base() {
+		}
+		
+		public override void Visit(ValueExpression expression)
+        {
+            switch (expression.Type)
+            {
+ 		    case NCalc.Domain.ValueType.Boolean:
+                Result.Append(Proper(expression.Value.ToString())).Append(" ");
+				// ---
+                break;
+			default:
+				base.Visit(expression);
+				break;
+			}
+		}
+		
+		public static string Proper(string text) {
+			return text.Substring(0, 1).ToUpper() + text.Substring(1).ToLower();
+		}
+		
+	}
+	
 	public class Exporter
 	{
 		int indentLevel;
@@ -68,15 +97,15 @@ namespace Jigsaw
 		}
 		
 		public static string Py(string exp) {
-			// FIXME: Expression -> Python
-			// true -> True
-			// false -> False
-			return exp;
+			var expr = new NCalc.Expression(exp);
+			expr.HasErrors(); // causes parsing
+			var visitor = new PythonVisitor();
+			expr.ParsedExpression.Accept(visitor);
+			return visitor.Result.ToString();
 		}
 		
 		public static string GetNextIncr() {
-			return String.Format("i{0}", incr_count);
-			incr_count++;
+			return String.Format("i{0}", incr_count++);
 		}
 		
 		public void Process(Diagram.CShape s, bool write) {
@@ -208,9 +237,8 @@ namespace Jigsaw
 				if (write)
 					WriteFormatLine("print({0})", Py(c["Expression"])); 
 			} else {
-				// not handled
 				if (write)
-					WriteFormatLine("{0} Unhandled block: {1}", comment, s.Text); 
+					WriteFormatLine("{0} FIXME: Unhandled block: {1}", comment, s.Text); 
 			}
 			foreach (CEdge edge in ((CBlock)s).Edges) {
 				if (endBlock) {
