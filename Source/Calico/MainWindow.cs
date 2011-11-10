@@ -1051,7 +1051,7 @@ namespace Calico {
                 if (retval) {
                     SetLanguage(CurrentLanguage);
                     manager[CurrentLanguage].engine.SetTraceOff();
-                    ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+                    CurrentDocument.ExecuteFileInBackground();
                 }
             } else if (Focus == Shell) {
                 ExecuteShell();
@@ -1168,9 +1168,11 @@ namespace Calico {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
+					// FIXME: Let Document handle tracing:
                     SetLanguage(CurrentLanguage);
                     manager[CurrentLanguage].engine.SetTraceOn(this);
                     ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+					// FIXME: call ExecuteFileWithTrace
                 }
             }
         }

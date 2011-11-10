@@ -57,6 +57,12 @@ namespace Calico {
             tab_widget.ShowAll();
         }
 
+        public virtual void ExecuteFileInBackground() {
+            // this allows document to handle it, if it wishes
+            // otherwise pass to calico
+            calico.ExecuteFileInBackground(filename, language);
+        }
+
         public static string _(string message) {
             return global::Mono.Unix.Catalog.GetString(message);
         }
@@ -66,7 +72,7 @@ namespace Calico {
         }
 
         public virtual bool HasContent {
-            get {return false;}
+            get {return true;}
         }
 
         public virtual bool IsDirty {
