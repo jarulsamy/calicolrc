@@ -78,7 +78,7 @@ namespace Jigsaw
 		    foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) {
 					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
 					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
-					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name);
+					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
 					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
 					for (int n = 0; n < names.Count; n++) {
 					  if (mapping.CheckSignature(type_name, method_name, types[n])) {
