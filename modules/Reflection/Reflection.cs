@@ -177,7 +177,6 @@ namespace Reflection
 					
 			public bool CheckSignature(string type_name, string method_name, List<Type> types) {
 				string key = String.Format("{0}.{1}({2})", type_name, method_name, ListToString(types));
-				Console.WriteLine("CheckSignature: key={0}", key);
 				if (signatures == null) { // no map file
 					return true;
 				} else {
