@@ -8,12 +8,12 @@ namespace Jigsaw
 		public class CMethodBlock : CBlock
 		{	
 		  string assembly_name;
-		  string type_name;
-		  string method_name;
-		  List<string> names;
+		  public string type_name;
+		  public string method_name;
+		  public List<string> names;
 		  List<Type> types;
 		  List<object> defaults;
-		  Type return_type;
+		  public Type return_type;
 			
 	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	        public CMethodBlock(Double X, Double Y, bool isFactory) : 
