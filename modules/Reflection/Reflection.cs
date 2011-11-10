@@ -75,6 +75,7 @@ namespace Reflection
 			string mapfile;
 			public Dictionary<string,bool> signatures;
 			public Dictionary<string,bool> types;
+			public Dictionary<string,string> defaults;
 			string map;
 
 			public Mapping(string assembly_name) : this(assembly_name, null) {
@@ -103,6 +104,7 @@ namespace Reflection
 				if (System.IO.File.Exists(mapfile)) {
 					signatures = new Dictionary<string,bool>();
 					types = new Dictionary<string,bool>();
+					defaults = new Dictionary<string,string>();
                     string type_name = "";
                     string method_name = "";
 					List<string> parameters = new List<string>();
@@ -115,8 +117,13 @@ namespace Reflection
                             case "map":
                                 break;
                             case "parameter":
+                                string parameter_name = xr.GetAttribute("name");
                                 string parameter_type = xr.GetAttribute("type");
+                                string parameter_default = xr.GetAttribute("default");
 								parameters.Add(parameter_type);
+                                string default_key = String.Format("{0}.{1}-{2}", 
+									type_name, method_name, parameter_name);
+								defaults[default_key] = parameter_default;
                                 break;
                             case "method":
                                 type_name = xr.GetAttribute("type_name");
@@ -165,7 +172,9 @@ namespace Reflection
     					    xw.WriteAttributeString("method_name", mi.Name);
     					    foreach (ParameterInfo pi in mi.GetParameters()) {
     					      xw.WriteStartElement("parameter");
+    					      xw.WriteAttributeString("name", pi.Name);
     					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+    					      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
     					      xw.WriteEndElement();
     					    }
     					  	xw.WriteEndElement();
@@ -190,6 +199,17 @@ namespace Reflection
 				} else {
 					string key = String.Format("{0}.{1}", type_name, method_name);
 					return types.ContainsKey(key);
+				}
+			}
+			public bool GetParameterDefault(string aname, string tname, string mname, string pname,
+								out object default_value) {
+                string default_key = String.Format("{0}.{1}-{2}", tname, mname, pname);
+				if (defaults.ContainsKey(default_key) && defaults[default_key] != "") {
+					default_value = defaults[default_key];
+					return true;
+				} else {
+					default_value = null;
+					return false;
 				}
 			}
 		}
@@ -557,6 +577,29 @@ namespace Reflection
 				List<object > parameters = new List<object> ();
 				foreach (ParameterInfo pi in mi.GetParameters()) {
 					parameters.Add (pi.DefaultValue);
+				}
+				retval.Add (parameters);
+			}
+			return retval;
+		}
+		
+		public static List<List<object>> getParameterDefaults (string aname, 
+						 string tname, 
+						 string mname,
+						 Mapping mapping)
+		{
+			List<List<object >> retval = new List<List<object>> ();
+			Type type = getType (aname, tname);
+			foreach (MethodInfo mi in getMethodInfos(type, mname)) {
+				List<object > parameters = new List<object> ();
+				foreach (ParameterInfo pi in mi.GetParameters()) {
+					object default_value;
+					bool found = mapping.GetParameterDefault(aname, tname, mname, pi.Name, 
+							out default_value);
+					if (found)
+						parameters.Add(default_value);
+					else
+						parameters.Add(pi.DefaultValue);
 				}
 				retval.Add (parameters);
 			}
