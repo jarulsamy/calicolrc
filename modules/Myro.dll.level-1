@@ -2,17 +2,17 @@
 <map>
     <method assembly_name="Myro" type_name="Myro" method_name="ask" />
     <method assembly_name="Myro" type_name="Myro" method_name="ask">
-        <parameter name="question" type="System.Object" default="What?" />
+        <parameter name="question" type="System.Object" default="'What?'" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="ask">
         <parameter name="question" type="System.Object" default="'What?'" />
-        <parameter name="title" type="System.String" default="Information" />
+        <parameter name="title" type="System.String" default="'Information'" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
-        <parameter name="question" type="System.String" default="" />
+        <parameter name="question" type="System.String" default="'Which?'" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
-        <parameter name="question" type="System.String" default="" />
+        <parameter name="question" type="System.String" default="'Which?'" />
         <parameter name="choices" type="IronRuby.Builtins.RubyArray" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
@@ -363,7 +363,7 @@
         <parameter name="items" type="System.Object[]" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeWindow">
-        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="title" type="System.String" default="'Calico Graphics'" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>
@@ -610,7 +610,7 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="show">
         <parameter name="picture" type="Graphics+Picture" default="" />
-        <parameter name="title" type="System.String" default="Myro Camera" />
+        <parameter name="title" type="System.String" default="'Myro Camera'" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="song2text">
         <parameter name="song" type="IronPython.Runtime.List" default="" />
@@ -633,7 +633,7 @@
     <method assembly_name="Myro" type_name="Myro" method_name="stop" />
     <method assembly_name="Myro" type_name="Myro" method_name="tails" />
     <method assembly_name="Myro" type_name="Myro" method_name="takePicture">
-        <parameter name="mode" type="System.String" default="jpeg" />
+        <parameter name="mode" type="System.String" default="'jpeg'" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="timer">
         <parameter name="seconds" type="System.Double" default="" />
@@ -682,7 +682,7 @@
         <parameter name="height" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="Window">
-        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="title" type="System.String" default="'Calico Graphics'" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>

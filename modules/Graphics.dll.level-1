@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <map>
     <method assembly_name="Graphics" type_name="Graphics" method_name="copyPicture">
         <parameter name="picture" type="Graphics+Picture" default="" />
@@ -96,12 +96,12 @@
         <parameter name="filename" type="System.String" default="" />
     </method>
     <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindow">
-        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="title" type="System.String" default="'Calico Graphics'" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>
     <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindowFast">
-        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="title" type="System.String" default="'Calico Graphics'" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>
@@ -244,7 +244,7 @@
         <parameter name="seconds" type="System.Double" default="" />
     </method>
     <method assembly_name="Graphics" type_name="Graphics" method_name="Window">
-        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="title" type="System.String" default="'Calico Graphics'" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>

@@ -86,28 +86,17 @@ namespace Jigsaw
 				}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
-					  if (types[n].ToString().Equals("System.String")) {
-					    if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
-					      _properties[names[n]] = new CExpressionProperty(names[n], 
-											      String.Format("'{0}'", 
-													    defaults[n])); 
-					    else
-					      _properties[names[n]] = new CExpressionProperty(names[n], 
-											      String.Format("'{0}'", 
-													    names[n])); 
-					  } else {
 					    if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
 					      _properties[names[n]] = new CExpressionProperty(names[n], 
 											      String.Format("{0}", defaults[n]));
 					    else
-					      // FIXME: make a default of the appropriate type
+					      // FIXME: make a default of the appropriate type if one not given
 					      _properties[names[n]] = new CExpressionProperty(names[n], 
 											      String.Format("{0}", 0));
-					  }
-					  if (parameter_list == "")
-					    parameter_list = names[n];
-					  else
-					    parameter_list += "," + names[n];
+						if (parameter_list == "")
+						    parameter_list = names[n];
+						else
+						    parameter_list += "," + names[n];
 				}
 				        block_text = String.Format("{0}({1})", method_name, parameter_list);
 				} else {
