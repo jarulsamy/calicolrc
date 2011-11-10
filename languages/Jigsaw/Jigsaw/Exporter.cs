@@ -6,7 +6,6 @@ using System;
 using Jigsaw;
 using System.Collections.Generic;
 using NCalc.Domain;
-using Antlr.Runtime;
 	
 namespace Jigsaw
 {
@@ -101,7 +100,7 @@ namespace Jigsaw
 			expr.HasErrors(); // causes parsing
 			var visitor = new PythonVisitor();
 			expr.ParsedExpression.Accept(visitor);
-			return visitor.Result.ToString();
+			return visitor.Result.ToString().Trim();
 		}
 		
 		public static string GetNextIncr() {
