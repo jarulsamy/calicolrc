@@ -24,46 +24,65 @@ using System.Collections.Generic;
 using System.IO;
 using Calico;
 
-public class CalicoJigsawEngine : Engine {
-    public CalicoJigsawEngine(LanguageManager manager) : base(manager) {
-    }
+public class CalicoJigsawEngine : Engine
+{
+	public CalicoJigsawEngine (LanguageManager manager) : base(manager)
+	{
+	}
 }
 
-public class CalicoJigsawDocument : Document {
-    public Jigsaw.Canvas cvs = null;
+public class CalicoJigsawDocument : Document
+{
+	public Jigsaw.Canvas cvs = null;
     
-    public CalicoJigsawDocument(Calico.MainWindow calico, string filename) : base(calico, filename, "jigsaw") {
-      cvs = new Jigsaw.Canvas(900, 600, 3000, 2000);
-      widget.AddWithViewport(cvs);
-      if (filename != null)
-	cvs.ReadFile(filename);
-      widget.ShowAll();
-    }
+	public CalicoJigsawDocument (Calico.MainWindow calico, string filename) : 
+	base(calico, filename, "jigsaw")
+	{
+		cvs = new Jigsaw.Canvas (900, 600, 3000, 2000);
+		widget.AddWithViewport (cvs);
+		if (filename != null)
+			cvs.ReadFile (filename);
+		widget.ShowAll ();
+	}
+	
+	public override void ExecuteFileInBackground ()
+	{
+		calico.Print("Running Jigsaw script...");
+		cvs.Run();
+		calico.Print("Done");
+	}
 
-  public override void ZoomIn() {
-    cvs.DoZoom(1.05);
-  }
+	public override void ZoomIn ()
+	{
+		cvs.DoZoom (1.05);
+	}
 
-  public override void ZoomOut() {
-    cvs.DoZoom(1.0/1.05);
-  }
+	public override void ZoomOut ()
+	{
+		cvs.DoZoom (1.0 / 1.05);
+	}
 
 }
 
-public class CalicoJigsawLanguage : Language {
-    public CalicoJigsawLanguage() : 
-        base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null) {
-    }
+public class CalicoJigsawLanguage : Language
+{
+	public CalicoJigsawLanguage () : 
+        base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null)
+	{
+	}
     
-    public override void MakeEngine(LanguageManager manager) {
-        engine = new CalicoJigsawEngine(manager);
-    }
+	public override void MakeEngine (LanguageManager manager)
+	{
+		engine = new CalicoJigsawEngine (manager);
+	}
 
-    public override Document MakeDocument(Calico.MainWindow calico, string filename) {
-          return new CalicoJigsawDocument(calico, filename);
-    }
+	public override Document MakeDocument (Calico.MainWindow calico, string filename)
+	{
+		return new CalicoJigsawDocument (calico, filename);
+	}
 
-    public static new Language MakeLanguage() {
-        return new CalicoJigsawLanguage();
-    }
+	public static new Language MakeLanguage ()
+	{
+		return new CalicoJigsawLanguage ();
+	}
 }
