@@ -306,8 +306,8 @@ namespace Diagram
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Indicate that the canvas must be redrawn
-		internal void Invalidate() {
+		internal void Invalidate()
+		{	// Indicate that the canvas must be redrawn
 			this.QueueDraw();
 		}
 
@@ -434,9 +434,8 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override bool OnExposeEvent(Gdk.EventExpose args)
         {	// Handle the Paint event by drawing all shapes and annotations
-			using (Context g = Gdk.CairoHelper.Create( args.Window )) {
-                //g.Rectangle(args.Area.X, args.Area.Y, args.Area.Width, args.Area.Height);
-                //g.Clip();
+			using (Context g = Gdk.CairoHelper.Create( args.Window )) 
+			{
 				Draw( g );
 				
 				if (_showInset) DrawInset(g);
@@ -569,7 +568,6 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		//[GLib.ConnectBefore]
 		protected void OnKeyPress(object o, Gtk.KeyPressEventArgs e) 
 		{
 			if (e.Event.Key == Gdk.Key.Up) {
@@ -2414,26 +2412,19 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Draw all CShape Decorators, if any
         public virtual void DrawDecorators(Cairo.Context g)
-        {
+        {	// Draw all CShape Decorators, if any
             foreach (CDecorator s in this.Decorators.Values) s.Draw(g);
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Morph the size and location of this shape to a bounding box 
-        // as defined by two points.
-        // Can be overridden.
-
-        // Morph the size and location of this shape to another shape's bounding box
         public virtual void MorphTo(CShape shp)
-        {
+        {	// Morph the size and location of this shape to a bounding box as defined by two points.
             this.MorphTo(shp.left, shp.top, shp.left + shp.width, shp.top + shp.height);
         }
 
-        // p1 is the upper left and p2 is the lower right of the new bounding box.
         public virtual void MorphTo(CPoint p1, CPoint p2)
-        {
+        {	// p1 is the upper left and p2 is the lower right of the new bounding box.
             this.MorphTo(p1.X, p1.Y, p2.X, p2.Y);
         }
 
@@ -3372,9 +3363,9 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Returns true if given point is within this shape.
         public override Boolean ContainsPoint(CPoint pnt, Canvas cvs)
-        {
+        {	// Returns true if given point is within this shape.
+			
             // The equation of an ellipse is defined as:
             //         2           2
             // (x - x0)    (y - y0)

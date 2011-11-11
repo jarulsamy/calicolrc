@@ -3,10 +3,52 @@ using Cairo;
 using System.Collections.Generic;
 
 // This Namespace contains various user-drawn widgets based on shapes in the Diagram namespace.
-// Most notably, this contains common GUI widgets.
 
 namespace Widgets
 {
+	// -----------------------------------------------------------------------
+	public class CBlockPalette : Diagram.CRoundedRectangle
+	{
+		private CSlider slider;
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
+		{
+			this.Radius = 5;
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkSlateGray;
+			this.FillColor = Diagram.Colors.Honeydew;
+			this.TextColor = Diagram.Colors.Black;
+			
+			// Add slider to widget - 20 pixels wide
+			this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
+		}
+		
+		public CBlockPalette(double x, double y) : base(x, y) {}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override Diagram.CShape Clone(double x, double y) {
+			CBlockPalette clone = new CBlockPalette(x, y, this.Width, this.Height);
+			return (Diagram.CShape)clone;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override void Draw(Cairo.Context g)
+        {
+			base.Draw(g);
+			this.slider.Top = this.Top+5;
+			this.slider.Left = this.Left + this.Width - this.slider.Width-5;
+			this.slider.Height = this.Height - 10;
+			this.slider.Draw(g);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        public override Boolean ContainsPoint(Diagram.CPoint pnt, Diagram.Canvas cvs)
+//        {
+//			return slider.ContainsPoint(pnt, cvs);
+//		}
+	}
+
 	// -----------------------------------------------------------------------
 	public class CRoundedButton : Diagram.CRoundedRectangle
 	{
@@ -92,7 +134,7 @@ namespace Widgets
 
 	// -----------------------------------------------------------------------
 	public class CTextBox : Diagram.CShape
-	{	
+	{
 		private Gtk.Entry _entry = null;
 		//private Fixed _fixed = null;
 		

@@ -27,7 +27,7 @@
     <ConsolePause>false</ConsolePause>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="MONO_PATH" value="/home/dblank/Calico/trunk/modules:/home/dblank/Calico/trunk/bin" />
+        <Variable name="MONO_PATH" value="C:\Programs\Mono\Calico-dev\modules;C:\Programs\Mono\Calico-dev\bin" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
@@ -94,12 +94,6 @@
       <HintPath>..\..\..\bin\IronRuby.Libraries.Yaml.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Mono.Posix, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Mono.Cairo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
       <Private>False</Private>
     </Reference>
@@ -134,6 +128,7 @@
       <Link>Reflection.cs</Link>
     </Compile>
     <Compile Include="CMethodBlock.cs" />
+    <Compile Include="Slider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

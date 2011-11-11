@@ -55,7 +55,7 @@ namespace Jigsaw
 		// References to button that are accessed in order to enable/disable them at runtime.
 		private Widgets.CRoundedButton bStop;
 		private Widgets.CRoundedButton bRun;
-		
+				
 		// Reference to single PropertiesWindow object
 		private InspectorWindow _inspector = null;
 		
@@ -116,6 +116,11 @@ namespace Jigsaw
 			_engine.Reset(this, _inspector);
 			
 			// Set up all widgets
+//			Widgets.CBlockPalette palette = new Widgets.CBlockPalette(500, 100, 200, 400);
+//			this.AddShape( palette );
+			
+//			Widgets.CSlider sl = new Widgets.CSlider(500, 100, 20, 400, 0.0);
+//			this.AddShape( sl );
 			
 			// Build tabbed panel for blocks
 			Widgets.CRoundedTab tbCtrl     = new Widgets.CRoundedTab(0,  67, 100, 30, "Control");
@@ -145,6 +150,13 @@ namespace Jigsaw
 			tbShapes.Dock = Diagram.DockSide.Left;
 			tbTools.Dock = Diagram.DockSide.Left;
 			tbNotes.Dock = Diagram.DockSide.Left;
+//			tbInOut.Dock = Diagram.DockSide.Left;
+//			tbCtrl.Dock = Diagram.DockSide.Left;
+//			tbVars.Dock = Diagram.DockSide.Left;
+//			tbMyro.Dock = Diagram.DockSide.Left;
+//			tbGraphics.Dock = Diagram.DockSide.Left;
+//			tbTools.Dock = Diagram.DockSide.Left;
+//			tbNotes.Dock = Diagram.DockSide.Left;
 			
 			// Add tabs to the canvas
 			this.AddShape(tbCtrl);
@@ -163,7 +175,7 @@ namespace Jigsaw
 				true, false, false, false, false);
 			this.AddShape(pnlBlock);
 			
-			pnlBlock.Dock = Diagram.DockSide.Left;
+//			pnlBlock.Dock = Diagram.DockSide.Left;
 			
 			// Factory Blocks for block area
 			
@@ -207,7 +219,7 @@ namespace Jigsaw
 			_shrect.LineColor = Diagram.Colors.Gray;
 			_shrect.LineWidth = 2;
 			_shrect._isFactory = true;
-			_shrect.Dock = Diagram.DockSide.Left;
+//			_shrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrect);
 			tbNotes.AddShape(_shrect);
 
@@ -217,7 +229,7 @@ namespace Jigsaw
 			_shrrect.LineWidth = 2;
 			_shrrect.Radius = 8;
 			_shrrect._isFactory = true;
-			_shrrect.Dock = Diagram.DockSide.Left;
+//			_shrrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrrect);
 			tbNotes.AddShape(_shrrect);
 			
@@ -226,7 +238,7 @@ namespace Jigsaw
 			_shellipse.LineColor = Diagram.Colors.Gray;
 			_shellipse.LineWidth = 2;
 			_shellipse._isFactory = true;
-			_shellipse.Dock = Diagram.DockSide.Left;
+//			_shellipse.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shellipse);
 			tbNotes.AddShape(_shellipse);
 			
@@ -326,6 +338,7 @@ namespace Jigsaw
 			  tbGraphics.AddShape(cblock);
 			}
 			
+
 			foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70)) {
 			  this.AddShape(cblock);
 			  tbShapes.AddShape(cblock);
@@ -866,9 +879,8 @@ namespace Jigsaw
 	}
 	
 	// -----------------------------------------------------------------------
-	// Base block class
 	public class CBlock : Diagram.CShape
-	{
+	{	// Base block class
 		protected BlockState _state = BlockState.Idle;	// Current state of this block
 		public CEdge InEdge;							// By default, all Blocks have one main input edge and one main output edge
 		public CEdge OutEdge;		
@@ -1484,6 +1496,23 @@ namespace Jigsaw
 					if (b.TryActivateWith(cvs, this)) 
 						break;
 			}
+			
+			// Check if near an edge and translate canvas if it is
+			double xmin = 0.0, ymin = 0.0, xmax = 0.0, ymax = 0.0;
+			int sw, sh;
+			cvs.GdkWindow.GetSize(out sw, out sh);
+			cvs.TransformPoint(0.0, 0.0, out xmin, out ymin);
+			cvs.TransformPoint(sw, sh, out xmax, out ymax);
+			if (this.Outline.Top < ymin) {
+				cvs.DoTranslate( 0.0, 40.0); //wymin - this.Outline.Top );
+			} else if (this.Outline.Left < xmin) {
+				cvs.DoTranslate( 40.0, 0.0); //wxmin - this.Outline.Left, 0.0 );
+			} else if (this.Outline.Top + this.Outline.Height > ymax) {
+				cvs.DoTranslate( 0.0, -40.0);
+			} else if (this.Outline.Left + this.Outline.Width > xmax) {
+				cvs.DoTranslate(-40.0, 0.0);
+			}
+			
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
