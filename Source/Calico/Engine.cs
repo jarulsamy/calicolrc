@@ -92,6 +92,9 @@ namespace Calico {
         public virtual void ConfigureTrace() {
         }
 
+        public virtual object GetDefaultContext() {
+            return null;
+        }
     }
     
     public class DLREngine : Engine {

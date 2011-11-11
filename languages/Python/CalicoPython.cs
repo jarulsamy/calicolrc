@@ -63,6 +63,10 @@ public class CalicoPythonEngine : DLREngine {
         return OnTraceBack;
     }
 	
+	public override object GetDefaultContext() {
+        return IronPython.Runtime.DefaultContext.Default;
+	}
+	
 	public override void ConfigureTrace() {
 	   if (trace)
             IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);

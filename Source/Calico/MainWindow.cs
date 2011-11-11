@@ -1100,10 +1100,11 @@ namespace Calico {
             }
 	    }
 
-        public static string Repr(object obj) {
+        public string Repr(object obj) {
             string repr = null;
     	    if (HasMethod(obj, "__repr__")) {
-                repr = InvokeMethod(obj, "__repr__", null);
+                // FIXME: make sure there is a python
+                repr = InvokeMethod(obj, "__repr__", manager["python"].engine.GetDefaultContext());
     	    } else if (HasMethod(obj, "to_s")) {
                 repr = InvokeMethod(obj, "to_s");
             } else if (obj is Array) {

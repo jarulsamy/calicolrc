@@ -1,21 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../languages/Python/CalicoPython.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
       <File FileName="../languages/Jigsaw/CalicoJigsaw.cs" Line="36" Column="41" />
-      <File FileName="Calico/Engine.cs" Line="257" Column="1" />
-      <File FileName="Calico/MainWindow.cs" Line="1" Column="1" />
+      <File FileName="Calico/Engine.cs" Line="97" Column="10" />
+      <File FileName="Calico/MainWindow.cs" Line="1106" Column="54" />
       <File FileName="Calico/TabCompletion.cs" Line="1" Column="1" />
       <File FileName="Calico/Main.cs" Line="1" Column="1" />
       <File FileName="Calico/Document.cs" Line="1" Column="1" />
       <File FileName="../modules/Reflection/Reflection.cs" Line="409" Column="23" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="51" Column="6" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
+        <State expanded="True">
           <Node name="Calico" expanded="True">
-            <Node name="References" expanded="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>
