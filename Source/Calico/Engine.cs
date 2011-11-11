@@ -23,6 +23,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using IronPython.Hosting;
+using IronPython.Modules;
 
 namespace Calico {
 
@@ -257,6 +258,28 @@ namespace Calico {
             }
             return retval;
         }
-      }
-}
+        /*
+        public IronPython.Compiler.Ast.PythonAst Parse() {
+            IronPython.Runtime.CodeContext context = new IronPython.Runtime.CodeContext();
+            SourceUnit sourceUnit = new SourceUnit();
+            string mode = "";
+            Parser parser = Parser.CreateParser(
+                new CompilerContext(sourceUnit, compiler_options, ThrowingErrorSink.Default),
+                (PythonOptions)context.LanguageContext.Options);
 
+            PythonAst ast = parser.ParseFile(true);
+        }
+        
+            Microsoft.Scripting.Runtime.LanguageContext context =
+            Microsoft.Scripting.SourceUnit sourceUnit = new Microsoft.Scripting.SourceUnit(context);
+             IronPython.Compiler.Parser parser = IronPython.Compiler.Parser.CreateParser(
+                         new Microsoft.Scripting.Runtime.CompilerContext(sourceUnit,
+                                compiler_options,
+                                ThrowingErrorSink.Default),
+                                (IronPython.PythonOptions)context.LanguageContext.Options);
+
+             PythonAst ast = parser.ParseFile(true);
+        }
+         */
+    }
+}
