@@ -123,16 +123,18 @@ namespace Jigsaw
 			Widgets.CRoundedTab tbInOut    = new Widgets.CRoundedTab(0, 133, 100, 30, "Input/Output");
 			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 166, 100, 30, "Myro");
 			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 199, 100, 30, "Graphics");
+			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 199 + 33, 100, 30, "Shapes");
 			Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools");
 			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes");
 			
-			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbNotes, tbGraphics});
-			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbNotes, tbGraphics});
-			tbVars.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbNotes, tbGraphics});
-			tbMyro.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbCtrl, tbVars, tbTools,  tbNotes, tbGraphics});
-			tbGraphics.AddTabs( new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbTools,  tbNotes});
-			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics});
-			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,   tbGraphics});
+			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbNotes, tbGraphics, tbShapes});
+			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbNotes, tbGraphics, tbShapes});
+			tbVars.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbNotes, tbGraphics, tbShapes});
+			tbMyro.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbCtrl, tbVars, tbTools,  tbNotes, tbGraphics, tbShapes});
+			tbGraphics.AddTabs( new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbTools, tbNotes, tbShapes});
+			tbShapes.AddTabs(   new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics, tbTools,  tbNotes});
+			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics, tbShapes});
+			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,  tbGraphics, tbShapes});
 			
 			// Dock all tabs to left
 			tbInOut.Dock = Diagram.DockSide.Left;
@@ -140,6 +142,7 @@ namespace Jigsaw
 			tbVars.Dock = Diagram.DockSide.Left;
 			tbMyro.Dock = Diagram.DockSide.Left;
 			tbGraphics.Dock = Diagram.DockSide.Left;
+			tbShapes.Dock = Diagram.DockSide.Left;
 			tbTools.Dock = Diagram.DockSide.Left;
 			tbNotes.Dock = Diagram.DockSide.Left;
 			
@@ -149,6 +152,7 @@ namespace Jigsaw
 			this.AddShape(tbInOut);
 			this.AddShape(tbMyro);
 			this.AddShape(tbGraphics);
+			this.AddShape(tbShapes);
 			this.AddShape(tbTools);
 			this.AddShape(tbNotes);
 			
@@ -320,6 +324,11 @@ namespace Jigsaw
 			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 230)) {
 			  this.AddShape(cblock);
 			  tbGraphics.AddShape(cblock);
+			}
+			
+			foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70)) {
+			  this.AddShape(cblock);
+			  tbShapes.AddShape(cblock);
 			}
 			
 			// --- Run tab
