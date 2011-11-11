@@ -55,6 +55,18 @@ public class CalicoPythonEngine : DLREngine {
         }
         engine.SetSearchPaths(paths);
     }
+	
+	public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
+        //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
+        Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
+        System.Threading.Thread.Sleep(1000);
+        return OnTraceBack;
+    }
+	
+	public override void ConfigureTrace() {
+	   if (trace)
+            IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);
+	}
 }
 
 public class CalicoPythonLanguage : Language {
@@ -69,4 +81,7 @@ public class CalicoPythonLanguage : Language {
     public static new Language MakeLanguage() {
         return new CalicoPythonLanguage();
     }
+	
+	public static void Main() {
+	}
 }

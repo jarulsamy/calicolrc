@@ -22,8 +22,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using IronPython.Hosting;
-using IronPython.Modules;
+//using IronPython.Hosting;
+//using IronPython.Modules;
 
 namespace Calico {
 
@@ -87,6 +87,9 @@ namespace Calico {
 
         public virtual void SetTraceOff() {
             trace = false;
+        }
+
+        public virtual void ConfigureTrace() {
         }
 
     }
@@ -208,13 +211,6 @@ namespace Calico {
             return true;
         }
 
-        public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
-            //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
-            Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
-            System.Threading.Thread.Sleep(1000);
-            return OnTraceBack;
-        }
-
         public override bool ExecuteFile(string filename) {
             //manager.calico.last_error = ""
             //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
@@ -230,8 +226,7 @@ namespace Calico {
                 manager.stderr.PrintLine(eo.FormatException(e));
                 return false;
             }
-            if (trace)
-                engine.SetTrace(OnTraceBack);
+            ConfigureTrace();
             try {
                 source.Execute(manager.scope);
             } catch (Exception e) {
@@ -258,6 +253,7 @@ namespace Calico {
             }
             return retval;
         }
+
         /*
         public IronPython.Compiler.Ast.PythonAst Parse() {
             IronPython.Runtime.CodeContext context = new IronPython.Runtime.CodeContext();

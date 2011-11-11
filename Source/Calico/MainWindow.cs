@@ -1103,7 +1103,7 @@ namespace Calico {
         public static string Repr(object obj) {
             string repr = null;
     	    if (HasMethod(obj, "__repr__")) {
-                repr = InvokeMethod(obj, "__repr__", IronPython.Runtime.DefaultContext.Default);
+                repr = InvokeMethod(obj, "__repr__", null);
     	    } else if (HasMethod(obj, "to_s")) {
                 repr = InvokeMethod(obj, "to_s");
             } else if (obj is Array) {
