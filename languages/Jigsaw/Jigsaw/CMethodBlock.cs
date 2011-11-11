@@ -14,6 +14,7 @@ namespace Jigsaw
 		  List<Type> types;
 		  List<object> defaults;
 		  public Type return_type;
+		  public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
 			
 	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	        public CMethodBlock(Double X, Double Y, bool isFactory) : 
@@ -58,7 +59,27 @@ namespace Jigsaw
 								this.types, this.defaults, this.return_type);
 				return clone;
 		    }	
-
+		
+		public string MakeVariableName(string methodname) {
+			methodname = methodname.ToLower();
+			string vname = "";
+			if (methodname.StartsWith("make")) {
+				vname = methodname.Substring("make".Length);
+			} else if (methodname.StartsWith("get")) {
+				vname = methodname.Substring("get".Length);
+			} else {
+				vname = methodname;
+			}
+			// FIXME: for some reason, it is created twice on each drop
+			if (!VariableNames.ContainsKey(vname)) {
+				VariableNames[vname] = 0;
+			} else {
+				if (! _isFactory)
+					VariableNames[vname] = VariableNames[vname] + .5;
+			}
+			return vname.ToUpper() + VariableNames[vname].ToString();
+		}
+		
 	    public void setValues(string assembly_name, 
 				  string type_name, 
 				  string method_name, 
@@ -82,7 +103,7 @@ namespace Jigsaw
 				string block_text;
 				if (! return_type.ToString().Equals("System.Void")) {
 				  _properties["Variable"] = new CVarNameProperty("Variable", 
-										 String.Format("{0}", method_name.ToUpper()));
+										 String.Format("{0}", MakeVariableName(method_name)));
 				}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
