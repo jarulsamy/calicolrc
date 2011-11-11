@@ -446,6 +446,7 @@ public static class Graphics {
       _windows[title].clear(false);
       _lastWindow = _windows[title];
       _lastWindow.KeepAbove = true;
+      return _windows[title];
     } else {
       _windows[title] = new Graphics.WindowClass(title, width, height);
       _lastWindow = _windows[title];

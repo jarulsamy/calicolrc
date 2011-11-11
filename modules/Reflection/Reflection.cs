@@ -82,6 +82,9 @@ namespace Reflection
 			}
 
 			public Mapping(string assembly_name, string map) {
+				signatures = new Dictionary<string,bool>();
+				types = new Dictionary<string,bool>();
+				defaults = new Dictionary<string,string>();
 				this.assembly_name = assembly_name;
 				this.map = map;
                 if (this.assembly_name != null) {
@@ -102,9 +105,6 @@ namespace Reflection
 
 			private void Load() {
 				if (System.IO.File.Exists(mapfile)) {
-					signatures = new Dictionary<string,bool>();
-					types = new Dictionary<string,bool>();
-					defaults = new Dictionary<string,string>();
                     string type_name = "";
                     string method_name = "";
 					List<string> parameters = new List<string>();
@@ -599,7 +599,10 @@ namespace Reflection
 					if (found)
 						parameters.Add(default_value);
 					else
-						parameters.Add(pi.DefaultValue);
+						if (pi.ParameterType != null && pi.ParameterType.ToString().CompareTo("System.String") == 0)
+							parameters.Add(String.Format("'{0}'", pi.DefaultValue));
+						else
+							parameters.Add(pi.DefaultValue);
 				}
 				retval.Add (parameters);
 			}
