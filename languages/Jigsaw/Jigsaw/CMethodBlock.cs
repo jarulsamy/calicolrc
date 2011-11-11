@@ -86,11 +86,14 @@ namespace Jigsaw
 				}
 				if (names != null) {
 					for (int n = 0; n < names.Count; n++) {
-					    if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
+					    // FIXME: make a default of the appropriate type if one not given
+						if (defaults[n] == null) {
+					      _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", 0));
+						} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
 					      _properties[names[n]] = new CExpressionProperty(names[n], 
 											      String.Format("{0}", defaults[n]));
 					    else
-					      // FIXME: make a default of the appropriate type if one not given
 					      _properties[names[n]] = new CExpressionProperty(names[n], 
 											      String.Format("{0}", 0));
 						if (parameter_list == "")
