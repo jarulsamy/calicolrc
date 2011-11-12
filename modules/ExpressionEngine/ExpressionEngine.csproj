@@ -39,12 +39,10 @@
     <Reference Include="Microsoft.Scripting, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Microsoft.Scripting.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\IronPython.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
 </Project>

@@ -3,15 +3,14 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="ExpressionEngine.cs">
     <Files>
       <File FileName="../../languages/Jigsaw/CalicoJigsaw.cs" Line="36" Column="41" />
-      <File FileName="ExpressionEngine.cs" Line="232" Column="4" />
+      <File FileName="ExpressionEngine.cs" Line="263" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="ExpressionEngine" expanded="True">
-            <Node name="References" expanded="True">
-              <Node name="/home/dblank/Calico/trunk/bin/Microsoft.Scripting.dll" selected="True" />
-            </Node>
+            <Node name="References" expanded="True" />
+            <Node name="ExpressionEngine.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -30,7 +29,10 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Calico/trunk/modules/ExpressionEngine/ExpressionEngine.cs" line="9" />
+      <Breakpoint file="/home/dblank/Calico/trunk/modules/ExpressionEngine/ExpressionEngine.cs" line="333" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

@@ -32,6 +32,11 @@ namespace Expression
 			this.scope = scope;
 		}
 
+		public virtual object GetVariable(string text)
+		{
+			return null;
+		}
+
 		public virtual void SetVariable (string variable, object value)
 		{
 		}
@@ -114,6 +119,11 @@ namespace Expression
 			return text;
 		}
 
+		public virtual object GetVariable(string text)
+		{
+			return engine.GetVariable(text);
+		}
+
 		public virtual void SetVariable (string variable, object value)
 		{
 			engine.SetVariable (variable, value);
@@ -190,6 +200,11 @@ namespace Expression
 			return new DLRScope (this);
 		}
 
+		public override object GetVariable(string text)
+		{
+			return dlr_scope.GetVariable(text);
+		}
+
 		public override void SetVariable (string variable, object value)
 		{
 			dlr_scope.SetVariable(variable, value);
@@ -249,16 +264,21 @@ namespace Expression
 			return text;
 		}
 
+		public override object GetVariable(string text)
+		{
+			return engine.GetVariable(text);
+		}
+
 		public override void SetVariable (string variable, object value)
 		{
-			engine.SetVariable (variable, text);
+			engine.SetVariable (variable, value);
 		}
 
 		public override object Evaluate (string text)
 		{
 			return engine.Evaluate (text);
 		}
-		
+
         public static string ArrayToString(object[] args) {
             string retval = "";
             if (args != null) {
@@ -308,14 +328,21 @@ namespace Expression
             return repr;
         }
 
-		public static void OMain() {
-			Expression exp = Engine.makeExpression("x + 1");
-			Engine.SetVariable("x", 78);
-			System.Console.WriteLine(((int)exp.Evaluate()) == 79 ? "works!" : "fail!");
+		public static void Main() {
+			Expression Expr = Engine.makeExpression("1 + 1");
+			Expr.SetVariable("X", Expr.Evaluate());
+			Console.WriteLine("Set {0} = {1}, {2}", "X", Expr.Evaluate(), 
+									Expr.GetVariable("X"));
+			/*
+			
+			Expression exp = Engine.makeExpression("1 + 1");
+			Engine.SetVariable("x", exp.Evaluate());
+			System.Console.WriteLine(((int)exp.Evaluate()) == 2 ? "works!" : "fail!");
 			exp = Engine.makeExpression("[1, 2, 3, x, 5]");
 			Engine.SetVariable("x", 100);
 			object obj = exp.Evaluate();
 			System.Console.WriteLine(exp.ToRepr(obj));
+			*/
 		}
 	}
 }
