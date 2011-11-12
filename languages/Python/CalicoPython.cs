@@ -24,68 +24,72 @@ using System.Collections.Generic;
 using System.IO;
 using Calico;
 
-public class CalicoPythonEngine : DLREngine {
+namespace CalicoPython {
 
-    public CalicoPythonEngine(LanguageManager manager) : base(manager) {
-        dlr_name = "py";
-        scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-        languageSetup = IronPython.Hosting.Python.CreateLanguageSetup(null);
-        // Set LanguageSetup options here:
-        languageSetup.Options["FullFrames"] = true; // for debugging
-        scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
-        // Create a Python-only scope:
-		scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-        scope = scriptRuntime.CreateScope();
-    }
-
-    public override void Start() {
-        // Get engine from manager:
-        engine = manager.scriptRuntime.GetEngine(dlr_name);  
-        // Set the compiler options here:
-        compiler_options = engine.GetCompilerOptions();
-        IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
-        options.PrintFunction = true;
-        options.AllowWithStatement = true;
-        options.TrueDivision = true;
-		// Set paths:
-		ICollection<string> paths = engine.GetSearchPaths();
-        // Let users find Calico modules:
-        foreach (string folder in new string[] { "modules", "src" }) {
-	  		paths.Add(Path.GetFullPath(folder));
-        }
-        engine.SetSearchPaths(paths);
-    }
+	public class CalicoPythonEngine : DLREngine {
 	
-	public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
-        //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
-        Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
-        System.Threading.Thread.Sleep(1000);
-        return OnTraceBack;
-    }
+	    public CalicoPythonEngine(LanguageManager manager) : base(manager) {
+	        dlr_name = "py";
+	        scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
+	        languageSetup = IronPython.Hosting.Python.CreateLanguageSetup(null);
+	        // Set LanguageSetup options here:
+	        languageSetup.Options["FullFrames"] = true; // for debugging
+	        scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
+	        // Create a Python-only scope:
+			scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+	        scope = scriptRuntime.CreateScope();
+	    }
 	
-	public override object GetDefaultContext() {
-        return IronPython.Runtime.DefaultContext.Default;
+	    public override void Start() {
+	        // Get engine from manager:
+			if (manager != null) {
+	        	engine = manager.scriptRuntime.GetEngine(dlr_name);  
+		    } else {
+				engine = scriptRuntime.GetEngine(dlr_name);  
+			}
+	        // Set the compiler options here:
+	        compiler_options = engine.GetCompilerOptions();
+	        IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
+	        options.PrintFunction = true;
+	        options.AllowWithStatement = true;
+	        options.TrueDivision = true;
+			// Set paths:
+			ICollection<string> paths = engine.GetSearchPaths();
+	        // Let users find Calico modules:
+	        foreach (string folder in new string[] { "modules", "src" }) {
+		  		paths.Add(Path.GetFullPath(folder));
+	        }
+	        engine.SetSearchPaths(paths);
+	    }
+		
+		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
+	        //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
+	        Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
+	        System.Threading.Thread.Sleep(1000);
+	        return OnTraceBack;
+	    }
+		
+		public override object GetDefaultContext() {
+	        return IronPython.Runtime.DefaultContext.Default;
+		}
+		
+		public override void ConfigureTrace() {
+		   if (trace)
+	            IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);
+		}
 	}
 	
-	public override void ConfigureTrace() {
-	   if (trace)
-            IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);
-	}
-}
-
-public class CalicoPythonLanguage : Language {
-	public CalicoPythonLanguage() : 
-		base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python") {
-    }
+	public class CalicoPythonLanguage : Language {
+		public CalicoPythonLanguage() : 
+			base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python") {
+	    }
+		
+		public override void MakeEngine(LanguageManager manager) {
+	        engine = new CalicoPythonEngine(manager);
+	    }
 	
-	public override void MakeEngine(LanguageManager manager) {
-        engine = new CalicoPythonEngine(manager);
-    }
-
-    public static new Language MakeLanguage() {
-        return new CalicoPythonLanguage();
-    }
-	
-	public static void Main() {
+	    public static new Language MakeLanguage() {
+	        return new CalicoPythonLanguage();
+	    }
 	}
 }
