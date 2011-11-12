@@ -1,0 +1,36 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ExpressionEngine.cs">
+    <Files>
+      <File FileName="../../languages/Jigsaw/CalicoJigsaw.cs" Line="36" Column="41" />
+      <File FileName="ExpressionEngine.cs" Line="232" Column="4" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="ExpressionEngine" expanded="True">
+            <Node name="References" expanded="True">
+              <Node name="/home/dblank/Calico/trunk/bin/Microsoft.Scripting.dll" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>vname</Value>
+          <Value>row[0]</Value>
+          <Value>row</Value>
+          <Value>contains</Value>
+          <Value>row[0] == vname</Value>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
