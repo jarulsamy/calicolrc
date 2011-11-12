@@ -250,7 +250,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Execute a simple repetition
 		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+			Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
@@ -273,7 +273,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
-				Repetitions.Expr.Parameters = locals;
+				Repetitions.Expr.SetScope(locals);
 				object oreps = Repetitions.Expr.Evaluate();
 				maxreps = (int)oreps;
 
@@ -532,7 +532,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Execute a simple repetition
 		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+			Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
@@ -553,7 +553,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
-				IfTest.Expr.Parameters = locals;
+				IfTest.Expr.SetScope(locals);
 				object otest = IfTest.Expr.Evaluate();
 				doIf = (bool)otest;
 
@@ -796,7 +796,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Execute a simple repetition
 		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+			Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
@@ -817,7 +817,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
-				IfTest.Expr.Parameters = locals;
+				IfTest.Expr.SetScope(locals);
 				object otest = IfTest.Expr.Evaluate();
 				doIf = (bool)otest;
 
@@ -1146,7 +1146,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Execute a simple repetition
 		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+			Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
@@ -1168,7 +1168,7 @@ namespace Jigsaw
 
 				try {
 					CExpressionProperty WhileTest = (CExpressionProperty)_properties["WhileTest"];
-					WhileTest.Expr.Parameters = locals;
+					WhileTest.Expr.SetScope(locals);
 					object otest = WhileTest.Expr.Evaluate();
 					doWhile = (bool)otest;
 	

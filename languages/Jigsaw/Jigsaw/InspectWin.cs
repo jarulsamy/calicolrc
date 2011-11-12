@@ -280,7 +280,7 @@ namespace Jigsaw
 		// Render all locals to window
 		public void DisplayLocals(Engine e) 
 		{
-			Dictionary<string,object> locals = null;
+			Expression.Scope locals = null;
 			StringBuilder sb = new StringBuilder();
 			
 			foreach (CallStack cs in e.CallStacks) {
@@ -288,9 +288,9 @@ namespace Jigsaw
 
 				//Console.WriteLine("------");
 				sb.AppendLine("------");
-				foreach (string k in locals.Keys) {
+				foreach (string k in locals.GetVariableNames()) {
 					//Console.WriteLine("{0} = {1}", k, locals[k]);
-					sb.AppendFormat("{0} = {1}\n", k, locals[k]);
+					sb.AppendFormat("{0} = {1}\n", k, locals.GetVariable(k));
 				}
 			}
 			
@@ -410,7 +410,7 @@ namespace Jigsaw
 	/// </summary>
 	public class CExpressionProperty : CProperty
 	{
-		private NCalc.Expression _Expr = null;
+		private Expression.Expression _Expr = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CExpressionProperty(string name, string txt) : base(name, txt) 
@@ -421,18 +421,18 @@ namespace Jigsaw
 		public override string Text {
 			get { return _Text; }
 			set {
-				_Expr = new NCalc.Expression(value);
+				_Expr = Expression.Engine.makeExpression(value);
 				if (_Expr.HasErrors()) {
 					_Text = "Err: " + value;
 				} else {
-					_Text = _Expr.ParsedExpression.ToString();
+					_Text = _Expr.ParsedExpression();
 					this.RaisePropertyChanged();
 				}
 			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public NCalc.Expression Expr {
+		public Expression.Expression Expr {
 			get { return _Expr; }
 		}
 		
@@ -440,7 +440,7 @@ namespace Jigsaw
 		public override void ToXml(XmlWriter w) {
 	        w.WriteStartElement("property");
 			w.WriteAttributeString("name", _Name);
-			w.WriteAttributeString("value", _Expr.ParsedExpression.ToString());
+			w.WriteAttributeString("value", _Expr.ParsedExpression());
 			w.WriteEndElement();	
 		}
 	}

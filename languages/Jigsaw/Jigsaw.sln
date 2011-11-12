@@ -1,9 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jigsaw", "Jigsaw\Jigsaw.csproj", "{2CB45586-76DE-4D8F-A082-A3FDDF34116B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCalc", "NCalc\NCalc.csproj", "{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,15 +13,11 @@ Global
 		{2CB45586-76DE-4D8F-A082-A3FDDF34116B}.Debug|x86.Build.0 = Debug|x86
 		{2CB45586-76DE-4D8F-A082-A3FDDF34116B}.Release|x86.ActiveCfg = Release|x86
 		{2CB45586-76DE-4D8F-A082-A3FDDF34116B}.Release|x86.Build.0 = Release|x86
-		{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}.Debug|x86.ActiveCfg = Debug|x86
-		{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}.Debug|x86.Build.0 = Debug|x86
-		{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}.Release|x86.ActiveCfg = Release|x86
-		{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}.Release|x86.Build.0 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Jigsaw\Jigsaw.csproj
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

@@ -43,7 +43,7 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override IEnumerator<RunnerResponse> 
-			Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+			Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{	// Execute a variable assignment
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,8 +66,8 @@ namespace Jigsaw
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
 				
-				RHS.Expr.Parameters = locals;
-				locals[VarName.Text] = RHS.Expr.Evaluate();
+				RHS.Expr.SetScope(locals);
+				RHS.Expr.SetVariable(VarName.Text, RHS.Expr.Evaluate());
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);

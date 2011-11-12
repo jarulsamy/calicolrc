@@ -65,11 +65,6 @@ namespace Jigsaw
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
 
-		public static List<CBlock> makeBlocksFromString(string path, int y=70) {
-			//"Myro/Myro.beep(int duration, int frequency)"
-			return null;
-		}
-
 		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70) {
 		  List<CBlock> retval = new List<CBlock>();
 		  List<string> blocknames = new List<string>();
@@ -315,23 +310,6 @@ namespace Jigsaw
 			CAssignment vblock1 = new CAssignment(110, 70, true);
 			this.AddShape(vblock1);
 			tbVars.AddShape(vblock1);
-
-			// --- Graphics Blocks
-			CGfxWindow gblock1 = new CGfxWindow(110, 70, true);
-			this.AddShape(gblock1);
-			tbGraphics.AddShape(gblock1);
-
-			CGfxLine gblock2 = new CGfxLine(110, 110, true);
-			this.AddShape(gblock2);
-			tbGraphics.AddShape(gblock2);
-
-			CGfxCircle gblock3 = new CGfxCircle(110, 150, true);
-			this.AddShape(gblock3);
-			tbGraphics.AddShape(gblock3);
-			
-			CGfxText gblock4 = new CGfxText(110, 190, true);
-			this.AddShape(gblock4);
-			tbGraphics.AddShape(gblock4);
 
 			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 230)) {
 			  this.AddShape(cblock);
@@ -1017,7 +995,7 @@ namespace Jigsaw
 		// Block Runners are provided the local scope and builtin scope in which they run. 
 		// Base behavior only calls output blocks and manages state. 
 		public virtual IEnumerator<RunnerResponse> Runner(
-								    	Dictionary<string, object> locals, 
+								    	Expression.Scope locals, 
 								        Dictionary<string, object> builtins) 
 		{
 			// !!! Important. The engine always calls the block runner once after it is added to the call stack

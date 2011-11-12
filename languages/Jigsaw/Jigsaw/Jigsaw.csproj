@@ -14,6 +14,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,64 +42,40 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <HintPath>..\..\..\bin\IronPython.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\modules\Graphics.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Myro">
-      <HintPath>..\..\..\modules\Myro.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SdlDotNet">
-      <HintPath>..\..\..\modules\SdlDotNet.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Tao.Sdl">
-      <HintPath>..\..\..\modules\Tao.Sdl.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="GifLib">
-      <HintPath>..\..\..\modules\GifLib.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="System.Xml">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="FarseerPhysics">
-      <HintPath>..\..\..\modules\FarseerPhysics.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="System.Drawing">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="IronRuby">
-      <HintPath>..\..\..\bin\IronRuby.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Mono.Cairo">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="IronRuby.Libraries">
-      <HintPath>..\..\..\bin\IronRuby.Libraries.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Mono.Posix">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="IronRuby.Rack">
-      <HintPath>..\..\..\bin\IronRuby.Rack.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="IronRuby.Libraries.Yaml">
-      <HintPath>..\..\..\bin\IronRuby.Libraries.Yaml.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Private>False</Private>
+    <Reference Include="ExpressionEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\modules\ExpressionEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -121,8 +98,6 @@
     <Compile Include="InspectWin.cs" />
     <Compile Include="ControlBlocks.cs" />
     <Compile Include="IOBlocks.cs" />
-    <Compile Include="GfxBlocks.cs" />
-    <Compile Include="MyroBlocks.cs" />
     <Compile Include="StatementBlocks.cs" />
     <Compile Include="..\..\..\modules\Reflection\Reflection.cs">
       <Link>Reflection.cs</Link>
@@ -131,10 +106,4 @@
     <Compile Include="Slider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\NCalc\NCalc.csproj">
-      <Project>{63AE4A14-A89E-4E5F-8B64-7B4D206634AD}</Project>
-      <Name>NCalc</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

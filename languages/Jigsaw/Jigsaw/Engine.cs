@@ -36,7 +36,7 @@ namespace Jigsaw
 	public class CallStack
 	{
 		private List<IEnumerator<RunnerResponse>> _stack = null;
-		private Dictionary<string, object> _locals = null;
+		private Expression.Scope _locals = null;
 		private Dictionary<string, object> _globals = null;
 		private Dictionary<string, object> _builtins = null;
 		
@@ -44,14 +44,14 @@ namespace Jigsaw
 		public CallStack(Dictionary<string, object> globals, 
 						 Dictionary<string, object> builtins) {
 			_stack = new List<IEnumerator<RunnerResponse>>();
-			_locals = new Dictionary<string, object>();
+			_locals = Expression.Engine.makeScope();
 			_globals = globals;
 			_builtins = builtins;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Return the locals
-		public Dictionary<string, object> Locals
+		public Expression.Scope Locals
 		{
 			get { return _locals; }
 		}

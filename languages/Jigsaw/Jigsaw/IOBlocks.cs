@@ -45,7 +45,7 @@ namespace Jigsaw
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override IEnumerator<RunnerResponse> 
-		Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 		{	// Execute print statement
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,9 +65,9 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				Expr.Expr.Parameters = locals;
+				Expr.Expr.SetScope(locals);
 				object o = Expr.Expr.Evaluate();
-				string toPrint = o.ToString();
+				string toPrint = Expr.Expr.ToRepr(o);
 				//Console.WriteLine(toPrint);
 				((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
 				

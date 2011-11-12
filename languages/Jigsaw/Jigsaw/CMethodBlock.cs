@@ -130,7 +130,7 @@ namespace Jigsaw
 			}
 
 		public override IEnumerator<RunnerResponse> 
-		Runner(Dictionary<string, object> locals, Dictionary<string, object> builtins) 
+		Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
 			{	// Execute print statement
 	
 				// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -155,7 +155,7 @@ namespace Jigsaw
 					System.Reflection.MethodInfo method = null;
 					foreach (string name in names) {
 						CExpressionProperty prop = (CExpressionProperty)_properties[name];
-						prop.Expr.Parameters = locals;
+						prop.Expr.SetScope(locals);
 						object value = prop.Expr.Evaluate();
 						args.Add(value);
 						arg_types.Add(value.GetType());
@@ -177,7 +177,7 @@ namespace Jigsaw
 					    }
 					    if (!(return_type.ToString().Equals("System.Void"))) {
 					      CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-					      locals[VarName.Text] = result;
+					      locals.SetVariable(VarName.Text, result);
 					    }
 					  } else {
 					    this["Message"] = "No matching method for these argument types";
