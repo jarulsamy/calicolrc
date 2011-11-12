@@ -7,6 +7,8 @@ CalicoPython.dll: CalicoPython.cs ../../bin/Calico.exe
 		-r:IronPython.Modules \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Scripting.Core \
+		-r:Microsoft.Dynamic \
+		-pkg:gtk-sharp-2.0 \
 		-target:library
 
 clean:
