@@ -62,10 +62,20 @@ namespace CalicoPython {
 	        engine.SetSearchPaths(paths);
 	    }
 		
-		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, string ttype, object retval) {
+		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, 
+										   string ttype, object retval) {
 	        //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
 	        Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
-	        System.Threading.Thread.Sleep(1000);
+	        Calico.MainWindow.Invoke( delegate {
+		    var pydict = (IronPython.Runtime.PythonDictionary)frame.f_locals;
+		    foreach(string key in pydict.Keys) {
+		      if (!key.StartsWith("_") && key != "calico") {
+			// WORKAROUND: had to pass in one at a time:
+			calico.UpdateLocal(key, calico.Repr(pydict[key]));
+		      }
+		    }
+		  });
+	        System.Threading.Thread.Sleep(300);
 	        return OnTraceBack;
 	    }
 		

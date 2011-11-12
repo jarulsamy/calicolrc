@@ -6,7 +6,6 @@
   </configuration>
   <import>
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
-    <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="Calico.MainWindow" design-size="607 558">
@@ -631,7 +630,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">1</property>
+                <property name="CurrentPage">2</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -692,6 +691,7 @@
                       <widget class="Gtk.TreeView" id="treeview2">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
+                        <property name="ShowScrollbars">True</property>
                       </widget>
                     </child>
                   </widget>

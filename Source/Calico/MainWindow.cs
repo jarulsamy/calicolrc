@@ -45,7 +45,9 @@ namespace Calico {
         public string path;
         bool IsUpdateEnvironment = false; // FIXME: get from user options
         Dictionary<string,bool> EnvironmentVariables = new Dictionary<string, bool>();
+        Dictionary<string,bool> LocalVariables = new Dictionary<string, bool>();
         Gtk.ListStore EnvironmentList;
+        Gtk.ListStore LocalList;
         public System.Threading.Thread executeThread = null;
         public History history = new History();
         public TabCompletion completion = null;
@@ -95,6 +97,9 @@ namespace Calico {
         }
         public Gtk.TreeView EnvironmentTreeView {
             get { return treeview1; }
+        }
+        public Gtk.TreeView LocalTreeView {
+            get { return treeview2; }
         }
         public Gtk.ScrolledWindow ScrolledWindow {
             get { return scrolledwindow1; }
@@ -297,6 +302,12 @@ namespace Calico {
             EnvironmentList = new Gtk.ListStore(typeof(string), typeof(string));
             EnvironmentTreeView.Model = EnvironmentList;
             EnvironmentTreeView.ShowAll();
+            // Local environment:
+            LocalTreeView.AppendColumn("Variable", new Gtk.CellRendererText(), "text", 0);
+            LocalTreeView.AppendColumn("Value", new Gtk.CellRendererText(), "text", 1);
+            LocalList = new Gtk.ListStore(typeof(string), typeof(string));
+            LocalTreeView.Model = LocalList;
+            LocalTreeView.ShowAll();
         }
 
         [GLib.ConnectBeforeAttribute]
@@ -1058,11 +1069,22 @@ namespace Calico {
             }
         }
 
-        public bool TreeModelForeachFunc (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
+        public bool EnvModelForeachFunc (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
             string vname = (string)model.GetValue(iter, 0);
             try {
                 model.SetValue(iter, 1, Repr(manager.scope.GetVariable(vname)));
             } catch {
+                model.SetValue(iter, 1, "<undefined>");
+            }
+            return false;
+        }
+
+        public bool LocalModelForeachFunc (Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter,
+            string variable, string value) {
+            string vname = (string)model.GetValue(iter, 0);
+            if (variable == vname) {
+                model.SetValue(iter, 1, value);
+            } else {
                 model.SetValue(iter, 1, "<undefined>");
             }
             return false;
@@ -1086,8 +1108,12 @@ namespace Calico {
         }
 
         public static bool HasMethod(object obj, string methodName) {
-	        Type type = obj.GetType();
-	        return type.GetMethod(methodName) != null;
+            if (obj != null) {
+	            Type type = obj.GetType();
+	            return type.GetMethod(methodName) != null;
+            } else {
+                return false;
+            }
 	    }
 
         public static string InvokeMethod(object obj, string methodName, params object [] args) {
@@ -1111,15 +1137,34 @@ namespace Calico {
                 repr = (string)ArrayToString((object[]) obj);
             }
             if (repr == null) {
-                repr = obj.ToString();
+                if (obj != null)
+                    repr = obj.ToString();
+                else
+                    repr = "None";
             }
             return repr;
+        }
+
+        public void ClearLocal() {
+            LocalList.Clear();
+            LocalVariables.Clear();
+        }
+
+        public void UpdateLocal(string vname, string repr) {
+            LocalList.Foreach((a, b, c) => LocalModelForeachFunc(a, b, c,
+                vname, repr));
+            if (! LocalVariables.ContainsKey(vname)) {
+                Gtk.TreeIter iter = LocalList.AppendValues(vname, repr);
+                Gtk.TreePath treepath = LocalList.GetPath(iter);
+                LocalTreeView.SetCursor(treepath, null, false);
+                LocalVariables[vname] = true;
+            }
         }
 
         public bool UpdateEnvironment() {
             // update tree in Environment tab
             // update the ones that already exist:
-            EnvironmentList.Foreach(TreeModelForeachFunc);
+            EnvironmentList.Foreach(EnvModelForeachFunc);
             // now, add those that aren't in it:
             foreach (string vname in manager.scope.GetVariableNames()) {
                 if (vname.StartsWith("_") || vname == "calico")
