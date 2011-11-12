@@ -51,6 +51,10 @@ namespace Calico {
             return true;
         }
 
+        public virtual object Evaluate(string text) {
+            return null;
+        }
+
         public virtual bool ExecuteFile(string filename) {
             return true;
         }
@@ -110,7 +114,13 @@ namespace Calico {
         }
 
         public override void Setup() {
-            manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
+            if (manager != null) {
+                manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
+            } else {
+                scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
+                scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+                scope = scriptRuntime.CreateScope();
+            }
         }
 
         public override void SetRedirects(CustomStream stdout, 
@@ -170,6 +180,18 @@ namespace Calico {
             return lines[lines.Length - 1].Trim() == ""; // ok, if nothing
         }
 
+        public override object Evaluate(string text) {
+            Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+            Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+            source.Compile(compiler_options);
+            object retval;
+            if (manager != null && manager.UseSharedScope)
+                retval = source.Execute(manager.scope);
+            else
+                retval = source.Execute(scope);
+            return retval;
+        }
+
         public override bool Execute(string text) {
             // This is called by RunInBackground() in the MainWindow
             //manager.calico.last_error = ""
@@ -197,7 +219,7 @@ namespace Calico {
                 }
             }
             try {
-                if (manager.UseSharedScope)
+                if (manager != null && manager.UseSharedScope)
                     source.Execute(manager.scope);
                 else
                     source.Execute(scope);
