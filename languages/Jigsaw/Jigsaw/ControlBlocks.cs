@@ -273,8 +273,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
-				Repetitions.Expr.SetScope(locals);
-				object oreps = Repetitions.Expr.Evaluate();
+				object oreps = Repetitions.Expr.Evaluate(locals);
 				maxreps = (int)oreps;
 
 			} catch (Exception ex) {
@@ -1168,8 +1167,7 @@ namespace Jigsaw
 
 				try {
 					CExpressionProperty WhileTest = (CExpressionProperty)_properties["WhileTest"];
-					WhileTest.Expr.SetScope(locals);
-					object otest = WhileTest.Expr.Evaluate();
+					object otest = WhileTest.Expr.Evaluate(locals);
 					doWhile = (bool)otest;
 	
 				} catch (Exception ex) {

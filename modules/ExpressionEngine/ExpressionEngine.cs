@@ -13,9 +13,6 @@ namespace Expression
 		public static Scope makeScope() {
 			return TheEngine.makeScope();
 		}
-		public static void SetVariable(string variable, object value) {
-			TheEngine.SetVariable(variable, value);
-		}
 	}
 	
 	public class ExpressionEngine
@@ -25,51 +22,15 @@ namespace Expression
 		{
 		}
 		
-		public Scope scope { get; set; }
-
-		public virtual void SetScope (Scope scope)
-		{
-			this.scope = scope;
-		}
-
-		public virtual object GetVariable(string text)
-		{
-			return null;
-		}
-
-		public virtual void SetVariable (string variable, object value)
-		{
-		}
-
-		public virtual object Evaluate (string exp)
-		{
-			return null;
-		}
-		public virtual object Evaluate ()
-		{
-			return null;
-		}
-		
-		public virtual Expression makeExpression ()
-		{
-			return new Expression (this, "");
-		}
-		
 		public virtual Expression makeExpression (string text)
 		{
-			return new Expression (this, text);
+			return new Expression (text);
 		}
 		
 		public virtual Scope makeScope ()
 		{
 			return new Scope ();
 		}	
-
-		public virtual bool HasErrors (string text)
-		{
-			return false;
-		}
-
 
 	}
 	
@@ -90,28 +51,32 @@ namespace Expression
 		public virtual void SetVariable(string name, object value)
 		{
 		}
+		public virtual void EvaluateStatement (string statement)
+		{	
+		}
+		public virtual bool HasErrors (string exp)
+		{
+			return false;
+		}
+		public virtual object Evaluate (string exp)
+		{
+			return null;
+		}
+
 	}
 	
 	public class Expression
 	{
-		ExpressionEngine engine;
 		string text;
-		
-		public Expression (ExpressionEngine engine, string text)
-		{
-			this.engine = engine;
-			this.text = text;
-		}
 		
 		public Expression (string text)
 		{
-			this.engine = null;
 			this.text = text;
 		}
 		
-		public bool HasErrors ()
+		public bool HasErrors (Scope scope)
 		{
-			return engine.HasErrors(text);
+			return scope.HasErrors(text);
 		}
 
 		public virtual string ParsedExpression ()
@@ -119,31 +84,13 @@ namespace Expression
 			return text;
 		}
 
-		public virtual object GetVariable(string text)
+		public virtual object Evaluate (Scope scope)
 		{
-			return engine.GetVariable(text);
-		}
-
-		public virtual void SetVariable (string variable, object value)
-		{
-			engine.SetVariable (variable, value);
-		}
-
-		public virtual object Evaluate (string text)
-		{
-			return engine.Evaluate (text);
-		}
-		public virtual object Evaluate ()
-		{
-			return engine.Evaluate (text);
+			return scope.Evaluate(text);
 		}
 		public virtual string ToRepr(object o)
 		{
 			 return text;
-		}
-		public void SetScope(Scope scope) 
-		{
-			engine.SetScope(scope);
 		}
 	}
 
@@ -154,8 +101,7 @@ namespace Expression
 		public Microsoft.Scripting.Hosting.ScriptRuntime scriptRuntime;
 		Microsoft.Scripting.Hosting.LanguageSetup languageSetup;
 		Microsoft.Scripting.CompilerOptions compiler_options;
-		Microsoft.Scripting.Hosting.ScriptEngine engine;
-		Microsoft.Scripting.Hosting.ScriptScope dlr_scope;
+		Microsoft.Scripting.Hosting.ScriptEngine dlr_engine;
 		
 		public DLRExpressionEngine () : base()
 		{
@@ -167,61 +113,24 @@ namespace Expression
 			scriptRuntimeSetup.LanguageSetups.Add (languageSetup); // add to local
 			// Create a Python-only scope:
 			scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime (scriptRuntimeSetup);
-			dlr_scope = scriptRuntime.CreateScope ();
-			engine = scriptRuntime.GetEngine (dlr_name);  
-			compiler_options = engine.GetCompilerOptions ();
+			//dlr_scope = scriptRuntime.CreateScope ();
+			dlr_engine = scriptRuntime.GetEngine (dlr_name);  
+			compiler_options = dlr_engine.GetCompilerOptions ();
 			IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
 			options.PrintFunction = true;
 			options.AllowWithStatement = true;
 			options.TrueDivision = true;
 		}
 		
-		public override void SetScope (Scope scope)
-		{
-			this.scope = scope;
-			dlr_scope = ((DLRScope)scope).dlr_scope;
-		}
-
-		public override object Evaluate (string exp)
-		{
-			Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
-			Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString (exp, sctype);
-			source.Compile (compiler_options);
-			return source.Execute (dlr_scope);
-		}
-		
 		public override Expression makeExpression (string text)
 		{
-			return new DLRExpression (this, text);
+			return new DLRExpression (text);
 		}
 
 		public override Scope makeScope ()
 		{
 			return new DLRScope (this);
 		}
-
-		public override object GetVariable(string text)
-		{
-			return dlr_scope.GetVariable(text);
-		}
-
-		public override void SetVariable (string variable, object value)
-		{
-			dlr_scope.SetVariable(variable, value);
-		}
-		
-		public override bool HasErrors (string text)
-		{
-			Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
-			Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString (text, sctype);
-			try {
-				source.Compile (compiler_options);
-				return false;
-			} catch {
-				return true;
-			}
-		}
-
 	}
 	
 	public class DLRScope : Scope
@@ -246,37 +155,27 @@ namespace Expression
 		{
 			dlr_scope.SetVariable(name, value);
 		}
+		public override void EvaluateStatement (string exp)
+		{
+			Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.SingleStatement;
+			Microsoft.Scripting.Hosting.ScriptSource source = engine.dlr_engine.CreateScriptSourceFromString (exp, sctype);
+			source.Compile (engine.compiler_options);
+			source.Execute (dlr_scope);
+		}
 	}
 	
 	public class DLRExpression : Expression
 	{
-		ExpressionEngine engine;
 		string text;
 		
-		public DLRExpression (DLRExpressionEngine engine, string text) : base(engine, text)
+		public DLRExpression (string text) : base(text)
 		{
-			this.engine = engine;
 			this.text = text;
 		}
 		
 		public override string ParsedExpression ()
 		{
 			return text;
-		}
-
-		public override object GetVariable(string text)
-		{
-			return engine.GetVariable(text);
-		}
-
-		public override void SetVariable (string variable, object value)
-		{
-			engine.SetVariable (variable, value);
-		}
-
-		public override object Evaluate (string text)
-		{
-			return engine.Evaluate (text);
 		}
 
         public static string ArrayToString(object[] args) {
