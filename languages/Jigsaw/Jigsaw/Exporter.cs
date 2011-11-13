@@ -5,41 +5,15 @@
 using System;
 using Jigsaw;
 using System.Collections.Generic;
-using NCalc.Domain;
 	
 namespace Jigsaw
 {
-	public class PythonVisitor : SerializationVisitor {
-		
-		public PythonVisitor() : base() {
-		}
-		
-		public override void Visit(ValueExpression expression)
-        {
-            switch (expression.Type)
-            {
- 		    case NCalc.Domain.ValueType.Boolean:
-                Result.Append(Proper(expression.Value.ToString())).Append(" ");
-				// ---
-                break;
-			default:
-				base.Visit(expression);
-				break;
-			}
-		}
-		
-		public static string Proper(string text) {
-			return text.Substring(0, 1).ToUpper() + text.Substring(1).ToLower();
-		}
-		
-	}
-	
 	public class Exporter
 	{
 		int indentLevel;
 		string indentString = "    ";
 		string comment = "#";
-		System.IO.FileStream fp;
+		System.IO.StreamWriter fp;
 		string filename = "";
 		Jigsaw.Canvas cvs;
 		Dictionary<string,bool> Imports;
@@ -49,12 +23,11 @@ namespace Jigsaw
 		public Exporter (Jigsaw.Canvas cvs)
 		{
 			this.cvs = cvs;
-			ToPython("export.py");
 		}
 		
 		public void ToPython(string filename) {
 			this.filename = filename;
-			//fp = System.IO.File.OpenWrite(filename);
+			fp = new System.IO.StreamWriter(filename);
 			indentLevel = 0;
 			// Go through blocks first, and look for:
 			// * parallel code (multiple start blocks)
@@ -75,10 +48,13 @@ namespace Jigsaw
 			WriteFormatLine("{0} by Calico Jigsaw", comment);
 			WriteFormatLine("{0} http://calicoproject.org", comment);
 			WriteLine("");
+			bool imports = false;
 			foreach(string key in Imports.Keys) {
 					WriteFormatLine("import {0}", key);				
+					imports = true;
 			}
-			WriteLine("");
+			if (imports)
+				WriteLine("");
 			// now, go through again, and write them out
 			incr_count = 1;
 			foreach (Diagram.CShape s in cvs.shapes) {
@@ -93,14 +69,15 @@ namespace Jigsaw
 			WriteLine("");
 			WriteLine("main()");
 			WriteLine("");
+			fp.Close();
 		}
 		
 		public static string Py(string exp) {
-			var expr = new NCalc.Expression(exp);
-			expr.HasErrors(); // causes parsing
-			var visitor = new PythonVisitor();
-			expr.ParsedExpression.Accept(visitor);
-			return visitor.Result.ToString().Trim();
+			var expr = new Expression.Expression(exp);
+			//expr.HasErrors(); // causes parsing
+			//var visitor = new PythonVisitor();
+			//expr.ParsedExpression.Accept(visitor);
+			return expr.ParsedExpression().Trim();
 		}
 		
 		public static string GetNextIncr() {
@@ -258,17 +235,23 @@ namespace Jigsaw
 		
 		public void WriteMain(CControlStart cs) {
 			// FIXME: keep count of mains, increment if more than one, main1(), main2()
-			Console.Write(replicate(indentString, indentLevel));
-			Console.WriteLine("def main():");
+			fp.Write(replicate(indentString, indentLevel));
+			fp.WriteLine("def main():");
+			//Console.Write(replicate(indentString, indentLevel));
+			//Console.WriteLine("def main():");
 		}
 
 		public void WriteLine(string text) {
-			Console.Write(replicate(indentString, indentLevel));
-			Console.WriteLine(text);
+			fp.Write(replicate(indentString, indentLevel));
+			fp.WriteLine(text);
+			//Console.Write(replicate(indentString, indentLevel));
+			//Console.WriteLine(text);
 		}
 		public void WriteFormatLine(string text, params object [] args) {
-			Console.Write(replicate(indentString, indentLevel));
-			Console.WriteLine(text, args);
+			fp.Write(replicate(indentString, indentLevel));
+			fp.WriteLine(text, args);
+			//Console.Write(replicate(indentString, indentLevel));
+			//Console.WriteLine(text, args);
 		}
 		
 	}

@@ -584,6 +584,14 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public string Export()
+		{
+			Exporter exporter = new Exporter(this);
+			exporter.ToPython("Jigsaw.py");
+			return System.IO.Path.GetFullPath("Jigsaw.py");
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnInspectorShow(object sender, EventArgs e)
 		{
 			this.ShowInspectorWindow();

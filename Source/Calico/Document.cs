@@ -63,6 +63,9 @@ namespace Calico {
             calico.ExecuteFileInBackground(filename, language);
         }
 
+        public virtual void Export(MainWindow calico) {
+        }
+
         public static string _(string message) {
             return global::Mono.Unix.Catalog.GetString(message);
         }

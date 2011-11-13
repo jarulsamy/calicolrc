@@ -1235,5 +1235,11 @@ namespace Calico {
                 CurrentDocument.ZoomOut();
         }
 
+        protected void OnExportAction1Activated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null)
+                CurrentDocument.Export(this);
+
+        }
     }
 }

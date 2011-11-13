@@ -62,6 +62,11 @@ public class CalicoJigsawDocument : Document
 		cvs.DoZoom (1.0 / 1.05);
 	}
 
+        public override void Export(Calico.MainWindow calico) {
+	  string filename = cvs.Export();
+	  calico.SelectOrOpen(filename);
+	}
+
 }
 
 public class CalicoJigsawLanguage : Language
