@@ -26,9 +26,34 @@ using Calico;
 
 public class CalicoJigsawEngine : Engine
 {
+	
+	public class MyTextWriter : TextWriter {
+		Calico.CustomStream custom;
+		public MyTextWriter(Calico.CustomStream custom) : base() {
+			this.custom = custom;
+		}
+		
+		public override System.Text.Encoding Encoding  {
+			get { return System.Text.Encoding.UTF8; }
+		}
+		
+		public override void Write (char[] buffer, int index, int count)
+		{
+			byte [] bytes = new byte[buffer.Length];
+			for (int i=0; i<buffer.Length; i++)
+				bytes[i] = (byte)buffer[i];
+			custom.Write(bytes, index, count);
+		}
+	}
+	
 	public CalicoJigsawEngine (LanguageManager manager) : base(manager)
 	{
 	}
+    public override void SetRedirects(CustomStream stdout, 
+                      CustomStream stderr) {
+		System.Console.SetOut(new MyTextWriter(stdout));
+	  	System.Console.SetError(new MyTextWriter(stderr));
+    }
 }
 
 public class CalicoJigsawDocument : Document
@@ -47,9 +72,8 @@ public class CalicoJigsawDocument : Document
 	
 	public override void ExecuteFileInBackground ()
 	{
-		calico.Print("Running Jigsaw script...");
+		calico.Print(Calico.Tag.Info, "Running Jigsaw script...\n");
 		cvs.Run();
-		calico.Print("Done");
 	}
 
 	public override void ZoomIn ()

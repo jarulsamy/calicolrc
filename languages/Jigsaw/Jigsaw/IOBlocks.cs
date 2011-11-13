@@ -67,7 +67,7 @@ namespace Jigsaw
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
 				object o = Expr.Expr.Evaluate(locals);
 				string toPrint = Expr.Expr.ToRepr(o);
-				//Console.WriteLine(toPrint);
+				Console.WriteLine(toPrint);
 				((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
 				
 			} catch (Exception ex) {
