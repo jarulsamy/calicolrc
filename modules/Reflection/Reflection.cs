@@ -494,7 +494,11 @@ namespace Reflection
 			Type type = getType (aname, tname);
 			foreach (MethodInfo mi in getMethodInfos(type, mname)) {
 				if (String.Compare (mi.Name, mname) == 0) {
+					try {
 					return mi.ReturnType;
+					} catch {
+						return null;
+					}
 				}
 			}
 			return null;
@@ -545,8 +549,12 @@ namespace Reflection
 			Type type = getType (aname, tname);
 			foreach (MethodInfo mi in getMethodInfos(type, mname)) {
 				List<string > parameters = new List<string> ();
+				try {
 				foreach (ParameterInfo pi in mi.GetParameters()) {
 					parameters.Add (pi.Name);
+				}
+				} catch {
+					continue;
 				}
 				retval.Add (parameters);
 			}
@@ -559,8 +567,12 @@ namespace Reflection
 			Type type = getType (aname, tname);
 			foreach (MethodInfo mi in getMethodInfos(type, mname)) {
 				List<Type > types = new List<Type> ();
+				try {
 				foreach (ParameterInfo pi in mi.GetParameters()) {
 					types.Add (pi.ParameterType);
+				}
+				} catch {
+					continue;
 				}
 				retval.Add (types);
 			}
@@ -592,6 +604,7 @@ namespace Reflection
 			Type type = getType (aname, tname);
 			foreach (MethodInfo mi in getMethodInfos(type, mname)) {
 				List<object > parameters = new List<object> ();
+				try {
 				foreach (ParameterInfo pi in mi.GetParameters()) {
 					object default_value;
 					bool found = mapping.GetParameterDefault(aname, tname, mname, pi.Name, 
@@ -603,6 +616,9 @@ namespace Reflection
 							parameters.Add(String.Format("'{0}'", pi.DefaultValue));
 						else
 							parameters.Add(pi.DefaultValue);
+				}
+				} catch {
+					continue;
 				}
 				retval.Add (parameters);
 			}
