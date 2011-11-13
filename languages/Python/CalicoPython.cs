@@ -64,8 +64,9 @@ namespace CalicoPython {
 		
 		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 										   string ttype, object retval) {
-	        //string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
-	        Calico.MainWindow.Invoke( delegate {calico.CurrentDocument.GotoLine((int)frame.f_lineno);});
+	        string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
+	        Calico.MainWindow.Invoke( delegate {calico.SelectOrOpen(filename);});
+		//CurrentDocument.GotoLine((int)frame.f_lineno);});
 	        Calico.MainWindow.Invoke( delegate {
 		    var pydict = (IronPython.Runtime.PythonDictionary)frame.f_locals;
 		    foreach(string key in pydict.Keys) {

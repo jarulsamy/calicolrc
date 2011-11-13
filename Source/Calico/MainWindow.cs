@@ -399,6 +399,14 @@ namespace Calico {
                     lineno = Convert.ToInt32(match.Groups[2].Captures[0].Value);
                 }
             }
+            // Special case for quick goto:
+            if (CurrentDocument != null && CurrentDocument.filename == filename) {
+                if (lineno != 0) {
+                    return CurrentDocument.GotoLine(lineno);
+                } else {
+                    return true;
+                }
+            }
             // FIXME: can attempt to open bogus path/filename
             // but this is useful for file creation
             Document page = null;

@@ -154,6 +154,7 @@ namespace Calico {
             texteditor.Options.HighlightMatchingBracket = true;
             texteditor.Options.OverrideDocumentEolMarker = true;
             texteditor.Options.DefaultEolMarker = "\n";
+            texteditor.Options.ShowIconMargin = true;
         }
 
         public override bool GotoLine(int lineno) {
