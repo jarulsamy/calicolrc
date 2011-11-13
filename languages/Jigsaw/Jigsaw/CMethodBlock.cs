@@ -176,7 +176,11 @@ namespace Jigsaw
 					    }
 					    if (!(return_type.ToString().Equals("System.Void"))) {
 					      CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-					      locals.SetVariable(VarName.Text, result);
+						  // Need to set LHS to evaluated expression:
+						  // First, set _ = RHS
+					      locals.SetVariable("_", result);
+						  // Then set LHS = _
+					      locals.Assignment(VarName.Text, "_");
 					    }
 					  } else {
 					    this["Message"] = "No matching method for these argument types";
