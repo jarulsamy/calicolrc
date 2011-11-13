@@ -429,7 +429,7 @@ namespace Jigsaw
 			IfEdge = new CEdge(this, "If", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
 			
 			// Properties
-			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "true");
+			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "True");
 			IfTest.PropertyChanged += OnPropertyChanged;
 			
 			_properties["IfTest"] = IfTest;
@@ -708,7 +708,7 @@ namespace Jigsaw
 			ElseEdge = new CEdge(this, "Else", EdgeType.Out, null, offsetX, 50.0, 20.0, 50.0, this.Width-20.0);
 			
 			// Properties
-			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "true");
+			CExpressionProperty IfTest = new CExpressionProperty("IfTest", "True");
 			IfTest.PropertyChanged += OnPropertyChanged;
 			
 			_properties["IfTest"] = IfTest;
@@ -1084,7 +1084,7 @@ namespace Jigsaw
 			LoopEdge = new CEdge(this, "Loop", EdgeType.Out, null, offsetX, 20.0, 20.0, 20.0, this.Width-20.0);
 			
 			// Properties
-			CExpressionProperty WhileTest = new CExpressionProperty("WhileTest", "true");
+			CExpressionProperty WhileTest = new CExpressionProperty("WhileTest", "True");
 			WhileTest.PropertyChanged += OnPropertyChanged;
 			_properties["WhileTest"] = WhileTest;
 			this.OnPropertyChanged(null, null);
