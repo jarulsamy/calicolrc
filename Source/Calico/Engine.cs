@@ -137,12 +137,13 @@ namespace Calico {
                     engine.Runtime.LoadAssembly(assembly);
             }
             // ---------------------------------------
-            DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "../modules"));
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "..", "modules"));
             foreach (FileInfo f in dir.GetFiles("*.dll")) {
                 string assembly_name = f.FullName;
                 assembly = System.Reflection.Assembly.LoadFile(assembly_name);
                 if (assembly != null) {
                     // initialize_module if possible
+                    try {
                     foreach (Type type in assembly.GetTypes()) {
                         System.Reflection.MethodInfo method;
                         try {
@@ -155,6 +156,9 @@ namespace Calico {
                             method.Invoke(type, new object [] {MainWindow.gui_thread_id});
                         } catch {
                         }
+                    }
+                    } catch {
+                        continue;
                     }
                     try {
                     engine.Runtime.LoadAssembly(assembly);

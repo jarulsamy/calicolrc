@@ -38,12 +38,12 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
-            Catalog.Init("calico", System.IO.Path.Combine(path, "../locale"));
+            Catalog.Init("calico", System.IO.Path.Combine(path, "..", "locale"));
             
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
 
-            DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "../languages"));
+            DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
             if (IsLoadModules) {
                 foreach (DirectoryInfo d in dir.GetDirectories("*"))
                 {

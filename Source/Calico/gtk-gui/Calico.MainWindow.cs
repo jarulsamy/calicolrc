@@ -82,7 +82,7 @@ namespace Calico
 		private global::Gtk.Statusbar statusbar1;
 		private global::Gtk.Label label6;
 		private global::Gtk.Label status_langauge;
-        
+		
 		protected virtual void Build ()
 		{
 			global::Stetic.Gui.Initialize (this);
@@ -228,7 +228,31 @@ namespace Calico
 			this.vbox1.Name = "vbox1";
 			this.vbox1.BorderWidth = ((uint)(5));
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentScriptsAction' action='RecentScriptsAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='ShowAction' action='ShowAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/></menu></menu><menu name='ScriptAction' action='ScriptAction'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='ShellAction' action='ShellAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='helpAction' action='helpAction'/><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name=\'menubar2\'><menu name=\'FileAction\' action=\'FileAction\'><menuite" +
+					"m name=\'openAction1\' action=\'openAction1\'/><menu name=\'NewAction\' action=\'NewAct" +
+					"ion\'/><separator/><menu name=\'RecentScriptsAction\' action=\'RecentScriptsAction\'/" +
+					"><menu name=\'ExamplesAction\' action=\'ExamplesAction\'/><separator/><menuitem name" +
+					"=\'saveAction\' action=\'saveAction\'/><menuitem name=\'saveAsAction\' action=\'saveAsA" +
+					"ction\'/><separator/><menuitem name=\'quitAction\' action=\'quitAction\'/></menu><men" +
+					"u name=\'EditAction\' action=\'EditAction\'><menuitem name=\'copyAction\' action=\'copy" +
+					"Action\'/><menuitem name=\'pasteAction\' action=\'pasteAction\'/><menuitem name=\'cutA" +
+					"ction\' action=\'cutAction\'/><separator/><menuitem name=\'undoAction\' action=\'undoA" +
+					"ction\'/><menuitem name=\'redoAction\' action=\'redoAction\'/><separator/><menuitem n" +
+					"ame=\'selectAllAction\' action=\'selectAllAction\'/><separator/><menuitem name=\'inde" +
+					"ntAction\' action=\'indentAction\'/><menuitem name=\'unindentAction\' action=\'uninden" +
+					"tAction\'/><separator/><menuitem name=\'CommentRegionAction\' action=\'CommentRegion" +
+					"Action\'/><menuitem name=\'UncommentRegionAction\' action=\'UncommentRegionAction\'/>" +
+					"</menu><menu name=\'ViewAction\' action=\'ViewAction\'><menuitem name=\'zoomInAction\'" +
+					" action=\'zoomInAction\'/><menuitem name=\'zoomOutAction\' action=\'zoomOutAction\'/><" +
+					"separator/><menuitem name=\'selectFontAction\' action=\'selectFontAction\'/><menu na" +
+					"me=\'ShowAction\' action=\'ShowAction\'><menuitem name=\'EnvironmentTabAction\' action" +
+					"=\'EnvironmentTabAction\'/><menuitem name=\'LocalsTabAction\' action=\'LocalsTabActio" +
+					"n\'/></menu></menu><menu name=\'ScriptAction\' action=\'ScriptAction\'><menu name=\'La" +
+					"nguageAction\' action=\'LanguageAction\'/><menuitem name=\'yesAction1\' action=\'yesAc" +
+					"tion1\'/><menuitem name=\'noAction\' action=\'noAction\'/><menuitem name=\'ShellAction" +
+					"\' action=\'ShellAction\'/></menu><menu name=\'HelpAction\' action=\'HelpAction\'><menu" +
+					"item name=\'helpAction\' action=\'helpAction\'/><menuitem name=\'aboutAction\' action=" +
+					"\'aboutAction\'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add (this.menubar2);
@@ -237,7 +261,7 @@ namespace Calico
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/><toolitem name='openAction' action='openAction'/><toolitem name='yesAction1' action='yesAction1'/><toolitem name='noAction' action='noAction'/><toolitem name='goForwardAction' action='goForwardAction'/></toolbar></ui>");
+			this.UIManager.AddUiFromString (@"<ui><toolbar name='toolbar1'><toolitem name='newAction' action='newAction'/><toolitem name='openAction' action='openAction'/><toolitem name='yesAction1' action='yesAction1'/><toolitem name='noAction' action='noAction'/><toolitem name='goForwardAction' action='goForwardAction'/></toolbar></ui>");
 			this.toolbar1 = ((global::Gtk.Toolbar)(this.UIManager.GetWidget ("/toolbar1")));
 			this.toolbar1.Name = "toolbar1";
 			this.toolbar1.ShowArrow = false;

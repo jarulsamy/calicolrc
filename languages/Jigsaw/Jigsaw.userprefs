@@ -1,25 +1,24 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw/StatementBlocks.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Diagram.cs">
     <Files>
-      <File FileName="CalicoJigsaw.cs" Line="36" Column="41" />
-      <File FileName="Jigsaw/Jigsaw.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw/MainWindow.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw/Diagram.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw/Engine.cs" Line="47" Column="41" />
-      <File FileName="Jigsaw/Main.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw/StatementBlocks.cs" Line="65" Column="9" />
-      <File FileName="Jigsaw/CMethodBlock.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw/InspectWin.cs" Line="293" Column="28" />
-      <File FileName="Jigsaw/IOBlocks.cs" Line="1" Column="1" />
-      <File FileName="../../modules/ExpressionEngine/ExpressionEngine.cs" Line="26" Column="4" />
+      <File FileName="CalicoJigsaw.cs" Line="1" Column="1" />
+      <File FileName="..\..\modules\ExpressionEngine\ExpressionEngine.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Diagram.cs" Line="3206" Column="5" />
+      <File FileName="Jigsaw\Engine.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Main.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\CMethodBlock.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\InspectWin.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\IOBlocks.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="StatementBlocks.cs" selected="True" />
+            <Node name="References" expanded="True" selected="True" />
           </Node>
         </State>
       </Pad>

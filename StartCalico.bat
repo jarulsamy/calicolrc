@@ -7,7 +7,7 @@ cd /d "%~dp0"
 REM Run Calico.exe with mono in a particular language:
 REM SET LANGUAGE=es_ES.UTF8
 REM SET LANG=es_ES.UTF8
-SET PATH=%PATH%;%CD%\bin
+SET PATH=%PATH%;%CD%\bin;%CD%\modules
 REM SET MONO_LOG_LEVEL=debug
 
 REM **********************************************
@@ -37,12 +37,14 @@ REM **       ADD REM TO ONE LINE BELOW &        **
 REM **   REMOVE REM FROM ANOTHER LINE BELOW     **
 REM **********************************************
 
-"C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files (x86)\Mono-2.6.7\bin\mono" bin\Calico.exe %*
 REM "C:\Program Files (x86)\Mono-2.8.2\bin\mono" bin\Calico.exe %*
 REM "C:\Program Files (x86)\Mono-2.10.3\bin\mono" bin\Calico.exe %*
 REM "C:\Program Files\Mono-2.6.7\bin\mono" bin\Calico.exe %*
 REM "C:\Program Files\Mono-2.8.2\bin\mono" bin\Calico.exe %*
-REM "C:\Program Files\Mono-2.10.3\bin\mono" bin\Calico.exe %*
+REM "C:\Program Files (x86)\Mono-2.10.3\bin\mono" bin\Calico.exe %*
+
+bin\Calico.exe %*
 
 REM **********************************************
 REM **       ADD REM TO ONE LINE ABOVE &        **
