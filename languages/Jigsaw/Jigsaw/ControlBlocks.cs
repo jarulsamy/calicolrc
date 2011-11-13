@@ -552,8 +552,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
-				IfTest.Expr.SetScope(locals);
-				object otest = IfTest.Expr.Evaluate();
+				object otest = IfTest.Expr.Evaluate(locals);
 				doIf = (bool)otest;
 
 			} catch (Exception ex) {
@@ -816,8 +815,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
-				IfTest.Expr.SetScope(locals);
-				object otest = IfTest.Expr.Evaluate();
+				object otest = IfTest.Expr.Evaluate(locals);
 				doIf = (bool)otest;
 
 			} catch (Exception ex) {

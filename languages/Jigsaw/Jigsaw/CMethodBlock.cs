@@ -155,8 +155,7 @@ namespace Jigsaw
 					System.Reflection.MethodInfo method = null;
 					foreach (string name in names) {
 						CExpressionProperty prop = (CExpressionProperty)_properties[name];
-						prop.Expr.SetScope(locals);
-						object value = prop.Expr.Evaluate();
+						object value = prop.Expr.Evaluate(locals);
 						args.Add(value);
 						arg_types.Add(value.GetType());
 					}

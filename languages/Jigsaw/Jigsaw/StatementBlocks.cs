@@ -66,8 +66,7 @@ namespace Jigsaw
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
 				
-				RHS.Expr.SetScope(locals);
-				RHS.Expr.SetVariable(VarName.Text, RHS.Expr.Evaluate());
+				locals.Assignment(VarName.Text, RHS.Expr.ParsedExpression());
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);

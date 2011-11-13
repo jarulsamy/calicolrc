@@ -13,6 +13,9 @@ namespace Expression
 		public static Scope makeScope() {
 			return TheEngine.makeScope();
 		}
+		public static bool HasErrors(string text) {
+			return TheEngine.HasErrors(text);
+		}
 	}
 	
 	public class ExpressionEngine
@@ -32,6 +35,10 @@ namespace Expression
 			return new Scope ();
 		}	
 
+		public virtual bool HasErrors (string text)
+		{
+			return false;
+		}	
 	}
 	
 	public class Scope
@@ -51,12 +58,12 @@ namespace Expression
 		public virtual void SetVariable(string name, object value)
 		{
 		}
+		public virtual void Assignment(string name, string value)
+		{
+			EvaluateStatement(String.Format("{0} = {1}", name, value));
+		}
 		public virtual void EvaluateStatement (string statement)
 		{	
-		}
-		public virtual bool HasErrors (string exp)
-		{
-			return false;
 		}
 		public virtual object Evaluate (string exp)
 		{
@@ -74,9 +81,9 @@ namespace Expression
 			this.text = text;
 		}
 		
-		public bool HasErrors (Scope scope)
+		public bool HasErrors ()
 		{
-			return scope.HasErrors(text);
+			return Engine.HasErrors(text);
 		}
 
 		public virtual string ParsedExpression ()
@@ -100,8 +107,8 @@ namespace Expression
 		public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
 		public Microsoft.Scripting.Hosting.ScriptRuntime scriptRuntime;
 		Microsoft.Scripting.Hosting.LanguageSetup languageSetup;
-		Microsoft.Scripting.CompilerOptions compiler_options;
-		Microsoft.Scripting.Hosting.ScriptEngine dlr_engine;
+		public Microsoft.Scripting.CompilerOptions compiler_options;
+		public Microsoft.Scripting.Hosting.ScriptEngine dlr_engine;
 		
 		public DLRExpressionEngine () : base()
 		{
@@ -130,6 +137,17 @@ namespace Expression
 		public override Scope makeScope ()
 		{
 			return new DLRScope (this);
+		}
+		public override bool HasErrors(string text)
+		{
+             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;	 
+             Microsoft.Scripting.Hosting.ScriptSource source = dlr_engine.CreateScriptSourceFromString (text, sctype);	 
+             try {	 
+                 source.Compile(compiler_options);	 
+                 return false;	 
+             } catch {	 
+                 return true;	 
+             }			
 		}
 	}
 	
@@ -162,6 +180,15 @@ namespace Expression
 			source.Compile (engine.compiler_options);
 			source.Execute (dlr_scope);
 		}
+		
+		public override object Evaluate (string exp)	 
+         {	 
+             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;	 
+             Microsoft.Scripting.Hosting.ScriptSource source = engine.dlr_engine.CreateScriptSourceFromString (exp, sctype);	 
+             source.Compile (engine.compiler_options);	 
+             return source.Execute (dlr_scope);	 
+         }		
+		
 	}
 	
 	public class DLRExpression : Expression
@@ -229,19 +256,21 @@ namespace Expression
 
 		public static void Main() {
 			Expression Expr = Engine.makeExpression("1 + 1");
-			Expr.SetVariable("X", Expr.Evaluate());
-			Console.WriteLine("Set {0} = {1}, {2}", "X", Expr.Evaluate(), 
-									Expr.GetVariable("X"));
-			/*
-			
-			Expression exp = Engine.makeExpression("1 + 1");
-			Engine.SetVariable("x", exp.Evaluate());
-			System.Console.WriteLine(((int)exp.Evaluate()) == 2 ? "works!" : "fail!");
-			exp = Engine.makeExpression("[1, 2, 3, x, 5]");
-			Engine.SetVariable("x", 100);
-			object obj = exp.Evaluate();
-			System.Console.WriteLine(exp.ToRepr(obj));
-			*/
+			Scope scope = Engine.makeScope();
+			scope.SetVariable("X", Expr.Evaluate(scope));
+			System.Console.WriteLine(((int)Expr.Evaluate(scope)) == 2 ? "works!" : "fail!");
+			Console.WriteLine("Set {0} = {1}, {2}", 
+				"X", 
+				Expr.Evaluate(scope), 
+				scope.GetVariable("X"));
+			scope.EvaluateStatement("X = 42");
+			Console.WriteLine("Set {0} = {1}", 
+				"X", 
+				scope.GetVariable("X"));
+			Expr = Engine.makeExpression("[1, 2, 3, x, 5]");
+			scope.SetVariable("x", 100);
+			object obj = Expr.Evaluate(scope);
+			System.Console.WriteLine(Expr.ToRepr(obj));
 		}
 	}
 }

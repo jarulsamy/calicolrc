@@ -65,8 +65,7 @@ namespace Jigsaw
 			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				Expr.Expr.SetScope(locals);
-				object o = Expr.Expr.Evaluate();
+				object o = Expr.Expr.Evaluate(locals);
 				string toPrint = Expr.Expr.ToRepr(o);
 				//Console.WriteLine(toPrint);
 				((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
