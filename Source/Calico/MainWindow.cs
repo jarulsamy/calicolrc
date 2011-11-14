@@ -51,6 +51,7 @@ namespace Calico {
         public System.Threading.Thread executeThread = null;
         public History history = new History();
         public TabCompletion completion = null;
+        static string dialogResponse;
         public Document CurrentDocument {
             get {
                 int page_num = DocumentNotebook.Page;
@@ -125,6 +126,15 @@ namespace Calico {
                 if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
                     return manager.languages[CurrentLanguage].proper_name;
                 return null;
+            }
+            set {
+                foreach (string lang in manager.getLanguages()) {
+                    string lang_proper = manager.languages[lang].proper_name;
+                    if (lang_proper == value) {
+                        CurrentLanguage = lang;
+                        break;
+                    }
+                }
             }
         }
 
@@ -400,7 +410,7 @@ namespace Calico {
                 }
             }
             // Special case for quick goto:
-            if (CurrentDocument != null && CurrentDocument.filename == filename) {
+            if (CurrentDocument != null && CurrentDocument.filename == filename && filename != null) {
                 if (lineno != 0) {
                     return CurrentDocument.GotoLine(lineno);
                 } else {
@@ -451,11 +461,9 @@ namespace Calico {
                 DocumentNotebook.SetTabReorderable(page.widget, true);
                 DocumentNotebook.CurrentPage = page_num;
                 page.close_button.Clicked += delegate { TryToClose(page); };
-                if (filename != null) {
-                    UpdateRecentFiles(filename);
-                }
             }
             if (filename != null) {
+                UpdateRecentFiles(filename);
                 string dir = System.IO.Path.GetDirectoryName(filename);
                 System.IO.Directory.SetCurrentDirectory(dir);
             }
@@ -503,8 +511,44 @@ namespace Calico {
             }
         }
 
-        protected virtual void OnNewAction1Activated(object sender, System.EventArgs e) {
-            SelectOrOpen();
+        public void PickNew() {
+            string [] prop_languages = manager.getLanguagesProper();
+            if (prop_languages.Length > 1) {
+                ManualResetEvent ev = new ManualResetEvent(false);
+                dialogResponse = null;
+                Invoke(delegate {
+                    Gtk.Dialog fc = new Gtk.Dialog("Select Language", this, 0);
+                    fc.VBox.PackStart(new Gtk.Label("Create a New Script"));
+                    foreach (string choice in manager.getLanguagesProper()) {
+                        Gtk.Button button = new Gtk.Button(choice);
+                        button.Clicked += new System.EventHandler(DialogHandler);
+                        fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+                    }
+                    fc.ShowAll();
+                    fc.Run();
+                    fc.Destroy();
+                    ev.Set();
+                    });
+                ev.WaitOne();
+                if (dialogResponse != null) {
+                    CurrentProperLanguage = dialogResponse;
+                    SelectOrOpen(null, CurrentLanguage);
+                }
+            } else {
+                SelectOrOpen();
+            }
+        }
+
+        public static void DialogHandler(object obj, System.EventArgs args) {
+            dialogResponse = ((Gtk.Button)obj).Label;
+        }
+
+        protected virtual void OnNewActionActivated(object sender, System.EventArgs e) {
+            PickNew();
+        }
+
+        protected virtual void OnButton3Clicked(object sender, System.EventArgs e) {
+            PickNew();
         }
 
         protected virtual void OnOpenAction1Activated(object sender, System.EventArgs e) {
@@ -514,10 +558,6 @@ namespace Calico {
                 SelectOrOpen(fc.Filename);
             }
             fc.Destroy();
-        }
-
-        protected virtual void OnNewActionActivated(object sender, System.EventArgs e) {
-            SelectOrOpen();
         }
 
         protected virtual void OnOpenActionActivated(object sender, System.EventArgs e) {
@@ -546,10 +586,6 @@ namespace Calico {
 
         protected virtual void OnButton2Clicked(object sender, System.EventArgs e) {
             OnOpenAction1Activated(sender, e);
-        }
-
-        protected virtual void OnButton3Clicked(object sender, System.EventArgs e) {
-            SelectOrOpen();
         }
 
         protected virtual void OnCopyActionActivated(object sender, System.EventArgs e) {

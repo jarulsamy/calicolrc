@@ -70,9 +70,20 @@ namespace Calico {
         }
 
         public string[] getLanguages() {
-            // FIXME: sort
             string[] keys = new string[languages.Count];
             languages.Keys.CopyTo(keys, 0);
+            Array.Sort(keys);
+            return keys;
+        }
+
+        public string[] getLanguagesProper() {
+            string[] keys = new string[languages.Count];
+            int i = 0;
+            foreach (string key in languages.Keys) {
+                keys[i] = languages[key].proper_name;
+                i++;
+            }
+            Array.Sort(keys);
             return keys;
         }
 
