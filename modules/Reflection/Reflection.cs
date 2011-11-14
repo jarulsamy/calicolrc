@@ -255,7 +255,7 @@ namespace Reflection
 			Assembly assembly = null;
 			try {
 				assembly = Assembly.LoadFrom (name);
-			} catch (System.IO.FileNotFoundException) {
+			} catch { //(System.IO.FileNotFoundException) {
 #pragma warning disable 612
 				assembly = Assembly.LoadWithPartialName (name);
 #pragma warning restore 612

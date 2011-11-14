@@ -3,9 +3,7 @@ using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 using System.Collections.Generic;
 using System.Collections; // IEnumerable
 
-namespace Shapes {
-
-  public static class Shapes {
+public static class Shapes {
 
     public static PythonTuple getMouse() {
       return Graphics.getMouse();
@@ -245,5 +243,5 @@ namespace Shapes {
     public static void step(Graphics.WindowClass window, double time) {
       window.step(time);
     }
-  }
 }
+

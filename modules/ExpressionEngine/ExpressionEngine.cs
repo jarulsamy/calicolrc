@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Expression
 {
@@ -160,6 +161,21 @@ namespace Expression
 		{
 			this.engine = engine;
 			dlr_scope = ((DLRExpressionEngine)this.engine).scriptRuntime.CreateScope ();
+			Assembly assembly;
+			foreach (string name in new string [] {"Myro", "Shapes", "Graphics"}) {
+				try {
+					assembly = Assembly.LoadFrom (name);
+				} catch { //(System.IO.FileNotFoundException) {
+#pragma warning disable 612
+					assembly = Assembly.LoadWithPartialName (name);
+#pragma warning restore 612
+				}
+				this.engine.scriptRuntime.LoadAssembly(assembly);
+			}
+
+			EvaluateStatement("import Myro");
+			EvaluateStatement("import Shapes");
+			EvaluateStatement("import Graphics");
 		}
 		public override IEnumerable<string> GetVariableNames() 
 		{
