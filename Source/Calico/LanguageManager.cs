@@ -100,6 +100,7 @@ namespace Calico {
         public void SetCalico(MainWindow calico) {
             this.calico = calico;
             scope.SetVariable("calico", calico);
+
         }
 
         public void SetRedirects(CustomStream stdout, CustomStream stderr) {

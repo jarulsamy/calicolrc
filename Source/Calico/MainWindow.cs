@@ -188,6 +188,10 @@ namespace Calico {
             Title = String.Format("Calico - {0}", System.Environment.UserName);
             
             manager.SetCalico(this);
+            // FIXME: move to Python language
+            manager["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
+                "del division, with_statement, print_function", false);
+
             manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
             // Run this in in the GUI thread, after we start:
             Gtk.Application.Invoke(delegate { manager.PostSetup(this); });

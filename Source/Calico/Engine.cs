@@ -51,6 +51,10 @@ namespace Calico {
             return true;
         }
 
+        public virtual bool Execute(string text, bool ok) {
+            return true;
+        }
+
         public virtual object Evaluate(string text) {
             return null;
         }
@@ -109,6 +113,7 @@ namespace Calico {
         public Microsoft.Scripting.CompilerOptions compiler_options;
         public Microsoft.Scripting.Hosting.ScriptEngine engine;
         public Microsoft.Scripting.Hosting.ScriptScope scope;
+        bool set_input = false;
 
         public DLREngine(LanguageManager manager) : base(manager) {
         }
@@ -174,8 +179,8 @@ namespace Calico {
             string [] lines = text.Split('\n');
             int line_count = lines.Length;
             if (line_count == 1) {
-                //if self.dlr_name == "py":
-                //    text = "from __future__ import print_function; " + text
+                // Need this here, as there are no compiler_options used:
+                text = "from __future__ import division, with_statement, print_function;" + text;
                 var sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
                 var source = engine.CreateScriptSourceFromString(text, sctype);
                 return (source.GetCodeProperties() ==
@@ -187,7 +192,14 @@ namespace Calico {
         public override object Evaluate(string text) {
             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
             Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-            source.Compile(compiler_options);
+	    try {
+	    if (compiler_options != null)
+	      source.Compile(compiler_options);
+	    else
+	      source.Compile();
+	    } catch {
+	      return null;
+	    }
             object retval;
             if (manager != null && manager.UseSharedScope)
                 retval = source.Execute(manager.scope);
@@ -195,8 +207,11 @@ namespace Calico {
                 retval = source.Execute(scope);
             return retval;
         }
-
         public override bool Execute(string text) {
+            return Execute(text, true);
+        }
+
+        public override bool Execute(string text, bool ok) {
             // This is called by RunInBackground() in the MainWindow
             //manager.calico.last_error = ""
             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
@@ -236,7 +251,8 @@ namespace Calico {
               }
               return false;
             }
-            manager.stderr.PrintLine(Tag.Info, "Ok");
+            if (ok)
+                manager.stderr.PrintLine(Tag.Info, "Ok");
             return true;
         }
 
@@ -257,7 +273,10 @@ namespace Calico {
             }
             ConfigureTrace();
             try {
-                source.Execute(manager.scope);
+                //if (manager != null && manager.UseSharedScope)
+                    source.Execute(manager.scope);
+                //else
+                //source.Execute(scope);
             } catch (Exception e) {
                 if (e.Message.ToString().Contains("Thread was being aborted")) {
                     manager.stderr.Print("[Script stopped----------]\n");
