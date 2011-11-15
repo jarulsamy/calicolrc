@@ -4,7 +4,7 @@ all: ../Graphics.dll ../Shapes.dll
 ../Graphics.dll: Graphics.cs
 	gmcs -sdk:4 -target:library Graphics.cs  \
 		-lib:../../bin \
-		-lib:../../modules \
+		-lib:../modules \
 		-r:IronPython \
 		-r:Microsoft.Dynamic \
 		-r:System.Drawing \
