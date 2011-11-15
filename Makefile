@@ -37,7 +37,7 @@ modules/Shapes.dll: modules/Graphics/Graphics.cs modules/Graphics/Shapes.cs
 modules/Reflection.dll: modules/Reflection/Reflection.cs 
 	cd modules/Reflection && make
 
-modules/Myro.dll: modules/Myro/Myro.cs 
+modules/Myro.dll: modules/Myro/Myro.cs modules/Graphics.dll modules/FarseerPhysics.dll
 	cd modules/Myro && make
 
 modules/Conx.dll: modules/Conx/Conx.cs

@@ -28,6 +28,10 @@ May need:
 
 in calico.exe.config to allow different frameworks (2 vs 4).
 
+NOTE:
+
+mono --runtime=v4.0 Calico.exe
+
 = Math.NET =
 
 mathdotnet.com - numerics, symbolic, etc.

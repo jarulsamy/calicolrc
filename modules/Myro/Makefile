@@ -2,10 +2,10 @@
 all: ../Myro.dll
 
 ../Myro.dll: Myro.cs ../Graphics/Graphics.cs
-	MONO_PATH=$(MONO_PATH) gmcs -target:library \
+	gmcs -target:library \
 		Myro.cs \
 		-lib:../../bin \
-		-lib:../../modules \
+		-lib:.. \
 		-unsafe \
 		-r:Graphics.dll \
 		-r:Tao.Sdl.dll \

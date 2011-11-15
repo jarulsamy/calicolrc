@@ -113,8 +113,7 @@ namespace Calico {
         public Microsoft.Scripting.CompilerOptions compiler_options;
         public Microsoft.Scripting.Hosting.ScriptEngine engine;
         public Microsoft.Scripting.Hosting.ScriptScope scope;
-        bool set_input = false;
-
+ 
         public DLREngine(LanguageManager manager) : base(manager) {
         }
 
