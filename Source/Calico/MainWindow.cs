@@ -1089,7 +1089,11 @@ namespace Calico {
                 StartButton.Sensitive = (Shell.Document.Text != "");
                 DebugButton.Sensitive = false; // only on documents
                 SetLanguage(ShellLanguage);
-                Shell.GrabFocus();
+                // Workaround: had to add this for notebook page selection:
+                GLib.Timeout.Add(0, delegate {
+                    Shell.GrabFocus();
+                    return false;
+                });
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
                 StartButton.Sensitive = false;
