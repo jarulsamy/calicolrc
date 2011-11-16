@@ -572,18 +572,23 @@ namespace Diagram
 		{
 			if (e.Event.Key == Gdk.Key.Up) {
 				this.DoTranslate(0.0, 5.0);
+				e.RetVal = true;
 			} else if (e.Event.Key == Gdk.Key.Down) {
 				this.DoTranslate(0.0, -5.0);
+				e.RetVal = true;
 			} else if (e.Event.Key == Gdk.Key.Left) {
 				this.DoTranslate(5.0, 0.0);
+				e.RetVal = true;
 			} else if (e.Event.Key == Gdk.Key.Right) {
 				this.DoTranslate(-5.0, 0.0);
+				e.RetVal = true;
 			} else if ((e.Event.State & Gdk.ModifierType.ControlMask) != 0) {
 				if ( e.Event.Key == Gdk.Key.plus ) {
 					this.DoZoom(1.05);
 				} else if (e.Event.Key == Gdk.Key.minus ) {
 					this.DoZoom(1.0/1.05);
 				}
+				e.RetVal = true;
 			}
 		}
 		
