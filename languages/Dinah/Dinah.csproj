@@ -50,6 +50,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="gtk-gui\MainWindow.cs" />
+    <Compile Include="DBlock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
