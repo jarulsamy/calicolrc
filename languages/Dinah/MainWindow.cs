@@ -29,15 +29,21 @@ public partial class MainWindow: Gtk.Window
 		
 		// Begin a Library:
 		Category category = new Category("Control");
+		category.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		StatementFactory block = new StatementFactory("Begin", "begin");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		block = new StatementFactory("If", "if");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		block = new StatementFactory("If Then", "ifthen");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		block = new StatementFactory("While", "while");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		block = new StatementFactory("Repeat", "repeat");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		category.ShowAll();
 		category.AddToMenu(Menu, menu_position++);
@@ -45,7 +51,10 @@ public partial class MainWindow: Gtk.Window
 		
 		// Begin a Library:
 		category = new Category("Variables");
+		category.ModifyBg(Gtk.StateType.Normal, Colors.LightGreen);
 		block = new StatementFactory("Let", "let");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.LightGreen);
+
 		category.Add(block);
 		category.ShowAll();
 		category.AddToMenu(Menu, menu_position++);
@@ -53,7 +62,9 @@ public partial class MainWindow: Gtk.Window
 
 		// Begin a Library:
 		category = new Category("Expressions");
+		category.ModifyBg(Gtk.StateType.Normal, Colors.LightBlue);
 		block = new ExpressionFactory("[expression]");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.LightBlue);
 		category.Add(block);
 		category.ShowAll();
 		category.AddToMenu(Menu, menu_position++);
@@ -61,7 +72,9 @@ public partial class MainWindow: Gtk.Window
 
 		// Begin a Library:
 		category = new Category("Shapes");
+		category.ModifyBg(Gtk.StateType.Normal, Colors.LightYellow);
 		block = new StatementFactory("draw()", "Shapes.draw");	
+		block.ModifyBg(Gtk.StateType.Normal, Colors.LightYellow);
 		category.Add(block);
 		category.ShowAll();
 		category.AddToMenu(Menu, menu_position++);
@@ -79,6 +92,26 @@ public partial class MainWindow: Gtk.Window
 		
 		// BEGIN Program Block
 		statement = new MethodStatement("draw()");
+		Program.Add( statement);
+		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
+		//w7.Position = 0;
+		w7.Expand = false;
+		w7.Fill = false;
+		statement.Show();
+		// END
+
+		// BEGIN Control Block
+		statement = new IfControlStatement();
+		Program.Add( statement);
+		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
+		//w7.Position = 0;
+		w7.Expand = false;
+		w7.Fill = false;
+		statement.Show();
+		// END
+
+		// BEGIN Control Block
+		statement = new IfThenControlStatement();
 		Program.Add( statement);
 		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
 		//w7.Position = 0;
