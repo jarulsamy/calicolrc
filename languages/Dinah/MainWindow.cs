@@ -9,7 +9,7 @@ public partial class MainWindow: Gtk.Window
 		get { return _menu; }
 	}
 		
-	public Gtk.VBox Program {
+	public Gtk.VBox ProgramArea {
 		get { return _program; }
 	}
 		
@@ -82,8 +82,8 @@ public partial class MainWindow: Gtk.Window
 
 		// BEGIN Program Block
 		Statement statement = new LetStatement("X");
-		Program.Add( statement);
-		Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(Program[statement]));
+		ProgramArea.Add( statement);
+		Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(ProgramArea[statement]));
 		//w7.Position = 0;
 		w7.Expand = false;
 		w7.Fill = false;
@@ -92,8 +92,8 @@ public partial class MainWindow: Gtk.Window
 		
 		// BEGIN Program Block
 		statement = new MethodStatement("draw()");
-		Program.Add( statement);
-		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
+		ProgramArea.Add( statement);
+		w7 = ((global::Gtk.Box.BoxChild)(ProgramArea[statement]));
 		//w7.Position = 0;
 		w7.Expand = false;
 		w7.Fill = false;
@@ -102,8 +102,8 @@ public partial class MainWindow: Gtk.Window
 
 		// BEGIN Control Block
 		statement = new IfControlStatement();
-		Program.Add( statement);
-		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
+		ProgramArea.Add( statement);
+		w7 = ((global::Gtk.Box.BoxChild)(ProgramArea[statement]));
 		//w7.Position = 0;
 		w7.Expand = false;
 		w7.Fill = false;
@@ -112,17 +112,17 @@ public partial class MainWindow: Gtk.Window
 
 		// BEGIN Control Block
 		statement = new IfThenControlStatement();
-		Program.Add( statement);
-		w7 = ((global::Gtk.Box.BoxChild)(Program[statement]));
+		ProgramArea.Add( statement);
+		w7 = ((global::Gtk.Box.BoxChild)(ProgramArea[statement]));
 		//w7.Position = 0;
 		w7.Expand = false;
 		w7.Fill = false;
 		statement.Show();
 		// END
 
-		Gtk.Drag.DestSet(Program, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
-		Program.DragDataReceived += HandleProgramDragDataReceived;
-		Program.Show();
+		Gtk.Drag.DestSet(ProgramArea, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
+		ProgramArea.DragDataReceived += HandleProgramDragDataReceived;
+		ProgramArea.Show();
 	}
 
 	void HandleProgramDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)

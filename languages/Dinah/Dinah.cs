@@ -58,6 +58,28 @@ namespace Dinah
 		}
 	}
 	
+	public class Program : Gtk.Frame {
+		public Gtk.VBox vbox;
+		public Program() {
+			vbox = new Gtk.VBox();
+			vbox.Show();
+			Add(vbox);
+			Show();
+			HeightRequest = 25;
+		}
+		
+		public void AddStatement(Statement statement) {
+			vbox.PackStart(statement, true, true, 0);
+			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(vbox[statement]));
+			w7.Position = 0;
+			w7.Expand = false;
+			w7.Fill = false;
+			statement.Show();
+			HeightRequest = -1;
+		}
+		
+	}
+	
 	public class Statement : Gtk.Frame {
 		public Gtk.HBox hbox;
 		public Gtk.Button gripper;
@@ -234,20 +256,10 @@ namespace Dinah
 			vbox.PackStart(topLine);
 			hbox.PackStart(vbox);
 			vbox.Add(alignment);
-			Gtk.VBox subblock = new Gtk.VBox();
-			subblock.Show();
-			
-			// BEGIN Program Block
-			Statement statement = new LetStatement("X");
-			subblock.Add( statement);
-			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(subblock[statement]));
-			//w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
-			statement.Show();
-			// END
-			
-			expander.Add( subblock);
+			Program program = new Program();		
+			//Statement statement = new LetStatement("X");
+			//program.AddStatement( statement);
+			expander.Add( program);
 		}
 	}
 
@@ -275,20 +287,10 @@ namespace Dinah
 			vbox.PackStart(topLine);
 			hbox.PackStart(vbox);
 			vbox.Add(alignment);
-			Gtk.VBox subblock = new Gtk.VBox();
-			subblock.Show();
-			
-			// BEGIN Program Block
+			Program program = new Program();
 			Statement statement = new LetStatement("X");
-			subblock.Add( statement);
-			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(subblock[statement]));
-			//w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
-			statement.Show();
-			// END
-			
-			expander.Add( subblock);
+			program.AddStatement(statement);			
+			expander.Add(program);
 
 			// Else:
 			Gtk.Expander else_expander = new Gtk.Expander("Else Do:");
@@ -296,23 +298,14 @@ namespace Dinah
 			Gtk.Alignment else_alignment = new Gtk.Alignment (0F, .75F, 1F, 0F);
 			else_alignment.Show();
 			else_expander.Show();
+
 			// for Do block:
 			else_alignment.Add(else_expander);
 			vbox.Add(else_alignment);
-			
-			// BEGIN Program Block
-			subblock = new Gtk.VBox();
-			subblock.Show();
+			program = new Program();
 			statement = new MethodStatement("draw()");
-			subblock.Add( statement);
-			w7 = ((global::Gtk.Box.BoxChild)(subblock[statement]));
-			//w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
-			statement.Show();
-			// END
-			
-			else_expander.Add(subblock);
+			program.AddStatement(statement);			
+			else_expander.Add(program);
 		}
 	}
 
