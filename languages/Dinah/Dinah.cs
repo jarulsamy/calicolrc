@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Dinah
 {
@@ -53,33 +54,12 @@ namespace Dinah
 	    {
 			// sender is what you dropped on
 			// args.SelectionData.Text says what to make
-	        Console.WriteLine ("Received: {0}", args.SelectionData.Text);
-	        Console.WriteLine ("From: {0}", sender);
+	        Console.WriteLine ("Empty Expression Received: {0}", args.SelectionData.Text);
+	        Console.WriteLine ("Empty Expression From: {0}", sender);
+            //Gtk.Drag.Finish (args.Context, true, false, args.Time);			
 		}
 	}
-	
-	public class Program : Gtk.Frame {
-		public Gtk.VBox vbox;
-		public Program() {
-			vbox = new Gtk.VBox();
-			vbox.Show();
-			Add(vbox);
-			Show();
-			HeightRequest = 25;
-		}
 		
-		public void AddStatement(Statement statement) {
-			vbox.PackStart(statement, true, true, 0);
-			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(vbox[statement]));
-			w7.Position = 0;
-			w7.Expand = false;
-			w7.Fill = false;
-			statement.Show();
-			HeightRequest = -1;
-		}
-		
-	}
-	
 	public class Statement : Gtk.Frame {
 		public Gtk.HBox hbox;
 		public Gtk.Button gripper;
@@ -129,43 +109,18 @@ namespace Dinah
 				Gdk.ModifierType.Button1Mask | Gdk.ModifierType.Button3Mask,
             	TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
 			// Setup Drop:
-			Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
-			DragDataReceived += HandleDragDataReceived;
-
-			//this.DragDataReceived += new Gtk.DragDataReceivedHandler (HandleLabelDragDataReceived);
-			//DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
-    	    //DragDataDelete += new Gtk.DragDataDeleteHandler (HandleSourceDragDataDelete);
-			//DragDataReceived += new Gtk.DragDataReceivedHandler (OnButton1DragDataReceived);
+			//Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
+			//DragDataReceived += HandleDragDataReceived;
 		}
 		
 	    protected static void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
 	    {
 			// sender is what you dropped on
 			// args.SelectionData.Text says what to make
-	        Console.WriteLine ("Received: {0}", args.SelectionData.Text);
-	        Console.WriteLine ("From: {0}", sender);
-			/*
-	        if (args.SelectionData.Length >=0 && args.SelectionData.Format == 8) {
-				// Gtk.SelectionData
-				DBlock newblock = new DBlock(args.SelectionData.Text, "drop");
-				newblock.ShowAll();
-				if (sender as Gtk.Expander != null) {
-					// Add to Expander's VBox
-					Gtk.Expander expander = (Gtk.Expander)sender;
-					Gtk.ScrolledWindow sw = (Gtk.ScrolledWindow)expander.Child;
-					Gtk.Viewport vp = (Gtk.Viewport)sw.Child;
-					Gtk.VBox vbox = (Gtk.VBox)vp.Child;
-					Console.WriteLine("({0}, {1})", args.X, args.Y);
-					newblock.DragDataReceived += new Gtk.DragDataReceivedHandler (HandleLabelDragDataReceived);
-	
-					vbox.PackStart(newblock, false, false, 0);
-				} else if (sender as Gtk.VBox != null) {
-					((Gtk.VBox)sender).Add(newblock);
-				}
-	            Gtk.Drag.Finish (args.Context, true, false, args.Time);
-	        }
-	        */
-	        Gtk.Drag.Finish (args.Context, false, false, args.Time);
+			// FIXME: should drop before or after statement
+			//Statement statement = Program.makeStatement(args.SelectionData.Text); 
+			//((Program)((Gtk.VBox)((Statement)sender).Parent).Parent).AddStatement(statement);
+            //Gtk.Drag.Finish (args.Context, true, false, args.Time);
 	    }
 		
 	}
@@ -257,8 +212,6 @@ namespace Dinah
 			hbox.PackStart(vbox);
 			vbox.Add(alignment);
 			Program program = new Program();		
-			//Statement statement = new LetStatement("X");
-			//program.AddStatement( statement);
 			expander.Add( program);
 		}
 	}
@@ -288,8 +241,6 @@ namespace Dinah
 			hbox.PackStart(vbox);
 			vbox.Add(alignment);
 			Program program = new Program();
-			Statement statement = new LetStatement("X");
-			program.AddStatement(statement);			
 			expander.Add(program);
 
 			// Else:
@@ -303,154 +254,9 @@ namespace Dinah
 			else_alignment.Add(else_expander);
 			vbox.Add(else_alignment);
 			program = new Program();
-			statement = new MethodStatement("draw()");
-			program.AddStatement(statement);			
 			else_expander.Add(program);
 		}
 	}
 
-	public class Category : Gtk.EventBox {
-		Gtk.VBox vbox;
-		Gtk.Expander expander;
-		
-		public Category(string label) : base() {
-			expander = new Gtk.Expander(label);
-			expander.Show();
-			Add(expander);
-			expander.CanFocus = true;
-			expander.Expanded = false;
-			// Container child expander1.Gtk.Container+ContainerChild
-			vbox = new Gtk.VBox ();
-			vbox.Spacing = 3;
-			Gtk.Label GtkLabel3 = new Gtk.Label ();
-			GtkLabel3.LabelProp = Mono.Unix.Catalog.GetString (label);
-			GtkLabel3.UseUnderline = true;
-			expander.LabelWidget = GtkLabel3;
-			vbox.ShowAll();
-			expander.Add(vbox);
-		}
-		
-		public void Add(StatementFactory block) {
-			block.Show();
-			vbox.Add(block);
-		}
-		
-		public void AddToMenu(Gtk.VBox vbox, int position) {
-			this.Show();
-			vbox.Add(this);
-			Gtk.Box.BoxChild w30 = ((Gtk.Box.BoxChild)(vbox[this]));
-			w30.Position = position;
-			w30.Expand = false;
-			w30.Fill = false;
-		}
-	}
-
-	public class StatementFactory : Gtk.Button
-	{
-		string BlockType;
-		string icon_string = "gtk-justify-fill";
-
-		public StatementFactory (string label, string type) : base() 
-		{
-			BlockType = type;
-			CanFocus = true;
-			UseUnderline = true;
-			Xalign = 0.0F;			
-			Gtk.Alignment w2 = new Gtk.Alignment (0.0F, 0.5F, 0F, 0F);
-			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			Gtk.HBox w3 = new Gtk.HBox ();
-			w3.Spacing = 2;
-			// Container child GtkHBox.Gtk.Container+ContainerChild
-			Gtk.Image w4 = new Gtk.Image (icon_string, Gtk.IconSize.Button);
-			w4.SetPadding(10, 0);
-			w3.Add (w4);
-			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w6 = new global::Gtk.Label ();
-			w6.LabelProp = global::Mono.Unix.Catalog.GetString (label);
-			w6.UseUnderline = true;
-			w3.Add (w6);
-			w2.Add (w3);
-			this.Add (w2);	
-			
-			
-			Gtk.Drag.SourceSet (this, 
-				Gdk.ModifierType.Button1Mask | Gdk.ModifierType.Button3Mask,
-            	TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
-			DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
-    	    DragDataDelete += new Gtk.DragDataDeleteHandler (HandleSourceDragDataDelete);
-			DragDataReceived += new Gtk.DragDataReceivedHandler (OnButton1DragDataReceived);
-		}
-		
-		// Drag object:
-	    private static void HandleSourceDragDataDelete (object sender, Gtk.DragDataDeleteArgs args)
-	    {
-	        Console.WriteLine ("Delete the data!");
-	    }
-		
-		// Drag object:
-	    private static void HandleSourceDragDataGet (object sender, Gtk.DragDataGetArgs args)
-	    {
-			Console.WriteLine("HandleSourceDragDataGet {0}", sender);
-			// sender is object being dropped
-			// Set args to be what you want to create
-	        //if (args.Info == (uint) TargetType.RootWindow)
-	        //    Console.WriteLine ("I was dropped on the rootwin");
-	        //else
-	        //args.SelectionData.Text = "create:" + ((DBlock)sender).BlockType;
-			//UriList list = new UriList (SelectedPhotos ());	
-            Byte [] data = System.Text.Encoding.UTF8.GetBytes(((StatementFactory)sender).BlockType);
-            Gdk.Atom [] targets = args.Context.Targets;
-			args.SelectionData.Set(targets[0], 8, data, data.Length);
-	    }
-		
-		protected void OnButton1DragBegin (object o, Gtk.DragBeginArgs args)
-		{
-			Console.WriteLine("DragBegin");
-		}
-	
-		protected void OnButton1DragDataGet (object o, Gtk.DragDataGetArgs args)
-		{
-			Console.WriteLine("DragDataGet");
-		}
-	
-		protected void OnButton1DragDataReceived (object o, Gtk.DragDataReceivedArgs args)
-		{
-			Console.WriteLine("DragDataReceived");
-		}
-	
-		protected void OnButton1DragDrop (object o, Gtk.DragDropArgs args)
-		{
-			Console.WriteLine("DragDrop");
-		}
-	
-		protected void OnButton1DragEnd (object o, Gtk.DragEndArgs args)
-		{
-			Console.WriteLine("DragEnd");
-		}
-	
-		protected void OnButton1DragLeave (object o, Gtk.DragLeaveArgs args)
-		{
-			Console.WriteLine("DragLeave");
-		}
-	
-		protected void OnButton1DragMotion (object o, Gtk.DragMotionArgs args)
-		{
-			Console.WriteLine("DragMotion");
-		}
-	
-		protected void OnButton1DragDataDelete (object o, Gtk.DragDataDeleteArgs args)
-		{
-			Console.WriteLine("DragDataDelete");
-		}				
-	}
-	
-	class ExpressionFactory : StatementFactory {
-		public string icon_string = "stock_dialog-info";
-		
-		public ExpressionFactory(string label) : base(label, "expression") {
-		}
-
-	}
-	
 }
 

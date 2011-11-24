@@ -10,7 +10,6 @@ public partial class MainWindow
 	private global::Gtk.VBox _menu;
 	private global::Gtk.Button button8;
 	private global::Gtk.ScrolledWindow scrolledwindow2;
-	private global::Gtk.VBox _program;
     
 	protected virtual void Build ()
 	{
@@ -85,15 +84,6 @@ public partial class MainWindow
 		this.scrolledwindow2.CanFocus = true;
 		this.scrolledwindow2.Name = "scrolledwindow2";
 		this.scrolledwindow2.ShadowType = ((global::Gtk.ShadowType)(1));
-		// Container child scrolledwindow2.Gtk.Container+ContainerChild
-		global::Gtk.Viewport w16 = new global::Gtk.Viewport ();
-		w16.ShadowType = ((global::Gtk.ShadowType)(0));
-		// Container child GtkViewport1.Gtk.Container+ContainerChild
-		this._program = new global::Gtk.VBox ();
-		this._program.Name = "_program";
-		this._program.Spacing = 6;
-		w16.Add (this._program);
-		this.scrolledwindow2.Add (w16);
 		this.hpaned1.Add (this.scrolledwindow2);
 		this.Add (this.hpaned1);
 		if ((this.Child != null)) {
@@ -102,6 +92,5 @@ public partial class MainWindow
 		this.DefaultWidth = 570;
 		this.DefaultHeight = 421;
 		this.Show ();
-		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 	}
 }
