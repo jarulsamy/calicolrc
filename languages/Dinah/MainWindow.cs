@@ -25,18 +25,18 @@ public partial class MainWindow: Gtk.Window
 		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		
-		block = new StatementFactory("If Then", "ifthen");	
-		Program.registerStatement("ifthen", () => new IfThenControlStatement());
+		block = new StatementFactory("If Else", "ifelse");	
+		Program.registerStatement("ifelse", () => new IfThenControlStatement());
 		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		
 		block = new StatementFactory("While", "while");	
-		Program.registerStatement("while", () => new Statement("while"));
+		Program.registerStatement("while", () => new Statement("while", "while"));
 		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		
 		block = new StatementFactory("Repeat", "repeat");	
-		Program.registerStatement("repeat", () => new Statement("repeat"));
+		Program.registerStatement("repeat", () => new Statement("repeat", "repeat"));
 		block.ModifyBg(Gtk.StateType.Normal, Colors.PaleGoldenrod);
 		category.Add(block);
 		
@@ -59,7 +59,7 @@ public partial class MainWindow: Gtk.Window
 		category = new Category("Expressions");
 		category.ModifyBg(Gtk.StateType.Normal, Colors.LightBlue);
 		block = new ExpressionFactory("[expression]");	
-		Program.registerStatement("expression", () => new Statement("expression"));
+		Program.registerStatement("expression", () => new Statement("expression", "expression"));
 
 		block.ModifyBg(Gtk.StateType.Normal, Colors.LightBlue);
 		category.Add(block);

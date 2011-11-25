@@ -40,7 +40,7 @@ namespace Dinah
 	
 	public class StatementFactory : Gtk.Button
 	{
-		string BlockType;
+		public string BlockType;
 		string icon_string = "gtk-justify-fill";
 
 		public StatementFactory (string label, string type) : base() 
@@ -65,7 +65,6 @@ namespace Dinah
 			w2.Add (w3);
 			this.Add (w2);	
 			
-			
 			Gtk.Drag.SourceSet (this, 
 				Gdk.ModifierType.Button1Mask | Gdk.ModifierType.Button3Mask,
             	TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
@@ -76,7 +75,7 @@ namespace Dinah
 	    private static void HandleSourceDragDataGet (object sender, Gtk.DragDataGetArgs args)
 	    {
 			Console.WriteLine("HandleSourceDragDataGet {0}", sender);
-            Byte [] data = System.Text.Encoding.UTF8.GetBytes(((StatementFactory)sender).BlockType);
+            Byte [] data = System.Text.Encoding.UTF8.GetBytes("create:" + ((StatementFactory)sender).BlockType);
             Gdk.Atom [] targets = args.Context.Targets;
 			args.SelectionData.Set(targets[0], 8, data, data.Length);
 	    }
