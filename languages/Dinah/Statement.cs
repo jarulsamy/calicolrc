@@ -12,6 +12,7 @@ namespace Dinah
 		public string icon_string = "gtk-justify-fill";
 		public string BlockType;
 		public string BlockID;
+		public Program myProgram;
 
 		public void HandleGripperDragDataGet (object sender, Gtk.DragDataGetArgs args)
 		{
@@ -74,6 +75,12 @@ namespace Dinah
 			Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
 			DragDataReceived += HandleDragDataReceived;
 		}
+
+		public void RemoveFromProgram() {
+			myProgram.vbox.Remove(this);
+			if (myProgram.vbox.Children.Length == 1) // the hidden label
+				myProgram.label.Show();
+		}
 		
 	    protected static void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
 	    {
@@ -85,11 +92,11 @@ namespace Dinah
 				string [] data = args.SelectionData.Text.Split(':');
 				if (data[0] == "create") {
 					Statement statement = Program.makeStatement(data[1]); 
-					((Program)((Gtk.VBox)((Statement)sender).Parent).Parent).AddStatement(statement, (Statement)sender, args.X, args.Y);
+					Program myprogram = ((Statement)sender).myProgram;
+					myprogram.AddStatement(statement, (Statement)sender, args.X, args.Y);
 	            	Gtk.Drag.Finish (args.Context, true, false, args.Time);
 				} else if (data[0] == "move") {
-					// FIXME: move item here
-					((Program)((Gtk.VBox)((Statement)sender).Parent).Parent).MoveStatement(data[1], (Statement)sender, args.X, args.Y);
+					((Statement)sender).myProgram.MoveStatement(data[1], (Statement)sender, args.X, args.Y);
 	            	Gtk.Drag.Finish (args.Context, true, false, args.Time);
 				}
 			} else {

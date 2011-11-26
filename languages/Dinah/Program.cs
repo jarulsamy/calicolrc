@@ -32,6 +32,7 @@ namespace Dinah
 		}
 		
 		public void AddStatement(Statement statement) {
+			statement.myProgram = this;
 			label.Hide();
 			vbox.PackStart(statement, true, true, 0);
 			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(vbox[statement]));
@@ -45,24 +46,25 @@ namespace Dinah
 		public void MoveStatement(string id, Statement dropped_on, int x, int y) {
 			// drop ID onto statement
 			Statement mover = Program.lookup[id];
-			Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(vbox[dropped_on]));
-			Gtk.Box.BoxChild w8 = ((Gtk.Box.BoxChild)(vbox[mover]));
-			Gdk.Rectangle rect = dropped_on.Allocation;
-			if (y < rect.Height/2) {
-				if (w8.Position == w7.Position) {
-					// then you probably meant next
-					w8.Position = w7.Position + 1; // next
-				} else {
+			if (mover.myProgram == dropped_on.myProgram) {
+				Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(vbox[dropped_on]));
+				Gtk.Box.BoxChild w8 = ((Gtk.Box.BoxChild)(vbox[mover]));
+				Gdk.Rectangle rect = dropped_on.Allocation;
+				if (y < rect.Height/2) {
 					w8.Position = w7.Position; //before, will put in front
-				}
-			} else {
-				if (w8.Position == w7.Position) {
-					// then you probably meant previous
-					w8.Position = w7.Position - 1; // before, will put in front
 				} else {
 					w8.Position = w7.Position + 1; // next
 				}
+			} else { // different programs
+				// FIXME: check for no more and show label
+				mover.RemoveFromProgram();
+				dropped_on.myProgram.AddStatement(mover, dropped_on, x, y);
 			}
+		}
+
+		public void MoveStatementToBottom(Statement mover) {
+			Gtk.Box.BoxChild w8 = ((Gtk.Box.BoxChild)(vbox[mover]));
+			w8.Position = -1; //last
 		}
 
 		public void AddStatement(Statement statement, Program widget, int x, int y) {
@@ -92,10 +94,14 @@ namespace Dinah
 			string [] data = args.SelectionData.Text.Split(':');
 			if (data[0] == "create") {
 				Statement statement = Program.makeStatement(data[1]); 
-				((Program)sender).AddStatement(statement, (Program)sender, args.X, args.Y);
+				this.AddStatement(statement, this, args.X, args.Y);
             	Gtk.Drag.Finish (args.Context, true, false, args.Time);
 			} else if (data[0] == "move") {
 				// FIXME: move item here
+				// Move to bottom:
+				Statement statement = Program.lookup[data[1]];
+				statement.RemoveFromProgram();
+				((Program)sender).AddStatement(statement, (Program)sender, args.X, args.Y);
             	Gtk.Drag.Finish (args.Context, true, false, args.Time);
 			}
 		}

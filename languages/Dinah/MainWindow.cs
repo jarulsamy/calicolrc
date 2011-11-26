@@ -12,10 +12,17 @@ public partial class MainWindow: Gtk.Window
 	public Gtk.ScrolledWindow ProgramScrolledWindow {
 		get { return scrolledwindow2; }
 	}
+	
+	public Gtk.Button Trashcan {
+		get { return button8; }
+	}
 		
 	public MainWindow (): base (Gtk.WindowType.Toplevel)
 	{
 		Build ();
+		
+		Gtk.Drag.DestSet(Trashcan, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
+		Trashcan.DragDataReceived += HandleTrashDragDataReceived;
 		
 		// Begin a Library:
 		Category category = new Category("Control");
@@ -80,5 +87,15 @@ public partial class MainWindow: Gtk.Window
 		
 		Program program = new Program();
 		ProgramScrolledWindow.AddWithViewport(program);		
+	}
+
+	void HandleTrashDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
+	{
+		string [] data = args.SelectionData.Text.Split(':');
+		if (data[0] == "move") {
+			Statement statement = Program.lookup[data[1]];
+			statement.RemoveFromProgram();
+        	Gtk.Drag.Finish (args.Context, true, false, args.Time);
+		}		
 	}
 }
