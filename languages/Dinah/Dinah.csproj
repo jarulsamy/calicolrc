@@ -54,6 +54,7 @@
     <Compile Include="StatementFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Statement.cs" />
+    <Compile Include="Engine.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -12,7 +12,9 @@ namespace Dinah
 		public string icon_string = "gtk-justify-fill";
 		public string BlockType;
 		public string BlockID;
+		public BlockState blockState;
 		public Program myProgram;
+		public bool BreakPoint;
 
 		public void HandleGripperDragDataGet (object sender, Gtk.DragDataGetArgs args)
 		{
@@ -75,11 +77,86 @@ namespace Dinah
 			Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
 			DragDataReceived += HandleDragDataReceived;
 		}
+		
+		public virtual IEnumerator<RunnerResponse> 
+			Runner(Scope locals, Dictionary<string, object> builtins) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.blockState = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the repetition
+			int count = 1;
+			int maxreps = 0;
+
+			// Start by getting the number of repetitions as an integer
+			// TODO: Allow access to global namespace
+			try {
+				//CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
+				//object oreps = Repetitions.Expr.Evaluate(locals);
+				//maxreps = (int)oreps;
+
+			} catch (Exception ex) {
+				//this["Message"] = ex.Message;
+				//MsgProp.Text = ex.Message;
+				
+				this.blockState = BlockState.Error;
+				rr.Action = EngineAction.NoAction;
+				rr.Runner = null;
+			}
+			// Go into a loop while block remains in an error state
+			while (this.blockState == BlockState.Error) yield return rr;
+			
+			// Execute the repetition
+			while ( count <= maxreps )
+			{
+				// Next perform one iteration of the enclosed stack
+				if (true) { //this.LoopEdge.IsConnected) {
+					rr.Action = EngineAction.Add;
+					//rr.Runner = this.LoopEdge.LinkedTo.Block.Runner(locals, builtins);
+					yield return rr;
+				}
+				
+				// At this point the body of the loop has completed
+				// Increment counter
+				count++;
+			}			
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.blockState == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (true) { //this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				//rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Runner = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.blockState = BlockState.Idle;
+			yield return rr;
+		}		
+		
 		public void RemoveFromProgram() {
 			myProgram.vbox.Remove(this);
-			if (myProgram.vbox.Children.Length == 1) // the hidden label
+			if (myProgram.vbox.Children.Length == 1) { // the hidden label
 				myProgram.label.Show();
+				myProgram.label.HeightRequest = 40;
+			}
 		}
 		
 	    protected static void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)

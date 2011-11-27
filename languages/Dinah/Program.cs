@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 namespace Dinah
 {
+	
 	public class Program : Gtk.Frame {
 		public Gtk.VBox vbox;
 		public Gtk.Label label;
 		public static Dictionary<string,Func<Statement>> factories = new Dictionary<string, Func<Statement>>();
 		public static Dictionary<string,Statement> lookup = new Dictionary<string, Statement>();
 		static int id_count = 1;
+		public static Engine engine = new Engine();
 			
 		public Program() {
 			vbox = new Gtk.VBox();
@@ -20,11 +22,36 @@ namespace Dinah
 			vbox.Show();
 			Add(vbox);
 			Show();
-			HeightRequest = 25;
+			HeightRequest = 40;
 			Gtk.Drag.DestSet(this, Gtk.DestDefaults.All, TargetTable.target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
 			DragDataReceived += HandleProgramDragDataReceived;
 		}
 		
+		public static List<Statement> getAllStatements() {
+			List<Statement> list = new List<Statement>();
+			foreach (Statement s in lookup.Values) {
+				list.Add(s);
+			}
+			return list;
+		}
+		
+		public static List<Statement> getStartStatements() {
+			List<Statement> list = new List<Statement>();
+			foreach (Statement s in lookup.Values) {
+				if (s.myProgram.vbox.Children.Length > 0 && s.myProgram.vbox.Children[0] == s)
+					list.Add(s);
+			}
+			return list;
+		}
+
+		public List<Statement> getStatements() {
+			List<Statement> list = new List<Statement>();
+			foreach (Statement s in vbox) {
+				list.Add(s);
+			}
+			return list;
+		}
+
 		public static string makeID() {
 			string retval = id_count.ToString();
 			id_count++;
