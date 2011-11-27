@@ -213,6 +213,15 @@ namespace Dinah
 			}		
 		}
 		
+		public void ReadFile(string filename) {
+		}
+		
+		public void Run() {
+		}
+		
+		public string Export() {
+			return "";
+		}
 	}
 	
 	public class TargetTable {
