@@ -94,8 +94,8 @@ namespace Dinah
 			Gtk.Image image = new Gtk.Image("gtk-delete", Gtk.IconSize.Button);
 			image.Show();
 			this.button8 = new Gtk.Button (image);
-			//this.button8.WidthRequest = 30;
-			this.button8.HeightRequest = 60;
+			this.button8.WidthRequest = 100;
+			this.button8.HeightRequest = 70;
 			this.button8.CanFocus = true;
 			this.button8.Name = "button8";
 			this.button8.UseUnderline = true;
