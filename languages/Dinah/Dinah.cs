@@ -32,6 +32,40 @@ namespace Dinah
 			return new Gdk.Color((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
 		}
 	}
+
+	internal class IconLoader
+	{
+		public static Gdk.Pixbuf LoadIcon (Gtk.Widget widget, string name, Gtk.IconSize size)
+		{
+			Gdk.Pixbuf res = widget.RenderIcon (name, size, null);
+			if ((res != null)) {
+				return res;
+			} else {
+				int sz;
+				int sy;
+				global::Gtk.Icon.SizeLookup (size, out  sz, out  sy);
+				try {
+					return Gtk.IconTheme.Default.LoadIcon (name, sz, 0);
+				} catch (System.Exception) {
+					if ((name != "gtk-missing-image")) {
+						return IconLoader.LoadIcon (widget, "gtk-missing-image", size);
+					} else {
+						Gdk.Pixmap pmap = new Gdk.Pixmap (Gdk.Screen.Default.RootWindow, sz, sz);
+						Gdk.GC gc = new Gdk.GC (pmap);
+						gc.RgbFgColor = new Gdk.Color (255, 255, 255);
+						pmap.DrawRectangle (gc, true, 0, 0, sz, sz);
+						gc.RgbFgColor = new Gdk.Color (0, 0, 0);
+						pmap.DrawRectangle (gc, false, 0, 0, (sz - 1), (sz - 1));
+						gc.SetLineAttributes (3, Gdk.LineStyle.Solid, Gdk.CapStyle.Round, Gdk.JoinStyle.Round);
+						gc.RgbFgColor = new Gdk.Color (255, 0, 0);
+						pmap.DrawLine (gc, (sz / 4), (sz / 4), ((sz - 1) - (sz / 4)), ((sz - 1) - (sz / 4)));
+						pmap.DrawLine (gc, ((sz - 1) - (sz / 4)), (sz / 4), (sz / 4), ((sz - 1) - (sz / 4)));
+						return Gdk.Pixbuf.FromDrawable (pmap, pmap.Colormap, 0, 0, 0, 0, sz, sz);
+					}
+				}
+			}
+		}
+	}
 	
 	public class DinahWidget : Gtk.Frame {
 		private global::Gtk.HPaned hpaned1;
@@ -91,9 +125,23 @@ namespace Dinah
 			w5.Position = 0;
 			// Container child vbox7.Gtk.Box+BoxChild
 			//"stock_trash_full", "gtk-justify-fill"
-			Gtk.Image image = new Gtk.Image("gtk-delete", Gtk.IconSize.Button);
-			image.Show();
-			this.button8 = new Gtk.Button (image);
+			//Gtk.Image image = new Gtk.Image(Gtk.Stock.Discard, Gtk.IconSize.Button);
+			
+			Gtk.Alignment alignment = new Gtk.Alignment (0.5F, 0.5F, 0F, 0F);
+			// Container child GtkAlignment.Gtk.Container+ContainerChild
+			global::Gtk.HBox hbox1 = new global::Gtk.HBox ();
+			hbox1.Spacing = 2;
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			Gtk.Image image = new global::Gtk.Image ();
+			image.Pixbuf = IconLoader.LoadIcon (this, "stock_trash_full", Gtk.IconSize.Dialog);
+			hbox1.Add(image);
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			//global::Gtk.Label w5 = new global::Gtk.Label ();
+			//w2.Add (w5);
+			alignment.Add(hbox1);
+		
+			this.button8 = new Gtk.Button ();
+			button8.Add(alignment);
 			this.button8.WidthRequest = 100;
 			this.button8.HeightRequest = 70;
 			this.button8.CanFocus = true;
