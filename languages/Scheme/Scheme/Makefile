@@ -1,10 +1,10 @@
 MCS=gmcs
 
 ../PJScheme.dll: pjscheme-rm.ss scheme-to-csharp.ss Scheme.cs pjscheme.cs
-	$(MCS) -debug Scheme.cs pjscheme.cs -target:library -lib:../../bin -r:Microsoft.VisualBasic.dll -r:../../../bin/Microsoft.Scripting.dll -r:../../../bin/IronPython.dll -r:../../../bin/Microsoft.Dynamic -out:../PJScheme.dll
+	$(MCS) -debug Scheme.cs pjscheme.cs -target:library -lib:../../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -out:../PJScheme.dll
 
 pjscheme: pjscheme.exe
-	MONO_PATH=../../bin mono --debug pjscheme.exe
+	MONO_PATH=../../../bin mono --debug pjscheme.exe
 
 pjscheme-ds.ss: environments-cps.ss parser-cps.ss unifier-cps.ss \
 		interpreter-cps.ss reader-cps.ss ds-transformer.ss
@@ -39,11 +39,11 @@ pjscheme.cs:
 
 pjscheme.exe: pjscheme-rm.ss scheme-to-csharp.ss Scheme.cs pjscheme.cs
 	$(MCS) -debug pjscheme.cs Scheme.cs getline.cs -main:PJScheme \
-	-lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll \
+	-lib:../../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll \
 	-r:IronPython.dll -r:Microsoft.Dynamic 
 
 Test.exe: Test.cs
-	$(MCS) Test.cs -lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
+	$(MCS) Test.cs -lib:../../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
 
 make-fact.ss: scheme-to-csharp.ss 
 	echo "(load \"rm-transformer.ss\")" > make-fact.ss
@@ -97,17 +97,17 @@ fact.cs: fact.ss Scheme.cs getline.cs make-fact.ss rm-transformer.ss
 	indent -di0 -i3 fact.cs
 
 fact: fact.exe
-	MONO_PATH=../../bin mono fact.exe
+	MONO_PATH=../../../bin mono fact.exe
 
 fact.exe: fact.cs
-	$(MCS) fact.cs Scheme.cs getline.cs -main:PJScheme -lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
+	$(MCS) fact.cs Scheme.cs getline.cs -main:PJScheme -lib:../../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
 
 Scheme.exe: Scheme.cs fact.cs
-	$(MCS) Scheme.cs fact.cs getline.cs -main:Scheme -lib:../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
-	MONO_PATH=../../bin mono Scheme.exe
+	$(MCS) Scheme.cs fact.cs getline.cs -main:Scheme -lib:../../../bin -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.dll
+	MONO_PATH=../../../bin mono Scheme.exe
 
 DLR.exe: DLR.cs
-	gmcs DLR.cs -lib:../../bin -r:Microsoft.Scripting.dll -r:Microsoft.Scripting.Core.dll
+	gmcs DLR.cs -lib:../../../bin -r:Microsoft.Scripting.dll -r:Microsoft.Scripting.Core.dll
 
 External.dll: External.cs
 	$(MCS) External.cs -target:library
