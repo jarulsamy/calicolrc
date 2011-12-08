@@ -65,6 +65,9 @@ namespace Calico {
                     return null;
             }
         }
+        public Gtk.HScale ProgramSpeed {
+            get { return hscale1;}
+        }
         public Gtk.Notebook.NotebookChild EnvironmentPage {
             get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
         }
@@ -114,9 +117,6 @@ namespace Calico {
         }
         public Gtk.Action StartButton {
             get { return yesAction1; }
-        }
-        public Gtk.Action DebugButton {
-            get { return goForwardAction; }
         }
         public Gtk.Action StopButton {
             get { return noAction; }
@@ -958,7 +958,6 @@ namespace Calico {
 
         public void OnStartRunning() {
             StartButton.Sensitive = false;
-            DebugButton.Sensitive = false;
             StopButton.Sensitive = true;
         }
 
@@ -967,14 +966,11 @@ namespace Calico {
             if (CurrentDocument != null) { // Editor
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true; // need something to execute
-                    DebugButton.Sensitive = true; // need something to execute
                 } else {
                     StartButton.Sensitive = false; // need something to execute
-                    DebugButton.Sensitive = false; // need something to execute
                 }
             } else { // Shell
                 StartButton.Sensitive = false; // need something to execute
-                DebugButton.Sensitive = false; // need something to execute
             }
             executeThread = null;
             /*
@@ -1077,17 +1073,14 @@ namespace Calico {
             StopButton.Sensitive = (executeThread != null);
             if (CurrentDocument != null) {
                 StartButton.Sensitive = (CurrentDocument.HasContent);
-                DebugButton.Sensitive = (CurrentDocument.HasContent);
                 SetLanguage(CurrentDocument.language);
                 CurrentDocument.widget.Child.GrabFocus();
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
                 StartButton.Sensitive = false;
-                DebugButton.Sensitive = false;
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
                 StartButton.Sensitive = (Shell.Document.Text != "");
-                DebugButton.Sensitive = false; // only on documents
                 SetLanguage(ShellLanguage);
                 // Workaround: had to add this for notebook page selection:
                 GLib.Timeout.Add(0, delegate {
@@ -1097,7 +1090,6 @@ namespace Calico {
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
                 StartButton.Sensitive = false;
-                DebugButton.Sensitive = false;
                 // Some other page
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             }
@@ -1112,9 +1104,16 @@ namespace Calico {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
-                    SetLanguage(CurrentLanguage);
-                    manager[CurrentLanguage].engine.SetTraceOff();
-                    CurrentDocument.ExecuteFileInBackground();
+                    if (ProgramSpeed.Value < 100) {
+                        // FIXME: Let Document handle tracing, call Document.ExecuteFileWithTrace
+                        SetLanguage(CurrentLanguage);
+                        manager[CurrentLanguage].engine.SetTraceOn(this);
+                        ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
+                    } else {
+                        SetLanguage(CurrentLanguage);
+                        manager[CurrentLanguage].engine.SetTraceOff();
+                        CurrentDocument.ExecuteFileInBackground();
+                    }
                 }
             } else if (Focus == Shell) {
                 ExecuteShell();
@@ -1261,20 +1260,6 @@ namespace Calico {
             KeyDown(true);
         }
 
-        protected void OnGoForwardActionActivated (object sender, System.EventArgs e)
-        {
-            if (CurrentDocument != null) {
-                bool retval = CurrentDocument.Save();
-                if (retval) {
-					// FIXME: Let Document handle tracing:
-                    SetLanguage(CurrentLanguage);
-                    manager[CurrentLanguage].engine.SetTraceOn(this);
-                    ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
-					// FIXME: call ExecuteFileWithTrace
-                }
-            }
-        }
-
         protected void OnZoomInActionActivated (object sender, System.EventArgs e)
         {
             if (CurrentDocument != null)
@@ -1287,7 +1272,7 @@ namespace Calico {
                 CurrentDocument.ZoomOut();
         }
 
-        protected void OnExportAction1Activated (object sender, System.EventArgs e)
+        protected void OnExportActionActivated (object sender, System.EventArgs e)
         {
             if (CurrentDocument != null)
                 CurrentDocument.Export(this);

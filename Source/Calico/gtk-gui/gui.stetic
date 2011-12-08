@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="607 558">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="733 558">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -45,13 +45,6 @@
         <property name="ShortLabel" translatable="yes">Stop Script</property>
         <property name="StockId">gtk-no</property>
         <signal name="Activated" handler="OnNoActionActivated" />
-      </action>
-      <action id="goForwardAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes" />
-        <property name="Sensitive">False</property>
-        <property name="StockId">gtk-go-forward</property>
-        <signal name="Activated" handler="OnGoForwardActionActivated" />
       </action>
       <action id="EditAction">
         <property name="Type">Action</property>
@@ -296,6 +289,37 @@
         <property name="DrawAsRadio">False</property>
         <property name="Active">True</property>
       </action>
+      <action id="ExportAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Export</property>
+        <property name="ShortLabel" translatable="yes">Export</property>
+        <signal name="Activated" handler="OnExportActionActivated" />
+      </action>
+      <action id="goForwardAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes" />
+        <property name="StockId">gtk-go-forward</property>
+      </action>
+      <action id="cancelAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes" />
+        <property name="StockId">gtk-cancel</property>
+      </action>
+      <action id="mediaForwardAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes" />
+        <property name="StockId">gtk-media-forward</property>
+      </action>
+      <action id="mediaNextAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes" />
+        <property name="StockId">gtk-media-next</property>
+      </action>
+      <action id="mediaPauseAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes" />
+        <property name="StockId">gtk-media-pause</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -353,6 +377,7 @@
                 <node type="Menuitem" action="yesAction1" />
                 <node type="Menuitem" action="noAction" />
                 <node type="Menuitem" action="ShellAction" />
+                <node type="Menuitem" action="ExportAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="helpAction" />
@@ -368,16 +393,62 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Toolbar" id="toolbar1">
+          <widget class="Gtk.HBox" id="hbox4">
             <property name="MemberName" />
-            <property name="ShowArrow">False</property>
-            <node name="toolbar1" type="Toolbar">
-              <node type="Toolitem" action="newAction" />
-              <node type="Toolitem" action="openAction" />
-              <node type="Toolitem" action="yesAction1" />
-              <node type="Toolitem" action="noAction" />
-              <node type="Toolitem" action="goForwardAction" />
-            </node>
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Toolbar" id="toolbar1">
+                <property name="MemberName" />
+                <property name="ShowArrow">False</property>
+                <node name="toolbar1" type="Toolbar">
+                  <node type="Toolitem" action="newAction" />
+                  <node type="Toolitem" action="openAction" />
+                  <node type="Toolitem" action="noAction" />
+                  <node type="Toolitem" action="yesAction1" />
+                </node>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.HScale" id="hscale1">
+                <property name="MemberName" />
+                <property name="WidthRequest">100</property>
+                <property name="CanFocus">True</property>
+                <property name="Inverted">True</property>
+                <property name="Upper">100</property>
+                <property name="PageIncrement">10</property>
+                <property name="StepIncrement">1</property>
+                <property name="Value">100</property>
+                <property name="DrawValue">False</property>
+                <property name="Digits">0</property>
+                <property name="ValuePos">Top</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Toolbar" id="toolbar2">
+                <property name="MemberName" />
+                <property name="ShowArrow">False</property>
+                <node name="__gtksharp_54_Stetic_Editor_ActionToolbar" type="Toolbar">
+                  <node type="Toolitem" action="mediaForwardAction" />
+                  <node type="Toolitem" action="mediaNextAction" />
+                  <node type="Toolitem" action="mediaPauseAction" />
+                </node>
+              </widget>
+              <packing>
+                <property name="Position">2</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="Position">1</property>
@@ -390,7 +461,7 @@
           <widget class="Gtk.VPaned" id="vpaned2">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">307</property>
+            <property name="Position">276</property>
             <child>
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
