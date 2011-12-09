@@ -115,11 +115,20 @@ namespace Calico {
         public Gtk.TextView Output {
             get { return textview1; }
         }
-        public Gtk.Action StartButton {
+        public Gtk.Button StartButton {
+            get { return _startButton; }
+        }
+        public Gtk.Action StartAction {
             get { return yesAction1; }
         }
-        public Gtk.Action StopButton {
-            get { return noAction; }
+        public Gtk.Button StopButton {
+            get { return _stopButton; }
+        }
+        public Gtk.Button PauseButton {
+            get { return _pauseButton; }
+        }
+        public Gtk.Button PlayButton {
+            get { return _playButton; }
         }
         public string CurrentProperLanguage {
             get {
@@ -327,10 +336,13 @@ namespace Calico {
         [GLib.ConnectBeforeAttribute]
         public void ShellKeyReleaseEvent(object obj, System.EventArgs args) {
             // This code was interacting with OnKeyPress
-            if (_shell.Document.Text == "")
+            if (_shell.Document.Text == "") {
                 StartButton.Sensitive = false;
-            else
+                StartAction.Sensitive = false;
+            } else {
                 StartButton.Sensitive = true;
+                StartAction.Sensitive = true;
+            }
         }
 
         public static bool needInvoke() {
@@ -552,6 +564,11 @@ namespace Calico {
         }
 
         protected virtual void OnButton3Clicked(object sender, System.EventArgs e) {
+            PickNew();
+
+        }
+        protected void OnNewButtonClicked (object sender, System.EventArgs e)
+        {
             PickNew();
         }
 
@@ -804,7 +821,6 @@ namespace Calico {
                     args.RetVal = true;
                 } else if (args.Event.Key == Gdk.Key.Return) {
                     // if control key is down, too, just insert a return
-                    bool force = false;
                     if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
                         Shell.InsertAtCaret("\n");
                         args.RetVal = true;
@@ -814,7 +830,7 @@ namespace Calico {
                     Mono.TextEditor.Caret caret = Shell.Caret;
                     int line = caret.Line;
                     int line_count = Shell.Document.LineCount;
-                    if (line != line_count - 1 && !force) {
+                    if (line != line_count - 1) {
                         completion = null;
                         args.RetVal = false;
                     }
@@ -825,7 +841,7 @@ namespace Calico {
                         completion = null;
                         args.RetVal = true;
                         // nothing to do, but handled
-                    } else if (manager[CurrentLanguage].engine.ReadyToExecute(text) || force) {
+                    } else if (manager[CurrentLanguage].engine.ReadyToExecute(text)) {
                         history.last(text.TrimEnd());
                         history.add("");
                         ExecuteShell();
@@ -860,6 +876,7 @@ namespace Calico {
                     completion = null;
                 }
             } else if (Focus is Mono.TextEditor.TextEditor) {
+                // Handle not dirty
                 // not shell
                 // Editor, handle : on end of line
             }
@@ -958,19 +975,36 @@ namespace Calico {
 
         public void OnStartRunning() {
             StartButton.Sensitive = false;
+            StartAction.Sensitive = false;
+            PlayButton.Sensitive = false;
+            PauseButton.Sensitive = false;
             StopButton.Sensitive = true;
+            noAction.Sensitive = true;
         }
 
         public void OnStopRunning() {
             StopButton.Sensitive = false;
+            noAction.Sensitive = false;
             if (CurrentDocument != null) { // Editor
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true; // need something to execute
+                    StartAction.Sensitive = true;
+                    ProgramSpeed.Sensitive = true;
+                    PlayButton.Sensitive = true;
+                    PauseButton.Sensitive = true;
                 } else {
                     StartButton.Sensitive = false; // need something to execute
+                    StartAction.Sensitive = false;
+                    ProgramSpeed.Sensitive = false;
+                    PlayButton.Sensitive = false;
+                    PauseButton.Sensitive = false;
                 }
             } else { // Shell
                 StartButton.Sensitive = false; // need something to execute
+                StartAction.Sensitive = false;
+                ProgramSpeed.Sensitive = false;
+                PlayButton.Sensitive = false;
+                PauseButton.Sensitive = false;
             }
             executeThread = null;
             /*
@@ -1070,17 +1104,51 @@ namespace Calico {
         }
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
-            StopButton.Sensitive = (executeThread != null);
+            if (executeThread != null) {
+                StopButton.Sensitive = true;
+                noAction.Sensitive = true;
+            } else {
+                StopButton.Sensitive = false;
+                noAction.Sensitive = false;
+            }
             if (CurrentDocument != null) {
-                StartButton.Sensitive = (CurrentDocument.HasContent);
+                if (CurrentDocument.HasContent) {
+                    StartButton.Sensitive = true;
+                    StartAction.Sensitive = true;
+                    ProgramSpeed.Sensitive = true;
+                    PauseButton.Sensitive = true;
+                    PlayButton.Sensitive = true;
+                } else {
+                    StartButton.Sensitive = false;
+                    StartAction.Sensitive = false;
+                    ProgramSpeed.Sensitive = false;
+                    PauseButton.Sensitive = false;
+                    PlayButton.Sensitive = false;
+                }
                 SetLanguage(CurrentDocument.language);
                 CurrentDocument.widget.Child.GrabFocus();
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
                 StartButton.Sensitive = false;
+                StartAction.Sensitive = false;
+                ProgramSpeed.Sensitive = false;
+                PauseButton.Sensitive = false;
+                PlayButton.Sensitive = false;
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
-                StartButton.Sensitive = (Shell.Document.Text != "");
+                if (Shell.Document.Text != "") {
+                    ProgramSpeed.Sensitive = false;
+                    StartAction.Sensitive = true;
+                    StartButton.Sensitive = true;
+                    PauseButton.Sensitive = false;
+                    PlayButton.Sensitive = false;
+                } else {
+                    StartButton.Sensitive = false;
+                    StartAction.Sensitive = false;
+                    ProgramSpeed.Sensitive = false;
+                    PauseButton.Sensitive = false;
+                    PlayButton.Sensitive = false;
+                }
                 SetLanguage(ShellLanguage);
                 // Workaround: had to add this for notebook page selection:
                 GLib.Timeout.Add(0, delegate {
@@ -1090,6 +1158,10 @@ namespace Calico {
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
                 StartButton.Sensitive = false;
+                StartAction.Sensitive = false;
+                ProgramSpeed.Sensitive = false;
+                PauseButton.Sensitive = false;
+                PlayButton.Sensitive = false;
                 // Some other page
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             }
@@ -1110,12 +1182,16 @@ namespace Calico {
                         manager[CurrentLanguage].engine.SetTraceOn(this);
                         ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
                     } else {
+                        ProgramSpeed.Sensitive = false;
                         SetLanguage(CurrentLanguage);
                         manager[CurrentLanguage].engine.SetTraceOff();
                         CurrentDocument.ExecuteFileInBackground();
                     }
                 }
-            } else if (Focus == Shell) {
+            } else if (DocumentNotebook.Page == SHELL) {
+                string text = Shell.Document.Text;
+                history.last(text.TrimEnd());
+                history.add("");
                 ExecuteShell();
             }
         }
@@ -1277,6 +1353,36 @@ namespace Calico {
             if (CurrentDocument != null)
                 CurrentDocument.Export(this);
 
+        }
+
+        protected void OnMediaPauseActionActivated (object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException ();
+        }
+
+        protected void OnOpenButtonClicked (object sender, System.EventArgs e)
+        {
+            OnOpenAction1Activated(sender, e);
+        }
+
+        protected void OnStopButtonClicked (object sender, System.EventArgs e)
+        {
+            AbortThread();
+        }
+
+        protected void OnStartButtonClicked (object sender, System.EventArgs e)
+        {
+            OnYesAction1Activated(sender, e);
+        }
+
+        protected void OnPauseButtonClicked (object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException ();
+        }
+
+        protected void OnPlayButtonClicked (object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException ();
         }
     }
 }
