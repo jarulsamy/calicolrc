@@ -979,9 +979,10 @@ namespace Diagram
             // If not found, try to load it
             if (assembly == null)
             {
-                System.Security.Policy.Evidence ev = new System.Security.Policy.Evidence();
-                assembly = Assembly.Load(assemblyName, ev);
-            }
+                //System.Security.Policy.Evidence ev = new System.Security.Policy.Evidence();
+                //assembly = Assembly.Load(assemblyName, ev);
+            	assembly = Assembly.Load(assemblyName);
+			}
 
             // If still don't have it, then quit
             if (assembly == null) return null;
@@ -993,9 +994,8 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the SelectionChanged event
         public virtual void RaiseSelectionChangedEvent()
-        {
+        {	// Allow external class to raise the SelectionChanged event
             if (SelectionChanged != null)
             {
                 ShapeListEventArgs evargs = new ShapeListEventArgs(SelectedShapes());
@@ -1434,10 +1434,10 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // This method searches through the shapes on the list from top down
-        // and returns the first shape that was hit.
         public CShape HitShape(CPoint pt)
-        {
+        {	/* This method searches through the shapes on the list from top down
+			   and returns the first shape that was hit. */
+			
             // Check shapes
             for ( int i=this.shapes.Count-1; i>=0; i--)
             {
@@ -1448,10 +1448,10 @@ namespace Diagram
             return null;
         }
 
-
-        // If shape_type is set, return first shape that is an instance of given type.
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CShape HitShape(CPoint pt, Type shape_type)
-        {
+        {	// If shape_type is set, return first shape that is an instance of given type.
+			
             // Check shapes
             for (int i = this.shapes.Count - 1; i >= 0; i--)
             {
@@ -1902,6 +1902,7 @@ namespace Diagram
 		protected int _Y;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
         // Constructors
         public CShape(List<CPoint> points, String text, Color textColor, 
                       Color lineColor, int lineWidth, Color fillColor,
@@ -2489,16 +2490,15 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Translate the upper left corner of this shape to the given point
         public void TranslateTo(CPoint pt)
-        {
+        {	// Translate the upper left corner of this shape to the given point
             this.Translate(new CPoint(pt.X - this.left, pt.Y - this.top));
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Translate the center point of this shape to the given point
         public void TranslateCenterTo(CPoint pt)
-        {
+        {	// Translate the center point of this shape to the given point
+			
             // Translates this shape's center point to the given point.
             this.Translate(new CPoint(pt.X - this.center.X, pt.Y - this.center.Y));
         }
@@ -2566,9 +2566,9 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Recalculate the bounding box for this shape as well as the center point
         public virtual void UpdateBoundingBox()
-        {
+        {	// Recalculate the bounding box for this shape as well as the center point
+			
             // If not points ...
             if (this.points.Count == 0)
             {
@@ -2611,9 +2611,8 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Update the location of all decorator objects
         public void UpdateDecorators()
-        {
+        {	// Update the location of all decorator objects
             foreach (CDecorator s in this.Decorators.Values) s.Update(this);
         }
 
@@ -2626,8 +2625,9 @@ namespace Diagram
             // Simple behavior is to use ContainsPoint.
             // More complex overridden bahavior may return a
             // part of a composite shape.
-            if (this.ContainsPoint(pt, cvs) == true) return this;
-            else return null;
+            //if (this.ContainsPoint(pt, cvs) == true) return this;
+			if (this.ContainsPoint(pt, cvs) && this.visible) return this;
+			return null;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3468,13 +3468,14 @@ namespace Diagram
     }
 
     // -----------------------------------------------------------------------
-    // Rounded Rectangle shape class
     public class CRoundedRectangle : CShape
-    {
+    {	// Rounded Rectangle shape class
+		
 		// radius = (float)(0.2 * Math.Min(w, h));
 		private double radius = 1.0; 
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
         // Constructors
         public CRoundedRectangle(List<CPoint> points) : base(points) { }
 
@@ -3508,32 +3509,29 @@ namespace Diagram
         public CRoundedRectangle(Dictionary<String, System.Object> parms) : base(parms) { }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Create and return a shape factory instance for a CRoundedRectangle.
         public static new ICanvasEventHandler CreateFactory()
-        {
+        {	// Create and return a shape factory instance for a CRoundedRectangle.
             return new CShapeFactory(typeof(CRoundedRectangle));
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Set radius of corners
 		public double Radius
-        {
+        {	// Set radius of corners
             get { return this.radius; }
             set { this.radius = value; }
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Override and set radius beyond base class behavior
 		public override CShape Clone(double X, double Y) 
-		{	
+		{	// Override and set radius beyond base class behavior
 			CRoundedRectangle clone = (CRoundedRectangle)base.Clone(X, Y);
 			clone.Radius = this.Radius;
 			return clone;
 		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Draw the rounded rectangle shape on the canvas
         public override void Draw(Cairo.Context g)
-        {
+        {	// Draw the rounded rectangle shape on the canvas
             // Note that an ellipse can have negative width or height and draw correctly.
             // The CBoundingBox is not strictly necessary to reorient points.
 			double x = this.left;
@@ -3646,10 +3644,11 @@ namespace Diagram
     }
 	
     // -----------------------------------------------------------------------
-    // line shape class
     public class CLine : CShape
-    {		
+    {	// line shape class
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		
         // Constructors
         public CLine(List<CPoint> points) : base(points) { }
 

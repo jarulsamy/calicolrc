@@ -178,6 +178,8 @@ namespace Jigsaw
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
         {	// If this block is hit, return a self reference.
         	
+			if (!this.visible) return null;
+			
 			double X = pt.X;
 			double Y = pt.Y;
 			double Ymin = this.Top;
@@ -453,6 +455,8 @@ namespace Jigsaw
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
         {	// If this block is hit, return a self reference.
         	
+			if (!this.visible) return null;
+			
 			double X = pt.X;
 			double Y = pt.Y;
 			double Ymin = this.Top;
@@ -735,6 +739,8 @@ namespace Jigsaw
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
         {	// If this block is hit, return a self reference.
         	
+			if (!this.visible) return null;
+			
 			double X = pt.X;
 			double Y = pt.Y;
 			double Ymin = this.Top;
@@ -1093,6 +1099,8 @@ namespace Jigsaw
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
         {	// If this block is hit, return a self reference.
         	
+			if (!this.visible) return null;
+			
 			double X = pt.X;
 			double Y = pt.Y;
 			double Ymin = this.Top;

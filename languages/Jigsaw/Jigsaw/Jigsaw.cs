@@ -61,7 +61,7 @@ namespace Jigsaw
 		
 		internal int _X;		// Cache
 		internal int _Y;
-				
+		
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
 
@@ -111,21 +111,27 @@ namespace Jigsaw
 			_engine.Reset(this, _inspector);
 			
 			// Set up all widgets
-//			Widgets.CBlockPalette palette = new Widgets.CBlockPalette(500, 100, 200, 400);
-//			this.AddShape( palette );
 			
-//			Widgets.CSlider sl = new Widgets.CSlider(500, 100, 20, 400, 0.0);
-//			this.AddShape( sl );
+			// Add block panel background to canvas
+//			Diagram.CRectangle pnlBlock = new Diagram.CRectangle(
+//			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 10000.0)}, 
+//				"", Diagram.Colors.Transparent, Diagram.Colors.Honeydew, 1, Diagram.Colors.Honeydew, 
+//				true, false, false, false, false);
+			Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
+//			pnlBlock.Dock = Diagram.DockSide.Left;
+			
+			//Widgets.CSlider sl = new Widgets.CSlider(500, 100, 20, 400, 0.0);
+			//this.AddShape( sl );
 			
 			// Build tabbed panel for blocks
-			Widgets.CRoundedTab tbCtrl     = new Widgets.CRoundedTab(0,  67, 100, 30, "Control");
-			Widgets.CRoundedTab tbVars     = new Widgets.CRoundedTab(0, 100, 100, 30, "Variables");
-			Widgets.CRoundedTab tbInOut    = new Widgets.CRoundedTab(0, 133, 100, 30, "Input/Output");
-			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 166, 100, 30, "Myro");
-			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 199, 100, 30, "Graphics");
-			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 199 + 33, 100, 30, "Shapes");
-			Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools");
-			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes");
+			Widgets.CRoundedTab tbCtrl     = new Widgets.CRoundedTab(0,  67, 100, 30, "Control", pnlBlock);
+			Widgets.CRoundedTab tbVars     = new Widgets.CRoundedTab(0, 100, 100, 30, "Variables", pnlBlock);
+			Widgets.CRoundedTab tbInOut    = new Widgets.CRoundedTab(0, 133, 100, 30, "Input/Output", pnlBlock);
+			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 166, 100, 30, "Myro", pnlBlock);
+			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 199, 100, 30, "Graphics", pnlBlock);
+			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 199 + 33, 100, 30, "Shapes", pnlBlock);
+			Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools", pnlBlock);
+			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes", pnlBlock);
 			
 			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbNotes, tbGraphics, tbShapes});
 			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbNotes, tbGraphics, tbShapes});
@@ -137,23 +143,16 @@ namespace Jigsaw
 			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,  tbGraphics, tbShapes});
 			
 			// Dock all tabs to left
-			tbInOut.Dock = Diagram.DockSide.Left;
-			tbCtrl.Dock = Diagram.DockSide.Left;
-			tbVars.Dock = Diagram.DockSide.Left;
-			tbMyro.Dock = Diagram.DockSide.Left;
+			tbInOut.Dock    = Diagram.DockSide.Left;
+			tbCtrl.Dock     = Diagram.DockSide.Left;
+			tbVars.Dock     = Diagram.DockSide.Left;
+			tbMyro.Dock     = Diagram.DockSide.Left;
 			tbGraphics.Dock = Diagram.DockSide.Left;
-			tbShapes.Dock = Diagram.DockSide.Left;
-			tbTools.Dock = Diagram.DockSide.Left;
-			tbNotes.Dock = Diagram.DockSide.Left;
-//			tbInOut.Dock = Diagram.DockSide.Left;
-//			tbCtrl.Dock = Diagram.DockSide.Left;
-//			tbVars.Dock = Diagram.DockSide.Left;
-//			tbMyro.Dock = Diagram.DockSide.Left;
-//			tbGraphics.Dock = Diagram.DockSide.Left;
-//			tbTools.Dock = Diagram.DockSide.Left;
-//			tbNotes.Dock = Diagram.DockSide.Left;
+			tbShapes.Dock   = Diagram.DockSide.Left;
+			tbTools.Dock    = Diagram.DockSide.Left;
+			tbNotes.Dock    = Diagram.DockSide.Left;
 			
-			// Add tabs to the canvas
+			// Add tabs and palette to the canvas
 			this.AddShape(tbCtrl);
 			this.AddShape(tbVars);
 			this.AddShape(tbInOut);
@@ -163,14 +162,7 @@ namespace Jigsaw
 			this.AddShape(tbTools);
 			this.AddShape(tbNotes);
 			
-			// Add block panel background to canvas
-			Diagram.CRectangle pnlBlock = new Diagram.CRectangle(
-			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 10000.0)}, 
-				"", Diagram.Colors.Transparent, Diagram.Colors.Honeydew, 1, Diagram.Colors.Honeydew, 
-				true, false, false, false, false);
 			this.AddShape(pnlBlock);
-			
-//			pnlBlock.Dock = Diagram.DockSide.Left;
 			
 			// Factory Blocks for block area
 			
@@ -485,7 +477,9 @@ namespace Jigsaw
 			{
 				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 				return;
+				
 			} else {
+				
             	if (this.Mode == Diagram.EMode.Editing)
             	{
 		            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
@@ -882,8 +876,9 @@ namespace Jigsaw
 
 		protected Dictionary<String, CProperty> _properties;
 		
-		// Constructor
-		public CBlock(List<Diagram.CPoint> pts, bool isFactory) : base(pts) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBlock(List<Diagram.CPoint> pts, bool isFactory) : base(pts)
+		{	// Constructor
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
 			this._isFactory = isFactory;
@@ -902,21 +897,23 @@ namespace Jigsaw
 			_properties["Message"] = MsgProp;
 		}
 		
-		// State getter/setter 
-		public BlockState State {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public BlockState State
+		{	// State getter/setter 
 			get { return _state;  }
 			set { _state = value; }
 		}
 		
-		// Method to clone a CBlock at X,Y
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override Diagram.CShape Clone(double X, double Y) 
-		{	// Clone this CBlock
+		{	// Method to clone a CBlock at X,Y
 			return this.Clone(X, Y, true);
 		}
 
-		// Method to clone a CBlock at X,Y with option to clone edges. 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public virtual CBlock Clone(double X, double Y, bool cloneEdges) 
-		{	// Clone this block. Optionally clone edges.
+		{	// Method to clone a CBlock at X,Y with option to clone edges.
+			
 			CBlock clone = (CBlock)base.Clone(X, Y);
 
 			// @@@ The following line is necessary for blocks that change height 
@@ -933,9 +930,9 @@ namespace Jigsaw
 			return clone;
 		}
 		
-		// Access property values
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public string this[string key]
-		{
+		{	// Access property values
 			get { return _properties[key].Text;  }
 			set { _properties[key].Text = value; }
 		}
@@ -1334,7 +1331,8 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {	// Handle mouse down event
-			// Completely override default behavior in CShape
+			
+			// Override default behavior in CShape
 			
             // If the canvas is in the editing state
             if (cvs.Mode == Diagram.EMode.Editing)

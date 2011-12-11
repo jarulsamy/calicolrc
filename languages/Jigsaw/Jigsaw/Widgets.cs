@@ -7,49 +7,6 @@ using System.Collections.Generic;
 namespace Widgets
 {
 	// -----------------------------------------------------------------------
-	public class CBlockPalette : Diagram.CRoundedRectangle
-	{
-		private CSlider slider;
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
-		{
-			this.Radius = 5;
-			this.LineWidth = 2;
-			this.LineColor = Diagram.Colors.DarkSlateGray;
-			this.FillColor = Diagram.Colors.Honeydew;
-			this.TextColor = Diagram.Colors.Black;
-			
-			// Add slider to widget - 20 pixels wide
-			this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
-		}
-		
-		public CBlockPalette(double x, double y) : base(x, y) {}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override Diagram.CShape Clone(double x, double y) {
-			CBlockPalette clone = new CBlockPalette(x, y, this.Width, this.Height);
-			return (Diagram.CShape)clone;
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override void Draw(Cairo.Context g)
-        {
-			base.Draw(g);
-			this.slider.Top = this.Top+5;
-			this.slider.Left = this.Left + this.Width - this.slider.Width-5;
-			this.slider.Height = this.Height - 10;
-			this.slider.Draw(g);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        public override Boolean ContainsPoint(Diagram.CPoint pnt, Diagram.Canvas cvs)
-//        {
-//			return slider.ContainsPoint(pnt, cvs);
-//		}
-	}
-
-	// -----------------------------------------------------------------------
 	public class CRoundedButton : Diagram.CRoundedRectangle
 	{
 		private bool _Enabled = true;
@@ -114,7 +71,8 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public bool Enabled {
+		public bool Enabled 
+		{	// Get/set enabled state of button
 			get { return _Enabled; }
 			set { 
 				_Enabled = value;
@@ -131,7 +89,91 @@ namespace Widgets
 			}
 		}
 	}
+	
+	// -----------------------------------------------------------------------
+	public class CBlockPalette : Diagram.CRectangle
+	{	// The background palette for currently available block factories
+		
+		// Keep a ref to the currently selected tab so the proper factory blocks are scrolled
+		internal CRoundedTab _currTab = null;
+		
+		// Keep track of previous mouse Y position to enable scrolling of factories
+		private double? _prevMouseY = null;
+		
+		//private CSlider slider;
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
+		{
+			this.LineWidth = 1;
+			this.LineColor = Diagram.Colors.Honeydew;
+			this.FillColor = Diagram.Colors.Honeydew;
+			this.TextColor = Diagram.Colors.Transparent;
+			this.Visible = true;
+			this.Sizable = false;
+			this.Selectable = false;
+			this.Draggable = false;
+			this.Connectable = false;
+			
+			// Add slider to widget - 20 pixels wide
+			//this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
+		}
+		
+		public CBlockPalette(double x, double y) : base(x, y) {}
 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override Diagram.CShape Clone(double x, double y) {
+			CBlockPalette clone = new CBlockPalette(x, y, this.Width, this.Height);
+			return (Diagram.CShape)clone;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
+				_prevMouseY = e.Y;
+			}
+			base.OnMouseDown(cvs, e);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (_prevMouseY != null && _currTab != null) {
+				double dY = e.Y - (double)_prevMouseY;
+				foreach (WeakReference wrshp in _currTab._shapes)
+				{
+					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+					if (shp != null) {
+						shp.Top += dY;
+					}
+				}
+				_prevMouseY = e.Y;
+				cvs.Invalidate();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			_prevMouseY = null;
+			base.OnMouseUp (cvs, e);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override void Draw(Cairo.Context g)
+        {
+			base.Draw(g);
+//			this.slider.Top = this.Top+5;
+//			this.slider.Left = this.Left + this.Width - this.slider.Width-5;
+//			this.slider.Height = this.Height - 10;
+//			this.slider.Draw(g);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        public override Boolean ContainsPoint(Diagram.CPoint pnt, Diagram.Canvas cvs)
+//        {
+//			return slider.ContainsPoint(pnt, cvs);
+//		}
+	}
+	
 	// -----------------------------------------------------------------------
 	public class CTextBox : Diagram.CShape
 	{
@@ -172,32 +214,16 @@ namespace Widgets
 	{
 		private bool _toggled = false;
 		private List<WeakReference> _tabs = new List<WeakReference>(); // weak references to other tabs in tab group
-		private List<WeakReference> _shapes = new List<WeakReference>(); 
+		internal List<WeakReference> _shapes = new List<WeakReference>();
 		
-		/// <summary>
-		/// Constructor 
-		/// </summary>
-		/// <param name="x">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="y">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="w">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="h">
-		/// A <see cref="System.Double"/>
-		/// </param>
-		/// <param name="label">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <param name="toggled">
-		/// A <see cref="System.Boolean"/>
-		/// </param>
-		public CRoundedTab (double x, double y, double w, double h, string label)
+		// Save a reference to the block palette
+		internal CBlockPalette _palette = null;
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette)
 			: base(x, y, w, h)
 		{
+			_palette = palette;
 			this.Text = label;
 			this.Radius = 5;
 			this.LineWidth = 0;
@@ -208,84 +234,80 @@ namespace Widgets
 			this.SetToggle(null, false);
 		}
 		
-		/// <summary>
-		/// Add another CRoundToggle to the group to act in concert 
-		/// </summary>
-		/// <param name="rt">
-		/// A <see cref="CRoundedToggle"/>
-		/// </param>
-		public void AddTab(CRoundedTab rt){
-			_tabs.Add( new WeakReference(rt) );
-		}
-		
-		/// <summary>
-		/// Add a list of associated rounded tabs to this tab
-		/// </summary>
-		/// <param name="rts">
-		/// A <see cref="List<CRoundedTab>"/>
-		/// </param>
-		public void AddTabs(List<CRoundedTab> rts){
-			foreach (CRoundedTab rt in rts) _tabs.Add( new WeakReference(rt) );
-		}
-		
-		/// <summary>
-		/// Add a CShape object to the shapes with visibility controlled by the tab 
-		/// </summary>
-		/// <param name="shp">
-		/// A <see cref="CShape"/>
-		/// </param>
-		public void AddShape(Diagram.CShape shp) {
-			_shapes.Add( new WeakReference(shp) );
-		}
-		
-		public void AddShapes(List<Diagram.CShape> shps) {
-			foreach (Diagram.CShape shp in shps) _shapes.Add( new WeakReference(shp) );
-		}
-		
-        /// <summary>
-        /// Override CShape OnMouseDown method 
-        /// </summary>
-        /// <param name="cvs">
-        /// A <see cref="Canvas"/>
-        /// </param>
-        /// <param name="e">
-        /// A <see cref="MouseEventArgs"/>
-        /// </param>
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
-        {	// Handle mouse down event
-						
+        {	// Override CShape OnMouseDown method 
+		
 			// If within shape, change fill color
-			if (this.ContainsPoint(e.X, e.Y, cvs)) {
+			if (this.ContainsPoint(e.X, e.Y, cvs)) 
+			{	
 				this.SetToggle(cvs, true);
 				cvs.Invalidate();
 			}
 		}
 		
-		/// <summary>
-		/// Toggle button state 
-		/// </summary>
-		/// <param name="val">
-		/// A <see cref="System.Boolean"/>
-		/// </param>
-		public void Toggle(Diagram.Canvas cvs) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseUp(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+        {	// Override OnMouseUp event
+			cvs.handler = cvs;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override void Draw(Cairo.Context g)
+        {	// Draw the tab widget
+			
+			// Start with the base rounded rectangle
+			base.Draw(g);
+			
+			// Add two smaller rectangle for scrolling up and down
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AddTab(CRoundedTab rt)
+		{	// Add another CRoundToggle to the group to act in concert 
+			_tabs.Add( new WeakReference(rt) );
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AddTabs(List<CRoundedTab> rts)
+		{	// Add a list of associated rounded tabs to this tab
+			foreach (CRoundedTab rt in rts) _tabs.Add( new WeakReference(rt) );
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AddShape(Diagram.CShape shp) 
+		{	// Add a CShape object to the shapes with visibility controlled by the tab 
+			_shapes.Add( new WeakReference(shp) );
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AddShapes(List<Diagram.CShape> shps) 
+		{
+			foreach (Diagram.CShape shp in shps) 
+				_shapes.Add( new WeakReference(shp) );
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Toggle(Diagram.Canvas cvs) 
+		{	// Toggle button state 
 			this.SetToggle(cvs, !_toggled);
 		}
 		
-		/// <summary>
-		/// Set the toggle state of a toggle button 
-		/// </summary>
-		/// <param name="val">
-		/// A <see cref="System.Boolean"/>
-		/// </param>
-		public void SetToggle(Diagram.Canvas cvs, bool val) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void SetToggle(Diagram.Canvas cvs, bool val) 
+		{	// Set the toggle state of a toggle button 
 			// Set this tab state
 			_toggled = val;
+			
 			if (_toggled) this.FillColor = Diagram.Colors.Honeydew;
 			else		  this.FillColor = Diagram.Colors.Silver;
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes
-			if (_toggled == true) {
+			if (_toggled == true) 
+			{
+				if (_palette != null) _palette._currTab= this;
+
 				foreach (WeakReference wr in _tabs) {
 					CRoundedTab rt = wr.Target as CRoundedTab;
 					if (rt != null) rt.SetToggle(cvs, false);
@@ -303,19 +325,11 @@ namespace Widgets
 				}
 			}
 			
+			// Redraw
 			if (cvs != null) cvs.DeselectAll();
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override void OnMouseMove(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
-        {	// Handle mouse move event
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseUp(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
-        {	// Handle mouse up event
-			cvs.handler = cvs;
-		}
+
 	}
 	
 //	// -----------------------------------------------------------------------
