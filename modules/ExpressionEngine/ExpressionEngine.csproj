@@ -44,5 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\IronPython.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Scripting.Core, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
