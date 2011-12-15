@@ -608,6 +608,8 @@ namespace Jigsaw
 				OnSaveAs(sender, e);
 			} else {
 				XmlWriter xw = new XmlTextWriter(_currentPath, Encoding.ASCII);
+				xw.Settings.Indent = true;
+				xw.Settings.IndentChars = ("    ");
 				this.ToXml(xw);
 				xw.Close();
 			}
