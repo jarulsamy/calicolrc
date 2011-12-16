@@ -607,11 +607,13 @@ namespace Jigsaw
 			if (_currentPath == null || _currentPath.Trim().Length == 0 ) {
 				OnSaveAs(sender, e);
 			} else {
-				XmlWriter xw = new XmlTextWriter(_currentPath, Encoding.ASCII);
-				xw.Settings.Indent = true;
-				xw.Settings.IndentChars = ("    ");
-				this.ToXml(xw);
-				xw.Close();
+				XmlWriterSettings settings = new XmlWriterSettings();
+				settings.Indent = true;
+				settings.IndentChars = "    ";
+				settings.Encoding = Encoding.ASCII;
+				using (XmlWriter xw = XmlWriter.Create(_currentPath, settings)) {
+					this.ToXml(xw);
+				}
 			}
 		}
 		
