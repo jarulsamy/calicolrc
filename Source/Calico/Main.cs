@@ -33,7 +33,11 @@ namespace Calico {
 
         [STAThread]
         public static void Main(string[] args) {
-            // Set up translations:
+            // Setup config
+            string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
+            Config config = new Config(config_path);
+            // Setup translations:
             string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
@@ -94,6 +98,7 @@ namespace Calico {
                 MainWindow win = new MainWindow(args, manager, Debug);
                 win.Show();
                 Application.Run();
+                config.Save();
             }
         }
 
