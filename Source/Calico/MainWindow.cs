@@ -1389,5 +1389,12 @@ namespace Calico {
         {
             throw new System.NotImplementedException ();
         }
+
+        protected void OnPrintActionActivated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.Print();
+            }
+        }
     }
 }

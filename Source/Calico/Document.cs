@@ -57,6 +57,17 @@ namespace Calico {
             tab_widget.ShowAll();
         }
 
+        public virtual string GetText() {
+            return null;
+        }
+
+        public virtual void Print() {
+            Save();
+            if (filename != null) {
+                new Printing(basename, GetText(), filename);
+            }
+        }
+
         public virtual void ExecuteFileInBackground() {
             // this allows document to handle it, if it wishes
             // otherwise pass to calico
@@ -165,6 +176,10 @@ namespace Calico {
             data.Caret.Column = 0;
             texteditor.ScrollToCaret();
             return true;
+        }
+
+        public override string GetText() {
+            return texteditor.Document.Text;
         }
 
         public override bool HasContent {

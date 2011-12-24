@@ -803,6 +803,7 @@ namespace Calico
 			this.EnvironmentTabAction.Activated += new global::System.EventHandler (this.OnEnvironmentTabActionActivated);
 			this.ExportAction.Activated += new global::System.EventHandler (this.OnExportActionActivated);
 			this.mediaPauseAction.Activated += new global::System.EventHandler (this.OnMediaPauseActionActivated);
+			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this._newButton.Clicked += new global::System.EventHandler (this.OnNewButtonClicked);
 			this._openButton.Clicked += new global::System.EventHandler (this.OnOpenButtonClicked);
 			this._stopButton.Clicked += new global::System.EventHandler (this.OnStopButtonClicked);
