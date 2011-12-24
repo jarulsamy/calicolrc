@@ -29,6 +29,7 @@ using Calico;
 namespace Calico {
 
     public partial class MainWindow : Gtk.Window {
+        public Config config;
         public Gtk.Clipboard clipboard;
         private Mono.TextEditor.TextEditor _shell;
         public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
@@ -49,7 +50,7 @@ namespace Calico {
         Gtk.ListStore EnvironmentList;
         Gtk.ListStore LocalList;
         public System.Threading.Thread executeThread = null;
-        public History history = new History();
+        public History history;
         public TabCompletion completion = null;
         static string dialogResponse;
         public Document CurrentDocument {
@@ -155,7 +156,9 @@ namespace Calico {
             return false;
         }
 
-        public MainWindow(string[] args, LanguageManager manager, bool Debug) : base(Gtk.WindowType.Toplevel) {
+        public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
+                base(Gtk.WindowType.Toplevel) {
+            this.config = config;
             this.Debug = Debug;
             this.manager = manager;
             completion = null;
@@ -304,8 +307,10 @@ namespace Calico {
             // Set EnvironmentPage to match displayed state:
             IsUpdateEnvironment = true;
             EnvironmentTabAction.Active = true;
-            GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+            history = new History((List<string>)this.config.values["shell"]["history"]);
+            UpdateUpDownArrows();
             // End of GUI setup
+            GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
 
         public void HandleException(GLib.UnhandledExceptionArgs args) {

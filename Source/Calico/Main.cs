@@ -95,7 +95,7 @@ namespace Calico {
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
-                MainWindow win = new MainWindow(args, manager, Debug);
+                MainWindow win = new MainWindow(args, manager, Debug, config);
                 win.Show();
                 Application.Run();
                 config.Save();

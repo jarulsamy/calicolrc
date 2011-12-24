@@ -68,50 +68,55 @@ namespace Calico {
             string setting = null;
             string type = null;
             string value = null;
+            object list = null;
             while (xr.Read()) {
                 switch (xr.NodeType) {
                 case XmlNodeType.Text:
                     if (xr.HasValue)
-                        value = xr.Value;
+                        if (list != null)
+                            ((List<string>)list).Add((string)makeValue(type, xr.Value));
+                        else
+                            value = xr.Value;
                     break;
                 case XmlNodeType.Element: // section or setting
-                    node_type = xr.Name.ToLower();
-                    if (node_type == "section") {
+                    if (xr.Name.ToLower() == "section") {
+                        node_type = xr.Name.ToLower();
                         section = xr.GetAttribute("name");
                         if (!values.ContainsKey(section)) {
                             // allow new sections defined in file
                             values[section] = new Dictionary<string, object>();
                         }
-                    } else if (node_type == "setting") {
+                    } else if (xr.Name.ToLower() == "setting") {
+                        list = null;
+                        value = null;
+                        node_type = xr.Name.ToLower();
                         setting = xr.GetAttribute("name");
                         type = xr.GetAttribute("type");
+                        if (type == "strings")
+                            list = new List<string>();
+                    } else if (xr.Name.ToLower() == "item") {
+                        // ok, will add to list
                     }
                     break;
                 case XmlNodeType.EndElement: // section or setting
                     if (node_type == "setting") {
-                        values[section][setting] = makeValue(type, value);
+                        if (type == "strings")
+                            values[section][setting] = list;
+                        else
+                            values[section][setting] = makeValue(type, value);
                     }
-                    node_type = null;
-                    value = null;
                     break;
                 }
             }
             xr.Close();
         }
         public object makeValue(string type, string value) {
-            Console.WriteLine("makeValue({0}, {1})", type, value);
             if (type == "int") {
                 return System.Int32.Parse(value);
             } else if (type == "string") {
                 return value;
             } else if (type == "strings") {
-                var retval = new List<string>();
-                if (value != null) {
-                    foreach (string item in value.Split(',')) {
-                        retval.Add(item);
-                    }
-                }
-                return retval;
+                return value;
             } else {
                 throw new Exception(String.Format("no such config type: {0}", type));
             }
@@ -120,7 +125,7 @@ namespace Calico {
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
             settings.IndentChars = "    ";
-            settings.Encoding = System.Text.Encoding.ASCII;
+            settings.Encoding = System.Text.Encoding.UTF8;
             using (XmlWriter xw = XmlWriter.Create(filename, settings)) {
                 xw.WriteStartDocument();
                 xw.WriteStartElement("sections");
@@ -132,13 +137,11 @@ namespace Calico {
                         xw.WriteAttributeString("name", vs.Key);
                         xw.WriteAttributeString("type", types[pair.Key][vs.Key]);
                         if (types[pair.Key][vs.Key] == "strings") {
-                            string v = "";
                             foreach(string item in (List<string>)values[pair.Key][vs.Key]) {
-                                if (v != "")
-                                    v += ",";
-                                v += item;
+                                xw.WriteStartElement("item");
+                                xw.WriteValue(item);
+                                xw.WriteEndElement();
                             }
-                            xw.WriteValue(v);
                         } else {
                             xw.WriteValue(vs.Value);
                         }

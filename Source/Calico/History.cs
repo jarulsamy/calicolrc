@@ -44,7 +44,8 @@ namespace Calico {
         }
 
         public History(List<string> history) {
-             this.history = history;
+            // reference
+            this.history = history;
             if (history.Count == 0 || history[Last] != "") {
                 history.Add("");
             }
