@@ -311,6 +311,7 @@
         <property name="Label" translatable="yes">_Print</property>
         <property name="ShortLabel" translatable="yes">_Print</property>
         <property name="StockId">gtk-print</property>
+        <signal name="Activated" handler="OnPrintActionActivated" />
       </action>
     </action-group>
     <property name="MemberName" />
