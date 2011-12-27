@@ -45,7 +45,7 @@ namespace Calico {
             else
                basename = String.Format("New {0} Script", calico.manager.languages[language].proper_name);
             tab_widget = new Gtk.HBox();
-            tab_label = new Gtk.Label(basename);
+            tab_label = new Gtk.Label(basename.Replace("_", "__"));
             ((Gtk.HBox)tab_widget).Add(tab_label);
             close_button = new Gtk.Button();
             Gtk.Image img = new Gtk.Image();
@@ -112,9 +112,9 @@ namespace Calico {
 
         public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {
             if (IsDirty)
-                tab_label.Text = String.Format("*{0}", basename);
+                tab_label.Text = String.Format("*{0}", basename.Replace("_", "__"));
             else
-                tab_label.Text = basename;
+                tab_label.Text = basename.Replace("_", "__");
         }
 
         public virtual void ZoomIn() {

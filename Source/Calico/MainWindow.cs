@@ -248,16 +248,16 @@ namespace Calico {
             Gtk.RadioMenuItem radioitem;
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
-                if (CurrentLanguage == null) {
-                    CurrentLanguage = language.name;
-                    ShellLanguage = language.name;
-                }
+                if (! language.IsTextLanguage)
+                    continue;
                 if (language.name == "python") {
                     // FIXME: get from defaults, preferred lang
                     CurrentLanguage = language.name;
                     ShellLanguage = language.name;
+                } else if (CurrentLanguage == null) {
+                    CurrentLanguage = language.name;
+                    ShellLanguage = language.name;
                 }
-                
                 // FIXME: select default language initially
                 // unique name, label, mnemonic, accel, tooltip, user data
                 string name = String.Format("Switch to {0}", language.proper_name);
@@ -309,6 +309,7 @@ namespace Calico {
             EnvironmentTabAction.Active = true;
             history = new History((List<string>)this.config.values["shell"]["history"]);
             UpdateUpDownArrows();
+            addToRecentsMenu(null);
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
@@ -484,7 +485,6 @@ namespace Calico {
                 page.close_button.Clicked += delegate { TryToClose(page); };
             }
             if (filename != null) {
-                UpdateRecentFiles(filename);
                 string dir = System.IO.Path.GetDirectoryName(filename);
                 System.IO.Directory.SetCurrentDirectory(dir);
             }
@@ -501,12 +501,31 @@ namespace Calico {
             }
         }
 
-        public void UpdateRecentFiles(string filename) {
-        }
-
         public Document MakeDocument(string filename) {
             string language = CurrentLanguage;
             return MakeDocument(filename, language);
+        }
+
+        public void addToRecentsMenu (string filename)
+        {
+            List<string> filenames = (List<string>)config.GetValue("config", "recent-files");
+            if (filename != null) {
+                // Last is most recent:
+                if (filenames.Contains(filename)) {
+                    filenames.Remove(filename);
+                }
+                filenames.Insert(0, filename);
+            }
+            // Now update menu:
+            Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentScriptsAction");
+            examples_menu.Submenu = new Gtk.Menu();
+            foreach (string file in filenames) {
+                Gtk.MenuItem fmenu = new Gtk.MenuItem(file.Replace("_", "__"));
+                ((Gtk.Menu)examples_menu.Submenu).Add(fmenu);
+                string fullname = file; // because C# doesn't make closures on values
+                fmenu.Activated += delegate { SelectOrOpen(fullname); };
+            }
+            examples_menu.Submenu.ShowAll();
         }
 
         public Document MakeDocument(string filename, string language) {
@@ -516,6 +535,7 @@ namespace Calico {
             // FIXME: get document from language
             Document document = manager.languages[language].MakeDocument(this, filename);
             document.Configure();
+            addToRecentsMenu(filename);
             return document;
         }
 
@@ -594,6 +614,7 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.Save();
                 SetLanguage(CurrentLanguage);
+                addToRecentsMenu(CurrentDocument.filename); // needed, if didn't have filename before
             }
         }
 
@@ -601,6 +622,7 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SaveAs();
                 SetLanguage(CurrentLanguage);
+                addToRecentsMenu(CurrentDocument.filename);
             }
         }
 

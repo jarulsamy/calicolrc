@@ -75,6 +75,7 @@ namespace Dinah
 		private global::Gtk.VBox _menu;
 		private global::Gtk.Button button8;
 		private global::Gtk.ScrolledWindow scrolledwindow2;
+		public Engine engine = new Engine();
 
 		int menu_position = 0;
 	

@@ -27,6 +27,7 @@ namespace Calico {
         public string proper_name;
         public string[] extensions;
         public string mimetype;
+        public bool IsTextLanguage = true;
 
         public Language() {
         }

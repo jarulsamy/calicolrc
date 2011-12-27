@@ -98,6 +98,7 @@ public class CalicoJigsawLanguage : Language
 	public CalicoJigsawLanguage () : 
         base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null)
 	{
+	  IsTextLanguage = false;
 	}
     
 	public override void MakeEngine (LanguageManager manager)

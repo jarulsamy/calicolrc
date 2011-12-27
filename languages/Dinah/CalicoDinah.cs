@@ -88,6 +88,7 @@ public class CalicoDinahLanguage : Language
 	public CalicoDinahLanguage () : 
         base("dinah",  "Dinah", new string[] { "din"}, null)
 	{
+	  IsTextLanguage = false;
 	}
     
 	public override void MakeEngine (LanguageManager manager)

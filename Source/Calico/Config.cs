@@ -37,7 +37,11 @@ namespace Calico {
             Initialize();
             // Load file, if exists:
             if (System.IO.File.Exists(filename)) {
-                Load();
+                try {
+                    Load();
+                } catch {
+                    Console.WriteLine("Skipping invalid config.xml file...");
+                }
             } else {
                 Save();
             }
