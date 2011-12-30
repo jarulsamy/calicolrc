@@ -516,6 +516,11 @@ namespace Calico {
                 }
                 filenames.Insert(0, filename);
             }
+            // Trim down to appropriate size:
+            int max = (int)config.GetValue("config", "recent-files-size");
+            if (filenames.Count > max) {
+                filenames.RemoveRange(max, filenames.Count - max);
+            }
             // Now update menu:
             Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentScriptsAction");
             examples_menu.Submenu = new Gtk.Menu();
@@ -532,11 +537,22 @@ namespace Calico {
             if (language == null) {
                 language = CurrentLanguage;
             }
-            // FIXME: get document from language
             Document document = manager.languages[language].MakeDocument(this, filename);
             document.Configure();
             addToRecentsMenu(filename);
             return document;
+        }
+
+        public void Cleanup() {
+            // Any additions before saving:
+            int max = (int)config.GetValue("shell", "history-size");
+            if (max != -1) { // no limit
+                List<string> history = (List<string>)config.GetValue("shell", "history");
+                if (history.Count > max) {
+                    history.RemoveRange(0, history.Count - max);
+                }
+            }
+            config.Save();
         }
 
         public bool Close() {
@@ -547,6 +563,7 @@ namespace Calico {
 
         protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
             if (Close()) {
+                Cleanup();
                 Gtk.Application.Quit();
                 a.RetVal = true;
             }
@@ -628,6 +645,7 @@ namespace Calico {
 
         protected virtual void OnQuitActionActivated(object sender, System.EventArgs e) {
             if (Close()) {
+                Cleanup();
                 Gtk.Application.Quit();
             }
         }
@@ -648,7 +666,7 @@ namespace Calico {
         }
 
         protected virtual string CommentText(string text) {
-            // FIXME: this right... need to get entire lines
+            // FIXME: this isn't right... need to get entire lines
             text = "## " + text.Replace("\n", "\n## ");
             return text;
         }
@@ -951,6 +969,9 @@ namespace Calico {
                 history_down.Sensitive = false;
             } else {
                 history_down.Sensitive = true;
+            }
+            if (spinbutton1.Value != history.Position + 1) {
+                spinbutton1.Value = history.Position + 1;
             }
         }
 
@@ -1417,6 +1438,16 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.Print();
             }
+        }
+
+        protected void OnSpinbutton1ChangeValue (object o, Gtk.ChangeValueArgs args)
+        {
+            //Console.WriteLine("ChangeValue: {0}", args);
+        }
+
+        protected void OnSpinbutton1Input (object o, Gtk.InputArgs args)
+        {
+            //Console.WriteLine("Input: {0}", args);
         }
     }
 }

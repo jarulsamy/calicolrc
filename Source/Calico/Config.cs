@@ -51,7 +51,9 @@ namespace Calico {
             SetValue("config", "font-size", "int", 10);
             SetValue("config", "languages", "strings", new List<string>() {"all"});
             SetValue("config", "recent-files", "strings", new List<string>());
+            SetValue("config", "recent-files-size", "int", 15);
             SetValue("shell", "history", "strings", new List<string>());
+            SetValue("shell", "history-size", "int", 50);
         }
         public object GetValue(string section, string setting) {
             return values[section][setting];

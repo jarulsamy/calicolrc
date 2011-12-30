@@ -98,7 +98,6 @@ namespace Calico {
                 MainWindow win = new MainWindow(args, manager, Debug, config);
                 win.Show();
                 Application.Run();
-                config.Save();
             }
         }
 
