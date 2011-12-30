@@ -210,6 +210,8 @@ namespace Calico {
             
             // Examples menu:
             Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExamplesAction");
+            if (examples_menu == null)
+                throw new Exception("/menubar2/FileAction/ExamplesAction");
             examples_menu.Submenu = new Gtk.Menu();
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager[lang];
@@ -231,6 +233,8 @@ namespace Calico {
             
             // New file menu:
             Gtk.MenuItem file_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/NewAction");
+            if (file_menu == null)
+                throw new Exception("/menubar2/FileAction/NewAction");
             file_menu.Submenu = new Gtk.Menu();
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
@@ -241,7 +245,9 @@ namespace Calico {
             file_menu.Submenu.ShowAll();
             
             // Languages to menu items:
-            Gtk.MenuItem switch_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/LanguageAction");
+            Gtk.MenuItem switch_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ShellAction1/LanguageAction");
+            if (switch_menu == null)
+                throw new Exception("/menubar2/ShellAction1/LanguageAction");
             switch_menu.Submenu = new Gtk.Menu();
             int count = 0;
             Gtk.RadioMenuItem @group = null;
@@ -309,6 +315,7 @@ namespace Calico {
             EnvironmentTabAction.Active = true;
             history = new History((List<string>)this.config.values["shell"]["history"]);
             UpdateUpDownArrows();
+            UpdateZoom();
             addToRecentsMenu(null);
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
@@ -523,6 +530,8 @@ namespace Calico {
             }
             // Now update menu:
             Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentScriptsAction");
+            if (examples_menu == null)
+                throw new Exception("/menubar2/FileAction/RecentScriptsAction");
             examples_menu.Submenu = new Gtk.Menu();
             foreach (string file in filenames) {
                 Gtk.MenuItem fmenu = new Gtk.MenuItem(file.Replace("_", "__"));
@@ -1384,6 +1393,19 @@ namespace Calico {
             KeyDown(true);
         }
 
+        protected void UpdateZoom()
+        {
+            Shell.Options.FontName = String.Format("{0} {1}",
+                           config.GetValue("config", "font"),
+                           config.GetValue("config", "font-size"));
+            Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))
+                 documents[widget].UpdateZoom();
+            }
+        }
+
         protected void OnZoomInActionActivated (object sender, System.EventArgs e)
         {
             config.SetValue("config", "font-size",
@@ -1414,13 +1436,6 @@ namespace Calico {
     		            documents[widget].UpdateZoom();
                 }
             }
-        }
-
-        protected void OnExportActionActivated (object sender, System.EventArgs e)
-        {
-            if (CurrentDocument != null)
-                CurrentDocument.Export(this);
-
         }
 
         protected void OnMediaPauseActionActivated (object sender, System.EventArgs e)
@@ -1468,6 +1483,34 @@ namespace Calico {
         protected void OnSpinbutton1Input (object o, Gtk.InputArgs args)
         {
             //Console.WriteLine("Input: {0}", args);
+        }
+
+        protected void OnResetShellActionActivated (object sender, System.EventArgs e)
+        {
+            // If running:
+            AbortThread();
+            // Now, reset the shell:
+            manager.Setup();
+            manager.Start();
+            manager.SetCalico(this);
+            // FIXME: move to Python language
+            manager["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
+                "del division, with_statement, print_function", false);
+            manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
+            manager.PostSetup(this);
+            Print(Tag.Info, "Shell reset!\n");
+        }
+
+        protected void OnExportAction1Activated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null)
+                CurrentDocument.Export(this);
+        }
+
+        protected void OnClearOutputActionActivated (object sender, System.EventArgs e)
+        {
+            Output.Buffer.Text = "";
+            Print(Tag.Info, String.Format("The Calico Project, Version {0}\n", MainClass.Version));
         }
     }
 }
