@@ -1386,14 +1386,34 @@ namespace Calico {
 
         protected void OnZoomInActionActivated (object sender, System.EventArgs e)
         {
-            if (CurrentDocument != null)
-                CurrentDocument.ZoomIn();
+            config.SetValue("config", "font-size",
+              ((int)config.GetValue("config", "font-size")) + 1);
+            Shell.Options.FontName = String.Format("{0} {1}",
+                           config.GetValue("config", "font"),
+                           config.GetValue("config", "font-size"));
+            Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))
+		            documents[widget].UpdateZoom();
+            }
         }
 
         protected void OnZoomOutActionActivated (object sender, System.EventArgs e)
         {
-            if (CurrentDocument != null)
-                CurrentDocument.ZoomOut();
+             if (((int)config.GetValue("config", "font-size")) > 5) {
+                 config.SetValue("config", "font-size",
+                    ((int)config.GetValue("config", "font-size")) - 1);
+                 Shell.Options.FontName = String.Format("{0} {1}",
+                             config.GetValue("config", "font"),
+                             config.GetValue("config", "font-size"));
+                Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+    	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                    if (documents.ContainsKey(widget))
+    		            documents[widget].UpdateZoom();
+                }
+            }
         }
 
         protected void OnExportActionActivated (object sender, System.EventArgs e)

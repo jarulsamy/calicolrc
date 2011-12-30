@@ -117,12 +117,8 @@ namespace Calico {
                 tab_label.Text = basename.Replace("_", "__");
         }
 
-        public virtual void ZoomIn() {
+        public virtual void UpdateZoom() {
         }
-
-        public virtual void ZoomOut() {
-        }
-
     }
 
     public class TextDocument : Document {
@@ -148,6 +144,12 @@ namespace Calico {
             widget.ShowAll();
         }
 
+        public override void UpdateZoom() {
+	        texteditor.Options.FontName = String.Format("{0} {1}",
+						      calico.config.GetValue("config", "font"), 
+						      calico.config.GetValue("config", "font-size"));
+        }
+
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
             if (texteditor.Document.Text == "") {
                 calico.StartButton.Sensitive = false;
@@ -168,6 +170,9 @@ namespace Calico {
             texteditor.Options.OverrideDocumentEolMarker = true;
             texteditor.Options.DefaultEolMarker = "\n";
             texteditor.Options.ShowIconMargin = true;
+	    texteditor.Options.FontName = String.Format("{0} {1}", 
+							calico.config.GetValue("config", "font"), 
+							calico.config.GetValue("config", "font-size"));
         }
 
         public override bool GotoLine(int lineno) {

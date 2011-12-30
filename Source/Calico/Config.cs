@@ -52,6 +52,8 @@ namespace Calico {
             SetValue("config", "languages", "strings", new List<string>() {"all"});
             SetValue("config", "recent-files", "strings", new List<string>());
             SetValue("config", "recent-files-size", "int", 15);
+	        SetValue("calico", "font", "string", "Courier");
+	        SetValue("calico", "font-size", "int", 10);
             SetValue("shell", "history", "strings", new List<string>());
             SetValue("shell", "history-size", "int", 50);
         }
@@ -65,6 +67,9 @@ namespace Calico {
             }
             values[section][setting] = value;
             types[section][setting] = type;
+        }
+        public void SetValue(string section, string setting, object value) {
+            values[section][setting] = value;
         }
         public void Load() {
             // Loads the file on top of those already loaded
