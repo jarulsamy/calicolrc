@@ -59,11 +59,12 @@ public class Printing {
       numLines = this.lines.Length;
       numPages = (numLines - 1) / this.linesPerPage + 1;
       this.printop.NPages = numPages;
+      context.Dispose();
     }
 
     public void OnDrawPage(object obj, Gtk.DrawPageArgs args) {
       Gtk.PrintContext context = args.Context;
-      var cr = context.CairoContext;
+      Cairo.Context cr = context.CairoContext;
       double width = context.Width;
       cr.Rectangle (0, 0, width, this.headerHeight);
       cr.SetSourceRGB(0.8, 0.8, 0.8);
@@ -111,7 +112,7 @@ public class Printing {
 	    line++;
 	    i++;
       }
-      //cr.Dispose();
+      //cr;
       layout = null;
     }
 
