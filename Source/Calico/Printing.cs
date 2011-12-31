@@ -117,6 +117,8 @@ public class Printing {
 
     public void OnEndPrint(object obj, Gtk.EndPrintArgs args) {
       //pass
+      Gtk.PrintContext context = args.Context;
+      context.Dispose();
     }
 }
     //if __name__ == "__main__":
