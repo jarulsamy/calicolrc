@@ -59,7 +59,10 @@ public class Printing {
     public void OnBeginPrint(object obj, Gtk.BeginPrintArgs args) {
       Gtk.PrintContext context = args.Context;
       double height = context.Height;
-      this.linesPerPage = 60;
+      if (calico.OS == "Windows")
+            this.linesPerPage = 60;
+      else
+            this.linesPerPage = 70;
       this.lines = this.contents.Split('\n');
       numLines = this.lines.Length;
       numPages = (numLines - 1) / this.linesPerPage + 1;
@@ -116,7 +119,10 @@ public class Printing {
       while (i < this.linesPerPage && line < numLines) {
 	    layout.SetText(this.lines[line]);
 	    Pango.CairoHelper.ShowLayout(cr, layout);
-	    cr.RelMoveTo(0, desc.Size/pangoScale * 10);
+	    if (calico.OS == "Windows")
+	    	    cr.RelMoveTo(0, desc.Size/pangoScale * 10);
+	    else
+	    	    cr.RelMoveTo(0, desc.Size/pangoScale);
 	    line++;
 	    i++;
       }
