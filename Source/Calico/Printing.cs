@@ -27,7 +27,7 @@ public class Printing {
     double headerHeight;
     double headerGap;
     int pangoScale;
-    double fontSize;
+    //double fontSize;
     Gtk.PrintOperation printop;
     int linesPerPage;
     string [] lines;
@@ -38,10 +38,15 @@ public class Printing {
       this.calico = calico;
       this.title = title;
       this.contents = text;
-      this.headerHeight = (10*72/25.4);
-      this.headerGap = (3*72/25.4);
+        if (calico.OS == "Windows") {
+          this.headerHeight = (10*72/25.4 * 5);
+          this.headerGap = (3*72/25.4 * 5);
+        } else {
+          this.headerHeight = (10*72/25.4);
+          this.headerGap = (3*72/25.4);
+        }
       this.pangoScale = 1024;
-      this.fontSize = 12.0; // FIXME: on Windows make bigger
+      //this.fontSize = 10.0;
       this.printop = new Gtk.PrintOperation();
       this.printop.BeginPrint += this.OnBeginPrint;
       this.printop.DrawPage += this.OnDrawPage;
@@ -54,18 +59,21 @@ public class Printing {
     public void OnBeginPrint(object obj, Gtk.BeginPrintArgs args) {
       Gtk.PrintContext context = args.Context;
       double height = context.Height;
-      this.linesPerPage = (int)(Math.Floor(height / this.fontSize));
+      this.linesPerPage = 60;
       this.lines = this.contents.Split('\n');
       numLines = this.lines.Length;
       numPages = (numLines - 1) / this.linesPerPage + 1;
       this.printop.NPages = numPages;
-      context.Dispose();
     }
 
     public void OnDrawPage(object obj, Gtk.DrawPageArgs args) {
       Gtk.PrintContext context = args.Context;
       Cairo.Context cr = context.CairoContext;
-      double width = context.Width;
+      double width;
+      if (calico.OS == "Windows")
+            width = context.Width - 200;
+      else
+            width = context.Width;
       cr.Rectangle (0, 0, width, this.headerHeight);
       cr.SetSourceRGB(0.8, 0.8, 0.8);
       cr.FillPreserve();
@@ -74,7 +82,7 @@ public class Printing {
       cr.Stroke();
       
       var layout = context.CreatePangoLayout();
-      var desc = calico.GetFont();
+      var desc = Pango.FontDescription.FromString("Monospace 10");
       layout.FontDescription = desc;
       layout.SetText(this.title);
       layout.Width = (int)(width);
@@ -99,7 +107,7 @@ public class Printing {
       Pango.CairoHelper.ShowLayout(cr, layout);
       
       layout = context.CreatePangoLayout();
-      desc = Pango.FontDescription.FromString("Monospace 12");
+      desc = Pango.FontDescription.FromString("Monospace 10");
       //desc.Size = (int)(this.fontSize * this.pangoScale);
       layout.FontDescription = desc;
       cr.MoveTo(0, this.headerHeight + this.headerGap);
@@ -108,18 +116,15 @@ public class Printing {
       while (i < this.linesPerPage && line < numLines) {
 	    layout.SetText(this.lines[line]);
 	    Pango.CairoHelper.ShowLayout(cr, layout);
-	    cr.RelMoveTo(0, this.fontSize);
+	    cr.RelMoveTo(0, desc.Size/pangoScale * 10);
 	    line++;
 	    i++;
       }
-      //cr;
-      layout = null;
+      layout.Dispose();
     }
 
     public void OnEndPrint(object obj, Gtk.EndPrintArgs args) {
       //pass
-      Gtk.PrintContext context = args.Context;
-      context.Dispose();
     }
 }
     //if __name__ == "__main__":
