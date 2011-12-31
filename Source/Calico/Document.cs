@@ -61,10 +61,10 @@ namespace Calico {
             return null;
         }
 
-        public virtual void Print() {
+        public virtual void Print(Calico.MainWindow calico) {
             Save();
             if (filename != null) {
-                new Printing(basename, GetText(), filename);
+                new Printing(calico, basename, GetText(), filename);
             }
         }
 
@@ -145,9 +145,7 @@ namespace Calico {
         }
 
         public override void UpdateZoom() {
-	        texteditor.Options.FontName = String.Format("{0} {1}",
-						      calico.config.GetValue("config", "font"), 
-						      calico.config.GetValue("config", "font-size"));
+	        texteditor.Options.FontName = calico.GetFont().ToString();
         }
 
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
@@ -170,9 +168,7 @@ namespace Calico {
             texteditor.Options.OverrideDocumentEolMarker = true;
             texteditor.Options.DefaultEolMarker = "\n";
             texteditor.Options.ShowIconMargin = true;
-	    texteditor.Options.FontName = String.Format("{0} {1}", 
-							calico.config.GetValue("config", "font"), 
-							calico.config.GetValue("config", "font-size"));
+	        texteditor.Options.FontName = calico.GetFont().ToString();
         }
 
         public override bool GotoLine(int lineno) {

@@ -21,6 +21,7 @@
 using System;
 
 public class Printing {
+    Calico.MainWindow calico;
     string title;
     string contents;
     double headerHeight;
@@ -33,7 +34,8 @@ public class Printing {
     int numPages;
     int numLines;
 
-    public Printing(string title, string text, string filename) {
+    public Printing(Calico.MainWindow calico, string title, string text, string filename) {
+      this.calico = calico;
       this.title = title;
       this.contents = text;
       this.headerHeight = (10*72/25.4);
@@ -71,7 +73,7 @@ public class Printing {
       cr.Stroke();
       
       var layout = context.CreatePangoLayout();
-      var desc = Pango.FontDescription.FromString("sans 14");
+      var desc = calico.GetFont();
       layout.FontDescription = desc;
       layout.SetText(this.title);
       layout.Width = (int)(width);
@@ -96,8 +98,8 @@ public class Printing {
       Pango.CairoHelper.ShowLayout(cr, layout);
       
       layout = context.CreatePangoLayout();
-      desc = Pango.FontDescription.FromString("mono");
-      desc.Size = (int)(this.fontSize * this.pangoScale);
+      desc = Pango.FontDescription.FromString("Monospace 12");
+      //desc.Size = (int)(this.fontSize * this.pangoScale);
       layout.FontDescription = desc;
       cr.MoveTo(0, this.headerHeight + this.headerGap);
       int line = args.PageNr * this.linesPerPage;

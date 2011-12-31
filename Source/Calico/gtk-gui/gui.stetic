@@ -171,6 +171,7 @@
         <property name="Label" translatable="yes">_About</property>
         <property name="ShortLabel" translatable="yes">_About</property>
         <property name="StockId">gtk-about</property>
+        <signal name="Activated" handler="About" />
       </action>
       <action id="ShellAction1">
         <property name="Type">Action</property>
@@ -225,6 +226,7 @@
         <property name="Label" translatable="yes">Change _Font...</property>
         <property name="ShortLabel" translatable="yes">Change _Font...</property>
         <property name="StockId">gtk-select-font</property>
+        <signal name="Activated" handler="SelectFont" />
       </action>
       <action id="SwitchToShellAction">
         <property name="Type">Action</property>
@@ -389,7 +391,6 @@
                 <node type="Menuitem" action="ClearOutputAction" />
               </node>
               <node type="Menu" action="HelpAction">
-                <node type="Menuitem" action="helpAction" />
                 <node type="Menuitem" action="aboutAction" />
               </node>
             </node>

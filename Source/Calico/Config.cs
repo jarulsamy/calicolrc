@@ -2,7 +2,7 @@
 //  Config.cs
 //  
 //  Author:
-//       dblank <${AuthorEmail}>
+//       dblank <doug.blank@gmail.com>
 // 
 //  Copyright (c) 2011 dblank
 // 
@@ -18,6 +18,7 @@
 // 
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Xml;
 using System.Collections.Generic;
@@ -47,8 +48,10 @@ namespace Calico {
             }
         }
         public void Initialize() {
-            SetValue("config", "font", "string", "Courier");
-            SetValue("config", "font-size", "int", 10);
+            SetValue("config", "font", "string", "Monospace");
+            SetValue("config", "font-size", "int", 10240);
+            SetValue("config", "font-bold", "bool", false);
+            SetValue("config", "font-italic", "bool", false);
             SetValue("config", "languages", "strings", new List<string>() {"all"});
             SetValue("config", "recent-files", "strings", new List<string>());
             SetValue("config", "recent-files-size", "int", 15);
@@ -124,6 +127,8 @@ namespace Calico {
         public object makeValue(string type, string value) {
             if (type == "int") {
                 return System.Int32.Parse(value);
+            } else if (type == "bool") {
+                return value == "true";
             } else if (type == "string") {
                 return value;
             } else if (type == "strings") {

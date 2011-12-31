@@ -684,6 +684,70 @@ namespace Calico {
             return text;
         }
 
+        string [] RSplit(string s) {
+            string [] data = s.Split(' ');
+            string left = "";
+            for (int i = 0; i < data.Length - 1; i++) {
+                if (left != "")
+                    left += " ";
+                left += data[i];
+            }
+            return new string [] {left, data[data.Length - 1]};
+        }
+
+        public virtual Pango.FontDescription GetFont() {
+            Pango.FontDescription pangofont = new Pango.FontDescription();
+            pangofont.Family = (string)config.GetValue("config", "font");
+            pangofont.Size = (int)config.GetValue("config", "font-size");
+            pangofont.Weight = ((bool)config.GetValue("config", "font-bold")) ? Pango.Weight.Bold : Pango.Weight.Normal;
+            pangofont.Style = ((bool)config.GetValue("config", "font-italic")) ? Pango.Style.Italic : Pango.Style.Normal;
+            return pangofont;
+        }
+
+        protected virtual void SetFont(string font) {
+            Pango.FontDescription desc = Pango.FontDescription.FromString(font);
+            config.SetValue("config", "font", desc.Family);
+            config.SetValue("config", "font-bold",  desc.Weight == Pango.Weight.Bold);
+            config.SetValue("config", "font-italic", desc.Style == Pango.Style.Italic);
+            config.SetValue("config", "font-size", desc.Size);
+        }
+
+        protected virtual void SelectFont(object sender, System.EventArgs e) {
+            Gtk.FontSelectionDialog d = new Gtk.FontSelectionDialog("Select Calico Font");
+            Pango.FontDescription pangofont = GetFont();
+            d.SetFontName(pangofont.ToString());
+            int response = d.Run();
+            if (response == (int)Gtk.ResponseType.Ok) {
+                SetFont(d.FontName);
+                UpdateZoom();
+            }
+            d.Destroy();
+        }
+
+        protected void About (object sender, System.EventArgs e) {
+    	  Gtk.AboutDialog aboutDialog = new Gtk.AboutDialog();
+          aboutDialog.DefaultResponse = Gtk.ResponseType.Close;
+    	  //aboutDialog.SetEmailHook(lambda dialog, email: self.message(email))
+    	  //aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
+    	  //aboutDialog.Artists =""
+    	  aboutDialog.Authors = new string[] {"Douglas Blank <dblank@cs.brynmawr.edu>"};
+    	  aboutDialog.Comments = (_("Scripting Environment") + "\n\n" +
+    				  _("Running on %s") + "\nMono %s\n");
+          aboutDialog.Copyright = _("(c) 2011, Institute for Personal Robots in Education");
+    	  //aboutDialog.Documenters
+    	  //aboutDialog.License
+    	  //aboutDialog.Logo
+    	  //aboutDialog.LogoIconName
+    	  aboutDialog.ProgramName = _("Calico Project");
+    	  //aboutDialog.TranslatorCredits
+    	  aboutDialog.Version = MainClass.Version;
+    	  aboutDialog.Website = "http://CalicoProject.org/";
+    	  //aboutDialog.WebsiteLabel
+    	  aboutDialog.WrapLicense = true;
+    	  aboutDialog.Run();
+    	  aboutDialog.Destroy();
+    	}
+
         protected virtual string CleanUpText(string text) {
             // Prevent weird characters like Word smart quotes.
             // First, replace all of those that we know about:
@@ -1395,9 +1459,7 @@ namespace Calico {
 
         protected void UpdateZoom()
         {
-            Shell.Options.FontName = String.Format("{0} {1}",
-                           config.GetValue("config", "font"),
-                           config.GetValue("config", "font-size"));
+            Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
@@ -1410,9 +1472,7 @@ namespace Calico {
         {
             config.SetValue("config", "font-size",
               ((int)config.GetValue("config", "font-size")) + 1);
-            Shell.Options.FontName = String.Format("{0} {1}",
-                           config.GetValue("config", "font"),
-                           config.GetValue("config", "font-size"));
+            Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
 	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
@@ -1426,9 +1486,7 @@ namespace Calico {
              if (((int)config.GetValue("config", "font-size")) > 5) {
                  config.SetValue("config", "font-size",
                     ((int)config.GetValue("config", "font-size")) - 1);
-                 Shell.Options.FontName = String.Format("{0} {1}",
-                             config.GetValue("config", "font"),
-                             config.GetValue("config", "font-size"));
+                 Shell.Options.FontName = GetFont().ToString();
                 Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
     	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                     Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
@@ -1471,7 +1529,7 @@ namespace Calico {
         protected void OnPrintActionActivated (object sender, System.EventArgs e)
         {
             if (CurrentDocument != null) {
-                CurrentDocument.Print();
+                CurrentDocument.Print(this);
             }
         }
 
