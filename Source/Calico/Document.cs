@@ -34,6 +34,8 @@ namespace Calico {
                 _documentType = value;
                 if (filename != null)
                     basename = System.IO.Path.GetFileName(filename);
+                else if (calico == null)
+                    basename = System.IO.Path.GetFileName(filename);
                 else
                    basename = String.Format("New {0} {1}", calico.manager.languages[language].proper_name, _documentType);
                 tab_label.Text = basename.Replace("_", "__");
@@ -98,8 +100,10 @@ namespace Calico {
             get {return true;}
         }
 
+        bool _isDirty = true;
         public virtual bool IsDirty {
-            get { return true; }
+            get { return _isDirty; }
+            set { _isDirty = value; }
         }
 
         public virtual void Configure() {
@@ -117,6 +121,15 @@ namespace Calico {
         public virtual bool Close() {
             // Close document, and return successful close status
             return true;
+        }
+
+        public virtual void UpdateDocument() {
+            if (tab_label != null && basename != null) {
+                if (IsDirty)
+                    tab_label.Text = String.Format("*{0}", basename.Replace("_", "__"));
+                else
+                    tab_label.Text = basename.Replace("_", "__");
+            }
         }
 
         public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {

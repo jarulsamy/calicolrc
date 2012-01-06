@@ -91,6 +91,15 @@ namespace Calico {
             }
         }
 
+        public Document GetDocumentByName(string name) {
+            for (int i = 0; i < DocumentNotebook.NPages; i++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
+                if (documents.ContainsKey(widget)  && documents[widget].filename.Contains(name))
+                    return documents[widget];
+            }
+            return null;
+        }
+
         public string OS {
             get {
                 string retval = System.Environment.OSVersion.Platform.ToString();
