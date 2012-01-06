@@ -265,9 +265,9 @@
         <property name="Label" translatable="yes">Examples</property>
         <property name="ShortLabel" translatable="yes">Examples</property>
       </action>
-      <action id="RecentScriptsAction">
+      <action id="RecentlyOpenedAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Recent Scripts</property>
+        <property name="Label" translatable="yes">Recently opened</property>
         <property name="ShortLabel" translatable="yes">Recent Scripts</property>
       </action>
       <action id="ShowAction">
@@ -345,7 +345,7 @@
                 <node type="Menuitem" action="openAction1" />
                 <node type="Menu" action="NewAction" />
                 <node type="Separator" />
-                <node type="Menu" action="RecentScriptsAction" />
+                <node type="Menu" action="RecentlyOpenedAction" />
                 <node type="Menu" action="ExamplesAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="saveAction" />
@@ -594,7 +594,7 @@
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">1</property>
+                <property name="CurrentPage">0</property>
                 <property name="Scrollable">True</property>
                 <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                 <child>
@@ -627,7 +627,7 @@
                             <property name="CanFocus">True</property>
                             <property name="Type">TextAndIcon</property>
                             <property name="Icon">stock:gtk-new LargeToolbar</property>
-                            <property name="Label" translatable="yes">New script</property>
+                            <property name="Label" translatable="yes">New...</property>
                             <property name="UseUnderline">True</property>
                             <signal name="Clicked" handler="OnButton3Clicked" />
                           </widget>

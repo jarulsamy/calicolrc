@@ -42,7 +42,7 @@ namespace Calico
 		private global::Gtk.RadioAction Option1Action;
 		private global::Gtk.RadioAction Option2Action;
 		private global::Gtk.Action ExamplesAction;
-		private global::Gtk.Action RecentScriptsAction;
+		private global::Gtk.Action RecentlyOpenedAction;
 		private global::Gtk.Action ShowAction;
 		private global::Gtk.ToggleAction EnvironmentTabAction;
 		private global::Gtk.ToggleAction LocalsTabAction;
@@ -217,9 +217,9 @@ namespace Calico
 			this.ExamplesAction = new global::Gtk.Action ("ExamplesAction", global::Mono.Unix.Catalog.GetString ("Examples"), null, null);
 			this.ExamplesAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Examples");
 			w1.Add (this.ExamplesAction, null);
-			this.RecentScriptsAction = new global::Gtk.Action ("RecentScriptsAction", global::Mono.Unix.Catalog.GetString ("Recent Scripts"), null, null);
-			this.RecentScriptsAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Recent Scripts");
-			w1.Add (this.RecentScriptsAction, null);
+			this.RecentlyOpenedAction = new global::Gtk.Action ("RecentlyOpenedAction", global::Mono.Unix.Catalog.GetString ("Recently opened"), null, null);
+			this.RecentlyOpenedAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Recent Scripts");
+			w1.Add (this.RecentlyOpenedAction, null);
 			this.ShowAction = new global::Gtk.Action ("ShowAction", global::Mono.Unix.Catalog.GetString ("Show"), null, null);
 			this.ShowAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Show");
 			w1.Add (this.ShowAction, null);
@@ -257,7 +257,7 @@ namespace Calico
 			this.vbox1.Name = "vbox1";
 			this.vbox1.BorderWidth = ((uint)(5));
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentScriptsAction' action='RecentScriptsAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='printAction' action='printAction'/><menuitem name='ExportAction1' action='ExportAction1'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='ShowAction' action='ShowAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/></menu></menu><menu name='ShellAction1' action='ShellAction1'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='SwitchToShellAction' action='SwitchToShellAction'/><menuitem name='ResetShellAction' action='ResetShellAction'/><menuitem name='ClearOutputAction' action='ClearOutputAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentlyOpenedAction' action='RecentlyOpenedAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='printAction' action='printAction'/><menuitem name='ExportAction1' action='ExportAction1'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='ShowAction' action='ShowAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/></menu></menu><menu name='ShellAction1' action='ShellAction1'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='SwitchToShellAction' action='SwitchToShellAction'/><menuitem name='ResetShellAction' action='ResetShellAction'/><menuitem name='ClearOutputAction' action='ClearOutputAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add (this.menubar2);
@@ -504,7 +504,7 @@ namespace Calico
 			this.notebook_docs = new global::Gtk.Notebook ();
 			this.notebook_docs.CanFocus = true;
 			this.notebook_docs.Name = "notebook_docs";
-			this.notebook_docs.CurrentPage = 1;
+			this.notebook_docs.CurrentPage = 0;
 			this.notebook_docs.Scrollable = true;
 			// Container child notebook_docs.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
@@ -555,7 +555,7 @@ namespace Calico
 			w88.Add (w89);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Label w91 = new global::Gtk.Label ();
-			w91.LabelProp = global::Mono.Unix.Catalog.GetString ("New script");
+			w91.LabelProp = global::Mono.Unix.Catalog.GetString ("New...");
 			w91.UseUnderline = true;
 			w88.Add (w91);
 			w87.Add (w88);

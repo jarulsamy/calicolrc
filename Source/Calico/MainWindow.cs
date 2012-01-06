@@ -216,10 +216,10 @@ namespace Calico {
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager[lang];
                 DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", language.name))));
-                Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
-                ((Gtk.Menu)examples_menu.Submenu).Add(menu);
-                menu.Submenu = new Gtk.Menu();
-                try {
+                if (dir.Exists) {
+                    Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
+                    ((Gtk.Menu)examples_menu.Submenu).Add(menu);
+                    menu.Submenu = new Gtk.Menu();
                     foreach (FileInfo f in dir.GetFiles("*.*")) {
                         if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
                             Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
@@ -228,10 +228,8 @@ namespace Calico {
                             fmenu.Activated += delegate { SelectOrOpen(fullname); };
                         }
                     }
-                } catch {
-                    // Ignore missing directory
+                    menu.Submenu.ShowAll();
                 }
-                menu.Submenu.ShowAll();
             }
             examples_menu.Submenu.ShowAll();
             
@@ -533,17 +531,17 @@ namespace Calico {
                 filenames.RemoveRange(max, filenames.Count - max);
             }
             // Now update menu:
-            Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentScriptsAction");
-            if (examples_menu == null)
-                throw new Exception("/menubar2/FileAction/RecentScriptsAction");
-            examples_menu.Submenu = new Gtk.Menu();
+            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
+            if (recents_menu == null)
+                throw new Exception("/menubar2/FileAction/RecentlyOpenedAction");
+            recents_menu.Submenu = new Gtk.Menu();
             foreach (string file in filenames) {
                 Gtk.MenuItem fmenu = new Gtk.MenuItem(file.Replace("_", "__"));
-                ((Gtk.Menu)examples_menu.Submenu).Add(fmenu);
+                ((Gtk.Menu)recents_menu.Submenu).Add(fmenu);
                 string fullname = file; // because C# doesn't make closures on values
                 fmenu.Activated += delegate { SelectOrOpen(fullname); };
             }
-            examples_menu.Submenu.ShowAll();
+            recents_menu.Submenu.ShowAll();
         }
 
         public Document MakeDocument(string filename, string language) {
@@ -588,12 +586,17 @@ namespace Calico {
                 ManualResetEvent ev = new ManualResetEvent(false);
                 dialogResponse = null;
                 Invoke(delegate {
-                    Gtk.Dialog fc = new Gtk.Dialog("Select Language", this, 0);
-                    fc.VBox.PackStart(new Gtk.Label("Create a New Script"));
-                    foreach (string choice in manager.getLanguagesProper()) {
+                    Gtk.Dialog fc = new Gtk.Dialog("Select item type", this, 0);
+                    fc.VBox.PackStart(new Gtk.Label("Create a new item"));
+                    string [] langs = manager.getLanguagesProper();
+                    foreach (string choice in langs) {
                         Gtk.Button button = new Gtk.Button(choice);
-                        button.Clicked += new System.EventHandler(DialogHandler);
-                        fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+                        button.Clicked += (o, a) => DialogHandler(o, a, fc);
+                        if (langs.Length > 5) {
+                            fc.VBox.PackStart(button, true, true, 5);
+                        } else {
+                            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+                        }
                     }
                     fc.ShowAll();
                     fc.Run();
@@ -610,8 +613,9 @@ namespace Calico {
             }
         }
 
-        public static void DialogHandler(object obj, System.EventArgs args) {
+        public static void DialogHandler(object obj, System.EventArgs args, Gtk.Dialog dialog) {
             dialogResponse = ((Gtk.Button)obj).Label;
+            dialog.Respond(Gtk.ResponseType.Ok);
         }
 
         protected virtual void OnNewActionActivated(object sender, System.EventArgs e) {

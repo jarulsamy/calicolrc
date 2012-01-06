@@ -64,10 +64,10 @@
     </Reference>
     <Reference Include="Microsoft.Scripting, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <HintPath>..\..\bin\Microsoft.Scripting.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Scripting.Core, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <HintPath>..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cairo" />
   </ItemGroup>

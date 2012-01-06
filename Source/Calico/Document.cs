@@ -28,6 +28,18 @@ namespace Calico {
         public string filename;
         public string basename;
         public Document document;
+        string _documentType;
+        public string DocumentType {
+            set {
+                _documentType = value;
+                if (filename != null)
+                    basename = System.IO.Path.GetFileName(filename);
+                else
+                   basename = String.Format("New {0} {1}", calico.manager.languages[language].proper_name, _documentType);
+                tab_label.Text = basename.Replace("_", "__");
+            }
+            get { return _documentType; }
+        }
         public Gtk.ScrolledWindow widget;
         public Gtk.Widget tab_widget;
         public Gtk.Label tab_label;
@@ -40,13 +52,10 @@ namespace Calico {
             this.filename = filename;
             this.language = language;
             widget = new Gtk.ScrolledWindow();
-            if (filename != null)
-                basename = System.IO.Path.GetFileName(filename);
-            else
-               basename = String.Format("New {0} Script", calico.manager.languages[language].proper_name);
             tab_widget = new Gtk.HBox();
-            tab_label = new Gtk.Label(basename.Replace("_", "__"));
+            tab_label = new Gtk.Label();
             ((Gtk.HBox)tab_widget).Add(tab_label);
+            DocumentType = "Script";
             close_button = new Gtk.Button();
             Gtk.Image img = new Gtk.Image();
             close_button.Relief = Gtk.ReliefStyle.None;
