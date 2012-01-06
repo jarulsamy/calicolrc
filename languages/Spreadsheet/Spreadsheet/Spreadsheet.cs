@@ -70,6 +70,7 @@ public class CalicoSpreadsheetDocument : Document
 	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
 	base(calico, filename, "spreadsheet")
 	{
+		DocumentType = "Sheet";
 		SpreadsheetWidget sheet = new SpreadsheetWidget();
 		widget.AddWithViewport (sheet);
 		//if (filename != null)
