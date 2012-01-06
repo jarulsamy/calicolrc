@@ -163,14 +163,13 @@ public class CalicoSpreadsheetDocument : Document
 		return list;
 	}
 	
-	public override bool Save ()
+	public override void SaveDocument()
 	{
 		Csv.writer writer = new Csv.writer(filename);
 		sheet.liststore.Foreach((model, path, iter) => SaveRow(writer, model, path, iter));
 		writer.Close();
 		IsDirty = false;
 		UpdateDocument();	
-		return true;
 	}
 }
 

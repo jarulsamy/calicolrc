@@ -110,12 +110,87 @@ namespace Calico {
             // For setting defaults
         }
 
+        public bool IsWritable(string filename) {
+            string directory = System.IO.Path.GetDirectoryName(filename);
+            string tempfile = System.IO.Path.Combine(directory, "tempfile.tmp");
+            bool retval = true;
+            try {
+                System.IO.FileStream fp = System.IO.File.OpenWrite(tempfile);
+                fp.Close();
+                System.IO.File.Delete(tempfile);
+            } catch {
+                retval = false;
+            }
+            return retval;
+        }
+
         public virtual bool SaveAs() {
-            return true;
+            bool retval = false;
+            string proposed_dir = "";
+            if (filename != null) {
+                proposed_dir = System.IO.Path.GetDirectoryName(filename);
+                basename = System.IO.Path.GetFileName(filename);
+            } else {
+                proposed_dir = System.IO.Directory.GetCurrentDirectory();
+                basename = "Untitled." + calico.manager[language].extensions[0]; // default
+            }
+            // first, let's make sure the directory is writable
+            if (! IsWritable(proposed_dir)) {
+                // if not, let's change dirs
+                proposed_dir = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal);
+            }
+            if (System.IO.Directory.GetCurrentDirectory() != proposed_dir) {
+                System.IO.Directory.SetCurrentDirectory(proposed_dir);
+            }
+            Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Enter the file to save"),
+                                       calico,
+                                       Gtk.FileChooserAction.Save,
+                                       _("Cancel"), Gtk.ResponseType.Cancel,
+                                       _("Save"), Gtk.ResponseType.Accept);
+            fc.CurrentName = basename;      // the file: entry text box
+            fc.SelectFilename(basename);    // the file selection, if it exists
+            fc.KeepAbove = true;
+            if (fc.Run() == (int)Gtk.ResponseType.Accept) {
+                // FIXME: check to see if already exists
+                // ask to overwrite
+                filename = fc.Filename;
+                tab_label.TooltipText = filename;
+                retval = Save();
+                if (retval) {
+                    language = calico.manager.GetLanguageFromExtension(filename);
+                    basename = System.IO.Path.GetFileName(filename);
+                    tab_label.Text = basename;
+                    tab_label.TooltipText = filename;
+                    //self.on_change_file();
+                }
+            }
+            fc.Destroy();
+            return retval;
         }
 
         public virtual bool Save() {
-            return true;
+            if (filename != null) {
+                try {
+                    SaveDocument();
+                    return true;
+                } catch {
+                    // fail.. let's try SaveAs...
+                }
+            }
+            bool retval = SaveAs();
+            // if successful
+            if (retval) {
+                // change name of tab/filename/basefile
+                basename = System.IO.Path.GetFileName(filename);
+                tab_label.TooltipText = filename;
+                tab_label.Text = basename;
+            }
+            return retval;
+        }
+
+        public virtual void SaveDocument() {
+            // Save the document details; to be overridden in subclass
         }
 
         public virtual bool Close() {
@@ -217,87 +292,13 @@ namespace Calico {
             return true;
         }
 
-        public bool IsWritable(string filename) {
-            string directory = System.IO.Path.GetDirectoryName(filename);
-            string tempfile = System.IO.Path.Combine(directory, "tempfile.tmp");
-            bool retval = true;
-            try {
-                System.IO.FileStream fp = System.IO.File.OpenWrite(tempfile);
-                fp.Close();
-                System.IO.File.Delete(tempfile);
-            } catch {
-                retval = false;
-            }
-            return retval;
+        public override void SaveDocument() {
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+            sw.Write(texteditor.Document.Text);
+            sw.Close();
+            texteditor.Document.SetNotDirtyState();
         }
 
-        public override bool SaveAs() {
-            bool retval = false;
-            string proposed_dir = "";
-            if (filename != null) {
-                proposed_dir = System.IO.Path.GetDirectoryName(filename);
-                basename = System.IO.Path.GetFileName(filename);
-            } else {
-                proposed_dir = System.IO.Directory.GetCurrentDirectory();
-                basename = "Untitled." + calico.manager[language].extensions[0]; // default
-            }
-            // first, let's make sure the directory is writable
-            if (! IsWritable(proposed_dir)) {
-                // if not, let's change dirs
-                proposed_dir = System.Environment.GetFolderPath(
-                    System.Environment.SpecialFolder.Personal);
-            }
-            if (System.IO.Directory.GetCurrentDirectory() != proposed_dir) {
-                System.IO.Directory.SetCurrentDirectory(proposed_dir);
-            }
-            Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Enter the file to save"),
-                                       calico,
-                                       Gtk.FileChooserAction.Save,
-                                       _("Cancel"), Gtk.ResponseType.Cancel,
-                                       _("Save"), Gtk.ResponseType.Accept);
-            fc.CurrentName = basename;      // the file: entry text box
-            fc.SelectFilename(basename);    // the file selection, if it exists
-            fc.KeepAbove = true;
-            if (fc.Run() == (int)Gtk.ResponseType.Accept) {
-                // FIXME: check to see if already exists
-                // ask to overwrite
-                filename = fc.Filename;
-                tab_label.TooltipText = filename;
-                retval = Save();
-                if (retval) {
-                    language = calico.manager.GetLanguageFromExtension(filename);
-                    basename = System.IO.Path.GetFileName(filename);
-                    tab_label.Text = basename;
-                    tab_label.TooltipText = filename;
-                    //self.on_change_file();
-                }
-            }
-            fc.Destroy();
-            return retval;
-        }
-
-        public override bool Save() {
-            if (filename != null) {
-                try {
-                    System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-                    sw.Write(texteditor.Document.Text);
-                    sw.Close();
-                    texteditor.Document.SetNotDirtyState();
-                    return true;
-                } catch {
-                    // fail.. let's try SaveAs...
-                }
-            }
-            bool retval = SaveAs();
-            // if successful
-            if (retval) {
-                // change name of tab/filename/basefile
-                basename = System.IO.Path.GetFileName(filename);
-                tab_label.TooltipText = filename;
-                tab_label.Text = basename;
-            }
-            return retval;
-        }
     }
 }
 
