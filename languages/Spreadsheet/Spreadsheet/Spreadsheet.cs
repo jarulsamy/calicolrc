@@ -23,59 +23,154 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Calico;
+using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
 public class SpreadsheetWidget : Gtk.TreeView {
 	
-	Gtk.ListStore liststore;
+	public Gtk.ListStore liststore;
+	Document document;
 
-	public SpreadsheetWidget() : base() {
+	public SpreadsheetWidget(Document doc) : base() {
+		document = doc;
+		EnableGridLines = Gtk.TreeViewGridLines.Both;
+		RulesHint = true;
 		// Environment table:
-		Gtk.CellRendererText renderer = new Gtk.CellRendererText();
-		renderer.Editable = true;
-		renderer.Edited += (o, args) => OnRendererEdited(o, args, 0);
-        AppendColumn("Column 1", renderer, "text", 0);
-		renderer = new Gtk.CellRendererText();
-		renderer.Editable = true;
-		renderer.Edited += (o, args) => OnRendererEdited(o, args, 1);
-        AppendColumn("Column 2", renderer, "text", 1);
-		Columns[0].SortIndicator = true;
-		Columns[1].SortIndicator = true;
-		Columns[0].Clickable = true;
-		Columns[1].Clickable = true;
-		Columns[0].SortColumnId = 0;
-		Columns[1].SortColumnId = 1;
-		
+		makeColumn();
+		int index = 0;
+		foreach(string col in new string [] {"A", "B", "C", "D", "E", "F", "G", "H", "I",
+											"J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+											"T", "U", "V", "W", "X", "Y", "Z"}) {
+			makeColumn(col, index + 1);
+			index++;
+		}
 		
         // Create a ListStore as the Model
-        liststore = new Gtk.ListStore(typeof(string), typeof(string));
+        liststore = new Gtk.ListStore(makeTypes()); 
         Model = liststore;
         ShowAll();
 		
-		liststore.AppendValues(new object [] {"row1-1", "0"});
-		liststore.AppendValues(new object [] {"row2-1", "1"});
-		liststore.AppendValues(new object [] {"row3-1", "2"});
-		liststore.AppendValues(new object [] {"row4-1", "3"});
+		//liststore.Append();
+		for (int i = 0; i < 100; i++) {
+			liststore.AppendValues(makeRow());
+		}
 	}
+	
+	Type [] makeTypes() {
+		Type [] types = new Type[27];
+		types[0] = typeof(int);
+		for (int i = 1; i < 27; i++) {
+			types[i] = typeof(string);
+		}
+		return types;
+	}
+	
+	object [] makeRow() {
+		object [] row = new object[27];
+		row[0] = Model.IterNChildren() + 1;
+		for (int i = 1; i < 27; i++) {
+			row[i] = "";
+		}
+		return row;
+	}
+	
+	public void makeColumn() {
+		// Inital column
+		Gtk.CellRendererText renderer = new Gtk.CellRendererText();
+		renderer.Background = "lightgray";
+		renderer.Editable = false;
+		Gtk.TreeViewColumn column = new Gtk.TreeViewColumn("", renderer, "text", 0);
+		column.SortIndicator = true;
+		column.Clickable = true;
+		column.SortColumnId = 0;
+        AppendColumn(column);
+	}	
 
+	public void makeColumn(string text, int index) {
+		Gtk.CellRendererText renderer = new Gtk.CellRendererText();
+		renderer.Editable = true;
+		renderer.Edited += makeHandler(index);
+		Gtk.TreeViewColumn column = new Gtk.TreeViewColumn(text, renderer, "text", index);
+		column.Resizable = true;
+		column.SortIndicator = true;
+		column.Clickable = true;
+		column.SortColumnId = index;
+		renderer.WidthChars = 15;
+		renderer.Ellipsize = Pango.EllipsizeMode.End;
+		column.Alignment = .5f;
+        AppendColumn(column);
+	}	
+	
+	Gtk.EditedHandler makeHandler(int index) {
+		return (o, a) => OnRendererEdited(o, a, index);
+	}
+	
 	void OnRendererEdited (object o, Gtk.EditedArgs args, int column)
 	{
 		Gtk.TreeIter iter;
 		liststore.GetIter(out iter, new Gtk.TreePath(args.Path));
 		liststore.SetValue(iter, column, args.NewText);
+		document.IsDirty = true;
+		document.UpdateDocument();
 	}
 }
 
 public class CalicoSpreadsheetDocument : Document
 {
+	public SpreadsheetWidget sheet;	
 	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
 	base(calico, filename, "spreadsheet")
 	{
 		DocumentType = "Sheet";
-		SpreadsheetWidget sheet = new SpreadsheetWidget();
+		sheet = new SpreadsheetWidget(this);
+		if (filename != null) {
+			int row = 0;
+			Gtk.TreeIter iter;
+			foreach(List line in new Csv.reader(filename).readLines()) {
+				int col = 1;
+				foreach(string item in line) {
+					sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+					sheet.liststore.SetValue(iter, col, item);
+					col++;
+				}
+				row++;
+			}
+		}
 		widget.AddWithViewport (sheet);
-		//if (filename != null)
-		//	cvs.ReadFile (filename);
 		widget.ShowAll ();
+	}
+	
+	bool SaveRow(Csv.writer writer, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
+		object [] content = new object[26];
+		for (int i = 1; i < 27; i++) {
+			content[i-1] = model.GetValue(iter, i);
+		}
+		writer.WriteFields(content);
+		return false;
+	}
+
+	bool GetData(List<List<string>> list, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
+		List<string> row = new List<string>();
+		for (int i = 1; i < 27; i++) {
+			row.Add((string)model.GetValue(iter, i));
+		}
+		list.Add(row);
+		return false;
+	}
+
+	public List<List<string>> GetData() {
+		List<List<string>> list = new List<List<string>>();
+		sheet.liststore.Foreach((model, path, iter) => GetData(list, model, path, iter));
+		return list;
+	}
+	
+	public override bool Save ()
+	{
+		Csv.writer writer = new Csv.writer(filename);
+		sheet.liststore.Foreach((model, path, iter) => SaveRow(writer, model, path, iter));
+		writer.Close();
+		IsDirty = false;
+		UpdateDocument();	
+		return true;
 	}
 }
 

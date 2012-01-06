@@ -1,17 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Spreadsheet/AssemblyInfo.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Spreadsheet/Spreadsheet.cs">
     <Files>
+      <File FileName="../Jigsaw/Jigsaw/InspectWin.cs" Line="159" Column="19" />
+      <File FileName="../../modules/Csv/Csv.cs" Line="5" Column="64" />
       <File FileName="Spreadsheet/Main.cs" Line="1" Column="1" />
       <File FileName="Spreadsheet/MainWindow.cs" Line="1" Column="1" />
-      <File FileName="Spreadsheet/Spreadsheet.cs" Line="73" Column="4" />
-      <File FileName="Spreadsheet/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Spreadsheet/Spreadsheet.cs" Line="151" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Spreadsheet" expanded="True">
-            <Node name="AssemblyInfo.cs" selected="True" />
+            <Node name="References" expanded="True" />
+            <Node name="Spreadsheet.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -34,7 +36,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Calico/trunk/languages/Spreadsheet/Spreadsheet/MainWindow.cs" line="11" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
