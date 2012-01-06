@@ -4,7 +4,6 @@
 public partial class MainWindow
 {
 	private global::Gtk.ScrolledWindow scrolledwindow1;
-	private global::Gtk.TreeView treeview1;
     
 	protected virtual void Build ()
 	{
@@ -18,11 +17,6 @@ public partial class MainWindow
 		this.scrolledwindow1.CanFocus = true;
 		this.scrolledwindow1.Name = "scrolledwindow1";
 		this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
-		// Container child scrolledwindow1.Gtk.Container+ContainerChild
-		this.treeview1 = new global::Gtk.TreeView ();
-		this.treeview1.CanFocus = true;
-		this.treeview1.Name = "treeview1";
-		this.scrolledwindow1.Add (this.treeview1);
 		this.Add (this.scrolledwindow1);
 		if ((this.Child != null)) {
 			this.Child.ShowAll ();
