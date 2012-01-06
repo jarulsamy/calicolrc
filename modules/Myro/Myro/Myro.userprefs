@@ -1,0 +1,37 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../Myro.cs">
+    <Files>
+      <File FileName="../Myro.cs" Line="1622" Column="23" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Myro" expanded="True">
+            <Node name="Myro.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>xr.NodeType</Value>
+          <Value>list</Value>
+          <Value>xr.HasValue</Value>
+          <Value>xr.Name</Value>
+          <Value>xr.GetAttribute("name")</Value>
+          <Value>section</Value>
+          <Value>setting</Value>
+          <Value>node_type</Value>
+          <Value>type</Value>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

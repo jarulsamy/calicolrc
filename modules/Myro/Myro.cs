@@ -1618,8 +1618,12 @@ public static class Myro {
         fc.VBox.PackStart(new Gtk.Label(question));
         foreach (string choice in choices) {
             Gtk.Button button = new Gtk.Button(choice);
-            button.Clicked += new System.EventHandler(DialogHandler);
-            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+            button.Clicked += (o, a) => DialogHandler(o, a, fc);
+			if (choices.Count < 5) {
+	            fc.AddActionWidget(button, Gtk.ResponseType.Ok);
+			} else {
+				fc.VBox.PackStart(button, true, true, 5);
+			}
         }
         fc.ShowAll();
         fc.Run();
@@ -1630,8 +1634,9 @@ public static class Myro {
     return dialogResponse;
   }
 
-  public static void DialogHandler(object obj, System.EventArgs args) {
+  public static void DialogHandler(object obj, System.EventArgs args, Gtk.Dialog dialog) {
     dialogResponse = ((Gtk.Button)obj).Label;
+	dialog.Respond(Gtk.ResponseType.Ok);
   }
 
   public static string input(object question) {

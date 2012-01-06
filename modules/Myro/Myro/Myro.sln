@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myro", "Myro.csproj", "{0E34AEA9-8B1C-4AD6-9985-F92AE75030E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E34AEA9-8B1C-4AD6-9985-F92AE75030E4}.Debug|x86.ActiveCfg = Debug|x86
+		{0E34AEA9-8B1C-4AD6-9985-F92AE75030E4}.Debug|x86.Build.0 = Debug|x86
+		{0E34AEA9-8B1C-4AD6-9985-F92AE75030E4}.Release|x86.ActiveCfg = Release|x86
+		{0E34AEA9-8B1C-4AD6-9985-F92AE75030E4}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Myro.csproj
+	EndGlobalSection
+EndGlobal
