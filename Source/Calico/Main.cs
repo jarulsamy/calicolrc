@@ -25,11 +25,39 @@ using System.Collections.Generic; // IList
 using Mono.Unix;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
         public static string Version = "2.0.0-alpha";
         public static bool IsLoadModules = true;
+
+       private static bool IsApplicationRunningOnMono(string processName)
+       {
+           var processFound = 0;
+
+           Process[] monoProcesses;
+           ProcessModuleCollection processModuleCollection;
+
+           //find all processes called 'mono', that's necessary because our app runs under the mono process!
+           monoProcesses = Process.GetProcessesByName("mono");
+
+           for (var i = 0; i <= monoProcesses.GetUpperBound(0); ++i)
+           {
+               processModuleCollection = monoProcesses[i].Modules;
+
+               for (var j = 0; j < processModuleCollection.Count; ++j)
+               {
+                   if (processModuleCollection[j].FileName.EndsWith(processName))
+                   {
+                       processFound++;
+                   }
+               }
+           }
+
+           //we don't find the current process, but if there is already another one running, return true!
+           return (processFound == 1);
+       }
 
         [STAThread]
         public static void Main(string[] args) {

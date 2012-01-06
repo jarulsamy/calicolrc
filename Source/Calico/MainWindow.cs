@@ -219,13 +219,17 @@ namespace Calico {
                 Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
                 ((Gtk.Menu)examples_menu.Submenu).Add(menu);
                 menu.Submenu = new Gtk.Menu();
-                foreach (FileInfo f in dir.GetFiles("*.*")) {
-                    if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
-                        Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
-                        ((Gtk.Menu)menu.Submenu).Add(fmenu);
-                        var fullname = f.FullName;
-                        fmenu.Activated += delegate { SelectOrOpen(fullname); };
+                try {
+                    foreach (FileInfo f in dir.GetFiles("*.*")) {
+                        if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
+                            Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
+                            ((Gtk.Menu)menu.Submenu).Add(fmenu);
+                            var fullname = f.FullName;
+                            fmenu.Activated += delegate { SelectOrOpen(fullname); };
+                        }
                     }
+                } catch {
+                    // Ignore missing directory
                 }
                 menu.Submenu.ShowAll();
             }
@@ -1569,6 +1573,20 @@ namespace Calico {
         {
             Output.Buffer.Text = "";
             Print(Tag.Info, String.Format("The Calico Project, Version {0}\n", MainClass.Version));
+        }
+
+        protected void OnPrintButtonClicked (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.Print(this);
+            }
+        }
+
+        protected void OnSaveButtonClicked (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.Save();
+            }
         }
     }
 }
