@@ -1,12 +1,13 @@
 
 CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe
-	gmcs -sdk:2 CalicoScheme.cs \
+	gmcs -debug CalicoScheme.cs \
 		-lib:../../bin \
 		-r:PJScheme.dll \
 		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
 		-r:Microsoft.VisualBasic \
 		-r:Microsoft.Scripting.dll \
+		-r:Microsoft.Scripting.Core.dll \
 		-r:IronPython.dll \
 		-r:Microsoft.Dynamic \
 		-target:library

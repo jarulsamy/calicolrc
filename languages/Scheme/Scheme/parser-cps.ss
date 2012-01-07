@@ -596,12 +596,16 @@
 	 (not (null? datum))
 	 (not (reserved-keyword? (car datum))))))
 
+(define get-reserved-keywords
+  (lambda ()
+    '(quote func define! quasiquote lambda if set! define
+	    begin cond and or let let* letrec case record-case
+	    try catch finally raise dict )))
+
 (define reserved-keyword?
   (lambda (x)
     (and (symbol? x)
-	 (memq x '(quote func define! quasiquote lambda if set! define
-                    begin cond and or let let* letrec case record-case
-                    try catch finally raise dict )))))
+	 (memq x (get-reserved-keywords)))))
 
 (define try? (tagged-list 'try >= 2))
 (define try-body (lambda (x) (cadr x)))

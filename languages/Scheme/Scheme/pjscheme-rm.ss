@@ -3908,15 +3908,17 @@
            (not (null? datum))
            (not (reserved-keyword? (car datum)))))))
 
+(define get-reserved-keywords
+  (lambda ()
+    (return*
+      (list 'quote 'func 'define! 'quasiquote 'lambda 'if 'set!
+       'define 'begin 'cond 'and 'or 'let 'let* 'letrec 'case
+       'record-case 'try 'catch 'finally 'raise 'dict))))
+
 (define reserved-keyword?
   (lambda (x)
     (return*
-      (and (symbol? x)
-           (memq
-             x
-             (list 'quote 'func 'define! 'quasiquote 'lambda 'if 'set!
-              'define 'begin 'cond 'and 'or 'let 'let* 'letrec 'case
-              'record-case 'try 'catch 'finally 'raise 'dict))))))
+      (and (symbol? x) (memq x (get-reserved-keywords))))))
 
 (define try-body (lambda (x) (return* (cadr x))))
 
@@ -4460,8 +4462,10 @@
         (if (null? args)
             (flatten
               (append
-                (map get-variables-from-frame (frames macro-env))
-                (map get-variables-from-frame (frames env))))
+                (get-reserved-keywords)
+                (append
+                  (map get-variables-from-frame (frames macro-env))
+                  (map get-variables-from-frame (frames env)))))
             (get-variables-from-frame (car (frames (car args)))))))))
 
 (define get-variables-from-frame

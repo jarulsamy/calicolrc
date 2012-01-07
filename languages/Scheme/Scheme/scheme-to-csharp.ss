@@ -96,6 +96,7 @@
     (try? "Func<object,bool>" ())
     (catch? "Func<object,bool>" ())
     (finally? "Func<object,bool>" ())
+    (get-reserved-keywords "object" ())
 
     ))
 

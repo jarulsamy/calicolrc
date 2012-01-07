@@ -101,8 +101,9 @@
            (instantiate right-pattern value k)
            (process-macro-clauses (cdr clauses) datum handler k)))
       (<cont-11> (bindings k)
-       (apply-cont k `(let (,(car bindings)) ,value)))
-      (<cont-12> (k) (apply-cont k `(cond ,@value)))
+       (apply-cont k `(let ((unquote (car bindings))) ,value)))
+      (<cont-12> (k)
+       (apply-cont k `(cond (unquote-splicing value))))
       (<cont-13> (clauses var k)
        (let ((clause (car clauses)))
          (cond
@@ -486,14 +487,17 @@
        (print-unparsed-sexps value2 handler k))
       (<cont2-11> () (halt* (cons value1 value2)))
       (<cont2-12> (bodies k)
-       (apply-cont k `(let ,value1 ,@value2 ,@bodies)))
+       (apply-cont k `(let (unquote value1) ,@value2 ,@bodies)))
       (<cont2-13> (procs vars k2)
        (apply-cont2
          k2
          (cons `(,(car vars) 'undefined) value1)
          (cons `(set! ,(car vars) ,(car procs)) value2)))
       (<cont2-14> (exp k)
-       (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))
+       (apply-cont
+         k
+         `(let ((r ,exp) (unquote-splicing value1))
+            (cond (unquote-splicing value2)))))
       (<cont2-15> (clauses var k2)
        (let ((clause (car clauses)))
          (if (eq? (car clause) 'else)
@@ -515,7 +519,9 @@
                        `((memq ,var ',(car clause)) (,name))
                        value2)))))))
       (<cont2-16> (k)
-       (apply-cont k `(let ,value1 (cond ,@value2))))
+       (apply-cont
+         k
+         `(let (unquote value1) (cond (unquote-splicing value2)))))
       (<cont2-17> (clauses var k2)
        (let ((clause (car clauses)))
          (if (eq? (car clause) 'else)
@@ -528,7 +534,8 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name (lambda ,(cadr clause) ,@(cddr clause)))
+                       `(,name
+                          (lambda (unquote (cadr clause)) ,@(cddr clause)))
                        value1)
                      (cons
                        `((eq? (car ,var) ',(car clause))
@@ -538,7 +545,8 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name (lambda ,(cadr clause) ,@(cddr clause)))
+                       `(,name
+                          (lambda (unquote (cadr clause)) ,@(cddr clause)))
                        value1)
                      (cons
                        `((memq (car ,var) ',(car clause))
@@ -727,7 +735,10 @@
        (let ((name (caadr datum))
              (formals (cdadr datum))
              (bodies (cddr datum)))
-         (apply-cont k `(define ,name (lambda ,formals ,@bodies)))))
+         (apply-cont
+           k
+           `(define (unquote name)
+              (lambda (unquote formals) ,@bodies)))))
       (<macro-2> ()
        (let ((exps (cdr datum)))
          (cond
@@ -777,7 +788,9 @@
                               k
                               `(let ((bool ,test-exp)
                                      (else-code (lambda ()
-                                                  (cond ,@other-clauses))))
+                                                  (cond
+                                                    (unquote-splicing
+                                                     other-clauses)))))
                                  (if bool bool (else-code))))))
                        ((null? other-clauses)
                         (if (null? (cdr then-exps))
@@ -790,13 +803,15 @@
                           k
                           `(if ,test-exp
                                ,(car then-exps)
-                               (cond ,@other-clauses))))
+                               (cond (unquote-splicing other-clauses)))))
                        (else
                         (apply-cont
                           k
                           `(if ,test-exp
                                (begin ,@then-exps)
-                               (cond ,@other-clauses)))))))))))
+                               (cond
+                                 (unquote-splicing
+                                  other-clauses))))))))))))
       (<macro-5> ()
        (if (symbol? (cadr datum))
            (let* ((name (cadr datum))
@@ -806,12 +821,13 @@
                   (bodies (cdddr datum)))
              (apply-cont
                k
-               `(letrec ((,name (lambda ,vars ,@bodies))) (,name ,@exps))))
+               `(letrec ((,name (lambda (unquote vars) ,@bodies)))
+                  (,name ,@exps))))
            (let* ((bindings (cadr datum))
                   (vars (map car bindings))
                   (exps (map cadr bindings))
                   (bodies (cddr datum)))
-             (apply-cont k `((lambda ,vars ,@bodies) ,@exps)))))
+             (apply-cont k `((lambda (unquote vars) ,@bodies) ,@exps)))))
       (<macro-6> ()
        (let* ((decls (cadr datum))
               (vars (map car decls))
@@ -1594,7 +1610,7 @@
   nest-let*-bindings
   (lambda (bindings bodies k)
     (if (or (null? bindings) (null? (cdr bindings)))
-        (apply-cont k `(let ,bindings ,@bodies))
+        (apply-cont k `(let (unquote bindings) ,@bodies))
         (nest-let*-bindings
           (cdr bindings)
           bodies
@@ -1868,14 +1884,15 @@
          (not (null? datum))
          (not (reserved-keyword? (car datum))))))
 
+(define get-reserved-keywords
+  (lambda ()
+    '(quote func define! quasiquote lambda if set! define begin
+      cond and or let let* letrec case record-case try catch
+      finally raise dict)))
+
 (define reserved-keyword?
   (lambda (x)
-    (and (symbol? x)
-         (memq
-           x
-           '(quote func define! quasiquote lambda if set! define begin
-             cond and or let let* letrec case record-case try catch
-             finally raise dict)))))
+    (and (symbol? x) (memq x (get-reserved-keywords)))))
 
 (define try-body (lambda (x) (cadr x)))
 
@@ -2263,8 +2280,10 @@
       (if (null? args)
           (flatten
             (append
-              (map get-variables-from-frame (frames macro-env))
-              (map get-variables-from-frame (frames env))))
+              (get-reserved-keywords)
+              (append
+                (map get-variables-from-frame (frames macro-env))
+                (map get-variables-from-frame (frames env)))))
           (get-variables-from-frame (car (frames (car args))))))))
 
 (define get-variables-from-frame

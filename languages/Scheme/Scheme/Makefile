@@ -1,4 +1,4 @@
-MCS=dmcs
+MCS=MONO_PATH=../../../bin:../../../modules gmcs -sdk:2
 
 ../PJScheme.dll: pjscheme-rm.ss scheme-to-csharp.ss Scheme.cs pjscheme.cs
 	$(MCS) -debug Scheme.cs pjscheme.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.Core -out:../PJScheme.dll
@@ -39,8 +39,12 @@ pjscheme.cs:
 
 pjscheme.exe: pjscheme-rm.ss scheme-to-csharp.ss Scheme.cs pjscheme.cs
 	$(MCS) -debug pjscheme.cs Scheme.cs getline.cs -main:PJScheme \
-	-lib:../../../bin -r:Microsoft.Scripting.dll \
-	-r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic 
+		-lib:../../../bin \
+		-r:Microsoft.Scripting.dll \
+		-r:Microsoft.Scripting.Core.dll \
+		-r:IronPython.dll \
+		-r:Microsoft.Dynamic \
+		-r:Microsoft.VisualBasic 
 
 Test.exe: Test.cs
 	$(MCS) Test.cs -lib:../../../bin -r:Microsoft.Scripting.dll

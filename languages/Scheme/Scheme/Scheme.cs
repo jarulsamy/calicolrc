@@ -573,6 +573,7 @@ public class Scheme {
 	set_env_b(env, symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1));
 	set_env_b(env, symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1));
 	set_env_b(env, symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1));
+	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1));
 	return env;
   }
   
@@ -711,14 +712,15 @@ public class Scheme {
 
   public static object using_prim(object args, object env) {
 	// implements "using"
+	Assembly assembly = null;
 	if (list_q(args)) {
 	  int len = (int) length(args);
 	  if (len > 0) { // (using "file.dll"), (using "System")
 		String filename = car(args).ToString();
-		Assembly assembly = null;
 		try {
-		  assembly = Assembly.LoadFrom(filename);
-		} catch (System.IO.FileNotFoundException) {
+    	  // FAILS without trying/catch when DEBUG in MonoDevelop
+		  assembly = Assembly.Load(filename);
+		} catch {
 #pragma warning disable 612
 		  assembly = Assembly.LoadWithPartialName(filename);
 #pragma warning restore 612
@@ -745,7 +747,7 @@ public class Scheme {
 	} else {
 	  throw new Exception("using takes a DLL name, and optionally a moduleName");
 	}
-	return null;
+	return PJScheme.symbol("<void>");
   }
   
   public static object ToDouble(object obj) {
@@ -1269,6 +1271,18 @@ public class Scheme {
 	  retval = null;
 	}
     return make_binding("dlr", retval);
+  }
+
+  public static object dlr_env_list() {
+    trace(1, "dlr_env_list"); 
+    object retval = list();
+    try {
+      foreach (string variable in _dlr_env.GetVariableNames()) {
+		retval = new Cons(variable, retval);
+      }
+    } catch {
+    }
+    return retval;
   }
 
   public static bool dlr_object_q(object result) {
@@ -2535,6 +2549,10 @@ public class Vector {
   public static void Main(string [] args) {
 	// ----------------------------------
 	// Math:
+	if (false) {
+		printf ("  (using \"Graphics\"): {0}\n", 
+			PJScheme.execute("(using \"Graphics\")"));
+		} else {
 	printf ("  Add(1,1), Result: {0}, Should be: {1}\n", 
 		Add(1, 1), 1 + 1);
 	printf ("  Multiply(10,2), Result: {0}, Should be: {1}\n", 
@@ -2608,6 +2626,7 @@ public class Vector {
     printf("display(list_to_vector( list(1, 2, 3))): ");
     display(list_to_vector( list(1, 2, 3)));
     printf("\n");
+		}
   }
 
   public static long longfact(long n) {

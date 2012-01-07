@@ -30,8 +30,8 @@ public class CalicoSchemeEngine : Engine
   {
   }
 
-  public override void Setup() {
-    base.Setup();
+  public override void PostSetup(MainWindow calico) {
+    base.PostSetup(calico);
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
   }
 

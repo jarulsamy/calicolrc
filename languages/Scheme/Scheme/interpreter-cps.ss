@@ -550,8 +550,10 @@
     (sort symbol<? (if (null? args)
 		       (flatten 
 			(append
-			 (map get-variables-from-frame (frames macro-env))
-			 (map get-variables-from-frame (frames env))))
+			 (get-reserved-keywords)
+			 (append
+			  (map get-variables-from-frame (frames macro-env))
+			  (map get-variables-from-frame (frames env)))))
 			(get-variables-from-frame (car (frames (car args))))))))
 
 (define get-variables-from-frame

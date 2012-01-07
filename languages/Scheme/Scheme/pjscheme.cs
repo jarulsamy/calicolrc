@@ -7061,37 +7061,30 @@ public class PJScheme:Scheme
 					    car ((object) datum))))));
    }
 
+   new public static object get_reserved_keywords ()
+   {
+      return ((object) PJScheme.
+	      list ((object) symbol ("quote"), (object) symbol ("func"),
+		    (object) symbol ("define!"),
+		    (object) symbol ("quasiquote"),
+		    (object) symbol ("lambda"), (object) symbol ("if"),
+		    (object) symbol ("set!"), (object) symbol ("define"),
+		    (object) symbol ("begin"), (object) symbol ("cond"),
+		    (object) symbol ("and"), (object) symbol ("or"),
+		    (object) symbol ("let"), (object) symbol ("let*"),
+		    (object) symbol ("letrec"), (object) symbol ("case"),
+		    (object) symbol ("record-case"), (object) symbol ("try"),
+		    (object) symbol ("catch"), (object) symbol ("finally"),
+		    (object) symbol ("raise"), (object) symbol ("dict")));
+   }
+
    new public static bool reserved_keyword_q (object x)
    {
       return ((bool)
 	      (((bool) PJScheme.symbol_q ((object) x))
 	       && ((bool) PJScheme.
 		   memq ((object) x,
-			 (object) PJScheme.list ((object) symbol ("quote"),
-						 (object) symbol ("func"),
-						 (object) symbol ("define!"),
-						 (object)
-						 symbol ("quasiquote"),
-						 (object) symbol ("lambda"),
-						 (object) symbol ("if"),
-						 (object) symbol ("set!"),
-						 (object) symbol ("define"),
-						 (object) symbol ("begin"),
-						 (object) symbol ("cond"),
-						 (object) symbol ("and"),
-						 (object) symbol ("or"),
-						 (object) symbol ("let"),
-						 (object) symbol ("let*"),
-						 (object) symbol ("letrec"),
-						 (object) symbol ("case"),
-						 (object)
-						 symbol ("record-case"),
-						 (object) symbol ("try"),
-						 (object) symbol ("catch"),
-						 (object) symbol ("finally"),
-						 (object) symbol ("raise"),
-						 (object)
-						 symbol ("dict"))))));
+			 (object) PJScheme.get_reserved_keywords ()))));
    }
 
    new public static object try_body (object x)
@@ -8016,7 +8009,7 @@ public class PJScheme:Scheme
       return ((object) PJScheme.
 	      sort ((Predicate2) symbolLessThan_q,
 		    (object) ((PJScheme.null_q ((object) args)) ? (PJScheme.
-								   flatten ((object) PJScheme.append ((object) map (get_variables_from_frame_proc, (object) PJScheme.frames ((object) macro_env)), (object) map (get_variables_from_frame_proc, (object) PJScheme.frames ((object) env))))) : (PJScheme.get_variables_from_frame ((object) PJScheme.car ((object) PJScheme.frames ((object) PJScheme.car ((object) args))))))));
+								   flatten ((object) PJScheme.append ((object) PJScheme.get_reserved_keywords (), (object) PJScheme.append ((object) map (get_variables_from_frame_proc, (object) PJScheme.frames ((object) macro_env)), (object) map (get_variables_from_frame_proc, (object) PJScheme.frames ((object) env)))))) : (PJScheme.get_variables_from_frame ((object) PJScheme.car ((object) PJScheme.frames ((object) PJScheme.car ((object) args))))))));
    }
 
    new public static object get_variables_from_frame (object frame)
