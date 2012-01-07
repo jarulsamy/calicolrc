@@ -1,5 +1,17 @@
 Calico2
 
+Bugs
+
+3. Scheme needs assemblies
+5. Add a Recents button on Home
+6. Search in toolbar
+7. SaveAs: use Exist: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
+8. Switching language by key does not change menu
+9. Hide Locals on check
+
+
+Big Tickets
+
 1. Recent Files [DONE - need to limit]
 1.1 History [DONE - need to limit]
 2. Reset shell
@@ -17,6 +29,7 @@ Calico2
 14. Ask to overwrite
 15. Ask to abort changes, save
 16. click in output to get history somehow
+17. Detect that the file has changed outside of Calico
 
 Problems, issues, features, and questions.
 

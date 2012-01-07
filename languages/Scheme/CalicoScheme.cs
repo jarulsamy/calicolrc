@@ -69,7 +69,7 @@ public class CalicoSchemeEngine : Engine
 public class CalicoSchemeLanguage : Language
 {
 	public CalicoSchemeLanguage () : 
-        base("scheme",  "Scheme", new string[] { "ss", "scm", "s" }, null)
+        base("scheme",  "Scheme", new string[] { "ss", "scm", "s" }, "text/x-scheme")
 	{
 	}
     
