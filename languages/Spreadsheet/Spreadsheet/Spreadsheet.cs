@@ -25,6 +25,32 @@ using System.IO;
 using Calico;
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
+public class Array {
+	Gtk.ListStore liststore;
+	int x;
+	Document document;
+
+	public Array(Document doc, Gtk.ListStore liststore, int x) {
+		this.document = doc;
+		this.liststore = liststore;
+		this.x = x;
+	}
+	public object this[int y] {
+		get {
+			Gtk.TreeIter iter;
+			liststore.GetIterFromString(out iter, x.ToString());
+			return liststore.GetValue(iter, y + 1);
+		}
+		set {
+			Gtk.TreeIter iter;
+			liststore.GetIterFromString(out iter, x.ToString());
+			liststore.SetValue(iter, y + 1, value);
+			document.IsDirty = true;
+			document.UpdateDocument();
+		}
+	}
+}
+
 public class SpreadsheetWidget : Gtk.TreeView {
 	
 	public Gtk.ListStore liststore;
@@ -33,6 +59,7 @@ public class SpreadsheetWidget : Gtk.TreeView {
 	public SpreadsheetWidget(Document doc) : base() {
 		document = doc;
 		EnableGridLines = Gtk.TreeViewGridLines.Both;
+		EnableSearch = true;
 		RulesHint = true;
 		// Environment table:
 		makeColumn();
@@ -139,6 +166,12 @@ public class CalicoSpreadsheetDocument : Document
 		widget.ShowAll ();
 	}
 	
+	public Array this[int x] {
+		get {
+			return new Array(this, sheet.liststore, x);
+		}
+	}
+		
 	bool SaveRow(Csv.writer writer, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
 		object [] content = new object[26];
 		for (int i = 1; i < 27; i++) {
@@ -163,6 +196,23 @@ public class CalicoSpreadsheetDocument : Document
 		return list;
 	}
 	
+	public object GetData(string column, int row) {
+		// column is "A", "B", row is 1 based
+		Gtk.TreeIter iter;
+		char c;
+		Char.TryParse(column.ToUpper(), out c);
+		int offset = c - 'A' + 1;
+		sheet.liststore.GetIterFromString(out iter, (row - 1).ToString());
+		return sheet.liststore.GetValue(iter, offset);
+	}
+
+	public object GetData(int x, int y) {
+		// Matrix, 0-based, swapped order of params from GetData("A", 1)
+		Gtk.TreeIter iter;
+		sheet.liststore.GetIterFromString(out iter, x.ToString());
+		return sheet.liststore.GetValue(iter, y + 1);
+	}
+
 	public override void SaveDocument()
 	{
 		Csv.writer writer = new Csv.writer(filename);

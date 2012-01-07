@@ -94,7 +94,7 @@ namespace Calico {
             }
         }
 
-        public Document GetDocumentByName(string name) {
+        public Document GetDocument(string name) {
             for (int i = 0; i < DocumentNotebook.NPages; i++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
                 if (documents.ContainsKey(widget)  && documents[widget].filename.Contains(name))
