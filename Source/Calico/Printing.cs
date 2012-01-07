@@ -57,8 +57,8 @@ public class Printing {
     }
 
     public void OnBeginPrint(object obj, Gtk.BeginPrintArgs args) {
-      Gtk.PrintContext context = args.Context;
-      double height = context.Height;
+      //Gtk.PrintContext context = args.Context;
+      //double height = context.Height;
       if (calico.OS == "Windows")
             this.linesPerPage = 60;
       else

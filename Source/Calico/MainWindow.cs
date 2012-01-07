@@ -238,7 +238,7 @@ namespace Calico {
                             Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
                             ((Gtk.Menu)menu.Submenu).Add(fmenu);
                             var fullname = f.FullName;
-                            fmenu.Activated += delegate { SelectOrOpen(fullname); };
+                            fmenu.Activated += delegate { Open(fullname); };
                         }
                     }
                     menu.Submenu.ShowAll();
@@ -255,7 +255,7 @@ namespace Calico {
                 Language language = pair.Value;
                 Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
                 ((Gtk.Menu)file_menu.Submenu).Add(menu);
-                menu.Activated += delegate { SelectOrOpen(null, language.name); };
+                menu.Activated += delegate { Open(null, language.name); };
             }
             file_menu.Submenu.ShowAll();
             
@@ -320,7 +320,7 @@ namespace Calico {
                         debug_handler = false;
                     }
                 } else {
-                    SelectOrOpen(System.IO.Path.GetFullPath(arg));
+                    Open(System.IO.Path.GetFullPath(arg));
                 }
             }
             if (debug_handler)
@@ -396,12 +396,12 @@ namespace Calico {
                 invoke();
         }
 
-        public bool SelectOrOpen() {
-            return SelectOrOpen(null, null);
+        public bool Open() {
+            return Open(null, null);
         }
 
-        public bool SelectOrOpen(string filename) {
-            return SelectOrOpen(filename, null);
+        public bool Open(string filename) {
+            return Open(filename, null);
         }
 
         public static string _(string message) {
@@ -443,7 +443,7 @@ namespace Calico {
             }
         }
 
-        public bool SelectOrOpen(string filename, string language) {
+        public bool Open(string filename, string language) {
             // First, check for filename:N format:
             int lineno = 0;
             if (filename != null) {
@@ -562,7 +562,7 @@ namespace Calico {
                 Gtk.MenuItem fmenu = new Gtk.MenuItem(file.Replace("_", "__"));
                 ((Gtk.Menu)recents_menu.Submenu).Add(fmenu);
                 string fullname = file; // because C# doesn't make closures on values
-                fmenu.Activated += delegate { SelectOrOpen(fullname); };
+                fmenu.Activated += delegate { Open(fullname); };
             }
             recents_menu.Submenu.ShowAll();
         }
@@ -619,10 +619,10 @@ namespace Calico {
                 ev.WaitOne();
                 if (dialogResponse != null) {
                     CurrentProperLanguage = dialogResponse;
-                    SelectOrOpen(null, CurrentLanguage);
+                    Open(null, CurrentLanguage);
                 }
             } else {
-                SelectOrOpen();
+                Open();
             }
         }
 
@@ -648,7 +648,7 @@ namespace Calico {
             Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog(_("Select the file to open"), this, Gtk.FileChooserAction.Open, _("Cancel"), Gtk.ResponseType.Cancel, _("Open"), Gtk.ResponseType.Accept);
             fc.KeepAbove = true;
             if (fc.Run() == (int)(Gtk.ResponseType.Accept)) {
-                SelectOrOpen(fc.Filename);
+                Open(fc.Filename);
             }
             fc.Destroy();
         }
@@ -714,35 +714,6 @@ namespace Calico {
                 left += data[i];
             }
             return new string [] {left, data[data.Length - 1]};
-        }
-
-        public virtual Pango.FontDescription GetFont() {
-            Pango.FontDescription pangofont = new Pango.FontDescription();
-            pangofont.Family = (string)config.GetValue("config", "font");
-            pangofont.Size = (int)config.GetValue("config", "font-size");
-            pangofont.Weight = ((bool)config.GetValue("config", "font-bold")) ? Pango.Weight.Bold : Pango.Weight.Normal;
-            pangofont.Style = ((bool)config.GetValue("config", "font-italic")) ? Pango.Style.Italic : Pango.Style.Normal;
-            return pangofont;
-        }
-
-        protected virtual void SetFont(string font) {
-            Pango.FontDescription desc = Pango.FontDescription.FromString(font);
-            config.SetValue("config", "font", desc.Family);
-            config.SetValue("config", "font-bold",  desc.Weight == Pango.Weight.Bold);
-            config.SetValue("config", "font-italic", desc.Style == Pango.Style.Italic);
-            config.SetValue("config", "font-size", desc.Size);
-        }
-
-        protected virtual void SelectFont(object sender, System.EventArgs e) {
-            Gtk.FontSelectionDialog d = new Gtk.FontSelectionDialog("Select Calico Font");
-            Pango.FontDescription pangofont = GetFont();
-            d.SetFontName(pangofont.ToString());
-            int response = d.Run();
-            if (response == (int)Gtk.ResponseType.Ok) {
-                SetFont(d.FontName);
-                UpdateZoom();
-            }
-            d.Destroy();
         }
 
         protected void About (object sender, System.EventArgs e) {
@@ -1478,6 +1449,34 @@ namespace Calico {
             KeyDown(true);
         }
 
+        public virtual Pango.FontDescription GetFont() {
+            Pango.FontDescription pangofont = new Pango.FontDescription();
+            pangofont.Family = (string)config.GetValue("config", "font");
+            pangofont.Size = (int)config.GetValue("config", "font-size");
+            pangofont.Weight = ((bool)config.GetValue("config", "font-bold")) ? Pango.Weight.Bold : Pango.Weight.Normal;
+            pangofont.Style = ((bool)config.GetValue("config", "font-italic")) ? Pango.Style.Italic : Pango.Style.Normal;
+            return pangofont;
+        }
+
+        protected virtual void SetFont(string font) {
+            Pango.FontDescription desc = Pango.FontDescription.FromString(font);
+            config.SetValue("config", "font", desc.Family);
+            config.SetValue("config", "font-bold",  desc.Weight == Pango.Weight.Bold);
+            config.SetValue("config", "font-italic", desc.Style == Pango.Style.Italic);
+            config.SetValue("config", "font-size", desc.Size);
+        }
+
+        protected virtual void SelectFont(object sender, System.EventArgs e) {
+            Gtk.FontSelectionDialog d = new Gtk.FontSelectionDialog("Select Calico Font");
+            Pango.FontDescription pangofont = GetFont();
+            d.SetFontName(pangofont.ToString());
+            int response = d.Run();
+            if (response == (int)Gtk.ResponseType.Ok) {
+                SetFont(d.FontName);
+                UpdateZoom();
+            }
+            d.Destroy();
+        }
         protected void UpdateZoom()
         {
             Shell.Options.FontName = GetFont().ToString();
@@ -1492,7 +1491,7 @@ namespace Calico {
         protected void OnZoomInActionActivated (object sender, System.EventArgs e)
         {
             config.SetValue("config", "font-size",
-              ((int)config.GetValue("config", "font-size")) + 1);
+              ((int)config.GetValue("config", "font-size")) + 1024);
             Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
 	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
@@ -1504,9 +1503,9 @@ namespace Calico {
 
         protected void OnZoomOutActionActivated (object sender, System.EventArgs e)
         {
-             if (((int)config.GetValue("config", "font-size")) > 5) {
+             if (((int)config.GetValue("config", "font-size")) > 5 * 1024) {
                  config.SetValue("config", "font-size",
-                    ((int)config.GetValue("config", "font-size")) - 1);
+                    ((int)config.GetValue("config", "font-size")) - 1024);
                  Shell.Options.FontName = GetFont().ToString();
                 Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
     	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {

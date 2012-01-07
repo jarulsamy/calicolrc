@@ -25,12 +25,12 @@ using System.IO;
 using Calico;
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
-public class Array {
+public class Row {
 	Gtk.ListStore liststore;
 	int x;
 	Document document;
 
-	public Array(Document doc, Gtk.ListStore liststore, int x) {
+	public Row(Document doc, Gtk.ListStore liststore, int x) {
 		this.document = doc;
 		this.liststore = liststore;
 		this.x = x;
@@ -45,6 +45,38 @@ public class Array {
 			Gtk.TreeIter iter;
 			liststore.GetIterFromString(out iter, x.ToString());
 			liststore.SetValue(iter, y + 1, value);
+			document.IsDirty = true;
+			document.UpdateDocument();
+		}
+	}
+}
+
+public class Column {
+	Gtk.ListStore liststore;
+	string column;
+	Document document;
+
+	public Column(Document doc, Gtk.ListStore liststore, string column) {
+		this.document = doc;
+		this.liststore = liststore;
+		this.column = column;
+	}
+	public object this[int row] {
+		get {
+			Gtk.TreeIter iter;
+			char c;
+			Char.TryParse(column.ToUpper(), out c);
+			int offset = c - 'A' + 1;
+			liststore.GetIterFromString(out iter, (row - 1).ToString());
+			return liststore.GetValue(iter, offset);
+		}
+		set {
+			Gtk.TreeIter iter;
+			char c;
+			Char.TryParse(column.ToUpper(), out c);
+			int offset = c - 'A' + 1;
+			liststore.GetIterFromString(out iter, (row - 1).ToString());
+			liststore.SetValue(iter, offset, value);
 			document.IsDirty = true;
 			document.UpdateDocument();
 		}
@@ -166,12 +198,18 @@ public class CalicoSpreadsheetDocument : Document
 		widget.ShowAll ();
 	}
 	
-	public Array this[int x] {
+	public Row this[int x] {
 		get {
-			return new Array(this, sheet.liststore, x);
+			return new Row(this, sheet.liststore, x);
 		}
 	}
 		
+	public Column this[string column] {
+		get {
+			return new Column(this, sheet.liststore, column);
+		}
+	}
+
 	bool SaveRow(Csv.writer writer, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
 		object [] content = new object[26];
 		for (int i = 1; i < 27; i++) {

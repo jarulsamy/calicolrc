@@ -49,7 +49,7 @@ namespace Calico {
         }
         public void Initialize() {
             SetValue("config", "font", "string", "Monospace");
-            SetValue("config", "font-size", "int", 10240);
+            SetValue("config", "font-size", "int", 10240); // 10 pt
             SetValue("config", "font-bold", "bool", false);
             SetValue("config", "font-italic", "bool", false);
             SetValue("config", "languages", "strings", new List<string>() {"all"});
