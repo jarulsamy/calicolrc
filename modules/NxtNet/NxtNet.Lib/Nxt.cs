@@ -357,6 +357,7 @@ namespace NxtNet
 
 			try
 			{
+				/*
 				// Calculate the complete response length.
 				if( responseLength > 0 )
 				{
@@ -366,7 +367,7 @@ namespace NxtNet
 				{
 					this._port.ReceivedBytesThreshold = 1;
 				}
-
+				*/
 				// Construct and send the bluetooth header.
 				byte[] header = new byte[ 2 ];
 				byte len = (byte) ( data.Length & 0x3f ); // 64 byte packet
