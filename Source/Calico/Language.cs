@@ -47,6 +47,10 @@ namespace Calico {
           return new TextDocument(calico, filename, name, mimetype);
         }
 
+        public virtual Document MakeDocument(MainWindow calico, string filename, string mimetype) {
+          return new TextDocument(calico, filename, name, mimetype);
+        }
+
         public static Language MakeLanguage() {
             return null;
         }

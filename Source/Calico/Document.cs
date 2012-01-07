@@ -224,6 +224,8 @@ namespace Calico {
 
         public TextDocument(MainWindow calico, string filename, string language, string mimetype) :
         base(calico, filename, language) {
+            Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
+                System.IO.Path.Combine(calico.path, "SyntaxModes"));
             options = new Mono.TextEditor.TextEditorOptions();
             Mono.TextEditor.Document document = new Mono.TextEditor.Document();
             if (System.IO.File.Exists(filename)) {
@@ -234,7 +236,8 @@ namespace Calico {
                 // FIXME: new file? invalid path? no longer exists?
             }
             texteditor = new Mono.TextEditor.TextEditor(document, options);
-            texteditor.Document.MimeType = mimetype;
+            if (mimetype != null)
+                texteditor.Document.MimeType = mimetype;
             widget.Add(texteditor);
             texteditor.Document.DocumentUpdated += OnDocumentUpdated;
             texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
@@ -296,6 +299,13 @@ namespace Calico {
             System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
             sw.Write(texteditor.Document.Text);
             sw.Close();
+            string possible_new_mime_type = calico.GetMimeType(filename);
+            if (possible_new_mime_type != null &&
+                texteditor.Document.MimeType != possible_new_mime_type) {
+                texteditor.Document.MimeType = possible_new_mime_type;
+                // HACK: reformat text:
+                texteditor.Document.Text = texteditor.Document.Text;
+            }
             texteditor.Document.SetNotDirtyState();
         }
 

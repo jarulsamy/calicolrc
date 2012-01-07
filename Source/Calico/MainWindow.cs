@@ -66,6 +66,9 @@ namespace Calico {
                     return null;
             }
         }
+        public Gtk.UIManager GUIManager {
+            get { return UIManager; }
+        }
         public Gtk.HScale ProgramSpeed {
             get { return hscale1;}
         }
@@ -328,6 +331,7 @@ namespace Calico {
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
+            searchbox.Hide();
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
@@ -519,9 +523,18 @@ namespace Calico {
             }
         }
 
-        public Document MakeDocument(string filename) {
-            string language = CurrentLanguage;
-            return MakeDocument(filename, language);
+        public Document MakeDocument(string filename, string language) {
+            Document document;
+            if (language == null) {
+                // Could not get language from filename, and not given
+                string mime_type = GetMimeType(filename);
+                document = manager.languages["python"].MakeDocument(this, filename, mime_type);
+            } else {
+                document = manager.languages[language].MakeDocument(this, filename);
+            }
+            document.Configure();
+            addToRecentsMenu(filename);
+            return document;
         }
 
         public void addToRecentsMenu (string filename)
@@ -551,16 +564,6 @@ namespace Calico {
                 fmenu.Activated += delegate { SelectOrOpen(fullname); };
             }
             recents_menu.Submenu.ShowAll();
-        }
-
-        public Document MakeDocument(string filename, string language) {
-            if (language == null) {
-                language = CurrentLanguage;
-            }
-            Document document = manager.languages[language].MakeDocument(this, filename);
-            document.Configure();
-            addToRecentsMenu(filename);
-            return document;
         }
 
         public void Cleanup() {
@@ -1600,6 +1603,178 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.Save();
             }
+        }
+
+        public string GetMimeType(string filename) {
+            string strExtension = System.IO.Path.GetExtension(filename);
+            switch (strExtension) {
+            case ".htm":
+                return "text/html";
+            case ".html":
+                return "text/html";
+            case ".txt":
+                return "text/plain";
+            case ".ss":
+                return "text/x-scheme";
+            case ".scm":
+                return "text/x-scheme";
+            case ".s":
+                return "text/x-scheme";
+            case ".py":
+                return "text/x-python";
+            case ".pyw":
+                return "text/x-python";
+            case ".rb":
+                return "text/x-ruby";
+            case ".cs":
+                return "text/x-csharp";
+            case ".fif":
+                return "application/fractals";
+            case ".hta":
+                return "application/hta";
+            case ".hqx":
+                return "application/mac-binhex40";
+            case ".vsi":
+                return "application/ms-vsi";
+            case ".p10":
+                return "application/pkcs10";
+            case ".p7m":
+                return "application/pkcs7-mime";
+            case ".p7s":
+                return "application/pkcs7-signature";
+            case ".cer":
+                return "application/pkix-cert";
+            case ".crl":
+                return "application/pkix-crl";
+            case ".ps":
+                return "application/postscript";
+            case ".setpay":
+                return "application/set-payment-initiation";
+            case ".setreg":
+                return "application/set-registration-initiation";
+            case ".sst":
+                return "application/vnd.ms-pki.certstore";
+            case ".pko":
+                return "application/vnd.ms-pki.pko";
+            case ".cat":
+                return "application/vnd.ms-pki.seccat";
+            case ".stl":
+                return "application/vnd.ms-pki.stl";
+            case ".wpl":
+                return "application/vnd.ms-wpl";
+            case ".xps":
+                return "application/vnd.ms-xpsdocument";
+            case ".z":
+                return "application/x-compress";
+            case ".tgz":
+                return "application/x-compressed";
+            case ".gz":
+                return "application/x-gzip";
+            case ".ins":
+                return "application/x-internet-signup";
+            case ".iii":
+                return "application/x-iphone";
+            case ".jtx":
+                return "application/x-jtx+xps";
+            case ".latex":
+                return "application/x-latex";
+            case ".nix":
+                return "application/x-mix-transfer";
+            case ".asx":
+                return "application/x-mplayer2";
+            case ".application":
+                return "application/x-ms-application";
+            case ".wmd":
+                return "application/x-ms-wmd";
+            case ".wmz":
+                return "application/x-ms-wmz";
+            case ".xbap":
+                return "application/x-ms-xbap";
+            case ".p12":
+                return "application/x-pkcs12";
+            case ".p7b":
+                return "application/x-pkcs7-certificates";
+            case ".p7r":
+                return "application/x-pkcs7-certreqresp";
+            case ".sit":
+                return "application/x-stuffit";
+            case ".tar":
+                return "application/x-tar";
+            case ".man":
+                return "application/x-troff-man";
+            case ".zip":
+                return "application/x-zip-compressed";
+            case ".xaml":
+                return "application/xaml+xml";
+            case ".xml":
+                return "application/xml";
+            case ".aiff":
+                return "audio/aiff";
+            case ".au":
+                return "audio/basic";
+            case ".mid":
+                return "audio/mid";
+            case ".mp3":
+                return "audio/mpeg";
+            case ".m3u":
+                return "audio/mpegurl";
+            case ".wav":
+                return "audio/wav";
+            case ".wax":
+                return "audio/x-ms-wax";
+            case ".wma":
+                return "audio/x-ms-wma";
+            case ".bmp":
+                return "image/bmp";
+            case ".gif":
+                return "image/gif";
+            case ".jpg":
+                return "image/jpeg";
+            case ".png":
+                return "image/png";
+            case ".tiff":
+                return "image/tiff";
+            case ".ico":
+                return "image/x-icon";
+            case ".dwfx":
+                return "model/vnd.dwfx+xps";
+            case ".css":
+                return "text/css";
+            case ".323":
+                return "text/h323";
+            case ".uls":
+                return "text/iuls";
+            case ".wsc":
+                return "text/scriptlet";
+            case ".htt":
+                return "text/webviewhtml";
+            case ".htc":
+                return "text/x-component";
+            case ".vcf":
+                return "text/x-vcard";
+            case ".wm":
+                return "video/x-ms-wm";
+            case ".wmv":
+                return "video/x-ms-wmv";
+            case ".wmx":
+                return "video/x-ms-wmx";
+            case ".wvx":
+                return "video/x-ms-wvx";
+            case ".avi":
+                return "video/x-msvideo";
+            default:
+                return "text/plain";
+            }
+        }
+
+        protected void OnFindActionActivated (object sender, System.EventArgs e)
+        {
+            searchbox.Show();
+        }
+
+        protected void OnButton125Clicked (object sender, System.EventArgs e)
+        {
+            searchbox.Hide();
         }
     }
 }
