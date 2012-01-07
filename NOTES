@@ -2,26 +2,25 @@ Calico2
 
 Bugs
 
-3. Scheme needs assemblies
 5. Add a Recents button on Home
 6. Search in toolbar
 7. SaveAs: use Exist: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
 8. Switching language by key does not change menu
-9. Hide Locals on check
+9. Hide Locals Tab on check box
 
 
 Big Tickets
 
 1. Recent Files [DONE - need to limit]
 1.1 History [DONE - need to limit]
-2. Reset shell
+2. Reset shell [DONE]
 3. Tab completion (for all expressions?)
-4. Loop in Graphics, win.run()
-5. Font
+4. Loop in Graphics, win.run() [OK]
+5. Font [DONE]
 6. Chat stuff (register, login, blast, chat)
-7. About
+7. About [DONE]
 8. Print (and newline issue on Windows) [DONE - windows sizing issue]
-9. Search/replace in Editor
+9. Search/replace in Editor [GUI]
 10. Languages, Jigsaw, Scheme [DONE]
 11. Debug/trace
 12. Goto file:line on right-click
@@ -145,3 +144,4 @@ DLR things for the Dynamic Language Runtime. Mono is the open source VM for the 
 
 # Mono: Dinah crashes on Mac on drop. 
 # Mono: Windows doesn't respond to treeview drags after Mono 2.6.4. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
+
