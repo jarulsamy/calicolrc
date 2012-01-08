@@ -396,14 +396,6 @@ namespace Calico {
                 invoke();
         }
 
-        public bool Open() {
-            return Open(null, null);
-        }
-
-        public bool Open(string filename) {
-            return Open(filename, null);
-        }
-
         public static string _(string message) {
             return global::Mono.Unix.Catalog.GetString(message);
         }
@@ -443,10 +435,23 @@ namespace Calico {
             }
         }
 
+        public bool Open() {
+            return Open(null, null);
+        }
+
+        public bool Open(string filename) {
+            Gtk.Application.Invoke( delegate {
+                Open(filename, null);
+            });
+            return true;
+        }
+
         public bool Open(string filename, string language) {
             // First, check for filename:N format:
             int lineno = 0;
             if (filename != null) {
+                // Get full path to file if not given:
+                filename = System.IO.Path.GetFullPath(filename);
                 System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(filename, "(.*)\\:(\\d+)$");
                 if (match.Success) {
                     // Groups[0] is entire string

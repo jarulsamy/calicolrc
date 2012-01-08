@@ -25,58 +25,48 @@ using System.IO;
 using Calico;
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
-public class Row {
-	Gtk.ListStore liststore;
-	int x;
-	Document document;
-
-	public Row(Document doc, Gtk.ListStore liststore, int x) {
-		this.document = doc;
-		this.liststore = liststore;
-		this.x = x;
-	}
-	public object this[int y] {
-		get {
-			Gtk.TreeIter iter;
-			liststore.GetIterFromString(out iter, x.ToString());
-			return liststore.GetValue(iter, y + 1);
-		}
-		set {
-			Gtk.TreeIter iter;
-			liststore.GetIterFromString(out iter, x.ToString());
-			liststore.SetValue(iter, y + 1, value);
-			document.IsDirty = true;
-			document.UpdateDocument();
-		}
-	}
-}
-
 public class Column {
 	Gtk.ListStore liststore;
-	string column;
+	string column = null;
 	Document document;
+	int x;
 
 	public Column(Document doc, Gtk.ListStore liststore, string column) {
 		this.document = doc;
 		this.liststore = liststore;
 		this.column = column;
 	}
-	public object this[int row] {
+	public Column(Document doc, Gtk.ListStore liststore, int x) {
+		this.document = doc;
+		this.liststore = liststore;
+		this.x = x;
+	}
+	public object this[int row_or_y] {
 		get {
 			Gtk.TreeIter iter;
-			char c;
-			Char.TryParse(column.ToUpper(), out c);
-			int offset = c - 'A' + 1;
-			liststore.GetIterFromString(out iter, (row - 1).ToString());
-			return liststore.GetValue(iter, offset);
+			if (column == null) {
+				liststore.GetIterFromString(out iter, row_or_y.ToString());
+				return liststore.GetValue(iter, x + 1);		
+			} else {
+				char c;
+				Char.TryParse(column.ToUpper(), out c);
+				int offset = c - 'A' + 1;
+				liststore.GetIterFromString(out iter, (row_or_y - 1).ToString());
+				return liststore.GetValue(iter, offset);
+			}
 		}
 		set {
 			Gtk.TreeIter iter;
-			char c;
-			Char.TryParse(column.ToUpper(), out c);
-			int offset = c - 'A' + 1;
-			liststore.GetIterFromString(out iter, (row - 1).ToString());
-			liststore.SetValue(iter, offset, value);
+			if (column == null) {
+				liststore.GetIterFromString(out iter, row_or_y.ToString());
+				liststore.SetValue(iter, x + 1, value.ToString());		
+			} else {
+				char c;
+				Char.TryParse(column.ToUpper(), out c);
+				int offset = c - 'A' + 1;
+				liststore.GetIterFromString(out iter, (row_or_y - 1).ToString());
+				liststore.SetValue(iter, offset, value.ToString());
+			}
 			document.IsDirty = true;
 			document.UpdateDocument();
 		}
@@ -198,9 +188,9 @@ public class CalicoSpreadsheetDocument : Document
 		widget.ShowAll ();
 	}
 	
-	public Row this[int x] {
+	public Column this[int x] {
 		get {
-			return new Row(this, sheet.liststore, x);
+			return new Column(this, sheet.liststore, x);
 		}
 	}
 		

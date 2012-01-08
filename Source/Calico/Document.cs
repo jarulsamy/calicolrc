@@ -201,9 +201,13 @@ namespace Calico {
         public virtual void UpdateDocument() {
             if (tab_label != null && basename != null) {
                 if (IsDirty)
-                    tab_label.Text = String.Format("*{0}", basename.Replace("_", "__"));
+                    Gtk.Application.Invoke( delegate {
+                        tab_label.Text = String.Format("*{0}", basename.Replace("_", "__"));
+                    });
                 else
-                    tab_label.Text = basename.Replace("_", "__");
+                    Gtk.Application.Invoke( delegate {
+                        tab_label.Text = basename.Replace("_", "__");
+                    });
             }
         }
 
