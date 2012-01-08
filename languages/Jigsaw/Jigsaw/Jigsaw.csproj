@@ -14,7 +14,6 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +27,7 @@
     <ConsolePause>false</ConsolePause>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="MONO_PATH" value="C:\Programs\Mono\Calico-dev\modules;C:\Programs\Mono\Calico-dev\bin" />
+        <Variable name="MONO_PATH" value="C:\Programs\Mono\Calico-dev\modules" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
@@ -47,30 +46,31 @@
     <Reference Include="System.Drawing" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
-      <Package>gtk-sharp-2.0</Package>
     </Reference>
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
-      <Package>glib-sharp-2.0</Package>
     </Reference>
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
-      <Package>gtk-sharp-2.0</Package>
-    </Reference>
-    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Private>False</Private>
-      <Package>gtk-sharp-2.0</Package>
     </Reference>
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
-      <Package>gtk-sharp-2.0</Package>
     </Reference>
-    <Reference Include="ExpressionEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\modules\ExpressionEngine.dll</HintPath>
+    <Reference Include="IronPython">
+      <HintPath>..\..\..\bin\IronPython.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Scripting.Core">
+      <HintPath>..\..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>..\..\..\bin\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Dynamic" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="plugin.png">
@@ -98,7 +98,7 @@
     <Compile Include="CMethodBlock.cs" />
     <Compile Include="Slider.cs" />
     <Compile Include="gtk-gui\generated.cs" />
-    <Compile Include="Exporter.cs" />
+    <Compile Include="ProcedureBlocks.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

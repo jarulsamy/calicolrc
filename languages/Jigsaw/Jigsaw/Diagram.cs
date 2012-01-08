@@ -22,6 +22,7 @@ namespace Diagram
 	public static class Colors {
 		public static readonly Color Transparent    = new Color(0.0,    0.0,    0.0,    0.0);
 		public static readonly Color White          = new Color(1.0,    1.0,    1.0);
+		public static readonly Color SemiWhite      = new Color(1.0,    1.0,    1.0,    0.7);
 		public static readonly Color Silver         = new Color(0.75,   0.75,   0.75);
 		public static readonly Color Gray           = new Color(0.5,    0.5,    0.5);
 		public static readonly Color LightGray      = new Color(0.8242, 0.8242, 0.8242);
@@ -47,6 +48,10 @@ namespace Diagram
 		
 		public static readonly Color DarkGreen      = new Color(0.0,    0.3910, 0.0);
 		public static readonly Color LightGreen     = new Color(0.5625, 0.9297, 0.5625);
+		
+		public static readonly Color Purple         = new Color(0.56,   0.0,    0.5);
+		public static readonly Color Plum           = new Color(0.867,  0.625,  0.867);
+		public static readonly Color Thistle        = new Color(0.844,  0.746,  0.844);
 	}
 	
     // -----------------------------------------------------------------------
@@ -137,6 +142,7 @@ namespace Diagram
         void OnMouseMove(Canvas cvs, MouseEventArgs e);
         void OnMouseUp(Canvas cvs, MouseEventArgs e);
         void OnDoubleClick(Canvas cvs, MouseEventArgs e);
+		void OnScroll(Canvas cvs, Gdk.EventScroll e);
         void CancelProcess(Canvas cvs);                 // Called when the current process should be cancelled
     }
 
@@ -181,7 +187,7 @@ namespace Diagram
 		internal double minOffsetY = 0.0;
 		
 		private double gridsize = 5.0;                          // Size of the drawing grid in pixels
-        private Boolean modified = false;                       // True if canvas has been modified and should be saved
+        private bool modified = false;                          // True if canvas has been modified and should be saved
 		
 		internal Gdk.ModifierType ModifierKeys = 0;				// State of modifier keys
 		
@@ -209,7 +215,7 @@ namespace Diagram
 		private Jigsaw.PropertyWindow _propertyWin = null;
 		
 		// Boolean indicating whether or not to draw inset
-		internal bool _showInset = true;
+		internal bool _showInset = false;
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public Canvas(int width, int height, double worldWidth, double worldHeight)
@@ -514,20 +520,7 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnZoomIn(object sender, EventArgs e)
-		{
-			this.DoZoom (1.05);
-		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnZoomOut(object sender, EventArgs e)
-		{
-			this.DoZoom(1.0/1.05);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnResetZoom(object sender, EventArgs e)
-		{
+		public void DoResetZoom() {
 			this.scale = 1.0;
 			this.offsetX = 0.0;
 			this.offsetY = 0.0;
@@ -535,11 +528,29 @@ namespace Diagram
 			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
 			this.UpdateOffsetLimits();
 			this.ClipOffsets ();
-			this.Invalidate();
+			this.Invalidate();	
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnToggleInset(object sender, EventArgs e)
+		public void OnViewZoomIn(object sender, EventArgs e)
+		{
+			this.DoZoom (1.05);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnViewZoomOut(object sender, EventArgs e)
+		{
+			this.DoZoom(1.0/1.05);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnViewZoom100(object sender, EventArgs e)
+		{
+			this.DoResetZoom();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnViewToggleInset(object sender, EventArgs e)
 		{
 			this.ToggleInset();
 			this.Invalidate();
@@ -548,23 +559,6 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void ToggleInset() {
 			this._showInset = !this._showInset;
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        protected void OnScroll(object o, Gtk.ScrollEventArgs e)
-        {	// Handle DrawingArea wheel scroll events
-			Gdk.EventScroll scl = (Gdk.EventScroll)e.Event;
-
-			if (scl.Direction == Gdk.ScrollDirection.Up) {
-				this.DoZoom(1.05);
-			} else if (scl.Direction == Gdk.ScrollDirection.Down) {;
-				this.DoZoom(1.0/1.05);
-			}
-//			
-//			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
-//			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
-//			
-//			this.Invalidate();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -587,6 +581,8 @@ namespace Diagram
 					this.DoZoom(1.05);
 				} else if (e.Event.Key == Gdk.Key.minus ) {
 					this.DoZoom(1.0/1.05);
+				} else if (e.Event.Key == Gdk.Key.Key_0 ) {
+					this.DoResetZoom();
 				}
 				e.RetVal = true;
 			}
@@ -607,6 +603,9 @@ namespace Diagram
         protected void OnMouseDown(object o, Gtk.ButtonPressEventArgs e)
         {	// Handle DrawingArea mouse events
 			
+			// This is necessary for key and scroll events to work on canvas
+			this.GrabFocus();
+			
 			// Update mouse down location and route event to current handler
 			// Scale and translate point coordinates
 			double ex = 0.0;
@@ -623,13 +622,12 @@ namespace Diagram
 			this.ModifierKeys = e.Event.State;
 			
             // If something hit then set as handler.
-			CShape ho = null;
-
             // First check if an annotation, shape or connector was hit.
-			// If something other than canvas was hit, reset handler.
-            ho = this.HitAnnotation(this.mouseDownExact);
+            CShape ho = this.HitAnnotation(this.mouseDownExact);
 			if (ho == null) ho = this.HitShape(this.mouseDownExact);
 			if (ho == null) ho = this.HitConnector(this.mouseDownExact);
+			
+			// If something other than canvas was hit, reset handler.
             if (ho != null) this.handler = ho;
 			
             // Route event to event handler
@@ -647,16 +645,15 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle MouseMove events
         protected void OnMouseMove(object o, Gtk.MotionNotifyEventArgs e)
-        {
+        {	// Handle MouseMove events
+			
             // Update mouse location and route event to current handler
 			double ex = 0.0;
 			double ey = 0.0;
 			double sx = (double)e.Event.X;
 			double sy = (double)e.Event.Y;
 			this.TransformPoint(sx, sy, out ex, out ey);
-			//Console.WriteLine("OnMouseMove(A) sx: {0} sy: {1} ex: {2} ey: {3}", sx, sy, ex, ey);
 			
             this.mouseExact = new CPoint(ex, ey); // Save the exact and snapped mouse position
             this.mouseGrid = this.SnapToGrid(this.mouseExact);
@@ -666,14 +663,13 @@ namespace Diagram
 			
             // Route event to current handler
 			MouseEventArgs mev = new MouseEventArgs(ex, ey, e);
-			//Console.WriteLine("OnMouseMove(A) ex: {0} ey: {1}", ex, ey);
             this.handler.OnMouseMove(this, mev);
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Handle MouseUp events
         protected void OnMouseUp(object o, Gtk.ButtonReleaseEventArgs e)
-        {
+        {	// Handle MouseUp events
+			
             // Update mouse up location and route event to current handler
 			double ex = 0.0;
 			double ey = 0.0;
@@ -690,11 +686,40 @@ namespace Diagram
             // Route event to current handler
             this.handler.OnMouseUp(this, new MouseEventArgs(ex, ey, e));
         }
-
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Canvas mouse down handler
+        protected void OnScroll(object o, Gtk.ScrollEventArgs e)
+        {	// Handle DrawingArea wheel scroll events
+			
+			Gdk.EventScroll scl = (Gdk.EventScroll)e.Event;
+			
+            // If something hit then set as handler.
+            // First check if an annotation, shape or connector was hit.
+            //CShape ho = this.HitAnnotation(this.mouseExact);
+			//if (ho == null) ho = this.HitShape(this.mouseExact);
+			//if (ho == null) ho = this.HitConnector(this.mouseExact);
+			
+			ICanvasEventHandler ho = this.HitShape(this.mouseExact);
+			if (ho == null) ho = this;
+			
+			ho.OnScroll (this, scl);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public virtual void OnScroll(Canvas cvs, Gdk.EventScroll scl)
+        {	// Handle DrawingArea wheel scroll events
+
+			if (scl.Direction == Gdk.ScrollDirection.Up) {
+				this.DoTranslate(0.0, 20.0);
+			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
+				this.DoTranslate(0.0, -20.0);
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void OnMouseDown(Canvas cvs, MouseEventArgs e)
-        {
+        {	// Canvas mouse down handler
+			
             if (this.Mode == EMode.Editing)
 			{
 	            // Deselect all if click on canvas with no shift key
@@ -718,9 +743,9 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Canvas mouse move handler
         public virtual void OnMouseMove(Canvas cvs, MouseEventArgs e)
-        {
+        {	// Canvas mouse move handler
+			
             if (this.Mode == EMode.Editing)
             {
                 if (this.EditMode == EMode.LassoLeftStart)
@@ -740,9 +765,9 @@ namespace Diagram
         }
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Canvas mouse up handler
         public virtual void OnMouseUp(Canvas cvs, MouseEventArgs e)
-        {
+        {	// Canvas mouse up handler
+			
             if (this.Mode == EMode.Editing)
             {
                 if (this.EditMode == EMode.LassoLeft || this.EditMode == EMode.LassoLeftStart)
@@ -785,17 +810,10 @@ namespace Diagram
             this.Invalidate();
         }
 		
-		/// <summary>
-		/// Double click event 
-		/// </summary>
-		/// <param name="cvs">
-		/// A <see cref="Canvas"/>
-		/// </param>
-		/// <param name="e">
-		/// A <see cref="MouseEventArgs"/>
-		/// </param>
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public virtual void OnDoubleClick(Canvas cvs, MouseEventArgs e)
-        {
+        {	// Handle double-clicke event
+			
 //            CShape ho = null;
 			
             if (this.Mode == EMode.Editing)
@@ -981,7 +999,7 @@ namespace Diagram
             {
                 //System.Security.Policy.Evidence ev = new System.Security.Policy.Evidence();
                 //assembly = Assembly.Load(assemblyName, ev);
-            	assembly = Assembly.Load(assemblyName);
+            	assembly = Assembly.LoadFrom(assemblyName);
 			}
 
             // If still don't have it, then quit
@@ -993,9 +1011,9 @@ namespace Diagram
             return t;
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        // - - - Allow external class to raise the SelectionChanged event - - - - - - - 
         public virtual void RaiseSelectionChangedEvent()
-        {	// Allow external class to raise the SelectionChanged event
+        {
             if (SelectionChanged != null)
             {
                 ShapeListEventArgs evargs = new ShapeListEventArgs(SelectedShapes());
@@ -1003,8 +1021,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the ShapesCreated event
+        // - - - Allow external class to raise the ShapesCreated event - - -
         public void RaiseShapesCreatedEvent(CShape s)
         {
             if (ShapesCreated != null)
@@ -1015,8 +1032,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the ShapesDeleted event
+        // - - - Allow external class to raise the ShapesDeleted event - - -
         public void RaiseShapesDeletedEvent(CShape s)
         {
             if (ShapesDeleted != null)
@@ -1027,8 +1043,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the ShapesMoved event
+        // - - - Allow external class to raise the ShapesMoved event - - -
         public void RaiseShapesMovedEvent(List<CShape> shps)
         {
             if (ShapesMoved != null)
@@ -1116,8 +1131,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the MouseMove event
+        // - - - Allow external class to raise the MouseMove event - - -
         public void RaiseCanvasMouseMove(MouseEventArgs e)
         {
             if (CanvasMouseMove != null)
@@ -1134,8 +1148,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the Click event
+        // - - - Allow external class to raise the Click event - - -
         public void RaiseCanvasClick(MouseEventArgs e)
         {
             if (CanvasClick != null)
@@ -1152,8 +1165,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // This method deletes all shapes on the canvas and sets it up as new
+        // - - - This method deletes all shapes on the canvas and sets it up as new - - -
         public void Clear()
         {
             // Make sure everything is deselected
@@ -1173,8 +1185,7 @@ namespace Diagram
             set { this.modified = value; }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Create a new point with coordintes equal to the closest grid point.
+        // - - - Create a new point with coordintes equal to the closest grid point. - - -
         public CPoint SnapToGrid(CPoint pnt)
         {
             double gs = this.gridsize;
@@ -1283,8 +1294,7 @@ namespace Diagram
             this.modified = true;
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Add a shape to the connector layer
+        // - - - Add a shape to the connector layer - - -
         public void AddConnector(CShape shp)
         {
             // Generate a unique name for this connector, if it does not have one
@@ -2629,7 +2639,13 @@ namespace Diagram
 			if (this.ContainsPoint(pt, cvs) && this.visible) return this;
 			return null;
         }
-
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void OnScroll(Canvas cvs, Gdk.EventScroll e)
+		{	// Default behavior is to hand event back to canvas
+			cvs.OnScroll(cvs, e);
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void OnMouseDown(Canvas cvs, MouseEventArgs e)
         {	// Handle mouse down event
@@ -4928,7 +4944,13 @@ namespace Diagram
 
             //this.class_name = class_name;
         }
-
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void OnScroll(Canvas cvs, Gdk.EventScroll e)
+		{	// Default behavior is to hand event back to canvas
+			cvs.OnScroll(cvs, e);
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void OnMouseDown(Canvas cvs, MouseEventArgs e)
         {
@@ -5078,6 +5100,12 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void OnDoubleClick(Canvas cvs, MouseEventArgs e)
         {
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void OnScroll(Canvas cvs, Gdk.EventScroll e)
+		{	// Default behavior is to hand event back to canvas
+			cvs.OnScroll(cvs, e);
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5274,6 +5302,12 @@ namespace Diagram
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void OnDoubleClick(Canvas cvs, MouseEventArgs e)
         {
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void OnScroll(Canvas cvs, Gdk.EventScroll e)
+		{	// Default behavior is to hand event back to canvas
+			cvs.OnScroll(cvs, e);
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -4,13 +4,6 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 
-// This file contains all things InspectorWindow. 
-// This includes the window itself and all property classes.
-// The namespace remains Jigsaw.
-
-// TODO:
-// Add a message console to the properties window and show errors there when property values cannot be parsed. See Text properties.
-
 namespace Jigsaw
 {
 	public class PropertyWindow : Gtk.Window
@@ -71,9 +64,9 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// React to a change in selection on the Jigsaw canvas
 		void OnJigsawSelectionChanged(Diagram.Canvas cvs, Diagram.ShapeListEventArgs e)
-		{
+		{	// React to a change in selection on the Jigsaw canvas
+			
 			// Before finishing, update PropertyWindow
 			// If at least one block is selected, show properties of selected block.
 			this.ClearProperties();
@@ -108,9 +101,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// When a value is edited, copy data back to CProperty
 		void OnPropValRendererEdited(object o, Gtk.EditedArgs args)
-		{
+		{	// When a value is edited, copy data back to CProperty
 			Gtk.TreeIter iter;
 			propList.GetIter(out iter, new Gtk.TreePath(args.Path));
 			CProperty prop = (CProperty)propList.GetValue(iter, 0);
@@ -121,8 +113,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Remove all properties from the InspectorWindow property list
-		public void ClearProperties() {
+		public void ClearProperties()
+		{	// Remove all properties from the InspectorWindow property list
 			propList.Clear();
 		}
 		
@@ -134,216 +126,216 @@ namespace Jigsaw
 		}
 	}
 	
-	/// <summary>
-	/// Top level floating window that displays the currently selected CBlock properties and other items
-	/// </summary>
-	public class InspectorWindow : Gtk.Window 
-	{
-
-//		private Gtk.TreeView localsTree = null;		// Locals List
-//		private Gtk.ListStore localsList = null;	// List of items in the local scope for the Locals Tree
-		private Gtk.TextView localsView = null;		// Locals window
-		private Gtk.TextView outputView = null;		// Output window
-		
-		private Jigsaw.Canvas cvs = null;
-		
-		/// <summary>
-		/// Inspector Window Constructor 
-		/// </summary>
-		public InspectorWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
-		{
-			this.Title = "Jigsaw Inspector";
-			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
-			this.Resize(300, 200);
-			this.KeepAbove = true;
-			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
-			
-			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
-			
-//			// See http://www.mono-project.com/GtkSharp_TreeView_Tutorial
+//	/// <summary>
+//	/// Top level floating window that displays the currently selected CBlock properties and other items
+//	/// </summary>
+//	public class InspectorWindow : Gtk.Window 
+//	{
+//
+////		private Gtk.TreeView localsTree = null;		// Locals List
+////		private Gtk.ListStore localsList = null;	// List of items in the local scope for the Locals Tree
+//		private Gtk.TextView localsView = null;		// Locals window
+//		private Gtk.TextView outputView = null;		// Output window
+//		
+//		private Jigsaw.Canvas cvs = null;
+//		
+//		/// <summary>
+//		/// Inspector Window Constructor 
+//		/// </summary>
+//		public InspectorWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
+//		{
+//			this.Title = "Jigsaw Inspector";
+//			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
+//			this.Resize(300, 200);
+//			this.KeepAbove = true;
+//			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
+//			
+//			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
+//			
+////			// See http://www.mono-project.com/GtkSharp_TreeView_Tutorial
+////			
+////			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+////			// New Tree view to display properties
+////			propTree = new Gtk.TreeView();
+////			
+////			// Create name columns
+////			Gtk.TreeViewColumn nameCol = new Gtk.TreeViewColumn ();
+////			nameCol.Title = "Name";
+////			
+////			Gtk.TreeViewColumn valCol = new Gtk.TreeViewColumn ();
+////			valCol.Title = "Value";
+////			
+////			// Add to TreeView
+////			propTree.AppendColumn(nameCol);
+////			propTree.AppendColumn(valCol);
+////			
+////			// Create and insert cell renderer
+////			Gtk.CellRendererText nameRenderer = new Gtk.CellRendererText();
+////  			nameCol.PackStart(nameRenderer, true);
+////
+////			// Create and insert cell renderer
+////			Gtk.CellRendererText valRenderer = new Gtk.CellRendererText();
+////  			valCol.PackStart(valRenderer, true);
+////
+////			// Link it all together
+////			nameCol.SetCellDataFunc(nameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
+////			valCol.SetCellDataFunc(valRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
+////			
+////			// Make the value column editable
+////			valRenderer.Editable = true;
+////			valRenderer.Edited += OnPropValRendererEdited;
+////			
+////			// Create a ListStore as the Model
+////			propList = new Gtk.ListStore(typeof (CProperty));
+////			propTree.Model = propList;
 //			
 //			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//			// New Tree view to display properties
-//			propTree = new Gtk.TreeView();
+//			// Locals Tree
+////			localsTree = new Gtk.TreeView();
+////			
+////			// Create name columns
+////			Gtk.TreeViewColumn locNameCol = new Gtk.TreeViewColumn ();
+////			locNameCol.Title = "Name";
+////			
+////			Gtk.TreeViewColumn locValCol = new Gtk.TreeViewColumn ();
+////			locValCol.Title = "Value";
+////			
+////			// Add to TreeView
+////			localsTree.AppendColumn(locNameCol);
+////			localsTree.AppendColumn(locValCol);
+////			
+////			// Create and insert cell renderer
+////			Gtk.CellRendererText locNameRenderer = new Gtk.CellRendererText();
+////  			locNameCol.PackStart(locNameRenderer, true);
+////
+////			// Create and insert cell renderer
+////			Gtk.CellRendererText locValRenderer = new Gtk.CellRendererText();
+////  			locValCol.PackStart(locValRenderer, true);
+////
+////			// Link it all together
+////			locNameCol.SetCellDataFunc(locNameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
+////			locValCol.SetCellDataFunc(locValRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
+////			
+////			// Make the value column editable
+////			locValRenderer.Editable = true;
+////			locValRenderer.Edited += OnLocalsValRendererEdited;
+////			
+////			// Create a ListStore as the Model
+////			localsList = new Gtk.ListStore(typeof(CProperty));
+////			localsTree.Model = localsList;
 //			
-//			// Create name columns
-//			Gtk.TreeViewColumn nameCol = new Gtk.TreeViewColumn ();
-//			nameCol.Title = "Name";
+//			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//			// locals display window
+//			localsView = new Gtk.TextView();
+//			Gtk.ScrolledWindow lsw = new Gtk.ScrolledWindow();
+//			lsw.CanFocus = true;
+//			lsw.VscrollbarPolicy = Gtk.PolicyType.Always;
+//			lsw.Add(localsView);
 //			
-//			Gtk.TreeViewColumn valCol = new Gtk.TreeViewColumn ();
-//			valCol.Title = "Value";
+//			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//			// Output window
+//			outputView = new Gtk.TextView();
+//			Gtk.ScrolledWindow osw = new Gtk.ScrolledWindow();
+//			osw.CanFocus = true;
+//			osw.VscrollbarPolicy = Gtk.PolicyType.Always;
+//			osw.Add(outputView);
 //			
-//			// Add to TreeView
-//			propTree.AppendColumn(nameCol);
-//			propTree.AppendColumn(valCol);
+//			// Put it all in a Notebook
+//			Gtk.Notebook nb = new Gtk.Notebook();
+//			//nb.AppendPage(propTree, new Gtk.Label("Properties"));
+//			nb.AppendPage(lsw, new Gtk.Label("Locals"));
+//			//nb.AppendPage(localsTree, new Gtk.Label("Locals"));
+//			nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
+//			nb.AppendPage(osw, new Gtk.Label("Output"));
 //			
-//			// Create and insert cell renderer
-//			Gtk.CellRendererText nameRenderer = new Gtk.CellRendererText();
-//  			nameCol.PackStart(nameRenderer, true);
+//			this.Add(nb);
+//		}
 //
-//			// Create and insert cell renderer
-//			Gtk.CellRendererText valRenderer = new Gtk.CellRendererText();
-//  			valCol.PackStart(valRenderer, true);
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void WriteLine(String msg) {
+//			// Add text to the buffer
+//			outputView.Buffer.Text += msg + "\n";
 //
-//			// Link it all together
-//			nameCol.SetCellDataFunc(nameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
-//			valCol.SetCellDataFunc(valRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
+//			// Always scroll to the cursor position
+//			Gtk.TextIter ti = outputView.Buffer.GetIterAtLine(outputView.Buffer.LineCount-1); 
+//			Gtk.TextMark tm = outputView.Buffer.CreateMark("eot", ti,false); 
+//			outputView.ScrollToMark(tm, 0, false, 0, 0); 
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void ClearOutput()
+//		{	// Clear contents of output window
+//			outputView.Buffer.Clear();
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void DisplayLocals(Engine e) 
+//		{	// Render all locals to window
 //			
-//			// Make the value column editable
-//			valRenderer.Editable = true;
-//			valRenderer.Edited += OnPropValRendererEdited;
+//			Microsoft.Scripting.Hosting.ScriptScope scope = e.Scope;
+//			StringBuilder sb = new StringBuilder();
 //			
-//			// Create a ListStore as the Model
-//			propList = new Gtk.ListStore(typeof (CProperty));
-//			propTree.Model = propList;
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Locals Tree
-//			localsTree = new Gtk.TreeView();
-//			
-//			// Create name columns
-//			Gtk.TreeViewColumn locNameCol = new Gtk.TreeViewColumn ();
-//			locNameCol.Title = "Name";
-//			
-//			Gtk.TreeViewColumn locValCol = new Gtk.TreeViewColumn ();
-//			locValCol.Title = "Value";
-//			
-//			// Add to TreeView
-//			localsTree.AppendColumn(locNameCol);
-//			localsTree.AppendColumn(locValCol);
-//			
-//			// Create and insert cell renderer
-//			Gtk.CellRendererText locNameRenderer = new Gtk.CellRendererText();
-//  			locNameCol.PackStart(locNameRenderer, true);
+//			foreach (CallStack cs in e.CallStacks) {
 //
-//			// Create and insert cell renderer
-//			Gtk.CellRendererText locValRenderer = new Gtk.CellRendererText();
-//  			locValCol.PackStart(locValRenderer, true);
+//				//Console.WriteLine("------");
+//				sb.AppendLine("------");
+//				foreach (string k in scope.GetVariableNames()) {
+//					//Console.WriteLine("{0} = {1}", k, locals[k]);
+//					sb.AppendFormat("{0} = {1}\n", k, scope.GetVariable(k));
+//				}
+//			}
+//			
+//			localsView.Buffer.Text = sb.ToString();
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void ClearLocals()
+//		{	// Clear contents of locals window
+//			localsView.Buffer.Clear();
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void RenderLocals()
+//		{	// Render the given locals scope in its window
+//			
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		// When a locals value is edited, copy data back to CProperty
+////		void OnLocalsValRendererEdited(object o, Gtk.EditedArgs args)
+////		{
+////			Gtk.TreeIter iter;
+////			localsList.GetIter(out iter, new Gtk.TreePath(args.Path));
+////			CProperty prop = (CProperty)localsList.GetValue(iter, 0);
+////			
+////			// TODO: Must evaluate the exprssion here before resetting?
+////			
+////			prop.Text = args.NewText;
+////			
+////			// Redraw
+////			//cvs.Invalidate();
+////		}
 //
-//			// Link it all together
-//			locNameCol.SetCellDataFunc(locNameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
-//			locValCol.SetCellDataFunc(locValRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
-//			
-//			// Make the value column editable
-//			locValRenderer.Editable = true;
-//			locValRenderer.Edited += OnLocalsValRendererEdited;
-//			
-//			// Create a ListStore as the Model
-//			localsList = new Gtk.ListStore(typeof(CProperty));
-//			localsTree.Model = localsList;
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// locals display window
-			localsView = new Gtk.TextView();
-			Gtk.ScrolledWindow lsw = new Gtk.ScrolledWindow();
-			lsw.CanFocus = true;
-			lsw.VscrollbarPolicy = Gtk.PolicyType.Always;
-			lsw.Add(localsView);
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Output window
-			outputView = new Gtk.TextView();
-			Gtk.ScrolledWindow osw = new Gtk.ScrolledWindow();
-			osw.CanFocus = true;
-			osw.VscrollbarPolicy = Gtk.PolicyType.Always;
-			osw.Add(outputView);
-			
-			// Put it all in a Notebook
-			Gtk.Notebook nb = new Gtk.Notebook();
-			//nb.AppendPage(propTree, new Gtk.Label("Properties"));
-			nb.AppendPage(lsw, new Gtk.Label("Locals"));
-			//nb.AppendPage(localsTree, new Gtk.Label("Locals"));
-			nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
-			nb.AppendPage(osw, new Gtk.Label("Output"));
-			
-			this.Add(nb);
-		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void WriteLine(String msg) {
-			// Add text to the buffer
-			outputView.Buffer.Text += msg + "\n";
-
-			// Always scroll to the cursor position
-			Gtk.TextIter ti = outputView.Buffer.GetIterAtLine(outputView.Buffer.LineCount-1); 
-			Gtk.TextMark tm = outputView.Buffer.CreateMark("eot", ti,false); 
-			outputView.ScrollToMark(tm, 0, false, 0, 0); 
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Clear contents of output window
-		public void ClearOutput() {
-			outputView.Buffer.Clear();
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Render all locals to window
-		public void DisplayLocals(Engine e) 
-		{
-			Expression.Scope locals = null;
-			StringBuilder sb = new StringBuilder();
-			
-			foreach (CallStack cs in e.CallStacks) {
-				locals = cs.Locals;
-
-				//Console.WriteLine("------");
-				sb.AppendLine("------");
-				foreach (string k in locals.GetVariableNames()) {
-					//Console.WriteLine("{0} = {1}", k, locals[k]);
-					sb.AppendFormat("{0} = {1}\n", k, locals.GetVariable(k));
-				}
-			}
-			
-			localsView.Buffer.Text = sb.ToString();
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Clear contents of locals window
-		public void ClearLocals() {
-			localsView.Buffer.Clear();
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Render the given locals scope in its window
-		public void RenderLocals() {
-			
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// When a locals value is edited, copy data back to CProperty
-//		void OnLocalsValRendererEdited(object o, Gtk.EditedArgs args)
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		// Remove all locals properties from the InspectorWindow locals list
+////		public void ClearLocals() {
+////			localsList.Clear();
+////		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		protected void DoDeleteEvent (object obj, Gtk.DeleteEventArgs args)
 //		{
-//			Gtk.TreeIter iter;
-//			localsList.GetIter(out iter, new Gtk.TreePath(args.Path));
-//			CProperty prop = (CProperty)localsList.GetValue(iter, 0);
-//			
-//			// TODO: Must evaluate the exprssion here before resetting?
-//			
-//			prop.Text = args.NewText;
-//			
-//			// Redraw
-//			//cvs.Invalidate();
+//			this.Hide();		// If HideAll() is used here instead, when ShowAll is called, Window forgets its position
+//			args.RetVal = true;
 //		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Remove all locals properties from the InspectorWindow locals list
-//		public void ClearLocals() {
-//			localsList.Clear();
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void DoDeleteEvent (object obj, Gtk.DeleteEventArgs args)
-		{
-			this.Hide();		// If HideAll() is used here instead, when ShowAll is called, Window forgets its position
-			args.RetVal = true;
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	}
 	
-	// This is a class that holds data for one property in PropertyWindow
+	// -----------------------------------------------------------------------
 	public class CProperty
-	{
+	{	// This is a class that holds data for one property in PropertyWindow
+		
 		protected string _Name;
 		protected string _Text;
 		
@@ -376,8 +368,8 @@ namespace Jigsaw
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Setting/getting Name value
-		public string Name {
+		public virtual string Name 
+		{	// Setting/getting Name value
 			get { return _Name; }
 			set { 
 				_Name = value;
@@ -386,9 +378,9 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Setting/getting value text
-		// This should be overridden and the text parsed and validated if intended to be a different type
-		public virtual string Text {
+		public virtual string Text 
+		{ 	// Setting/getting value text
+			// This should be overridden and the text parsed and validated if intended to be a different type
 			get { return _Text; }
 			set {
 				_Text = value;
@@ -405,90 +397,164 @@ namespace Jigsaw
 		}
 	}
 	
-	/// <summary>
-	/// Subclass of CProperty with a simple string value and string value holding an expression 
-	/// </summary>
+	// -----------------------------------------------------------------------
 	public class CExpressionProperty : CProperty
-	{
-		private Expression.Expression _Expr = null;
+	{	// Subclass of CProperty with a simple string value and string value holding an expression 
+		
+		//private Expression.Expression _Expr = null;
+		private Microsoft.Scripting.Hosting.ScriptSource _Source = null;
+		private Microsoft.Scripting.Hosting.CompiledCode _Compiled = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CExpressionProperty(string name, string txt) : base(name, txt) 
 		{ }
+
+//		public override string Text 
+//		{	// Setting/getting Text parses and updates internal expression
+//			get { return _Text; }
+//			set {
+//				_Expr = Expression.Engine.makeExpression(value);
+//				if (_Expr.HasErrors()) {
+//					_Text = "Err: " + value;
+//				} else {
+//					_Text = _Expr.ParsedExpression();
+//					this.RaisePropertyChanged();
+//				}
+//			}
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Setting/getting Text parses and updates internal expression
-		public override string Text {
-			get { return _Text; }
-			set {
-				_Expr = Expression.Engine.makeExpression(value);
-				if (_Expr.HasErrors()) {
-					_Text = "Err: " + value;
-				} else {
-					_Text = _Expr.ParsedExpression();
-					this.RaisePropertyChanged();
-				}
-			}
+		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
+		{
+			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Expression);
+			_Compiled = _Source.Compile();
+			Text = _Source.GetCode();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public Expression.Expression Expr {
-			get { return _Expr; }
+		public object Evaluate(Microsoft.Scripting.Hosting.ScriptScope scope) {
+			return _Compiled.Execute(scope);
+			//return _Expr.Execute(scope);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public Microsoft.Scripting.Hosting.ScriptSource Expr {
+			get { return _Source; }
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void ToXml(XmlWriter w) {
 	        w.WriteStartElement("property");
 			w.WriteAttributeString("name", _Name);
-			w.WriteAttributeString("value", _Expr.ParsedExpression());
+			if (_Source != null)
+				w.WriteAttributeString("value", _Source.GetCode());
+			else
+				w.WriteAttributeString("value", "");
+			//w.WriteAttributeString("value", _Expr.ParsedExpression());
 			w.WriteEndElement();	
 		}
 	}
 	
-	/// <summary>
-	/// Property that holds a variable name (identifier) 
-	/// </summary>
-	public class CVarNameProperty : CProperty
-	{	
+	// -----------------------------------------------------------------------
+	public class CStatementProperty : CProperty
+	{	// Subclass of CProperty with a simple string value and string value holding an arbitrary statement 
+		
+		private Microsoft.Scripting.Hosting.ScriptSource _Source = null;
+		private Microsoft.Scripting.Hosting.CompiledCode _Compiled = null;
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CVarNameProperty(string name, string txt) : base(name, txt) 
+		public CStatementProperty(string name, string txt) : base(name, txt) 
 		{ }
-	}
-
-	/// <summary>
-	/// Property that holds a string 
-	/// </summary>
-	public class CStringProperty : CProperty
-	{
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
+		{
+			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Statements);
+			_Compiled = _Source.Compile();
+			Text = _Source.GetCode();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Evaluate(Microsoft.Scripting.Hosting.ScriptScope scope)
+		{	// Its a statement ... nothing to return
+			_Compiled.Execute(scope);
+			//_Source.Execute(scope);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public Microsoft.Scripting.Hosting.ScriptSource Statement {
+			get { return _Source; }
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void ToXml(XmlWriter w) {
+	        w.WriteStartElement("property");
+			w.WriteAttributeString("name", _Name);
+			if (_Source != null)
+				w.WriteAttributeString("value", _Source.GetCode());
+			else
+				w.WriteAttributeString("value", "");
+			w.WriteEndElement();
+		}
+	}
+	
+	// -----------------------------------------------------------------------
+	public class CVarNameProperty : CProperty
+	{	// Property that holds a variable name (identifier) 
+		public CVarNameProperty(string name, string txt) : base(name, txt) 
+		{
+			this.Name = name.Trim ();
+			this.Text = txt.Trim ();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override string Name 
+		{	// Setting/getting Name value
+			get { return _Name; }
+			set { 
+				_Name = value.Trim ();
+				this.RaisePropertyChanged();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override string Text 
+		{ 	// Setting/getting value text
+			// This should be overridden and the text parsed and validated if intended to be a different type
+			get { return _Text; }
+			set {
+				_Text = value.Trim ();
+				this.RaisePropertyChanged();
+			}
+		}
+	}
+	
+	// -----------------------------------------------------------------------
+	public class CStringProperty : CProperty
+	{	// Property that holds a string 
 		public CStringProperty(string name, string txt) : base(name, txt) 
 		{ }
 	}
 	
-	/// <summary>
-	/// Property that can be read only. Changing value does nothing to block.
-	/// </summary>
+	// -----------------------------------------------------------------------
 	public class CReadOnlyProperty : CProperty
-	{
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	{	// Property that can be read only. Changing value does nothing to block.
 		public CReadOnlyProperty(string name) : this (name, "") {
 		}
-//		
+
 		public CReadOnlyProperty(string name, string txt) : base(name, txt) {
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Getting value text. Cannot set.
-		public override string Text {
+		public override string Text
+		{	// Getting value text. Cannot set.
 			get { return _Text; }
 		}
 	}
 	
-	/// <summary>
-	/// Property that holds an integer 
-	/// </summary>
+	// -----------------------------------------------------------------------
 	public class CIntegerProperty : CProperty
-	{	
+	{	// Property that holds an integer 
 		private int _val = 0;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -498,8 +564,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Setting/getting Text parses and updates integer
-		public override string Text {
+		public override string Text 
+		{	// Setting/getting Text parses and updates integer
 			get { return _val.ToString(); }
 			set {
 				try {
@@ -513,8 +579,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Setting/getting value
-		public int Value {
+		public int Value 
+		{	// Setting/getting value
 			get { return _val; }
 			set { 
 				_val = value;
@@ -532,11 +598,10 @@ namespace Jigsaw
 		}
 	}
 	
-	/// <summary>
-	/// Property that holds a path to a file 
-	/// </summary>
+	// -----------------------------------------------------------------------
 	public class CPathProperty : CProperty
-	{
+	{	// Property that holds a path to a file 
+		
 //		string file = @"\\MyServer\MyFolderA\MyFolderB\MyFile.jpg";
 //        FileInfo fi = new FileInfo(file);
 //        Console.WriteLine(fi.Name);                  // Prints MyFile.jpg
@@ -549,4 +614,3 @@ namespace Jigsaw
 	}
 	
 }
-

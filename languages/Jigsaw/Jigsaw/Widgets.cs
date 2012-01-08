@@ -128,6 +128,30 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e){
+			if (this.ContainsPoint(e.X, e.Y, cvs) )
+			{
+				double dY = 0.0;
+				if (e.Direction == Gdk.ScrollDirection.Up) {
+					dY = 20.0;
+				} else if (e.Direction == Gdk.ScrollDirection.Down) {
+					dY = -20.0;
+				}
+				
+				foreach (WeakReference wrshp in _currTab._shapes)
+				{
+					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+					if (shp != null) {
+						shp.Top += dY;
+					}
+				}
+				cvs.Invalidate();
+			} else {
+				base.OnScroll(cvs, e);
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
 			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
 				_prevMouseY = e.Y;
@@ -271,7 +295,9 @@ namespace Widgets
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void AddTabs(List<CRoundedTab> rts)
 		{	// Add a list of associated rounded tabs to this tab
-			foreach (CRoundedTab rt in rts) _tabs.Add( new WeakReference(rt) );
+			foreach (CRoundedTab rt in rts) 
+				if (this != rt)
+					_tabs.Add( new WeakReference(rt) );
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

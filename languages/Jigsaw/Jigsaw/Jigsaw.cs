@@ -6,17 +6,9 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using Cairo;
+using Microsoft.Scripting.Hosting;
 
-// TODO:
-// Allow the out-edge of a complete stack (not just single blocks) being dragged
-//   to activate and connect to unconnected in-edges of stationary blocks/stacks.
-// Stop Script blocks should not attach to inner blocks
-// Block output edge should activate when near an input edge
-// Can Graphics.Rendering.Pango.Markup be used to render stylized text in a Block?
-// Implement Delete Stack context menu item
-// Add IO blocks [Write to file], [Add to file], [Read from file]
-
-// Model:
+// Model for Block Connections:
 // Blocks have one or more edges (connection points). 
 // Edges have activation zones and activating points.
 // Activating points, when dragged over an edge's activation zone, activate that edge.
@@ -27,14 +19,13 @@ namespace Jigsaw
 {
 	// -----------------------------------------------------------------------
 	
-	/// <summary>
-	/// Enumerates block edge types
-	/// </summary>
+	// --- Enumerates block edge types -------------------------------------
 	public enum EdgeType
 	{
 		In = 1, Out = 2
 	}
-
+	
+	// --- Enumerates block states -------------------------------------------
 	public enum BlockState
 	{
 		Idle = 1, Running = 2, Error = 3
@@ -44,53 +35,22 @@ namespace Jigsaw
 	public class Canvas : Diagram.Canvas
 	{	// Subclass of Canvas that adds custom behavior 
 		
-		// _currentPath holds the path to the currently open program file.
-		// If _currentPath holds a value of null, no file is open.
-		// _isModified is set to true whenever something is done that requires the 
-		// current program to be saved. It is used to check with the user when the 
-		// program is attempted to be closed with unsaved changes.
-		private string _currentPath = null;
-		private bool _isModified = false;
-		
-		// References to button that are accessed in order to enable/disable them at runtime.
-		private Widgets.CRoundedButton bStop;
-		private Widgets.CRoundedButton bRun;
-				
+		private string _currentPath = null; // path to the currently open program file
+
 		// Reference to single PropertiesWindow object
-		private InspectorWindow _inspector = null;
+		//private InspectorWindow _inspector = null;
 		
-		internal int _X;		// Cache
-		internal int _Y;
-		
+		// Jigsaw events
+		public event EventHandler JigsawRun;
+		public event EventHandler JigsawStep;
+		public event EventHandler JigsawStop;
+		public event EventHandler JigsawPause;
+
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
-
-		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70) {
-		  List<CBlock> retval = new List<CBlock>();
-		  List<string> blocknames = new List<string>();
-		  Reflection.Utils.Mapping mapping = new Reflection.Utils.Mapping(assembly_name, "level-1");
-		  foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name)) {
-		    foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) {
-					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
-					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
-					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
-					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
-					for (int n = 0; n < names.Count; n++) {
-					  if (mapping.CheckSignature(type_name, method_name, types[n])) {
-					    CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
-									    names[n], types[n], defaults[n], return_type, true);
-					    //property.PropertyChanged += block.OnPropertyChanged;
-					    if (! blocknames.Contains(block.Text)) {
-					      retval.Add(block);
-					      blocknames.Add(block.Text);
-					      y += 40;
-					    }
-					  }
-					}							
-				}
-		  }
-		  return retval;
-		}
+		
+		// A flag to help track running state
+		private bool _isRunning = false;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
@@ -99,67 +59,70 @@ namespace Jigsaw
 			BackColor = Diagram.Colors.LightSlateGray;
 			this.lasso.LineColor = Diagram.Colors.WhiteSmoke;
 			
+			this.CanFocus = true;
+			
 			// Properties window shared by all blocks
-			_inspector = new Jigsaw.InspectorWindow(this);
+			//_inspector = new Jigsaw.InspectorWindow(this);
 			
 			// Engine to run Jigsaw programs
 			_engine = new Engine();
 			_engine.EngineRun   += OnEngineRun;
 			_engine.EngineStep  += OnEngineStep;
 			_engine.EngineStop  += OnEngineStop;
+			_engine.EnginePause += OnEnginePause;
 			_engine.EngineReset += OnEngineReset;
-			_engine.Reset(this, _inspector);
+			_engine.Reset(this); //, _inspector);
 			
 			// Set up all widgets
 			
 			// Add block panel background to canvas
-//			Diagram.CRectangle pnlBlock = new Diagram.CRectangle(
-//			    new List<Diagram.CPoint>() {new Diagram.CPoint(95.0, 0.0), new Diagram.CPoint(300.0, 10000.0)}, 
-//				"", Diagram.Colors.Transparent, Diagram.Colors.Honeydew, 1, Diagram.Colors.Honeydew, 
-//				true, false, false, false, false);
 			Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
-//			pnlBlock.Dock = Diagram.DockSide.Left;
 			
 			//Widgets.CSlider sl = new Widgets.CSlider(500, 100, 20, 400, 0.0);
 			//this.AddShape( sl );
 			
 			// Build tabbed panel for blocks
 			Widgets.CRoundedTab tbCtrl     = new Widgets.CRoundedTab(0,  67, 100, 30, "Control", pnlBlock);
-			Widgets.CRoundedTab tbVars     = new Widgets.CRoundedTab(0, 100, 100, 30, "Variables", pnlBlock);
+			Widgets.CRoundedTab tbStats    = new Widgets.CRoundedTab(0, 100, 100, 30, "Statements", pnlBlock);
 			Widgets.CRoundedTab tbInOut    = new Widgets.CRoundedTab(0, 133, 100, 30, "Input/Output", pnlBlock);
-			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 166, 100, 30, "Myro", pnlBlock);
-			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 199, 100, 30, "Graphics", pnlBlock);
-			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 199 + 33, 100, 30, "Shapes", pnlBlock);
-			Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools", pnlBlock);
+			Widgets.CRoundedTab tbProc     = new Widgets.CRoundedTab(0, 166, 100, 30, "Procedures", pnlBlock);
+			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 199, 100, 30, "Myro", pnlBlock);
+			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 232, 100, 30, "Graphics", pnlBlock);
+			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 265, 100, 30, "Shapes", pnlBlock);
+			//Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools", pnlBlock);
 			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes", pnlBlock);
 			
-			tbInOut.AddTabs(    new List<Widgets.CRoundedTab>() {tbMyro,  tbVars, tbCtrl, tbTools,  tbNotes, tbGraphics, tbShapes});
-			tbCtrl.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbVars, tbTools,  tbNotes, tbGraphics, tbShapes});
-			tbVars.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbNotes, tbGraphics, tbShapes});
-			tbMyro.AddTabs(     new List<Widgets.CRoundedTab>() {tbInOut, tbCtrl, tbVars, tbTools,  tbNotes, tbGraphics, tbShapes});
-			tbGraphics.AddTabs( new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbTools, tbNotes, tbShapes});
-			tbShapes.AddTabs(   new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics, tbTools,  tbNotes});
-			tbTools.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbVars,   tbNotes, tbGraphics, tbShapes});
-			tbNotes.AddTabs(    new List<Widgets.CRoundedTab>() {tbInOut, tbMyro, tbCtrl, tbTools,  tbVars,  tbGraphics, tbShapes});
+			List<Widgets.CRoundedTab> allTabs = new List<Widgets.CRoundedTab>() {tbCtrl, tbStats, tbInOut, tbProc, tbMyro, tbGraphics, tbShapes, tbNotes}; //,  tbTools
+			tbCtrl.AddTabs(     allTabs );
+			tbStats.AddTabs(    allTabs );
+			tbInOut.AddTabs(    allTabs );
+			tbProc.AddTabs(     allTabs );
+			tbMyro.AddTabs(     allTabs );
+			tbGraphics.AddTabs( allTabs );
+			tbShapes.AddTabs(   allTabs );
+			//tbTools.AddTabs(    allTabs );
+			tbNotes.AddTabs(    allTabs );
 			
 			// Dock all tabs to left
 			tbInOut.Dock    = Diagram.DockSide.Left;
 			tbCtrl.Dock     = Diagram.DockSide.Left;
-			tbVars.Dock     = Diagram.DockSide.Left;
+			tbStats.Dock    = Diagram.DockSide.Left;
+			tbProc.Dock     = Diagram.DockSide.Left;
 			tbMyro.Dock     = Diagram.DockSide.Left;
 			tbGraphics.Dock = Diagram.DockSide.Left;
 			tbShapes.Dock   = Diagram.DockSide.Left;
-			tbTools.Dock    = Diagram.DockSide.Left;
+			//tbTools.Dock    = Diagram.DockSide.Left;
 			tbNotes.Dock    = Diagram.DockSide.Left;
 			
 			// Add tabs and palette to the canvas
 			this.AddShape(tbCtrl);
-			this.AddShape(tbVars);
+			this.AddShape(tbStats);
 			this.AddShape(tbInOut);
+			this.AddShape(tbProc);
 			this.AddShape(tbMyro);
 			this.AddShape(tbGraphics);
 			this.AddShape(tbShapes);
-			this.AddShape(tbTools);
+			//this.AddShape(tbTools);
 			this.AddShape(tbNotes);
 			
 			this.AddShape(pnlBlock);
@@ -167,38 +130,60 @@ namespace Jigsaw
 			// Factory Blocks for block area
 			
 			// --- Control
-			CControlStart block20 = new CControlStart(110, 70, true);
+			CControlStart block20 = new CControlStart(110, 70, pnlBlock);
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
 
-			CControlIf block21 = new CControlIf(110, 120, true);
+			CControlIf block21 = new CControlIf(110, 120, pnlBlock);
 			this.AddShape(block21);
 			tbCtrl.AddShape(block21);
 
-			CControlIfElse block22 = new CControlIfElse(110, 190, true);
+			CControlIfElse block22 = new CControlIfElse(110, 190, pnlBlock);
 			this.AddShape(block22);
 			tbCtrl.AddShape(block22);
 			
-			CControlWhile block23 = new CControlWhile(110, 290, true);
+			CControlWhile block23 = new CControlWhile(110, 290, pnlBlock);
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
 			
-			CControlRepeat block24 = new CControlRepeat(110, 360, true);
+			CControlRepeat block24 = new CControlRepeat(110, 360, pnlBlock);
 			this.AddShape(block24);
 			tbCtrl.AddShape(block24);
 			
-			CControlEnd block25 = new CControlEnd(110, 430, true);
+			CControlEnd block25 = new CControlEnd(110, 430, pnlBlock);
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
 			
+			// --- Statements Blocks
+			CAssignment vblock1 = new CAssignment(110, 70, pnlBlock);
+			this.AddShape(vblock1);
+			tbStats.AddShape(vblock1);
+
+			CStatement vblock2 = new CStatement(110, 110, pnlBlock);
+			this.AddShape(vblock2);
+			tbStats.AddShape(vblock2);
+			
 			// --- IO
-			CIOPrint _cioprint = new CIOPrint(110, 70, true);
+			CIOPrint _cioprint = new CIOPrint(110, 70, pnlBlock);
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
 			
-			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 110, true);
+			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 110, pnlBlock);
 			this.AddShape(_ciowritefile);
 			tbInOut.AddShape(_ciowritefile);
+			
+			// --- Procedures
+			CProcedureStart bProcStart = new CProcedureStart(110, 70, pnlBlock);
+			this.AddShape(bProcStart);
+			tbProc.AddShape(bProcStart);
+			
+			CProcedureReturn bProcRet = new CProcedureReturn(110, 120, pnlBlock);
+			this.AddShape(bProcRet);
+			tbProc.AddShape(bProcRet);
+			
+			CProcedureCall bProcCall = new CProcedureCall(110, 160, pnlBlock);
+			this.AddShape(bProcCall);
+			tbProc.AddShape(bProcCall);
 			
 			// --- Shapes
 			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
@@ -206,7 +191,6 @@ namespace Jigsaw
 			_shrect.LineColor = Diagram.Colors.Gray;
 			_shrect.LineWidth = 2;
 			_shrect._isFactory = true;
-//			_shrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrect);
 			tbNotes.AddShape(_shrect);
 
@@ -216,7 +200,6 @@ namespace Jigsaw
 			_shrrect.LineWidth = 2;
 			_shrrect.Radius = 8;
 			_shrrect._isFactory = true;
-//			_shrrect.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shrrect);
 			tbNotes.AddShape(_shrrect);
 			
@@ -225,7 +208,6 @@ namespace Jigsaw
 			_shellipse.LineColor = Diagram.Colors.Gray;
 			_shellipse.LineWidth = 2;
 			_shellipse._isFactory = true;
-//			_shellipse.Dock = Diagram.DockSide.Left;
 			this.AddShape(_shellipse);
 			tbNotes.AddShape(_shellipse);
 			
@@ -241,111 +223,109 @@ namespace Jigsaw
 //			_shconn._isFactory = true;
 //			this.AddShape(_shconn);
 //			tbNotes.AddShape(_shconn);
-
+			
 			// --- Myro
-			foreach (CBlock cblock in makeBlocksFromDll("Myro")) {
+			foreach (CBlock cblock in makeBlocksFromDll("Myro", 70, pnlBlock)) {
 			  this.AddShape(cblock);
 			  tbMyro.AddShape(cblock);
 			}
-			/*
-			CRobot block1 = new CRobot(110, 70, true);
-			block1.Text = "init robot on [COM]";
-			this.AddShape(block1);
-			tbMyro.AddShape(block1);
-	
-			CRobot block2 = new CRobot(110, 110, true);
-			block2.Text = "forward [by] for [secs]";
-			this.AddShape(block2);
-			tbMyro.AddShape(block2);
-	
-			CRobot block3 = new CRobot(110, 150, true);
-			block3.Text = "backward [by] for [secs]";
-			this.AddShape(block3);
-			tbMyro.AddShape(block3);
 			
-			CRobot block4 = new CRobot(110, 190, true);
-			block4.Text = "turn left [by] for [secs]";
-			this.AddShape(block4);
-			tbMyro.AddShape(block4);
-	
-			CRobot block5 = new CRobot(110, 230, true);
-			block5.Text = "turn right [by] for [secs]";
-			this.AddShape(block5);
-			tbMyro.AddShape(block5);
-			*/
-
-//			Widgets.CTextBox tb1 = new Widgets.CTextBox(110, 70, 100, 25, "Blah", cvsFixed);
-//			cvs.AddShape(tb1);
-//			tbProp.AddShape(tb1);
-//			
-//			Blocks.CRobot block6 = new Blocks.CRobot(100, 380, true);
-//			block6.Text = "stop robot";
-//			cvs.AddShape(block6);
-//			
-//			Blocks.CRobot block7 = new Blocks.CRobot(100, 420, true);
-//			block7.Text = "take picture";
-//			cvs.AddShape(block7);
-//			
-//			Blocks.CRobot block8 = new Blocks.CRobot(100, 460, true);
-//			block8.Text = "save picture to [file]";
-//			cvs.AddShape(block8);
-//			
-//			Blocks.CRobot block9 = new Blocks.CRobot(100, 500, true);
-//			block9.Text = "beep";
-//			cvs.AddShape(block9);
-//			
-//			Blocks.CRobot block10 = new Blocks.CRobot(100, 540, true);
-//			block10.Text = "speak [message]";
-//			cvs.AddShape(block10);
-			
-			// --- Variable Blocks
-			CAssignment vblock1 = new CAssignment(110, 70, true);
-			this.AddShape(vblock1);
-			tbVars.AddShape(vblock1);
-
-			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 230)) {
+			// --- Graphics Blocks
+			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 70, pnlBlock)) {
 			  this.AddShape(cblock);
 			  tbGraphics.AddShape(cblock);
 			}
 			
-
-			foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70)) {
+			// --- Shapes Blocks
+			foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70, pnlBlock)) {
 			  this.AddShape(cblock);
 			  tbShapes.AddShape(cblock);
 			}
 			
-			// --- Run tab
-			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
-			bRun.Dock = Diagram.DockSide.Left;
-			bRun.MouseDown += OnRunMouseDown;
-			this.AddShape(bRun);
-			tbTools.AddShape(bRun);
+//			// --- Run tab
+//			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
+//			bRun.Dock = Diagram.DockSide.Left;
+//			bRun.MouseDown += OnRunMouseDown;
+//			this.AddShape(bRun);
+//			tbTools.AddShape(bRun);
+//			
+//			bStop = new Widgets.CRoundedButton(150, 110, 100, 25, "Stop");
+//			bStop.Dock = Diagram.DockSide.Left;
+//			bStop.Enabled = false;
+//			bStop.MouseDown += OnStopMouseDown;
+//			this.AddShape(bStop);
+//			tbTools.AddShape(bStop);
+//			
+//			Widgets.CRoundedButton bReset = new Widgets.CRoundedButton(150, 150, 100, 25, "Reset");
+//			bReset.Dock = Diagram.DockSide.Left;
+//			bReset.MouseDown += OnResetMouseDown;
+//			this.AddShape(bReset);
+//			tbTools.AddShape(bReset);
+//			
+//			Widgets.CRoundedButton bStep = new Widgets.CRoundedButton(150, 190, 100, 25, "Step");
+//			bStep.Dock = Diagram.DockSide.Left;
+//			bStep.MouseDown += OnStepMouseDown;
+//			this.AddShape(bStep);
+//			tbTools.AddShape(bStep);
 			
-			bStop = new Widgets.CRoundedButton(150, 110, 100, 25, "Stop");
-			bStop.Dock = Diagram.DockSide.Left;
-			bStop.Enabled = false;
-			bStop.MouseDown += OnStopMouseDown;
-			this.AddShape(bStop);
-			tbTools.AddShape(bStop);
-			
-			Widgets.CRoundedButton bReset = new Widgets.CRoundedButton(150, 150, 100, 25, "Reset");
-			bReset.Dock = Diagram.DockSide.Left;
-			bReset.MouseDown += OnResetMouseDown;
-			this.AddShape(bReset);
-			tbTools.AddShape(bReset);
-			
-			Widgets.CRoundedButton bStep = new Widgets.CRoundedButton(150, 190, 100, 25, "Step");
-			bStep.Dock = Diagram.DockSide.Left;
-			bStep.MouseDown += OnStepMouseDown;
-			this.AddShape(bStep);
-			tbTools.AddShape(bStep);
-
 			// Select first tab
 			tbCtrl.SetToggle(this, true);
+			
+			// No changes so far
+			this.Modified = false;
+			
+			this.OnFileNew(null, null);
+			
+//			// Starting blocks
+//			CControlStart b1 = new CControlStart(410, 70);
+//			CControlEnd   b2 = new CControlEnd(410, 150);
+//			this.AddShape(b1);
+//			this.AddShape(b2);
+//			
+//			// Connect and reposition
+//			b1.OutEdge.LinkedTo = b2.InEdge;
+//			b2.InEdge.LinkedTo = b1.OutEdge;
+//			b2.RepositionBlocks(b2.InEdge);
+			
 		}
 
-		public Engine engine {
-		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70, Widgets.CBlockPalette palette=null) {
+		  	List<CBlock> retval = new List<CBlock>();
+		  	List<string> blocknames = new List<string>();
+			
+		  	Reflection.Utils.Mapping mapping = new Reflection.Utils.Mapping(assembly_name, "level-1");
+		  	foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name))
+			{
+		    	foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) 
+				{
+					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
+					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
+					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
+					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
+					for (int n = 0; n < names.Count; n++) 
+					{
+						if (mapping.CheckSignature(type_name, method_name, types[n])) 
+						{
+					    	CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+									    					names[n], types[n], defaults[n], return_type, palette);
+					    	//property.PropertyChanged += block.OnPropertyChanged;
+					    	if (! blocknames.Contains(block.Text)) 
+							{
+					      		retval.Add(block);
+					      		blocknames.Add(block.Text);
+					      		y += 40;
+					    	}
+					  	}
+					}							
+				}
+		  	}
+		  	return retval;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public Engine engine
+		{
 			get {
 				return _engine;
 			}
@@ -359,54 +339,120 @@ namespace Jigsaw
 			}
 			set {
 				_currentPath = value;
-				if (_currentPath != null)
-					_inspector.Title = "Jigsaw Inspector - " + System.IO.Path.GetFileName(_currentPath);
-				else
-					_inspector.Title = "Jigsaw Inspector";
 			}
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		void OnResetMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-		{
-			_engine.Reset(this, _inspector);
-			_inspector.ClearLocals();
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		void OnResetMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
+//		{
+//			_engine.Reset(this); //, _inspector);
+//			//_inspector.ClearLocals();
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		void OnStepMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
+//		{
+//			// Step the engine
+//			_engine.Step();
+//			
+//			// Update the locals display
+//			//_inspector.DisplayLocals(_engine);
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		void OnStopMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
+//		{
+//			_engine.Stop();
+//		}
+//		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		void OnRunMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
+//		{
+//			if (_engine.IsRunning == false) _engine.Reset(this); //, _inspector);
+//			_engine.Run();
+//		}
+		
+		// - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
+        public void RaiseJigsawRun()
+        {
+            if (JigsawRun != null)
+            {
+				EventArgs e = new EventArgs();
+            	JigsawRun(this, e);
+            }
+        }
+		
+		// - - Raise the JigsawPause event  - - - - - - - - - - - - - - 
+        public void RaiseJigsawPause()
+        {
+            if (JigsawPause != null)
+            {
+				EventArgs e = new EventArgs();
+            	JigsawPause(this, e);
+            }
+        }
+		
+		// - - Raise the JigsawStep event  - - - - - - - - - - - - - - 
+        public void RaiseJigsawStep()
+        {
+            if (JigsawStep != null)
+            {
+				EventArgs e = new EventArgs();
+            	JigsawStep(this, e);
+            }
+        }
+
+		// - - Raise the JigsawStop event  - - - - - - - - - - - - - - 
+        public void RaiseJigsawStop()
+        {
+            if (JigsawStop != null)
+            {
+				EventArgs e = new EventArgs();
+            	JigsawStop(this, e);
+            }
+        }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		void OnStepMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-		{
-			// Step the engine
-			_engine.Step();
-			
-			// Update the locals display
-			_inspector.DisplayLocals(_engine);
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		void OnStopMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-		{
-			_engine.Stop();
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		void OnRunMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-		{
-			if (_engine.IsRunning == false) _engine.Reset(this, _inspector);
-			_engine.Run();
-		}
-		
 		public void Run()
 		{
-			if (_engine.IsRunning == false) _engine.Reset(this, _inspector);
+			//if (_engine.IsRunning == false) _engine.Reset(this); //, _inspector);
+			if (!_isRunning) engine.Reset(this);
+			_isRunning = true;
 			_engine.Run();
+			RaiseJigsawRun();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Stop()
+		{
+			_engine.Stop();
+			_engine.Reset(this);
+			_isRunning = false;
+			//RaiseJigsawStop();	// Already raised in OnEngineStop
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Pause()
+		{
+			_engine.Pause();
+			RaiseJigsawPause();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Step()
+		{
+			if (!_isRunning) engine.Reset(this);
+			_isRunning = true;
+			//_engine.Stop();
+			_engine.Step();
+			RaiseJigsawStep();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineRun(object sender, EventArgs e)
 		{	
-			bRun.Enabled = false;
-			bStop.Enabled = true;
+//			bRun.Enabled = false;
+//			bStop.Enabled = true;
 			this.Invalidate();
 		}
 		
@@ -426,14 +472,24 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineStop(object sender, EventArgs e)
 		{	
-			bStop.Enabled = false;
-			bRun.Enabled = true;
+//			bStop.Enabled = false;
+//			bRun.Enabled = true;
+			_isRunning = false;
 			this.Invalidate();
+			RaiseJigsawStop();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		void OnEnginePause(object sender, EventArgs e)
+		{	
+			this.Invalidate();
+			RaiseJigsawPause();
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Return a list of all non-factory blocks - - - - - - -
+		// TODO: Change to an enumerator
 		public List<CBlock> AllBlocks()
-		{	// Return a list of all non-factory blocks  
+		{
 			List<CBlock> blocks = new List<CBlock>();
 			
 			foreach (Diagram.CShape s in this.AllShapes()) {
@@ -470,15 +526,30 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DeactivateAllBlocks() 
+		{	// Deactivate all blocks
+			Diagram.Canvas cvs = (Diagram.Canvas)this;
+			foreach (CBlock b in AllBlocks()) b.Deactivate(cvs);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll e) {
+//			// If on palette, scroll palette
+//			
+//			// Otherwise, defer to default behavior
+//			base.OnScroll(cvs, e);	
+//		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {
 			// Intercept right-mouse on canvas
-			if (e.Button == Diagram.MouseButtons.Right) 
-			{
-				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
-				return;
-				
-			} else {
+//			if (e.Button == Diagram.MouseButtons.Right) 
+//			{
+//				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
+//				return;
+//				
+//			} else {
 				
             	if (this.Mode == Diagram.EMode.Editing)
             	{
@@ -489,7 +560,7 @@ namespace Jigsaw
 					
 					this.Invalidate();										// Redraw
 				}
-			}
+//			}
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -528,84 +599,84 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) {
-			// Create the context menu for this block
-			
-			// Cache info
-			_X = X;
-			_Y = Y;
-	
-			// Create and show context menu
-			Gtk.Menu mnu = new Gtk.Menu();
-			
-			Gtk.MenuItem mnuNew = new Gtk.MenuItem("New");
-			mnuNew.Activated += OnNewFile;
-			Gtk.MenuItem mnuOpen = new Gtk.MenuItem("Open...");
-			mnuOpen.Activated += OnOpenFile;
-			Gtk.MenuItem mnuSave = new Gtk.MenuItem("Save");
-			mnuSave.Activated += OnSave;
-			Gtk.MenuItem mnuSaveAs = new Gtk.MenuItem("Save As...");
-			mnuSaveAs.Activated += OnSaveAs;
-			Gtk.MenuItem mnuProps = new Gtk.MenuItem("Inspect");
-			mnuProps.Activated += OnInspectorShow;
-			Gtk.MenuItem mnuZoomIn = new Gtk.MenuItem("Zoom in");
-			mnuZoomIn.Activated += OnZoomIn;
-			Gtk.MenuItem mnuZoomOut = new Gtk.MenuItem("Zoom out");
-			mnuZoomOut.Activated += OnZoomOut;
-			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Zoom reset");
-			mnuResetZoom.Activated += OnResetZoom;
-			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle inset");
-			mnuToggleInset.Activated += OnToggleInset;
-			
-			mnu.Append(mnuNew);
-			mnu.Append(mnuOpen);
-			mnu.Append( new Gtk.SeparatorMenuItem() );
-			mnu.Append(mnuSave);
-			mnu.Append(mnuSaveAs);
-			mnu.Append( new Gtk.SeparatorMenuItem() );
-			mnu.Append(mnuProps);
-			mnu.Append( new Gtk.SeparatorMenuItem() );
-			mnu.Append(mnuZoomIn);
-			mnu.Append(mnuZoomOut);
-			mnu.Append(mnuResetZoom);
-			mnu.Append( new Gtk.SeparatorMenuItem() );
-			mnu.Append(mnuToggleInset);
-			
-			mnu.ShowAll();
-			mnu.Popup();
-			
-			return true;
-		}
+//		protected bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) {
+//			// Create the context menu for this block
+//			
+//			// Cache info
+//			_X = X;
+//			_Y = Y;
+//	
+//			// Create and show context menu
+//			Gtk.Menu mnu = new Gtk.Menu();
+//			
+//			Gtk.MenuItem mnuNew = new Gtk.MenuItem("New");
+//			mnuNew.Activated += OnFileNew;
+//			Gtk.MenuItem mnuOpen = new Gtk.MenuItem("Open...");
+//			mnuOpen.Activated += OnFileOpen;
+//			Gtk.MenuItem mnuSave = new Gtk.MenuItem("Save");
+//			mnuSave.Activated += OnFileSave;
+//			Gtk.MenuItem mnuSaveAs = new Gtk.MenuItem("Save As...");
+//			mnuSaveAs.Activated += OnFileSaveAs;
+//			//Gtk.MenuItem mnuProps = new Gtk.MenuItem("Inspect");
+//			//mnuProps.Activated += OnInspectorShow;
+//			Gtk.MenuItem mnuZoomIn = new Gtk.MenuItem("Zoom in");
+//			mnuZoomIn.Activated += OnViewZoomIn;
+//			Gtk.MenuItem mnuZoomOut = new Gtk.MenuItem("Zoom out");
+//			mnuZoomOut.Activated += OnViewZoomOut;
+//			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Zoom reset");
+//			mnuResetZoom.Activated += OnViewZoom100;
+//			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle inset");
+//			mnuToggleInset.Activated += OnViewToggleInset;
+//			
+//			mnu.Append(mnuNew);
+//			mnu.Append(mnuOpen);
+//			mnu.Append( new Gtk.SeparatorMenuItem() );
+//			mnu.Append(mnuSave);
+//			mnu.Append(mnuSaveAs);
+//			mnu.Append( new Gtk.SeparatorMenuItem() );
+//			//mnu.Append(mnuProps);
+//			//mnu.Append( new Gtk.SeparatorMenuItem() );
+//			mnu.Append(mnuZoomIn);
+//			mnu.Append(mnuZoomOut);
+//			mnu.Append(mnuResetZoom);
+//			mnu.Append( new Gtk.SeparatorMenuItem() );
+//			mnu.Append(mnuToggleInset);
+//			
+//			mnu.ShowAll();
+//			mnu.Popup();
+//			
+//			return true;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public string Export()
-		{
-			Exporter exporter = new Exporter(this);
-			exporter.ToPython("Jigsaw.py");
-			return System.IO.Path.GetFullPath("Jigsaw.py");
-		}
+//		public string Export()
+//		{
+//			Exporter exporter = new Exporter(this);
+//			exporter.ToPython("Jigsaw.py");
+//			return System.IO.Path.GetFullPath("Jigsaw.py");
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnInspectorShow(object sender, EventArgs e)
-		{
-			this.ShowInspectorWindow();
-		}
+//		protected void OnInspectorShow(object sender, EventArgs e)
+//		{
+//			this.ShowInspectorWindow();
+//		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ShowInspectorWindow()
-		{
-			_inspector.ShowAll();
-			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
-			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
-		}
+//		public void ShowInspectorWindow()
+//		{
+//			_inspector.ShowAll();
+//			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
+//			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
+//		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnSave(object sender, EventArgs e)
+		public void OnFileSave(object sender, EventArgs e)
 		{	// Save to current file
 			
 			// If no current file, go to save as and request file path
 			if (_currentPath == null || _currentPath.Trim().Length == 0 ) {
-				OnSaveAs(sender, e);
+				OnFileSaveAs(sender, e);
 			} else {
 				XmlWriterSettings settings = new XmlWriterSettings();
 				settings.Indent = true;
@@ -618,14 +689,20 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnSaveAs(object sender, EventArgs e)
+		public void OnFileSaveAs(object sender, EventArgs e)
 		{
-			// Set up and show the file chooer
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (this.Toplevel.IsTopLevel) toplevel = (Gtk.Window)this.Toplevel;
+			
+			// Set up and show the file chooser
 			Gtk.FileChooserDialog fc = null;
-			fc = new Gtk.FileChooserDialog("Save as Jigsaw file...", null,
+			fc = new Gtk.FileChooserDialog("Save as Jigsaw file...",
+			                               toplevel,
 			                               Gtk.FileChooserAction.Save,
 			                               "Cancel", Gtk.ResponseType.Cancel,
 			                               "Save",   Gtk.ResponseType.Accept);
+			fc.DoOverwriteConfirmation = true;
 			Gtk.FileFilter f1 = new Gtk.FileFilter();
 			f1.Name = "XML files";
 			f1.AddPattern("*.xml");
@@ -639,12 +716,23 @@ namespace Jigsaw
 			// Collect the path
 			int response = fc.Run();
 			
-			// Save the path and go to OnSave for the actual save
+			// Save the path and go to OnFileSave for the actual save
 			if (response == (int)Gtk.ResponseType.Accept) 
 			{
-				CurrentPath = fc.Filename;
-				fc.Destroy();
-				OnSave(sender, e);
+				try
+				{
+					CurrentPath = fc.Filename;
+					
+					// Add .xml extension if missing
+					if (!_currentPath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) CurrentPath += ".xml";
+					fc.Destroy();
+					Directory.SetCurrentDirectory(Directory.GetDirectoryRoot(CurrentPath));
+					OnFileSave(sender, e);
+				} catch (DirectoryNotFoundException ex) {
+					Console.WriteLine("The specified directory does not exist. {0}", ex);
+				} catch (Exception ex) {
+					Console.WriteLine("Error saving file: {0}", ex);
+				}
 				
 			} else {
 				// Must call Destroy() to close FileChooserDialog window.
@@ -653,17 +741,134 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnNewFile(object sender, EventArgs e)
+		public void OnFileSaveAsPython(object sender, EventArgs e)
 		{
-			this.DeleteAllBlocks();
-			CurrentPath = null;
-			this.Invalidate();
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (this.Toplevel.IsTopLevel) toplevel = (Gtk.Window)this.Toplevel;
+			
+			// Set up and show the file chooer
+			Gtk.FileChooserDialog fc = null;
+			fc = new Gtk.FileChooserDialog("Save as Python file...", 
+			                               toplevel,
+			                               Gtk.FileChooserAction.Save,
+			                               "Cancel", Gtk.ResponseType.Cancel,
+			                               "Save",   Gtk.ResponseType.Accept);
+			fc.DoOverwriteConfirmation = true;
+			Gtk.FileFilter f1 = new Gtk.FileFilter();
+			f1.Name = "Python Files";
+			f1.AddPattern("*.py");
+			Gtk.FileFilter f2 = new Gtk.FileFilter();
+			f2.Name = "All files";
+			f2.AddPattern("*.*");
+			fc.AddFilter(f1);
+			fc.AddFilter(f2);
+			
+			// Collect the path
+			int response = fc.Run();
+			
+			// Save the path and go to OnFileSave for the actual save
+			if (response == (int)Gtk.ResponseType.Accept) 
+			{
+				String ppath = fc.Filename;
+				
+				// Add .py extension if missing
+				if (!ppath.EndsWith(".py", StringComparison.OrdinalIgnoreCase))	ppath += ".py";
+
+				// Destroy dialog
+				fc.Destroy();
+				
+				// Do the code generation
+		        using (StreamWriter outfile = new StreamWriter(ppath)) {
+		            outfile.Write(this.ToPython());
+		        }
+				
+			} else {
+				// Must call Destroy() to close FileChooserDialog window.
+				fc.Destroy();
+			}
+		}
+		
+		// - - - Query to save if unsaved changes - - -
+		public bool ResolveUnsavedChanges()
+		{
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (this.Toplevel.IsTopLevel) toplevel = (Gtk.Window)this.Toplevel;
+			
+			// If modifications were made ...
+			if (this.Modified == true) {
+				
+				// Set prompt to previous file name, if there is one.
+				string msg = "Save changes?";
+				if (this._currentPath != null && this._currentPath.Length > 0) 
+					msg = String.Format ("Save changes to {0}?", System.IO.Path.GetFileName( _currentPath));
+				
+				// Show dialog asking to save changes
+				Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+					toplevel, 
+					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+					Gtk.MessageType.Warning,
+					Gtk.ButtonsType.None,
+					msg);
+				dlg.AddButton("Yes", Gtk.ResponseType.Yes);
+				dlg.AddButton("No", Gtk.ResponseType.No);
+				dlg.AddButton("Cancel", Gtk.ResponseType.Cancel);
+				dlg.Title = "Unsaved Changes";
+				Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+				dlg.Destroy();
+				
+				// If cancel, then the whole thing should be aborted. Return false.
+				if (rsp == Gtk.ResponseType.Cancel)
+				{
+					return false;		// Not resolved
+				} else if (rsp == Gtk.ResponseType.Yes) {
+					// If yes, then attempt to save.
+					this.OnFileSave (null, null);
+					return !this.Modified;			// If save was cancelled (i.e. Modified == true), abort.
+				} else {
+					// If no, changes are to be abandoned.
+					this.Modified = false;
+					return true;
+				}
+			}
+			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Open a file and recreate the jigsaw program
-		protected void OnOpenFile(object sender, EventArgs e)
+		public void OnFileNew(object sender, EventArgs e)
 		{
+			// Resolve any unsaved changes.
+			if (this.ResolveUnsavedChanges() == false) return;
+			
+			// Delete all existing non-factory blocks
+			this.DeleteAllBlocks();
+			
+			// Created default starting blocks
+			CControlStart b1 = new CControlStart(410, 70);
+			CControlEnd   b2 = new CControlEnd(410, 150);
+			this.AddShape(b1);
+			this.AddShape(b2);
+			
+			// Connect and reposition
+			b1.OutEdge.LinkedTo = b2.InEdge;
+			b2.InEdge.LinkedTo = b1.OutEdge;
+			b2.RepositionBlocks(b2.InEdge);
+			
+			// Reset modified flag
+			this.Modified = false;
+			
+			// Redraw
+			this.Invalidate();
+		}
+		
+		// - - Open a file and recreate the jigsaw program - - - - - - -
+		public void OnFileOpen(object sender, EventArgs e)
+		{
+			// Resolve any unsaved changes.
+			if (this.ResolveUnsavedChanges() == false) return;
+			
+			// Get file to open
 			Gtk.FileChooserDialog fc = null;
 			fc = new Gtk.FileChooserDialog("Jigsaw file to open", null,
 			                               Gtk.FileChooserAction.Open,
@@ -678,18 +883,25 @@ namespace Jigsaw
 			fc.AddFilter(f1);
 			fc.AddFilter(f2);
 			
-			if (fc.Run() == (int)Gtk.ResponseType.Accept) 
-			{
-			  ReadFile(fc.Filename);
+			int response = fc.Run ();
+			
+			// If file selected, read it
+			if (response == (int)Gtk.ResponseType.Accept) {
+				ReadFile(fc.Filename);
+				CurrentPath = fc.Filename;
 			}
 			
 			// Must call Destroy() to close FileChooserDialog window.
 			fc.Destroy();
 			
-			// Update screen
+			// Reset modified flag
+			this.Modified = false;
+			
+			// Redraw
 			this.Invalidate();
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool ReadFile(string filename) {
 				// Temp vars to hold parse vals
 				string name;
@@ -822,9 +1034,59 @@ namespace Jigsaw
 				}
 				return true;
 		}
+
+		// - - - Generate a Python version of the program - - - - - - - - - - -
+		public string ToPython()
+		{
+			// Validate
+			// Check for exactly one start block. If 0 or > 1 found, can't generate.
+			// Also collect all libraries to import
+			List<CBlock> allBlocks = this.AllBlocks();
+			
+			int count = 0;
+			CControlStart sblock = null;
+			foreach (CBlock b in allBlocks)
+			{
+				if (b is CControlStart) {
+					sblock = (CControlStart)b;
+					count++;
+				}
+				
+				// @@@ Identify the required library to import for this block, if any
+				
+			}
+			
+			if (count == 0 || count > 1) {
+				Console.WriteLine("Error. Exactly one Control Start Block must exist for Python generation. {0} Control Start Blocks were found", count);
+				return null;
+			}
+			
+			// Add header
+			StringBuilder o = new StringBuilder();
+			
+			o.AppendLine("# This Python program was automatically generated by Calico Jigsaw");
+			o.AppendLine("# http://calicoproject.org");
+			o.AppendLine();
+			
+			// @@@ Do necessary imports here
+			
+			// Generate all procedures
+			foreach (CBlock b in allBlocks)
+			{
+				if (b is CProcedureStart) {
+					b.ToPython(o, 0);
+					o.AppendLine();			// Add blank line to end of all procedures
+				}
+			}
+			
+			// Generate main program
+			sblock.ToPython(o, 0);
+			
+			// Return result
+			return o.ToString();
+		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Completely replace serializtion of Jigsaw Program
+		// - - - Completely replace serialization of Jigsaw Program - - - - - -
         public override void ToXml(XmlWriter w)
         {
             w.WriteStartElement("jigsaw");
@@ -869,24 +1131,27 @@ namespace Jigsaw
 		public CEdge InEdge;							// By default, all Blocks have one main input edge and one main output edge
 		public CEdge OutEdge;		
 		
-		//public CReadOnlyProperty TextProp = null;		// Just a property to reflect text into Inspector
-		//public CReadOnlyProperty MsgProp = null;		// All blocks have a Message property
-
-		protected int textYOffset = 0;					// Y offset for when a block's text
+		protected int _textYOffset = 0;					// Y offset for when a block's text
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
-		
+				
 		protected Gtk.Window _propDialog = null;
 		protected Gtk.Window _contextMenu = null;
 
 		protected Dictionary<String, CProperty> _properties;
 		
+		private Widgets.CBlockPalette _palette = null;	// Reference to block palette, if a factory
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CBlock(List<Diagram.CPoint> pts, bool isFactory) : base(pts)
+		public CBlock(List<Diagram.CPoint> pts, Widgets.CBlockPalette palette = null) : base(pts)
 		{	// Constructor
 			double offsetX = 0.5*this.Width;
 			double offsetY = this.Height;
-			this._isFactory = isFactory;
-			if (isFactory) this.Dock = Diagram.DockSide.Left;
+			
+			this._palette = palette;
+			if (palette != null) {
+				this._isFactory = true;
+				this.Dock = Diagram.DockSide.Left;
+			}
 			
 			// Default edges
 			InEdge = new CEdge(this, "In", EdgeType.In, null, offsetX, 0.0, 0.0, 0.0, this.Width);
@@ -911,6 +1176,8 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override Diagram.CShape Clone(double X, double Y) 
 		{	// Method to clone a CBlock at X,Y
+			// This method is used when a factory object is dropped on a canvas and a new clone is created
+			
 			return this.Clone(X, Y, true);
 		}
 
@@ -941,8 +1208,7 @@ namespace Jigsaw
 			set { _properties[key].Text = value; }
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Override Text property of blocks to also set the TextProp value when assigned
+		// - - Override Text property of blocks to also set the TextProp value when assigned
         public override String Text
         {
             get { return this.text; }
@@ -999,17 +1265,23 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// All blocks need a Block Runner, which is an IEnumerator that executes the block's behavior.
-		// Block Runner IEnumerators return a RunnerResponse object.
-		// Block Runners are provided the local scope and builtin scope in which they run. 
-		// Base behavior only calls output blocks and manages state. 
-		public virtual IEnumerator<RunnerResponse> Runner(
-								    	Expression.Scope locals, 
-								        Dictionary<string, object> builtins) 
+		public virtual bool Compile( ScriptEngine engine, Jigsaw.Canvas cvs )
+		{	// Compile the block code into something that can be executed.
+			// This behavior is block-specific.
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
 		{
+			// All blocks need a Block Runner, which is an IEnumerator that executes the block's behavior.
+			// Block Runner IEnumerators return a RunnerResponse object.
+			// Block Runners are provided the local scope and builtin scope in which they run. 
+			// Base behavior only calls output blocks and manages state. 
+			
 			// !!! Important. The engine always calls the block runner once after it is added to the call stack
 			// !!! and the response is essentially ignored.
-			// !!! It is important to always call these three lines at the top of every block runner 
+			// !!! It is important to always add the following section to the top of every block runner 
 			// !!! implementation to ensure proper operation.
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1022,13 +1294,15 @@ namespace Jigsaw
 				rr.Runner = null;
 				yield return rr;
 			}
+			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Custom behavior will occur 
+			// Custom behavior will occur here
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
@@ -1039,12 +1313,17 @@ namespace Jigsaw
 			this.State = BlockState.Idle;
 			yield return rr;
 		}
+
+		// - - - Generate an return Python translation of a block - - - - -
+		public virtual bool ToPython (StringBuilder o, int indent)
+		{
+			return true;
+		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // CBlock subclasses must provide a method that outputs an 
-        // XML representation of itself to the given XmlWriter
         public override void ToXml(XmlWriter w)
-        {
+        {	// CBlock subclasses must provide a method that outputs an 
+        	// XML representation of itself to the given XmlWriter
             w.WriteStartElement("block");
             this.WriteXmlAttributes(w); 
 			this.WriteXmlTags(w);
@@ -1052,9 +1331,8 @@ namespace Jigsaw
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write the base standard attributes shared by all shapes
         protected override void WriteXmlAttributes(XmlWriter w)
-        {
+        {	// Write the base standard attributes shared by all shapes
             // Get object assembly and full name
             Type typ = this.GetType();
             //String FullAsmName = typ.Assembly.FullName;
@@ -1071,23 +1349,20 @@ namespace Jigsaw
         }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Virtual to read custom Xml tags
         public virtual void ReadXmlTag(XmlReader r)
-        {
-	  // nothing to do
-	}
+        {	// Virtual to read custom Xml tags
+	  		// nothing to do
+		}
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Virtual to read custom Xml content end of an element
         public virtual void ReadXmlEndElement(XmlReader r)
-	{
-	  // nothing to do
-	}
+		{	// Virtual to read custom Xml content end of an element
+		  	// nothing to do
+		}
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Override to write custom Xml content of a shape.
         protected override void WriteXmlTags(XmlWriter w)
-        {
+        {	// Override to write custom Xml content of a shape.
 			foreach (CEdge e in this.Edges) e.ToXml(w);
 			foreach (CProperty p in this.Properties) p.ToXml(w);
         }
@@ -1101,10 +1376,10 @@ namespace Jigsaw
 //		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// All blocks follow the same pattern for drawing.
-		// Block subclasses only need to define the graphics path, fill color and text.
         public override void Draw(Cairo.Context g)
-        {	// Draw block on the canvas
+        {	// All blocks follow the same pattern for drawing.
+			// Block subclasses only need to define the graphics path, fill color and text.
+			// Draw block on the canvas
 			
             // Cannot draw with negative width or height, 
             // so use bounding box points to draw
@@ -1149,7 +1424,7 @@ namespace Jigsaw
 				g.Color = Diagram.Colors.LightPink;
 			}
 			
-			// Draw breakpoint, if necessary
+			// Draw breakpoint, if set
 			if (this._hasBreakPoint) {
 				g.Color = Diagram.Colors.Red;
 				g.MoveTo(x+2, y+7);
@@ -1157,7 +1432,14 @@ namespace Jigsaw
 				g.ClosePath();
 				g.Fill();
 			}
-						
+			
+			// Add a connection indicator to in-edge, if connected
+			if (InEdge.IsConnected) {
+				g.Color = Diagram.Colors.SemiWhite;
+				g.Rectangle(x+0.5*w-10, y+1, 20, 2);
+				g.Fill ();
+			}
+			
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
 			
@@ -1178,7 +1460,7 @@ namespace Jigsaw
 				double cx = x + 0.5*w;
 				double cy = y + 0.5*20;
 
-				int layoutWidth, layoutHeight;
+				//int layoutWidth, layoutHeight;
 				
 				g.Color = this.TextColor;
 
@@ -1186,21 +1468,23 @@ namespace Jigsaw
 				Pango.FontDescription desc = Pango.FontDescription.FromString(
 						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
 				layout.FontDescription = desc;
-				layout.Alignment = Pango.Alignment.Center;
+				layout.Alignment = Pango.Alignment.Left; //Center;
+				layout.Ellipsize = Pango.EllipsizeMode.End;
+				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
 				
 				layout.SetText(text);
-				layout.GetSize(out layoutWidth, out layoutHeight);
-				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-				g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset); 
+//				layout.GetSize(out layoutWidth, out layoutHeight);
+//				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+//				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+				//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset);
+				g.MoveTo(x+10.0, y+3.0+_textYOffset);
 				Pango.CairoHelper.ShowLayout(g, layout);
             }
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Base block outline graphics path figure
 		protected virtual void SetPath(Cairo.Context g) 
-		{
+		{	// Base block outline graphics path figure
 			double x = this.left;
             double y = this.top;
             double w = this.width;
@@ -1230,20 +1514,17 @@ namespace Jigsaw
             g.ClosePath();
 		}
 		
-		/// <summary>
-		/// Returns a list of all edges. Override if subclass adds edges to block.
-		/// </summary>
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public virtual List<CEdge> Edges 
-		{
+		{	// Returns a list of all edges. Override if subclass adds edges to block.
 			get {
 				return new List<CEdge>() { this.InEdge, this.OutEdge };
 			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Returns a list of all block properties
 		public virtual List<CProperty> Properties 
-		{
+		{	// Returns a list of all block properties
 			get {
 				return new List<CProperty>( _properties.Values );
 				//return new List<CProperty>() { this.TextProp, this.MsgProp };
@@ -1274,8 +1555,7 @@ namespace Jigsaw
 			}
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Return the top of the stack starting at this block
+		// -- Return the top of the stack starting at this block - - - -
 		public CBlock StackTop
 		{
 			get {
@@ -1368,6 +1648,19 @@ namespace Jigsaw
             }
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll e)
+		{
+			// If this is a factory block...
+			if (this.IsFactory && _palette != null) {
+				// delegate event to block palette
+				_palette.OnScroll(cvs, e);
+			} else {
+				// Default behavior is to delegate event to canvas
+				cvs.OnScroll(cvs, e);
+			}
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) {
 			// Create the context menu for this block
@@ -1396,8 +1689,8 @@ namespace Jigsaw
 			mnuBreak.Activated += OnToggleBreakpoint;
 			Gtk.MenuItem mnuProps = new Gtk.MenuItem("Properties");
 			mnuProps.Activated += OnPropertiesShow;
-			Gtk.MenuItem mnuInspect = new Gtk.MenuItem("Inspector");
-			mnuInspect.Activated += OnInspectorShow;
+			//Gtk.MenuItem mnuInspect = new Gtk.MenuItem("Inspector");
+			//mnuInspect.Activated += OnInspectorShow;
 			
 			mnu.Append(mnuDelBlock);
 			mnu.Append(mnuDelStack);
@@ -1407,7 +1700,7 @@ namespace Jigsaw
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuBreak);
 			mnu.Append(mnuProps);
-			mnu.Append(mnuInspect);
+			//mnu.Append(mnuInspect);
 			
 			mnu.ShowAll();
 			mnu.Popup();
@@ -1416,11 +1709,11 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnInspectorShow(object sender, EventArgs e)
-		{
-			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
-			_cvs = null;
-		}
+//		protected void OnInspectorShow(object sender, EventArgs e)
+//		{
+//			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
+//			_cvs = null;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnToggleBreakpoint(object sender, EventArgs e)
@@ -1477,15 +1770,22 @@ namespace Jigsaw
 		public override void OnDrag(Diagram.Canvas cvs)
 		{	// Invoke base class behavior
 			base.OnDrag(cvs);
-
+			
+			Jigsaw.Canvas js = (Jigsaw.Canvas)cvs;
+			
 			// If possible, activate another block's edge
-			foreach (CBlock b in ((Jigsaw.Canvas)cvs).AllBlocks()) {
-				if (!this.BranchesContain(b)) 		// Skip if shape under drag is linked in branches to shape being moved (i.e. it is in the dragged stack)
-					if (b.TryActivateWith(cvs, this)) 
+			foreach (CBlock b in js.AllBlocks()) {
+				//b.Deactivate(cvs);
+				// Skip if shape under drag is linked in branches to shape being moved (i.e. it is in the dragged stack)
+				if (!this.BranchesContain(b)) {
+					if (b.TryActivateWith(cvs, this)) {
 						break;
+					}
+				}
 			}
 			
-			// Check if near an edge and translate canvas if it is
+			// Check if the block being dragged is near an edge.
+			// Translate canvas if it is as a kind of canvas scrolling.
 			double xmin = 0.0, ymin = 0.0, xmax = 0.0, ymax = 0.0;
 			int sw, sh;
 			cvs.GdkWindow.GetSize(out sw, out sh);
@@ -1501,6 +1801,8 @@ namespace Jigsaw
 				cvs.DoTranslate(-40.0, 0.0);
 			}
 			
+			// Set modified flag
+			js.Modified = true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1513,16 +1815,13 @@ namespace Jigsaw
 			
 			CBlock dropped = null;
 			CBlock linked = null;
-			CEdge prt = null;
 			
-			// If not a factory, moveteh block
+			// If not a factory, move the block
 			if (!this.IsFactory) {
 				this.MatchOutline(cvs);
 				dropped = this;
-				
 			} else {
 				// When a factory object is dropped, create a new instance.
-
 				dropped = (CBlock)this.Clone(this.Outline.Left, this.Outline.Top);
 				cvs.AddShape( dropped );
 			}
@@ -1542,14 +1841,15 @@ namespace Jigsaw
 			
 			// If the block has an edge that is activating another edge at the time of the drop
 			// establish the connection
-			prt = dropped.GetActivatingEdge();		// Look for an activating edge
-			if (prt != null) {
+			List<CEdge> edges = null;
+			edges = dropped.GetActivatingEdges();		// Look for an activating edge
+			foreach (CEdge prt in edges) {
 				dropped.Connect(prt, cvs);			// Set up the connection and deactivate other edge
 				linked = prt.LinkedTo.Block;		// Get a reference to the newly linked block
 				linked.RepositionBlocks(null);
 			}
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool TryActivateWith(Diagram.Canvas cvs, CBlock blk) 
 		{	// Try to activate an edge in this stationary block with an edge in the dragged block blk
@@ -1629,26 +1929,29 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CEdge GetActivatingEdge()
+		public List<CEdge> GetActivatingEdges()
 		{	// Find and return an edge in this block that is activating another edge
-			foreach (CEdge e in this.Edges)
-				if (e.IsActivating != null) 
-					return e;
-
-			return null;
+			List<CEdge> edges = new List<CEdge>();
+			
+			foreach (CEdge e in this.Edges) {
+				if (e.IsActivating != null) {
+					edges.Add (e);
+					//return e;
+				}
+			}
+			
+			return edges;
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// A utility method to compeltely disconnect this block for all others
+		// - - -A utility method to completely disconnect this block for all others - - -
 		public override void Disconnect()
 		{
 			foreach (CEdge e in this.Edges) e.Disconnect();
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - Establish the putative link of an activating edge - - - -
 		public bool Connect(CEdge activatingEdge, Diagram.Canvas cvs)
-		{	// Establish the putative link of an activating edge
-			
+		{			
 			// Get and check the edge that this edge is activating
 			CEdge activatedEdge = activatingEdge.IsActivating;
 			if (activatedEdge == null) return false;
@@ -1710,8 +2013,8 @@ namespace Jigsaw
 				this.Left = linkedBlk.Left - linkedEdge._azX;				
 			}
 			
-			// Then, recursively reposition all blocks 
-			// that are not connected through the entry edge.
+			// Then, recursively reposition all subordinate blocks 
+			// not connected through the entry edge.
 			foreach (CEdge edg in this.Edges) {				// Loop over all edges in this block
 				if (entryEdge != edg && edg.IsConnected) {	// Skip the entry edge of this block
 					linkedEdge = edg.LinkedTo;				// Get the edge linked to this edge
@@ -1838,8 +2141,6 @@ namespace Jigsaw
 			double ax = prt.ActivatingX;
 			double ay = prt.ActivatingY;
 			
-			//Console.WriteLine("{0} in [{1},{2}], {3} in [{4},{5}]", ax, l, r, ay, t, b);
-			
 			if (ax >= l && ax <= r && ay >= t && ay <= b)
 			{
 				// If the given edge is already activated by this edge, do nothing
@@ -1851,9 +2152,11 @@ namespace Jigsaw
 				
 				// Activate this edge and display activation zone
 				List<Diagram.CPoint> pts = new List<Diagram.CPoint>() { new Diagram.CPoint( l, t ), new Diagram.CPoint( r, b ) };
-				Color clr = new Color(1.0, 1.0, 1.0, 0.7);
-	            this._activationZone = new Diagram.CRectangle(pts, "", Diagram.Colors.Transparent, clr, 1, clr,
-	                                             true, false, false, false, false);
+				//Color clr = new Color(1.0, 1.0, 1.0, 0.7);
+	            this._activationZone = new Diagram.CRectangle(
+					pts, "", Diagram.Colors.Transparent,
+					Diagram.Colors.SemiWhite, 0, Diagram.Colors.SemiWhite,
+	                true, false, false, false, false);
 	            cvs.AddAnnotation(this._activationZone);
 				
 				// Save ref to this edge as being activated by given edge

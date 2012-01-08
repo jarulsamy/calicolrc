@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Cairo;
+using Microsoft.Scripting.Hosting;
 
 namespace Jigsaw
 {
@@ -11,11 +13,11 @@ namespace Jigsaw
     {	// Input/Output block shape class
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public CInputOutput(Double X, Double Y, bool isFactory) 
+        public CInputOutput(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
 				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory )
+				palette )
 		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkBlue;
@@ -23,7 +25,7 @@ namespace Jigsaw
 			this.Sizable = false;
 		}
 		
-		public CInputOutput(Double X, Double Y) : this(X, Y, false) { }
+		public CInputOutput(Double X, Double Y) : this(X, Y, null) {}
     }
 	
 	// -----------------------------------------------------------------------
@@ -31,8 +33,8 @@ namespace Jigsaw
     {	// Print block shape class
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOPrint(Double X, Double Y, bool isFactory) 
-			: base(X, Y, isFactory )
+		public CIOPrint(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
 		{
 			// Properties
 			CExpressionProperty Expr = new CExpressionProperty("Expression", "X");
@@ -40,12 +42,52 @@ namespace Jigsaw
 			_properties["Expression"] = Expr;
 			this.OnPropertyChanged(null, null);
 		}
+		public CIOPrint(Double X, Double Y) : this(X, Y, null) {}
 		
-		public CIOPrint(Double X, Double Y) : this(X, Y, false) { }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> 
-		Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = String.Format("print({0})", this["Expression"]);
+		}
+		
+		// - - - Generate and return Python statement - - - - - - - - - - -
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				o.AppendFormat("{0}print({1})\n", sindent, this["Expression"]);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+				
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CIOPrint.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
+			try {
+				Expr.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute print statement
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,14 +104,13 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Do the print
-			// TODO: Allow access to global namespace
 			try {
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				object o = Expr.Expr.Evaluate(locals);
-				string toPrint = Expr.Expr.ToRepr(o);
+				object o = Expr.Evaluate(scope);
+				string toPrint = o.ToString();
 				Console.WriteLine(toPrint);
-				((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
-				
+				//((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
+				//((InspectorWindow)scope.GetVariable("_inspector")).WriteLine(toPrint);
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				
@@ -85,7 +126,7 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
@@ -96,13 +137,6 @@ namespace Jigsaw
 			this.State = BlockState.Idle;
 			yield return rr;
 		}
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs e){
-			this.Text = String.Format("print {0}", this["Expression"]);
-			//.Text = String.Format("print {0}", Expr.Text);
-		}
 	}
 
 	// -----------------------------------------------------------------------
@@ -110,8 +144,8 @@ namespace Jigsaw
     {	// Write an item to a file path
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CIOWriteToFile(Double X, Double Y, bool isFactory) 
-			: base(X, Y, isFactory )
+		public CIOWriteToFile(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
 		{
 			// Properties
 			CExpressionProperty Expr = new CExpressionProperty("Expression", "expr");
@@ -123,11 +157,11 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		
-		public CIOWriteToFile(Double X, Double Y) : this(X, Y, false) { }
+		public CIOWriteToFile(Double X, Double Y) : this(X, Y, null) {}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Update text when property changes
-		public void OnPropertyChanged(object sender, EventArgs E){
+		public void OnPropertyChanged(object sender, EventArgs E)
+		{	// Update text when property changes
 			this.Text = String.Format("write {0} to {1}", this["Expression"], this["FilePath"]);
 		}
 	}

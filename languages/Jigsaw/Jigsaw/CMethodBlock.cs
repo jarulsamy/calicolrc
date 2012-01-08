@@ -2,37 +2,35 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using Microsoft.Scripting.Hosting;
 
 namespace Jigsaw
 {
-		public class CMethodBlock : CBlock
-		{	
-		  string assembly_name;
-		  public string type_name;
-		  public string method_name;
-		  public List<string> names;
-		  List<Type> types;
-		  List<object> defaults;
-		  public Type return_type;
-		  public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
-			
-	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	        public CMethodBlock(Double X, Double Y, bool isFactory) : 
-			base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+	public class CMethodBlock : CBlock
+	{	
+		string assembly_name;
+		public string type_name;
+		public string method_name;
+		public List<string> names;
+		List<Type> types;
+		List<object> defaults;
+		public Type return_type;
+		public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CMethodBlock(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
 				new Diagram.CPoint(X + 175, Y + 20)}),
-				isFactory)
-			{
-			  assembly_name = "";
-			  type_name = "";
-			  method_name = "";
-			  names = new List<string>();
-			  types = new List<Type>();
-			  defaults = new List<object>();
-			  return_type = System.Type.GetType("System.Void");
-		}
-		
-		public CMethodBlock(Double X, Double Y) : this(X, Y, false) {
+				palette)
+		{
+			assembly_name = "";
+			type_name = "";
+			method_name = "";
+			names = new List<string>();
+			types = new List<Type>();
+			defaults = new List<object>();
+			return_type = System.Type.GetType("System.Void");
 		}
 		
 		public CMethodBlock(Double X, Double Y, 
@@ -43,24 +41,27 @@ namespace Jigsaw
 				    List<Type> types,
 				    List<object> defaults,
 				    Type return_type,
-				    bool isFactory) 
+				    Widgets.CBlockPalette palette = null) 
 				: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 					new Diagram.CPoint(X, Y),
 					new Diagram.CPoint(X + 175, Y + 20)}),
-					isFactory )
+					palette )
 		{
-		  setValues(assembly_name, type_name, method_name, names, types, defaults, return_type);
+			setValues(assembly_name, type_name, method_name, names, types, defaults, return_type);
 		}
-
+		
+		public CMethodBlock(Double X, Double Y) : this(X, Y, null) {}
+		
 		public override CBlock Clone(double X, double Y, bool cloneEdges) 
 		{	// Clone this block. Optionally clone edges.
-				CBlock clone = (CBlock)base.Clone(X, Y, cloneEdges);
-				((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.names, 
+			CBlock clone = (CBlock)base.Clone(X, Y, cloneEdges);
+			((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.names, 
 								this.types, this.defaults, this.return_type);
-				return clone;
-		    }	
+			return clone;
+		}
 		
-		public string MakeVariableName(string methodname) {
+		public string MakeVariableName(string methodname)
+		{
 			methodname = methodname.ToLower();
 			string vname = "";
 			if (methodname.StartsWith("make")) {
@@ -87,75 +88,80 @@ namespace Jigsaw
 				  List<Type> types,
 				  List<object> defaults,
 				  Type return_type)
-		  {
-				this.assembly_name = assembly_name;
-				this.type_name = type_name;
-				this.method_name = method_name;
-				this.names = names;
-				this.types = types;
-				this.defaults = defaults;
-				this.return_type = return_type;
-				this.LineWidth = 2;
-				this.LineColor = Diagram.Colors.DarkBlue;
-				this.FillColor = Diagram.Colors.LightBlue;
-				this.Sizable = false;
-				string parameter_list = "";
-				string block_text;
-				if (! return_type.ToString().Equals("System.Void")) {
-				  _properties["Variable"] = new CVarNameProperty("Variable", 
+		{
+			this.assembly_name = assembly_name;
+			this.type_name = type_name;
+			this.method_name = method_name;
+			this.names = names;
+			this.types = types;
+			this.defaults = defaults;
+			this.return_type = return_type;
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkBlue;
+			this.FillColor = Diagram.Colors.LightBlue;
+			this.Sizable = false;
+			string parameter_list = "";
+			string block_text;
+			
+			if (! return_type.ToString().Equals("System.Void")) {
+				_properties["Variable"] = new CVarNameProperty("Variable", 
 										 String.Format("{0}", MakeVariableName(method_name)));
-				}
-				if (names != null) {
-					for (int n = 0; n < names.Count; n++) {
-					    // FIXME: make a default of the appropriate type if one not given
-						if (defaults[n] == null) {
-					      _properties[names[n]] = new CExpressionProperty(names[n], 
-											      String.Format("{0}", 0));
-						} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
-					      _properties[names[n]] = new CExpressionProperty(names[n], 
-											      String.Format("{0}", defaults[n]));
-					    else
-					      _properties[names[n]] = new CExpressionProperty(names[n], 
-											      String.Format("{0}", 0));
-						if (parameter_list == "")
-						    parameter_list = names[n];
-						else
-						    parameter_list += "," + names[n];
-				}
-				        block_text = String.Format("{0}({1})", method_name, parameter_list);
-				} else {
-					block_text = String.Format("method");
-				}
-	    		this.Text = block_text;
 			}
-
-		public override IEnumerator<RunnerResponse> 
-		Runner(Expression.Scope locals, Dictionary<string, object> builtins) 
-			{	// Execute print statement
-	
-				// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				// Always place this block of code at the top of all block runners
-				this.State = BlockState.Running;				// Indicate that the block is running
-				RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
-				yield return rr;
-				if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-					rr.Action = EngineAction.Break;				// so that engine can stop
-					rr.Runner = null;
-					yield return rr;
+			
+			if (names != null)
+			{
+				for (int n = 0; n < names.Count; n++)
+				{
+					// FIXME: make a default of the appropriate type if one not given
+					if (defaults[n] == null) {
+						_properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", 0));
+					} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull")))
+					    _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", defaults[n]));
+					else
+					    _properties[names[n]] = new CExpressionProperty(names[n], 
+											      String.Format("{0}", 0));
+					if (parameter_list == "")
+						parameter_list = names[n];
+					else
+						parameter_list += "," + names[n];
 				}
-				// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 				
-				// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				// Do the print
-				// TODO: Allow access to global namespace
-				try {
+				block_text = String.Format("{0}({1})", method_name, parameter_list);
+			} else {
+				block_text = String.Format("method");
+			}
+	    	this.Text = block_text;
+		}
+
+		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
+		{	// Execute print statement
+	
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Break;				// so that engine can stop
+				rr.Runner = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+				
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the print
+			// TODO: Allow access to global namespace
+			try 
+			{
 					// First, get the expressions from the properties and evaluate them:
 					List<object> args = new List<object>();
 					List<Type> arg_types = new List<Type>();
 					System.Reflection.MethodInfo method = null;
 					foreach (string name in names) {
 						CExpressionProperty prop = (CExpressionProperty)_properties[name];
-						object value = prop.Expr.Evaluate(locals);
+						object value = prop.Evaluate(scope);
 						args.Add(value);
 						arg_types.Add(value.GetType());
 					}
@@ -178,9 +184,10 @@ namespace Jigsaw
 					      CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 						  // Need to set LHS to evaluated expression:
 						  // First, set _ = RHS
-					      locals.SetVariable("_", result);
+					      scope.SetVariable("_", result);
 						  // Then set LHS = _
-					      locals.Assignment(VarName.Text, "_");
+						  // @@@
+					      //scope.Assignment(VarName.Text, "_");
 					    }
 					  } else {
 					    this["Message"] = "No matching method for these argument types";
@@ -208,7 +215,7 @@ namespace Jigsaw
 				// If connected, replace this runner with the next runner to the stack.
 				if (this.OutEdge.IsConnected) {
 					rr.Action = EngineAction.Replace;
-					rr.Runner = this.OutEdge.LinkedTo.Block.Runner(locals, builtins);
+					rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
 				} else {
 					// If not connected, just remove this runner
 					rr.Action = EngineAction.Remove;
@@ -235,7 +242,7 @@ namespace Jigsaw
 	  } 
 	}
 
-        public override void ReadXmlTag(XmlReader xr)
+    public override void ReadXmlTag(XmlReader xr)
 	{
 	  //</method>
 	  if (xr.Name == "method") {
@@ -260,9 +267,9 @@ namespace Jigsaw
 	    }
 	  }
 	}
-			
-        protected override void WriteXmlTags(XmlWriter xw)
-        {
+	
+    protected override void WriteXmlTags(XmlWriter xw)
+    {
 	  // Write the method tag first, so when we read it first
 	  // and make the full CMethodBlock before the variables
 	  xw.WriteStartElement("method");
@@ -277,8 +284,8 @@ namespace Jigsaw
 	      xw.WriteAttributeString("default", defaults[n].ToString());
 	      xw.WriteEndElement();
 	    }
-	  xw.WriteEndElement();
-	  base.WriteXmlTags(xw);
-        }
-     }
+	  		xw.WriteEndElement();
+	  		base.WriteXmlTags(xw);
+		}
+	}
 }
