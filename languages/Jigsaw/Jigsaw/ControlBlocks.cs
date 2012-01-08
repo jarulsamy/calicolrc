@@ -1210,7 +1210,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
-			this.Text = String.Format("while {0})", this["WhileTest"]);
+			this.Text = String.Format("while ({0})", this["WhileTest"]);
 		}
 		
 		// - - - Generate and return Python if statement - - - - -

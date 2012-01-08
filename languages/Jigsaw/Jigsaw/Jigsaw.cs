@@ -338,6 +338,7 @@ namespace Jigsaw
 				return _currentPath;
 			}
 			set {
+				if (value != null) value = value.Trim (); 
 				_currentPath = value;
 			}
 		}
@@ -726,14 +727,14 @@ namespace Jigsaw
 					// Add .xml extension if missing
 					if (!_currentPath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) CurrentPath += ".xml";
 					fc.Destroy();
-					Directory.SetCurrentDirectory(Directory.GetDirectoryRoot(CurrentPath));
+					Directory.SetCurrentDirectory(System.IO.Path.GetDirectoryName(CurrentPath));
 					OnFileSave(sender, e);
 				} catch (DirectoryNotFoundException ex) {
 					Console.WriteLine("The specified directory does not exist. {0}", ex);
 				} catch (Exception ex) {
 					Console.WriteLine("Error saving file: {0}", ex);
 				}
-				
+			
 			} else {
 				// Must call Destroy() to close FileChooserDialog window.
 				fc.Destroy();
@@ -844,6 +845,9 @@ namespace Jigsaw
 			// Delete all existing non-factory blocks
 			this.DeleteAllBlocks();
 			
+			// Clear current path
+			this.CurrentPath = null;
+			
 			// Created default starting blocks
 			CControlStart b1 = new CControlStart(410, 70);
 			CControlEnd   b2 = new CControlEnd(410, 150);
@@ -889,6 +893,7 @@ namespace Jigsaw
 			if (response == (int)Gtk.ResponseType.Accept) {
 				ReadFile(fc.Filename);
 				CurrentPath = fc.Filename;
+				Directory.SetCurrentDirectory(System.IO.Path.GetDirectoryName(CurrentPath));
 			}
 			
 			// Must call Destroy() to close FileChooserDialog window.

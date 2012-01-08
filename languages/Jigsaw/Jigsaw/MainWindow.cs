@@ -389,7 +389,7 @@ public class MainWindow : Gtk.Window
 	private void UpdateWindowTitle() {
 		this.Title = "Jigsaw";
 		string filepath = js.CurrentPath;
-		if (filepath != null) this.Title += " - " + System.IO.Path.GetFileName(filepath);
+		if (filepath != null && filepath != "") this.Title += " - " + System.IO.Path.GetFileName(filepath);
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
