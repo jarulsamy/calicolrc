@@ -1228,9 +1228,11 @@ public class Scheme {
 
   public static object dlr_apply(object proc, object args) {
 	//printf("dlr_apply({0}, {1})\n", proc, args);
+	object retval;
 	if (proc is Method) {
-	  return ((Method)proc).method.Invoke(((Method)proc).classobj, 
+	  retval = ((Method)proc).method.Invoke(((Method)proc).classobj, 
 		  list_to_array(args));
+  	    return retval != null ? retval : symbol("<void>");
 	} else if (proc is MethodNeedsArgs) {
 	  // get the method based on args
 	  Type type = ((MethodNeedsArgs)proc).classobj.GetType();
@@ -1238,11 +1240,13 @@ public class Scheme {
 	  method = type.GetMethod(((MethodNeedsArgs)proc).name, 
 				  get_types(list_to_array(args)));
 	  // then invoke
-	  return method.Invoke(((MethodNeedsArgs)proc).classobj, 
+	  retval = method.Invoke(((MethodNeedsArgs)proc).classobj, 
 			       list_to_array(args));
+  	    return retval != null ? retval : symbol("<void>");
 	} else {
       try {
-        return _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+        retval = _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+  	    return retval != null ? retval : symbol("<void>");
       } catch {
         return (proc as Closure)(list_to_array(args));
       }

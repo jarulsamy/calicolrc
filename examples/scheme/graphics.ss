@@ -35,4 +35,7 @@
                                 (Graphics.Point 100 100)))
          (line.draw win)
          (line.rotate 90))))
+
+ (test)
+ (test2)
  

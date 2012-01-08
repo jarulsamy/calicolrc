@@ -178,6 +178,8 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
+            Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
+                System.IO.Path.Combine(path, "SyntaxModes"));
             // Colors by name:
             // FIXME: load from defaults
             tagnames[Tag.Error] = "error";
