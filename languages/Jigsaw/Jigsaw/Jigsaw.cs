@@ -686,6 +686,7 @@ namespace Jigsaw
 				using (XmlWriter xw = XmlWriter.Create(_currentPath, settings)) {
 					this.ToXml(xw);
 				}
+				this.Modified = false;
 			}
 		}
 		
@@ -704,14 +705,22 @@ namespace Jigsaw
 			                               "Cancel", Gtk.ResponseType.Cancel,
 			                               "Save",   Gtk.ResponseType.Accept);
 			fc.DoOverwriteConfirmation = true;
+			
 			Gtk.FileFilter f1 = new Gtk.FileFilter();
-			f1.Name = "XML files";
-			f1.AddPattern("*.xml");
-			Gtk.FileFilter f2 = new Gtk.FileFilter();
-			f2.Name = "All files";
-			f2.AddPattern("*.*");
+			f1.Name = "Jigsaw files";
+			f1.AddPattern("*.jig");
 			fc.AddFilter(f1);
+			
+			Gtk.FileFilter f2 = new Gtk.FileFilter();
+			f2.Name = "XML files";
+			f2.AddPattern("*.xml");
 			fc.AddFilter(f2);
+			
+			Gtk.FileFilter f3 = new Gtk.FileFilter();
+			f3.Name = "All files";
+			f3.AddPattern("*.*");
+			fc.AddFilter(f3);
+			
 			if ( _currentPath != null ) fc.SetFilename(_currentPath);
 			
 			// Collect the path
@@ -725,7 +734,7 @@ namespace Jigsaw
 					CurrentPath = fc.Filename;
 					
 					// Add .xml extension if missing
-					if (!_currentPath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) CurrentPath += ".xml";
+					if (!_currentPath.EndsWith(".jig", StringComparison.OrdinalIgnoreCase)) CurrentPath += ".jig";
 					fc.Destroy();
 					Directory.SetCurrentDirectory(System.IO.Path.GetDirectoryName(CurrentPath));
 					OnFileSave(sender, e);
@@ -878,14 +887,21 @@ namespace Jigsaw
 			                               Gtk.FileChooserAction.Open,
 			                               "Cancel", Gtk.ResponseType.Cancel,
 			                               "Open",   Gtk.ResponseType.Accept);
+			
 			Gtk.FileFilter f1 = new Gtk.FileFilter();
-			f1.Name = "XML files";
-			f1.AddPattern("*.xml");
-			Gtk.FileFilter f2 = new Gtk.FileFilter();
-			f2.Name = "All files";
-			f2.AddPattern("*.*");
+			f1.Name = "Jigsaw files";
+			f1.AddPattern("*.jig");
 			fc.AddFilter(f1);
+			
+			Gtk.FileFilter f2 = new Gtk.FileFilter();
+			f2.Name = "XML files";
+			f2.AddPattern("*.xml");
 			fc.AddFilter(f2);
+			
+			Gtk.FileFilter f3 = new Gtk.FileFilter();
+			f3.Name = "All files";
+			f3.AddPattern("*.*");
+			fc.AddFilter(f3);
 			
 			int response = fc.Run ();
 			
