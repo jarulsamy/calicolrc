@@ -62,23 +62,16 @@ namespace CalicoPython {
 	        engine.SetSearchPaths(paths);
 	    }
 		
-		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(IronPython.Runtime.Exceptions.TraceBackFrame frame, 
-										   string ttype, object retval) {
-	        string filename = String.Format("{0}:{1}", frame.f_code.co_filename, frame.f_lineno);
-	        Calico.MainWindow.Invoke( delegate {calico.SelectOrOpen(filename);});
-		//CurrentDocument.GotoLine((int)frame.f_lineno);});
-	        Calico.MainWindow.Invoke( delegate {
-		    var pydict = (IronPython.Runtime.PythonDictionary)frame.f_locals;
-		    foreach(string key in pydict.Keys) {
-		      if (!key.StartsWith("_") && key != "calico") {
-			// WORKAROUND: had to pass in one at a time:
-			calico.UpdateLocal(key, calico.Repr(pydict[key]));
-		      }
-		    }
-		  });
-	        System.Threading.Thread.Sleep(300);
-	        return OnTraceBack;
-	    }
+		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(
+				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
+				  string ttype, object retval) {
+		  Calico.MainWindow.Invoke( delegate {
+		      calico.CurrentDocument.GotoLine((int)frame.f_lineno);
+		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
+		    });
+		  System.Threading.Thread.Sleep((int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000));
+		  return OnTraceBack;
+		}
 		
 		public override object GetDefaultContext() {
 	        return IronPython.Runtime.DefaultContext.Default;

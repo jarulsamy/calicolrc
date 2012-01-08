@@ -72,7 +72,7 @@ namespace Calico {
             get { return UIManager; }
         }
         public Gtk.HScale ProgramSpeed {
-            get { return hscale1;}
+            get { return debugSpeed;}
         }
         public Gtk.Notebook.NotebookChild EnvironmentPage {
             get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
@@ -1412,15 +1412,19 @@ namespace Calico {
             LocalVariables.Clear();
         }
 
-        public void UpdateLocal(string vname, string repr) {
-            LocalList.Foreach((a, b, c) => LocalModelForeachFunc(a, b, c,
-                vname, repr));
-            if (! LocalVariables.ContainsKey(vname)) {
-                Gtk.TreeIter iter = LocalList.AppendValues(vname, repr);
-                Gtk.TreePath treepath = LocalList.GetPath(iter);
-                LocalTreeView.SetCursor(treepath, null, false);
-                LocalVariables[vname] = true;
+        public void UpdateLocal(IDictionary<object,object> pydict) {
+            // Added IronPython.dll to be able to handle this
+            LocalList = new Gtk.ListStore(typeof(string), typeof(string));
+           foreach(object key in pydict.Keys) {
+                string vname = key.ToString();
+                if (! vname.StartsWith("_") && vname != "calico") {
+                    string repr = Repr(pydict[key]);
+                    Gtk.TreeIter iter = LocalList.AppendValues(vname, repr);
+                    Gtk.TreePath treepath = LocalList.GetPath(iter);
+                    LocalTreeView.SetCursor(treepath, null, false);
+                }
             }
+            LocalTreeView.Model = LocalList;
         }
 
         public bool UpdateEnvironment() {

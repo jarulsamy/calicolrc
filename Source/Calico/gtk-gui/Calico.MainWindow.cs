@@ -62,7 +62,7 @@ namespace Calico
 		private global::Gtk.Button _saveButton;
 		private global::Gtk.Button _stopButton;
 		private global::Gtk.Button _startButton;
-		private global::Gtk.HScale hscale1;
+		private global::Gtk.HScale debugSpeed;
 		private global::Gtk.Button _pauseButton;
 		private global::Gtk.Button _playButton;
 		private global::Gtk.HBox searchbox;
@@ -106,7 +106,7 @@ namespace Calico
 		private global::Gtk.Statusbar statusbar1;
 		private global::Gtk.Label label6;
 		private global::Gtk.Label status_langauge;
-		
+        
 		protected virtual void Build ()
 		{
 			global::Stetic.Gui.Initialize (this);
@@ -268,34 +268,7 @@ namespace Calico
 			this.vbox1.Name = "vbox1";
 			this.vbox1.BorderWidth = ((uint)(5));
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name=\'menubar2\'><menu name=\'FileAction\' action=\'FileAction\'><menuite" +
-					"m name=\'openAction1\' action=\'openAction1\'/><menu name=\'NewAction\' action=\'NewAct" +
-					"ion\'/><separator/><menu name=\'RecentlyOpenedAction\' action=\'RecentlyOpenedAction" +
-					"\'/><menu name=\'ExamplesAction\' action=\'ExamplesAction\'/><separator/><menuitem na" +
-					"me=\'saveAction\' action=\'saveAction\'/><menuitem name=\'saveAsAction\' action=\'saveA" +
-					"sAction\'/><separator/><menuitem name=\'printAction\' action=\'printAction\'/><menuit" +
-					"em name=\'ExportAction1\' action=\'ExportAction1\'/><separator/><menuitem name=\'quit" +
-					"Action\' action=\'quitAction\'/></menu><menu name=\'EditAction\' action=\'EditAction\'>" +
-					"<menuitem name=\'copyAction\' action=\'copyAction\'/><menuitem name=\'pasteAction\' ac" +
-					"tion=\'pasteAction\'/><menuitem name=\'cutAction\' action=\'cutAction\'/><separator/><" +
-					"menuitem name=\'undoAction\' action=\'undoAction\'/><menuitem name=\'redoAction\' acti" +
-					"on=\'redoAction\'/><separator/><menuitem name=\'selectAllAction\' action=\'selectAllA" +
-					"ction\'/><separator/><menuitem name=\'indentAction\' action=\'indentAction\'/><menuit" +
-					"em name=\'unindentAction\' action=\'unindentAction\'/><separator/><menuitem name=\'Co" +
-					"mmentRegionAction\' action=\'CommentRegionAction\'/><menuitem name=\'UncommentRegion" +
-					"Action\' action=\'UncommentRegionAction\'/><separator/><menuitem name=\'findAction\' " +
-					"action=\'findAction\'/></menu><menu name=\'ViewAction\' action=\'ViewAction\'><menuite" +
-					"m name=\'zoomInAction\' action=\'zoomInAction\'/><menuitem name=\'zoomOutAction\' acti" +
-					"on=\'zoomOutAction\'/><separator/><menuitem name=\'selectFontAction\' action=\'select" +
-					"FontAction\'/><menu name=\'ShowAction\' action=\'ShowAction\'><menuitem name=\'Environ" +
-					"mentTabAction\' action=\'EnvironmentTabAction\'/><menuitem name=\'LocalsTabAction\' a" +
-					"ction=\'LocalsTabAction\'/></menu></menu><menu name=\'ShellAction1\' action=\'ShellAc" +
-					"tion1\'><menu name=\'LanguageAction\' action=\'LanguageAction\'/><menuitem name=\'yesA" +
-					"ction1\' action=\'yesAction1\'/><menuitem name=\'noAction\' action=\'noAction\'/><menui" +
-					"tem name=\'SwitchToShellAction\' action=\'SwitchToShellAction\'/><menuitem name=\'Res" +
-					"etShellAction\' action=\'ResetShellAction\'/><menuitem name=\'ClearOutputAction\' act" +
-					"ion=\'ClearOutputAction\'/></menu><menu name=\'HelpAction\' action=\'HelpAction\'><men" +
-					"uitem name=\'aboutAction\' action=\'aboutAction\'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentlyOpenedAction' action='RecentlyOpenedAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='printAction' action='printAction'/><menuitem name='ExportAction1' action='ExportAction1'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/><separator/><menuitem name='findAction' action='findAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='ShowAction' action='ShowAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/></menu></menu><menu name='ShellAction1' action='ShellAction1'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='SwitchToShellAction' action='SwitchToShellAction'/><menuitem name='ResetShellAction' action='ResetShellAction'/><menuitem name='ClearOutputAction' action='ClearOutputAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='aboutAction' action='aboutAction'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add (this.menubar2);
@@ -453,21 +426,21 @@ namespace Calico
 			w56.Expand = false;
 			w56.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
-			this.hscale1 = new global::Gtk.HScale (null);
-			this.hscale1.WidthRequest = 100;
-			this.hscale1.Sensitive = false;
-			this.hscale1.CanFocus = true;
-			this.hscale1.Name = "hscale1";
-			this.hscale1.Inverted = true;
-			this.hscale1.Adjustment.Upper = 100D;
-			this.hscale1.Adjustment.PageIncrement = 10D;
-			this.hscale1.Adjustment.StepIncrement = 1D;
-			this.hscale1.Adjustment.Value = 100D;
-			this.hscale1.DrawValue = false;
-			this.hscale1.Digits = 0;
-			this.hscale1.ValuePos = ((global::Gtk.PositionType)(2));
-			this.hbox4.Add (this.hscale1);
-			global::Gtk.Box.BoxChild w57 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.hscale1]));
+			this.debugSpeed = new global::Gtk.HScale (null);
+			this.debugSpeed.WidthRequest = 100;
+			this.debugSpeed.Sensitive = false;
+			this.debugSpeed.CanFocus = true;
+			this.debugSpeed.Name = "debugSpeed";
+			this.debugSpeed.Inverted = true;
+			this.debugSpeed.Adjustment.Upper = 100;
+			this.debugSpeed.Adjustment.PageIncrement = 10;
+			this.debugSpeed.Adjustment.StepIncrement = 1;
+			this.debugSpeed.Adjustment.Value = 100;
+			this.debugSpeed.DrawValue = false;
+			this.debugSpeed.Digits = 0;
+			this.debugSpeed.ValuePos = ((global::Gtk.PositionType)(2));
+			this.hbox4.Add (this.debugSpeed);
+			global::Gtk.Box.BoxChild w57 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.debugSpeed]));
 			w57.Position = 6;
 			w57.Expand = false;
 			// Container child hbox4.Gtk.Box+BoxChild
@@ -868,13 +841,13 @@ namespace Calico
 			w167.Expand = false;
 			w167.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
-			this.spinbutton1 = new global::Gtk.SpinButton (1D, 100D, 1D);
+			this.spinbutton1 = new global::Gtk.SpinButton (1, 100, 1);
 			this.spinbutton1.CanFocus = true;
 			this.spinbutton1.Name = "spinbutton1";
-			this.spinbutton1.Adjustment.PageIncrement = 10D;
-			this.spinbutton1.ClimbRate = 1D;
+			this.spinbutton1.Adjustment.PageIncrement = 10;
+			this.spinbutton1.ClimbRate = 1;
 			this.spinbutton1.Numeric = true;
-			this.spinbutton1.Value = 1D;
+			this.spinbutton1.Value = 1;
 			this.vbox3.Add (this.spinbutton1);
 			global::Gtk.Box.BoxChild w168 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.spinbutton1]));
 			w168.Position = 2;

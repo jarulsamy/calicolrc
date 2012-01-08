@@ -519,7 +519,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.HScale" id="hscale1">
+              <widget class="Gtk.HScale" id="debugSpeed">
                 <property name="MemberName" />
                 <property name="WidthRequest">100</property>
                 <property name="Sensitive">False</property>

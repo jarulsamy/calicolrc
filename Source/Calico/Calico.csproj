@@ -70,6 +70,16 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cairo" />
+    <Reference Include="Reflection, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\modules\Reflection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\IronPython.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
