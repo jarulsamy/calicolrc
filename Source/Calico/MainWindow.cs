@@ -30,12 +30,14 @@ namespace Calico {
 
     public partial class MainWindow : Gtk.Window {
         public Config config;
+        bool searchBoxVisible = true;
         public Gtk.Clipboard clipboard;
         private Mono.TextEditor.TextEditor _shell;
         public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
         public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
         public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag, Gtk.TextTag>();
         public static Dictionary<Tag, string> tagnames = new Dictionary<Tag, string>();
+        public Gtk.RadioMenuItem language_group;
         public LanguageManager manager;
         public string CurrentLanguage = null;
         public string ShellLanguage = null;
@@ -267,7 +269,7 @@ namespace Calico {
                 throw new Exception("/menubar2/ShellAction1/LanguageAction");
             switch_menu.Submenu = new Gtk.Menu();
             int count = 0;
-            Gtk.RadioMenuItem @group = null;
+            language_group = null;
             Gtk.RadioMenuItem radioitem;
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
@@ -286,17 +288,17 @@ namespace Calico {
                 string name = String.Format("Switch to {0}", language.proper_name);
                 if (count == 0) {
                     radioitem = new Gtk.RadioMenuItem(name);
-                    @group = radioitem;
+                    language_group = radioitem;
                 } else {
-                    radioitem = new Gtk.RadioMenuItem(@group, name);
+                    radioitem = new Gtk.RadioMenuItem(language_group, name);
                 }
+                radioitem.Activated += OnSwitchLanguage;
                 ((Gtk.Menu)switch_menu.Submenu).Add(radioitem);
                 uint key;
                 Gdk.ModifierType mod;
                 Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
                 radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                 languages_by_count[count + 1] = language;
-                radioitem.ButtonReleaseEvent += OnSwitchLanguage;
                 //DragDataReceived += SelectionReceived;
                 radioitem.Data["id"] = count + 1;
                 count++;
@@ -334,6 +336,8 @@ namespace Calico {
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
+            searchbox.Hidden += HandleSearchboxHidden;
+            searchbox.Shown += HandleSearchboxShown;
             searchbox.Hide();
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
@@ -402,11 +406,6 @@ namespace Calico {
             return global::Mono.Unix.Catalog.GetString(message);
         }
 
-        public void OnSwitchLanguage(object obj, Gtk.ButtonReleaseEventArgs args) {
-            Gtk.RadioMenuItem radioitem = (Gtk.RadioMenuItem)obj;
-            OnSwitchLanguage((int)radioitem.Data["id"]);
-        }
-
         public void SetLanguage(string language) {
             CurrentLanguage = language;
             if (CurrentLanguage != null) {
@@ -426,6 +425,11 @@ namespace Calico {
                 status_langauge.Text = String.Format("<i>{0}</i> ", CurrentProperLanguage);
                 status_langauge.UseMarkup = true;
             });
+        }
+
+        public void OnSwitchLanguage(object obj, EventArgs e) {
+            Gtk.RadioMenuItem radioitem = (Gtk.RadioMenuItem)obj;
+            OnSwitchLanguage((int)radioitem.Data["id"]);
         }
 
         public void OnSwitchLanguage(int lang_count) {
@@ -913,11 +917,7 @@ namespace Calico {
         [GLib.ConnectBeforeAttribute]
         protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
             int key_0 = (int)Gdk.Key.Key_0;
-            if (((((int)args.Event.Key) > key_0) && ((int)args.Event.Key) < (key_0 + 10)) && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
-                OnSwitchLanguage(((int)args.Event.Key) - key_0);
-                args.RetVal = true;
-                return;
-            }
+            ///  FIXME           if (searchbox.Hidden) and escape, close it
             if (Focus == Shell) {
                 // Shell handler
                 // control+c, if nothing is selected, else it is a copy
@@ -1774,9 +1774,49 @@ namespace Calico {
             }
         }
 
+        /*
+        void SearchNext() {
+            self.editor.document.texteditor.SearchPattern = self.entry.Text;
+            selection_range = self.editor.document.texteditor.SelectionRange;
+            if (selection_range) {
+                if (from_selection_start) {
+                    offset = selection_range.Offset;
+                } else {
+                    offset = selection_range.Offset + selection_range.Length;
+                }
+            } else {
+                offset = self.editor.document.texteditor.Caret.Offset;
+                search_result = self.editor.document.texteditor.SearchForward(offset);
+                if (search_result) {
+                    offset = search_result.Offset;
+                    length = search_result.Length;
+                    self.editor.document.texteditor.Caret.Offset = offset + length;
+                    self.editor.document.texteditor.SetSelection(offset,
+                                                                 offset + length);
+                    self.editor.document.texteditor.ScrollToCaret();
+                }
+            }
+        }
+        */
+
         protected void OnFindActionActivated (object sender, System.EventArgs e)
         {
-            searchbox.Show();
+            if (!searchBoxVisible) {
+                searchbox.Show();
+                comboboxentry1.GrabFocus();
+            } else {
+                searchbox.Hide();
+            }
+        }
+
+        void HandleSearchboxHidden (object sender, EventArgs e)
+        {
+            searchBoxVisible = false;
+        }
+
+        void HandleSearchboxShown (object sender, EventArgs e)
+        {
+            searchBoxVisible = true;
         }
 
         protected void OnButton125Clicked (object sender, System.EventArgs e)
