@@ -2,33 +2,34 @@ Calico2
 
 Bugs
 
-5. Add a Recents button on Home
-6. Search in toolbar
-7. SaveAs: use Exist: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
-8. Switching language by key does not change menu
-9. Hide Locals Tab on check box
-
+* Add a Recents, Help buttons on Home
+* Search in toolbar
+* SaveAs: Warning? use Exist?: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
+* Hide Locals Tab on check box
+* Printing gives error: Cairo.Context: called from finalization thread, programmer is missing a call to Dispose
 
 Big Tickets
 
 1. Recent Files [DONE - need to limit]
-1.1 History [DONE - need to limit]
+1.1 History [DONE]
 2. Reset shell [DONE]
 3. Tab completion (for all expressions?)
 4. Loop in Graphics, win.run() [OK]
 5. Font [DONE]
 6. Chat stuff (register, login, blast, chat)
 7. About [DONE]
-8. Print (and newline issue on Windows) [DONE - windows sizing issue]
-9. Search/replace in Editor [GUI]
+8. Print (and newline issue on Windows) [DONE]
+9. Search/replace in Editor [GUI Done]
 10. Languages, Jigsaw, Scheme [DONE]
 11. Debug/trace
 12. Goto file:line on right-click
+12.1 Show error Help button on error
 13. Config save/load [DONE - need to add all items back]
-14. Ask to overwrite
+14. Ask to overwrite [DONE]
 15. Ask to abort changes, save
 16. click in output to get history somehow
 17. Detect that the file has changed outside of Calico
+18. Windows/Mac/Linux versions
 
 Problems, issues, features, and questions.
 

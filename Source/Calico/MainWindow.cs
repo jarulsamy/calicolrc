@@ -162,6 +162,23 @@ namespace Calico {
             }
         }
 
+        protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {
+			// System.dll:
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
+        }
+
+		protected void OnButton100Clicked (object sender, System.EventArgs e)
+		{
+			// Recently opened
+            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
+			recents_menu.Activate();
+		}
+		protected void OnButton25Clicked (object sender, System.EventArgs e)
+		{
+			// General Help 
+			// System.dll:
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Help");
+		}
         public static bool Contains(string ext, string[] extensions) {
             foreach (string lext in extensions) {
                 if (lext == ext)
@@ -458,12 +475,14 @@ namespace Calico {
             if (filename != null) {
                 // Get full path to file if not given:
                 filename = System.IO.Path.GetFullPath(filename);
+				// Needs Systm.dll:
                 System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(filename, "(.*)\\:(\\d+)$");
                 if (match.Success) {
                     // Groups[0] is entire string
                     filename = (string)match.Groups[1].Captures[0].Value;
                     lineno = Convert.ToInt32(match.Groups[2].Captures[0].Value);
                 }
+                // -----
             }
             // Special case for quick goto:
             if (CurrentDocument != null && CurrentDocument.filename == filename && filename != null) {
@@ -908,10 +927,6 @@ namespace Calico {
                 data.Document.RequestUpdate(new Mono.TextEditor.MultipleLineUpdate(startLineNr, endLineNr));
                 data.Document.CommitDocumentUpdate();
             }
-        }
-
-        protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {
-            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
         }
 
         [GLib.ConnectBeforeAttribute]

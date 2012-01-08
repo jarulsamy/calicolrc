@@ -685,7 +685,7 @@
           <widget class="Gtk.VPaned" id="vpaned2">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">274</property>
+            <property name="Position">337</property>
             <child>
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
@@ -702,7 +702,7 @@
                         <property name="MemberName" />
                         <property name="Spacing">14</property>
                         <property name="BorderWidth">15</property>
-                        <property name="Size">4</property>
+                        <property name="Size">5</property>
                         <property name="LayoutStyle">Start</property>
                         <child>
                           <widget class="Gtk.Button" id="button4">
@@ -754,14 +754,28 @@
                         <child>
                           <widget class="Gtk.Button" id="button100">
                             <property name="MemberName" />
-                            <property name="Sensitive">False</property>
                             <property name="CanFocus">True</property>
                             <property name="Type">TextOnly</property>
-                            <property name="Label" translatable="yes">Load Last Script...</property>
+                            <property name="Label" translatable="yes">Recently opened...</property>
                             <property name="UseUnderline">True</property>
                           </widget>
                           <packing>
                             <property name="Position">3</property>
+                            <property name="Expand">False</property>
+                            <property name="Fill">False</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Button" id="button25">
+                            <property name="MemberName" />
+                            <property name="CanFocus">True</property>
+                            <property name="Type">TextAndIcon</property>
+                            <property name="Icon">stock:gtk-help LargeToolbar</property>
+                            <property name="Label" translatable="yes">Help...</property>
+                            <property name="UseUnderline">True</property>
+                          </widget>
+                          <packing>
+                            <property name="Position">4</property>
                             <property name="Expand">False</property>
                             <property name="Fill">False</property>
                           </packing>

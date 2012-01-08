@@ -32,6 +32,7 @@ namespace Calico {
         public static string Version = "2.0.0-alpha";
         public static bool IsLoadModules = true;
 
+		/*
        private static bool IsApplicationRunningOnMono(string processName)
        {
            var processFound = 0;
@@ -58,7 +59,7 @@ namespace Calico {
            //we don't find the current process, but if there is already another one running, return true!
            return (processFound == 1);
        }
-
+		 */
         [STAThread]
         public static void Main(string[] args) {
             // Setup config

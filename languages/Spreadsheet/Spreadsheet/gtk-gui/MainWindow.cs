@@ -4,7 +4,7 @@
 public partial class MainWindow
 {
 	private global::Gtk.ScrolledWindow scrolledwindow1;
-    
+	
 	protected virtual void Build ()
 	{
 		global::Stetic.Gui.Initialize (this);
