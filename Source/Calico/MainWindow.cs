@@ -1783,5 +1783,24 @@ namespace Calico {
         {
             searchbox.Hide();
         }
+
+        public static bool yesno(string question) {
+            ManualResetEvent ev = new ManualResetEvent(false);
+            bool retval = false;
+            Invoke(delegate {
+                Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                                       0, Gtk.MessageType.Question,
+                                       Gtk.ButtonsType.YesNo,
+                                       question);
+                fc.ShowAll();
+                if (fc.Run() == (int)(Gtk.ResponseType.Yes)) {
+                   retval = true;
+                }
+                fc.Destroy();
+                ev.Set();
+                });
+            ev.WaitOne();
+            return retval;
+        }
     }
 }

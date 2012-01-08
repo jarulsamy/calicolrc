@@ -241,13 +241,18 @@ public class CalicoSpreadsheetDocument : Document
 		return sheet.liststore.GetValue(iter, y + 1);
 	}
 
-	public override void SaveDocument()
+	public override bool SaveDocument()
 	{
-		Csv.writer writer = new Csv.writer(filename);
-		sheet.liststore.Foreach((model, path, iter) => SaveRow(writer, model, path, iter));
-		writer.Close();
-		IsDirty = false;
-		UpdateDocument();	
+		try {
+			Csv.writer writer = new Csv.writer(filename);
+			sheet.liststore.Foreach((model, path, iter) => SaveRow(writer, model, path, iter));
+			writer.Close();
+			IsDirty = false;
+			UpdateDocument();	
+			return true;
+		} catch {
+			return false;
+		}
 	}
 }
 

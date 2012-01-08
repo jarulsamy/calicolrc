@@ -152,12 +152,23 @@ namespace Calico {
             fc.SelectFilename(basename);    // the file selection, if it exists
             fc.KeepAbove = true;
             if (fc.Run() == (int)Gtk.ResponseType.Accept) {
+                fc.Hide();
                 // FIXME: check to see if already exists
                 // ask to overwrite
                 filename = fc.Filename;
-                tab_label.TooltipText = filename;
+                if (System.IO.File.Exists(filename)) {
+                    bool yesno = MainWindow.yesno(
+                        String.Format("The file\n{0}\nexists. Overwrite it?", filename));
+                    if (!yesno)
+                        return false;
+                }
                 retval = Save();
                 if (retval) {
+                    // Set CurrentDirectory here:
+                    string dir = System.IO.Path.GetDirectoryName(filename);
+                    System.IO.Directory.SetCurrentDirectory(dir);
+                    // Update GUI:
+                    tab_label.TooltipText = filename;
                     language = calico.manager.GetLanguageFromExtension(filename);
                     basename = System.IO.Path.GetFileName(filename);
                     tab_label.Text = basename;
@@ -172,15 +183,14 @@ namespace Calico {
         public virtual bool Save() {
             if (filename != null) {
                 try {
-                    SaveDocument();
-                    return true;
+                    return SaveDocument();
                 } catch {
                     // fail.. let's try SaveAs...
                 }
             }
             bool retval = SaveAs();
-            // if successful
             if (retval) {
+                // if successful
                 // change name of tab/filename/basefile
                 basename = System.IO.Path.GetFileName(filename);
                 tab_label.TooltipText = filename;
@@ -189,8 +199,9 @@ namespace Calico {
             return retval;
         }
 
-        public virtual void SaveDocument() {
+        public virtual bool SaveDocument() {
             // Save the document details; to be overridden in subclass
+            return true;
         }
 
         public virtual bool Close() {
@@ -272,6 +283,7 @@ namespace Calico {
             texteditor.Options.OverrideDocumentEolMarker = true;
             texteditor.Options.DefaultEolMarker = "\n";
             texteditor.Options.ShowIconMargin = true;
+            texteditor.Options.ShowFoldMargin = true;
 	        texteditor.Options.FontName = calico.GetFont().ToString();
         }
 
@@ -299,18 +311,23 @@ namespace Calico {
             return true;
         }
 
-        public override void SaveDocument() {
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-            sw.Write(texteditor.Document.Text);
-            sw.Close();
-            string possible_new_mime_type = calico.GetMimeType(filename);
-            if (possible_new_mime_type != null &&
-                texteditor.Document.MimeType != possible_new_mime_type) {
-                texteditor.Document.MimeType = possible_new_mime_type;
-                // HACK: reformat text:
-                texteditor.Document.Text = texteditor.Document.Text;
+        public override bool SaveDocument() {
+            try {
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+                sw.Write(texteditor.Document.Text);
+                sw.Close();
+                string possible_new_mime_type = calico.GetMimeType(filename);
+                if (possible_new_mime_type != null &&
+                    texteditor.Document.MimeType != possible_new_mime_type) {
+                    texteditor.Document.MimeType = possible_new_mime_type;
+                    // HACK: reformat text:
+                    texteditor.Document.Text = texteditor.Document.Text;
+                }
+                texteditor.Document.SetNotDirtyState();
+                return true;
+            } catch {
+                return false;
             }
-            texteditor.Document.SetNotDirtyState();
         }
 
     }
