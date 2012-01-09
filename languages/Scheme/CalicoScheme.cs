@@ -66,6 +66,23 @@ public class CalicoSchemeEngine : Engine
   }
 }
 
+public class CalicoSchemeDocument : TextDocument {
+
+    public CalicoSchemeDocument(MainWindow calico, string filename, string language, string mimetype) :
+            	   base(calico, filename, language, mimetype) {
+    }
+
+    public override void UseLibrary(string fullname) {
+                Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
+                data.Document.BeginAtomicUndo();
+                data.Document.EndAtomicUndo();
+		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
+                texteditor.Insert(0, String.Format("(using \"{0}\")\n", bname));
+                data.Document.RequestUpdate(new Mono.TextEditor.LineUpdate(0));
+                data.Document.CommitDocumentUpdate();
+     }
+}
+	
 public class CalicoSchemeLanguage : Language
 {
 	public CalicoSchemeLanguage () : 
@@ -77,6 +94,10 @@ public class CalicoSchemeLanguage : Language
 	{
 		engine = new CalicoSchemeEngine (manager);
 	}
+
+        public override Document MakeDocument(MainWindow calico, string filename) {
+	        return new CalicoSchemeDocument(calico, filename, name, mimetype);
+        }
 
 	public static new Language MakeLanguage ()
 	{

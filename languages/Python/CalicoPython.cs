@@ -66,11 +66,15 @@ namespace CalicoPython {
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 				  string ttype, object retval) {
 		  Calico.MainWindow.Invoke( delegate {
-		      calico.CurrentDocument.GotoLine((int)frame.f_lineno);
+		      if (calico.CurrentDocument != null && calico.CurrentDocument.filename == frame.f_code.co_filename)
+			  	calico.CurrentDocument.GotoLine((int)frame.f_lineno);
 		      calico.UpdateLocal(frame);
 		    });
 		  if (calico.ProgramSpeed.Value == 0) {
 		    calico.playResetEvent.WaitOne();
+		    if (calico.ProgramSpeed.Value == 0) {
+		      calico.playResetEvent.Reset();
+		    }
 		  } else {
 		    System.Threading.Thread.Sleep((int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000));
 		  }

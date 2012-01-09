@@ -10,6 +10,7 @@ CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe
 		-r:Microsoft.Scripting.Core.dll \
 		-r:IronPython.dll \
 		-r:Microsoft.Dynamic \
+		-r:Mono.TextEditor \
 		-target:library
 
 clean:
