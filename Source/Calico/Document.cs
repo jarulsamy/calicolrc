@@ -72,7 +72,7 @@ namespace Calico {
             return null;
         }
 
-        public void UseLibrary (string fullname)
+        public virtual void UseLibrary (string fullname)
         {
             // Tell the document to use the library "filename"
         }
@@ -340,7 +340,6 @@ namespace Calico {
                 return false;
             }
         }
-
     }
 }
 

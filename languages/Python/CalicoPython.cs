@@ -86,16 +86,38 @@ namespace CalicoPython {
 	            IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);
 		}
 	}
+
+
+	public class CalicoPythonDocument : TextDocument {
+
+	    public CalicoPythonDocument(MainWindow calico, string filename, string language, string mimetype) :
+            	   base(calico, filename, language, mimetype) {
+            }
+
+	    public override void UseLibrary(string fullname) {
+                Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
+                data.Document.BeginAtomicUndo();
+                data.Document.EndAtomicUndo();
+		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
+                texteditor.Insert(0, String.Format("import {0}\n", bname));
+                data.Document.RequestUpdate(new Mono.TextEditor.LineUpdate(0));
+                data.Document.CommitDocumentUpdate();
+            }
+        }
 	
 	public class CalicoPythonLanguage : Language {
 		public CalicoPythonLanguage() : 
 			base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python") {
 	    }
 		
-		public override void MakeEngine(LanguageManager manager) {
+  	    public override void MakeEngine(LanguageManager manager) {
 	        engine = new CalicoPythonEngine(manager);
 	    }
-	
+
+            public override Document MakeDocument(MainWindow calico, string filename) {
+            	return new CalicoPythonDocument(calico, filename, name, mimetype);
+            }
+
 	    public static new Language MakeLanguage() {
 	        return new CalicoPythonLanguage();
 	    }

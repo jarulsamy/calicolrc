@@ -8,6 +8,7 @@ CalicoPython.dll: CalicoPython.cs ../../bin/Calico.exe
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Scripting.Core \
 		-r:Microsoft.Dynamic \
+		-r:Mono.TextEditor \
 		-pkg:gtk-sharp-2.0 \
 		-target:library
 

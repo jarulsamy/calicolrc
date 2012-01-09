@@ -48,6 +48,23 @@ public class CalicoRubyEngine : DLREngine {
     }
 }
 
+public class CalicoRubyDocument : TextDocument {
+
+    public CalicoRubyDocument(MainWindow calico, string filename, string language, string mimetype) :
+         	   base(calico, filename, language, mimetype) {
+    }
+
+    public override void UseLibrary(string fullname) {
+                Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
+                data.Document.BeginAtomicUndo();
+                data.Document.EndAtomicUndo();
+		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
+                texteditor.Insert(0, String.Format("require \"{0}\"\n", bname));
+                data.Document.RequestUpdate(new Mono.TextEditor.LineUpdate(0));
+                data.Document.CommitDocumentUpdate();
+     }
+}
+	
 public class CalicoRubyLanguage : Language {
 
     public CalicoRubyLanguage() :
@@ -56,6 +73,10 @@ public class CalicoRubyLanguage : Language {
 
     public override void MakeEngine(LanguageManager manager) {
         engine = new CalicoRubyEngine(manager);
+    }
+
+    public override Document MakeDocument(MainWindow calico, string filename) {
+      	return new CalicoRubyDocument(calico, filename, name, mimetype);
     }
 
     public static new Language MakeLanguage() {

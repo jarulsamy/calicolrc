@@ -6,6 +6,8 @@ CalicoRuby.dll: CalicoRuby.cs ../../bin/Calico.exe
 		-r:IronRuby \
 		-r:Microsoft.Scripting \
 		-r:Microsoft.Scripting.Core \
+		-r:Mono.TextEditor \
+		-pkg:gtk-sharp-2.0 \
 		-target:library
 
 clean:
