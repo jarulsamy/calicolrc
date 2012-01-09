@@ -1414,16 +1414,19 @@ namespace Calico {
             LocalVariables.Clear();
         }
 
-        public void UpdateLocal(IDictionary<object,object> pydict) {
+        public void UpdateLocal(IronPython.Runtime.Exceptions.TraceBackFrame frame) {
             // Added IronPython.dll to be able to handle this
+            //Console.WriteLine(frame.
+            IDictionary<object,object> locals = (IDictionary<object,object>)frame.f_locals;
             LocalList = new Gtk.ListStore(typeof(string), typeof(string));
-           foreach(object key in pydict.Keys) {
+           foreach(object key in locals.Keys) {
                 string vname = key.ToString();
                 if (! vname.StartsWith("_") && vname != "calico") {
-                    string repr = Repr(pydict[key]);
-                    Gtk.TreeIter iter = LocalList.AppendValues(vname, repr);
-                    Gtk.TreePath treepath = LocalList.GetPath(iter);
-                    LocalTreeView.SetCursor(treepath, null, false);
+                    string repr = Repr(locals[key]);
+                    LocalList.AppendValues(vname, repr);
+                    //Gtk.TreeIter iter = LocalList.AppendValues(vname, repr);
+                    //Gtk.TreePath treepath = LocalList.GetPath(iter);
+                    //LocalTreeView.SetCursor(treepath, null, false);
                 }
             }
             LocalTreeView.Model = LocalList;

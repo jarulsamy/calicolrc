@@ -67,7 +67,7 @@ namespace CalicoPython {
 				  string ttype, object retval) {
 		  Calico.MainWindow.Invoke( delegate {
 		      calico.CurrentDocument.GotoLine((int)frame.f_lineno);
-		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
+		      calico.UpdateLocal(frame);
 		    });
 		  if (calico.ProgramSpeed.Value == 0) {
 		    calico.playResetEvent.WaitOne();
