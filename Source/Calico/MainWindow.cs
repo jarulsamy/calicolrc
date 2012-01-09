@@ -187,6 +187,7 @@ namespace Calico {
 
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
+            this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));
             this.config = config;
             this.Debug = Debug;
             this.manager = manager;

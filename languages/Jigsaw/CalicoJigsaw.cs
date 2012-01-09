@@ -64,7 +64,7 @@ public class CalicoJigsawDocument : Document
 	base(calico, filename, "jigsaw")
 	{
 		cvs = new Jigsaw.Canvas (900, 600, 3000, 2000);
-		widget.AddWithViewport (cvs);
+		widget.Add(cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
 		widget.ShowAll ();
@@ -87,8 +87,8 @@ public class CalicoJigsawDocument : Document
 	}
 
         public override void Export(Calico.MainWindow calico) {
-	  string filename = cvs.Export();
-	  calico.SelectOrOpen(filename);
+	  //string filename = cvs.Export();
+	  //calico.SelectOrOpen(filename);
 	}
 
 }
