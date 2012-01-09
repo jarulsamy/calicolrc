@@ -291,17 +291,6 @@
         <property name="DrawAsRadio">False</property>
         <property name="Active">True</property>
       </action>
-      <action id="mediaPlayAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes" />
-        <property name="StockId">gtk-media-play</property>
-      </action>
-      <action id="mediaPauseAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes" />
-        <property name="StockId">gtk-media-pause</property>
-        <signal name="Activated" handler="OnMediaPauseActionActivated" />
-      </action>
       <action id="printAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">_Print</property>
@@ -568,6 +557,24 @@
               </packing>
             </child>
             <child>
+              <widget class="Gtk.Button" id="_pauseButton1">
+                <property name="MemberName" />
+                <property name="Sensitive">False</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-media-pause LargeToolbar</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <signal name="Clicked" handler="OnPauseButton1Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">7</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="_playButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
@@ -579,7 +586,7 @@
                 <signal name="Clicked" handler="OnPlayButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">7</property>
+                <property name="Position">8</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -666,7 +673,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">8</property>
+                <property name="Position">9</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>

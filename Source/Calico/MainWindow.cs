@@ -143,6 +143,9 @@ namespace Calico {
         public Gtk.Button PlayButton {
             get { return _playButton; }
         }
+        public Gtk.Button PauseButton {
+            get { return _pauseButton1; }
+        }
         public string CurrentProperLanguage {
             get {
                 if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
@@ -1134,12 +1137,15 @@ namespace Calico {
             StartAction.Sensitive = false;
             StopButton.Sensitive = true;
             noAction.Sensitive = true;
+            if (ProgramSpeed.Value < 100)
+                PauseButton.Sensitive = true;
         }
 
         public void OnStopRunning() {
-	    ProgramSpeed.Sensitive = true;
+	        ProgramSpeed.Sensitive = true;
             PlayButton.Sensitive = false;
             noAction.Sensitive = false;
+            PauseButton.Sensitive = false;
             if (CurrentDocument != null) { // Editor
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true; // need something to execute
@@ -1309,16 +1315,16 @@ namespace Calico {
         }
 
         public virtual void trace_on() {
-	  // FIXME: doesn't work; appears to need to be set before starting
-	    ProgramSpeed.Value = 50;
-	    ProgramSpeed.Sensitive = true;
+	        // FIXME: doesn't work; appears to need to be set before starting
+    	    ProgramSpeed.Value = 50;
+	        ProgramSpeed.Sensitive = true;
             manager[CurrentLanguage].engine.SetTraceOn(this);
             manager[CurrentLanguage].engine.ConfigureTrace();
-	}
+	    }
 
         public virtual void trace_off() {
             manager[CurrentLanguage].engine.SetTraceOff();
-	}
+	    }
 
         protected virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
@@ -1576,11 +1582,6 @@ namespace Calico {
             }
         }
 
-        protected void OnMediaPauseActionActivated (object sender, System.EventArgs e)
-        {
-            throw new System.NotImplementedException ();
-        }
-
         protected void OnOpenButtonClicked (object sender, System.EventArgs e)
         {
             OnOpenAction1Activated(sender, e);
@@ -1599,7 +1600,7 @@ namespace Calico {
         protected void OnPlayButtonClicked (object sender, System.EventArgs e)
         {
             playResetEvent.Set();
-            if (debugSpeed.Value != 0) {
+            if (ProgramSpeed.Value != 0) {
                 PlayButton.Sensitive = false;
             }
         }
@@ -1927,11 +1928,19 @@ namespace Calico {
             System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
         }
 
+        protected void OnPauseButton1Clicked (object sender, System.EventArgs e)
+        {
+            ProgramSpeed.Value = 0;
+            PlayButton.Sensitive = true;
+        }
+
         protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)
         {
-            if (((Gtk.Scale)o).Value == 0) {
-                PlayButton.Sensitive = true;
-                playResetEvent.Reset();
+            if (executeThread != null) { // Running prgram
+                if (((Gtk.Scale)o).Value == 0) {
+                    PlayButton.Sensitive = true;
+                    playResetEvent.Reset();
+                }
             }
         }
     }
