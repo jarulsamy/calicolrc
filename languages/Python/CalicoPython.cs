@@ -69,7 +69,11 @@ namespace CalicoPython {
 		      calico.CurrentDocument.GotoLine((int)frame.f_lineno);
 		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
 		    });
-		  System.Threading.Thread.Sleep((int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000));
+		  if (calico.ProgramSpeed.Value == 0) {
+		    calico.playResetEvent.WaitOne();
+		  } else {
+		    System.Threading.Thread.Sleep((int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000));
+		  }
 		  return OnTraceBack;
 		}
 		

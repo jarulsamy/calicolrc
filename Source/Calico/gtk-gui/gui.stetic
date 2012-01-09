@@ -550,7 +550,6 @@
               <widget class="Gtk.HScale" id="debugSpeed">
                 <property name="MemberName" />
                 <property name="WidthRequest">100</property>
-                <property name="Sensitive">False</property>
                 <property name="CanFocus">True</property>
                 <property name="Inverted">True</property>
                 <property name="Upper">100</property>
@@ -560,29 +559,12 @@
                 <property name="DrawValue">False</property>
                 <property name="Digits">0</property>
                 <property name="ValuePos">Top</property>
+                <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
               </widget>
               <packing>
                 <property name="Position">6</property>
                 <property name="AutoSize">False</property>
                 <property name="Expand">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="_pauseButton">
-                <property name="MemberName" />
-                <property name="Sensitive">False</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-media-pause LargeToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <signal name="Clicked" handler="OnPauseButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">7</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
               </packing>
             </child>
             <child>
@@ -597,7 +579,7 @@
                 <signal name="Clicked" handler="OnPlayButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">8</property>
+                <property name="Position">7</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -684,7 +666,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">9</property>
+                <property name="Position">8</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>

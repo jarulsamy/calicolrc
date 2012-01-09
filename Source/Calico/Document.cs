@@ -236,6 +236,12 @@ namespace Calico {
 
         public virtual void UpdateZoom() {
         }
+        public virtual void ZoomIn() {
+        }
+        public virtual void ZoomOut() {
+        }
+        public virtual void DefaultZoom() {
+        }
     }
 
     public class TextDocument : Document {

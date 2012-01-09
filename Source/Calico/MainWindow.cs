@@ -37,6 +37,7 @@ namespace Calico {
         public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
         public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag, Gtk.TextTag>();
         public static Dictionary<Tag, string> tagnames = new Dictionary<Tag, string>();
+        public ManualResetEvent playResetEvent = new ManualResetEvent(false);
         public Gtk.RadioMenuItem language_group;
         public LanguageManager manager;
         public string CurrentLanguage = null;
@@ -99,7 +100,7 @@ namespace Calico {
         public Document GetDocument(string name) {
             for (int i = 0; i < DocumentNotebook.NPages; i++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
-                if (documents.ContainsKey(widget)  && documents[widget].filename.Contains(name))
+                if (documents.ContainsKey(widget) && documents[widget].filename.Contains(name))
                     return documents[widget];
             }
             return null;
@@ -138,9 +139,6 @@ namespace Calico {
         }
         public Gtk.Button StopButton {
             get { return _stopButton; }
-        }
-        public Gtk.Button PauseButton {
-            get { return _pauseButton; }
         }
         public Gtk.Button PlayButton {
             get { return _playButton; }
@@ -1129,8 +1127,6 @@ namespace Calico {
         public void OnStartRunning() {
             StartButton.Sensitive = false;
             StartAction.Sensitive = false;
-            PlayButton.Sensitive = false;
-            PauseButton.Sensitive = false;
             StopButton.Sensitive = true;
             noAction.Sensitive = true;
         }
@@ -1143,21 +1139,18 @@ namespace Calico {
                     StartButton.Sensitive = true; // need something to execute
                     StartAction.Sensitive = true;
                     ProgramSpeed.Sensitive = true;
-                    PlayButton.Sensitive = true;
-                    PauseButton.Sensitive = true;
+                    PlayButton.Sensitive = false;
                 } else {
                     StartButton.Sensitive = false; // need something to execute
                     StartAction.Sensitive = false;
                     ProgramSpeed.Sensitive = false;
                     PlayButton.Sensitive = false;
-                    PauseButton.Sensitive = false;
                 }
             } else { // Shell
                 StartButton.Sensitive = false; // need something to execute
                 StartAction.Sensitive = false;
                 ProgramSpeed.Sensitive = false;
                 PlayButton.Sensitive = false;
-                PauseButton.Sensitive = false;
             }
             executeThread = null;
             /*
@@ -1268,15 +1261,9 @@ namespace Calico {
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true;
                     StartAction.Sensitive = true;
-                    ProgramSpeed.Sensitive = true;
-                    PauseButton.Sensitive = true;
-                    PlayButton.Sensitive = true;
                 } else {
                     StartButton.Sensitive = false;
                     StartAction.Sensitive = false;
-                    ProgramSpeed.Sensitive = false;
-                    PauseButton.Sensitive = false;
-                    PlayButton.Sensitive = false;
                 }
                 SetLanguage(CurrentDocument.language);
                 CurrentDocument.widget.Child.GrabFocus();
@@ -1285,7 +1272,6 @@ namespace Calico {
                 StartButton.Sensitive = false;
                 StartAction.Sensitive = false;
                 ProgramSpeed.Sensitive = false;
-                PauseButton.Sensitive = false;
                 PlayButton.Sensitive = false;
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
@@ -1293,13 +1279,11 @@ namespace Calico {
                     ProgramSpeed.Sensitive = false;
                     StartAction.Sensitive = true;
                     StartButton.Sensitive = true;
-                    PauseButton.Sensitive = false;
                     PlayButton.Sensitive = false;
                 } else {
                     StartButton.Sensitive = false;
                     StartAction.Sensitive = false;
                     ProgramSpeed.Sensitive = false;
-                    PauseButton.Sensitive = false;
                     PlayButton.Sensitive = false;
                 }
                 SetLanguage(ShellLanguage);
@@ -1313,7 +1297,6 @@ namespace Calico {
                 StartButton.Sensitive = false;
                 StartAction.Sensitive = false;
                 ProgramSpeed.Sensitive = false;
-                PauseButton.Sensitive = false;
                 PlayButton.Sensitive = false;
                 // Some other page
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
@@ -1532,6 +1515,19 @@ namespace Calico {
             }
         }
 
+        protected void DefaultZoom()
+        {
+            Shell.Options.FontName = GetFont().ToString();
+            Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget)) {
+                 documents[widget].DefaultZoom();
+                 documents[widget].UpdateZoom();
+                }
+            }
+        }
+
         protected void OnZoomInActionActivated (object sender, System.EventArgs e)
         {
             config.SetValue("config", "font-size",
@@ -1540,8 +1536,10 @@ namespace Calico {
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
 	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                if (documents.ContainsKey(widget))
-		            documents[widget].UpdateZoom();
+                if (documents.ContainsKey(widget)) {
+                    documents[widget].ZoomIn();
+                    documents[widget].UpdateZoom();
+                }
             }
         }
 
@@ -1554,8 +1552,10 @@ namespace Calico {
                 Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
     	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                     Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget))
-    		            documents[widget].UpdateZoom();
+                    if (documents.ContainsKey(widget)) {
+                        documents[widget].ZoomOut();
+                        documents[widget].UpdateZoom();
+                    }
                 }
             }
         }
@@ -1580,14 +1580,15 @@ namespace Calico {
             OnYesAction1Activated(sender, e);
         }
 
-        protected void OnPauseButtonClicked (object sender, System.EventArgs e)
-        {
-            throw new System.NotImplementedException ();
-        }
-
         protected void OnPlayButtonClicked (object sender, System.EventArgs e)
         {
-            throw new System.NotImplementedException ();
+            playResetEvent.Set();
+            if (debugSpeed.Value == 0) {
+                Thread.Sleep(1);
+                playResetEvent.Reset(); // set it again!
+            } else {
+                PlayButton.Sensitive = false;
+            }
         }
 
         protected void OnPrintActionActivated (object sender, System.EventArgs e)
@@ -1911,6 +1912,14 @@ namespace Calico {
         protected void OnWhatSNewActionActivated (object sender, System.EventArgs e)
         {
             System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
+        }
+
+        protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)
+        {
+            if (((Gtk.Scale)o).Value == 0) {
+                PlayButton.Sensitive = true;
+                playResetEvent.Reset();
+            }
         }
     }
 }
