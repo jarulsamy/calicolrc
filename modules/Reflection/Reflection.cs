@@ -405,6 +405,46 @@ namespace Reflection
 			return retval;
 		}
 		
+		public static List<string> getConstructorNames (string aname)
+		{
+			Assembly assembly = getAssembly (aname);
+			List<string > retval = new List<string> ();
+			foreach (ConstructorInfo ci in 
+	       			assembly.GetType().GetConstructors(BindingFlags.Public)) {
+				retval.Add (ci.Name);
+			}
+			retval.Sort ();
+			return retval;
+		}
+
+		public static List<string> getConstructorNames (string aname, string tname, Mapping mapping)
+		{
+			Type type = getType (aname, tname);
+			// first see if there is a map file of particular name
+			// now load:
+			List<string > retval = new List<string> ();
+			foreach (ConstructorInfo ci in type.GetConstructors(BindingFlags.Public)) {
+				if (!retval.Contains (ci.Name))
+					if (mapping.CheckType(tname, ci.Name)) {
+						retval.Add (ci.Name);
+				}
+			}
+			retval.Sort ();
+			return retval;
+		}
+
+		public static List<string> getConstructorNames (string aname, string tname)
+		{
+			Type type = getType (aname, tname);
+			List<string > retval = new List<string> ();
+			foreach (ConstructorInfo ci in type.GetConstructors(BindingFlags.Public)) {
+				if (!retval.Contains (ci.Name))
+					retval.Add (ci.Name);
+			}
+			retval.Sort ();
+			return retval;
+		}
+
 		public static string ListToString(IList args) {
 			string retval = "";
             int count = args.Count;
@@ -447,6 +487,19 @@ namespace Reflection
 			return retval;
 		}
 
+
+		public static ConstructorInfo[] getConstructors (Type type)
+		{
+			// get the constructors of a Class (cls) given these flags:
+			ConstructorInfo[] constructorInfos = type.GetConstructors (BindingFlags.Public);
+			// sort methods by name:
+			Array.Sort (constructorInfos,
+		 		delegate(ConstructorInfo constructorInfo1, ConstructorInfo constructorInfo2)
+				{
+				return constructorInfo1.Name.CompareTo (constructorInfo2.Name); });
+			return constructorInfos;
+		}
+		
 		public static MemberInfo getMemberInfo (Type type, string mname)
 		{
 			foreach (MemberInfo mi in type.GetMembers()) {
