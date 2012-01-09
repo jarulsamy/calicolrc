@@ -410,7 +410,7 @@ namespace Reflection
 			Assembly assembly = getAssembly (aname);
 			List<string > retval = new List<string> ();
 			foreach (ConstructorInfo ci in 
-	       			assembly.GetType().GetConstructors(BindingFlags.Public)) {
+	       			assembly.GetType().GetConstructors()) {
 				retval.Add (ci.Name);
 			}
 			retval.Sort ();
@@ -423,7 +423,7 @@ namespace Reflection
 			// first see if there is a map file of particular name
 			// now load:
 			List<string > retval = new List<string> ();
-			foreach (ConstructorInfo ci in type.GetConstructors(BindingFlags.Public)) {
+			foreach (ConstructorInfo ci in type.GetConstructors()) {
 				if (!retval.Contains (ci.Name))
 					if (mapping.CheckType(tname, ci.Name)) {
 						retval.Add (ci.Name);
@@ -437,7 +437,7 @@ namespace Reflection
 		{
 			Type type = getType (aname, tname);
 			List<string > retval = new List<string> ();
-			foreach (ConstructorInfo ci in type.GetConstructors(BindingFlags.Public)) {
+			foreach (ConstructorInfo ci in type.GetConstructors()) {
 				if (!retval.Contains (ci.Name))
 					retval.Add (ci.Name);
 			}
@@ -491,7 +491,7 @@ namespace Reflection
 		public static ConstructorInfo[] getConstructors (Type type)
 		{
 			// get the constructors of a Class (cls) given these flags:
-			ConstructorInfo[] constructorInfos = type.GetConstructors (BindingFlags.Public);
+			ConstructorInfo[] constructorInfos = type.GetConstructors();
 			// sort methods by name:
 			Array.Sort (constructorInfos,
 		 		delegate(ConstructorInfo constructorInfo1, ConstructorInfo constructorInfo2)
