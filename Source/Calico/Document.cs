@@ -72,6 +72,11 @@ namespace Calico {
             return null;
         }
 
+        public void UseLibrary (string fullname)
+        {
+            // Tell the document to use the library "filename"
+        }
+
         public virtual void Print(Calico.MainWindow calico) {
             Save();
             if (filename != null) {

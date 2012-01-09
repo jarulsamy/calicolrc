@@ -162,23 +162,23 @@ namespace Calico {
             }
         }
 
+        protected void OnButtonWhatsNewClicked (object sender, System.EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
+        }
+
+        protected void OnButtonRecentlyUsedClicked (object sender, System.EventArgs e)
+        {
+            // Recently opened
+            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
+            ((Gtk.Menu)recents_menu.Submenu).Popup();
+        }
+
         protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {
 			// System.dll:
             System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
         }
 
-		protected void OnButton100Clicked (object sender, System.EventArgs e)
-		{
-			// Recently opened
-            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
-			recents_menu.Activate();
-		}
-		protected void OnButton25Clicked (object sender, System.EventArgs e)
-		{
-			// General Help 
-			// System.dll:
-            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Help");
-		}
         public static bool Contains(string ext, string[] extensions) {
             foreach (string lext in extensions) {
                 if (lext == ext)
@@ -279,7 +279,26 @@ namespace Calico {
                 menu.Activated += delegate { Open(null, language.name); };
             }
             file_menu.Submenu.ShowAll();
-            
+
+
+            // Use Library menu:
+            Gtk.MenuItem library_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/UseALibraryAction");
+            if (library_menu == null)
+                throw new Exception("/menubar2/EditAction/UseALibraryAction");
+            library_menu.Submenu = new Gtk.Menu();
+            // Scan for DLLs:
+            DirectoryInfo ldir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", "modules")));
+            if (ldir.Exists) {
+                foreach (FileInfo f in ldir.GetFiles("*.dll")) {
+                    Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Substring(0,
+                        f.Name.Length - 4).Replace("_", "__"));
+                    ((Gtk.Menu)library_menu.Submenu).Add(fmenu);
+                    var fullname = f.FullName;
+                    fmenu.Activated += delegate { UseLibrary(fullname); };
+                }
+            }
+            library_menu.Submenu.ShowAll();
+
             // Languages to menu items:
             Gtk.MenuItem switch_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ShellAction1/LanguageAction");
             if (switch_menu == null)
@@ -358,6 +377,13 @@ namespace Calico {
             searchbox.Hide();
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+        }
+
+        public void UseLibrary (string fullname)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.UseLibrary(fullname);
+            }
         }
 
         public void HandleException(GLib.UnhandledExceptionArgs args) {
@@ -665,10 +691,6 @@ namespace Calico {
             PickNew();
         }
 
-        protected virtual void OnButton3Clicked(object sender, System.EventArgs e) {
-            PickNew();
-
-        }
         protected void OnNewButtonClicked (object sender, System.EventArgs e)
         {
             PickNew();
@@ -708,10 +730,6 @@ namespace Calico {
                 Cleanup();
                 Gtk.Application.Quit();
             }
-        }
-
-        protected virtual void OnButton2Clicked(object sender, System.EventArgs e) {
-            OnOpenAction1Activated(sender, e);
         }
 
         protected virtual void OnCopyActionActivated(object sender, System.EventArgs e) {
@@ -1860,6 +1878,39 @@ namespace Calico {
                 });
             ev.WaitOne();
             return retval;
+        }
+
+        protected void OnButton26Clicked (object sender, System.EventArgs e)
+        {
+            // Help
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Help");
+        }
+
+        protected void OnButton3Clicked (object sender, System.EventArgs e)
+        {
+            // New
+            PickNew();
+        }
+
+        protected void OnButton7Clicked (object sender, System.EventArgs e)
+        {
+            // Open
+            OnOpenAction1Activated(sender, e);
+        }
+
+        protected void OnGettingStartedActionActivated (object sender, System.EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
+        }
+
+        protected void OnHelpAction1Activated (object sender, System.EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Help");
+        }
+
+        protected void OnWhatSNewActionActivated (object sender, System.EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
         }
     }
 }
