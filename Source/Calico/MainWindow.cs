@@ -78,6 +78,9 @@ namespace Calico {
         public Gtk.Notebook.NotebookChild EnvironmentPage {
             get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
         }
+        public Gtk.Notebook.NotebookChild LocalsPage {
+            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]);}
+        }
         public Gtk.Notebook DocumentNotebook {
             get { return notebook_docs; }
         }
@@ -1470,7 +1473,7 @@ namespace Calico {
                     EnvironmentVariables[vname] = true;
                 }
             }
-            return IsUpdateEnvironment; // keep doing
+            return IsUpdateEnvironment; // keep going
         }
 
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)
@@ -1949,5 +1952,17 @@ namespace Calico {
                 }
             }
         }
+
+        protected void OnLocalsTabActionActivated (object sender, System.EventArgs e)
+        {
+            // show tab if active
+            if (! LocalsTabAction.Active) {
+                LocalsPage.Child.Hide();
+            } else {
+                LocalsPage.Child.Show();
+                ToolNotebook.Page = 2;
+            }
+        }
+
     }
 }

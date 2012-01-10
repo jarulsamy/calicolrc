@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="839" Column="19" />
+      <File FileName="Calico/MainWindow.cs" Line="81" Column="34" />
       <File FileName="../languages/Python/CalicoPython.cs" Line="74" Column="18" />
     </Files>
   </MonoDevelop.Ide.Workbench>

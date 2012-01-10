@@ -277,7 +277,7 @@
       </action>
       <action id="EnvironmentTabAction">
         <property name="Type">Toggle</property>
-        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;e</property>
+        <property name="Accelerator">&lt;Control&gt;e</property>
         <property name="Label" translatable="yes">Environment Tab</property>
         <property name="ShortLabel" translatable="yes">Environment Tab</property>
         <property name="DrawAsRadio">False</property>
@@ -286,10 +286,12 @@
       </action>
       <action id="LocalsTabAction">
         <property name="Type">Toggle</property>
+        <property name="Accelerator">&lt;Control&gt;l</property>
         <property name="Label" translatable="yes">Locals Tab</property>
         <property name="ShortLabel" translatable="yes">Locals Tab</property>
         <property name="DrawAsRadio">False</property>
         <property name="Active">True</property>
+        <signal name="Activated" handler="OnLocalsTabActionActivated" />
       </action>
       <action id="printAction">
         <property name="Type">Action</property>
@@ -702,7 +704,7 @@
           <widget class="Gtk.VPaned" id="vpaned2">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">337</property>
+            <property name="Position">276</property>
             <child>
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />

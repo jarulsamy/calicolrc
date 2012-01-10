@@ -244,11 +244,11 @@ namespace Calico
 			this.EnvironmentTabAction = new global::Gtk.ToggleAction ("EnvironmentTabAction", global::Mono.Unix.Catalog.GetString ("Environment Tab"), null, null);
 			this.EnvironmentTabAction.Active = true;
 			this.EnvironmentTabAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Environment Tab");
-			w1.Add (this.EnvironmentTabAction, "<Control><Mod2>e");
+			w1.Add (this.EnvironmentTabAction, "<Control>e");
 			this.LocalsTabAction = new global::Gtk.ToggleAction ("LocalsTabAction", global::Mono.Unix.Catalog.GetString ("Locals Tab"), null, null);
 			this.LocalsTabAction.Active = true;
 			this.LocalsTabAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Locals Tab");
-			w1.Add (this.LocalsTabAction, null);
+			w1.Add (this.LocalsTabAction, "<Control>l");
 			this.printAction = new global::Gtk.Action ("printAction", global::Mono.Unix.Catalog.GetString ("_Print"), null, "gtk-print");
 			this.printAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Print");
 			w1.Add (this.printAction, null);
@@ -626,7 +626,7 @@ namespace Calico
 			this.vpaned2 = new global::Gtk.VPaned ();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 337;
+			this.vpaned2.Position = 276;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook ();
 			this.notebook_docs.CanFocus = true;
@@ -1151,6 +1151,7 @@ namespace Calico
 			this.selectFontAction.Activated += new global::System.EventHandler (this.SelectFont);
 			this.SwitchToShellAction.Activated += new global::System.EventHandler (this.OnShellActionActivated);
 			this.EnvironmentTabAction.Activated += new global::System.EventHandler (this.OnEnvironmentTabActionActivated);
+			this.LocalsTabAction.Activated += new global::System.EventHandler (this.OnLocalsTabActionActivated);
 			this.printAction.Activated += new global::System.EventHandler (this.OnPrintActionActivated);
 			this.ResetShellAction.Activated += new global::System.EventHandler (this.OnResetShellActionActivated);
 			this.ClearOutputAction.Activated += new global::System.EventHandler (this.OnClearOutputActionActivated);

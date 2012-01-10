@@ -2,15 +2,16 @@ Calico2
 
 Bugs
 
-* Add a Recents, Help buttons on Home
 * Search in toolbar
 * SaveAs: Warning? use Exist?: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
-* Hide Locals Tab on check box
 * Printing gives error: Cairo.Context: called from finalization thread, programmer is missing a call to Dispose
+* Ask to save unsaved files on shutdown/close tab
+* Add tooltips
+* Translations
 
 Big Tickets
 
-1. Recent Files [DONE - need to limit]
+1. Recent Files [DONE]
 1.1 History [DONE]
 2. Reset shell [DONE]
 3. Tab completion (for all expressions?)
@@ -21,15 +22,16 @@ Big Tickets
 8. Print (and newline issue on Windows) [DONE]
 9. Search/replace in Editor [GUI Done]
 10. Languages, Jigsaw, Scheme [DONE]
-11. Debug/trace
+11. Debug/trace [DONE]
 12. Goto file:line on right-click
 12.1 Show error Help button on error
-13. Config save/load [DONE - need to add all items back]
+13. Config save/load [DONE]
 14. Ask to overwrite [DONE]
 15. Ask to abort changes, save
 16. click in output to get history somehow
 17. Detect that the file has changed outside of Calico
 18. Windows/Mac/Linux versions
+19. Add a breakpoint
 
 Problems, issues, features, and questions.
 
@@ -45,6 +47,7 @@ in calico.exe.config to allow different frameworks (2 vs 4).
 NOTE:
 
 mono --runtime=v4.0 Calico.exe
+mcs -sdk:2 File.cs ...
 
 = Math.NET =
 
