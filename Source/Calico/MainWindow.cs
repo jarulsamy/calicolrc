@@ -1137,8 +1137,11 @@ namespace Calico {
             StartAction.Sensitive = false;
             StopButton.Sensitive = true;
             noAction.Sensitive = true;
-            if (ProgramSpeed.Value < 100)
+            if (ProgramSpeed.Value == 0) {
+                PlayButton.Sensitive = true;
+            } else if (ProgramSpeed.Value < 100) {
                 PauseButton.Sensitive = true;
+            }
         }
 
         public void OnStopRunning() {
@@ -1603,6 +1606,7 @@ namespace Calico {
             playResetEvent.Set();
             if (ProgramSpeed.Value != 0) {
                 PlayButton.Sensitive = false;
+                PauseButton.Sensitive = true;
             }
         }
 
@@ -1933,6 +1937,7 @@ namespace Calico {
         {
             ProgramSpeed.Value = 0;
             PlayButton.Sensitive = true;
+            PauseButton.Sensitive = false;
         }
 
         protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)

@@ -1,8 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Users\dblank\Desktop\Calico\Source\Calico\MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
-      <File FileName="c:\Users\dblank\Desktop\Calico\Source\Calico\MainWindow.cs" Line="31" Column="39" />
+      <File FileName="Calico/MainWindow.cs" Line="839" Column="19" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="74" Column="18" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
