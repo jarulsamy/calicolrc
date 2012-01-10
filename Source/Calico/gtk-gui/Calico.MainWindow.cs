@@ -69,10 +69,10 @@ namespace Calico
 		private global::Gtk.Button _playButton;
 		private global::Gtk.HBox searchbox;
 		private global::Gtk.Label label7;
-		private global::Gtk.ComboBoxEntry comboboxentry1;
-		private global::Gtk.Button button123;
-		private global::Gtk.Button button124;
-		private global::Gtk.Button button125;
+		private global::Gtk.ComboBoxEntry searchEntry;
+		private global::Gtk.Button searchNextButton;
+		private global::Gtk.Button searchPrevButton;
+		private global::Gtk.Button searchStopButton;
 		private global::Gtk.HSeparator hseparator1;
 		private global::Gtk.VPaned vpaned2;
 		private global::Gtk.Notebook notebook_docs;
@@ -524,19 +524,19 @@ namespace Calico
 			w76.Expand = false;
 			w76.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
-			this.comboboxentry1 = global::Gtk.ComboBoxEntry.NewText ();
-			this.comboboxentry1.Name = "comboboxentry1";
-			this.searchbox.Add (this.comboboxentry1);
-			global::Gtk.Box.BoxChild w77 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.comboboxentry1]));
+			this.searchEntry = global::Gtk.ComboBoxEntry.NewText ();
+			this.searchEntry.Name = "searchEntry";
+			this.searchbox.Add (this.searchEntry);
+			global::Gtk.Box.BoxChild w77 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.searchEntry]));
 			w77.Position = 1;
 			w77.Expand = false;
 			w77.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
-			this.button123 = new global::Gtk.Button ();
-			this.button123.CanFocus = true;
-			this.button123.Name = "button123";
-			this.button123.UseUnderline = true;
-			// Container child button123.Gtk.Container+ContainerChild
+			this.searchNextButton = new global::Gtk.Button ();
+			this.searchNextButton.CanFocus = true;
+			this.searchNextButton.Name = "searchNextButton";
+			this.searchNextButton.UseUnderline = true;
+			// Container child searchNextButton.Gtk.Container+ContainerChild
 			global::Gtk.Alignment w78 = new global::Gtk.Alignment (0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
 			global::Gtk.HBox w79 = new global::Gtk.HBox ();
@@ -549,18 +549,18 @@ namespace Calico
 			global::Gtk.Label w82 = new global::Gtk.Label ();
 			w79.Add (w82);
 			w78.Add (w79);
-			this.button123.Add (w78);
-			this.searchbox.Add (this.button123);
-			global::Gtk.Box.BoxChild w86 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.button123]));
+			this.searchNextButton.Add (w78);
+			this.searchbox.Add (this.searchNextButton);
+			global::Gtk.Box.BoxChild w86 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.searchNextButton]));
 			w86.Position = 2;
 			w86.Expand = false;
 			w86.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
-			this.button124 = new global::Gtk.Button ();
-			this.button124.CanFocus = true;
-			this.button124.Name = "button124";
-			this.button124.UseUnderline = true;
-			// Container child button124.Gtk.Container+ContainerChild
+			this.searchPrevButton = new global::Gtk.Button ();
+			this.searchPrevButton.CanFocus = true;
+			this.searchPrevButton.Name = "searchPrevButton";
+			this.searchPrevButton.UseUnderline = true;
+			// Container child searchPrevButton.Gtk.Container+ContainerChild
 			global::Gtk.Alignment w87 = new global::Gtk.Alignment (0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
 			global::Gtk.HBox w88 = new global::Gtk.HBox ();
@@ -573,18 +573,18 @@ namespace Calico
 			global::Gtk.Label w91 = new global::Gtk.Label ();
 			w88.Add (w91);
 			w87.Add (w88);
-			this.button124.Add (w87);
-			this.searchbox.Add (this.button124);
-			global::Gtk.Box.BoxChild w95 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.button124]));
+			this.searchPrevButton.Add (w87);
+			this.searchbox.Add (this.searchPrevButton);
+			global::Gtk.Box.BoxChild w95 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.searchPrevButton]));
 			w95.Position = 3;
 			w95.Expand = false;
 			w95.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
-			this.button125 = new global::Gtk.Button ();
-			this.button125.CanFocus = true;
-			this.button125.Name = "button125";
-			this.button125.UseUnderline = true;
-			// Container child button125.Gtk.Container+ContainerChild
+			this.searchStopButton = new global::Gtk.Button ();
+			this.searchStopButton.CanFocus = true;
+			this.searchStopButton.Name = "searchStopButton";
+			this.searchStopButton.UseUnderline = true;
+			// Container child searchStopButton.Gtk.Container+ContainerChild
 			global::Gtk.Alignment w96 = new global::Gtk.Alignment (0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
 			global::Gtk.HBox w97 = new global::Gtk.HBox ();
@@ -597,9 +597,9 @@ namespace Calico
 			global::Gtk.Label w100 = new global::Gtk.Label ();
 			w97.Add (w100);
 			w96.Add (w97);
-			this.button125.Add (w96);
-			this.searchbox.Add (this.button125);
-			global::Gtk.Box.BoxChild w104 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.button125]));
+			this.searchStopButton.Add (w96);
+			this.searchbox.Add (this.searchStopButton);
+			global::Gtk.Box.BoxChild w104 = ((global::Gtk.Box.BoxChild)(this.searchbox [this.searchStopButton]));
 			w104.Position = 4;
 			w104.Expand = false;
 			w104.Fill = false;
@@ -1169,7 +1169,10 @@ namespace Calico
 			this.debugSpeed.ChangeValue += new global::Gtk.ChangeValueHandler (this.OnDebugSpeedChangeValue);
 			this._pauseButton1.Clicked += new global::System.EventHandler (this.OnPauseButton1Clicked);
 			this._playButton.Clicked += new global::System.EventHandler (this.OnPlayButtonClicked);
-			this.button125.Clicked += new global::System.EventHandler (this.OnButton125Clicked);
+			this.searchEntry.Changed += new global::System.EventHandler (this.OnSearchEntryChanged);
+			this.searchNextButton.Clicked += new global::System.EventHandler (this.OnSearchNextButtonClicked);
+			this.searchPrevButton.Clicked += new global::System.EventHandler (this.OnSearchPrevButtonClicked);
+			this.searchStopButton.Clicked += new global::System.EventHandler (this.OnButton125Clicked);
 			this.notebook_docs.SwitchPage += new global::Gtk.SwitchPageHandler (this.OnNotebookDocsSwitchPage);
 			this.button4.Clicked += new global::System.EventHandler (this.OnButton4Clicked);
 			this.button26.Clicked += new global::System.EventHandler (this.OnButton26Clicked);

@@ -30,7 +30,6 @@ namespace Calico {
 
     public partial class MainWindow : Gtk.Window {
         public Config config;
-        bool searchBoxVisible = true;
         public Gtk.Clipboard clipboard;
         private Mono.TextEditor.TextEditor _shell;
         public Dictionary<Gtk.Widget, Document> documents = new Dictionary<Gtk.Widget, Document>();
@@ -377,8 +376,6 @@ namespace Calico {
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
-            searchbox.Hidden += HandleSearchboxHidden;
-            searchbox.Shown += HandleSearchboxShown;
             searchbox.Hide();
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
@@ -1834,54 +1831,35 @@ namespace Calico {
             }
         }
 
-        /*
-        void SearchNext() {
-            self.editor.document.texteditor.SearchPattern = self.entry.Text;
-            selection_range = self.editor.document.texteditor.SelectionRange;
-            if (selection_range) {
-                if (from_selection_start) {
-                    offset = selection_range.Offset;
-                } else {
-                    offset = selection_range.Offset + selection_range.Length;
-                }
-            } else {
-                offset = self.editor.document.texteditor.Caret.Offset;
-                search_result = self.editor.document.texteditor.SearchForward(offset);
-                if (search_result) {
-                    offset = search_result.Offset;
-                    length = search_result.Length;
-                    self.editor.document.texteditor.Caret.Offset = offset + length;
-                    self.editor.document.texteditor.SetSelection(offset,
-                                                                 offset + length);
-                    self.editor.document.texteditor.ScrollToCaret();
-                }
-            }
-        }
-        */
-
         protected void OnFindActionActivated (object sender, System.EventArgs e)
         {
-            if (!searchBoxVisible) {
-                searchbox.Show();
-                comboboxentry1.GrabFocus();
-            } else {
-                searchbox.Hide();
-            }
+            HandleSearchboxShown(sender, e);
         }
 
         void HandleSearchboxHidden (object sender, EventArgs e)
         {
-            searchBoxVisible = false;
+            searchbox.Hide();
+            if (CurrentDocument != null) {
+                CurrentDocument.SearchStop();
+                CurrentDocument.widget.Child.GrabFocus();
+            }
         }
 
         void HandleSearchboxShown (object sender, EventArgs e)
         {
-            searchBoxVisible = true;
+            searchbox.Show();
+            searchEntry.GrabFocus();
+            // FIXME: select all text
+            //searchEntry.ActiveText.SelectRegion(0, searchEntry.ActiveText.Length);
+            if (CurrentDocument != null) {
+                CurrentDocument.SearchStart();
+            }
         }
 
         protected void OnButton125Clicked (object sender, System.EventArgs e)
         {
-            searchbox.Hide();
+            // searchbox Close
+            HandleSearchboxHidden(sender, e);
         }
 
         public static bool yesno(string question) {
@@ -1964,5 +1942,25 @@ namespace Calico {
             }
         }
 
+        protected void OnSearchEntryChanged (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.SearchMore(searchEntry.ActiveText);
+            }
+        }
+
+        protected void OnSearchNextButtonClicked (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.SearchNext(searchEntry.ActiveText);
+            }
+        }
+
+        protected void OnSearchPrevButtonClicked (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.SearchPrevious(searchEntry.ActiveText);
+            }
+        }
     }
 }

@@ -53,6 +53,11 @@ namespace CalicoPython {
 	        options.PrintFunction = true;
 	        options.AllowWithStatement = true;
 	        options.TrueDivision = true;
+			// FIXME: before a executefile, __name__ is "__builtin__";
+			//        after it is "<module>"
+			// FIXME: this doesn't work:
+			//options.ModuleName = "__main__";
+            //options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
 			// Set paths:
 			ICollection<string> paths = engine.GetSearchPaths();
 	        // Let users find Calico modules:

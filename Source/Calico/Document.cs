@@ -242,6 +242,19 @@ namespace Calico {
         }
         public virtual void DefaultZoom() {
         }
+        public virtual void SearchStart() {
+        }
+        public virtual bool SearchNext(string s) {
+            return false;
+        }
+        public virtual bool SearchMore(string s) {
+            return false;
+        }
+        public virtual bool SearchPrevious(string s) {
+            return false;
+        }
+        public virtual void SearchStop() {
+        }
     }
 
     public class TextDocument : Document {
@@ -339,6 +352,59 @@ namespace Calico {
             } catch {
                 return false;
             }
+        }
+
+        bool Search(string s, bool from_selection_start) {
+            // internal to handle next/next with more text
+            int offset;
+            Mono.TextEditor.SearchResult search_result = null;
+            texteditor.SearchPattern = s;
+            var selection_range = texteditor.SelectionRange;
+            if (selection_range != null) {
+                if (from_selection_start) {
+                    offset = selection_range.Offset;
+                } else {
+                    offset = selection_range.Offset + selection_range.Length;
+                }
+            } else {
+                offset = texteditor.Caret.Offset;
+            }
+            search_result = texteditor.SearchForward(offset);
+            if (search_result != null) {
+                offset = search_result.Offset;
+                int length = search_result.Length;
+                texteditor.Caret.Offset = offset + length;
+                texteditor.SetSelection(offset, offset + length);
+                texteditor.ScrollToCaret();
+            }
+            return (search_result != null);
+        }
+
+        public override bool SearchNext(string s) {
+            return Search(s, false);
+        }
+        public override bool SearchMore(string s) {
+            // continue with more text to search
+            return Search(s, true);
+        }
+        public override bool SearchPrevious(string s) {
+            texteditor.SearchPattern = s;
+            int offset;
+            var selection_range = texteditor.SelectionRange;
+            if (selection_range != null) {
+                offset = selection_range.Offset;
+            } else {
+                offset = texteditor.Caret.Offset;
+            }
+            var search_result = texteditor.SearchBackward(offset);
+            if (search_result != null) {
+                offset = search_result.Offset;
+                int length = search_result.Length;
+                texteditor.Caret.Offset = offset + length;
+                texteditor.SetSelection(offset, offset + length);
+                texteditor.ScrollToCaret();
+            }
+            return (search_result != null);
         }
     }
 }

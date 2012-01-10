@@ -611,10 +611,11 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.ComboBoxEntry" id="comboboxentry1">
+                  <widget class="Gtk.ComboBoxEntry" id="searchEntry">
                     <property name="MemberName" />
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes" />
+                    <signal name="Changed" handler="OnSearchEntryChanged" />
                   </widget>
                   <packing>
                     <property name="Position">1</property>
@@ -624,13 +625,14 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="button123">
+                  <widget class="Gtk.Button" id="searchNextButton">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
                     <property name="Icon">stock:stock_down LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
+                    <signal name="Clicked" handler="OnSearchNextButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">2</property>
@@ -640,13 +642,14 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="button124">
+                  <widget class="Gtk.Button" id="searchPrevButton">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
                     <property name="Icon">stock:stock_up LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
+                    <signal name="Clicked" handler="OnSearchPrevButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">3</property>
@@ -656,7 +659,7 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="button125">
+                  <widget class="Gtk.Button" id="searchStopButton">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>

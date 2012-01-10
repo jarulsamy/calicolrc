@@ -192,10 +192,11 @@ namespace Calico {
             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
             Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
 	    try {
-	    if (compiler_options != null)
-	      source.Compile(compiler_options);
-	    else
-	      source.Compile();
+    	    if (compiler_options != null) {
+    	        source.Compile(compiler_options);
+            } else {
+    	      source.Compile();
+            }
 	    } catch {
 	      return null;
 	    }
