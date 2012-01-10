@@ -671,6 +671,20 @@ namespace Jigsaw
 //			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 //		}
 
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool SaveDocument(string filename) 
+		{
+		       	XmlWriterSettings settings = new XmlWriterSettings();
+		       	settings.Indent = true;
+			settings.IndentChars = "    ";
+			settings.Encoding = Encoding.ASCII;
+			using (XmlWriter xw = XmlWriter.Create(filename, settings)) {
+				this.ToXml(xw);
+			}
+			return true;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnFileSave(object sender, EventArgs e)
 		{	// Save to current file
@@ -679,13 +693,7 @@ namespace Jigsaw
 			if (_currentPath == null || _currentPath.Trim().Length == 0 ) {
 				OnFileSaveAs(sender, e);
 			} else {
-				XmlWriterSettings settings = new XmlWriterSettings();
-				settings.Indent = true;
-				settings.IndentChars = "    ";
-				settings.Encoding = Encoding.ASCII;
-				using (XmlWriter xw = XmlWriter.Create(_currentPath, settings)) {
-					this.ToXml(xw);
-				}
+			        SaveDocument(_currentPath);
 				this.Modified = false;
 			}
 		}

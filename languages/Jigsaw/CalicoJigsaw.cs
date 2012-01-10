@@ -90,6 +90,10 @@ public class CalicoJigsawDocument : Document
 	  //string filename = cvs.Export();
 	  //calico.SelectOrOpen(filename);
 	}
+       
+        public override bool SaveDocument() {
+	  return cvs.SaveDocument(filename);
+	}
 
 }
 
