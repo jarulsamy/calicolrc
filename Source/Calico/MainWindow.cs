@@ -1146,6 +1146,7 @@ namespace Calico {
             PlayButton.Sensitive = false;
             noAction.Sensitive = false;
             PauseButton.Sensitive = false;
+            StopButton.Sensitive = false;
             if (CurrentDocument != null) { // Editor
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true; // need something to execute

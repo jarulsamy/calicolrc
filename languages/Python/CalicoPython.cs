@@ -76,7 +76,9 @@ namespace CalicoPython {
 		      calico.playResetEvent.Reset();
 		    }
 		  } else {
-		    System.Threading.Thread.Sleep((int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000));
+		    int pause = (int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000);
+		    // Force at least a slight sleep, else no GUI controls
+		    System.Threading.Thread.Sleep(Math.Max(pause, 1));
 		  }
 		  return OnTraceBack;
 		}
