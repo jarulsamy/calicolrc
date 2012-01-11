@@ -40,22 +40,38 @@ namespace Jigsaw
 		// - - - Generate and return Python statement - - - - -
 		public override bool ToPython (StringBuilder o, int indent)
 		{
+			// This generates main statements right at the top level
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				o.AppendFormat ("{0}if __name__ == '__main__':\n", sindent);
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
-					b.ToPython(o, indent+1);
+					b.ToPython(o, indent);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+					o.AppendFormat ("{0}pass\n", sindent);
 				}
 				
 			} catch (Exception ex){
 				Console.WriteLine("{0} (in CControlStart.ToPython)", ex.Message);
 				return false;
 			}
+			
+//			try
+//			{
+//				string sindent = new string (' ', 2*indent);
+//				o.AppendFormat ("{0}if __name__ == '__main__':\n", sindent);
+//				if (this.OutEdge.IsConnected) {
+//					CBlock b = this.OutEdge.LinkedTo.Block;
+//					b.ToPython(o, indent+1);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
+//				}
+//				
+//			} catch (Exception ex){
+//				Console.WriteLine("{0} (in CControlStart.ToPython)", ex.Message);
+//				return false;
+//			}
 			
 			return true;
 		}
@@ -636,7 +652,7 @@ namespace Jigsaw
 					rr.Runner = this.IfEdge.LinkedTo.Block.Runner(scope, stack);
 					yield return rr;
 				}
-			}			
+			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state

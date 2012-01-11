@@ -160,11 +160,10 @@ namespace Jigsaw
 			
 			// Properties
 			CStatementProperty Stat = new CStatementProperty("Statement", "pass");
-			
 			Stat.PropertyChanged += OnPropertyChanged;
-			
 			_properties["Statement"] = Stat;
 			this.OnPropertyChanged(null, null);
+			
 		}
 		public CStatement(Double X, Double Y) : this(X, Y, null) {}
 		

@@ -35,9 +35,9 @@ namespace Jigsaw
 			
 			// Properties
 			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");
-			CVarNameProperty Arg1 = new CVarNameProperty("Arg1", "");
-			CVarNameProperty Arg2 = new CVarNameProperty("Arg2", "");
-			CVarNameProperty Arg3 = new CVarNameProperty("Arg3", "");
+			CVarNameProperty Arg1 = new CVarNameProperty("Param1", "");
+			CVarNameProperty Arg2 = new CVarNameProperty("Param2", "");
+			CVarNameProperty Arg3 = new CVarNameProperty("Param3", "");
 			
 			ProcName.PropertyChanged += OnPropertyChanged;
 			Arg1.PropertyChanged += OnPropertyChanged;
@@ -45,13 +45,13 @@ namespace Jigsaw
 			Arg3.PropertyChanged += OnPropertyChanged;
 			
 			_properties["Procedure Name"] = ProcName;
-			_properties["Arg1"] = Arg1;
-			_properties["Arg2"] = Arg2;
-			_properties["Arg3"] = Arg3;
+			_properties["Param1"] = Arg1;
+			_properties["Param2"] = Arg2;
+			_properties["Param3"] = Arg3;
 			
-			_argnames.Add ("Arg1");
-			_argnames.Add ("Arg2");
-			_argnames.Add ("Arg3");
+			_argnames.Add ("Param1");
+			_argnames.Add ("Param2");
+			_argnames.Add ("Param3");
 			
 			this.OnPropertyChanged(null, null);
 		}
@@ -232,13 +232,13 @@ namespace Jigsaw
 			this.Text = "call ...";
 			
 			// Properties
-			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
+			CVarNameProperty VarName  = new CVarNameProperty("Variable", "X");
 			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");
-			CExpressionProperty Arg1 = new CExpressionProperty("Arg1", "");
-			CExpressionProperty Arg2 = new CExpressionProperty("Arg2", "");
-			CExpressionProperty Arg3 = new CExpressionProperty("Arg3", "");
+			CExpressionProperty Arg1  = new CExpressionProperty("Param1", "");
+			CExpressionProperty Arg2  = new CExpressionProperty("Param2", "");
+			CExpressionProperty Arg3  = new CExpressionProperty("Param3", "");
 			
-			VarName.PropertyChanged += OnPropertyChanged;
+			VarName.PropertyChanged  += OnPropertyChanged;
 			ProcName.PropertyChanged += OnPropertyChanged;
 			Arg1.PropertyChanged += OnPropertyChanged;
 			Arg2.PropertyChanged += OnPropertyChanged;
@@ -246,13 +246,13 @@ namespace Jigsaw
 			
 			_properties["Variable"] = VarName;
 			_properties["Procedure Name"] = ProcName;
-			_properties["Arg1"] = Arg1;
-			_properties["Arg2"] = Arg2;
-			_properties["Arg3"] = Arg3;
+			_properties["Param1"] = Arg1;
+			_properties["Param2"] = Arg2;
+			_properties["Param3"] = Arg3;
 			
-			_argnames.Add ("Arg1");
-			_argnames.Add ("Arg2");
-			_argnames.Add ("Arg3");
+			_argnames.Add ("Param1");
+			_argnames.Add ("Param2");
+			_argnames.Add ("Param3");
 			
 			this.OnPropertyChanged(null, null);
 		}
@@ -260,15 +260,15 @@ namespace Jigsaw
 		public CProcedureCall(Double X, Double Y) : this(X, Y, null) {}
 		
         // - - - Private util to build delimited arg list string - - - - - -
-		private string argListString
+		private string paramListString
 		{
 			get {
-				List<String> arglist = new List<String>();
+				List<String> paramlist = new List<String>();
 				foreach (string aname in _argnames) {
 					if (_properties.ContainsKey(aname) && _properties[aname].Text.Length > 0) 
-						arglist.Add (_properties[aname].Text);
+						paramlist.Add (_properties[aname].Text);
 				}
-				return String.Join (", ", arglist);
+				return String.Join (", ", paramlist);
 			}
 		}
 		
@@ -294,7 +294,8 @@ namespace Jigsaw
 		public override bool Compile( ScriptEngine engine, Jigsaw.Canvas cvs )
 		{	// Compile the block code into something that can be executed.
 			
-			// Look for the procedure block being called and save a reference
+			// Look for the procedure block being called and save a reference.
+			// If a procedure block with matching signature does not exist, we have a compile error.
 			procStartBlock = null;
 			string pname = this.ProcedureName;
 			foreach (CBlock b in cvs.AllBlocks ())
@@ -332,9 +333,9 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			if (this.VariableName.Length > 0) {
-				this.Text = String.Format("{0} = {1}({2})", this.VariableName, this.ProcedureName, argListString);
+				this.Text = String.Format("{0} = {1}({2})", this.VariableName, this.ProcedureName, paramListString);
 			} else {
-				this.Text = String.Format("{0}({1})", this.ProcedureName, argListString);
+				this.Text = String.Format("{0}({1})", this.ProcedureName, paramListString);
 			}
 		}
 		
@@ -345,9 +346,9 @@ namespace Jigsaw
 			{
 				string sindent = new string (' ', 2*indent);
 				if (this.VariableName.Length > 0) {
-					o.AppendFormat("{0}{1} = {2}({3})\n", sindent, this.VariableName, this.ProcedureName, this.argListString);
+					o.AppendFormat("{0}{1} = {2}({3})\n", sindent, this.VariableName, this.ProcedureName, this.paramListString);
 				} else {
-					o.AppendFormat("{0}{1}({2})\n", sindent, this.ProcedureName, this.argListString);
+					o.AppendFormat("{0}{1}({2})\n", sindent, this.ProcedureName, this.paramListString);
 				}
 				
 				if (this.OutEdge.IsConnected) {
@@ -528,7 +529,10 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
-
+			
+//			rr.Action = EngineAction.Return;
+//			rr.Runner = null;
+			
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;

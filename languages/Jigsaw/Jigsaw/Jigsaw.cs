@@ -290,7 +290,8 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70, Widgets.CBlockPalette palette=null) {
+		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70, Widgets.CBlockPalette palette=null) 
+		{
 		  	List<CBlock> retval = new List<CBlock>();
 		  	List<string> blocknames = new List<string>();
 			
@@ -303,13 +304,13 @@ namespace Jigsaw
 					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
 					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
 					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
+					
 					for (int n = 0; n < names.Count; n++) 
 					{
 						if (mapping.CheckSignature(type_name, method_name, types[n])) 
 						{
 					    	CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
 									    					names[n], types[n], defaults[n], return_type, palette);
-					    	//property.PropertyChanged += block.OnPropertyChanged;
 					    	if (! blocknames.Contains(block.Text)) 
 							{
 					      		retval.Add(block);
@@ -1804,12 +1805,10 @@ namespace Jigsaw
 			
 			// If possible, activate another block's edge
 			foreach (CBlock b in js.AllBlocks()) {
-				//b.Deactivate(cvs);
 				// Skip if shape under drag is linked in branches to shape being moved (i.e. it is in the dragged stack)
 				if (!this.BranchesContain(b)) {
-					if (b.TryActivateWith(cvs, this)) {
-						break;
-					}
+					//b.TryActivateWith(cvs, this);		// Activates all blocks possible
+					if (b.TryActivateWith(cvs, this)) break;
 				}
 			}
 			
@@ -1882,16 +1881,15 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool TryActivateWith(Diagram.Canvas cvs, CBlock blk) 
 		{	// Try to activate an edge in this stationary block with an edge in the dragged block blk
-			foreach (CEdge prt1 in blk.Edges)
-				foreach (CEdge prt2 in this.Edges)
-					if (prt2.TryActivateWith(cvs, prt1) == true) 
+			foreach (CEdge edg1 in blk.Edges)
+				foreach (CEdge edg2 in this.Edges)
+					if (edg2.TryActivateWith(cvs, edg1) == true) 
 						return true;
 			
 			return false;
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Deactivate all activation zones
+		// - - - Deactivate all activation zones - - - - - - - - - - - - - -
 		public void Deactivate(Diagram.Canvas cvs) {
 			foreach (CEdge e in this.Edges) e.Deactivate(cvs);
 		}
@@ -1980,7 +1978,7 @@ namespace Jigsaw
 		
 		// - - Establish the putative link of an activating edge - - - -
 		public bool Connect(CEdge activatingEdge, Diagram.Canvas cvs)
-		{			
+		{
 			// Get and check the edge that this edge is activating
 			CEdge activatedEdge = activatingEdge.IsActivating;
 			if (activatedEdge == null) return false;

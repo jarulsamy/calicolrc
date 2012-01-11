@@ -18,7 +18,8 @@ namespace Jigsaw
 		Add = 1, 		// Add new block runner to call stack.
 		Replace = 2, 	// Replace current block runner with new one.
 		Remove = 3, 	// Remove current block runner only.
-		Break = 4		// Breakpoint. Stop timer.
+		Break = 4,		// Breakpoint. Stop timer.
+		Return = 5		// Stack is done. Return value and remove entire stack
 	}
 	
 	// -----------------------------------------------------------------------
@@ -73,8 +74,20 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void RemoveRunner(IEnumerator<RunnerResponse> runner) {
+		public void PopRunner(IEnumerator<RunnerResponse> runner) {
 			_stack.Remove(runner);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void PopProcedure() {
+//			// Keep popping runners until procedure top found
+//			while( !_stack[0] is C
+//			_stack.Remove(runner);
+//		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Clear() {
+			_stack.Clear ();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -220,18 +233,16 @@ namespace Jigsaw
 			return true;
 		}
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Build and return a new ScriptScope based on a ChainedDictionary - - - - -
 		public ScriptScope CreateScope(Dictionary<string,object> globals)
-		{	// Build and return a new ScriptScope based on a ChainedDictionary
-			
+		{
 			Dictionary<string,object> locals = new Dictionary<string, object>();
 			return this.CreateScope(globals, locals);
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Build and return a new ScriptScope based on two ChainedDictionaries - - - - -
 		public ScriptScope CreateScope(Dictionary<string,object> globals, Dictionary<string,object> locals)
-		{	// Build and return a new ScriptScope based on two ChainedDictionarys
-			
+		{
 			ChainedDictionary chaining  = new ChainedDictionary(locals, globals);
 			ScriptScope scope = engine.CreateScope(chaining);
 			
@@ -256,18 +267,22 @@ namespace Jigsaw
 					RunnerResponse rr = br.Current;			// Check the response
 					
 					if (rslt == false) {
-						stack.RemoveRunner(br);				// Enumerator has passed the end of the collection
+						stack.PopRunner(br);				// Enumerator has passed the end of the collection
 					} else {
 						switch (rr.Action) {				// Take appropriate action
 						case EngineAction.Break:
 							this.Stop();
 							break;
 						case EngineAction.Remove:
-							stack.RemoveRunner(br);
+							stack.PopRunner(br);
 							stack.RetVal = rr.RetVal;		// Copy returned value to temp location in stack
 							break;
+//						case EngineAction.Return:
+//							stack.PopProcedure();
+//							stack.RetVal = rr.RetVal;		// Copy returned value to temp location in stack
+//							break;
 						case EngineAction.Replace:
-							stack.RemoveRunner(br);
+							stack.PopRunner(br);
 							stack.PushRunner(rr.Runner);
 							rr.Runner.MoveNext();
 							break;

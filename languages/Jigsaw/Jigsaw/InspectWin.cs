@@ -19,6 +19,8 @@ namespace Jigsaw
 			this.Resize(300, 200);
 			this.KeepAbove = true;
 			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
+			this.ParentWindow = _cvs.ParentWindow;
+			this.DestroyWithParent = true;
 			
 			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
 			this.cvs.SelectionChanged += OnJigsawSelectionChanged;
@@ -77,7 +79,7 @@ namespace Jigsaw
 					if (b.IsFactory == false) {
 						//b.PopulatePropertiesWindow(this);
 						foreach (CProperty p in b.Properties)
-							propList.AppendValues(p);
+							if (p.Visible) propList.AppendValues(p);
 					}
 				}
 			}
@@ -338,6 +340,7 @@ namespace Jigsaw
 		
 		protected string _Name;
 		protected string _Text;
+		protected bool _Visible = true;
 		
 		// Event that is raised whenever a property value is changed. 
 		public event EventHandler PropertyChanged;
@@ -384,6 +387,16 @@ namespace Jigsaw
 			get { return _Text; }
 			set {
 				_Text = value;
+				this.RaisePropertyChanged();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual bool Visible 
+		{ 	// Setting/getting visible property
+			get { return _Visible; }
+			set {
+				_Visible = value;
 				this.RaisePropertyChanged();
 			}
 		}
@@ -449,8 +462,7 @@ namespace Jigsaw
 			if (_Source != null)
 				w.WriteAttributeString("value", _Source.GetCode());
 			else
-				w.WriteAttributeString("value", "");
-			//w.WriteAttributeString("value", _Expr.ParsedExpression());
+				w.WriteAttributeString("value", _Text);
 			w.WriteEndElement();	
 		}
 	}
@@ -470,6 +482,14 @@ namespace Jigsaw
 		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
 		{
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Statements);
+			_Compiled = _Source.Compile();
+			Text = _Source.GetCode();
+		}
+		
+		// - - - Replaces statement with given string and compile - - - - - - -
+		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, string statement) 
+		{
+			_Source = engine.CreateScriptSourceFromString(statement, Microsoft.Scripting.SourceCodeKind.Statements);
 			_Compiled = _Source.Compile();
 			Text = _Source.GetCode();
 		}
