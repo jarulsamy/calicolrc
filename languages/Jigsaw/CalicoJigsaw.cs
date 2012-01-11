@@ -64,7 +64,7 @@ public class CalicoJigsawDocument : Document
 	base(calico, filename, "jigsaw")
 	{
 		cvs = new Jigsaw.Canvas (900, 600, 3000, 2000);
-		widget.Add(cvs);
+		widget.AddWithViewport(cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
 		widget.ShowAll ();
