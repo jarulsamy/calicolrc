@@ -74,7 +74,9 @@ public class CalicoJigsawDocument : Document
 	public override void ExecuteFileInBackground ()
 	{
 		calico.Print(Calico.Tag.Info, "Running Jigsaw script...\n");
-		cvs.Run();
+		Gtk.Application.Invoke( delegate {
+			cvs.Run();
+		});
 	}
 
 	public override void ZoomIn ()
