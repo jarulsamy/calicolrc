@@ -102,6 +102,7 @@ namespace Jigsaw
 		private List<CallStack> _callStacks = null;
 		//private InspectorWindow _inspector = null;
 		private bool _inStep = false;		// true if currently executing a single step
+		private string _modulePath = null;
 		
 		//private Expression.DLRScope scope = null;
 		public ScriptRuntimeSetup scriptRuntimeSetup;
@@ -128,8 +129,10 @@ namespace Jigsaw
 		public event EventHandler EnginePause;
 		public event EventHandler EngineReset;
 		
-		public Engine ()
+		public Engine (string modulePath)
 		{
+			// Set the path to find any DLLs for the engine
+			ModulePath = modulePath;
 			scriptRuntimeSetup = new ScriptRuntimeSetup();
 			languageSetup = Python.CreateLanguageSetup(null);
 			
@@ -145,7 +148,8 @@ namespace Jigsaw
 			// Reload all assemblies
 			Assembly assembly = null;
 			foreach (string name in new string [] {"Myro", "Shapes", "Graphics"}) {
-				String tname = String.Format("/Programs/Mono/Calico-dev/modules/{0}.dll", name);
+				String tname = System.IO.Path.Combine (ModulePath, 
+				                           			   String.Format ("{0}.dll", name));
 				try {
 					assembly = Assembly.LoadFrom(tname);
 				} catch { //(System.IO.FileNotFoundException) {
@@ -164,12 +168,12 @@ namespace Jigsaw
 			// Populate scopes with assemblies
 			ScriptSource source;
 			ScriptScope scope = engine.CreateScope(globals);
-			source = engine.CreateScriptSourceFromString("import Myro", SourceCodeKind.Statements);
-			source.Execute(scope);
-			source = engine.CreateScriptSourceFromString("import Shapes", SourceCodeKind.Statements);
-			source.Execute(scope);
-			source = engine.CreateScriptSourceFromString("import Graphics", SourceCodeKind.Statements);
-			source.Execute(scope);
+			//source = engine.CreateScriptSourceFromString("import Myro", SourceCodeKind.Statements);
+			//source.Execute(scope);
+			//source = engine.CreateScriptSourceFromString("import Shapes", SourceCodeKind.Statements);
+			//source.Execute(scope);
+			//source = engine.CreateScriptSourceFromString("import Graphics", SourceCodeKind.Statements);
+			//source.Execute(scope);
 			//scope.SetVariable("_inspector", _inspector);
 			
 			compiler_options = engine.GetCompilerOptions();
@@ -192,6 +196,16 @@ namespace Jigsaw
 		public List<CallStack> CallStacks
 		{	// Return the list if CallStacks currently in the engine
 			get { return _callStacks; }
+		}
+		
+		public string ModulePath
+		{
+			// Returns the absolute module path for DLLs
+			get { return _modulePath; }
+			// Set with relative or absolute; saves absolute
+			set { 
+				_modulePath = System.IO.Path.GetFullPath(value); 
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -418,6 +432,13 @@ namespace Jigsaw
             	EngineReset(this, e);
             }
         }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void SetModulePath (string module_path)
+		{
+			throw new NotImplementedException ();
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	}
 	

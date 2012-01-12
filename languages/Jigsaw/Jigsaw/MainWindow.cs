@@ -7,9 +7,9 @@ public class JigsawWidget : Gtk.ScrolledWindow
   //Gtk.Fixed cvsFixed = null;
   public object document = null;
 
-  public JigsawWidget() {
+  public JigsawWidget(string modulePath) {
 	this.CanFocus = true;
-	cvs = new Jigsaw.Canvas(900, 600, 3000, 2000);
+	cvs = new Jigsaw.Canvas(modulePath, 900, 600, 3000, 2000);
 	this.Add (cvs);
   }
 
@@ -257,7 +257,10 @@ public class MainWindow : Gtk.Window
 //		sw.AddWithViewport(cvsFixed);
 		
 		// Create core Jigsaw Canvas
-		js = new Jigsaw.Canvas(900, 600, 3000, 2000);		
+		// "/Programs/Mono/Calico-dev/modules"
+		// For running directly from Calico/languages/Jigsaw outside of Calico:
+		js = new Jigsaw.Canvas(System.IO.Path.Combine("..", "..", "modules"), 
+		                       900, 600, 3000, 2000);		
 		js.JigsawRun += new EventHandler(OnJigsawRun);
 		js.JigsawStop += new EventHandler(OnJigsawStop);
 		js.JigsawStep += new EventHandler(OnJigsawStep);

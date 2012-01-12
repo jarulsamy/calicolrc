@@ -53,7 +53,8 @@ namespace Jigsaw
 		private bool _isRunning = false;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public Canvas(int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
+		public Canvas(string modulePath, 
+		              int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
 			// Setup some colors
 			BackColor = Diagram.Colors.LightSlateGray;
@@ -65,7 +66,7 @@ namespace Jigsaw
 			//_inspector = new Jigsaw.InspectorWindow(this);
 			
 			// Engine to run Jigsaw programs
-			_engine = new Engine();
+			_engine = new Engine(modulePath);
 			_engine.EngineRun   += OnEngineRun;
 			_engine.EngineStep  += OnEngineStep;
 			_engine.EngineStop  += OnEngineStop;
@@ -1152,6 +1153,8 @@ namespace Jigsaw
 				foreach (CEdge e in b.Edges) e._id = 0;
             }
         }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	}
 	
 	// -----------------------------------------------------------------------

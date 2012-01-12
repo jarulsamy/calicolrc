@@ -63,7 +63,8 @@ public class CalicoJigsawDocument : Document
 	public CalicoJigsawDocument (Calico.MainWindow calico, string filename) : 
 	base(calico, filename, "jigsaw")
 	{
-		cvs = new Jigsaw.Canvas (900, 600, 3000, 2000);
+		cvs = new Jigsaw.Canvas (
+			System.IO.Path.Combine (calico.path, "../modules"), 900, 600, 3000, 2000);
 		widget.AddWithViewport(cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
