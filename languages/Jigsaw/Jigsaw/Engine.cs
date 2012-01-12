@@ -168,12 +168,12 @@ namespace Jigsaw
 			// Populate scopes with assemblies
 			ScriptSource source;
 			ScriptScope scope = engine.CreateScope(globals);
-			//source = engine.CreateScriptSourceFromString("import Myro", SourceCodeKind.Statements);
-			//source.Execute(scope);
-			//source = engine.CreateScriptSourceFromString("import Shapes", SourceCodeKind.Statements);
-			//source.Execute(scope);
-			//source = engine.CreateScriptSourceFromString("import Graphics", SourceCodeKind.Statements);
-			//source.Execute(scope);
+			source = engine.CreateScriptSourceFromString("import Myro", SourceCodeKind.Statements);
+			source.Execute(scope);
+			source = engine.CreateScriptSourceFromString("import Shapes", SourceCodeKind.Statements);
+			source.Execute(scope);
+			source = engine.CreateScriptSourceFromString("import Graphics", SourceCodeKind.Statements);
+			source.Execute(scope);
 			//scope.SetVariable("_inspector", _inspector);
 			
 			compiler_options = engine.GetCompilerOptions();
