@@ -38,7 +38,7 @@ namespace Jigsaw
 		private string _currentPath = null; // path to the currently open program file
 
 		// Reference to single PropertiesWindow object
-		//private InspectorWindow _inspector = null;
+		private InspectorWindow _inspector = null;
 		
 		// Jigsaw events
 		public event EventHandler JigsawRun;
@@ -49,12 +49,19 @@ namespace Jigsaw
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
 		
+		// Path to look for modules to load
+		private string _modulePath = null;
+		
+		// Reference to block panel
+		private Widgets.CBlockPalette pnlBlock = null;
+		
+		private List<Widgets.CRoundedTab> allTabs = null;
+		
 		// A flag to help track running state
 		private bool _isRunning = false;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public Canvas(string modulePath, 
-		              int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
+		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
 			// Setup some colors
 			BackColor = Diagram.Colors.LightSlateGray;
@@ -63,74 +70,39 @@ namespace Jigsaw
 			this.CanFocus = true;
 			
 			// Properties window shared by all blocks
-			//_inspector = new Jigsaw.InspectorWindow(this);
+			_inspector = new Jigsaw.InspectorWindow(this);
+			
+			
 			
 			// Engine to run Jigsaw programs
-			_engine = new Engine(modulePath);
+			_engine = new Engine();
 			_engine.EngineRun   += OnEngineRun;
 			_engine.EngineStep  += OnEngineStep;
 			_engine.EngineStop  += OnEngineStop;
 			_engine.EnginePause += OnEnginePause;
 			_engine.EngineReset += OnEngineReset;
-			_engine.Reset(this); //, _inspector);
+			_engine.Reset(this, _inspector);
+			//_engine.Reset(this); //, _inspector);
 			
 			// Set up all widgets
+			//List<Widgets.CRoundedTab> allTabs = new List<Widgets.CRoundedTab>();
+			allTabs = new List<Widgets.CRoundedTab>();
 			
 			// Add block panel background to canvas
-			Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
-			
-			//Widgets.CSlider sl = new Widgets.CSlider(500, 100, 20, 400, 0.0);
-			//this.AddShape( sl );
-			
-			// Build tabbed panel for blocks
-			Widgets.CRoundedTab tbCtrl     = new Widgets.CRoundedTab(0,  67, 100, 30, "Control", pnlBlock);
-			Widgets.CRoundedTab tbStats    = new Widgets.CRoundedTab(0, 100, 100, 30, "Statements", pnlBlock);
-			Widgets.CRoundedTab tbInOut    = new Widgets.CRoundedTab(0, 133, 100, 30, "Input/Output", pnlBlock);
-			Widgets.CRoundedTab tbProc     = new Widgets.CRoundedTab(0, 166, 100, 30, "Procedures", pnlBlock);
-			Widgets.CRoundedTab tbMyro     = new Widgets.CRoundedTab(0, 199, 100, 30, "Myro", pnlBlock);
-			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 232, 100, 30, "Graphics", pnlBlock);
-			Widgets.CRoundedTab tbShapes   = new Widgets.CRoundedTab(0, 265, 100, 30, "Shapes", pnlBlock);
-			//Widgets.CRoundedTab tbTools    = new Widgets.CRoundedTab(0, 298, 100, 30, "Tools", pnlBlock);
-			Widgets.CRoundedTab tbNotes    = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes", pnlBlock);
-			
-			List<Widgets.CRoundedTab> allTabs = new List<Widgets.CRoundedTab>() {tbCtrl, tbStats, tbInOut, tbProc, tbMyro, tbGraphics, tbShapes, tbNotes}; //,  tbTools
-			tbCtrl.AddTabs(     allTabs );
-			tbStats.AddTabs(    allTabs );
-			tbInOut.AddTabs(    allTabs );
-			tbProc.AddTabs(     allTabs );
-			tbMyro.AddTabs(     allTabs );
-			tbGraphics.AddTabs( allTabs );
-			tbShapes.AddTabs(   allTabs );
-			//tbTools.AddTabs(    allTabs );
-			tbNotes.AddTabs(    allTabs );
-			
-			// Dock all tabs to left
-			tbInOut.Dock    = Diagram.DockSide.Left;
-			tbCtrl.Dock     = Diagram.DockSide.Left;
-			tbStats.Dock    = Diagram.DockSide.Left;
-			tbProc.Dock     = Diagram.DockSide.Left;
-			tbMyro.Dock     = Diagram.DockSide.Left;
-			tbGraphics.Dock = Diagram.DockSide.Left;
-			tbShapes.Dock   = Diagram.DockSide.Left;
-			//tbTools.Dock    = Diagram.DockSide.Left;
-			tbNotes.Dock    = Diagram.DockSide.Left;
-			
-			// Add tabs and palette to the canvas
-			this.AddShape(tbCtrl);
-			this.AddShape(tbStats);
-			this.AddShape(tbInOut);
-			this.AddShape(tbProc);
-			this.AddShape(tbMyro);
-			this.AddShape(tbGraphics);
-			this.AddShape(tbShapes);
-			//this.AddShape(tbTools);
-			this.AddShape(tbNotes);
-			
+			//Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
+			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
 			this.AddShape(pnlBlock);
 			
-			// Factory Blocks for block area
+			// Build tabbed panel for blocks
+			int tabY = 33;
 			
-			// --- Control
+			// ----- Control tab and factory blocks
+			tabY += 33;
+			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0,  tabY, 100, 30, "Control", pnlBlock);
+			tbCtrl.Dock = Diagram.DockSide.Left;
+			this.AddShape(tbCtrl);
+			allTabs.Add (tbCtrl);
+			
 			CControlStart block20 = new CControlStart(110, 70, pnlBlock);
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
@@ -155,7 +127,13 @@ namespace Jigsaw
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
 			
-			// --- Statements Blocks
+			// ----- Statement tab and factory blocks	
+			tabY += 33;
+			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, 30, "Statements", pnlBlock);
+			tbStats.Dock = Diagram.DockSide.Left;
+			this.AddShape(tbStats);
+			allTabs.Add (tbStats);
+
 			CAssignment vblock1 = new CAssignment(110, 70, pnlBlock);
 			this.AddShape(vblock1);
 			tbStats.AddShape(vblock1);
@@ -164,7 +142,17 @@ namespace Jigsaw
 			this.AddShape(vblock2);
 			tbStats.AddShape(vblock2);
 			
-			// --- IO
+			CComment bCmt1 = new CComment(110, 150, pnlBlock);
+			this.AddShape(bCmt1);
+			tbStats.AddShape(bCmt1);
+			
+			// ----- IO tab and factory blocks
+			tabY += 33;
+			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, 30, "Input/Output", pnlBlock);
+			tbInOut.Dock = Diagram.DockSide.Left;
+			this.AddShape(tbInOut);
+			allTabs.Add (tbInOut);
+			
 			CIOPrint _cioprint = new CIOPrint(110, 70, pnlBlock);
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
@@ -173,7 +161,13 @@ namespace Jigsaw
 			this.AddShape(_ciowritefile);
 			tbInOut.AddShape(_ciowritefile);
 			
-			// --- Procedures
+			// ----- Procedures tab and factory blocks
+			tabY += 33;
+			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, 30, "Procedures", pnlBlock);
+			tbProc.Dock = Diagram.DockSide.Left;
+			this.AddShape(tbProc);
+			allTabs.Add (tbProc);
+
 			CProcedureStart bProcStart = new CProcedureStart(110, 70, pnlBlock);
 			this.AddShape(bProcStart);
 			tbProc.AddShape(bProcStart);
@@ -185,33 +179,113 @@ namespace Jigsaw
 			CProcedureCall bProcCall = new CProcedureCall(110, 160, pnlBlock);
 			this.AddShape(bProcCall);
 			tbProc.AddShape(bProcCall);
-			
-			// --- Shapes
-			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
-			_shrect.FillColor = Diagram.Colors.LightYellow;
-			_shrect.LineColor = Diagram.Colors.Gray;
-			_shrect.LineWidth = 2;
-			_shrect._isFactory = true;
-			this.AddShape(_shrect);
-			tbNotes.AddShape(_shrect);
 
-			Diagram.CRoundedRectangle _shrrect = new Diagram.CRoundedRectangle(130, 115, 135, 30);
-			_shrrect.FillColor = Diagram.Colors.LightYellow;
-			_shrrect.LineColor = Diagram.Colors.Gray;
-			_shrrect.LineWidth = 2;
-			_shrrect.Radius = 8;
-			_shrrect._isFactory = true;
-			this.AddShape(_shrrect);
-			tbNotes.AddShape(_shrrect);
+			// Add all tabs to each tabs so that they work as expected
+			foreach (Widgets.CRoundedTab tab in allTabs) tab.AddTabs( allTabs );
 			
-			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
-			_shellipse.FillColor = Diagram.Colors.LightYellow;
-			_shellipse.LineColor = Diagram.Colors.Gray;
-			_shellipse.LineWidth = 2;
-			_shellipse._isFactory = true;
-			this.AddShape(_shellipse);
-			tbNotes.AddShape(_shellipse);
+			// Bring panel to top after all tabs added to canvas
+			pnlBlock.BringToFront(this);
 			
+			// Look for map files in module path and try to load
+			if (modulePath != null) {
+				// Look for all map files and load
+				string[] filePaths = System.IO.Directory.GetFiles(modulePath, "*.map");
+				
+				// Give each a go
+				foreach (string pth in filePaths) {
+					try {
+						UseLibrary(pth);
+					} catch (Exception ex){
+						Console.WriteLine (ex.Message);
+					}
+				}
+			}
+			
+			// Select first tab
+			tbCtrl.SetToggle(this, true);
+			
+			// No changes so far
+			this.Modified = false;
+			
+			// Init to starting state with initial set of blocks
+			this.OnFileNew(null, null);
+			
+//			// ----- Myro tab and factory blocks
+//			Widgets.CRoundedTab tbMyro = new Widgets.CRoundedTab(0, 199, 100, 30, "Myro", pnlBlock);
+//			tbMyro.Dock = Diagram.DockSide.Left;
+//			this.AddShape(tbMyro);
+//			allTabs.Add (tbMyro);
+//			
+//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Myro.dll") == false) {
+//				Console.WriteLine ("Failed to load Myro");	
+//			} else {
+//				foreach (CBlock cblock in makeBlocksFromDll("Myro", 70, pnlBlock)) {
+//				  this.AddShape(cblock);
+//				  tbMyro.AddShape(cblock);
+//				}
+//			}
+//
+//			// ----- Graphics tab and factory blocks
+//			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 232, 100, 30, "Graphics", pnlBlock);
+//			tbGraphics.Dock = Diagram.DockSide.Left;
+//			this.AddShape(tbGraphics);
+//			allTabs.Add (tbGraphics);
+//			
+//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Graphics.dll") == false) {
+//				Console.WriteLine ("Failed to load Graphics");	
+//			} else {
+//				foreach (CBlock cblock in makeBlocksFromDll("Graphics", 70, pnlBlock)) {
+//				  this.AddShape(cblock);
+//				  tbGraphics.AddShape(cblock);
+//				}
+//			}			
+//
+//			// ----- Shapes tab and factory blocks
+//			Widgets.CRoundedTab tbShapes = new Widgets.CRoundedTab(0, 265, 100, 30, "Shapes", pnlBlock);
+//			tbShapes.Dock = Diagram.DockSide.Left;
+//			this.AddShape(tbShapes);
+//			allTabs.Add (tbShapes);
+//			
+//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Shapes.dll") == false) {
+//				Console.WriteLine ("Failed to load Shapes");	
+//			} else {
+//				foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70, pnlBlock)) {
+//				  this.AddShape(cblock);
+//				  tbShapes.AddShape(cblock);
+//				}
+//			}
+			
+//			// ----- Notes tab and factory blocks
+//			Widgets.CRoundedTab tbNotes = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes", pnlBlock);
+//			tbNotes.Dock = Diagram.DockSide.Left;
+//			this.AddShape(tbNotes);
+//			allTabs.Add (tbNotes);
+//			
+//			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
+//			_shrect.FillColor = Diagram.Colors.LightYellow;
+//			_shrect.LineColor = Diagram.Colors.Gray;
+//			_shrect.LineWidth = 2;
+//			_shrect._isFactory = true;
+//			this.AddShape(_shrect);
+//			tbNotes.AddShape(_shrect);
+//
+//			Diagram.CRoundedRectangle _shrrect = new Diagram.CRoundedRectangle(130, 115, 135, 30);
+//			_shrrect.FillColor = Diagram.Colors.LightYellow;
+//			_shrrect.LineColor = Diagram.Colors.Gray;
+//			_shrrect.LineWidth = 2;
+//			_shrrect.Radius = 8;
+//			_shrrect._isFactory = true;
+//			this.AddShape(_shrrect);
+//			tbNotes.AddShape(_shrrect);
+//			
+//			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
+//			_shellipse.FillColor = Diagram.Colors.LightYellow;
+//			_shellipse.LineColor = Diagram.Colors.Gray;
+//			_shellipse.LineWidth = 2;
+//			_shellipse._isFactory = true;
+//			this.AddShape(_shellipse);
+//			tbNotes.AddShape(_shellipse);
+//
 //			Diagram.CConnector _shconn = new Diagram.CConnector(
 //			                             	new List<Diagram.CPoint>() { 
 //												new Diagram.CPoint(130, 210), 
@@ -224,25 +298,7 @@ namespace Jigsaw
 //			_shconn._isFactory = true;
 //			this.AddShape(_shconn);
 //			tbNotes.AddShape(_shconn);
-			
-			// --- Myro
-			foreach (CBlock cblock in makeBlocksFromDll("Myro", 70, pnlBlock)) {
-			  this.AddShape(cblock);
-			  tbMyro.AddShape(cblock);
-			}
-			
-			// --- Graphics Blocks
-			foreach (CBlock cblock in makeBlocksFromDll("Graphics", 70, pnlBlock)) {
-			  this.AddShape(cblock);
-			  tbGraphics.AddShape(cblock);
-			}
-			
-			// --- Shapes Blocks
-			foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70, pnlBlock)) {
-			  this.AddShape(cblock);
-			  tbShapes.AddShape(cblock);
-			}
-			
+
 //			// --- Run tab
 //			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
 //			bRun.Dock = Diagram.DockSide.Left;
@@ -268,62 +324,223 @@ namespace Jigsaw
 //			bStep.MouseDown += OnStepMouseDown;
 //			this.AddShape(bStep);
 //			tbTools.AddShape(bStep);
-			
-			// Select first tab
-			tbCtrl.SetToggle(this, true);
-			
-			// No changes so far
-			this.Modified = false;
-			
-			this.OnFileNew(null, null);
-			
-//			// Starting blocks
-//			CControlStart b1 = new CControlStart(410, 70);
-//			CControlEnd   b2 = new CControlEnd(410, 150);
-//			this.AddShape(b1);
-//			this.AddShape(b2);
-//			
-//			// Connect and reposition
-//			b1.OutEdge.LinkedTo = b2.InEdge;
-//			b2.InEdge.LinkedTo = b1.OutEdge;
-//			b2.RepositionBlocks(b2.InEdge);
-			
 		}
-
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70, Widgets.CBlockPalette palette=null) 
+		public string ModulePath
 		{
-		  	List<CBlock> retval = new List<CBlock>();
-		  	List<string> blocknames = new List<string>();
-			
-		  	Reflection.Utils.Mapping mapping = new Reflection.Utils.Mapping(assembly_name, "level-1");
-		  	foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name))
-			{
-		    	foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) 
-				{
-					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
-					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
-					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
-					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
-					
-					for (int n = 0; n < names.Count; n++) 
-					{
-						if (mapping.CheckSignature(type_name, method_name, types[n])) 
-						{
-					    	CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
-									    					names[n], types[n], defaults[n], return_type, palette);
-					    	if (! blocknames.Contains(block.Text)) 
-							{
-					      		retval.Add(block);
-					      		blocknames.Add(block.Text);
-					      		y += 40;
-					    	}
-					  	}
-					}							
-				}
-		  	}
-		  	return retval;
+			// Returns the absolute module path for DLLs
+			get { return _modulePath; }
+			// Set with relative or absolute; saves absolute
+			set {
+				if (value == null)
+					_modulePath = null;
+				else
+					_modulePath = System.IO.Path.GetFullPath(value); 
+			}
 		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool UseLibrary(string mapfile)
+		{
+			// Load and build blocks from assembly mapfile
+			List<CBlock> blocks = new List<CBlock>();
+			string assembly_name = "";
+	        string type_name = "";
+	        string method_name = "";
+			string constructor_name = "";
+			string return_type = "";
+			
+			List<string> param_names = null;
+			List<string> param_type_names = null;
+			List<Type> param_types = null;
+			List<string> param_defaults = null;
+			
+			int y = 70;
+			CBlock block = null;
+			
+			try
+			{
+				using (XmlReader xr = XmlTextReader.Create(mapfile)) {
+			        while (xr.Read()) {
+			            switch (xr.NodeType) {
+						
+			            case XmlNodeType.Element:
+			                string name = xr.Name.ToLower();
+							
+			                switch (name) {
+			                case "map":
+								// TODO: If assembly not found, stop immediately.
+								// Start by loading the assembly
+								string assembly_path = xr.GetAttribute("path");
+								engine.LoadAssembly(assembly_path);
+			                    break;
+								
+							case "method":
+								assembly_name = xr.GetAttribute("assembly_name");
+			                    type_name     = xr.GetAttribute("type_name");
+			                    method_name   = xr.GetAttribute("method_name");
+								return_type   = xr.GetAttribute("return_type");
+								
+								// Create new containers for new object. 
+								// These must be new, they cannot be cleared because they are passed by ref to the constructor.
+								param_names = new List<string>();
+								param_type_names = new List<string>();
+								param_types = new List<Type>();
+								param_defaults = new List<string>();
+								
+			                    break;
+
+							case "constructor":
+								assembly_name    = xr.GetAttribute("assembly_name");
+			                    type_name        = xr.GetAttribute("type_name");
+			                    constructor_name = xr.GetAttribute("constructor_name");
+								return_type      = type_name;		// Constructors return instances of themselves
+								
+								// Create new containers for new object. 
+								// These must be new, they cannot be cleared because they are passed by ref to the constructor.
+								param_names = new List<string>();
+								param_type_names = new List<string>();
+								param_types = new List<Type>();
+								param_defaults = new List<string>();
+								
+			                    break;
+								
+			                case "parameter":
+			                    string param_name    = xr.GetAttribute("name");
+			                    string param_type    = xr.GetAttribute("type");
+			                    string param_default = xr.GetAttribute("default");
+								
+								param_names.Add(param_name);
+								param_type_names.Add(param_type);
+								//param_types.Add( System.Type.GetType(param_type) );
+								param_defaults.Add (param_default);
+								
+			                    break;
+		
+			                }
+			                break;
+							
+						case XmlNodeType.EndElement:
+							name = xr.Name.ToLower();
+							
+							switch (name) {
+			                case "method":
+						    	block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+										    			 param_names, param_type_names, param_defaults, 
+														 return_type, pnlBlock);
+								block.Visible = false;
+					      		blocks.Add(block);
+					      		y += 40;
+		
+								break;
+								
+			                case "constructor":
+								return_type = type_name;
+						    	block = new CMethodBlock(110, y, assembly_name, type_name, type_name, 
+										    			 param_names, param_type_names, param_defaults, 
+								                         return_type, pnlBlock);
+								block.Visible = false;
+					      		blocks.Add(block);
+					      		y += 40;
+		
+								break;
+							}
+							break;
+			            }
+			        }
+			        xr.Close();
+				}
+				
+				
+				// Get next available tab location
+				double tabY = 0.0;
+				foreach (Widgets.CRoundedTab tt in allTabs) {
+					if (tt.Top > tabY) tabY = tt.Top;
+				}
+				
+				// Add tab
+				tabY += 33.0;
+				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, 30, assembly_name, pnlBlock);
+				tab.Dock = Diagram.DockSide.Left;
+				this.AddShape(tab);
+				pnlBlock.BringToFront(this);
+				
+				// Add this tab to all other tabs
+				foreach (Widgets.CRoundedTab tt in allTabs) tt.AddTab(tab);
+				
+				// Add all other tabs to this tab
+				tab.AddTabs (allTabs);
+				
+				// Add this tab to list of all tabs
+				allTabs.Add (tab);
+				
+				// Add blocks
+				foreach (CBlock cblock in blocks) {
+				  this.AddShape(cblock);
+				  tab.AddShape(cblock);
+				}
+				
+				// Select the new tab
+				tab.SetToggle(this, true);
+				
+				// Redraw
+				this.Invalidate();
+				
+				return true;
+				
+			} catch (Exception ex) {
+					
+				// Inform user of error
+				Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+					null,
+					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+					Gtk.MessageType.Error,
+					Gtk.ButtonsType.Ok,
+					String.Format ("Unable to load library:\n\n{0}", ex.Message));
+				dlg2.Title = "Library load failed";
+				
+				Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+				dlg2.Destroy();
+				
+				return false;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public static List<CBlock> makeBlocksFromDll(string assembly_name, int y=70, Widgets.CBlockPalette palette=null) 
+//		{
+//		  	List<CBlock> retval = new List<CBlock>();
+//		  	List<string> blocknames = new List<string>();
+//			
+//		  	Reflection.Utils.Mapping mapping = new Reflection.Utils.Mapping(assembly_name, "level-1");
+//		  	foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name))
+//			{
+//		    	foreach (string method_name in Reflection.Utils.getStaticMethodNames(assembly_name, type_name, mapping)) 
+//				{
+//					List<List<string>> names = Reflection.Utils.getParameterNames(assembly_name, type_name, method_name);
+//					List<List<Type>> types = Reflection.Utils.getParameterTypes(assembly_name, type_name, method_name);
+//					List<List<object>> defaults = Reflection.Utils.getParameterDefaults(assembly_name, type_name, method_name, mapping);
+//					Type return_type = Reflection.Utils.getMethodReturnType(assembly_name, type_name, method_name);
+//					
+//					for (int n = 0; n < names.Count; n++) 
+//					{
+//						if (mapping.CheckSignature(type_name, method_name, types[n])) 
+//						{
+//					    	CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+//									    					names[n], types[n], defaults[n], return_type, palette);
+//					    	if (! blocknames.Contains(block.Text)) 
+//							{
+//					      		retval.Add(block);
+//					      		blocknames.Add(block.Text);
+//					      		y += 40;
+//					    	}
+//					  	}
+//					}							
+//				}
+//		  	}
+//		  	return retval;
+//		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Engine engine
@@ -344,37 +561,7 @@ namespace Jigsaw
 				_currentPath = value;
 			}
 		}
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		void OnResetMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-//		{
-//			_engine.Reset(this); //, _inspector);
-//			//_inspector.ClearLocals();
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		void OnStepMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-//		{
-//			// Step the engine
-//			_engine.Step();
-//			
-//			// Update the locals display
-//			//_inspector.DisplayLocals(_engine);
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		void OnStopMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-//		{
-//			_engine.Stop();
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		void OnRunMouseDown(Diagram.CShape shp, Diagram.ShapeEventArgs e)
-//		{
-//			if (_engine.IsRunning == false) _engine.Reset(this); //, _inspector);
-//			_engine.Run();
-//		}
-		
+
 		// - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
         public void RaiseJigsawRun()
         {
@@ -419,7 +606,8 @@ namespace Jigsaw
 		public void Run()
 		{
 			//if (_engine.IsRunning == false) _engine.Reset(this); //, _inspector);
-			if (!_isRunning) engine.Reset(this);
+			//if (!_isRunning) engine.Reset(this);
+			if (!_isRunning) engine.Reset(this, _inspector);
 			_isRunning = true;
 			_engine.Run();
 			RaiseJigsawRun();
@@ -429,7 +617,8 @@ namespace Jigsaw
 		public void Stop()
 		{
 			_engine.Stop();
-			_engine.Reset(this);
+			_engine.Reset(this, _inspector);
+			//_engine.Reset(this);
 			_isRunning = false;
 			//RaiseJigsawStop();	// Already raised in OnEngineStop
 		}
@@ -444,7 +633,8 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Step()
 		{
-			if (!_isRunning) engine.Reset(this);
+			//if (!_isRunning) engine.Reset(this);
+			if (!_isRunning) engine.Reset(this, _inspector);
 			_isRunning = true;
 			//_engine.Stop();
 			_engine.Step();
@@ -463,6 +653,9 @@ namespace Jigsaw
 		void OnEngineStep(object sender, EventArgs e)
 		{	
 			this.Invalidate();
+			
+			// Update the locals display
+			//_inspector.DisplayLocals(_engine);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -660,25 +853,25 @@ namespace Jigsaw
 //		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected void OnInspectorShow(object sender, EventArgs e)
-//		{
-//			this.ShowInspectorWindow();
-//		}
+		protected void OnInspectorShow(object sender, EventArgs e)
+		{
+			this.ShowInspectorWindow();
+		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void ShowInspectorWindow()
-//		{
-//			_inspector.ShowAll();
-//			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
-//			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
-//		}
+		public void ShowInspectorWindow()
+		{
+			_inspector.ShowAll();
+			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
+			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
+		}
 
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool SaveDocument(string filename) 
 		{
-		       	XmlWriterSettings settings = new XmlWriterSettings();
-		       	settings.Indent = true;
+	       	XmlWriterSettings settings = new XmlWriterSettings();
+	       	settings.Indent = true;
 			settings.IndentChars = "    ";
 			settings.Encoding = Encoding.ASCII;
 			using (XmlWriter xw = XmlWriter.Create(filename, settings)) {
@@ -695,7 +888,7 @@ namespace Jigsaw
 			if (_currentPath == null || _currentPath.Trim().Length == 0 ) {
 				OnFileSaveAs(sender, e);
 			} else {
-			        SaveDocument(_currentPath);
+				SaveDocument(_currentPath);
 				this.Modified = false;
 			}
 		}
@@ -1153,8 +1346,6 @@ namespace Jigsaw
 				foreach (CEdge e in b.Edges) e._id = 0;
             }
         }
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	}
 	
 	// -----------------------------------------------------------------------
@@ -1166,7 +1357,7 @@ namespace Jigsaw
 		
 		protected int _textYOffset = 0;					// Y offset for when a block's text
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
-				
+		
 		protected Gtk.Window _propDialog = null;
 		protected Gtk.Window _contextMenu = null;
 
@@ -1475,20 +1666,19 @@ namespace Jigsaw
 			
             // Finally, draw any shape decorator shapes
             this.DrawDecorators(g);
-			
+
 			g.Restore();
         }
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected virtual void DrawLabels(Cairo.Context g) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected virtual void DrawLabels(Cairo.Context g)
+		{
 			if (this.Text.Length > 0)
             {
 	            double x = this.left;
 	            double y = this.top;
 	            double w = this.width;
 	            //double h = this.height;
-				
-				//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
 				
 				double cx = x + 0.5*w;
 				double cy = y + 0.5*20;
@@ -1506,10 +1696,6 @@ namespace Jigsaw
 				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
 				
 				layout.SetText(text);
-//				layout.GetSize(out layoutWidth, out layoutHeight);
-//				double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-//				double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-				//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset);
 				g.MoveTo(x+10.0, y+3.0+_textYOffset);
 				Pango.CairoHelper.ShowLayout(g, layout);
             }
@@ -1645,10 +1831,9 @@ namespace Jigsaw
 			return rslt;
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Handle mouse down event - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
-        {	// Handle mouse down event
-			
+        {
 			// Override default behavior in CShape
 			
             // If the canvas is in the editing state
@@ -1694,15 +1879,14 @@ namespace Jigsaw
 			}
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected override bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) {
-			// Create the context menu for this block
-			
+		// - - - Create the context menu for this block - - - - - - - - - - -
+		protected override bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) 
+		{
 			// Cache info
 			_cvs = cvs;
 			_X = X;
 			_Y = Y;
-	
+			
 			// Create and show context menu
 			Gtk.Menu mnu = new Gtk.Menu();
 			
@@ -1742,11 +1926,11 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected void OnInspectorShow(object sender, EventArgs e)
-//		{
-//			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
-//			_cvs = null;
-//		}
+		protected void OnInspectorShow(object sender, EventArgs e)
+		{
+			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
+			_cvs = null;
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnToggleBreakpoint(object sender, EventArgs e)

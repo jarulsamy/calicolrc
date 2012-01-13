@@ -258,4 +258,97 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
+	
+	// --- Generic Python statement block shape class --------------------------------
+    public class CComment : CBlock
+    {
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 40)	}),
+				palette )
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.Gray;
+			this.FillColor = Diagram.Colors.LightYellow;;
+			this.Sizable = true;
+			
+			// Properties
+			CStringProperty comment = new CStringProperty("Comment", "Comment");
+			comment.PropertyChanged += OnPropertyChanged;
+			_properties["Comment"] = comment;
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CComment(Double X, Double Y) : this(X, Y, null) {}
+		
+        // - - - Update text when property changes - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{
+			this.Text = String.Format("{0}", this["Comment"]);
+		}
+		
+		// - - - Return a list of all edges - - - - - - - - - - - - - - - -
+		public override List<CEdge> Edges 
+		{	// No edges on a comment
+			get {
+				return new List<CEdge>();
+			}
+		}
+		
+		// - - - Draw comment so it wraps within the block shape - - - - - - -
+		protected override void DrawLabels(Cairo.Context g)
+		{
+			if (this.Text.Length > 0)
+            {
+	            double x = this.left;
+	            double y = this.top;
+	            double w = this.width;
+	            //double h = this.height;
+				
+				double cx = x + 0.5*w;
+				double cy = y + 0.5*20;
+
+				//int layoutWidth, layoutHeight;
+				
+				g.Color = this.TextColor;
+
+				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+				Pango.FontDescription desc = Pango.FontDescription.FromString(
+						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+				layout.FontDescription = desc;
+				layout.Alignment = Pango.Alignment.Left; //Center;
+				//layout.Ellipsize = Pango.EllipsizeMode.End;
+				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
+				
+				layout.SetText(text);
+				g.MoveTo(x+10.0, y+3.0+_textYOffset);
+				Pango.CairoHelper.ShowLayout(g, layout);
+            }
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected override void SetPath(Cairo.Context g) 
+		{	// Base block outline graphics path figure
+			double x = this.left;
+            double y = this.top;
+            double w = this.width;
+            double h = this.height;
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
+			
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+		}
+
+    }
 }

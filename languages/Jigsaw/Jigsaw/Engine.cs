@@ -100,9 +100,8 @@ namespace Jigsaw
 	public class Engine
 	{
 		private List<CallStack> _callStacks = null;
-		//private InspectorWindow _inspector = null;
+		private InspectorWindow _inspector = null;
 		private bool _inStep = false;		// true if currently executing a single step
-		private string _modulePath = null;
 		
 		//private Expression.DLRScope scope = null;
 		public ScriptRuntimeSetup scriptRuntimeSetup;
@@ -129,10 +128,8 @@ namespace Jigsaw
 		public event EventHandler EnginePause;
 		public event EventHandler EngineReset;
 		
-		public Engine (string modulePath)
+		public Engine ()
 		{
-			// Set the path to find any DLLs for the engine
-			ModulePath = modulePath;
 			scriptRuntimeSetup = new ScriptRuntimeSetup();
 			languageSetup = Python.CreateLanguageSetup(null);
 			
@@ -145,41 +142,58 @@ namespace Jigsaw
 			engine = scriptRuntime.GetEngine("py");
 			globals = new Dictionary<string, object>();
 			
-			// Reload all assemblies
-			Assembly assembly = null;
-			foreach (string name in new string [] {"Myro", "Shapes", "Graphics"}) {
-				String tname = System.IO.Path.Combine (ModulePath, 
-				                           			   String.Format ("{0}.dll", name));
-				try {
-					assembly = Assembly.LoadFrom(tname);
-				} catch { //(System.IO.FileNotFoundException) {
-//#pragma warning disable 612
-//					assembly = Assembly.LoadWithPartialName (tname);
-//#pragma warning restore 612
-				}
-				
-				try {
-					scriptRuntime.LoadAssembly(assembly);
-				} catch {
-					Console.WriteLine ("Failed to load assembly " + name);
-				}
-			}
-
-			// Populate scopes with assemblies
-			ScriptSource source;
-			ScriptScope scope = engine.CreateScope(globals);
-			source = engine.CreateScriptSourceFromString("import Myro", SourceCodeKind.Statements);
-			source.Execute(scope);
-			source = engine.CreateScriptSourceFromString("import Shapes", SourceCodeKind.Statements);
-			source.Execute(scope);
-			source = engine.CreateScriptSourceFromString("import Graphics", SourceCodeKind.Statements);
-			source.Execute(scope);
-			//scope.SetVariable("_inspector", _inspector);
-			
 			compiler_options = engine.GetCompilerOptions();
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).PrintFunction = true;
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).AllowWithStatement = true;
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
+		}
+		
+		// - - - Load assembly into global scope - - - - - - - - - - - -
+		public bool LoadAssembly(string dllPath)
+		{
+			// Reload all assemblies
+			
+			// Get root name
+			string assemblyName = System.IO.Path.GetFileNameWithoutExtension(dllPath);
+			assemblyName = assemblyName.Trim ();
+			
+			// If not found, fail
+			if (assemblyName.Length == 0) {
+				Console.WriteLine ("(Engine.LoadAssembly) Assembly name not found in module path {0}", dllPath);
+				return false;
+			}
+			
+			Assembly assembly = null;
+			try {
+				assembly = Assembly.LoadFrom(dllPath);
+			} catch (Exception ex){ //(System.IO.FileNotFoundException) {
+				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly from module path {0}: {1}", dllPath, ex.Message);
+				return false;
+//#pragma warning disable 612
+//					assembly = Assembly.LoadWithPartialName (tname);
+//#pragma warning restore 612
+			}
+			
+			try {
+				scriptRuntime.LoadAssembly(assembly);
+			} catch (Exception ex){
+				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly {0} into script runtime: {1}", assemblyName, ex.Message);
+				return false;
+			}
+
+			// Populate scope with assembly
+			try {
+				ScriptSource source;
+				ScriptScope scope = engine.CreateScope(globals);
+				string importStatement = String.Format ("import {0}", assemblyName);
+				source = engine.CreateScriptSourceFromString(importStatement, SourceCodeKind.Statements);
+				source.Execute(scope);
+			} catch (Exception ex) {
+				Console.WriteLine ("(Engine.LoadAssembly) Error importing assembly {0} into global scope: {1}", assemblyName, ex.Message);
+				return false;
+			}
+			
+			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,22 +212,12 @@ namespace Jigsaw
 			get { return _callStacks; }
 		}
 		
-		public string ModulePath
-		{
-			// Returns the absolute module path for DLLs
-			get { return _modulePath; }
-			// Set with relative or absolute; saves absolute
-			set { 
-				_modulePath = System.IO.Path.GetFullPath(value); 
-			}
-		}
-		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public bool Reset(Jigsaw.Canvas cvs)
+		public bool Reset(Jigsaw.Canvas cvs, InspectorWindow inspector)
 		{
 			// Save reference to the InspectorWindow
-			//_inspector = inspector;
-			//_inspector.ClearOutput();
+			_inspector = inspector;
+			_inspector.ClearOutput();
 			
 			// Recreate top level list of all call stacks. 
 			// There can be more than one because Jigsaw allows multiple stacks to run simultaneously.
@@ -432,13 +436,13 @@ namespace Jigsaw
             	EngineReset(this, e);
             }
         }
-
+ 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void SetModulePath (string module_path)
 		{
 			throw new NotImplementedException ();
 		}
-
+	
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	}
 	

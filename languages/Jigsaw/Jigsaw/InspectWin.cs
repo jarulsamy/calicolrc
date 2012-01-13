@@ -65,10 +65,9 @@ namespace Jigsaw
 			this.Add(propTree);
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - React to a change in selection on the Jigsaw canvas - - - - - - -
 		void OnJigsawSelectionChanged(Diagram.Canvas cvs, Diagram.ShapeListEventArgs e)
-		{	// React to a change in selection on the Jigsaw canvas
-			
+		{
 			// Before finishing, update PropertyWindow
 			// If at least one block is selected, show properties of selected block.
 			this.ClearProperties();
@@ -128,158 +127,153 @@ namespace Jigsaw
 		}
 	}
 	
-//	/// <summary>
-//	/// Top level floating window that displays the currently selected CBlock properties and other items
-//	/// </summary>
-//	public class InspectorWindow : Gtk.Window 
-//	{
-//
-////		private Gtk.TreeView localsTree = null;		// Locals List
-////		private Gtk.ListStore localsList = null;	// List of items in the local scope for the Locals Tree
-//		private Gtk.TextView localsView = null;		// Locals window
-//		private Gtk.TextView outputView = null;		// Output window
-//		
-//		private Jigsaw.Canvas cvs = null;
-//		
-//		/// <summary>
-//		/// Inspector Window Constructor 
-//		/// </summary>
-//		public InspectorWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
-//		{
-//			this.Title = "Jigsaw Inspector";
-//			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
-//			this.Resize(300, 200);
-//			this.KeepAbove = true;
-//			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
-//			
-//			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
-//			
-////			// See http://www.mono-project.com/GtkSharp_TreeView_Tutorial
-////			
-////			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-////			// New Tree view to display properties
-////			propTree = new Gtk.TreeView();
-////			
-////			// Create name columns
-////			Gtk.TreeViewColumn nameCol = new Gtk.TreeViewColumn ();
-////			nameCol.Title = "Name";
-////			
-////			Gtk.TreeViewColumn valCol = new Gtk.TreeViewColumn ();
-////			valCol.Title = "Value";
-////			
-////			// Add to TreeView
-////			propTree.AppendColumn(nameCol);
-////			propTree.AppendColumn(valCol);
-////			
-////			// Create and insert cell renderer
-////			Gtk.CellRendererText nameRenderer = new Gtk.CellRendererText();
-////  			nameCol.PackStart(nameRenderer, true);
-////
-////			// Create and insert cell renderer
-////			Gtk.CellRendererText valRenderer = new Gtk.CellRendererText();
-////  			valCol.PackStart(valRenderer, true);
-////
-////			// Link it all together
-////			nameCol.SetCellDataFunc(nameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
-////			valCol.SetCellDataFunc(valRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
-////			
-////			// Make the value column editable
-////			valRenderer.Editable = true;
-////			valRenderer.Edited += OnPropValRendererEdited;
-////			
-////			// Create a ListStore as the Model
-////			propList = new Gtk.ListStore(typeof (CProperty));
-////			propTree.Model = propList;
+	// ----------------------------------------------------------------------
+	public class InspectorWindow : Gtk.Window 
+	{
+
+//		private Gtk.TreeView localsTree = null;		// Locals List
+//		private Gtk.ListStore localsList = null;	// List of items in the local scope for the Locals Tree
+		private Gtk.TextView localsView = null;		// Locals window
+		private Gtk.TextView outputView = null;		// Output window
+		
+		private Jigsaw.Canvas cvs = null;
+		
+		// - - - Inspector Window Constructor 
+		public InspectorWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
+		{
+			this.Title = "Jigsaw Inspector";
+			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
+			this.Resize(300, 200);
+			this.KeepAbove = true;
+			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
+			
+			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
+			
+//			// See http://www.mono-project.com/GtkSharp_TreeView_Tutorial
 //			
 //			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//			// Locals Tree
-////			localsTree = new Gtk.TreeView();
-////			
-////			// Create name columns
-////			Gtk.TreeViewColumn locNameCol = new Gtk.TreeViewColumn ();
-////			locNameCol.Title = "Name";
-////			
-////			Gtk.TreeViewColumn locValCol = new Gtk.TreeViewColumn ();
-////			locValCol.Title = "Value";
-////			
-////			// Add to TreeView
-////			localsTree.AppendColumn(locNameCol);
-////			localsTree.AppendColumn(locValCol);
-////			
-////			// Create and insert cell renderer
-////			Gtk.CellRendererText locNameRenderer = new Gtk.CellRendererText();
-////  			locNameCol.PackStart(locNameRenderer, true);
-////
-////			// Create and insert cell renderer
-////			Gtk.CellRendererText locValRenderer = new Gtk.CellRendererText();
-////  			locValCol.PackStart(locValRenderer, true);
-////
-////			// Link it all together
-////			locNameCol.SetCellDataFunc(locNameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
-////			locValCol.SetCellDataFunc(locValRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
-////			
-////			// Make the value column editable
-////			locValRenderer.Editable = true;
-////			locValRenderer.Edited += OnLocalsValRendererEdited;
-////			
-////			// Create a ListStore as the Model
-////			localsList = new Gtk.ListStore(typeof(CProperty));
-////			localsTree.Model = localsList;
+//			// New Tree view to display properties
+//			propTree = new Gtk.TreeView();
 //			
-//			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//			// locals display window
-//			localsView = new Gtk.TextView();
-//			Gtk.ScrolledWindow lsw = new Gtk.ScrolledWindow();
-//			lsw.CanFocus = true;
-//			lsw.VscrollbarPolicy = Gtk.PolicyType.Always;
-//			lsw.Add(localsView);
+//			// Create name columns
+//			Gtk.TreeViewColumn nameCol = new Gtk.TreeViewColumn ();
+//			nameCol.Title = "Name";
 //			
-//			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//			// Output window
-//			outputView = new Gtk.TextView();
-//			Gtk.ScrolledWindow osw = new Gtk.ScrolledWindow();
-//			osw.CanFocus = true;
-//			osw.VscrollbarPolicy = Gtk.PolicyType.Always;
-//			osw.Add(outputView);
+//			Gtk.TreeViewColumn valCol = new Gtk.TreeViewColumn ();
+//			valCol.Title = "Value";
 //			
-//			// Put it all in a Notebook
-//			Gtk.Notebook nb = new Gtk.Notebook();
-//			//nb.AppendPage(propTree, new Gtk.Label("Properties"));
-//			nb.AppendPage(lsw, new Gtk.Label("Locals"));
-//			//nb.AppendPage(localsTree, new Gtk.Label("Locals"));
-//			nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
-//			nb.AppendPage(osw, new Gtk.Label("Output"));
+//			// Add to TreeView
+//			propTree.AppendColumn(nameCol);
+//			propTree.AppendColumn(valCol);
 //			
-//			this.Add(nb);
-//		}
+//			// Create and insert cell renderer
+//			Gtk.CellRendererText nameRenderer = new Gtk.CellRendererText();
+//  			nameCol.PackStart(nameRenderer, true);
 //
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void WriteLine(String msg) {
-//			// Add text to the buffer
-//			outputView.Buffer.Text += msg + "\n";
+//			// Create and insert cell renderer
+//			Gtk.CellRendererText valRenderer = new Gtk.CellRendererText();
+//  			valCol.PackStart(valRenderer, true);
 //
-//			// Always scroll to the cursor position
-//			Gtk.TextIter ti = outputView.Buffer.GetIterAtLine(outputView.Buffer.LineCount-1); 
-//			Gtk.TextMark tm = outputView.Buffer.CreateMark("eot", ti,false); 
-//			outputView.ScrollToMark(tm, 0, false, 0, 0); 
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void ClearOutput()
-//		{	// Clear contents of output window
-//			outputView.Buffer.Clear();
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//			// Link it all together
+//			nameCol.SetCellDataFunc(nameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
+//			valCol.SetCellDataFunc(valRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
+//			
+//			// Make the value column editable
+//			valRenderer.Editable = true;
+//			valRenderer.Edited += OnPropValRendererEdited;
+//			
+//			// Create a ListStore as the Model
+//			propList = new Gtk.ListStore(typeof (CProperty));
+//			propTree.Model = propList;
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Locals Tree
+//			localsTree = new Gtk.TreeView();
+//			
+//			// Create name columns
+//			Gtk.TreeViewColumn locNameCol = new Gtk.TreeViewColumn ();
+//			locNameCol.Title = "Name";
+//			
+//			Gtk.TreeViewColumn locValCol = new Gtk.TreeViewColumn ();
+//			locValCol.Title = "Value";
+//			
+//			// Add to TreeView
+//			localsTree.AppendColumn(locNameCol);
+//			localsTree.AppendColumn(locValCol);
+//			
+//			// Create and insert cell renderer
+//			Gtk.CellRendererText locNameRenderer = new Gtk.CellRendererText();
+//  			locNameCol.PackStart(locNameRenderer, true);
+//
+//			// Create and insert cell renderer
+//			Gtk.CellRendererText locValRenderer = new Gtk.CellRendererText();
+//  			locValCol.PackStart(locValRenderer, true);
+//
+//			// Link it all together
+//			locNameCol.SetCellDataFunc(locNameRenderer, new Gtk.TreeCellDataFunc(RenderPropertyName));
+//			locValCol.SetCellDataFunc(locValRenderer, new Gtk.TreeCellDataFunc(RenderPropertyValue));
+//			
+//			// Make the value column editable
+//			locValRenderer.Editable = true;
+//			locValRenderer.Edited += OnLocalsValRendererEdited;
+//			
+//			// Create a ListStore as the Model
+//			localsList = new Gtk.ListStore(typeof(CProperty));
+//			localsTree.Model = localsList;
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// locals display window
+			localsView = new Gtk.TextView();
+			Gtk.ScrolledWindow lsw = new Gtk.ScrolledWindow();
+			lsw.CanFocus = true;
+			lsw.VscrollbarPolicy = Gtk.PolicyType.Always;
+			lsw.Add(localsView);
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Output window
+			outputView = new Gtk.TextView();
+			Gtk.ScrolledWindow osw = new Gtk.ScrolledWindow();
+			osw.CanFocus = true;
+			osw.VscrollbarPolicy = Gtk.PolicyType.Always;
+			osw.Add(outputView);
+			
+			// Put it all in a Notebook
+			Gtk.Notebook nb = new Gtk.Notebook();
+			//nb.AppendPage(propTree, new Gtk.Label("Properties"));
+			nb.AppendPage(lsw, new Gtk.Label("Locals"));
+			//nb.AppendPage(localsTree, new Gtk.Label("Locals"));
+			nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
+			nb.AppendPage(osw, new Gtk.Label("Output"));
+			
+			this.Add(nb);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void WriteLine(String msg) {
+			// Add text to the buffer
+			outputView.Buffer.Text += msg + "\n";
+
+			// Always scroll to the cursor position
+			Gtk.TextIter ti = outputView.Buffer.GetIterAtLine(outputView.Buffer.LineCount-1); 
+			Gtk.TextMark tm = outputView.Buffer.CreateMark("eot", ti,false); 
+			outputView.ScrollToMark(tm, 0, false, 0, 0); 
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ClearOutput()
+		{	// Clear contents of output window
+			outputView.Buffer.Clear();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		public void DisplayLocals(Engine e) 
 //		{	// Render all locals to window
 //			
-//			Microsoft.Scripting.Hosting.ScriptScope scope = e.Scope;
+//			//Microsoft.Scripting.Hosting.ScriptScope scope = e.Scope;
 //			StringBuilder sb = new StringBuilder();
 //			
 //			foreach (CallStack cs in e.CallStacks) {
 //
-//				//Console.WriteLine("------");
 //				sb.AppendLine("------");
 //				foreach (string k in scope.GetVariableNames()) {
 //					//Console.WriteLine("{0} = {1}", k, locals[k]);
@@ -289,50 +283,50 @@ namespace Jigsaw
 //			
 //			localsView.Buffer.Text = sb.ToString();
 //		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void ClearLocals()
-//		{	// Clear contents of locals window
-//			localsView.Buffer.Clear();
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void RenderLocals()
-//		{	// Render the given locals scope in its window
-//			
-//		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		// When a locals value is edited, copy data back to CProperty
-////		void OnLocalsValRendererEdited(object o, Gtk.EditedArgs args)
-////		{
-////			Gtk.TreeIter iter;
-////			localsList.GetIter(out iter, new Gtk.TreePath(args.Path));
-////			CProperty prop = (CProperty)localsList.GetValue(iter, 0);
-////			
-////			// TODO: Must evaluate the exprssion here before resetting?
-////			
-////			prop.Text = args.NewText;
-////			
-////			// Redraw
-////			//cvs.Invalidate();
-////		}
-//
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		// Remove all locals properties from the InspectorWindow locals list
-////		public void ClearLocals() {
-////			localsList.Clear();
-////		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected void DoDeleteEvent (object obj, Gtk.DeleteEventArgs args)
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ClearLocals()
+		{	// Clear contents of locals window
+			localsView.Buffer.Clear();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void RenderLocals()
+		{	// Render the given locals scope in its window
+			
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// When a locals value is edited, copy data back to CProperty
+//		void OnLocalsValRendererEdited(object o, Gtk.EditedArgs args)
 //		{
-//			this.Hide();		// If HideAll() is used here instead, when ShowAll is called, Window forgets its position
-//			args.RetVal = true;
+//			Gtk.TreeIter iter;
+//			localsList.GetIter(out iter, new Gtk.TreePath(args.Path));
+//			CProperty prop = (CProperty)localsList.GetValue(iter, 0);
+//			
+//			// TODO: Must evaluate the exprssion here before resetting?
+//			
+//			prop.Text = args.NewText;
+//			
+//			// Redraw
+//			//cvs.Invalidate();
 //		}
-//		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Remove all locals properties from the InspectorWindow locals list
+//		public void ClearLocals() {
+//			localsList.Clear();
+//		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void DoDeleteEvent (object obj, Gtk.DeleteEventArgs args)
+		{
+			this.Hide();		// If HideAll() is used here instead, when ShowAll is called, Window forgets its position
+			args.RetVal = true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	}
 	
 	// -----------------------------------------------------------------------
 	public class CProperty

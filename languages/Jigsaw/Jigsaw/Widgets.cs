@@ -340,7 +340,10 @@ namespace Widgets
 				}
 				foreach (WeakReference wrshp in _shapes) {
 					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-					if (shp != null) shp.Visible = true;
+					if (shp != null) {
+						shp.Visible = true;
+						shp.BringToFront(cvs);
+					}
 				}
 			}
 			// If turned off, hide all referenced shapes

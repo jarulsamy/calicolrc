@@ -1,5 +1,8 @@
 using System;
+using System.Xml;
+using System.Text;
 using System.Collections.Generic;
+using System.Reflection;
 
 public class JigsawWidget : Gtk.ScrolledWindow
 {
@@ -52,13 +55,13 @@ public class MainWindow : Gtk.Window
 		this.DefaultHeight = 700;
 		this.DeleteEvent += new Gtk.DeleteEventHandler (this.OnDeleteEvent);
 
-		// VBox
+		// - - - VBox
 		Gtk.VBox vb = new Gtk.VBox(false, 0);
 		
 		Gtk.AccelGroup agrp = new Gtk.AccelGroup();
 		this.AddAccelGroup(agrp);
 		
-		// File menu
+		// - - - File menu
 		Gtk.Menu muFile = new Gtk.Menu();
 
 		Gtk.MenuItem miNew = new Gtk.MenuItem("_New");
@@ -90,13 +93,24 @@ public class MainWindow : Gtk.Window
 		
 		Gtk.MenuItem miSep2 = new Gtk.MenuItem();
 		muFile.Append(miSep2);
+
+		Gtk.MenuItem miUse = new Gtk.MenuItem("_Use Library...");
+		miUse.Activated += new EventHandler(OnFileUseLibrary);
+		muFile.Append(miUse);
+		
+		Gtk.MenuItem miMap = new Gtk.MenuItem("_Generate Library Map File...");
+		miMap.Activated += new EventHandler(OnFileGenLibMap);
+		muFile.Append(miMap);
+		
+		Gtk.MenuItem miSep3 = new Gtk.MenuItem();
+		muFile.Append(miSep3);
 		
 		Gtk.MenuItem miExit = new Gtk.MenuItem("_Quit");
 		miExit.Activated += new EventHandler(OnFileExit);
 		muFile.Append(miExit);
 		miExit.AddAccelerator("activate", agrp, (int)'Q', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
-		
-		// View Menu
+
+		// - - - View Menu
 		Gtk.Menu muView = new Gtk.Menu();
 		
 		Gtk.MenuItem miViewZoomIn = new Gtk.MenuItem("_Zoom In");
@@ -151,7 +165,6 @@ public class MainWindow : Gtk.Window
 		muRun.Append(miRunStop);
 		miRunStop.Sensitive = false;
 		miRunStop.AddAccelerator("activate", agrp, (int)Gdk.Key.F5, Gdk.ModifierType.ShiftMask, Gtk.AccelFlags.Visible);
-
 
 		// Build menu Bar
 		Gtk.MenuBar mb = new Gtk.MenuBar();
@@ -259,8 +272,12 @@ public class MainWindow : Gtk.Window
 		// Create core Jigsaw Canvas
 		// "/Programs/Mono/Calico-dev/modules"
 		// For running directly from Calico/languages/Jigsaw outside of Calico:
-		js = new Jigsaw.Canvas(System.IO.Path.Combine("..", "..", "modules"), 
-		                       900, 600, 3000, 2000);		
+		//js = new Jigsaw.Canvas(System.IO.Path.Combine("..", "..", "modules"), 
+		//                       900, 600, 3000, 2000);	
+		
+		string modulePath = null;
+		modulePath = @"C:\Programs\Mono\Calico-dev\modules\";
+		js = new Jigsaw.Canvas(modulePath, 900, 600, 3000, 2000);		
 		js.JigsawRun += new EventHandler(OnJigsawRun);
 		js.JigsawStop += new EventHandler(OnJigsawStop);
 		js.JigsawStep += new EventHandler(OnJigsawStep);
@@ -402,6 +419,202 @@ public class MainWindow : Gtk.Window
 		Gtk.Application.Quit();
 	}
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnFileUseLibrary(object sender, EventArgs a)
+	{
+		js.Stop();
+		
+		// Get map file path
+		Gtk.FileChooserDialog fc = null;
+		fc = new Gtk.FileChooserDialog("Library to load", 
+		                               this,
+		                               Gtk.FileChooserAction.Open,
+		                               "Cancel", Gtk.ResponseType.Cancel,
+		                               "Load",   Gtk.ResponseType.Accept);
+		
+		Gtk.FileFilter f1 = new Gtk.FileFilter();
+		f1.Name = "Library map files";
+		f1.AddPattern("*.map");
+		fc.AddFilter(f1);
+		
+		Gtk.FileFilter f3 = new Gtk.FileFilter();
+		f3.Name = "All files";
+		f3.AddPattern("*.*");
+		fc.AddFilter(f3);
+		
+		int response = fc.Run ();
+
+		// If file not selected, exit
+		if (response == (int)Gtk.ResponseType.Cancel) {
+			fc.Destroy();
+			return;
+		}
+		
+		// Get map file name
+		string mapfile = fc.Filename;
+		fc.Destroy();
+		
+		// Check if file does not exist
+		if (!System.IO.File.Exists(mapfile)) {
+			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Warning,
+				Gtk.ButtonsType.Ok,
+				"Map file not found");
+			dlg.Title = "File not found";
+			
+			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			dlg.Destroy();
+			return;
+		}
+		
+		js.UseLibrary(mapfile);
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnFileGenLibMap(object sender, EventArgs a)
+	{
+		js.Stop();
+		
+		// Get DLL file path
+		Gtk.FileChooserDialog fc = null;
+		fc = new Gtk.FileChooserDialog("Library to map", 
+		                               this,
+		                               Gtk.FileChooserAction.Open,
+		                               "Cancel", Gtk.ResponseType.Cancel,
+		                               "Open",   Gtk.ResponseType.Accept);
+		
+		Gtk.FileFilter f1 = new Gtk.FileFilter();
+		f1.Name = "DLL files";
+		f1.AddPattern("*.dll");
+		fc.AddFilter(f1);
+		
+		Gtk.FileFilter f3 = new Gtk.FileFilter();
+		f3.Name = "All files";
+		f3.AddPattern("*.*");
+		fc.AddFilter(f3);
+		
+		int response = fc.Run ();
+
+		// If file not selected, exit
+		if (response == (int)Gtk.ResponseType.Cancel) {
+			fc.Destroy();
+			return;
+		}
+		
+		// Get assembly info
+		string assembly_name = fc.Filename;
+		fc.Destroy();
+		
+		// Create map file path
+		string dir_name = System.IO.Path.GetDirectoryName(assembly_name);
+		string base_file = System.IO.Path.GetFileNameWithoutExtension(assembly_name);
+		string filename = String.Format ("{0}{1}{2}.map", dir_name, System.IO.Path.DirectorySeparatorChar, base_file);
+		
+		// Check if to overwrite
+		if (System.IO.File.Exists(filename)) {
+			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Warning,
+				Gtk.ButtonsType.YesNo,
+				"Map file already exists. Overwrite it?");
+			dlg.Title = "Overwrite?";
+			
+			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			dlg.Destroy();
+			if (rsp == Gtk.ResponseType.No) return;
+		}
+		
+		// Create XML map file -- temp modified from Reflection.Utils.Mapping.Save()
+		XmlWriterSettings settings = new XmlWriterSettings();
+		settings.Indent = true;
+		settings.IndentChars = "    ";
+		settings.Encoding = Encoding.ASCII;
+		
+		try
+		{
+			using (XmlWriter xw = XmlWriter.Create(filename, settings)) {
+				xw.WriteStartElement("map");
+				xw.WriteAttributeString("path", assembly_name);
+				xw.WriteElementString("docstring", "");
+				
+			  	foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name))
+				{	//Console.WriteLine (type_name);
+					Type type = Reflection.Utils.getType(assembly_name, type_name);
+					
+					// Write constructors
+					foreach (ConstructorInfo ci in Reflection.Utils.getConstructors(type))
+					{	// write it
+						xw.WriteStartElement("constructor");
+				  	    xw.WriteAttributeString("assembly_name", base_file);
+					    xw.WriteAttributeString("type_name", type_name);
+					    xw.WriteAttributeString("constructor_name", ci.Name);
+						xw.WriteElementString("docstring", "");
+						
+					    foreach (ParameterInfo pi in ci.GetParameters()) {
+					      xw.WriteStartElement("parameter");
+					      xw.WriteAttributeString("name", pi.Name);
+					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+					      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
+					      xw.WriteEndElement();
+					    }
+						
+					  	xw.WriteEndElement();
+					}
+					
+					// Write static methods
+					foreach (MethodInfo mi in Reflection.Utils.getStaticMethods(type))
+					{	// write it
+						xw.WriteStartElement("method");
+				  	    xw.WriteAttributeString("assembly_name", base_file);
+					    xw.WriteAttributeString("type_name", type_name);
+					    xw.WriteAttributeString("method_name", mi.Name);
+						xw.WriteAttributeString("return_type", mi.ReturnType.FullName);
+						xw.WriteElementString("docstring", "");
+						
+					    foreach (ParameterInfo pi in mi.GetParameters()) {
+					      xw.WriteStartElement("parameter");
+					      xw.WriteAttributeString("name", pi.Name);
+					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+					      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
+					      xw.WriteEndElement();
+					    }
+					  	xw.WriteEndElement();
+					}
+			  	}
+				
+				xw.WriteEndElement();	// close map
+			}
+			
+			// Inform user where map file written
+			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Info,
+				Gtk.ButtonsType.Ok,
+				String.Format ("Map file created at {0}", filename));
+			dlg2.Title = "Map File Created";
+			
+			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+			dlg2.Destroy();
+			
+		} catch (Exception ex) {
+			// Inform user of error
+			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Error,
+				Gtk.ButtonsType.Ok,
+				String.Format ("Map file creation Failed:\n\n{0}", ex.Message));
+			dlg2.Title = "Map File Creation Failed";
+			
+			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+			dlg2.Destroy();
+		}
+	}
+	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnViewZoomIn(object sender, EventArgs a)
 	{	

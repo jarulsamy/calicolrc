@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<map path="C:\Programs\Mono\Calico-dev\modules\Graphics.dll">
+    <docstring />
+    <constructor assembly_name="Graphics" type_name="Arc" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="radius" type="System.Int32" default="" />
+        <parameter name="start" type="System.Double" default="" />
+        <parameter name="stop" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Arrow" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="degrees" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Arrow" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="BarChart" constructor_name=".ctor">
+        <docstring />
+        <parameter name="title" type="System.String" default="" />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Button" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="label" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Canvas" constructor_name=".ctor">
+        <docstring />
+        <parameter name="mode" type="System.String" default="" />
+        <parameter name="h" type="Gtk.Adjustment" default="" />
+        <parameter name="v" type="Gtk.Adjustment" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Canvas" constructor_name=".ctor">
+        <docstring />
+        <parameter name="mode" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Circle" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="radius" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
+        <parameter name="a" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="r" type="System.Double" default="" />
+        <parameter name="g" type="System.Double" default="" />
+        <parameter name="b" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="r" type="System.Double" default="" />
+        <parameter name="g" type="System.Double" default="" />
+        <parameter name="b" type="System.Double" default="" />
+        <parameter name="a" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="name" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="color" type="Graphics+Color" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Color" constructor_name=".ctor">
+        <docstring />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Curve" constructor_name=".ctor">
+        <docstring />
+        <parameter name="has_pen" type="System.Boolean" default="" />
+        <parameter name="iterable0" type="System.Collections.IList" default="" />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+        <parameter name="iterable3" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Curve" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable0" type="System.Collections.IList" default="" />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+        <parameter name="iterable3" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Dot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Dot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="dot" type="Graphics+Dot" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Dot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Dot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="x" type="System.Double" default="" />
+        <parameter name="y" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="System.EventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="System.String" default="" />
+        <parameter name="value" type="System.Object" default="" />
+        <parameter name="time" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="System.String" default="" />
+        <parameter name="time" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="Gtk.MotionNotifyEventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="Gtk.KeyPressEventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="Gtk.ButtonReleaseEventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="Gtk.ButtonPressEventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Event" constructor_name=".ctor">
+        <docstring />
+        <parameter name="args" type="Gtk.KeyReleaseEventArgs" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Frame" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Frame" constructor_name=".ctor">
+        <docstring />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Gradient" constructor_name=".ctor">
+        <docstring />
+        <parameter name="gtype" type="System.String" default="" />
+        <parameter name="p1" type="System.Collections.IList" default="" />
+        <parameter name="radius1" type="System.Double" default="" />
+        <parameter name="c1" type="Graphics+Color" default="" />
+        <parameter name="p2" type="System.Collections.IList" default="" />
+        <parameter name="radius2" type="System.Double" default="" />
+        <parameter name="c2" type="Graphics+Color" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Gradient" constructor_name=".ctor">
+        <docstring />
+        <parameter name="gtype" type="System.String" default="" />
+        <parameter name="p1" type="System.Collections.IList" default="" />
+        <parameter name="c1" type="Graphics+Color" default="" />
+        <parameter name="p2" type="System.Collections.IList" default="" />
+        <parameter name="c2" type="Graphics+Color" default="" />
+    </constructor>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="copyPicture" return_type="Graphics+Picture">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getAlpha" return_type="System.Int32">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getBlue" return_type="System.Int32">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getColorNames" return_type="IronPython.Runtime.List">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getGray" return_type="System.Int32">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getGreen" return_type="System.Int32">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getKeyPressed" return_type="System.String">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getKeyState" return_type="System.String">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouse" return_type="IronPython.Runtime.PythonTuple">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouseNow" return_type="IronPython.Runtime.PythonTuple">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getMouseState" return_type="System.String">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getPixel" return_type="Graphics+Pixel">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getPixels" return_type="System.Collections.IEnumerable">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRed" return_type="System.Int32">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRGB" return_type="IronPython.Runtime.PythonTuple">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getRGBA" return_type="IronPython.Runtime.PythonTuple">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getWindow" return_type="Graphics+WindowClass">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="getWindow" return_type="Graphics+WindowClass">
+        <docstring />
+        <parameter name="title" type="System.String" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="GraphicsLoop" return_type="System.Void">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Init" return_type="System.Void">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Invoke" return_type="System.Void">
+        <docstring />
+        <parameter name="invoke" type="Graphics+InvokeDelegate" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="r" type="System.Double" default="" />
+        <parameter name="g" type="System.Double" default="" />
+        <parameter name="b" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="r" type="System.Double" default="" />
+        <parameter name="g" type="System.Double" default="" />
+        <parameter name="b" type="System.Double" default="" />
+        <parameter name="a" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="color" type="System.String" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeColor" return_type="Graphics+Color">
+        <docstring />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
+        <parameter name="a" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture" return_type="Graphics+Picture">
+        <docstring />
+        <parameter name="filename" type="System.String" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture" return_type="Graphics+Picture">
+        <docstring />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+        <parameter name="c" type="Graphics+Color" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture" return_type="Graphics+Picture">
+        <docstring />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture" return_type="Graphics+Picture">
+        <docstring />
+        <parameter name="window" type="Graphics+WindowClass" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindow" return_type="Graphics+WindowClass">
+        <docstring />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="width" type="System.Int32" default="300" />
+        <parameter name="height" type="System.Int32" default="300" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindowFast" return_type="Graphics+WindowClass">
+        <docstring />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="width" type="System.Int32" default="300" />
+        <parameter name="height" type="System.Int32" default="300" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="needInvoke" return_type="System.Boolean">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onKeyPress" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onKeyRelease" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseDown" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseMovement" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="onMouseUp" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`3[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Graphics+Event, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="PyList" return_type="IronPython.Runtime.List">
+        <docstring />
+        <parameter name="items" type="System.Object[]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="PyTuple" return_type="IronPython.Runtime.PythonTuple">
+        <docstring />
+        <parameter name="items" type="System.Object[]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="run" return_type="System.Void">
+        <docstring />
+        <parameter name="function" type="System.Func`1[[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="run" return_type="System.Void">
+        <docstring />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture" return_type="System.Void">
+        <docstring />
+        <parameter name="list" type="IronPython.Runtime.List" default="" />
+        <parameter name="filename" type="System.String" default="" />
+        <parameter name="delay" type="System.Int16" default="" />
+        <parameter name="repeat" type="System.Boolean" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture" return_type="System.Void">
+        <docstring />
+        <parameter name="list" type="IronPython.Runtime.List" default="" />
+        <parameter name="filename" type="System.String" default="" />
+        <parameter name="delay" type="System.Int16" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture" return_type="System.Void">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="filename" type="System.String" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="savePicture" return_type="System.Void">
+        <docstring />
+        <parameter name="list" type="IronPython.Runtime.List" default="" />
+        <parameter name="filename" type="System.String" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="set_gui_thread_id" return_type="System.Void">
+        <docstring />
+        <parameter name="gui_thread_id" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setAlpha" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="value" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setBlue" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="value" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setColor" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="color" type="Graphics+Color" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setGray" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="value" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setGreen" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="value" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixel" return_type="System.Void">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixel" return_type="System.Void">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+        <parameter name="color" type="Graphics+Color" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setPixels" return_type="System.Void">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="picture2" type="Graphics+Picture" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRed" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="value" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="red" type="System.Int32" default="" />
+        <parameter name="green" type="System.Int32" default="" />
+        <parameter name="blue" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="red" type="System.Byte" default="" />
+        <parameter name="green" type="System.Byte" default="" />
+        <parameter name="blue" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="red" type="System.Single" default="" />
+        <parameter name="green" type="System.Single" default="" />
+        <parameter name="blue" type="System.Single" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGB" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="rgb" type="System.Collections.IList" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="setRGBA" return_type="System.Void">
+        <docstring />
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="red" type="System.Byte" default="" />
+        <parameter name="green" type="System.Byte" default="" />
+        <parameter name="blue" type="System.Byte" default="" />
+        <parameter name="alpha" type="System.Byte" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Show" return_type="System.Void">
+        <docstring />
+        <parameter name="o" type="System.Object" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="ShowAll" return_type="System.Void">
+        <docstring />
+        <parameter name="o" type="System.Object" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Vector" return_type="Microsoft.Xna.Framework.Vector2">
+        <docstring />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Vector" return_type="Microsoft.Xna.Framework.Vector2">
+        <docstring />
+        <parameter name="x" type="System.Double" default="" />
+        <parameter name="y" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="VectorRotate" return_type="Microsoft.Xna.Framework.Vector2">
+        <docstring />
+        <parameter name="v" type="Microsoft.Xna.Framework.Vector2" default="" />
+        <parameter name="angle" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="wait" return_type="System.Void">
+        <docstring />
+        <parameter name="seconds" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Window" return_type="Graphics+WindowClass">
+        <docstring />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Graphics" type_name="Graphics" method_name="Window" return_type="Graphics+WindowClass">
+        <docstring />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="width" type="System.Int32" default="300" />
+        <parameter name="height" type="System.Int32" default="300" />
+    </method>
+    <constructor assembly_name="Graphics" type_name="Group" constructor_name=".ctor">
+        <docstring />
+        <parameter name="shapes" type="Graphics+Shape[]" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="HSlider" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="width" type="System.Object" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="InvokeDelegate" constructor_name=".ctor">
+        <docstring />
+        <parameter name="object" type="System.Object" default="" />
+        <parameter name="method" type="System.IntPtr" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Line" constructor_name=".ctor">
+        <docstring />
+        <parameter name="has_pen" type="System.Boolean" default="" />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Line" constructor_name=".ctor">
+        <docstring />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Line" constructor_name=".ctor">
+        <docstring />
+        <parameter name="points" type="System.Object[]" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Line" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Oval" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="xRadius" type="System.Int32" default="" />
+        <parameter name="yRadius" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Pen" constructor_name=".ctor">
+        <docstring />
+        <parameter name="border" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Pen" constructor_name=".ctor">
+        <docstring />
+        <parameter name="color" type="Graphics+Color" default="" />
+        <parameter name="border" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+        <parameter name="buffer" type="System.Byte[]" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+        <parameter name="buffer" type="System.Byte[]" default="" />
+        <parameter name="depth" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+        <parameter name="color" type="Graphics+Color" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="bitmap" type="System.Drawing.Bitmap" default="" />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="has_pen" type="System.Boolean" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="filename" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="pixbuf" type="Gdk.Pixbuf" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Picture" constructor_name=".ctor">
+        <docstring />
+        <parameter name="original" type="Graphics+Picture" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Pie" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="radius" type="System.Int32" default="" />
+        <parameter name="start" type="System.Double" default="" />
+        <parameter name="stop" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Pixel" constructor_name=".ctor">
+        <docstring />
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Plot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="title" type="System.String" default="" />
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Plot" constructor_name=".ctor">
+        <docstring />
+        <parameter name="list" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Point" constructor_name=".ctor">
+        <docstring />
+        <parameter name="dot" type="Graphics+Dot" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Point" constructor_name=".ctor">
+        <docstring />
+        <parameter name="x" type="System.Object" default="" />
+        <parameter name="y" type="System.Object" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Point" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Polygon" constructor_name=".ctor">
+        <docstring />
+        <parameter name="points" type="System.Object[]" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Polygon" constructor_name=".ctor">
+        <docstring />
+        <parameter name="line" type="Graphics+Line" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Rectangle" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="RoundedRectangle" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable1" type="System.Collections.IList" default="" />
+        <parameter name="iterable2" type="System.Collections.IList" default="" />
+        <parameter name="radius" type="System.Double" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Shape" constructor_name=".ctor">
+        <docstring />
+        <parameter name="has_pen" type="System.Boolean" default="True" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="Text" constructor_name=".ctor">
+        <docstring />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="text" type="System.String" default="" />
+    </constructor>
+    <constructor assembly_name="Graphics" type_name="WindowClass" constructor_name=".ctor">
+        <docstring />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
+        <parameter name="width" type="System.Int32" default="300" />
+        <parameter name="height" type="System.Int32" default="300" />
+    </constructor>
+</map>

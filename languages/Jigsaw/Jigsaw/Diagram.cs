@@ -293,8 +293,7 @@ namespace Diagram
 //			return 1;
 //		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Clear all delegates that have registed to handle this class's events
+		// - - - Clear all delegates that have registed to handle this class's events - - -
         public void ClearEventHandlers()
         {
             this.CanvasMouseDown = null;
@@ -327,8 +326,6 @@ namespace Diagram
 			g.Scale(     this.scale,         this.scale);
 			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
 			g.Translate( this.offsetX,       this.offsetY);
-			
-//			g.Translate( this.offsetX-this.scaleCenterX, this.offsetY-this.scaleCenterY);
 			
 			// Clear background
 			g.Color = this.BackColor;
@@ -1934,7 +1931,7 @@ namespace Diagram
             this.Sizable = sizable;
             this.Selectable = selectable;
             this.Connectable = connectable;
-
+			
             this.center = new CPoint(0.0, 0.0);
             this.UpdateBoundingBox();
         }
@@ -1987,8 +1984,7 @@ namespace Diagram
 			}
 		}
 		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // String representation of a shape is its name
+        // - - - String representation of a shape is its name - - - - - - -
         public override string ToString()
         {
             return this.name;
@@ -2008,10 +2004,9 @@ namespace Diagram
             set { this.visible = value; }
         }
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected virtual bool ShowContextMenu(Canvas cvs, int X, int Y) {
-			// Create the context menu for this shape
-			
+		// - - - Create the context menu for this shape - - - - - - - - - -
+		protected virtual bool ShowContextMenu(Canvas cvs, int X, int Y) 
+		{
 			// Cache info
 			_cvs = cvs;
 			_X = X;
@@ -2063,17 +2058,29 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnBringToFront(object sender, EventArgs e)
 		{
-			_cvs.BringToFront(this);
+			this.BringToFront(_cvs);
 			_cvs.Invalidate();
-			_cvs = null;
+			_cvs = null;		
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnSendToBack(object sender, EventArgs e)
 		{
-			_cvs.SendToBack(this);
+			this.SendToBack(_cvs);
 			_cvs.Invalidate();
 			_cvs = null;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void BringToFront(Canvas cvs) 
+		{
+			cvs.BringToFront(this);	
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void SendToBack(Canvas cvs) 
+		{
+			cvs.SendToBack(this);
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3129,8 +3136,7 @@ namespace Diagram
             w.WriteEndElement();
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write all decorators in the shape to Xml writer
+        // - - - Write all decorators in the shape to Xml writer - - - - - - - -
         protected virtual void WriteXmlDecorators(XmlWriter w)
         {
             w.WriteStartElement("decorators");
@@ -3142,8 +3148,7 @@ namespace Diagram
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Rectangle shape class
+    // --- Rectangle shape class -------------------------------------------
     public class CRectangle : CShape
     {
         // Constructors
@@ -3173,15 +3178,13 @@ namespace Diagram
         // Constructor that uses a dictionary of initial values
         public CRectangle(Dictionary<String, System.Object> parms) : base(parms) { }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Create and return a shape factory instance for a CRectangle.
+        // - - - Create and return a shape factory instance for a CRectangle - - - -
         public static new ICanvasEventHandler CreateFactory()
         {
             return new CShapeFactory(typeof(CRectangle));
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Draw the rectangle shape on the canvas
+        // - - - Draw the rectangle shape on the canvas - - - - -
         public override void Draw(Cairo.Context g)
         {
             // Cannot draw a rectangle with negative width or height, 

@@ -7,14 +7,17 @@ using Microsoft.Scripting.Hosting;
 namespace Jigsaw
 {
 	public class CMethodBlock : CBlock
-	{	
+	{
 		string assembly_name;
 		public string type_name;
 		public string method_name;
 		public List<string> param_names;
-		List<Type> types;
-		List<object> defaults;
-		public Type return_type;
+		List<string> types;
+		List<string> defaults;
+		public string return_type;
+		//List<Type> types;
+		//List<object> defaults;
+		//public Type return_type;
 		public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
 		
 		private bool _inHandler = false;	// Breaks re-entrant OnPropertyChanged event loops
@@ -30,9 +33,12 @@ namespace Jigsaw
 			type_name = "";
 			method_name = "";
 			param_names = new List<string>();
-			types = new List<Type>();
-			defaults = new List<object>();
-			return_type = System.Type.GetType("System.Void");
+			types = new List<string>();
+			defaults = new List<string>();
+			return_type = "System.Void";
+			//types = new List<Type>();
+			//defaults = new List<object>();
+			//return_type = System.Type.GetType("System.Void");
 		}
 		
 		public CMethodBlock(Double X, Double Y, 
@@ -40,9 +46,12 @@ namespace Jigsaw
 				    string type_name, 
 				    string method_name, 
 				    List<string> names,
-				    List<Type> types,
-				    List<object> defaults,
-				    Type return_type,
+				    List<string> types,
+				    List<string> defaults,
+		            string return_type,
+		            //List<Type> types,
+		            //List<object> defaults,
+				    //Type return_type,
 				    Widgets.CBlockPalette palette = null) 
 				: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 					new Diagram.CPoint(X, Y),
@@ -81,9 +90,13 @@ namespace Jigsaw
 				  string type_name, 
 				  string method_name, 
 				  List<string> names,
-				  List<Type> types,
-				  List<object> defaults,
-				  Type return_type)
+				  List<string> types,
+				  List<string> defaults,
+		          string return_type
+		          //List<Type> types,
+		          //List<object> defaults,
+				  //Type return_type
+		          )
 		{
 			this.assembly_name = assembly_name;
 			this.type_name = type_name;
@@ -116,26 +129,30 @@ namespace Jigsaw
 				for (int n = 0; n < names.Count; n++)
 				{
 					// FIXME: make a default of the appropriate type if one not given
-					if (defaults[n] == null) {
+					if (defaults[n] == null || defaults[n] == "") {
 						tprop = new CExpressionProperty(names[n], String.Format("{0}", 0));
 						tprop.PropertyChanged += OnPropertyChanged;
 						_properties[names[n]] = tprop;
-					} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull"))) {
+						
+					//} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull"))) {
+					} else if (!(defaults[n].Equals("System.DBNull"))) {
 						tprop = new CExpressionProperty(names[n], String.Format("{0}", defaults[n]));
 						tprop.PropertyChanged += OnPropertyChanged;
 					    _properties[names[n]] = tprop;
+						
 					} else {
 						tprop = new CExpressionProperty(names[n], String.Format("{0}", 0));
 						tprop.PropertyChanged += OnPropertyChanged;
 					    _properties[names[n]] = tprop;
 					}
 					
-					if (parameter_list == "")
-						parameter_list = names[n];
-					else
-						parameter_list += "," + names[n];
+//					if (parameter_list == "")
+//						parameter_list = names[n];
+//					else
+//						parameter_list += "," + names[n];
 				}
 				
+				parameter_list = String.Join (",", names);
 				block_text = String.Format("{0}({1})", method_name, parameter_list);
 			//} else {
 				//block_text = String.Format("method");
@@ -364,7 +381,8 @@ namespace Jigsaw
 				assembly_name = xr.GetAttribute("assembly_name");
 				type_name = xr.GetAttribute("type_name");
 				method_name = xr.GetAttribute("method_name");
-				return_type = System.Type.GetType(xr.GetAttribute("return_type"));
+				return_type = xr.GetAttribute("return_type");
+				//return_type = System.Type.GetType(xr.GetAttribute("return_type"));
 				
 			} else if (xr.Name == "parameter")
 			{
@@ -374,12 +392,15 @@ namespace Jigsaw
 				string parameter_type = xr.GetAttribute("type");
 				string parameter_default = xr.GetAttribute("default");
 				param_names.Add(parameter_name);
-				types.Add(System.Type.GetType(parameter_type));
+				types.Add(parameter_type);
+				//types.Add(System.Type.GetType(parameter_type));
 				
-				if (!parameter_default.Equals(""))
-					defaults.Add(System.Type.GetType(parameter_default));
-				else {
-					defaults.Add(System.DBNull.Value);
+				if (!parameter_default.Equals("")) {
+					defaults.Add(parameter_default);
+					//defaults.Add(System.Type.GetType(parameter_default));
+				} else {
+					defaults.Add("System.DBNull");
+					//defaults.Add(System.DBNull.Value);
 				}
 			}
 		}
@@ -393,12 +414,14 @@ namespace Jigsaw
 			xw.WriteAttributeString("assembly_name", assembly_name);
 			xw.WriteAttributeString("type_name", type_name);
 			xw.WriteAttributeString("method_name", method_name);
-			xw.WriteAttributeString("return_type", return_type.AssemblyQualifiedName);
+			xw.WriteAttributeString("return_type", return_type);
+			//xw.WriteAttributeString("return_type", return_type.AssemblyQualifiedName);
 			
 		    for (int n = 0; n < param_names.Count; n++) {
 				xw.WriteStartElement("parameter");
 				xw.WriteAttributeString("name", param_names[n]);
-				xw.WriteAttributeString("type", types[n].AssemblyQualifiedName);
+				xw.WriteAttributeString("type", types[n]);
+				//xw.WriteAttributeString("type", types[n].AssemblyQualifiedName);
 				xw.WriteAttributeString("default", defaults[n].ToString());
 				xw.WriteEndElement();
 		    }
