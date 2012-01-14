@@ -135,6 +135,8 @@ namespace Widgets
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 				if (shp != null) {
 					move = shp.Top;
+					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+					shp.Select(cvs);		// Select this shape
 					break;
 				}
 			}
@@ -156,6 +158,8 @@ namespace Widgets
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 				if (shp != null) {
 					move = shp.Top;
+					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+					shp.Select(cvs);		// Select this shape
 				}
 			}
 			foreach (WeakReference wrshp in _currTab._shapes)
@@ -182,6 +186,9 @@ namespace Widgets
 					if (shp.Text.ToLower().Contains(s.ToLower()) && shp.Top > 0) {
 						found = true;
 						move = shp.Top; 
+						cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+						shp.Select(cvs);		// Select this shape
+						cvs.Invalidate();
 						break;
 					}
 				}
@@ -202,8 +209,9 @@ namespace Widgets
 				MoveBlocksToTop(cvs);
 				found = SearchNext(cvs, s);
 			}
-			if (! found)
+			if (! found) {
 				_currTab.searchEnd = true;
+			}
 			return found;
 		}
 
@@ -221,6 +229,9 @@ namespace Widgets
 					if (shp.Text.ToLower().Contains(s.ToLower()) && shp.Top > 5) {
 						found = true;
 						move = shp.Top; 
+						cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+						shp.Select(cvs);		// Select this shape
+						cvs.Invalidate();
 						break;
 					}
 				}
@@ -262,6 +273,9 @@ namespace Widgets
 					if (shp.Text.ToLower().Contains(s.ToLower())) {
 						found = true;
 						move = shp.Top; 
+						cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+						shp.Select(cvs);		// Select this shape
+						cvs.Invalidate();
 						break;
 					}
 				}
