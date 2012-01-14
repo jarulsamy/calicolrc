@@ -441,6 +441,7 @@
                 <property name="Icon">stock:gtk-print LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnPrintButtonClicked" />
               </widget>
               <packing>
@@ -458,6 +459,7 @@
                 <property name="Icon">stock:gtk-new LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnNewButtonClicked" />
               </widget>
               <packing>
@@ -475,6 +477,7 @@
                 <property name="Icon">stock:gtk-open LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnOpenButtonClicked" />
               </widget>
               <packing>
@@ -492,10 +495,22 @@
                 <property name="Icon">stock:gtk-save LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnSaveButtonClicked" />
               </widget>
               <packing>
                 <property name="Position">3</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="vseparator1">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="Position">4</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -510,10 +525,11 @@
                 <property name="Icon">stock:gtk-no LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnStopButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">4</property>
+                <property name="Position">5</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -528,10 +544,11 @@
                 <property name="Icon">stock:gtk-yes LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnStartButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">5</property>
+                <property name="Position">6</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -553,7 +570,7 @@
                 <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
               </widget>
               <packing>
-                <property name="Position">6</property>
+                <property name="Position">7</property>
                 <property name="AutoSize">False</property>
                 <property name="Expand">False</property>
               </packing>
@@ -567,10 +584,11 @@
                 <property name="Icon">stock:gtk-media-pause LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnPauseButton1Clicked" />
               </widget>
               <packing>
-                <property name="Position">7</property>
+                <property name="Position">8</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -585,10 +603,11 @@
                 <property name="Icon">stock:gtk-media-play LargeToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnPlayButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">8</property>
+                <property name="Position">9</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -598,13 +617,24 @@
               <widget class="Gtk.HBox" id="searchbox">
                 <property name="MemberName" />
                 <child>
+                  <widget class="Gtk.VSeparator" id="vseparator2">
+                    <property name="MemberName" />
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="Gtk.Label" id="label7">
                     <property name="MemberName" />
                     <property name="LabelProp" translatable="yes">&lt;b&gt;Find: &lt;/b&gt;</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
-                    <property name="Position">0</property>
+                    <property name="Position">1</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -618,7 +648,7 @@
                     <signal name="Changed" handler="OnSearchEntryChanged" />
                   </widget>
                   <packing>
-                    <property name="Position">1</property>
+                    <property name="Position">2</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -632,10 +662,11 @@
                     <property name="Icon">stock:stock_down LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
                     <signal name="Clicked" handler="OnSearchNextButtonClicked" />
                   </widget>
                   <packing>
-                    <property name="Position">2</property>
+                    <property name="Position">3</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -649,10 +680,11 @@
                     <property name="Icon">stock:stock_up LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
                     <signal name="Clicked" handler="OnSearchPrevButtonClicked" />
                   </widget>
                   <packing>
-                    <property name="Position">3</property>
+                    <property name="Position">4</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -663,13 +695,14 @@
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-cancel LargeToolbar</property>
+                    <property name="Icon">stock:gtk-close LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
                     <signal name="Clicked" handler="OnButton125Clicked" />
                   </widget>
                   <packing>
-                    <property name="Position">4</property>
+                    <property name="Position">5</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
@@ -678,7 +711,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">9</property>
+                <property name="Position">10</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>

@@ -276,7 +276,7 @@ public class MainWindow : Gtk.Window
 		//                       900, 600, 3000, 2000);	
 		
 		string modulePath = null;
-		modulePath = @"C:\Programs\Mono\Calico-dev\modules\";
+		modulePath = "../../modules"; // @"C:\Programs\Mono\Calico-dev\modules\";
 		js = new Jigsaw.Canvas(modulePath, 900, 600, 3000, 2000);		
 		js.JigsawRun += new EventHandler(OnJigsawRun);
 		js.JigsawStop += new EventHandler(OnJigsawStop);

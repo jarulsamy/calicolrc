@@ -953,11 +953,24 @@ namespace Calico {
 
         [GLib.ConnectBeforeAttribute]
         protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-            int key_0 = (int)Gdk.Key.Key_0;
-            ///  FIXME           if (searchbox.Hidden) and escape, close it
-            if (Focus == Shell) {
+            if (Focus == searchEntry.Entry) {
+                if (args.Event.Key == Gdk.Key.Escape) {
+                    HandleSearchboxHidden(null, null);
+                    args.RetVal = true;
+                } else if (args.Event.Key == Gdk.Key.BackSpace) {
+                    if (CurrentDocument != null) {
+                        searchEntry.Entry.DeleteText(searchEntry.Entry.Text.Length - 1,
+                                                     searchEntry.Entry.Text.Length);
+                        CurrentDocument.SearchPrevious(searchEntry.Entry.Text);
+                    }
+                    args.RetVal = true;
+                } else if (args.Event.Key == Gdk.Key.Return) {
+                    CurrentDocument.SearchNext(searchEntry.ActiveText);
+                    args.RetVal = true;
+                } // else, don't handle
+            } else if (Focus == Shell) {
                 // Shell handler
-                // control+c, if nothing is selected, else it is a copy
+                // FIXME: control+c, if nothing is selected, else it is a copy
                 if (args.Event.Key == Gdk.Key.c && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
                     string text = Shell.SelectedText;
                     if (text == null) {
@@ -966,7 +979,7 @@ namespace Calico {
                         args.RetVal = true;
                     }
                 } else if (args.Event.Key == Gdk.Key.Escape) {
-                    // escape with selected, delete; else delete all
+                    // FIXME: escape with selected, delete; else delete all
                     string text = Shell.SelectedText;
                     if (text == null) {
                         Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
@@ -1849,11 +1862,6 @@ namespace Calico {
         {
             searchbox.Show();
             searchEntry.GrabFocus();
-            // FIXME: select all text
-            //searchEntry.ActiveText.SelectRegion(0, searchEntry.ActiveText.Length);
-            if (CurrentDocument != null) {
-                CurrentDocument.SearchStart();
-            }
         }
 
         protected void OnButton125Clicked (object sender, System.EventArgs e)
@@ -1954,6 +1962,7 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchNext(searchEntry.ActiveText);
             }
+            searchEntry.Entry.GrabFocus();
         }
 
         protected void OnSearchPrevButtonClicked (object sender, System.EventArgs e)
@@ -1961,6 +1970,8 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchPrevious(searchEntry.ActiveText);
             }
+            searchEntry.Entry.GrabFocus();
         }
+
     }
 }
