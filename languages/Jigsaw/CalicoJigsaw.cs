@@ -64,7 +64,7 @@ public class CalicoJigsawDocument : Document
 	base(calico, filename, "jigsaw")
 	{
 		cvs = new Jigsaw.Canvas (
-			System.IO.Path.Combine (calico.path, "../modules"), 900, 600, 3000, 2000);
+			System.IO.Path.Combine (calico.path, "../modules"), 100, 100, 3000, 2000);
 		widget.AddWithViewport(cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
@@ -98,6 +98,17 @@ public class CalicoJigsawDocument : Document
 	  return cvs.SaveDocument(filename);
 	}
 
+        public override bool SearchMore(string s) {
+	  return cvs.SearchMore(s);
+	}
+
+        public override bool SearchNext(string s) {
+	  return cvs.SearchNext(s);
+	}
+
+        public override bool SearchPrevious(string s) {
+	  return cvs.SearchPrevious(s);
+	}
 }
 
 public class CalicoJigsawLanguage : Language
