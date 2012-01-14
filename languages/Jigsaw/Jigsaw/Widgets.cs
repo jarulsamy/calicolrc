@@ -128,6 +128,166 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void MoveBlocksToTop(Diagram.Canvas cvs) {
+			double move = 0;
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					move = shp.Top;
+					break;
+				}
+			}
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					shp.Top -= move - 5;
+				}
+			}
+			cvs.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void MoveBlocksToBottom(Diagram.Canvas cvs) {
+			double move = 0;
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					move = shp.Top;
+				}
+			}
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					shp.Top -= move - 5;
+				}
+			}
+			cvs.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool SearchMore(Diagram.Canvas cvs, string s) {
+			///Find with more detail in s; might be a match here
+			/// Return True if found
+			bool found = false;
+			double move = 0;
+			// FIXME: use position in Window, not in Tab
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					if (shp.Text.ToLower().Contains(s.ToLower()) && shp.Top > 0) {
+						found = true;
+						move = shp.Top; 
+						break;
+					}
+				}
+			}
+			if (found) {
+				foreach (WeakReference wrshp in _currTab._shapes)
+				{
+					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+					if (shp != null) {
+						shp.Top -= move - 5; // move down from top slightly
+					}
+				}
+				cvs.Invalidate();
+				_currTab.searchEnd = false;
+			} else if (_currTab.searchEnd) {
+				// we are failing, again; go to top and search
+				_currTab.searchEnd = false;
+				MoveBlocksToTop(cvs);
+				found = SearchNext(cvs, s);
+			}
+			if (! found)
+				_currTab.searchEnd = true;
+			return found;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool SearchNext(Diagram.Canvas cvs, string s) {
+			///Find the next occurance of s
+			/// Return True if found
+			bool found = false;
+			double move = 0;
+			// FIXME: use position in Window, not in Tab
+			foreach (WeakReference wrshp in _currTab._shapes)
+			{
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null) {
+					if (shp.Text.ToLower().Contains(s.ToLower()) && shp.Top > 5) {
+						found = true;
+						move = shp.Top; 
+						break;
+					}
+				}
+			}
+			if (found) {
+				foreach (WeakReference wrshp in _currTab._shapes)
+				{
+					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+					if (shp != null) {
+						shp.Top -= move - 5; // move down from top slightly
+					}
+				}
+				cvs.Invalidate();
+				_currTab.searchEnd = false;
+			} else if (_currTab.searchEnd) {
+				// we are failing, again; go to top and search
+				_currTab.searchEnd = false;
+				MoveBlocksToTop(cvs);
+				found = SearchNext(cvs, s);
+			}
+			if (! found)
+				_currTab.searchEnd = true;
+			return found;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool SearchPrevious(Diagram.Canvas cvs, string s) {
+			/// Find a previous occurance of s from where we are
+			/// Return true if found
+			bool found = false;
+			double move = 0;
+			// in reverse order
+			// FIXME: use position in Window, not in Tab
+			for (int i = _currTab._shapes.Count - 1; i > 0; i--)
+			{
+				WeakReference wrshp = _currTab._shapes[i];
+				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+				if (shp != null && shp.Top < 0) {
+					if (shp.Text.ToLower().Contains(s.ToLower())) {
+						found = true;
+						move = shp.Top; 
+						break;
+					}
+				}
+			}
+			if (found) {
+				foreach (WeakReference wrshp in _currTab._shapes)
+				{
+					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+					if (shp != null) {
+						shp.Top -= move - 5; // move down from top slightly
+					}
+				}
+				cvs.Invalidate();
+				_currTab.searchTop = false;
+			} else if (_currTab.searchTop) {
+				// we are failing, again; go to bottom and search
+				_currTab.searchTop = false;
+				MoveBlocksToBottom(cvs);
+				found = SearchPrevious(cvs, s);
+			}
+			if (! found)
+				_currTab.searchTop = true;
+			return found;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e){
 			if (this.ContainsPoint(e.X, e.Y, cvs) )
 			{
@@ -239,6 +399,10 @@ namespace Widgets
 		private bool _toggled = false;
 		private List<WeakReference> _tabs = new List<WeakReference>(); // weak references to other tabs in tab group
 		internal List<WeakReference> _shapes = new List<WeakReference>();
+		
+		// Search data for this set of blocks:
+		internal bool searchEnd = false;
+		internal bool searchTop = false;
 		
 		// Save a reference to the block palette
 		internal CBlockPalette _palette = null;

@@ -845,12 +845,14 @@ namespace Jigsaw
 //		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public string Export()
-//		{
-//			Exporter exporter = new Exporter(this);
-//			exporter.ToPython("Jigsaw.py");
-//			return System.IO.Path.GetFullPath("Jigsaw.py");
-//		}
+		public string Export(string filename)
+		{
+			filename = System.IO.Path.GetFullPath(filename);
+	        using (StreamWriter outfile = new StreamWriter(filename)) {
+	            outfile.Write(this.ToPython());
+	        }
+			return filename;
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnInspectorShow(object sender, EventArgs e)
@@ -1346,6 +1348,20 @@ namespace Jigsaw
 				foreach (CEdge e in b.Edges) e._id = 0;
             }
         }
+	    // -----------------------------------------------------------------------
+	    public bool SearchMore(string s) {
+	        return pnlBlock.SearchMore(this, s);
+	    }
+
+	    // -----------------------------------------------------------------------
+	    public bool SearchNext(string s) {
+	        return pnlBlock.SearchNext(this, s);
+	    }
+
+	    // -----------------------------------------------------------------------
+	    public bool SearchPrevious(string s) {
+	        return pnlBlock.SearchPrevious(this, s);
+	    }
 	}
 	
 	// -----------------------------------------------------------------------

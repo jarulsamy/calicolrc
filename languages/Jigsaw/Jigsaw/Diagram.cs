@@ -1087,7 +1087,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     this.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -1105,7 +1105,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     this.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -1123,7 +1123,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     this.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -1140,7 +1140,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     this.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -1157,7 +1157,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     this.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -2158,7 +2158,7 @@ namespace Diagram
                 catch (Exception ex)
                 {
                     if (cvs != null) cvs.RaiseCanvasError(ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -2179,7 +2179,7 @@ namespace Diagram
                     {
                         cvs.RaiseCanvasError(ex.Message);
                     }
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -2201,7 +2201,7 @@ namespace Diagram
                     {
                         cvs.RaiseCanvasError(ex.Message);
                     }
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
@@ -2223,7 +2223,7 @@ namespace Diagram
                     {
                         cvs.RaiseCanvasError(ex.Message);
                     }
-                    Console.WriteLine(ex.Message);
+                    Console.Error.WriteLine(ex.Message);
                 }
             }
         }
