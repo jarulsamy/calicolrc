@@ -896,7 +896,7 @@ namespace Calico {
 
         static void SelectLineBlock(Mono.TextEditor.TextEditorData data, int endLineNr, int startLineNr) {
             Mono.TextEditor.LineSegment endLine = data.Document.GetLine(endLineNr);
-            data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 0, endLineNr, endLine.Length);
+            data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 1, endLineNr, endLine.Length);
         }
 
         protected virtual void OnCommentRegionActionActivated(object sender, System.EventArgs e) {
@@ -915,9 +915,9 @@ namespace Calico {
                 }
                 if (data.IsSomethingSelected)
                     SelectLineBlock(data, endLineNr, startLineNr);
-                if (data.Caret.Column != 0) {
+                if (data.Caret.Column != 1) {
                     data.Caret.PreserveSelection = true;
-                    data.Caret.Column = System.Math.Max(0, data.Caret.Column - last);
+                    data.Caret.Column = System.Math.Max(1, data.Caret.Column - last + 1);
                     data.Caret.PreserveSelection = false;
                 }
                 data.Document.EndAtomicUndo();
@@ -942,9 +942,9 @@ namespace Calico {
                 }
                 if (data.IsSomethingSelected)
                     SelectLineBlock(data, endLineNr, startLineNr);
-                if (data.Caret.Column != 0) {
+                if (data.Caret.Column != 1) {
                     data.Caret.PreserveSelection = true;
-                    data.Caret.Column = System.Math.Max(0, data.Caret.Column - last);
+                    data.Caret.Column = System.Math.Max(1, data.Caret.Column - last);
                     data.Caret.PreserveSelection = false;
                 }
                 data.Document.EndAtomicUndo();
@@ -999,7 +999,7 @@ namespace Calico {
                     Mono.TextEditor.Caret caret = Shell.Caret;
                     int line = caret.Line;
                     int line_count = Shell.Document.LineCount;
-                    if (line != line_count - 1) {
+                    if (line != line_count) {
                         completion = null;
                         args.RetVal = false;
                     }
@@ -1026,8 +1026,8 @@ namespace Calico {
                     // where are we?
                     int lineNo = Shell.Caret.Line;
                     string [] lines = Shell.Document.Text.Split('\n');
-                    string line = lines[lineNo];
-                    string text = line.Substring(0, Shell.Caret.Column);
+                    string line = lines[lineNo - 1];
+                    string text = line.Substring(0, Shell.Caret.Column - 1);
                     if (text.Trim() != "") { // something there!
                         if (completion == null) {
                             completion = new TabCompletion(this, Shell, text);
@@ -1062,7 +1062,7 @@ namespace Calico {
                 Shell.Document.Text = text;
                 Shell.GrabFocus();
                 Shell.Caret.Line = Shell.Document.LineCount;
-                Shell.Caret.Column = Shell.Document.GetLine(1).Length;
+                Shell.Caret.Column = 1; //Shell.Document.GetLine(1).Length;
              }
             UpdateUpDownArrows();
         }
