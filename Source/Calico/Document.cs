@@ -313,8 +313,8 @@ namespace Calico {
 
         public override bool GotoLine(int lineno) {
             var data = texteditor.GetTextEditorData();
-            data.Caret.Line = lineno - 1;
-            data.Caret.Column = 0;
+            data.Caret.Line = lineno;
+            data.Caret.Column = 1;
             texteditor.ScrollToCaret();
             return true;
         }

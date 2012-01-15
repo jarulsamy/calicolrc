@@ -1056,13 +1056,13 @@ namespace Calico {
             var caret = Shell.Caret;
             int line = caret.Line;
             int line_count = Shell.Document.LineCount;
-            if (force || line == (line_count - 1)) {
+            if (force || line == (line_count)) {
                 history.update(text.TrimEnd());
                 text = history.down();
                 Shell.Document.Text = text;
                 Shell.GrabFocus();
-                Shell.Caret.Line = Shell.Document.LineCount - 1;
-                Shell.Caret.Column = Shell.Document.GetLine(0).Length;
+                Shell.Caret.Line = Shell.Document.LineCount;
+                Shell.Caret.Column = Shell.Document.GetLine(1).Length;
              }
             UpdateUpDownArrows();
         }
@@ -1071,14 +1071,14 @@ namespace Calico {
             string text = Shell.Document.Text;
             var caret = Shell.Caret;
             int line = caret.Line;
-            if (force || line == 0) {
+            if (force || line == 1) {
                 history.update(text.TrimEnd());
                 text = history.up();
                 Shell.Document.Text = text;
                 Shell.GrabFocus();
-                Shell.Caret.Line = 0;
-                int col = Shell.Document.GetLine(0).Length;
-                Shell.Caret.Column = col;
+                Shell.Caret.Line = 1;
+                int col = Shell.Document.GetLine(1).Length;
+                Shell.Caret.Column = col + 1;
             }
             UpdateUpDownArrows();
         }
@@ -1108,8 +1108,8 @@ namespace Calico {
                 Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
                 Mono.TextEditor.DeleteActions.DeleteSelection(Shell.GetTextEditorData());
                 Shell.GrabFocus();
-                Shell.Caret.Line = 0;
-                Shell.Caret.Column = 0;
+                Shell.Caret.Line = 1;
+                Shell.Caret.Column = 1;
             }
             return true;
         }
