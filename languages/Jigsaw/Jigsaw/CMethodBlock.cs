@@ -15,13 +15,11 @@ namespace Jigsaw
 		List<string> types;
 		List<string> defaults;
 		public string return_type;
-		//List<Type> types;
-		//List<object> defaults;
-		//public Type return_type;
 		public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
 		
-		private bool _inHandler = false;	// Breaks re-entrant OnPropertyChanged event loops
-		
+		private string _source = null;
+		private Microsoft.Scripting.Hosting.CompiledCode _compiled = null;
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CMethodBlock(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
@@ -36,9 +34,6 @@ namespace Jigsaw
 			types = new List<string>();
 			defaults = new List<string>();
 			return_type = "System.Void";
-			//types = new List<Type>();
-			//defaults = new List<object>();
-			//return_type = System.Type.GetType("System.Void");
 		}
 		
 		public CMethodBlock(Double X, Double Y, 
@@ -49,9 +44,6 @@ namespace Jigsaw
 				    List<string> types,
 				    List<string> defaults,
 		            string return_type,
-		            //List<Type> types,
-		            //List<object> defaults,
-				    //Type return_type,
 				    Widgets.CBlockPalette palette = null) 
 				: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 					new Diagram.CPoint(X, Y),
@@ -69,6 +61,8 @@ namespace Jigsaw
 			CBlock clone = (CBlock)base.Clone(X, Y, cloneEdges);
 			((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.param_names, 
 								this.types, this.defaults, this.return_type);
+			clone.FillColor = this.FillColor;
+			clone.LineColor = this.LineColor;
 			return clone;
 		}
 		
@@ -93,28 +87,23 @@ namespace Jigsaw
 				  List<string> types,
 				  List<string> defaults,
 		          string return_type
-		          //List<Type> types,
-		          //List<object> defaults,
-				  //Type return_type
 		          )
 		{
 			this.assembly_name = assembly_name;
 			this.type_name = type_name;
-			this.method_name = method_name;
+			this.method_name = method_name;			// Name of function/constructor to call
 			this.param_names = names;				// Names of all parameters
-			this.types = types;
-			this.defaults = defaults;
-			this.return_type = return_type;
-			this.LineWidth = 2;
+			this.types = types;						// Parameter type strings
+			this.defaults = defaults;				// Parameter default values (as strings)
+			this.return_type = return_type;			// Return type string
+			
+			this.LineWidth = 2;						// Default block visual characteristics
 			this.LineColor = Diagram.Colors.DarkBlue;
 			this.FillColor = Diagram.Colors.LightBlue;
 			this.Sizable = false;
-			string parameter_list = "";
-			string block_text = "pass";
 			
 			// Make a variable property to hold values *returned* from functions
 			if (! return_type.ToString().Equals("System.Void")) {
-				//_properties["Variable"] = new CVarNameProperty("Variable", String.Format("{0}", MakeVariableName(method_name)));
 				CVarNameProperty tvar = new CVarNameProperty("Variable", "");
 				tvar.PropertyChanged += OnPropertyChanged;
 				_properties["Variable"] = tvar;
@@ -123,9 +112,9 @@ namespace Jigsaw
 			// Make all properties to hold function arguments
 			CExpressionProperty tprop = null;
 			
+			// Create parameters
 			if (names != null)
 			{
-				// Create parameters
 				for (int n = 0; n < names.Count; n++)
 				{
 					// FIXME: make a default of the appropriate type if one not given
@@ -134,7 +123,6 @@ namespace Jigsaw
 						tprop.PropertyChanged += OnPropertyChanged;
 						_properties[names[n]] = tprop;
 						
-					//} else if (!(defaults[n].GetType().ToString().Equals("System.DBNull"))) {
 					} else if (!(defaults[n].Equals("System.DBNull"))) {
 						tprop = new CExpressionProperty(names[n], String.Format("{0}", defaults[n]));
 						tprop.PropertyChanged += OnPropertyChanged;
@@ -145,71 +133,78 @@ namespace Jigsaw
 						tprop.PropertyChanged += OnPropertyChanged;
 					    _properties[names[n]] = tprop;
 					}
-					
-//					if (parameter_list == "")
-//						parameter_list = names[n];
-//					else
-//						parameter_list += "," + names[n];
 				}
-				
-				parameter_list = String.Join (",", names);
-				block_text = String.Format("{0}({1})", method_name, parameter_list);
-			//} else {
-				//block_text = String.Format("method");
 			}
-			
-			//this.Text = block_text;
-			
-			// Build statement from text
-			CStatementProperty Stat = new CStatementProperty("Statement", block_text);
-			Stat.Visible = false;
-			Stat.PropertyChanged += OnPropertyChanged;
-			_properties["Statement"] = Stat;
+
+			// Setup and init Property
 			this.OnPropertyChanged(null, null);
 		}
 		
         // - - - Update text when property changes - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
-			// Setting the Statement property re-raises this event. Supress re-entrant calls.
-			if (_inHandler == true) return;
-			_inHandler = true;
-			
 			// Get variable name to assign, if one was set
 			string varname = "";
 			if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
 			
 			// Build string to display in block
 			if (varname.Length > 0) {
-				this["Statement"] = String.Format("{0}={1}({2})", varname, method_name, paramListString);
+				this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListString);
 			} else {
-				this["Statement"] = String.Format("{0}({1})", method_name, paramListString);
+				this.Text = String.Format("{0}({1})", method_name, paramListString);
 			}
-			this.Text = String.Format("{0}", this["Statement"]);
+		}
+		
+		// - - - Generate and return Python procedure call - - - - - - - - -
+		private string ToPython ()
+		{
+			// Get variable name to assign, if one was set
+			string varname = "";
+			if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
 			
-			// Cancel re-entrant inhibition
-			_inHandler = false;
+			// Build Python
+			string code = String.Format("{0}.{1}({2})", assembly_name, method_name, paramListString);
+			if (varname.Length > 0) code = String.Format("{0}={1})", varname, code);
+			
+			this._source = code;
+			
+			return code;
+		}
+		
+		// - - - Append line of code to StringBuilder - - - - - - - - - - - -
+		public override bool ToPython (System.Text.StringBuilder o, int indent)
+		{
+			try
+			{
+				string code = this.ToPython();
+				string sindent = new string (' ', 2*indent);
+				
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				// Continue to connected Block, if there is one
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+				
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CMethodBlock.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
-			try {
-				// Rebuild statement and compile. Result is stored in property for later execution.
-				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
-				
-				// Build statement with no variable to assign.
-				string statement = String.Format("{0}.{1}({2})", assembly_name, method_name, paramListString);
-				
-				// Get variable name to assign, if one was set
-				string varname = "";
-				if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
-				
-				// Add assignment if variable specified
-				if (varname.Length > 0) statement = String.Format("{0}={1}", varname, statement);
-				
+			try
+			{
 				// Compile
-				Stat.Compile(engine, statement);
+				string code = this.ToPython();
+				
+				ScriptSource ssrc = engine.CreateScriptSourceFromString(code, Microsoft.Scripting.SourceCodeKind.Statements);
+				_compiled = ssrc.Compile();
 				
 				return true;
 				
@@ -220,11 +215,19 @@ namespace Jigsaw
 			
 		}
 		
+		// - - - Return a list of all assembly names required for this block - - - - - - -
+		public override List<string> RequiredAssemblies
+		{
+			get 
+			{
+				return new List<string>() {assembly_name};
+			}
+		}
+		
 		// - - - Execute statement - - - - - - - - - - - - - - - - - - - - - 
 		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
 		{
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Always place this block of code at the top of all block runners
+			// - - - Always place this block of code at the top of all block runners
 			this.State = BlockState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
@@ -234,13 +237,9 @@ namespace Jigsaw
 				yield return rr;
 			}
 			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Execute the statement
+			// - - - Execute the statement - - - - - - - - - - - - - - - -
 			try {
-				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
-				Stat.Evaluate(scope);
+				_compiled.Execute(scope);
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				this["Message"] = ex.Message;
@@ -249,74 +248,6 @@ namespace Jigsaw
 				rr.Action = EngineAction.NoAction;
 				rr.Runner = null;
 			}
-			
-//			try 
-//			{
-//				// First, get the expressions from the properties and evaluate them:
-//				List<object> args = new List<object>();
-//				List<Type> arg_types = new List<Type>();
-//				System.Reflection.MethodInfo method = null;
-				
-//				foreach (string name in param_names) {
-//					CExpressionProperty prop = (CExpressionProperty)_properties[name];
-//					object value = prop.Evaluate(scope); 
-//					args.Add(value);
-//					arg_types.Add(value.GetType());
-//				}
-				
-//				// Next, get the type and correct method based on the args above
-//				Type type = Reflection.Utils.getType(assembly_name, type_name);
-//				if (type != null)
-//				{
-//					method = Reflection.Utils.getMethodFromArgTypes(type, method_name, arg_types.ToArray());
-//					// and call it, if it is valid:
-//					object result = null;
-//					
-//					if (method != null) 
-//					{
-//						try {
-//							result = method.Invoke(type, args.ToArray());
-//						} catch (Exception ex) {
-//							this["Message"] = ex.Message;
-//							Console.WriteLine (this["Message"]);
-//							this.State = BlockState.Error;
-//							rr.Action = EngineAction.NoAction;
-//							rr.Runner = null;
-//					    }
-//						
-//					    if (!(return_type.ToString().Equals("System.Void"))) {
-//							CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-//							// Need to set LHS to evaluated expression:
-//							// First, set _ = RHS
-//							scope.SetVariable("_", result);
-//							// Then set LHS = _
-//							// @@@
-//							scope.SetVariable(VarName.Text, "_");
-//					    }
-//						
-//					} else {
-//						this["Message"] = "No matching method for these argument types";
-//						Console.WriteLine (this["Message"]);
-//						this.State = BlockState.Error;
-//						rr.Action = EngineAction.NoAction;
-//						rr.Runner = null;
-//					}
-//					
-//				} else {
-//					this["Message"] = "Can't find assembly";
-//					Console.WriteLine (this["Message"]);
-//					this.State = BlockState.Error;
-//					rr.Action = EngineAction.NoAction;
-//					rr.Runner = null;
-//				}
-//				
-//			} catch (Exception ex) {
-//				this["Message"] = ex.Message;
-//				Console.WriteLine (this["Message"]);
-//				this.State = BlockState.Error;
-//				rr.Action = EngineAction.NoAction;
-//				rr.Runner = null;
-//			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -337,30 +268,8 @@ namespace Jigsaw
 			this.State = BlockState.Idle;
 			yield return rr;
 		}
-
-//		// - - - 
-//		public string MakeVariableName(string methodname)
-//		{
-//			methodname = methodname.ToLower();
-//			string vname = "";
-//			if (methodname.StartsWith("make")) {
-//				vname = methodname.Substring("make".Length);
-//			} else if (methodname.StartsWith("get")) {
-//				vname = methodname.Substring("get".Length);
-//			} else {
-//				vname = methodname;
-//			}
-//			// FIXME: for some reason, it is created twice on each drop
-//			if (!VariableNames.ContainsKey(vname)) {
-//				VariableNames[vname] = 0;
-//			} else {
-//				if (! _isFactory)
-//					VariableNames[vname] = VariableNames[vname] + .5;
-//			}
-//			return vname.ToUpper() + VariableNames[vname].ToString();
-//		}
 		
-		// - - - 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void ReadXmlEndElement(XmlReader r)
 		{
 			// end of method, call SetValues, even though we have all of the info; we need
@@ -370,42 +279,33 @@ namespace Jigsaw
 			} 
 		}
 		
-		// - - - 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void ReadXmlTag(XmlReader xr)
 		{
-			//</method>
 			if (xr.Name == "method")
 			{
-				//<method assembly_name="Myro" type_name="Myro" method_name="askQuestion" return_type="System.String">
-				//Console.WriteLine("ok ReadXmlTag save item");
 				assembly_name = xr.GetAttribute("assembly_name");
 				type_name = xr.GetAttribute("type_name");
 				method_name = xr.GetAttribute("method_name");
 				return_type = xr.GetAttribute("return_type");
-				//return_type = System.Type.GetType(xr.GetAttribute("return_type"));
 				
-			} else if (xr.Name == "parameter")
-			{
-				//<parameter name="question" type="System.String" default="" />
-				//<parameter name="choices" type="IronRuby.Builtins.RubyArray" default="" />
+			} else if (xr.Name == "parameter") {
+				
 				string parameter_name = xr.GetAttribute("name");
 				string parameter_type = xr.GetAttribute("type");
 				string parameter_default = xr.GetAttribute("default");
 				param_names.Add(parameter_name);
 				types.Add(parameter_type);
-				//types.Add(System.Type.GetType(parameter_type));
 				
 				if (!parameter_default.Equals("")) {
 					defaults.Add(parameter_default);
-					//defaults.Add(System.Type.GetType(parameter_default));
 				} else {
 					defaults.Add("System.DBNull");
-					//defaults.Add(System.DBNull.Value);
 				}
 			}
 		}
 	
-		// - - - 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override void WriteXmlTags(XmlWriter xw)
 		{
 			// Write the method tag first, so when we read it first
@@ -415,13 +315,11 @@ namespace Jigsaw
 			xw.WriteAttributeString("type_name", type_name);
 			xw.WriteAttributeString("method_name", method_name);
 			xw.WriteAttributeString("return_type", return_type);
-			//xw.WriteAttributeString("return_type", return_type.AssemblyQualifiedName);
 			
 		    for (int n = 0; n < param_names.Count; n++) {
 				xw.WriteStartElement("parameter");
 				xw.WriteAttributeString("name", param_names[n]);
 				xw.WriteAttributeString("type", types[n]);
-				//xw.WriteAttributeString("type", types[n].AssemblyQualifiedName);
 				xw.WriteAttributeString("default", defaults[n].ToString());
 				xw.WriteEndElement();
 		    }

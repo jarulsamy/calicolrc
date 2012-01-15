@@ -1390,9 +1390,8 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Select all shapes. 
-        // Return the number of shapes selected.
+        // - - - Select all shapes - - - - - - - - - - - - - - - - - - -
+        // - - - Return the number of shapes selected.
         public int SelectAll()
         {
             int count = 0;
@@ -1415,9 +1414,8 @@ namespace Diagram
             return count;
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Deselect all shapes.
-        // Return the number of shapes deselected.
+        // - - - Deselect all shapes - - - - - - - - - - - - - - - - - - -
+        // - - - Return the number of shapes deselected.
         public int DeselectAll()
         {
             int count = 0;

@@ -110,6 +110,16 @@ public class MainWindow : Gtk.Window
 		muFile.Append(miExit);
 		miExit.AddAccelerator("activate", agrp, (int)'Q', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 
+		// - - - Edit Menu
+		Gtk.Menu muEdit = new Gtk.Menu();
+		
+		Gtk.MenuItem miEditFind = new Gtk.MenuItem("_Find");
+		miEditFind.Activated += new EventHandler(OnEditFind);
+		muEdit.Append(miEditFind);
+		miEditFind.AddAccelerator("activate", agrp, (int)'F', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+
+		// @@@
+		
 		// - - - View Menu
 		Gtk.Menu muView = new Gtk.Menu();
 		
@@ -172,6 +182,10 @@ public class MainWindow : Gtk.Window
 		Gtk.MenuItem miFile = new Gtk.MenuItem("_File");
 		miFile.Submenu = muFile;
 		mb.Append(miFile);
+
+		Gtk.MenuItem miEdit = new Gtk.MenuItem("_Edit");
+		miEdit.Submenu = muEdit;
+		mb.Append(miEdit);
 		
 		Gtk.MenuItem miView = new Gtk.MenuItem("_View");
 		miView.Submenu = muView;
@@ -424,7 +438,7 @@ public class MainWindow : Gtk.Window
 	{
 		js.Stop();
 		
-		// Get map file path
+		// Get file path. Can be DLL or map file
 		Gtk.FileChooserDialog fc = null;
 		fc = new Gtk.FileChooserDialog("Library to load", 
 		                               this,
@@ -433,9 +447,14 @@ public class MainWindow : Gtk.Window
 		                               "Load",   Gtk.ResponseType.Accept);
 		
 		Gtk.FileFilter f1 = new Gtk.FileFilter();
-		f1.Name = "Library map files";
-		f1.AddPattern("*.map");
+		f1.Name = "Library files";
+		f1.AddPattern("*.dll");
 		fc.AddFilter(f1);
+		
+		Gtk.FileFilter f2 = new Gtk.FileFilter();
+		f2.Name = "Library map files";
+		f2.AddPattern("*.map");
+		fc.AddFilter(f2);
 		
 		Gtk.FileFilter f3 = new Gtk.FileFilter();
 		f3.Name = "All files";
@@ -450,18 +469,19 @@ public class MainWindow : Gtk.Window
 			return;
 		}
 		
-		// Get map file name
-		string mapfile = fc.Filename;
+		// Get file name
+		string filename = fc.Filename;
+		string filetype = System.IO.Path.GetExtension(filename).ToLower();
 		fc.Destroy();
 		
-		// Check if file does not exist
-		if (!System.IO.File.Exists(mapfile)) {
+		// Check if file exists
+		if (!System.IO.File.Exists(filename)) {
 			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
 				this,
 				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 				Gtk.MessageType.Warning,
 				Gtk.ButtonsType.Ok,
-				"Map file not found");
+				String.Format ("File not found: {0}", filename));
 			dlg.Title = "File not found";
 			
 			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
@@ -469,7 +489,19 @@ public class MainWindow : Gtk.Window
 			return;
 		}
 		
-		js.UseLibrary(mapfile);
+		try
+		{	// Decide what to do based on file extension
+			if (filetype == ".map") {
+				System.IO.TextReader tr = new System.IO.StreamReader(filename);
+				js.UseLibraryMap(tr);
+			} else {	// Assume it's a dll
+				StringBuilder sb = js.CreateMapFile(filename);
+				System.IO.TextReader tr = new System.IO.StringReader (sb.ToString ());
+				js.UseLibraryMap(tr);
+			}
+		} catch (Exception ex) {
+			Console.WriteLine ("Error loading library: {0}", ex.Message);
+		}
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -507,7 +539,7 @@ public class MainWindow : Gtk.Window
 		string assembly_name = fc.Filename;
 		fc.Destroy();
 		
-		// Create map file path
+		// Get map file path
 		string dir_name = System.IO.Path.GetDirectoryName(assembly_name);
 		string base_file = System.IO.Path.GetFileNameWithoutExtension(assembly_name);
 		string filename = String.Format ("{0}{1}{2}.map", dir_name, System.IO.Path.DirectorySeparatorChar, base_file);
@@ -526,67 +558,11 @@ public class MainWindow : Gtk.Window
 			dlg.Destroy();
 			if (rsp == Gtk.ResponseType.No) return;
 		}
-		
-		// Create XML map file -- temp modified from Reflection.Utils.Mapping.Save()
-		XmlWriterSettings settings = new XmlWriterSettings();
-		settings.Indent = true;
-		settings.IndentChars = "    ";
-		settings.Encoding = Encoding.ASCII;
-		
+
 		try
 		{
-			using (XmlWriter xw = XmlWriter.Create(filename, settings)) {
-				xw.WriteStartElement("map");
-				xw.WriteAttributeString("path", assembly_name);
-				xw.WriteElementString("docstring", "");
-				
-			  	foreach (string type_name in Reflection.Utils.getTypeNames(assembly_name))
-				{	//Console.WriteLine (type_name);
-					Type type = Reflection.Utils.getType(assembly_name, type_name);
-					
-					// Write constructors
-					foreach (ConstructorInfo ci in Reflection.Utils.getConstructors(type))
-					{	// write it
-						xw.WriteStartElement("constructor");
-				  	    xw.WriteAttributeString("assembly_name", base_file);
-					    xw.WriteAttributeString("type_name", type_name);
-					    xw.WriteAttributeString("constructor_name", ci.Name);
-						xw.WriteElementString("docstring", "");
-						
-					    foreach (ParameterInfo pi in ci.GetParameters()) {
-					      xw.WriteStartElement("parameter");
-					      xw.WriteAttributeString("name", pi.Name);
-					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
-					      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
-					      xw.WriteEndElement();
-					    }
-						
-					  	xw.WriteEndElement();
-					}
-					
-					// Write static methods
-					foreach (MethodInfo mi in Reflection.Utils.getStaticMethods(type))
-					{	// write it
-						xw.WriteStartElement("method");
-				  	    xw.WriteAttributeString("assembly_name", base_file);
-					    xw.WriteAttributeString("type_name", type_name);
-					    xw.WriteAttributeString("method_name", mi.Name);
-						xw.WriteAttributeString("return_type", mi.ReturnType.FullName);
-						xw.WriteElementString("docstring", "");
-						
-					    foreach (ParameterInfo pi in mi.GetParameters()) {
-					      xw.WriteStartElement("parameter");
-					      xw.WriteAttributeString("name", pi.Name);
-					      xw.WriteAttributeString("type", pi.ParameterType.FullName);
-					      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
-					      xw.WriteEndElement();
-					    }
-					  	xw.WriteEndElement();
-					}
-			  	}
-				
-				xw.WriteEndElement();	// close map
-			}
+			StringBuilder sb = js.CreateMapFile(assembly_name);
+			System.IO.File.WriteAllText(filename, sb.ToString());
 			
 			// Inform user where map file written
 			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
@@ -613,6 +589,35 @@ public class MainWindow : Gtk.Window
 			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
 			dlg2.Destroy();
 		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnEditFind(object sender, EventArgs a)
+	{
+		Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+			this,
+			Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+			Gtk.MessageType.Question,
+			Gtk.ButtonsType.None,
+			null);
+			dlg.AddButton("Cancel", Gtk.ResponseType.Cancel);
+			dlg.AddButton("Find", Gtk.ResponseType.Accept);
+		dlg.Title = "Find...";
+		dlg.Markup = "<b>Please enter text to find in all blocks</b>";
+		Gtk.Entry entry = new Gtk.Entry();
+		Gtk.HBox hbox = new Gtk.HBox();
+		hbox.PackStart(new Gtk.Label("Find: "), false, false, 5);
+		hbox.PackEnd(entry);
+		//dlg.SecondaryUseMarkup = true;
+		//dlg.SecondaryText = "This will be used for <i>identification</i> purposes";
+		dlg.VBox.PackEnd(hbox, true, true, 0);
+		dlg.ShowAll();
+		Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+		if (rsp == Gtk.ResponseType.Accept) {
+			string src = entry.Text;
+			js.SearchMore(src);
+		}
+		dlg.Destroy();
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

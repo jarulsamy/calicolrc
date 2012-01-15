@@ -35,24 +35,18 @@ namespace Jigsaw
 			
 			// Properties
 			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");
-			CVarNameProperty Arg1 = new CVarNameProperty("Param1", "");
-			CVarNameProperty Arg2 = new CVarNameProperty("Param2", "");
-			CVarNameProperty Arg3 = new CVarNameProperty("Param3", "");
-			
 			ProcName.PropertyChanged += OnPropertyChanged;
-			Arg1.PropertyChanged += OnPropertyChanged;
-			Arg2.PropertyChanged += OnPropertyChanged;
-			Arg3.PropertyChanged += OnPropertyChanged;
-			
 			_properties["Procedure Name"] = ProcName;
-			_properties["Param1"] = Arg1;
-			_properties["Param2"] = Arg2;
-			_properties["Param3"] = Arg3;
 			
-			_argnames.Add ("Param1");
-			_argnames.Add ("Param2");
-			_argnames.Add ("Param3");
-			
+			// Parameter properties
+			for (int i=1; i<=5; i++) {
+				string paramname = String.Format ("Param{0}", i);
+				CVarNameProperty Par = new CVarNameProperty(paramname, "");
+				Par.PropertyChanged += OnPropertyChanged;
+				_properties[paramname] = Par;
+				_argnames.Add (paramname);
+			}
+
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -88,12 +82,19 @@ namespace Jigsaw
 		}
 
 		// - - - Generate and return Python translation of a procedure - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("def {0}({1}):", this.ProcedureName, this.argListString);
+			return code;
+		}
+		
+		// - - - 
 		public override bool ToPython (StringBuilder o, int indent)
 		{
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				o.AppendFormat("{0}def {1}({2}):\n", sindent, this.ProcedureName, this.argListString);
+				o.AppendFormat("{0}{1}\n", sindent, this.ToPython());
 				
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
@@ -233,27 +234,21 @@ namespace Jigsaw
 			
 			// Properties
 			CVarNameProperty VarName  = new CVarNameProperty("Variable", "X");
-			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");
-			CExpressionProperty Arg1  = new CExpressionProperty("Param1", "");
-			CExpressionProperty Arg2  = new CExpressionProperty("Param2", "");
-			CExpressionProperty Arg3  = new CExpressionProperty("Param3", "");
-			
 			VarName.PropertyChanged  += OnPropertyChanged;
-			ProcName.PropertyChanged += OnPropertyChanged;
-			Arg1.PropertyChanged += OnPropertyChanged;
-			Arg2.PropertyChanged += OnPropertyChanged;
-			Arg3.PropertyChanged += OnPropertyChanged;
-			
 			_properties["Variable"] = VarName;
+			
+			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");
+			ProcName.PropertyChanged += OnPropertyChanged;
 			_properties["Procedure Name"] = ProcName;
-			_properties["Param1"] = Arg1;
-			_properties["Param2"] = Arg2;
-			_properties["Param3"] = Arg3;
 			
-			_argnames.Add ("Param1");
-			_argnames.Add ("Param2");
-			_argnames.Add ("Param3");
-			
+			// Create arguments
+			for (int i=1; i<=5; i++) {
+				string argname = String.Format ("Arg{0}", i);
+				CExpressionProperty Arg = new CExpressionProperty(argname, "");
+				Arg.PropertyChanged += OnPropertyChanged;
+				_properties[argname] = Arg;
+				_argnames.Add (argname);
+			}
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -290,6 +285,16 @@ namespace Jigsaw
 			}
 		}
 		
+        // - - - Update text when property changes - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{
+			if (this.VariableName.Length > 0) {
+				this.Text = String.Format("{0} = {1}({2})", this.VariableName, this.ProcedureName, paramListString);
+			} else {
+				this.Text = String.Format("{0}({1})", this.ProcedureName, paramListString);
+			}
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override bool Compile( ScriptEngine engine, Jigsaw.Canvas cvs )
 		{	// Compile the block code into something that can be executed.
@@ -322,34 +327,31 @@ namespace Jigsaw
 			
 			// Compile all expressions passed to procedure
 			foreach (string aname in _argnames) {
-				CExpressionProperty Arg1 = (CExpressionProperty)_properties[aname];
-				if (Arg1.Text.Length > 0) Arg1.Compile(engine);
+				CExpressionProperty Arg = (CExpressionProperty)_properties[aname];
+				if (Arg.Text.Length > 0) Arg.Compile(engine);
 			}
 			
 			return true;
 		}
-		
-        // - - - Update text when property changes - - - - - - - - - - - -
-		public void OnPropertyChanged(object sender, EventArgs e)
+
+		// - - - Generate and return Python procedure call - - - - -
+		private string ToPython ()
 		{
-			if (this.VariableName.Length > 0) {
-				this.Text = String.Format("{0} = {1}({2})", this.VariableName, this.ProcedureName, paramListString);
-			} else {
-				this.Text = String.Format("{0}({1})", this.ProcedureName, paramListString);
-			}
+			string code = String.Format("{0}({1})", this.ProcedureName, this.paramListString);
+			if (this.VariableName.Length > 0) String.Format("{0} = {1}", this.VariableName, code);
+			
+			return code;
 		}
 		
-		// - - - Generate and return Python procedure call - - - - -
+		// - - -
 		public override bool ToPython (StringBuilder o, int indent)
 		{
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				if (this.VariableName.Length > 0) {
-					o.AppendFormat("{0}{1} = {2}({3})\n", sindent, this.VariableName, this.ProcedureName, this.paramListString);
-				} else {
-					o.AppendFormat("{0}{1}({2})\n", sindent, this.ProcedureName, this.paramListString);
-				}
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
 				
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
@@ -382,13 +384,12 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
 			try 
-			{	
-				// Set Args to be passed to start block
+			{	// Set Args to be passed to start block
 				List<object> args = new List<object>();
 				
 				foreach (string aname in _argnames) {
-					CExpressionProperty Arg1 = (CExpressionProperty)_properties[aname];
-					if (Arg1.Text.Length > 0) args.Add( Arg1.Evaluate(scope) );
+					CExpressionProperty Arg = (CExpressionProperty)_properties[aname];
+					if (Arg.Text.Length > 0) args.Add( Arg.Evaluate(scope) );
 				}
 				procStartBlock.Args = args;
 				
@@ -577,12 +578,18 @@ namespace Jigsaw
 		}
 
 		// - - - Generate and return Python translation of a procedure return - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format ("return {0}", this["Expression"]);
+			return code;
+		}
+		
 		public override bool ToPython (StringBuilder o, int indent)
 		{
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				o.AppendFormat("{0}return {1}\n", sindent, this["Expression"]);
+				o.AppendFormat("{0}{1}\n", sindent, this.ToPython ());
 				
 			} catch (Exception ex){
 				Console.WriteLine(ex.Message);

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Xml;
 using System.IO;
+using System.Reflection;
 using Cairo;
 using Microsoft.Scripting.Hosting;
 
@@ -71,9 +72,7 @@ namespace Jigsaw
 			
 			// Properties window shared by all blocks
 			_inspector = new Jigsaw.InspectorWindow(this);
-			
-			
-			
+
 			// Engine to run Jigsaw programs
 			_engine = new Engine();
 			_engine.EngineRun   += OnEngineRun;
@@ -142,9 +141,13 @@ namespace Jigsaw
 			this.AddShape(vblock2);
 			tbStats.AddShape(vblock2);
 			
-			CComment bCmt1 = new CComment(110, 150, pnlBlock);
+			CInlineComment bCmt1 = new CInlineComment(110, 150, pnlBlock);
 			this.AddShape(bCmt1);
 			tbStats.AddShape(bCmt1);
+			
+			CComment bCmt2 = new CComment(110, 190, pnlBlock);
+			this.AddShape(bCmt2);
+			tbStats.AddShape(bCmt2);
 			
 			// ----- IO tab and factory blocks
 			tabY += 33;
@@ -189,12 +192,13 @@ namespace Jigsaw
 			// Look for map files in module path and try to load
 			if (modulePath != null) {
 				// Look for all map files and load
-				string[] filePaths = System.IO.Directory.GetFiles(modulePath, "*.map");
+				string[] filePaths = Directory.GetFiles(modulePath, "*.map");
 				
 				// Give each a go
 				foreach (string pth in filePaths) {
 					try {
-						UseLibrary(pth);
+						TextReader tr = new StreamReader(pth);
+						UseLibraryMap(tr);
 					} catch (Exception ex){
 						Console.WriteLine (ex.Message);
 					}
@@ -340,10 +344,100 @@ namespace Jigsaw
 			}
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public bool UseLibrary(string mapfile)
+		// - - - Create XML map file in StringBuilder object - - - - - - - - -
+		public StringBuilder CreateMapFile(string dllfile)
+		{	
+			StringBuilder sb = new StringBuilder();
+			try
+			{
+				string assembname = System.IO.Path.GetFileNameWithoutExtension(dllfile);
+				
+				XmlWriterSettings settings = new XmlWriterSettings();
+				settings.Indent = true;
+				settings.IndentChars = "    ";
+				settings.Encoding = Encoding.ASCII;
+				
+				using (XmlWriter xw = XmlWriter.Create(sb, settings)) {
+					xw.WriteStartElement("map");
+					xw.WriteAttributeString("path", dllfile);
+					xw.WriteElementString("docstring", "");
+					
+					// light blue
+					xw.WriteStartElement("fill_color");
+					xw.WriteAttributeString("red", "0.6758"); 
+					xw.WriteAttributeString("green", "0.8437"); 
+					xw.WriteAttributeString("blue", "0.8984");
+					xw.WriteAttributeString("alpha", "1.0");
+					xw.WriteEndElement();
+					
+					// dark blue
+					xw.WriteStartElement("line_color");
+					xw.WriteAttributeString("red", "0.0"); 
+					xw.WriteAttributeString("green", "0.0"); 
+					xw.WriteAttributeString("blue", "0.5430");
+					xw.WriteAttributeString("alpha", "1.0");
+					xw.WriteEndElement();
+					
+				  	foreach (string type_name in Reflection.Utils.getTypeNames(dllfile))
+					{	//Console.WriteLine (type_name);
+						Type type = Reflection.Utils.getType(dllfile, type_name);
+						
+						// Write constructors
+						foreach (ConstructorInfo ci in Reflection.Utils.getConstructors(type))
+						{	// write it
+							xw.WriteStartElement("constructor");
+					  	    xw.WriteAttributeString("assembly_name", assembname);
+						    xw.WriteAttributeString("type_name", type_name);
+						    xw.WriteAttributeString("constructor_name", ci.Name);
+							xw.WriteElementString("docstring", "");
+							
+						    foreach (ParameterInfo pi in ci.GetParameters()) {
+						      xw.WriteStartElement("parameter");
+						      xw.WriteAttributeString("name", pi.Name);
+						      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+						      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
+						      xw.WriteEndElement();
+						    }
+							
+						  	xw.WriteEndElement();
+						}
+						
+						// Write static methods
+						foreach (MethodInfo mi in Reflection.Utils.getStaticMethods(type))
+						{	// write it
+							xw.WriteStartElement("method");
+					  	    xw.WriteAttributeString("assembly_name", assembname);
+						    xw.WriteAttributeString("type_name", type_name);
+						    xw.WriteAttributeString("method_name", mi.Name);
+							xw.WriteAttributeString("return_type", mi.ReturnType.FullName);
+							xw.WriteElementString("docstring", "");
+							
+						    foreach (ParameterInfo pi in mi.GetParameters()) {
+						      xw.WriteStartElement("parameter");
+						      xw.WriteAttributeString("name", pi.Name);
+						      xw.WriteAttributeString("type", pi.ParameterType.FullName);
+						      xw.WriteAttributeString("default", pi.DefaultValue.ToString());
+						      xw.WriteEndElement();
+						    }
+						  	xw.WriteEndElement();
+						}
+				  	}
+					
+					xw.WriteEndElement();	// close map
+					
+				}
+				
+				return sb;
+				
+			} catch (Exception ex) {
+				Console.WriteLine("Map file created failed: {0}", ex.Message);
+				return null;
+			}
+		}
+		
+		// - - - Load and build blocks from assembly map xml - - - - - - - - - - - - - - -
+		public bool UseLibraryMap(TextReader tr)
 		{
-			// Load and build blocks from assembly mapfile
 			List<CBlock> blocks = new List<CBlock>();
 			string assembly_name = "";
 	        string type_name = "";
@@ -358,10 +452,13 @@ namespace Jigsaw
 			
 			int y = 70;
 			CBlock block = null;
+			Color fill_color = Diagram.Colors.LightBlue;
+			Color line_color = Diagram.Colors.DarkBlue;
+			double R, G, B, A;
 			
 			try
 			{
-				using (XmlReader xr = XmlTextReader.Create(mapfile)) {
+				using (XmlReader xr = XmlTextReader.Create(tr)) {
 			        while (xr.Read()) {
 			            switch (xr.NodeType) {
 						
@@ -417,7 +514,40 @@ namespace Jigsaw
 								param_defaults.Add (param_default);
 								
 			                    break;
-		
+								
+							case "docstring":
+								// TODO: Do something with document string
+								break;
+								
+							case "fill_color":
+								R = fill_color.R;
+								G = fill_color.G;
+								B = fill_color.B;
+								A = fill_color.A;
+								
+								Double.TryParse (xr.GetAttribute("red"), out R);
+								Double.TryParse (xr.GetAttribute("green"), out G);
+								Double.TryParse (xr.GetAttribute("blue"), out B);
+								Double.TryParse (xr.GetAttribute("alpha"), out A);
+								
+								fill_color = new Color(R,G,B,A);
+								
+								break;
+								
+							case "line_color":
+								R = line_color.R;
+								G = line_color.G;
+								B = line_color.B;
+								A = line_color.A;
+								
+								Double.TryParse (xr.GetAttribute("red"), out R);
+								Double.TryParse (xr.GetAttribute("green"), out G);
+								Double.TryParse (xr.GetAttribute("blue"), out B);
+								Double.TryParse (xr.GetAttribute("alpha"), out A);
+								
+								line_color = new Color(R,G,B,A);
+								
+								break;
 			                }
 			                break;
 							
@@ -430,6 +560,8 @@ namespace Jigsaw
 										    			 param_names, param_type_names, param_defaults, 
 														 return_type, pnlBlock);
 								block.Visible = false;
+								block.FillColor = fill_color;
+								block.LineColor = line_color;
 					      		blocks.Add(block);
 					      		y += 40;
 		
@@ -441,6 +573,8 @@ namespace Jigsaw
 										    			 param_names, param_type_names, param_defaults, 
 								                         return_type, pnlBlock);
 								block.Visible = false;
+								block.FillColor = fill_color;
+								block.LineColor = line_color;
 					      		blocks.Add(block);
 					      		y += 40;
 		
@@ -1268,6 +1402,7 @@ namespace Jigsaw
 			// Check for exactly one start block. If 0 or > 1 found, can't generate.
 			// Also collect all libraries to import
 			List<CBlock> allBlocks = this.AllBlocks();
+			Dictionary<string, string> allAssemblies = new Dictionary<string, string>();
 			
 			int count = 0;
 			CControlStart sblock = null;
@@ -1278,8 +1413,8 @@ namespace Jigsaw
 					count++;
 				}
 				
-				// @@@ Identify the required library to import for this block, if any
-				
+				// Identify the required library to import for this block, if any
+				foreach (string asm in b.RequiredAssemblies) allAssemblies[asm] = null;
 			}
 			
 			if (count == 0 || count > 1) {
@@ -1294,7 +1429,11 @@ namespace Jigsaw
 			o.AppendLine("# http://calicoproject.org");
 			o.AppendLine();
 			
-			// @@@ Do necessary imports here
+			// Do necessary imports here
+			o.AppendLine ("import clr");
+			foreach (string k in allAssemblies.Keys) o.AppendFormat("clr.AddReference('{0}')\n", k);
+			foreach (string k in allAssemblies.Keys) o.AppendFormat("import {0}\n", k);
+			o.AppendLine ();
 			
 			// Generate all procedures
 			foreach (CBlock b in allBlocks)
@@ -1553,11 +1692,20 @@ namespace Jigsaw
 			this.State = BlockState.Idle;
 			yield return rr;
 		}
-
+		
 		// - - - Generate an return Python translation of a block - - - - -
 		public virtual bool ToPython (StringBuilder o, int indent)
-		{
+		{	// The default behavior is to add nothing.
 			return true;
+		}
+		
+		// - - - Return a list of all assembly names required for this block - - -
+		public virtual List<string> RequiredAssemblies
+		{
+			get 
+			{
+				return new List<string>();
+			}
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1575,15 +1723,10 @@ namespace Jigsaw
         {	// Write the base standard attributes shared by all shapes
             // Get object assembly and full name
             Type typ = this.GetType();
-            //String FullAsmName = typ.Assembly.FullName;
-            //String[] items = FullAsmName.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-            //String AsmName = items[0];
             String FullName = typ.FullName;
 
             w.WriteAttributeString("id", this._id.ToString());
 			w.WriteAttributeString("typeName", FullName);
-            //w.WriteAttributeString("typeName", this.GetType().Name);
-            //w.WriteAttributeString("typeName", String.Format("{0};{1}", AsmName, FullName));
 			w.WriteAttributeString("left", this.Left.ToString());
 			w.WriteAttributeString("top", this.Top.ToString());
         }
@@ -1606,14 +1749,6 @@ namespace Jigsaw
 			foreach (CEdge e in this.Edges) e.ToXml(w);
 			foreach (CProperty p in this.Properties) p.ToXml(w);
         }
-		
-//	 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected virtual void WriteXmlProperty(XmlWriter w, string name, string val) {
-//	        w.WriteStartElement("property");
-//			w.WriteAttributeString("name", name);
-//			w.WriteAttributeString("value", val);
-//			w.WriteEndElement();	
-//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void Draw(Cairo.Context g)

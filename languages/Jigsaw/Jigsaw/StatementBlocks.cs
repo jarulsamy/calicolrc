@@ -260,6 +260,58 @@ namespace Jigsaw
     }
 	
 	// --- Generic Python statement block shape class --------------------------------
+    public class CInlineComment : CBlock
+    {
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CInlineComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)	}),
+				palette )
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.Gray;
+			this.FillColor = Diagram.Colors.LightYellow;;
+			this.Sizable = false;
+			
+			// Properties
+			CStringProperty comment = new CStringProperty("Comment", "Comment");
+			comment.PropertyChanged += OnPropertyChanged;
+			_properties["Comment"] = comment;
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CInlineComment(Double X, Double Y) : this(X, Y, null) {}
+		
+        // - - - Update text when property changes - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{
+			this.Text = String.Format("{0}", this["Comment"]);
+		}
+		
+		// - - - Generate and return Python statement - - - - - - - - - - -
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				o.AppendFormat("{0}# {1}\n", sindent, this["Comment"]);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+				
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CInlineComment.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+	}
+	
+	// --- Generic Python statement block shape class --------------------------------
     public class CComment : CBlock
     {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
