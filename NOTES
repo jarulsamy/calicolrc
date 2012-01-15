@@ -2,22 +2,23 @@ Calico2
 
 Bugs
 
-* Printing gives error: Cairo.Context: called from finalization thread, programmer is missing a call to Dispose
-* Ask to save unsaved files on shutdown/close tab
-* Add tooltips
-* Translations
-
-Big Tickets
-
-6. Chat stuff (register, login, blast, chat)
-7. About [%s]
-12. Goto file:line on right-click
-12.1 Show error Help button on error
-15. Ask to abort changes, save
-16. click in output to get history somehow
-17. Detect that the file has changed outside of Calico
-18. Windows/Mac/Linux versions
-19. Add a breakpoint
+ 1. Printing gives error: Cairo.Context: called from finalization thread, 
+    programmer is missing a call to Dispose
+ 2. Ask to save unsaved files on shutdown/close tab
+ 3. Add tooltips
+ 4. Translations? How? Why does Calico on Windows work with Mono.Unix?
+ 5. Running a file does not use print as function. Need to... what? 
+    set Python compiler options?
+ 6. Tab completion [needs refinement]
+ 7. Chat stuff (register, login, blast, chat)
+ 8. About [need vars, what VM]
+ 9. Goto file: line on right-click (or button)
+10. Show error Help button on error
+11. Ask to abort changes, save
+12. click in output to get history somehow
+13. Detect that the file has changed outside of Calico
+14. Windows/Mac/Linux versions
+15. Add a breakpoint
 
 Problems, issues, features, and questions.
 
