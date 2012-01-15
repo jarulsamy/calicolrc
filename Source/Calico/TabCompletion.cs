@@ -35,7 +35,7 @@ namespace Calico {
         public static string [] ArrayRange(string [] array, int start, int stop) {
             List<string> temp = new List<string>();
             if (stop == -1)
-                stop = array.Length - 1;
+                stop = array.Length - 2;
             int pos = 0;
             foreach (string s in array) {
                 if (pos >= start && pos <= stop)
@@ -45,20 +45,16 @@ namespace Calico {
             return temp.ToArray();
         }
 
-        public static bool hasattr(object value, string part) {
-            // FIXME:
-            Console.WriteLine("hasattr({0}, {1})", value, part);
-            return false;
+        public bool hasattr(MainWindow calico, object value, string part) {
+            return dir(calico, value).Contains(part);
         }
 
-        public static object getattr(object value, string part) {
-            // FIXME:
-            return null;
+        public object getattr(MainWindow calico, object value, string part) {
+            return ((DLREngine)calico.manager[calico.CurrentLanguage].engine).engine.Operations.GetMember(value, part);
         }
 
-        public List<string> dir(object obj) {
-            // FIXME: is this all? Constructors, other members?
-            return Reflection.Utils.getMethodNames(obj.GetType());
+        public IList<string> dir(MainWindow calico, object obj) {
+            return ((DLREngine)calico.manager[calico.CurrentLanguage].engine).engine.Operations.GetMemberNames(obj);
         }
 
         public TabCompletion(MainWindow calico, Mono.TextEditor.TextEditor shell, string text) {
@@ -82,8 +78,8 @@ namespace Calico {
                     found = calico.manager[calico.CurrentLanguage].engine.tryGetVariable(root, out value);
                     if (found) {
                         foreach (string part in ArrayRange(parts, 1, -1)) {
-                            if (hasattr(value, part)) {
-                                value = getattr(value, part);
+                            if (hasattr(calico, value, part)) {
+                                value = getattr(calico, value, part);
                             } else {
                                 value = null;
                                 break;
@@ -92,7 +88,7 @@ namespace Calico {
                         if (value != null) {
                             partial = parts[parts.Length - 1];
                             items = new List<string>();
-                            foreach(string x in dir(value)) {
+                            foreach(string x in dir(calico, value)) {
                                 if (x.StartsWith(partial) && ! x.StartsWith("_"))
                                     items.Add(x);
                             }
@@ -126,7 +122,7 @@ namespace Calico {
                     if (count % 3 == 0) {
                         retval += "\n";
                     }
-                    retval += item; //"%-25s" % item;
+                    retval += String.Format("{0}\t", item); //"%-25s" % item;
                     count += 1;
                 }
                 return retval + "\n----------------------\n";
