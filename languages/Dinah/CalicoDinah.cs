@@ -78,7 +78,7 @@ public class CalicoDinahDocument : Document
 
         public override void Export(Calico.MainWindow calico) {
 	  string filename = dinah.Export();
-	  calico.SelectOrOpen(filename);
+	  calico.Open(filename);
 	}
 
 }
