@@ -55,140 +55,6 @@ namespace Calico {
         public History history;
         public TabCompletion completion = null;
         static string dialogResponse;
-        public Document CurrentDocument {
-            get {
-                int page_num = DocumentNotebook.Page;
-                if (page_num > 1) {
-                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget))
-                        return documents[widget];
-                    else
-                        return null;
-                } else
-                    return null;
-            }
-        }
-        public Gtk.UIManager GUIManager {
-            get { return UIManager; }
-        }
-        public Gtk.HScale ProgramSpeed {
-            get { return debugSpeed;}
-        }
-        public Gtk.Notebook.NotebookChild EnvironmentPage {
-            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
-        }
-        public Gtk.Notebook.NotebookChild LocalsPage {
-            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]);}
-        }
-        public Gtk.Notebook DocumentNotebook {
-            get { return notebook_docs; }
-        }
-        public Gtk.Notebook ToolNotebook {
-            get { return notebook_tools; }
-        }
-        public Document this[int page_num] {
-            get {
-                if (page_num > 1) {
-                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget))
-                        return documents[widget];
-                    else
-                        return null;
-                } else
-                    return null;
-            }
-        }
-
-        public Document GetDocument(string name) {
-            for (int i = 0; i < DocumentNotebook.NPages; i++) {
-                Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
-                if (documents.ContainsKey(widget) && documents[widget].filename.Contains(name))
-                    return documents[widget];
-            }
-            return null;
-        }
-
-        public string OS {
-            get {
-                string retval = System.Environment.OSVersion.Platform.ToString();
-                if (retval.StartsWith("Win"))
-                    retval = "Windows";
-                return retval;
-                // "Unix" or "Windows" are two common retvals
-            }
-        }
-        public Gtk.TreeView EnvironmentTreeView {
-            get { return treeview1; }
-        }
-        public Gtk.TreeView LocalTreeView {
-            get { return treeview2; }
-        }
-        public Gtk.ScrolledWindow ScrolledWindow {
-            get { return scrolledwindow1; }
-            set { scrolledwindow1 = value; }
-        }
-        public Mono.TextEditor.TextEditor Shell {
-            get { return _shell; }
-        }
-        public Gtk.TextView Output {
-            get { return textview1; }
-        }
-        public Gtk.Button StartButton {
-            get { return _startButton; }
-        }
-        public Gtk.Action StartAction {
-            get { return yesAction1; }
-        }
-        public Gtk.Button StopButton {
-            get { return _stopButton; }
-        }
-        public Gtk.Button PlayButton {
-            get { return _playButton; }
-        }
-        public Gtk.Button PauseButton {
-            get { return _pauseButton1; }
-        }
-        public string CurrentProperLanguage {
-            get {
-                if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
-                    return manager.languages[CurrentLanguage].proper_name;
-                return null;
-            }
-            set {
-                foreach (string lang in manager.getLanguages()) {
-                    string lang_proper = manager.languages[lang].proper_name;
-                    if (lang_proper == value) {
-                        CurrentLanguage = lang;
-                        break;
-                    }
-                }
-            }
-        }
-
-        protected void OnButtonWhatsNewClicked (object sender, System.EventArgs e)
-        {
-            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
-        }
-
-        protected void OnButtonRecentlyUsedClicked (object sender, System.EventArgs e)
-        {
-            // Recently opened
-            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
-            ((Gtk.Menu)recents_menu.Submenu).Popup();
-        }
-
-        protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {
-			// System.dll:
-            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
-        }
-
-        public static bool Contains(string ext, string[] extensions) {
-            foreach (string lext in extensions) {
-                if (lext == ext)
-                    return true;
-            }
-            return false;
-        }
 
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
@@ -379,6 +245,141 @@ namespace Calico {
             searchbox.Hide();
             // End of GUI setup
             GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+        }
+
+        // ------------------------------------------------------------
+        public Document CurrentDocument {
+            get {
+                int page_num = DocumentNotebook.Page;
+                if (page_num > 1) {
+                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                    if (documents.ContainsKey(widget))
+                        return documents[widget];
+                    else
+                        return null;
+                } else
+                    return null;
+            }
+        }
+        public Gtk.UIManager GUIManager {
+            get { return UIManager; }
+        }
+        public Gtk.HScale ProgramSpeed {
+            get { return debugSpeed;}
+        }
+        public Gtk.Notebook.NotebookChild EnvironmentPage {
+            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]);}
+        }
+        public Gtk.Notebook.NotebookChild LocalsPage {
+            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]);}
+        }
+        public Gtk.Notebook DocumentNotebook {
+            get { return notebook_docs; }
+        }
+        public Gtk.Notebook ToolNotebook {
+            get { return notebook_tools; }
+        }
+        public Document this[int page_num] {
+            get {
+                if (page_num > 1) {
+                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                    if (documents.ContainsKey(widget))
+                        return documents[widget];
+                    else
+                        return null;
+                } else
+                    return null;
+            }
+        }
+        public string OS {
+            get {
+                string retval = System.Environment.OSVersion.Platform.ToString();
+                if (retval.StartsWith("Win"))
+                    retval = "Windows";
+                return retval;
+                // "Unix" or "Windows" are two common retvals
+            }
+        }
+        public Gtk.TreeView EnvironmentTreeView {
+            get { return treeview1; }
+        }
+        public Gtk.TreeView LocalTreeView {
+            get { return treeview2; }
+        }
+        public Gtk.ScrolledWindow ScrolledWindow {
+            get { return scrolledwindow1; }
+            set { scrolledwindow1 = value; }
+        }
+        public Mono.TextEditor.TextEditor Shell {
+            get { return _shell; }
+        }
+        public Gtk.TextView Output {
+            get { return textview1; }
+        }
+        public Gtk.Button StartButton {
+            get { return _startButton; }
+        }
+        public Gtk.Action StartAction {
+            get { return yesAction1; }
+        }
+        public Gtk.Button StopButton {
+            get { return _stopButton; }
+        }
+        public Gtk.Button PlayButton {
+            get { return _playButton; }
+        }
+        public Gtk.Button PauseButton {
+            get { return _pauseButton1; }
+        }
+        public string CurrentProperLanguage {
+            get {
+                if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
+                    return manager.languages[CurrentLanguage].proper_name;
+                return null;
+            }
+            set {
+                foreach (string lang in manager.getLanguages()) {
+                    string lang_proper = manager.languages[lang].proper_name;
+                    if (lang_proper == value) {
+                        CurrentLanguage = lang;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public Document GetDocument(string name) {
+            for (int i = 0; i < DocumentNotebook.NPages; i++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
+                if (documents.ContainsKey(widget) && documents[widget].filename.Contains(name))
+                    return documents[widget];
+            }
+            return null;
+        }
+
+        protected void OnButtonWhatsNewClicked (object sender, System.EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
+        }
+
+        protected void OnButtonRecentlyUsedClicked (object sender, System.EventArgs e)
+        {
+            // Recently opened
+            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/RecentlyOpenedAction");
+            ((Gtk.Menu)recents_menu.Submenu).Popup();
+        }
+
+        protected virtual void OnButton4Clicked(object sender, System.EventArgs e) {
+			// System.dll:
+            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Getting_Started");
+        }
+
+        public static bool Contains(string ext, string[] extensions) {
+            foreach (string lext in extensions) {
+                if (lext == ext)
+                    return true;
+            }
+            return false;
         }
 
         public void UseLibrary (string fullname)
