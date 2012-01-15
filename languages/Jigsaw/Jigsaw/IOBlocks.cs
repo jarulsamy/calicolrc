@@ -86,74 +86,74 @@ namespace Jigsaw
 			return true;
 		}
 		
-//		public static string Repr(object obj)
-//		{
-//			return Repr(obj, 0);
-//		}
-//
-//		public static string Repr(object obj, int depth)
-//		{
-//			if (depth > 3) // FIXME: cheap trick to avoid recursive data structures
-//				return "...";
-//			if (obj == null) {
-//				return "None"; 
+		public static string Repr(object obj)
+		{
+			return Repr(obj, 0);
+		}
+
+		public static string Repr(object obj, int depth)
+		{
+			if (depth > 3) // FIXME: cheap trick to avoid recursive data structures
+				return "...";
+			if (obj == null) {
+				return "None"; 
 //			} else if (obj is IronPython.Runtime.List) {
 //				return ((IronPython.Runtime.List)obj).__repr__ (
 //		  			IronPython.Runtime.DefaultContext.Default);
 //			} else if (obj is IronPython.Runtime.PythonTuple) {
 //				return obj.ToString();
-//			} else if (obj is Array) {
-//				return ArrayToString((object[])obj, depth);
-//			} else if (obj is IList) {
-//				return ListToString((IList)obj, depth);
-//			} else if (obj is IDictionary) {
-//				return DictionaryToString((IDictionary)obj, depth);
-//			} else {
-//				return obj.ToString ();
-//			}
-//		}
-//		
-//		public static string ArrayToString(object[] args, int depth)
-//		{
-//			string retval = "";
-//			if (args != null) {
-//				int count = ((Array)args).Length;
-//				for (int i = 0; i < count; i++) {
-//					if (retval != "")
-//						retval += ", ";
-//					retval += Repr(args[i], depth + 1);
-//				}
-//			}
-//			return String.Format("Array[{0}]", retval);
-//		}
-//
-//		public static string ListToString(IList args, int depth)
-//		{
-//			string retval = "";
-//			if (args != null) {
-//				foreach(object item in args) {
-//					if (retval != "")
-//						retval += ", ";
-//					retval += Repr(item, depth + 1);
-//				}
-//			}
-//			return String.Format("[{0}]", retval);
-//		}
-//
-//		public static string DictionaryToString(IDictionary args, int depth)
-//		{
-//			string retval = "";
-//			if (args != null) {
-//				foreach(object key in args.Keys) {
-//					if (retval != "")
-//						retval += ", ";
-//					retval += String.Format("{0}: {1}", 
-//								Repr(key, depth + 1), 
-//								Repr(args[key], depth + 1));
-//				}
-//			}
-//			return String.Format("{{{0}}}", retval);
-//		}
+			} else if (obj is Array) {
+				return ArrayToString((object[])obj, depth);
+			} else if (obj is IList) {
+				return ListToString((IList)obj, depth);
+			} else if (obj is IDictionary) {
+				return DictionaryToString((IDictionary)obj, depth);
+			} else {
+				return obj.ToString ();
+			}
+		}
+		
+		public static string ArrayToString(object[] args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				int count = ((Array)args).Length;
+				for (int i = 0; i < count; i++) {
+					if (retval != "")
+						retval += ", ";
+					retval += Repr(args[i], depth + 1);
+				}
+			}
+			return String.Format("Array[{0}]", retval);
+		}
+
+		public static string ListToString(IList args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				foreach(object item in args) {
+					if (retval != "")
+						retval += ", ";
+					retval += Repr(item, depth + 1);
+				}
+			}
+			return String.Format("[{0}]", retval);
+		}
+
+		public static string DictionaryToString(IDictionary args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				foreach(object key in args.Keys) {
+					if (retval != "")
+						retval += ", ";
+					retval += String.Format("{0}: {1}", 
+								Repr(key, depth + 1), 
+								Repr(args[key], depth + 1));
+				}
+			}
+			return String.Format("{{{0}}}", retval);
+		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
@@ -175,9 +175,8 @@ namespace Jigsaw
 			try {
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
 				object o = Expr.Evaluate(scope);
-				Console.WriteLine(o.ToString ());
-				//string toPrint = Repr(o);
-				//Console.WriteLine(toPrint);
+				string toPrint = Repr(o);
+				Console.WriteLine(toPrint);
 				//((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
 				//((InspectorWindow)scope.GetVariable("_inspector")).WriteLine(toPrint);
 			} catch (Exception ex) {
