@@ -775,8 +775,10 @@ namespace Calico {
     	  //aboutDialog.SetUrlHook(lambda dialog, link: Gnome.Url.Show(link))
     	  //aboutDialog.Artists =""
     	  aboutDialog.Authors = new string[] {"Douglas Blank <dblank@cs.brynmawr.edu>"};
-    	  aboutDialog.Comments = (_("Scripting Environment") + "\n\n" +
-    				  _("Running on %s") + "\nMono %s\n");
+    	  aboutDialog.Comments = (_("Scripting Environment") + "\n\n"
+    				  + String.Format(_("Running on {0}"), System.Environment.OSVersion.VersionString)
+                      //+ String.Format("\nMono {0}\n", Mono.Runtime.GetDisplayName())
+                      );
           aboutDialog.Copyright = _("(c) 2011, Institute for Personal Robots in Education");
     	  //aboutDialog.Documenters
     	  //aboutDialog.License
