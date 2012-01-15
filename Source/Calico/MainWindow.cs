@@ -964,12 +964,15 @@ namespace Calico {
                     if (CurrentDocument != null) {
                         searchEntry.Entry.DeleteText(searchEntry.Entry.Text.Length - 1,
                                                      searchEntry.Entry.Text.Length);
-                        CurrentDocument.SearchPrevious(searchEntry.Entry.Text);
+                        if (CurrentDocument != null)
+                            CurrentDocument.SearchPrevious(searchEntry.Entry.Text);
                     }
                     args.RetVal = true;
                 } else if (args.Event.Key == Gdk.Key.Return) {
-                    CurrentDocument.SearchNext(searchEntry.ActiveText);
-                    args.RetVal = true;
+                    if (CurrentDocument != null) {
+                        CurrentDocument.SearchNext(searchEntry.ActiveText);
+                        args.RetVal = true;
+                    }
                 } // else, don't handle
             } else if (Focus == Shell) {
                 // Shell handler

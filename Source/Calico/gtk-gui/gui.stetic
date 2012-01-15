@@ -168,7 +168,7 @@
       <action id="aboutAction">
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Mod2&gt;F10</property>
-        <property name="Label" translatable="yes">_About</property>
+        <property name="Label" translatable="yes">_About Calico</property>
         <property name="ShortLabel" translatable="yes">_About</property>
         <property name="StockId">gtk-about</property>
         <signal name="Activated" handler="About" />
@@ -348,6 +348,21 @@
         <property name="ShortLabel" translatable="yes">What's new...</property>
         <signal name="Activated" handler="OnWhatSNewActionActivated" />
       </action>
+      <action id="ToolsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Tools</property>
+        <property name="ShortLabel" translatable="yes">Tools</property>
+      </action>
+      <action id="AboutAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">About...</property>
+        <property name="ShortLabel" translatable="yes">About...</property>
+      </action>
+      <action id="OptionsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Options...</property>
+        <property name="ShortLabel" translatable="yes">Options...</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -414,6 +429,10 @@
                 <node type="Menuitem" action="SwitchToShellAction" />
                 <node type="Menuitem" action="ResetShellAction" />
                 <node type="Menuitem" action="ClearOutputAction" />
+              </node>
+              <node type="Menu" action="ToolsAction">
+                <node type="Menuitem" action="AboutAction" />
+                <node type="Menuitem" action="OptionsAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="aboutAction" />
@@ -1225,7 +1244,7 @@
           </widget>
           <packing>
             <property name="Position">3</property>
-            <property name="AutoSize">True</property>
+            <property name="AutoSize">False</property>
           </packing>
         </child>
         <child>
