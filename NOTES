@@ -2,8 +2,6 @@ Calico2
 
 Bugs
 
-* Search in toolbar
-* SaveAs: Warning? use Exist?: (Calico:11579): Gtk-WARNING **: Unable to retrieve the file info for `file:///home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': Error stating file '/home/dblank/Calico/trunk/languages/Jigsaw/Jigsaw/Untitled.py': No such file or directory
 * Printing gives error: Cairo.Context: called from finalization thread, programmer is missing a call to Dispose
 * Ask to save unsaved files on shutdown/close tab
 * Add tooltips
@@ -11,22 +9,10 @@ Bugs
 
 Big Tickets
 
-1. Recent Files [DONE]
-1.1 History [DONE]
-2. Reset shell [DONE]
-3. Tab completion (for all expressions?)
-4. Loop in Graphics, win.run() [OK]
-5. Font [DONE]
 6. Chat stuff (register, login, blast, chat)
-7. About [DONE]
-8. Print (and newline issue on Windows) [DONE]
-9. Search/replace in Editor [GUI Done]
-10. Languages, Jigsaw, Scheme [DONE]
-11. Debug/trace [DONE]
+7. About [%s]
 12. Goto file:line on right-click
 12.1 Show error Help button on error
-13. Config save/load [DONE]
-14. Ask to overwrite [DONE]
 15. Ask to abort changes, save
 16. click in output to get history somehow
 17. Detect that the file has changed outside of Calico
