@@ -597,7 +597,7 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnEditFind(object sender, EventArgs a)
 	{
-		js.BuildSearchSet();
+		//js.BuildSearchSet();
 		
 		_dlg = new Gtk.MessageDialog(
 			this,
@@ -612,6 +612,7 @@ public class MainWindow : Gtk.Window
 		bCancel.Clicked += new System.EventHandler(OnSearchCancel);
 		bPrev.Clicked += new System.EventHandler(OnSearchPrev);
 		bNext.Clicked += new System.EventHandler(OnSearchNext);
+		_dlg.DeleteEvent += OnSearchClosed;
 		
 		_dlg.Title = "Find...";
 		_dlg.Markup = "<b>Please enter text to find in all blocks</b>";
@@ -630,8 +631,16 @@ public class MainWindow : Gtk.Window
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void OnSearchClosed(object sender, EventArgs args)
+	{
+		// Cancel search when dialog is closed
+		OnSearchCancel(sender, args);
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private void OnSearchCancel(object sender, EventArgs args)
 	{
+		js.SearchCancel();
 		_dlg.Destroy();
 		_dlg = null;
 		_entry = null;
@@ -641,16 +650,44 @@ public class MainWindow : Gtk.Window
 	private void OnSearchNext(object sender, EventArgs args)
 	{
 		string src = _entry.Text;
-		if (src.Trim ().Length == 0) return;
-		bool result = js.SearchNext(src);
+		if (src.Length == 0) return;
+		bool found = js.SearchNext(src);
+		
+		if (!found) {
+			// Inform user of unfortunate outcome
+			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Info,
+				Gtk.ButtonsType.Ok,
+				String.Format ("Nothing more found matching {0}", src));
+			dlg2.Title = "Nothing found";
+			
+			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+			dlg2.Destroy();
+		}
 	}
 		
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private void OnSearchPrev(object sender, EventArgs args)
 	{
 		string src = _entry.Text;
-		if (src.Trim ().Length == 0) return;
-		bool result = js.SearchPrevious(src);
+		if (src.Length == 0) return;
+		bool found = js.SearchPrevious(src);
+		
+		if (!found) {
+			// Inform user of unfortunate outcome
+			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Info,
+				Gtk.ButtonsType.Ok,
+				String.Format ("Nothing more found matching {0}", src));
+			dlg2.Title = "Nothing found";
+			
+			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+			dlg2.Destroy();
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

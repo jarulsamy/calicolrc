@@ -61,9 +61,11 @@ namespace Jigsaw
 		// A flag to help track running state
 		private bool _isRunning = false;
 		
-		// Support search
+		// Variables to support search
 		private List<KeyValuePair<Widgets.CRoundedTab,CBlock>> _searchSet = null;
-		int _searchPos = 0;
+		int _searchStart = 0;			// Starting search position
+		int _searchPos = 0;				// Next position to test in search
+		bool _searchNext = true;		// true means searching forward. false means searching backward
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
@@ -1492,13 +1494,8 @@ namespace Jigsaw
             }
         }
 		
-	    // - - -
-	    public bool SearchMore(string s) {
-	        //return pnlBlock.SearchMore(this, s);
-	    }
-		
-		// - - - Build a list of tab-block KeyValuePair items to use to search over - - - 
-		internal bool BuildSearchSet() {
+		// - - - Build a list of tab-block KeyValuePair items to use for search - - - 
+		internal void BuildSearchSet() {
 
 			_searchSet = new List<KeyValuePair<Widgets.CRoundedTab,CBlock>>();
 			KeyValuePair<Widgets.CRoundedTab,CBlock> item;
@@ -1515,51 +1512,59 @@ namespace Jigsaw
 					}
 				}
 			}
-			_searchPos = 0;
 			
-			return true;
 		}
 		
-	    // -----------------------------------------------------------------------
+	    // - - - Cancel a search and cleanup - - - - - - - 
+	    public void SearchCancel() {
+	        if (_searchSet != null) _searchSet.Clear ();
+			_searchSet = null;
+			_searchPos = 0;
+	    }
+		
+	    // - - -
+	    public bool SearchMore(string s) {
+	        return SearchNext (s);
+	    }
+		
+	    // - - - Look for the next block matching the search string - - - - - - - 
 	    public bool SearchNext(string s) {
 
 			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
 			CBlock bb;
 			Widgets.CRoundedTab tt;
+			bool foundMatch = false;
 			string ss = s.ToLower();
-
-			// Move forward until match found or reach end
-			int numItems = _searchSet.Count;
 			
+			if (_searchSet == null) {	// If first time to search, init search set
+				this.BuildSearchSet();
+				_searchStart = 0;
+				_searchPos = _searchStart;
+				_searchNext = true;
+//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
+//				//SearchCancel();						 // Reset in case want to search again
+//				return false;
+			}
+			
+			// If currently searching backward, and switch direction to forward, reset starting position to current
+			if (_searchNext == false) {
+				_searchStart = _searchPos;
+			}
+			_searchNext = true;
+			
+			// Perform search
+			int numItems = _searchSet.Count;
+			foundMatch = false;
 			while (true) {
-
-				// Check if passed end of search items
-				if (_searchPos >= numItems) {
-					
-					_searchPos = 0;
-					
-					// Inform user of error
-					Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-						null,
-						Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-						Gtk.MessageType.Info,
-						Gtk.ButtonsType.Ok,
-						String.Format ("Nothing more found matching {0}", s));
-					dlg2.Title = "Nothing found";
-					
-					Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-					dlg2.Destroy();
-					
-					return false;
-				}
-
+				
 				item = _searchSet[_searchPos];
 				bb = item.Value;
 				string txt = bb.Text.ToLower();
-				_searchPos = _searchPos+1;
 				
 				// A match is found
 				if (txt.Contains ( ss )) {
+					foundMatch = true;
+					
 					// Select the tab
 					tt = item.Key;
 					tt.SetToggle(this, true);
@@ -1577,54 +1582,56 @@ namespace Jigsaw
 					// Select the found block
 					this.DeselectAll();
 					bb.Select(this);
-					
-					this.Invalidate();
-					return true;
 				}
 				
 				this.Invalidate();
+				
+				// Set next item to test
+				_searchPos = (_searchPos + 1) % numItems;
+				
+				// If found a mathc this time, return true
+				if (foundMatch) return true;
 			}
 	    }
 
-	    // -----------------------------------------------------------------------
+	    // - - - Look for the previous block matching the search string - - - - - - - 
 	    public bool SearchPrevious(string s) {
 			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
 			CBlock bb;
+			bool foundMatch = false;
 			Widgets.CRoundedTab tt;
 			string ss = s.ToLower();
-
-			// Move forward until match found or reach end
-			int numItems = _searchSet.Count;
 			
+			// Init search set, if necessary
+			if (_searchSet == null) {
+				this.BuildSearchSet();
+				_searchStart = _searchSet.Count-1;
+				_searchPos = _searchStart;
+				_searchNext = false;
+//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
+//				//SearchCancel();						 // Reset in case want to search again
+//				return false;
+			}
+			
+			// If currently searching forward, and switch direction to backward, reset starting position to current
+			if (_searchNext == true) {
+				_searchStart = _searchPos;
+			}
+			_searchNext = false;
+			
+			// Perform search
+			int numItems = _searchSet.Count;
+			foundMatch = false;
 			while (true) {
-
-				// Check if passed end of search items
-				if (_searchPos < 0) {
-					
-					_searchPos = numItems - 1;
-					
-					// Inform user of error
-					Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-						null,
-						Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-						Gtk.MessageType.Info,
-						Gtk.ButtonsType.Ok,
-						String.Format ("Nothing more found matching {0}", s));
-					dlg2.Title = "Nothing found";
-					
-					Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-					dlg2.Destroy();
-					
-					return false;
-				}
-
+				
 				item = _searchSet[_searchPos];
 				bb = item.Value;
 				string txt = bb.Text.ToLower();
-				_searchPos = _searchPos - 1;
-
+				
 				// A match is found
 				if (txt.Contains ( ss )) {
+					foundMatch = true;
+					
 					// Select the tab
 					tt = item.Key;
 					tt.SetToggle(this, true);
@@ -1642,12 +1649,17 @@ namespace Jigsaw
 					// Select the found block
 					this.DeselectAll();
 					bb.Select(this);
-										
-					this.Invalidate();
-					return true;
 				}
 				
 				this.Invalidate();
+				
+				// Set next item to test
+				_searchPos = (_searchPos - 1) % numItems;
+				if (_searchPos < 0) _searchPos += numItems;
+				//Console.WriteLine ("{0} {1}", _searchPos, _searchStart);
+				
+				// If found a mathc this time, return true
+				if (foundMatch) return true;
 			}
 	    }
 	}
