@@ -1,3 +1,9 @@
+;; This program automatically converts fully registerized Scheme code into C#
+;;
+;; Written by Douglas Blank
+;; dblank@brynmawr.edu
+;; http://cs.brynmawr.edu/~dblank
+
 ;; temporary - to access various utilities (define*? etc.)
 (load "rm-transformer.ss")
 
@@ -33,6 +39,7 @@
 			     make-binding
                              dlr-env-lookup
                              dlr-env-contains
+			     raw-read-line
 			     ))
 (define *function-signatures* '())
 
@@ -67,6 +74,7 @@
     (display-prim "void" ())
     (pretty-print-prim "void" ())
     (newline-prim "void" ())
+    (ends-with-newline? "bool" ("string"))
     (parse-string "void" ())
     (get-parsed-sexps "void" ())
     (set-car! "void" ())
@@ -96,6 +104,8 @@
     (try? "Func<object,bool>" ())
     (catch? "Func<object,bool>" ())
     (finally? "Func<object,bool>" ())
+    (help? "Func<object,bool>" ())
+    (choose? "Func<object,bool>" ())
     (get-reserved-keywords "object" ())
 
     ))
@@ -191,7 +201,7 @@
   }
 
   public static Closure dlr_func(object proc) {
-    // Make a C# function that when evaluated will 
+    // Make a Csharp function that when evaluated will 
     // call apply on the proc
     return delegate (object[] args) { 
       object temp_k_reg, temp_k2_reg, temp_handler_reg, temp_env_reg, temp_args_reg, temp_proc_reg, retval;

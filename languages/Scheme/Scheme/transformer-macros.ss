@@ -8,6 +8,14 @@
   (syntax-rules ()
     [(_ formals body ...) (lambda formals body ...)]))
 
+(define-syntax lambda-cont3
+  (syntax-rules ()
+    [(_ formals body ...) (lambda formals body ...)]))
+
+(define-syntax lambda-fail
+  (syntax-rules ()
+    [(_ formals body ...) (lambda formals body ...)]))
+
 ;; procedures (closures and primitives)
 
 (define-syntax lambda-proc
@@ -17,6 +25,10 @@
 ;; exception handlers
 
 (define-syntax lambda-handler
+  (syntax-rules ()
+    [(_ formals body ...) (lambda formals body ...)]))
+
+(define-syntax lambda-handler2
   (syntax-rules ()
     [(_ formals body ...) (lambda formals body ...)]))
 

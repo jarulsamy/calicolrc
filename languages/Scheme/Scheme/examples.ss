@@ -7,6 +7,15 @@
   (set! odd? odd)
   (set! even? even))
 
+(define-syntax time 
+  [(time ?exp) (let* ((run (lambda () ?exp))
+		      (start (current-time))
+		      (result (run))
+		      (end (current-time)))
+		 (display (list 'took (- end start) 'seconds))
+		 (newline)
+		 result)])
+
 ;;---------------------------------------------------------------------
 ;; collect is like list comprehension in Python
 
@@ -24,11 +33,6 @@
 	  (cons (f (car values)) (filter-map f pred? (cdr values)))
 	  (filter-map f pred? (cdr values))))))
 
-(define-syntax time 
-  [(time ?exp) (let ((start (current-time)))
-		 ?exp
-		 (- (current-time) start))])
-
 ;;---------------------------------------------------------------------
 ;; for loops
 
@@ -36,9 +40,9 @@
   [(for ?exp times do . ?bodies)
    (for-repeat ?exp (lambda () . ?bodies))]
   [(for ?var in ?exp do . ?bodies)
-   (for-iterate1 ?exp (lambda (?var) . ?bodies))]
+   (for-each (lambda (?var) . ?bodies) ?exp)]
   [(for ?var at (?i) in ?exp do . ?bodies)
-   (for-iterate2 0 ?exp (lambda (?var ?i) . ?bodies))]
+   (for-iterate 0 ?exp (lambda (?var ?i) . ?bodies))]
   [(for ?var at (?i ?j . ?rest) in ?exp do . ?bodies)
    (for ?var at (?i) in ?exp do
      (for ?var at (?j . ?rest) in ?var do . ?bodies))])
@@ -51,21 +55,13 @@
 	(f)
 	(for-repeat (- n 1) f)))))
 
-(define for-iterate1
-  (lambda (values f)
-    (if (null? values)
-      'done
-      (begin
-	(f (car values))
-	(for-iterate1 (cdr values) f)))))
-
-(define for-iterate2
+(define for-iterate
   (lambda (i values f)
     (if (null? values)
       'done
       (begin
 	(f (car values) i)
-	(for-iterate2 (+ i 1) (cdr values) f)))))
+	(for-iterate (+ i 1) (cdr values) f)))))
 
 (define matrix2d
   '((10 20)
@@ -124,18 +120,6 @@
 (define ! (lambda (n) (nth n facts)))
 
 ;;---------------------------------------------------------------------
-;; example interaction:
-
-;; > (load "interpreter-cps.ss")
-;; Loaded EOPL init file
-;; > (start)
-;; ==> "(load \"examples.ss\")"
-;; ok
-;; ==> "(odd? 43)"
-;; #t
-;; ==> quit
-;; (exiting the interpreter)
-
 ;; other examples:
 
 ;; ==> "(list (odd? 42) (even? 42) (odd? 43) (even? 43))"

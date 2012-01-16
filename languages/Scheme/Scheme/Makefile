@@ -26,6 +26,7 @@ pjscheme-rm.ss: pjscheme-ds.ss
 
 run: pjscheme-rm.ss 
 	echo "(load \"pjscheme-rm.ss\")" > pjscheme-run.ss
+	echo "(load \"no-csharp-support.ss\")" >> pjscheme-run.ss
 	echo "(begin (display (run start)) (newline))" >> pjscheme-run.ss
 	petite pjscheme-run.ss
 
@@ -117,7 +118,7 @@ External.dll: External.cs
 	$(MCS) External.cs -target:library
 
 clean:
-	$(RM) *.exe *~ pjscheme-ds.ss pjscheme-rm.ss compile-rm.ss make-fact.ss \
+	$(RM) *.exe *~ pjscheme-ds.ss pjscheme-rm.ss compile-rm.ss compile-ds.ss make-fact.ss \
 		fact.cs make-pjscheme.ss pjscheme.exe pjscheme.cs pjscheme-cps.ss \
-		pjscheme-run.ss pjscheme.ss fact-rm.ss fact-ds.ss all*.ss testall.ss compile-dm.ss
+		pjscheme-run.ss pjscheme.ss fact-rm.ss fact-ds.ss all*.ss testall.ss
 

@@ -102,43 +102,35 @@
           (search-frames (cdr frames) variable))))))
 
 (define* lookup-value
-  (lambda (variable env handler k)
-    (lookup-binding variable env handler
-      (lambda-cont (binding)
-	(k (binding-value binding))))))
+  (lambda (variable env handler fail k)
+    (lookup-binding variable env handler fail
+      (lambda-cont2 (binding fail)
+	(k (binding-value binding) fail)))))
 
 (define* lookup-binding
-  (lambda (variable env handler k)
+  (lambda (variable env handler fail k)
     (let ((binding (search-env env variable)))
       (if binding
-	(k binding)
-	(split-variable variable
-	  (lambda-cont (components)
+	(k binding fail)
+	(split-variable variable fail
+	  (lambda-cont2 (components fail)
             (if (dlr-env-contains variable)
-                (k (dlr-env-lookup variable))
+                (k (dlr-env-lookup variable) fail)
                 (if components
-		    (lookup-variable-components components "" env handler k)
-                    (handler (format "unbound variable ~a" variable))))))))))
-
-(define dlr-env-contains
-  (lambda (variable)
-    #t))
-
-(define dlr-env-lookup
-  (lambda (variable)
-    (binding 42)))
+		    (lookup-variable-components components "" env handler fail k)
+                    (handler (format "unbound variable ~a" variable) fail)))))))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist
 (define* lookup-binding-in-first-frame
-  (lambda (var env handler k)
+  (lambda (var env handler fail k)
     (let ((frame (first-frame env)))
       (let ((binding (search-frame frame var)))
         (if binding
-	  (k binding)
+	  (k binding fail)
           (let ((new-binding (make-binding var 'undefined)))
             (let ((new-frame (cons new-binding frame)))
               (set-first-frame! env new-frame)
-	      (k new-binding))))))))
+	      (k new-binding fail))))))))
 
 (define* lookup-variable-components
   ;; math.x.y.z where math is a module or a DLR module/item
@@ -146,39 +138,39 @@
   ;; components: '(x y z) "test" ...
   ;; components: '(y z) "test.x" ...
   ;; components: '(z) "test.x.z" ...
-  (lambda (components path env handler k)
+  (lambda (components path env handler fail k)
     ;;(printf "components: ~s path: ~s\n" components path)
     (let ((var (car components)))
-      (lookup-module-binding var env path handler
-	(lambda-cont (binding)
+      (lookup-module-binding var env path handler fail
+	(lambda-cont2 (binding fail)
 	  (if (null? (cdr components))
-	    (k binding)
+	    (k binding fail)
 	    (let ((result (binding-value binding))
 		  (new-path (if (string=? path "")
 			      (format "~a" var)
 			      (format "~a.~a" path var))))
 	      (if (not (environment? result))
                   (if (dlr-object? result)
-                      (k (dlr-lookup-components result (cdr components)))
-                      (handler (format "~a is not a module" new-path)))
+                      (k (dlr-lookup-components result (cdr components)) fail)
+                      (handler (format "~a is not a module" new-path) fail))
                   (lookup-variable-components
-		    (cdr components) new-path result handler k)))))))))
+		    (cdr components) new-path result handler fail k)))))))))
 
 (define* lookup-module-binding
-  (lambda (var env path handler k)
+  (lambda (var env path handler fail k)
     (let ((binding (search-env env var)))
       (cond
-	(binding (k binding))
-        ((dlr-env-contains var) (k (dlr-env-lookup var)))
-	((string=? path "") (handler (format "unbound module '~a'" var)))
-	(else (handler (format "unbound variable '~a' in module '~a'" var path)))))))
+	(binding (k binding fail))
+        ((dlr-env-contains var) (k (dlr-env-lookup var) fail))
+	((string=? path "") (handler (format "unbound module '~a'" var) fail))
+	(else (handler (format "unbound variable '~a' in module '~a'" var path) fail))))))
 
 (define* split-variable
-  (lambda (variable k)
+  (lambda (variable fail k)
     (let ((strings (group (string->list (symbol->string variable)) #\.)))
       (if (or (member "" strings) (= (length strings) 1))
-	(k #f)
-	(k (map string->symbol strings))))))
+	(k #f fail)
+	(k (map string->symbol strings) fail)))))
 
 (define group
   (lambda (chars delimiter)

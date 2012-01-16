@@ -1,15 +1,21 @@
-(load "transformer-macros.ss")
-
-;; Scanner and s-expression reader
-
+;; Calico Scheme scanner and s-expression reader
+;;
 ;; includes support for vectors, rationals, exponents, and backquote
+;;
+;; Written by James B. Marshall and Douglas S. Blank
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+;; dblank@brynmawr.edu
+;; http://cs.brynmawr.edu/~dblank
+
+(load "transformer-macros.ss")
 
 ;;------------------------------------------------------------------------
 ;; scanner - character stream represented as a position number
 
 (define chars-to-scan 'undefined)
-(define read-line-count 1)
-(define read-char-count 0)
+(define read-line-count 'undefined)
+(define read-char-count 'undefined)
 
 (define 1st
   (lambda (n) (string-ref chars-to-scan n)))
@@ -21,124 +27,135 @@
 ;; from all of the characters in the string
 
 (define* scan-input
-  (lambda (input handler k)   ;; k receives a list of tokens
+  (lambda (input handler fail k)   ;; k receives 2 args: a list of tokens, fail
+    (set! read-char-count 0)
+    (set! read-line-count 1)
     (set! chars-to-scan (string-append input (string #\nul)))
-    (scan-input-loop 0 handler k)))
+    (scan-input-loop 0 handler fail k)))
 
 (define* scan-input-loop
-  (lambda (chars handler k)   ;; k receives a list of tokens
-    (apply-action '(goto start-state) '() chars handler
-      (lambda-cont2 (token chars-left)
+  (lambda (chars handler fail k)   ;; k receives 2 args: a list of tokens, fail
+    (apply-action '(goto start-state) '() chars handler fail
+      (lambda-cont3 (token chars-left fail)
 	(if (token-type? token 'end-marker)
-	  (k (list token))
-	  (scan-input-loop chars-left handler
-	    (lambda-cont (tokens)
-	      (k (cons token tokens)))))))))
-
-;; for testing purposes
-(define init-cont (lambda-cont (v) (halt* v)))
-(define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
-(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
-
-;; for testing purposes
-(define scan-string
-  (lambda (input)
-    (set! read-line-count 1)
-    (set! read-char-count 0)
-    (scan-input input init-handler init-cont)))
-
-;; for testing purposes
-(define scan-file
-  (lambda (filename)
-    (set! read-line-count 1)
-    (set! read-char-count 0)
-    (scan-input (read-content filename) init-handler init-cont)))
+	  (k (list token) fail)
+	  (scan-input-loop chars-left handler fail
+	    (lambda-cont2 (tokens fail)
+	      (k (cons token tokens) fail))))))))
 
 ;;------------------------------------------------------------------------
 ;; scanner actions
 
 ;; <action> ::= (shift <next-action>)
 ;;            | (replace <new-char> <next-action>)
+;;            | (drop-newline <next-action>)
 ;;            | (drop <next-action>)
 ;;            | (goto <state>)
 ;;            | (emit <token-type>)
 
 (define* apply-action
-  (lambda (action buffer chars handler k)  ;; k receives 2 args: token, chars-left
+  (lambda (action buffer chars handler fail k)  ;; k receives 3 args: token, chars-left, fail
+;;    (display "action: ")
+;;    (display action)
+;;    (display ", buffer: ")
+;;    (write buffer)
+;;    (newline)
     (record-case action
       (shift (next)
 	(begin
 	  (set! read-char-count (+ read-char-count 1))
-	  (apply-action next (cons (1st chars) buffer) (remaining chars) handler k)))
+	  (apply-action next (cons (1st chars) buffer) (remaining chars) handler fail k)))
       (replace (new-char next)
-	(apply-action next (cons new-char buffer) (remaining chars) handler k))
+	(apply-action next (cons new-char buffer) (remaining chars) handler fail k))
       (drop-newline (next)
 	(begin
 	  (set! read-line-count (+ read-line-count 1))
 	  (set! read-char-count 0)
-	  (apply-action next buffer (remaining chars) handler k)))
+	  (apply-action next buffer (remaining chars) handler fail k)))
       (drop (next)
 	(begin
 	  (set! read-char-count (+ read-char-count 1))
-	  (apply-action next buffer (remaining chars) handler k)))
+	  (apply-action next buffer (remaining chars) handler fail k)))
       (goto (state)
 	(let ((action (apply-state state (1st chars))))
 	  (if (eq? action 'error)
-	    (scan-error chars handler)
-	    (apply-action action buffer chars handler k))))
+	    (scan-error chars handler fail)
+	    (apply-action action buffer chars handler fail k))))
       (emit (token-type)
-	(convert-buffer-to-token token-type buffer handler
-	  (lambda-cont (v) (k (append v (list read-line-count read-char-count))
-			      chars))))
+	(convert-buffer-to-token token-type buffer handler fail
+	  (lambda-cont2 (v fail)
+	    (k (append v (list read-line-count read-char-count)) chars fail))))
       (else (error 'apply-action "invalid action: ~a" action)))))
       
 (define* scan-error
-  (lambda (chars handler)
+  (lambda (chars handler fail)
     (let ((c (1st chars)))
       (if (char=? c #\nul)
-	(handler 
-	 (format "unexpected end of input at line: ~a col: ~a" 
-		 read-line-count read-char-count))
-	(handler 
-	 (format "unexpected character ~a encountered at line: ~a col: ~a" 
-		 c read-line-count read-char-count))))))
+	(handler (format "scan error: unexpected end of input at line ~a, char ~a" 
+			 read-line-count read-char-count)
+		 fail)
+	(handler (format "scan error: unexpected character ~a encountered at line ~a, char ~a" 
+			 c read-line-count read-char-count)
+		 fail)))))
 
 (define* convert-buffer-to-token
-  (lambda (token-type buffer handler k)
+  (lambda (token-type buffer handler fail k)
     (let ((buffer (reverse buffer)))
       (case token-type
 	(integer
-	  (k (list 'integer (list->string buffer))))
+	  (k (list 'integer (list->string buffer)) fail))
 	(decimal
-	  (k (list 'decimal (list->string buffer))))
+	  (k (list 'decimal (list->string buffer)) fail))
 	(rational
-	  (k (list 'rational (list->string buffer))))
+	  (k (list 'rational (list->string buffer)) fail))
 	(identifier
-	  (k (list 'identifier (string->symbol (list->string buffer)))))
+	  (k (list 'identifier (string->symbol (list->string buffer))) fail))
 	(boolean
-	  (k (list 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T)))))
+	  (k (list 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T))) fail))
 	(character
-	  (k (list 'character (car buffer))))
+	  (k (list 'character (car buffer)) fail))
 	(named-character
 	  (let ((name (list->string buffer)))
 	    (cond
-	      ((string=? name "nul") (k (list 'character #\nul)))
-	      ((string=? name "space") (k (list 'character #\space)))
-	      ((string=? name "tab") (k (list 'character #\tab)))
-	      ((string=? name "newline") (k (list 'character #\newline)))
-	      ((string=? name "linefeed") (k (list 'character #\newline)))
-	      ((string=? name "backspace") (k (list 'character #\backspace)))
-	      ((string=? name "return") (k (list 'character #\return)))
-	      ((string=? name "page") (k (list 'character #\page)))
-	      (else (handler (format "invalid character name '~a' at line: ~a col: ~a" name read-line-count read-char-count))))))
+	      ((string=? name "nul") (k (list 'character #\nul) fail))
+	      ((string=? name "space") (k (list 'character #\space) fail))
+	      ((string=? name "tab") (k (list 'character #\tab) fail))
+	      ((string=? name "newline") (k (list 'character #\newline) fail))
+	      ((string=? name "linefeed") (k (list 'character #\newline) fail))
+	      ((string=? name "backspace") (k (list 'character #\backspace) fail))
+	      ((string=? name "return") (k (list 'character #\return) fail))
+	      ((string=? name "page") (k (list 'character #\page) fail))
+	      (else (handler (format "invalid character name '~a' at line ~a, char ~a"
+				     name read-line-count read-char-count)
+			     fail)))))
 	(string
-	  (k (list 'string (list->string buffer))))
+	  (k (list 'string (list->string buffer)) fail))
 	(else
-	  (k (list token-type)))))))
+	  (k (list token-type) fail))))))
 
 (define token-type?
   (lambda (token class)
     (eq? (car token) class)))
+
+(define get-line-count
+  (lambda (token)
+    (rac (rdc token))))
+
+(define get-char-count
+  (lambda (token)
+    (rac token)))
+
+(define rac
+  (lambda (lyst)
+    (cond
+     ((null? (cdr lyst)) (car lyst))
+     (else (rac (cdr lyst))))))
+
+(define rdc
+  (lambda (lyst)
+    (cond
+     ((null? (cdr lyst)) '())
+     (else (cons (car lyst) (rdc (cdr lyst)))))))
 
 ;;------------------------------------------------------------------------
 ;; character categories
@@ -202,6 +219,7 @@
 ;;------------------------------------------------------------------------
 ;; finite-state automaton
 
+;; this is just a table lookup
 (define apply-state
   (lambda (state c)
     (case state
@@ -361,46 +379,6 @@
 (define first (lambda (x) (car x)))
 (define rest-of (lambda (x) (cdr x)))
 
-;; for testing purposes
-(define read-string
-  (lambda (input)
-    (read-datum input init-handler init-cont2)))
-
-(define* read-datum
-  (lambda (input handler k)  ;; k receives 2 args:  sexp, tokens-left
-    (set! read-char-count 0)
-    (set! read-line-count 1)
-    (scan-input input handler
-      (lambda-cont (tokens)
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp tokens-left)
-	    (if (token-type? (first tokens-left) 'end-marker)
-	      (k sexp tokens-left)
-	      (handler (format "tokens left over at line: ~a col: ~a" 
-			       (get-line-count (first tokens-left))
-			       (get-char-count (first tokens-left))
-			       )))))))))
-
-(define get-line-count
-  (lambda (token)
-    (rac (rdc token))))
-
-(define get-char-count
-  (lambda (token)
-    (rac token)))
-
-(define rac
-  (lambda (lyst)
-    (cond
-     ((null? (cdr lyst)) (car lyst))
-     (else (rac (cdr lyst))))))
-
-(define rdc
-  (lambda (lyst)
-    (cond
-     ((null? (cdr lyst)) '())
-     (else (cons (car lyst) (rdc (cdr lyst)))))))
-
 (define string->integer
   (lambda (str)
     (string->number str)))
@@ -418,135 +396,112 @@
     (if v #t #f)))
 
 (define* read-sexp
-  (lambda (tokens handler k)   ;; k receives 2 args:  sexp, tokens-left
+  (lambda (tokens handler fail k)   ;; k receives 3 args: sexp, tokens-left, fail
     (record-case (first tokens)
       (integer (str)
-	(k (string->integer str) (rest-of tokens)))
+	(k (string->integer str) (rest-of tokens) fail))
       (decimal (str)
-	(k (string->decimal str) (rest-of tokens)))
+	(k (string->decimal str) (rest-of tokens) fail))
       (rational (str)
 	(let ((num (string->rational str)))
 	  (if (true? num)
-	    (k num (rest-of tokens))
-	    (handler (format "cannot represent ~a at line: ~a col: ~a" 
+	    (k num (rest-of tokens) fail)
+	    (handler (format "cannot represent ~a at line ~a, char ~a" 
 			     str 
 			     (get-line-count (first tokens)) 
-			     (get-char-count (first tokens)))))))
-      (boolean (bool) (k bool (rest-of tokens)))
-      (character (char) (k char (rest-of tokens)))
-      (string (str) (k str (rest-of tokens)))
-      (identifier (id) (k id (rest-of tokens)))
-      (apostrophe () (read-abbreviation tokens 'quote handler k))
-      (backquote () (read-abbreviation tokens 'quasiquote handler k))
-      (comma () (read-abbreviation tokens 'unquote handler k))
-      (comma-at () (read-abbreviation tokens 'unquote-splicing handler k))
+			     (get-char-count (first tokens)))
+		     fail))))
+      (boolean (bool) (k bool (rest-of tokens) fail))
+      (character (char) (k char (rest-of tokens) fail))
+      (string (str) (k str (rest-of tokens) fail))
+      (identifier (id) (k id (rest-of tokens) fail))
+      (apostrophe () (read-abbreviation tokens 'quote handler fail k))
+      (backquote () (read-abbreviation tokens 'quasiquote handler fail k))
+      (comma () (read-abbreviation tokens 'unquote handler fail k))
+      (comma-at () (read-abbreviation tokens 'unquote-splicing handler fail k))
       (lparen ()
 	(let ((tokens (rest-of tokens)))
 	  (if (token-type? (first tokens) 'dot)
-	    (read-error tokens handler)
-	    (read-sexp-sequence tokens 'rparen handler k))))
+	    (read-error tokens handler fail)
+	    (read-sexp-sequence tokens 'rparen handler fail k))))
       (lbracket ()
 	(let ((tokens (rest-of tokens)))
 	  (if (token-type? (first tokens) 'dot)
-	    (read-error tokens handler)
-	    (read-sexp-sequence tokens 'rbracket handler k))))
+	    (read-error tokens handler fail)
+	    (read-sexp-sequence tokens 'rbracket handler fail k))))
       (lvector ()
-	(read-vector (rest-of tokens) handler
-	  (lambda-cont2 (sexps tokens-left)
-	    (k (list->vector sexps) tokens-left))))
-      (else (read-error tokens handler)))))
+	(read-vector (rest-of tokens) handler fail
+	  (lambda-cont3 (sexps tokens-left fail)
+	    (k (list->vector sexps) tokens-left fail))))
+      (else (read-error tokens handler fail)))))
 
 (define* read-abbreviation
-  (lambda (tokens keyword handler k)  ;; k receives 2 args: sexp, tokens-left
-    (read-sexp (rest-of tokens) handler
-      (lambda-cont2 (sexp tokens-left)
-	(k (list keyword sexp) tokens-left)))))
+  (lambda (tokens keyword handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
+    (read-sexp (rest-of tokens) handler fail
+      (lambda-cont3 (sexp tokens-left fail)
+	(k (list keyword sexp) tokens-left fail)))))
 
 (define* read-sexp-sequence
-  (lambda (tokens expected-terminator handler k)
+  (lambda (tokens expected-terminator handler fail k)
     (record-case (first tokens)
       ((rparen rbracket) ()
-       (close-sexp-sequence '() tokens expected-terminator handler k))
+       (close-sexp-sequence '() tokens expected-terminator handler fail k))
       (dot ()
-	(read-sexp (rest-of tokens) handler
-	  (lambda-cont2 (sexp tokens-left)
-	    (close-sexp-sequence sexp tokens-left expected-terminator handler k))))
+	(read-sexp (rest-of tokens) handler fail
+	  (lambda-cont3 (sexp tokens-left fail)
+	    (close-sexp-sequence sexp tokens-left expected-terminator handler fail k))))
       (else
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp1 tokens-left)
-	    (read-sexp-sequence tokens-left expected-terminator handler
-	      (lambda-cont2 (sexp2 tokens-left)
-		(k (cons sexp1 sexp2) tokens-left)))))))))
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp1 tokens-left fail)
+	    (read-sexp-sequence tokens-left expected-terminator handler fail
+	      (lambda-cont3 (sexp2 tokens-left fail)
+		(k (cons sexp1 sexp2) tokens-left fail)))))))))
 
 (define* close-sexp-sequence
-  (lambda (sexp tokens expected-terminator handler k)
+  (lambda (sexp tokens expected-terminator handler fail k)
     (record-case (first tokens)
       ((rparen rbracket) ()
        (cond
 	 ((token-type? (first tokens) expected-terminator)
-	  (k sexp (rest-of tokens)))
+	  (k sexp (rest-of tokens) fail))
 	 ((eq? expected-terminator 'rparen)
-	  (handler 
-	   (format "parenthesized list terminated by bracket at line: ~a col: ~a" (get-line-count (first tokens)) (get-char-count (first tokens)))))
+	  (handler (format "parenthesized list terminated by bracket at line ~a, char ~a"
+			   (get-line-count (first tokens)) (get-char-count (first tokens)))
+		   fail))
 	 ((eq? expected-terminator 'rbracket)
-	  (handler (format "bracketed list terminated by parenthesis at line: ~a col: ~a" (get-line-count (first tokens)) (get-char-count (first tokens)))))))
-      (else (read-error tokens handler)))))
+	  (handler (format "bracketed list terminated by parenthesis at line ~a, char ~a"
+			   (get-line-count (first tokens)) (get-char-count (first tokens)))
+		   fail))))
+      (else (read-error tokens handler fail)))))
 
 (define* read-vector
-  (lambda (tokens handler k)
+  (lambda (tokens handler fail k)
     (record-case (first tokens)
       (rparen ()
-	(k '() (rest-of tokens)))
+	(k '() (rest-of tokens) fail))
       (else
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp1 tokens-left)
-	    (read-vector tokens-left handler
-	      (lambda-cont2 (sexps tokens-left)
-		(k (cons sexp1 sexps) tokens-left)))))))))
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp1 tokens-left fail)
+	    (read-vector tokens-left handler fail
+	      (lambda-cont3 (sexps tokens-left fail)
+		(k (cons sexp1 sexps) tokens-left fail)))))))))
 
 (define* read-error
-  (lambda (tokens handler)
-    (let ((token (first tokens)))
+  (lambda (tokens handler fail)
+    (let ((token (first tokens))
+	  (where (if (null? load-stack) "" (format " in ~a" (car load-stack)))))
       (if (token-type? token 'end-marker)
-	(handler (format "unexpected end of input at line: ~a col: ~a" 
+	(handler (format "read error: unexpected end of input at line ~a, char ~a~a" 
 			 (get-line-count token) 
-			 (get-char-count token)))
-	(handler (format "unexpected token ~a encountered at line: ~a col: ~a" 
+			 (get-char-count token)
+			 where)
+		 fail)
+	(handler (format "read error: unexpected token ~a encountered at line ~a, char ~a~a"
 			 (car token) 
 			 (get-line-count token)
-			 (get-char-count token)))))))
-
-;;------------------------------------------------------------------------
-;; file reader
-
-;; for testing purposes
-(define read-file
-  (lambda (filename)
-    (scan-input (read-content filename) init-handler
-      (lambda-cont (tokens)
-	(print-unparsed-sexps tokens init-handler init-cont)))))
-
-;; for testing purposes
-(define* print-unparsed-sexps
-  (lambda (tokens handler k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k 'done)
-      (read-sexp tokens handler
-	(lambda-cont2 (sexp tokens-left)
-	  (pretty-print sexp)
-	  (print-unparsed-sexps tokens-left handler k))))))
-
-;; for testing purposes
-
-;; read-next-sexp takes a list of tokens and reads the next full sexp
-;; from the tokens.  It returns the result and the remaining tokens as
-;; a pair, or an exception object of the form (exception "description")
-
-(define read-next-sexp
-  (lambda (tokens)
-    (read-sexp tokens init-handler
-      (lambda-cont2 (sexp tokens-left)
-	(halt* (cons sexp tokens-left))))))
+			 (get-char-count token)
+			 where)
+		 fail)))))
 
 ;; returns the entire file contents as a single string
 (define read-content
@@ -558,6 +513,66 @@
 	    (if (eof-object? char)
 	      '()
 	      (cons char (loop (read-char port))))))))))
+
+;; takes a list of tokens and reads the next full sexp from the
+;; tokens. It returns the result and the remaining tokens as a pair,
+;; or an exception object of the form (exception "description").
+;; Used only in scheme-to-csharp.ss
+(define read-next-sexp
+  (lambda (tokens)
+    (read-sexp tokens init-handler2 init-fail
+      (lambda-cont3 (sexp tokens-left fail)
+	(halt* (cons sexp tokens-left))))))
+
+;;------------------------------------------------------------------------
+;; for manual testing only in scheme
+
+(define init-cont (lambda-cont (v) (halt* v)))
+(define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
+(define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
+(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
+(define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
+(define init-fail (lambda-fail () (halt* "no more choices")))
+
+(define scan-string
+  (lambda (input)
+    (scan-input input init-handler2 init-fail init-cont2)))
+
+(define scan-file
+  (lambda (filename)
+    (scan-input (read-content filename) init-handler2 init-fail init-cont2)))
+
+(define read-string
+  (lambda (input)
+    (read-datum input init-handler2 init-fail init-cont3)))
+
+(define* read-datum
+  (lambda (input handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
+    (scan-input input handler fail
+      (lambda-cont2 (tokens fail)
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp tokens-left fail)
+	    (if (token-type? (first tokens-left) 'end-marker)
+	      (k sexp tokens-left fail)
+	      (handler (format "tokens left over at line ~a, char ~a" 
+			       (get-line-count (first tokens-left))
+			       (get-char-count (first tokens-left)))
+		       fail))))))))
+
+(define read-file
+  (lambda (filename)
+    (scan-input (read-content filename) init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(print-unparsed-sexps tokens init-handler2 init-fail init-cont2)))))
+
+(define* print-unparsed-sexps
+  (lambda (tokens handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k 'done fail)
+      (read-sexp tokens handler fail
+	(lambda-cont3 (sexp tokens-left fail)
+	  (pretty-print sexp)
+	  (print-unparsed-sexps tokens-left handler fail k))))))
 
 ;; for testing in c#
 ;; (define Main
@@ -571,17 +586,17 @@
 
 ;; Handle command-line args too
 ;;(define* load-files
-;;  (lambda (filenames handler k)
+;;  (lambda (filenames handler fail k)
 ;;    (if (null? filenames)
-;;	(k 'ok)
-;;	(read-datum (format "(import \\\"~a\\\")" (car filenames)) handler
-;; 	    (lambda-cont2 (datum tokens-left)
+;;	(k 'ok fail)
+;;	(read-datum (format "(import \\\"~a\\\")" (car filenames)) handler fail
+;; 	    (lambda-cont3 (datum tokens-left fail)
 ;;		(printf "   (import \\\"~a\\\")...\n" (car filenames))
-;; 		(parse datum handler
-;; 		    (lambda-cont (exp)
-;; 			(m exp toplevel-env handler
-;;			   (lambda-cont (result)
-;;			      (load-files (cdr filenames) handler k))))))))))
+;; 		(parse datum handler fail
+;; 		    (lambda-cont2 (exp fail)
+;; 			(m exp toplevel-env handler fail
+;;			   (lambda-cont2 (result fail)
+;;			      (load-files (cdr filenames) handler fail k))))))))))
 
 (load "transformer-macros.ss")
 
@@ -687,43 +702,35 @@
           (search-frames (cdr frames) variable))))))
 
 (define* lookup-value
-  (lambda (variable env handler k)
-    (lookup-binding variable env handler
-      (lambda-cont (binding)
-	(k (binding-value binding))))))
+  (lambda (variable env handler fail k)
+    (lookup-binding variable env handler fail
+      (lambda-cont2 (binding fail)
+	(k (binding-value binding) fail)))))
 
 (define* lookup-binding
-  (lambda (variable env handler k)
+  (lambda (variable env handler fail k)
     (let ((binding (search-env env variable)))
       (if binding
-	(k binding)
-	(split-variable variable
-	  (lambda-cont (components)
+	(k binding fail)
+	(split-variable variable fail
+	  (lambda-cont2 (components fail)
             (if (dlr-env-contains variable)
-                (k (dlr-env-lookup variable))
+                (k (dlr-env-lookup variable) fail)
                 (if components
-		    (lookup-variable-components components "" env handler k)
-                    (handler (format "unbound variable ~a" variable))))))))))
-
-(define dlr-env-contains
-  (lambda (variable)
-    #t))
-
-(define dlr-env-lookup
-  (lambda (variable)
-    (binding 42)))
+		    (lookup-variable-components components "" env handler fail k)
+                    (handler (format "unbound variable ~a" variable) fail)))))))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist
 (define* lookup-binding-in-first-frame
-  (lambda (var env handler k)
+  (lambda (var env handler fail k)
     (let ((frame (first-frame env)))
       (let ((binding (search-frame frame var)))
         (if binding
-	  (k binding)
+	  (k binding fail)
           (let ((new-binding (make-binding var 'undefined)))
             (let ((new-frame (cons new-binding frame)))
               (set-first-frame! env new-frame)
-	      (k new-binding))))))))
+	      (k new-binding fail))))))))
 
 (define* lookup-variable-components
   ;; math.x.y.z where math is a module or a DLR module/item
@@ -731,39 +738,39 @@
   ;; components: '(x y z) "test" ...
   ;; components: '(y z) "test.x" ...
   ;; components: '(z) "test.x.z" ...
-  (lambda (components path env handler k)
+  (lambda (components path env handler fail k)
     ;;(printf "components: ~s path: ~s\n" components path)
     (let ((var (car components)))
-      (lookup-module-binding var env path handler
-	(lambda-cont (binding)
+      (lookup-module-binding var env path handler fail
+	(lambda-cont2 (binding fail)
 	  (if (null? (cdr components))
-	    (k binding)
+	    (k binding fail)
 	    (let ((result (binding-value binding))
 		  (new-path (if (string=? path "")
 			      (format "~a" var)
 			      (format "~a.~a" path var))))
 	      (if (not (environment? result))
                   (if (dlr-object? result)
-                      (k (dlr-lookup-components result (cdr components)))
-                      (handler (format "~a is not a module" new-path)))
+                      (k (dlr-lookup-components result (cdr components)) fail)
+                      (handler (format "~a is not a module" new-path) fail))
                   (lookup-variable-components
-		    (cdr components) new-path result handler k)))))))))
+		    (cdr components) new-path result handler fail k)))))))))
 
 (define* lookup-module-binding
-  (lambda (var env path handler k)
+  (lambda (var env path handler fail k)
     (let ((binding (search-env env var)))
       (cond
-	(binding (k binding))
-        ((dlr-env-contains var) (k (dlr-env-lookup var)))
-	((string=? path "") (handler (format "unbound module '~a'" var)))
-	(else (handler (format "unbound variable '~a' in module '~a'" var path)))))))
+	(binding (k binding fail))
+        ((dlr-env-contains var) (k (dlr-env-lookup var) fail))
+	((string=? path "") (handler (format "unbound module '~a'" var) fail))
+	(else (handler (format "unbound variable '~a' in module '~a'" var path) fail))))))
 
 (define* split-variable
-  (lambda (variable k)
+  (lambda (variable fail k)
     (let ((strings (group (string->list (symbol->string variable)) #\.)))
       (if (or (member "" strings) (= (length strings) 1))
-	(k #f)
-	(k (map string->symbol strings))))))
+	(k #f fail)
+	(k (map string->symbol strings) fail)))))
 
 (define group
   (lambda (chars delimiter)
@@ -782,6 +789,14 @@
 		     (cons (apply string (list-head chars n))
 			   (group (cdr (list-tail chars n))))))))))
       (group chars))))
+;; Calico Scheme parser
+;;
+;; Written by James B. Marshall and Douglas S. Blank
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+;; dblank@brynmawr.edu
+;; http://cs.brynmawr.edu/~dblank
+
 (load "transformer-macros.ss")
 
 ;;--------------------------------------------------------------------------
@@ -802,6 +817,7 @@
 ;;         | (if <exp> <exp> <exp>)
 ;;         | (set! <var> <exp>)
 ;;         | (define <var> <exp>)
+;;         | (define <var> <docstring> <exp>)
 ;;         | (define-syntax <keyword> (<pattern> <pattern>) ...)
 ;;         | (begin <exp> ...)
 ;;         | (lambda (<formal> ...) <exp> ...)
@@ -812,6 +828,8 @@
 ;;         | (try <body> (catch <var> <exp> ...) (finally <exp> ...))
 ;;         | (raise <exp>)
 ;;         | (dict (<exp> <exp>) ...)
+;;         | (help <var>)
+;;         | (choose <exp> ...)
 
 (define-datatype expression expression?
   (lit-exp
@@ -829,10 +847,12 @@
     (rhs-exp expression?))
   (define-exp
     (id symbol?)
-    (rhs-exp (list-of expression?)))
+    (docstring string?)
+    (rhs-exp expression?))
   (define!-exp
     (id symbol?)
-    (rhs-exp (list-of expression?)))
+    (docstring string?)
+    (rhs-exp expression?))
   (define-syntax-exp
     (keyword symbol?)
     (clauses (list-of (list-of pattern?))))
@@ -864,6 +884,10 @@
     (exp expression?))
   (dict-exp
     (pairs (list-of (list-of expression?))))
+  (help-exp
+    (var symbol?))
+  (choose-exp
+    (exps (list-of expression?)))
   )
 
 ;;--------------------------------------------------------------------------
@@ -890,27 +914,30 @@
     (and (pair? x) (eq? (car x) 'pattern-macro))))
 
 (define* expand-once
-  (lambda (datum handler k)
-    (lookup-value (car datum) macro-env handler
-      (lambda-cont (macro)
+  (lambda (datum handler fail k)
+    (lookup-value (car datum) macro-env handler fail
+      (lambda-cont2 (macro fail)
 	(if (pattern-macro? macro)
-	  (process-macro-clauses (macro-clauses macro) datum handler k)
-	  (macro datum k))))))
+	  (process-macro-clauses (macro-clauses macro) datum handler fail k)
+	  ;; macro transformer functions take 1-arg continuations:
+	  (macro datum
+	    (lambda-cont (expansion)
+	      (k expansion fail))))))))
 
 (define* process-macro-clauses
-  (lambda (clauses datum handler k)
+  (lambda (clauses datum handler fail k)
     (if (null? clauses)
-      (handler (format "no matching clause found for ~a" datum))
+      (handler (format "no matching clause found for ~a" datum) fail)
       (let ((left-pattern (caar clauses))
 	    (right-pattern (cadar clauses)))
 	(unify-patterns left-pattern datum
 	  (lambda-cont (subst)
 	    (if subst
-	      (instantiate right-pattern subst k)
-	      (process-macro-clauses (cdr clauses) datum handler k))))))))
+	      (instantiate right-pattern subst (lambda-cont (v) (k v fail)))
+	      (process-macro-clauses (cdr clauses) datum handler fail k))))))))
 
 (define mit-define-transformer
-  (lambda-macro (datum k) 
+  (lambda-macro (datum k)
     (let ((name (caadr datum))
 	  (formals (cdadr datum))
 	  (bodies (cddr datum)))
@@ -1117,167 +1144,170 @@
 
 ;;--------------------------------------------------------------------------
 
-;; for testing purposes
-(define parse-string
-  (lambda (string)
-    (read-datum string init-handler
-      (lambda-cont2 (datum tokens-left)
-	(parse datum init-handler init-cont)))))
-
 (define* parse
-  (lambda (datum handler k)
+  (lambda (datum handler fail k)
     (cond
-      ((literal? datum) (k (lit-exp datum)))
-      ((quote? datum) (k (lit-exp (cadr datum))))
+      ((literal? datum) (k (lit-exp datum) fail))
+      ((quote? datum) (k (lit-exp (cadr datum)) fail))
       ((quasiquote? datum)
-       (expand-quasiquote (cadr datum) handler
+       (expand-quasiquote (cadr datum)
 	 (lambda-cont (v)
-	   (parse v handler k))))
-      ((unquote? datum) (handler (format "misplaced ~a" datum)))
-      ((unquote-splicing? datum) (handler (format "misplaced ~a" datum)))
-      ((symbol? datum) (k (var-exp datum)))
+	   (parse v handler fail k))))
+      ((unquote? datum) (handler (format "misplaced ~a" datum) fail))
+      ((unquote-splicing? datum) (handler (format "misplaced ~a" datum) fail))
+      ((symbol? datum) (k (var-exp datum) fail))
       ((syntactic-sugar? datum)
-       (expand-once datum handler
-	 (lambda-cont (v)
-	   (parse v handler k))))
+       (expand-once datum handler fail
+	 (lambda-cont2 (v fail)
+	   (parse v handler fail k))))
       ((if-then? datum)
-       (parse (cadr datum) handler
-	 (lambda-cont (v1)
-	   (parse (caddr datum) handler
-	     (lambda-cont (v2)
-	       (k (if-exp v1 v2 (lit-exp #f))))))))
+       (parse (cadr datum) handler fail
+	 (lambda-cont2 (v1 fail)
+	   (parse (caddr datum) handler fail
+	     (lambda-cont2 (v2 fail)
+	       (k (if-exp v1 v2 (lit-exp #f)) fail))))))
       ((if-else? datum)
-       (parse (cadr datum) handler
-	 (lambda-cont (v1)
-	   (parse (caddr datum) handler
-	     (lambda-cont (v2)
-	       (parse (cadddr datum) handler
-		 (lambda-cont (v3)
-		   (k (if-exp v1 v2 v3)))))))))
+       (parse (cadr datum) handler fail
+	 (lambda-cont2 (v1 fail)
+	   (parse (caddr datum) handler fail
+	     (lambda-cont2 (v2 fail)
+	       (parse (cadddr datum) handler fail
+		 (lambda-cont2 (v3 fail)
+		   (k (if-exp v1 v2 v3) fail))))))))
       ((assignment? datum)
-       (parse (caddr datum) handler
-	 (lambda-cont (v)
-	   (k (assign-exp (cadr datum) v)))))
-      ((func? datum) (parse (cadr datum) handler
-                       (lambda-cont (e)
-                         (k (func-exp e)))))
+       (parse (caddr datum) handler fail
+	 (lambda-cont2 (v fail)
+	   (k (assign-exp (cadr datum) v) fail))))
+      ((func? datum) (parse (cadr datum) handler fail
+                       (lambda-cont2 (e fail)
+                         (k (func-exp e) fail))))
       ((define? datum)
-       (if (mit-style? datum)
-	 (mit-define-transformer datum
-	   (lambda-cont (v)
-	     (parse v handler k)))
-	 (if (= (length datum) 3) ;; (define x 1)
-	     (parse (caddr datum) handler 
-		(lambda-cont (body)
-		    (k (define-exp (cadr datum) (list body)))))
-	     (parse (cadddr datum) handler ;; (define x "" 8)
-		 (lambda-cont (body)
-		    (parse (caddr datum) handler
-			(lambda-cont (docstring)
-			    (k (define-exp (cadr datum) (list docstring body))))))))))
+       (cond
+	 ((mit-style? datum)
+	  (mit-define-transformer datum
+	    (lambda-cont (v)
+	      (parse v handler fail k))))
+	 ((= (length datum) 3) ;; (define <var> <body>)
+	  (parse (caddr datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (k (define-exp (cadr datum) "" body) fail))))
+	 ((and (= (length datum) 4) (string? (caddr datum))) ;; (define <var> <docstring> <body>)
+	  (parse (cadddr datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (k (define-exp (cadr datum) (caddr datum) body) fail))))
+	 (else (handler (format "bad concrete syntax: ~a" datum) fail))))
       ((define!? datum)
-       (if (mit-style? datum)
-	 (mit-define-transformer datum
-	   (lambda-cont (v)
-	     (parse v handler k)))
-	 (if (= (length datum) 3) ;; (define! x 1)
-	     (parse (caddr datum) handler 
-		(lambda-cont (body)
-		    (k (define!-exp (cadr datum) (list body)))))
-	     (parse (cadddr datum) handler ;; (define! x "" 8)
-		 (lambda-cont (body)
-		    (parse (caddr datum) handler
-			(lambda-cont (docstring)
-			    (k (define!-exp (cadr datum) (list docstring body))))))))))
+       (cond
+	 ((mit-style? datum)
+	  (mit-define-transformer datum
+	    (lambda-cont (v)
+	      (parse v handler fail k))))
+	 ((= (length datum) 3) ;; (define! <var> <body>)
+	  (parse (caddr datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (k (define!-exp (cadr datum) "" body) fail))))
+	 ((and (= (length datum) 4) (string? (caddr datum))) ;; (define! <var> <docstring> <body>)
+	  (parse (cadddr datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (k (define!-exp (cadr datum) (caddr datum) body) fail))))
+	 (else (handler (format "bad concrete syntax: ~a" datum) fail))))
       ((define-syntax? datum)
-       (k (define-syntax-exp (cadr datum) (cddr datum))))
+       (k (define-syntax-exp (cadr datum) (cddr datum)) fail))
       ((begin? datum)
-       (parse-all (cdr datum) handler
-	 (lambda-cont (v)
+       (parse-all (cdr datum) handler fail
+	 (lambda-cont2 (v fail)
 	   (cond
-	     ((null? v) (handler (format "bad concrete syntax: ~a" datum)))
-	     ((null? (cdr v)) (k (car v)))
-	     (else (k (begin-exp v)))))))
+	     ((null? v) (handler (format "bad concrete syntax: ~a" datum) fail))
+	     ((null? (cdr v)) (k (car v) fail))
+	     (else (k (begin-exp v) fail))))))
       ((lambda? datum)
-       (parse (cons 'begin (cddr datum)) handler
-	 (lambda-cont (body)
+       (parse (cons 'begin (cddr datum)) handler fail
+	 (lambda-cont2 (body fail)
 	   (if (list? (cadr datum))
-	     (k (lambda-exp (cadr datum) body))
-	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) body))))))
+	     (k (lambda-exp (cadr datum) body) fail)
+	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) body) fail)))))
       ((try? datum)
        (cond
 	 ((= (length datum) 2)
 	  ;; (try <body>)
-	  (parse (try-body datum) handler k))
+	  (parse (try-body datum) handler fail k))
 	 ((and (= (length datum) 3) (catch? (caddr datum)))
 	  ;; (try <body> (catch <var> <exp> ...))
-	  (parse (try-body datum) handler
-	    (lambda-cont (body)
-	      (parse-all (catch-exps (caddr datum)) handler
-		(lambda-cont (cexps)
+	  (parse (try-body datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (parse-all (catch-exps (caddr datum)) handler fail
+		(lambda-cont2 (cexps fail)
 		  (let ((cvar (catch-var (caddr datum))))
-		    (k (try-catch-exp body cvar cexps))))))))
+		    (k (try-catch-exp body cvar cexps) fail)))))))
 	 ((and (= (length datum) 3) (finally? (caddr datum)))
 	  ;; (try <body> (finally <exp> ...))
-	  (parse (try-body datum) handler
-	    (lambda-cont (body)
-	      (parse-all (finally-exps (caddr datum)) handler
-		(lambda-cont (fexps)
-		  (k (try-finally-exp body fexps)))))))
+	  (parse (try-body datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (parse-all (finally-exps (caddr datum)) handler fail
+		(lambda-cont2 (fexps fail)
+		  (k (try-finally-exp body fexps) fail))))))
 	 ((and (= (length datum) 4) (catch? (caddr datum)) (finally? (cadddr datum)))
 	  ;; (try <body> (catch <var> <exp> ...) (finally <exp> ...))
-	  (parse (try-body datum) handler
-	    (lambda-cont (body)
-	      (parse-all (catch-exps (caddr datum)) handler
-		(lambda-cont (cexps)
-		  (parse-all (finally-exps (cadddr datum)) handler
-		    (lambda-cont (fexps)
+	  (parse (try-body datum) handler fail
+	    (lambda-cont2 (body fail)
+	      (parse-all (catch-exps (caddr datum)) handler fail
+		(lambda-cont2 (cexps fail)
+		  (parse-all (finally-exps (cadddr datum)) handler fail
+		    (lambda-cont2 (fexps fail)
 		      (let ((cvar (catch-var (caddr datum))))
-			(k (try-catch-finally-exp body cvar cexps fexps))))))))))
-	 (else (handler (format "bad try syntax: ~a" datum)))))
+			(k (try-catch-finally-exp body cvar cexps fexps) fail)))))))))
+	 (else (handler (format "bad try syntax: ~a" datum) fail))))
       ((raise? datum)
-       (parse (cadr datum) handler
-	 (lambda-cont (v)
-	   (k (raise-exp v)))))
+       (parse (cadr datum) handler fail
+	 (lambda-cont2 (v fail)
+	   (k (raise-exp v) fail))))
       ((dict? datum)
-       (parse-pairs (cdr datum) handler
-	  (lambda-cont (v1)
-	     (k (dict-exp v1)))))
+       (parse-pairs (cdr datum) handler fail
+	 (lambda-cont2 (v1 fail)
+	   (k (dict-exp v1) fail))))
+      ((help? datum)
+       (if (symbol? (cadr datum))
+	 (k (help-exp (cadr datum)) fail)
+	 (handler (format "bad concrete syntax: ~a" datum) fail)))
+      ((choose? datum)
+       (parse-all (cdr datum) handler fail
+	 (lambda-cont2 (exps fail)
+	   (k (choose-exp exps) fail))))
       ((application? datum)
-       (parse (car datum) handler
-	 (lambda-cont (v1)
-	   (parse-all (cdr datum) handler
-	     (lambda-cont (v2)
-	       (k (app-exp v1 v2)))))))
-      (else (handler (format "bad concrete syntax: ~a" datum))))))
+       (parse (car datum) handler fail
+	 (lambda-cont2 (v1 fail)
+	   (parse-all (cdr datum) handler fail
+	     (lambda-cont2 (v2 fail)
+	       (k (app-exp v1 v2) fail))))))
+      (else (handler (format "bad concrete syntax: ~a" datum) fail)))))
 
 (define* parse-pairs
-  (lambda (pairs handler k)
+  (lambda (pairs handler fail k)
     (if (null? pairs)
-      (k '())
-      (parse (caar pairs) handler
-	(lambda-cont (a)
-	  (parse (cadar pairs) handler
-	    (lambda-cont (b)
-              (parse-pairs (cdr pairs) handler
-                  (lambda-cont (results)
-		      (k (cons (list a b) results)))))))))))
+      (k '() fail)
+      (parse (caar pairs) handler fail
+	(lambda-cont2 (a fail)
+	  (parse (cadar pairs) handler fail
+	    (lambda-cont2 (b fail)
+              (parse-pairs (cdr pairs) handler fail
+		(lambda-cont2 (results fail)
+		  (k (cons (list a b) results) fail))))))))))
 
 (define* parse-all
-  (lambda (datum-list handler k)
+  (lambda (datum-list handler fail k)
     (if (null? datum-list)
-      (k '())
-      (parse (car datum-list) handler
-	(lambda-cont (a)
-	  (parse-all (cdr datum-list) handler
-	    (lambda-cont (b)
-	      (k (cons a b)))))))))
+      (k '() fail)
+      (parse (car datum-list) handler fail
+	(lambda-cont2 (a fail)
+	  (parse-all (cdr datum-list) handler fail
+	    (lambda-cont2 (b fail)
+	      (k (cons a b) fail))))))))
 
 (define* expand-quasiquote
-  (lambda (datum handler k)
+  (lambda (datum k)
     (cond
       ((vector? datum)
-       (expand-quasiquote (vector->list datum) handler
+       (expand-quasiquote (vector->list datum)
 	 (lambda-cont (ls) (k `(list->vector ,ls)))))
       ((not (pair? datum)) (k `(quote ,datum)))
       ;; doesn't handle nested quasiquotes yet
@@ -1286,26 +1316,26 @@
       ((unquote-splicing? (car datum))
        (if (null? (cdr datum))
 	 (k (cadr (car datum)))
-	 (expand-quasiquote (cdr datum) handler
+	 (expand-quasiquote (cdr datum)
 	   (lambda-cont (v) (k `(append ,(cadr (car datum)) ,v))))))
       ((quasiquote-list? datum)
-       (expand-quasiquote-list datum handler
+       (expand-quasiquote-list datum
 	 (lambda-cont (v)
 	   (k `(list ,@v)))))
       (else
-	(expand-quasiquote (car datum) handler
+	(expand-quasiquote (car datum)
 	  (lambda-cont (v1)
-	    (expand-quasiquote (cdr datum) handler
+	    (expand-quasiquote (cdr datum)
 	      (lambda-cont (v2)
 		(k `(cons ,v1 ,v2))))))))))
 
 (define* expand-quasiquote-list
-  (lambda (datum handler k)
+  (lambda (datum k)
     (if (null? datum)
       (k '())
-      (expand-quasiquote (car datum) handler
+      (expand-quasiquote (car datum)
 	(lambda-cont (v1)
-	  (expand-quasiquote-list (cdr datum) handler
+	  (expand-quasiquote-list (cdr datum)
 	    (lambda-cont (v2)
 	       (k (cons v1 v2)))))))))
 
@@ -1373,6 +1403,15 @@
 (define lambda? (tagged-list 'lambda >= 3))
 (define raise? (tagged-list 'raise = 2))
 (define dict? (tagged-list 'dict >= 1))
+(define help? (tagged-list 'help = 2))
+(define choose? (tagged-list 'choose >= 1))
+(define try? (tagged-list 'try >= 2))
+(define try-body (lambda (x) (cadr x)))
+(define catch? (tagged-list 'catch >= 3))
+(define catch-var (lambda (x) (cadr x)))
+(define catch-exps (lambda (x) (cddr x)))
+(define finally? (tagged-list 'finally >= 2))
+(define finally-exps (lambda (x) (cdr x)))
 
 (define application?
   (lambda (datum)
@@ -1384,546 +1423,680 @@
   (lambda ()
     '(quote func define! quasiquote lambda if set! define
 	    begin cond and or let let* letrec case record-case
-	    try catch finally raise dict )))
+	    try catch finally raise dict help choose)))
 
 (define reserved-keyword?
   (lambda (x)
     (and (symbol? x)
 	 (memq x (get-reserved-keywords)))))
 
-(define try? (tagged-list 'try >= 2))
-(define try-body (lambda (x) (cadr x)))
-(define catch? (tagged-list 'catch >= 3))
-(define catch-var (lambda (x) (cadr x)))
-(define catch-exps (lambda (x) (cddr x)))
-(define finally? (tagged-list 'finally >= 2))
-(define finally-exps (lambda (x) (cdr x)))
-
 ;;------------------------------------------------------------------------
-;; file parser
+;; for manual testing only in scheme
 
-;; for testing purposes
+(define parse-string
+  (lambda (string)
+    (read-datum string init-handler2 init-fail
+      (lambda-cont3 (datum tokens-left fail)
+	(parse datum init-handler2 init-fail init-cont2)))))
+
 (define print-parsed-sexps
   (lambda (filename)
     (for-each pretty-print (get-parsed-sexps filename))))
 
-;; for testing purposes
 (define get-parsed-sexps
   (lambda (filename)
-    (scan-input (read-content filename) init-handler 
-      (lambda-cont (tokens) 
-	(parse-sexps tokens init-handler init-cont)))))
+    (scan-input (read-content filename) init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(parse-sexps tokens init-handler2 init-fail init-cont2)))))
 
-;; for testing purposes
 (define* parse-sexps
-  (lambda (tokens handler k)
+  (lambda (tokens handler fail k)
     (if (token-type? (first tokens) 'end-marker)
-      (k '())
-      (read-sexp tokens handler
-	(lambda-cont2 (datum tokens-left)
-	  (parse datum handler
-	    (lambda-cont (exp)
-	      (parse-sexps tokens-left handler
-		(lambda-cont (v)
-		  (k (cons exp v)))))))))))
+      (k '() fail)
+      (read-sexp tokens handler fail
+	(lambda-cont3 (datum tokens-left fail)
+	  (parse datum handler fail
+	    (lambda-cont2 (exp fail)
+	      (parse-sexps tokens-left handler fail
+		(lambda-cont2 (v fail)
+		  (k (cons exp v) fail))))))))))
+;; Calico Scheme interpreter
+;;
+;; Written by James B. Marshall and Douglas S. Blank
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+;; dblank@brynmawr.edu
+;; http://cs.brynmawr.edu/~dblank
+
 (load "transformer-macros.ss")
 
 ;;----------------------------------------------------------------------------
-;; Interpreter
+;; Interpreter with support for choose
 
 (load "environments-cps.ss")
 (load "parser-cps.ss")
 
-;; temporary
-(define testall
-  (lambda ()
-    (read-datum "(load \"examples.ss\")" REP-handler
-      (lambda-cont2 (datum tokens-left)
-	(parse datum REP-handler
-	  (lambda-cont (exp)
-	    (m exp toplevel-env REP-handler
-	      (lambda-cont (v)
-		(read-datum "(test-all)" REP-handler
-		  (lambda-cont2 (datum tokens-left)
-		    (parse datum REP-handler
-		      (lambda-cont (exp)
-			(m exp toplevel-env REP-handler
-			  (lambda-cont (v)
-			    (read-datum "(exit)" REP-handler
-			      (lambda-cont2 (datum tokens-left)
-				(parse datum REP-handler
-				  (lambda-cont (exp)
-				    (m exp toplevel-env REP-handler REP-k)))))))))))))))))))
-
-(define start
-  (lambda ()
-    (read-eval-print)))
+;;(case-sensitive #t)
 
 (define *need-newline* #f)
-
-(define REP-k
-  (lambda-cont (v)
-    (if (not (eq? v '<void>))
-	(pretty-print-prim v))
-    (if *need-newline* (newline))
-    (read-eval-print)))
 
 (define pretty-print-prim
   (lambda (arg)
     (set! *need-newline* #f)
-    (pretty-print arg)))
+    (pretty-print (if (procedure-object? arg) '<procedure> arg))))
+
+(define procedure-object?
+  (lambda (x)
+    (or (procedure? x) (and (pair? x) (eq? (car x) 'procedure)))))
 
 (define newline-prim
   (lambda ()
     (set! *need-newline* #f)
     (newline)))
 
+(define ends-with-newline?
+  (lambda (s)
+    (let ((len (string-length s)))
+      (equal? (substring s (- len 1) len) "\n"))))
+
 (define display-prim
-  (lambda (arg)
-    (let* ((s (format "~s" arg))
-	   (len (string-length s)))
-      (set! *need-newline* (true? (not (equal? (substring s (- len 1) len) "\n"))))
+  (lambda (x)
+    (let ((s (format "~a" x)))  ;; must use ~a, not ~s, to handle embedded newlines properly
+      (set! *need-newline* (true? (not (ends-with-newline? s))))
       (display s))))
 
-(define REP-handler
-  (lambda-handler (e)
-    (REP-k `(uncaught exception: ,e))))
+(define REP-k
+  (lambda-cont2 (v fail)
+    (if (not (eq? v '<void>))
+	(pretty-print-prim v))
+    (if *need-newline* (newline))
+    (read-eval-print fail)))
 
+(define REP-handler
+  (lambda-handler2 (e fail)
+    (REP-k `(uncaught exception: ,e) fail)))
+
+(define REP-fail
+  (lambda-fail ()
+    (REP-k "no more choices" REP-fail)))
+
+(define load-stack '())
+
+(define start
+  (lambda ()
+    ;; start with fresh environments
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env))
+    (read-eval-print REP-fail)))
+
+;; avoids reinitializing environments on startup (useful for crash recovery)
+(define restart
+  (lambda ()
+    (printf "Restarting...\n")
+    (read-eval-print REP-fail)))
+
+;; scheme version of read-line
 (define read-line
   (lambda (prompt)
     (printf prompt)
-    (read)))
+    (let ((input (read)))
+      (format "~s" input))))
+
+;; because read-line uses (read), it can only read a single sexp at a
+;; time. it always returns a string version of its input. if the input
+;; is the list (+ 2 3), the string "(+ 2 3)" is returned; if the input
+;; is the string "apple", the string "\"apple\"" is returned; etc.
+;;
+;; the C# version of read-line should always return the input as a
+;; string, which may contain multiple sexps. if the input is a scheme
+;; string such as "apple", read-line should return the input with
+;; embedded double quotes such as "\"apple\"".
+
+;; raw-read-line is only for testing the scheme version of the code,
+;; and should not be converted to C#. the user must always type the
+;; input as a string. this allows multiple sexps to be input at once.
+(define raw-read-line
+  (lambda (prompt)
+    (printf prompt)
+    (let loop ((input (read)))
+      (if (string? input)
+	input
+	(begin
+	  (printf "Error: input must be enclosed in quotation marks.\n==> ")
+	  (loop (read)))))))
 
 (define* read-eval-print
-  (lambda ()
-    (let* ((input (read-line "==> "))
-	   (input-string (format "~s" input)))
-      (read-datum input-string REP-handler
-	(lambda-cont2 (datum tokens-left)
-	  (parse datum REP-handler
-	    (lambda-cont (exp)
-	      (m exp toplevel-env REP-handler REP-k))))))))
+  (lambda (fail)
+    (set! load-stack '())  ;; in case a previous load encountered an error
+    (let ((input-string (read-line "==> ")))  ;; or raw-read-line
+      (scan-input input-string REP-handler fail
+	(lambda-cont2 (tokens fail)
+	  (read-and-eval-sexps tokens toplevel-env REP-handler fail REP-k))))))
+
+(define* read-and-eval-sexps
+  (lambda (tokens env handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k '<void> fail)
+      (read-sexp tokens handler fail
+	(lambda-cont3 (datum tokens-left fail)
+	  (parse datum handler fail
+	    (lambda-cont2 (exp fail)
+	      (m exp env handler fail
+		(lambda-cont2 (v fail)
+		  (if (token-type? (first tokens-left) 'end-marker)
+		    (k v fail)
+		    (read-and-eval-sexps tokens-left env handler fail k)))))))))))
 
 (define* m
-  (lambda (exp env handler k)
+  (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
     (cases expression exp
-      (lit-exp (datum) (k datum))
-      (var-exp (id) (lookup-value id env handler k))
-      (func-exp (exp) (m exp env handler
-                        (lambda-cont (f)
-                          (k (dlr-func f)))))
+      (lit-exp (datum) (k datum fail))
+      (var-exp (id) (lookup-value id env handler fail k))
+      (func-exp (exp) (m exp env handler fail
+                        (lambda-cont2 (f fail)
+                          (k (dlr-func f) fail))))
       (if-exp (test-exp then-exp else-exp)
-	(m test-exp env handler
-	  (lambda-cont (bool)
+	(m test-exp env handler fail
+	  (lambda-cont2 (bool fail)
 	    (if bool
-	      (m then-exp env handler k)
-	      (m else-exp env handler k)))))
+	      (m then-exp env handler fail k)
+	      (m else-exp env handler fail k)))))
       (assign-exp (var rhs-exp)
-	(m rhs-exp env handler
-	  (lambda-cont (rhs-value)
-	    (lookup-binding var env handler
-	      (lambda-cont (binding)
+	(m rhs-exp env handler fail
+	  (lambda-cont2 (rhs-value fail)
+	    (lookup-binding var env handler fail
+	      (lambda-cont2 (binding fail)
+		(let ((old-value (binding-value binding)))
+		  (set-binding-value! binding rhs-value)
+		  ;; need to undo the assignment if we back up
+		  (let ((new-fail (lambda-fail () (set-binding-value! binding old-value) (fail))))
+		    (k '<void> new-fail))))))))
+      (define-exp (var docstring rhs-exp)
+	(m rhs-exp env handler fail
+	  (lambda-cont2 (rhs-value fail)
+	    (lookup-binding-in-first-frame var env handler fail
+	      (lambda-cont2 (binding fail)
 		(set-binding-value! binding rhs-value)
-		(k '<void>))))))
-      (define-exp (var rhs-exp)
-        (if (= (length rhs-exp) 1)
-            (m (car rhs-exp) env handler
-              (lambda-cont (rhs-value)
-                (lookup-binding-in-first-frame var env handler
-                  (lambda-cont (binding)
-                    (set-binding-value! binding rhs-value)
-                    (k '<void>)))))
-            (m (cadr rhs-exp) env handler ;; body
-              (lambda-cont (rhs-value)
-		 (m (car rhs-exp) env handler ;; docstring
-		    (lambda-cont (docstring)
-		       (lookup-binding-in-first-frame var env handler
-			  (lambda-cont (binding)
-			     (set-binding-docstring! binding docstring)
-			     (set-binding-value! binding rhs-value)
-			     (k '<void>)))))))))
-      (define!-exp (var rhs-exp)
-        (if (= (length rhs-exp) 1)
-            (m (car rhs-exp) env handler
-              (lambda-cont (rhs-value)
-                 (set-global-value! var rhs-value)
-                 (k '<void>)))
-            (m (cadr rhs-exp) env handler ;; body
-              (lambda-cont (rhs-value)
-		 (m (car rhs-exp) env handler ;; docstring
- 		    (lambda-cont (docstring)
-                       (set-global-value! var rhs-value)
-                       (set-global-docstring! var docstring)
-    	               (k '<void>)))))))
+		(set-binding-docstring! binding docstring)
+		;; definitions should occur only at top level, so no need to undo
+		(k '<void> fail))))))
+      (define!-exp (var docstring rhs-exp)
+	(m rhs-exp env handler fail
+	  (lambda-cont2 (rhs-value fail)
+	    (set-global-value! var rhs-value)
+	    (set-global-docstring! var docstring)
+	    (k '<void> fail))))
       (define-syntax-exp (keyword clauses)
-	(lookup-binding-in-first-frame keyword macro-env handler
-	  (lambda-cont (binding)
+	(lookup-binding-in-first-frame keyword macro-env handler fail
+	  (lambda-cont2 (binding fail)
 	    (set-binding-value! binding (make-pattern-macro clauses))
-	    (k '<void>))))
-      (begin-exp (exps) (eval-sequence exps env handler k))
+	    (k '<void> fail))))
+      (begin-exp (exps) (eval-sequence exps env handler fail k))
       (lambda-exp (formals body)
-	(k (closure formals body env)))
+	(k (closure formals body env) fail))
       (mu-lambda-exp (formals runt body)
-	(k (mu-closure formals runt body env)))
+	(k (mu-closure formals runt body env) fail))
       (try-catch-exp (body cvar cexps)
 	(let ((new-handler (try-catch-handler cvar cexps env handler k)))
-	  (m body env new-handler k)))
+	  (m body env new-handler fail k)))
       (try-finally-exp (body fexps)
 	(let ((new-handler (try-finally-handler fexps env handler)))
-	  (m body env new-handler
-	    (lambda-cont (v)
+	  (m body env new-handler fail
+	    (lambda-cont2 (v fail)
 	      ;;(printf "executing finally block~%")
-	      (eval-sequence fexps env handler
-		(lambda-cont (v2) (k v)))))))
+	      (eval-sequence fexps env handler fail
+		(lambda-cont2 (v2 fail) (k v fail)))))))
       (try-catch-finally-exp (body cvar cexps fexps)
 	(let ((new-handler (try-catch-finally-handler cvar cexps fexps env handler k)))
-	  (m body env new-handler
-	     (lambda-cont (v)
+	  (m body env new-handler fail
+	     (lambda-cont2 (v fail)
 	       ;;(printf "executing finally block~%")
-	       (eval-sequence fexps env handler
-		 (lambda-cont (v2) (k v)))))))
+	       (eval-sequence fexps env handler fail
+		 (lambda-cont2 (v2 fail) (k v fail)))))))
       (raise-exp (exp)
-	(m exp env handler
-	  ;; todo: pass in more info to handler (k, env)
-	  (lambda-cont (e) (handler e))))
+	(m exp env handler fail
+	  ;; TODO: pass in more info to handler (k, env) to support resume, etc.
+	  (lambda-cont2 (e fail) (handler e fail))))
       (dict-exp (pairs)
-	(k (list 'dict pairs)))
+	(k (list 'dict pairs) fail))
+      (help-exp (var)
+	(if (reserved-keyword? var)
+	  (k (format "~a is a keyword" var) fail)
+	  (lookup-binding var env handler fail
+	    (lambda-cont2 (binding fail)
+	      (k (binding-docstring binding) fail)))))
+      (choose-exp (exps)
+	(eval-choices exps env handler fail k))
       (app-exp (operator operands)
-	 (m* operands env handler
-            (lambda-cont (args)
-	       (m operator env handler
-	           (lambda-cont (proc)
-		      (if (dlr-exp? proc)
-			  (k (dlr-apply proc args))
-			  (proc args env handler k)))))))
+	(m* operands env handler fail
+	  (lambda-cont2 (args fail)
+	    (m operator env handler fail
+	      (lambda-cont2 (proc fail)
+		(if (dlr-exp? proc)
+		  (k (dlr-apply proc args) fail)
+		  (proc args env handler fail k)))))))
       (else (error 'm "bad abstract syntax: ~a" exp)))))
 
 (define try-catch-handler
   (lambda (cvar cexps env handler k)
-    (lambda-handler (e)
+    (lambda-handler2 (e fail)
       ;;(printf "try-handler: handling ~a exception~%" e)
       (let ((new-env (extend env (list cvar) (list e))))
 	;;(printf "executing catch block~%")
-	(eval-sequence cexps new-env handler k)))))
+	(eval-sequence cexps new-env handler fail k)))))
 
 (define try-finally-handler
   (lambda (fexps env handler)
-    (lambda-handler (e)
+    (lambda-handler2 (e fail)
       ;;(printf "executing finally block~%")
-      (eval-sequence fexps env handler
-	(lambda-cont (v)
+      (eval-sequence fexps env handler fail
+	(lambda-cont2 (v fail)
 	  ;;(printf "propagating ~a exception~%" e)
-	  (handler e))))))
+	  (handler e fail))))))
 
 (define try-catch-finally-handler
   (lambda (cvar cexps fexps env handler k)
-    (lambda-handler (e)
+    (lambda-handler2 (e fail)
       ;;(printf "try-handler: handling ~a exception~%" e)
       (let ((new-env (extend env (list cvar) (list e))))
 	(let ((catch-handler (try-finally-handler fexps env handler)))
 	  ;;(printf "executing catch block~%")
-	  (eval-sequence cexps new-env catch-handler
-	    (lambda-cont (v)
+	  (eval-sequence cexps new-env catch-handler fail
+	    (lambda-cont2 (v fail)
 	      ;;(printf "executing finally block~%")
-	      (eval-sequence fexps env handler
-		(lambda-cont (v2) (k v))))))))))
+	      (eval-sequence fexps env handler fail
+		(lambda-cont2 (v2 fail) (k v fail))))))))))
+
+(define* eval-choices
+  (lambda (exps env handler fail k)
+    (if (null? exps)
+      ;; no more choices, so backtrack to previous choice point
+      (fail)
+      (let ((new-fail (lambda-fail () (eval-choices (cdr exps) env handler fail k))))
+	;; if new-fail is invoked, it will try the next choice
+	(m (car exps) env handler new-fail k)))))
 
 (define closure
   (lambda (formals body env)
-    (lambda-proc (args env2 handler k2)
+    (lambda-proc (args env2 handler fail k2)
       (if (= (length args) (length formals))
-	(m body (extend env formals args) handler k2)
-	(handler "incorrect number of arguments")))))
+	(m body (extend env formals args) handler fail k2)
+	(handler "incorrect number of arguments" fail)))))
 
 (define mu-closure
   (lambda (formals runt body env)
-    (lambda-proc (args env2 handler k2)
+    (lambda-proc (args env2 handler fail k2)
       (if (>= (length args) (length formals))
 	(let ((new-env
 		(extend env
 		  (cons runt formals)
 		  (cons (list-tail args (length formals))
 			(list-head args (length formals))))))
-	  (m body new-env handler k2))
-	(handler "not enough arguments given")))))
+	  (m body new-env handler fail k2))
+	(handler "not enough arguments given" fail)))))
 
 (define* m*
-  (lambda (exps env handler k)
+  (lambda (exps env handler fail k)
     (if (null? exps)
-      (k '())
-      (m (car exps) env handler
-	(lambda-cont (v1)
-	  (m* (cdr exps) env handler
-	    (lambda-cont (v2)
-	      (k (cons v1 v2)))))))))
+      (k '() fail)
+      (m (car exps) env handler fail
+	(lambda-cont2 (v1 fail)
+	  (m* (cdr exps) env handler fail
+	    (lambda-cont2 (v2 fail)
+	      (k (cons v1 v2) fail))))))))
 
 (define* eval-sequence
-  (lambda (exps env handler k)
-    (m (car exps) env handler
-       (lambda-cont (result)
+  (lambda (exps env handler fail k)
+    (m (car exps) env handler fail
+       (lambda-cont2 (result fail)
 	 (if (null? (cdr exps))
-	   (k result)
-	   (eval-sequence (cdr exps) env handler k))))))
+	   (k result fail)
+	   (eval-sequence (cdr exps) env handler fail k))))))
 
 (define make-initial-env-extended
   (lambda (env)
     ;; this is here as a hook for extending environments in C# etc.
     env))
 
+(define length-prim
+  (lambda-proc (args env2 handler fail k2)
+    (if (= (length args) 1)
+      (length-loop (car args) 0 (car args) handler fail k2)
+      (handler "incorrect number of arguments to procedure length" fail))))
+
+(define* length-loop
+  (lambda (x sum ls handler fail k2)
+    (cond
+      ((null? x) (k2 sum fail))
+      ((not (pair? x)) (handler (format "~a is not a proper list" ls) fail))
+      (else (length-loop (cdr x) (+ sum 1) ls handler fail k2)))))
+
 (define make-toplevel-env
   (lambda ()
     (make-initial-env-extended
      (make-initial-environment
-      (list 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'null? 'cons 'car 'cdr
-	    'list '+ '- '* '/ '< '> '= 'equal? 'eq? 'memq 'range 'set-car! 'set-cdr!
-	    'import 'get 'call-with-current-continuation 'call/cc
+      (list 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'length
+	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq 'member 'range
+	    'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require 'cut
 	    'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env
-	    'using 'not 'printf 'vector 'vector-set! 'vector-ref 'make-vector 'help)
+	    'using 'not 'printf 'vector 'vector-set! 'vector-ref 'make-vector)
       (list
 	;; exit
-        (lambda-proc (args env2 handler k2)
-	  (set! macro-env (make-macro-env))
-	  (set! toplevel-env (make-toplevel-env))
-	  ;; temporary
-	  (set! load-stack '())
+        (lambda-proc (args env2 handler fail k2)
 	  (halt* '(exiting the interpreter)))
 	;; eval
-	(lambda-proc (args env2 handler k2)
-	  (parse (car args) handler
-	    (lambda-cont (exp)
-	      (m exp toplevel-env handler k2))))   ;; use toplevel-env here?
+	(lambda-proc (args env2 handler fail k2)
+	  (parse (car args) handler fail
+	    (lambda-cont2 (exp fail)
+	      (m exp toplevel-env handler fail k2))))   ;; use toplevel-env here?
 	;; parse
-	(lambda-proc (args env2 handler k2)
-	  (parse (car args) handler k2))
+	(lambda-proc (args env2 handler fail k2)
+	  (parse (car args) handler fail k2))
 	;; parse-string
-	(lambda-proc (args env2 handler k2)
-	  (read-datum (car args) handler
-	    (lambda-cont2 (datum tokens-left)
-	      (parse datum handler k2))))
+	(lambda-proc (args env2 handler fail k2)
+	  (scan-input (car args) handler fail
+	    (lambda-cont2 (tokens fail)
+	      (read-sexp tokens handler fail
+		(lambda-cont3 (datum tokens-left fail)
+		  (if (token-type? (first tokens-left) 'end-marker)
+		    (parse datum handler fail k2)
+		    (handler (format "tokens left over at line ~a, char ~a" 
+				     (get-line-count (first tokens-left))
+				     (get-char-count (first tokens-left)))
+			     fail)))))))
 	;; apply
-	(lambda-proc (args env2 handler k2)
+	(lambda-proc (args env2 handler fail k2)
 	  (let ((proc (car args))
 		(proc-args (cadr args)))
-	    (proc proc-args env2 handler k2)))
+	    (proc proc-args env2 handler fail k2)))
+;; FIX: need to check each fixed-arity primitive for correct number of args before calling
 	;; sqrt
-	(lambda-proc (args env2 handler k2) (k2 (apply sqrt args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply sqrt args) fail))
 	;; print
-	(lambda-proc (args env2 handler k2) (for-each pretty-print-prim args) (k2 '<void>))
+	(lambda-proc (args env2 handler fail k2) (for-each pretty-print-prim args) (k2 '<void> fail))
 	;; display
-	(lambda-proc (args env2 handler k2) (apply display-prim args) (k2 '<void>))
+	(lambda-proc (args env2 handler fail k2) (apply display-prim args) (k2 '<void> fail))
 	;; newline
-	(lambda-proc (args env2 handler k2) (newline-prim) (k2 '<void>))
+	(lambda-proc (args env2 handler fail k2) (newline-prim) (k2 '<void> fail))
 	;; load
-	(lambda-proc (args env2 handler k2) 
-	   (set! load-stack '())
-	   (load-file (car args) toplevel-env handler k2))
+	(lambda-proc (args env2 handler fail k2)
+	   (load-file (car args) toplevel-env handler fail k2))
+	;; length
+	length-prim
 	;; null?
-	(lambda-proc (args env2 handler k2) (k2 (apply null? args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply null? args) fail))
 	;; cons
-	(lambda-proc (args env2 handler k2) (k2 (apply cons args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply cons args) fail))
 	;; car
-	(lambda-proc (args env2 handler k2) (k2 (apply car args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply car args) fail))
 	;; cdr
-	(lambda-proc (args env2 handler k2) (k2 (apply cdr args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply cdr args) fail))
+	;; cadr
+	(lambda-proc (args env2 handler fail k2) (k2 (apply cadr args) fail))
+	;; caddr
+	(lambda-proc (args env2 handler fail k2) (k2 (apply caddr args) fail))
 	;; list
-	(lambda-proc (args env2 handler k2) (k2 args))
+	(lambda-proc (args env2 handler fail k2) (k2 args fail))
 	;; +
-	(lambda-proc (args env2 handler k2) (k2 (apply + args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply + args) fail))
 	;; - 
-	(lambda-proc (args env2 handler k2) (k2 (apply - args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply - args) fail))
 	;; *
-	(lambda-proc (args env2 handler k2) (k2 (apply * args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply * args) fail))
 	;; /
-	(lambda-proc (args env2 handler k2)
+	(lambda-proc (args env2 handler fail k2)
           (cond
             ((= (length args) 1)
              (if (= (car args) 0)
-                 (handler "division by zero")
-                 (k2 (apply / args))))
+                 (handler "division by zero" fail)
+                 (k2 (apply / args) fail)))
             ((>= (length args) 2)
              (if (= (cadr args) 0)
-                 (handler "division by zero")
-                 (k2 (apply / args))))
-            (else (handler "not enough args to /"))))
+                 (handler "division by zero" fail)
+                 (k2 (apply / args) fail)))
+            (else (handler "not enough args to /" fail))))
 	;; <
-	(lambda-proc (args env2 handler k2) (k2 (apply < args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply < args) fail))
 	;; >
-	(lambda-proc (args env2 handler k2) (k2 (apply > args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply > args) fail))
 	;; =
-	(lambda-proc (args env2 handler k2) (k2 (apply = args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply = args) fail))
+	;; abs
+	(lambda-proc (args env2 handler fail k2) (k2 (apply abs args) fail))
 	;; equal?
-	(lambda-proc (args env2 handler k2) (k2 (apply equal? args)))
+	(lambda-proc (args env2 handler fail k2)
+	  (if (= (length args) 2)
+	    (equal-objects? (car args) (cadr args)
+	      (lambda-cont (bool) (k2 bool fail)))
+	    (handler "incorrect number of arguments to procedure equal?" fail)))
 	;; eq?
-	(lambda-proc (args env2 handler k2) (k2 (apply eq? args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply eq? args) fail))
 	;; memq
-	(lambda-proc (args env2 handler k2) (k2 (apply memq args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply memq args) fail))
+	;; member
+	(lambda-proc (args env2 handler fail k2)
+	  (if (= (length args) 2)
+	    (member-prim (car args) (cadr args) (cadr args) handler fail k2)
+	    (handler "incorrect number of arguments to procedure member" fail)))
 	;; range
-	(lambda-proc (args env2 handler k2) (k2 (apply range args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply range args) fail))
 	;; set-car!
-	(lambda-proc (args env2 handler k2) (k2 (apply set-car! args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply set-car! args) fail))
 	;; set-cdr
-	(lambda-proc (args env2 handler k2) (k2 (apply set-cdr! args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply set-cdr! args) fail))
 	;; import
-	(lambda-proc (args env2 handler k2) (import-primitive args env2 handler k2))
+	(lambda-proc (args env2 handler fail k2) (import-primitive args env2 handler fail k2))
 	;; get
-	(lambda-proc (args env2 handler k2) (get-primitive args env2 handler k2))
+	(lambda-proc (args env2 handler fail k2) (get-primitive args env2 handler fail k2))
 	;; call/cc
-	(lambda-proc (args env2 handler k2) (call/cc-primitive (car args) env2 handler k2))
+	(lambda-proc (args env2 handler fail k2) (call/cc-primitive (car args) env2 handler fail k2))
 	;; call/cc
-	(lambda-proc (args env2 handler k2) (call/cc-primitive (car args) env2 handler k2))
+	(lambda-proc (args env2 handler fail k2) (call/cc-primitive (car args) env2 handler fail k2))
+	;; abort
+	(lambda-proc (args env2 handler fail k2)
+	  (if (null? args)
+	    (REP-k '<void> fail)
+	    (REP-k (car args) fail)))
+	;; require
+	(lambda-proc (args env2 handler fail k2)
+	  (if (true? (car args))
+	    (k2 'ok fail)
+	    (fail)))
+	;; cut
+	(lambda-proc (args env2 handler fail k2) (k2 'ok REP-fail))
 	;; reverse
-	(lambda-proc (args env2 handler k2) (k2 (apply reverse args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply reverse args) fail))
 	;; append
-	(lambda-proc (args env2 handler k2) (k2 (apply append args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply append args) fail))
 	;; list->vector
-	(lambda-proc (args env2 handler k2) (k2 (apply make-vector args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply make-vector args) fail))
 	;; dir
-	(lambda-proc (args env2 handler k2) (k2 (dir args env2)))
+	(lambda-proc (args env2 handler fail k2) (k2 (dir args env2) fail))
 	;; current-time
-	(lambda-proc (args env2 handler k2) (k2 (get-current-time)))
+	(lambda-proc (args env2 handler fail k2) (k2 (get-current-time) fail))
 	;; map
-	(lambda-proc (args env2 handler k2)
-	  (map-prim (car args) (cdr args) env2 handler k2))
+	(lambda-proc (args env2 handler fail k2)
+	  (map-prim (car args) (cdr args) env2 handler fail k2))
 	;; for-each
-	(lambda-proc (args env2 handler k2)
-	  (for-each-prim (car args) (cdr args) env2 handler k2))
+	(lambda-proc (args env2 handler fail k2)
+	  (for-each-prim (car args) (cdr args) env2 handler fail k2))
 	;; env
-	(lambda-proc (args env2 handler k2) (k2 env2))
+	(lambda-proc (args env2 handler fail k2) (k2 env2 fail))
 	;; using (not defined in scheme-scheme)
-	(lambda-proc (args env2 handler k2) (k2 (using-prim args env2)))
+	(lambda-proc (args env2 handler fail k2) (k2 (using-prim args env2) fail))
 	;; not
-	(lambda-proc (args env2 handler k2) (k2 (not (car args))))
+	(lambda-proc (args env2 handler fail k2) (k2 (not (car args)) fail))
 	;; printf
-	(lambda-proc (args env2 handler k2) (apply printf-prim args) (k2 '<void>))
+	(lambda-proc (args env2 handler fail k2) (apply printf-prim args) (k2 '<void> fail))
         ;; vector
-	(lambda-proc (args env2 handler k2) (k2 (make-vector args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (make-vector args) fail))
         ;; vector-set!
-	(lambda-proc (args env2 handler k2) (k2 (vector-set! (car args) (cadr args) (caddr args))))
+	(lambda-proc (args env2 handler fail k2) (k2 (vector-set! (car args) (cadr args) (caddr args)) fail))
         ;; vector-ref
-	(lambda-proc (args env2 handler k2) (k2 (apply vector-ref args)))
+	(lambda-proc (args env2 handler fail k2) (k2 (apply vector-ref args) fail))
         ;; make-vector
-	(lambda-proc (args env2 handler k2) (k2 (make-vector-size (car args))))
-	
-        ;; help
-	(lambda-proc (args env2 handler k2) (help-prim (car args) 
-						       env2 handler k2))
+	(lambda-proc (args env2 handler fail k2) (k2 (make-vector-size (car args)) fail))
 	)))))
+
+(define toplevel-env (make-toplevel-env))
+
+(define* equal-objects?
+  (lambda (x y k)
+    (cond
+      ((or (and (null? x) (null? y))
+	   (and (boolean? x) (boolean? y) (eq? x y))
+	   (and (symbol? x) (symbol? y) (eq? x y))
+	   (and (number? x) (number? y) (= x y))
+	   (and (char? x) (char? y) (char=? x y))
+	   (and (string? x) (string? y) (string=? x y)))
+       (k #t))
+      ((and (pair? x) (pair? y))
+       (equal-objects? (car x) (car y)
+	 (lambda-cont (bool)
+	   (if bool
+	     (equal-objects? (cdr x) (cdr y) k)
+	     (k #f)))))
+      ((and (vector? x) (vector? y) (= (vector-length x) (vector-length y)))
+       (equal-vectors? x y (- (vector-length x) 1) k))
+      (else (k #f)))))
+
+(define* equal-vectors?
+  (lambda (v1 v2 i k)
+    (if (< i 0)
+      (k #t)
+      (equal-objects? (vector-ref v1 i) (vector-ref v2 i)
+	(lambda-cont (bool)
+	  (if bool
+	    (equal-vectors? v1 v2 (- i 1) k)
+	    (k #f)))))))
+
+(define* member-prim
+  (lambda (x ls orig-ls handler fail k)
+    (cond
+      ((null? ls) (k #f fail))
+      ((not (pair? ls)) (handler (format "improper list ~a" orig-ls) fail))
+      (else (equal-objects? x (car ls)
+	      (lambda-cont (bool)
+		(if bool
+		  (k ls fail)
+		  (member-prim x (cdr ls) orig-ls handler fail k))))))))
 
 ;; supports procedures of any number of arguments
 (define* map-prim
-  (lambda (proc args env handler k)
+  (lambda (proc args env handler fail k)
     (if (iterator? (car args))
-        (iterate-collect proc (car args) env handler k)
+        (iterate-collect proc (car args) env handler fail k)
         (let ((len (length args))
               (list-args (listify args)))
           (cond
-            ((= len 1) (map1 proc (car list-args) env handler k))
-            ((= len 2) (map2 proc (car list-args) (cadr list-args) env handler k))
-            (else (mapN proc list-args env handler k)))))))
+            ((= len 1) (map1 proc (car list-args) env handler fail k))
+            ((= len 2) (map2 proc (car list-args) (cadr list-args) env handler fail k))
+            (else (mapN proc list-args env handler fail k)))))))
 
 (define* iterate
-  (lambda (proc generator env handler k)
+  (lambda (proc generator env handler fail k)
     (let ((iterator (get-iterator generator)))
-      (iterate-continue proc iterator env handler k))))
+      (iterate-continue proc iterator env handler fail k))))
 
 (define* iterate-continue
-  (lambda (proc iterator env handler k)
+  (lambda (proc iterator env handler fail k)
     (let ((item (next-item iterator)))
       (if (null? item)
-          (k '())
-          (proc (list item) env handler
-            (lambda-cont (v)
-              (iterate-continue proc iterator env handler k)))))))
+          (k '() fail)
+          (proc (list item) env handler fail
+            (lambda-cont2 (v fail)
+              (iterate-continue proc iterator env handler fail k)))))))
 
 (define* iterate-collect
-  (lambda (proc generator env handler k)
+  (lambda (proc generator env handler fail k)
     (let ((iterator (get-iterator generator)))
-      (iterate-collect-continue proc iterator env handler k))))
+      (iterate-collect-continue proc iterator env handler fail k))))
 
 (define* iterate-collect-continue
-  (lambda (proc iterator env handler k)
+  (lambda (proc iterator env handler fail k)
     (let ((item (next-item iterator)))
       (if (null? item)
-          (k '())
-          (proc (list item) env handler
-            (lambda-cont (v1)
-              (iterate-collect-continue proc iterator env handler
-                (lambda-cont (v2)
-                  (k (cons v1 v2))))))))))
+          (k '() fail)
+          (proc (list item) env handler fail
+            (lambda-cont2 (v1 fail)
+              (iterate-collect-continue proc iterator env handler fail
+                (lambda-cont2 (v2 fail)
+                  (k (cons v1 v2) fail)))))))))
 
 (define listify
   (lambda (arg-list)
     (cond
      ((null? arg-list) '())
-     ((list? (car arg-list)) (cons (car arg-list)
-				   (listify (cdr arg-list))))
-     ((vector? (car arg-list)) (cons (my-vector->list (car arg-list))
-				     (listify (cdr arg-list))))
-     ((string? (car arg-list)) (cons (string->list (car arg-list))
-				     (listify (cdr arg-list))))
+     ((list? (car arg-list))
+      (cons (car arg-list) (listify (cdr arg-list))))
+     ((vector? (car arg-list))
+      (cons (my-vector->list (car arg-list)) (listify (cdr arg-list))))
+     ((string? (car arg-list))
+      (cons (string->list (car arg-list)) (listify (cdr arg-list))))
      (else (error 'map "cannot use object type '~a' in map" 
 		  (get_type (car arg-list))))))) ;; get_type is defined in C#
 
 ;; for improved efficiency
 (define* map1
-  (lambda (proc list1 env handler k)
+  (lambda (proc list1 env handler fail k)
     (if (null? list1)
-      (k '())
+      (k '() fail)
       (if (dlr-exp? proc)
-	  (map1 proc (cdr list1) env handler
-		(lambda-cont (v2)
-			     (k (cons (dlr-apply proc (list (car list1)))
-				      v2))))
-	  (proc (list (car list1)) env handler
-		(lambda-cont (v1)
-			     (map1 proc (cdr list1) env handler
-				   (lambda-cont (v2)
-						(k (cons v1 v2))))))))))
+	(map1 proc (cdr list1) env handler fail
+	  (lambda-cont2 (v2 fail)
+	    (k (cons (dlr-apply proc (list (car list1))) v2)
+	       fail)))
+	(proc (list (car list1)) env handler fail
+	  (lambda-cont2 (v1 fail)
+	    (map1 proc (cdr list1) env handler fail
+	      (lambda-cont2 (v2 fail)
+		(k (cons v1 v2) fail)))))))))
 
 ;; for improved efficiency
 (define* map2
-  (lambda (proc list1 list2 env handler k)
+  (lambda (proc list1 list2 env handler fail k)
     (if (null? list1)
-      (k '())
+      (k '() fail)
       (if (dlr-exp? proc)
-	  (map2 proc (cdr list1) (cdr list2) env handler
-		(lambda-cont (v2)
-			     (k (cons (dlr-apply proc (list (car list1) (car list2)))
-				      v2))))
-	  (proc (list (car list1) (car list2)) env handler
-		(lambda-cont (v1)
-			     (map2 proc (cdr list1) (cdr list2) env handler
-				   (lambda-cont (v2)
-						(k (cons v1 v2))))))))))
+	(map2 proc (cdr list1) (cdr list2) env handler fail
+	  (lambda-cont2 (v2 fail)
+	    (k (cons (dlr-apply proc (list (car list1) (car list2))) v2)
+	       fail)))
+	(proc (list (car list1) (car list2)) env handler fail
+	  (lambda-cont2 (v1 fail)
+	    (map2 proc (cdr list1) (cdr list2) env handler fail
+	      (lambda-cont2 (v2 fail)
+		(k (cons v1 v2) fail)))))))))
 
 (define* mapN
-  (lambda (proc lists env handler k)
+  (lambda (proc lists env handler fail k)
     (if (null? (car lists))
-      (k '())
+      (k '() fail)
       (if (dlr-exp? proc)
-	  (mapN proc (map cdr lists) env handler
-		(lambda-cont (v2)
-		    (k (cons (dlr-apply proc (map car lists)) v2))))
-	  (proc (map car lists) env handler
-		(lambda-cont (v1)
-			     (mapN proc (map cdr lists) env handler
-				   (lambda-cont (v2)
-						(k (cons v1 v2))))))))))
+	(mapN proc (map cdr lists) env handler fail
+	  (lambda-cont2 (v2 fail)
+	    (k (cons (dlr-apply proc (map car lists)) v2)
+	      fail)))
+	(proc (map car lists) env handler fail
+	  (lambda-cont2 (v1 fail)
+	    (mapN proc (map cdr lists) env handler fail
+	      (lambda-cont2 (v2 fail)
+		(k (cons v1 v2) fail)))))))))
 
 (define* for-each-prim
-  (lambda (proc lists env handler k)
+  (lambda (proc lists env handler fail k)
     (if (iterator? (car lists))
-        (iterate proc (car lists) env handler k)
-        (let ((arg-list (listify lists)))
-          (if (null? (car arg-list))
-              (k '<void>)
-              (if (dlr-exp? proc) 
-                  (begin 
-                    (dlr-apply proc (map car arg-list))
-                    (for-each-prim proc (map cdr arg-list) env handler k))
-                  (proc (map car arg-list) env handler
-		    (lambda-cont (v1)
-                      (for-each-prim proc (map cdr arg-list) env handler k)))))))))
+      (iterate proc (car lists) env handler fail k)
+      (let ((arg-list (listify lists)))
+	(if (null? (car arg-list))
+	  (k '<void> fail)
+	  (if (dlr-exp? proc) 
+	    (begin
+	      (dlr-apply proc (map car arg-list))
+	      (for-each-prim proc (map cdr arg-list) env handler fail k))
+	    (proc (map car arg-list) env handler fail
+	      (lambda-cont2 (v1 fail)
+		(for-each-prim proc (map cdr arg-list) env handler fail k)))))))))
 
 (define get-current-time
   (lambda ()
@@ -1933,37 +2106,37 @@
 		     1000000000))))))
 
 (define* get-primitive
-  (lambda (args env handler k)
+  (lambda (args env handler fail k)
     (let ((sym (car args)))
-      (lookup-value sym env handler
-	(lambda-cont (v)
+      (lookup-value sym env handler fail
+	(lambda-cont2 (v fail)
 	  (cond
-	    ((null? (cdr args)) (k v))
-	    ((not (environment? v)) (handler (format "~a is not a module" sym)))
-	    (else (get-primitive (cdr args) v handler k))))))))
+	    ((null? (cdr args)) (k v fail))
+	    ((not (environment? v)) (handler (format "~a is not a module" sym) fail))
+	    (else (get-primitive (cdr args) v handler fail k))))))))
 
 ;; bug fix needed:
 ;; (import "my-fact.ss" 'm)
 ;; (m.m.m.m.m.fib 10) =>  89
 
 (define* import-primitive
-  (lambda (args env handler k)
+  (lambda (args env handler fail k)
     (let ((filename (car args)))
 	(if (null? (cdr args))
-	  (load-file filename env handler k)
+	  (load-file filename env handler fail k)
 	  (let ((module-name (cadr args)))
-	    (lookup-binding-in-first-frame module-name env handler
-	      (lambda-cont (binding)
+	    (lookup-binding-in-first-frame module-name env handler fail
+	      (lambda-cont2 (binding fail)
 		(let ((module (extend env '() '())))
 		  (set-binding-value! binding module)
-		  (load-file filename module handler k)))))))))
+		  (load-file filename module handler fail k)))))))))
 
 (define* call/cc-primitive
-  (lambda (proc env handler k)
-    (let ((fake-k (lambda-proc (args env2 handler k2) (k (car args)))))
+  (lambda (proc env handler fail k)
+    (let ((fake-k (lambda-proc (args env2 handler fail k2) (k (car args) fail))))
       (if (dlr-exp? proc)
-	  (k (dlr-apply proc (list fake-k)))
-	  (proc (list fake-k) env handler k)))))
+	  (k (dlr-apply proc (list fake-k)) fail)
+	  (proc (list fake-k) env handler fail k)))))
 
 (define flatten
   (lambda (lists)
@@ -1976,13 +2149,11 @@
 (define dir
   (lambda (args env)
     (sort symbol<? (if (null? args)
-		       (flatten 
-			(append
-			 (get-reserved-keywords)
-			 (append
-			  (map get-variables-from-frame (frames macro-env))
-			  (map get-variables-from-frame (frames env)))))
-			(get-variables-from-frame (car (frames (car args))))))))
+		       (flatten
+			 (append (get-reserved-keywords)
+				 (map get-variables-from-frame (frames macro-env))
+				 (map get-variables-from-frame (frames env))))
+		       (get-variables-from-frame (car (frames (car args))))))))
 
 (define get-variables-from-frame
   (lambda (frame) 
@@ -1994,52 +2165,42 @@
 	  (b_string (symbol->string b)))
       (string<? a_string b_string))))
 
-(define load-stack '())
-
 (define* load-file
-  (lambda (filename env handler k)
+  (lambda (filename env handler fail k)
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
-       (k '<void>))
+       (k '<void> fail))
       ((not (string? filename))
-       (handler (format "filename is not a string: ~a" filename)))
+       (handler (format "filename is not a string: ~a" filename) fail))
       ((not (file-exists? filename))
-       (handler (format "file does not exist: ~a" filename)))
+       (handler (format "file does not exist: ~a" filename) fail))
       (else
        (set! load-stack (cons filename load-stack))
-       (scan-input (read-content filename) handler
-	 (lambda-cont (tokens)
-	   (load-loop tokens env handler
-	     (lambda-cont (v)
-	       (set! load-stack (cdr load-stack))
-	       (k v)))))))))
-
-(define* load-loop
-  (lambda (tokens env handler k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k '<void>)
-      (read-sexp tokens handler
-	(lambda-cont2 (datum tokens-left)
-	  (parse datum handler
-	    (lambda-cont (exp)
-	      (m exp env handler
-		(lambda-cont (v)
-		  (load-loop tokens-left env handler k))))))))))
+       (scan-input (read-content filename) handler fail
+	 (lambda-cont2 (tokens fail)
+	   (read-and-eval-sexps tokens env handler fail
+	     (lambda-cont2 (v fail)
+	       ;; pop load-stack
+	       (if (null? load-stack)
+		 (printf "WARNING: empty load-stack encountered!\n")  ;; should never happen
+		 (set! load-stack (cdr load-stack)))
+	       (k '<void> fail)))))))))
 
 (define* load-files
-  (lambda (filenames env handler k)
+  (lambda (filenames env handler fail k)
     (if (null? filenames)
-      (k 'ok)
-      (load-file (car filenames) env handler
-	(lambda-cont (v)
-	  (load-files (cdr filenames) env handler k))))))
+      (k '<void> fail)
+      (load-file (car filenames) env handler fail
+	(lambda-cont2 (v fail)
+	  (load-files (cdr filenames) env handler fail k))))))
 
-(define* help-prim
-  (lambda (var env handler k)
-    (lookup-binding var env handler
-	 (lambda-cont (binding)
-	     (k (binding-docstring binding))))))
+;; help is now a special form
+;;(define* help-prim
+;;  (lambda (var env handler fail k)
+;;    (lookup-binding var env handler fail
+;;      (lambda-cont2 (binding fail)
+;;	(k (binding-docstring binding) fail)))))
 
 (define range
   (lambda args
@@ -2054,54 +2215,52 @@
 	((null? (cddr args)) (range (car args) (cadr args) 1 '()))
 	(else (range (car args) (cadr args) (caddr args) '()))))))
 	
-(define make-external-proc
-  (lambda (external-function-object)
-    (lambda-proc (args env2 handler k2)
-      (k2 (apply* external-function-object args)))))
-
 (define make-vector list->vector) ;; ignored in C#
 
-(define toplevel-env (make-toplevel-env))
-(define macro-env (make-macro-env))
-
+;;------------------------------------------------------------------------
 ;; For C# only
+
+(define make-external-proc
+  (lambda (external-function-object)
+    (lambda-proc (args env2 handler fail k2)
+      (k2 (apply* external-function-object args) fail))))
+
 (define Main 
-  (lambda (args)
+  (lambda filenames
     (printf "Calico Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env))
+    (set! load-stack '())
     ;; in the register machine, this call just sets up the registers
-    (load-files (list args) toplevel-env init-handler init-cont)
-    ;; need this to start the computation after registers are set up
+    (load-files filenames toplevel-env REP-handler REP-fail REP-k)
+    ;; starts the computation after registers are set up
     (trampoline)))
 
 (define execute
-  (lambda (input-string)
+  (lambda (string)
     (set! load-stack '())
-    (read-datum input-string init-handler
-	(lambda-cont2 (datum tokens-left)
-	  (parse datum init-handler
-	    (lambda-cont (exp)
-	      (m exp toplevel-env init-handler init-cont)))))
-      (trampoline)))
+    (scan-input string init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(read-and-eval-sexps tokens toplevel-env init-handler2 fail init-cont2)))
+    (trampoline)))
 
 (define execute-file
   (lambda (filename)
     (set! load-stack '())
-    (load-file filename toplevel-env init-handler init-cont)
-    ;; need this to start the computation after registers are set up
+    (load-file filename toplevel-env init-handler2 init-fail init-cont2)
     (trampoline)))
 
 (define try-parse-string
   (lambda (string)
-    (read-datum string init-handler
-      (lambda-cont2 (datum tokens-left)
-	(parse datum init-handler init-cont)))
+    (scan-input string init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(parse-sexps tokens init-handler2 fail init-cont2)))
     (trampoline)))
-    
-(define dlr-func
-    (lambda (exp env)
-      (m exp env init-handler init-cont)
-      (trampoline)))
+
+;;------------------------------------------------------------------------
+;; for manual testing only in scheme
+
 (load "transformer-macros.ss")
 
 ;; Unification pattern-matcher

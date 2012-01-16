@@ -1,3 +1,11 @@
+;; This program automatically converts CPS code with procedural
+;; representations of continuations and closures into first-order
+;; tail form.
+;;
+;; Written by James B. Marshall
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+
 (case-sensitive #t)
 (load "parser-cps.ss")
 
@@ -16,14 +24,17 @@
 (define make-all-datatypes
   (lambda ()
     (list
-      (make-datatype 'continuation 'cont '((k k2 REP-k) value))
-      (make-datatype 'continuation2 'cont2 '((k k2) value1 value2))
-      (make-datatype 'handler 'handler '((handler REP-handler) exception))
-      (make-datatype 'procedure 'proc '(proc args env2 handler k2))
+      (make-datatype 'continuation 'cont '((k k2) value))                         ;; removed REP-k from list
+      (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))         ;; added REP-k to list
+      (make-datatype 'continuation3 'cont3 '((k k2) value1 value2 value3))        ;; new
+      (make-datatype 'fail-continuation 'fail '((fail REP-fail)))                 ;; new
+      (make-datatype 'handler 'handler '((handler) exception))                    ;; removed REP-handler from list
+      (make-datatype 'handler2 'handler2 '((handler REP-handler) exception fail)) ;; new
+      (make-datatype 'procedure 'proc '((proc) args env2 handler fail k2))        ;; added fail
       (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer) datum k))
       )))
 
-(define record-field-order '(formals runt body env env2 handler k k2))
+(define record-field-order '(formals runt body env env2 handler fail k k2))
 
 ;;-------------------------------------------------------------------------------
 

@@ -399,11 +399,13 @@ public class Scheme {
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
+  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
   public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
   public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
   public static Proc make_vector_proc = new Proc("list->vector", (Procedure1) make_vector, 1, 1);
   public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
+  public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
   public static Proc memq_proc = new Proc("memq", (Procedure2Bool) memq, 2, 2);
   public static Proc range_proc = new Proc("range", (Procedure1) range, -1, 1);
   public static Proc reverse_proc = new Proc("reverse", (Procedure1) reverse, 1, 1);
@@ -411,6 +413,7 @@ public class Scheme {
   public static Proc set_car_b_proc = new Proc("set-car!", (Procedure2Void) set_car_b, 2, 0);
   public static Proc set_cdr_b_proc = new Proc("set-cdr!", (Procedure2Void) set_cdr_b, 2, 0);
   public static Proc sqrt_proc = new Proc("sqrt", (Procedure1) sqrt, -1, 1);
+  public static Proc abs_proc = new Proc("abs", (Procedure1) abs, -1, 1);
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
@@ -1044,6 +1047,12 @@ public class Scheme {
     Vector v = (Vector) vector;
     int pos = (int) index;
     return v.get(pos);
+  }
+
+  public static object vector_length(object vector) {
+	trace(2, "called: vector_length\n");
+    Vector v = (Vector) vector;
+    return v.length();
   }
 
   public static object list_to_vector(object lyst) {
@@ -2245,6 +2254,17 @@ public class Scheme {
 	throw new Exception("need to apply procedure to list");
   }
 
+  public static object abs(object obj) {
+	if (pair_q(obj)) {
+	  obj = car(obj);
+	  if (obj is int)
+		return Math.Abs((int)obj);
+	  else
+		throw new Exception(String.Format("can't take absolute value of this type of number: {0}", obj));
+	}
+	throw new Exception("need to apply procedure to list");
+  }
+
   public static object cons(object obj) {
 	return cons(car(obj), cadr(obj));
   }
@@ -2553,10 +2573,10 @@ public class Vector {
   public static void Main(string [] args) {
 	// ----------------------------------
 	// Math:
-	if (false) {
-		printf ("  (using \"Graphics\"): {0}\n", 
-			PJScheme.execute("(using \"Graphics\")"));
-		} else {
+//	if (false) {
+//		printf ("  (using \"Graphics\"): {0}\n",
+//			PJScheme.execute("(using \"Graphics\")"));
+//		} else {
 	printf ("  Add(1,1), Result: {0}, Should be: {1}\n", 
 		Add(1, 1), 1 + 1);
 	printf ("  Multiply(10,2), Result: {0}, Should be: {1}\n", 
@@ -2630,7 +2650,7 @@ public class Vector {
     printf("display(list_to_vector( list(1, 2, 3))): ");
     display(list_to_vector( list(1, 2, 3)));
     printf("\n");
-		}
+//		}
   }
 
   public static long longfact(long n) {

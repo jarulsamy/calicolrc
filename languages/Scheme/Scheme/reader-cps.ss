@@ -1,15 +1,21 @@
-(load "transformer-macros.ss")
-
-;; Scanner and s-expression reader
-
+;; Calico Scheme scanner and s-expression reader
+;;
 ;; includes support for vectors, rationals, exponents, and backquote
+;;
+;; Written by James B. Marshall and Douglas S. Blank
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+;; dblank@brynmawr.edu
+;; http://cs.brynmawr.edu/~dblank
+
+(load "transformer-macros.ss")
 
 ;;------------------------------------------------------------------------
 ;; scanner - character stream represented as a position number
 
 (define chars-to-scan 'undefined)
-(define read-line-count 1)
-(define read-char-count 0)
+(define read-line-count 'undefined)
+(define read-char-count 'undefined)
 
 (define 1st
   (lambda (n) (string-ref chars-to-scan n)))
@@ -21,124 +27,135 @@
 ;; from all of the characters in the string
 
 (define* scan-input
-  (lambda (input handler k)   ;; k receives a list of tokens
+  (lambda (input handler fail k)   ;; k receives 2 args: a list of tokens, fail
+    (set! read-char-count 0)
+    (set! read-line-count 1)
     (set! chars-to-scan (string-append input (string #\nul)))
-    (scan-input-loop 0 handler k)))
+    (scan-input-loop 0 handler fail k)))
 
 (define* scan-input-loop
-  (lambda (chars handler k)   ;; k receives a list of tokens
-    (apply-action '(goto start-state) '() chars handler
-      (lambda-cont2 (token chars-left)
+  (lambda (chars handler fail k)   ;; k receives 2 args: a list of tokens, fail
+    (apply-action '(goto start-state) '() chars handler fail
+      (lambda-cont3 (token chars-left fail)
 	(if (token-type? token 'end-marker)
-	  (k (list token))
-	  (scan-input-loop chars-left handler
-	    (lambda-cont (tokens)
-	      (k (cons token tokens)))))))))
-
-;; for testing purposes
-(define init-cont (lambda-cont (v) (halt* v)))
-(define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
-(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
-
-;; for testing purposes
-(define scan-string
-  (lambda (input)
-    (set! read-line-count 1)
-    (set! read-char-count 0)
-    (scan-input input init-handler init-cont)))
-
-;; for testing purposes
-(define scan-file
-  (lambda (filename)
-    (set! read-line-count 1)
-    (set! read-char-count 0)
-    (scan-input (read-content filename) init-handler init-cont)))
+	  (k (list token) fail)
+	  (scan-input-loop chars-left handler fail
+	    (lambda-cont2 (tokens fail)
+	      (k (cons token tokens) fail))))))))
 
 ;;------------------------------------------------------------------------
 ;; scanner actions
 
 ;; <action> ::= (shift <next-action>)
 ;;            | (replace <new-char> <next-action>)
+;;            | (drop-newline <next-action>)
 ;;            | (drop <next-action>)
 ;;            | (goto <state>)
 ;;            | (emit <token-type>)
 
 (define* apply-action
-  (lambda (action buffer chars handler k)  ;; k receives 2 args: token, chars-left
+  (lambda (action buffer chars handler fail k)  ;; k receives 3 args: token, chars-left, fail
+;;    (display "action: ")
+;;    (display action)
+;;    (display ", buffer: ")
+;;    (write buffer)
+;;    (newline)
     (record-case action
       (shift (next)
 	(begin
 	  (set! read-char-count (+ read-char-count 1))
-	  (apply-action next (cons (1st chars) buffer) (remaining chars) handler k)))
+	  (apply-action next (cons (1st chars) buffer) (remaining chars) handler fail k)))
       (replace (new-char next)
-	(apply-action next (cons new-char buffer) (remaining chars) handler k))
+	(apply-action next (cons new-char buffer) (remaining chars) handler fail k))
       (drop-newline (next)
 	(begin
 	  (set! read-line-count (+ read-line-count 1))
 	  (set! read-char-count 0)
-	  (apply-action next buffer (remaining chars) handler k)))
+	  (apply-action next buffer (remaining chars) handler fail k)))
       (drop (next)
 	(begin
 	  (set! read-char-count (+ read-char-count 1))
-	  (apply-action next buffer (remaining chars) handler k)))
+	  (apply-action next buffer (remaining chars) handler fail k)))
       (goto (state)
 	(let ((action (apply-state state (1st chars))))
 	  (if (eq? action 'error)
-	    (scan-error chars handler)
-	    (apply-action action buffer chars handler k))))
+	    (scan-error chars handler fail)
+	    (apply-action action buffer chars handler fail k))))
       (emit (token-type)
-	(convert-buffer-to-token token-type buffer handler
-	  (lambda-cont (v) (k (append v (list read-line-count read-char-count))
-			      chars))))
+	(convert-buffer-to-token token-type buffer handler fail
+	  (lambda-cont2 (v fail)
+	    (k (append v (list read-line-count read-char-count)) chars fail))))
       (else (error 'apply-action "invalid action: ~a" action)))))
       
 (define* scan-error
-  (lambda (chars handler)
+  (lambda (chars handler fail)
     (let ((c (1st chars)))
       (if (char=? c #\nul)
-	(handler 
-	 (format "unexpected end of input at line: ~a col: ~a" 
-		 read-line-count read-char-count))
-	(handler 
-	 (format "unexpected character ~a encountered at line: ~a col: ~a" 
-		 c read-line-count read-char-count))))))
+	(handler (format "scan error: unexpected end of input at line ~a, char ~a" 
+			 read-line-count read-char-count)
+		 fail)
+	(handler (format "scan error: unexpected character ~a encountered at line ~a, char ~a" 
+			 c read-line-count read-char-count)
+		 fail)))))
 
 (define* convert-buffer-to-token
-  (lambda (token-type buffer handler k)
+  (lambda (token-type buffer handler fail k)
     (let ((buffer (reverse buffer)))
       (case token-type
 	(integer
-	  (k (list 'integer (list->string buffer))))
+	  (k (list 'integer (list->string buffer)) fail))
 	(decimal
-	  (k (list 'decimal (list->string buffer))))
+	  (k (list 'decimal (list->string buffer)) fail))
 	(rational
-	  (k (list 'rational (list->string buffer))))
+	  (k (list 'rational (list->string buffer)) fail))
 	(identifier
-	  (k (list 'identifier (string->symbol (list->string buffer)))))
+	  (k (list 'identifier (string->symbol (list->string buffer))) fail))
 	(boolean
-	  (k (list 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T)))))
+	  (k (list 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T))) fail))
 	(character
-	  (k (list 'character (car buffer))))
+	  (k (list 'character (car buffer)) fail))
 	(named-character
 	  (let ((name (list->string buffer)))
 	    (cond
-	      ((string=? name "nul") (k (list 'character #\nul)))
-	      ((string=? name "space") (k (list 'character #\space)))
-	      ((string=? name "tab") (k (list 'character #\tab)))
-	      ((string=? name "newline") (k (list 'character #\newline)))
-	      ((string=? name "linefeed") (k (list 'character #\newline)))
-	      ((string=? name "backspace") (k (list 'character #\backspace)))
-	      ((string=? name "return") (k (list 'character #\return)))
-	      ((string=? name "page") (k (list 'character #\page)))
-	      (else (handler (format "invalid character name '~a' at line: ~a col: ~a" name read-line-count read-char-count))))))
+	      ((string=? name "nul") (k (list 'character #\nul) fail))
+	      ((string=? name "space") (k (list 'character #\space) fail))
+	      ((string=? name "tab") (k (list 'character #\tab) fail))
+	      ((string=? name "newline") (k (list 'character #\newline) fail))
+	      ((string=? name "linefeed") (k (list 'character #\newline) fail))
+	      ((string=? name "backspace") (k (list 'character #\backspace) fail))
+	      ((string=? name "return") (k (list 'character #\return) fail))
+	      ((string=? name "page") (k (list 'character #\page) fail))
+	      (else (handler (format "invalid character name '~a' at line ~a, char ~a"
+				     name read-line-count read-char-count)
+			     fail)))))
 	(string
-	  (k (list 'string (list->string buffer))))
+	  (k (list 'string (list->string buffer)) fail))
 	(else
-	  (k (list token-type)))))))
+	  (k (list token-type) fail))))))
 
 (define token-type?
   (lambda (token class)
     (eq? (car token) class)))
+
+(define get-line-count
+  (lambda (token)
+    (rac (rdc token))))
+
+(define get-char-count
+  (lambda (token)
+    (rac token)))
+
+(define rac
+  (lambda (lyst)
+    (cond
+     ((null? (cdr lyst)) (car lyst))
+     (else (rac (cdr lyst))))))
+
+(define rdc
+  (lambda (lyst)
+    (cond
+     ((null? (cdr lyst)) '())
+     (else (cons (car lyst) (rdc (cdr lyst)))))))
 
 ;;------------------------------------------------------------------------
 ;; character categories
@@ -202,6 +219,7 @@
 ;;------------------------------------------------------------------------
 ;; finite-state automaton
 
+;; this is just a table lookup
 (define apply-state
   (lambda (state c)
     (case state
@@ -361,46 +379,6 @@
 (define first (lambda (x) (car x)))
 (define rest-of (lambda (x) (cdr x)))
 
-;; for testing purposes
-(define read-string
-  (lambda (input)
-    (read-datum input init-handler init-cont2)))
-
-(define* read-datum
-  (lambda (input handler k)  ;; k receives 2 args:  sexp, tokens-left
-    (set! read-char-count 0)
-    (set! read-line-count 1)
-    (scan-input input handler
-      (lambda-cont (tokens)
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp tokens-left)
-	    (if (token-type? (first tokens-left) 'end-marker)
-	      (k sexp tokens-left)
-	      (handler (format "tokens left over at line: ~a col: ~a" 
-			       (get-line-count (first tokens-left))
-			       (get-char-count (first tokens-left))
-			       )))))))))
-
-(define get-line-count
-  (lambda (token)
-    (rac (rdc token))))
-
-(define get-char-count
-  (lambda (token)
-    (rac token)))
-
-(define rac
-  (lambda (lyst)
-    (cond
-     ((null? (cdr lyst)) (car lyst))
-     (else (rac (cdr lyst))))))
-
-(define rdc
-  (lambda (lyst)
-    (cond
-     ((null? (cdr lyst)) '())
-     (else (cons (car lyst) (rdc (cdr lyst)))))))
-
 (define string->integer
   (lambda (str)
     (string->number str)))
@@ -418,135 +396,112 @@
     (if v #t #f)))
 
 (define* read-sexp
-  (lambda (tokens handler k)   ;; k receives 2 args:  sexp, tokens-left
+  (lambda (tokens handler fail k)   ;; k receives 3 args: sexp, tokens-left, fail
     (record-case (first tokens)
       (integer (str)
-	(k (string->integer str) (rest-of tokens)))
+	(k (string->integer str) (rest-of tokens) fail))
       (decimal (str)
-	(k (string->decimal str) (rest-of tokens)))
+	(k (string->decimal str) (rest-of tokens) fail))
       (rational (str)
 	(let ((num (string->rational str)))
 	  (if (true? num)
-	    (k num (rest-of tokens))
-	    (handler (format "cannot represent ~a at line: ~a col: ~a" 
+	    (k num (rest-of tokens) fail)
+	    (handler (format "cannot represent ~a at line ~a, char ~a" 
 			     str 
 			     (get-line-count (first tokens)) 
-			     (get-char-count (first tokens)))))))
-      (boolean (bool) (k bool (rest-of tokens)))
-      (character (char) (k char (rest-of tokens)))
-      (string (str) (k str (rest-of tokens)))
-      (identifier (id) (k id (rest-of tokens)))
-      (apostrophe () (read-abbreviation tokens 'quote handler k))
-      (backquote () (read-abbreviation tokens 'quasiquote handler k))
-      (comma () (read-abbreviation tokens 'unquote handler k))
-      (comma-at () (read-abbreviation tokens 'unquote-splicing handler k))
+			     (get-char-count (first tokens)))
+		     fail))))
+      (boolean (bool) (k bool (rest-of tokens) fail))
+      (character (char) (k char (rest-of tokens) fail))
+      (string (str) (k str (rest-of tokens) fail))
+      (identifier (id) (k id (rest-of tokens) fail))
+      (apostrophe () (read-abbreviation tokens 'quote handler fail k))
+      (backquote () (read-abbreviation tokens 'quasiquote handler fail k))
+      (comma () (read-abbreviation tokens 'unquote handler fail k))
+      (comma-at () (read-abbreviation tokens 'unquote-splicing handler fail k))
       (lparen ()
 	(let ((tokens (rest-of tokens)))
 	  (if (token-type? (first tokens) 'dot)
-	    (read-error tokens handler)
-	    (read-sexp-sequence tokens 'rparen handler k))))
+	    (read-error tokens handler fail)
+	    (read-sexp-sequence tokens 'rparen handler fail k))))
       (lbracket ()
 	(let ((tokens (rest-of tokens)))
 	  (if (token-type? (first tokens) 'dot)
-	    (read-error tokens handler)
-	    (read-sexp-sequence tokens 'rbracket handler k))))
+	    (read-error tokens handler fail)
+	    (read-sexp-sequence tokens 'rbracket handler fail k))))
       (lvector ()
-	(read-vector (rest-of tokens) handler
-	  (lambda-cont2 (sexps tokens-left)
-	    (k (list->vector sexps) tokens-left))))
-      (else (read-error tokens handler)))))
+	(read-vector (rest-of tokens) handler fail
+	  (lambda-cont3 (sexps tokens-left fail)
+	    (k (list->vector sexps) tokens-left fail))))
+      (else (read-error tokens handler fail)))))
 
 (define* read-abbreviation
-  (lambda (tokens keyword handler k)  ;; k receives 2 args: sexp, tokens-left
-    (read-sexp (rest-of tokens) handler
-      (lambda-cont2 (sexp tokens-left)
-	(k (list keyword sexp) tokens-left)))))
+  (lambda (tokens keyword handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
+    (read-sexp (rest-of tokens) handler fail
+      (lambda-cont3 (sexp tokens-left fail)
+	(k (list keyword sexp) tokens-left fail)))))
 
 (define* read-sexp-sequence
-  (lambda (tokens expected-terminator handler k)
+  (lambda (tokens expected-terminator handler fail k)
     (record-case (first tokens)
       ((rparen rbracket) ()
-       (close-sexp-sequence '() tokens expected-terminator handler k))
+       (close-sexp-sequence '() tokens expected-terminator handler fail k))
       (dot ()
-	(read-sexp (rest-of tokens) handler
-	  (lambda-cont2 (sexp tokens-left)
-	    (close-sexp-sequence sexp tokens-left expected-terminator handler k))))
+	(read-sexp (rest-of tokens) handler fail
+	  (lambda-cont3 (sexp tokens-left fail)
+	    (close-sexp-sequence sexp tokens-left expected-terminator handler fail k))))
       (else
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp1 tokens-left)
-	    (read-sexp-sequence tokens-left expected-terminator handler
-	      (lambda-cont2 (sexp2 tokens-left)
-		(k (cons sexp1 sexp2) tokens-left)))))))))
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp1 tokens-left fail)
+	    (read-sexp-sequence tokens-left expected-terminator handler fail
+	      (lambda-cont3 (sexp2 tokens-left fail)
+		(k (cons sexp1 sexp2) tokens-left fail)))))))))
 
 (define* close-sexp-sequence
-  (lambda (sexp tokens expected-terminator handler k)
+  (lambda (sexp tokens expected-terminator handler fail k)
     (record-case (first tokens)
       ((rparen rbracket) ()
        (cond
 	 ((token-type? (first tokens) expected-terminator)
-	  (k sexp (rest-of tokens)))
+	  (k sexp (rest-of tokens) fail))
 	 ((eq? expected-terminator 'rparen)
-	  (handler 
-	   (format "parenthesized list terminated by bracket at line: ~a col: ~a" (get-line-count (first tokens)) (get-char-count (first tokens)))))
+	  (handler (format "parenthesized list terminated by bracket at line ~a, char ~a"
+			   (get-line-count (first tokens)) (get-char-count (first tokens)))
+		   fail))
 	 ((eq? expected-terminator 'rbracket)
-	  (handler (format "bracketed list terminated by parenthesis at line: ~a col: ~a" (get-line-count (first tokens)) (get-char-count (first tokens)))))))
-      (else (read-error tokens handler)))))
+	  (handler (format "bracketed list terminated by parenthesis at line ~a, char ~a"
+			   (get-line-count (first tokens)) (get-char-count (first tokens)))
+		   fail))))
+      (else (read-error tokens handler fail)))))
 
 (define* read-vector
-  (lambda (tokens handler k)
+  (lambda (tokens handler fail k)
     (record-case (first tokens)
       (rparen ()
-	(k '() (rest-of tokens)))
+	(k '() (rest-of tokens) fail))
       (else
-	(read-sexp tokens handler
-	  (lambda-cont2 (sexp1 tokens-left)
-	    (read-vector tokens-left handler
-	      (lambda-cont2 (sexps tokens-left)
-		(k (cons sexp1 sexps) tokens-left)))))))))
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp1 tokens-left fail)
+	    (read-vector tokens-left handler fail
+	      (lambda-cont3 (sexps tokens-left fail)
+		(k (cons sexp1 sexps) tokens-left fail)))))))))
 
 (define* read-error
-  (lambda (tokens handler)
-    (let ((token (first tokens)))
+  (lambda (tokens handler fail)
+    (let ((token (first tokens))
+	  (where (if (null? load-stack) "" (format " in ~a" (car load-stack)))))
       (if (token-type? token 'end-marker)
-	(handler (format "unexpected end of input at line: ~a col: ~a" 
+	(handler (format "read error: unexpected end of input at line ~a, char ~a~a" 
 			 (get-line-count token) 
-			 (get-char-count token)))
-	(handler (format "unexpected token ~a encountered at line: ~a col: ~a" 
+			 (get-char-count token)
+			 where)
+		 fail)
+	(handler (format "read error: unexpected token ~a encountered at line ~a, char ~a~a"
 			 (car token) 
 			 (get-line-count token)
-			 (get-char-count token)))))))
-
-;;------------------------------------------------------------------------
-;; file reader
-
-;; for testing purposes
-(define read-file
-  (lambda (filename)
-    (scan-input (read-content filename) init-handler
-      (lambda-cont (tokens)
-	(print-unparsed-sexps tokens init-handler init-cont)))))
-
-;; for testing purposes
-(define* print-unparsed-sexps
-  (lambda (tokens handler k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k 'done)
-      (read-sexp tokens handler
-	(lambda-cont2 (sexp tokens-left)
-	  (pretty-print sexp)
-	  (print-unparsed-sexps tokens-left handler k))))))
-
-;; for testing purposes
-
-;; read-next-sexp takes a list of tokens and reads the next full sexp
-;; from the tokens.  It returns the result and the remaining tokens as
-;; a pair, or an exception object of the form (exception "description")
-
-(define read-next-sexp
-  (lambda (tokens)
-    (read-sexp tokens init-handler
-      (lambda-cont2 (sexp tokens-left)
-	(halt* (cons sexp tokens-left))))))
+			 (get-char-count token)
+			 where)
+		 fail)))))
 
 ;; returns the entire file contents as a single string
 (define read-content
@@ -558,6 +513,66 @@
 	    (if (eof-object? char)
 	      '()
 	      (cons char (loop (read-char port))))))))))
+
+;; takes a list of tokens and reads the next full sexp from the
+;; tokens. It returns the result and the remaining tokens as a pair,
+;; or an exception object of the form (exception "description").
+;; Used only in scheme-to-csharp.ss
+(define read-next-sexp
+  (lambda (tokens)
+    (read-sexp tokens init-handler2 init-fail
+      (lambda-cont3 (sexp tokens-left fail)
+	(halt* (cons sexp tokens-left))))))
+
+;;------------------------------------------------------------------------
+;; for manual testing only in scheme
+
+(define init-cont (lambda-cont (v) (halt* v)))
+(define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
+(define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
+(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
+(define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
+(define init-fail (lambda-fail () (halt* "no more choices")))
+
+(define scan-string
+  (lambda (input)
+    (scan-input input init-handler2 init-fail init-cont2)))
+
+(define scan-file
+  (lambda (filename)
+    (scan-input (read-content filename) init-handler2 init-fail init-cont2)))
+
+(define read-string
+  (lambda (input)
+    (read-datum input init-handler2 init-fail init-cont3)))
+
+(define* read-datum
+  (lambda (input handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
+    (scan-input input handler fail
+      (lambda-cont2 (tokens fail)
+	(read-sexp tokens handler fail
+	  (lambda-cont3 (sexp tokens-left fail)
+	    (if (token-type? (first tokens-left) 'end-marker)
+	      (k sexp tokens-left fail)
+	      (handler (format "tokens left over at line ~a, char ~a" 
+			       (get-line-count (first tokens-left))
+			       (get-char-count (first tokens-left)))
+		       fail))))))))
+
+(define read-file
+  (lambda (filename)
+    (scan-input (read-content filename) init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(print-unparsed-sexps tokens init-handler2 init-fail init-cont2)))))
+
+(define* print-unparsed-sexps
+  (lambda (tokens handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k 'done fail)
+      (read-sexp tokens handler fail
+	(lambda-cont3 (sexp tokens-left fail)
+	  (pretty-print sexp)
+	  (print-unparsed-sexps tokens-left handler fail k))))))
 
 ;; for testing in c#
 ;; (define Main
@@ -571,15 +586,15 @@
 
 ;; Handle command-line args too
 ;;(define* load-files
-;;  (lambda (filenames handler k)
+;;  (lambda (filenames handler fail k)
 ;;    (if (null? filenames)
-;;	(k 'ok)
-;;	(read-datum (format "(import \\\"~a\\\")" (car filenames)) handler
-;; 	    (lambda-cont2 (datum tokens-left)
+;;	(k 'ok fail)
+;;	(read-datum (format "(import \\\"~a\\\")" (car filenames)) handler fail
+;; 	    (lambda-cont3 (datum tokens-left fail)
 ;;		(printf "   (import \\\"~a\\\")...\n" (car filenames))
-;; 		(parse datum handler
-;; 		    (lambda-cont (exp)
-;; 			(m exp toplevel-env handler
-;;			   (lambda-cont (result)
-;;			      (load-files (cdr filenames) handler k))))))))))
+;; 		(parse datum handler fail
+;; 		    (lambda-cont2 (exp fail)
+;; 			(m exp toplevel-env handler fail
+;;			   (lambda-cont2 (result fail)
+;;			      (load-files (cdr filenames) handler fail k))))))))))
 

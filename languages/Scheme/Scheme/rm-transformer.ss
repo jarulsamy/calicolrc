@@ -1,3 +1,10 @@
+;; This program automatically converts CPS code in first-order tail
+;; form into trampolined register machine form.
+;;
+;; Written by James B. Marshall
+;; jmarshall@slc.edu
+;; http://science.slc.edu/~jmarshall
+;;
 ;; assumptions:
 ;; - code in first-order tail form
 ;; - define* functions will be converted to 0 arguments
@@ -269,7 +276,7 @@
 ;;	    (quote (datum) code)
 	    (quasiquote (datum)
 	      (if *generate-low-level-registerized-code?*
-		(transform (expand-quasiquote datum init-handler init-cont))
+		(transform (expand-quasiquote datum init-cont))
 		(list 'quasiquote (transform-quasiquote datum))))
 	    (if (test . conseqs)
 	      `(if ,@(map transform (cdr code))))
@@ -618,6 +625,7 @@
       ((null? datum) ''())
       ((number? datum) datum)
       ((boolean? datum) datum)
+      ((char? datum) datum)
       ((list? datum)
        `(list ,@(map expand-quote datum)))
       ((pair? datum)
