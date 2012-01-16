@@ -3,13 +3,13 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
       <File FileName="Jigsaw\MainWindow.cs" Line="629" Column="3" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1654" Column="11" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="1547" Column="5" />
       <File FileName="Jigsaw\CMethodBlock.cs" Line="166" Column="12" />
       <File FileName="Jigsaw\ProcedureBlocks.cs" Line="88" Column="16" />
       <File FileName="Jigsaw\ControlBlocks.cs" Line="1217" Column="24" />
       <File FileName="Jigsaw\IOBlocks.cs" Line="111" Column="12" />
       <File FileName="Jigsaw\StatementBlocks.cs" Line="285" Column="3" />
-      <File FileName="Jigsaw\Widgets.cs" Line="250" Column="42" />
+      <File FileName="Jigsaw\Widgets.cs" Line="282" Column="7" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

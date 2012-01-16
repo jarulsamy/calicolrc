@@ -1541,19 +1541,18 @@ namespace Jigsaw
 				_searchStart = 0;
 				_searchPos = _searchStart;
 				_searchNext = true;
-//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
-//				//SearchCancel();						 // Reset in case want to search again
-//				return false;
+			} else if (_searchPos == _searchStart) { // If not first time, check for completion
+				SearchCancel();						 // Reset in case want to search again
+				return false;
 			}
 			
+			int numItems = _searchSet.Count;
+			
 			// If currently searching backward, and switch direction to forward, reset starting position to current
-			if (_searchNext == false) {
-				_searchStart = _searchPos;
-			}
+			if (_searchNext == false) _searchStart = _searchPos;
 			_searchNext = true;
 			
 			// Perform search
-			int numItems = _searchSet.Count;
 			foundMatch = false;
 			while (true) {
 				
@@ -1589,8 +1588,13 @@ namespace Jigsaw
 				// Set next item to test
 				_searchPos = (_searchPos + 1) % numItems;
 				
-				// If found a mathc this time, return true
+				// If found a match this time, return true
 				if (foundMatch) return true;
+				
+				if (_searchPos == _searchStart) {
+					SearchCancel();						 // Reset in case want to search again
+					return false;
+				}
 			}
 	    }
 
@@ -1608,15 +1612,13 @@ namespace Jigsaw
 				_searchStart = _searchSet.Count-1;
 				_searchPos = _searchStart;
 				_searchNext = false;
-//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
-//				//SearchCancel();						 // Reset in case want to search again
-//				return false;
+			} else if (_searchPos == _searchStart) { // If not first time, check for completion
+				SearchCancel();						 // Reset in case want to search again
+				return false;
 			}
 			
 			// If currently searching forward, and switch direction to backward, reset starting position to current
-			if (_searchNext == true) {
-				_searchStart = _searchPos;
-			}
+			if (_searchNext == true) _searchStart = _searchPos;
 			_searchNext = false;
 			
 			// Perform search
@@ -1660,6 +1662,11 @@ namespace Jigsaw
 				
 				// If found a mathc this time, return true
 				if (foundMatch) return true;
+				
+				if (_searchPos == _searchStart) {
+					SearchCancel();						 // Reset in case want to search again
+					return false;
+				}
 			}
 	    }
 	}
