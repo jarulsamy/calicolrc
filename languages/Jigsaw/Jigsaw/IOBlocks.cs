@@ -96,7 +96,7 @@ namespace Jigsaw
 			if (depth > 3) // FIXME: cheap trick to avoid recursive data structures
 				return "...";
 			if (obj == null) {
-				return "None"; 
+				return "None";
 //			} else if (obj is IronPython.Runtime.List) {
 //				return ((IronPython.Runtime.List)obj).__repr__ (
 //		  			IronPython.Runtime.DefaultContext.Default);

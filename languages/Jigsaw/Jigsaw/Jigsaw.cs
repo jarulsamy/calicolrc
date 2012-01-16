@@ -61,6 +61,10 @@ namespace Jigsaw
 		// A flag to help track running state
 		private bool _isRunning = false;
 		
+		// Support search
+		private List<KeyValuePair<Widgets.CRoundedTab,CBlock>> _searchSet = null;
+		int _searchPos = 0;
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
@@ -1487,19 +1491,164 @@ namespace Jigsaw
 				foreach (CEdge e in b.Edges) e._id = 0;
             }
         }
-	    // -----------------------------------------------------------------------
+		
+	    // - - -
 	    public bool SearchMore(string s) {
-	        return pnlBlock.SearchMore(this, s);
+	        //return pnlBlock.SearchMore(this, s);
 	    }
+		
+		// - - - Build a list of tab-block KeyValuePair items to use to search over - - - 
+		internal bool BuildSearchSet() {
 
+			_searchSet = new List<KeyValuePair<Widgets.CRoundedTab,CBlock>>();
+			KeyValuePair<Widgets.CRoundedTab,CBlock> item;
+			CBlock bb = null;
+			
+			// Build a list of items to search
+			foreach (Widgets.CRoundedTab t in allTabs) {
+				foreach (WeakReference wr in t._shapes) {
+					Diagram.CShape shp = wr.Target as Diagram.CShape;
+					if (shp is CBlock) {
+						bb = (CBlock) shp;
+						item = new KeyValuePair<Widgets.CRoundedTab, CBlock>(t,bb);
+						_searchSet.Add ( item  );
+					}
+				}
+			}
+			_searchPos = 0;
+			
+			return true;
+		}
+		
 	    // -----------------------------------------------------------------------
 	    public bool SearchNext(string s) {
-	        return pnlBlock.SearchNext(this, s);
+
+			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
+			CBlock bb;
+			Widgets.CRoundedTab tt;
+			string ss = s.ToLower();
+
+			// Move forward until match found or reach end
+			int numItems = _searchSet.Count;
+			
+			while (true) {
+
+				// Check if passed end of search items
+				if (_searchPos >= numItems) {
+					
+					_searchPos = 0;
+					
+					// Inform user of error
+					Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+						null,
+						Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+						Gtk.MessageType.Info,
+						Gtk.ButtonsType.Ok,
+						String.Format ("Nothing more found matching {0}", s));
+					dlg2.Title = "Nothing found";
+					
+					Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+					dlg2.Destroy();
+					
+					return false;
+				}
+
+				item = _searchSet[_searchPos];
+				bb = item.Value;
+				string txt = bb.Text.ToLower();
+				_searchPos = _searchPos+1;
+				
+				// A match is found
+				if (txt.Contains ( ss )) {
+					// Select the tab
+					tt = item.Key;
+					tt.SetToggle(this, true);
+					
+					// Shift all factory blocks up
+					double dY = 70.0 - bb.Top; 
+					foreach (WeakReference wrshp in tt._shapes)
+					{
+						Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+						if (shp != null) {
+							shp.Top += dY;
+						}
+					}
+					
+					// Select the found block
+					this.DeselectAll();
+					bb.Select(this);
+					
+					this.Invalidate();
+					return true;
+				}
+				
+				this.Invalidate();
+			}
 	    }
 
 	    // -----------------------------------------------------------------------
 	    public bool SearchPrevious(string s) {
-	        return pnlBlock.SearchPrevious(this, s);
+			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
+			CBlock bb;
+			Widgets.CRoundedTab tt;
+			string ss = s.ToLower();
+
+			// Move forward until match found or reach end
+			int numItems = _searchSet.Count;
+			
+			while (true) {
+
+				// Check if passed end of search items
+				if (_searchPos < 0) {
+					
+					_searchPos = numItems - 1;
+					
+					// Inform user of error
+					Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+						null,
+						Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+						Gtk.MessageType.Info,
+						Gtk.ButtonsType.Ok,
+						String.Format ("Nothing more found matching {0}", s));
+					dlg2.Title = "Nothing found";
+					
+					Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+					dlg2.Destroy();
+					
+					return false;
+				}
+
+				item = _searchSet[_searchPos];
+				bb = item.Value;
+				string txt = bb.Text.ToLower();
+				_searchPos = _searchPos - 1;
+
+				// A match is found
+				if (txt.Contains ( ss )) {
+					// Select the tab
+					tt = item.Key;
+					tt.SetToggle(this, true);
+					
+					// Shift all factory blocks up
+					double dY = 70.0 - bb.Top; 
+					foreach (WeakReference wrshp in tt._shapes)
+					{
+						Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+						if (shp != null) {
+							shp.Top += dY;
+						}
+					}
+					
+					// Select the found block
+					this.DeselectAll();
+					bb.Select(this);
+										
+					this.Invalidate();
+					return true;
+				}
+				
+				this.Invalidate();
+			}
 	    }
 	}
 	

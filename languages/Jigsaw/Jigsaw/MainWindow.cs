@@ -44,7 +44,10 @@ public class MainWindow : Gtk.Window
 	Gtk.MenuItem miRunPause = null;
 	Gtk.MenuItem miRunStep = null;
 	Gtk.MenuItem miRunStop = null;
-
+	
+	Gtk.MessageDialog _dlg = null;		// Var that temporarily holds dialog while showing
+	Gtk.Entry _entry = null;
+	
 	public MainWindow () : base(Gtk.WindowType.Toplevel)
 	{
 		// Main window
@@ -594,32 +597,62 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnEditFind(object sender, EventArgs a)
 	{
-		Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+		js.BuildSearchSet();
+		
+		_dlg = new Gtk.MessageDialog(
 			this,
 			Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 			Gtk.MessageType.Question,
 			Gtk.ButtonsType.None,
 			null);
-			dlg.AddButton("Cancel", Gtk.ResponseType.Cancel);
-			dlg.AddButton("Find", Gtk.ResponseType.Accept);
-		dlg.Title = "Find...";
-		dlg.Markup = "<b>Please enter text to find in all blocks</b>";
-		Gtk.Entry entry = new Gtk.Entry();
+		Gtk.Button bCancel = (Gtk.Button)_dlg.AddButton("Cancel", Gtk.ResponseType.Cancel);
+		Gtk.Button bPrev   = (Gtk.Button)_dlg.AddButton("<< Find Previous", Gtk.ResponseType.No);
+		Gtk.Button bNext   = (Gtk.Button)_dlg.AddButton("Find Next >>", Gtk.ResponseType.Yes);
+		
+		bCancel.Clicked += new System.EventHandler(OnSearchCancel);
+		bPrev.Clicked += new System.EventHandler(OnSearchPrev);
+		bNext.Clicked += new System.EventHandler(OnSearchNext);
+		
+		_dlg.Title = "Find...";
+		_dlg.Markup = "<b>Please enter text to find in all blocks</b>";
+		_dlg.DefaultResponse = Gtk.ResponseType.Yes;
+		
+		_entry = new Gtk.Entry();
 		Gtk.HBox hbox = new Gtk.HBox();
 		hbox.PackStart(new Gtk.Label("Find: "), false, false, 5);
-		hbox.PackEnd(entry);
-		//dlg.SecondaryUseMarkup = true;
-		//dlg.SecondaryText = "This will be used for <i>identification</i> purposes";
-		dlg.VBox.PackEnd(hbox, true, true, 0);
-		dlg.ShowAll();
-		Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
-		if (rsp == Gtk.ResponseType.Accept) {
-			string src = entry.Text;
-			js.SearchMore(src);
-		}
-		dlg.Destroy();
+		hbox.PackEnd(_entry);
+		//_dlg.SecondaryUseMarkup = true;
+		//_dlg.SecondaryText = "This will be used for <i>identification</i> purposes";
+		_dlg.VBox.PackEnd(hbox, true, true, 0);
+		_dlg.ShowAll();
+
+		Gtk.ResponseType rsp = (Gtk.ResponseType)_dlg.Run ();
 	}
 	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void OnSearchCancel(object sender, EventArgs args)
+	{
+		_dlg.Destroy();
+		_dlg = null;
+		_entry = null;
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void OnSearchNext(object sender, EventArgs args)
+	{
+		string src = _entry.Text;
+		if (src.Trim ().Length == 0) return;
+		bool result = js.SearchNext(src);
+	}
+		
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void OnSearchPrev(object sender, EventArgs args)
+	{
+		string src = _entry.Text;
+		if (src.Trim ().Length == 0) return;
+		bool result = js.SearchPrevious(src);
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnViewZoomIn(object sender, EventArgs a)
 	{	
