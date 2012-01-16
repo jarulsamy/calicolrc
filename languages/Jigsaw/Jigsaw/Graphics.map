@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="us-ascii"?>
+<?xml version="1.0" encoding="utf-16"?>
 <map path="C:\Programs\Mono\Calico-dev\modules\Graphics.dll">
     <docstring />
+    <fill_color red="0.8984" green="0.8437" blue="0.6758" alpha="1.0" />
+    <line_color red="0.5430" green="0.0" blue="0.0" alpha="1.0" />
     <constructor assembly_name="Graphics" type_name="Arc" constructor_name=".ctor">
         <docstring />
         <parameter name="iterable" type="System.Collections.IList" default="" />
