@@ -106,13 +106,8 @@ namespace CalicoPython {
             }
 
 	    public override void UseLibrary(string fullname) {
-                Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
-                data.Document.BeginAtomicUndo();
-                data.Document.EndAtomicUndo();
 		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
                 texteditor.Insert(0, String.Format("import {0}\n", bname));
-                data.Document.RequestUpdate(new Mono.TextEditor.LineUpdate(0));
-                data.Document.CommitDocumentUpdate();
             }
         }
 	
