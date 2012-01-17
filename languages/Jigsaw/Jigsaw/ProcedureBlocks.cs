@@ -122,8 +122,8 @@ namespace Jigsaw
 			yield return rr;
 			
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -146,7 +146,7 @@ namespace Jigsaw
 				this["Message"] = ex.Message;
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,11 +156,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Clean up
@@ -377,8 +377,8 @@ namespace Jigsaw
 			yield return rr;
 			
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -395,7 +395,7 @@ namespace Jigsaw
 				
 				// Create a new Runner from called procedure start block and push on to this call stack
 				rr.Action = EngineAction.Add;
-				rr.Runner = procStartBlock.Runner(scope, stack);
+				rr.Frame = procStartBlock.Frame(scope, stack);
 				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -403,7 +403,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			yield return rr;
@@ -418,7 +418,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -428,11 +428,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -507,46 +507,50 @@ namespace Jigsaw
 			yield return rr;
 			
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
+			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
 			try
-			{	// Remove this Runner from call stack and return value
-				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				rr.RetVal = Expr.Evaluate(scope);
-				
+			{	// Evaluate return expression
+				CExpressionProperty exp = (CExpressionProperty)_properties["Expression"];
+				rr.RetVal = exp.Evaluate(scope);
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				this["Message"] = ex.Message;
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
 			
-//			rr.Action = EngineAction.Return;
-//			rr.Runner = null;
+			// Remove this frame from call stack and return value
 			
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
-			}
-			
-			// Indicate that the block is no longer running
+			rr.Action = EngineAction.Return;
+			rr.Frame = null;
 			this.State = BlockState.Idle;
 			yield return rr;
+			
+//			// If connected, replace this runner with the next runner to the stack.
+//			if (this.OutEdge.IsConnected) {
+//				rr.Action = EngineAction.Replace;
+//				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+//			} else {
+//				// If not connected, just remove this runner
+//				rr.Action = EngineAction.Remove;
+//				rr.Frame = null;
+//			}
+//			
+//			// Indicate that the block is no longer running
+//			this.State = BlockState.Idle;
+//			yield return rr;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -601,5 +605,4 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
-
 }

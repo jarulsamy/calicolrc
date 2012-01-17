@@ -128,9 +128,13 @@ namespace Jigsaw
 			this.AddShape(block24);
 			tbCtrl.AddShape(block24);
 			
-			CControlEnd block25 = new CControlEnd(110, 430, pnlBlock);
+			CControlBreak block25 = new CControlBreak(110, 430, pnlBlock);
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
+			
+			CControlEnd block26 = new CControlEnd(110, 470, pnlBlock);
+			this.AddShape(block26);
+			tbCtrl.AddShape(block26);
 			
 			// ----- Statement tab and factory blocks	
 			tabY += 33;
@@ -1680,7 +1684,8 @@ namespace Jigsaw
 		
 		protected int _textYOffset = 0;					// Y offset for when a block's text
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
-		
+		internal bool _breakStop = false;				// If true, marks a block as a stopping point for popping frames from stack 
+														// when a break is executed. Should be set to true for all loops.
 		protected Gtk.Window _propDialog = null;
 		protected Gtk.Window _contextMenu = null;
 
@@ -1819,6 +1824,13 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual StackFrame Frame(ScriptScope scope, CallStack stack ) 
+		{
+			StackFrame frm = new StackFrame(this, this.Runner (scope, stack) );
+			return frm;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public virtual IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
 		{
 			// All blocks need a Block Runner, which is an IEnumerator that executes the block's behavior.
@@ -1837,8 +1849,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				rr.Frame = null;
 				yield return rr;
 			}
 			
@@ -1849,11 +1861,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running

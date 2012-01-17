@@ -357,7 +357,6 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawPause(object sender, EventArgs a)
 	{	
-		Console.WriteLine ("OnJigsawPause");
 		tbRunStep.Sensitive = true;
 		tbRunStop.Sensitive = true;
 		tbRunRun.Sensitive = true;

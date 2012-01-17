@@ -18,20 +18,21 @@ namespace Jigsaw
 		Add = 1, 		// Add new block runner to call stack.
 		Replace = 2, 	// Replace current block runner with new one.
 		Remove = 3, 	// Remove current block runner only.
-		Break = 4,		// Breakpoint. Stop timer.
-		Return = 5		// Stack is done. Return value and remove entire stack
+		Pause = 4,		// Breakpoint. Pause execution
+		Break = 5,		// Break from a loop or conditional
+		Return = 6		// Stack is done. Return value and remove entire stack
 	}
 	
 	// -----------------------------------------------------------------------
 	public class RunnerResponse
 	{	// A tiny struct with the sole purpose of allowing Runners to return multiple items
 		public EngineAction Action = EngineAction.NoAction;
-		public IEnumerator<RunnerResponse> Runner = null;
+		public StackFrame Frame = null;
 		public object RetVal = null;
 		
-		public RunnerResponse(EngineAction ea, IEnumerator<RunnerResponse> rr) {
+		public RunnerResponse(EngineAction ea, StackFrame frame) {
 			Action = ea;
-			Runner = rr;
+			Frame = frame;
 		}
 
 		public RunnerResponse()
@@ -39,10 +40,51 @@ namespace Jigsaw
 	}
 	
 	// -----------------------------------------------------------------------
+	public class StackFrame
+	{
+		// Block whose runner is managed
+		internal CBlock _block = null;
+		
+		// Internal runner encapsulated by the stack frame
+		internal IEnumerator<RunnerResponse> _runner = null;
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public StackFrame(CBlock blk, IEnumerator<RunnerResponse> runner) {
+			_block = blk;
+			_runner = runner;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public IEnumerator<RunnerResponse> Runner
+		{
+			get
+			{
+				return _runner;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public RunnerResponse Current
+		{
+			get
+			{
+				return _runner.Current;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool MoveNext()
+		{
+			return _runner.MoveNext ();
+		}
+
+	}
+	
+	// -----------------------------------------------------------------------
 	public class CallStack
 	{	// Call stack manages the stack of block runners (calls) currently executing
 		
-		private List<IEnumerator<RunnerResponse>> _stack = null;
+		private List<StackFrame> _stack = null;
 		
 		// This is the globals for this call stack
 		public Dictionary<string,object> globals = null;
@@ -52,14 +94,22 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CallStack(Dictionary<string,object> globals) {
-			_stack = new List<IEnumerator<RunnerResponse>>();
+			_stack = new List<StackFrame>();
 			this.globals = globals;	// Keep track of this call stacks globals
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void AppendRunner(CBlock b, ScriptScope scope) 
-		{	// Create a block runner given a block and append it to the end of the stack
-			_stack.Add( b.Runner(scope, this) );
+		public void Dump() {
+			foreach (StackFrame f in _stack) Console.WriteLine (f._block.Text);
+			Console.WriteLine ("---");
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AppendFrame(CBlock b, ScriptScope scope) 
+		{	// Create a block runner given a block
+			// createa a StackFrame and append it to the end of the stack
+			IEnumerator<RunnerResponse> runner = b.Runner(scope, this);
+			_stack.Add( new StackFrame(b, runner ));
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,22 +118,47 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public IEnumerator<RunnerResponse> GetTopRunner() {
+		public StackFrame GetTopFrame() {
 			if (_stack.Count > 0) return _stack[0];
 			return null;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void PopRunner(IEnumerator<RunnerResponse> runner) {
-			_stack.Remove(runner);
+		public void PopFrame(StackFrame frame) {
+			_stack.Remove(frame);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public void PopProcedure() {
-//			// Keep popping runners until procedure top found
-//			while( !_stack[0] is C
-//			_stack.Remove(runner);
-//		}
+		public void PopProcedure() {
+			// Keep popping runners until entire procedure is removed, or call stack is empty
+			while ( _stack.Count > 0 && !(_stack[0]._block is CProcedureCall)) {
+				_stack[0]._block.State = BlockState.Idle;
+				_stack.RemoveAt(0);
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBlock PopBreak() {
+			// Pop inner-most loop or conditional to respond to break statement
+			while ( _stack.Count > 0 && _stack[0]._block._breakStop == false) {
+				_stack[0]._block.State = BlockState.Idle;
+				_stack.RemoveAt(0);
+			}
+			
+			// Return next if outedge is connected
+			CBlock b = _stack[0]._block;
+			
+			// If connected, return the next frame
+			CBlock nextBlock = null;
+			if (b.OutEdge.IsConnected) {
+				nextBlock = b.OutEdge.LinkedTo.Block;
+			}
+
+			_stack[0]._block.State = BlockState.Idle;
+			_stack.RemoveAt(0);
+			
+			return nextBlock;
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Clear() {
@@ -91,8 +166,8 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void PushRunner(IEnumerator<RunnerResponse> runner) {
-			_stack.Insert(0, runner);
+		public void PushFrame(StackFrame frame) {
+			_stack.Insert(0, frame);
 		}
 	}
 	
@@ -103,7 +178,6 @@ namespace Jigsaw
 		private InspectorWindow _inspector = null;
 		private bool _inStep = false;		// true if currently executing a single step
 		
-		//private Expression.DLRScope scope = null;
 		public ScriptRuntimeSetup scriptRuntimeSetup;
 		public ScriptRuntime scriptRuntime;
 		public LanguageSetup languageSetup;
@@ -240,7 +314,7 @@ namespace Jigsaw
 							CControlStart cs = (CControlStart)s;
 							CallStack stack = new CallStack(globals);	// Add new runner to call stack
 							ScriptScope scope = this.CreateScope(globals);
-							stack.AppendRunner( (CControlStart)s, scope );
+							stack.AppendFrame( (CControlStart)s, scope );
 							_callStacks.Add(stack);
 						}
 					}
@@ -278,67 +352,58 @@ namespace Jigsaw
 			{
 				CallStack stack = _callStacks[i];
 				
-				if (stack.Count > 0) {						// Get the top-most block runner
-					IEnumerator<RunnerResponse> br = stack.GetTopRunner();	
+				if (stack.Count > 0) {							// Get the top-most block runner
+					StackFrame br = stack.GetTopFrame();	
 					
-					bool rslt = br.MoveNext();				// Advance block runner and see if fell off end
-					RunnerResponse rr = br.Current;			// Check the response
+					bool rslt = br.MoveNext();					// Advance block runner and see if fell off end
+					RunnerResponse rr = br.Current;				// Check the response
 					
 					if (rslt == false) {
-						stack.PopRunner(br);				// Enumerator has passed the end of the collection
+						stack.PopFrame(br);						// Enumerator has passed the end of the collection
 					} else {
-						switch (rr.Action) {				// Take appropriate action
-						case EngineAction.Break:
-							this.Stop();
+						switch (rr.Action) {					// Take appropriate action
+						case EngineAction.Pause:
+							this.Pause();
 							break;
 						case EngineAction.Remove:
-							stack.PopRunner(br);
-							stack.RetVal = rr.RetVal;		// Copy returned value to temp location in stack
+							stack.PopFrame(br);
+							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
 							break;
-//						case EngineAction.Return:
-//							stack.PopProcedure();
-//							stack.RetVal = rr.RetVal;		// Copy returned value to temp location in stack
-//							break;
+						case EngineAction.Break:
+							CBlock bnext = stack.PopBreak();	// Return block connected to out edge, if there is one
+							if (bnext != null) {				// Scope was hidden in RetVal. Get it and make next frame.
+								ScriptScope scope = (ScriptScope) rr.RetVal;
+								StackFrame frame = bnext.Frame(scope, stack);
+								stack.PushFrame(frame);			// Push next frame and get started
+								frame.MoveNext();
+							}
+							break;
+						case EngineAction.Return:
+							stack.PopProcedure();
+							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
+							break;
 						case EngineAction.Replace:
-							stack.PopRunner(br);
-							stack.PushRunner(rr.Runner);
-							rr.Runner.MoveNext();
+							stack.PopFrame(br);
+							stack.PushFrame(rr.Frame);
+							rr.Frame.MoveNext();
 							break;
 						case EngineAction.Add:
-							stack.PushRunner(rr.Runner);
-							rr.Runner.MoveNext();
+							stack.PushFrame(rr.Frame);
+							rr.Frame.MoveNext();
 							break;
 						case EngineAction.NoAction:
 							break;
 						}
 					}
-					
-//					// If there is a breakpoint, stop timer
-//					if (rr.Action == EngineAction.Break)
-//					{
-//						this.Stop();
-//					}
-//					
-//					// Conditions for removing the block runner from the stack
-//					if (rr.Action == EngineAction.Remove ||
-//					    rr.Action == EngineAction.Replace ||
-//					    rslt == false) {
-//						stack.RemoveRunner(br);
-//					}
-					
-//					// Conditions for adding a new block runner
-//					if (rr.Action == EngineAction.Replace ||
-//			            rr.Action == EngineAction.Add ||
-//			            rr.Runner != null) {
-//						stack.PushRunner(rr.Runner);
-//						rr.Runner.MoveNext();						// Take first step right away
-//					}
 
 				} else {
 					// If call stack is empty, the block runner stack has completed execution.
 					// Remove stack from list of all stacks.
 					_callStacks.RemoveAt(i);
 				}
+				
+				// Print call stack
+				//if (_callStacks.Count > 0) _callStacks[0].Dump();
 			}
 			
 			_inStep = false;

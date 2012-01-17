@@ -97,8 +97,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,7 +118,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -129,11 +129,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -218,8 +218,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -235,7 +235,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -246,11 +246,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running

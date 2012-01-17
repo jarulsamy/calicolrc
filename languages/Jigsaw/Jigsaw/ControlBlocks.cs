@@ -192,6 +192,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
+			this._breakStop = true;
 			
 			// Create inner edge to connect loop stack
 			double offsetX = 0.5*this.Width + 10.0;
@@ -315,8 +316,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -337,7 +338,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
@@ -348,7 +349,7 @@ namespace Jigsaw
 				// Next perform one iteration of the enclosed stack
 				if (this.LoopEdge.IsConnected) {
 					rr.Action = EngineAction.Add;
-					rr.Runner = this.LoopEdge.LinkedTo.Block.Runner(scope, stack);
+					rr.Frame = this.LoopEdge.LinkedTo.Block.Frame(scope, stack);
 					yield return rr;
 				}
 				
@@ -365,11 +366,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -603,8 +604,8 @@ namespace Jigsaw
 			yield return rr;
 			
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -623,7 +624,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
@@ -633,7 +634,7 @@ namespace Jigsaw
 			{	// Execute enclosed stack
 				if (this.IfEdge.IsConnected) {
 					rr.Action = EngineAction.Add;
-					rr.Runner = this.IfEdge.LinkedTo.Block.Runner(scope, stack);
+					rr.Frame = this.IfEdge.LinkedTo.Block.Frame(scope, stack);
 					yield return rr;
 				}
 			}
@@ -645,11 +646,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -921,8 +922,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -941,7 +942,7 @@ namespace Jigsaw
 				
 				this.State = BlockState.Error;
 				rr.Action = EngineAction.NoAction;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
@@ -951,13 +952,13 @@ namespace Jigsaw
 			{	// Execute enclosed stack
 				if (this.IfEdge.IsConnected) {
 					rr.Action = EngineAction.Add;
-					rr.Runner = this.IfEdge.LinkedTo.Block.Runner(scope, stack);
+					rr.Frame = this.IfEdge.LinkedTo.Block.Frame(scope, stack);
 					yield return rr;
 				}
 			} else {
 				if (this.ElseEdge.IsConnected) {
 					rr.Action = EngineAction.Add;
-					rr.Runner = this.ElseEdge.LinkedTo.Block.Runner(scope, stack);
+					rr.Frame = this.ElseEdge.LinkedTo.Block.Frame(scope, stack);
 					yield return rr;
 				}
 			}
@@ -969,11 +970,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -1193,6 +1194,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
+			this._breakStop = true;
 			
 			// Create inner edge to connect loop stack
 			double offsetX = 0.5*this.Width + 10.0;
@@ -1316,8 +1318,8 @@ namespace Jigsaw
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
-				rr.Action = EngineAction.Break;				// so that engine can stop
-				rr.Runner = null;
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
 				yield return rr;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1337,7 +1339,7 @@ namespace Jigsaw
 					
 					this.State = BlockState.Error;
 					rr.Action = EngineAction.NoAction;
-					rr.Runner = null;
+					rr.Frame = null;
 				}
 				
 				// Go into a loop while block remains in an error state
@@ -1348,7 +1350,7 @@ namespace Jigsaw
 					// Push internal runner on to stack
 					// Pops itself off stack when done
 					rr.Action = EngineAction.Add;
-					rr.Runner = this.LoopEdge.LinkedTo.Block.Runner(scope, stack);
+					rr.Frame = this.LoopEdge.LinkedTo.Block.Frame(scope, stack);
 					yield return rr;
 				} 
 				else 
@@ -1366,11 +1368,11 @@ namespace Jigsaw
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
 				rr.Action = EngineAction.Replace;
-				rr.Runner = this.OutEdge.LinkedTo.Block.Runner(scope, stack);
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
 			} else {
 				// If not connected, just remove this runner
 				rr.Action = EngineAction.Remove;
-				rr.Runner = null;
+				rr.Frame = null;
 			}
 			
 			// Indicate that the block is no longer running
@@ -1458,5 +1460,114 @@ namespace Jigsaw
 			g.LineTo( x, y+r );
             g.ClosePath();
 		}		
+    }
+	
+	// -----------------------------------------------------------------------
+    public class CControlBreak : CBlock
+    {	// Break block shape class
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CControlBreak(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y), 
+				new Diagram.CPoint(X + 175, Y + 20)}),
+				palette) 
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGoldenrod;
+			this.FillColor = Diagram.Colors.PaleGoldenrod;
+			this.Sizable = false;
+			this.Text = "break out";
+		}
+		
+		public CControlBreak(Double X, Double Y) : this(X, Y, null) {}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override List<CEdge> Edges 
+		{	// Return a list of all edges
+			// Break blocks only have an input edge
+			get {
+				return new List<CEdge>() { this.InEdge };
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		{	// Break from a loop or conditional
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
+				yield return rr;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+			
+			rr.Action = EngineAction.Break;
+			rr.Frame = null;
+			rr.RetVal = scope;
+			this.State = BlockState.Idle;
+			yield return rr;
+
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected override void SetPath(Cairo.Context g) 
+		{
+			double x = this.left;
+            double y = this.top;
+			
+            double w = this.width;
+            double h = this.height;
+			double r = 6.0;
+			double hpi = 0.5*Math.PI;
+			
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+11, y );
+			g.LineTo( x+14, y+4 );
+			g.LineTo( x+24, y+4 );
+			g.LineTo( x+27, y );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+11, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.LineTo( x, y+r );
+            g.ClosePath();
+		}
+		
+		// - - - Generate and return Python translation of a break - - - - -
+		private string ToPython ()
+		{
+			return "break";
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				o.AppendFormat("{0}{1}\n", sindent, this.ToPython ());
+				
+			} catch (Exception ex){
+				Console.WriteLine(ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     }
 }
