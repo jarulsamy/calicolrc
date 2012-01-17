@@ -26,7 +26,6 @@ using System.IO; // DirectoryInfo, FileInfo
 using System.IO.Ports; // SerialPort
 using System.Threading;
 using IronPython.Runtime; // List
-using IronRuby.Builtins; // RubyArray
 using System.Collections.Generic; // IList
 using System.Collections; // IEnumerator
 
@@ -1498,7 +1497,7 @@ public static class Myro {
     return obj.ToString();
   }
 
-  public static List to_l(RubyArray obj) {
+  public static List to_l(IList obj) {
     List list = new List();
     foreach (object choice in obj)
         list.append(choice.ToString());
@@ -1606,11 +1605,7 @@ public static class Myro {
     return askQuestion(question, Graphics.PyList("Yes", "No"));
   }
 
-  public static string askQuestion(string question, RubyArray choices) {
-    return askQuestion(question, to_l(choices));
-  }
-
-  public static string askQuestion(string question, List choices) {
+  public static string askQuestion(string question, IList choices) {
     ManualResetEvent ev = new ManualResetEvent(false);
     dialogResponse = null;
     Invoke(delegate {
