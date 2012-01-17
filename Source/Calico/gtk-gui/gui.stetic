@@ -363,6 +363,12 @@
         <property name="Label" translatable="yes">Options...</property>
         <property name="ShortLabel" translatable="yes">Options...</property>
       </action>
+      <action id="ToggleBreakpointAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Toggle Breakpoint</property>
+        <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
+        <signal name="Activated" handler="OnSetBreakpointActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -433,6 +439,8 @@
               <node type="Menu" action="ToolsAction">
                 <node type="Menuitem" action="AboutAction" />
                 <node type="Menuitem" action="OptionsAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="ToggleBreakpointAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="aboutAction" />

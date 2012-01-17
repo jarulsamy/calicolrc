@@ -1979,5 +1979,13 @@ namespace Calico {
             searchEntry.Entry.GrabFocus();
         }
 
+        protected void OnSetBreakpointActionActivated (object sender, System.EventArgs e)
+        {
+            Mono.TextEditor.TextEditor texteditor = ((TextDocument)CurrentDocument).texteditor;
+            MonoDevelop.Debugger.DebugTextMarker debugTextMarker =
+                new MonoDevelop.Debugger.BreakpointTextMarker(texteditor, true);
+            texteditor.Document.AddMarker(1, debugTextMarker);
+
+        }
     }
 }

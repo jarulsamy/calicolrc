@@ -96,6 +96,7 @@
     <Compile Include="gtk-gui\Calico.MainWindow.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Printing.cs" />
+    <Compile Include="DebugTextMarker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
