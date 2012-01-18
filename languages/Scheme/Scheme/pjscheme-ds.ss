@@ -545,11 +545,14 @@
          (make-cont2 '<cont2-85> k)))
       (<cont2-87> (filenames env handler k)
        (load-files (cdr filenames) env handler value2 k))
-      (<cont2-88> ()
-       (read-and-eval-sexps value1 toplevel-env init-handler2
-         value2 init-cont2))
-      (<cont2-89> ()
-       (parse-sexps value1 init-handler2 value2 init-cont2))
+      (<cont2-88> () (set! last-fail value2) (halt* value1))
+      (<cont2-89> () (halt* #t))
+      (<cont2-90> ()
+       (parse-sexps
+         value1
+         try-parse-handler
+         value2
+         (make-cont2 '<cont2-89>)))
       (else (error 'apply-cont2 "bad continuation2: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -688,6 +691,10 @@
                                 handler)))
            (eval-sequence cexps new-env catch-handler fail
              (make-cont2 '<cont2-59> fexps env handler k)))))
+      (<handler2-6> ()
+       (set! last-fail fail)
+       (halt* (list 'exception exception)))
+      (<handler2-7> () (halt* #f))
       (else (error 'apply-handler2 "bad handler2: ~a" handler)))))
 
 ;;----------------------------------------------------------------------
@@ -2182,9 +2189,9 @@
   read-eval-print
   (lambda (fail)
     (set! load-stack '())
-    (let ((input-string (read-line "==> ")))
+    (let ((input (read-line "==> ")))
       (scan-input
-        input-string
+        input
         REP-handler
         fail
         (make-cont2 '<cont2-51>)))))
@@ -2633,10 +2640,6 @@
         ((null? (cddr args)) (range (car args) (cadr args) 1 '()))
         (else (range (car args) (cadr args) (caddr args) '()))))))
 
-(define make-external-proc
-  (lambda (external-function-object)
-    (make-proc '<proc-58> external-function-object)))
-
 (define Main
   (lambda filenames
     (printf "Calico Scheme (0.2)\n")
@@ -2648,30 +2651,42 @@
       REP-k)
     (trampoline)))
 
+(define make-external-proc
+  (lambda (external-function-object)
+    (make-proc '<proc-58> external-function-object)))
+
+(define reinitialize-globals
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env))
+    (set! load-stack '())
+    (set! last-fail REP-fail)))
+
 (define execute
-  (lambda (string)
+  (lambda (input)
     (set! load-stack '())
     (scan-input
-      string
-      init-handler2
-      init-fail
-      (make-cont2 '<cont2-88>))
+      input
+      REP-handler
+      last-fail
+      (make-cont2 '<cont2-51>))
     (trampoline)))
 
 (define execute-file
   (lambda (filename)
     (set! load-stack '())
-    (load-file filename toplevel-env init-handler2 init-fail
-      init-cont2)
+    (load-file filename toplevel-env REP-handler last-fail
+      REP-k)
     (trampoline)))
 
-(define try-parse-string
-  (lambda (string)
+(define try-parse
+  (lambda (input)
+    (set! load-stack '())
     (scan-input
-      string
-      init-handler2
-      init-fail
-      (make-cont2 '<cont2-89>))
+      input
+      try-parse-handler
+      REP-fail
+      (make-cont2 '<cont2-90>))
     (trampoline)))
 
 (define pattern?
@@ -2835,17 +2850,27 @@
 
 (define *need-newline* #f)
 
-(define REP-k (make-cont2 '<cont2-50>))
+(define scheme-REP-k (make-cont2 '<cont2-50>))
 
-(define REP-handler (make-handler2 '<handler2-2>))
+(define scheme-REP-handler (make-handler2 '<handler2-2>))
 
-(define REP-fail (make-fail '<fail-2>))
-
-(define load-stack '())
+(define scheme-REP-fail (make-fail '<fail-2>))
 
 (define length-prim (make-proc '<proc-3>))
 
 (define toplevel-env (make-toplevel-env))
 
+(define load-stack '())
+
 (define make-vector list->vector)
+
+(define REP-k (make-cont2 '<cont2-88>))
+
+(define REP-fail (make-fail '<fail-1>))
+
+(define REP-handler (make-handler2 '<handler2-6>))
+
+(define last-fail REP-fail)
+
+(define try-parse-handler (make-handler2 '<handler2-7>))
 

@@ -7,6 +7,7 @@
 ;; http://science.slc.edu/~jmarshall
 
 (case-sensitive #t)
+
 (load "parser-cps.ss")
 
 ;; default transformer settings
@@ -20,22 +21,63 @@
 ;; - no internal define/define*'s
 
 ;;-------------------------------------------------------------------------------
+;; recognized datatypes
 
 (define make-all-datatypes
   (lambda ()
     (list
-      (make-datatype 'continuation 'cont '((k k2) value))                         ;; removed REP-k from list
-      (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))         ;; added REP-k to list
-      (make-datatype 'continuation3 'cont3 '((k k2) value1 value2 value3))        ;; new
-      (make-datatype 'fail-continuation 'fail '((fail REP-fail)))                 ;; new
-      (make-datatype 'handler 'handler '((handler) exception))                    ;; removed REP-handler from list
-      (make-datatype 'handler2 'handler2 '((handler REP-handler) exception fail)) ;; new
-      (make-datatype 'procedure 'proc '((proc) args env2 handler fail k2))        ;; added fail
+      (make-datatype 'continuation 'cont '((k k2) value))
+      (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))
+      (make-datatype 'continuation3 'cont3 '((k k2) value1 value2 value3))
+      (make-datatype 'fail-continuation 'fail '((fail)))
+      (make-datatype 'handler 'handler '((handler) exception))
+      (make-datatype 'handler2 'handler2 '((handler) exception fail))
+      (make-datatype 'procedure 'proc '((proc) args env2 handler fail k2))
       (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer) datum k))
       )))
 
+;; determines the order of the free variables in data-structure records
 (define record-field-order '(formals runt body env env2 handler fail k k2))
 
+;;-------------------------------------------------------------------------------
+;; (make-datatype <long-name> <short-name> (<app-symbols> <arg1> <arg2> ...))
+;;
+;; <long-name> is the type tag for objects of this datatype.
+;;
+;; <short-name> is the basis for the record tags, the lambda form, and
+;; the name of the apply function for objects of this datatype.
+;;
+;; <app-symbols> is a list of all symbols used to refer to objects of
+;; this datatype in application expressions in the source code.  The
+;; first symbol in the list is used as the formal parameter for the
+;; datatype object in the apply function.
+;;
+;; <argN> are the names of the other formal parameters in the apply function.
+;;
+;;-------------------------------------------------------------------------------
+;; Example:
+;; (define record-field-order '(x y z))
+;; (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))
+;; generates the following code and code transformations:
+;;
+;; (define make-cont2
+;;   (lambda args
+;;     (cons 'continuation2 args)))
+;;
+;; (lambda-cont2 (a b) ...y x...)    transforms to  (make-cont2 '<cont2-1> x y)
+;; (lambda-cont2 (c d) ...z x y...)  transforms to  (make-cont2 '<cont2-2> x y z)
+;;
+;; (define* apply-cont2
+;;   (lambda (k value1 value2)
+;;     (record-case (cdr k)
+;;       (<cont2-1> (x y) ...)
+;;       (<cont2-2> (x y z) ...)
+;;       ...)))
+;;
+;; (k 1 2)      transforms to  (apply-cont2 k 1 2)
+;; (k2 a b)     transforms to  (apply-cont2 k2 a b)
+;; (REP-k c d)  transforms to  (apply-cont2 REP-k c d)
+;;
 ;;-------------------------------------------------------------------------------
 
 (define need-eopl-support? #f)

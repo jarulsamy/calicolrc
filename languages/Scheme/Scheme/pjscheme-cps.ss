@@ -1476,8 +1476,6 @@
 (load "environments-cps.ss")
 (load "parser-cps.ss")
 
-;;(case-sensitive #t)
-
 (define *need-newline* #f)
 
 (define pretty-print-prim
@@ -1505,22 +1503,20 @@
       (set! *need-newline* (true? (not (ends-with-newline? s))))
       (display s))))
 
-(define REP-k
+(define scheme-REP-k
   (lambda-cont2 (v fail)
     (if (not (eq? v '<void>))
 	(pretty-print-prim v))
     (if *need-newline* (newline))
     (read-eval-print fail)))
 
-(define REP-handler
+(define scheme-REP-handler
   (lambda-handler2 (e fail)
     (REP-k `(uncaught exception: ,e) fail)))
 
-(define REP-fail
+(define scheme-REP-fail
   (lambda-fail ()
     (REP-k "no more choices" REP-fail)))
-
-(define load-stack '())
 
 (define start
   (lambda ()
@@ -1535,7 +1531,6 @@
     (printf "Restarting...\n")
     (read-eval-print REP-fail)))
 
-;; scheme version of read-line
 (define read-line
   (lambda (prompt)
     (printf prompt)
@@ -1547,14 +1542,10 @@
 ;; is the list (+ 2 3), the string "(+ 2 3)" is returned; if the input
 ;; is the string "apple", the string "\"apple\"" is returned; etc.
 ;;
-;; the C# version of read-line should always return the input as a
-;; string, which may contain multiple sexps. if the input is a scheme
-;; string such as "apple", read-line should return the input with
-;; embedded double quotes such as "\"apple\"".
+;; raw-read-line is only for testing the evaluation of multiple sexps
+;; at once.  the user must type the input as a string enclosed by
+;; double quotes.
 
-;; raw-read-line is only for testing the scheme version of the code,
-;; and should not be converted to C#. the user must always type the
-;; input as a string. this allows multiple sexps to be input at once.
 (define raw-read-line
   (lambda (prompt)
     (printf prompt)
@@ -1568,8 +1559,8 @@
 (define* read-eval-print
   (lambda (fail)
     (set! load-stack '())  ;; in case a previous load encountered an error
-    (let ((input-string (read-line "==> ")))  ;; or raw-read-line
-      (scan-input input-string REP-handler fail
+    (let ((input (read-line "==> ")))  ;; or raw-read-line
+      (scan-input input REP-handler fail
 	(lambda-cont2 (tokens fail)
 	  (read-and-eval-sexps tokens toplevel-env REP-handler fail REP-k))))))
 
@@ -2165,6 +2156,8 @@
 	  (b_string (symbol->string b)))
       (string<? a_string b_string))))
 
+(define load-stack '())
+
 (define* load-file
   (lambda (filename env handler fail k)
     (cond
@@ -2217,15 +2210,8 @@
 	
 (define make-vector list->vector) ;; ignored in C#
 
-;;------------------------------------------------------------------------
-;; For C# only
-
-(define make-external-proc
-  (lambda (external-function-object)
-    (lambda-proc (args env2 handler fail k2)
-      (k2 (apply* external-function-object args) fail))))
-
-(define Main 
+;; not used
+(define Main
   (lambda filenames
     (printf "Calico Scheme (0.2)\n")
     (printf "(c) 2009-2011, IPRE\n")
@@ -2237,25 +2223,64 @@
     ;; starts the computation after registers are set up
     (trampoline)))
 
-(define execute
-  (lambda (string)
+;;------------------------------------------------------------------------
+;; C# support
+
+(define make-external-proc
+  (lambda (external-function-object)
+    (lambda-proc (args env2 handler fail k2)
+      (k2 (apply* external-function-object args) fail))))
+
+(define REP-k
+  (lambda-cont2 (result fail)
+    (set! last-fail fail)
+    (halt* result)))
+
+(define REP-fail
+  (lambda-fail ()
+    (halt* "no more choices")))
+
+(define REP-handler
+  (lambda-handler2 (e fail)
+    (set! last-fail fail)
+    (halt* (list 'exception e))))
+
+(define last-fail REP-fail)
+
+;; not used yet
+(define reinitialize-globals
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env))
     (set! load-stack '())
-    (scan-input string init-handler2 init-fail
+    (set! last-fail REP-fail)))
+
+(define execute
+  (lambda (input)
+    (set! load-stack '())
+    (scan-input input REP-handler last-fail
       (lambda-cont2 (tokens fail)
-	(read-and-eval-sexps tokens toplevel-env init-handler2 fail init-cont2)))
+	(read-and-eval-sexps tokens toplevel-env REP-handler fail REP-k)))
     (trampoline)))
 
 (define execute-file
   (lambda (filename)
     (set! load-stack '())
-    (load-file filename toplevel-env init-handler2 init-fail init-cont2)
+    (load-file filename toplevel-env REP-handler last-fail REP-k)
     (trampoline)))
 
-(define try-parse-string
-  (lambda (string)
-    (scan-input string init-handler2 init-fail
+(define try-parse-handler
+  (lambda-handler2 (e fail)
+    (halt* #f)))
+
+(define try-parse
+  (lambda (input)
+    (set! load-stack '())
+    (scan-input input try-parse-handler REP-fail
       (lambda-cont2 (tokens fail)
-	(parse-sexps tokens init-handler2 fail init-cont2)))
+	(parse-sexps tokens try-parse-handler fail
+	  (lambda-cont2 (result fail)
+	    (halt* #t)))))
     (trampoline)))
 
 ;;------------------------------------------------------------------------

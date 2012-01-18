@@ -1,5 +1,5 @@
 (load "rm-transformer.ss")
-(compile-level-output)
 (delete-file "pjscheme-rm.ss")
+(compile-level-output)
 (rm-transform-file "pjscheme-ds.ss" "pjscheme-rm.ss")
 (exit)

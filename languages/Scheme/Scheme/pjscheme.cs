@@ -1658,17 +1658,18 @@ public class PJScheme:Scheme {
 	    filenames_reg = PJScheme.cdr((object) filenames);
 	    pc = (Function) load_files;
 	 } else if (true_q(PJScheme.Eq((object) PJScheme.car((object) temp_1), (object) symbol("<cont2-88>")))) {
-	    k_reg = init_cont2;
-	    fail_reg = value2_reg;
-	    handler_reg = init_handler2;
-	    env_reg = toplevel_env;
-	    tokens_reg = value1_reg;
-	    pc = (Function) read_and_eval_sexps;
+	    last_fail = value2_reg;
+	    final_reg = value1_reg;
+	    pc = null;
 
 	 } else if (true_q(PJScheme.Eq((object) PJScheme.car((object) temp_1), (object) symbol("<cont2-89>")))) {
-	    k_reg = init_cont2;
+	    final_reg = true;
+	    pc = null;
+
+	 } else if (true_q(PJScheme.Eq((object) PJScheme.car((object) temp_1), (object) symbol("<cont2-90>")))) {
+	    k_reg = PJScheme.make_cont2((object) symbol("<cont2-89>"));
 	    fail_reg = value2_reg;
-	    handler_reg = init_handler2;
+	    handler_reg = try_parse_handler;
 	    tokens_reg = value1_reg;
 	    pc = (Function) parse_sexps;
 
@@ -1998,6 +1999,15 @@ public class PJScheme:Scheme {
 		  pc = (Function) eval_sequence;
 	       }
 	    }
+	 } else if (true_q(PJScheme.Eq((object) PJScheme.car((object) temp_1), (object) symbol("<handler2-6>")))) {
+	    last_fail = fail_reg;
+	    final_reg = PJScheme.list((object) symbol("exception"), (object) exception_reg);
+	    pc = null;
+
+	 } else if (true_q(PJScheme.Eq((object) PJScheme.car((object) temp_1), (object) symbol("<handler2-7>")))) {
+	    final_reg = false;
+	    pc = null;
+
 	 } else
 	    throw new Exception(format(symbol("apply-handler2") + ": " + "bad handler2: ~a", handler_reg));
       }
@@ -4090,29 +4100,14 @@ public class PJScheme:Scheme {
 
    }
 
-   new public static void start() {
-      toplevel_env = PJScheme.make_toplevel_env();
-      macro_env = PJScheme.make_macro_env();
-      fail_reg = REP_fail;
-      pc = (Function) read_eval_print;
-
-   }
-
-   new public static void restart() {
-      PJScheme.printf((object) "Restarting...\n");
-      fail_reg = REP_fail;
-      pc = (Function) read_eval_print;
-
-   }
-
    new public static void read_eval_print() {
       load_stack = EmptyList;
       {
-	 object input_string = null;
-	        input_string = PJScheme.read_line((object) "==> ");
+	 object input = null;
+	        input = PJScheme.read_line((object) "==> ");
 	        k_reg = PJScheme.make_cont2((object) symbol("<cont2-51>"));
 	        handler_reg = REP_handler;
-	        input_reg = input_string;
+	        input_reg = input;
 	        pc = (Function) scan_input;
       }
 
@@ -4761,47 +4756,41 @@ public class PJScheme:Scheme {
       return ((object) PJScheme.make_proc((object) symbol("<proc-58>"), (object) external_function_object));
    }
 
-   new public static void Main(string[] filenames) {
-      PJScheme.printf((object) "Calico Scheme (0.2)\n");
-      PJScheme.printf((object) "(c) 2009-2011, IPRE\n");
+   new public static void reinitialize_globals() {
       toplevel_env = PJScheme.make_toplevel_env();
       macro_env = PJScheme.make_macro_env();
       load_stack = EmptyList;
-      k_reg = REP_k;
-      fail_reg = REP_fail;
-      handler_reg = REP_handler;
-      env_reg = toplevel_env;
-      filenames_reg = filenames;
-      pc = (Function) load_files;
-      PJScheme.trampoline();
+      last_fail = REP_fail;
+
    }
 
-   new public static object execute(string make_string) {
+   new public static object execute(string input) {
       load_stack = EmptyList;
-      k_reg = PJScheme.make_cont2((object) symbol("<cont2-88>"));
-      fail_reg = init_fail;
-      handler_reg = init_handler2;
-      input_reg = make_string;
+      k_reg = PJScheme.make_cont2((object) symbol("<cont2-51>"));
+      fail_reg = last_fail;
+      handler_reg = REP_handler;
+      input_reg = input;
       pc = (Function) scan_input;
       return ((object) PJScheme.trampoline());
    }
 
    new public static void execute_file(string filename) {
       load_stack = EmptyList;
-      k_reg = init_cont2;
-      fail_reg = init_fail;
-      handler_reg = init_handler2;
+      k_reg = REP_k;
+      fail_reg = last_fail;
+      handler_reg = REP_handler;
       env_reg = toplevel_env;
       filename_reg = filename;
       pc = (Function) load_file;
       PJScheme.trampoline();
    }
 
-   new public static object try_parse_string(object make_string) {
-      k_reg = PJScheme.make_cont2((object) symbol("<cont2-89>"));
-      fail_reg = init_fail;
-      handler_reg = init_handler2;
-      input_reg = make_string;
+   new public static object try_parse(object input) {
+      load_stack = EmptyList;
+      k_reg = PJScheme.make_cont2((object) symbol("<cont2-90>"));
+      fail_reg = REP_fail;
+      handler_reg = try_parse_handler;
+      input_reg = input;
       pc = (Function) scan_input;
       return ((object) PJScheme.trampoline());
    }
@@ -4978,12 +4967,14 @@ public class PJScheme:Scheme {
    static Func < object, bool > try_q = PJScheme.tagged_list((object) symbol("try"), (Predicate2) GreaterOrEqual, (object) 2);
    static Func < object, bool > catch_q = PJScheme.tagged_list((object) symbol("catch"), (Predicate2) GreaterOrEqual, (object) 3);
    static Func < object, bool > finally_q = PJScheme.tagged_list((object) symbol("finally"), (Predicate2) GreaterOrEqual, (object) 2);
-   static object REP_k = PJScheme.make_cont2((object) symbol("<cont2-50>"));
-   static object REP_handler = PJScheme.make_handler2((object) symbol("<handler2-2>"));
-   static object REP_fail = PJScheme.make_fail((object) symbol("<fail-2>"));
-   static object load_stack = EmptyList;
    static object length_prim = PJScheme.make_proc((object) symbol("<proc-3>"));
    static object toplevel_env = PJScheme.make_toplevel_env();
+   static object load_stack = EmptyList;
+   static object REP_k = PJScheme.make_cont2((object) symbol("<cont2-88>"));
+   static object REP_fail = PJScheme.make_fail((object) symbol("<fail-1>"));
+   static object REP_handler = PJScheme.make_handler2((object) symbol("<handler2-6>"));
+   static object last_fail = REP_fail;
+   static object try_parse_handler = PJScheme.make_handler2((object) symbol("<handler2-7>"));
 
 
    new public static object trampoline() {

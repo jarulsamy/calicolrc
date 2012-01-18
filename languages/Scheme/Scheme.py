@@ -36,6 +36,7 @@ class SchemeEngine(Engine):
         self.engine = PJScheme
 
     def execute(self, text):
+        print "YOWZA! calling python execute method..."
         result = self.engine.execute(text)
         # FIXME: when exceptions have a better format in Scheme:
         result = "%s" % result

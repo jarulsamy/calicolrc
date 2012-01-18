@@ -10,6 +10,8 @@
 ;; - define* functions will be converted to 0 arguments
 ;; - no internal define/define*'s
 
+(case-sensitive #t)
+
 (load "ds-transformer.ss")
 
 ;; default transformer settings

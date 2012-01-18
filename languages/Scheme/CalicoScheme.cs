@@ -60,7 +60,7 @@ public class CalicoSchemeEngine : Engine
       return true; // force it
     }
     // else, only if valid parse
-    string retval = PJScheme.try_parse_string(text).ToString();
+    string retval = PJScheme.try_parse(text).ToString();
     // FIXME: when exceptions have a better format in Scheme:
     return (!retval.StartsWith("(exception "));
   }

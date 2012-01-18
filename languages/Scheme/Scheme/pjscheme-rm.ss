@@ -1574,22 +1574,25 @@
                                                                                                                                                                                                                                                                                                                                                                     (set! pc load-files))
                                                                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-88>)
                                                                                                                                                                                                                                                                                                                                                                       (begin
-                                                                                                                                                                                                                                                                                                                                                                        (set! k_reg init-cont2)
-                                                                                                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                        (set! handler_reg init-handler2)
-                                                                                                                                                                                                                                                                                                                                                                        (set! env_reg toplevel-env)
-                                                                                                                                                                                                                                                                                                                                                                        (set! tokens_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                                                                        (set! pc read-and-eval-sexps))
+                                                                                                                                                                                                                                                                                                                                                                        (set! last-fail value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                        (set! final_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                                                                        (set! pc #f))
                                                                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-89>)
                                                                                                                                                                                                                                                                                                                                                                           (begin
-                                                                                                                                                                                                                                                                                                                                                                            (set! k_reg init-cont2)
-                                                                                                                                                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                            (set! handler_reg init-handler2)
-                                                                                                                                                                                                                                                                                                                                                                            (set! tokens_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                                                                            (set! pc parse-sexps))
-                                                                                                                                                                                                                                                                                                                                                                          (error 'apply-cont2
-                                                                                                                                                                                                                                                                                                                                                                            "bad continuation2: ~a"
-                                                                                                                                                                                                                                                                                                                                                                            k_reg)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                                                                                                                                                                                                                                                            (set! final_reg #t)
+                                                                                                                                                                                                                                                                                                                                                                            (set! pc #f))
+                                                                                                                                                                                                                                                                                                                                                                          (if (eq? (car temp_1) '<cont2-90>)
+                                                                                                                                                                                                                                                                                                                                                                              (begin
+                                                                                                                                                                                                                                                                                                                                                                                (set! k_reg
+                                                                                                                                                                                                                                                                                                                                                                                  (make-cont2 '<cont2-89>))
+                                                                                                                                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                                (set! handler_reg
+                                                                                                                                                                                                                                                                                                                                                                                  try-parse-handler)
+                                                                                                                                                                                                                                                                                                                                                                                (set! tokens_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                                                                                (set! pc parse-sexps))
+                                                                                                                                                                                                                                                                                                                                                                              (error 'apply-cont2
+                                                                                                                                                                                                                                                                                                                                                                                "bad continuation2: ~a"
+                                                                                                                                                                                                                                                                                                                                                                                k_reg))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 (define make-cont3
   (lambda args (return* (cons 'continuation3 args))))
@@ -1884,9 +1887,16 @@
                                 (set! env_reg new-env)
                                 (set! exps_reg cexps)
                                 (set! pc eval-sequence))))
-                          (error 'apply-handler2
-                            "bad handler2: ~a"
-                            handler_reg)))))))))
+                          (if (eq? (car temp_1) '<handler2-6>)
+                              (begin
+                                (set! last-fail fail_reg)
+                                (set! final_reg (list 'exception exception_reg))
+                                (set! pc #f))
+                              (if (eq? (car temp_1) '<handler2-7>)
+                                  (begin (set! final_reg #f) (set! pc #f))
+                                  (error 'apply-handler2
+                                    "bad handler2: ~a"
+                                    handler_reg)))))))))))
 
 (define make-proc
   (lambda args (return* (cons 'procedure args))))
@@ -4068,11 +4078,11 @@
   read-eval-print
   (lambda ()
     (set! load-stack '())
-    (let ((input-string 'undefined))
-      (set! input-string (read-line "==> "))
+    (let ((input 'undefined))
+      (set! input (read-line "==> "))
       (set! k_reg (make-cont2 '<cont2-51>))
       (set! handler_reg REP-handler)
-      (set! input_reg input-string)
+      (set! input_reg input)
       (set! pc scan-input))))
 
 (define*
@@ -4765,10 +4775,6 @@
               (return*
                 (range (car args) (cadr args) (caddr args) '())))))))
 
-(define make-external-proc
-  (lambda (external-function-object)
-    (return* (make-proc '<proc-58> external-function-object))))
-
 (define Main
   (lambda filenames
     (printf "Calico Scheme (0.2)\n")
@@ -4784,33 +4790,45 @@
     (set! pc load-files)
     (return* (trampoline))))
 
-(define execute
-  (lambda (string)
+(define make-external-proc
+  (lambda (external-function-object)
+    (return* (make-proc '<proc-58> external-function-object))))
+
+(define reinitialize-globals
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env))
     (set! load-stack '())
-    (set! k_reg (make-cont2 '<cont2-88>))
-    (set! fail_reg init-fail)
-    (set! handler_reg init-handler2)
-    (set! input_reg string)
+    (set! last-fail REP-fail)))
+
+(define execute
+  (lambda (input)
+    (set! load-stack '())
+    (set! k_reg (make-cont2 '<cont2-51>))
+    (set! fail_reg last-fail)
+    (set! handler_reg REP-handler)
+    (set! input_reg input)
     (set! pc scan-input)
     (return* (trampoline))))
 
 (define execute-file
   (lambda (filename)
     (set! load-stack '())
-    (set! k_reg init-cont2)
-    (set! fail_reg init-fail)
-    (set! handler_reg init-handler2)
+    (set! k_reg REP-k)
+    (set! fail_reg last-fail)
+    (set! handler_reg REP-handler)
     (set! env_reg toplevel-env)
     (set! filename_reg filename)
     (set! pc load-file)
     (return* (trampoline))))
 
-(define try-parse-string
-  (lambda (string)
-    (set! k_reg (make-cont2 '<cont2-89>))
-    (set! fail_reg init-fail)
-    (set! handler_reg init-handler2)
-    (set! input_reg string)
+(define try-parse
+  (lambda (input)
+    (set! load-stack '())
+    (set! k_reg (make-cont2 '<cont2-90>))
+    (set! fail_reg REP-fail)
+    (set! handler_reg try-parse-handler)
+    (set! input_reg input)
     (set! pc scan-input)
     (return* (trampoline))))
 
@@ -5012,19 +5030,29 @@
 
 (define *need-newline* #f)
 
-(define REP-k (make-cont2 '<cont2-50>))
+(define scheme-REP-k (make-cont2 '<cont2-50>))
 
-(define REP-handler (make-handler2 '<handler2-2>))
+(define scheme-REP-handler (make-handler2 '<handler2-2>))
 
-(define REP-fail (make-fail '<fail-2>))
-
-(define load-stack '())
+(define scheme-REP-fail (make-fail '<fail-2>))
 
 (define length-prim (make-proc '<proc-3>))
 
 (define toplevel-env (make-toplevel-env))
 
+(define load-stack '())
+
 (define make-vector list->vector)
+
+(define REP-k (make-cont2 '<cont2-88>))
+
+(define REP-fail (make-fail '<fail-1>))
+
+(define REP-handler (make-handler2 '<handler2-6>))
+
+(define last-fail REP-fail)
+
+(define try-parse-handler (make-handler2 '<handler2-7>))
 
 ;; the trampoline
 (define trampoline

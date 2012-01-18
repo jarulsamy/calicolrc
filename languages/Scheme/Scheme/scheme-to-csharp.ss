@@ -17,8 +17,15 @@
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
 (define *ignore-functions* '(
-			     read-content 
+			     scheme-REP-k
+			     scheme-REP-handler
+			     scheme-REP-fail
+			     start
+			     restart
 			     read-line
+			     raw-read-line
+			     Main
+			     read-content 
 			     string->integer 
 			     string->decimal 
 			     string->rational
@@ -39,7 +46,6 @@
 			     make-binding
                              dlr-env-lookup
                              dlr-env-contains
-			     raw-read-line
 			     ))
 (define *function-signatures* '())
 
