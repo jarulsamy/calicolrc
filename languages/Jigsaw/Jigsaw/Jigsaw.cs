@@ -54,7 +54,7 @@ namespace Jigsaw
 		private string _modulePath = null;
 		
 		// Reference to block panel
-		private Widgets.CBlockPalette pnlBlock = null;
+		internal Widgets.CBlockPalette pnlBlock = null;
 		
 		private List<Widgets.CRoundedTab> allTabs = null;
 		
@@ -958,7 +958,35 @@ namespace Jigsaw
 			b.Deselect(cvs);
 			b.Deactivate(cvs);
 			b.Disconnect();
+			b.StopOutline (cvs);
 			cvs.DeleteShape(b);
+		}
+		
+		// - - - Delete an entire stack of block given block that istop of stack - - - - -
+		public void DeleteStack(CBlock block)
+		{
+			CBlock top = block.StackTop;
+			
+			// Maintain a stack of blocks to be deleted and we progress down through the tree
+			List<CBlock> toDelete = new List<CBlock>();
+			toDelete.Add(block);
+			
+			while (toDelete.Count > 0) {
+				// Get the block on top of the stack
+				CBlock nextBlock = toDelete[0];
+				toDelete.RemoveAt(0);
+				
+				// Add all output child blocks to list of blocks to be deleted
+				foreach (CEdge e in nextBlock.Edges) {
+					if ( e.Type != EdgeType.In && e.IsConnected ) 
+						toDelete.Add(e.LinkedTo.Block);
+				}
+				
+				// Delete the block
+				this.DeleteBlock(nextBlock);
+			}
+			
+			top.RepositionBlocks(null);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2386,9 +2414,27 @@ namespace Jigsaw
 			// First get the stack top
 			CBlock top = this.StackTop;
 			
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
+			
+			// Ask to delete the block
+			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+				toplevel,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				"Delete the selected block?");
+			dlg.Title = "Delete Block?";
+			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			dlg.Destroy();
+			if (rsp == Gtk.ResponseType.No) return;
+			
+			// Delete and reposition what's left
 			(_cvs as Canvas).DeleteBlock(this);
 			if (top != this) top.RepositionBlocks(null);
 			
+			// Redraw
 			_cvs.Invalidate();
 			_cvs = null;
 		}
@@ -2396,30 +2442,23 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnDeleteStack(object sender, EventArgs evt)
 		{
-			// First get the stack top
-			CBlock top = this.StackTop;
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
 			
-			// Maintain a stack of blocks to be deleted and we progress down through the tree
-			List<CBlock> toDelete = new List<CBlock>();
-			toDelete.Add(this);
+			// Ask to delete the block
+			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+				toplevel,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				"Delete the selected block and all blocks below it in its stack?");
+			dlg.Title = "Delete Stack?";
+			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			dlg.Destroy();
+			if (rsp == Gtk.ResponseType.No) return;
 			
-			while (toDelete.Count > 0) {
-				// Get the block on top of the stack
-				CBlock nextBlock = toDelete[0];
-				toDelete.RemoveAt(0);
-				
-				// Add all output child blocks to list of blocks to be deleted
-				foreach (CEdge e in nextBlock.Edges) {
-					if ( e.Type != EdgeType.In && e.IsConnected ) 
-						toDelete.Add(e.LinkedTo.Block);
-				}
-				
-				// Delete the block
-				(_cvs as Canvas).DeleteBlock(nextBlock);
-			}
-			
-			if (top != this) top.RepositionBlocks(null);
-			
+			(_cvs as Canvas).DeleteStack(this);
 			_cvs.Invalidate();
 			_cvs = null;
 		}
@@ -2472,14 +2511,36 @@ namespace Jigsaw
 			CBlock dropped = null;
 			CBlock linked = null;
 			
+			// Get jigsaw canvas
+			Jigsaw.Canvas js = (Jigsaw.Canvas)cvs;
+			
 			// If not a factory, move the block
 			if (!this.IsFactory) {
+				
+				// Move the block
 				this.MatchOutline(cvs);
-				dropped = this;
+				
+				// If dropped on the palette, delete the block
+				if (js.pnlBlock.ContainsPoint( this.Center.X, this.Center.Y, js )) {
+					_cvs = js;
+					this.OnDeleteStack(null, null);
+					//js.DeleteStack(this);
+					return;
+					
+				} else {
+					// Otherwise, set dropped varuiable and continue
+					dropped = this;
+				}
+				
 			} else {
-				// When a factory object is dropped, create a new instance.
-				dropped = (CBlock)this.Clone(this.Outline.Left, this.Outline.Top);
-				cvs.AddShape( dropped );
+				// If a factory block is dropped on the palette, do nothing
+				if (js.pnlBlock.ContainsPoint( this.Outline.Left, this.Outline.Top, js)) {
+					return;
+				} else {
+					// When a factory object is dropped, create a new instance.
+					dropped = (CBlock)this.Clone(this.Outline.Left, this.Outline.Top);
+					cvs.AddShape( dropped );
+				}
 			}
 			
 			// Deselect all shapes including factory and select dropped block
