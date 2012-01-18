@@ -1162,7 +1162,6 @@ namespace Calico {
                 PauseButton.Sensitive = true;
             } else if (CurrentDocument != null && CurrentDocument.HasBreakpointSet) {
                 PauseButton.Sensitive = true;
-                PlayButton.Sensitive = true;
             }
         }
 
