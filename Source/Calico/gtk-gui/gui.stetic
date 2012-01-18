@@ -365,6 +365,7 @@
       </action>
       <action id="ToggleBreakpointAction">
         <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;period</property>
         <property name="Label" translatable="yes">Toggle Breakpoint</property>
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />

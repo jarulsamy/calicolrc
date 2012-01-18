@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 
 namespace Calico {
     public class Document {
@@ -255,6 +256,8 @@ namespace Calico {
         }
         public virtual void SearchStop() {
         }
+        public virtual void ToggleBreakpoint() {
+        }
     }
 
     public class TextDocument : Document {
@@ -405,6 +408,28 @@ namespace Calico {
                 texteditor.ScrollToCaret();
             }
             return (search_result != null);
+        }
+
+        public MonoDevelop.Debugger.DebugTextMarker GetBreakpointAtLine(int lineno) {
+            Mono.TextEditor.LineSegment lineSegment = texteditor.GetLine(lineno);
+            if (lineSegment.MarkerCount == 1) {
+                List<object> list = new List<object>(lineSegment.Markers);
+                return (MonoDevelop.Debugger.DebugTextMarker)list[0];
+            }
+            return null;
+        }
+
+        public override void ToggleBreakpoint() {
+            // First, find out what line we are on
+            int lineno = texteditor.Caret.Line;
+            // Is there a breakpoint there?
+            MonoDevelop.Debugger.DebugTextMarker marker = GetBreakpointAtLine(lineno);
+            if (marker != null) {
+                texteditor.Document.RemoveMarker(marker, true);
+            } else {
+                marker = new MonoDevelop.Debugger.BreakpointTextMarker(texteditor, true);
+                texteditor.Document.AddMarker(lineno, marker);
+            }
         }
     }
 }

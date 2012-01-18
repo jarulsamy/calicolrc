@@ -293,7 +293,7 @@ namespace Calico
 			w1.Add (this.OptionsAction, null);
 			this.ToggleBreakpointAction = new global::Gtk.Action ("ToggleBreakpointAction", global::Mono.Unix.Catalog.GetString ("Toggle Breakpoint"), null, null);
 			this.ToggleBreakpointAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Toggle Breakpoint");
-			w1.Add (this.ToggleBreakpointAction, null);
+			w1.Add (this.ToggleBreakpointAction, "<Control><Mod2>period");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "Calico.MainWindow";
