@@ -18,114 +18,138 @@
 // 
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Calico;
 
-namespace CalicoPython {
-
-	public class CalicoPythonEngine : DLREngine {
+namespace CalicoPython
+{
+	public class CalicoPythonEngine : DLREngine
+	{
 	
-	    public CalicoPythonEngine(LanguageManager manager) : base(manager) {
-	        dlr_name = "py";
-	        scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
-	        languageSetup = IronPython.Hosting.Python.CreateLanguageSetup(null);
-	        // Set LanguageSetup options here:
-	        languageSetup.Options["FullFrames"] = true; // for debugging
-	        scriptRuntimeSetup.LanguageSetups.Add(languageSetup); // add to local
-	        // Create a Python-only scope:
-			scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
-	        scope = scriptRuntime.CreateScope();
-	    }
+		public CalicoPythonEngine (LanguageManager manager) : base(manager)
+		{
+			dlr_name = "py";
+			scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup ();
+			languageSetup = IronPython.Hosting.Python.CreateLanguageSetup (null);
+			// Set LanguageSetup options here:
+			languageSetup.Options ["FullFrames"] = true; // for debugging
+			scriptRuntimeSetup.LanguageSetups.Add (languageSetup); // add to local
+			// Create a Python-only scope:
+			scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime (scriptRuntimeSetup);
+			scope = scriptRuntime.CreateScope ();
+		}
 	
-	    public override void Start() {
-	        // Get engine from manager:
+		public override void Start ()
+		{
+			// Get engine from manager:
 			if (manager != null) {
-	        	engine = manager.scriptRuntime.GetEngine(dlr_name);  
-		    } else {
-				engine = scriptRuntime.GetEngine(dlr_name);  
+				engine = manager.scriptRuntime.GetEngine (dlr_name);  
+			} else {
+				engine = scriptRuntime.GetEngine (dlr_name);  
 			}
-	        // Set the compiler options here:
-	        compiler_options = engine.GetCompilerOptions();
-	        IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
-	        options.PrintFunction = true;
-	        options.AllowWithStatement = true;
-	        options.TrueDivision = true;
+			// Set the compiler options here:
+			compiler_options = engine.GetCompilerOptions ();
+			IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
+			options.PrintFunction = true;
+			options.AllowWithStatement = true;
+			options.TrueDivision = true;
 			// FIXME: before a executefile, __name__ is "__builtin__";
 			//        after it is "<module>"
 			// FIXME: this doesn't work:
 			//options.ModuleName = "__main__";
-            //options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
+			//options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
 			// Set paths:
-			ICollection<string> paths = engine.GetSearchPaths();
-	        // Let users find Calico modules:
-	        foreach (string folder in new string[] { "modules", "src" }) {
-		  		paths.Add(Path.GetFullPath(folder));
-	        }
-	        engine.SetSearchPaths(paths);
-	    }
+			ICollection<string > paths = engine.GetSearchPaths ();
+			// Let users find Calico modules:
+			foreach (string folder in new string[] { "modules", "src" }) {
+				paths.Add (Path.GetFullPath (folder));
+			}
+			engine.SetSearchPaths (paths);
+		}
 		
-		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack(
+		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack (
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
-				  string ttype, object retval) {
-		  Calico.MainWindow.Invoke( delegate {
-		      if (calico.CurrentDocument != null && calico.CurrentDocument.filename == frame.f_code.co_filename)
-			  	calico.CurrentDocument.GotoLine((int)frame.f_lineno);
-		      calico.UpdateLocal(frame);
-		    });
-		  if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument != null && calico.CurrentDocument.HasBreakpointSetAtLine((int)frame.f_lineno)) {
-		    calico.playResetEvent.WaitOne();
-		    if (calico.ProgramSpeed.Value == 0) {
-		      calico.playResetEvent.Reset();
-		    }
-		  } else {
-		    int pause = (int)((100 - calico.ProgramSpeed.Value)/100.0 * 1000);
-		    // Force at least a slight sleep, else no GUI controls
-		    System.Threading.Thread.Sleep(Math.Max(pause, 1));
-		  }
-		  return OnTraceBack;
+				  string ttype, object retval)
+		{
+			Calico.MainWindow.Invoke (delegate {
+				if (calico.CurrentDocument != null 
+					&& calico.CurrentDocument.filename == frame.f_code.co_filename
+					&& calico.ProgramSpeed.Value != 100) {
+					Console.Error.WriteLine(calico.ProgramSpeed.Value);
+					calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
+				}
+				calico.UpdateLocal (frame);
+			});
+			if (calico.CurrentDocument != null && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
+				calico.ProgramSpeed.Value = 0;
+				calico.PlayButton.Sensitive = true;
+				calico.PauseButton.Sensitive = false;
+				calico.playResetEvent.WaitOne ();				
+				if (calico.ProgramSpeed.Value == 0) {
+					calico.playResetEvent.Reset ();
+				}
+			} else if (calico.ProgramSpeed.Value == 0) {
+				calico.playResetEvent.WaitOne ();
+				if (calico.ProgramSpeed.Value == 0) {
+					calico.playResetEvent.Reset ();
+				}
+			} else {
+				int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
+				// Force at least a slight sleep, else no GUI controls
+				System.Threading.Thread.Sleep (Math.Max (pause, 1));
+			}
+			return OnTraceBack;
 		}
 		
-		public override object GetDefaultContext() {
-	        return IronPython.Runtime.DefaultContext.Default;
+		public override object GetDefaultContext ()
+		{
+			return IronPython.Runtime.DefaultContext.Default;
 		}
 		
-		public override void ConfigureTrace() {
-		   if (trace)
-	            IronPython.Hosting.Python.SetTrace(engine, OnTraceBack);
+		public override void ConfigureTrace ()
+		{
+			if (trace)
+				IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
 		}
 	}
 
+	public class CalicoPythonDocument : TextDocument
+	{
 
-	public class CalicoPythonDocument : TextDocument {
+		public CalicoPythonDocument (MainWindow calico, string filename, string language, string mimetype) :
+            	   base(calico, filename, language, mimetype)
+		{
+		}
 
-	    public CalicoPythonDocument(MainWindow calico, string filename, string language, string mimetype) :
-            	   base(calico, filename, language, mimetype) {
-            }
-
-	    public override void UseLibrary(string fullname) {
-		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
-                texteditor.Insert(0, String.Format("import {0}\n", bname));
-            }
-        }
+		public override void UseLibrary (string fullname)
+		{
+			string bname = System.IO.Path.GetFileNameWithoutExtension (fullname);
+			texteditor.Insert (0, String.Format ("import {0}\n", bname));
+		}
+	}
 	
-	public class CalicoPythonLanguage : Language {
-		public CalicoPythonLanguage() : 
-			base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python") {
-	    }
+	public class CalicoPythonLanguage : Language
+	{
+		public CalicoPythonLanguage () : 
+			base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python")
+		{
+		}
 		
-  	    public override void MakeEngine(LanguageManager manager) {
-	        engine = new CalicoPythonEngine(manager);
-	    }
+		public override void MakeEngine (LanguageManager manager)
+		{
+			engine = new CalicoPythonEngine (manager);
+		}
 
-            public override Document MakeDocument(MainWindow calico, string filename) {
-            	return new CalicoPythonDocument(calico, filename, name, mimetype);
-            }
+		public override Document MakeDocument (MainWindow calico, string filename)
+		{
+			return new CalicoPythonDocument (calico, filename, name, mimetype);
+		}
 
-	    public static new Language MakeLanguage() {
-	        return new CalicoPythonLanguage();
-	    }
+		public static new Language MakeLanguage ()
+		{
+			return new CalicoPythonLanguage ();
+		}
 	}
 }
