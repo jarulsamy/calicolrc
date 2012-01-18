@@ -89,25 +89,29 @@ public class CalicoJigsawDocument : Document
 		cvs.DoZoom (1.0 / 1.05);
 	}
 
-        public override void Export(Calico.MainWindow calico) {
-	  //string filename = cvs.Export();
-	  //calico.SelectOrOpen(filename);
+    public override void Export(Calico.MainWindow calico) {
+	  	string filename = cvs.Export();
+	  	calico.Open(filename);
 	}
        
-        public override bool SaveDocument() {
+    public override bool SaveDocument() {
 	  return cvs.SaveDocument(filename);
 	}
 
-        public override bool SearchMore(string s) {
+    public override bool SearchMore(string s) {
 	  return cvs.SearchMore(s);
 	}
 
-        public override bool SearchNext(string s) {
+    public override bool SearchNext(string s) {
 	  return cvs.SearchNext(s);
 	}
 
-        public override bool SearchPrevious(string s) {
+    public override bool SearchPrevious(string s) {
 	  return cvs.SearchPrevious(s);
+	}
+	
+	public override void UseLibrary(string filename) {
+		cvs.UseLibrary(filename);
 	}
 }
 
