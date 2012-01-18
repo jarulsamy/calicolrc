@@ -1160,6 +1160,9 @@ namespace Calico {
                 PlayButton.Sensitive = true;
             } else if (ProgramSpeed.Value < 100) {
                 PauseButton.Sensitive = true;
+            } else if (CurrentDocument != null && CurrentDocument.HasBreakpointSet) {
+                PauseButton.Sensitive = true;
+                PlayButton.Sensitive = true;
             }
         }
 
@@ -1353,7 +1356,7 @@ namespace Calico {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
-                    if (ProgramSpeed.Value < 100) {
+                    if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
                         // FIXME: Let Document handle tracing, call Document.ExecuteFileWithTrace
                         SetLanguage(CurrentLanguage);
                         manager[CurrentLanguage].engine.SetTraceOn(this);

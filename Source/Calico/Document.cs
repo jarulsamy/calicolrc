@@ -258,6 +258,12 @@ namespace Calico {
         }
         public virtual void ToggleBreakpoint() {
         }
+        public virtual bool HasBreakpointSet {
+            get { return false; }
+        }
+        public virtual bool HasBreakpointSetAtLine(int lineno) {
+            return false;
+        }
     }
 
     public class TextDocument : Document {
@@ -418,7 +424,7 @@ namespace Calico {
             }
             return null;
         }
-
+        private int breakpointCount = 0;
         public override void ToggleBreakpoint() {
             // First, find out what line we are on
             int lineno = texteditor.Caret.Line;
@@ -426,10 +432,19 @@ namespace Calico {
             MonoDevelop.Debugger.DebugTextMarker marker = GetBreakpointAtLine(lineno);
             if (marker != null) {
                 texteditor.Document.RemoveMarker(marker, true);
+                breakpointCount--;
             } else {
                 marker = new MonoDevelop.Debugger.BreakpointTextMarker(texteditor, true);
                 texteditor.Document.AddMarker(lineno, marker);
+                breakpointCount++;
             }
+        }
+
+        public override bool HasBreakpointSet {
+            get { return breakpointCount > 0; }
+        }
+        public override bool HasBreakpointSetAtLine(int lineno) {
+            return GetBreakpointAtLine(lineno) != null;
         }
     }
 }

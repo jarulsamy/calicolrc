@@ -2,9 +2,32 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Calico/MainWindow.cs">
     <Files>
-      <File FileName="Calico/MainWindow.cs" Line="81" Column="34" />
-      <File FileName="../languages/Python/CalicoPython.cs" Line="74" Column="18" />
+      <File FileName="Calico/MainWindow.cs" Line="1164" Column="1" />
+      <File FileName="../languages/Python/CalicoPython.cs" Line="80" Column="44" />
+      <File FileName="Calico/TabCompletion.cs" Line="54" Column="10" />
+      <File FileName="Calico/Engine.cs" Line="100" Column="29" />
+      <File FileName="Calico/LanguageManager.cs" Line="68" Column="1" />
+      <File FileName="Calico/Document.cs" Line="404" Column="20" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Calico" expanded="True">
+            <Node name="MainWindow.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>value</Value>
+          <Value>part</Value>
+          <Value>type</Value>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

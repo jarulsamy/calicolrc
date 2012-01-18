@@ -75,7 +75,7 @@ namespace CalicoPython {
 			  	calico.CurrentDocument.GotoLine((int)frame.f_lineno);
 		      calico.UpdateLocal(frame);
 		    });
-		  if (calico.ProgramSpeed.Value == 0) {
+		  if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument != null && calico.CurrentDocument.HasBreakpointSetAtLine((int)frame.f_lineno)) {
 		    calico.playResetEvent.WaitOne();
 		    if (calico.ProgramSpeed.Value == 0) {
 		      calico.playResetEvent.Reset();

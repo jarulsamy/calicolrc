@@ -79,6 +79,18 @@ namespace Jigsaw
 			}
 		}
 		
+		private string paramListStringNames
+		{
+			get {
+				List<String> paramlist = new List<String>();
+				foreach (string pname in param_names) {
+					if (_properties.ContainsKey(pname)) 
+						paramlist.Add (pname);
+				}
+				return String.Join (", ", paramlist);
+			}
+		}
+
 		// - - - 
 	    public void setValues(string assembly_name, 
 				  string type_name, 
@@ -149,9 +161,17 @@ namespace Jigsaw
 			
 			// Build string to display in block
 			if (varname.Length > 0) {
-				this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListString);
-			} else {
-				this.Text = String.Format("{0}({1})", method_name, paramListString);
+				if (IsFactory) {
+					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListStringNames);
+				} else {
+					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListString);
+				}
+ 			} else {
+				if (IsFactory) {
+					this.Text = String.Format("{0}({1})", method_name, paramListStringNames);
+				} else {
+					this.Text = String.Format("{0}({1})", method_name, paramListString);
+				}
 			}
 		}
 		

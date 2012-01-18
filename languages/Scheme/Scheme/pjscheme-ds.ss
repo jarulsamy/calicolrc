@@ -70,8 +70,9 @@
              (make-cont '<cont-2> fail k))
            (process-macro-clauses (cdr clauses) datum handler fail k)))
       (<cont-4> (bindings k)
-       (apply-cont k `(let (,(car bindings)) ,value)))
-      (<cont-5> (k) (apply-cont k `(cond ,@value)))
+       (apply-cont k `(let ((unquote (car bindings))) ,value)))
+      (<cont-5> (k)
+       (apply-cont k `(cond (unquote-splicing value))))
       (<cont-6> (clauses var k)
        (let ((clause (car clauses)))
          (cond
@@ -217,14 +218,17 @@
              value2 k)
            (apply-macro value1 datum (make-cont '<cont-2> value2 k))))
       (<cont2-10> (bodies k)
-       (apply-cont k `(let ,value1 ,@value2 ,@bodies)))
+       (apply-cont k `(let (unquote value1) ,@value2 ,@bodies)))
       (<cont2-11> (procs vars k2)
        (apply-cont2
          k2
          (cons `(,(car vars) 'undefined) value1)
          (cons `(set! ,(car vars) ,(car procs)) value2)))
       (<cont2-12> (exp k)
-       (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))
+       (apply-cont
+         k
+         `(let ((r ,exp) (unquote-splicing value1))
+            (cond (unquote-splicing value2)))))
       (<cont2-13> (clauses var k2)
        (let ((clause (car clauses)))
          (if (eq? (car clause) 'else)
@@ -246,7 +250,9 @@
                        `((memq ,var ',(car clause)) (,name))
                        value2)))))))
       (<cont2-14> (k)
-       (apply-cont k `(let ,value1 (cond ,@value2))))
+       (apply-cont
+         k
+         `(let (unquote value1) (cond (unquote-splicing value2)))))
       (<cont2-15> (clauses var k2)
        (let ((clause (car clauses)))
          (if (eq? (car clause) 'else)
@@ -259,7 +265,8 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name (lambda ,(cadr clause) ,@(cddr clause)))
+                       `(,name
+                          (lambda (unquote (cadr clause)) ,@(cddr clause)))
                        value1)
                      (cons
                        `((eq? (car ,var) ',(car clause))
@@ -269,7 +276,8 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name (lambda ,(cadr clause) ,@(cddr clause)))
+                       `(,name
+                          (lambda (unquote (cadr clause)) ,@(cddr clause)))
                        value1)
                      (cons
                        `((memq (car ,var) ',(car clause))
@@ -866,7 +874,10 @@
        (let ((name (caadr datum))
              (formals (cdadr datum))
              (bodies (cddr datum)))
-         (apply-cont k `(define ,name (lambda ,formals ,@bodies)))))
+         (apply-cont
+           k
+           `(define (unquote name)
+              (lambda (unquote formals) ,@bodies)))))
       (<macro-2> ()
        (let ((exps (cdr datum)))
          (cond
@@ -916,7 +927,9 @@
                               k
                               `(let ((bool ,test-exp)
                                      (else-code (lambda ()
-                                                  (cond ,@other-clauses))))
+                                                  (cond
+                                                    (unquote-splicing
+                                                     other-clauses)))))
                                  (if bool bool (else-code))))))
                        ((null? other-clauses)
                         (if (null? (cdr then-exps))
@@ -929,13 +942,15 @@
                           k
                           `(if ,test-exp
                                ,(car then-exps)
-                               (cond ,@other-clauses))))
+                               (cond (unquote-splicing other-clauses)))))
                        (else
                         (apply-cont
                           k
                           `(if ,test-exp
                                (begin ,@then-exps)
-                               (cond ,@other-clauses)))))))))))
+                               (cond
+                                 (unquote-splicing
+                                  other-clauses))))))))))))
       (<macro-5> ()
        (if (symbol? (cadr datum))
            (let* ((name (cadr datum))
@@ -945,12 +960,13 @@
                   (bodies (cdddr datum)))
              (apply-cont
                k
-               `(letrec ((,name (lambda ,vars ,@bodies))) (,name ,@exps))))
+               `(letrec ((,name (lambda (unquote vars) ,@bodies)))
+                  (,name ,@exps))))
            (let* ((bindings (cadr datum))
                   (vars (map car bindings))
                   (exps (map cadr bindings))
                   (bodies (cddr datum)))
-             (apply-cont k `((lambda ,vars ,@bodies) ,@exps)))))
+             (apply-cont k `((lambda (unquote vars) ,@bodies) ,@exps)))))
       (<macro-6> ()
        (let* ((decls (cadr datum))
               (vars (map car decls))
@@ -993,7 +1009,7 @@
 ;;----------------------------------------------------------------------
 ;; main program
 
-(define 1st (lambda (n) (string-ref chars-to-scan n)))
+(define \x31;st (lambda (n) (string-ref chars-to-scan n)))
 
 (define remaining (lambda (n) (+ 1 n)))
 
@@ -1018,7 +1034,7 @@
       (shift (next)
        (begin
          (set! read-char-count (+ read-char-count 1))
-         (apply-action next (cons (1st chars) buffer)
+         (apply-action next (cons (\x31;st chars) buffer)
            (remaining chars) handler fail k)))
       (replace (new-char next)
        (apply-action next (cons new-char buffer) (remaining chars)
@@ -1035,7 +1051,7 @@
          (apply-action next buffer (remaining chars) handler fail
            k)))
       (goto (state)
-       (let ((action (apply-state state (1st chars))))
+       (let ((action (apply-state state (\x31;st chars))))
          (if (eq? action 'error)
              (scan-error chars handler fail)
              (apply-action action buffer chars handler fail k))))
@@ -1047,7 +1063,7 @@
 (define*
   scan-error
   (lambda (chars handler fail)
-    (let ((c (1st chars)))
+    (let ((c (\x31;st chars)))
       (if (char=? c #\nul)
           (apply-handler2
             handler
@@ -1757,7 +1773,7 @@
   nest-let*-bindings
   (lambda (bindings bodies k)
     (if (or (null? bindings) (null? (cdr bindings)))
-        (apply-cont k `(let ,bindings ,@bodies))
+        (apply-cont k `(let (unquote bindings) ,@bodies))
         (nest-let*-bindings
           (cdr bindings)
           bodies
@@ -2234,8 +2250,8 @@
           (make-cont2 '<cont2-61> docstring var k)))
      (define-syntax-exp
        (keyword clauses)
-       (lookup-binding-in-first-frame keyword macro-env handler
-         fail (make-cont2 '<cont2-60> clauses k)))
+       (lookup-binding-in-first-frame keyword macro-env handler fail
+         (make-cont2 '<cont2-60> clauses k)))
      (begin-exp (exps) (eval-sequence exps env handler fail k))
      (lambda-exp
        (formals body)
@@ -2504,8 +2520,7 @@
         (if (dlr-exp? proc)
             (map2 proc (cdr list1) (cdr list2) env handler fail
               (make-cont2 '<cont2-79> list1 list2 proc k))
-            (apply-proc proc (list (car list1) (car list2)) env handler
-              fail
+            (apply-proc proc (list (car list1) (car list2)) env handler fail
               (make-cont2 '<cont2-78> list1 list2 proc env handler k))))))
 
 (define*
