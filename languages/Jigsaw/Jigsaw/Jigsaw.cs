@@ -136,6 +136,10 @@ namespace Jigsaw
 			this.AddShape(block26);
 			tbCtrl.AddShape(block26);
 			
+			CControlForeach block27 = new CControlForeach(110, 510, pnlBlock);
+			this.AddShape(block27);
+			tbCtrl.AddShape(block27);
+			
 			// ----- Statement tab and factory blocks	
 			tabY += 33;
 			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, 30, "Statements", pnlBlock);
