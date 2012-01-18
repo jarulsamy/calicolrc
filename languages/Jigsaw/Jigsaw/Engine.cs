@@ -223,7 +223,7 @@ namespace Jigsaw
 		}
 		
 		// - - - Load assembly into global scope - - - - - - - - - - - -
-		public bool LoadAssembly(string dllPath)
+		public Assembly LoadAssembly(string dllPath)
 		{
 			// Reload all assemblies
 			
@@ -234,7 +234,7 @@ namespace Jigsaw
 			// If not found, fail
 			if (assemblyName.Length == 0) {
 				Console.WriteLine ("(Engine.LoadAssembly) Assembly name not found in module path {0}", dllPath);
-				return false;
+				return null;
 			}
 			
 			Assembly assembly = null;
@@ -242,7 +242,7 @@ namespace Jigsaw
 				assembly = Assembly.LoadFrom(dllPath);
 			} catch (Exception ex){ //(System.IO.FileNotFoundException) {
 				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly from module path {0}: {1}", dllPath, ex.Message);
-				return false;
+				return null;
 //#pragma warning disable 612
 //					assembly = Assembly.LoadWithPartialName (tname);
 //#pragma warning restore 612
@@ -252,7 +252,7 @@ namespace Jigsaw
 				scriptRuntime.LoadAssembly(assembly);
 			} catch (Exception ex){
 				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly {0} into script runtime: {1}", assemblyName, ex.Message);
-				return false;
+				return null;
 			}
 
 			// Populate scope with assembly
@@ -264,10 +264,10 @@ namespace Jigsaw
 				source.Execute(scope);
 			} catch (Exception ex) {
 				Console.WriteLine ("(Engine.LoadAssembly) Error importing assembly {0} into global scope: {1}", assemblyName, ex.Message);
-				return false;
+				return null;
 			}
 			
-			return true;
+			return assembly;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
