@@ -474,6 +474,20 @@ namespace Jigsaw
 			CBlock block = null;
 
 			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
+			
+			// Find a good, random, same-for-everyone color for this DLL:
+			// Make a hash from name:
+			int hash = 17;
+			foreach (char c in assembly_name) {
+				hash = hash * 31 + c.GetHashCode();
+			}
+			hash = Math.Abs(hash);
+			// Get the color from the color dictionary:
+			Dictionary<string,Color> dict = Widgets.Colors.colors;
+			List<string> names = new List<string>(dict.Keys);
+			Color fill_color = dict[names[hash % names.Count]];
+			// Make the line color be a little darker than fill:
+			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
 
 			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
 				Type type = Reflection.Utils.getType (assembly, type_name);
@@ -489,9 +503,11 @@ namespace Jigsaw
 					}
 					string return_type = type_name;
 					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
-                                                                    param_names, param_type_names, param_defaults,
+                                                    param_names, param_type_names, param_defaults,
                                                     return_type, pnlBlock);
 					block.Visible = false;
+					block.LineColor = line_color;
+					block.FillColor = fill_color;
 					blocks.Add (block);
 					y += 40;
 				}
@@ -507,9 +523,11 @@ namespace Jigsaw
 					}
 					string return_type = mi.ReturnType.ToString ();
 					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
-                                                                    param_names, param_type_names, param_defaults,
-                                                                            return_type, pnlBlock);
+                                                param_names, param_type_names, param_defaults,
+                                                return_type, pnlBlock);
 					block.Visible = false;
+					block.LineColor = line_color;
+					block.FillColor = fill_color;
 					blocks.Add (block);
 					y += 40;
 				}
