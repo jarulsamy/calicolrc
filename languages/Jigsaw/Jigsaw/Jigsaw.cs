@@ -445,6 +445,114 @@ namespace Jigsaw
 			}
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+		public void UseLibrary(string filename)
+		{
+			// Interface for Calico
+			Stop();
+			string filetype = System.IO.Path.GetExtension(filename).ToLower();
+			try
+			{	// Decide what to do based on file extension
+				if (filetype == ".map") {
+					System.IO.TextReader tr = new System.IO.StreamReader(filename);
+					UseLibraryMap(tr);
+				} else {	// Assume it's a dll
+					UseLibraryDLL(filename);
+				}
+			} catch (Exception ex) {
+				Console.Error.WriteLine ("Error loading library: {0}", ex.Message);
+			}
+		}
+	
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool UseLibraryDLL(string dllfile)
+		{
+			// Load and build blocks from assembly dllfile
+			List<CBlock > blocks = new List<CBlock> ();
+			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
+			int y = 70;
+			CBlock block = null;
+
+			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
+
+			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
+				Type type = Reflection.Utils.getType (assembly, type_name);
+
+				foreach (System.Reflection.ConstructorInfo ci in Reflection.Utils.getConstructors(type)) {
+					List<string > param_names = new List<string> ();
+					List<string > param_type_names = new List<string> ();
+					List<string > param_defaults = new List<string> ();
+					foreach (System.Reflection.ParameterInfo pi in ci.GetParameters()) {
+						param_names.Add (pi.Name);
+						param_type_names.Add (pi.ParameterType.FullName);
+						param_defaults.Add (pi.DefaultValue.ToString ());
+					}
+					string return_type = type_name;
+					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
+                                                                    param_names, param_type_names, param_defaults,
+                                                    return_type, pnlBlock);
+					block.Visible = false;
+					blocks.Add (block);
+					y += 40;
+				}
+
+				foreach (System.Reflection.MethodInfo mi in Reflection.Utils.getStaticMethods(type)) {
+					List<string > param_names = new List<string> ();
+					List<string > param_type_names = new List<string> ();
+					List<string > param_defaults = new List<string> ();
+					foreach (System.Reflection.ParameterInfo pi in mi.GetParameters()) {
+						param_names.Add (pi.Name);
+						param_type_names.Add (pi.ParameterType.FullName);
+						param_defaults.Add (pi.DefaultValue.ToString ());
+					}
+					string return_type = mi.ReturnType.ToString ();
+					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
+                                                                    param_names, param_type_names, param_defaults,
+                                                                            return_type, pnlBlock);
+					block.Visible = false;
+					blocks.Add (block);
+					y += 40;
+				}
+			}
+			// Get next available tab location
+			double tabY = 0.0;
+			foreach (Widgets.CRoundedTab tt in allTabs) {
+				if (tt.Top > tabY)
+					tabY = tt.Top;
+			}
+
+			// Add tab
+			tabY += 33.0;
+			Widgets.CRoundedTab tab = new Widgets.CRoundedTab (0, tabY, 100, 30, assembly_name, pnlBlock);
+			tab.Dock = Diagram.DockSide.Left;
+			this.AddShape (tab);
+			pnlBlock.BringToFront (this);
+
+			// Add this tab to all other tabs
+			foreach (Widgets.CRoundedTab tt in allTabs)
+				tt.AddTab (tab);
+
+			// Add all other tabs to this tab
+			tab.AddTabs (allTabs);
+
+			// Add this tab to list of all tabs
+			allTabs.Add (tab);
+
+			// Add blocks
+			foreach (CBlock cblock in blocks) {
+				this.AddShape (cblock);
+				tab.AddShape (cblock);
+			}
+
+			// Select the new tab
+			tab.SetToggle (this, true);
+
+			// Redraw
+			this.Invalidate ();
+
+			return true;
+		}
+
 		// - - - Load and build blocks from assembly map xml - - - - - - - - - - - - - - -
 		public bool UseLibraryMap(TextReader tr)
 		{
@@ -989,15 +1097,17 @@ namespace Jigsaw
 //		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public string Export(string filename)
+		public string Export()
 		{
-			filename = System.IO.Path.GetFullPath(filename);
+			// FIXME: ask for filename
+			// allow cancel
+			string filename = System.IO.Path.GetFullPath("Jigsaw.py");
 	        using (StreamWriter outfile = new StreamWriter(filename)) {
 	            outfile.Write(this.ToPython());
 	        }
 			return filename;
 		}
-		
+				
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnInspectorShow(object sender, EventArgs e)
 		{
