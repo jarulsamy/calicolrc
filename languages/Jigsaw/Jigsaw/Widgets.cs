@@ -456,7 +456,7 @@ namespace Widgets
 			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
 				_prevMouseY = e.Y;
 			}
-			base.OnMouseDown(cvs, e);
+			//base.OnMouseDown(cvs, e);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

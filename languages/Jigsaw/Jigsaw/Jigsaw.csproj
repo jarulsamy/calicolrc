@@ -44,7 +44,6 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Mono.Cairo" />
     <Reference Include="Mono.Posix" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
@@ -71,6 +70,9 @@
       <HintPath>..\..\..\bin\Microsoft.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="System.Dynamic" />
+    <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="plugin.png">

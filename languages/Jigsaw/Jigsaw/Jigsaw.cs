@@ -1022,21 +1022,35 @@ namespace Jigsaw
 				cvs.DeleteShape(b);
 			}
 		}
-
+		
+		// - - - Bring an entire stack of blocks to the front - - - - -
+		public void BringStackToFront(CBlock block)
+		{
+			//CBlock top = block.StackTop;
+			
+			// Maintain a stack of blocks to be brought to top as we progress down through the tree
+			List<CBlock> toProcess = new List<CBlock>();
+			toProcess.Add(block);
+			
+			while (toProcess.Count > 0) {
+				// Get the block on top of the stack
+				CBlock nextBlock = toProcess[0];
+				this.BringToFront (nextBlock);
+				
+				// Add all output child blocks to list of blocks to be deleted
+				foreach (CEdge e in nextBlock.Edges) {
+					if ( e.Type != EdgeType.In && e.IsConnected ) 
+						toProcess.Add(e.LinkedTo.Block);
+				}
+			}
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DeactivateAllBlocks() 
 		{	// Deactivate all blocks
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			foreach (CBlock b in AllBlocks()) b.Deactivate(cvs);
 		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll e) {
-//			// If on palette, scroll palette
-//			
-//			// Otherwise, defer to default behavior
-//			base.OnScroll(cvs, e);	
-//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
@@ -2565,9 +2579,11 @@ namespace Jigsaw
 				}
 			}
 			
-			// Deselect all shapes including factory and select dropped block
+			// Deselect all shapes including factory and select dropped block.
+			// Move all dropped blocks to top
 			cvs.DeselectAll();
 			dropped.Select(cvs);
+			//js.BringStackToFront(dropped);
 			
 			// When a block is dropped, always disconnect anything linked to input edges
 			// of dragged top block. An opportunity to reconnect follows.
