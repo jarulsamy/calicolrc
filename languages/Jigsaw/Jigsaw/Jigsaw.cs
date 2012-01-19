@@ -1026,8 +1026,6 @@ namespace Jigsaw
 		// - - - Bring an entire stack of blocks to the front - - - - -
 		public void BringStackToFront(CBlock block)
 		{
-			//CBlock top = block.StackTop;
-			
 			// Maintain a stack of blocks to be brought to top as we progress down through the tree
 			List<CBlock> toProcess = new List<CBlock>();
 			toProcess.Add(block);
@@ -1035,6 +1033,7 @@ namespace Jigsaw
 			while (toProcess.Count > 0) {
 				// Get the block on top of the stack
 				CBlock nextBlock = toProcess[0];
+				toProcess.RemoveAt (0);
 				this.BringToFront (nextBlock);
 				
 				// Add all output child blocks to list of blocks to be deleted
@@ -2583,7 +2582,6 @@ namespace Jigsaw
 			// Move all dropped blocks to top
 			cvs.DeselectAll();
 			dropped.Select(cvs);
-			//js.BringStackToFront(dropped);
 			
 			// When a block is dropped, always disconnect anything linked to input edges
 			// of dragged top block. An opportunity to reconnect follows.
@@ -2603,6 +2601,8 @@ namespace Jigsaw
 				linked = prt.LinkedTo.Block;		// Get a reference to the newly linked block
 				linked.RepositionBlocks(null);
 			}
+			
+			js.BringStackToFront(dropped);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
