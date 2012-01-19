@@ -1,6 +1,6 @@
-MCS=MONO_PATH=../../../bin:../../../modules gmcs -sdk:2
+MCS=MONO_PATH=../../../bin:../../../modules mcs -sdk:2
 
-../PJScheme.dll: pjscheme.cs Scheme.cs
+../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile
 	$(MCS) -debug Scheme.cs pjscheme.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.Core -out:../PJScheme.dll
 
 pjscheme-ds.ss: reader-cps.ss environments-cps.ss parser-cps.ss \
