@@ -70,10 +70,6 @@
       <HintPath>..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cairo" />
-    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <HintPath>..\..\bin\IronPython.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.Posix">
       <SpecificVersion>False</SpecificVersion>
     </Reference>

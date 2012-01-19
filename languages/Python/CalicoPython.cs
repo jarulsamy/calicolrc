@@ -77,10 +77,9 @@ namespace CalicoPython
 				if (calico.CurrentDocument != null 
 					&& calico.CurrentDocument.filename == frame.f_code.co_filename
 					&& calico.ProgramSpeed.Value != 100) {
-					Console.Error.WriteLine(calico.ProgramSpeed.Value);
 					calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
 				}
-				calico.UpdateLocal (frame);
+				calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
 			});
 			if (calico.CurrentDocument != null && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
 				calico.ProgramSpeed.Value = 0;
