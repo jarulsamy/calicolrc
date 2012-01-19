@@ -75,6 +75,7 @@ public class CalicoJigsawDocument : Document
 	{
 		calico.Print(Calico.Tag.Info, "Running Jigsaw script...\n");
 		Gtk.Application.Invoke( delegate {
+			cvs.Stop();
 			cvs.Run();
 		});
 	}
