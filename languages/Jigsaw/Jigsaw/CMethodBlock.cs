@@ -184,8 +184,7 @@ namespace Jigsaw
 			
 			// Build Python
 			string code = String.Format("{0}.{1}({2})", assembly_name, method_name, paramListString);
-			if (varname.Length > 0) code = String.Format("{0}={1}", varname, code);
-			
+			if (varname.Length > 0) code = String.Format("{0} = {1}", varname, code);
 			this._source = code;
 			
 			return code;
