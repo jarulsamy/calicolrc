@@ -1613,8 +1613,9 @@ namespace Jigsaw
 			o.AppendLine();
 			
 			// Do necessary imports here
-			o.AppendLine ("import clr");
-			foreach (string k in allAssemblies.Keys) o.AppendFormat("clr.AddReference('{0}')\n", k);
+			// This is not necessary if run in Calico:
+			//o.AppendLine ("import clr");
+			//foreach (string k in allAssemblies.Keys) o.AppendFormat("clr.AddReference('{0}')\n", k);
 			foreach (string k in allAssemblies.Keys) o.AppendFormat("import {0}\n", k);
 			o.AppendLine ();
 			
