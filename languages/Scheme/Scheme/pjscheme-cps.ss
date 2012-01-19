@@ -1503,6 +1503,7 @@
       (set! *need-newline* (true? (not (ends-with-newline? s))))
       (display s))))
 
+;; redefined as REP-k when no-csharp-support.ss is loaded
 (define scheme-REP-k
   (lambda-cont2 (v fail)
     (if (not (eq? v '<void>))
@@ -1510,10 +1511,12 @@
     (if *need-newline* (newline))
     (read-eval-print fail)))
 
+;; redefined as REP-handler when no-csharp-support.ss is loaded
 (define scheme-REP-handler
   (lambda-handler2 (e fail)
     (REP-k `(uncaught exception: ,e) fail)))
 
+;; redefined as REP-fail when no-csharp-support.ss is loaded
 (define scheme-REP-fail
   (lambda-fail ()
     (REP-k "no more choices" REP-fail)))

@@ -88,6 +88,7 @@
     (set-binding-value! "void" ())
     (set-binding-docstring! "void" ())
     (set-first-frame! "void" ())
+    (try-parse "bool" ())
 
     (tagged-list "Func<object,bool>" ("object" "Predicate2" "object"))
     (sort "object" ("Predicate2" "object"))

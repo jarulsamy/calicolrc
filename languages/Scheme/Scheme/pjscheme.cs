@@ -4785,14 +4785,14 @@ public class PJScheme:Scheme {
       PJScheme.trampoline();
    }
 
-   new public static object try_parse(object input) {
+   new public static bool try_parse(object input) {
       load_stack = EmptyList;
       k_reg = PJScheme.make_cont2((object) symbol("<cont2-90>"));
       fail_reg = REP_fail;
       handler_reg = try_parse_handler;
       input_reg = input;
       pc = (Function) scan_input;
-      return ((object) PJScheme.trampoline());
+      return ((bool) PJScheme.trampoline());
    }
 
    new public static bool pattern_q(object x) {
