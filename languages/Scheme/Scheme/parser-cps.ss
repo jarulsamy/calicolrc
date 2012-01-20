@@ -648,6 +648,10 @@
       (lambda-cont3 (datum tokens-left fail)
 	(parse datum init-handler2 init-fail init-cont2)))))
 
+;;(define parse-file
+;;  (lambda (filename)
+;;    (get-parsed-sexps filename)))
+
 (define print-parsed-sexps
   (lambda (filename)
     (for-each pretty-print (get-parsed-sexps filename))))

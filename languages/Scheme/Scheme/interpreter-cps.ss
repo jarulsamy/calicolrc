@@ -14,6 +14,8 @@
 (load "environments-cps.ss")
 (load "parser-cps.ss")
 
+(define void-value '<void>)
+
 (define *need-newline* #f)
 
 (define pretty-print-prim
@@ -44,7 +46,7 @@
 ;; redefined as REP-k when no-csharp-support.ss is loaded
 (define scheme-REP-k
   (lambda-cont2 (v fail)
-    (if (not (eq? v '<void>))
+    (if (not (eq? v void-value))
 	(pretty-print-prim v))
     (if *need-newline* (newline))
     (read-eval-print fail)))
@@ -108,7 +110,7 @@
 (define* read-and-eval-sexps
   (lambda (tokens env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
-      (k '<void> fail)
+      (k void-value fail)
       (read-sexp tokens handler fail
 	(lambda-cont3 (datum tokens-left fail)
 	  (parse datum handler fail
@@ -125,8 +127,8 @@
       (lit-exp (datum) (k datum fail))
       (var-exp (id) (lookup-value id env handler fail k))
       (func-exp (exp) (m exp env handler fail
-                        (lambda-cont2 (f fail)
-                          (k (dlr-func f) fail))))
+                        (lambda-cont2 (proc fail)
+                          (k (dlr-func proc) fail))))
       (if-exp (test-exp then-exp else-exp)
 	(m test-exp env handler fail
 	  (lambda-cont2 (bool fail)
@@ -142,7 +144,7 @@
 		  (set-binding-value! binding rhs-value)
 		  ;; need to undo the assignment if we back up
 		  (let ((new-fail (lambda-fail () (set-binding-value! binding old-value) (fail))))
-		    (k '<void> new-fail))))))))
+		    (k void-value new-fail))))))))
       (define-exp (var docstring rhs-exp)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
@@ -151,18 +153,18 @@
 		(set-binding-value! binding rhs-value)
 		(set-binding-docstring! binding docstring)
 		;; definitions should occur only at top level, so no need to undo
-		(k '<void> fail))))))
+		(k void-value fail))))))
       (define!-exp (var docstring rhs-exp)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
 	    (set-global-value! var rhs-value)
 	    (set-global-docstring! var docstring)
-	    (k '<void> fail))))
+	    (k void-value fail))))
       (define-syntax-exp (keyword clauses)
 	(lookup-binding-in-first-frame keyword macro-env handler fail
 	  (lambda-cont2 (binding fail)
 	    (set-binding-value! binding (make-pattern-macro clauses))
-	    (k '<void> fail))))
+	    (k void-value fail))))
       (begin-exp (exps) (eval-sequence exps env handler fail k))
       (lambda-exp (formals body)
 	(k (closure formals body env) fail))
@@ -307,12 +309,14 @@
   (lambda ()
     (make-initial-env-extended
      (make-initial-environment
-      (list 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'length
+      (list 'void 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'length
 	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq 'member 'range
 	    'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require 'cut
 	    'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env
 	    'using 'not 'printf 'vector 'vector-set! 'vector-ref 'make-vector)
       (list
+	;; void
+	(lambda-proc (args env2 handler fail k2) (k2 void-value fail))
 	;; exit
         (lambda-proc (args env2 handler fail k2)
 	  (halt* '(exiting the interpreter)))
@@ -345,11 +349,11 @@
 	;; sqrt
 	(lambda-proc (args env2 handler fail k2) (k2 (apply sqrt args) fail))
 	;; print
-	(lambda-proc (args env2 handler fail k2) (for-each pretty-print-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (for-each pretty-print-prim args) (k2 void-value fail))
 	;; display
-	(lambda-proc (args env2 handler fail k2) (apply display-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (apply display-prim args) (k2 void-value fail))
 	;; newline
-	(lambda-proc (args env2 handler fail k2) (newline-prim) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (newline-prim) (k2 void-value fail))
 	;; load
 	(lambda-proc (args env2 handler fail k2)
 	   (load-file (car args) toplevel-env handler fail k2))
@@ -427,7 +431,7 @@
 	;; abort
 	(lambda-proc (args env2 handler fail k2)
 	  (if (null? args)
-	    (REP-k '<void> fail)
+	    (REP-k void-value fail)
 	    (REP-k (car args) fail)))
 	;; require
 	(lambda-proc (args env2 handler fail k2)
@@ -459,7 +463,7 @@
 	;; not
 	(lambda-proc (args env2 handler fail k2) (k2 (not (car args)) fail))
 	;; printf
-	(lambda-proc (args env2 handler fail k2) (apply printf-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (apply printf-prim args) (k2 void-value fail))
         ;; vector
 	(lambda-proc (args env2 handler fail k2) (k2 (make-vector args) fail))
         ;; vector-set!
@@ -621,7 +625,7 @@
       (iterate proc (car lists) env handler fail k)
       (let ((arg-list (listify lists)))
 	(if (null? (car arg-list))
-	  (k '<void> fail)
+	  (k void-value fail)
 	  (if (dlr-exp? proc) 
 	    (begin
 	      (dlr-apply proc (map car arg-list))
@@ -704,7 +708,7 @@
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
-       (k '<void> fail))
+       (k void-value fail))
       ((not (string? filename))
        (handler (format "filename is not a string: ~a" filename) fail))
       ((not (file-exists? filename))
@@ -719,12 +723,12 @@
 	       (if (null? load-stack)
 		 (printf "WARNING: empty load-stack encountered!\n")  ;; should never happen
 		 (set! load-stack (cdr load-stack)))
-	       (k '<void> fail)))))))))
+	       (k void-value fail)))))))))
 
 (define* load-files
   (lambda (filenames env handler fail k)
     (if (null? filenames)
-      (k '<void> fail)
+      (k void-value fail)
       (load-file (car filenames) env handler fail
 	(lambda-cont2 (v fail)
 	  (load-files (cdr filenames) env handler fail k))))))
@@ -773,9 +777,9 @@
       (k2 (apply* external-function-object args) fail))))
 
 (define REP-k
-  (lambda-cont2 (result fail)
+  (lambda-cont2 (v fail)
     (set! last-fail fail)
-    (halt* result)))
+    (halt* v)))
 
 (define REP-fail
   (lambda-fail ()

@@ -527,10 +527,10 @@
 ;;------------------------------------------------------------------------
 ;; for manual testing only in scheme
 
-(define init-cont (lambda-cont (v) (halt* v)))
+;;(define init-cont (lambda-cont (v) (halt* v)))
 (define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
 (define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
-(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
+;;(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
 (define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
 (define init-fail (lambda-fail () (halt* "no more choices")))
 
@@ -597,4 +597,210 @@
 ;; 			(m exp toplevel-env handler fail
 ;;			   (lambda-cont2 (result fail)
 ;;			      (load-files (cdr filenames) handler fail k))))))))))
+
+;;------------------------------------------------------------------------
+
+;;(define token-start 0)
+
+;;(define* scan-input2
+;;  (lambda (input handler fail k)   ;; k receives 2 args: a list of tokens, fail
+;;    (set! read-char-count 0)
+;;    (set! read-line-count 1)
+;;    (set! token-start 0)
+;;    (set! chars-to-scan (string-append input (string #\nul)))
+;;    (scan-input-loop2 0 handler fail k)))
+
+;;(define* scan-input-loop2
+;;  (lambda (chars handler fail k)   ;; k receives 2 args: a list of tokens, fail
+;;    (apply-action2 '(goto start-state) '() chars handler fail
+;;      (lambda-cont3 (token chars-left fail)
+;;	(if (token-type? token 'end-marker)
+;;	  (k (list token) fail)
+;;	  (scan-input-loop2 chars-left handler fail
+;;	    (lambda-cont2 (tokens fail)
+;;	      (k (cons token tokens) fail))))))))
+
+;;(define* apply-action2
+;;  (lambda (action buffer chars handler fail k)  ;; k receives 3 args: token, chars-left, fail
+;;;;    (display "action: ")
+;;;;    (display action)
+;;;;    (display ", buffer: ")
+;;;;    (write buffer)
+;;;;    (newline)
+;;    (record-case action
+;;      (shift (next)
+;;	(begin
+;;	  (set! read-char-count (+ read-char-count 1))
+;;	  (apply-action2 next (cons (1st chars) buffer) (remaining chars) handler fail k)))
+;;      (replace (new-char next)
+;;	(apply-action2 next (cons new-char buffer) (remaining chars) handler fail k))
+;;      (drop-newline (next)
+;;	(begin
+;;	  (set! read-line-count (+ read-line-count 1))
+;;	  (set! read-char-count 0)
+;;	  (apply-action2 next buffer (remaining chars) handler fail k)))
+;;      (drop (next)
+;;	(begin
+;;	  (set! read-char-count (+ read-char-count 1))
+;;	  (apply-action2 next buffer (remaining chars) handler fail k)))
+;;      (goto (state)
+;;	(let ((action (apply-state2 state (1st chars))))
+;;	  (if (eq? action 'error)
+;;	    (scan-error chars handler fail)
+;;	    (apply-action2 action buffer chars handler fail k))))
+;;      (emit (token-type)
+;;	(convert-buffer-to-token token-type buffer handler fail
+;;	  (lambda-cont2 (v fail)
+;;	    (k (append v (list read-line-count read-char-count)) chars fail))))
+;;      (else (error 'apply-action2 "invalid action: ~a" action)))))
+
+;;(define apply-state2
+;;  (lambda (state c)
+;;    (case state
+;;      (start-state
+;;	(cond
+;;	  ((char=? c #\newline) '(drop-newline (goto start-state)))
+;;	  ((char-whitespace? c) '(drop (goto start-state)))
+;;	  ((char=? c #\;) '(drop (goto comment-state)))
+;;	  ((char=? c #\() '(drop (emit lparen)))
+;;	  ((char=? c #\[) '(drop (emit lbracket)))
+;;	  ((char=? c #\)) '(drop (emit rparen)))
+;;	  ((char=? c #\]) '(drop (emit rbracket)))
+;;	  ((char=? c #\') '(drop (emit apostrophe)))
+;;	  ((char=? c #\`) '(drop (emit backquote)))
+;;	  ((char=? c #\,) '(drop (goto comma-state)))
+;;	  ((char=? c #\#) '(drop (goto hash-prefix-state)))
+;;	  ((char=? c #\") '(drop (goto string-state)))
+;;	  ((char-initial? c) '(shift (goto identifier-state)))
+;;	  ((char-sign? c) '(shift (goto signed-state)))
+;;	  ((char=? c #\.) '(shift (goto decimal-point-state)))
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\nul) '(drop (emit end-marker)))
+;;	  (else 'error)))
+;;      (comment-state
+;;	(cond
+;;	  ((char=? c #\newline) '(drop-newline (goto start-state)))
+;;	  ((char=? c #\nul) '(goto start-state))
+;;	  (else '(drop (goto comment-state)))))
+;;      (comma-state
+;;	(cond
+;;	  ((char=? c #\@) '(drop (emit comma-at)))
+;;	  (else '(emit comma))))
+;;      (hash-prefix-state
+;;	(cond
+;;	  ((char-boolean? c) '(shift (emit boolean)))
+;;	  ((char=? c #\\) '(drop (goto character-state)))
+;;	  ((char=? c #\() '(drop (emit lvector)))
+;;	  (else 'error)))
+;;      (character-state
+;;	(cond
+;;	  ((char-alphabetic? c) '(shift (goto alphabetic-character-state)))
+;;	  ((not (char=? c #\nul)) '(shift (emit character)))
+;;	  (else 'error)))
+;;      (alphabetic-character-state
+;;	(cond
+;;	  ((char-alphabetic? c) '(shift (goto named-character-state)))
+;;	  (else '(emit character))))
+;;      (named-character-state
+;;	(cond
+;;	  ((char-delimiter? c) '(emit named-character))
+;;	  (else '(shift (goto named-character-state)))))
+;;      (string-state
+;;	(cond
+;;	  ((char=? c #\") '(drop (emit string)))
+;;	  ((char=? c #\\) '(drop (goto string-escape-state)))
+;;	  ((char=? c #\nul) 'error)
+;;	  (else '(shift (goto string-state)))))
+;;      (string-escape-state
+;;	(cond
+;;	  ((char=? c #\") '(shift (goto string-state)))
+;;	  ((char=? c #\\) '(shift (goto string-state)))
+;;	  ((char=? c #\b) '(replace #\backspace (goto string-state)))
+;;	  ((char=? c #\f) '(replace #\page (goto string-state)))
+;;	  ((char=? c #\n) '(replace #\newline (goto string-state)))
+;;	  ;;((char=? c #\r) '(replace #\newline (goto string-state)))
+;;	  ((char=? c #\t) '(replace #\tab (goto string-state)))
+;;	  ((char=? c #\r) '(replace #\return (goto string-state)))
+;;	  (else 'error)))
+;;      (identifier-state
+;;	(cond
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  (else 'error)))
+;;      (signed-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\.) '(shift (goto signed-decimal-point-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (decimal-point-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((char-delimiter? c) '(emit dot))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (signed-decimal-point-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (whole-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\.) '(shift (goto fractional-number-state)))
+;;	  ((char=? c #\/) '(shift (goto rational-number-state)))
+;;	  ((or (char=? c #\e) (char=? c #\E)) '(shift (goto suffix-state)))
+;;	  ((char-delimiter? c) '(emit integer))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (fractional-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((or (char=? c #\e) (char=? c #\E)) '(shift (goto suffix-state)))
+;;	  ((char-delimiter? c) '(emit decimal))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (rational-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto rational-number-state*)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (rational-number-state*
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto rational-number-state*)))
+;;	  ((char-delimiter? c) '(emit rational))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (suffix-state
+;;	(cond
+;;	  ((char-sign? c) '(shift (goto signed-exponent-state)))
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (signed-exponent-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (exponent-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit decimal))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (else
+;;	(error 'apply-state2 "invalid state: ~a" state)))))
+
+;;(define scan-string2
+;;  (lambda (input)
+;;    (scan-input2 input init-handler2 init-fail init-cont2)))
+
+;;(define scan-file2
+;;  (lambda (filename)
+;;    (scan-input2 (read-content filename) init-handler2 init-fail init-cont2)))
 

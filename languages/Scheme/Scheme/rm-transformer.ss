@@ -278,7 +278,7 @@
 ;;	    (quote (datum) code)
 	    (quasiquote (datum)
 	      (if *generate-low-level-registerized-code?*
-		(transform (expand-quasiquote datum init-cont))
+		(transform (expand-quasiquote datum (lambda (v) v)))
 		(list 'quasiquote (transform-quasiquote datum))))
 	    (if (test . conseqs)
 	      `(if ,@(map transform (cdr code))))

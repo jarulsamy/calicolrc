@@ -60,19 +60,18 @@
   apply-cont
   (lambda (k value)
     (record-case (cdr k)
-      (<cont-1> () (halt* value))
-      (<cont-2> (fail k) (apply-cont2 k value fail))
-      (<cont-3> (clauses datum right-pattern handler fail k)
+      (<cont-1> (fail k) (apply-cont2 k value fail))
+      (<cont-2> (clauses datum right-pattern handler fail k)
        (if value
            (instantiate
              right-pattern
              value
-             (make-cont '<cont-2> fail k))
+             (make-cont '<cont-1> fail k))
            (process-macro-clauses (cdr clauses) datum handler fail k)))
-      (<cont-4> (bindings k)
+      (<cont-3> (bindings k)
        (apply-cont k `(let (,(car bindings)) ,value)))
-      (<cont-5> (k) (apply-cont k `(cond ,@value)))
-      (<cont-6> (clauses var k)
+      (<cont-4> (k) (apply-cont k `(cond ,@value)))
+      (<cont-5> (clauses var k)
        (let ((clause (car clauses)))
          (cond
            ((eq? (car clause) 'else)
@@ -87,68 +86,68 @@
               (cons
                 `((memq ,var ',(car clause)) ,@(cdr clause))
                 value))))))
-      (<cont-7> (handler fail k) (parse value handler fail k))
-      (<cont-8> (v1 k) (apply-cont k `(cons ,v1 ,value)))
-      (<cont-9> (datum k)
+      (<cont-6> (handler fail k) (parse value handler fail k))
+      (<cont-7> (v1 k) (apply-cont k `(cons ,v1 ,value)))
+      (<cont-8> (datum k)
        (expand-quasiquote
          (cdr datum)
-         (make-cont '<cont-8> value k)))
-      (<cont-10> (k) (apply-cont k `(list ,@value)))
-      (<cont-11> (datum k)
+         (make-cont '<cont-7> value k)))
+      (<cont-9> (k) (apply-cont k `(list ,@value)))
+      (<cont-10> (datum k)
        (apply-cont k `(append ,(cadr (car datum)) ,value)))
-      (<cont-12> (k) (apply-cont k `(list->vector ,value)))
-      (<cont-13> (v1 k) (apply-cont k (cons v1 value)))
-      (<cont-14> (datum k)
+      (<cont-11> (k) (apply-cont k `(list->vector ,value)))
+      (<cont-12> (v1 k) (apply-cont k (cons v1 value)))
+      (<cont-13> (datum k)
        (expand-quasiquote-list
          (cdr datum)
-         (make-cont '<cont-13> value k)))
-      (<cont-15> (fail k2) (apply-cont2 k2 value fail))
-      (<cont-16> (x y k)
+         (make-cont '<cont-12> value k)))
+      (<cont-14> (fail k2) (apply-cont2 k2 value fail))
+      (<cont-15> (x y k)
        (if value
            (equal-objects? (cdr x) (cdr y) k)
            (apply-cont k #f)))
-      (<cont-17> (i v1 v2 k)
+      (<cont-16> (i v1 v2 k)
        (if value
            (equal-vectors? v1 v2 (- i 1) k)
            (apply-cont k #f)))
-      (<cont-18> (ls orig-ls x handler fail k)
+      (<cont-17> (ls orig-ls x handler fail k)
        (if value
            (apply-cont2 k ls fail)
            (member-prim x (cdr ls) orig-ls handler fail k)))
-      (<cont-19> (pattern var k)
+      (<cont-18> (pattern var k)
        (if value (apply-cont k #t) (occurs? var (cdr pattern) k)))
-      (<cont-20> (p1 p2 k)
+      (<cont-19> (p1 p2 k)
        (if value
            (apply-cont k #f)
            (apply-cont k (make-sub 'unit p1 p2))))
-      (<cont-21> (s-car k)
+      (<cont-20> (s-car k)
        (if (not value)
            (apply-cont k #f)
            (apply-cont k (make-sub 'composite s-car value))))
-      (<cont-22> (new-cdr1 s-car k)
+      (<cont-21> (new-cdr1 s-car k)
        (unify-patterns
          new-cdr1
          value
-         (make-cont '<cont-21> s-car k)))
-      (<cont-23> (pair2 s-car k)
+         (make-cont '<cont-20> s-car k)))
+      (<cont-22> (pair2 s-car k)
        (instantiate
          (cdr pair2)
          s-car
-         (make-cont '<cont-22> value s-car k)))
-      (<cont-24> (pair1 pair2 k)
+         (make-cont '<cont-21> value s-car k)))
+      (<cont-23> (pair1 pair2 k)
        (if (not value)
            (apply-cont k #f)
            (instantiate
              (cdr pair1)
              value
-             (make-cont '<cont-23> pair2 value k))))
-      (<cont-25> (a k) (apply-cont k (cons a value)))
-      (<cont-26> (pattern s k)
+             (make-cont '<cont-22> pair2 value k))))
+      (<cont-24> (a k) (apply-cont k (cons a value)))
+      (<cont-25> (pattern s k)
        (instantiate
          (cdr pattern)
          s
-         (make-cont '<cont-25> value k)))
-      (<cont-27> (s2 k) (instantiate value s2 k))
+         (make-cont '<cont-24> value k)))
+      (<cont-26> (s2 k) (instantiate value s2 k))
       (else (error 'apply-cont "bad continuation: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -215,7 +214,7 @@
        (if (pattern-macro? value1)
            (process-macro-clauses (macro-clauses value1) datum handler
              value2 k)
-           (apply-macro value1 datum (make-cont '<cont-2> value2 k))))
+           (apply-macro value1 datum (make-cont '<cont-1> value2 k))))
       (<cont2-10> (bodies k)
        (apply-cont k `(let ,value1 ,@value2 ,@bodies)))
       (<cont2-11> (procs vars k2)
@@ -412,7 +411,8 @@
          value2
          (make-cont2 '<cont2-48> value1 k)))
       (<cont2-50> ()
-       (if (not (eq? value1 '<void>)) (pretty-print-prim value1))
+       (if (not (eq? value1 void-value))
+           (pretty-print-prim value1))
        (if *need-newline* (newline))
        (read-eval-print value2))
       (<cont2-51> ()
@@ -442,15 +442,15 @@
          (make-cont2 '<cont2-58> value1 k)))
       (<cont2-60> (clauses k)
        (set-binding-value! value1 (make-pattern-macro clauses))
-       (apply-cont2 k '<void> value2))
+       (apply-cont2 k void-value value2))
       (<cont2-61> (docstring var k)
        (set-global-value! var value1)
        (set-global-docstring! var docstring)
-       (apply-cont2 k '<void> value2))
+       (apply-cont2 k void-value value2))
       (<cont2-62> (docstring rhs-value k)
        (set-binding-value! value1 rhs-value)
        (set-binding-docstring! value1 docstring)
-       (apply-cont2 k '<void> value2))
+       (apply-cont2 k void-value value2))
       (<cont2-63> (docstring var env handler k)
        (lookup-binding-in-first-frame var env handler value2
          (make-cont2 '<cont2-62> docstring value1 k)))
@@ -462,7 +462,7 @@
                            value1
                            old-value
                            value2)))
-           (apply-cont2 k '<void> new-fail))))
+           (apply-cont2 k void-value new-fail))))
       (<cont2-65> (var env handler k)
        (lookup-binding var env handler value2
          (make-cont2 '<cont2-64> value1 k)))
@@ -539,7 +539,7 @@
        (if (null? load-stack)
            (printf "WARNING: empty load-stack encountered!\n")
            (set! load-stack (cdr load-stack)))
-       (apply-cont2 k '<void> value2))
+       (apply-cont2 k void-value value2))
       (<cont2-86> (env handler k)
        (read-and-eval-sexps value1 env handler value2
          (make-cont2 '<cont2-85> k)))
@@ -654,18 +654,6 @@
              fail)))))
 
 ;;----------------------------------------------------------------------
-;; handler datatype
-
-(define make-handler (lambda args (cons 'handler args)))
-
-(define*
-  apply-handler
-  (lambda (handler exception)
-    (record-case (cdr handler)
-      (<handler-1> () (halt* (list 'exception exception)))
-      (else (error 'apply-handler "bad handler: ~a" handler)))))
-
-;;----------------------------------------------------------------------
 ;; handler2 datatype
 
 (define make-handler2 (lambda args (cons 'handler2 args)))
@@ -741,7 +729,7 @@
       (<proc-7> () (apply-cont2 k2 (make-vector args) fail))
       (<proc-8> ()
        (apply printf-prim args)
-       (apply-cont2 k2 '<void> fail))
+       (apply-cont2 k2 void-value fail))
       (<proc-9> () (apply-cont2 k2 (not (car args)) fail))
       (<proc-10> () (apply-cont2 k2 (using-prim args env2) fail))
       (<proc-11> () (apply-cont2 k2 env2 fail))
@@ -762,7 +750,7 @@
            (apply-fail fail)))
       (<proc-21> ()
        (if (null? args)
-           (apply-cont2 REP-k '<void> fail)
+           (apply-cont2 REP-k void-value fail)
            (apply-cont2 REP-k (car args) fail)))
       (<proc-22> ()
        (call/cc-primitive (car args) env2 handler fail k2))
@@ -786,7 +774,7 @@
            (equal-objects?
              (car args)
              (cadr args)
-             (make-cont '<cont-15> fail k2))
+             (make-cont '<cont-14> fail k2))
            (apply-handler2
              handler
              "incorrect number of arguments to procedure equal?"
@@ -819,13 +807,15 @@
       (<proc-46> () (apply-cont2 k2 (apply null? args) fail))
       (<proc-47> ()
        (load-file (car args) toplevel-env handler fail k2))
-      (<proc-48> () (newline-prim) (apply-cont2 k2 '<void> fail))
+      (<proc-48> ()
+       (newline-prim)
+       (apply-cont2 k2 void-value fail))
       (<proc-49> ()
        (apply display-prim args)
-       (apply-cont2 k2 '<void> fail))
+       (apply-cont2 k2 void-value fail))
       (<proc-50> ()
        (for-each pretty-print-prim args)
-       (apply-cont2 k2 '<void> fail))
+       (apply-cont2 k2 void-value fail))
       (<proc-51> () (apply-cont2 k2 (apply sqrt args) fail))
       (<proc-52> ()
        (let ((proc (car args)) (proc-args (cadr args)))
@@ -844,8 +834,9 @@
          fail
          (make-cont2 '<cont2-73> handler k2)))
       (<proc-56> () (halt* '(exiting the interpreter)))
-      (<proc-57> (k) (apply-cont2 k (car args) fail))
-      (<proc-58> (external-function-object)
+      (<proc-57> () (apply-cont2 k2 void-value fail))
+      (<proc-58> (k) (apply-cont2 k (car args) fail))
+      (<proc-59> (external-function-object)
        (apply-cont2
          k2
          (apply* external-function-object args)
@@ -969,7 +960,7 @@
              (case-clauses->simple-cond-clauses
                exp
                clauses
-               (make-cont '<cont-5> k))
+               (make-cont '<cont-4> k))
              (case-clauses->cond-clauses
                'r
                clauses
@@ -1740,7 +1731,7 @@
           (unify-patterns
             left-pattern
             datum
-            (make-cont '<cont-3> clauses datum right-pattern handler
+            (make-cont '<cont-2> clauses datum right-pattern handler
               fail k))))))
 
 (define*
@@ -1761,7 +1752,7 @@
         (nest-let*-bindings
           (cdr bindings)
           bodies
-          (make-cont '<cont-4> bindings k)))))
+          (make-cont '<cont-3> bindings k)))))
 
 (define*
   case-clauses->simple-cond-clauses
@@ -1771,7 +1762,7 @@
         (case-clauses->simple-cond-clauses
           var
           (cdr clauses)
-          (make-cont '<cont-6> clauses var k)))))
+          (make-cont '<cont-5> clauses var k)))))
 
 (define*
   case-clauses->cond-clauses
@@ -1810,7 +1801,7 @@
       ((quasiquote? datum)
        (expand-quasiquote
          (cadr datum)
-         (make-cont '<cont-7> handler fail k)))
+         (make-cont '<cont-6> handler fail k)))
       ((unquote? datum)
        (apply-handler2 handler (format "misplaced ~a" datum) fail))
       ((unquote-splicing? datum)
@@ -1852,7 +1843,7 @@
           (apply-macro
             mit-define-transformer
             datum
-            (make-cont '<cont-7> handler fail k)))
+            (make-cont '<cont-6> handler fail k)))
          ((= (length datum) 3)
           (parse
             (caddr datum)
@@ -1876,7 +1867,7 @@
           (apply-macro
             mit-define-transformer
             datum
-            (make-cont '<cont-7> handler fail k)))
+            (make-cont '<cont-6> handler fail k)))
          ((= (length datum) 3)
           (parse
             (caddr datum)
@@ -2006,7 +1997,7 @@
       ((vector? datum)
        (expand-quasiquote
          (vector->list datum)
-         (make-cont '<cont-12> k)))
+         (make-cont '<cont-11> k)))
       ((not (pair? datum)) (apply-cont k `',datum))
       ((quasiquote? datum) (apply-cont k `',datum))
       ((unquote? datum) (apply-cont k (cadr datum)))
@@ -2015,13 +2006,13 @@
            (apply-cont k (cadr (car datum)))
            (expand-quasiquote
              (cdr datum)
-             (make-cont '<cont-11> datum k))))
+             (make-cont '<cont-10> datum k))))
       ((quasiquote-list? datum)
-       (expand-quasiquote-list datum (make-cont '<cont-10> k)))
+       (expand-quasiquote-list datum (make-cont '<cont-9> k)))
       (else
        (expand-quasiquote
          (car datum)
-         (make-cont '<cont-9> datum k))))))
+         (make-cont '<cont-8> datum k))))))
 
 (define*
   expand-quasiquote-list
@@ -2030,7 +2021,7 @@
         (apply-cont k '())
         (expand-quasiquote
           (car datum)
-          (make-cont '<cont-14> datum k)))))
+          (make-cont '<cont-13> datum k)))))
 
 (define quasiquote-list?
   (lambda (datum)
@@ -2200,7 +2191,7 @@
   read-and-eval-sexps
   (lambda (tokens env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
-        (apply-cont2 k '<void> fail)
+        (apply-cont2 k void-value fail)
         (read-sexp
           tokens
           handler
@@ -2338,41 +2329,42 @@
   (lambda ()
     (make-initial-env-extended
       (make-initial-environment
-        (list 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print
-         'display 'newline 'load 'length 'null? 'cons 'car 'cdr 'cadr
-         'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq
-         'member 'range 'set-car! 'set-cdr! 'import 'get
+        (list 'void 'exit 'eval 'parse 'parse-string 'apply 'sqrt
+         'print 'display 'newline 'load 'length 'null? 'cons 'car
+         'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal?
+         'eq? 'memq 'member 'range 'set-car! 'set-cdr! 'import 'get
          'call-with-current-continuation 'call/cc 'abort 'require
          'cut 'reverse 'append 'list->vector 'dir 'current-time 'map
          'for-each 'env 'using 'not 'printf 'vector 'vector-set!
          'vector-ref 'make-vector)
-        (list (make-proc '<proc-56>) (make-proc '<proc-55>)
-         (make-proc '<proc-54>) (make-proc '<proc-53>)
-         (make-proc '<proc-52>) (make-proc '<proc-51>)
-         (make-proc '<proc-50>) (make-proc '<proc-49>)
-         (make-proc '<proc-48>) (make-proc '<proc-47>) length-prim
-         (make-proc '<proc-46>) (make-proc '<proc-45>)
-         (make-proc '<proc-44>) (make-proc '<proc-43>)
-         (make-proc '<proc-42>) (make-proc '<proc-41>)
-         (make-proc '<proc-40>) (make-proc '<proc-39>)
-         (make-proc '<proc-38>) (make-proc '<proc-37>)
-         (make-proc '<proc-36>) (make-proc '<proc-35>)
-         (make-proc '<proc-34>) (make-proc '<proc-33>)
-         (make-proc '<proc-32>) (make-proc '<proc-31>)
-         (make-proc '<proc-30>) (make-proc '<proc-29>)
-         (make-proc '<proc-28>) (make-proc '<proc-27>)
-         (make-proc '<proc-26>) (make-proc '<proc-25>)
-         (make-proc '<proc-24>) (make-proc '<proc-23>)
-         (make-proc '<proc-22>) (make-proc '<proc-22>)
-         (make-proc '<proc-21>) (make-proc '<proc-20>)
-         (make-proc '<proc-19>) (make-proc '<proc-18>)
-         (make-proc '<proc-17>) (make-proc '<proc-16>)
-         (make-proc '<proc-15>) (make-proc '<proc-14>)
-         (make-proc '<proc-13>) (make-proc '<proc-12>)
-         (make-proc '<proc-11>) (make-proc '<proc-10>)
-         (make-proc '<proc-9>) (make-proc '<proc-8>)
-         (make-proc '<proc-7>) (make-proc '<proc-6>)
-         (make-proc '<proc-5>) (make-proc '<proc-4>))))))
+        (list (make-proc '<proc-57>) (make-proc '<proc-56>)
+         (make-proc '<proc-55>) (make-proc '<proc-54>)
+         (make-proc '<proc-53>) (make-proc '<proc-52>)
+         (make-proc '<proc-51>) (make-proc '<proc-50>)
+         (make-proc '<proc-49>) (make-proc '<proc-48>)
+         (make-proc '<proc-47>) length-prim (make-proc '<proc-46>)
+         (make-proc '<proc-45>) (make-proc '<proc-44>)
+         (make-proc '<proc-43>) (make-proc '<proc-42>)
+         (make-proc '<proc-41>) (make-proc '<proc-40>)
+         (make-proc '<proc-39>) (make-proc '<proc-38>)
+         (make-proc '<proc-37>) (make-proc '<proc-36>)
+         (make-proc '<proc-35>) (make-proc '<proc-34>)
+         (make-proc '<proc-33>) (make-proc '<proc-32>)
+         (make-proc '<proc-31>) (make-proc '<proc-30>)
+         (make-proc '<proc-29>) (make-proc '<proc-28>)
+         (make-proc '<proc-27>) (make-proc '<proc-26>)
+         (make-proc '<proc-25>) (make-proc '<proc-24>)
+         (make-proc '<proc-23>) (make-proc '<proc-22>)
+         (make-proc '<proc-22>) (make-proc '<proc-21>)
+         (make-proc '<proc-20>) (make-proc '<proc-19>)
+         (make-proc '<proc-18>) (make-proc '<proc-17>)
+         (make-proc '<proc-16>) (make-proc '<proc-15>)
+         (make-proc '<proc-14>) (make-proc '<proc-13>)
+         (make-proc '<proc-12>) (make-proc '<proc-11>)
+         (make-proc '<proc-10>) (make-proc '<proc-9>)
+         (make-proc '<proc-8>) (make-proc '<proc-7>)
+         (make-proc '<proc-6>) (make-proc '<proc-5>)
+         (make-proc '<proc-4>))))))
 
 (define*
   equal-objects?
@@ -2389,7 +2381,7 @@
        (equal-objects?
          (car x)
          (car y)
-         (make-cont '<cont-16> x y k)))
+         (make-cont '<cont-15> x y k)))
       ((and (vector? x)
             (vector? y)
             (= (vector-length x) (vector-length y)))
@@ -2404,7 +2396,7 @@
         (equal-objects?
           (vector-ref v1 i)
           (vector-ref v2 i)
-          (make-cont '<cont-17> i v1 v2 k)))))
+          (make-cont '<cont-16> i v1 v2 k)))))
 
 (define*
   member-prim
@@ -2420,7 +2412,7 @@
        (equal-objects?
          x
          (car ls)
-         (make-cont '<cont-18> ls orig-ls x handler fail k))))))
+         (make-cont '<cont-17> ls orig-ls x handler fail k))))))
 
 (define*
   map-prim
@@ -2526,7 +2518,7 @@
         (iterate proc (car lists) env handler fail k)
         (let ((arg-list (listify lists)))
           (if (null? (car arg-list))
-              (apply-cont2 k '<void> fail)
+              (apply-cont2 k void-value fail)
               (if (dlr-exp? proc)
                   (begin
                     (dlr-apply proc (map car arg-list))
@@ -2562,7 +2554,7 @@
 (define*
   call/cc-primitive
   (lambda (proc env handler fail k)
-    (let ((fake-k (make-proc '<proc-57> k)))
+    (let ((fake-k (make-proc '<proc-58> k)))
       (if (dlr-exp? proc)
           (apply-cont2 k (dlr-apply proc (list fake-k)) fail)
           (apply-proc proc (list fake-k) env handler fail k)))))
@@ -2602,7 +2594,7 @@
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
-       (apply-cont2 k '<void> fail))
+       (apply-cont2 k void-value fail))
       ((not (string? filename))
        (apply-handler2
          handler
@@ -2625,7 +2617,7 @@
   load-files
   (lambda (filenames env handler fail k)
     (if (null? filenames)
-        (apply-cont2 k '<void> fail)
+        (apply-cont2 k void-value fail)
         (load-file (car filenames) env handler fail
           (make-cont2 '<cont2-87> filenames env handler k)))))
 
@@ -2653,7 +2645,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc '<proc-58> external-function-object)))
+    (make-proc '<proc-59> external-function-object)))
 
 (define reinitialize-globals
   (lambda ()
@@ -2717,7 +2709,7 @@
        (occurs?
          var
          (car pattern)
-         (make-cont '<cont-19> pattern var k))))))
+         (make-cont '<cont-18> pattern var k))))))
 
 (define*
   unify-patterns
@@ -2726,7 +2718,7 @@
       ((pattern-variable? p1)
        (if (pattern-variable? p2)
            (apply-cont k (make-sub 'unit p1 p2))
-           (occurs? p1 p2 (make-cont '<cont-20> p1 p2 k))))
+           (occurs? p1 p2 (make-cont '<cont-19> p1 p2 k))))
       ((pattern-variable? p2) (unify-patterns p2 p1 k))
       ((and (constant? p1) (constant? p2) (equal? p1 p2))
        (apply-cont k (make-sub 'empty)))
@@ -2739,7 +2731,7 @@
     (unify-patterns
       (car pair1)
       (car pair2)
-      (make-cont '<cont-24> pair1 pair2 k))))
+      (make-cont '<cont-23> pair1 pair2 k))))
 
 (define*
   instantiate
@@ -2751,7 +2743,7 @@
        (instantiate
          (car pattern)
          s
-         (make-cont '<cont-26> pattern s k)))
+         (make-cont '<cont-25> pattern s k)))
       (else (error 'instantiate "bad pattern: ~a" pattern)))))
 
 (define make-sub (lambda args (cons 'substitution args)))
@@ -2766,7 +2758,7 @@
            (apply-cont k new-pattern)
            (apply-cont k var)))
       (composite (s1 s2)
-       (apply-sub s1 var (make-cont '<cont-27> s2 k)))
+       (apply-sub s1 var (make-cont '<cont-26> s2 k)))
       (else (error 'apply-sub "bad substitution: ~a" s)))))
 
 (define chars-to-scan 'undefined)
@@ -2775,13 +2767,9 @@
 
 (define read-char-count 'undefined)
 
-(define init-cont (make-cont '<cont-1>))
-
 (define init-cont2 (make-cont2 '<cont2-3>))
 
 (define init-cont3 (make-cont3 '<cont3-9>))
-
-(define init-handler (make-handler '<handler-1>))
 
 (define init-handler2 (make-handler2 '<handler2-1>))
 
@@ -2847,6 +2835,8 @@
 (define catch? (tagged-list 'catch >= 3))
 
 (define finally? (tagged-list 'finally >= 2))
+
+(define void-value '<void>)
 
 (define *need-newline* #f)
 

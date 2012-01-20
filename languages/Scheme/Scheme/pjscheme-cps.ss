@@ -527,10 +527,10 @@
 ;;------------------------------------------------------------------------
 ;; for manual testing only in scheme
 
-(define init-cont (lambda-cont (v) (halt* v)))
+;;(define init-cont (lambda-cont (v) (halt* v)))
 (define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
 (define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
-(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
+;;(define init-handler (lambda-handler (e) (halt* (list 'exception e))))
 (define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
 (define init-fail (lambda-fail () (halt* "no more choices")))
 
@@ -597,6 +597,212 @@
 ;; 			(m exp toplevel-env handler fail
 ;;			   (lambda-cont2 (result fail)
 ;;			      (load-files (cdr filenames) handler fail k))))))))))
+
+;;------------------------------------------------------------------------
+
+;;(define token-start 0)
+
+;;(define* scan-input2
+;;  (lambda (input handler fail k)   ;; k receives 2 args: a list of tokens, fail
+;;    (set! read-char-count 0)
+;;    (set! read-line-count 1)
+;;    (set! token-start 0)
+;;    (set! chars-to-scan (string-append input (string #\nul)))
+;;    (scan-input-loop2 0 handler fail k)))
+
+;;(define* scan-input-loop2
+;;  (lambda (chars handler fail k)   ;; k receives 2 args: a list of tokens, fail
+;;    (apply-action2 '(goto start-state) '() chars handler fail
+;;      (lambda-cont3 (token chars-left fail)
+;;	(if (token-type? token 'end-marker)
+;;	  (k (list token) fail)
+;;	  (scan-input-loop2 chars-left handler fail
+;;	    (lambda-cont2 (tokens fail)
+;;	      (k (cons token tokens) fail))))))))
+
+;;(define* apply-action2
+;;  (lambda (action buffer chars handler fail k)  ;; k receives 3 args: token, chars-left, fail
+;;;;    (display "action: ")
+;;;;    (display action)
+;;;;    (display ", buffer: ")
+;;;;    (write buffer)
+;;;;    (newline)
+;;    (record-case action
+;;      (shift (next)
+;;	(begin
+;;	  (set! read-char-count (+ read-char-count 1))
+;;	  (apply-action2 next (cons (1st chars) buffer) (remaining chars) handler fail k)))
+;;      (replace (new-char next)
+;;	(apply-action2 next (cons new-char buffer) (remaining chars) handler fail k))
+;;      (drop-newline (next)
+;;	(begin
+;;	  (set! read-line-count (+ read-line-count 1))
+;;	  (set! read-char-count 0)
+;;	  (apply-action2 next buffer (remaining chars) handler fail k)))
+;;      (drop (next)
+;;	(begin
+;;	  (set! read-char-count (+ read-char-count 1))
+;;	  (apply-action2 next buffer (remaining chars) handler fail k)))
+;;      (goto (state)
+;;	(let ((action (apply-state2 state (1st chars))))
+;;	  (if (eq? action 'error)
+;;	    (scan-error chars handler fail)
+;;	    (apply-action2 action buffer chars handler fail k))))
+;;      (emit (token-type)
+;;	(convert-buffer-to-token token-type buffer handler fail
+;;	  (lambda-cont2 (v fail)
+;;	    (k (append v (list read-line-count read-char-count)) chars fail))))
+;;      (else (error 'apply-action2 "invalid action: ~a" action)))))
+
+;;(define apply-state2
+;;  (lambda (state c)
+;;    (case state
+;;      (start-state
+;;	(cond
+;;	  ((char=? c #\newline) '(drop-newline (goto start-state)))
+;;	  ((char-whitespace? c) '(drop (goto start-state)))
+;;	  ((char=? c #\;) '(drop (goto comment-state)))
+;;	  ((char=? c #\() '(drop (emit lparen)))
+;;	  ((char=? c #\[) '(drop (emit lbracket)))
+;;	  ((char=? c #\)) '(drop (emit rparen)))
+;;	  ((char=? c #\]) '(drop (emit rbracket)))
+;;	  ((char=? c #\') '(drop (emit apostrophe)))
+;;	  ((char=? c #\`) '(drop (emit backquote)))
+;;	  ((char=? c #\,) '(drop (goto comma-state)))
+;;	  ((char=? c #\#) '(drop (goto hash-prefix-state)))
+;;	  ((char=? c #\") '(drop (goto string-state)))
+;;	  ((char-initial? c) '(shift (goto identifier-state)))
+;;	  ((char-sign? c) '(shift (goto signed-state)))
+;;	  ((char=? c #\.) '(shift (goto decimal-point-state)))
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\nul) '(drop (emit end-marker)))
+;;	  (else 'error)))
+;;      (comment-state
+;;	(cond
+;;	  ((char=? c #\newline) '(drop-newline (goto start-state)))
+;;	  ((char=? c #\nul) '(goto start-state))
+;;	  (else '(drop (goto comment-state)))))
+;;      (comma-state
+;;	(cond
+;;	  ((char=? c #\@) '(drop (emit comma-at)))
+;;	  (else '(emit comma))))
+;;      (hash-prefix-state
+;;	(cond
+;;	  ((char-boolean? c) '(shift (emit boolean)))
+;;	  ((char=? c #\\) '(drop (goto character-state)))
+;;	  ((char=? c #\() '(drop (emit lvector)))
+;;	  (else 'error)))
+;;      (character-state
+;;	(cond
+;;	  ((char-alphabetic? c) '(shift (goto alphabetic-character-state)))
+;;	  ((not (char=? c #\nul)) '(shift (emit character)))
+;;	  (else 'error)))
+;;      (alphabetic-character-state
+;;	(cond
+;;	  ((char-alphabetic? c) '(shift (goto named-character-state)))
+;;	  (else '(emit character))))
+;;      (named-character-state
+;;	(cond
+;;	  ((char-delimiter? c) '(emit named-character))
+;;	  (else '(shift (goto named-character-state)))))
+;;      (string-state
+;;	(cond
+;;	  ((char=? c #\") '(drop (emit string)))
+;;	  ((char=? c #\\) '(drop (goto string-escape-state)))
+;;	  ((char=? c #\nul) 'error)
+;;	  (else '(shift (goto string-state)))))
+;;      (string-escape-state
+;;	(cond
+;;	  ((char=? c #\") '(shift (goto string-state)))
+;;	  ((char=? c #\\) '(shift (goto string-state)))
+;;	  ((char=? c #\b) '(replace #\backspace (goto string-state)))
+;;	  ((char=? c #\f) '(replace #\page (goto string-state)))
+;;	  ((char=? c #\n) '(replace #\newline (goto string-state)))
+;;	  ;;((char=? c #\r) '(replace #\newline (goto string-state)))
+;;	  ((char=? c #\t) '(replace #\tab (goto string-state)))
+;;	  ((char=? c #\r) '(replace #\return (goto string-state)))
+;;	  (else 'error)))
+;;      (identifier-state
+;;	(cond
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  (else 'error)))
+;;      (signed-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\.) '(shift (goto signed-decimal-point-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (decimal-point-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((char-delimiter? c) '(emit dot))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (signed-decimal-point-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (whole-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto whole-number-state)))
+;;	  ((char=? c #\.) '(shift (goto fractional-number-state)))
+;;	  ((char=? c #\/) '(shift (goto rational-number-state)))
+;;	  ((or (char=? c #\e) (char=? c #\E)) '(shift (goto suffix-state)))
+;;	  ((char-delimiter? c) '(emit integer))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (fractional-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto fractional-number-state)))
+;;	  ((or (char=? c #\e) (char=? c #\E)) '(shift (goto suffix-state)))
+;;	  ((char-delimiter? c) '(emit decimal))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (rational-number-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto rational-number-state*)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (rational-number-state*
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto rational-number-state*)))
+;;	  ((char-delimiter? c) '(emit rational))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (suffix-state
+;;	(cond
+;;	  ((char-sign? c) '(shift (goto signed-exponent-state)))
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (signed-exponent-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit identifier))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (exponent-state
+;;	(cond
+;;	  ((char-numeric? c) '(shift (goto exponent-state)))
+;;	  ((char-delimiter? c) '(emit decimal))
+;;	  ((char-subsequent? c) '(shift (goto identifier-state)))
+;;	  (else 'error)))
+;;      (else
+;;	(error 'apply-state2 "invalid state: ~a" state)))))
+
+;;(define scan-string2
+;;  (lambda (input)
+;;    (scan-input2 input init-handler2 init-fail init-cont2)))
+
+;;(define scan-file2
+;;  (lambda (filename)
+;;    (scan-input2 (read-content filename) init-handler2 init-fail init-cont2)))
 
 (load "transformer-macros.ss")
 
@@ -1439,6 +1645,10 @@
       (lambda-cont3 (datum tokens-left fail)
 	(parse datum init-handler2 init-fail init-cont2)))))
 
+;;(define parse-file
+;;  (lambda (filename)
+;;    (get-parsed-sexps filename)))
+
 (define print-parsed-sexps
   (lambda (filename)
     (for-each pretty-print (get-parsed-sexps filename))))
@@ -1476,6 +1686,8 @@
 (load "environments-cps.ss")
 (load "parser-cps.ss")
 
+(define void-value '<void>)
+
 (define *need-newline* #f)
 
 (define pretty-print-prim
@@ -1506,7 +1718,7 @@
 ;; redefined as REP-k when no-csharp-support.ss is loaded
 (define scheme-REP-k
   (lambda-cont2 (v fail)
-    (if (not (eq? v '<void>))
+    (if (not (eq? v void-value))
 	(pretty-print-prim v))
     (if *need-newline* (newline))
     (read-eval-print fail)))
@@ -1570,7 +1782,7 @@
 (define* read-and-eval-sexps
   (lambda (tokens env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
-      (k '<void> fail)
+      (k void-value fail)
       (read-sexp tokens handler fail
 	(lambda-cont3 (datum tokens-left fail)
 	  (parse datum handler fail
@@ -1587,8 +1799,8 @@
       (lit-exp (datum) (k datum fail))
       (var-exp (id) (lookup-value id env handler fail k))
       (func-exp (exp) (m exp env handler fail
-                        (lambda-cont2 (f fail)
-                          (k (dlr-func f) fail))))
+                        (lambda-cont2 (proc fail)
+                          (k (dlr-func proc) fail))))
       (if-exp (test-exp then-exp else-exp)
 	(m test-exp env handler fail
 	  (lambda-cont2 (bool fail)
@@ -1604,7 +1816,7 @@
 		  (set-binding-value! binding rhs-value)
 		  ;; need to undo the assignment if we back up
 		  (let ((new-fail (lambda-fail () (set-binding-value! binding old-value) (fail))))
-		    (k '<void> new-fail))))))))
+		    (k void-value new-fail))))))))
       (define-exp (var docstring rhs-exp)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
@@ -1613,18 +1825,18 @@
 		(set-binding-value! binding rhs-value)
 		(set-binding-docstring! binding docstring)
 		;; definitions should occur only at top level, so no need to undo
-		(k '<void> fail))))))
+		(k void-value fail))))))
       (define!-exp (var docstring rhs-exp)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
 	    (set-global-value! var rhs-value)
 	    (set-global-docstring! var docstring)
-	    (k '<void> fail))))
+	    (k void-value fail))))
       (define-syntax-exp (keyword clauses)
 	(lookup-binding-in-first-frame keyword macro-env handler fail
 	  (lambda-cont2 (binding fail)
 	    (set-binding-value! binding (make-pattern-macro clauses))
-	    (k '<void> fail))))
+	    (k void-value fail))))
       (begin-exp (exps) (eval-sequence exps env handler fail k))
       (lambda-exp (formals body)
 	(k (closure formals body env) fail))
@@ -1769,12 +1981,14 @@
   (lambda ()
     (make-initial-env-extended
      (make-initial-environment
-      (list 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'length
+      (list 'void 'exit 'eval 'parse 'parse-string 'apply 'sqrt 'print 'display 'newline 'load 'length
 	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq 'member 'range
 	    'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require 'cut
 	    'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env
 	    'using 'not 'printf 'vector 'vector-set! 'vector-ref 'make-vector)
       (list
+	;; void
+	(lambda-proc (args env2 handler fail k2) (k2 void-value fail))
 	;; exit
         (lambda-proc (args env2 handler fail k2)
 	  (halt* '(exiting the interpreter)))
@@ -1807,11 +2021,11 @@
 	;; sqrt
 	(lambda-proc (args env2 handler fail k2) (k2 (apply sqrt args) fail))
 	;; print
-	(lambda-proc (args env2 handler fail k2) (for-each pretty-print-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (for-each pretty-print-prim args) (k2 void-value fail))
 	;; display
-	(lambda-proc (args env2 handler fail k2) (apply display-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (apply display-prim args) (k2 void-value fail))
 	;; newline
-	(lambda-proc (args env2 handler fail k2) (newline-prim) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (newline-prim) (k2 void-value fail))
 	;; load
 	(lambda-proc (args env2 handler fail k2)
 	   (load-file (car args) toplevel-env handler fail k2))
@@ -1889,7 +2103,7 @@
 	;; abort
 	(lambda-proc (args env2 handler fail k2)
 	  (if (null? args)
-	    (REP-k '<void> fail)
+	    (REP-k void-value fail)
 	    (REP-k (car args) fail)))
 	;; require
 	(lambda-proc (args env2 handler fail k2)
@@ -1921,7 +2135,7 @@
 	;; not
 	(lambda-proc (args env2 handler fail k2) (k2 (not (car args)) fail))
 	;; printf
-	(lambda-proc (args env2 handler fail k2) (apply printf-prim args) (k2 '<void> fail))
+	(lambda-proc (args env2 handler fail k2) (apply printf-prim args) (k2 void-value fail))
         ;; vector
 	(lambda-proc (args env2 handler fail k2) (k2 (make-vector args) fail))
         ;; vector-set!
@@ -2083,7 +2297,7 @@
       (iterate proc (car lists) env handler fail k)
       (let ((arg-list (listify lists)))
 	(if (null? (car arg-list))
-	  (k '<void> fail)
+	  (k void-value fail)
 	  (if (dlr-exp? proc) 
 	    (begin
 	      (dlr-apply proc (map car arg-list))
@@ -2166,7 +2380,7 @@
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
-       (k '<void> fail))
+       (k void-value fail))
       ((not (string? filename))
        (handler (format "filename is not a string: ~a" filename) fail))
       ((not (file-exists? filename))
@@ -2181,12 +2395,12 @@
 	       (if (null? load-stack)
 		 (printf "WARNING: empty load-stack encountered!\n")  ;; should never happen
 		 (set! load-stack (cdr load-stack)))
-	       (k '<void> fail)))))))))
+	       (k void-value fail)))))))))
 
 (define* load-files
   (lambda (filenames env handler fail k)
     (if (null? filenames)
-      (k '<void> fail)
+      (k void-value fail)
       (load-file (car filenames) env handler fail
 	(lambda-cont2 (v fail)
 	  (load-files (cdr filenames) env handler fail k))))))
@@ -2235,9 +2449,9 @@
       (k2 (apply* external-function-object args) fail))))
 
 (define REP-k
-  (lambda-cont2 (result fail)
+  (lambda-cont2 (v fail)
     (set! last-fail fail)
-    (halt* result)))
+    (halt* v)))
 
 (define REP-fail
   (lambda-fail ()

@@ -36,15 +36,18 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text) {
-    string result = PJScheme.execute(text).ToString();
-    // FIXME: when exceptions have a better format in Scheme:
-    if (result.StartsWith("(exception ")) {
-      System.Console.Error.WriteLine(result);
-      return false;
-    } else {
-      System.Console.WriteLine(result);
-      return true;
+    object result = PJScheme.execute(text);
+    if (result == null) {
+       return true;
     }
+    string resultString = result.ToString();
+    // FIXME: when exceptions have a better format in Scheme:
+    if (resultString.StartsWith("(exception ")) {
+      System.Console.Error.WriteLine(resultString);
+      return false;
+    }
+    System.Console.WriteLine(result);
+    return true;
   }
 
   public override bool ExecuteFile(string filename) {

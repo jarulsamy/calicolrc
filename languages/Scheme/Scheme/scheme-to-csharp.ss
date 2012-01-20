@@ -16,7 +16,8 @@
 
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
-(define *ignore-functions* '(
+(define *ignore-definitions* '(
+                             void-value
 			     scheme-REP-k
 			     scheme-REP-handler
 			     scheme-REP-fail
@@ -117,9 +118,9 @@
 
     ))
 
-(define *system-ignore-functions*
+(define *system-ignore-definitions*
   ;; use scheme name of functions to not move to csharp
-  '(*function-signatures* *ignore-functions* run trampoline *need-newline*
+  '(*function-signatures* *ignore-definitions* run trampoline *need-newline*
     *code*))
 
 (define proper-name
@@ -190,6 +191,8 @@
 
 (define cs-trampoline
   "
+  static object void_value = null;
+
   new public static object trampoline () {
 	while (pc != null) {
             try {
@@ -207,35 +210,16 @@
 	return (final_reg);
   }
 
-  public static Closure dlr_func(object proc) {
-    // Make a Csharp function that when evaluated will 
-    // call apply on the proc
+  public static Closure dlr_func(object schemeProc) {
+    // Return a Csharp function that when invoked acts
+    // like schemeProc by calling apply_proc on its args.
     return delegate (object[] args) { 
-      object temp_k_reg, temp_k2_reg, temp_handler_reg, temp_env_reg, temp_args_reg, temp_proc_reg, retval;
-      // make backups:
-      temp_k_reg = k_reg;
-      temp_k2_reg = k2_reg;
-      temp_handler_reg = handler_reg;
-      temp_env_reg = env_reg;
-      temp_args_reg = args_reg;
-      temp_proc_reg = proc_reg;
-      // set up registers:
-      k_reg = init_cont;
-      k2_reg = init_cont;
-      handler_reg = init_handler;
-      env_reg = toplevel_env;
+      proc_reg = schemeProc;
       args_reg = PJScheme.list ((object) args);
-      proc_reg = proc;
+      handler_reg = REP_handler;
+      k2_reg = REP_k;
       pc = (Function) apply_proc;
-      retval = (object) PJScheme.trampoline();
-      // Put things back the way they were:
-      k_reg = temp_k_reg;
-      k2_reg = temp_k2_reg;
-      handler_reg = temp_handler_reg;
-      env_reg = temp_env_reg;
-      args_reg = temp_args_reg;
-      proc_reg = temp_proc_reg;
-      return retval;
+      return PJScheme.trampoline();
     };
   }
 ")
@@ -372,7 +356,7 @@
     (db "convert-define: ~a~%" def)
     (let ((name (cadr def)))
       (cond
-       ((memq name (append *ignore-functions* *system-ignore-functions*))
+       ((memq name (append *ignore-definitions* *system-ignore-definitions*))
 	;; primitive function or system function
 	;; def = (define name (lambda args body ...))
 	;;(printf "Ignoring function ~a~%" name)
