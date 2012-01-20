@@ -198,6 +198,7 @@ namespace Calico {
     	      source.Compile();
             }
 	    } catch {
+                Console.Error.WriteLine("Unable to compile!");
 	      return null;
 	    }
             object retval;
