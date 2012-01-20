@@ -938,6 +938,7 @@ namespace Calico
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Home");
+			this.label2.WidthChars = 8;
 			this.notebook_docs.SetTabLabel (this.hbox1, this.label2);
 			this.label2.ShowAll ();
 			// Container child notebook_docs.Gtk.Notebook+NotebookChild
@@ -1044,6 +1045,7 @@ namespace Calico
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Shell");
+			this.label1.WidthChars = 8;
 			this.notebook_docs.SetTabLabel (this.hbox2, this.label1);
 			this.label1.ShowAll ();
 			this.vpaned2.Add (this.notebook_docs);

@@ -1010,6 +1010,7 @@
                   <widget class="Gtk.Label" id="label2">
                     <property name="MemberName" />
                     <property name="LabelProp" translatable="yes">Home</property>
+                    <property name="WidthChars">8</property>
                   </widget>
                   <packing>
                     <property name="type">tab</property>
@@ -1134,6 +1135,7 @@
                   <widget class="Gtk.Label" id="label1">
                     <property name="MemberName" />
                     <property name="LabelProp" translatable="yes">Shell</property>
+                    <property name="WidthChars">8</property>
                   </widget>
                   <packing>
                     <property name="type">tab</property>
