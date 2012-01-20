@@ -4307,16 +4307,25 @@ public static class Myro {
     pixel.setColor(c);
   }
   public static void setRGB(Graphics.Pixel pixel, IList rgb) {
-    pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
+    pixel.setRGB(
+			System.Convert.ToByte((int)rgb[0]), 
+			System.Convert.ToByte((int)rgb[1]), 
+			System.Convert.ToByte((int)rgb[2]));
   }
   public static void setRGB(Graphics.Pixel pixel, byte red, byte green, byte blue) {
     pixel.setRGB(red, green, blue);
   }
   public static void setRGB(Graphics.Pixel pixel, int red, int green, int blue) {
-    pixel.setRGB((byte)red, (byte)green, (byte)blue);
+    pixel.setRGB(
+			System.Convert.ToByte((int)red), 
+			System.Convert.ToByte((int)green), 
+			System.Convert.ToByte((int)blue));
   }
   public static void setRGB(Graphics.Pixel pixel, float red, float green, float blue) {
-    pixel.setRGB((byte)red, (byte)green, (byte)blue);
+    pixel.setRGB(
+			System.Convert.ToByte((int)red), 
+			System.Convert.ToByte((int)green), 
+			System.Convert.ToByte((int)green));
   }
   public static void setRGBA(Graphics.Pixel pixel, byte red, byte green, byte blue, byte alpha) {
     pixel.setRGBA(red, green, blue, alpha);
