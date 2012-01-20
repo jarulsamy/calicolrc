@@ -48,7 +48,7 @@ namespace CalicoPython
 				engine = manager.scriptRuntime.GetEngine (dlr_name);  
 			} else {
 				engine = scriptRuntime.GetEngine (dlr_name);  
-			}
+			}		
 			// Set the compiler options here:
 			compiler_options = engine.GetCompilerOptions ();
 			IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
@@ -111,6 +111,16 @@ namespace CalicoPython
 		{
 			if (trace)
 				IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
+		}
+		
+        public override void PostSetup(MainWindow calico) {
+			base.PostSetup(calico);
+            // Set up input
+            Execute(//"import clr;" +
+                //"clr.AddReference('Myro');" +
+                "from Myro import ask;" +
+                "__builtins__['input'] = ask;" +
+                "del ask;", false);
 		}
 	}
 

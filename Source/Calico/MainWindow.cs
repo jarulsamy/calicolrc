@@ -236,15 +236,17 @@ namespace Calico {
             if (debug_handler)
                 GLib.ExceptionManager.UnhandledException += HandleException;
             // Set EnvironmentPage to match displayed state:
-            IsUpdateEnvironment = true;
-            EnvironmentTabAction.Active = true;
+            //IsUpdateEnvironment = true;
+            //EnvironmentTabAction.Active = true;
+            EnvironmentPage.Child.Hide();
+            LocalsPage.Child.Hide();
             history = new History((List<string>)this.config.values["shell"]["history"]);
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
             searchbox.Hide();
             // End of GUI setup
-            GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
+            //GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
 
         // ------------------------------------------------------------
@@ -1100,9 +1102,6 @@ namespace Calico {
                 history_down.Sensitive = true;
             }
 	  }
-	  if (spinbutton1.Value != history.Position + 1) {
-	    spinbutton1.Value = history.Position + 1;
-	  }
         }
 
         public bool ExecuteShell() {
@@ -1300,6 +1299,7 @@ namespace Calico {
 	          }
     	      SetLanguage(CurrentDocument.language);
     	      CurrentDocument.widget.Child.GrabFocus();
+              //CurrentDocument.tab_label.Text =
     	      Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
     	      if (executeThread == null) {
