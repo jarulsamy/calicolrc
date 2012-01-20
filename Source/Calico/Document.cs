@@ -30,25 +30,13 @@ namespace Calico {
         public string basename;
         public Document document;
         string _documentType;
-        public string DocumentType {
-            set {
-                _documentType = value;
-                if (filename != null)
-                    basename = System.IO.Path.GetFileName(filename);
-                else if (calico == null)
-                    basename = System.IO.Path.GetFileName(filename);
-                else
-                   basename = String.Format("New {0} {1}", calico.manager.languages[language].proper_name, _documentType);
-                tab_label.Text = basename.Replace("_", "__");
-            }
-            get { return _documentType; }
-        }
         public Gtk.ScrolledWindow widget;
         public Gtk.Widget tab_widget;
         public Gtk.Label tab_label;
         // label for notebook page
         public Gtk.Button close_button;
         // tab close button
+        bool _isDirty = true;
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
@@ -67,6 +55,20 @@ namespace Calico {
             ((Gtk.HBox)tab_widget).Add(close_button);
             tab_label.TooltipText = filename;
             tab_widget.ShowAll();
+        }
+
+        public string DocumentType {
+            set {
+                _documentType = value;
+                if (filename != null)
+                    basename = System.IO.Path.GetFileName(filename);
+                else if (calico == null)
+                    basename = System.IO.Path.GetFileName(filename);
+                else
+                   basename = String.Format("New {0} {1}", calico.manager.languages[language].proper_name, _documentType);
+                tab_label.Text = basename.Replace("_", "__");
+            }
+            get { return _documentType; }
         }
 
         public virtual string GetText() {
@@ -106,7 +108,6 @@ namespace Calico {
             get {return true;}
         }
 
-        bool _isDirty = true;
         public virtual bool IsDirty {
             get { return _isDirty; }
             set { _isDirty = value; }
