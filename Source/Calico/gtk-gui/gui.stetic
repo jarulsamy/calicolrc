@@ -281,7 +281,7 @@
         <property name="Label" translatable="yes">Environment Tab</property>
         <property name="ShortLabel" translatable="yes">Environment Tab</property>
         <property name="DrawAsRadio">False</property>
-        <property name="Active">True</property>
+        <property name="Active">False</property>
         <signal name="Activated" handler="OnEnvironmentTabActionActivated" />
       </action>
       <action id="LocalsTabAction">
@@ -290,7 +290,7 @@
         <property name="Label" translatable="yes">Locals Tab</property>
         <property name="ShortLabel" translatable="yes">Locals Tab</property>
         <property name="DrawAsRadio">False</property>
-        <property name="Active">True</property>
+        <property name="Active">False</property>
         <signal name="Activated" handler="OnLocalsTabActionActivated" />
       </action>
       <action id="printAction">
@@ -773,7 +773,7 @@
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">1</property>
                 <property name="Scrollable">True</property>
                 <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                 <child>
@@ -1089,30 +1089,12 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="Gtk.SpinButton" id="spinbutton1">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="Lower">1</property>
-                                <property name="Upper">100</property>
-                                <property name="PageIncrement">10</property>
-                                <property name="StepIncrement">1</property>
-                                <property name="ClimbRate">1</property>
-                                <property name="Numeric">True</property>
-                                <property name="Value">1</property>
-                              </widget>
-                              <packing>
-                                <property name="Position">2</property>
-                                <property name="AutoSize">True</property>
-                                <property name="Expand">False</property>
-                                <property name="Fill">False</property>
-                              </packing>
+                              <placeholder />
                             </child>
                           </widget>
                           <packing>
                             <property name="Position">0</property>
                             <property name="AutoSize">True</property>
-                            <property name="Expand">False</property>
-                            <property name="Fill">False</property>
                           </packing>
                         </child>
                       </widget>

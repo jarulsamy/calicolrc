@@ -106,7 +106,6 @@ namespace Calico
 		private global::Gtk.HBox hbox3;
 		private global::Gtk.Button history_up;
 		private global::Gtk.Button history_down;
-		private global::Gtk.SpinButton spinbutton1;
 		private global::Gtk.ScrolledWindow scrolledwindow1;
 		private global::Gtk.Label label1;
 		private global::Gtk.Notebook notebook_tools;
@@ -248,11 +247,9 @@ namespace Calico
 			this.ShowAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Show");
 			w1.Add (this.ShowAction, null);
 			this.EnvironmentTabAction = new global::Gtk.ToggleAction ("EnvironmentTabAction", global::Mono.Unix.Catalog.GetString ("Environment Tab"), null, null);
-			this.EnvironmentTabAction.Active = true;
 			this.EnvironmentTabAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Environment Tab");
 			w1.Add (this.EnvironmentTabAction, "<Control>e");
 			this.LocalsTabAction = new global::Gtk.ToggleAction ("LocalsTabAction", global::Mono.Unix.Catalog.GetString ("Locals Tab"), null, null);
-			this.LocalsTabAction.Active = true;
 			this.LocalsTabAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Locals Tab");
 			w1.Add (this.LocalsTabAction, "<Control>l");
 			this.printAction = new global::Gtk.Action ("printAction", global::Mono.Unix.Catalog.GetString ("_Print"), null, "gtk-print");
@@ -676,7 +673,7 @@ namespace Calico
 			this.notebook_docs = new global::Gtk.Notebook ();
 			this.notebook_docs.CanFocus = true;
 			this.notebook_docs.Name = "notebook_docs";
-			this.notebook_docs.CurrentPage = 0;
+			this.notebook_docs.CurrentPage = 1;
 			this.notebook_docs.Scrollable = true;
 			// Container child notebook_docs.Gtk.Notebook+NotebookChild
 			this.hbox1 = new global::Gtk.HBox ();
@@ -1024,40 +1021,25 @@ namespace Calico
 			w195.Position = 1;
 			w195.Expand = false;
 			w195.Fill = false;
-			// Container child vbox3.Gtk.Box+BoxChild
-			this.spinbutton1 = new global::Gtk.SpinButton (1, 100, 1);
-			this.spinbutton1.CanFocus = true;
-			this.spinbutton1.Name = "spinbutton1";
-			this.spinbutton1.Adjustment.PageIncrement = 10;
-			this.spinbutton1.ClimbRate = 1;
-			this.spinbutton1.Numeric = true;
-			this.spinbutton1.Value = 1;
-			this.vbox3.Add (this.spinbutton1);
-			global::Gtk.Box.BoxChild w196 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.spinbutton1]));
-			w196.Position = 2;
-			w196.Expand = false;
-			w196.Fill = false;
 			this.vbox2.Add (this.vbox3);
-			global::Gtk.Box.BoxChild w197 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.vbox3]));
+			global::Gtk.Box.BoxChild w196 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.vbox3]));
+			w196.Position = 0;
+			this.hbox2.Add (this.vbox2);
+			global::Gtk.Box.BoxChild w197 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.vbox2]));
 			w197.Position = 0;
 			w197.Expand = false;
 			w197.Fill = false;
-			this.hbox2.Add (this.vbox2);
-			global::Gtk.Box.BoxChild w198 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.vbox2]));
-			w198.Position = 0;
-			w198.Expand = false;
-			w198.Fill = false;
 			// Container child hbox2.Gtk.Box+BoxChild
 			this.scrolledwindow1 = new global::Gtk.ScrolledWindow ();
 			this.scrolledwindow1.CanFocus = true;
 			this.scrolledwindow1.Name = "scrolledwindow1";
 			this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
 			this.hbox2.Add (this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w199 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.scrolledwindow1]));
-			w199.Position = 1;
+			global::Gtk.Box.BoxChild w198 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.scrolledwindow1]));
+			w198.Position = 1;
 			this.notebook_docs.Add (this.hbox2);
-			global::Gtk.Notebook.NotebookChild w200 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs [this.hbox2]));
-			w200.Position = 1;
+			global::Gtk.Notebook.NotebookChild w199 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs [this.hbox2]));
+			w199.Position = 1;
 			// Notebook tab
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
@@ -1065,8 +1047,8 @@ namespace Calico
 			this.notebook_docs.SetTabLabel (this.hbox2, this.label1);
 			this.label1.ShowAll ();
 			this.vpaned2.Add (this.notebook_docs);
-			global::Gtk.Paned.PanedChild w201 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.notebook_docs]));
-			w201.Resize = false;
+			global::Gtk.Paned.PanedChild w200 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.notebook_docs]));
+			w200.Resize = false;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook ();
 			this.notebook_tools.CanFocus = true;
@@ -1101,8 +1083,8 @@ namespace Calico
 			this.treeview1.Name = "treeview1";
 			this.GtkScrolledWindow1.Add (this.treeview1);
 			this.notebook_tools.Add (this.GtkScrolledWindow1);
-			global::Gtk.Notebook.NotebookChild w205 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools [this.GtkScrolledWindow1]));
-			w205.Position = 1;
+			global::Gtk.Notebook.NotebookChild w204 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools [this.GtkScrolledWindow1]));
+			w204.Position = 1;
 			// Notebook tab
 			this.label4 = new global::Gtk.Label ();
 			this.label4.Name = "label4";
@@ -1120,8 +1102,8 @@ namespace Calico
 			this.treeview2.Name = "treeview2";
 			this.scrolledwindow2.Add (this.treeview2);
 			this.notebook_tools.Add (this.scrolledwindow2);
-			global::Gtk.Notebook.NotebookChild w207 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools [this.scrolledwindow2]));
-			w207.Position = 2;
+			global::Gtk.Notebook.NotebookChild w206 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools [this.scrolledwindow2]));
+			w206.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label ();
 			this.label5.Name = "label5";
@@ -1129,12 +1111,12 @@ namespace Calico
 			this.notebook_tools.SetTabLabel (this.scrolledwindow2, this.label5);
 			this.label5.ShowAll ();
 			this.vpaned2.Add (this.notebook_tools);
-			global::Gtk.Paned.PanedChild w208 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.notebook_tools]));
-			w208.Resize = false;
-			w208.Shrink = false;
+			global::Gtk.Paned.PanedChild w207 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.notebook_tools]));
+			w207.Resize = false;
+			w207.Shrink = false;
 			this.vbox1.Add (this.vpaned2);
-			global::Gtk.Box.BoxChild w209 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.vpaned2]));
-			w209.Position = 3;
+			global::Gtk.Box.BoxChild w208 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.vpaned2]));
+			w208.Position = 3;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.statusbar1 = new global::Gtk.Statusbar ();
 			this.statusbar1.Name = "statusbar1";
@@ -1144,25 +1126,25 @@ namespace Calico
 			this.label6.Name = "label6";
 			this.label6.LabelProp = global::Mono.Unix.Catalog.GetString ("Language:");
 			this.statusbar1.Add (this.label6);
-			global::Gtk.Box.BoxChild w210 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.label6]));
-			w210.Position = 0;
-			w210.Expand = false;
-			w210.Fill = false;
+			global::Gtk.Box.BoxChild w209 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.label6]));
+			w209.Position = 0;
+			w209.Expand = false;
+			w209.Fill = false;
 			// Container child statusbar1.Gtk.Box+BoxChild
 			this.status_langauge = new global::Gtk.Label ();
 			this.status_langauge.Name = "status_langauge";
 			this.status_langauge.LabelProp = global::Mono.Unix.Catalog.GetString ("<i>Python</i>");
 			this.status_langauge.UseMarkup = true;
 			this.statusbar1.Add (this.status_langauge);
-			global::Gtk.Box.BoxChild w211 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.status_langauge]));
-			w211.Position = 1;
+			global::Gtk.Box.BoxChild w210 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.status_langauge]));
+			w210.Position = 1;
+			w210.Expand = false;
+			w210.Fill = false;
+			this.vbox1.Add (this.statusbar1);
+			global::Gtk.Box.BoxChild w211 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.statusbar1]));
+			w211.Position = 4;
 			w211.Expand = false;
 			w211.Fill = false;
-			this.vbox1.Add (this.statusbar1);
-			global::Gtk.Box.BoxChild w212 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.statusbar1]));
-			w212.Position = 4;
-			w212.Expand = false;
-			w212.Fill = false;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
