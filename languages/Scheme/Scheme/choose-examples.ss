@@ -8,13 +8,22 @@
 		 result)])
 
 ;;----------------------------------------------------------------------------
-;; Baker, Cooper, Fletcher, Miller, and Smith live on different floors of an
-;; apartment house that contains only five floors.  Baker does not live on the
-;; top floor.  Cooper does not live on the bottom floor.  Fletcher does not
-;; live on either the top or the bottom floor.  Miller lives on a higher floor
-;; than does Cooper.  Smith does not live on a floor adjacent to Fletcher's.
-;; Fletcher does not live on a floor adjacent to Cooper's.  Where does
-;; everyone live?
+
+(define ace?
+  (lambda (card)
+    (equal? card 'ace)))
+
+(define face-card?
+  (lambda (card)
+    (member card '(jack queen king))))
+
+(define total
+  (lambda (cards)
+    (cond
+      ((null? cards) 0)
+      ((face-card? (car cards)) (+ 10 (total (cdr cards))))
+      ((ace? (car cards)) (+ (choose 1 11) (total (cdr cards))))
+      (else (+ (car cards) (total (cdr cards)))))))
 
 (define distinct?
   (lambda (nums)
@@ -22,6 +31,22 @@
         (null? (cdr nums))
 	(and (not (member (car nums) (cdr nums)))
 	     (distinct? (cdr nums))))))
+
+(define all-totals
+  (lambda (cards)
+    (let loop ((totals '()))
+      (require (distinct? totals))
+      (choose (loop (cons (total cards) totals))
+	      totals))))
+
+;;----------------------------------------------------------------------------
+;; Baker, Cooper, Fletcher, Miller, and Smith live on different floors of an
+;; apartment house that contains only five floors.  Baker does not live on the
+;; top floor.  Cooper does not live on the bottom floor.  Fletcher does not
+;; live on either the top or the bottom floor.  Miller lives on a higher floor
+;; than does Cooper.  Smith does not live on a floor adjacent to Fletcher's.
+;; Fletcher does not live on a floor adjacent to Cooper's.  Where does
+;; everyone live?
 
 (define floors
   (lambda ()
