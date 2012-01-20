@@ -2522,15 +2522,28 @@ namespace Jigsaw
 			cvs.GdkWindow.GetSize(out sw, out sh);
 			cvs.TransformPoint(0.0, 0.0, out xmin, out ymin);
 			cvs.TransformPoint(sw, sh, out xmax, out ymax);
-			if (this.Outline.Top < ymin) {
-				cvs.DoTranslate( 0.0, 40.0); //wymin - this.Outline.Top );
-			} else if (this.Outline.Left < xmin) {
-				cvs.DoTranslate( 40.0, 0.0); //wxmin - this.Outline.Left, 0.0 );
-			} else if (this.Outline.Top + this.Outline.Height > ymax) {
+			
+			// Auto-translate based on mouse position, not block boundaries
+			double margin = 50.0;
+			if (cvs.mouseExact.Y < ymin + margin) {
+				cvs.DoTranslate( 0.0, 40.0);
+			} else if (cvs.mouseExact.X < xmin + margin) {
+				cvs.DoTranslate( 40.0, 0.0);
+			} else if (cvs.mouseExact.Y > ymax - margin) {
 				cvs.DoTranslate( 0.0, -40.0);
-			} else if (this.Outline.Left + this.Outline.Width > xmax) {
+			} else if (cvs.mouseExact.X > xmax - margin) {
 				cvs.DoTranslate(-40.0, 0.0);
 			}
+
+//			if (this.Outline.Top < ymin) {
+//				cvs.DoTranslate( 0.0, 40.0); //wymin - this.Outline.Top );
+//			} else if (this.Outline.Left < xmin) {
+//				cvs.DoTranslate( 40.0, 0.0); //wxmin - this.Outline.Left, 0.0 );
+//			} else if (this.Outline.Top + this.Outline.Height > ymax) {
+//				cvs.DoTranslate( 0.0, -40.0);
+//			} else if (this.Outline.Left + this.Outline.Width > xmax) {
+//				cvs.DoTranslate(-40.0, 0.0);
+//			}
 			
 			// Set modified flag
 			js.Modified = true;
