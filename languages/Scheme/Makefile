@@ -1,5 +1,5 @@
 
-CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe
+CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
 	gmcs -debug CalicoScheme.cs \
 		-lib:../../bin \
 		-r:PJScheme.dll \

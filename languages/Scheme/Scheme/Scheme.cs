@@ -1087,7 +1087,7 @@ public class Scheme {
   public static object make_string(object obj) {
 	trace(9, "called: make_string\n");
 	if (obj == null || obj == (object) NULL) {
-	  trace(10, "make_string returned: \"\\0\"\n");
+	  trace(0, "make_string returned: \"\\0\"\n");
 	  return (object) "\0";
 	}
 	trace(10, "make_string returned: \"{0}\"\n", obj.ToString());
@@ -2092,7 +2092,7 @@ public class Scheme {
 	if (lyst is Cons) {
 	  object current = lyst;
 	  while (!Eq(current, EmptyList)) {
-		retval += car(current).ToString();
+		retval += make_string(car(current));
 		current = cdr(current);
 	  }
 	}
@@ -2171,9 +2171,10 @@ public class Scheme {
 	  int count = ((Array)args).Length;
 	  for (int i = 0; i < count; i++) {
 		Object item = args[count - i - 1];
-		if (item == null) 
-		  result = EmptyList;
-		else if (item is object[])
+		//if (item == null) 
+		//  result = EmptyList;
+        // else
+		if (item is object[])
 		  result = append( list((object[]) item), result);
 		else
 		  result = new Cons(item, result);

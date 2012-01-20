@@ -204,7 +204,7 @@
                     string [] parts = get_parts(e.ToString(), NEWLINE_STRING);
 		    exception_reg = format(\"{0}\", parts[0]);
                 }
-		pc = (Function) apply_handler;
+		pc = (Function) apply_handler2;
 	    }
 	}
 	return (final_reg);
