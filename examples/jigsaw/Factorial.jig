@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <block id="1" typeName="Jigsaw.CControlStart" left="330" top="30">
+        <edge id="1" name="Out" linkedTo="14" />
+        <property name="Label" value="when program starts" />
+        <property name="Message" value="" />
+    </block>
+    <block id="2" typeName="Jigsaw.CControlEnd" left="330" top="100">
+        <edge id="2" name="In" linkedTo="13" />
+        <property name="Label" value="stop script" />
+        <property name="Message" value="" />
+    </block>
+    <block id="3" typeName="Jigsaw.CProcedureStart" left="545" top="30">
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="define Factorial (number)" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="Factorial" />
+        <property name="Arg1" value="number" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+    </block>
+    <block id="4" typeName="Jigsaw.CControlIf" left="545" top="60">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="11" />
+        <edge id="6" name="If" linkedTo="7" />
+        <property name="Label" value="if number &gt; 1" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="number &gt; 1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CProcedureCall" left="565" top="80">
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="9" />
+        <property name="Label" value="X = Factorial(number - 1)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="X" />
+        <property name="Procedure Name" value="Factorial" />
+        <property name="Arg1" value="number - 1" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+    </block>
+    <block id="6" typeName="Jigsaw.CAssignment" left="565" top="100">
+        <edge id="9" name="In" linkedTo="8" />
+        <edge id="10" name="Out" linkedTo="-1" />
+        <property name="Label" value="number = X * number" />
+        <property name="Message" value="" />
+        <property name="Variable" value="number" />
+        <property name="Expression" value="X * number" />
+    </block>
+    <block id="7" typeName="Jigsaw.CProcedureReturn" left="545" top="140">
+        <edge id="11" name="In" linkedTo="5" />
+        <property name="Label" value="return number" />
+        <property name="Message" value="" />
+        <property name="Expression" value="number" />
+    </block>
+    <block id="8" typeName="Jigsaw.CIOPrint" left="330" top="80">
+        <edge id="12" name="In" linkedTo="15" />
+        <edge id="13" name="Out" linkedTo="2" />
+        <property name="Label" value="print(X)" />
+        <property name="Message" value="" />
+        <property name="Expression" value="X" />
+    </block>
+    <block id="9" typeName="Jigsaw.CProcedureCall" left="330" top="60">
+        <edge id="14" name="In" linkedTo="1" />
+        <edge id="15" name="Out" linkedTo="12" />
+        <property name="Label" value="X = Factorial(5)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="X" />
+        <property name="Procedure Name" value="Factorial" />
+        <property name="Arg1" value="5" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+    </block>
+    <block id="10" typeName="Jigsaw.CProcedureStart" left="370" top="210">
+        <edge id="16" name="Out" linkedTo="17" />
+        <property name="Label" value="define MyProc ()" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="MyProc" />
+        <property name="Arg1" value="" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+    </block>
+    <block id="11" typeName="Jigsaw.CControlIf" left="370" top="240">
+        <edge id="17" name="In" linkedTo="16" />
+        <edge id="18" name="Out" linkedTo="-1" />
+        <edge id="19" name="If" linkedTo="-1" />
+        <property name="Label" value="if True" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="" />
+    </block>
+</jigsaw>
