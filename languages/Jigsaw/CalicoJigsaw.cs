@@ -114,6 +114,10 @@ public class CalicoJigsawDocument : Document
 	public override void UseLibrary(string filename) {
 		cvs.UseLibrary(filename);
 	}
+	
+	public override void Stop() {
+		cvs.Stop();
+	}
 }
 
 public class CalicoJigsawLanguage : Language
