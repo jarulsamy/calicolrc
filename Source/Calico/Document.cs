@@ -265,6 +265,8 @@ namespace Calico {
         public virtual bool HasBreakpointSetAtLine(int lineno) {
             return false;
         }
+        public virtual void Stop() {
+        }
     }
 
     public class TextDocument : Document {
