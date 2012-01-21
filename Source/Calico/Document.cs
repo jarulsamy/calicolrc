@@ -77,7 +77,7 @@ namespace Calico {
 
         public virtual void UseLibrary (string fullname)
         {
-            // Tell the document to use the library "filename"
+            // pass
         }
 
         public virtual void Print(Calico.MainWindow calico) {
@@ -444,9 +444,16 @@ namespace Calico {
         public override bool HasBreakpointSet {
             get { return breakpointCount > 0; }
         }
+
         public override bool HasBreakpointSetAtLine(int lineno) {
             return GetBreakpointAtLine(lineno) != null;
         }
+
+        public virtual void UseLibrary (string fullname)
+        {
+            texteditor.Insert (0, calico.manager[language].GetUseLibraryString(fullname));
+        }
+
     }
 }
 

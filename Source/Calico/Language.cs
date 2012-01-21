@@ -54,6 +54,12 @@ namespace Calico {
         public static Language MakeLanguage() {
             return null;
         }
+
+        public virtual string GetUseLibraryString (string fullname)
+        {
+            return "";
+        }
+
     }
     
 }

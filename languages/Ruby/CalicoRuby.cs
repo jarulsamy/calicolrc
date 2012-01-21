@@ -54,10 +54,6 @@ public class CalicoRubyDocument : TextDocument {
          	   base(calico, filename, language, mimetype) {
     }
 
-    public override void UseLibrary(string fullname) {
-		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
-                texteditor.Insert(0, String.Format("require \"{0}\"\n", bname));
-     }
 }
 	
 public class CalicoRubyLanguage : Language {
@@ -76,5 +72,10 @@ public class CalicoRubyLanguage : Language {
 
     public static new Language MakeLanguage() {
         return new CalicoRubyLanguage();
+    }
+
+    public override string GetUseLibraryString(string fullname) {
+		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
+                return String.Format("require \"{0}\"\n", bname);
     }
 }

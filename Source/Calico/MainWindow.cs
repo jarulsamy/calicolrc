@@ -388,6 +388,10 @@ namespace Calico {
         {
             if (CurrentDocument != null) {
                 CurrentDocument.UseLibrary(fullname);
+            } else if (Focus == Shell) {
+                string text = manager[CurrentLanguage].GetUseLibraryString(fullname);
+                if (text != "")
+                    Shell.Insert(0, text);
             }
         }
 

@@ -73,10 +73,6 @@ public class CalicoSchemeDocument : TextDocument {
             	   base(calico, filename, language, mimetype) {
     }
 
-    public override void UseLibrary(string fullname) {
-		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
-                texteditor.Insert(0, String.Format("(using \"{0}\")\n", bname));
-     }
 }
 	
 public class CalicoSchemeLanguage : Language
@@ -99,4 +95,9 @@ public class CalicoSchemeLanguage : Language
 	{
 		return new CalicoSchemeLanguage ();
 	}
+
+        public override string GetUseLibraryString(string fullname) {
+		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
+                return String.Format("(using \"{0}\")\n", bname);
+     }
 }

@@ -131,12 +131,7 @@ namespace CalicoPython
             	   base(calico, filename, language, mimetype)
 		{
 		}
-
-		public override void UseLibrary (string fullname)
-		{
-			string bname = System.IO.Path.GetFileNameWithoutExtension (fullname);
-			texteditor.Insert (0, String.Format ("import {0}\n", bname));
-		}
+		
 	}
 	
 	public class CalicoPythonLanguage : Language
@@ -160,5 +155,10 @@ namespace CalicoPython
 		{
 			return new CalicoPythonLanguage ();
 		}
+
+		public override string GetUseLibraryString(string fullname) {
+			string bname = System.IO.Path.GetFileNameWithoutExtension (fullname);
+			return String.Format ("import {0}\n", bname);
+		}		
 	}
 }
