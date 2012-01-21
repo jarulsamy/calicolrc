@@ -1218,15 +1218,11 @@ namespace Calico {
         }
 
         public void AbortThread() {
-            // FIXME: import Myro
             if (executeThread != null) {
                 Print(Tag.Warning, _("Stopping...\n"));
                 executeThread.Abort();
                 executeThread.Join();
                 executeThread = null;
-                //if Myro.robot:
-                //    Myro.robot.flush()
-                //    Myro.robot.stop()
                 Invoke(OnStopRunning);
             }
         }
@@ -1493,7 +1489,13 @@ namespace Calico {
 
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)
         {
-            AbortThread();
+			if (CurrentDocument != null) {
+                if (manager.languages[CurrentDocument.language].IsTextLanguage) {
+                    AbortThread();
+                } else {
+                    CurrentDocument.Stop();
+                }
+            }
         }
 
         protected virtual void OnEnvironmentTabActionActivated (object sender, System.EventArgs e)
