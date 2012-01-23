@@ -3788,8 +3788,9 @@ public static class Myro {
 	return;
       byte [] bytes = new byte[1];
       lock(serial) {
-        serial.DiscardInBuffer();
-        serial.DiscardOutBuffer();
+	// DiscardInBuffer() is causing trouble on Mac OSX - doesn't clear buffer
+        //serial.DiscardInBuffer();
+        //serial.DiscardOutBuffer();
 	while (true) {
 	  try {
 	    serial.Read(bytes, 0, 1);
@@ -3798,8 +3799,8 @@ public static class Myro {
 	    // no data, so we're done
 	    break;
 	  }
-	  serial.DiscardInBuffer();
-	  serial.DiscardOutBuffer();
+	  //serial.DiscardInBuffer();
+	  //serial.DiscardOutBuffer();
 	}
       }
     }
