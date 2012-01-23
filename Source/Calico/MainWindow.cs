@@ -1189,7 +1189,7 @@ namespace Calico {
             executeThread = null;
 			manager["python"].engine.Execute("import Myro as _\n" +
 				"if _.robot: _.robot.flush(); _.robot.stop()\n" + 
-				"del _");
+				"del _", false);
             /*
        if self.calico.last_error != "":
             url = self.make_error_url(self.language, self.calico.last_error)
