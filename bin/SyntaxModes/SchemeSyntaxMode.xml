@@ -1,4 +1,4 @@
-<!-- RubySyntaxMode.xml
+<!-- SchemeSyntaxMode.xml
 
  Author:
    Doug Blank <doug.blank@gmail.com>
@@ -26,7 +26,6 @@
 <SyntaxMode name = "Scheme" mimeTypes="text/x-scheme">
 	<Property name="LineComment">;</Property>
 	<Property name="StringQuote">"</Property>
-	<Property name="StringQuote">'</Property>
 	
 	<EolSpan color = "comment" rule="Comment" tagColor="comment.tag">;</EolSpan>
 	
@@ -35,11 +34,6 @@
 		<End>"</End>
 	</Span>
 
-	<Span color = "string" rule="String" stopateol = "true" escape='\'>
-		<Begin>&apos;</Begin>
-		<End>&apos;</End>
-	</Span>
-	
 	<Span color = "string" rule="String" stopateol = "true" escape='\'>
 		<Begin>/</Begin>
 		<End>/</End>
