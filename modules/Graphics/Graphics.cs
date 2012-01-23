@@ -457,12 +457,14 @@ public static class Graphics {
   }
 
   public static void wait(double seconds) {
-        ManualResetEvent mre = new ManualResetEvent(false);
+    Thread.Sleep((int)(seconds * 1000));
+    
+    /*    ManualResetEvent mre = new ManualResetEvent(false);
         GLib.Timeout.Add(((uint)seconds * 1000), new GLib.TimeoutHandler( delegate {
                           mre.Set();
                           return false;
         }));
-        mre.WaitOne();
+        mre.WaitOne();*/
   }
 
   public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
@@ -1880,7 +1882,7 @@ public static class Graphics {
         }
 
     public Point getP2() {
-          return getScreenPoint(points[1]);
+          return getScreenPoint(points[2]);
     }
 
     public Point getScreenPoint(IList iterable) {
