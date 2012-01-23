@@ -1223,11 +1223,11 @@ namespace Calico {
                 executeThread.Abort();
                 executeThread.Join();
                 executeThread = null;
-				/*
+				
 				manager["python"].engine.Execute("import Myro as _\n" +
 					"if _.robot: _.robot.flush(); _.robot.stop()\n" + 
 					"del _", false);
-				*/
+				
                 Invoke(OnStopRunning);
             }
         }
