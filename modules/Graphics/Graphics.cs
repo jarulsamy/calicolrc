@@ -1001,11 +1001,12 @@ public static class Graphics {
     public double time = 0.0;
     public double simulationStepTime = 0.01;
     public string state = "init";
-    
+    public Gdk.Color bg = new Gdk.Color(255, 255, 255);
+
     public WindowClass(string title="Calico Graphics",
                   int width=300, 
                   int height=300) : base(title) {
-      _canvas = new Canvas("auto");
+      _canvas = new Canvas("auto", width, height);
       AllowGrow = true;
       AllowShrink = true;
       SetDefaultSize(width, height);
@@ -1030,13 +1031,14 @@ public static class Graphics {
     public void clear() {
       clear(true);
     }
-
+    
     public void clear(bool redraw) {
-	  _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
-						   // FIXME: w,h of Window?
-						   (int)800, 
-						   (int)600);
+      _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+					       // FIXME: w,h of Window?
+					       (int)800, 
+					       (int)600);
 	  _canvas.need_to_draw_surface = false;
+
 	  mode = "auto";
 	  Resize(width, height);
 	  timer_running = false;
@@ -1080,7 +1082,7 @@ public static class Graphics {
     }
 
     public void setBackground(Color color) {
-          Gdk.Color bg = new Gdk.Color((byte)color.red, 
+          bg = new Gdk.Color((byte)color.red, 
                   (byte)color.green, 
                   (byte)color.blue);
           _canvas.ModifyBg(Gtk.StateType.Normal, bg);
@@ -1122,8 +1124,6 @@ public static class Graphics {
                   _canvas.shapes.Insert(_canvas.shapes.Count, shape);
                 }
         QueueDraw();
-      } else {
-        throw new Exception("shape not drawn on window");
       }
     }
     public void stackOnBottom(Shape shape) {
@@ -1358,7 +1358,9 @@ public static class Graphics {
           base.ShowAll(); 
         });
     }
+
     public new void Resize(int width, int height) {
+      _canvas.resize(width, height);
       Invoke(delegate {
           base.Resize(width, height);
         });
@@ -1414,10 +1416,10 @@ public static class Graphics {
       }
       set {
         if (value == "auto" || value == "manual" || value == "physics" || 
-	    value == "bitmap")
+	    value == "bitmap" || value == "bitmapmanual")
           canvas.mode = value;
         else
-          throw new Exception("window mode must be 'auto', 'manual', 'bitmap', or 'physics'");
+          throw new Exception("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', or 'physics'");
       }
     }          
 
@@ -1429,7 +1431,15 @@ public static class Graphics {
     }
 
     public void update() { // Window
-      need_to_redraw();
+      if (mode == "manual" || mode == "bitmapmanual")
+	{
+	  _canvas.need_to_draw_surface = true;
+	  QueueDraw();
+	}
+      else
+	{
+	  need_to_redraw();
+	}
     }
 
     public void step() { // Window
@@ -1439,6 +1449,10 @@ public static class Graphics {
       // Same as update, but will make sure it 
       // doesn't update too fast.
       // handle physics
+
+      // kjo
+      _canvas.need_to_draw_surface = true;
+      
       if (mode == "physics") {
         _canvas.world.Step((float)simulationStepTime); 
         time += simulationStepTime; 
@@ -1459,6 +1473,18 @@ public static class Graphics {
 		diff = (now - last_update).TotalMilliseconds / 1000.0;
       }
       last_update = DateTime.Now;
+      
+      if (mode == "bitmapmanual")
+	{
+	using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
+	  g.Save();
+	  g.Operator = Cairo.Operator.Source;
+	  g.SetSourceSurface(_canvas.surface, 0, 0);
+	  g.Paint();
+	  g.Restore();
+	}	   
+      }      
+	  
       _dirty = false;
       ManualResetEvent ev = new ManualResetEvent(false);
       Invoke(delegate { 
@@ -1618,45 +1644,86 @@ public static class Graphics {
     private string _mode;
     public FarseerPhysics.Dynamics.World world; 
     public object document;
+    private int width = 800, height = 600;
     public Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
 							       // FIXME: w,h of Window?
 							       (int)800, 
 							       (int)600);
+
+
+    public Cairo.ImageSurface finalsurface;
+
+
     public bool need_to_draw_surface = false;
     
     public string mode {
-          get {
-            return _mode;
-          }
-          set {
-            if (value == "manual" || value == "auto" || value == "physics" || 
-		value == "bitmap") {
-              _mode = value;
-              if (value == "physics")
+      get {
+	return _mode;
+      }
+      set {
+	if (value == "manual" || value == "auto" || value == "physics" || 
+	    value == "bitmap" || value == "bitmapmanual") {
+	  _mode = value;
+	  
+	  if (value == "physics")
                 initPhysics();
+	  resetSurfaces();
+	  
             } else
-                throw new Exception("canvas mode must be 'manual', 'auto', 'bitmap', or 'physics'");
-          }
+                throw new Exception("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual' or 'physics'");
+      }
     }
-
+    
     void initPhysics() {
       world = new FarseerPhysics.Dynamics.World(new Vector2(0.0f, 9.8f));
     }
 
-    public Canvas(string mode) : base(null, null) {
-          this.mode = mode;
+
+    void resetSurfaces()
+    {
+      surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+				       width,
+				       height);	  
+      if (mode == "bitmapmanual")
+	{
+	  finalsurface =  new Cairo.ImageSurface(Cairo.Format.Argb32, 
+						 // FIXME: w,h of Window?
+						 width, 
+						 height);
+	}
+      else
+	{
+	  finalsurface = surface;      	      
+	}      
     }
 
-    public Canvas(string mode, Gtk.Adjustment h, Gtk.Adjustment v) : 
-       base(h, v) {
-          this.mode = mode;
+    public void resize(int width, int height)
+    {
+      Console.Error.WriteLine("resizing");
+
+      this.width = width;
+      this.height = height;
+      resetSurfaces();
+    }
+
+    public Canvas(string mode, int width, int height) : base(null, null) {
+      this.mode = mode;
+      resize(width, height);
+    }
+    
+    public Canvas(string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v) {
+      surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+				       width,
+				       height);	  
+      this.mode = mode;
+      resize(width, height);
     }
         
     protected override bool OnExposeEvent (Gdk.EventExpose args) {
       using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
 	if (need_to_draw_surface) {
 	  g.Save();
-	  g.SetSourceSurface(surface, 0, 0);
+	  g.SetSourceSurface(finalsurface, 0, 0);
 	  g.Paint();
 	  g.Restore();
 	}
@@ -2285,11 +2352,11 @@ public static class Graphics {
     
     public void draw(WindowClass win) { // Shape
       // Add this shape to the Canvas list.
-      if (win.mode == "bitmap") {
+      if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
+	win.canvas.need_to_draw_surface = true;
 	using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
 	  render(g);
 	}
-	win.canvas.need_to_draw_surface = true;
       } else {
 	lock(win.getCanvas().shapes) {
 	  if (! win.getCanvas().shapes.Contains(this)) 
@@ -2313,11 +2380,11 @@ public static class Graphics {
 
     public void draw(Canvas canvas) { // Shape
       // Add this shape to the Canvas list.
-      if (canvas.mode == "bitmap") {
+      if (canvas.mode == "bitmap" || canvas.mode == "bitmapmanual" ) {
+	canvas.need_to_draw_surface = true;
 	using (Cairo.Context g = new Cairo.Context(canvas.surface)) {
 	  render(g);
 	}
-	canvas.need_to_draw_surface = true;
       } else {
 	lock(canvas.shapes) {
 	  if (! canvas.shapes.Contains(this)) 
