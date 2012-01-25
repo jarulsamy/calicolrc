@@ -129,50 +129,56 @@ namespace Calico {
 
         public override void SetRedirects(CustomStream stdout, 
                       CustomStream stderr) {
+		  if (engine != null) {
             engine.Runtime.IO.SetOutput(stdout, System.Text.Encoding.UTF8);
             engine.Runtime.IO.SetErrorOutput(stderr,System.Text.Encoding.UTF8);
+		  }
         }
 
         public override void PostSetup(MainWindow calico) {
-            System.Reflection.Assembly assembly;
-            // ---------------------------------------
-            foreach (System.Reflection.AssemblyName aname in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
-                assembly = System.Reflection.Assembly.Load(aname);
-                    engine.Runtime.LoadAssembly(assembly);
-            }
-            // ---------------------------------------
-            DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "..", "modules"));
-            foreach (FileInfo f in dir.GetFiles("*.dll")) {
-                string assembly_name = f.FullName;
-                assembly = System.Reflection.Assembly.LoadFile(assembly_name);
-                if (assembly != null) {
-                    // initialize_module if possible
-                    try {
-                    foreach (Type type in assembly.GetTypes()) {
-                        System.Reflection.MethodInfo method;
-                        try {
-                            method = type.GetMethod("initialize_module");
-                            method.Invoke(type, new object [] {calico.path, calico.OS});
-                        } catch {
-                        }
-                        try {
-                            method = type.GetMethod("set_gui_thread_id");
-                            method.Invoke(type, new object [] {MainWindow.gui_thread_id});
-                        } catch {
-                        }
-                    }
-                    } catch {
-                        continue;
-                    }
-                    try {
-                    engine.Runtime.LoadAssembly(assembly);
-                    } catch {
-                        Console.WriteLine("Failed to load assembly {0}", assembly);
-                    }
-                }
-            }
+		  System.Reflection.Assembly assembly;
+		  // ---------------------------------------
+		  foreach (System.Reflection.AssemblyName aname in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
+			assembly = System.Reflection.Assembly.Load(aname);
+			if (engine != null)
+			  engine.Runtime.LoadAssembly(assembly);
+		  }
+		  // ---------------------------------------
+		  DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "..", "modules"));
+		  foreach (FileInfo f in dir.GetFiles("*.dll")) {
+			string assembly_name = f.FullName;
+			assembly = System.Reflection.Assembly.LoadFile(assembly_name);
+			if (assembly != null) {
+			  // initialize_module if possible
+			  try {
+				foreach (Type type in assembly.GetTypes()) {
+				  System.Reflection.MethodInfo method;
+				  try {
+					method = type.GetMethod("initialize_module");
+					method.Invoke(type, new object [] {calico.path, calico.OS});
+				  } catch {
+				  }
+				  try {
+					method = type.GetMethod("set_gui_thread_id");
+					method.Invoke(type, new object [] {MainWindow.gui_thread_id});
+				  } catch {
+				  }
+				}
+			  } catch {
+				continue;
+			  }
+			  if (engine != null) {
+				try {
+				  engine.Runtime.LoadAssembly(assembly);
+				} catch {
+				  Console.WriteLine("{0} failed to load assembly {1}", 
+					  dlr_name, assembly);
+				}
+			  }
+			}
+		  }
         }
-
+		
         public override bool ReadyToExecute(string text) {
             // If more than one line in DLR, wait for a blank line
             string [] lines = text.Split('\n');

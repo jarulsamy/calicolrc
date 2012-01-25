@@ -39,12 +39,17 @@ public class CalicoRubyEngine : DLREngine {
     }
 
     public override void Start() {
-        // Get engine from manager:
-	engine = manager.scriptRuntime.GetEngine(dlr_name);
-        // Set the compiler options here:
-        compiler_options = engine.GetCompilerOptions();
-        //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
-        // set some ruby options
+	  // Get engine from manager:
+	  try {
+		engine = manager.scriptRuntime.GetEngine(dlr_name);
+	  } catch {
+		System.Console.Error.WriteLine("ERROR: Ruby failed to start");
+	  }
+	  // Set the compiler options here:
+	  if (engine != null)
+		compiler_options = engine.GetCompilerOptions();
+	  //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
+	  // set some ruby options
     }
 }
 
