@@ -1,5 +1,11 @@
 Calico2
 
+Packages
+
+* Fedora
+** mono-devel monodoc gtk-sharp2 gtk-sharp2-devel
+** monodevelop
+
 Bugs
 
  1. Printing gives error: Cairo.Context: called from finalization thread, 
