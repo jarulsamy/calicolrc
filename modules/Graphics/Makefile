@@ -28,5 +28,19 @@ all: ../Graphics.dll ../Shapes.dll
 		-pkg:gtk-sharp-2.0 \
 		-out:../Shapes.dll 
 
+../Graphviz.dll: Graphviz.cs
+	gmcs -sdk:4 -target:library Graphviz.cs Graphics.cs  \
+		-lib:../../bin \
+		-lib:../ \
+		-r:IronPython \
+		-r:Microsoft.Dynamic \
+		-r:System.Drawing \
+		-r:Mono.Cairo \
+		-r:FarseerPhysics.dll \
+		-r:GifLib.dll \
+		-pkg:gtk-sharp-2.0 \
+		-out:../Graphviz.dll 
+
+
 clean::
 	rm -rf ../Graphics.dll ../Shapes.dll *~
