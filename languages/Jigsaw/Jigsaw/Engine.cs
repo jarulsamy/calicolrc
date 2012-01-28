@@ -187,6 +187,9 @@ namespace Jigsaw
 		// This dictionary is injected into all ScriptScope objects as the global namespace
 		private Dictionary<string,object> globals = null;
 		
+		// List of all paths to DLLs that are loaded. Paths are stored in keys to be unique
+		internal Dictionary<string, bool> loadedAssemblies = new Dictionary<string, bool>();
+		
 		// -- This boolean is used by the GLib.TimeoutHandler method in Run
 		// and is returned by OnTimerElapsed. When OnTimerElapsed returns true, 
 		// GLib.TimeoutHandler reschedules it automatically. When it returns false,
@@ -225,8 +228,6 @@ namespace Jigsaw
 		// - - - Load assembly into global scope - - - - - - - - - - - -
 		public Assembly LoadAssembly(string dllPath)
 		{
-			// Reload all assemblies
-			
 			// Get root name
 			string assemblyName = System.IO.Path.GetFileNameWithoutExtension(dllPath);
 			assemblyName = assemblyName.Trim ();
@@ -267,6 +268,10 @@ namespace Jigsaw
 				return null;
 			}
 			
+			// Add assembly reference to collection.
+			// Do not add if already in keys to avoid problem with using foreach statement to load assemblies
+			if (!loadedAssemblies.ContainsKey(dllPath)) loadedAssemblies[dllPath] = true;
+			
 			return assembly;
 		}
 		
@@ -291,7 +296,7 @@ namespace Jigsaw
 		{
 			// Save reference to the InspectorWindow
 			_inspector = inspector;
-			_inspector.ClearOutput();
+			_inspector.ClearGlobals();
 			
 			// Recreate top level list of all call stacks. 
 			// There can be more than one because Jigsaw allows multiple stacks to run simultaneously.
@@ -299,6 +304,10 @@ namespace Jigsaw
 				_callStacks = new List<CallStack>();
 			else
 				_callStacks.Clear();
+			
+			// Recreate globals and reload all assemblies
+			globals = new Dictionary<string, object>();
+			foreach (string dllPath in loadedAssemblies.Keys) LoadAssembly(dllPath);
 			
 			// Reset all blocks
 			foreach (Diagram.CShape s in cvs.shapes) {
@@ -312,8 +321,8 @@ namespace Jigsaw
 						
 						if (s is CControlStart) {				// If also a ControlStart block ...
 							CControlStart cs = (CControlStart)s;
-							CallStack stack = new CallStack(globals);	// Add new runner to call stack
-							ScriptScope scope = this.CreateScope(globals);
+							CallStack stack = new CallStack(globals);					// Add new runner to call stack
+							ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
 							stack.AppendFrame( (CControlStart)s, scope );
 							_callStacks.Add(stack);
 						}
@@ -353,43 +362,43 @@ namespace Jigsaw
 				CallStack stack = _callStacks[i];
 				
 				if (stack.Count > 0) {							// Get the top-most block runner
-					StackFrame br = stack.GetTopFrame();	
+					StackFrame frame = stack.GetTopFrame();	
 					
-					bool rslt = br.MoveNext();					// Advance block runner and see if fell off end
-					RunnerResponse rr = br.Current;				// Check the response
+					bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
+					RunnerResponse rr = frame.Current;			// Check the response
 					
-					if (rslt == false) {
-						stack.PopFrame(br);						// Enumerator has passed the end of the collection
+					if (rslt == false) {						// The enumerator is done. Pop frame from stack.
+						stack.PopFrame(frame);					// Enumerator has passed the end of the collection
 					} else {
-						switch (rr.Action) {					// Take appropriate action
-						case EngineAction.Pause:
+						switch (rr.Action) {					// Take appropriate action as directed by current runner
+						case EngineAction.Pause:				// Pause the engine
 							this.Pause();
 							break;
-						case EngineAction.Remove:
-							stack.PopFrame(br);
+						case EngineAction.Remove:				// Remove top frame and continue
+							stack.PopFrame(frame);
 							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
+							break;
+						case EngineAction.Return:				// Procedure returning
+							stack.PopProcedure();				// Pop all the way up to procedure call
+							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
+							break;								// When proc call continues, it will pick up retval
+						case EngineAction.Replace:				// This implements the blocks sequence
+							stack.PopFrame(frame);				// Current frame is removed
+							stack.PushFrame(rr.Frame);			// Next frame pushed, as indicated by runner
+							rr.Frame.MoveNext();
+							break;
+						case EngineAction.Add:					// Pushes a new frame on to the stack
+							stack.PushFrame(rr.Frame);
+							rr.Frame.MoveNext();
 							break;
 						case EngineAction.Break:
 							CBlock bnext = stack.PopBreak();	// Return block connected to out edge, if there is one
 							if (bnext != null) {				// Scope was hidden in RetVal. Get it and make next frame.
 								ScriptScope scope = (ScriptScope) rr.RetVal;
-								StackFrame frame = bnext.Frame(scope, stack);
-								stack.PushFrame(frame);			// Push next frame and get started
-								frame.MoveNext();
+								StackFrame frame2 = bnext.Frame(scope, stack);
+								stack.PushFrame(frame2);			// Push next frame and get started
+								frame2.MoveNext();
 							}
-							break;
-						case EngineAction.Return:
-							stack.PopProcedure();
-							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
-							break;
-						case EngineAction.Replace:
-							stack.PopFrame(br);
-							stack.PushFrame(rr.Frame);
-							rr.Frame.MoveNext();
-							break;
-						case EngineAction.Add:
-							stack.PushFrame(rr.Frame);
-							rr.Frame.MoveNext();
 							break;
 						case EngineAction.NoAction:
 							break;
@@ -405,6 +414,8 @@ namespace Jigsaw
 				// Print call stack
 				//if (_callStacks.Count > 0) _callStacks[0].Dump();
 			}
+			
+			//_inspector.Update (globals);
 			
 			_inStep = false;
 			RaiseEngineStep();

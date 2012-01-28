@@ -56,6 +56,7 @@ namespace Jigsaw
 		// Reference to block panel
 		internal Widgets.CBlockPalette pnlBlock = null;
 		
+		// List of all tab widgets
 		private List<Widgets.CRoundedTab> allTabs = null;
 		
 		// A flag to help track running state
@@ -894,7 +895,6 @@ namespace Jigsaw
 			_engine.Reset(this, _inspector);
 			//_engine.Reset(this);
 			_isRunning = false;
-			//RaiseJigsawStop();	// Already raised in OnEngineStop
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1597,7 +1597,7 @@ namespace Jigsaw
 				}
 				
 				// Identify the required library to import for this block, if any
-				foreach (string asm in b.RequiredAssemblies) allAssemblies[asm] = null;
+				//foreach (string asm in b.RequiredAssemblies) allAssemblies[asm] = null;
 			}
 			
 			if (count == 0 || count > 1) {
@@ -1616,7 +1616,11 @@ namespace Jigsaw
 			// This is not necessary if run in Calico:
 			//o.AppendLine ("import clr");
 			//foreach (string k in allAssemblies.Keys) o.AppendFormat("clr.AddReference('{0}')\n", k);
-			foreach (string k in allAssemblies.Keys) o.AppendFormat("import {0}\n", k);
+			//foreach (string k in allAssemblies.Keys) o.AppendFormat("import {0}\n", k);
+			foreach (string dllPath in engine.loadedAssemblies.Keys) {
+				string assemblyName = System.IO.Path.GetFileNameWithoutExtension(dllPath);
+				o.AppendFormat("import {0}\n", assemblyName);
+			}
 			o.AppendLine ();
 			
 			// Generate all procedures

@@ -131,17 +131,28 @@ namespace Jigsaw
 			// Create a new ScriptScope using passed variables
 			try
 			{
-				// Assemble dictionary of parameters passed to block as initial local scope
-				List<String> arglist = new List<String>();
-				foreach (string aname in _argnames) {
-					if (_properties.ContainsKey(aname) && _properties[aname].Text.Length > 0) 
-						arglist.Add (_properties[aname].Text);
+				// If connected, replace this runner with the next runner to the stack.
+				if (this.OutEdge.IsConnected) {
+					// Assemble dictionary of parameters passed to block as initial local scope
+					List<String> arglist = new List<String>();
+					foreach (string aname in _argnames) {
+						if (_properties.ContainsKey(aname) && _properties[aname].Text.Length > 0) 
+							arglist.Add (_properties[aname].Text);
+					}
+					Dictionary<string, object> locals = new Dictionary<string, object>();
+					for (int i=0; i<arglist.Count; i++) locals[arglist[i]] = Args[i];
+					
+					ChainedDictionary chaining  = new ChainedDictionary(locals, stack.globals);
+					scope = scope.Engine.CreateScope(chaining);
+
+					rr.Action = EngineAction.Replace;
+					rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+				} else {
+					// If not connected, just remove this runner
+					rr.Action = EngineAction.Remove;
+					rr.Frame = null;
 				}
-				Dictionary<string, object> locals = new Dictionary<string, object>();
-				for (int i=0; i<arglist.Count; i++) locals[arglist[i]] = Args[i];
 				
-				ChainedDictionary chaining  = new ChainedDictionary(locals, stack.globals);
-				scope = scope.Engine.CreateScope(chaining);
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
 				this.State = BlockState.Error;
@@ -153,16 +164,6 @@ namespace Jigsaw
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
 
-			// If connected, replace this runner with the next runner to the stack.
-			if (this.OutEdge.IsConnected) {
-				rr.Action = EngineAction.Replace;
-				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
-			} else {
-				// If not connected, just remove this runner
-				rr.Action = EngineAction.Remove;
-				rr.Frame = null;
-			}
-			
 			// Clean up
 			this.Args = null;
 			
@@ -338,7 +339,8 @@ namespace Jigsaw
 		private string ToPython ()
 		{
 			string code = String.Format("{0}({1})", this.ProcedureName, this.paramListString);
-			if (this.VariableName.Length > 0) String.Format("{0} = {1}", this.VariableName, code);
+			if (this.VariableName.Length > 0) 
+				code = String.Format("{0} = {1}", this.VariableName, code);
 			
 			return code;
 		}

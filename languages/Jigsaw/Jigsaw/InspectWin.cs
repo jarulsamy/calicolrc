@@ -133,8 +133,8 @@ namespace Jigsaw
 
 //		private Gtk.TreeView localsTree = null;		// Locals List
 //		private Gtk.ListStore localsList = null;	// List of items in the local scope for the Locals Tree
-		private Gtk.TextView localsView = null;		// Locals window
-		private Gtk.TextView outputView = null;		// Output window
+		private Gtk.TextView localsView = null;			// Locals window
+		private Gtk.TextView globalsView = null;		// Globals window
 		
 		private Jigsaw.Canvas cvs = null;
 		
@@ -230,20 +230,20 @@ namespace Jigsaw
 			lsw.Add(localsView);
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			// Output window
-			outputView = new Gtk.TextView();
+			// globals display window
+			globalsView = new Gtk.TextView();
 			Gtk.ScrolledWindow osw = new Gtk.ScrolledWindow();
 			osw.CanFocus = true;
 			osw.VscrollbarPolicy = Gtk.PolicyType.Always;
-			osw.Add(outputView);
+			osw.Add(globalsView);
 			
 			// Put it all in a Notebook
 			Gtk.Notebook nb = new Gtk.Notebook();
 			//nb.AppendPage(propTree, new Gtk.Label("Properties"));
 			nb.AppendPage(lsw, new Gtk.Label("Locals"));
 			//nb.AppendPage(localsTree, new Gtk.Label("Locals"));
-			nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
-			nb.AppendPage(osw, new Gtk.Label("Output"));
+			//nb.AppendPage(new Gtk.Label("REPL Window"), new Gtk.Label("Debug"));
+			nb.AppendPage(osw, new Gtk.Label("Globals"));
 			
 			this.Add(nb);
 		}
@@ -251,20 +251,26 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void WriteLine(String msg) {
 			// Add text to the buffer
-			outputView.Buffer.Text += msg + "\n";
+			globalsView.Buffer.Text += msg + "\n";
 
 			// Always scroll to the cursor position
-			Gtk.TextIter ti = outputView.Buffer.GetIterAtLine(outputView.Buffer.LineCount-1); 
-			Gtk.TextMark tm = outputView.Buffer.CreateMark("eot", ti,false); 
-			outputView.ScrollToMark(tm, 0, false, 0, 0); 
+			Gtk.TextIter ti = globalsView.Buffer.GetIterAtLine(globalsView.Buffer.LineCount-1); 
+			Gtk.TextMark tm = globalsView.Buffer.CreateMark("eot", ti,false); 
+			globalsView.ScrollToMark(tm, 0, false, 0, 0); 
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ClearOutput()
-		{	// Clear contents of output window
-			outputView.Buffer.Clear();
+		public void ClearGlobals()
+		{	// Clear contents of globals window
+			globalsView.Buffer.Clear();
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ClearLocals()
+		{	// Clear contents of locals window
+			localsView.Buffer.Clear();
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		public void DisplayLocals(Engine e) 
 //		{	// Render all locals to window
@@ -285,15 +291,13 @@ namespace Jigsaw
 //		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ClearLocals()
-		{	// Clear contents of locals window
-			localsView.Buffer.Clear();
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void RenderLocals()
-		{	// Render the given locals scope in its window
+		public void Update(Dictionary<string,object> globals)
+		{	// Render the given globals and locals scope in its window
 			
+			foreach ( string k in globals.Keys ) {
+				Console.WriteLine ( "{0}={1}", k, globals[k]);
+			}
+			Console.WriteLine ("---");
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -312,12 +316,6 @@ namespace Jigsaw
 //			//cvs.Invalidate();
 //		}
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Remove all locals properties from the InspectorWindow locals list
-//		public void ClearLocals() {
-//			localsList.Clear();
-//		}
-		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void DoDeleteEvent (object obj, Gtk.DeleteEventArgs args)
 		{

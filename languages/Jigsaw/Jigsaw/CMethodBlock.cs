@@ -127,24 +127,28 @@ namespace Jigsaw
 			// Create parameters
 			if (names != null)
 			{
-				for (int n = 0; n < names.Count; n++)
+				for (int i = 0; i < names.Count; i++)
 				{
+					String formatted_default = "";
+					
 					// FIXME: make a default of the appropriate type if one not given
-					if (defaults[n] == null || defaults[n] == "") {
-						tprop = new CExpressionProperty(names[n], String.Format("{0}", 0));
-						tprop.PropertyChanged += OnPropertyChanged;
-						_properties[names[n]] = tprop;
+					if (defaults[i] == null || defaults[i] == "") {
+						formatted_default = String.Format("{0}", 0);
 						
-					} else if (!(defaults[n].Equals("System.DBNull"))) {
-						tprop = new CExpressionProperty(names[n], String.Format("{0}", defaults[n]));
-						tprop.PropertyChanged += OnPropertyChanged;
-					    _properties[names[n]] = tprop;
+					} else if (types[i] == "System.String") {
+						formatted_default = String.Format("\"{0}\"", defaults[i]);
+						
+					} else if (!(defaults[i].Equals("System.DBNull"))) {
+						formatted_default = String.Format("{0}", defaults[i]);
 						
 					} else {
-						tprop = new CExpressionProperty(names[n], String.Format("{0}", 0));
-						tprop.PropertyChanged += OnPropertyChanged;
-					    _properties[names[n]] = tprop;
+						formatted_default = String.Format("{0}", 0);
 					}
+					
+					tprop = new CExpressionProperty(names[i], formatted_default);
+					tprop.PropertyChanged += OnPropertyChanged;
+				    _properties[names[i]] = tprop;					
+					
 				}
 			}
 

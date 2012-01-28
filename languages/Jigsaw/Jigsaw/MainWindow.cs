@@ -153,7 +153,12 @@ public class MainWindow : Gtk.Window
 		miViewProperties.Activated += new EventHandler(OnViewProperties);
 		muView.Append(miViewProperties);
 		miViewProperties.AddAccelerator("activate", agrp, (int)'P', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
-		
+
+		Gtk.MenuItem miViewInspector = new Gtk.MenuItem("_Inspector");
+		miViewInspector.Activated += new EventHandler(OnViewInspector);
+		muView.Append(miViewInspector);
+		miViewProperties.AddAccelerator("activate", agrp, (int)'I', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+
 		// Run Menu
 		Gtk.Menu muRun = new Gtk.Menu();
 		
@@ -717,6 +722,12 @@ public class MainWindow : Gtk.Window
 	protected void OnViewProperties(object sender, EventArgs a)
 	{	
 		js.ShowPropertiesWindow();
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnViewInspector(object sender, EventArgs a)
+	{	
+		js.ShowInspectorWindow();
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
