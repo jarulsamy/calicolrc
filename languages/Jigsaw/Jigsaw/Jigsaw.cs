@@ -62,6 +62,9 @@ namespace Jigsaw
 		// A flag to help track running state
 		private bool _isRunning = false;
 		
+		// True if to update block display while running
+		private bool _updateDisplay = true;
+		
 		// Variables to support search
 		private List<KeyValuePair<Widgets.CRoundedTab,CBlock>> _searchSet = null;
 		int _searchStart = 0;			// Starting search position
@@ -836,8 +839,52 @@ namespace Jigsaw
 				_currentPath = value;
 			}
 		}
+		
+		// - - - Set the rate that the engine timer runs - - - - - - -
+		public double TimeOut 
+		{
+			set
+			{
+				// Slowest rate is once every 2 seconds.
+				uint newTimeOut = (uint)(2000.0/value);
+				
+				if (value <= 0.0) {
+					// Do nothing if too small
+					return;
+				} else if ( _engine.TimeOut == newTimeOut) {
+					// Do nothing if value hasn't changed
+					return;
+				} else if (value >= 100) {
+					// Turn off updating if 100 or greater
+					Console.WriteLine ("Turbo mode!");
+					UpdateDisplay = false;
+				} else {
+					// Otherwise turn updating back on
+					UpdateDisplay = true;
+				}
 
-		// - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
+				_engine.TimeOut = newTimeOut;
+			}
+			get
+			{
+				return 2000.0/_engine.TimeOut;
+			}
+		}
+
+		// - - - Set internal flag indicating if display should update while running - - - - - - -
+		public bool UpdateDisplay 
+		{
+			set
+			{
+				_updateDisplay = value;
+			}
+			get
+			{
+				return _updateDisplay;
+			}
+		}
+
+		// - - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
         public void RaiseJigsawRun()
         {
             if (JigsawRun != null)
@@ -880,8 +927,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			//if (_engine.IsRunning == false) _engine.Reset(this); //, _inspector);
-			//if (!_isRunning) engine.Reset(this);
 			if (!_isRunning) engine.Reset(this, _inspector);
 			_isRunning = true;
 			_engine.Run();
@@ -917,7 +962,7 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineRun(object sender, EventArgs e)
-		{	
+		{
 //			bRun.Enabled = false;
 //			bStop.Enabled = true;
 			this.Invalidate();
@@ -926,7 +971,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineStep(object sender, EventArgs e)
 		{	
-			this.Invalidate();
+			if (_updateDisplay) this.Invalidate();
 			
 			// Update the locals display
 			//_inspector.DisplayLocals(_engine);

@@ -276,6 +276,15 @@ public class MainWindow : Gtk.Window
 		tbRunStop.Sensitive = false;
 		tb.Add(tbRunStop);
 		
+		Gtk.HScale hsRunSlider = new Gtk.HScale(1, 100, 1);
+		hsRunSlider.Value = 10.0;
+		hsRunSlider.ValuePos = Gtk.PositionType.Right;
+		hsRunSlider.SetSizeRequest(100, 10);
+		hsRunSlider.TooltipText = "Slide to adjust run speed";
+		hsRunSlider.Sensitive = true;
+		hsRunSlider.ChangeValue += new Gtk.ChangeValueHandler(OnSliderChangeValue);
+		tb.Add (hsRunSlider);
+		
 		vb.PackStart (tb, false, false, 0);
 		
 		// Embedded scrolled window
@@ -305,12 +314,22 @@ public class MainWindow : Gtk.Window
 		js.JigsawStep += new EventHandler(OnJigsawStep);
 		js.JigsawPause += new EventHandler(OnJigsawPause);
 		
+		// Init slider
+		hsRunSlider.Value = js.TimeOut;
+		
 		vb.Add(js);
-
 		this.Add(vb);
 
 		// Let 'er rip
 		this.ShowAll();
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnSliderChangeValue(object sender, EventArgs a)
+	{	
+		Gtk.HScale s = (Gtk.HScale)sender;
+		js.TimeOut = s.Value;
+		//Console.WriteLine ("{0}", s.Value);
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -328,7 +347,7 @@ public class MainWindow : Gtk.Window
 		miRunStep.Sensitive = tbRunStep.Sensitive;
 		miRunStop.Sensitive = tbRunStop.Sensitive;
 	}
-
+	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{	

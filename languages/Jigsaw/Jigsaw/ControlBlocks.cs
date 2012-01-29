@@ -1346,11 +1346,16 @@ namespace Jigsaw
 				while (this.State == BlockState.Error) yield return rr;
 			
 				// Next perform one iteration of the enclosed stack
-				if (doWhile == true && this.LoopEdge.IsConnected) {
-					// Push internal runner on to stack
-					// Pops itself off stack when done
-					rr.Action = EngineAction.Add;
-					rr.Frame = this.LoopEdge.LinkedTo.Block.Frame(scope, stack);
+				if (doWhile == true) {
+					
+					if (this.LoopEdge.IsConnected) {
+						// Push internal runner on to stack
+						// Pops itself off stack when done
+						rr.Action = EngineAction.Add;
+						rr.Frame = this.LoopEdge.LinkedTo.Block.Frame(scope, stack);
+					} else {
+						rr.Action = EngineAction.NoAction;
+					}
 					yield return rr;
 				} 
 				else 

@@ -196,7 +196,10 @@ namespace Jigsaw
 		// It is not rescheduled. When the Jigsaw program is running, _timerContinue is set to true
 		// so OnTimerElapsed contineus to be rescheduled and continues to run. 
 		// To stop the run, _timerContinue is set to false.
-		private bool _timerContinue = false;
+		
+		private bool _timerContinue = false;	// false to stop timer
+		private bool _timerReset = false;		// true to stop and start timer with new timeout
+		private uint _timeOut = 100;			// timer timeout value
 		
 		// Engine events
 		public event EventHandler EngineRun;
@@ -273,6 +276,20 @@ namespace Jigsaw
 			if (!loadedAssemblies.ContainsKey(dllPath)) loadedAssemblies[dllPath] = true;
 			
 			return assembly;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public uint TimeOut 
+		{
+			set
+			{
+				_timeOut = value;
+				_timerReset = true;
+			}
+			get
+			{
+				return _timeOut;
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -432,7 +449,7 @@ namespace Jigsaw
 			_timerContinue = true;
 			
 			// Dealing with cross-thread issues...
-			GLib.Timeout.Add(50, new GLib.TimeoutHandler(OnTimerElapsed));
+			GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 			RaiseEngineRun();
 		}
 		
@@ -453,13 +470,23 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		private bool OnTimerElapsed()
 		{
+			// Exit if requested
+			if (_timerContinue == false) return false;
+			
 			// Execute one step
 			this.Step();
 			
 			// If the step advanced the engine to a completion point, stop
 			if (!this.IsRunning) this.Stop();
 			
-			// Return the current state of the desire to continue
+			// Install new timeout if requested and stop this one
+			if (_timerReset) {
+				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+				_timerReset = false;
+				return false;
+			}
+			
+			// Return the current state indicating the desire to continue
 			return _timerContinue;
 		}
 		
