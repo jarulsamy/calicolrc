@@ -90,7 +90,15 @@ public class CalicoJigsawDocument : Document
 		cvs.DoZoom (1.0 / 1.05);
 	}
 
-    public override void Export(Calico.MainWindow calico) {
+        public override void ToggleBreakpoint() {
+	       cvs.ToggleBreakPoint();
+        }
+
+        public override bool HasBreakpointSet {
+	       get { return cvs.HasBreakPointSet(); }
+        }
+
+        public override void Export(Calico.MainWindow calico) {
 	  	string filename = cvs.Export();
 	  	calico.Open(filename);
 	}

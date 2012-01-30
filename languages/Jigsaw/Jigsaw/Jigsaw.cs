@@ -1035,6 +1035,34 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void ToggleBreakPoint()
+		{
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock b = (CBlock)s;
+					if (!b.IsFactory && b.Selected) {
+						b.ToggleBreakPoint();
+					}
+				}
+			}
+			this.Invalidate();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public bool HasBreakPointSet()
+		{
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock b = (CBlock)s;
+					if (!b.IsFactory && b.BreakPoint) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DeleteBlock(CBlock b) 
 		{	// Properly delete given block 
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
