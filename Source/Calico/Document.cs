@@ -437,7 +437,7 @@ namespace Calico {
                 texteditor.Document.RemoveMarker(marker, true);
                 breakpointCount--;
             } else {
-                marker = new MonoDevelop.Debugger.BreakpointTextMarker(texteditor, true);
+                marker = new MonoDevelop.Debugger.BreakpointTextMarker(texteditor, false);
                 texteditor.Document.AddMarker(lineno, marker);
                 breakpointCount++;
             }
