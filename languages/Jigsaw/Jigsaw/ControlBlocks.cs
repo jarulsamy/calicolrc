@@ -11,11 +11,13 @@ namespace Jigsaw
 	// --- Control start block shape class -----------------------------------------
     public class CControlStart : CBlock
     {
+		public CEdge StartEdge = null;
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CControlStart(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 30) }),
+				new Diagram.CPoint(X + 175, Y + 60) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -24,6 +26,9 @@ namespace Jigsaw
 			this.Sizable = false;
 			this.Text = "when program starts";
 			
+			double offsetX = 0.5*this.Width + 10.0;
+			StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
+			
 			_textYOffset = 10;							// Block text offset
 		}
 		
@@ -31,11 +36,41 @@ namespace Jigsaw
 		
 		// - - - Return a list of all edges - - - - - - - - - - - - - - - -
 		public override List<CEdge> Edges 
-		{
-			// Control start blocks only have an output edge
+		{	// Control start blocks only have an inner start edge
 			get {
-				return new List<CEdge>() { this.OutEdge };
+				return new List<CEdge>() { this.StartEdge };
 			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				rr.Frame = null;
+				yield return rr;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.StartEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.StartEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
 		}
 		
 		// - - - Generate and return Python statement - - - - -
@@ -45,11 +80,11 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				if (this.OutEdge.IsConnected) {
-					CBlock b = this.OutEdge.LinkedTo.Block;
+				if (this.StartEdge.IsConnected) {
+					CBlock b = this.StartEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					o.AppendFormat ("{0}pass\n", sindent);
+//				} else {
+//					o.AppendFormat ("{0}pass\n", sindent);
 				}
 				
 			} catch (Exception ex){
@@ -60,15 +95,59 @@ namespace Jigsaw
 			return true;
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
+        {	// If this block is hit, return a self reference.
+        	
+			if (!this.visible) return null;
+			
+			double X = pt.X;
+			double Y = pt.Y;
+			double Ymin = this.Top;
+			double Xmin = this.Left;
+			double Ymax = Ymin + this.Height;
+			double Xmax = Xmin + this.Width;
+			
+			// If point in outer bounding box...
+			if (X >= Xmin && X <= Xmax && Y >= Ymin && Y <= Ymax)
+			{	// ...and also in inner bounding box
+				if (X >= (Xmin + 20) && Y >= (Ymin + 30) && Y <= (Ymax - 30))
+				{	// ...then not hit
+					return null;
+				}
+				else
+				{	// Otherwise, hit
+					return this;
+				}
+			}
+			else
+			{	// Not hit if outside outer bounding box
+				return null;
+			}
+        }
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void RepositionBlocks(CEdge entryEdge)
+		{	// Reposition this block wrt the entry edge
+
+			if (this.StartEdge.IsConnected) {
+				CEdge linkedEdge = this.StartEdge.LinkedTo;
+				CBlock linkedBlock = linkedEdge.Block;
+				linkedBlock.RepositionBlocks(linkedEdge);
+				this.Height = linkedBlock.StackHeight + 50.0;
+				
+			} else {
+				this.Height = 60.0;
+			}
+			
+			base.RepositionBlocks(entryEdge);
+		}
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override void SetPath(Cairo.Context g) 
 		{
 			double x = this.left;
             double y = this.top;
-			
-			// If absolute positioning, convert x and y back to screen coordinates
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-			
             double w = this.width;
             double h = this.height;
 			double r = 6.0;
@@ -78,19 +157,43 @@ namespace Jigsaw
 			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
 			g.LineTo( x+w-r, y+10);
 			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
+			
+			g.LineTo( x+w, y+30-r );
+			g.Arc(    x+w-r, y+30-r, r, 0.0, hpi );
+			g.LineTo( x+27+20, y+30 );
+			g.LineTo( x+24+20, y+30+4 );
+			g.LineTo( x+14+20, y+30+4 );
+			g.LineTo( x+11+20, y+30 );
+			g.LineTo( x+20+r, y+30 );
+			g.ArcNegative( x+20+r, y+30+r, r, -hpi, Math.PI );
+			g.LineTo( x+20, y+h-20-r );
+			g.ArcNegative( x+20+r, y+h-20-r, r, Math.PI, hpi);
+			g.LineTo( x+11+20, y+h-20);
+			g.LineTo( x+14+20, y+h-20+4);
+			g.LineTo( x+24+20, y+h-20+4);
+			g.LineTo( x+27+20, y+h-20);
+			g.LineTo( x+w-r, y+h-20 );
+			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
 			g.LineTo( x+w, y+h-r );
 			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+27, y+h );
-			g.LineTo( x+24, y+h+4 );
-			g.LineTo( x+14, y+h+4 );
 			g.LineTo( x+11, y+h );
 			g.LineTo( x+r, y+h );
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			
+//			g.LineTo( x+w, y+h-r );
+//			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+//			g.LineTo( x+27, y+h );
+//			g.LineTo( x+24, y+h+4 );
+//			g.LineTo( x+14, y+h+4 );
+//			g.LineTo( x+11, y+h );
+//			g.LineTo( x+r, y+h );
+//			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			
 			g.LineTo( x, y+10 );
             g.ClosePath();
 		}
     }
-
+		
 	// -----------------------------------------------------------------------
     public class CControlEnd : CBlock
     {	// Control end block shape class
@@ -106,7 +209,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
-			this.Text = "stop script";
+			this.Text = "end program";
 		}
 		
 		public CControlEnd(Double X, Double Y) : this(X, Y, null) {}
@@ -716,10 +819,6 @@ namespace Jigsaw
 		{
 			double x = this.left;
             double y = this.top;
-
-			// If absolute positioning, convert x and y back to screen coordinates
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-
             double w = this.width;
             double h = this.height;
 			double r = 6.0;
@@ -1504,7 +1603,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
-			this.Text = "break out";
+			this.Text = "exit loop";
 		}
 		
 		public CControlBreak(Double X, Double Y) : this(X, Y, null) {}

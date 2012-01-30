@@ -12,6 +12,8 @@ namespace Jigsaw
     public class CProcedureStart : CBlock
     {	// Procedure start block shape class
 		
+		public CEdge StartEdge = null;
+		
 		// To hold ordered list of arguments passed to procedure when called
 		public List<object> Args = null;
 		
@@ -22,7 +24,7 @@ namespace Jigsaw
         public CProcedureStart(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 30) }),
+				new Diagram.CPoint(X + 175, Y + 60) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -31,6 +33,9 @@ namespace Jigsaw
 			this.Sizable = false;
 			this.Text = "define ...";
 			
+			double offsetX = 0.5*this.Width + 10.0;
+			StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
+
 			_textYOffset = 10;							// Block text offset
 			
 			// Properties
@@ -51,6 +56,63 @@ namespace Jigsaw
 		}
 		
 		public CProcedureStart(Double X, Double Y) : this(X, Y, null) {}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override List<CEdge> Edges 
+		{	// Return a list of all edges
+			// Procedure start blocks only have an inner start edge
+			get {
+				return new List<CEdge>() { this.StartEdge };
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
+        {	// If this block is hit, return a self reference.
+        	
+			if (!this.visible) return null;
+			
+			double X = pt.X;
+			double Y = pt.Y;
+			double Ymin = this.Top;
+			double Xmin = this.Left;
+			double Ymax = Ymin + this.Height;
+			double Xmax = Xmin + this.Width;
+			
+			// If point in outer bounding box...
+			if (X >= Xmin && X <= Xmax && Y >= Ymin && Y <= Ymax)
+			{	// ...and also in inner bounding box
+				if (X >= (Xmin + 20) && Y >= (Ymin + 30) && Y <= (Ymax - 30))
+				{	// ...then not hit
+					return null;
+				}
+				else
+				{	// Otherwise, hit
+					return this;
+				}
+			}
+			else
+			{	// Not hit if outside outer bounding box
+				return null;
+			}
+        }
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void RepositionBlocks(CEdge entryEdge)
+		{	// Reposition this block wrt the entry edge
+
+			if (this.StartEdge.IsConnected) {
+				CEdge linkedEdge = this.StartEdge.LinkedTo;
+				CBlock linkedBlock = linkedEdge.Block;
+				linkedBlock.RepositionBlocks(linkedEdge);
+				this.Height = linkedBlock.StackHeight + 50.0;
+				
+			} else {
+				this.Height = 60.0;
+			}
+			
+			base.RepositionBlocks(entryEdge);
+		}
 		
         // - - - Private util to build delimited arg list string - - - - - -
 		private string argListString
@@ -80,13 +142,6 @@ namespace Jigsaw
 			// Update block text
 			this.Text = String.Format("define {0} ({1})", this.ProcedureName, argListString);
 		}
-
-		// - - - Generate and return Python translation of a procedure - - - - -
-		private string ToPython ()
-		{
-			string code = String.Format("def {0}({1}):", this.ProcedureName, this.argListString);
-			return code;
-		}
 		
 		// - - - 
 		public override bool ToPython (StringBuilder o, int indent)
@@ -94,10 +149,11 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', 2*indent);
-				o.AppendFormat("{0}{1}\n", sindent, this.ToPython());
+				string code = String.Format("def {0}({1}):", this.ProcedureName, this.argListString);
+				o.AppendFormat("{0}{1}\n", sindent, code);
 				
-				if (this.OutEdge.IsConnected) {
-					CBlock b = this.OutEdge.LinkedTo.Block;
+				if (this.StartEdge.IsConnected) {
+					CBlock b = this.StartEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
 					string sindent2 = new string (' ', 2*(indent+1));
@@ -132,7 +188,7 @@ namespace Jigsaw
 			try
 			{
 				// If connected, replace this runner with the next runner to the stack.
-				if (this.OutEdge.IsConnected) {
+				if (this.StartEdge.IsConnected) {
 					// Assemble dictionary of parameters passed to block as initial local scope
 					List<String> arglist = new List<String>();
 					foreach (string aname in _argnames) {
@@ -146,7 +202,7 @@ namespace Jigsaw
 					scope = scope.Engine.CreateScope(chaining);
 
 					rr.Action = EngineAction.Replace;
-					rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+					rr.Frame = this.StartEdge.LinkedTo.Block.Frame(scope, stack);
 				} else {
 					// If not connected, just remove this runner
 					rr.Action = EngineAction.Remove;
@@ -171,22 +227,12 @@ namespace Jigsaw
 			this.State = BlockState.Idle;
 			yield return rr;
 		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override List<CEdge> Edges 
-		{	// Return a list of all edges
-			// Procedure start blocks only have an output edge
-			get {
-				return new List<CEdge>() { this.OutEdge };
-			}
-		}
-
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override void SetPath(Cairo.Context g) 
 		{
 			double x = this.left;
             double y = this.top;
-			
             double w = this.width;
             double h = this.height;
 			double r = 6.0;
@@ -196,17 +242,58 @@ namespace Jigsaw
 			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
 			g.LineTo( x+w-r, y+10);
 			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
+			
+			g.LineTo( x+w, y+30-r );
+			g.Arc(    x+w-r, y+30-r, r, 0.0, hpi );
+			g.LineTo( x+27+20, y+30 );
+			g.LineTo( x+24+20, y+30+4 );
+			g.LineTo( x+14+20, y+30+4 );
+			g.LineTo( x+11+20, y+30 );
+			g.LineTo( x+20+r, y+30 );
+			g.ArcNegative( x+20+r, y+30+r, r, -hpi, Math.PI );
+			g.LineTo( x+20, y+h-20-r );
+			g.ArcNegative( x+20+r, y+h-20-r, r, Math.PI, hpi);
+			g.LineTo( x+11+20, y+h-20);
+			g.LineTo( x+14+20, y+h-20+4);
+			g.LineTo( x+24+20, y+h-20+4);
+			g.LineTo( x+27+20, y+h-20);
+			g.LineTo( x+w-r, y+h-20 );
+			g.Arc(    x+w-r, y+h-20+r, r, -hpi, 0.0);
 			g.LineTo( x+w, y+h-r );
 			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-			g.LineTo( x+27, y+h );
-			g.LineTo( x+24, y+h+4 );
-			g.LineTo( x+14, y+h+4 );
 			g.LineTo( x+11, y+h );
 			g.LineTo( x+r, y+h );
 			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
 			g.LineTo( x, y+10 );
             g.ClosePath();
 		}
+		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		protected override void SetPath(Cairo.Context g) 
+//		{
+//			double x = this.left;
+//            double y = this.top;
+//			
+//            double w = this.width;
+//            double h = this.height;
+//			double r = 6.0;
+//			double hpi = 0.5*Math.PI;
+//			
+//			g.MoveTo( x, y+10);
+//			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
+//			g.LineTo( x+w-r, y+10);
+//			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
+//			g.LineTo( x+w, y+h-r );
+//			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+//			g.LineTo( x+27, y+h );
+//			g.LineTo( x+24, y+h+4 );
+//			g.LineTo( x+14, y+h+4 );
+//			g.LineTo( x+11, y+h );
+//			g.LineTo( x+r, y+h );
+//			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+//			g.LineTo( x, y+10 );
+//            g.ClosePath();
+//		}
     }
 	
 	// -----------------------------------------------------------------------

@@ -119,31 +119,31 @@ namespace Jigsaw
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
 
-			CControlIf block21 = new CControlIf(110, 120, pnlBlock);
+			CControlIf block21 = new CControlIf(110, 150, pnlBlock);
 			this.AddShape(block21);
 			tbCtrl.AddShape(block21);
 
-			CControlIfElse block22 = new CControlIfElse(110, 190, pnlBlock);
+			CControlIfElse block22 = new CControlIfElse(110, 220, pnlBlock);
 			this.AddShape(block22);
 			tbCtrl.AddShape(block22);
 			
-			CControlWhile block23 = new CControlWhile(110, 290, pnlBlock);
+			CControlWhile block23 = new CControlWhile(110, 320, pnlBlock);
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
 			
-			CControlRepeat block24 = new CControlRepeat(110, 360, pnlBlock);
+			CControlRepeat block24 = new CControlRepeat(110, 390, pnlBlock);
 			this.AddShape(block24);
 			tbCtrl.AddShape(block24);
 			
-			CControlBreak block25 = new CControlBreak(110, 430, pnlBlock);
+			CControlBreak block25 = new CControlBreak(110, 460, pnlBlock);
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
 			
-			CControlEnd block26 = new CControlEnd(110, 470, pnlBlock);
+			CControlEnd block26 = new CControlEnd(110, 500, pnlBlock);
 			this.AddShape(block26);
 			tbCtrl.AddShape(block26);
 			
-			CControlForeach block27 = new CControlForeach(110, 510, pnlBlock);
+			CControlForeach block27 = new CControlForeach(110, 540, pnlBlock);
 			this.AddShape(block27);
 			tbCtrl.AddShape(block27);
 			
@@ -196,11 +196,11 @@ namespace Jigsaw
 			this.AddShape(bProcStart);
 			tbProc.AddShape(bProcStart);
 			
-			CProcedureReturn bProcRet = new CProcedureReturn(110, 120, pnlBlock);
+			CProcedureReturn bProcRet = new CProcedureReturn(110, 150, pnlBlock);
 			this.AddShape(bProcRet);
 			tbProc.AddShape(bProcRet);
 			
-			CProcedureCall bProcCall = new CProcedureCall(110, 160, pnlBlock);
+			CProcedureCall bProcCall = new CProcedureCall(110, 190, pnlBlock);
 			this.AddShape(bProcCall);
 			tbProc.AddShape(bProcCall);
 
@@ -1470,14 +1470,14 @@ namespace Jigsaw
 			
 			// Created default starting blocks
 			CControlStart b1 = new CControlStart(410, 70);
-			CControlEnd   b2 = new CControlEnd(410, 150);
 			this.AddShape(b1);
-			this.AddShape(b2);
+			//CControlEnd   b2 = new CControlEnd(410, 150);;
+			//this.AddShape(b2);
 			
 			// Connect and reposition
-			b1.OutEdge.LinkedTo = b2.InEdge;
-			b2.InEdge.LinkedTo = b1.OutEdge;
-			b2.RepositionBlocks(b2.InEdge);
+			//b1.OutEdge.LinkedTo = b2.InEdge;
+			//b2.InEdge.LinkedTo = b1.OutEdge;
+			//b2.RepositionBlocks(b2.InEdge);
 			
 			// Reset modified flag
 			this.Modified = false;
