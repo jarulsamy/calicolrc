@@ -353,7 +353,7 @@ public class MainWindow : Gtk.Window
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawStop(object sender, EventArgs a)
-	{	
+	{
 		tbRunRun.Sensitive = true;
 		tbRunStep.Sensitive = true;
 		tbRunStop.Sensitive = false;
@@ -748,7 +748,7 @@ public class MainWindow : Gtk.Window
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnViewAutoProps(object sender, EventArgs a)
-	{	
+	{	// Set mode to automatically view the properties dialog to match checked state of menu
 		js.AutoProperties = (sender as Gtk.CheckMenuItem).Active;
 	}
 	

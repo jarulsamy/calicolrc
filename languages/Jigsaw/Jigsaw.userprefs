@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ActiveRuntime="MS.NET" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
     <Files>
-      <File FileName="Jigsaw\MainWindow.cs" Line="754" Column="2" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="745" Column="4" />
       <File FileName="Jigsaw\Jigsaw.cs" Line="851" Column="5" />
       <File FileName="Jigsaw\ControlBlocks.cs" Line="325" Column="11" />
       <File FileName="Jigsaw\Engine.cs" Line="457" Column="14" />
