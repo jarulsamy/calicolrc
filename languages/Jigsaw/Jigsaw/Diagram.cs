@@ -305,8 +305,8 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void ShowPropertiesWindow()
 		{
-			_propertyWin.ShowAll();
 			_propertyWin.SetPosition(Gtk.WindowPosition.Mouse);
+			_propertyWin.ShowAll();
 			_propertyWin.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
 		

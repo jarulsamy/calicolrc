@@ -1,21 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" ActiveRuntime="MS.NET" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Engine.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
     <Files>
-      <File FileName="Jigsaw\MainWindow.cs" Line="127" Column="36" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="887" Column="4" />
-      <File FileName="Jigsaw\ControlBlocks.cs" Line="12" Column="6" />
-      <File FileName="Jigsaw\Engine.cs" Line="439" Column="28" />
-      <File FileName="Jigsaw\ProcedureBlocks.cs" Line="369" Column="4" />
-      <File FileName="Jigsaw\IOBlocks.cs" Line="159" Column="88" />
-      <File FileName="Jigsaw\StatementBlocks.cs" Line="212" Column="88" />
-      <File FileName="Jigsaw\InspectWin.cs" Line="301" Column="4" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="754" Column="2" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="851" Column="5" />
+      <File FileName="Jigsaw\ControlBlocks.cs" Line="325" Column="11" />
+      <File FileName="Jigsaw\Engine.cs" Line="457" Column="14" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="7" Column="1" />
+      <File FileName="Jigsaw\Diagram.cs" Line="312" Column="3" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="Engine.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>

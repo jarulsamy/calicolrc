@@ -65,6 +65,9 @@ namespace Jigsaw
 		// True if to update block display while running
 		private bool _updateDisplay = true;
 		
+		// If true, automatically show properties dialog when drop new block
+		internal bool _autoProperties = false;
+		
 		// Variables to support search
 		private List<KeyValuePair<Widgets.CRoundedTab,CBlock>> _searchSet = null;
 		int _searchStart = 0;			// Starting search position
@@ -840,7 +843,19 @@ namespace Jigsaw
 			}
 		}
 		
-		// - - - Set the rate that the engine timer runs - - - - - - -
+		// - - - Set/get the mode that automatically displays the properties dialog - - -
+		public bool AutoProperties
+		{
+			set {
+				_autoProperties = value;
+			}
+			
+			get {
+				return _autoProperties;
+			}
+		}
+		
+		// - - - Set/get the rate that the engine timer runs - - - - - - -
 		public double TimeOut 
 		{
 			set
@@ -2187,21 +2202,20 @@ namespace Jigsaw
 			if (this.DashStyle != null) g.SetDash(this.DashStyle, 0.0);
 			g.LineWidth = this.LineWidth;
 			g.Stroke();
-
+			
+			// Add a connection indicator to in-edge, if connected
+			if (InEdge.IsConnected) {
+				g.Color = Diagram.Colors.SemiWhite;
+				//g.Rectangle(x+0.5*w-10, y+1, 20, 3);
+				g.MoveTo(x+0.5*w-20, y+1);
+				g.LineTo(x+0.5*w, y+7);		// Governs height of inverted triangle
+				g.LineTo(x+0.5*w+20, y+1);
+				g.ClosePath();
+				g.Fill ();
+			}
+			
 			// Text
 			DrawLabels(g);
-			
-			// If in an error state, add an x to the block
-			if (this._state == BlockState.Error) {
-				g.Color = new Color(1.0, 0.0, 0.0, 0.5);
-				g.LineWidth = 5;
-				g.MoveTo(x, y);
-				g.LineTo(x+w, y+h);
-				g.MoveTo(x+w, y);
-				g.LineTo(x, y+h);
-				g.Stroke();
-				g.Color = Diagram.Colors.LightPink;
-			}
 			
 			// Draw breakpoint, if set
 			if (this._hasBreakPoint) {
@@ -2212,15 +2226,16 @@ namespace Jigsaw
 				g.Fill();
 			}
 			
-			// Add a connection indicator to in-edge, if connected
-			if (InEdge.IsConnected) {
-				g.Color = Diagram.Colors.SemiWhite;
-				//g.Rectangle(x+0.5*w-10, y+1, 20, 3);
-				g.MoveTo(x+0.5*w-20, y+1);
-				g.LineTo(x+0.5*w, y+5);
-				g.LineTo(x+0.5*w+20, y+1);
-				g.ClosePath();
-				g.Fill ();
+			// If in an error state, draw an x over top of the block
+			if (this._state == BlockState.Error) {
+				g.Color = new Color(1.0, 0.0, 0.0, 0.5);
+				g.LineWidth = 5;
+				g.MoveTo(x, y);
+				g.LineTo(x+w, y+h);
+				g.MoveTo(x+w, y);
+				g.LineTo(x, y+h);
+				g.Stroke();
+				g.Color = Diagram.Colors.LightPink;
 			}
 			
             // Finally, draw any shape decorator shapes
@@ -2668,7 +2683,12 @@ namespace Jigsaw
 				linked.RepositionBlocks(null);
 			}
 			
+			// Always bring stack of blocks to front
 			js.BringStackToFront(dropped);
+			
+			// If in auto properties dialog mode, automatically show the dialog
+			bool popup = (cvs as Jigsaw.Canvas)._autoProperties;
+			if (this.IsFactory && popup) dropped.OnDoubleClick(cvs, null);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

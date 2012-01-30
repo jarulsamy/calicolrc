@@ -120,8 +120,6 @@ public class MainWindow : Gtk.Window
 		miEditFind.Activated += new EventHandler(OnEditFind);
 		muEdit.Append(miEditFind);
 		miEditFind.AddAccelerator("activate", agrp, (int)'F', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
-
-		// @@@
 		
 		// - - - View Menu
 		Gtk.Menu muView = new Gtk.Menu();
@@ -141,8 +139,7 @@ public class MainWindow : Gtk.Window
 		muView.Append(miViewZoom100);
 		miViewZoom100.AddAccelerator("activate", agrp, (int)'0', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 		
-		Gtk.MenuItem miViewSep1 = new Gtk.MenuItem();
-		muView.Append(miViewSep1);
+		muView.Append(new Gtk.MenuItem());
 		
 		Gtk.MenuItem miViewToggleInset = new Gtk.MenuItem("_Toggle Inset");
 		miViewToggleInset.Activated += new EventHandler(OnViewToggleInset);
@@ -154,10 +151,16 @@ public class MainWindow : Gtk.Window
 		muView.Append(miViewProperties);
 		miViewProperties.AddAccelerator("activate", agrp, (int)'P', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 
-		Gtk.MenuItem miViewInspector = new Gtk.MenuItem("_Inspector");
-		miViewInspector.Activated += new EventHandler(OnViewInspector);
-		muView.Append(miViewInspector);
-		miViewProperties.AddAccelerator("activate", agrp, (int)'I', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+//		Gtk.MenuItem miViewInspector = new Gtk.MenuItem("_Inspector");
+//		miViewInspector.Activated += new EventHandler(OnViewInspector);
+//		muView.Append(miViewInspector);
+//		miViewProperties.AddAccelerator("activate", agrp, (int)'I', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+
+		muView.Append(new Gtk.MenuItem());
+		
+		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
+		miViewAutoProps.Activated += new EventHandler(OnViewAutoProps);
+		muView.Append(miViewAutoProps);
 
 		// Run Menu
 		Gtk.Menu muRun = new Gtk.Menu();
@@ -743,6 +746,12 @@ public class MainWindow : Gtk.Window
 		js.ShowPropertiesWindow();
 	}
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnViewAutoProps(object sender, EventArgs a)
+	{	
+		js.AutoProperties = (sender as Gtk.CheckMenuItem).Active;
+	}
+	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnViewInspector(object sender, EventArgs a)
 	{	
