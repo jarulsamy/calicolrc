@@ -1676,21 +1676,19 @@ namespace Jigsaw
 			List<CBlock> allBlocks = this.AllBlocks();
 			Dictionary<string, string> allAssemblies = new Dictionary<string, string>();
 			
-			int count = 0;
-			CControlStart sblock = null;
+			List<CControlStart> sblocks = new List<CControlStart>();
 			foreach (CBlock b in allBlocks)
 			{
 				if (b is CControlStart) {
-					sblock = (CControlStart)b;
-					count++;
+					sblocks.Add((CControlStart)b);
 				}
 				
 				// Identify the required library to import for this block, if any
 				//foreach (string asm in b.RequiredAssemblies) allAssemblies[asm] = null;
 			}
 			
-			if (count == 0 || count > 1) {
-				Console.WriteLine("Error. Exactly one Control Start Block must exist for Python generation. {0} Control Start Blocks were found", count);
+			if (sblocks.Count == 0) {
+				Console.Error.WriteLine("Error. At least one Control Start Block must exist for Python generation.");
 				return null;
 			}
 			
@@ -1710,8 +1708,12 @@ namespace Jigsaw
 				string assemblyName = System.IO.Path.GetFileNameWithoutExtension(dllPath);
 				o.AppendFormat("import {0}\n", assemblyName);
 			}
+			// Special imports for specific functionality
+			if (sblocks.Count > 1) {
+				o.AppendLine("from Myro import doTogether");
+			}
 			o.AppendLine ();
-			
+
 			// Generate all procedures
 			foreach (CBlock b in allBlocks)
 			{
@@ -1721,8 +1723,22 @@ namespace Jigsaw
 				}
 			}
 			
-			// Generate main program
-			sblock.ToPython(o, 0);
+			if (sblocks.Count > 1) {
+				int count = 1;
+				string functions = "";
+				foreach(CControlStart sblock in sblocks) {
+					o.AppendFormat("def main{0}():\n", count);
+					sblock.ToPython(o, 1);
+					if (functions != "") functions += ", ";
+					functions += String.Format("main{0}", count);
+					o.AppendLine();
+					count++;
+				}
+				o.AppendFormat("doTogether({0})\n", functions);
+			} else {
+				// Generate main program
+				sblocks[0].ToPython(o, 0);
+			}
 			
 			// Return result
 			return o.ToString();
