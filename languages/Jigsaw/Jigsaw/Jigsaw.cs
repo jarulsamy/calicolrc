@@ -937,7 +937,7 @@ namespace Jigsaw
 		public void Stop()
 		{
 			_engine.Stop();
-			_engine.Reset(this, _inspector);
+			//_engine.Reset(this, _inspector);
 			//_engine.Reset(this);
 			_isRunning = false;
 		}
@@ -990,6 +990,7 @@ namespace Jigsaw
 //			bStop.Enabled = false;
 //			bRun.Enabled = true;
 			_isRunning = false;
+			_engine.Reset(this, _inspector);
 			this.Invalidate();
 			RaiseJigsawStop();
 		}
@@ -2214,7 +2215,11 @@ namespace Jigsaw
 			// Add a connection indicator to in-edge, if connected
 			if (InEdge.IsConnected) {
 				g.Color = Diagram.Colors.SemiWhite;
-				g.Rectangle(x+0.5*w-10, y+1, 20, 2);
+				//g.Rectangle(x+0.5*w-10, y+1, 20, 3);
+				g.MoveTo(x+0.5*w-20, y+1);
+				g.LineTo(x+0.5*w, y+5);
+				g.LineTo(x+0.5*w+20, y+1);
+				g.ClosePath();
 				g.Fill ();
 			}
 			
@@ -2264,8 +2269,6 @@ namespace Jigsaw
             double h = this.height;
 			double r = 6.0;
 			double hpi = 0.5*Math.PI;
-			
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
 			
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );

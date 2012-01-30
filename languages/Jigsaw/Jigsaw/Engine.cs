@@ -20,7 +20,8 @@ namespace Jigsaw
 		Remove = 3, 	// Remove current block runner only.
 		Pause = 4,		// Breakpoint. Pause execution
 		Break = 5,		// Break from a loop or conditional
-		Return = 6		// Stack is done. Return value and remove entire stack
+		Return = 6,		// Stack is done. Return value and remove entire stack
+		Stop = 10		// Stop engine execution
 	}
 	
 	// -----------------------------------------------------------------------
@@ -384,6 +385,13 @@ namespace Jigsaw
 					bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
 					RunnerResponse rr = frame.Current;			// Check the response
 					
+					// At any time, if requested to stop, wipe out all call stacks and exit
+					if (rr.Action == EngineAction.Stop) {
+						Stop ();
+						break;
+					}
+					
+					// React to other requests from execution blocks
 					if (rslt == false) {						// The enumerator is done. Pop frame from stack.
 						stack.PopFrame(frame);					// Enumerator has passed the end of the collection
 					} else {

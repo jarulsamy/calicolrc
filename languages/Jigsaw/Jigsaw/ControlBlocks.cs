@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Cairo;
+using Microsoft.Scripting.Hosting;
 
 namespace Jigsaw
 {
@@ -142,15 +143,36 @@ namespace Jigsaw
 			}
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Execute the end block
+			rr.Action = EngineAction.Stop;
+			rr.Frame = null;
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected override void SetPath(Cairo.Context g) 
 		{
 			double x = this.left;
             double y = this.top;
-
-			// If absolute positioning, convert x and y back to screen coordinates
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-			
             double w = this.width;
             double h = this.height;
 			double r = 6.0;
@@ -293,7 +315,7 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		public override bool Compile(ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing an if-block involves evaluting the given exression
 			CExpressionProperty Repetitions = (CExpressionProperty)_properties["Repetitions"];
@@ -307,7 +329,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute a simple repetition
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -580,7 +602,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		public override bool Compile(ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing an if-block involves evaluting the given exression
 			CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
@@ -594,7 +616,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute a conditional
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -899,7 +921,7 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		public override bool Compile(ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing an if-block involves evaluting the given exression
 			CExpressionProperty IfTest = (CExpressionProperty)_properties["IfTest"];
@@ -913,7 +935,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute a simple repetition
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1295,7 +1317,7 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		public override bool Compile(ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing an if-block involves evaluting the given exression
 			CExpressionProperty WhileTest = (CExpressionProperty)_properties["WhileTest"];
@@ -1309,7 +1331,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute a simple repetition
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1497,7 +1519,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Break from a loop or conditional
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1698,7 +1720,7 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		public override bool Compile(ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing an if-block involves evaluting the given exression
 			CExpressionProperty Sequence = (CExpressionProperty)_properties["Sequence"];
@@ -1712,7 +1734,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override IEnumerator<RunnerResponse> Runner(Microsoft.Scripting.Hosting.ScriptScope scope, CallStack stack) 
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
 		{	// Execute a for-each
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
