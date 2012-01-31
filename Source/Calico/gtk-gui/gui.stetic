@@ -320,7 +320,7 @@
       </action>
       <action id="findAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">_Find</property>
+        <property name="Label" translatable="yes">_Find Next</property>
         <property name="ShortLabel" translatable="yes">_Find</property>
         <property name="StockId">gtk-find</property>
         <signal name="Activated" handler="OnFindActionActivated" />
@@ -376,6 +376,12 @@
         <property name="Label" translatable="yes">Options</property>
         <property name="ShortLabel" translatable="yes">Options</property>
       </action>
+      <action id="FindPreviousAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Control&gt;r</property>
+        <property name="Label" translatable="yes">Find Previous</property>
+        <property name="ShortLabel" translatable="yes">Find Previous</property>
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -424,6 +430,7 @@
                 <node type="Menuitem" action="UncommentRegionAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="findAction" />
+                <node type="Menuitem" action="FindPreviousAction" />
               </node>
               <node type="Menu" action="ViewAction">
                 <node type="Menuitem" action="zoomInAction" />
@@ -693,7 +700,7 @@
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:stock_down LargeToolbar</property>
+                    <property name="Icon">stock:gtk-go-down LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
@@ -711,7 +718,7 @@
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:stock_up LargeToolbar</property>
+                    <property name="Icon">stock:gtk-go-up LargeToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
@@ -779,7 +786,7 @@
               <widget class="Gtk.Notebook" id="notebook_docs">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">1</property>
+                <property name="CurrentPage">0</property>
                 <property name="Scrollable">True</property>
                 <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                 <child>
@@ -955,7 +962,7 @@
                                             <property name="MemberName" />
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
-                                            <property name="Icon">stock:stock_attach LargeToolbar</property>
+                                            <property name="Icon">stock:gtk-edit Menu</property>
                                             <property name="Label" translatable="yes">Recently used...</property>
                                             <property name="UseUnderline">True</property>
                                             <property name="Relief">None</property>
@@ -1156,7 +1163,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">2</property>
+                <property name="CurrentPage">0</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -1235,10 +1242,6 @@
                   </packing>
                 </child>
               </widget>
-              <packing>
-                <property name="Resize">False</property>
-                <property name="Shrink">False</property>
-              </packing>
             </child>
           </widget>
           <packing>
