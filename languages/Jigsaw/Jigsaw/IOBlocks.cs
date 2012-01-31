@@ -86,6 +86,7 @@ namespace Jigsaw
 			return true;
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public static string Repr(object obj)
 		{
 			return Repr(obj, 0);

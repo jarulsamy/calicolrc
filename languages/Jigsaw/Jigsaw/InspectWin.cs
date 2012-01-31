@@ -438,8 +438,8 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public object Evaluate(Microsoft.Scripting.Hosting.ScriptScope scope) {
+			if (_Compiled == null) Compile (scope.Engine);
 			return _Compiled.Execute(scope);
-			//return _Expr.Execute(scope);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -489,8 +489,8 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Evaluate(Microsoft.Scripting.Hosting.ScriptScope scope)
 		{	// Its a statement ... nothing to return
+			if (_Compiled == null) Compile (scope.Engine);
 			_Compiled.Execute(scope);
-			//_Source.Execute(scope);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
