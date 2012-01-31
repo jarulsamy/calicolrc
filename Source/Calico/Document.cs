@@ -376,6 +376,10 @@ namespace Calico {
             return true;
         }
 
+        public override void Stop() {
+            calico.AbortThread();
+        }
+
         public override bool SaveDocument() {
             try {
                 System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);

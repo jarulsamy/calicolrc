@@ -1233,10 +1233,9 @@ namespace Calico {
         }
 
         public void ExecuteFileInBackground(string filename, string language) {
-            // This is the only approved method of running code
+            // This is run from text documents that don't run themselves:
             Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
-                Invoke(OnStartRunning);
                 CurrentLanguage = language;
                 manager[CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
@@ -1362,17 +1361,18 @@ namespace Calico {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
+                    SetLanguage(CurrentLanguage);
                     if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
-                        // FIXME: Let Document handle tracing, call Document.ExecuteFileWithTrace
-                        SetLanguage(CurrentLanguage);
                         manager[CurrentLanguage].engine.SetTraceOn(this);
-                        ExecuteFileInBackground(CurrentDocument.filename, CurrentDocument.language);
                     } else {
                         ProgramSpeed.Sensitive = false;
-                        SetLanguage(CurrentLanguage);
                         manager[CurrentLanguage].engine.SetTraceOff();
-                        CurrentDocument.ExecuteFileInBackground();
                     }
+                    // If a language can handle it, it will run it
+                    // Otherwise, it passes it back to calico.ExecuteInBackground():
+                    OnStartRunning();
+                    // If document handles running, it manages UI itself
+                    CurrentDocument.ExecuteFileInBackground();
                 }
             } else if (DocumentNotebook.Page == SHELL) {
                 string text = Shell.Document.Text;
@@ -1620,7 +1620,8 @@ namespace Calico {
 
         protected void OnStopButtonClicked (object sender, System.EventArgs e)
         {
-            AbortThread();
+            if (CurrentDocument != null)
+                CurrentDocument.Stop();
         }
 
         protected void OnStartButtonClicked (object sender, System.EventArgs e)

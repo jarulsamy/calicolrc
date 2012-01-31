@@ -137,6 +137,7 @@ public class CalicoJigsawDocument : Document
 	public override void Stop ()
 	{
 		cvs.Stop ();
+		calico.OnStopRunning();
 	}
 	public override string [] GetAuthors() 
 	{
