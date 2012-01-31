@@ -912,7 +912,7 @@ namespace Calico {
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
                 int endLineNr = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
-                data.Document.BeginAtomicUndo();
+                //data.Document.BeginAtomicUndo();
                 int first = -1;
                 int last = 0;
                 foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
@@ -927,7 +927,7 @@ namespace Calico {
                     data.Caret.Column = System.Math.Max(1, data.Caret.Column - last + 1);
                     data.Caret.PreserveSelection = false;
                 }
-                data.Document.EndAtomicUndo();
+                //data.Document.EndAtomicUndo();
                 data.Document.RequestUpdate(new Mono.TextEditor.MultipleLineUpdate(startLineNr, endLineNr));
                 data.Document.CommitDocumentUpdate();
             }
@@ -939,7 +939,7 @@ namespace Calico {
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
                 int endLineNr = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
-                data.Document.BeginAtomicUndo();
+                //data.Document.BeginAtomicUndo();
                 int first = -1;
                 int last = 0;
                 foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
@@ -954,7 +954,7 @@ namespace Calico {
                     data.Caret.Column = System.Math.Max(1, data.Caret.Column - last);
                     data.Caret.PreserveSelection = false;
                 }
-                data.Document.EndAtomicUndo();
+                //data.Document.EndAtomicUndo();
                 data.Document.RequestUpdate(new Mono.TextEditor.MultipleLineUpdate(startLineNr, endLineNr));
                 data.Document.CommitDocumentUpdate();
             }
