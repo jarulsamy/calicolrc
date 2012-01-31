@@ -1293,6 +1293,8 @@ namespace Calico {
                 noAction.Sensitive = false;
             }
             if (CurrentDocument != null) {
+              Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
+              CurrentDocument.SetOptionsMenu(options_menu);
 	          if (executeThread == null) {
                 if (CurrentDocument.HasContent) {
                     StartButton.Sensitive = true;
@@ -1992,5 +1994,14 @@ namespace Calico {
                 CurrentDocument.ToggleBreakpoint();
             }
         }
+
+        protected void OnAboutActionActivated (object sender, System.EventArgs e)
+        {
+            if (CurrentDocument != null) {
+                CurrentDocument.OnAbout();
+            }
+
+        }
+
     }
 }

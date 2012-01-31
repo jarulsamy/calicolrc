@@ -267,6 +267,35 @@ namespace Calico {
         }
         public virtual void Stop() {
         }
+
+        public virtual string [] GetAuthors() {
+            return new string[] {};
+        }
+
+        public virtual void OnAbout() {
+            string proper_name = calico.manager[language].proper_name;
+            Gtk.AboutDialog aboutDialog = new Gtk.AboutDialog();
+            aboutDialog.DefaultResponse = Gtk.ResponseType.Close;
+            aboutDialog.Authors = GetAuthors();
+            aboutDialog.Comments = (proper_name + " " + _("for Calico"));
+            aboutDialog.Copyright = _("(c) 2012, Institute for Personal Robots in Education");
+            aboutDialog.ProgramName = "Calico " + proper_name;
+            aboutDialog.Version = MainClass.Version;
+            aboutDialog.Website = "http://CalicoProject.org/Calico_" + proper_name;
+            aboutDialog.WrapLicense = true;
+            aboutDialog.Run();
+            aboutDialog.Destroy();
+        }
+        public virtual void SetOptionsMenu(Gtk.MenuItem options_menu) {
+            //Gtk.Menu menu = (Gtk.Menu)options_menu.Submenu;
+            //menu.Detach();
+            //options_menu.Submenu = null;
+            options_menu.Submenu = new Gtk.Menu();
+            Gtk.MenuItem submenu = new Gtk.MenuItem("Empty");
+            submenu.Sensitive = false;
+            ((Gtk.Menu)options_menu.Submenu).Add(submenu);
+            options_menu.ShowAll();
+        }
     }
 
     public class TextDocument : Document {
@@ -451,7 +480,7 @@ namespace Calico {
             return GetBreakpointAtLine(lineno) != null;
         }
 
-        public virtual void UseLibrary (string fullname)
+        public override void UseLibrary (string fullname)
         {
             texteditor.Insert (0, calico.manager[language].GetUseLibraryString(fullname));
         }

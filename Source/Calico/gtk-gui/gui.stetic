@@ -357,6 +357,7 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">About...</property>
         <property name="ShortLabel" translatable="yes">About...</property>
+        <signal name="Activated" handler="OnAboutActionActivated" />
       </action>
       <action id="OptionsAction">
         <property name="Type">Action</property>
@@ -369,6 +370,11 @@
         <property name="Label" translatable="yes">Toggle Breakpoint</property>
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />
+      </action>
+      <action id="OptionsAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Options</property>
+        <property name="ShortLabel" translatable="yes">Options</property>
       </action>
     </action-group>
     <property name="MemberName" />
@@ -439,9 +445,9 @@
               </node>
               <node type="Menu" action="ToolsAction">
                 <node type="Menuitem" action="AboutAction" />
-                <node type="Menuitem" action="OptionsAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="ToggleBreakpointAction" />
+                <node type="Menu" action="OptionsAction1" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="aboutAction" />
