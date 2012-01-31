@@ -72,7 +72,13 @@ public class CalicoJigsawDocument : Document
 		widget.AddWithViewport (cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
+		calico.ProgramSpeed.ChangeValue += ChangeTimeOut;
 		widget.ShowAll ();
+	}
+	
+	public void ChangeTimeOut(object sender, EventArgs args) {
+		Gtk.HScale s = (Gtk.HScale)sender;
+		cvs.TimeOut = s.Value;
 	}
 	
 	public override void ExecuteFileInBackground ()
