@@ -12,6 +12,7 @@ all: ../Myro.dll
 		-r:Tao.Sdl.dll \
 		-r:SdlDotNet \
 		-r:System.Drawing \
+		-r:Microsoft.Dynamic \
 		-r:IronPython \
 	        -r:IronRuby \
 		-r:FarseerPhysics.dll \

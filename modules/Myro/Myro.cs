@@ -4353,6 +4353,9 @@ public static class Myro {
   public static void savePicture(List list, string filename, short delay, bool repeat) {
     Graphics.savePicture(list, filename, delay, repeat);
   }
+  public static void savePicture(List list, string filename) {
+    Graphics.savePicture(list, filename, 0, true);
+  }
   public static object Vector(int x, int y) {
     return Graphics.Vector((float)x, (float)y);
   }
