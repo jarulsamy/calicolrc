@@ -30,7 +30,7 @@ Bugs
 Problems, issues, features, and questions.
 
 Debugging:
-MONO_LOG_LEVEL=debug calico --no-handler 
+MONO_LOG_LEVEL=debug calico --debug-handler
 
 May need:
 
@@ -83,7 +83,6 @@ These are issues with the code in Calico/src/*.py
 Major missing features:
 
 # Calico: Need to run code in an AppDomain rather than thread?
-# Calico: Add Printing
 # Calico: options for toggle word wrap, linenumbers, others
 # Calico: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
 # Calico: No backups made of files when saving
