@@ -41,7 +41,7 @@ namespace CalicoPython
 			scope = scriptRuntime.CreateScope ();
 		}
 	
-		public override void Start ()
+		public override void Start (string path)
 		{
 			// Get engine from manager:
 			if (manager != null) {
@@ -64,7 +64,7 @@ namespace CalicoPython
 			ICollection<string > paths = engine.GetSearchPaths ();
 			// Let users find Calico modules:
 			foreach (string folder in new string[] { "modules", "src" }) {
-				paths.Add (Path.GetFullPath (folder));
+				paths.Add (Path.GetFullPath(String.Format("{0}/{1}/{2}", path, "..", folder)));
 			}
 			engine.SetSearchPaths (paths);
 		}

@@ -108,7 +108,7 @@ namespace Calico {
             //languages["python"] = CalicoPythonLanguage.MakeLanguage();
             //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
             // Now, let's load engines
-            Calico.LanguageManager manager = new Calico.LanguageManager(languages);
+            Calico.LanguageManager manager = new Calico.LanguageManager(path, languages);
            // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {

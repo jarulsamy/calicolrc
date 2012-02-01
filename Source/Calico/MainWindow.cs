@@ -1660,8 +1660,8 @@ namespace Calico {
             // If running:
             AbortThread();
             // Now, reset the shell:
-            manager.Setup();
-            manager.Start();
+            manager.Setup(path);
+            manager.Start(path);
             manager.SetCalico(this);
             // FIXME: move to Python language
             manager["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +

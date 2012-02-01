@@ -38,7 +38,7 @@ public class CalicoRubyEngine : DLREngine {
         scope = scriptRuntime.CreateScope();
     }
 
-    public override void Start() {
+    public override void Start(string path) {
 	  // Get engine from manager:
 	  try {
 		engine = manager.scriptRuntime.GetEngine(dlr_name);

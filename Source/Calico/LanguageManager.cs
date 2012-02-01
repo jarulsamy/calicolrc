@@ -34,21 +34,21 @@ namespace Calico {
         public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
         public bool UseSharedScope = true;
 
-        public LanguageManager(Dictionary<string,Language> langs) {
+        public LanguageManager(string path, Dictionary<string,Language> langs) {
             languages = new Dictionary<string, Language>();
             foreach (string name in langs.Keys) {
                 Register(langs[name]); // This may fail, which won't add language
             }
-            Setup();
-            Start();
+            Setup(path);
+            Start(path);
         }
 
-        public void Setup() {
+        public void Setup(string path) {
             // In case it needs it for DLR languages
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string language in getLanguages()) {
                 try {
-                    languages[language].engine.Setup();
+                    languages[language].engine.Setup(path);
                 } catch {
                     Console.Error.WriteLine("Language failed to initialize: {0}", language);
                     languages.Remove(language);
@@ -112,9 +112,9 @@ namespace Calico {
             }
         }
 
-        public void Start() {
+        public void Start(string path) {
             foreach (string language in languages.Keys) {
-                languages[language].engine.Start();
+                languages[language].engine.Start(path);
             }
         }
 
@@ -125,8 +125,8 @@ namespace Calico {
         }
 
         public void Reset(MainWindow calico) {
-            Setup();
-            Start();
+            Setup(calico.path);
+            Start(calico.path);
             SetRedirects(stdout, stderr);
             PostSetup(calico);
         }

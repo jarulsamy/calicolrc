@@ -63,10 +63,10 @@ namespace Calico {
             return true;
         }
 
-        public virtual void Setup() {
+        public virtual void Setup(string path) {
         }
 
-        public virtual void Start() {
+        public virtual void Start(string path) {
         }
 
         public virtual void SetRedirects(CustomStream stdout, CustomStream stderr) {
@@ -117,7 +117,7 @@ namespace Calico {
         public DLREngine(LanguageManager manager) : base(manager) {
         }
 
-        public override void Setup() {
+        public override void Setup(string path) {
             if (manager != null) {
                 manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
             } else {
