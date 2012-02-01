@@ -321,7 +321,45 @@ namespace Calico {
             widget.Add(texteditor);
             texteditor.Document.DocumentUpdated += OnDocumentUpdated;
             texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
+            texteditor.ButtonPressEvent += OnPopupMenu;
             widget.ShowAll();
+        }
+
+        Gdk.Point menuPopupLocation;
+
+        void OnPopupMenu (object o, Gtk.ButtonPressEventArgs args)
+        {
+            if (args.Event.Button == 3) {
+                double textEditorXOffset = args.Event.X - texteditor.TextViewMargin.XOffset;
+                if (textEditorXOffset < 0)
+                  return;
+                this.menuPopupLocation = new Gdk.Point ((int)args.Event.X, (int)args.Event.Y);
+                //DocumentLocation loc= this.TextViewMargin.VisualToDocumentLocation (textEditorXOffset, (int)args.Event.Y);
+                //if (!this.IsSomethingSelected || !this.SelectionRange.Contains (Document.LocationToOffset (loc)))
+                //  Caret.Location = loc;
+                ShowPopup ();
+                //texteditor.ResetMouseState ();
+            }
+        }
+
+        void PositionPopupMenu (Gtk.Menu menu, out int x, out int y, out bool pushIn)
+        {
+              texteditor.GdkWindow.GetOrigin (out x, out y);
+              x += this.menuPopupLocation.X;
+              y += this.menuPopupLocation.Y;
+              pushIn = true;
+        }
+
+        void ShowPopup() {
+              Gtk.Menu menu = new Gtk.Menu();
+              Gtk.MenuItem menuitem = new Gtk.MenuItem("Toggle Breakpoint");
+              menuitem.Activated += (sender, e) => ToggleBreakpoint();
+              menu.Append (menuitem);
+              menu.Destroyed += delegate {
+                texteditor.QueueDraw ();
+              };
+              menu.ShowAll();
+              menu.Popup (null, null, new Gtk.MenuPositionFunc (PositionPopupMenu), 0, Gtk.Global.CurrentEventTime);
         }
 
         public override void UpdateZoom() {
