@@ -21,6 +21,7 @@ namespace Jigsaw
 		Pause = 4,		// Breakpoint. Pause execution
 		Break = 5,		// Break from a loop or conditional
 		Return = 6,		// Stack is done. Return value and remove entire stack
+		Error = 7,		// A runtime error occurred
 		Stop = 10		// Stop engine execution
 	}
 	
@@ -208,6 +209,7 @@ namespace Jigsaw
 		public event EventHandler EngineStop;
 		public event EventHandler EnginePause;
 		public event EventHandler EngineReset;
+		public event EventHandler EngineError;
 		
 		public Engine ()
 		{
@@ -425,6 +427,9 @@ namespace Jigsaw
 								frame2.MoveNext();
 							}
 							break;
+						case EngineAction.Error:
+							RaiseEngineError();
+							break;
 						case EngineAction.NoAction:
 							break;
 						}
@@ -435,9 +440,6 @@ namespace Jigsaw
 					// Remove stack from list of all stacks.
 					_callStacks.RemoveAt(i);
 				}
-				
-				// Print call stack
-				//if (_callStacks.Count > 0) _callStacks[0].Dump();
 			}
 			
 			//_inspector.Update (globals);
@@ -547,7 +549,17 @@ namespace Jigsaw
             	EngineReset(this, e);
             }
         }
- 
+		
+		// - - Raise the EngineError event - - - - - - - - - - - - - - -
+        public void RaiseEngineError()
+        {
+            if (EngineError != null)
+            {
+				EventArgs e = new EventArgs();
+            	EngineError(this, e);
+            }
+        }
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void SetModulePath (string module_path)
 		{

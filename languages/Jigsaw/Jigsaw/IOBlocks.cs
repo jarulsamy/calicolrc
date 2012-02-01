@@ -182,9 +182,9 @@ namespace Jigsaw
 				//((InspectorWindow)scope.GetVariable("_inspector")).WriteLine(toPrint);
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
-				
+				this["Message"] = ex.Message;
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

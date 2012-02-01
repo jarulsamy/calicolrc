@@ -46,6 +46,7 @@ namespace Jigsaw
 		public event EventHandler JigsawStep;
 		public event EventHandler JigsawStop;
 		public event EventHandler JigsawPause;
+		public event EventHandler JigsawError;
 
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
@@ -93,6 +94,7 @@ namespace Jigsaw
 			_engine.EngineStop  += OnEngineStop;
 			_engine.EnginePause += OnEnginePause;
 			_engine.EngineReset += OnEngineReset;
+			_engine.EngineError += OnEngineError;
 			_engine.Reset(this, _inspector);
 			//_engine.Reset(this); //, _inspector);
 			
@@ -938,6 +940,16 @@ namespace Jigsaw
             	JigsawStop(this, e);
             }
         }
+
+		// - - Raise the JigsawError event  - - - - - - - - - - - - - - 
+        public void RaiseJigsawError()
+        {
+            if (JigsawError != null)
+            {
+				EventArgs e = new EventArgs();
+            	JigsawError(this, e);
+            }
+        }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
@@ -1015,6 +1027,12 @@ namespace Jigsaw
 		{	
 			this.Invalidate();
 			RaiseJigsawPause();
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		void OnEngineError(object sender, EventArgs e)
+		{	
+			RaiseJigsawError();
 		}
 		
 		// - - - Return a list of all non-factory blocks - - - - - - -

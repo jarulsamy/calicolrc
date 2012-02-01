@@ -211,8 +211,9 @@ namespace Jigsaw
 				
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
+				Console.WriteLine (ex.Message);
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			
@@ -267,33 +268,6 @@ namespace Jigsaw
 			g.LineTo( x, y+10 );
             g.ClosePath();
 		}
-		
-//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected override void SetPath(Cairo.Context g) 
-//		{
-//			double x = this.left;
-//            double y = this.top;
-//			
-//            double w = this.width;
-//            double h = this.height;
-//			double r = 6.0;
-//			double hpi = 0.5*Math.PI;
-//			
-//			g.MoveTo( x, y+10);
-//			g.Arc(    x+50, y+95, 100, -0.665*Math.PI, -0.324*Math.PI);
-//			g.LineTo( x+w-r, y+10);
-//			g.Arc(    x+w-r, y+10+r, r, -hpi, 0.0 );
-//			g.LineTo( x+w, y+h-r );
-//			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
-//			g.LineTo( x+27, y+h );
-//			g.LineTo( x+24, y+h+4 );
-//			g.LineTo( x+14, y+h+4 );
-//			g.LineTo( x+11, y+h );
-//			g.LineTo( x+r, y+h );
-//			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
-//			g.LineTo( x, y+10 );
-//            g.ClosePath();
-//		}
     }
 	
 	// -----------------------------------------------------------------------
@@ -491,7 +465,7 @@ namespace Jigsaw
 				this["Message"] = ex.Message;
 				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			
@@ -612,7 +586,7 @@ namespace Jigsaw
 				this["Message"] = ex.Message;
 				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			

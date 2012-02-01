@@ -316,6 +316,7 @@ public class MainWindow : Gtk.Window
 		js.JigsawStop += new EventHandler(OnJigsawStop);
 		js.JigsawStep += new EventHandler(OnJigsawStep);
 		js.JigsawPause += new EventHandler(OnJigsawPause);
+		//js.JigsawError += new EventHandler(OnJigsawError);
 		
 		// Init slider
 		hsRunSlider.Value = js.TimeOut;
@@ -332,7 +333,6 @@ public class MainWindow : Gtk.Window
 	{	
 		Gtk.HScale s = (Gtk.HScale)sender;
 		js.TimeOut = s.Value;
-		//Console.WriteLine ("{0}", s.Value);
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -394,6 +394,12 @@ public class MainWindow : Gtk.Window
 		miRunPause.Sensitive = tbRunPause.Sensitive;
 		miRunStep.Sensitive = tbRunStep.Sensitive;
 		miRunStop.Sensitive = tbRunStop.Sensitive;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+	protected void OnJigsawError(object sender, EventArgs a)
+	{
+		Console.WriteLine ("Jigsaw error");
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

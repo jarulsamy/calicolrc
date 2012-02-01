@@ -266,9 +266,8 @@ namespace Jigsaw
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				this["Message"] = ex.Message;
-				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			

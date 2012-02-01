@@ -117,7 +117,7 @@ namespace Jigsaw
 				this["Message"] = ex.Message;
 				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 
@@ -234,7 +234,7 @@ namespace Jigsaw
 				this["Message"] = ex.Message;
 				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 

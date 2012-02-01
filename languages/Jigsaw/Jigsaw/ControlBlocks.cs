@@ -460,11 +460,11 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
+			
 			// Go into a loop while block remains in an error state
 			while (this.State == BlockState.Error) yield return rr;
 			
@@ -746,9 +746,8 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
@@ -1047,6 +1046,7 @@ namespace Jigsaw
 				//rr.Frame = null;
 				yield return rr;
 			}
+			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
 			// Do the if-else-test
@@ -1060,9 +1060,8 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				
 				this.State = BlockState.Error;
-				rr.Action = EngineAction.NoAction;
+				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
@@ -1457,9 +1456,8 @@ namespace Jigsaw
 	
 				} catch (Exception ex) {
 					this["Message"] = ex.Message;
-					
 					this.State = BlockState.Error;
-					rr.Action = EngineAction.NoAction;
+					rr.Action = EngineAction.Error;
 					rr.Frame = null;
 				}
 				
@@ -1856,7 +1854,7 @@ namespace Jigsaw
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
                 this.State = BlockState.Error;
-                rr.Action = EngineAction.NoAction;
+                rr.Action = EngineAction.Error;
                 rr.Frame = null;
 			}
 			
