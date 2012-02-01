@@ -962,7 +962,7 @@
                                             <property name="MemberName" />
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
-                                            <property name="Icon">stock:gtk-edit Menu</property>
+                                            <property name="Icon">stock:gtk-edit LargeToolbar</property>
                                             <property name="Label" translatable="yes">Recently used...</property>
                                             <property name="UseUnderline">True</property>
                                             <property name="Relief">None</property>
