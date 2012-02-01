@@ -1223,11 +1223,11 @@ namespace Calico {
                 executeThread.Abort();
                 executeThread.Join();
                 executeThread = null;
-				
+				/*
 				manager["python"].engine.Execute("import Myro as _\n" +
 					"if _.robot: _.robot.flush(); _.robot.stop()\n" + 
 					"del _", false);
-				
+				*/
                 Invoke(OnStopRunning);
             }
         }
@@ -1497,11 +1497,7 @@ namespace Calico {
         protected virtual void OnNoActionActivated (object sender, System.EventArgs e)
         {
 			if (CurrentDocument != null) {
-                if (manager.languages[CurrentDocument.language].IsTextLanguage) {
-                    AbortThread();
-                } else {
-                    CurrentDocument.Stop();
-                }
+                CurrentDocument.Stop();
             }
         }
 
@@ -1622,6 +1618,8 @@ namespace Calico {
         {
             if (CurrentDocument != null)
                 CurrentDocument.Stop();
+            else
+                AbortThread();
         }
 
         protected void OnStartButtonClicked (object sender, System.EventArgs e)
