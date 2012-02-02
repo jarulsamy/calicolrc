@@ -1,1 +1,1 @@
-zip -r Calico-2.0.0beta2.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/modules/*/*" "Calico/StartCalico" "Calico/StartCalico.app/*" "Calico/languages/*/*" "Calico/server/*" "Calico/modules/Tao*" "Calico/README.txt" "Calico/NOTES" 
+C:\Users\dblank\Desktop\zip.exe -r Calico-2.0.0beta2.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/modules/*/*" "Calico/StartCalico" "Calico/StartCalico.app/*" "Calico/languages/Jigsaw/Jigsaw/*" "Calico/server/*" "Calico/plugins/*" "Calico/README.txt" "Calico/NOTES" "Calico/make-zip.bat" "Calico/Makefile" 
