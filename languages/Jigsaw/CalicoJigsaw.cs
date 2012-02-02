@@ -83,7 +83,7 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
-		//calico.OnStopRunning();
+		calico.OnStopRunning();
 	}
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
@@ -108,11 +108,16 @@ public class CalicoJigsawDocument : Document
 	{
 		calico.Print (Calico.Tag.Info, "Running Jigsaw script...\n");
 		Gtk.Application.Invoke (delegate {
-			cvs.Stop ();
+			cvs.Reset ();
 			cvs.Run ();
 		});
 	}
-
+	/*
+	void override Print ()
+	{
+		new Printing("base", "filename");
+	}	
+	*/
 	public override void ZoomIn ()
 	{
 		cvs.DoZoom (1.05);

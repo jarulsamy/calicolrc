@@ -900,6 +900,12 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Reset()
+		{
+			engine.Reset(this, _inspector);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineRun(object sender, EventArgs e)
 		{
 //			bRun.Enabled = false;
