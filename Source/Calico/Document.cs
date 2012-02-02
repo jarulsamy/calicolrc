@@ -108,6 +108,14 @@ namespace Calico {
             get {return true;}
         }
 
+        public virtual bool HasSelection {
+            get {return false;}
+        }
+
+        public virtual object Selection {
+            get {return null;}
+        }
+
         public virtual bool IsDirty {
             get { return _isDirty; }
             set { _isDirty = value; }
@@ -404,6 +412,14 @@ namespace Calico {
 
         public override bool HasContent {
             get { return texteditor.Document.Text != ""; }
+        }
+
+        public override bool HasSelection {
+            get {return texteditor.SelectedText != null;}
+        }
+
+        public override object Selection {
+            get {return texteditor.SelectedText;}
         }
 
         public override bool IsDirty {

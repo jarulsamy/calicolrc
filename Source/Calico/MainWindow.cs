@@ -1361,18 +1361,26 @@ namespace Calico {
             if (CurrentDocument != null) {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
-                    SetLanguage(CurrentLanguage);
-                    if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
-                        manager[CurrentLanguage].engine.SetTraceOn(this);
-                    } else {
-                        ProgramSpeed.Sensitive = false;
-                        manager[CurrentLanguage].engine.SetTraceOff();
+                    // if select, just send that
+                    if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {
+                        string text = (string)CurrentDocument.Selection;
+                        history.last(text.TrimEnd());
+                        history.add("");
+                        Execute(text.TrimEnd(), CurrentLanguage);
+                    } else { // run as a file, if something selected
+                        SetLanguage(CurrentLanguage);
+                        if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
+                            manager[CurrentLanguage].engine.SetTraceOn(this);
+                        } else {
+                            ProgramSpeed.Sensitive = false;
+                            manager[CurrentLanguage].engine.SetTraceOff();
+                        }
+                        // If a language can handle it, it will run it
+                        // Otherwise, it passes it back to calico.ExecuteInBackground():
+                        OnStartRunning();
+                        // If document handles running, it manages UI itself
+                        CurrentDocument.ExecuteFileInBackground();
                     }
-                    // If a language can handle it, it will run it
-                    // Otherwise, it passes it back to calico.ExecuteInBackground():
-                    OnStartRunning();
-                    // If document handles running, it manages UI itself
-                    CurrentDocument.ExecuteFileInBackground();
                 }
             } else if (DocumentNotebook.Page == SHELL) {
                 string text = Shell.Document.Text;
