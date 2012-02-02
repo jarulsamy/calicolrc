@@ -315,8 +315,8 @@ namespace Jigsaw
 		public bool Reset(Jigsaw.Canvas cvs, InspectorWindow inspector)
 		{
 			// Save reference to the InspectorWindow
-			_inspector = inspector;
-			_inspector.ClearGlobals();
+			//_inspector = inspector;
+			//_inspector.ClearGlobals();
 			
 			// Recreate top level list of all call stacks. 
 			// There can be more than one because Jigsaw allows multiple stacks to run simultaneously.

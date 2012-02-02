@@ -84,11 +84,11 @@ namespace Jigsaw
 			
 			this.CanFocus = true;
 			
-			// Safe module path
-			this._modulePath = modulePath;
+			// Expand provided module path to a full path and save
+			this._modulePath = System.IO.Path.GetFullPath(modulePath);;
 			
 			// Properties window shared by all blocks
-			_inspector = new Jigsaw.InspectorWindow(this);
+			//_inspector = new Jigsaw.InspectorWindow(this);
 
 			// Engine to run Jigsaw programs
 			_engine = new Engine();
@@ -273,20 +273,34 @@ namespace Jigsaw
 					xw.WriteAttributeString("path", dllfile);
 					xw.WriteElementString("docstring", "");
 					
-					// light blue
+					// Find a good, random, same-for-everyone color for this DLL:
+					// Make a hash from name:
+					int hash = 17;
+					foreach (char c in assembname) hash = hash * 31 + c.GetHashCode();
+					hash = Math.Abs(hash);
+					
+					// Get the color from the color dictionary:
+					//Dictionary<string,Color> dict = Widgets.Colors.colors;
+					//List<string> names = new List<string>(dict.Keys);
+					//Color fill_color = dict[names[hash % names.Count]];
+					Random rnd = new Random(hash);
+					Color fill_color = new Cairo.Color( rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5);
+					
+					// Make the line color be a little darker than fill:
+					Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
+					
 					xw.WriteStartElement("fill_color");
-					xw.WriteAttributeString("red", "0.6758"); 
-					xw.WriteAttributeString("green", "0.8437"); 
-					xw.WriteAttributeString("blue", "0.8984");
-					xw.WriteAttributeString("alpha", "1.0");
+					xw.WriteAttributeString("red", String.Format("{0:0.000}", fill_color.R)); //"0.6758"); 
+					xw.WriteAttributeString("green", String.Format("{0:0.000}", fill_color.G)); //"0.8437"); 
+					xw.WriteAttributeString("blue", String.Format("{0:0.000}", fill_color.B)); //"0.8984");
+					xw.WriteAttributeString("alpha", String.Format("{0:0.000}", fill_color.A)); //"1.0");
 					xw.WriteEndElement();
 					
-					// dark blue
 					xw.WriteStartElement("line_color");
-					xw.WriteAttributeString("red", "0.0"); 
-					xw.WriteAttributeString("green", "0.0"); 
-					xw.WriteAttributeString("blue", "0.5430");
-					xw.WriteAttributeString("alpha", "1.0");
+					xw.WriteAttributeString("red", String.Format("{0:0.000}", line_color.R)); //"0.0"); 
+					xw.WriteAttributeString("green", String.Format("{0:0.000}", line_color.G)); //"0.0"); 
+					xw.WriteAttributeString("blue", String.Format("{0:0.000}", line_color.B)); //"0.5430");
+					xw.WriteAttributeString("alpha", String.Format("{0:0.000}", line_color.A)); //"1.0");
 					xw.WriteEndElement();
 					
 				  	foreach (string type_name in Reflection.Utils.getTypeNames(dllfile))
@@ -365,32 +379,40 @@ namespace Jigsaw
 			}
 		}
 	
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Use Library and assign random color - - - - - - - - - - - - - - - - - - - -
 		public bool UseLibraryDLL(string dllfile)
 		{
-			// Load and build blocks from assembly dllfile
-			List<CBlock > blocks = new List<CBlock> ();
 			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
-			int y = 70;
-			CBlock block = null;
-
-			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
 			
 			// Find a good, random, same-for-everyone color for this DLL:
 			// Make a hash from name:
 			int hash = 17;
-			foreach (char c in assembly_name) {
-				hash = hash * 31 + c.GetHashCode();
-			}
+			foreach (char c in assembly_name) hash = hash * 31 + c.GetHashCode();
 			hash = Math.Abs(hash);
 			
 			// Get the color from the color dictionary:
-			Dictionary<string,Color> dict = Widgets.Colors.colors;
-			List<string> names = new List<string>(dict.Keys);
-			Color fill_color = dict[names[hash % names.Count]];
-			
+//			Dictionary<string,Color> dict = Widgets.Colors.colors;
+//			List<string> names = new List<string>(dict.Keys);
+//			Color fill_color = dict[names[hash % names.Count]];
+			Random rnd = new Random(hash);
+			Color fill_color = new Cairo.Color( rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5);
+
 			// Make the line color be a little darker than fill:
 			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
+			
+			return UseLibraryDLL(dllfile, fill_color, line_color);
+		}
+		
+		// - - - Use Library with given colors - - - - - - - - - - - - - - - - - - - -
+		public bool UseLibraryDLL(string dllfile, Color fill_color, Color line_color)
+		{
+			// Load and build blocks from assembly dllfile
+			List<CBlock > blocks = new List<CBlock> ();
+			int y = 70;
+			CBlock block = null;
+
+			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
+			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
 
 			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
 				Type type = Reflection.Utils.getType (assembly, type_name);
@@ -570,7 +592,7 @@ namespace Jigsaw
 								Double.TryParse (xr.GetAttribute("alpha"), out A);
 								
 								fill_color = new Color(R,G,B,A);
-								
+
 								break;
 								
 							case "line_color":
@@ -1443,13 +1465,9 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool ReadFile(string filename) {
 				// Temp vars to hold parse vals
-				string name;
-				string val;
-				string typeName;
-				int X;
-				int Y;
-				int id;
-				int edgeId;
+				string name, val, typeName;
+				double R, G, B, A;
+				int X, Y, id, edgeId;
 				CBlock tBlock = null;
 				CEdge tEdge = null;
 				CEdge tLinkedEdge = null;
@@ -1479,9 +1497,8 @@ namespace Jigsaw
 						
 						case "module":
 							string modName = xr.GetAttribute("name");
-							//string mpath = System.IO.Path.Combine( ModulePath, modName );
-							//UseLibrary (mpath);
-							if (!engine.loadedAssemblies.ContainsKey(modName)) UseLibrary (modName);
+							string mpath = System.IO.Path.Combine( ModulePath, modName );
+							if (!engine.loadedAssemblies.ContainsKey(mpath)) UseLibrary (mpath);
 							break;
 						
 						case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
@@ -1504,13 +1521,34 @@ namespace Jigsaw
 							
 						case "property":	// <property name="variable" value="X" />
 							// Add a property to the block
-							name = xr.GetAttribute("name");
-							val = xr.GetAttribute("value");
-							tBlock[name] = val;
-							//tBlock.SetProperty(name, val);
+							try {
+								name = xr.GetAttribute("name");
+								val = xr.GetAttribute("value");
+								tBlock[name] = val;
+								//tBlock.SetProperty(name, val);
+							} catch (Exception ex) {
+								Console.WriteLine("Error in Jigsaw.ReadFile while reading property {0}: {1}", name, ex.Message);
+							}
 							break;
+						
+						case "fill_color":
+							R = double.Parse(xr.GetAttribute("R"));
+							G = double.Parse(xr.GetAttribute("G"));
+							B = double.Parse(xr.GetAttribute("B"));
+							A = double.Parse(xr.GetAttribute("A"));
+							tBlock.FillColor = new Color(R,G,B,A);
+							break;
+						
+						case "line_color":
+							R = double.Parse(xr.GetAttribute("R"));
+							G = double.Parse(xr.GetAttribute("G"));
+							B = double.Parse(xr.GetAttribute("B"));
+							A = double.Parse(xr.GetAttribute("A"));
+							tBlock.LineColor = new Color(R,G,B,A);
+							break;
+						
 						default:
-						        tBlock.ReadXmlTag(xr);
+						    tBlock.ReadXmlTag(xr);
 							break;
 						}
 						
@@ -1666,10 +1704,9 @@ namespace Jigsaw
 			// Write all loaded modules to the Jigsaw file
 			foreach (string dllPath in engine.loadedAssemblies.Keys) 
 			{
-				//string assemblyName = System.IO.Path.GetFileName(dllPath);
+				string modName = System.IO.Path.GetFileName(dllPath);
 				w.WriteStartElement ("module");
-				//w.WriteAttributeString("name", assemblyName);
-				w.WriteAttributeString("name", dllPath);
+				w.WriteAttributeString("name", modName);
 				w.WriteEndElement();
 			}
 			
@@ -2135,6 +2172,23 @@ namespace Jigsaw
         {	// Override to write custom Xml content of a shape.
 			foreach (CEdge e in this.Edges) e.ToXml(w);
 			foreach (CProperty p in this.Properties) p.ToXml(w);
+			
+			// Write block colors
+			Color fill = this.FillColor;
+			w.WriteStartElement("fill_color");
+			w.WriteAttributeString("R", fill.R.ToString());
+			w.WriteAttributeString("G", fill.G.ToString());
+			w.WriteAttributeString("B", fill.B.ToString());
+			w.WriteAttributeString("A", fill.A.ToString());
+			w.WriteEndElement();
+			
+			Color line = this.LineColor;
+			w.WriteStartElement("line_color");
+			w.WriteAttributeString("R", line.R.ToString());
+			w.WriteAttributeString("G", line.G.ToString());
+			w.WriteAttributeString("B", line.B.ToString());
+			w.WriteAttributeString("A", line.A.ToString());
+			w.WriteEndElement();
         }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -47,6 +47,7 @@ public class MainWindow : Gtk.Window
 	
 	Gtk.MessageDialog _dlg = null;		// Var that temporarily holds dialog while showing
 	Gtk.Entry _entry = null;
+	private string _modulePath = null;
 	
 	public MainWindow () : base(Gtk.WindowType.Toplevel)
 	{
@@ -57,7 +58,7 @@ public class MainWindow : Gtk.Window
 		this.DefaultWidth = 1000;
 		this.DefaultHeight = 700;
 		this.DeleteEvent += new Gtk.DeleteEventHandler (this.OnDeleteEvent);
-
+		
 		// - - - VBox
 		Gtk.VBox vb = new Gtk.VBox(false, 0);
 		
@@ -309,9 +310,8 @@ public class MainWindow : Gtk.Window
 		//js = new Jigsaw.Canvas(System.IO.Path.Combine("..", "..", "modules"), 
 		//                       900, 600, 3000, 2000);	
 		
-		string modulePath = null;
-		modulePath = "../../modules"; // @"C:\Programs\Mono\Calico-dev\modules\";
-		js = new Jigsaw.Canvas(modulePath, 900, 600, 3000, 2000);		
+		_modulePath = System.IO.Path.GetFullPath("../../modules");		
+		js = new Jigsaw.Canvas(_modulePath, 900, 600, 3000, 2000);		
 		js.JigsawRun += new EventHandler(OnJigsawRun);
 		js.JigsawStop += new EventHandler(OnJigsawStop);
 		js.JigsawStep += new EventHandler(OnJigsawStep);
@@ -496,10 +496,12 @@ public class MainWindow : Gtk.Window
 		f3.AddPattern("*.*");
 		fc.AddFilter(f3);
 		
+		fc.SetCurrentFolder( _modulePath );
+		
 		int response = fc.Run ();
 
 		// If file not selected, exit
-		if (response == (int)Gtk.ResponseType.Cancel) {
+		if (response != (int)Gtk.ResponseType.Accept) {
 			fc.Destroy();
 			return;
 		}
