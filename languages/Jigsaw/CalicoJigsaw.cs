@@ -73,7 +73,30 @@ public class CalicoJigsawDocument : Document
 		if (filename != null)
 			cvs.ReadFile (filename);
 		calico.ProgramSpeed.ChangeValue += ChangeTimeOut;
+		cvs.JigsawStop += new EventHandler(OnJigsawStop);
+		cvs.JigsawStep += new EventHandler(OnJigsawStep);
+		cvs.JigsawPause += new EventHandler(OnJigsawPause);
+		cvs.JigsawError += new EventHandler(OnJigsawError);
+
 		widget.ShowAll ();
+	}
+	
+	protected void OnJigsawStop(object sender, EventArgs a)
+	{
+		//calico.OnStopRunning();
+	}
+	
+	protected void OnJigsawStep(object sender, EventArgs a)
+	{
+	}
+	
+	protected void OnJigsawPause(object sender, EventArgs a)
+	{
+	}
+	
+	protected void OnJigsawError(object sender, EventArgs a)
+	{
+		calico.OnStopRunning();		
 	}
 	
 	public void ChangeTimeOut(object sender, EventArgs args) {
