@@ -67,6 +67,22 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal override CEdge GetEdgeByName(string name)
+		{
+			// First try base class behavior.
+			// If edge not found, look for custom edges.
+			string tname = name.ToLower();
+			
+			CEdge e = base.GetEdgeByName(tname);
+			if (e == null) {
+				if (tname == "start") {
+					e = StartEdge;
+				}
+			}
+			return e;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override Diagram.CShape HitShape(Diagram.CPoint pt, Diagram.Canvas cvs)
         {	// If this block is hit, return a self reference.
         	

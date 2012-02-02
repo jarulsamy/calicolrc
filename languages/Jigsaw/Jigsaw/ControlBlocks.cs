@@ -27,7 +27,7 @@ namespace Jigsaw
 			this.Text = "when program starts";
 			
 			double offsetX = 0.5*this.Width + 10.0;
-			StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
+			this.StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
 			
 			_textYOffset = 10;							// Block text offset
 		}
@@ -40,6 +40,22 @@ namespace Jigsaw
 			get {
 				return new List<CEdge>() { this.StartEdge };
 			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal override CEdge GetEdgeByName(string name)
+		{
+			// First try base class behavior.
+			// If edge not found, look for custom edges.
+			string tname = name.ToLower();
+			
+			CEdge e = base.GetEdgeByName(tname);
+			if (e == null) {
+				if (tname == "start") {
+					e = StartEdge;
+				}
+			}
+			return e;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

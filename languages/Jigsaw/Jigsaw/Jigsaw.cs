@@ -84,6 +84,9 @@ namespace Jigsaw
 			
 			this.CanFocus = true;
 			
+			// Safe module path
+			this._modulePath = modulePath;
+			
 			// Properties window shared by all blocks
 			_inspector = new Jigsaw.InspectorWindow(this);
 
@@ -213,20 +216,20 @@ namespace Jigsaw
 			pnlBlock.BringToFront(this);
 			
 			// Look for map files in module path and try to load
-			if (modulePath != null) {
-				// Look for all map files and load
-				string[] filePaths = Directory.GetFiles(modulePath, "*.map");
-				
-				// Give each a go
-				foreach (string pth in filePaths) {
-					try {
-						TextReader tr = new StreamReader(pth);
-						UseLibraryMap(tr);
-					} catch (Exception ex){
-						Console.WriteLine (ex.Message);
-					}
-				}
-			}
+//			if (modulePath != null) {
+//				// Look for all map files and load
+//				string[] filePaths = Directory.GetFiles(modulePath, "*.map");
+//				
+//				// Give each a go
+//				foreach (string pth in filePaths) {
+//					try {
+//						TextReader tr = new StreamReader(pth);
+//						UseLibraryMap(tr);
+//					} catch (Exception ex){
+//						Console.WriteLine (ex.Message);
+//					}
+//				}
+//			}
 			
 			// Select first tab
 			tbCtrl.SetToggle(this, true);
@@ -236,121 +239,6 @@ namespace Jigsaw
 			
 			// Init to starting state with initial set of blocks
 			this.OnFileNew(null, null);
-			
-//			// ----- Myro tab and factory blocks
-//			Widgets.CRoundedTab tbMyro = new Widgets.CRoundedTab(0, 199, 100, 30, "Myro", pnlBlock);
-//			tbMyro.Dock = Diagram.DockSide.Left;
-//			this.AddShape(tbMyro);
-//			allTabs.Add (tbMyro);
-//			
-//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Myro.dll") == false) {
-//				Console.WriteLine ("Failed to load Myro");	
-//			} else {
-//				foreach (CBlock cblock in makeBlocksFromDll("Myro", 70, pnlBlock)) {
-//				  this.AddShape(cblock);
-//				  tbMyro.AddShape(cblock);
-//				}
-//			}
-//
-//			// ----- Graphics tab and factory blocks
-//			Widgets.CRoundedTab tbGraphics = new Widgets.CRoundedTab(0, 232, 100, 30, "Graphics", pnlBlock);
-//			tbGraphics.Dock = Diagram.DockSide.Left;
-//			this.AddShape(tbGraphics);
-//			allTabs.Add (tbGraphics);
-//			
-//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Graphics.dll") == false) {
-//				Console.WriteLine ("Failed to load Graphics");	
-//			} else {
-//				foreach (CBlock cblock in makeBlocksFromDll("Graphics", 70, pnlBlock)) {
-//				  this.AddShape(cblock);
-//				  tbGraphics.AddShape(cblock);
-//				}
-//			}			
-//
-//			// ----- Shapes tab and factory blocks
-//			Widgets.CRoundedTab tbShapes = new Widgets.CRoundedTab(0, 265, 100, 30, "Shapes", pnlBlock);
-//			tbShapes.Dock = Diagram.DockSide.Left;
-//			this.AddShape(tbShapes);
-//			allTabs.Add (tbShapes);
-//			
-//			if (engine.LoadAssembly("/Programs/Mono/Calico-dev/modules/Shapes.dll") == false) {
-//				Console.WriteLine ("Failed to load Shapes");	
-//			} else {
-//				foreach (CBlock cblock in makeBlocksFromDll("Shapes", 70, pnlBlock)) {
-//				  this.AddShape(cblock);
-//				  tbShapes.AddShape(cblock);
-//				}
-//			}
-			
-//			// ----- Notes tab and factory blocks
-//			Widgets.CRoundedTab tbNotes = new Widgets.CRoundedTab(0, 331, 100, 30, "Notes", pnlBlock);
-//			tbNotes.Dock = Diagram.DockSide.Left;
-//			this.AddShape(tbNotes);
-//			allTabs.Add (tbNotes);
-//			
-//			Diagram.CRectangle _shrect = new Diagram.CRectangle(130, 70, 135, 30);
-//			_shrect.FillColor = Diagram.Colors.LightYellow;
-//			_shrect.LineColor = Diagram.Colors.Gray;
-//			_shrect.LineWidth = 2;
-//			_shrect._isFactory = true;
-//			this.AddShape(_shrect);
-//			tbNotes.AddShape(_shrect);
-//
-//			Diagram.CRoundedRectangle _shrrect = new Diagram.CRoundedRectangle(130, 115, 135, 30);
-//			_shrrect.FillColor = Diagram.Colors.LightYellow;
-//			_shrrect.LineColor = Diagram.Colors.Gray;
-//			_shrrect.LineWidth = 2;
-//			_shrrect.Radius = 8;
-//			_shrrect._isFactory = true;
-//			this.AddShape(_shrrect);
-//			tbNotes.AddShape(_shrrect);
-//			
-//			Diagram.CEllipse _shellipse = new Diagram.CEllipse(130, 160, 135, 30);
-//			_shellipse.FillColor = Diagram.Colors.LightYellow;
-//			_shellipse.LineColor = Diagram.Colors.Gray;
-//			_shellipse.LineWidth = 2;
-//			_shellipse._isFactory = true;
-//			this.AddShape(_shellipse);
-//			tbNotes.AddShape(_shellipse);
-//
-//			Diagram.CConnector _shconn = new Diagram.CConnector(
-//			                             	new List<Diagram.CPoint>() { 
-//												new Diagram.CPoint(130, 210), 
-//												new Diagram.CPoint(198, 210),
-//												new Diagram.CPoint(198, 230),
-//												new Diagram.CPoint(266, 230) } );
-//			_shconn.LineColor = Diagram.Colors.LightBlue;
-//			_shconn.LineWidth = 2;
-//			_shconn.FillColor = Diagram.Colors.Transparent;
-//			_shconn._isFactory = true;
-//			this.AddShape(_shconn);
-//			tbNotes.AddShape(_shconn);
-
-//			// --- Run tab
-//			bRun = new Widgets.CRoundedButton(150, 70, 100, 25, "Auto-Step");
-//			bRun.Dock = Diagram.DockSide.Left;
-//			bRun.MouseDown += OnRunMouseDown;
-//			this.AddShape(bRun);
-//			tbTools.AddShape(bRun);
-//			
-//			bStop = new Widgets.CRoundedButton(150, 110, 100, 25, "Stop");
-//			bStop.Dock = Diagram.DockSide.Left;
-//			bStop.Enabled = false;
-//			bStop.MouseDown += OnStopMouseDown;
-//			this.AddShape(bStop);
-//			tbTools.AddShape(bStop);
-//			
-//			Widgets.CRoundedButton bReset = new Widgets.CRoundedButton(150, 150, 100, 25, "Reset");
-//			bReset.Dock = Diagram.DockSide.Left;
-//			bReset.MouseDown += OnResetMouseDown;
-//			this.AddShape(bReset);
-//			tbTools.AddShape(bReset);
-//			
-//			Widgets.CRoundedButton bStep = new Widgets.CRoundedButton(150, 190, 100, 25, "Step");
-//			bStep.Dock = Diagram.DockSide.Left;
-//			bStep.MouseDown += OnStepMouseDown;
-//			this.AddShape(bStep);
-//			tbTools.AddShape(bStep);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -495,10 +383,12 @@ namespace Jigsaw
 				hash = hash * 31 + c.GetHashCode();
 			}
 			hash = Math.Abs(hash);
+			
 			// Get the color from the color dictionary:
 			Dictionary<string,Color> dict = Widgets.Colors.colors;
 			List<string> names = new List<string>(dict.Keys);
 			Color fill_color = dict[names[hash % names.Count]];
+			
 			// Make the line color be a little darker than fill:
 			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
 
@@ -1292,7 +1182,6 @@ namespace Jigsaw
 			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
 
-
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool SaveDocument(string filename) 
 		{
@@ -1362,7 +1251,7 @@ namespace Jigsaw
 				{
 					CurrentPath = fc.Filename;
 					
-					// Add .xml extension if missing
+					// Add .jig extension if missing
 					if (!_currentPath.EndsWith(".jig", StringComparison.OrdinalIgnoreCase)) CurrentPath += ".jig";
 					fc.Destroy();
 					Directory.SetCurrentDirectory(System.IO.Path.GetDirectoryName(CurrentPath));
@@ -1569,8 +1458,8 @@ namespace Jigsaw
 				this.DeleteAllBlocks();
 				CurrentPath = filename;
 				
-				// === First Step : Read XML and ceate all blocks 
-				//     and build dictionaries of CBlock and CEdge references
+				// First Step : Read XML and create all blocks 
+				// Build dictionaries of CBlock and CEdge references
 				Dictionary<string,CBlock> blocks = new Dictionary<string, CBlock>();
 				Dictionary<string,CEdge> edges = new Dictionary<string, CEdge>();
 				
@@ -1586,6 +1475,13 @@ namespace Jigsaw
 						
 						switch (name) {
 						case "jigsaw":
+							break;
+						
+						case "module":
+							string modName = xr.GetAttribute("name");
+							//string mpath = System.IO.Path.Combine( ModulePath, modName );
+							//UseLibrary (mpath);
+							if (!engine.loadedAssemblies.ContainsKey(modName)) UseLibrary (modName);
 							break;
 						
 						case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
@@ -1766,7 +1662,17 @@ namespace Jigsaw
         public override void ToXml(XmlWriter w)
         {
             w.WriteStartElement("jigsaw");
-
+			
+			// Write all loaded modules to the Jigsaw file
+			foreach (string dllPath in engine.loadedAssemblies.Keys) 
+			{
+				//string assemblyName = System.IO.Path.GetFileName(dllPath);
+				w.WriteStartElement ("module");
+				//w.WriteAttributeString("name", assemblyName);
+				w.WriteAttributeString("name", dllPath);
+				w.WriteEndElement();
+			}
+			
             // Assign temporary ids 
 			List<CBlock> blocks = this.AllBlocks();
             int idCount = 0;
