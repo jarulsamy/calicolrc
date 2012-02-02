@@ -1,0 +1,1 @@
+zip -r Calico-2.0.0beta2.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/modules/*/*" "Calico/StartCalico" "Calico/StartCalico.app/*" "Calico/languages/*/*" "Calico/server/*" "Calico/modules/Tao*" "Calico/README.txt" "Calico/NOTES" 
