@@ -24,6 +24,11 @@ namespace Graphviz4Net.Graphs
 
         #region Properties
 
+        /// <summary>
+        /// This collection is not specialized, because edges might connect either nodes or sub-graphs, 
+        /// therefore we cannot choose between <c>TVerticesEdge</c> or <c>TSubgraphsEdge</c>. 
+        /// If you want 'type safe' access use <see cref="VerticesEdges"/> or <see cref="SubGraphsEdges"/>.
+        /// </summary>
         public IEnumerable<IEdge> Edges
         {
             get { return this.edges; }
@@ -37,6 +42,16 @@ namespace Graphviz4Net.Graphs
         public IEnumerable<TSubGraph> SubGraphs
         {
             get { return this.subGraphs; }
+        }
+
+        public IEnumerable<TVeticesEdge> VerticesEdges
+        {
+            get { return this.Edges.OfType<TVeticesEdge>(); }
+        }
+
+        public IEnumerable<TSubGraphsEdge> SubGraphsEdges
+        {
+            get { return this.Edges.OfType<TSubGraphsEdge>(); }
         }
 
         public event EventHandler<GraphChangedArgs> Changed;

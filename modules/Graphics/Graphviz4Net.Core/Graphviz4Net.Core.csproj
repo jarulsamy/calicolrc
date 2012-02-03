@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,29 +25,19 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Antlr3.Runtime">
+      <HintPath>..\..\tools\antlr-dotnet-csharp3\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Antlr3.Runtime, Version=3.3.1.7705, Culture=neutral, PublicKeyToken=eb42632606e9261f">
-      <HintPath>..\..\..\bin\Antlr3.Runtime.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DotExeRunner.cs" />
@@ -67,6 +57,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Dot\AntlrParser\DotGrammar.g</DependentUpon>
     </Compile>
+    <Compile Include="Dot\AntlrParser\DotGraphBuilder.cs" />
+    <Compile Include="Dot\AntlrParser\IntDotGraphBuilder.cs" />
+    <Compile Include="Dot\AntlrParser\StringDotGraphBuilder.cs" />
     <Compile Include="Dot\BoundingBox.cs" />
     <Compile Include="Dot\DotEdge.cs" />
     <Compile Include="Dot\DotGraph.cs" />
@@ -77,7 +70,6 @@
     <Compile Include="Dot\IDotParser.cs" />
     <Compile Include="Dot\IGraphToDotConverter.cs" />
     <Compile Include="Dot\ParserException.cs" />
-    <Compile Include="Dot\SimpleDotParser.cs" />
     <Compile Include="Graphs\AttributedUtils.cs" />
     <Compile Include="Graphs\Edge.cs" />
     <Compile Include="Graphs\Graph.cs" />

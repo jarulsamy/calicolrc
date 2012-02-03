@@ -17,7 +17,7 @@ namespace Graphviz4Net
             this.filename = filename;
         }
 
-        public StreamReader RunDot(string os, string path, Action<StreamWriter> writeGraph)
+        public StreamReader RunDot(Action<StreamWriter> writeGraph)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -32,7 +32,7 @@ namespace Graphviz4Net
                 File.WriteAllText(this.filename + ".dot", graph);
 
                 // now we read the file and write it to the real process input.
-                using (var reader = this.runner.RunDot(os, path, w => w.Write(graph)))
+                using (var reader = this.runner.RunDot(w => w.Write(graph)))
                 {
                     // we read all output, save it into another file, and return it as a memory stream
                     var text = reader.ReadToEnd();

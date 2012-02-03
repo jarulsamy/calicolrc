@@ -1,10 +1,10 @@
-﻿
+
 namespace Graphviz4Net.Dot
 {
     using System.IO;
 
-    public interface IDotParser
+    public interface IDotParser<TVertexId>
     {
-        DotGraph Parse(StreamReader reader);
+        DotGraph<TVertexId> Parse(TextReader reader);
     }
 }

@@ -5,7 +5,7 @@ namespace Graphviz4Net.Dot
 {
     using Graphs;
 
-    public class DotSubGraph : SubGraph<DotVertex>
+    public class DotSubGraph<TVertexId> : SubGraph<DotVertex<TVertexId>>
     {
         private BoundingBox bondingBox = null;
 

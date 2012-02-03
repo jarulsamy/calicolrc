@@ -1,11 +1,10 @@
 ﻿
-using System.Collections.Generic;
-using System.Windows;
-
 namespace Graphviz4Net
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Windows;
 
     public static class Utils
     {

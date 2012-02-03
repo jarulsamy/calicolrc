@@ -1,11 +1,13 @@
 
+
 namespace Graphviz4Net
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.Windows;
     using Dot;
+    using Dot.AntlrParser;
     using Graphs;
 
     /// <summary>
@@ -18,17 +20,17 @@ namespace Graphviz4Net
     ///     <list type="dot">
     ///         <item><see cref="IGraphToDotConverter"/></item>
     ///         <item><see cref="IDotRunner"/></item>
-    ///         <item><see cref="IDotParser"/></item>
-    ///         <item><see cref="ILayoutBuilder"/></item>
+    ///         <item><see cref="IDotParser{TVertexId}"/></item>
+    ///         <item><see cref="ILayoutBuilder{TVertexId}"/></item>
     ///     </list>
     /// </para>
     /// <para>
     ///     The process of building a graph is divided up into three stages: <see cref="StartBuilder"/>, 
     ///     <see cref="RunDot"/>, <see cref="BuildGraph"/>. 
-    ///     Only the <see cref="BuildGraph"/> and <see cref="StartBuilder"/> stages invokes the <see cref="ILayoutBuilder"/>; 
+    ///     Only the <see cref="BuildGraph"/> and <see cref="StartBuilder"/> stages invokes the <see cref="ILayoutBuilder{TVertexId}"/>; 
     ///     therefore, if the graph is built from GUI elements (e.g. WPF controls) these has to be 
     ///     run in the dispatcher thread. On contrary, the <see cref="RunDot"/> phase 
-    ///     invokes only the <see cref="ILayoutBuilder.GetSize"/> method so, if this method 
+    ///     invokes only the <see cref="ILayoutBuilder{TVertexId}.GetSize"/> method so, if this method 
     ///     can run outsize the dispatcher thread (e.g., one can calculate the size in advance), 
     ///     then the invocation of <see cref="RunDot"/> (the actual layouting, which might be slow) can 
     ///     be run in parallel.
@@ -36,9 +38,9 @@ namespace Graphviz4Net
     /// </remarks>
     public class LayoutDirector
     {
-        private readonly ILayoutBuilder builder;
+        private readonly ILayoutBuilder<int> builder;
 
-        private readonly IDotParser parser;
+        private readonly IDotParser<int> parser;
 
         private readonly IGraphToDotConverter converter;
 
@@ -46,13 +48,51 @@ namespace Graphviz4Net
 
         private IGraph originalGraph = null;
 
-        private DotGraph dotGraph = null;
+        private DotGraph<int> dotGraph = null;
 
         private object[] originalGraphElementsMap = null;
 
-        public LayoutDirector(
-            ILayoutBuilder builder,
-            IDotParser parser, 
+        /// <summary>
+        /// Factory method: provides convenient way to construct <see cref="LayoutDirector"/>. 
+        /// </summary>
+        /// <remarks>
+        /// <para>If an argument value is not provided (i.e., it's null), then
+        /// default implementation of required interface is provided. See the 
+        /// documentation of the constructor of this class for the list of 
+        /// default implementations of these interfaces.</para>
+        /// </remarks>
+        public static LayoutDirector GetLayoutDirector(
+            ILayoutBuilder<int> builder,
+            IDotParser<int> parser = null, 
+            IGraphToDotConverter converter = null, 
+            IDotRunner dotRunner = null)
+        {
+            Contract.Requires(builder != null);
+            Contract.Ensures(Contract.Result<LayoutDirector>() != null);
+            if (parser == null)
+                parser = AntlrParserAdapter<int>.GetParser();
+            if (converter == null)
+                converter = new GraphToDotConverter();
+            if (dotRunner == null)
+                dotRunner = new DotExeRunner();
+
+            return new LayoutDirector(builder, parser, converter, dotRunner);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LayoutDirector"/> class.
+        /// </summary>
+        /// <param name="builder">The builder is responsible for building the actual graphical output.</param>
+        /// <param name="parser">The parser pases DOT output, default 
+        /// implementation is <see cref="AntlrParserAdapter{T}"/>. 
+        /// Use factory method <see cref="AntlrParserAdapter{T}.GetParser()"/></param>
+        /// <param name="converter">The converter converts the .NET graph into a 
+        /// GraphViz representation. Default implementation is <see cref="GraphToDotConverter"/>.</param>
+        /// <param name="dotRunner">The dot runner runs the DOT utility. 
+        /// Default implementation is <see cref="DotExeRunner"/></param>
+        private LayoutDirector(
+            ILayoutBuilder<int> builder,
+            IDotParser<int> parser, 
             IGraphToDotConverter converter, 
             IDotRunner dotRunner)
         {
@@ -65,17 +105,7 @@ namespace Graphviz4Net
             this.converter = converter;
             this.dotRunner = dotRunner;
         }
-		
-		/*
-		public LayoutDirector Parse(string filename) {
-			var builder = new LayoutBuilder();
-			var parser = new Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter();
-			var converter = new GraphToDotConverter();
-			var dotRunner = new DotExeRunner();
-			new LayoutDirector(builder, parser, converter, dotRunner);
-		}
-		*/
-		
+
         /// <summary>
         /// Starts the builder. If the builder requires to be run 
         /// in the dispatcher thread, this method must be run in it.
@@ -93,14 +123,13 @@ namespace Graphviz4Net
         /// An invocation of <see cref="StartBuilder"/> must precede by a call to this method.
         /// </summary>
         /// <remarks>
-        /// This method uses <see cref="IDotRunner"/> and <see cref="IDotParser"/>, 
-        /// it does not invoke any method on <see cref="ILayoutBuilder"/>. 
-        /// So in case the <see cref="ILayoutBuilder"/> requires to run in dispatcher thread, 
+        /// This method uses <see cref="IDotRunner"/> and <see cref="IDotParser{TVertexId}"/>, 
+        /// it does not invoke any method on <see cref="ILayoutBuilder{TVertexId}"/>. 
+        /// So in case the <see cref="ILayoutBuilder{TVertexId}"/> requires to run in dispatcher thread, 
         /// this method does not have to do so, unless the <see cref="IDotRunner"/> or 
-        /// <see cref="IDotParser"/> require it.
+        /// <see cref="IDotParser{TVertexId}"/> require it.
         /// </remarks>
-        /// <param name="graph">The graph to be layout.</param>
-        public void RunDot(string os, string path)
+        public void RunDot()
         {
             if (this.originalGraph == null)
             {
@@ -108,7 +137,7 @@ namespace Graphviz4Net
                     "LayoutDirector: the RunDot method must be invoked before call to BuildGraph");
             }
 
-            var reader = this.dotRunner.RunDot(os, path,
+            var reader = this.dotRunner.RunDot(
                 writer => 
                     this.originalGraphElementsMap = 
                         this.converter.Convert(
@@ -151,9 +180,9 @@ namespace Graphviz4Net
         {
             foreach (var edge in dotGraph.Edges)
             {
-                if (edge is DotEdge)
+                if (edge is DotEdge<int>)
                 {
-                    var dotEdge = (DotEdge) edge;
+                    var dotEdge = (DotEdge<int>) edge;
                     Contract.Assert(
                         0 <= dotEdge.Id && dotEdge.Id < this.originalGraphElementsMap.Length,
                         "The id of an edge is not in the range of originalGraphElementsMap.");
@@ -233,9 +262,9 @@ namespace Graphviz4Net
 
         private class AttributesProvider : IAttributesProvider
         {
-            private readonly ILayoutBuilder builder;
+            private readonly ILayoutBuilder<int> builder;
 
-            public AttributesProvider(ILayoutBuilder builder)
+            public AttributesProvider(ILayoutBuilder<int> builder)
             {
                 this.builder = builder;
             }

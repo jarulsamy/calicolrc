@@ -1,28 +1,41 @@
 ﻿
-using System.Globalization;
-using System.Windows;
-
 namespace Graphviz4Net.Dot
 {
+    using System.Windows;
     using System.Collections.Generic;
     using Graphs;
 
-    public class DotVertex : IAttributed
+    /// <summary>
+    /// Represents a vertex in a <see cref="DotGraph{TVertexId}"/> obtained from an output of the DOT program.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A vertex can have any general Id type. If you want to use the whole process of layout 
+    /// building implemented in <see cref="LayoutDirector"/> then under the hood, the vertices 
+    /// will have <see cref="System.Int32"/> ids.
+    /// </para>
+    /// <para>
+    /// If you want to use only parsing abilities of Graphviz4Net, 
+    /// you can use the vertices with e.g. <see cref="System.String"/> ids.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TId"></typeparam>
+    public class DotVertex<TId> : IAttributed
     {
         private readonly IDictionary<string, string> attributes;
 
-        public DotVertex(int id)
+        public DotVertex(TId id)
             : this(id, new Dictionary<string, string>())
         {
         }
 
-        public DotVertex(int id, IDictionary<string, string> attributes)
+        public DotVertex(TId id, IDictionary<string, string> attributes)
         {
             this.Id = id;
             this.attributes = attributes;
         }
 
-        public int Id { get; private set; }
+        public TId Id { get; private set; }
 
         public double? Width
         {
@@ -68,7 +81,7 @@ namespace Graphviz4Net.Dot
 
         public override string ToString()
         {
-            return this.Id.ToString(CultureInfo.InvariantCulture);
+            return this.Id.ToString();
         }
     }
 }

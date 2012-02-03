@@ -8,7 +8,7 @@ namespace Graphviz4Net.Dot
     using System.Windows;
     using Graphs;
 
-    public class DotEdge : Edge<DotVertex>
+    public class DotEdge<TVertexId> : Edge<DotVertex<TVertexId>>
     {
         private Point[] data;
 
@@ -23,12 +23,12 @@ namespace Graphviz4Net.Dot
         /// </summary>
         private string parsedPos;
 
-        public DotEdge(DotVertex source, DotVertex destination) 
+        public DotEdge(DotVertex<TVertexId> source, DotVertex<TVertexId> destination) 
             : base(source, destination)
         {
         }
 
-        public DotEdge(DotVertex source, DotVertex destination, IDictionary<string, string> attributes)
+        public DotEdge(DotVertex<TVertexId> source, DotVertex<TVertexId> destination, IDictionary<string, string> attributes)
             : base(source, destination, null, null, attributes)
         {
         }      
