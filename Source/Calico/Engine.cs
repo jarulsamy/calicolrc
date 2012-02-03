@@ -155,12 +155,14 @@ namespace Calico {
 				  System.Reflection.MethodInfo method;
 				  try {
 					method = type.GetMethod("initialize_module");
-					method.Invoke(type, new object [] {calico.path, calico.OS});
+                    if (method != null)
+					    method.Invoke(type, new object [] {calico.path, calico.OS});
 				  } catch {
 				  }
 				  try {
 					method = type.GetMethod("set_gui_thread_id");
-					method.Invoke(type, new object [] {MainWindow.gui_thread_id});
+                    if (method != null)
+					    method.Invoke(type, new object [] {MainWindow.gui_thread_id});
 				  } catch {
 				  }
 				}
