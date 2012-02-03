@@ -5006,7 +5006,7 @@ public static class Myro {
 
       if (os_name == "Windows") {
         string file = startup_path;
-        file = Path.Combine(file, "bin");
+        //file = Path.Combine(file, "bin");
         file = Path.Combine(file, "windows");
         file = Path.Combine(file, "eSpeak");
         myProcess.StartInfo.FileName = Path.Combine(file, "espeak.exe");
