@@ -18,46 +18,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 $Id: $
 */
-using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
-using System.Runtime.InteropServices; // Marshal
+using IronPython.Runtime;
+// Operations, List, Tuple, Dict, ...
+using System.Runtime.InteropServices;
+// Marshal
 using System.Collections.Generic;
-using System.Collections; // IEnumerable
+using System.Collections;
+// IEnumerable
 using System.Threading;
-using System.Drawing; // Image, Bitmap
-using System.Net; // WebRequest
-using System.IO; // MemoryStream
+using System.Drawing;
+// Image, Bitmap
+using System.Net;
+// WebRequest
+using System.IO;
+// MemoryStream
 using System;
 
-using Microsoft.Xna.Framework; // Vector2, Matrix
+using Microsoft.Xna.Framework;// Vector2, Matrix
 
-public static class Graphics {
+public static class Graphics
+{
 
-  public static int gui_thread_id = -1;
-  public delegate void InvokeDelegate();
-  public static void Invoke(InvokeDelegate invoke) {
-    if (needInvoke())
-      Gtk.Application.Invoke(delegate {invoke();});
-    else
-      invoke();
-  }
-  public static bool needInvoke() {
-    if (Graphics.gui_thread_id == -1) {
-      return false; // direcly in GUI thread
-    } else if (Graphics.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
-      return false; // you are already in the GUI thread
-    } else {
-      return true; // need to invoke!
-    }
-  }
+	public static int gui_thread_id = -1;
+	public delegate void InvokeDelegate ();
 
-  public static void set_gui_thread_id(int gui_thread_id) {
-    Graphics.gui_thread_id = gui_thread_id;
-  }
+	public static void Invoke (InvokeDelegate invoke)
+	{
+		if (needInvoke ())
+			Gtk.Application.Invoke (delegate {
+				invoke ();});
+		else
+			invoke ();
+	}
 
-  private static WindowClass _lastWindow = null;
+	public static bool needInvoke ()
+	{
+		if (Graphics.gui_thread_id == -1) {
+			return false; // direcly in GUI thread
+		} else if (Graphics.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
+			return false; // you are already in the GUI thread
+		} else {
+			return true; // need to invoke!
+		}
+	}
 
-  public static readonly Dictionary<string,Color> colors = 
-    new Dictionary<string,Color>() {
+	public static void set_gui_thread_id (int gui_thread_id)
+	{
+		Graphics.gui_thread_id = gui_thread_id;
+	}
+
+	private static WindowClass _lastWindow = null;
+	public static readonly Dictionary<string,Color> colors = 
+    new Dictionary<string,Color> () {
        {"black", new Color(0x00, 0x00, 0x00)}, 
        {"navy", new Color(0x00, 0x00, 0x80)}, 
        {"darkblue", new Color(0x00, 0x00, 0x8B)}, 
@@ -207,4010 +219,4362 @@ public static class Graphics {
        {"white", new Color(0xFF, 0xFF, 0xFF)}, 
     };
 
-  public static PythonTuple getMouse() {
-    return getWindow().getMouse();
-  }
+	public static PythonTuple getMouse ()
+	{
+		return getWindow ().getMouse ();
+	}
 
-  public static PythonTuple getMouseNow() {
-    return getWindow().getMouseNow();
-  }
+	public static PythonTuple getMouseNow ()
+	{
+		return getWindow ().getMouseNow ();
+	}
 
-  public static string getMouseState() {
-    return getWindow().getMouseState();
-  }
+	public static string getMouseState ()
+	{
+		return getWindow ().getMouseState ();
+	}
 
-  public static string getKeyState() {
-    return getWindow().getKeyState();
-  }  
+	public static string getKeyState ()
+	{
+		return getWindow ().getKeyState ();
+	}
 
-  public static string getKeyPressed() {
-    return getWindow().getKeyPressed();
-  }  
+	public static string getKeyPressed ()
+	{
+		return getWindow ().getKeyPressed ();
+	}
 
-  public static void run() {
-    getWindow().run();
-  }
+	public static void run ()
+	{
+		getWindow ().run ();
+	}
 
-  public static void run(Func<object> function) {
-    getWindow().run(function);
-  }
+	public static void run (Func<object> function)
+	{
+		getWindow ().run (function);
+	}
 
-  // Callbacks:
+	// Callbacks:
 
-  public static void onMouseUp(Func<object,Event,object> function) {
-    getWindow().onMouseUp(function);
-  }
+	public static void onMouseUp (Func<object,Event,object> function)
+	{
+		getWindow ().onMouseUp (function);
+	}
 
-  public static void onMouseDown(Func<object,Event,object> function) {
-    getWindow().onMouseDown(function);
-  }
+	public static void onMouseDown (Func<object,Event,object> function)
+	{
+		getWindow ().onMouseDown (function);
+	}
 
-  public static void onMouseMovement(Func<object,Event,object> function) {
-    getWindow().onMouseMovement(function);
-  }
+	public static void onMouseMovement (Func<object,Event,object> function)
+	{
+		getWindow ().onMouseMovement (function);
+	}
 
-  public static void onKeyPress(Func<object,Event,object> function) {
-    getWindow().onKeyPress(function);
-  }
+	public static void onKeyPress (Func<object,Event,object> function)
+	{
+		getWindow ().onKeyPress (function);
+	}
 
-  public static void onKeyRelease(Func<object,Event,object> function) {
-    getWindow().onKeyRelease(function);
-  }
+	public static void onKeyRelease (Func<object,Event,object> function)
+	{
+		getWindow ().onKeyRelease (function);
+	}
 
-  public static List getColorNames() {
-    List retval = new List();
-    foreach (String key in colors.Keys) {
-      retval.append(key);
-    }
-    return retval;
-  }
+	public static List getColorNames ()
+	{
+		List retval = new List ();
+		foreach (String key in colors.Keys) {
+			retval.append (key);
+		}
+		return retval;
+	}
   
-  public static List PyList(params object [] items) {
-    // make a list from an array
-    List retval = new List();
-    for (int i = 0; i < items.Length; i++) {
-      retval.append(items[i]);
-    }
-    return retval;
-  }
+	public static List PyList (params object [] items)
+	{
+		// make a list from an array
+		List retval = new List ();
+		for (int i = 0; i < items.Length; i++) {
+			retval.append (items [i]);
+		}
+		return retval;
+	}
   
-  public static PythonTuple PyTuple(params object [] items) {
-    // make a tuple from an array
-    return new PythonTuple(items);
-  }
+	public static PythonTuple PyTuple (params object [] items)
+	{
+		// make a tuple from an array
+		return new PythonTuple (items);
+	}
 
-  private static Dictionary<string, Graphics.WindowClass> _windows =
-    new Dictionary<string, Graphics.WindowClass>();
+	private static Dictionary<string, Graphics.WindowClass> _windows =
+    new Dictionary<string, Graphics.WindowClass> ();
   
-  public static Color getColor(Picture picture, int x, int y) {
-    return picture.getColor(x, y);
-  }
+	public static Color getColor (Picture picture, int x, int y)
+	{
+		return picture.getColor (x, y);
+	}
   
-  public static Pixel getPixel(Picture picture, int x, int y) {
-    return picture.getPixel(x, y);
-  }
+	public static Pixel getPixel (Picture picture, int x, int y)
+	{
+		return picture.getPixel (x, y);
+	}
   
-  public static IEnumerable getPixels(Picture picture) {
-    for (int x=0; x < picture.width; x++) {
-      for (int y=0; y < picture.height; y++) {
-        yield return picture.getPixel(x, y);
-      }
-    }
-  }
-  public static void setPixels(Picture picture, Picture picture2) {
-    for (int x=0; x < picture.width; x++) {
-      for (int y=0; y < picture.height; y++) {
-        picture.setPixel(x, y, picture2.getPixel(x, y));
-      }
-    }
-  }
+	public static IEnumerable getPixels (Picture picture)
+	{
+		for (int x=0; x < picture.width; x++) {
+			for (int y=0; y < picture.height; y++) {
+				yield return picture.getPixel(x, y);
+			}
+		}
+	}
 
-  public static void setPixel(Picture picture, int x, int y, Color color) {
-        picture.setPixel(x, y, color);
-  }
+	public static void setPixels (Picture picture, Picture picture2)
+	{
+		for (int x=0; x < picture.width; x++) {
+			for (int y=0; y < picture.height; y++) {
+				picture.setPixel (x, y, picture2.getPixel (x, y));
+			}
+		}
+	}
 
-  public static void setPixel(Picture picture, int x, int y, Pixel pixel) {
-        picture.setPixel(x, y, pixel);
-  }
+	public static void setPixel (Picture picture, int x, int y, Color color)
+	{
+		picture.setPixel (x, y, color);
+	}
 
-  public static Color getColor(Pixel pixel) {
-    return pixel.getColor();
-  }
-  public static void setColor(Pixel pixel, Color color) {
-    pixel.setColor(color);
-  }
-  public static PythonTuple getRGB(Pixel pixel) {
-    return pixel.getRGB();
-  }
-  public static PythonTuple getRGBA(Pixel pixel) {
-    return pixel.getRGBA();
-  }
-  public static int getGray(Pixel pixel) {
-    return pixel.getGray();
-  }
-  public static int getRed(Pixel pixel) {
-    return pixel.getRed();
-  }
-  public static int getGreen(Pixel pixel) {
-    return pixel.getGreen();
-  }
-  public static int getBlue(Pixel pixel) {
-    return pixel.getBlue();
-  }
-  public static int getAlpha(Pixel pixel) {
-    return pixel.getAlpha();
-  }
-  public static void setRGB(Pixel pixel, int red, int green, int blue) {
-    pixel.setRGB((byte)red, (byte)green, (byte)blue);
-  }
-  public static void setRGB(Pixel pixel, IList rgb) {
-    pixel.setRGB((byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
-  }
-  public static void setRGB(Pixel pixel, float red, float green, float blue) {
-    pixel.setRGB((byte)red, (byte)green, (byte)blue);
-  }
-  public static void setRGB(Pixel pixel, byte red, byte green, byte blue) {
-    pixel.setRGB(red, green, blue);
-  }
-  public static void setRGBA(Pixel pixel, byte red, byte green, byte blue, byte alpha) {
-    pixel.setRGBA(red, green, blue, alpha);
-  }
-  public static void setGray(Pixel pixel, byte value) {
-    pixel.setGray(value);
-  }
-  public static void setRed(Pixel pixel, byte value) {
-    pixel.setRed(value);
-  }
-  public static void setGreen(Pixel pixel, byte value) {
-    pixel.setGreen(value);
-  }
-  public static void setBlue(Pixel pixel, byte value) {
-    pixel.setBlue(value);
-  }
-  public static void setAlpha(Pixel pixel, byte value) {
-    pixel.setAlpha(value);
-  }
-  
-  public static void savePicture(Picture picture, string filename) {
-    picture.savePicture(filename);
-  }
-  public static void savePicture(List list, string filename) {
-    savePicture(list, filename, 10, false);
-  }
-  public static void savePicture(List list, string filename, short delay) {
-    savePicture(list, filename, delay, false);
-  }
-  public static void savePicture(List list, string filename, short delay, bool repeat) {
-    if (filename.Substring(filename.Length - 3, 3) != "gif"){
-        throw new Exception("saving a list of pictures creates an animated gif; use the gif extension");
-    }
-    List<GifLib.GifFrame> frameList = new List<GifLib.GifFrame>();
-    foreach (Graphics.Picture picture in list) {
-      Gdk.Pixbuf pixbuf = picture.getPixbuf();
-      Byte [] buffer = pixbuf.SaveToBuffer("png");
-      MemoryStream ms = new MemoryStream(buffer);
-      Bitmap bitmap = new Bitmap(ms);
-      //bitmap.MakeTransparent(backColor);
-      GifLib.GifFrame frame = GifLib.GifHelper.BitmapToFrame(bitmap);
-      frameList.Add(frame);
-    }
-    GifLib.GifHelper.Merge(frameList, filename, delay, repeat);
-  }
+	public static void setPixel (Picture picture, int x, int y, Pixel pixel)
+	{
+		picture.setPixel (x, y, pixel);
+	}
 
-  public static Picture makePicture(int x, int y) {
-    return new Picture(x, y);
-  }
-  public static Picture makePicture(int x, int y, Color c) {
-    return new Picture(x, y, c);
-  }
-  public static Picture makePicture(string filename) {
-    return new Picture(filename);
-  }
-  
-  public static Picture copyPicture(Picture picture) {
-    return new Picture(picture);
-  }
-  
-  public static void Init() { 
-    // Start a thread in Background to run Graphics
-    // Only for use in non-GUI environments
-    Thread t = new Thread(GraphicsLoop);
-    t.Start();
-  }
-  
-  public static void GraphicsLoop() {
-    Gtk.Application.Init();
-    Gtk.Application.Run();
-  }
-  
-  public static Picture makePicture(WindowClass window) { //, string filename) {
-    ManualResetEvent ev = new ManualResetEvent(false);
-    Gdk.Pixbuf pixbuf = null;
-    Invoke( delegate {
-        Gdk.Drawable drawable = window.getDrawable();
-        Gdk.Colormap colormap = drawable.Colormap;
-        int _width = 0;
-        int _height = 0;
-        drawable.GetSize(out _width, out _height);
-        pixbuf = Gdk.Pixbuf.FromDrawable(drawable, colormap, 0, 0, 0, 0, _width, _height);
-        ev.Set();
-      });
-    ev.WaitOne();
-    return new Picture(pixbuf);
-  }
+	public static Color getColor (Pixel pixel)
+	{
+		return pixel.getColor ();
+	}
 
-  public static Graphics.WindowClass makeWindowFast(string title="Calico Graphics",
+	public static void setColor (Pixel pixel, Color color)
+	{
+		pixel.setColor (color);
+	}
+
+	public static PythonTuple getRGB (Pixel pixel)
+	{
+		return pixel.getRGB ();
+	}
+
+	public static PythonTuple getRGBA (Pixel pixel)
+	{
+		return pixel.getRGBA ();
+	}
+
+	public static int getGray (Pixel pixel)
+	{
+		return pixel.getGray ();
+	}
+
+	public static int getRed (Pixel pixel)
+	{
+		return pixel.getRed ();
+	}
+
+	public static int getGreen (Pixel pixel)
+	{
+		return pixel.getGreen ();
+	}
+
+	public static int getBlue (Pixel pixel)
+	{
+		return pixel.getBlue ();
+	}
+
+	public static int getAlpha (Pixel pixel)
+	{
+		return pixel.getAlpha ();
+	}
+
+	public static void setRGB (Pixel pixel, int red, int green, int blue)
+	{
+		pixel.setRGB ((byte)red, (byte)green, (byte)blue);
+	}
+
+	public static void setRGB (Pixel pixel, IList rgb)
+	{
+		pixel.setRGB ((byte)rgb [0], (byte)rgb [1], (byte)rgb [2]);
+	}
+
+	public static void setRGB (Pixel pixel, float red, float green, float blue)
+	{
+		pixel.setRGB ((byte)red, (byte)green, (byte)blue);
+	}
+
+	public static void setRGB (Pixel pixel, byte red, byte green, byte blue)
+	{
+		pixel.setRGB (red, green, blue);
+	}
+
+	public static void setRGBA (Pixel pixel, byte red, byte green, byte blue, byte alpha)
+	{
+		pixel.setRGBA (red, green, blue, alpha);
+	}
+
+	public static void setGray (Pixel pixel, byte value)
+	{
+		pixel.setGray (value);
+	}
+
+	public static void setRed (Pixel pixel, byte value)
+	{
+		pixel.setRed (value);
+	}
+
+	public static void setGreen (Pixel pixel, byte value)
+	{
+		pixel.setGreen (value);
+	}
+
+	public static void setBlue (Pixel pixel, byte value)
+	{
+		pixel.setBlue (value);
+	}
+
+	public static void setAlpha (Pixel pixel, byte value)
+	{
+		pixel.setAlpha (value);
+	}
+  
+	public static void savePicture (Picture picture, string filename)
+	{
+		picture.savePicture (filename);
+	}
+
+	public static void savePicture (List list, string filename)
+	{
+		savePicture (list, filename, 10, false);
+	}
+
+	public static void savePicture (List list, string filename, short delay)
+	{
+		savePicture (list, filename, delay, false);
+	}
+
+	public static void savePicture (List list, string filename, short delay, bool repeat)
+	{
+		if (filename.Substring (filename.Length - 3, 3) != "gif") {
+			throw new Exception ("saving a list of pictures creates an animated gif; use the gif extension");
+		}
+		List<GifLib.GifFrame> frameList = new List<GifLib.GifFrame> ();
+		foreach (Graphics.Picture picture in list) {
+			Gdk.Pixbuf pixbuf = picture.getPixbuf ();
+			Byte [] buffer = pixbuf.SaveToBuffer ("png");
+			MemoryStream ms = new MemoryStream (buffer);
+			Bitmap bitmap = new Bitmap (ms);
+			//bitmap.MakeTransparent(backColor);
+			GifLib.GifFrame frame = GifLib.GifHelper.BitmapToFrame (bitmap);
+			frameList.Add (frame);
+		}
+		GifLib.GifHelper.Merge (frameList, filename, delay, repeat);
+	}
+
+	public static Picture makePicture (int x, int y)
+	{
+		return new Picture (x, y);
+	}
+
+	public static Picture makePicture (int x, int y, Color c)
+	{
+		return new Picture (x, y, c);
+	}
+
+	public static Picture makePicture (string filename)
+	{
+		return new Picture (filename);
+	}
+  
+	public static Picture copyPicture (Picture picture)
+	{
+		return new Picture (picture);
+	}
+  
+	public static void Init ()
+	{ 
+		// Start a thread in Background to run Graphics
+		// Only for use in non-GUI environments
+		Thread t = new Thread (GraphicsLoop);
+		t.Start ();
+	}
+  
+	public static void GraphicsLoop ()
+	{
+		Gtk.Application.Init ();
+		Gtk.Application.Run ();
+	}
+  
+	public static Picture makePicture (WindowClass window)
+	{ //, string filename) {
+		ManualResetEvent ev = new ManualResetEvent (false);
+		Gdk.Pixbuf pixbuf = null;
+		Invoke (delegate {
+			Gdk.Drawable drawable = window.getDrawable ();
+			Gdk.Colormap colormap = drawable.Colormap;
+			int _width = 0;
+			int _height = 0;
+			drawable.GetSize (out _width, out _height);
+			pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
+			ev.Set ();
+		});
+		ev.WaitOne ();
+		return new Picture (pixbuf);
+	}
+
+	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
                                            int width=300,
-                                           int height=300) {
-    if (_windows.ContainsKey(title)) {
-      _windows[title].clear(false);
-      _lastWindow = _windows[title];
-      _lastWindow.KeepAbove = true;
-      return _windows[title];
-    } else {
-      _windows[title] = new Graphics.WindowClass(title, width, height);
-      _lastWindow = _windows[title];
-      _lastWindow.KeepAbove = true;
-      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for realize
-      return _windows[title];
-    }
-  }
+                                           int height=300)
+	{
+		if (_windows.ContainsKey (title)) {
+			_windows [title].clear (false);
+			_lastWindow = _windows [title];
+			_lastWindow.KeepAbove = true;
+			return _windows [title];
+		} else {
+			_windows [title] = new Graphics.WindowClass (title, width, height);
+			_lastWindow = _windows [title];
+			_lastWindow.KeepAbove = true;
+			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
+			return _windows [title];
+		}
+	}
 
-  public static void wait(double seconds) {
-    Thread.Sleep((int)(seconds * 1000));
+	public static void wait (double seconds)
+	{
+		Thread.Sleep ((int)(seconds * 1000));
     
-    /*    ManualResetEvent mre = new ManualResetEvent(false);
+		/*    ManualResetEvent mre = new ManualResetEvent(false);
         GLib.Timeout.Add(((uint)seconds * 1000), new GLib.TimeoutHandler( delegate {
                           mre.Set();
                           return false;
         }));
         mre.WaitOne();*/
-  }
+	}
 
-  public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
+	public static Graphics.WindowClass makeWindow (string title="Calico Graphics",
                                            int width=300, 
-                                           int height=300) {
-    if (_windows.ContainsKey(title)) {
-      _windows[title].clear();
-      _windows[title].mode = "auto";
-      _windows[title].ShowAll();
-      _windows[title].Resize(width, height);
-      _windows[title].QueueDraw();
-      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for redraw
-      /*
+                                           int height=300)
+	{
+		if (_windows.ContainsKey (title)) {
+			_windows [title].clear ();
+			_windows [title].mode = "auto";
+			_windows [title].ShowAll ();
+			_windows [title].Resize (width, height);
+			_windows [title].QueueDraw ();
+			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for redraw
+			/*
       Gtk.Application.Invoke(delegate { 
           _windows[title].GdkWindow.UrgencyHint = true;
         });
       */
-      _lastWindow = _windows[title];
-      return _windows[title];
-    } else {
-      _windows[title] = new Graphics.WindowClass(title, width, height);
-      /*
+			_lastWindow = _windows [title];
+			return _windows [title];
+		} else {
+			_windows [title] = new Graphics.WindowClass (title, width, height);
+			/*
       Gtk.Application.Invoke(delegate { 
           _windows[title].GdkWindow.UrgencyHint = true;
         });
       */
-      _lastWindow = _windows[title];
-      _lastWindow.KeepAbove = true;
-      Thread.Sleep((int)(.1 * 1000)); // FIXME: wait for realize
-      return _windows[title];
-    }
-  }
+			_lastWindow = _windows [title];
+			_lastWindow.KeepAbove = true;
+			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
+			return _windows [title];
+		}
+	}
 
-  public static Graphics.WindowClass getWindow() {
-    if (_lastWindow != null) {
-      return _lastWindow;
-    } else {
-      throw new Exception("no windows exist yet");
-    }
-  }
+	public static Graphics.WindowClass getWindow ()
+	{
+		if (_lastWindow != null) {
+			return _lastWindow;
+		} else {
+			throw new Exception ("no windows exist yet");
+		}
+	}
   
-  public static Graphics.WindowClass getWindow(string title) {
-    if (_windows.ContainsKey(title)) {
-      return _windows[title];
-    } else {
-      return null;
-    }
-  }
+	public static Graphics.WindowClass getWindow (string title)
+	{
+		if (_windows.ContainsKey (title)) {
+			return _windows [title];
+		} else {
+			return null;
+		}
+	}
 
-  public static Graphics.WindowClass Window(string title="Calico Graphics",
+	public static Graphics.WindowClass Window (string title="Calico Graphics",
                                        int width=300, 
-                                       int height=300) {
-    return makeWindow(title, width, height);
-  }
+                                       int height=300)
+	{
+		return makeWindow (title, width, height);
+	}
 
-  public static Graphics.WindowClass Window(int width,
-                                            int height) {
-    return makeWindow("Calico Graphics", width, height);
-  }
+	public static Graphics.WindowClass Window (int width,
+                                            int height)
+	{
+		return makeWindow ("Calico Graphics", width, height);
+	}
 
-  public static Color makeColor(string color) {
-    return new Color(color);
-  }
+	public static Color makeColor (string color)
+	{
+		return new Color (color);
+	}
 
-  public static Color makeColor(int r, int g, int b) {
-    return new Color(r, g, b);
-  }
+	public static Color makeColor (int r, int g, int b)
+	{
+		return new Color (r, g, b);
+	}
 
-  public static Color makeColor(int r, int g, int b, int a) {
-    return new Color(r, g, b, a);
-  }
+	public static Color makeColor (int r, int g, int b, int a)
+	{
+		return new Color (r, g, b, a);
+	}
 
-  public static Color makeColor(double r, double g, double b) {
-    return new Color(r, g, b);
-  }
+	public static Color makeColor (double r, double g, double b)
+	{
+		return new Color (r, g, b);
+	}
 
-  public static Color makeColor(double r, double g, double b, double a) {
-    return new Color(r, g, b, a);
-  }
+	public static Color makeColor (double r, double g, double b, double a)
+	{
+		return new Color (r, g, b, a);
+	}
 
-  public class Event {
-    public double x;
-    public double y;
-    public object value;
-    public double time;
-    public string type;
-    public string key;
+	public class Event
+	{
+		public double x;
+		public double y;
+		public object value;
+		public double time;
+		public string type;
+		public string key;
     
-    public Event(Gtk.ButtonReleaseEventArgs args) {
-      type = "mouse-release";
-      x = args.Event.X;
-      y = args.Event.Y;
-      time = args.Event.Time;
-    }
+		public Event (Gtk.ButtonReleaseEventArgs args)
+		{
+			type = "mouse-release";
+			x = args.Event.X;
+			y = args.Event.Y;
+			time = args.Event.Time;
+		}
 
-    public Event(Gtk.KeyPressEventArgs args) {
-      type = "key-press";
-      time = args.Event.Time;
-      key = args.Event.Key.ToString();
-    }
+		public Event (Gtk.KeyPressEventArgs args)
+		{
+			type = "key-press";
+			time = args.Event.Time;
+			key = args.Event.Key.ToString ();
+		}
 
-    public Event(Gtk.KeyReleaseEventArgs args) {
-      type = "key-release";
-      time = args.Event.Time;
-      key = args.Event.Key.ToString();
-    }
+		public Event (Gtk.KeyReleaseEventArgs args)
+		{
+			type = "key-release";
+			time = args.Event.Time;
+			key = args.Event.Key.ToString ();
+		}
 
-    public Event(Gtk.ButtonPressEventArgs args) {
-      type = "mouse-press";
-      x = args.Event.X;
-      y = args.Event.Y;
-      time = args.Event.Time;
-    }
+		public Event (Gtk.ButtonPressEventArgs args)
+		{
+			type = "mouse-press";
+			x = args.Event.X;
+			y = args.Event.Y;
+			time = args.Event.Time;
+		}
 
-    public Event(Gtk.MotionNotifyEventArgs args) {
-      type = "mouse-motion";
-      x = args.Event.X;
-      y = args.Event.Y;
-      time = args.Event.Time;
-    }
+		public Event (Gtk.MotionNotifyEventArgs args)
+		{
+			type = "mouse-motion";
+			x = args.Event.X;
+			y = args.Event.Y;
+			time = args.Event.Time;
+		}
 
-    public Event(System.EventArgs args) {
-      type = "system-event";
-    }
+		public Event (System.EventArgs args)
+		{
+			type = "system-event";
+		}
 
-    public Event(string args) {
-      type = args;
-    }
+		public Event (string args)
+		{
+			type = args;
+		}
 
-    public Event(string args, double time) {
-      type = args;
-      this.time = time;
-    }
+		public Event (string args, double time)
+		{
+			type = args;
+			this.time = time;
+		}
 
-    public Event(string args, object value, double time) {
-      type = args;
-      this.value = value;
-      this.time = time;
-    }
+		public Event (string args, object value, double time)
+		{
+			type = args;
+			this.value = value;
+			this.time = time;
+		}
 
-    public override string ToString() {
-      if (time == 0 && x == 0 && y == 0) {
-	return String.Format("<Event \"{0}\">", type);
-      } else if (x == 0 && y == 0) {
-	return String.Format("<Event \"{0}\" at {1}>", type, time);
-      } else {
-	return String.Format("<Event \"{0}\" ({1},{2}) at {3}>", 
+		public override string ToString ()
+		{
+			if (time == 0 && x == 0 && y == 0) {
+				return String.Format ("<Event \"{0}\">", type);
+			} else if (x == 0 && y == 0) {
+				return String.Format ("<Event \"{0}\" at {1}>", type, time);
+			} else {
+				return String.Format ("<Event \"{0}\" ({1},{2}) at {3}>", 
 			     type, x, y, time);
-      }
-    }
+			}
+		}
 
-    public string __repr__() {
-      return ToString();
-    }
+		public string __repr__ ()
+		{
+			return ToString ();
+		}
 
-  }
+	}
   
-  public class Plot {
+	public class Plot
+	{
 
-    public WindowClass window;
-    public List data = new List();
-    public Line line = new Line();
-    int border = 50;
-    public Text xLabel;
-    public Text yLabel;
+		public WindowClass window;
+		public List data = new List ();
+		public Line line = new Line ();
+		int border = 50;
+		public Text xLabel;
+		public Text yLabel;
 
-    public Plot(IList list) : this("Plot", 640, 480) {
-      foreach (double item in list)
-        {
-          append(item);
-        }
-    }
+		public Plot (IList list) : this("Plot", 640, 480)
+		{
+			foreach (double item in list) {
+				append (item);
+			}
+		}
 
-    public Plot(string title, int width, int height) {
-      window = makeWindow(title, width, height);
-      Line tick;
-      Rectangle rect = new Rectangle(new Point(border, border), 
-                                     new Point(width - border, height - border));
-      rect.fill = new Color("white");
-      rect.outline = new Color("black");
-      rect.tag = "line";
-      rect.draw(window);
-      // x ticks:
-      int interval = (width - border * 2) / 10;
-      for (int x = border; x <= width - border; x += interval) {
-        tick = new Line(new Point(x, height - border), 
-                        new Point(x, height - border + 10));
-        tick.outline = new Color("black");
-        tick.tag = "line";
-        tick.draw(window);
-      }
-      // y ticks:
-      interval = (height - border * 2) / 10;
-      for (int y = height - border; y >= border; y -= interval) {
-        tick = new Line(new Point(border - 10, y), 
-                        new Point(border, y));
-        tick.outline = new Color("black");
-        tick.tag = "line";
-        tick.draw(window);
-      }
-      yLabel = new Text(new Point(border/3, height/2), "y legend");
-      yLabel.fill = new Color("black");
-      yLabel.rotate(90);
-      yLabel.draw(window);
-      xLabel = new Text(new Point(width/2, height - border/3), "x legend");
-      xLabel.fill = new Color("black");
-      xLabel.draw(window);
-    }
+		public Plot (string title, int width, int height)
+		{
+			window = makeWindow (title, width, height);
+			Line tick;
+			Rectangle rect = new Rectangle (new Point (border, border), 
+                                     new Point (width - border, height - border));
+			rect.fill = new Color ("white");
+			rect.outline = new Color ("black");
+			rect.tag = "line";
+			rect.draw (window);
+			// x ticks:
+			int interval = (width - border * 2) / 10;
+			for (int x = border; x <= width - border; x += interval) {
+				tick = new Line (new Point (x, height - border), 
+                        new Point (x, height - border + 10));
+				tick.outline = new Color ("black");
+				tick.tag = "line";
+				tick.draw (window);
+			}
+			// y ticks:
+			interval = (height - border * 2) / 10;
+			for (int y = height - border; y >= border; y -= interval) {
+				tick = new Line (new Point (border - 10, y), 
+                        new Point (border, y));
+				tick.outline = new Color ("black");
+				tick.tag = "line";
+				tick.draw (window);
+			}
+			yLabel = new Text (new Point (border / 3, height / 2), "y legend");
+			yLabel.fill = new Color ("black");
+			yLabel.rotate (90);
+			yLabel.draw (window);
+			xLabel = new Text (new Point (width / 2, height - border / 3), "x legend");
+			xLabel.fill = new Color ("black");
+			xLabel.draw (window);
+		}
 
-    public void append(int datum) {
-      append(System.Convert.ToDouble(datum));
-    }
-    public void append(double datum) {
-      line.undraw();
-      data.Add(datum);
-      if (data.Count > 1) {
-        line = new Line();
-        line.outline = new Color("red");
-        int col = 0;
-        double h;
-        int increment = (window.width - 2 * border) / (data.Count - 1);
-        double min = 10000;
-        double max = -10000;
-        foreach (double i in data) {
-          min = Math.Min(min, i);
-          max = Math.Max(max, i);
-        }
-        if (increment == 0) {
-          increment = 1;
-        }
-        foreach (double i in data) {
-          if (max != min) {
-            h = (window.height - border * 2) * (i - min)/(max - min);
-          } else {
-            h = (window.height - border * 2) * .5;
-          }
-          line.append(new Point(border + col, window.height - border - h));
-          col += increment;
-        }
-        line.set_points();
-        line.draw(window);
+		public void append (int datum)
+		{
+			append (System.Convert.ToDouble (datum));
+		}
 
-        // remove previous tick numbers:
-        List to_remove = new List();
-        lock(window.canvas.shapes) {
-          foreach (Shape shape in window.canvas.shapes) {
-            if (shape.tag == "tick")
-              to_remove.Add(shape);
-          }
-          foreach (Shape shape in to_remove) {
-            window.canvas.shapes.Remove(shape);
-          }
-        }
-        // x ticks:
-        int interval = (window.width - border * 2) / 10;
-        int int_value = data.Count / 10;
-        int count = 1;
-        Text text;
-        for (int x = border; x <= window.width - border; x += interval) {
-          text = new Text(new Point(x, window.height - border + 20), count.ToString());
-          text.outline = new Color("black");
-          text.fontSize = 9;
-          text.tag = "tick";
-          text.draw(window);
-          count += int_value;
-        }
-        // y ticks:
-        interval = (window.height - border * 2) / 10;
-        double interval_value = (max - min) / 10;
-        double sum = min;
-        for (int y = window.height - border; y >= border; y -= interval) {
-          text = new Text(new Point(border - 20, y), sum.ToString());
-          text.outline = new Color("black");
-          text.fontSize = 9;
-          text.tag = "tick";
-          text.draw(window);
-          sum += interval_value;
-        }
-      }
-    }
+		public void append (double datum)
+		{
+			line.undraw ();
+			data.Add (datum);
+			if (data.Count > 1) {
+				line = new Line ();
+				line.outline = new Color ("red");
+				int col = 0;
+				double h;
+				int increment = (window.width - 2 * border) / (data.Count - 1);
+				double min = 10000;
+				double max = -10000;
+				foreach (double i in data) {
+					min = Math.Min (min, i);
+					max = Math.Max (max, i);
+				}
+				if (increment == 0) {
+					increment = 1;
+				}
+				foreach (double i in data) {
+					if (max != min) {
+						h = (window.height - border * 2) * (i - min) / (max - min);
+					} else {
+						h = (window.height - border * 2) * .5;
+					}
+					line.append (new Point (border + col, window.height - border - h));
+					col += increment;
+				}
+				line.set_points ();
+				line.draw (window);
+
+				// remove previous tick numbers:
+				List to_remove = new List ();
+				lock (window.canvas.shapes) {
+					foreach (Shape shape in window.canvas.shapes) {
+						if (shape.tag == "tick")
+							to_remove.Add (shape);
+					}
+					foreach (Shape shape in to_remove) {
+						window.canvas.shapes.Remove (shape);
+					}
+				}
+				// x ticks:
+				int interval = (window.width - border * 2) / 10;
+				int int_value = data.Count / 10;
+				int count = 1;
+				Text text;
+				for (int x = border; x <= window.width - border; x += interval) {
+					text = new Text (new Point (x, window.height - border + 20), count.ToString ());
+					text.outline = new Color ("black");
+					text.fontSize = 9;
+					text.tag = "tick";
+					text.draw (window);
+					count += int_value;
+				}
+				// y ticks:
+				interval = (window.height - border * 2) / 10;
+				double interval_value = (max - min) / 10;
+				double sum = min;
+				for (int y = window.height - border; y >= border; y -= interval) {
+					text = new Text (new Point (border - 20, y), sum.ToString ());
+					text.outline = new Color ("black");
+					text.fontSize = 9;
+					text.tag = "tick";
+					text.draw (window);
+					sum += interval_value;
+				}
+			}
+		}
     
-  }
+	}
 
-  public class BarChart {
+	public class BarChart
+	{
 
-    public WindowClass window;
-    public List data = new List();
-    int border = 50;
-    public Text xLabel;
-    public Text yLabel;
+		public WindowClass window;
+		public List data = new List ();
+		int border = 50;
+		public Text xLabel;
+		public Text yLabel;
 
-    public BarChart(string title, int width, int height) {
-      window = makeWindow(title, width, height);
-      Line tick;
-      Rectangle rect = new Rectangle(new Point(border, border), 
-                                     new Point(width - border, height - border));
-      rect.fill = new Color("white");
-      rect.outline = new Color("black");
-      rect.tag = "line";
-      rect.draw(window);
-      // x ticks:
-      int interval = (width - border * 2) / 10;
-      for (int x = border; x <= width - border; x += interval) {
-        tick = new Line(new Point(x, height - border), 
-                        new Point(x, height - border + 10));
-        tick.outline = new Color("black");
-        tick.tag = "line";
-        tick.draw(window);
-      }
-      // y ticks:
-      interval = (height - border * 2) / 10;
-      for (int y = height - border; y >= border; y -= interval) {
-        tick = new Line(new Point(border - 10, y), 
-                        new Point(border, y));
-        tick.outline = new Color("black");
-        tick.tag = "line";
-        tick.draw(window);
-      }
-      yLabel = new Text(new Point(border/3, height/2), "y legend");
-      yLabel.fill = new Color("black");
-      yLabel.rotate(90);
-      yLabel.draw(window);
-      xLabel = new Text(new Point(width/2, height - border/3), "x legend");
-      xLabel.fill = new Color("black");
-      xLabel.draw(window);
-    }
+		public BarChart (string title, int width, int height)
+		{
+			window = makeWindow (title, width, height);
+			Line tick;
+			Rectangle rect = new Rectangle (new Point (border, border), 
+                                     new Point (width - border, height - border));
+			rect.fill = new Color ("white");
+			rect.outline = new Color ("black");
+			rect.tag = "line";
+			rect.draw (window);
+			// x ticks:
+			int interval = (width - border * 2) / 10;
+			for (int x = border; x <= width - border; x += interval) {
+				tick = new Line (new Point (x, height - border), 
+                        new Point (x, height - border + 10));
+				tick.outline = new Color ("black");
+				tick.tag = "line";
+				tick.draw (window);
+			}
+			// y ticks:
+			interval = (height - border * 2) / 10;
+			for (int y = height - border; y >= border; y -= interval) {
+				tick = new Line (new Point (border - 10, y), 
+                        new Point (border, y));
+				tick.outline = new Color ("black");
+				tick.tag = "line";
+				tick.draw (window);
+			}
+			yLabel = new Text (new Point (border / 3, height / 2), "y legend");
+			yLabel.fill = new Color ("black");
+			yLabel.rotate (90);
+			yLabel.draw (window);
+			xLabel = new Text (new Point (width / 2, height - border / 3), "x legend");
+			xLabel.fill = new Color ("black");
+			xLabel.draw (window);
+		}
 
-    public void append(int datum) {
-      append(System.Convert.ToDouble(datum));
-    }
+		public void append (int datum)
+		{
+			append (System.Convert.ToDouble (datum));
+		}
 
-    public void append(double datum) {
-      data.Add(datum);
-    }
-  }
+		public void append (double datum)
+		{
+			data.Add (datum);
+		}
+	}
 
-  public class Color {
-    internal Cairo.Color _cairo;
-    public WindowClass window;  // for setting color of a Window()
-    public Picture picture; // for setting color of Picture()
-    public int x = -1; // for use with picture, above
-    public int y = -1; // for use with picture, above
+	public class Color
+	{
+		internal Cairo.Color _cairo;
+		public WindowClass window;  // for setting color of a Window()
+		public Picture picture; // for setting color of Picture()
+		public int x = -1; // for use with picture, above
+		public int y = -1; // for use with picture, above
 
-    public Cairo.Color getCairo() {
-      return _cairo;
-    }
+		public Cairo.Color getCairo ()
+		{
+			return _cairo;
+		}
     
-    public Color(string name) {
-      if (name.StartsWith("#")) {
-        int r = (int)System.Convert.ToUInt32(name.Substring(1, 2), 16);
-        int g = (int)System.Convert.ToUInt32(name.Substring(3, 2), 16);
-        int b = (int)System.Convert.ToUInt32(name.Substring(5, 2), 16);
-        _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b));
-      } else if (colors.ContainsKey(name.ToLower())) {
-        _cairo = colors[name.ToLower()]._cairo;
-      } else {
-        throw new Exception(String.Format("unknown colorname '{0}'", name));
-      }
-    }
+		public Color (string name)
+		{
+			if (name.StartsWith ("#")) {
+				int r = (int)System.Convert.ToUInt32 (name.Substring (1, 2), 16);
+				int g = (int)System.Convert.ToUInt32 (name.Substring (3, 2), 16);
+				int b = (int)System.Convert.ToUInt32 (name.Substring (5, 2), 16);
+				_cairo = new Cairo.Color (ToCairo (r), ToCairo (g), ToCairo (b));
+			} else if (colors.ContainsKey (name.ToLower ())) {
+				_cairo = colors [name.ToLower ()]._cairo;
+			} else {
+				throw new Exception (String.Format ("unknown colorname '{0}'", name));
+			}
+		}
 
-    public Color(Color color) {
-      _cairo = new Cairo.Color(color._cairo.R, color._cairo.G, color._cairo.B, color._cairo.A);
-    }
+		public Color (Color color)
+		{
+			_cairo = new Cairo.Color (color._cairo.R, color._cairo.G, color._cairo.B, color._cairo.A);
+		}
 
-    public Color(int r, int g, int b) {
-      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), 1.0);
-    }
+		public Color (int r, int g, int b)
+		{
+			_cairo = new Cairo.Color (ToCairo (r), ToCairo (g), ToCairo (b), 1.0);
+		}
 
-    public Color(int r, int g, int b, int a) {
-      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), ToCairo(a));
-    }
+		public Color (int r, int g, int b, int a)
+		{
+			_cairo = new Cairo.Color (ToCairo (r), ToCairo (g), ToCairo (b), ToCairo (a));
+		}
 
-    public Color(double r, double g, double b) {
-      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), 1.0);
-    }
+		public Color (double r, double g, double b)
+		{
+			_cairo = new Cairo.Color (ToCairo (r), ToCairo (g), ToCairo (b), 1.0);
+		}
 
-    public Color(double r, double g, double b, double a) {
-      _cairo = new Cairo.Color(ToCairo(r), ToCairo(g), ToCairo(b), ToCairo(a));
-    }
+		public Color (double r, double g, double b, double a)
+		{
+			_cairo = new Cairo.Color (ToCairo (r), ToCairo (g), ToCairo (b), ToCairo (a));
+		}
 
-    public Color Copy() {
-      return new Color(red, green, blue, alpha);
-    }
+		public Color Copy ()
+		{
+			return new Color (red, green, blue, alpha);
+		}
 
-    public void QueueDraw() { // color
-      if (window is WindowClass) {
-        if (window.getMode() == "auto" || 
-	    window.getMode() == "bitmap" || 
-            window.getMode() == "physics")
-          window.update();
-        // else, manually call step()
-      } 
-    }
+		public void QueueDraw ()
+		{ // color
+			if (window is WindowClass) {
+				if (window.getMode () == "auto" || 
+	    window.getMode () == "bitmap" || 
+            window.getMode () == "physics")
+					window.update ();
+				// else, manually call step()
+			} 
+		}
     
-    public int red {
-      get {
-        return FromCairo(_cairo.R);
-      }
-      set {
-        _cairo.R = ToCairo(value);
-        if (picture is Picture) {
-          if (x >= 0 && y >= 0)
-            picture.setRed(x, y, (byte)value);
-          else {
-            foreach (Pixel pixel in picture.getPixels()) {
-              pixel.setRed((byte)value);
-            }
-          }
-        } else
-            QueueDraw();
-      }
-    }
+		public int red {
+			get {
+				return FromCairo (_cairo.R);
+			}
+			set {
+				_cairo.R = ToCairo (value);
+				if (picture is Picture) {
+					if (x >= 0 && y >= 0)
+						picture.setRed (x, y, (byte)value);
+					else {
+						foreach (Pixel pixel in picture.getPixels()) {
+							pixel.setRed ((byte)value);
+						}
+					}
+				} else
+					QueueDraw ();
+			}
+		}
 
-    public int green {
-      get {
-        return FromCairo(_cairo.G);
-      }
-      set {
-        _cairo.G = ToCairo(value);
-        if (picture is Picture) {
-          if (x >= 0 && y >= 0)
-            picture.setGreen(x, y, (byte)value);
-          else {
-            foreach (Pixel pixel in picture.getPixels()) {
-              pixel.setGreen((byte)value);
-            }
-          }
-        } else
-            QueueDraw();
-      }
-    }
+		public int green {
+			get {
+				return FromCairo (_cairo.G);
+			}
+			set {
+				_cairo.G = ToCairo (value);
+				if (picture is Picture) {
+					if (x >= 0 && y >= 0)
+						picture.setGreen (x, y, (byte)value);
+					else {
+						foreach (Pixel pixel in picture.getPixels()) {
+							pixel.setGreen ((byte)value);
+						}
+					}
+				} else
+					QueueDraw ();
+			}
+		}
 
-    public int blue {
-      get {
-        return FromCairo(_cairo.B);
-      }
-      set {
-        _cairo.B = ToCairo(value);
-        if (picture is Picture) {
-          if (x >= 0 && y >= 0)
-            picture.setBlue(x, y, (byte)value);
-          else {
-            foreach (Pixel pixel in picture.getPixels()) {
-              pixel.setBlue((byte)value);
-            }
-          }
-        } else
-            QueueDraw();
-      }
-    }
+		public int blue {
+			get {
+				return FromCairo (_cairo.B);
+			}
+			set {
+				_cairo.B = ToCairo (value);
+				if (picture is Picture) {
+					if (x >= 0 && y >= 0)
+						picture.setBlue (x, y, (byte)value);
+					else {
+						foreach (Pixel pixel in picture.getPixels()) {
+							pixel.setBlue ((byte)value);
+						}
+					}
+				} else
+					QueueDraw ();
+			}
+		}
 
-    public int alpha {
-      get {
-        return FromCairo(_cairo.A);
-      }
-      set {
-        _cairo.A = ToCairo(value);
-        if (picture is Picture) {
-          if (x >= 0 && y >= 0)
-            picture.setAlpha(x, y, (byte)value);
-          else {
-            foreach (Pixel pixel in picture.getPixels()) {
-              pixel.setAlpha((byte)value);
-            }
-          }
-        } else
-            QueueDraw();
-      }
-    }
+		public int alpha {
+			get {
+				return FromCairo (_cairo.A);
+			}
+			set {
+				_cairo.A = ToCairo (value);
+				if (picture is Picture) {
+					if (x >= 0 && y >= 0)
+						picture.setAlpha (x, y, (byte)value);
+					else {
+						foreach (Pixel pixel in picture.getPixels()) {
+							pixel.setAlpha ((byte)value);
+						}
+					}
+				} else
+					QueueDraw ();
+			}
+		}
 
-    double ToCairo(int value) {
-      return Math.Max(Math.Min((value / 255.0), 1.0), 0.0);
-    }
+		double ToCairo (int value)
+		{
+			return Math.Max (Math.Min ((value / 255.0), 1.0), 0.0);
+		}
     
-    double ToCairo(double value) {
-      return Math.Max(Math.Min((value / 255.0), 1.0), 0.0);
-    }
+		double ToCairo (double value)
+		{
+			return Math.Max (Math.Min ((value / 255.0), 1.0), 0.0);
+		}
     
-    int FromCairo(double value) {
-      return (int)(value * 255);
-    }
+		int FromCairo (double value)
+		{
+			return (int)(value * 255);
+		}
     
-    public override string ToString() {
-      return String.Format("<Color (r={0},g={1},b={2},a={3})>", 
+		public override string ToString ()
+		{
+			return String.Format ("<Color (r={0},g={1},b={2},a={3})>", 
                            red, green, blue, alpha);
-    }
+		}
     
-  }
+	}
 
-  public class Gradient {
-    public string gtype;
-    public Color c1, c2;
-    public Point p1, p2;
-    public double radius1, radius2;
+	public class Gradient
+	{
+		public string gtype;
+		public Color c1, c2;
+		public Point p1, p2;
+		public double radius1, radius2;
     
-    // ("linear", (100, 200), Color("red"), (200, 100), Color("blue"))
-    public Gradient(string gtype, IList p1, Color c1, IList p2, Color c2) {
-      this.gtype = gtype;
-      this.p1 = new Point(p1[0], p1[1]);
-      this.p2 = new Point(p2[0], p2[1]);
-      this.c1 = c1;
-      this.c2 = c2;
-    }
+		// ("linear", (100, 200), Color("red"), (200, 100), Color("blue"))
+		public Gradient (string gtype, IList p1, Color c1, IList p2, Color c2)
+		{
+			this.gtype = gtype;
+			this.p1 = new Point (p1 [0], p1 [1]);
+			this.p2 = new Point (p2 [0], p2 [1]);
+			this.c1 = c1;
+			this.c2 = c2;
+		}
 
-    public Gradient(string gtype, 
+		public Gradient (string gtype, 
                     IList p1, double radius1, Color c1, 
-                    IList p2, double radius2, Color c2) {
-      this.gtype = gtype;
-      this.p1 = new Point(p1[0], p1[1]);
-      this.radius1 = radius1;
-      this.c1 = c1;
-      this.p2 = new Point(p2[0], p2[1]);
-      this.radius2 = radius2;
-      this.c2 = c2;
-    }
-  }
+                    IList p2, double radius2, Color c2)
+		{
+			this.gtype = gtype;
+			this.p1 = new Point (p1 [0], p1 [1]);
+			this.radius1 = radius1;
+			this.c1 = c1;
+			this.p2 = new Point (p2 [0], p2 [1]);
+			this.radius2 = radius2;
+			this.c2 = c2;
+		}
+	}
   
-  public class WindowClass : Gtk.Window {
-    internal Canvas _canvas;
-    internal bool _dirty = false;
-    private bool timer_running = false;
-    private DateTime last_update = new DateTime(2000,1,1);
-    internal double _update_interval = .1; // how often, in seconds, to update
-    public List onClickCallbacks = new List();
-    public List onMouseMovementCallbacks = new List();
-    public List onMouseUpCallbacks = new List();
-    public List onKeyPressCallbacks = new List();
-    public List onKeyReleaseCallbacks = new List();
-    public PythonTuple _lastClick;
-    public string _lastKey = "";
-    public string _mouseState = "up";
-    public string _keyState = "up";
-    ManualResetEvent _lastClickFlag = new ManualResetEvent(false);
-    public double time = 0.0;
-    public double simulationStepTime = 0.01;
-    public string state = "init";
-    public Gdk.Color bg = new Gdk.Color(255, 255, 255);
+	public class WindowClass : Gtk.Window
+	{
+		internal Canvas _canvas;
+		internal bool _dirty = false;
+		private bool timer_running = false;
+		private DateTime last_update = new DateTime (2000, 1, 1);
+		internal double _update_interval = .1; // how often, in seconds, to update
+		public List onClickCallbacks = new List ();
+		public List onMouseMovementCallbacks = new List ();
+		public List onMouseUpCallbacks = new List ();
+		public List onKeyPressCallbacks = new List ();
+		public List onKeyReleaseCallbacks = new List ();
+		public PythonTuple _lastClick;
+		public string _lastKey = "";
+		public string _mouseState = "up";
+		public string _keyState = "up";
+		ManualResetEvent _lastClickFlag = new ManualResetEvent (false);
+		public double time = 0.0;
+		public double simulationStepTime = 0.01;
+		public string state = "init";
+		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
 
-    public WindowClass(string title="Calico Graphics",
+		public WindowClass (string title="Calico Graphics",
                   int width=300, 
-                  int height=300) : base(title) {
-      _canvas = new Canvas("auto", width, height);
-      AllowGrow = true;
-      AllowShrink = true;
-      SetDefaultSize(width, height);
-      AddEvents((int)Gdk.EventMask.ButtonPressMask);
-      AddEvents((int)Gdk.EventMask.ButtonReleaseMask);
-      AddEvents((int)Gdk.EventMask.PointerMotionMask);
-      AddEvents((int)Gdk.EventMask.KeyReleaseMask);
-      AddEvents((int)Gdk.EventMask.KeyPressMask);
-      ButtonPressEvent  += HandleClickCallbacks;
-      ButtonReleaseEvent  += HandleMouseUpCallbacks;
-      ButtonPressEvent  += saveLastClick;
-      ButtonReleaseEvent  += updateMouseState;
-      MotionNotifyEvent += HandleMouseMovementCallbacks;
-      KeyPressEvent     += HandleKeyPressCallbacks;
-      KeyReleaseEvent   += HandleKeyReleaseCallbacks;
-      //ConfigureEvent += configureEventBefore;
-      DeleteEvent += OnDelete;
-      Add(_canvas);
-      ShowAll();
-    }
+                  int height=300) : base(title)
+		{
+			_canvas = new Canvas ("auto", width, height);
+			AllowGrow = true;
+			AllowShrink = true;
+			SetDefaultSize (width, height);
+			AddEvents ((int)Gdk.EventMask.ButtonPressMask);
+			AddEvents ((int)Gdk.EventMask.ButtonReleaseMask);
+			AddEvents ((int)Gdk.EventMask.PointerMotionMask);
+			AddEvents ((int)Gdk.EventMask.KeyReleaseMask);
+			AddEvents ((int)Gdk.EventMask.KeyPressMask);
+			ButtonPressEvent += HandleClickCallbacks;
+			ButtonReleaseEvent += HandleMouseUpCallbacks;
+			ButtonPressEvent += saveLastClick;
+			ButtonReleaseEvent += updateMouseState;
+			MotionNotifyEvent += HandleMouseMovementCallbacks;
+			KeyPressEvent += HandleKeyPressCallbacks;
+			KeyReleaseEvent += HandleKeyReleaseCallbacks;
+			//ConfigureEvent += configureEventBefore;
+			DeleteEvent += OnDelete;
+			Add (_canvas);
+			ShowAll ();
+		}
 
-    public void clear() {
-      clear(true);
-    }
+		public void clear ()
+		{
+			clear (true);
+		}
     
-    public void clear(bool redraw) {
-      _canvas.surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
-					       // FIXME: w,h of Window?
+		public void clear (bool redraw)
+		{
+			_canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
+			// FIXME: w,h of Window?
 					       (int)800, 
 					       (int)600);
-	  _canvas.need_to_draw_surface = false;
+			_canvas.need_to_draw_surface = false;
 
-	  mode = "auto";
-	  Resize(width, height);
-	  timer_running = false;
-	  last_update = new DateTime(2000,1,1);
-	  _update_interval = .1; // how often, in seconds, to update
-	  onClickCallbacks = new List();
-	  onMouseMovementCallbacks = new List();
-	  onMouseUpCallbacks = new List();
-	  onKeyPressCallbacks = new List();
-	  onKeyReleaseCallbacks = new List();
-	  _lastKey = "";
-	  _mouseState = "up";
-	  _keyState = "up";
-	  time = 0.0;
-	  simulationStepTime = 0.01;
-	  state = "init";
-          lock(_canvas.shapes)
-	    _canvas.shapes.Clear();
-	  Invoke( delegate {
-	      foreach (Gtk.Widget child in _canvas.Children) {
-		_canvas.Remove(child);
-	      }
-	    });
-	  if (redraw)
-	    QueueDraw();
-        }
+			mode = "auto";
+			Resize (width, height);
+			timer_running = false;
+			last_update = new DateTime (2000, 1, 1);
+			_update_interval = .1; // how often, in seconds, to update
+			onClickCallbacks = new List ();
+			onMouseMovementCallbacks = new List ();
+			onMouseUpCallbacks = new List ();
+			onKeyPressCallbacks = new List ();
+			onKeyReleaseCallbacks = new List ();
+			_lastKey = "";
+			_mouseState = "up";
+			_keyState = "up";
+			time = 0.0;
+			simulationStepTime = 0.01;
+			state = "init";
+			lock (_canvas.shapes)
+				_canvas.shapes.Clear ();
+			Invoke (delegate {
+				foreach (Gtk.Widget child in _canvas.Children) {
+					_canvas.Remove (child);
+				}
+			});
+			if (redraw)
+				QueueDraw ();
+		}
 
-    public Microsoft.Xna.Framework.Vector2 gravity {
-      get {
-        return canvas.world.Gravity;
-      }
-      set {
-        canvas.world.Gravity = value;
-      }
-    }
+		public Microsoft.Xna.Framework.Vector2 gravity {
+			get {
+				return canvas.world.Gravity;
+			}
+			set {
+				canvas.world.Gravity = value;
+			}
+		}
 
-    public void close() {
-      Invoke(delegate { 
-          Hide();
-        });
-    }
+		public void close ()
+		{
+			Invoke (delegate { 
+				Hide ();
+			});
+		}
 
-    public void setBackground(Color color) {
-          bg = new Gdk.Color((byte)color.red, 
+		public void setBackground (Color color)
+		{
+			bg = new Gdk.Color ((byte)color.red, 
                   (byte)color.green, 
                   (byte)color.blue);
-          _canvas.ModifyBg(Gtk.StateType.Normal, bg);
-        }
+			_canvas.ModifyBg (Gtk.StateType.Normal, bg);
+		}
     
-    public Gdk.Drawable getDrawable() {
-      return GdkWindow;
-    }
+		public Gdk.Drawable getDrawable ()
+		{
+			return GdkWindow;
+		}
 
-    private void OnDelete(object obj, Gtk.DeleteEventArgs args)  {
-      _windows.Remove(Title);
-    }
+		private void OnDelete (object obj, Gtk.DeleteEventArgs args)
+		{
+			_windows.Remove (Title);
+		}
     
-    public int getWidth() {
-      int _width, _height;
-      this.GetSize(out _width, out _height);
-      return width;
-    }
+		public int getWidth ()
+		{
+			int _width, _height;
+			this.GetSize (out _width, out _height);
+			return width;
+		}
     
-    public int getHeight() {
-      int _width, _height;
-      this.GetSize(out _width, out _height);
-      return _height;
-    }
+		public int getHeight ()
+		{
+			int _width, _height;
+			this.GetSize (out _width, out _height);
+			return _height;
+		}
     
-    public void draw(Shape shape) {
-      shape.draw(this);
-    }
+		public void draw (Shape shape)
+		{
+			shape.draw (this);
+		}
 
-    public void undraw(Shape shape) {
-      shape.undraw();
-    }
+		public void undraw (Shape shape)
+		{
+			shape.undraw ();
+		}
 
-    public void stackOnTop(Shape shape) {
-      // last drawn is on top
-      if (_canvas.shapes.Contains(shape)) {
-                lock(_canvas.shapes) {
-                  _canvas.shapes.Remove(shape);
-                  _canvas.shapes.Insert(_canvas.shapes.Count, shape);
-                }
-        QueueDraw();
-      }
-    }
-    public void stackOnBottom(Shape shape) {
-      // first drawn is on bottom
-      if (_canvas.shapes.Contains(shape)) {
-                lock(_canvas.shapes) {
-                  _canvas.shapes.Remove(shape);
-                  _canvas.shapes.Insert(0, shape);
-                }
-        QueueDraw();
-      } else {
-        throw new Exception("shape not drawn on window");
-      }
-    }
+		public void stackOnTop (Shape shape)
+		{
+			// last drawn is on top
+			if (_canvas.shapes.Contains (shape)) {
+				lock (_canvas.shapes) {
+					_canvas.shapes.Remove (shape);
+					_canvas.shapes.Insert (_canvas.shapes.Count, shape);
+				}
+				QueueDraw ();
+			}
+		}
 
-    void saveLastClick(object obj, Gtk.ButtonPressEventArgs args) {
-      _mouseState = "down";
-      _lastClick = PyTuple(args.Event.X, args.Event.Y);
-      _lastClickFlag.Set();
-    }
+		public void stackOnBottom (Shape shape)
+		{
+			// first drawn is on bottom
+			if (_canvas.shapes.Contains (shape)) {
+				lock (_canvas.shapes) {
+					_canvas.shapes.Remove (shape);
+					_canvas.shapes.Insert (0, shape);
+				}
+				QueueDraw ();
+			} else {
+				throw new Exception ("shape not drawn on window");
+			}
+		}
+
+		void saveLastClick (object obj, Gtk.ButtonPressEventArgs args)
+		{
+			_mouseState = "down";
+			_lastClick = PyTuple (args.Event.X, args.Event.Y);
+			_lastClickFlag.Set ();
+		}
     
-    void updateMouseState(object obj, Gtk.ButtonReleaseEventArgs args) {
-      _mouseState = "up";
-    }
+		void updateMouseState (object obj, Gtk.ButtonReleaseEventArgs args)
+		{
+			_mouseState = "up";
+		}
     
-    private void HandleMouseMovementCallbacks(object obj,
-                      Gtk.MotionNotifyEventArgs args) {
-      Event evt = new Event(args);
-      foreach (Func<object,Event,object> function in onMouseMovementCallbacks) {
-	try {
-	  Invoke( delegate {
-	      Func<object,Event,object> f = (Func<object,Event,object>)function;
-	      f(obj, evt);
-	    });
-	} catch (Exception e) {
-	  Console.Error.WriteLine("Error in onMouseMove function");
-	  Console.Error.WriteLine(e.Message);
-	}        
-      }
-    }
+		private void HandleMouseMovementCallbacks (object obj,
+                      Gtk.MotionNotifyEventArgs args)
+		{
+			Event evt = new Event (args);
+			foreach (Func<object,Event,object> function in onMouseMovementCallbacks) {
+				try {
+					Invoke (delegate {
+						Func<object,Event,object > f = (Func<object,Event,object>)function;
+						f (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in onMouseMove function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			}
+		}
     
-    private void HandleClickCallbacks(object obj,
-                                      Gtk.ButtonPressEventArgs args) {
-      Event evt = new Event(args);
-      foreach (Func<object,Event,object> function in onClickCallbacks) {
-	try {
-	  Invoke( delegate {
-	      Func<object,Event,object> f = (Func<object,Event,object>)function;
-	      f(obj, evt);
-	    });
-	} catch (Exception e) {
-	  Console.Error.WriteLine("Error in onMouseDown function");
-	  Console.Error.WriteLine(e.Message);
-	}        
-      }
-    }
+		private void HandleClickCallbacks (object obj,
+                                      Gtk.ButtonPressEventArgs args)
+		{
+			Event evt = new Event (args);
+			foreach (Func<object,Event,object> function in onClickCallbacks) {
+				try {
+					Invoke (delegate {
+						Func<object,Event,object > f = (Func<object,Event,object>)function;
+						f (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in onMouseDown function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			}
+		}
     
-    private void HandleMouseUpCallbacks(object obj,
-                                      Gtk.ButtonReleaseEventArgs args) {
-      Event evt = new Event(args);
-      foreach (Func<object,Event,object> function in onMouseUpCallbacks) {
-	try {
-	  Invoke( delegate {
-	      Func<object,Event,object> f = (Func<object,Event,object>)function;
-	      f(obj, evt);
-	    });
-	} catch (Exception e) {
-	  Console.Error.WriteLine("Error in onMouseUp function");
-	  Console.Error.WriteLine(e.Message);
-	}        
-      }
-    }
+		private void HandleMouseUpCallbacks (object obj,
+                                      Gtk.ButtonReleaseEventArgs args)
+		{
+			Event evt = new Event (args);
+			foreach (Func<object,Event,object> function in onMouseUpCallbacks) {
+				try {
+					Invoke (delegate {
+						Func<object,Event,object > f = (Func<object,Event,object>)function;
+						f (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in onMouseUp function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			}
+		}
     
     [GLib.ConnectBefore]
-    private void HandleKeyPressCallbacks(object obj,
-                                      Gtk.KeyPressEventArgs args) {
-          _lastKey = args.Event.Key.ToString();
-      _keyState = "down";
-      Event evt = new Event(args);
-      foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
-	try {
-	  Invoke( delegate {
-	      Func<object,Event,object> f = (Func<object,Event,object>)function;
-	      f(obj, evt);
-	    });
-	} catch (Exception e) {
-	  Console.Error.WriteLine("Error in onKeypress function");
-	  Console.Error.WriteLine(e.Message);
-	}        
-      }
-    }
+		private void HandleKeyPressCallbacks (object obj,
+                                      Gtk.KeyPressEventArgs args)
+		{
+			_lastKey = args.Event.Key.ToString ();
+			_keyState = "down";
+			Event evt = new Event (args);
+			foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
+				try {
+					Invoke (delegate {
+						Func<object,Event,object > f = (Func<object,Event,object>)function;
+						f (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in onKeypress function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			}
+		}
     
-    private void HandleKeyReleaseCallbacks(object obj,
-                                      Gtk.KeyReleaseEventArgs args) {
-      _keyState = "up";
-      Event evt = new Event(args);
-      foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
-	try {
-	  Invoke( delegate {
-	      Func<object,Event,object> f = (Func<object,Event,object>)function;
-	      f(obj, evt);
-	    });
-	} catch (Exception e) {
-	  Console.Error.WriteLine("Error in onKeyRelease function");
-	  Console.Error.WriteLine(e.Message);
-	}        
-      }
-    }
+		private void HandleKeyReleaseCallbacks (object obj,
+                                      Gtk.KeyReleaseEventArgs args)
+		{
+			_keyState = "up";
+			Event evt = new Event (args);
+			foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
+				try {
+					Invoke (delegate {
+						Func<object,Event,object > f = (Func<object,Event,object>)function;
+						f (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in onKeyRelease function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			}
+		}
     
-    public void onClick(Func<object,Event,object> function) {
-      onClickCallbacks.Add(function);
-    }
+		public void onClick (Func<object,Event,object> function)
+		{
+			onClickCallbacks.Add (function);
+		}
     
-    public void onMouseDown(Func<object,Event,object> function) {
-      onClickCallbacks.Add(function);
-    }
+		public void onMouseDown (Func<object,Event,object> function)
+		{
+			onClickCallbacks.Add (function);
+		}
 
-    public void run(Func<object> function) {
-      try {
-	// FIXME: Understand why:
-	// This does not like a Gtk Application Invoke here
-	function();
-      } catch (Exception e) {
-	if (!e.Message.Contains("Thread was being aborted")) {
-	  Console.Error.WriteLine("Error in run function");
-	  Console.Error.WriteLine(e.Message);
-	}
-      }
-    }
+		public void run (Func<object> function)
+		{
+			try {
+				// FIXME: Understand why:
+				// This does not like a Gtk Application Invoke here
+				function ();
+			} catch (Exception e) {
+				if (!e.Message.Contains ("Thread was being aborted")) {
+					Console.Error.WriteLine ("Error in run function");
+					Console.Error.WriteLine (e.Message);
+				}
+			}
+		}
 
-    public void run() {
-        while (true)
-            step(.01);
-    }
+		public void run ()
+		{
+			while (true)
+				step (.01);
+		}
 
-    public void onMouseUp(Func<object,Event,object> function) {
-      onMouseUpCallbacks.Add(function);
-    }
+		public void onMouseUp (Func<object,Event,object> function)
+		{
+			onMouseUpCallbacks.Add (function);
+		}
     
-    public void onMouseMovement(Func<object,Event,object> function) {
-      onMouseMovementCallbacks.Add(function);
-    }
+		public void onMouseMovement (Func<object,Event,object> function)
+		{
+			onMouseMovementCallbacks.Add (function);
+		}
     
-    public void onKeyPress(Func<object,Event,object> function) {
-      onKeyPressCallbacks.Add(function);
-    }
+		public void onKeyPress (Func<object,Event,object> function)
+		{
+			onKeyPressCallbacks.Add (function);
+		}
     
-    public void onKeyRelease(Func<object,Event,object> function) {
-      onKeyReleaseCallbacks.Add(function);
-    }
+		public void onKeyRelease (Func<object,Event,object> function)
+		{
+			onKeyReleaseCallbacks.Add (function);
+		}
     
-    public double updateInterval {
-      get {
-        return _update_interval;
-      }
-      set {
-        _update_interval = value;
-      }
-    }
+		public double updateInterval {
+			get {
+				return _update_interval;
+			}
+			set {
+				_update_interval = value;
+			}
+		}
     
-    public int height {
-      get {
-        int _width, _height;
-        this.GetSize(out _width, out _height);
-        return _height;
-      }
-    }
-    public int width {
-      get {
-        int _width, _height;
-        this.GetSize(out _width, out _height);
-        return _width;
-      }
-    }
+		public int height {
+			get {
+				int _width, _height;
+				this.GetSize (out _width, out _height);
+				return _height;
+			}
+		}
 
-    public Canvas getCanvas() {
-      return _canvas;
-    }
-    
-    public Canvas canvas {
-      get {
-        return _canvas;
-      }
-    }
+		public int width {
+			get {
+				int _width, _height;
+				this.GetSize (out _width, out _height);
+				return _width;
+			}
+		}
 
-    public PythonTuple getMouse() {
-      while (Gtk.Application.EventsPending())
-                Gtk.Application.RunIteration();
-      _lastClickFlag = new ManualResetEvent(false);
-      _lastClickFlag.WaitOne();
-      return _lastClick;
-    }
+		public Canvas getCanvas ()
+		{
+			return _canvas;
+		}
     
-    public PythonTuple getMouseNow() {
-      int x = 0, y = 0;
-      ManualResetEvent mre = new ManualResetEvent(false);
-      Invoke(delegate { 
-          GetPointer(out x, out y);
-          mre.Set();
-        });
-      mre.WaitOne();
-      return PyTuple(x, y);
-    }
-    
-    public string getMouseState() {
-      return _mouseState;
-    }
-    
-    public string getKeyPressed() {
-      string lk = _lastKey;
-      _lastKey = "";
-      return lk;
-    }
-    
-    public string getKeyState() {
-      return _keyState;
-    }
-    
-    public new void Show() {
-      Invoke(delegate { 
-          DateTime now = DateTime.Now;
-          last_update = now;
-          _dirty = false;
-          base.Show(); 
-        });
-    }
-    public new void ShowAll() {
-      Invoke(delegate { 
-          DateTime now = DateTime.Now;
-          last_update = now;
-          _dirty = false;
-          base.ShowAll(); 
-        });
-    }
+		public Canvas canvas {
+			get {
+				return _canvas;
+			}
+		}
 
-    public new void Resize(int width, int height) {
-      _canvas.resize(width, height);
-      Invoke(delegate {
-          base.Resize(width, height);
-        });
-    }
+		public PythonTuple getMouse ()
+		{
+			while (Gtk.Application.EventsPending())
+				Gtk.Application.RunIteration ();
+			_lastClickFlag = new ManualResetEvent (false);
+			_lastClickFlag.WaitOne ();
+			return _lastClick;
+		}
     
-    public void need_to_redraw() {
-      _dirty = true;
-      DateTime now = DateTime.Now;
-      // diff is TimeSpan
-      if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
-        // pass, too soon!
-        // but we need to make sure that someone checks
-        // in the future. 
-        if (timer_running) {
-          // already one running!
-          // we'll just wait
-        } else {
-          // let's spawn one to check in 100 ms or so
-          timer_running = true;
-          GLib.Timeout.Add((uint)(updateInterval * 1000), 
-                           new GLib.TimeoutHandler(_redraw_now) );
-        }
-      } else { // it is not too soon
-        if (timer_running) {
-          // no need to start another
-        } else {
-          // let's spawn one to check in 100 ms or so
-          timer_running = true;
-          GLib.Timeout.Add((uint)(updateInterval * 1000), 
-                           new GLib.TimeoutHandler(_redraw_now) );
-        }
-      }
-    }
+		public PythonTuple getMouseNow ()
+		{
+			int x = 0, y = 0;
+			ManualResetEvent mre = new ManualResetEvent (false);
+			Invoke (delegate { 
+				GetPointer (out x, out y);
+				mre.Set ();
+			});
+			mre.WaitOne ();
+			return PyTuple (x, y);
+		}
     
-    private bool _redraw_now() {
-      DateTime now = DateTime.Now;
-      if (_dirty) {
-        last_update = now;
-        _dirty = false;
-        QueueDraw(); // gtk
-      }
-      timer_running = false;
-      return false; // return true to try again
-    }
+		public string getMouseState ()
+		{
+			return _mouseState;
+		}
+    
+		public string getKeyPressed ()
+		{
+			string lk = _lastKey;
+			_lastKey = "";
+			return lk;
+		}
+    
+		public string getKeyState ()
+		{
+			return _keyState;
+		}
+    
+		public new void Show ()
+		{
+			Invoke (delegate { 
+				DateTime now = DateTime.Now;
+				last_update = now;
+				_dirty = false;
+				base.Show (); 
+			});
+		}
 
-    public string getMode() {
-      return _canvas.mode;
-    }
+		public new void ShowAll ()
+		{
+			Invoke (delegate { 
+				DateTime now = DateTime.Now;
+				last_update = now;
+				_dirty = false;
+				base.ShowAll (); 
+			});
+		}
 
-    public string mode {
-      get {
-        return _canvas.mode;
-      }
-      set {
-        if (value == "auto" || value == "manual" || value == "physics" || 
+		public new void Resize (int width, int height)
+		{
+			_canvas.resize (width, height);
+			Invoke (delegate {
+				base.Resize (width, height);
+			});
+		}
+    
+		public void need_to_redraw ()
+		{
+			_dirty = true;
+			DateTime now = DateTime.Now;
+			// diff is TimeSpan
+			if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
+				// pass, too soon!
+				// but we need to make sure that someone checks
+				// in the future. 
+				if (timer_running) {
+					// already one running!
+					// we'll just wait
+				} else {
+					// let's spawn one to check in 100 ms or so
+					timer_running = true;
+					GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+                           new GLib.TimeoutHandler (_redraw_now));
+				}
+			} else { // it is not too soon
+				if (timer_running) {
+					// no need to start another
+				} else {
+					// let's spawn one to check in 100 ms or so
+					timer_running = true;
+					GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+                           new GLib.TimeoutHandler (_redraw_now));
+				}
+			}
+		}
+    
+		private bool _redraw_now ()
+		{
+			DateTime now = DateTime.Now;
+			if (_dirty) {
+				last_update = now;
+				_dirty = false;
+				QueueDraw (); // gtk
+			}
+			timer_running = false;
+			return false; // return true to try again
+		}
+
+		public string getMode ()
+		{
+			return _canvas.mode;
+		}
+
+		public string mode {
+			get {
+				return _canvas.mode;
+			}
+			set {
+				if (value == "auto" || value == "manual" || value == "physics" || 
 	    value == "bitmap" || value == "bitmapmanual")
-          canvas.mode = value;
-        else
-          throw new Exception("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', or 'physics'");
-      }
-    }          
+					canvas.mode = value;
+				else
+					throw new Exception ("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', or 'physics'");
+			}
+		}
 
-    public void updateNow() { // Window
-      need_to_redraw();
-      // Manual call to update, let's update then:
-      while (Gtk.Application.EventsPending())
-        Gtk.Application.RunIteration();
-    }
+		public void updateNow ()
+		{ // Window
+			need_to_redraw ();
+			// Manual call to update, let's update then:
+			while (Gtk.Application.EventsPending())
+				Gtk.Application.RunIteration ();
+		}
 
-    public void update() { // Window
-      if (mode == "manual" || mode == "bitmapmanual")
-	{
-	  _canvas.need_to_draw_surface = true;
-	  QueueDraw();
-	}
-      else
-	{
-	  need_to_redraw();
-	}
-    }
+		public void update ()
+		{ // Window
+			if (mode == "manual" || mode == "bitmapmanual") {
+				_canvas.need_to_draw_surface = true;
+				QueueDraw ();
+			} else {
+				need_to_redraw ();
+			}
+		}
 
-    public void step() { // Window
-      step(0);
-    }
-    public void step(double step_time) { // Window, in seconds
-      // Same as update, but will make sure it 
-      // doesn't update too fast.
-      // handle physics
+		public void step ()
+		{ // Window
+			step (0);
+		}
 
-      // kjo
-      _canvas.need_to_draw_surface = true;
+		public void step (double step_time)
+		{ // Window, in seconds
+			// Same as update, but will make sure it 
+			// doesn't update too fast.
+			// handle physics
+
+			// kjo
+			_canvas.need_to_draw_surface = true;
       
-      if (mode == "physics") {
-        _canvas.world.Step((float)simulationStepTime); 
-        time += simulationStepTime; 
-        // update the sprites
-        lock (_canvas.shapes) {
-          foreach (Shape shape in _canvas.shapes) {
-            shape.updateFromPhysics();
-          }
-        }
-      }
-      // and now the update
-      DateTime now = DateTime.Now;
-      // diff is TimeSpan, converted to seconds:
-      double diff = (now - last_update).TotalMilliseconds / 1000.0;
-      while (diff < step_time) {
-        Thread.Sleep((int)(diff/10 * 1000)); // 10 times per diff
-		now = DateTime.Now;
-		diff = (now - last_update).TotalMilliseconds / 1000.0;
-      }
-      last_update = DateTime.Now;
+			if (mode == "physics") {
+				_canvas.world.Step ((float)simulationStepTime); 
+				time += simulationStepTime; 
+				// update the sprites
+				lock (_canvas.shapes) {
+					foreach (Shape shape in _canvas.shapes) {
+						shape.updateFromPhysics ();
+					}
+				}
+			}
+			// and now the update
+			DateTime now = DateTime.Now;
+			// diff is TimeSpan, converted to seconds:
+			double diff = (now - last_update).TotalMilliseconds / 1000.0;
+			while (diff < step_time) {
+				Thread.Sleep ((int)(diff / 10 * 1000)); // 10 times per diff
+				now = DateTime.Now;
+				diff = (now - last_update).TotalMilliseconds / 1000.0;
+			}
+			last_update = DateTime.Now;
       
-      if (mode == "bitmapmanual")
-	{
-	using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
-	  g.Save();
-	  g.Operator = Cairo.Operator.Source;
-	  g.SetSourceSurface(_canvas.surface, 0, 0);
-	  g.Paint();
-	  g.Restore();
-	}	   
-      }      
+			if (mode == "bitmapmanual") {
+				using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
+					g.Save ();
+					g.Operator = Cairo.Operator.Source;
+					g.SetSourceSurface (_canvas.surface, 0, 0);
+					g.Paint ();
+					g.Restore ();
+				}	   
+			}      
 	  
-      _dirty = false;
-      ManualResetEvent ev = new ManualResetEvent(false);
-      Invoke(delegate { 
-          QueueDraw();
-          GdkWindow.ProcessUpdates(true);
-          ev.Set();
-        });
-      ev.WaitOne();
-    }
+			_dirty = false;
+			ManualResetEvent ev = new ManualResetEvent (false);
+			Invoke (delegate { 
+				QueueDraw ();
+				GdkWindow.ProcessUpdates (true);
+				ev.Set ();
+			});
+			ev.WaitOne ();
+		}
 
-    public override string ToString()
-    {
-      return String.Format("<Window (title='{0}',width={1},height={2})>", 
+		public override string ToString ()
+		{
+			return String.Format ("<Window (title='{0}',width={1},height={2})>", 
                            Title, width, height);
-    }
-  }
-  
- public static void ShowAll(object o) {
-    Invoke(delegate { ((Gtk.Widget)o).ShowAll(); });
-  }
-  
-  public static void Show(object o) {
-    Invoke(delegate { ((Gtk.Widget)o).Show(); });
-  }
-  
-  public static Vector2 VectorRotate(Vector2 v, double angle) {
-    Microsoft.Xna.Framework.Matrix m = Microsoft.Xna.Framework.Matrix.CreateRotationZ((float)angle);
-    return Vector2.Transform(v, m );
-  }
-
-  public static Vector2 Vector(int x, int y) {
-    return new Vector2((float)x, (float)y);
-  }
-  
-  public static Vector2 Vector(double x, double y) {
-    return new Vector2((float)x, (float)y);
-  }
-
-  public class Point : IList {
-    public double x;
-    public double y;
-
-    public Point(IList iterable): this(iterable[0], iterable[1]) {
-    }
-    
-    public Point(object x, object y) {
-      this.x = System.Convert.ToDouble(x);
-      this.y = System.Convert.ToDouble(y);
-    }
-    
-    public Point(Dot dot) {
-      this.x = dot.x;
-      this.y = dot.y;
-    }
-    
-    public double distance(Point p) {
-      return Math.Sqrt(Math.Pow(x - p.x, 2) + Math.Pow(y - p.y, 2));
-    }
-
-    public override string ToString()
-    {
-      return String.Format("<Point (x={0},y={1})>", x, y);
-    }
-
-    public void draw(WindowClass window) {
-      throw new Exception("Can't draw a point; use Dot instead");
-    }
-
-    // Items necessary for it to be an IList
-    public bool IsFixedSize {
-      get {
-	return true;
-      }
-    }
-    
-    public bool IsReadOnly {
-      get {
-	return false;
-      }
-    }
-    
-    public bool IsSynchronized {
-      get {
-	return false;
-      }
-    }
-    
-    public void CopyTo(System.Array array, int index) {
-    }
-    
-    public int Add(object value) {
-      return 1; // should return count
-    }
-    
-    public int Count {
-      get {
-	return 2;
-      }
-    }
-    
-    public void Remove(object value) {
-    }
-    
-    public void RemoveAt(int index) {
-    }
-    
-    public void Clear() {
-    }
-    
-    public bool Contains(object value) {
-      return false;
-    }
-    
-    public int IndexOf(object value) {
-      return -1;
-    }
-    
-    public void Insert(int index, object value) {
-    }
-    
-    public object this[int index] {
-      get {
-	if (index == 0) {
-	  return x;
-	} else if (index == 1) {
-	  return y;
-	} else {
-	  throw new Exception("invalid access of Point");
+		}
 	}
-      }
-      set { // value is the item
-	if (index == 0) {
-	  x = System.Convert.ToDouble(value);
-	} else if (index == 1) {
-	  y = System.Convert.ToDouble(value);
-	}
-      }
-    }
-
-    public object SyncRoot {
-      get {
-	return this;
-      }
-    }
-    
-    public IEnumerator GetEnumerator() {
-      // Refer to the IEnumerator documentation for an example of
-      // implementing an enumerator.
-      throw new Exception("The method or operation is not implemented.");
-    }
-  }
   
-  public class Canvas : Gtk.Layout {
+	public static void ShowAll (object o)
+	{
+		Invoke (delegate {
+			((Gtk.Widget)o).ShowAll (); });
+	}
+  
+	public static void Show (object o)
+	{
+		Invoke (delegate {
+			((Gtk.Widget)o).Show (); });
+	}
+  
+	public static Vector2 VectorRotate (Vector2 v, double angle)
+	{
+		Microsoft.Xna.Framework.Matrix m = Microsoft.Xna.Framework.Matrix.CreateRotationZ ((float)angle);
+		return Vector2.Transform (v, m);
+	}
+
+	public static Vector2 Vector (int x, int y)
+	{
+		return new Vector2 ((float)x, (float)y);
+	}
+  
+	public static Vector2 Vector (double x, double y)
+	{
+		return new Vector2 ((float)x, (float)y);
+	}
+
+	public class Point : IList
+	{
+		public double x;
+		public double y;
+
+		public Point (IList iterable): this(iterable[0], iterable[1])
+		{
+		}
     
-    // Shape.draw() will add them here:
-    public List<Shape> shapes = new List<Shape>();
-    private string _mode;
-    public FarseerPhysics.Dynamics.World world; 
-    public object document;
-    private int width = 800, height = 600;
-    public Cairo.ImageSurface surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
-							       // FIXME: w,h of Window?
+		public Point (object x, object y)
+		{
+			this.x = System.Convert.ToDouble (x);
+			this.y = System.Convert.ToDouble (y);
+		}
+    
+		public Point (Dot dot)
+		{
+			this.x = dot.x;
+			this.y = dot.y;
+		}
+    
+		public double distance (Point p)
+		{
+			return Math.Sqrt (Math.Pow (x - p.x, 2) + Math.Pow (y - p.y, 2));
+		}
+
+		public override string ToString ()
+		{
+			return String.Format ("<Point (x={0},y={1})>", x, y);
+		}
+
+		public void draw (WindowClass window)
+		{
+			throw new Exception ("Can't draw a point; use Dot instead");
+		}
+
+		// Items necessary for it to be an IList
+		public bool IsFixedSize {
+			get {
+				return true;
+			}
+		}
+    
+		public bool IsReadOnly {
+			get {
+				return false;
+			}
+		}
+    
+		public bool IsSynchronized {
+			get {
+				return false;
+			}
+		}
+    
+		public void CopyTo (System.Array array, int index)
+		{
+		}
+    
+		public int Add (object value)
+		{
+			return 1; // should return count
+		}
+    
+		public int Count {
+			get {
+				return 2;
+			}
+		}
+    
+		public void Remove (object value)
+		{
+		}
+    
+		public void RemoveAt (int index)
+		{
+		}
+    
+		public void Clear ()
+		{
+		}
+    
+		public bool Contains (object value)
+		{
+			return false;
+		}
+    
+		public int IndexOf (object value)
+		{
+			return -1;
+		}
+    
+		public void Insert (int index, object value)
+		{
+		}
+    
+		public object this [int index] {
+			get {
+				if (index == 0) {
+					return x;
+				} else if (index == 1) {
+					return y;
+				} else {
+					throw new Exception ("invalid access of Point");
+				}
+			}
+			set { // value is the item
+				if (index == 0) {
+					x = System.Convert.ToDouble (value);
+				} else if (index == 1) {
+					y = System.Convert.ToDouble (value);
+				}
+			}
+		}
+
+		public object SyncRoot {
+			get {
+				return this;
+			}
+		}
+    
+		public IEnumerator GetEnumerator ()
+		{
+			// Refer to the IEnumerator documentation for an example of
+			// implementing an enumerator.
+			throw new Exception ("The method or operation is not implemented.");
+		}
+	}
+  
+	public class Canvas : Gtk.Layout
+	{
+    
+		// Shape.draw() will add them here:
+		public List<Shape> shapes = new List<Shape> ();
+		private string _mode;
+		public FarseerPhysics.Dynamics.World world;
+		public object document;
+		private int width = 800, height = 600 ;
+		public Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
+		// FIXME: w,h of Window?
 							       (int)800, 
 							       (int)600);
-
-
-    public Cairo.ImageSurface finalsurface;
-
-
-    public bool need_to_draw_surface = false;
+		public Cairo.ImageSurface finalsurface;
+		public bool need_to_draw_surface = false;
     
-    public string mode {
-      get {
-	return _mode;
-      }
-      set {
-	if (value == "manual" || value == "auto" || value == "physics" || 
+		public string mode {
+			get {
+				return _mode;
+			}
+			set {
+				if (value == "manual" || value == "auto" || value == "physics" || 
 	    value == "bitmap" || value == "bitmapmanual") {
-	  _mode = value;
+					_mode = value;
 	  
-	  if (value == "physics")
-                initPhysics();
-	  resetSurfaces();
+					if (value == "physics")
+						initPhysics ();
+					resetSurfaces ();
 	  
-            } else
-                throw new Exception("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual' or 'physics'");
-      }
-    }
+				} else
+					throw new Exception ("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual' or 'physics'");
+			}
+		}
     
-    void initPhysics() {
-      world = new FarseerPhysics.Dynamics.World(new Vector2(0.0f, 9.8f));
-    }
+		void initPhysics ()
+		{
+			world = new FarseerPhysics.Dynamics.World (new Vector2 (0.0f, 9.8f));
+		}
 
-
-    void resetSurfaces()
-    {
-      surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+		void resetSurfaces ()
+		{
+			surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
 				       width,
 				       height);	  
-      if (mode == "bitmapmanual")
-	{
-	  finalsurface =  new Cairo.ImageSurface(Cairo.Format.Argb32, 
-						 // FIXME: w,h of Window?
+			if (mode == "bitmapmanual") {
+				finalsurface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
+				// FIXME: w,h of Window?
 						 width, 
 						 height);
-	}
-      else
-	{
-	  finalsurface = surface;      	      
-	}      
-    }
+			} else {
+				finalsurface = surface;      	      
+			}      
+		}
 
-    public void resize(int width, int height)
-    {
-      Console.Error.WriteLine("resizing");
+		public void resize (int width, int height)
+		{
+			Console.Error.WriteLine ("resizing");
 
-      this.width = width;
-      this.height = height;
-      resetSurfaces();
-    }
+			this.width = width;
+			this.height = height;
+			resetSurfaces ();
+		}
 
-    public Canvas(string mode, int width, int height) : base(null, null) {
-      this.mode = mode;
-      resize(width, height);
-    }
+		public Canvas (string mode, int width, int height) : base(null, null)
+		{
+			this.mode = mode;
+			resize (width, height);
+		}
     
-    public Canvas(string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v) {
-      surface = new Cairo.ImageSurface(Cairo.Format.Argb32, 
+		public Canvas (string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v)
+		{
+			surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
 				       width,
 				       height);	  
-      this.mode = mode;
-      resize(width, height);
-    }
-        
-    protected override bool OnExposeEvent (Gdk.EventExpose args) {
-      using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
-	if (need_to_draw_surface) {
-	  g.Save();
-	  g.SetSourceSurface(finalsurface, 0, 0);
-	  g.Paint();
-	  g.Restore();
-	}
-	lock(shapes) {
-	  foreach (Shape shape in shapes) {
-	    shape.render(g);
-	    shape.updateGlobalPosition(g);
-	  }
-	}
-      }
-      return base.OnExposeEvent(args);
-    }
-  }
-  
-  public class Shape {
-    public Point center;
-    public string tag;
-    public WindowClass window;
-    internal double _rotation; // internally radians
-    internal double _scaleFactor; // percent
-    public FarseerPhysics.Dynamics.World world;
-    public FarseerPhysics.Dynamics.Body body;
-    internal FarseerPhysics.Dynamics.BodyType _bodyType;
-    internal float _bounce;
-    internal float _friction;
-    internal float _density;
-    public List<Shape> shapes = new List<Shape>();
-    public double gx = 0.0;
-    public double gy = 0.0;
-    public bool visible = true;
-    
-    public Point [] points;
-    internal Color _fill;
-    internal Color _outline;
-    public Gradient _gradient;
-    private int _border;
-    public bool wrap = false;
-    
-    private Pen _pen;
-    private bool _has_pen;
-    internal bool close_path = true;
-        
-    public Shape(bool has_pen=true) {
-      _rotation = 0;
-      _scaleFactor = 1.0;
-      center = new Point(0,0);
-      this.has_pen = has_pen;
-      if (this.has_pen) 
-        pen = new Pen(new Color(0, 0, 0), 1);
-      color = new Color("purple");
-      outline = new Color("black");
-      border = 1;
-      _bounce = 0.8f;
-      _friction = 0.5f;
-      _density = 1.0f;
-      _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-    }
-    
-    // FIXME: points are in relative to center coordinates
-    // FIXME: set x,y of points should go from screen_coords to relative
-    // FIXME: should call QueueDraw on set
-
-    public virtual bool hit(double x, double y)
-    {
-      return false;
-    }
-
-    public void connect(string signal, Func<object,Event,object> function) {
-      if (signal == "click") {
-        window.onMouseDown( delegate (object obj, Event evt) {
-	    if (hit(evt.x, evt.y)) {
-	      try {
-		Invoke( delegate {
-		    function(obj, evt);
-		  });
-	      } catch (Exception e) {
-                Console.Error.WriteLine("Error in connect('click') function");
-                Console.Error.WriteLine(e.Message);
-              }        
-              return true;
-            }
-            return false;
-	  });
-      } else {
-	throw new Exception("invalid signal for this object");
-      }
-    }
-
-    public double bounce {
-      get
-        {
-          if (body != null)
-            return body.Restitution;
-          else
-            return _bounce;
-        }
-      set
-        {
-          if (body != null)
-            body.Restitution = (float)value;
-          else
-            _bounce = (float)value;
-        }
-    }
-
-    public double friction {
-      get
-        {
-          if (body != null)
-            return body.Friction;
-          else
-            return _friction;
-        }
-      set
-        {
-          if (body != null)
-            body.Friction = (float)value;
-          else
-            _friction = (float)value;
-        }
-    }
-
-    public double density {
-      get
-        {
-          return _density;
-        }
-      set
-        {
-          _density = (float)value;
-        }
-    }
-
-    public double mass {
-      get
-        {
-          if (body != null)
-            return body.Mass;
-          else
-            throw new Exception("need to draw shape first");
-        }
-      set
-        {
-          if (body != null)
-            body.Mass = (float)value;
-          else
-            throw new Exception("need to draw shape first");
-        }
-    }
-
-    public string bodyType // shape
-    {
-      get {
-        if (_bodyType == FarseerPhysics.Dynamics.BodyType.Dynamic) {
-          return "dynamic";
-        } else if (_bodyType == FarseerPhysics.Dynamics.BodyType.Static) {
-          return "static";
-        } else {
-          return "unkown";
-        }
-      }
-      set {
-        if (value  == "dynamic") {
-          _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
-          if (body != null)
-            body.IsStatic = false;
-        } else if (value  == "static") {
-          _bodyType = FarseerPhysics.Dynamics.BodyType.Static;
-          if (body != null)
-            body.IsStatic = true;
-        } else {
-          throw new Exception("bodyType must be 'dynamic' or 'static'");
-        }
-      }
-    }
-
-    public virtual void addToPhysics() { // Shape
-    }
-
-    public virtual void updateFromPhysics() {
-      // get from body, put in sprite
-      if (body != null) {
-        float MeterInPixels = 64.0f;
-        if (wrap) {
-          float x = (float)wrap_width((float)(body.Position.X * MeterInPixels));
-          float y = (float)wrap_height((float)(body.Position.Y * MeterInPixels));
-          body.Position = new Vector2(x/MeterInPixels, y/MeterInPixels);
-        }
-        Vector2 position = body.Position * MeterInPixels;
-        double rotation = body.Rotation * 180.0/Math.PI; 
-        // Move it
-        _moveTo(position.X, position.Y);
-        _rotateTo(rotation);
-      }
-    }
-
-    public void updatePhysics()
-    {
-      // get from sprite, put in body
-      if (body != null) {
-        float MeterInPixels = 64.0f;
-        body.Position = new Vector2(((float)x)/MeterInPixels, 
-                                    ((float)y)/MeterInPixels);
-        // FIXME: undo operation; call rotateTo()?
-        body.Rotation = (float)_rotation;
-      }
-    }
-
-    public void stackOnTop() {
-      if (window != null) {
-        window.stackOnTop(this);
-      }
-    }
-
-    public void stackOnBottom() {
-      if (window != null) {
-        window.stackOnBottom(this);
-      }
-    }
-
-    public Point getP1() {
-          return getScreenPoint(points[0]);
-        }
-
-    public Point getP2() {
-          return getScreenPoint(points[2]);
-    }
-
-    public Point getScreenPoint(IList iterable) {
-      // p is relative to center, rotate, and scale; returns
-      // screen coordinate of p
-      double px = 0, py = 0;
-      using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-	Point temp = screen_coord(center);
-	g.Translate(temp.x, temp.y);
-	g.Rotate(_rotation);
-	g.Scale(_scaleFactor, _scaleFactor);
-	px = System.Convert.ToDouble(iterable[0]);
-	py = System.Convert.ToDouble(iterable[1]);
-	g.UserToDevice(ref px, ref py);
-      }
-      return new Point(px, py);
-    }
-
-    public Point getCenter()
-    {
-      return center;
-    }
-
-    public bool has_pen {
-      get {
-        return _has_pen;
-      }
-      set {
-        _has_pen = value;
-      }
-    }
-    
-    public double rotation {
-      get {
-        return _rotation * 180.0/Math.PI;
-      }
-      set {
-        rotateTo(value);
-      }
-    }
-
-    public double scaleFactor {
-      get {
-        return _scaleFactor;
-      }
-      set {
-        scaleTo(value);
-      }
-    }
-
-    public double x {
-      get {
-        return center.x;
-      }
-      set {
-        moveTo(value, center.y);
-      }
-    }
-        
-    public double getX() {
-          return center.x;
-    }
-        
-    public double getY() {
-          return center.y;
-    }
-        
-    public void setX(double value) {
-          moveTo(value, center.y);
-    }
-        
-    public void setY(double value) {
-          moveTo(center.x, value);
-    }
-        
-    public double y {
-      get {
-        return center.y;
-      }
-      set {
-        moveTo(center.x, value);
-      }
-    }
-
-    public void setWidth(int value) {
-          _border = value;
-          QueueDraw();
-    }
-        
-    public int border {
-      get {
-        return _border;
-      }
-      set {
-        _border = value;
-        QueueDraw();
-      }
-    }
-    
-    public Pen pen {
-      get {
-        return _pen;
-      }
-      set {
-        if (has_pen) {
-          _pen = value;
-          _pen.center.x = center.x;
-          _pen.center.y = center.y;
-          QueueDraw();
-        } else
-            throw new Exception("this shape cannot have a pen");
-      }
-    }
-    
-    public void QueueDraw() { // shape
-      if (window is WindowClass) {
-        if (window.getMode() == "auto" ||
-	    window.getMode() == "bitmap" || 
-            window.getMode() == "physics")
-          window.update();
-        // else, manually call step()
-      }
-    }
-    
-    public bool contains(IList iterable) {
-      Point p = new Point(iterable);
-      int counter = 0;
-      double xinters;
-      Point p1, p2;
-      if (points != null) {
-	p1 = points[0];
-	for (int i=1; i<=points.Length; i++) {
-	  p2 = points[i % points.Length];
-	  if (p.y > Math.Min(p1.y, p2.y)) {
-	    if (p.y <= Math.Max(p1.y, p2.y)) {
-	      if (p.x <= Math.Max(p1.x, p2.x)) {
-		if (p1.y != p2.y) {
-		  xinters = (p.y - p1.y) * (p2.x - p1.x)/(p2.y - p1.y) + p1.x;
-		  if (p1.x == p2.x || p.x <= xinters)
-		    counter++;
+			this.mode = mode;
+			resize (width, height);
 		}
-	      }
-	    }
-	  }
-	  p1 = p2;
+        
+		protected override bool OnExposeEvent (Gdk.EventExpose args)
+		{
+			using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
+				if (need_to_draw_surface) {
+					g.Save ();
+					g.SetSourceSurface (finalsurface, 0, 0);
+					g.Paint ();
+					g.Restore ();
+				}
+				lock (shapes) {
+					foreach (Shape shape in shapes) {
+						shape.render (g);
+						shape.updateGlobalPosition (g);
+					}
+				}
+			}
+			return base.OnExposeEvent (args);
+		}
 	}
-	return (counter % 2 == 0); // hit?
-      } else {
-	return false;
-      }
-    }
+  
+	public class Shape
+	{
+		public Point center;
+		public string tag;
+		public WindowClass window;
+		internal double _rotation; // internally radians
+		internal double _scaleFactor; // percent
+		public FarseerPhysics.Dynamics.World world;
+		public FarseerPhysics.Dynamics.Body body;
+		internal FarseerPhysics.Dynamics.BodyType _bodyType;
+		internal float _bounce;
+		internal float _friction;
+		internal float _density;
+		public List<Shape> shapes = new List<Shape> ();
+		public double gx = 0.0;
+		public double gy = 0.0;
+		public bool visible = true;
+		public Point[] points;
+		internal Color _fill;
+		internal Color _outline;
+		public Gradient _gradient;
+		private int _border;
+		public bool wrap = false;
+		private Pen _pen;
+		private bool _has_pen;
+		internal bool close_path = true;
+        
+		public Shape (bool has_pen=true)
+		{
+			_rotation = 0;
+			_scaleFactor = 1.0;
+			center = new Point (0, 0);
+			this.has_pen = has_pen;
+			if (this.has_pen) 
+				pen = new Pen (new Color (0, 0, 0), 1);
+			color = new Color ("purple");
+			outline = new Color ("black");
+			border = 1;
+			_bounce = 0.8f;
+			_friction = 0.5f;
+			_density = 1.0f;
+			_bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+		}
+    
+		// FIXME: points are in relative to center coordinates
+		// FIXME: set x,y of points should go from screen_coords to relative
+		// FIXME: should call QueueDraw on set
 
-    public void set_points(params Point [] ps) {
-      // 1. set center to absolute
-      double sumx = 0.0;
-      double sumy = 0.0;
-      if (ps.Length > 0) {
-        for (int i = 0; i < ps.Length; i++) {
-          sumx += ps[i].x;
-          sumy += ps[i].y;
-        }
-        center.x = sumx/ps.Length;
-        center.y = sumy/ps.Length;
-      } else {
-        center.x = 0;
-        center.y = 0;
-      }
-      // 2. compute this.points in relative terms to center
-      points = new Point [ps.Length];
-      for (int i = 0; i < ps.Length; i++) {
-        points[i] = new Point(ps[i].x - center.x, 
-                              ps[i].y - center.y);
-      }
-    }
-    
-    public void append(IList iterable) {
-      // add a new point to list of points
-      // first copy old points
-      // FIXME: could make points a list
-      Point [] new_points = new Point [points.Length + 1];
-      for (int i = 0; i < points.Length; i++) {
-        new_points[i] = points[i];
-      }
-      // Now add new point:
-      new_points[points.Length] = new Point(iterable);
-      points = new_points;
-    }
+		public virtual bool hit (double x, double y)
+		{
+			return false;
+		}
 
-    public void set_points() {
-      // 1. set center to absolute
-      double sumx = 0.0;
-      double sumy = 0.0;
-      if (points.Length > 0) {
-        for (int i = 0; i < points.Length; i++) {
-          sumx += points[i].x;
-          sumy += points[i].y;
-        }
-        center.x = sumx/points.Length;
-        center.y = sumy/points.Length;
-      } else {
-        center.x = 0;
-        center.y = 0;
-      }
-      // 2. compute this.points in relative terms to center
-      for (int i = 0; i < points.Length; i++) {
-        points[i].x = points[i].x - center.x;
-        points[i].y = points[i].y - center.y;
-      }
-    }
-    
-    public double screen_angle(double dir) {
-      // Screen coords are 45 degrees from system
-      return dir - (45 * Math.PI/180.0);
-    }
+		public void connect (string signal, Func<object,Event,object> function)
+		{
+			if (signal == "click") {
+				window.onMouseDown (delegate (object obj, Event evt) {
+					if (hit (evt.x, evt.y)) {
+						try {
+							Invoke (delegate {
+								function (obj, evt);
+							});
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in connect('click') function");
+							Console.Error.WriteLine (e.Message);
+						}        
+						return true;
+					}
+					return false;
+				});
+			} else {
+				throw new Exception ("invalid signal for this object");
+			}
+		}
 
-    public void forward(double distance) {
-      double angle = screen_angle(_rotation);
-      double x = ((distance) * Math.Cos(angle) - (distance) * Math.Sin(angle));
-      double y = ((distance) * Math.Sin(angle) + (distance) * Math.Cos(angle));
-      center.x += x;
-      center.y += y;
-      updatePen();
-      QueueDraw();
-    }
-    
-    public void updatePen()
-    {
-      if (has_pen && pen.down)
-        pen.appendPath(new Point(center.x, center.y));
-    }
+		public double bounce {
+			get {
+				if (body != null)
+					return body.Restitution;
+				else
+					return _bounce;
+			}
+			set {
+				if (body != null)
+					body.Restitution = (float)value;
+				else
+					_bounce = (float)value;
+			}
+		}
 
-    public void  updateGlobalPosition(Cairo.Context g) {
-      gx = center.x;
-      gy = center.y;
-      g.UserToDevice(ref gx, ref gy);
-    }
+		public double friction {
+			get {
+				if (body != null)
+					return body.Friction;
+				else
+					return _friction;
+			}
+			set {
+				if (body != null)
+					body.Friction = (float)value;
+				else
+					_friction = (float)value;
+			}
+		}
 
-    public Line penUp() {
-      pen._down = false;
-      return pen.resetPath();
-    }
+		public double density {
+			get {
+				return _density;
+			}
+			set {
+				_density = (float)value;
+			}
+		}
+
+		public double mass {
+			get {
+				if (body != null)
+					return body.Mass;
+				else
+					throw new Exception ("need to draw shape first");
+			}
+			set {
+				if (body != null)
+					body.Mass = (float)value;
+				else
+					throw new Exception ("need to draw shape first");
+			}
+		}
+
+		public string bodyType { // shape
+			get {
+				if (_bodyType == FarseerPhysics.Dynamics.BodyType.Dynamic) {
+					return "dynamic";
+				} else if (_bodyType == FarseerPhysics.Dynamics.BodyType.Static) {
+					return "static";
+				} else {
+					return "unkown";
+				}
+			}
+			set {
+				if (value == "dynamic") {
+					_bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+					if (body != null)
+						body.IsStatic = false;
+				} else if (value == "static") {
+					_bodyType = FarseerPhysics.Dynamics.BodyType.Static;
+					if (body != null)
+						body.IsStatic = true;
+				} else {
+					throw new Exception ("bodyType must be 'dynamic' or 'static'");
+				}
+			}
+		}
+
+		public virtual void addToPhysics ()
+		{ // Shape
+		}
+
+		public virtual void updateFromPhysics ()
+		{
+			// get from body, put in sprite
+			if (body != null) {
+				float MeterInPixels = 64.0f;
+				if (wrap) {
+					float x = (float)wrap_width ((float)(body.Position.X * MeterInPixels));
+					float y = (float)wrap_height ((float)(body.Position.Y * MeterInPixels));
+					body.Position = new Vector2 (x / MeterInPixels, y / MeterInPixels);
+				}
+				Vector2 position = body.Position * MeterInPixels;
+				double rotation = body.Rotation * 180.0 / Math.PI; 
+				// Move it
+				_moveTo (position.X, position.Y);
+				_rotateTo (rotation);
+			}
+		}
+
+		public void updatePhysics ()
+		{
+			// get from sprite, put in body
+			if (body != null) {
+				float MeterInPixels = 64.0f;
+				body.Position = new Vector2 (((float)x) / MeterInPixels, 
+                                    ((float)y) / MeterInPixels);
+				// FIXME: undo operation; call rotateTo()?
+				body.Rotation = (float)_rotation;
+			}
+		}
+
+		public void stackOnTop ()
+		{
+			if (window != null) {
+				window.stackOnTop (this);
+			}
+		}
+
+		public void stackOnBottom ()
+		{
+			if (window != null) {
+				window.stackOnBottom (this);
+			}
+		}
+
+		public Point getP1 ()
+		{
+			return getScreenPoint (points [0]);
+		}
+
+		public Point getP2 ()
+		{
+			return getScreenPoint (points [2]);
+		}
+
+		public Point getScreenPoint (IList iterable)
+		{
+			// p is relative to center, rotate, and scale; returns
+			// screen coordinate of p
+			double px = 0, py = 0;
+			using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+				Point temp = screen_coord (center);
+				g.Translate (temp.x, temp.y);
+				g.Rotate (_rotation);
+				g.Scale (_scaleFactor, _scaleFactor);
+				px = System.Convert.ToDouble (iterable [0]);
+				py = System.Convert.ToDouble (iterable [1]);
+				g.UserToDevice (ref px, ref py);
+			}
+			return new Point (px, py);
+		}
+
+		public Point getCenter ()
+		{
+			return center;
+		}
+
+		public bool has_pen {
+			get {
+				return _has_pen;
+			}
+			set {
+				_has_pen = value;
+			}
+		}
     
-    public void penDown() {
-      pen._down = true;
-      pen.appendPath(new Point(center.x, center.y));
-    }
+		public double rotation {
+			get {
+				return _rotation * 180.0 / Math.PI;
+			}
+			set {
+				rotateTo (value);
+			}
+		}
+
+		public double scaleFactor {
+			get {
+				return _scaleFactor;
+			}
+			set {
+				scaleTo (value);
+			}
+		}
+
+		public double x {
+			get {
+				return center.x;
+			}
+			set {
+				moveTo (value, center.y);
+			}
+		}
+        
+		public double getX ()
+		{
+			return center.x;
+		}
+        
+		public double getY ()
+		{
+			return center.y;
+		}
+        
+		public void setX (double value)
+		{
+			moveTo (value, center.y);
+		}
+        
+		public void setY (double value)
+		{
+			moveTo (center.x, value);
+		}
+        
+		public double y {
+			get {
+				return center.y;
+			}
+			set {
+				moveTo (center.x, value);
+			}
+		}
+
+		public void setWidth (int value)
+		{
+			_border = value;
+			QueueDraw ();
+		}
+        
+		public int border {
+			get {
+				return _border;
+			}
+			set {
+				_border = value;
+				QueueDraw ();
+			}
+		}
     
-    public void backward(double distance) {
-      forward(-distance);
-    }
+		public Pen pen {
+			get {
+				return _pen;
+			}
+			set {
+				if (has_pen) {
+					_pen = value;
+					_pen.center.x = center.x;
+					_pen.center.y = center.y;
+					QueueDraw ();
+				} else
+					throw new Exception ("this shape cannot have a pen");
+			}
+		}
     
-    public virtual void render(Cairo.Context g) { // Shape
-      if (!visible) return;
-      g.Save();
-      Point temp;
-      if (points != null) {
-        g.LineWidth = border;
-        temp = screen_coord(center);
-        g.Translate(temp.x, temp.y);
-        g.Rotate(_rotation);
-        g.Scale(_scaleFactor, _scaleFactor);
-        temp = screen_coord(points[0]);
-        g.MoveTo(temp.x, temp.y);
-        for (int p = 1; p < points.Length; p++) {
-          temp = screen_coord(points[p]);
-          g.LineTo(temp.x, temp.y);
-        }
-        if (close_path)
-          g.ClosePath();
-        if (gradient != null) {
-          Cairo.Gradient pat;
-          if (gradient.gtype == "linear")
-            pat = new Cairo.LinearGradient(gradient.p1.x,
+		public void QueueDraw ()
+		{ // shape
+			if (window is WindowClass) {
+				if (window.getMode () == "auto" ||
+	    window.getMode () == "bitmap" || 
+            window.getMode () == "physics")
+					window.update ();
+				// else, manually call step()
+			}
+		}
+    
+		public bool contains (IList iterable)
+		{
+			Point p = new Point (iterable);
+			int counter = 0;
+			double xinters;
+			Point p1, p2;
+			if (points != null) {
+				p1 = points [0];
+				for (int i=1; i<=points.Length; i++) {
+					p2 = points [i % points.Length];
+					if (p.y > Math.Min (p1.y, p2.y)) {
+						if (p.y <= Math.Max (p1.y, p2.y)) {
+							if (p.x <= Math.Max (p1.x, p2.x)) {
+								if (p1.y != p2.y) {
+									xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+									if (p1.x == p2.x || p.x <= xinters)
+										counter++;
+								}
+							}
+						}
+					}
+					p1 = p2;
+				}
+				return (counter % 2 == 0); // hit?
+			} else {
+				return false;
+			}
+		}
+
+		public void set_points (params Point [] ps)
+		{
+			// 1. set center to absolute
+			double sumx = 0.0;
+			double sumy = 0.0;
+			if (ps.Length > 0) {
+				for (int i = 0; i < ps.Length; i++) {
+					sumx += ps [i].x;
+					sumy += ps [i].y;
+				}
+				center.x = sumx / ps.Length;
+				center.y = sumy / ps.Length;
+			} else {
+				center.x = 0;
+				center.y = 0;
+			}
+			// 2. compute this.points in relative terms to center
+			points = new Point [ps.Length];
+			for (int i = 0; i < ps.Length; i++) {
+				points [i] = new Point (ps [i].x - center.x, 
+                              ps [i].y - center.y);
+			}
+		}
+    
+		public void append (IList iterable)
+		{
+			// add a new point to list of points
+			// first copy old points
+			// FIXME: could make points a list
+			Point [] new_points = new Point [points.Length + 1];
+			for (int i = 0; i < points.Length; i++) {
+				new_points [i] = points [i];
+			}
+			// Now add new point:
+			new_points [points.Length] = new Point (iterable);
+			points = new_points;
+		}
+
+		public void set_points ()
+		{
+			// 1. set center to absolute
+			double sumx = 0.0;
+			double sumy = 0.0;
+			if (points.Length > 0) {
+				for (int i = 0; i < points.Length; i++) {
+					sumx += points [i].x;
+					sumy += points [i].y;
+				}
+				center.x = sumx / points.Length;
+				center.y = sumy / points.Length;
+			} else {
+				center.x = 0;
+				center.y = 0;
+			}
+			// 2. compute this.points in relative terms to center
+			for (int i = 0; i < points.Length; i++) {
+				points [i].x = points [i].x - center.x;
+				points [i].y = points [i].y - center.y;
+			}
+		}
+    
+		public double screen_angle (double dir)
+		{
+			// Screen coords are 45 degrees from system
+			return dir - (45 * Math.PI / 180.0);
+		}
+
+		public void forward (double distance)
+		{
+			double angle = screen_angle (_rotation);
+			double x = ((distance) * Math.Cos (angle) - (distance) * Math.Sin (angle));
+			double y = ((distance) * Math.Sin (angle) + (distance) * Math.Cos (angle));
+			center.x += x;
+			center.y += y;
+			updatePen ();
+			QueueDraw ();
+		}
+    
+		public void updatePen ()
+		{
+			if (has_pen && pen.down)
+				pen.appendPath (new Point (center.x, center.y));
+		}
+
+		public void  updateGlobalPosition (Cairo.Context g)
+		{
+			gx = center.x;
+			gy = center.y;
+			g.UserToDevice (ref gx, ref gy);
+		}
+
+		public Line penUp ()
+		{
+			pen._down = false;
+			return pen.resetPath ();
+		}
+    
+		public void penDown ()
+		{
+			pen._down = true;
+			pen.appendPath (new Point (center.x, center.y));
+		}
+    
+		public void backward (double distance)
+		{
+			forward (-distance);
+		}
+    
+		public virtual void render (Cairo.Context g)
+		{ // Shape
+			if (!visible)
+				return;
+			g.Save ();
+			Point temp;
+			if (points != null) {
+				g.LineWidth = border;
+				temp = screen_coord (center);
+				g.Translate (temp.x, temp.y);
+				g.Rotate (_rotation);
+				g.Scale (_scaleFactor, _scaleFactor);
+				temp = screen_coord (points [0]);
+				g.MoveTo (temp.x, temp.y);
+				for (int p = 1; p < points.Length; p++) {
+					temp = screen_coord (points [p]);
+					g.LineTo (temp.x, temp.y);
+				}
+				if (close_path)
+					g.ClosePath ();
+				if (gradient != null) {
+					Cairo.Gradient pat;
+					if (gradient.gtype == "linear")
+						pat = new Cairo.LinearGradient (gradient.p1.x,
                                            gradient.p1.y, 
                                            gradient.p2.x, 
                                            gradient.p2.y);
-          else
-            pat = new Cairo.RadialGradient(gradient.p1.x,
+					else
+						pat = new Cairo.RadialGradient (gradient.p1.x,
                                            gradient.p1.y, 
                                            gradient.radius1,
                                            gradient.p2.x, 
                                            gradient.p2.y,
                                            gradient.radius2);
           
-          pat.AddColorStop (0, gradient.c1.getCairo());
-          pat.AddColorStop (1, gradient.c2.getCairo());
-          g.Pattern = pat;
-          g.FillPreserve();
-        } else if (_fill != null) {
-          g.Color = _fill.getCairo();
-          g.FillPreserve();
-        }
-        if (_outline != null) {
-          g.Color = _outline.getCairo();
-          g.Stroke();
-        }
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-      if (has_pen)
-        pen.render(g);
-    }
+					pat.AddColorStop (0, gradient.c1.getCairo ());
+					pat.AddColorStop (1, gradient.c2.getCairo ());
+					g.Pattern = pat;
+					g.FillPreserve ();
+				} else if (_fill != null) {
+					g.Color = _fill.getCairo ();
+					g.FillPreserve ();
+				}
+				if (_outline != null) {
+					g.Color = _outline.getCairo ();
+					g.Stroke ();
+				}
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			if (has_pen)
+				pen.render (g);
+		}
     
-    public Point screen_coord(IList iterable) {
-      // FIXME: return in coords of screen
-      return new Point(iterable); 
-      // new Point(point.x - center.x, point.y - center.y);
-    }
+		public Point screen_coord (IList iterable)
+		{
+			// FIXME: return in coords of screen
+			return new Point (iterable); 
+			// new Point(point.x - center.x, point.y - center.y);
+		}
     
-    internal double wrap_width(double x) {
-      if (x < 0)
-        return wrap_width(window.width + x);
-      else if (x >= window.width)
-        return wrap_width(x - window.width);
-      else
-        return x;
-    }
+		internal double wrap_width (double x)
+		{
+			if (x < 0)
+				return wrap_width (window.width + x);
+			else if (x >= window.width)
+				return wrap_width (x - window.width);
+			else
+				return x;
+		}
 
-    internal double wrap_height(double y) {
-      if (y < 0)
-        return wrap_height(window.height + y);
-      else if (y >= window.height)
-        return wrap_height(y - window.height);
-      else
-        return y;
-    }
+		internal double wrap_height (double y)
+		{
+			if (y < 0)
+				return wrap_height (window.height + y);
+			else if (y >= window.height)
+				return wrap_height (y - window.height);
+			else
+				return y;
+		}
 
-    public void move(double dx, double dy) {
-      center.x += dx;
-      center.y += dy;
-      updatePen();
-      if (wrap) {
-        center.x = wrap_width(center.x);
-        center.y = wrap_height(center.y);
-      }
-      if (body != null)
-        updatePhysics();
-      QueueDraw();
-    }
+		public virtual void move (double dx, double dy)
+		{
+			center.x += dx;
+			center.y += dy;
+			updatePen ();
+			if (wrap) {
+				center.x = wrap_width (center.x);
+				center.y = wrap_height (center.y);
+			}
+			if (body != null)
+				updatePhysics ();
+			QueueDraw ();
+		}
 
-    public void moveTo(double x, double y) {
-      double dx = x - center.x;
-      double dy = y - center.y;
-      move(dx, dy);
-    }
+		public virtual void moveTo (double x, double y)
+		{
+			double dx = x - center.x;
+			double dy = y - center.y;
+			move (dx, dy);
+		}
 
-    public void _moveTo(double x, double y) {
-      double dx = x - center.x;
-      double dy = y - center.y;
-      _move(dx, dy);
-    }
+		public void _moveTo (double x, double y)
+		{
+			double dx = x - center.x;
+			double dy = y - center.y;
+			_move (dx, dy);
+		}
         
-    public void _move(double dx, double dy) {
-      center.x += dx;
-      center.y += dy;
-      updatePen();
-    }
+		public void _move (double dx, double dy)
+		{
+			center.x += dx;
+			center.y += dy;
+			updatePen ();
+		}
 
-    public void rotate(double degrees) {
-      _rotation -= (Math.PI / 180.0) * degrees;
-      if (body != null)
-        updatePhysics();
-      QueueDraw();
-    }
+		public virtual void rotate (double degrees)
+		{
+			_rotation -= (Math.PI / 180.0) * degrees;
+			if (body != null)
+				updatePhysics ();
+			QueueDraw ();
+		}
     
-    public void rotateTo(double degrees) {
-      _rotation = degrees * (Math.PI) / 180.0;
-      if (body != null)
-        updatePhysics();
-      QueueDraw();
-    }
+		public virtual void rotateTo (double degrees)
+		{
+			_rotation = degrees * (Math.PI) / 180.0;
+			if (body != null)
+				updatePhysics ();
+			QueueDraw ();
+		}
 
-    public void _rotate(double degrees) {
-      _rotation -= (Math.PI / 180.0) * degrees;
-    }
+		public void _rotate (double degrees)
+		{
+			_rotation -= (Math.PI / 180.0) * degrees;
+		}
     
-    public void _rotateTo(double degrees) {
-      _rotation = degrees * (Math.PI) / 180.0;
-    }
+		public void _rotateTo (double degrees)
+		{
+			_rotation = degrees * (Math.PI) / 180.0;
+		}
     
-    public void scale(double percent) {
-      _scaleFactor *= percent;
-      QueueDraw();
-    }
+		public void scale (double percent)
+		{
+			_scaleFactor *= percent;
+			QueueDraw ();
+		}
         
-    public void scaleTo(double percent) {
-      _scaleFactor = percent;
-      if (body != null)
-        updatePhysics();
-      QueueDraw();
-    }
+		public void scaleTo (double percent)
+		{
+			_scaleFactor = percent;
+			if (body != null)
+				updatePhysics ();
+			QueueDraw ();
+		}
     
-    public void update() { // Shape
-      // Alias to QueueDraw
-      QueueDraw(); 
-    }
+		public void update ()
+		{ // Shape
+			// Alias to QueueDraw
+			QueueDraw (); 
+		}
     
-    public void draw(WindowClass win) { // Shape
-      // Add this shape to the Canvas list.
-      if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
-	win.canvas.need_to_draw_surface = true;
-	using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
-	  render(g);
-	}
-      } else {
-	lock(win.getCanvas().shapes) {
-	  if (! win.getCanvas().shapes.Contains(this)) 
-	    win.getCanvas().shapes.Add(this);
-	}
-	// Make sure each subshape is associated with this window
-	// so QueueDraw will redraw:
-	lock(shapes) {
-	  foreach (Shape shape in shapes)
-	    {
-	      shape.window = win;
-	    }
-	}
-      }
-      window = win;
-      if (window._canvas.world != null) {
-        addToPhysics();
-      }
-      QueueDraw();
-    }
+		public void draw (WindowClass win)
+		{ // Shape
+			// Add this shape to the Canvas list.
+			if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
+				win.canvas.need_to_draw_surface = true;
+				using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
+					render (g);
+				}
+			} else {
+				lock (win.getCanvas().shapes) {
+					if (! win.getCanvas ().shapes.Contains (this)) 
+						win.getCanvas ().shapes.Add (this);
+				}
+				// Make sure each subshape is associated with this window
+				// so QueueDraw will redraw:
+				lock (shapes) {
+					foreach (Shape shape in shapes) {
+						shape.window = win;
+					}
+				}
+			}
+			window = win;
+			if (window._canvas.world != null) {
+				addToPhysics ();
+			}
+			QueueDraw ();
+		}
 
-    public void draw(Canvas canvas) { // Shape
-      // Add this shape to the Canvas list.
-      if (canvas.mode == "bitmap" || canvas.mode == "bitmapmanual" ) {
-	canvas.need_to_draw_surface = true;
-	using (Cairo.Context g = new Cairo.Context(canvas.surface)) {
-	  render(g);
+		public void draw (Canvas canvas)
+		{ // Shape
+			// Add this shape to the Canvas list.
+			if (canvas.mode == "bitmap" || canvas.mode == "bitmapmanual") {
+				canvas.need_to_draw_surface = true;
+				using (Cairo.Context g = new Cairo.Context(canvas.surface)) {
+					render (g);
+				}
+			} else {
+				lock (canvas.shapes) {
+					if (! canvas.shapes.Contains (this)) 
+						canvas.shapes.Add (this);
+				}
+			}
+			if (canvas.world != null) {
+				addToPhysics ();
+			}
+			QueueDraw ();
+		}
+    
+		public void draw (Shape shape)
+		{ // Shape
+			// Add this shape to the shape's list.
+			lock (shape.shapes) {
+				if (! shape.shapes.Contains (this)) 
+					shape.shapes.Add (this);
+			}
+			window = shape.window;
+			QueueDraw ();
+		}
+    
+		public void undraw ()
+		{
+			Invoke (delegate {
+				if (window != null) {
+					lock (window.getCanvas().shapes) {
+						if (window.getCanvas ().shapes.Contains (this)) {
+							window.getCanvas ().shapes.Remove (this);
+							if (window is WindowClass)
+								((WindowClass)window).QueueDraw ();
+							window = null;
+						}
+					}
+				}
+			});
+		}
+    
+		public Gradient gradient {
+			set {
+				_gradient = value;
+				QueueDraw ();
+			}
+			get {
+				return _gradient;
+			} 
+		}
+
+		public Color color {
+			set {
+				if (value != null) {
+					_fill = ((Color)value).Copy ();
+					_outline = _fill;
+				} else {
+					_fill = null;
+					_outline = null;
+				}
+				QueueDraw ();
+			}
+			get {
+				if (_fill != null) {
+					_fill.window = this.window;
+					return _fill; // share!
+				} else
+					return null;
+			}
+		}
+
+		public void setFill (Color value)
+		{
+			if (value == null) {
+				_fill = null;
+			} else {
+				_fill = ((Color)value).Copy ();
+			}
+			QueueDraw ();
+		}
+    
+		public virtual Color fill {
+			set {
+				if (value == null) {
+					_fill = null;
+				} else {
+					_fill = ((Color)value).Copy ();
+				}
+				QueueDraw ();
+			}
+			get {
+				if (_fill != null) {
+					_fill.window = this.window;
+					return _fill;
+				} else
+					return null;
+			}
+		}
+
+		public void setOutline (Color value)
+		{
+			if (value == null) {
+				_outline = null;
+			} else {
+				_outline = ((Color)value).Copy ();
+			}
+			QueueDraw ();
+		}
+    
+		public Color outline {
+			set {
+				if (value == null) {
+					_outline = null;
+				} else {
+					_outline = ((Color)value).Copy ();
+				}
+				QueueDraw ();
+			}
+			get {
+				if (_outline != null) {
+					_outline.window = this.window;
+					return _outline; // share!
+				} else
+					return null;
+			}
+		}
 	}
-      } else {
-	lock(canvas.shapes) {
-	  if (! canvas.shapes.Contains(this)) 
-	    canvas.shapes.Add(this);
-	}
-      }
-      if (canvas.world != null) {
-	addToPhysics();
-      }
-      QueueDraw();
-    }
-    
-    public void draw(Shape shape) { // Shape
-      // Add this shape to the shape's list.
-      lock(shape.shapes) {
-	if (! shape.shapes.Contains(this)) 
-	  shape.shapes.Add(this);
-      }
-      window = shape.window;
-      QueueDraw();
-    }
-    
-    public void undraw() {
-      Invoke(delegate {
-          if (window != null) {
-        lock(window.getCanvas().shapes) {
-            if (window.getCanvas().shapes.Contains(this)) {
-                    window.getCanvas().shapes.Remove(this);
-                    if (window is WindowClass)
-                      ((WindowClass)window).QueueDraw();
-                    window = null;
-                }
-        }
-      }
-        });
-    }
-    
-    public Gradient gradient {
-      set {
-        _gradient = value;
-        QueueDraw();
-      }
-      get {
-        return _gradient;
-      } 
-    }
-
-    public Color color {
-      set {
-            if (value != null) {
-                _fill = ((Color)value).Copy();
-                _outline = _fill;
-            } else {
-                _fill = null;
-                _outline = null;
-            }
-            QueueDraw();
-      }
-      get {
-            if (_fill != null) {
-              _fill.window = this.window;
-              return _fill; // share!
-            } 
-          else
-            return null;
-        }
-    }
-
-        public void setFill(Color value) {
-          if (value == null) {
-                _fill = null;
-          } else {
-                _fill = ((Color)value).Copy();
-          }
-          QueueDraw();
-        }
-    
-    public virtual Color fill {
-      set {
-        if (value == null) {
-          _fill = null;
-        } else {
-          _fill = ((Color)value).Copy();
-        }
-        QueueDraw();
-      }
-      get
-        {
-          if (_fill != null)
-            {
-              _fill.window = this.window;
-              return _fill;
-            } 
-          else
-            return null;
-        }
-    }
-
-    public void setOutline(Color value) {
-          if (value == null) {
-                _outline = null;
-          } else {
-                _outline = ((Color)value).Copy();
-          }
-          QueueDraw();
-        }
-    
-    public Color outline {
-      set {
-        if (value == null) {
-          _outline = null;
-        } else {
-          _outline = ((Color)value).Copy();
-        }
-        QueueDraw();
-      }
-      get
-        {
-          if (_outline != null)
-            {
-              _outline.window = this.window;
-              return _outline; // share!
-            } 
-          else
-            return null;
-        }
-    }
-  }
   
-  public class Text : Shape {
-    public string _text;
-    public string fontFace = "sans serif";
-    public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
-    public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
-    double _fontSize = 18;
-    public string xJustification = "center"; // left, center, right
-    public string yJustification = "center"; // top, center, bottom
+	public class Text : Shape
+	{
+		public string _text;
+		public string fontFace = "sans serif";
+		public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
+		public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
+		double _fontSize = 18;
+		public string xJustification = "center"; // left, center, right
+		public string yJustification = "center"; // top, center, bottom
 
-    // FIXME: add wrappers around justifications, weight, slant, face
+		// FIXME: add wrappers around justifications, weight, slant, face
 
-    public double fontSize
-    {
-      get
-        {
-          return _fontSize;
-        }
-      set
-        {
-          _fontSize = value;
-          QueueDraw();
-        }
-    }
+		public double fontSize {
+			get {
+				return _fontSize;
+			}
+			set {
+				_fontSize = value;
+				QueueDraw ();
+			}
+		}
 
-    public string text
-    {
-      get
-        {
-          return _text;
-        }
-      set
-        {
-          _text = value;
-          QueueDraw();
-        }
-    }
+		public string text {
+			get {
+				return _text;
+			}
+			set {
+				_text = value;
+				QueueDraw ();
+			}
+		}
 
-    public Text(IList iterable, string text) {
-      this.text = text;
-      set_points(new Point(iterable));
-    }
+		public Text (IList iterable, string text)
+		{
+			this.text = text;
+			set_points (new Point (iterable));
+		}
 
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      Point temp = screen_coord(center);
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      if (gradient != null) {
-        Cairo.Gradient pat;
-        if (gradient.gtype == "linear")
-          pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			Point temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			if (gradient != null) {
+				Cairo.Gradient pat;
+				if (gradient.gtype == "linear")
+					pat = new Cairo.LinearGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.p2.x, 
                                          gradient.p2.y);
-        else
-          pat = new Cairo.RadialGradient(gradient.p1.x,
+				else
+					pat = new Cairo.RadialGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.radius1,
                                          gradient.p2.x, 
                                          gradient.p2.y,
                                          gradient.radius2);
         
-        pat.AddColorStop (0, gradient.c1.getCairo());
-        pat.AddColorStop (1, gradient.c2.getCairo());
-        g.Pattern = pat;
-        g.FillPreserve();
-      } else if (_fill != null)
-          g.Color = _fill._cairo;
-      else
-        g.Color = new Cairo.Color(0,0,0); // default color when none given
-      Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
-      Pango.FontDescription desc = Pango.FontDescription.FromString(
-                            String.Format("{0} {1}", fontFace, fontSize));
-      layout.FontDescription = desc;
-      layout.SetText(text);
-      layout.Alignment = Pango.Alignment.Center;
-      int layoutWidth, layoutHeight;
-      layout.GetSize(out layoutWidth, out layoutHeight);
-      double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-      double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-      Point p = new Point(0,0);
-      if (xJustification == "center") {
-        p.x = points[0].x - teWidth  / 2; // - te.XBearing;
-      } else if (xJustification == "left") {
-        p.x = points[0].x;
-      } else if (xJustification == "right") {
-        p.x = points[0].x + teWidth;
-      }
-      if (yJustification == "center") {
-        p.y = points[0].y - teHeight / 2; // - te.YBearing;
-      } else if (yJustification == "bottom") {
-        p.y = points[0].y;
-      } else if (yJustification == "top") {
-        p.y = points[0].y - teHeight;
-      }
-      temp = screen_coord(p);
-      g.MoveTo(temp.x, temp.y);
-      Pango.CairoHelper.ShowLayout(g, layout);
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Stroke();
-      g.Restore();
-    }
+				pat.AddColorStop (0, gradient.c1.getCairo ());
+				pat.AddColorStop (1, gradient.c2.getCairo ());
+				g.Pattern = pat;
+				g.FillPreserve ();
+			} else if (_fill != null)
+				g.Color = _fill._cairo;
+			else
+				g.Color = new Cairo.Color (0, 0, 0); // default color when none given
+			Pango.Layout layout = Pango.CairoHelper.CreateLayout (g);
+			Pango.FontDescription desc = Pango.FontDescription.FromString (
+                            String.Format ("{0} {1}", fontFace, fontSize));
+			layout.FontDescription = desc;
+			layout.SetText (text);
+			layout.Alignment = Pango.Alignment.Center;
+			int layoutWidth, layoutHeight;
+			layout.GetSize (out layoutWidth, out layoutHeight);
+			double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+			double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+			Point p = new Point (0, 0);
+			if (xJustification == "center") {
+				p.x = points [0].x - teWidth / 2; // - te.XBearing;
+			} else if (xJustification == "left") {
+				p.x = points [0].x;
+			} else if (xJustification == "right") {
+				p.x = points [0].x + teWidth;
+			}
+			if (yJustification == "center") {
+				p.y = points [0].y - teHeight / 2; // - te.YBearing;
+			} else if (yJustification == "bottom") {
+				p.y = points [0].y;
+			} else if (yJustification == "top") {
+				p.y = points [0].y - teHeight;
+			}
+			temp = screen_coord (p);
+			g.MoveTo (temp.x, temp.y);
+			Pango.CairoHelper.ShowLayout (g, layout);
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Stroke ();
+			g.Restore ();
+		}
 
-    public double width {
-      get {
-        using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-          Cairo.TextExtents te = g.TextExtents(text);
-          return te.Width * 2;
-        }
-      }
-    }
+		public double width {
+			get {
+				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					Cairo.TextExtents te = g.TextExtents (text);
+					return te.Width * 2;
+				}
+			}
+		}
 
-    public double height {
-      get {
-        using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-          Cairo.TextExtents te = g.TextExtents(text);
-          return te.Height * 2;
-        }
-      }
-    }
+		public double height {
+			get {
+				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					Cairo.TextExtents te = g.TextExtents (text);
+					return te.Height * 2;
+				}
+			}
+		}
 
-    public override void addToPhysics() { // Text
-      world = window._canvas.world;
-      double width = 0;
-      double height = 0;
-      using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-        Cairo.TextExtents te = g.TextExtents(text);
-        // FIXME: need to adjust based on justification
-        // This works with x centered, y centered
-        width = te.Width * 2;
-        height = te.Height * 2;
-      }
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateRectangle(
+		public override void addToPhysics ()
+		{ // Text
+			world = window._canvas.world;
+			double width = 0;
+			double height = 0;
+			using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+				Cairo.TextExtents te = g.TextExtents (text);
+				// FIXME: need to adjust based on justification
+				// This works with x centered, y centered
+				width = te.Width * 2;
+				height = te.Height * 2;
+			}
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
                  world,
-                 (float)(width / MeterInPixels),   // radius in meters
-                 (float)(height / MeterInPixels),  // radius in meters
-                 _density,                         // density
+                 (float)(width / MeterInPixels), // radius in meters
+                 (float)(height / MeterInPixels), // radius in meters
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
-  }
+			// Give it some bounce and friction
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
+	}
 
-  public class Line : Shape {
+	public class Line : Shape
+	{
 
-    public Line(params object [] points) : base(true) {
-      Point [] temp = new Point [points.Length];
-      int count = 0;
-      foreach (object o in points) {
-        if (o is Point)
-          temp[count] = (Point)o ;
-        else if (o is IList) {
-          IList i = (IList)o;
-          temp[count] = new Point(i[0], i[1]);
-        } else {
-          throw new Exception("Line: can't convert arg to a point");
-        }
-        count++;
-      }
-      set_points(temp);
-    }
+		public Line (params object [] points) : base(true)
+		{
+			Point [] temp = new Point [points.Length];
+			int count = 0;
+			foreach (object o in points) {
+				if (o is Point)
+					temp [count] = (Point)o;
+				else if (o is IList) {
+					IList i = (IList)o;
+					temp [count] = new Point (i [0], i [1]);
+				} else {
+					throw new Exception ("Line: can't convert arg to a point");
+				}
+				count++;
+			}
+			set_points (temp);
+		}
 
-    public Line(IList iterable1, IList iterable2) :
-       this(true, iterable1, iterable2) {
-    }
+		public Line (IList iterable1, IList iterable2) :
+       this(true, iterable1, iterable2)
+		{
+		}
 
-    public Line(bool has_pen, IList iterable1, IList iterable2) {
-      set_points(new Point(iterable1), 
-		 new Point(iterable2));
-      close_path = false;
-      fill = null;
-    }
+		public Line (bool has_pen, IList iterable1, IList iterable2)
+		{
+			set_points (new Point (iterable1), 
+		 new Point (iterable2));
+			close_path = false;
+			fill = null;
+		}
 
-    public Line() : base(true) {
-      points = new Point[0];
-      close_path = false;
-      fill = null;
-    }
-  }
+		public Line () : base(true)
+		{
+			points = new Point[0];
+			close_path = false;
+			fill = null;
+		}
+	}
 
-  public class Curve : Shape {
-    public Curve(IList iterable0, 
+	public class Curve : Shape
+	{
+		public Curve (IList iterable0, 
                  IList iterable1, 
                  IList iterable2, 
                  IList iterable3):
-      this(true, iterable0, iterable1, iterable2, iterable3) {
-    }
-    public Curve(bool has_pen, 
+      this(true, iterable0, iterable1, iterable2, iterable3)
+		{
+		}
+
+		public Curve (bool has_pen, 
                  IList iterable0, 
                  IList iterable1, 
                  IList iterable2, 
                  IList iterable3) : 
-    base(has_pen) {
-      set_points(new Point(iterable0), new Point(iterable1), 
-		 new Point(iterable2), new Point(iterable3));
-      fill = null;
-    }    
+    base(has_pen)
+		{
+			set_points (new Point (iterable0), new Point (iterable1), 
+		 new Point (iterable2), new Point (iterable3));
+			fill = null;
+		}
 
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      Point temp, p1, p2, p3;
-      if (points != null) {
-        g.LineWidth = border;
-        temp = screen_coord(center);
-        g.Translate(temp.x, temp.y);
-        g.Rotate(_rotation);
-        g.Scale(_scaleFactor, _scaleFactor);
-        temp = screen_coord(points[0]);
-        g.MoveTo(temp.x, temp.y);
-        for (int p = 1; p < points.Length; p += 3) {
-          p1 = screen_coord(points[p]);
-          p2 = screen_coord(points[p+1]);
-          p3 = screen_coord(points[p+2]);
-          g.CurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-        }
-        if (gradient != null) {
-          Cairo.Gradient pat;
-          if (gradient.gtype == "linear")
-            pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			Point temp, p1, p2, p3;
+			if (points != null) {
+				g.LineWidth = border;
+				temp = screen_coord (center);
+				g.Translate (temp.x, temp.y);
+				g.Rotate (_rotation);
+				g.Scale (_scaleFactor, _scaleFactor);
+				temp = screen_coord (points [0]);
+				g.MoveTo (temp.x, temp.y);
+				for (int p = 1; p < points.Length; p += 3) {
+					p1 = screen_coord (points [p]);
+					p2 = screen_coord (points [p + 1]);
+					p3 = screen_coord (points [p + 2]);
+					g.CurveTo (p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+				}
+				if (gradient != null) {
+					Cairo.Gradient pat;
+					if (gradient.gtype == "linear")
+						pat = new Cairo.LinearGradient (gradient.p1.x,
                                            gradient.p1.y, 
                                            gradient.p2.x, 
                                            gradient.p2.y);
-          else
-            pat = new Cairo.RadialGradient(gradient.p1.x,
+					else
+						pat = new Cairo.RadialGradient (gradient.p1.x,
                                            gradient.p1.y, 
                                            gradient.radius1,
                                            gradient.p2.x, 
                                            gradient.p2.y,
                                            gradient.radius2);
           
-          pat.AddColorStop (0, gradient.c1.getCairo());
-          pat.AddColorStop (1, gradient.c2.getCairo());
-          g.Pattern = pat;
-          g.FillPreserve();
-        } else if (_fill != null) {
-          g.Color = _fill._cairo;
-          g.FillPreserve();
-        }
-        if (_outline != null) {
-          g.Color = _outline._cairo;
-          g.Stroke();
-        }
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-      if (has_pen)
-        pen.render(g);
-    }
-  }
-  
-  public class Arrow : Shape {
-    public Arrow(IList iterable) :  this(iterable, 0) {
-    }
-    public Arrow(IList iterable, double degrees) :  base(true) {
-      set_points(new Point(  0,  0),
-		 new Point(  0, -5), 
-		 new Point(  11,  0),
-		 new Point(  0,  5) 
-		 );
-      center.x = System.Convert.ToDouble(iterable[0]);
-      center.y = System.Convert.ToDouble(iterable[1]);
-      rotate(degrees);
-    }
-  }
-  
-  public class Turtle : Shape {
-    public Turtle(IList iterable) :  this(iterable, 0) {
-    }
-    public Turtle(IList iterable, double degrees) :  base(true) {
-      set_points(new Point(  0,  0),
-		 new Point( -5, -5), 
-		 new Point(  5,  0),
-		 new Point( -5,  5) 
-		 );
-      center.x = System.Convert.ToDouble(iterable[0]);
-      center.y = System.Convert.ToDouble(iterable[1]);
-      rotate(degrees);
-    }
-  }
-  
-  public class Pen : Shape {
-    private List<Point> _path; // = new List<Point>();
-    public bool _down;
-    public double minDistance = 1;
-    
-    public Pen(Color color, int border) : base(false) {
-      _down = false;
-      _path = new List<Point>();
-      this.color = color;
-      this.border = border;
-    }
-    
-    public Pen(int border) : base(false) {
-      _down = false;
-      _path = new List<Point>();
-      this.color = new Color(0, 0, 0);
-      this.border = border;
-    }
-
-    public List<Point> getPath() {
-      return _path;
-    }
-    
-    public Line resetPath() {
-      Line temp = new Line(_path.ToArray());
-      _path = new List<Point>();
-      return temp;
-    }
-
-    public void appendPath(IList iterable) {
-      Point temp = new Point(iterable);
-      if (_path.Count > 0) {
-	if (_path[_path.Count - 1].distance(temp) > minDistance)
-	  _path.Add(temp);
-      } else {
-	_path.Add(temp);
-      }
-    }
-    
-    public bool down {
-      get {
-        return _down;
-      }
-    }
-    
-    public List<Point> path {
-      get {
-        return _path;
-      }
-    }
-    
-        public override void render(Cairo.Context g) {
-	  if (!visible) return;
-          // render path
-          g.Save();
-          Point temp = screen_coord(center);
-          g.Translate(temp.x, temp.y);
-          g.Rotate(_rotation);
-          g.Scale(_scaleFactor, _scaleFactor);
-          if (path != null && path.Count > 0) {
-            g.LineWidth = border;
-            temp = screen_coord(path[0]);
-            g.MoveTo(temp.x, temp.y);
-            for (int p = 1; p < path.Count; p++) {
-              temp = screen_coord(path[p]);
-              g.LineTo(temp.x, temp.y);
-            }
-            if (_outline != null) {
-              g.Color = _outline._cairo;
-              g.Stroke();
-            }
-          }
-          foreach (Shape shape in shapes) {
-            shape.render(g);
-            shape.updateGlobalPosition(g);
-          }
-          g.Restore();
-        }
-  }
-
-  public class Pixel {
-    private Picture picture;
-    public int x;
-    public int y;
-    
-    public Pixel(Picture picture, int x, int y) {
-      this.picture = picture;
-      this.x = picture.wrap_width(x);
-      this.y = picture.wrap_height(y);
-    }
-
-    public Color getColor() {
-      return picture.getColor(x, y);
-    }
-    public PythonTuple getRGB() {
-      return picture.getRGB(x, y);
-    }
-    public PythonTuple getRGBA() {
-      return picture.getRGBA(x, y);
-    }
-    public int getGray() {
-      return picture.getGray(x, y);
-    }
-    public int getRed() {
-      return picture.getRed(x, y);
-    }
-    public int getGreen() {
-      return picture.getGreen(x, y);
-    }
-    public int getBlue() {
-      return picture.getBlue(x, y);
-    }
-    public int getAlpha() {
-      return picture.getAlpha(x, y);
-    }
-    public void setColor(Color color) {
-      picture.setColor(x, y, color);
-    }
-    public void setRGB(byte red, byte green, byte blue) {
-      picture.setRGB(x, y, red, green, blue);
-    }
-    public void setRGBA(byte red, byte green, byte blue, byte alpha) {
-      picture.setRGBA(x, y, red, green, blue, alpha);
-    }
-    public void setGray(byte value) {
-      picture.setGray(x, y, value);
-    }
-    public void setRed(byte value) {
-      picture.setRed(x, y, value);
-    }
-    public void setGreen(byte value) {
-      picture.setGreen(x, y, value);
-    }
-    public void setBlue(byte value) {
-      picture.setBlue(x, y, value);
-    }
-    public void setAlpha(byte value) {
-      picture.setAlpha(x, y, value);
-    }
-  }
-  
-  public class Picture : Shape {
-    Gdk.Pixbuf _pixbuf; // in memory rep of picture
-    
-    public Gdk.Pixbuf pixbuf
-    {
-      get
-	{
-	  return _pixbuf;
+					pat.AddColorStop (0, gradient.c1.getCairo ());
+					pat.AddColorStop (1, gradient.c2.getCairo ());
+					g.Pattern = pat;
+					g.FillPreserve ();
+				} else if (_fill != null) {
+					g.Color = _fill._cairo;
+					g.FillPreserve ();
+				}
+				if (_outline != null) {
+					g.Color = _outline._cairo;
+					g.Stroke ();
+				}
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			if (has_pen)
+				pen.render (g);
+		}
 	}
-    }
+  
+	public class Arrow : Shape
+	{
+		public Arrow (IList iterable) :  this(iterable, 0)
+		{
+		}
 
-    public Picture(string filename) : this(true) {
-      if (filename.StartsWith("http://")) {
-        HttpWebRequest req = (HttpWebRequest) WebRequest.Create(filename);
-        req.KeepAlive = false;
-        req.Timeout = 10000;        
-        WebResponse resp = req.GetResponse();
-        Stream s = resp.GetResponseStream();
-        _pixbuf = new Gdk.Pixbuf(s);
-      } else {
-        _pixbuf = new Gdk.Pixbuf(filename);
-      }
-      if (!_pixbuf.HasAlpha) {
-        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-      }
-      set_points(new Point(0, 0), 
-                 new Point(_pixbuf.Width, 0),
-                 new Point(_pixbuf.Width, _pixbuf.Height), 
-                 new Point(0, _pixbuf.Height));
-    }
+		public Arrow (IList iterable, double degrees) :  base(true)
+		{
+			set_points (new Point (0, 0),
+		 new Point (0, -5), 
+		 new Point (11, 0),
+		 new Point (0, 5) 
+		 );
+			center.x = System.Convert.ToDouble (iterable [0]);
+			center.y = System.Convert.ToDouble (iterable [1]);
+			rotate (degrees);
+		}
+	}
+  
+	public class Turtle : Shape
+	{
+		public Turtle (IList iterable) :  this(iterable, 0)
+		{
+		}
 
-    public Picture(bool has_pen) : base(has_pen) {
-        this._fill.picture = this;
-    }
+		public Turtle (IList iterable, double degrees) :  base(true)
+		{
+			set_points (new Point (0, 0),
+		 new Point (-5, -5), 
+		 new Point (5, 0),
+		 new Point (-5, 5) 
+		 );
+			center.x = System.Convert.ToDouble (iterable [0]);
+			center.y = System.Convert.ToDouble (iterable [1]);
+			rotate (degrees);
+		}
+	}
+  
+	public class Pen : Shape
+	{
+		private List<Point> _path; // = new List<Point>();
+		public bool _down;
+		public double minDistance = 1;
+    
+		public Pen (Color color, int border) : base(false)
+		{
+			_down = false;
+			_path = new List<Point> ();
+			this.color = color;
+			this.border = border;
+		}
+    
+		public Pen (int border) : base(false)
+		{
+			_down = false;
+			_path = new List<Point> ();
+			this.color = new Color (0, 0, 0);
+			this.border = border;
+		}
 
-    public Picture(Picture original) : this(true) {
-      // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(original._pixbuf.Colorspace, true, 8, original.getWidth(), original.getHeight());
-      if (!_pixbuf.HasAlpha) {
-        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-      }
-      for (int x=0; x < _pixbuf.Width; x++) {
-        for (int y=0; y < _pixbuf.Height; y++) {
-          byte r = (byte)original.getRed(x, y);
-          byte g = (byte)original.getGreen(x, y);
-          byte b = (byte)original.getBlue(x, y);
-          byte a = (byte)original.getAlpha(x, y);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public List<Point> getPath ()
+		{
+			return _path;
+		}
+    
+		public Line resetPath ()
+		{
+			Line temp = new Line (_path.ToArray ());
+			_path = new List<Point> ();
+			return temp;
+		}
+
+		public void appendPath (IList iterable)
+		{
+			Point temp = new Point (iterable);
+			if (_path.Count > 0) {
+				if (_path [_path.Count - 1].distance (temp) > minDistance)
+					_path.Add (temp);
+			} else {
+				_path.Add (temp);
+			}
+		}
+    
+		public bool down {
+			get {
+				return _down;
+			}
+		}
+    
+		public List<Point> path {
+			get {
+				return _path;
+			}
+		}
+    
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			// render path
+			g.Save ();
+			Point temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			if (path != null && path.Count > 0) {
+				g.LineWidth = border;
+				temp = screen_coord (path [0]);
+				g.MoveTo (temp.x, temp.y);
+				for (int p = 1; p < path.Count; p++) {
+					temp = screen_coord (path [p]);
+					g.LineTo (temp.x, temp.y);
+				}
+				if (_outline != null) {
+					g.Color = _outline._cairo;
+					g.Stroke ();
+				}
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+		}
+	}
+
+	public class Pixel
+	{
+		private Picture picture;
+		public int x;
+		public int y;
+    
+		public Pixel (Picture picture, int x, int y)
+		{
+			this.picture = picture;
+			this.x = picture.wrap_width (x);
+			this.y = picture.wrap_height (y);
+		}
+
+		public Color getColor ()
+		{
+			return picture.getColor (x, y);
+		}
+
+		public PythonTuple getRGB ()
+		{
+			return picture.getRGB (x, y);
+		}
+
+		public PythonTuple getRGBA ()
+		{
+			return picture.getRGBA (x, y);
+		}
+
+		public int getGray ()
+		{
+			return picture.getGray (x, y);
+		}
+
+		public int getRed ()
+		{
+			return picture.getRed (x, y);
+		}
+
+		public int getGreen ()
+		{
+			return picture.getGreen (x, y);
+		}
+
+		public int getBlue ()
+		{
+			return picture.getBlue (x, y);
+		}
+
+		public int getAlpha ()
+		{
+			return picture.getAlpha (x, y);
+		}
+
+		public void setColor (Color color)
+		{
+			picture.setColor (x, y, color);
+		}
+
+		public void setRGB (byte red, byte green, byte blue)
+		{
+			picture.setRGB (x, y, red, green, blue);
+		}
+
+		public void setRGBA (byte red, byte green, byte blue, byte alpha)
+		{
+			picture.setRGBA (x, y, red, green, blue, alpha);
+		}
+
+		public void setGray (byte value)
+		{
+			picture.setGray (x, y, value);
+		}
+
+		public void setRed (byte value)
+		{
+			picture.setRed (x, y, value);
+		}
+
+		public void setGreen (byte value)
+		{
+			picture.setGreen (x, y, value);
+		}
+
+		public void setBlue (byte value)
+		{
+			picture.setBlue (x, y, value);
+		}
+
+		public void setAlpha (byte value)
+		{
+			picture.setAlpha (x, y, value);
+		}
+	}
+  
+	public class Picture : Shape
+	{
+		Gdk.Pixbuf _pixbuf; // in memory rep of picture
+    
+		public Gdk.Pixbuf pixbuf {
+			get {
+				return _pixbuf;
+			}
+		}
+
+		public Picture (string filename) : this(true)
+		{
+			if (filename.StartsWith ("http://")) {
+				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
+				req.KeepAlive = false;
+				req.Timeout = 10000;        
+				WebResponse resp = req.GetResponse ();
+				Stream s = resp.GetResponseStream ();
+				_pixbuf = new Gdk.Pixbuf (s);
+			} else {
+				_pixbuf = new Gdk.Pixbuf (filename);
+			}
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			set_points (new Point (0, 0), 
+                 new Point (_pixbuf.Width, 0),
+                 new Point (_pixbuf.Width, _pixbuf.Height), 
+                 new Point (0, _pixbuf.Height));
+		}
+
+		public Picture (bool has_pen) : base(has_pen)
+		{
+			this._fill.picture = this;
+		}
+
+		public Picture (Picture original) : this(true)
+		{
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					byte r = (byte)original.getRed (x, y);
+					byte g = (byte)original.getGreen (x, y);
+					byte b = (byte)original.getBlue (x, y);
+					byte a = (byte)original.getAlpha (x, y);
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 0, r);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 1, g);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 2, b);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 3, a);
-        }
-      }
-      set_points(original.points);
-	  center = original.center;
-    }
+				}
+			}
+			set_points (original.points);
+			center = original.center;
+		}
     
-    public Picture(Gdk.Pixbuf pixbuf) : this(true) {
-      _pixbuf = pixbuf;
-      if (!_pixbuf.HasAlpha) {
-        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-      }
-      set_points(new Point(0, 0), 
-                 new Point(_pixbuf.Width, 0),
-                 new Point(_pixbuf.Width, _pixbuf.Height), 
-                 new Point(0, _pixbuf.Height));
-    }
+		public Picture (Gdk.Pixbuf pixbuf) : this(true)
+		{
+			_pixbuf = pixbuf;
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			set_points (new Point (0, 0), 
+                 new Point (_pixbuf.Width, 0),
+                 new Point (_pixbuf.Width, _pixbuf.Height), 
+                 new Point (0, _pixbuf.Height));
+		}
 
-    public Picture(System.Drawing.Bitmap bitmap, int width, int height) : this(true) {
-      // Colorspace, has_alpha, bits_per_sample, width, height:
-      // FIXME: convert bitmap.palette to colormap
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-      if (!_pixbuf.HasAlpha) {
-        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-      }
-      for (int x=0; x < _pixbuf.Width; x += 2) {
-        for (int y=0; y < _pixbuf.Height; y++) {
-          System.Drawing.Color pixel = bitmap.GetPixel(x/2, y);
-          // First pixel
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public Picture (System.Drawing.Bitmap bitmap, int width, int height) : this(true)
+		{
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			// FIXME: convert bitmap.palette to colormap
+			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			for (int x=0; x < _pixbuf.Width; x += 2) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					System.Drawing.Color pixel = bitmap.GetPixel (x / 2, y);
+					// First pixel
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 0, pixel.R);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 1, pixel.G);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 2, pixel.B);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 3, pixel.A);
-          // Second pixel
-          int x2 = x + 1;
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					// Second pixel
+					int x2 = x + 1;
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x2 * _pixbuf.NChannels + 0, pixel.R);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x2 * _pixbuf.NChannels + 1, pixel.G);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x2 * _pixbuf.NChannels + 2, pixel.B);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x2 * _pixbuf.NChannels + 3, pixel.A);
-        }
-      }
-      set_points(new Point(0, 0), 
-                 new Point(_pixbuf.Width, 0),
-                 new Point(_pixbuf.Width, _pixbuf.Height), 
-                 new Point(0, _pixbuf.Height));
-    }
+				}
+			}
+			set_points (new Point (0, 0), 
+                 new Point (_pixbuf.Width, 0),
+                 new Point (_pixbuf.Width, _pixbuf.Height), 
+                 new Point (0, _pixbuf.Height));
+		}
 
-        public void fromArray(Byte [] buffer, string format) {
-          if (format == "BGRX") { // b, r, g, ignore
-                int count = 0;
-                for (int i=0; i < buffer.Length; i+=4) {
-                  byte b = buffer[i];
-                  byte g = buffer[i + 1];
-                  byte r = buffer[i + 2];
-                  // NOTE: x is from the other side
-                  int x = _pixbuf.Width - count % _pixbuf.Width;
-                  int y = count/_pixbuf.Width;
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void fromArray (Byte [] buffer, string format)
+		{
+			if (format == "BGRX") { // b, r, g, ignore
+				int count = 0;
+				for (int i=0; i < buffer.Length; i+=4) {
+					byte b = buffer [i];
+					byte g = buffer [i + 1];
+					byte r = buffer [i + 2];
+					// NOTE: x is from the other side
+					int x = _pixbuf.Width - count % _pixbuf.Width;
+					int y = count / _pixbuf.Width;
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 0, r);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 1, g);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 2, b);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 3, 255);
-                  count++;
-                }
-          } else if (format == "GRAY") { 
-                int count = 0;
-                for (int i=0; i < buffer.Length; i++) {
-                  byte g = buffer[i];
-                  // NOTE: x is from the other side
-                  int x = _pixbuf.Width - count % _pixbuf.Width;
-                  int y = count/_pixbuf.Width;
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					count++;
+				}
+			} else if (format == "GRAY") { 
+				int count = 0;
+				for (int i=0; i < buffer.Length; i++) {
+					byte g = buffer [i];
+					// NOTE: x is from the other side
+					int x = _pixbuf.Width - count % _pixbuf.Width;
+					int y = count / _pixbuf.Width;
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 0, g);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 1, g);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 2, g);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
               x * _pixbuf.NChannels + 3, 255);
-                  count++;
-                }
-          } else {
-                throw new Exception("Picture.fromArray(array, format): invalid format");
-          }
-          QueueDraw();
-        }
+					count++;
+				}
+			} else {
+				throw new Exception ("Picture.fromArray(array, format): invalid format");
+			}
+			QueueDraw ();
+		}
     
-    public Picture(int width, int height, byte [] buffer, int depth) : this(true) {
-      // depth should be 1
-          // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-          if (!_pixbuf.HasAlpha) {
-            _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-          }
-          for (int x=0; x < _pixbuf.Width; x++) {
-                for (int y=0; y < _pixbuf.Height; y++) {
-                  byte r = buffer[(y * width + x)];
-                  byte g = r;
-                  byte b = r;
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public Picture (int width, int height, byte [] buffer, int depth) : this(true)
+		{
+			// depth should be 1
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					byte r = buffer [(y * width + x)];
+					byte g = r;
+					byte b = r;
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 0, r);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 1, g);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 2, b);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 3, 255);
-                }
-          }
-          set_points(new Point(0, 0), 
-                     new Point(_pixbuf.Width, 0),
-                     new Point(_pixbuf.Width, _pixbuf.Height), 
-                     new Point(0, _pixbuf.Height));
-    }
+				}
+			}
+			set_points (new Point (0, 0), 
+                     new Point (_pixbuf.Width, 0),
+                     new Point (_pixbuf.Width, _pixbuf.Height), 
+                     new Point (0, _pixbuf.Height));
+		}
 
-    public Picture(int width, int height, byte [] buffer) : this(true) {
-          // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-          if (!_pixbuf.HasAlpha) {
-            _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-          }
-          for (int x=0; x < _pixbuf.Width; x++) {
-                for (int y=0; y < _pixbuf.Height; y++) {
-                  byte r = buffer[(y * width + x) * 3 + 0];
-                  byte g = buffer[(y * width + x) * 3 + 1];
-                  byte b = buffer[(y * width + x) * 3 + 2];
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public Picture (int width, int height, byte [] buffer) : this(true)
+		{
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					byte r = buffer [(y * width + x) * 3 + 0];
+					byte g = buffer [(y * width + x) * 3 + 1];
+					byte b = buffer [(y * width + x) * 3 + 2];
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 0, r);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 1, g);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 2, b);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                     x * _pixbuf.NChannels + 3, 255);
-                }
-          }
-          set_points(new Point(0, 0), 
-                     new Point(_pixbuf.Width, 0),
-                     new Point(_pixbuf.Width, _pixbuf.Height), 
-                     new Point(0, _pixbuf.Height));
-    }
+				}
+			}
+			set_points (new Point (0, 0), 
+                     new Point (_pixbuf.Width, 0),
+                     new Point (_pixbuf.Width, _pixbuf.Height), 
+                     new Point (0, _pixbuf.Height));
+		}
 
-    public Picture(int width, int height) : this(true) {
-          // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-          if (!_pixbuf.HasAlpha) {
-            _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-          }
-          // WORKAROUND: image needs alpha set to zero (full opacity/no
-          // transparency). Might as well set default color, too:
-          for (int x=0; x < _pixbuf.Width; x++) {
-                for (int y=0; y < _pixbuf.Height; y++) {
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public Picture (int width, int height) : this(true)
+		{
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			// WORKAROUND: image needs alpha set to zero (full opacity/no
+			// transparency). Might as well set default color, too:
+			for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                           x * _pixbuf.NChannels + 0, 255);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                           x * _pixbuf.NChannels + 1, 255);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                           x * _pixbuf.NChannels + 2, 255);
-                  Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                           x * _pixbuf.NChannels + 3, 255);
-                }
-          }
-          set_points(new Point(0, 0), 
-                     new Point(_pixbuf.Width, 0),
-                     new Point(_pixbuf.Width, _pixbuf.Height), 
-                     new Point(0, _pixbuf.Height));
-    }
+				}
+			}
+			set_points (new Point (0, 0), 
+                     new Point (_pixbuf.Width, 0),
+                     new Point (_pixbuf.Width, _pixbuf.Height), 
+                     new Point (0, _pixbuf.Height));
+		}
 
-    public Picture(int width, int height, Color color) : this(true) {
-          // Colorspace, has_alpha, bits_per_sample, width, height:
-      _pixbuf = new Gdk.Pixbuf(new Gdk.Colorspace(), true, 8, width, height);
-      if (!_pixbuf.HasAlpha) {
-        _pixbuf = _pixbuf.AddAlpha(true, 0, 0, 0); // alpha color?
-      }
-      // WORKAROUND: image needs alpha set to zero (full opacity/no
-      // transparency). Might as well set default color, too:
-      for (int x=0; x < _pixbuf.Width; x++) {
-        for (int y=0; y < _pixbuf.Height; y++) {
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public Picture (int width, int height, Color color) : this(true)
+		{
+			// Colorspace, has_alpha, bits_per_sample, width, height:
+			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			// WORKAROUND: image needs alpha set to zero (full opacity/no
+			// transparency). Might as well set default color, too:
+			for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 0, (byte)color.red);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 1, (byte)color.green);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 2, (byte)color.blue);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 3, (byte)color.alpha);
-        }
-      }
-      set_points(new Point(0, 0), 
-                 new Point(_pixbuf.Width, 0),
-                 new Point(_pixbuf.Width, _pixbuf.Height), 
-                 new Point(0, _pixbuf.Height));
-    }
+				}
+			}
+			set_points (new Point (0, 0), 
+                 new Point (_pixbuf.Width, 0),
+                 new Point (_pixbuf.Width, _pixbuf.Height), 
+                 new Point (0, _pixbuf.Height));
+		}
 
-    public Picture getRegion(IList iterable, int width, int height, double degrees) {
-      Point p = new Point(iterable);
-      Picture pic = new Picture(width, height);
-      double angle = degrees * Math.PI/180.0;
-      double px, py;
-      int ox = 0;
-      for (int x = -width/2; x < width/2; x++) {
-        int oy = 0;
-        for (int y = -height/2; y < height/2; y++) {
-          // rotate that x,y:
-          px = x * Math.Cos(angle) - y * Math.Sin(angle);
-          py = x * Math.Sin(angle) + y * Math.Cos(angle);
-          // set the color of the new image from the offset of this:
-          pic.setColor(ox, oy, this.getPixel((int)(p.x + px), 
-                                             (int)(p.y + py)).getColor());
-          oy += 1;
-        }
-        ox += 1;
-      }
-      return pic;
-    }
+		public Picture getRegion (IList iterable, int width, int height, double degrees)
+		{
+			Point p = new Point (iterable);
+			Picture pic = new Picture (width, height);
+			double angle = degrees * Math.PI / 180.0;
+			double px, py;
+			int ox = 0;
+			for (int x = -width/2; x < width/2; x++) {
+				int oy = 0;
+				for (int y = -height/2; y < height/2; y++) {
+					// rotate that x,y:
+					px = x * Math.Cos (angle) - y * Math.Sin (angle);
+					py = x * Math.Sin (angle) + y * Math.Cos (angle);
+					// set the color of the new image from the offset of this:
+					pic.setColor (ox, oy, this.getPixel ((int)(p.x + px), 
+                                             (int)(p.y + py)).getColor ());
+					oy += 1;
+				}
+				ox += 1;
+			}
+			return pic;
+		}
 
-    public Picture getRegion(IList iterable, int width, int height) {
-      Point p = new Point(iterable);
-      Picture pic = new Picture(width, height);
-      for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-          pic.setColor(x, y, this.getPixel((int)(p.x + x), 
-					   (int)(p.y + y)).getColor());
-        }
-      }
-      return pic;
-    }
+		public Picture getRegion (IList iterable, int width, int height)
+		{
+			Point p = new Point (iterable);
+			Picture pic = new Picture (width, height);
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					pic.setColor (x, y, this.getPixel ((int)(p.x + x), 
+					   (int)(p.y + y)).getColor ());
+				}
+			}
+			return pic;
+		}
 
-    public void setRegion(IList iterable, Picture picture) {
-      // FIXME: better way would use Context to draw the image onto
-      // another image. Also, consider making this pic.draw(picture)
-      // This doesn't respect the color pallette of picture.
-      Point p = new Point(iterable);
-      for (int x = 0; x < picture.width; x++) {
-        for (int y = 0; y < picture.height; y++) {
-	  Color c1 = this.getPixel((int)(p.x + x), 
-				   (int)(p.y + y)).getColor();
-	  Color c2 = picture.getPixel((int)(x), 
-				      (int)(y)).getColor();
-	  int t2 = c2.alpha;
-	  int t1 = Math.Max(Math.Min(255 - t2, 255), 0);
-          this.setColor((int)(p.x + x), 
+		public void setRegion (IList iterable, Picture picture)
+		{
+			// FIXME: better way would use Context to draw the image onto
+			// another image. Also, consider making this pic.draw(picture)
+			// This doesn't respect the color pallette of picture.
+			Point p = new Point (iterable);
+			for (int x = 0; x < picture.width; x++) {
+				for (int y = 0; y < picture.height; y++) {
+					Color c1 = this.getPixel ((int)(p.x + x), 
+				   (int)(p.y + y)).getColor ();
+					Color c2 = picture.getPixel ((int)(x), 
+				      (int)(y)).getColor ();
+					int t2 = c2.alpha;
+					int t1 = Math.Max (Math.Min (255 - t2, 255), 0);
+					this.setColor ((int)(p.x + x), 
 			(int)(p.y + y), 
-			new Color(t1 * c1.red + t2 * c2.red,
+			new Color (t1 * c1.red + t2 * c2.red,
 				  t1 * c1.green + t2 * c2.green,
 				  t1 * c1.blue + t2 * c2.blue));
-	}
-      }
-    }
+				}
+			}
+		}
 
-    public void setRegion(IList iterable, int width, int height, double degrees,
-                          Picture picture) {
-      Point p = new Point(iterable);
-      double angle = degrees * Math.PI/180.0;
-      double px, py;
-      int tx, ty;
-      for (int x = -width/2; x < width/2; x++) {
-        for (int y = -height/2; y < height/2; y++) {
-          // rotate that x,y:
-          px = x * Math.Cos(angle) - y * Math.Sin(angle);
-          py = x * Math.Sin(angle) + y * Math.Cos(angle);
-          // set the color of the new image from the offset of this:
-          tx = (int)(p.x + px);
-          ty = (int)(p.y + py);
-          this.getPixel(tx, ty).setColor(color);
-          // FIXME: a lame way to not skip any pixels:
-          // Need a region fill algorithm
-          if ((int)px + 1 < width/2) {
-            this.getPixel(tx + 1, ty).setColor(color);
-            if ((int)py + 1 < height/2) {
-              this.getPixel(tx + 1, ty + 1).setColor(color);
-              this.getPixel(tx, ty + 1).setColor(color);
-            }
-          } else {
-            if ((int)py + 1 < height/2) {
-              this.getPixel(tx, ty + 1).setColor(picture.getColor(x + width/2, 
-								  y + height/2));
-            }
-          }
-        }
-      }
-    }
+		public void setRegion (IList iterable, int width, int height, double degrees,
+                          Picture picture)
+		{
+			Point p = new Point (iterable);
+			double angle = degrees * Math.PI / 180.0;
+			double px, py;
+			int tx, ty;
+			for (int x = -width/2; x < width/2; x++) {
+				for (int y = -height/2; y < height/2; y++) {
+					// rotate that x,y:
+					px = x * Math.Cos (angle) - y * Math.Sin (angle);
+					py = x * Math.Sin (angle) + y * Math.Cos (angle);
+					// set the color of the new image from the offset of this:
+					tx = (int)(p.x + px);
+					ty = (int)(p.y + py);
+					this.getPixel (tx, ty).setColor (color);
+					// FIXME: a lame way to not skip any pixels:
+					// Need a region fill algorithm
+					if ((int)px + 1 < width / 2) {
+						this.getPixel (tx + 1, ty).setColor (color);
+						if ((int)py + 1 < height / 2) {
+							this.getPixel (tx + 1, ty + 1).setColor (color);
+							this.getPixel (tx, ty + 1).setColor (color);
+						}
+					} else {
+						if ((int)py + 1 < height / 2) {
+							this.getPixel (tx, ty + 1).setColor (picture.getColor (x + width / 2, 
+								  y + height / 2));
+						}
+					}
+				}
+			}
+		}
 
-    public void setRegion(IList iterable, int width, int height, double degrees,
-                          Color color) {
-      Point p = new Point(iterable);
-      double angle = degrees * Math.PI/180.0;
-      double px, py;
-      int tx, ty;
-      for (int x = -width/2; x < width/2; x++) {
-        for (int y = -height/2; y < height/2; y++) {
-          // rotate that x,y:
-          px = x * Math.Cos(angle) - y * Math.Sin(angle);
-          py = x * Math.Sin(angle) + y * Math.Cos(angle);
-          // set the color of the new image from the offset of this:
-          tx = (int)(p.x + px);
-          ty = (int)(p.y + py);
-          this.getPixel(tx, ty).setColor(color);
-          // FIXME: a lame way to not skip any pixels:
-          // Need a region fill algorithm
-          if ((int)px + 1 < width/2) {
-            this.getPixel(tx + 1, ty).setColor(color);
-            if ((int)py + 1 < height/2) {
-              this.getPixel(tx + 1, ty + 1).setColor(color);
-              this.getPixel(tx, ty + 1).setColor(color);
-            }
-          } else {
-            if ((int)py + 1 < height/2) {
-              this.getPixel(tx, ty + 1).setColor(color);
-            }
-          }
-        }
-      }
-    }
+		public void setRegion (IList iterable, int width, int height, double degrees,
+                          Color color)
+		{
+			Point p = new Point (iterable);
+			double angle = degrees * Math.PI / 180.0;
+			double px, py;
+			int tx, ty;
+			for (int x = -width/2; x < width/2; x++) {
+				for (int y = -height/2; y < height/2; y++) {
+					// rotate that x,y:
+					px = x * Math.Cos (angle) - y * Math.Sin (angle);
+					py = x * Math.Sin (angle) + y * Math.Cos (angle);
+					// set the color of the new image from the offset of this:
+					tx = (int)(p.x + px);
+					ty = (int)(p.y + py);
+					this.getPixel (tx, ty).setColor (color);
+					// FIXME: a lame way to not skip any pixels:
+					// Need a region fill algorithm
+					if ((int)px + 1 < width / 2) {
+						this.getPixel (tx + 1, ty).setColor (color);
+						if ((int)py + 1 < height / 2) {
+							this.getPixel (tx + 1, ty + 1).setColor (color);
+							this.getPixel (tx, ty + 1).setColor (color);
+						}
+					} else {
+						if ((int)py + 1 < height / 2) {
+							this.getPixel (tx, ty + 1).setColor (color);
+						}
+					}
+				}
+			}
+		}
     
-    public Gdk.Pixbuf getPixbuf()
-    {
-      return _pixbuf;
-    }
+		public Gdk.Pixbuf getPixbuf ()
+		{
+			return _pixbuf;
+		}
 
-    public int getWidth() {
-        return _pixbuf.Width;
-    }
+		public int getWidth ()
+		{
+			return _pixbuf.Width;
+		}
 
-    public int getHeight() {
-        return _pixbuf.Height;
-    }
+		public int getHeight ()
+		{
+			return _pixbuf.Height;
+		}
 
-    public void savePicture(string filename) {
-      // png, and jpg
-      String format;
-      if (filename.Substring(filename.Length - 3, 3) == "png") {
-       format = "png";
-      } else if (filename.Substring(filename.Length - 3, 3) == "jpg") {
-       format = "jpeg";
-      } else if (filename.Substring(filename.Length - 3, 3) == "gif") {
-       //format = "png";
-       // FIXME: use LibGif
-       throw new Exception("not implemented yet; use jpg or png");
-      } else {
-       //format = "png";
-       throw new Exception("unknown image type; use jpg or png");
-      }
-      _pixbuf.Save(filename, format);
-    }
+		public void savePicture (string filename)
+		{
+			// png, and jpg
+			String format;
+			if (filename.Substring (filename.Length - 3, 3) == "png") {
+				format = "png";
+			} else if (filename.Substring (filename.Length - 3, 3) == "jpg") {
+				format = "jpeg";
+			} else if (filename.Substring (filename.Length - 3, 3) == "gif") {
+				//format = "png";
+				// FIXME: use LibGif
+				throw new Exception ("not implemented yet; use jpg or png");
+			} else {
+				//format = "png";
+				throw new Exception ("unknown image type; use jpg or png");
+			}
+			_pixbuf.Save (filename, format);
+		}
     
-    public Pixel getPixel(int x, int y) {
-      return new Pixel(this, x, y);
-    }
+		public Pixel getPixel (int x, int y)
+		{
+			return new Pixel (this, x, y);
+		}
     
-    public void setPixel(int x, int y, Color color) {
-      int red = color.red;
-      int green = color.green;
-      int blue = color.blue;
-      int alpha = color.alpha;
-      this.setRGBA(x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
-    }
+		public void setPixel (int x, int y, Color color)
+		{
+			int red = color.red;
+			int green = color.green;
+			int blue = color.blue;
+			int alpha = color.alpha;
+			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+		}
 
-    public void setPixel(int x, int y, Pixel pixel) {
-      int red = pixel.getRed();
-      int green = pixel.getGreen();
-      int blue = pixel.getBlue();
-      int alpha = pixel.getAlpha();
-      this.setRGBA(x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
-    }
+		public void setPixel (int x, int y, Pixel pixel)
+		{
+			int red = pixel.getRed ();
+			int green = pixel.getGreen ();
+			int blue = pixel.getBlue ();
+			int alpha = pixel.getAlpha ();
+			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+		}
 
-    public IEnumerable getPixels() {
-          for (int x=0; x < width; x++) {
-            for (int y=0; y < height; y++) {
-                  yield return getPixel(x, y);
-            }
-          }
-    }
+		public IEnumerable getPixels ()
+		{
+			for (int x=0; x < width; x++) {
+				for (int y=0; y < height; y++) {
+					yield return getPixel(x, y);
+				}
+			}
+		}
 
-    public void setPixels(Picture picture) {
-          for (int x=0; x < width; x++) {
-            for (int y=0; y < height; y++) {
-              setPixel(x, y, picture.getPixel(x, y));
-            }
-          }
-    }
+		public void setPixels (Picture picture)
+		{
+			for (int x=0; x < width; x++) {
+				for (int y=0; y < height; y++) {
+					setPixel (x, y, picture.getPixel (x, y));
+				}
+			}
+		}
 
-    public Color getColor(int x, int y) {
-      // red, green, blue, alpha
-      Color temp = new Color(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
-      temp.picture = this;
-      temp.x = x;
-      temp.y = y;
-      return temp;
-    }
+		public Color getColor (int x, int y)
+		{
+			// red, green, blue, alpha
+			Color temp = new Color (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
+			temp.picture = this;
+			temp.x = x;
+			temp.y = y;
+			return temp;
+		}
     
-    public PythonTuple getRGB(int x, int y) {
-      // red, green, blue, alpha
-      return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y));
-    }
+		public PythonTuple getRGB (int x, int y)
+		{
+			// red, green, blue, alpha
+			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y));
+		}
     
-        public PythonTuple getRGBA(int x, int y) {
-          // red, green, blue, alpha
-          return PyTuple(getRed(x, y), getGreen(x, y), getBlue(x, y), getAlpha(x, y));
-        }
+		public PythonTuple getRGBA (int x, int y)
+		{
+			// red, green, blue, alpha
+			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
+		}
 
-    internal int wrap_width(int x) {
-      if (x < 0)
-        return wrap_width((int)(width + x));
-      else if (x >= width)
-        return wrap_width((int)(x - width));
-      else
-        return x;
-    }
+		internal int wrap_width (int x)
+		{
+			if (x < 0)
+				return wrap_width ((int)(width + x));
+			else if (x >= width)
+				return wrap_width ((int)(x - width));
+			else
+				return x;
+		}
 
-    internal int wrap_height(int y) {
-      if (y < 0)
-        return wrap_height((int)(height + y));
-      else if (y >= height)
-        return wrap_height((int)(y - height));
-      else
-        return y;
-    }
+		internal int wrap_height (int y)
+		{
+			if (y < 0)
+				return wrap_height ((int)(height + y));
+			else if (y >= height)
+				return wrap_height ((int)(y - height));
+			else
+				return y;
+		}
 
-    public int getGray(int x, int y) {
-          // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      int r = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public int getGray (int x, int y)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			int r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 0);
-      int g = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			int g = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 1);
-      int b = Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			int b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 2);
-      return (int)(((double)(r + g + b))/3.0);
-        }
+			return (int)(((double)(r + g + b)) / 3.0);
+		}
     
-        public int getRed(int x, int y) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public int getRed (int x, int y)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                   x * _pixbuf.NChannels + 0);
-        }
+		}
     
-        public int getGreen(int x, int y) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public int getGreen (int x, int y)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                   x * _pixbuf.NChannels + 1);
-        }
+		}
     
-        public int getBlue(int x, int y) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public int getBlue (int x, int y)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                   x * _pixbuf.NChannels + 2);
-        }
+		}
     
-        public int getAlpha(int x, int y) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          return Marshal.ReadByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public int getAlpha (int x, int y)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                   x * _pixbuf.NChannels + 3);
-        }
+		}
     
-    public void setColor(int x, int y, Color color) {
-      // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setColor (int x, int y, Color color)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                         x * _pixbuf.NChannels + 0, (byte)color.red);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                         x * _pixbuf.NChannels + 1, (byte)color.green);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                         x * _pixbuf.NChannels + 2, (byte)color.blue);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                         x * _pixbuf.NChannels + 3, (byte)color.alpha);
-      QueueDraw();
-    }
+			QueueDraw ();
+		}
 
-    public void setGray(int x, int y, byte value) {
-          // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setGray (int x, int y, byte value)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 0, value);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 1, value);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 2, value);
-      QueueDraw();
-        }
+			QueueDraw ();
+		}
     
-    public void setRed(int x, int y, byte value) {
-      // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setRed (int x, int y, byte value)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                 x * _pixbuf.NChannels + 0, value);
-      QueueDraw();
-    }
+			QueueDraw ();
+		}
 
-        public void setGreen(int x, int y, byte value) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setGreen (int x, int y, byte value)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 1, value);
-          QueueDraw();
-        }
+			QueueDraw ();
+		}
 
-    public void setBlue(int x, int y, byte value) {
-          // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setBlue (int x, int y, byte value)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 2, value);
-      QueueDraw();
-        }
+			QueueDraw ();
+		}
     
-        public void setAlpha(int x, int y, byte value) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setAlpha (int x, int y, byte value)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 3, value);
-          QueueDraw();
-        }
+			QueueDraw ();
+		}
 
-    public void setRGB(int x, int y, byte red, byte green, byte blue) {
-          // red, green, blue, alpha
-      x = wrap_width(x);
-      y = wrap_height(y);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setRGB (int x, int y, byte red, byte green, byte blue)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 0, red);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 1, green);
-      Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 2, blue);
-      QueueDraw();
-        }
+			QueueDraw ();
+		}
     
-        public void setRGBA(int x, int y, byte red, byte green, byte blue, 
-                            byte alpha) {
-          // red, green, blue, alpha
-          x = wrap_width(x);
-          y = wrap_height(y);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+		public void setRGBA (int x, int y, byte red, byte green, byte blue, 
+                            byte alpha)
+		{
+			// red, green, blue, alpha
+			x = wrap_width (x);
+			y = wrap_height (y);
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 0, red);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 1, green);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 2, blue);
-          Marshal.WriteByte(_pixbuf.Pixels, y * _pixbuf.Rowstride +
+			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                   x * _pixbuf.NChannels + 3, alpha);
-          QueueDraw();
-        }
+			QueueDraw ();
+		}
 
-    public override Color fill {
+		public override Color fill {
         // operate on picture
-        get {
-            return _fill;
-        }
-        set {
-            value.picture = this;
-        }
-    }
+			get {
+				return _fill;
+			}
+			set {
+				value.picture = this;
+			}
+		}
 
-        public override void render(Cairo.Context g) { // picture
-	  if (!visible) return;
-          g.Save();
-          Point temp = screen_coord(center);
-          g.Translate(temp.x, temp.y);
-          g.Rotate(_rotation);
-          g.Scale(_scaleFactor, _scaleFactor);
-          Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, -_pixbuf.Width/2, -_pixbuf.Height/2);
-          g.Paint();
-          g.LineWidth = border;
-          g.MoveTo(-_pixbuf.Width/2, -_pixbuf.Height/2);
-          if (_outline != null) {
-            g.LineTo(_pixbuf.Width/2, -_pixbuf.Height/2);
-            g.LineTo(_pixbuf.Width/2, _pixbuf.Height/2);
-            g.LineTo(-_pixbuf.Width/2, _pixbuf.Height/2);
-            g.ClosePath();
-            g.Color = _outline._cairo;
-          }
-          g.Stroke();
-          foreach (Shape shape in shapes) {
-            shape.render(g);
-            shape.updateGlobalPosition(g);
-          }
-          g.Restore();
-          if (has_pen)
-            pen.render(g);
-        }
+		public override void render (Cairo.Context g)
+		{ // picture
+			if (!visible)
+				return;
+			g.Save ();
+			Point temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			Gdk.CairoHelper.SetSourcePixbuf (g, _pixbuf, -_pixbuf.Width / 2, -_pixbuf.Height / 2);
+			g.Paint ();
+			g.LineWidth = border;
+			g.MoveTo (-_pixbuf.Width / 2, -_pixbuf.Height / 2);
+			if (_outline != null) {
+				g.LineTo (_pixbuf.Width / 2, -_pixbuf.Height / 2);
+				g.LineTo (_pixbuf.Width / 2, _pixbuf.Height / 2);
+				g.LineTo (-_pixbuf.Width / 2, _pixbuf.Height / 2);
+				g.ClosePath ();
+				g.Color = _outline._cairo;
+			}
+			g.Stroke ();
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			if (has_pen)
+				pen.render (g);
+		}
     
-    public int width {
-      get {
-        //return (int)(_pixbuf.Width*_scaleFactor);
-                return _pixbuf.Width;
-      }
-    }
-    public int height {
-      get {
-        //return (int)(_pixbuf.Height*_scaleFactor);
-        return _pixbuf.Height;
-      }
-    }
+		public int width {
+			get {
+				//return (int)(_pixbuf.Width*_scaleFactor);
+				return _pixbuf.Width;
+			}
+		}
 
-    public Pixel [] get_pixels() {
-          return new Pixel[10];
-    }
+		public int height {
+			get {
+				//return (int)(_pixbuf.Height*_scaleFactor);
+				return _pixbuf.Height;
+			}
+		}
 
-    public override string ToString() {
-          return String.Format("<Picture (width={0}, height={1})>", width, height);
-    }
+		public Pixel [] get_pixels ()
+		{
+			return new Pixel[10];
+		}
 
-  } // -- end of Picture class
+		public override string ToString ()
+		{
+			return String.Format ("<Picture (width={0}, height={1})>", width, height);
+		}
+
+	} // -- end of Picture class
 
 
-  private static double currentTime() {
-    System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime(1970,1,1);
-    return t.TotalSeconds;
-  }
+	private static double currentTime ()
+	{
+		System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime (1970, 1, 1);
+		return t.TotalSeconds;
+	}
 
-  public class Button : Gtk.Button {
-    public double _x, _y;
-    public WindowClass window;
+	public class Button : Gtk.Button
+	{
+		public double _x, _y;
+		public WindowClass window;
     
-    public Button(IList iterable, string label) : base(label) {
-      _x = System.Convert.ToDouble(iterable[0]);
-      _y = System.Convert.ToDouble(iterable[1]);
-    }
+		public Button (IList iterable, string label) : base(label)
+		{
+			_x = System.Convert.ToDouble (iterable [0]);
+			_y = System.Convert.ToDouble (iterable [1]);
+		}
     
-    public double x
-    {
-      get
-	{
-	  return _x;
+		public double x {
+			get {
+				return _x;
+			}
+			set {
+				moveTo (value, _y);
+				window.QueueDraw ();
+			}
+		}
+
+		public double y {
+			get {
+				return _y;
+			}
+			set {
+				moveTo (_x, value);
+				window.QueueDraw ();
+			}
+		}
+
+		public void moveTo (object x, object y)
+		{
+			_x = System.Convert.ToDouble (x);
+			_y = System.Convert.ToDouble (y);
+			// FIXME: actually move it
+		}
+
+		public void draw (WindowClass win)
+		{ // button
+			window = win;
+			Invoke (delegate {
+				Show ();
+				window.getCanvas ().Put (this, (int)_x, (int)_y);
+				window.QueueDraw ();
+			});
+		}
+
+		public void connect (string signal, Func<object,Event,object> function)
+		{
+			Clicked += delegate(object obj, System.EventArgs args) {
+				Event evt = new Event ("click", Graphics.currentTime ());
+				try {
+					Invoke (delegate {
+						function (obj, evt);
+					});
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in connected function");
+					Console.Error.WriteLine (e.Message);
+				}        
+			};
+		}
 	}
-      set
+
+	public class HSlider : Gtk.HScale
 	{
-	  moveTo(value, _y);
-	  window.QueueDraw();
-	}
-    }
-
-    public double y
-    {
-      get
-	{
-	  return _y;
-	}
-      set
-	{
-	  moveTo(_x, value);
-	  window.QueueDraw();
-	}
-    }
-
-    public void moveTo(object x, object y) {
-      _x = System.Convert.ToDouble(x);
-      _y = System.Convert.ToDouble(y);
-      // FIXME: actually move it
-    }
-
-    public void draw(WindowClass win) { // button
-      window = win;
-      Invoke( delegate {
-	  Show();
-	  window.getCanvas().Put(this, (int)_x, (int)_y);
-	  window.QueueDraw();
-	});
-    }
-
-    public void connect(string signal, Func<object,Event,object> function) {
-      Clicked += delegate(object obj, System.EventArgs args) {
-            Event evt = new Event("click", Graphics.currentTime());
-	    try {
-	      Invoke( delegate {
-		  function(obj, evt);
-		});
-	    } catch (Exception e) {
-	      Console.Error.WriteLine("Error in connected function");
-	      Console.Error.WriteLine(e.Message);
-	    }        
-       };
-    }
-  }
-
-  public class HSlider : Gtk.HScale {
-    public WindowClass window;
-    public double _width;
-    public double _x, _y;
+		public WindowClass window;
+		public double _width;
+		public double _x, _y;
     
-    public HSlider(IList iterable, object width) : 
-      base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0)) {
-      UpdatePolicy = Gtk.UpdateType.Continuous;
-      Digits = 0;
-      ValuePos = Gtk.PositionType.Top;
-      DrawValue = true;    
-      this.width = System.Convert.ToDouble(width);
-      _x = System.Convert.ToDouble(iterable[0]);
-      _y = System.Convert.ToDouble(iterable[1]);
-    }
+		public HSlider (IList iterable, object width) : 
+      base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+		{
+			UpdatePolicy = Gtk.UpdateType.Continuous;
+			Digits = 0;
+			ValuePos = Gtk.PositionType.Top;
+			DrawValue = true;    
+			this.width = System.Convert.ToDouble (width);
+			_x = System.Convert.ToDouble (iterable [0]);
+			_y = System.Convert.ToDouble (iterable [1]);
+		}
     
-    public double x
-    {
-      get
-	{
-	  return _x;
-	}
-      set
-	{
-	  moveTo(value, _y);
-	  window.QueueDraw();
-	}
-    }
+		public double x {
+			get {
+				return _x;
+			}
+			set {
+				moveTo (value, _y);
+				window.QueueDraw ();
+			}
+		}
 
-    public double y
-    {
-      get
-	{
-	  return _y;
-	}
-      set
-	{
-	  moveTo(_x, value);
-	  window.QueueDraw();
-	}
-    }
+		public double y {
+			get {
+				return _y;
+			}
+			set {
+				moveTo (_x, value);
+				window.QueueDraw ();
+			}
+		}
 
-    public double width
-    {
-      get
-	{
-	  return _width;
+		public double width {
+			get {
+				return _width;
+			}
+			set {
+				_width = value;
+				SetSizeRequest ((int)_width, -1);
+			}
+		}
+
+		public void moveTo (object x, object y)
+		{
+			_x = System.Convert.ToDouble (x);
+			_y = System.Convert.ToDouble (y);
+			// FIXME: actually move it
+		}
+
+		public void draw (WindowClass win)
+		{ // hslider
+			window = win;
+			Invoke (delegate {
+				Show ();
+				window.getCanvas ().Put (this, (int)_x, (int)_y);
+				window.QueueDraw ();
+			});
+		}
+
+		public void connect (string signal, Func<object,Event,object> function)
+		{
+			if (signal.Equals ("change-value")) {
+				ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
+					Event evt = new Event (signal, (object)Value, Graphics.currentTime ());
+					try {
+						Invoke (delegate {
+							function (obj, evt);
+						});
+					} catch (Exception e) {
+						Console.Error.WriteLine ("Error in connected function");
+						Console.Error.WriteLine (e.Message);
+					}        
+				};
+			} else {
+				throw new Exception ("invalid signal for this object");
+			}
+		}
 	}
-      set
-	{
-	  _width = value;
-	  SetSizeRequest((int)_width, -1);
-	}
-    }
-
-    public void moveTo(object x, object y) {
-      _x = System.Convert.ToDouble(x);
-      _y = System.Convert.ToDouble(y);
-      // FIXME: actually move it
-    }
-
-    public void draw(WindowClass win) { // hslider
-      window = win;
-      Invoke( delegate {
-	  Show();
-	  window.getCanvas().Put(this, (int)_x, (int)_y);
-	  window.QueueDraw();
-	});
-    }
-
-    public void connect(string signal, Func<object,Event,object> function) {
-      if (signal.Equals("change-value")) {
-	ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
-             Event evt = new Event(signal, (object)Value, Graphics.currentTime());
-        	    try {
-        	      Invoke( delegate {
-        		  function(obj, evt);
-        		});
-        	    } catch (Exception e) {
-        	      Console.Error.WriteLine("Error in connected function");
-        	      Console.Error.WriteLine(e.Message);
-        	    }        
-        };
-      } else {
-	throw new Exception("invalid signal for this object");
-      }
-    }
-  }
   
-  public class Rectangle : Shape {
-    public Rectangle(IList iterable1, IList iterable2) : base(true) {
-      set_points(new Point(iterable1[0], iterable1[1]),
-		 new Point(iterable2[0], iterable1[1]),
-		 new Point(iterable2[0], iterable2[1]),
-		 new Point(iterable1[0], iterable2[1]));
-    }
+	public class Rectangle : Shape
+	{
+		public Rectangle (IList iterable1, IList iterable2) : base(true)
+		{
+			set_points (new Point (iterable1 [0], iterable1 [1]),
+		 new Point (iterable2 [0], iterable1 [1]),
+		 new Point (iterable2 [0], iterable2 [1]),
+		 new Point (iterable1 [0], iterable2 [1]));
+		}
     
-    public double width {
-        get { return points[2].x - points[0].x;}
-    }
-    public double height {
-        get { return points[2].y - points[0].y;}
-    }
+		public double width {
+			get { return points [2].x - points [0].x;}
+		}
 
-    public override void addToPhysics() { // Rectangle
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateRectangle(
+		public double height {
+			get { return points [2].y - points [0].y;}
+		}
+
+		public override void addToPhysics ()
+		{ // Rectangle
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
                  world,
-                 (float)(width / MeterInPixels),   // radius in meters
-                 (float)(height / MeterInPixels),  // radius in meters
-                 _density,                         // density
+                 (float)(width / MeterInPixels), // radius in meters
+                 (float)(height / MeterInPixels), // radius in meters
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
-  }
+			// Give it some bounce and friction
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
+	}
 
-  public class RoundedRectangle : Shape {
-    public double radius = 0.0;
-    public RoundedRectangle(IList iterable1, IList iterable2, double radius) : base(true) {
-      set_points(new Point(iterable1[0], iterable1[1]),
-                 new Point(iterable2[0], iterable1[1]),
-                 new Point(iterable2[0], iterable2[1]),
-                 new Point(iterable1[0], iterable2[1]));
-      this.radius = radius;
-    }
+	public class RoundedRectangle : Shape
+	{
+		public double radius = 0.0;
+
+		public RoundedRectangle (IList iterable1, IList iterable2, double radius) : base(true)
+		{
+			set_points (new Point (iterable1 [0], iterable1 [1]),
+                 new Point (iterable2 [0], iterable1 [1]),
+                 new Point (iterable2 [0], iterable2 [1]),
+                 new Point (iterable1 [0], iterable2 [1]));
+			this.radius = radius;
+		}
     
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      // draws rectangles with rounded (circular arc) corners 
-      g.Save();
-      Point temp = screen_coord(center);
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      if (points != null) {
-        g.LineWidth = border;
-        double top = points[0].y + radius;
-        double bottom = points[2].y - radius;
-        double left = points[0].x + radius;
-        double right = points[2].x - radius;
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			// draws rectangles with rounded (circular arc) corners 
+			g.Save ();
+			Point temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			if (points != null) {
+				g.LineWidth = border;
+				double top = points [0].y + radius;
+				double bottom = points [2].y - radius;
+				double left = points [0].x + radius;
+				double right = points [2].x - radius;
 
-        //g.MoveTo(p1.x, p2.y);
-        g.Arc(left, top, radius, .50 * (Math.PI * 2.0), .75 * (Math.PI * 2.0));
-        g.Arc(right, top, radius, .75 * (Math.PI * 2.0), 1.0 * (Math.PI * 2.0));
-        g.Arc(right, bottom, radius, 1.0 * (Math.PI * 2.0), .25 * (Math.PI * 2.0));
-        g.Arc(left, bottom, radius, .25 * (Math.PI * 2.0), .50 * (Math.PI * 2.0));
+				//g.MoveTo(p1.x, p2.y);
+				g.Arc (left, top, radius, .50 * (Math.PI * 2.0), .75 * (Math.PI * 2.0));
+				g.Arc (right, top, radius, .75 * (Math.PI * 2.0), 1.0 * (Math.PI * 2.0));
+				g.Arc (right, bottom, radius, 1.0 * (Math.PI * 2.0), .25 * (Math.PI * 2.0));
+				g.Arc (left, bottom, radius, .25 * (Math.PI * 2.0), .50 * (Math.PI * 2.0));
 
-        g.ClosePath();
-        if (_fill != null) {
-          g.Color = _fill._cairo;
-          g.FillPreserve();
-        }
-        if (_outline != null) {
-          g.Color = _outline._cairo;
-          g.Stroke();
-        }
-        foreach (Shape shape in shapes) {
-          shape.render(g);
-          shape.updateGlobalPosition(g);
-        }
-        g.Restore();
-        if (has_pen)
-          pen.render(g);
-      }
-    }
-  }
+				g.ClosePath ();
+				if (_fill != null) {
+					g.Color = _fill._cairo;
+					g.FillPreserve ();
+				}
+				if (_outline != null) {
+					g.Color = _outline._cairo;
+					g.Stroke ();
+				}
+				foreach (Shape shape in shapes) {
+					shape.render (g);
+					shape.updateGlobalPosition (g);
+				}
+				g.Restore ();
+				if (has_pen)
+					pen.render (g);
+			}
+		}
+	}
 
-  public class Polygon : Shape {
+	public class Polygon : Shape
+	{
 
-    public Polygon(Line line) : this(line.points) {
-      center = line.center;
-    }
+		public Polygon (Line line) : this(line.points)
+		{
+			center = line.center;
+		}
     
-    public Polygon(params object [] points) : base(true) {
-      Point [] temp = new Point [points.Length];
-      int count = 0;
-      foreach (object o in points) {
-        if (o is Point)
-          temp[count] = (Point)o ;
-        else if (o is IList) {
-          IList i = (IList)o;
-          temp[count] = new Point(i[0], i[1]);
-        } else {
-          throw new Exception("Polygon: can't convert arg to a point");
-        }
-        count++;
-      }
-      set_points(temp);
-    }
+		public Polygon (params object [] points) : base(true)
+		{
+			Point [] temp = new Point [points.Length];
+			int count = 0;
+			foreach (object o in points) {
+				if (o is Point)
+					temp [count] = (Point)o;
+				else if (o is IList) {
+					IList i = (IList)o;
+					temp [count] = new Point (i [0], i [1]);
+				} else {
+					throw new Exception ("Polygon: can't convert arg to a point");
+				}
+				count++;
+			}
+			set_points (temp);
+		}
 
-    public override void addToPhysics() { // Polygon
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices();
-      // Position is absolute:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      // Points should be relative to position:
-      foreach (Point point in points) {
-        vertices.Add( new Vector2((float)((point.x)/MeterInPixels), 
-                                  (float)((point.y)/MeterInPixels)) );
-      }
-      body = FarseerPhysics.Factories.BodyFactory.CreatePolygon(
+		public override void addToPhysics ()
+		{ // Polygon
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices ();
+			// Position is absolute:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			// Points should be relative to position:
+			foreach (Point point in points) {
+				vertices.Add (new Vector2 ((float)((point.x) / MeterInPixels), 
+                                  (float)((point.y) / MeterInPixels)));
+			}
+			body = FarseerPhysics.Factories.BodyFactory.CreatePolygon (
                  world,
-                 vertices,           
+                 vertices, 
                  _density,
                  position);
-      // Give it some bounce and friction
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
-  }
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
+	}
 
-  public class Dot : Shape {
-    public Dot(int x, int y) : base(true) {
-      set_points(new Point(x,y));
-    }
+	public class Dot : Shape
+	{
+		public Dot (int x, int y) : base(true)
+		{
+			set_points (new Point (x, y));
+		}
 
-    public Dot(double x, double y) : base(true) {
-      set_points(new Point(x,y));
-    }
+		public Dot (double x, double y) : base(true)
+		{
+			set_points (new Point (x, y));
+		}
 
-    public Dot(IList iterable) : base(true) {
-      set_points(new Point(iterable));
-    }
+		public Dot (IList iterable) : base(true)
+		{
+			set_points (new Point (iterable));
+		}
     
-    public Dot(Dot dot) : base(true) {
-      set_points(new Point(dot.x, dot.y));
-    }
+		public Dot (Dot dot) : base(true)
+		{
+			set_points (new Point (dot.x, dot.y));
+		}
         
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      Point temp = screen_coord(center);
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      if (points != null) {
-        g.LineWidth = border;
-        temp = screen_coord(points[0]);
-        g.MoveTo(temp.x, temp.y);
-        g.LineTo(temp.x + 1, temp.y + 1);
-        g.ClosePath();
-        g.Stroke();
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-      if (has_pen)
-        pen.render(g);
-    }
-  }
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			Point temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			if (points != null) {
+				g.LineWidth = border;
+				temp = screen_coord (points [0]);
+				g.MoveTo (temp.x, temp.y);
+				g.LineTo (temp.x + 1, temp.y + 1);
+				g.ClosePath ();
+				g.Stroke ();
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			if (has_pen)
+				pen.render (g);
+		}
+	}
 
-  public class Circle : Shape {
-    int _radius;
-    public int radius {
-      get {
-        return _radius;
-      }
-      set {
-        _radius = value;
-        QueueDraw();
-      }
-    }
+	public class Circle : Shape
+	{
+		int _radius;
 
-    public Circle(IList iterable, int radius) : base(true) {
-      set_points(new Point(iterable));
-      _radius = radius;
-    }
+		public int radius {
+			get {
+				return _radius;
+			}
+			set {
+				_radius = value;
+				QueueDraw ();
+			}
+		}
 
-    public override void addToPhysics() { // Circle
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		public Circle (IList iterable, int radius) : base(true)
+		{
+			set_points (new Point (iterable));
+			_radius = radius;
+		}
+
+		public override void addToPhysics ()
+		{ // Circle
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateCircle (
                  world,
-                 radius / MeterInPixels,           // radius in meters
-                 _density,                         // density
+                 radius / MeterInPixels, // radius in meters
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
 
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      // Center is in global screen coords, whatever they are
-      Point temp = screen_coord(center);
-      // Temp is in Gtk coordinate system
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      // Now move to 0,0 as origin of shape
-      temp = screen_coord(points[0]);
-      g.LineWidth = border;
-      g.Arc(temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
-      g.ClosePath();
-      if (gradient != null) {
-        Cairo.Gradient pat;
-        if (gradient.gtype == "linear")
-          pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			// Center is in global screen coords, whatever they are
+			Point temp = screen_coord (center);
+			// Temp is in Gtk coordinate system
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			// Now move to 0,0 as origin of shape
+			temp = screen_coord (points [0]);
+			g.LineWidth = border;
+			g.Arc (temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
+			g.ClosePath ();
+			if (gradient != null) {
+				Cairo.Gradient pat;
+				if (gradient.gtype == "linear")
+					pat = new Cairo.LinearGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.p2.x, 
                                          gradient.p2.y);
-        else
-          pat = new Cairo.RadialGradient(gradient.p1.x,
+				else
+					pat = new Cairo.RadialGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.radius1,
                                          gradient.p2.x, 
                                          gradient.p2.y,
                                          gradient.radius2);
         
-        pat.AddColorStop (0, gradient.c1.getCairo());
-        pat.AddColorStop (1, gradient.c2.getCairo());
-        g.Pattern = pat;
-        g.FillPreserve();
-      } else if (_fill != null) {
-        g.Color = _fill._cairo;
-        g.FillPreserve();
-      }
-      if (_outline != null) {
-        g.Color = _outline._cairo;
-        g.Stroke();
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-    }
-  }
+				pat.AddColorStop (0, gradient.c1.getCairo ());
+				pat.AddColorStop (1, gradient.c2.getCairo ());
+				g.Pattern = pat;
+				g.FillPreserve ();
+			} else if (_fill != null) {
+				g.Color = _fill._cairo;
+				g.FillPreserve ();
+			}
+			if (_outline != null) {
+				g.Color = _outline._cairo;
+				g.Stroke ();
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+		}
+	}
 
-  public class Oval : Shape {
-    int _xRadius;
-    int _yRadius;
+	public class Oval : Shape
+	{
+		int _xRadius;
+		int _yRadius;
     
-    public int xRadius {
-      get {
-        return _xRadius;
-      }
-      set {
-        _xRadius = value;
-        QueueDraw();
-      }
-    }
+		public int xRadius {
+			get {
+				return _xRadius;
+			}
+			set {
+				_xRadius = value;
+				QueueDraw ();
+			}
+		}
     
-    public int yRadius {
-      get {
-        return _yRadius;
-      }
-      set {
-        _yRadius = value;
-        QueueDraw();
-      }
-    }
+		public int yRadius {
+			get {
+				return _yRadius;
+			}
+			set {
+				_yRadius = value;
+				QueueDraw ();
+			}
+		}
 
-    public Oval(IList iterable, int xRadius, int yRadius) : base(true) {
-      set_points(new Point(iterable));
-      _xRadius = xRadius;
-      _yRadius = yRadius;
-    }
+		public Oval (IList iterable, int xRadius, int yRadius) : base(true)
+		{
+			set_points (new Point (iterable));
+			_xRadius = xRadius;
+			_yRadius = yRadius;
+		}
     
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      // Center is in global screen coords, whatever they are
-      Point temp = screen_coord(center);
-      // Temp is in Gtk coordinate system
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      // Now, turn into an Oval:
-      g.Scale(1.0, ((double)_yRadius)/((double)_xRadius));
-      // Now move to 0,0 as origin of shape
-      temp = screen_coord(points[0]);
-      g.LineWidth = border;
-      g.Arc(temp.x, temp.y, _xRadius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
-      g.ClosePath();
-      if (gradient != null) {
-        Cairo.Gradient pat;
-        if (gradient.gtype == "linear")
-          pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			// Center is in global screen coords, whatever they are
+			Point temp = screen_coord (center);
+			// Temp is in Gtk coordinate system
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			// Now, turn into an Oval:
+			g.Scale (1.0, ((double)_yRadius) / ((double)_xRadius));
+			// Now move to 0,0 as origin of shape
+			temp = screen_coord (points [0]);
+			g.LineWidth = border;
+			g.Arc (temp.x, temp.y, _xRadius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
+			g.ClosePath ();
+			if (gradient != null) {
+				Cairo.Gradient pat;
+				if (gradient.gtype == "linear")
+					pat = new Cairo.LinearGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.p2.x, 
                                          gradient.p2.y);
-        else
-          pat = new Cairo.RadialGradient(gradient.p1.x,
+				else
+					pat = new Cairo.RadialGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.radius1,
                                          gradient.p2.x, 
                                          gradient.p2.y,
                                          gradient.radius2);
         
-        pat.AddColorStop (0, gradient.c1.getCairo());
-        pat.AddColorStop (1, gradient.c2.getCairo());
-        g.Pattern = pat;
-        g.FillPreserve();
-      } else if (_fill != null) {
-        g.Color = _fill._cairo;
-        g.FillPreserve();
-      }
-      if (_outline != null) {
-        g.Color = _outline._cairo;
-        g.Stroke();
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Stroke();
-      g.Restore();
-    }
+				pat.AddColorStop (0, gradient.c1.getCairo ());
+				pat.AddColorStop (1, gradient.c2.getCairo ());
+				g.Pattern = pat;
+				g.FillPreserve ();
+			} else if (_fill != null) {
+				g.Color = _fill._cairo;
+				g.FillPreserve ();
+			}
+			if (_outline != null) {
+				g.Color = _outline._cairo;
+				g.Stroke ();
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Stroke ();
+			g.Restore ();
+		}
 
-    public override void addToPhysics() { // Circle
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateEllipse(
+		public override void addToPhysics ()
+		{ // Circle
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateEllipse (
                  world,
-                 xRadius / MeterInPixels,           // x radius in meters
-                 yRadius / MeterInPixels,           // y radius in meters
+                 xRadius / MeterInPixels, // x radius in meters
+                 yRadius / MeterInPixels, // y radius in meters
                  20,
-                 _density,                         // density
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
-  }
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
+	}
 
-  public class Pie : Shape {
-    int _radius;
-    double _start;
-    double _stop;
+	public class Pie : Shape
+	{
+		int _radius;
+		double _start;
+		double _stop;
 
-    public Pie(IList iterable, int radius, double start, double stop) : base(true) {
-      set_points(new Point(iterable));
-      _radius = radius;
-      _start = start;
-      _stop = stop;
-    }
+		public Pie (IList iterable, int radius, double start, double stop) : base(true)
+		{
+			set_points (new Point (iterable));
+			_radius = radius;
+			_start = start;
+			_stop = stop;
+		}
 
-    public override void addToPhysics() { // Circle
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		public override void addToPhysics ()
+		{ // Circle
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateCircle (
                  world,
-                 radius / MeterInPixels,           // radius in meters
-                 _density,                         // density
+                 radius / MeterInPixels, // radius in meters
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
 
-    /*
+		/*
     public override void addToPhysics() { // Pie
       world = window._canvas.world;
       float MeterInPixels = 64.0f;
@@ -4235,266 +4599,527 @@ public static class Graphics {
     }
     */
 
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      // Center is in global screen coords, whatever they are
-      Point temp = screen_coord(center);
-      // Temp is in Gtk coordinate system
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      // Now move to 0,0 as origin of shape
-      temp = screen_coord(points[0]);
-      g.LineWidth = border;
-      double tstart = start * (Math.PI) / 180.0;
-      double tstop = stop * (Math.PI) / 180.0;
-      g.MoveTo(temp.x, temp.y);
-      g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
-      g.ClosePath();
-      if (gradient != null) {
-        Cairo.Gradient pat;
-        if (gradient.gtype == "linear")
-          pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			// Center is in global screen coords, whatever they are
+			Point temp = screen_coord (center);
+			// Temp is in Gtk coordinate system
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			// Now move to 0,0 as origin of shape
+			temp = screen_coord (points [0]);
+			g.LineWidth = border;
+			double tstart = start * (Math.PI) / 180.0;
+			double tstop = stop * (Math.PI) / 180.0;
+			g.MoveTo (temp.x, temp.y);
+			g.Arc (temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
+			g.ClosePath ();
+			if (gradient != null) {
+				Cairo.Gradient pat;
+				if (gradient.gtype == "linear")
+					pat = new Cairo.LinearGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.p2.x, 
                                          gradient.p2.y);
-        else
-          pat = new Cairo.RadialGradient(gradient.p1.x,
+				else
+					pat = new Cairo.RadialGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.radius1,
                                          gradient.p2.x, 
                                          gradient.p2.y,
                                          gradient.radius2);
         
-        pat.AddColorStop (0, gradient.c1.getCairo());
-        pat.AddColorStop (1, gradient.c2.getCairo());
-        g.Pattern = pat;
-        g.FillPreserve();
-      } else if (_fill != null) {
-        g.Color = _fill._cairo;
-        g.FillPreserve();
-      }
-      if (_outline != null) {
-        g.Color = _outline._cairo;
-        g.Stroke();
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-    }
+				pat.AddColorStop (0, gradient.c1.getCairo ());
+				pat.AddColorStop (1, gradient.c2.getCairo ());
+				g.Pattern = pat;
+				g.FillPreserve ();
+			} else if (_fill != null) {
+				g.Color = _fill._cairo;
+				g.FillPreserve ();
+			}
+			if (_outline != null) {
+				g.Color = _outline._cairo;
+				g.Stroke ();
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+		}
 
-    public int radius {
-      get {
-        return _radius;
-      }
-      set {
-        _radius = value;
-        QueueDraw();
-      }
-    }
+		public int radius {
+			get {
+				return _radius;
+			}
+			set {
+				_radius = value;
+				QueueDraw ();
+			}
+		}
 
-    public double start {
-      get {
-        return _start;
-      }
-      set {
-        _start = value;
-        QueueDraw();
-      }
-    }
+		public double start {
+			get {
+				return _start;
+			}
+			set {
+				_start = value;
+				QueueDraw ();
+			}
+		}
 
-    public double stop {
-      get {
-        return _stop;
-      }
-      set {
-        _stop = value;
-        QueueDraw();
-      }
-    }
-  }
+		public double stop {
+			get {
+				return _stop;
+			}
+			set {
+				_stop = value;
+				QueueDraw ();
+			}
+		}
+	}
 
-  public class Arc : Shape {
-    int _radius;
-    double _start;
-    double _stop;
+	public class Arc : Shape
+	{
+		int _radius;
+		double _start;
+		double _stop;
 
-    public Arc(IList iterable, int radius, double start, double stop) 
-    : base(true) {
-      set_points(new Point(iterable));
-      fill = null;
-      _radius = radius;
-      _start = start;
-      _stop = stop;
-    }
+		public Arc (IList iterable, int radius, double start, double stop) 
+    : base(true)
+		{
+			set_points (new Point (iterable));
+			fill = null;
+			_radius = radius;
+			_start = start;
+			_stop = stop;
+		}
 
-    public override void addToPhysics() { // Circle
-      world = window._canvas.world;
-      float MeterInPixels = 64.0f;
-      // from x,y to meters of window
-      // arbitrary:
-      Vector2 position = new Vector2(((float)x)/MeterInPixels, 
-                                     ((float)y)/MeterInPixels);
-      body = FarseerPhysics.Factories.BodyFactory.CreateCircle(
+		public override void addToPhysics ()
+		{ // Circle
+			world = window._canvas.world;
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+                                     ((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateCircle (
                  world,
-                 radius / MeterInPixels,           // radius in meters
-                 _density,                         // density
+                 radius / MeterInPixels, // radius in meters
+                 _density, // density
                  position);                        // center
-      // Give it some bounce and friction
-      body.BodyType = _bodyType;
-      body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-      body.Restitution = _bounce;
-      body.Rotation = (float)_rotation;
-      body.Friction = _friction;
-      body.UserData = this; // point back to this shape
-      body.FixtureList[0].UserData = this; // point back to this shape
-    }
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		}
 
-    public override void render(Cairo.Context g) {
-      if (!visible) return;
-      g.Save();
-      // Center is in global screen coords, whatever they are
-      Point temp = screen_coord(center);
-      // Temp is in Gtk coordinate system
-      g.Translate(temp.x, temp.y);
-      g.Rotate(_rotation);
-      g.Scale(_scaleFactor, _scaleFactor);
-      // Now move to 0,0 as origin of shape
-      temp = screen_coord(points[0]);
-      g.LineWidth = border;
-      double tstart = start * (Math.PI) / 180.0;
-      double tstop = stop * (Math.PI) / 180.0;
-      g.Arc(temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
-      if (gradient != null) {
-        Cairo.Gradient pat;
-        if (gradient.gtype == "linear")
-          pat = new Cairo.LinearGradient(gradient.p1.x,
+		public override void render (Cairo.Context g)
+		{
+			if (!visible)
+				return;
+			g.Save ();
+			// Center is in global screen coords, whatever they are
+			Point temp = screen_coord (center);
+			// Temp is in Gtk coordinate system
+			g.Translate (temp.x, temp.y);
+			g.Rotate (_rotation);
+			g.Scale (_scaleFactor, _scaleFactor);
+			// Now move to 0,0 as origin of shape
+			temp = screen_coord (points [0]);
+			g.LineWidth = border;
+			double tstart = start * (Math.PI) / 180.0;
+			double tstop = stop * (Math.PI) / 180.0;
+			g.Arc (temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
+			if (gradient != null) {
+				Cairo.Gradient pat;
+				if (gradient.gtype == "linear")
+					pat = new Cairo.LinearGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.p2.x, 
                                          gradient.p2.y);
-        else
-          pat = new Cairo.RadialGradient(gradient.p1.x,
+				else
+					pat = new Cairo.RadialGradient (gradient.p1.x,
                                          gradient.p1.y, 
                                          gradient.radius1,
                                          gradient.p2.x, 
                                          gradient.p2.y,
                                          gradient.radius2);
         
-        pat.AddColorStop (0, gradient.c1.getCairo());
-        pat.AddColorStop (1, gradient.c2.getCairo());
-        g.Pattern = pat;
-        g.FillPreserve();
-      } else if (_fill != null) {
-        g.Color = _fill._cairo;
-        g.FillPreserve();
-      }
-      if (_outline != null) {
-        g.Color = _outline._cairo;
-        g.Stroke();
-      }
-      foreach (Shape shape in shapes) {
-        shape.render(g);
-        shape.updateGlobalPosition(g);
-      }
-      g.Restore();
-    }
+				pat.AddColorStop (0, gradient.c1.getCairo ());
+				pat.AddColorStop (1, gradient.c2.getCairo ());
+				g.Pattern = pat;
+				g.FillPreserve ();
+			} else if (_fill != null) {
+				g.Color = _fill._cairo;
+				g.FillPreserve ();
+			}
+			if (_outline != null) {
+				g.Color = _outline._cairo;
+				g.Stroke ();
+			}
+			foreach (Shape shape in shapes) {
+				shape.render (g);
+				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+		}
 
-    public int radius {
-      get {
-        return _radius;
-      }
-      set {
-        _radius = value;
-        QueueDraw();
-      }
-    }
+		public int radius {
+			get {
+				return _radius;
+			}
+			set {
+				_radius = value;
+				QueueDraw ();
+			}
+		}
 
-    public double start {
-      get {
-        return _start;
-      }
-      set {
-        _start = value;
-        QueueDraw();
-      }
-    }
+		public double start {
+			get {
+				return _start;
+			}
+			set {
+				_start = value;
+				QueueDraw ();
+			}
+		}
 
-    public double stop {
-      get {
-        return _stop;
-      }
-      set {
-        _stop = value;
-        QueueDraw();
-      }
-    }
-  }
+		public double stop {
+			get {
+				return _stop;
+			}
+			set {
+				_stop = value;
+				QueueDraw ();
+			}
+		}
+	}
 
-  public class Frame : Shape {
-    public Frame(int x, int y)
-    {
-      set_points(new Point(x, y));
-    }
-    public Frame(IList iterable)
-    {
-      set_points(new Point(iterable));
-    }
-  }
+	public class Frame : Shape
+	{
+		public Frame (int x, int y)
+		{
+			set_points (new Point (x, y));
+		}
+
+		public Frame (IList iterable)
+		{
+			set_points (new Point (iterable));
+		}
+	}
+
+	public class Graph
+	{
+		public static double graph_count = 1;
+		public Graphics.WindowClass window = null;
+		public Dictionary<string,Dictionary<string,Shape>> vertices = new Dictionary<string,Dictionary<string,Shape>> ();
+		public Dictionary<string,Dictionary<string,object>> edges = new Dictionary<string, Dictionary<string,object>> ();
+		public Dictionary<string,object> options = new Dictionary<string, object> {
+			{"default_shape", "circle"},
+			{"default_outline", "black"},
+			{"fill", "white"},
+			{"line_type", "curve"},
+		};
+		Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
+		Graphviz4Net.Dot.DotGraph<string> graph = null;
+		double scale = 1.0;
+		
+		public Graph ()
+		{
+		}
+
+		Point translate(double x, double y) {
+        	return new Point(x * scale + window.width/2 - graph.Width/ 2 * scale,
+                			(graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
+		}
+		
+		public void load (string contents)
+		{
+			parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser ();
+			graph = parser.Parse (contents);
+		}
+
+		public void draw(WindowClass window) {
+			this.window = window;
+			draw();
+		}
+
+		public void draw(WindowClass window, IDictionary options) {
+			this.window = window;
+			draw(options);
+		}
+
+		public void draw(IDictionary options) {
+			foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
+				this.options[kvp.Key.ToString()] = kvp.Value;
+			}
+			draw();
+		}
+		
+		public void draw() {
+			if (window == null) {
+				string label;
+				if (options.ContainsKey("label")) {
+                	label = (string)options["label"];
+				} else if (graph.Attributes.ContainsKey("label")) {
+                	label = graph.Attributes["label"].Trim().Split('\n')[0].Trim();
+				} else {
+                	label = String.Format("Graph #{0}", Graph.graph_count);
+					Graph.graph_count++;
+				}
+				int width, height;
+				if (options.ContainsKey("width")) {
+					width = (int)options["width"];
+				} else {
+					width = (int)graph.Width;
+				}
+				if (options.ContainsKey("height")) {
+					height = (int)options["height"];
+				} else {
+					height = (int)graph.Height;
+				}
+				window = Graphics.Window(label, width, height);
+			}
+			if (options.ContainsKey("scale")) {
+            	scale = (double)options["scale"];
+			} else {
+            	scale = Math.Min(window.width/(double)graph.Width, window.height/(double)graph.Height) * .95;
+			}
+	        foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
+	            if (v.Position == null) {
+	                continue;
+				}
+	            Point c = translate(((System.Windows.Point)v.Position).X, ((System.Windows.Point)v.Position).Y);
+	            int width = (int)(((double)v.Width) * 72 * scale);
+				int height = (int)(((double)v.Height) * 72 * scale);
+				string shape;
+				if (options.ContainsKey("shape")) {
+	                shape = (string)options["shape"];
+				} else if (v.Attributes.ContainsKey("shape")) {
+	                shape = v.Attributes["shape"];
+				} else {
+	                shape = (string)options["default_shape"];
+				}
+				Graphics.Color outline;
+				if (options.ContainsKey("outline")) {
+	                outline = new Graphics.Color((string)options["outline"]);
+				} else if  (v.Attributes.ContainsKey("color")) {
+	                outline = new Graphics.Color(v.Attributes["color"]);
+				} else {
+	                outline = new Graphics.Color((string)options["default_outline"]);
+				}
+	            // Shapes:
+				Shape obj1 = null;
+				Shape obj2 = null;
+	            if (shape == "circle" || shape == "ellipse") {
+	                obj1 = new Graphics.Oval(c, width/2, height/2);
+				} else if (shape == "doublecircle") {
+	                obj1 = new Graphics.Oval(c, width/2, height/2);
+	                obj2 = new Graphics.Oval(c, width/2 - 4, height/2 - 4);
+				} else if (shape == "box") {
+	                obj1 = new Graphics.Rectangle(new Point(c.x - width/2, c.y - height/2),
+	                                          	  new Point(c.x + width/2, c.y + height/2));
+	            //elif shape == "diamond":
+				} else {
+	                throw new Exception(String.Format("unknown shape: {0}", shape));
+				}
+	            if (obj1 != null) {
+	                obj1.outline = new Graphics.Color(outline);
+	                obj1.fill = new Graphics.Color((string)options["fill"]);
+	                obj1.border = 2;
+	                obj1.draw(window);
+				}
+	            if (obj2 != null) {
+	                obj2.outline = new Graphics.Color(outline);
+	                obj2.fill = new Graphics.Color((string)options["fill"]);
+	                obj2.border = 2;
+	                obj2.draw(window);
+				}
+	            // Text:
+				string label;
+	            if (v.Attributes.ContainsKey("label")) {
+	                label = v.Attributes["label"].Trim();
+				} else {
+	                label = v.Id.Trim();
+				}
+	            if (label.Contains("|")) {
+	                string [] labels = label.Split('|');
+	                int parts = labels.Length;
+	                for (int divider = 0; divider < labels.Length - 1; divider++) {
+	                    double x1 = c.x - width/2 + (divider + 1) * width/parts;
+	                    double y1 = c.y - height/2;
+	                    double x2 = x1;
+	                    double y2 = c.y + height/2;
+	                    Line line = new Graphics.Line(new Point(x1, y1), new Point(x2, y2));
+	                    line.outline = new Graphics.Color("black");
+	                    line.draw(window);
+					}
+	                label = labels[1].Trim(); // FIXME: should draw each part
+				}
+	            Graphics.Text text = new Graphics.Text(c, label);
+	            text.fontSize = 10 * scale;
+	            text.color = new Graphics.Color("black");
+	            text.draw(window);
+	            vertices[label] = new Dictionary<string,Shape>();
+	            if (obj1 != null && obj2 != null) {
+	                vertices[label]["shape"] = new Graphics.Group(obj1, obj2);
+				} else {
+	                vertices[label]["shape"] = obj1;
+				}
+	            vertices[label]["label"] = text;
+			}
+	        int count = 0;
+	        foreach(Graphviz4Net.Dot.DotEdge<string> e in graph.Edges) {
+				string index;
+	            if (e.LabelPos != null) {
+	                index = e.Label.Trim();
+				} else {
+	                index = count.ToString();
+				}
+	            edges[index] = new Dictionary<string,object>();
+	            edges[index]["line"] = new List<Shape>();
+				List<Point> points = new List<Point>();
+				foreach(System.Windows.Point p in e.Path) {
+	            	points.Add(new Graphics.Point(translate(p.X, p.Y)));
+				}
+				string color;
+	            if (e.Attributes.ContainsKey("color")) {
+	                color = e.Attributes["color"];
+				} else {
+	                color = "black";
+				}
+	            // Line:
+	            if ((string)options["line_type"] == "curve") {
+	                for (int i = 0; i < points.Count/3; i++) {
+	                    int j = i * 3;
+	                    Curve line = new Graphics.Curve(points[j], points[j + 1], points[j + 2], points[j + 3]);
+	                    line.outline = new Graphics.Color(color);
+	                    line.border = 2;
+	                    line.draw(window);
+	                    ((List<Shape>)edges[index]["line"]).Add(line);
+					}
+				} else {
+	                Line line = new Graphics.Line(points[0], points[points.Count - 1]);
+	                line.outline = new Graphics.Color(color);
+	                line.border = 2;
+	                line.draw(window);
+	                ((List<Shape>)edges[index]["line"]).Add(line);
+				}
+				// Arrows:
+		        double w;
+				double h;
+	           	if (e.SourceArrowEnd != null) {
+	                Arrow arrow = new Graphics.Arrow(points[0]);
+	                if ((string)options["line_type"] == "curve") {
+	                    w = points[0].x - points[1].x;
+	                    h = points[0].y - points[1].y;
+					} else {
+	                    w = points[0].x - points[points.Count - 1].x;
+	                    h = points[0].y - points[points.Count - 1].y;
+					}
+	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
+	                arrow.fill = new Graphics.Color(color);
+	                arrow.rotate(degrees);
+	                arrow.scale(scale);
+	                arrow.draw(window);
+	                edges[index]["source_arrow"] = arrow;
+				}
+	            if (e.DestinationArrowEnd != null) {
+	                Arrow arrow = new Graphics.Arrow(points[points.Count - 1]);
+	                if ((string)options["line_type"] == "curve") { // FIXME: these may be backwards:
+	                    w = points[points.Count - 2].x - points[points.Count - 1].x;
+	                    h = points[points.Count - 2].y - points[points.Count - 1].y;
+					} else {
+	                    w = points[0].x - points[points.Count - 1].x;
+	                    h = points[0].y - points[points.Count - 1].y;
+					}
+	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
+	                arrow.fill = new Graphics.Color(color);
+	                arrow.rotate(degrees);
+	                arrow.scale(scale);
+	                arrow.draw(window);
+	                edges[index]["destination_arrow"] = arrow;
+				}
+	            if (e.LabelPos != null) {
+	                Point p = translate(((System.Windows.Point)e.LabelPos).X, 
+										((System.Windows.Point)e.LabelPos).Y);
+	                Text text = new Graphics.Text(p, e.Label);
+	                text.fontSize = 10 * scale;
+	                text.color = new Graphics.Color("black");
+	                text.draw(window);
+	                edges[index]["label"] = text;
+				}
+	            count++;
+			}
+		}
+	}
+
+	public class Group : Shape
+	{
     
-  public class Group {
+		public List<Shape> items = new List<Shape> ();
+		public string mode = "individual"; // squadron or individual
     
-    public List<Shape> items = new List<Shape>();
-    public string mode = "individual"; // squadron or individual
-    public Point center = new Point(0,0);
+		public Group (params Shape [] shapes) : base(false)
+		{
+			foreach (Shape shape in shapes) {
+				items.Add (shape);
+			}
+			center = new Point (0, 0);
+		}
     
-    public Group(params Shape [] shapes) {
-      foreach (Shape shape in shapes) {
-        items.Add(shape);
-      }
-    }
+		public override void rotate (double degrees)
+		{
+			// rotate group
+			if (mode == "individual") {
+				foreach (Shape shape in items) {
+					shape.rotate (degrees);
+				}
+			} else {
+				// find center of screen positions
+				double x = 0, y = 0;
+				foreach (Shape shape in items) {
+					x += shape.center.x;
+					y += shape.center.y;
+				}
+				center.x = x / (items.Count);
+				center.y = y / (items.Count);
+				// rotate them
+				foreach (Shape shape in items) {
+					shape.rotate (degrees);
+				}
+			}
+		}
     
-    public void rotate(double degrees) {
-      // rotate group
-      if (mode == "individual") {
-        foreach (Shape shape in items) {
-          shape.rotate(degrees);
-        }
-      } else {
-        // find center of screen positions
-        double x = 0, y = 0;
-        foreach (Shape shape in items) {
-          x += shape.center.x;
-          y += shape.center.y;
-        }
-        center.x = x/(items.Count);
-        center.y = y/(items.Count);
-        // rotate them
-        foreach (Shape shape in items) {
-          shape.rotate(degrees);
-        }
-      }
-    }
+		public override void rotateTo (double degrees)
+		{
+			foreach (Shape shape in items) {
+				shape.rotateTo (degrees);
+			}
+		}
     
-    public void rotateTo(double degrees) {
-      foreach (Shape shape in items) {
-        shape.rotateTo(degrees);
-      }
-    }
+		public override void moveTo (double x, double y)
+		{
+			foreach (Shape shape in items) {
+				shape.moveTo (x, y);
+			}
+		}
     
-    public void moveTo(int x, int y) {
-      foreach (Shape shape in items) {
-        shape.moveTo(x, y);
-      }
-    }
-    
-    public void move(int x, int y) {
-      foreach (Shape shape in items) {
-        shape.move(x, y);
-      }
-    }
-  }
+		public override void move (double x, double y)
+		{
+			foreach (Shape shape in items) {
+				shape.move (x, y);
+			}
+		}
+	}
 }
 

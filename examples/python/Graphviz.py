@@ -1,193 +1,4 @@
-import System
 import Graphics
-import Graphviz4Net
-
-class Graph:
-    count = 1
-
-    def __init__(self):
-        self.vertices = {}
-        self.edges = {}
-
-    def load(self, contents):
-        self.parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter[str].GetParser()
-        self.graph = self.parser.Parse(contents)
-
-    def translate(self, x, y):
-        return (x * self.scale + self.window.width/2 - self.graph.Width/ 2 * self.scale,
-                (self.graph.Height - y) * self.scale + self.window.height/2 - self.graph.Height/ 2 * self.scale)
-
-    def draw(self, window=None, defaults={}):
-        if window is None:
-            if ("label" in self.graph.Attributes.Keys):
-                label = self.graph.Attributes["label"].Split("\n")[0]
-            else:
-                label = "Graph #%d" % Graph.count
-                Graph.count += 1
-            if "width" in defaults:
-                width = defaults["width"]
-            else:
-                width = 300
-            if "height" in defaults:
-                height = defaults["height"]
-            else:
-                height = 300
-            self.window = Graphics.Window(label, max(width, self.graph.Width),
-                                                 max(height, self.graph.Height))
-        else:
-            self.window = window
-        self.scale = min(self.window.width/self.graph.Width, self.window.height/self.graph.Height) * .95
-        # Defaults
-        if "scale" in defaults:
-            self.scale = defaults["scale"]
-        else:
-            self.scale = min(self.window.width/self.graph.Width, self.window.height/self.graph.Height) * .95
-        if "shape" in defaults:
-            default_shape = defaults["shape"]
-        else:
-            default_shape = "circle"
-        if "fill" in defaults:
-            default_fill = defaults["fill"]
-        else:
-            default_fill = "white"
-        if "outline" in defaults:
-            default_outline = defaults["outline"]
-        else:
-            default_outline = "black"
-        if "line_type" in defaults:
-            line_type = defaults["line_type"]
-        else:
-            line_type = "curve"
-        ## Draw
-        obj1, obj2 = None, None
-        w, h = self.window.width, self.window.height
-        for v in self.graph.Vertices:
-            if v.Position is None:
-                continue
-            cx, cy = self.translate(v.Position.X, v.Position.Y)
-            width, height = v.Width * 72 * self.scale, v.Height * 72 * self.scale
-            if "shape" in v.Attributes.Keys:
-                shape = v.Attributes["shape"]
-            else:
-                shape = default_shape
-            if "color" in v.Attributes.Keys:
-                outline = Graphics.Color(v.Attributes["color"])
-            else:
-                outline = Graphics.Color(default_outline)
-            ## Shapes:
-            if shape == "circle" or shape == "ellipse":
-                obj1 = Graphics.Oval((cx, cy), width/2, height/2)
-            elif shape == "doublecircle":
-                obj1 = Graphics.Oval((cx, cy), width/2, height/2)
-                obj2 = Graphics.Oval((cx, cy), width/2 - 4, height/2 - 4)
-            elif shape == "box":
-                obj1 = Graphics.Rectangle((cx - width/2, cy - height/2),
-                                          (cx + width/2, cy + height/2))
-            #elif shape == "diamond":
-            else:
-                raise Exception("unknown shape: " + shape)
-            if obj1:
-                obj1.outline = Graphics.Color(outline)
-                obj1.fill = Graphics.Color(default_fill)
-                obj1.border = 2
-                obj1.draw(self.window)
-            if obj2:
-                obj2.outline = Graphics.Color(outline)
-                obj2.fill = Graphics.Color(default_fill)
-                obj2.border = 2
-                obj2.draw(self.window)
-            ## Text:
-            if "label" in v.Attributes.Keys:
-                label = v.Attributes["label"].Trim()
-            else:
-                label = v.Id.Trim()
-            if "|" in label:
-                labels = label.Split("|")
-                parts = len(labels)
-                for divider in range(parts - 1):
-                    x1 = cx - width/2 + (divider + 1) * width/parts
-                    y1 = cy - height/2
-                    x2 = x1
-                    y2 = cy + height/2
-                    line = Graphics.Line((x1, y1), (x2, y2))
-                    line.outline = Graphics.Color("black")
-                    line.draw(self.window)
-                label = labels[1].Trim() # FIXME: should draw each part
-            text = Graphics.Text((cx, cy), label)
-            text.fontSize = 10 * self.scale
-            text.color = Graphics.Color("black")
-            text.draw(self.window)
-            self.vertices[label] = {}
-            if obj1 and obj2:
-                self.vertices[label]["shape"] = Graphics.Group(obj1, obj2)
-            else:
-                self.vertices[label]["shape"] = obj1
-            self.vertices[label]["label"] = text
-
-        count = 0
-        for e in self.graph.Edges:
-            count += 1
-            if e.LabelPos:
-                index = e.Label.Trim()
-            else:
-                index = str(count)
-            self.edges[index] = {}
-            self.edges[index]["line"] = []
-            points = [Graphics.Point(self.translate(p.X, p.Y)) for p in e.Path]
-            if "color" in e.Attributes.Keys:
-                color = e.Attributes["color"]
-            else:
-                color = "black"
-            ## Line:
-            if line_type == "curve":
-                for i in range(int(len(points)/3)):
-                    j = i * 3
-                    line = Graphics.Curve(points[j], points[j + 1], points[j + 2], points[j + 3])
-                    line.outline = Graphics.Color(color)
-                    line.border = 2
-                    line.draw(self.window)
-                    self.edges[index]["line"].append(line)
-            else:
-                line = Graphics.Line(points[0], points[-1])
-                line.outline = Graphics.Color(color)
-                line.border = 2
-                line.draw(self.window)
-                self.edges[index]["line"].append(line)
-            if e.SourceArrowEnd:
-                arrow = Graphics.Arrow(points[0])
-                if line_type == "curve":
-                    w = points[0].x - points[1].x
-                    h = points[0].y - points[1].y
-                else:
-                    w = points[0].x - points[-1].x
-                    h = points[0].y - points[-1].y
-                degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90
-                arrow.fill = Graphics.Color(color)
-                arrow.rotate(degrees)
-                arrow.scale(self.scale)
-                arrow.draw(self.window)
-                self.edges[index]["source_arrow"] = arrow
-            if e.DestinationArrowEnd:
-                arrow = Graphics.Arrow(points[-1])
-                if line_type == "curve": # FIXME: these may be backwards:
-                    w = points[-2].x - points[-1].x
-                    h = points[-2].y - points[-1].y
-                else:
-                    w = points[0].x - points[-1].x
-                    h = points[0].y - points[-1].y
-                degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90
-                arrow.fill = Graphics.Color(color)
-                arrow.rotate(degrees)
-                arrow.scale(self.scale)
-                arrow.draw(self.window)
-                self.edges[index]["destination_arrow"] = arrow
-            if e.LabelPos:
-                x, y = self.translate(e.LabelPos.X, e.LabelPos.Y)
-                text = Graphics.Text((x, y), e.Label)
-                text.fontSize = 10 * self.scale
-                text.color = Graphics.Color("black")
-                text.draw(self.window)
-                self.edges[index]["label"] = text
 
 hello_world = """
 digraph {
@@ -353,13 +164,16 @@ tree = """digraph {
 """
 
 count = 1
-for content, defaults in [(hello_world, {"shape" : "circle", "scale": 1.0}),
-                          (fsm, {"shape":"doublecircle"}),
-                          (kennedys, {"shape": "circle", "width": 800}),
-                          (phil, {"shape":"box"}),
-                          (tree, {"shape" : "box", "line_type": "line"})]:
-    g = Graph()
+for content, options in [(hello_world, {"label": "Hello World",
+                                        "default_shape" : "circle",
+                                        }),
+                          (fsm, {"label": "Finite State Machine", "default_shape":"doublecircle"}),
+                          (kennedys, {"label": "Kennedys", "default_shape": "circle", "width": 800}),
+                          (phil, {"default_shape":"box"}),
+                          (tree, {"label": "Binary Tree", "default_shape" : "box", "line_type": "line"})]:
+    g = Graphics.Graph()
     g.load(content)
-    #win = Graphics.Window("Graph #%d" % count, 500, 500)
-    #count += 1
-    g.draw(defaults=defaults)
+    win = Graphics.Window("Graph #%d" % count, 500, 500)
+    win.mode = "physics"
+    count += 1
+    g.draw(win, options)
