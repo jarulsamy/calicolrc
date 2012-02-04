@@ -4829,8 +4829,8 @@ public static class Graphics
 			{"fill", "white"},
 			{"line_type", "curve"},
 		};
-		Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
-		Graphviz4Net.Dot.DotGraph<string> graph = null;
+		public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
+		public Graphviz4Net.Dot.DotGraph<string> graph = null;
 		double scale = 1.0;
 		
 		public Graph ()
