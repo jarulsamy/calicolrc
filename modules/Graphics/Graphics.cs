@@ -2789,6 +2789,21 @@ public static class Graphics {
     }
     public Arrow(IList iterable, double degrees) :  base(true) {
       set_points(new Point(  0,  0),
+		 new Point(  0, -5), 
+		 new Point(  11,  0),
+		 new Point(  0,  5) 
+		 );
+      center.x = System.Convert.ToDouble(iterable[0]);
+      center.y = System.Convert.ToDouble(iterable[1]);
+      rotate(degrees);
+    }
+  }
+  
+  public class Turtle : Shape {
+    public Turtle(IList iterable) :  this(iterable, 0) {
+    }
+    public Turtle(IList iterable, double degrees) :  base(true) {
+      set_points(new Point(  0,  0),
 		 new Point( -5, -5), 
 		 new Point(  5,  0),
 		 new Point( -5,  5) 

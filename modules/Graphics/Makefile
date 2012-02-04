@@ -2,22 +2,24 @@
 all: ../Graphics.dll ../Shapes.dll
 
 ../Graphics.dll: Graphics.cs
-	gmcs -sdk:4 -target:library Graphics.cs  \
+	MONO_PATH=../../bin gmcs -target:library \
+		Graphics.cs  \
 		-lib:../../bin \
 		-lib:../ \
+		-r:../../bin/Mono.Cairo.dll \
 		-r:IronPython \
 		-r:Microsoft.Dynamic \
 		-r:System.Drawing \
-		-r:Mono.Cairo \
 		-r:FarseerPhysics.dll \
 		-r:GifLib.dll \
 		-pkg:gtk-sharp-2.0 \
 		-out:../Graphics.dll 
 
 ../Shapes.dll: Shapes.cs Graphics.cs
-	gmcs -sdk:4 -target:library Shapes.cs  \
+	gmcs -target:library Shapes.cs  \
 		-lib:../../bin \
 		-lib:../ \
+		-r:../../bin/Mono.Cairo.dll \
 		-r:IronPython \
 		-r:Graphics \
 		-r:Microsoft.Dynamic \
@@ -27,20 +29,6 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:GifLib.dll \
 		-pkg:gtk-sharp-2.0 \
 		-out:../Shapes.dll 
-
-../Graphviz.dll: Graphviz.cs
-	gmcs -sdk:4 -target:library Graphviz.cs Graphics.cs  \
-		-lib:../../bin \
-		-lib:../ \
-		-r:IronPython \
-		-r:Microsoft.Dynamic \
-		-r:System.Drawing \
-		-r:Mono.Cairo \
-		-r:FarseerPhysics.dll \
-		-r:GifLib.dll \
-		-pkg:gtk-sharp-2.0 \
-		-out:../Graphviz.dll 
-
 
 clean::
 	rm -rf ../Graphics.dll ../Shapes.dll *~

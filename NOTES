@@ -29,8 +29,18 @@ Bugs
 
 Problems, issues, features, and questions.
 
-Debugging:
-MONO_LOG_LEVEL=debug calico --debug-handler
+== Graphviz ==
+
+Currently, the graphviz code doesn't parse node lines, so attributes
+about the shape of nodes is ignored. To fix, edit:
+
+modules/Graphics/Graphviz4Net.Core/Dot/AntlrParser/DotGrammar.g
+
+to add { AddNode(); } (see example like AddEdge).
+
+== Debugging ==
+
+MONO_LOG_LEVEL=debug calico --debug --debug-handler
 
 May need:
 
