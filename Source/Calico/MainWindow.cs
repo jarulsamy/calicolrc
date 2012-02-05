@@ -971,7 +971,7 @@ namespace Calico {
                         searchEntry.Entry.DeleteText(searchEntry.Entry.Text.Length - 1,
                                                      searchEntry.Entry.Text.Length);
                         if (CurrentDocument != null)
-                            CurrentDocument.SearchPrevious(searchEntry.Entry.Text);
+                            CurrentDocument.SearchMore(searchEntry.Entry.Text);
                     }
                     args.RetVal = true;
                 } else if (args.Event.Key == Gdk.Key.Return) {
