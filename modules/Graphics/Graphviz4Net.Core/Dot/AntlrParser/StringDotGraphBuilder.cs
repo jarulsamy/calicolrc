@@ -23,6 +23,10 @@ namespace Graphviz4Net.Dot.AntlrParser
         protected override DotVertex<string> GetVertex(string idStr)
         {
             DotVertex<string> result;
+			if (idStr.Contains(":")) {
+				string [] parts = idStr.Split(':');
+				idStr = parts[0];
+			}
             if (this.vertices.TryGetValue(idStr, out result))
             {
                 return result;

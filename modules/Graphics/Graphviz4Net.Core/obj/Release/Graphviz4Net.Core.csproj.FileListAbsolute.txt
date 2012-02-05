@@ -4,3 +4,8 @@ C:\Users\dblank\Desktop\graphviz4net_6424f3584097\src\Graphviz4Net.Core\bin\Rele
 C:\Users\dblank\Desktop\graphviz4net_6424f3584097\src\Graphviz4Net.Core\obj\Release\ResolveAssemblyReference.cache
 C:\Users\dblank\Desktop\graphviz4net_6424f3584097\src\Graphviz4Net.Core\obj\Release\Graphviz4Net.dll
 C:\Users\dblank\Desktop\graphviz4net_6424f3584097\src\Graphviz4Net.Core\obj\Release\Graphviz4Net.pdb
+C:\Users\dblank\Desktop\Calico\modules\Graphics\Graphviz4Net.Core\obj\Release\ResolveAssemblyReference.cache
+C:\Users\dblank\Desktop\Calico\modules\Graphics\Graphviz4Net.Core\obj\Release\Graphviz4Net.dll
+C:\Users\dblank\Desktop\Calico\modules\Graphics\Graphviz4Net.Core\obj\Release\Graphviz4Net.pdb
+C:\Users\dblank\Desktop\Calico\modules\Graphviz4Net.dll
+C:\Users\dblank\Desktop\Calico\modules\Graphviz4Net.pdb

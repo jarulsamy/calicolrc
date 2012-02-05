@@ -76,7 +76,7 @@ EDGE_OPERATOR_ARROW :	'->';
 
 // ids and attr values
 ALLOWED_QUOTED_VALUES : ('.')+ ;
-ID  :   (STR|NUMBER|'_')+ ;
+ID  :   (STR|NUMBER|'_'|':')+ ;
 fragment STR	: ('a'..'z'|'A'..'Z');
 fragment NUMBER : '0'..'9';
 
