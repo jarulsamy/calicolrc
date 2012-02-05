@@ -240,7 +240,13 @@ namespace Calico {
             //EnvironmentTabAction.Active = true;
             EnvironmentPage.Child.Hide();
             LocalsPage.Child.Hide();
+            HistoryPage.Child.Hide();
             history = new History((List<string>)this.config.values["shell"]["history"]);
+            ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of previous history]\n");
+            foreach(string text in (List<string>)this.config.values["shell"]["history"]) {
+                ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.Trim() + "\n");
+            }
+            ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of current history]\n");
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
@@ -274,6 +280,9 @@ namespace Calico {
         }
         public Gtk.Notebook.NotebookChild LocalsPage {
             get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]);}
+        }
+        public Gtk.Notebook.NotebookChild HistoryPage {
+            get { return (Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow4]);}
         }
         public Gtk.Notebook DocumentNotebook {
             get { return notebook_docs; }
@@ -1031,6 +1040,7 @@ namespace Calico {
                         // nothing to do, but handled
                     } else if (manager[CurrentLanguage].engine.ReadyToExecute(text)) {
                         history.last(text.TrimEnd());
+                        ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
                         history.add("");
                         ExecuteShell();
                         completion = null;
@@ -1374,6 +1384,7 @@ namespace Calico {
                     if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {
                         string text = (string)CurrentDocument.Selection;
                         history.last(text.TrimEnd());
+                        ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
                         history.add("");
                         Execute(text.TrimEnd(), CurrentLanguage);
                     } else { // run as a file, if something selected
@@ -1389,11 +1400,13 @@ namespace Calico {
                         OnStartRunning();
                         // If document handles running, it manages UI itself
                         CurrentDocument.ExecuteFileInBackground();
+                        ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Run file]\n");
                     }
                 }
             } else if (DocumentNotebook.Page == SHELL) {
                 string text = Shell.Document.Text;
                 history.last(text.TrimEnd());
+                ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
                 history.add("");
                 ExecuteShell();
             }
@@ -2034,5 +2047,15 @@ namespace Calico {
 
         }
 
+        protected void OnHistoryTabActionActivated (object sender, System.EventArgs e)
+        {
+            // show history tab if active
+            if (! HistoryTabAction.Active) {
+                HistoryPage.Child.Hide();
+            } else {
+                HistoryPage.Child.Show();
+                ToolNotebook.Page = 3;
+            }
+        }
     }
 }

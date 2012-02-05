@@ -34,7 +34,8 @@ using System.IO;
 // MemoryStream
 using System;
 
-using Microsoft.Xna.Framework;// Vector2, Matrix
+using Microsoft.Xna.Framework;
+using System.Diagnostics;// Vector2, Matrix
 
 public static class Graphics
 {
@@ -4816,7 +4817,55 @@ public static class Graphics
 			set_points (new Point (iterable));
 		}
 	}
-
+	
+	public class Node
+	{
+		public Graph graph;
+		public string name;
+		public string label;
+		public string shape;
+		
+		public Node(string name) {
+			this.name = name;
+		}
+		public Shape getShape() {
+			return graph.vertices[name]["shape"];
+		}
+	}
+	
+	public class Edge
+	{
+		public Graph graph;
+		public string label;
+		public Node nodeFrom;
+		public Node nodeTo;
+		public string recordFrom;
+		public string recordTo;
+		public string nameFrom;
+		public string nameTo;
+		
+		public Edge(string nameFrom, string recordFrom, Node nodeFrom, 
+					string nameTo, string recordTo, Node nodeTo) {
+			this.nameFrom = nameFrom;
+			this.recordFrom = recordFrom;
+			this.nodeFrom = nodeFrom;
+			this.nameTo = nameTo;
+			this.recordTo = recordTo;
+			this.nodeTo = nodeTo;
+		}
+		
+		public string getFromName() {
+			if (recordFrom != null)
+				return String.Format("{0}:{1}", nameFrom, recordFrom);
+			return nameFrom;
+		}
+		public string getToName() {
+			if (recordTo != null)
+				return String.Format("{0}:{1}", nameTo, recordTo);
+			return nameTo;
+		}
+	}
+	
 	public class Graph
 	{
 		public static double graph_count = 1;
@@ -4831,20 +4880,132 @@ public static class Graphics
 		};
 		public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
 		public Graphviz4Net.Dot.DotGraph<string> graph = null;
+		public Dictionary<string,Node> graphNodes = new Dictionary<string,Node>();
+		public List<Edge> graphEdges = new List<Edge>();
+		public string pre_text;
+		public string post_text;
 		double scale = 1.0;
 		
 		public Graph ()
 		{
+		}
+		
+		public void addNode(string name) {
+			graphNodes[name] = new Graphics.Node(name);
+			graphNodes[name].graph = this;
+		}
+		
+		public void addNode(Node node) {
+			graphNodes[node.name] = node;
+			graphNodes[node.name].graph = this;
+		}
+		
+		public Node lookupNode(string name) {
+			foreach(Node node in graphNodes.Values) {
+				if (node.name == name)
+					return node;
+			}
+			return null;
+		}
+		
+		public List<Shape> getEdgeLines(string id) {
+			return (List<Shape>)edges[id]["line"];
+		}
+
+		public void addEdge(string nameFrom, string nameTo) {
+			string recordFrom = null;
+			string recordTo = null;
+			if (nameFrom.Contains(":")) {
+				string [] parts = nameFrom.Split(':');
+				nameFrom = parts[0];
+				recordFrom = parts[1];
+			}
+			if (nameTo.Contains(":")) {
+				string [] parts = nameTo.Split(':');
+				nameTo = parts[0];
+				recordTo = parts[1];
+			}
+			Edge edge = new Edge(nameFrom, recordFrom, lookupNode(nameFrom), 
+						  		 nameTo, recordTo, lookupNode(nameTo));
+			graphEdges.Add(edge);
+			edge.graph = this;
 		}
 
 		Point translate(double x, double y) {
         	return new Point(x * scale + window.width/2 - graph.Width/ 2 * scale,
                 			(graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
 		}
+
+		public string recurseEdges(IList list) {
+			string edges = "";
+			if (list == null || list.Count == 0) {
+			} else {
+				if (list[0] != null) {
+					if (list[0] is IList  && ((IList)list[0]).Count == 3) {
+						edges += String.Format("  {0}:left -> {1};\n", list[1], ((IList)list[0])[1]);
+						edges += recurseEdges((IList)list[0]);
+					} else {
+						edges += String.Format("  {0}:left -> {1};\n", list[1], list[0]);
+					}
+				}
+				if (list[2] != null) {
+					if (list[2] is IList && ((IList)list[2]).Count == 3) {
+						edges += String.Format("  {0}:right -> {1};\n", list[1], ((IList)list[2])[1]);
+						edges += recurseEdges((IList)list[2]);
+					} else {
+						edges += String.Format("  {0}:right -> {1};\n", list[1], list[2]);
+					}
+				}
+			}
+			return edges;
+		}
 		
-		public void load (string contents)
+		public string recurseNodes(IList list) {
+			string nodes = "";
+			if (list != null && list.Count == 3) {
+				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[1].ToString());
+				if (list[0] is IList)
+					nodes += recurseNodes((IList)list[0]);
+				else
+					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[0].ToString());
+				if (list[2] is IList)
+					nodes += recurseNodes((IList)list[2]);
+				else
+					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[2].ToString());
+			}
+			return nodes;
+		}
+
+		public void layout(IList list) {
+			string edges = "digraph {\n";
+			edges += @"  node [label=""\\N"", shape=record];";
+			edges += "\n";
+			edges += recurseNodes(list);
+			edges += recurseEdges(list);
+			edges += "}";
+			layout(edges);
+		}
+		
+		public void layout() {
+			string edges = "digraph {\n";
+			foreach (Edge edge in graphEdges) {
+				edges += String.Format("{0} -> {1}\n", edge.getFromName(), edge.getToName());
+			}
+			edges += "}";
+			layout(edges);
+		}
+		
+		public void layout (string contents) {
+			layout(contents, true);
+		}
+
+		public void layout (string contents, bool process)
 		{
-			parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser ();
+			pre_text = contents; // for debugging
+			if (process)
+				contents = processDot(contents);
+			post_text = contents; // for debugging
+			parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser();
 			graph = parser.Parse (contents);
 		}
 
@@ -5061,11 +5222,64 @@ public static class Graphics
 	            count++;
 			}
 		}
+		
+		public static string processDot(string text) {
+			string os_name = "Linux";
+			string startup_path = "/home/dblank/Calico/trunk/bin";
+			bool warn_missing_dot = false;
+			string retval = null;
+		    Process myProcess = new Process();
+
+		    // create a temporary file with the text to be processed
+		    var textpath = System.IO.Path.GetTempFileName();
+		    using (TextWriter writer = File.CreateText(textpath)){
+		        writer.WriteLine(text);
+		    }
+		
+		    try {
+		      myProcess.StartInfo.UseShellExecute = false;
+		
+		      if (os_name == "Windows") {
+		        string file = startup_path;
+		        //file = Path.Combine(file, "bin");
+		        file = Path.Combine(file, "windows");
+		        file = Path.Combine(file, "dot");
+		        myProcess.StartInfo.FileName = Path.Combine(file, "dot.exe");
+		      } else {
+		        if (File.Exists("/usr/bin/dot")){
+		        // assumes espeak is in /usr/bin/ on macs
+		            myProcess.StartInfo.FileName = "dot";
+		        }
+		        else if (File.Exists("/usr/local/bin/dot")){
+			// or look for espeak is in /usr/local/bin/ on macs
+		            myProcess.StartInfo.FileName = "dot";
+		        }
+		        else{
+		        // assumes in path
+		            myProcess.StartInfo.FileName = "dot";
+		        }
+		      }
+		      myProcess.StartInfo.CreateNoWindow = true;
+			  myProcess.StartInfo.RedirectStandardOutput = true;
+		      myProcess.StartInfo.Arguments = ("-Tdot " + textpath);
+		      myProcess.Start();
+			  retval = myProcess.StandardOutput.ReadToEnd();			  
+			  myProcess.WaitForExit();
+		#pragma warning disable 0168
+		    } catch (Exception e) {
+		#pragma warning restore 0168
+		      if (warn_missing_dot) {
+		        Console.WriteLine("WARNING: missing dot command");
+		        warn_missing_dot = false; // just once
+		      }
+		    }
+			return retval;
+		}
+
 	}
 
 	public class Group : Shape
 	{
-    
 		public List<Shape> items = new List<Shape> ();
 		public string mode = "individual"; // squadron or individual
     

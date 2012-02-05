@@ -173,7 +173,7 @@ for content, options in [(hello_world, {"label": "Hello World",
                          (tree, {"label": "Binary Tree", "default_shape" : "box", "line_type": "line"})
                         ]:
     g = Graphics.Graph()
-    g.load(content)
+    g.layout(content, False) ## don't process Dot file
     #win = Graphics.Window("Graph #%d" % count, 500, 500)
     count += 1
     g.draw(options)

@@ -382,6 +382,14 @@
         <property name="Label" translatable="yes">Find Previous</property>
         <property name="ShortLabel" translatable="yes">Find Previous</property>
       </action>
+      <action id="HistoryTabAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">History Tab</property>
+        <property name="ShortLabel" translatable="yes">History Tab</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Activated" handler="OnHistoryTabActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -440,6 +448,7 @@
                 <node type="Menu" action="ShowAction">
                   <node type="Menuitem" action="EnvironmentTabAction" />
                   <node type="Menuitem" action="LocalsTabAction" />
+                  <node type="Menuitem" action="HistoryTabAction" />
                 </node>
               </node>
               <node type="Menu" action="ShellAction1">
@@ -1163,7 +1172,7 @@
               <widget class="Gtk.Notebook" id="notebook_tools">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="CurrentPage">0</property>
+                <property name="CurrentPage">3</property>
                 <property name="Scrollable">True</property>
                 <child>
                   <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -1241,6 +1250,33 @@
                     <property name="type">tab</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="scrolledwindow4">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.TextView" id="historyview">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="Editable">False</property>
+                        <property name="Text" translatable="yes" />
+                      </widget>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="label999">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">History</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
               </widget>
             </child>
           </widget>
@@ -1254,7 +1290,7 @@
             <property name="MemberName" />
             <property name="Spacing">6</property>
             <child>
-              <widget class="Gtk.Label" id="label6">
+              <widget class="Gtk.Label" id="label9">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Language:</property>
               </widget>
