@@ -95,17 +95,6 @@ public class MainWindow : Gtk.Window
 		miSaveAsPython.Activated += new EventHandler(OnFileSaveAsPython);
 		muFile.Append(miSaveAsPython);
 		
-		Gtk.MenuItem miSep2 = new Gtk.MenuItem();
-		muFile.Append(miSep2);
-
-		Gtk.MenuItem miUse = new Gtk.MenuItem("_Use Library...");
-		miUse.Activated += new EventHandler(OnFileUseLibrary);
-		muFile.Append(miUse);
-		
-		Gtk.MenuItem miMap = new Gtk.MenuItem("_Generate Library Map File...");
-		miMap.Activated += new EventHandler(OnFileGenLibMap);
-		muFile.Append(miMap);
-		
 		Gtk.MenuItem miSep3 = new Gtk.MenuItem();
 		muFile.Append(miSep3);
 		
@@ -117,10 +106,21 @@ public class MainWindow : Gtk.Window
 		// - - - Edit Menu
 		Gtk.Menu muEdit = new Gtk.Menu();
 		
-		Gtk.MenuItem miEditFind = new Gtk.MenuItem("_Find");
-		miEditFind.Activated += new EventHandler(OnEditFind);
-		muEdit.Append(miEditFind);
-		miEditFind.AddAccelerator("activate", agrp, (int)'F', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+//		Gtk.MenuItem miEditFind = new Gtk.MenuItem("_Find");
+//		miEditFind.Activated += new EventHandler(OnEditFind);
+//		muEdit.Append(miEditFind);
+//		miEditFind.AddAccelerator("activate", agrp, (int)'F', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+//		
+//		Gtk.MenuItem miSep2 = new Gtk.MenuItem();
+//		muEdit.Append(miSep2);
+
+		Gtk.MenuItem miUse = new Gtk.MenuItem("_Use Library...");
+		miUse.Activated += new EventHandler(OnEditUseLibrary);
+		muEdit.Append(miUse);
+		
+		Gtk.MenuItem miMap = new Gtk.MenuItem("_Generate Library Map File...");
+		miMap.Activated += new EventHandler(OnEditGenLibMap);
+		muEdit.Append(miMap);
 		
 		// - - - View Menu
 		Gtk.Menu muView = new Gtk.Menu();
@@ -288,6 +288,36 @@ public class MainWindow : Gtk.Window
 		hsRunSlider.Sensitive = true;
 		hsRunSlider.ChangeValue += new Gtk.ChangeValueHandler(OnSliderChangeValue);
 		tb.Add (hsRunSlider);
+		
+		Gtk.VSeparator tbSep3 = new Gtk.VSeparator();
+		tb.Add(tbSep3);
+		
+		Gtk.Label labFind = new Gtk.Label("  Find: ");
+		tb.Add ( labFind );
+		
+		Gtk.Entry entSearch = new Gtk.Entry();
+		entSearch.TooltipText = "Find a factory block matching entered text";
+		entSearch.Changed += new EventHandler(OnSearchMore);
+		tb.Add ( entSearch );
+		_entry = entSearch;
+		
+		Gtk.Image imFindNext = new Gtk.Image(Gtk.Stock.GoDown, Gtk.IconSize.SmallToolbar);
+		Gtk.Button tbFindNext = new Gtk.Button(imFindNext);
+		tbFindNext.Clicked += new EventHandler(OnSearchNext);
+		tbFindNext.TooltipText = "Find Next";
+		tb.Add ( tbFindNext );
+		
+		Gtk.Image imFindPrev = new Gtk.Image(Gtk.Stock.GoUp, Gtk.IconSize.SmallToolbar);
+		Gtk.Button tbFindPrev = new Gtk.Button(imFindPrev);
+		tbFindPrev.Clicked += new EventHandler(OnSearchPrev);
+		tbFindPrev.TooltipText = "Find Previous";
+		tb.Add ( tbFindPrev );
+		
+		Gtk.Image imFindStop = new Gtk.Image(Gtk.Stock.MediaStop, Gtk.IconSize.SmallToolbar);
+		Gtk.Button tbFindStop = new Gtk.Button(imFindStop);
+		tbFindStop.Clicked += new EventHandler(OnSearchCancel);
+		tbFindStop.TooltipText = "Stop Find";
+		tb.Add ( tbFindStop );
 		
 		vb.PackStart (tb, false, false, 0);
 		
@@ -469,7 +499,7 @@ public class MainWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnFileUseLibrary(object sender, EventArgs a)
+	protected void OnEditUseLibrary(object sender, EventArgs a)
 	{
 		js.Stop();
 		
@@ -542,7 +572,7 @@ public class MainWindow : Gtk.Window
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnFileGenLibMap(object sender, EventArgs a)
+	protected void OnEditGenLibMap(object sender, EventArgs a)
 	{
 		js.Stop();
 		
@@ -633,6 +663,7 @@ public class MainWindow : Gtk.Window
 	{
 		//js.BuildSearchSet();
 		
+		js.SearchStart ();
 		_dlg = new Gtk.MessageDialog(
 			this,
 			Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
@@ -653,6 +684,7 @@ public class MainWindow : Gtk.Window
 		_dlg.DefaultResponse = Gtk.ResponseType.Yes;
 		
 		_entry = new Gtk.Entry();
+		_entry.Changed += new System.EventHandler(OnSearchMore);
 		Gtk.HBox hbox = new Gtk.HBox();
 		hbox.PackStart(new Gtk.Label("Find: "), false, false, 5);
 		hbox.PackEnd(_entry);
@@ -675,9 +707,33 @@ public class MainWindow : Gtk.Window
 	private void OnSearchCancel(object sender, EventArgs args)
 	{
 		js.SearchCancel();
-		_dlg.Destroy();
-		_dlg = null;
-		_entry = null;
+		_entry.Text = "";
+		if (_dlg != null) {
+			_dlg.Destroy();
+			_dlg = null;
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void OnSearchMore(object sender, EventArgs args)
+	{
+		string src = _entry.Text;
+		if (src.Length == 0) return;
+		bool found = js.SearchMore(src);
+
+		if (!found) {
+			// Inform user of unfortunate outcome
+			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+				this,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Info,
+				Gtk.ButtonsType.Ok,
+				String.Format ("Nothing more found matching {0}", src));
+			dlg2.Title = "Nothing found";
+			
+			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+			dlg2.Destroy();
+		}
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

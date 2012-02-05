@@ -539,11 +539,7 @@ namespace Widgets
 		private bool _toggled = false;
 		private List<WeakReference> _tabs = new List<WeakReference>(); // weak references to other tabs in tab group
 		internal List<WeakReference> _shapes = new List<WeakReference>();
-		
-//		// Search data for this set of blocks:
-//		internal bool searchEnd = false;
-//		internal bool searchTop = false;
-		
+
 		// Save a reference to the block palette
 		internal CBlockPalette _palette = null;
 		
@@ -617,6 +613,15 @@ namespace Widgets
 				_shapes.Add( new WeakReference(shp) );
 		}
 		
+		// - - - Return selected state - - - - - - - - - - - - - - - -
+		public bool Toggled 
+		{
+			get
+			{
+				return _toggled;
+			}
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Toggle(Diagram.Canvas cvs) 
 		{	// Toggle button state 
@@ -661,8 +666,6 @@ namespace Widgets
 			// Redraw
 			if (cvs != null) cvs.DeselectAll();
 		}
-		
-
 	}
 	
 //	// -----------------------------------------------------------------------
