@@ -1828,6 +1828,9 @@ namespace Jigsaw
 			// - - - Find the next matching factory block in the current direction
 			public bool More(string s) 
 			{
+				if (s == "")
+					return true;
+				
 				// Set up string to find
 				string ss = s.ToLower();
 				
