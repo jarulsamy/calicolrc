@@ -72,6 +72,10 @@ namespace Calico {
             history[Position] = text;
         }
 
+        public string update() {
+            return history[Position];
+        }
+
         public void add(string text) {
             if (text != "")
                 text = text.TrimEnd() + "\n";
@@ -91,6 +95,42 @@ namespace Calico {
                 history[Last] = text;
             }
             position = history.Count - 1;
+        }
+
+        public bool SearchMore(string text) {
+            if (text == "") return true;
+            text = text.ToLower();
+            for (int i = position; i > 0; i--) {
+                if (history[i].ToLower().Contains(text)) {
+                    position = i;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool SearchPrevious(string text) {
+            if (text == "") return true;
+            text = text.ToLower();
+            for (int i = position - 1; i > 0; i--) {
+                if (i > 0 && history[i].ToLower().Contains(text)) {
+                    position = i;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool SearchNext(string text) {
+            if (text == "") return true;
+            text = text.ToLower();
+            for (int i = position + 1; i < history.Count; i++) {
+                if (i < history.Count && history[i].ToLower().Contains(text)) {
+                    position = i;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

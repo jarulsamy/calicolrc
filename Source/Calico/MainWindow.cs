@@ -970,14 +970,23 @@ namespace Calico {
                     if (CurrentDocument != null) {
                         searchEntry.Entry.DeleteText(searchEntry.Entry.Text.Length - 1,
                                                      searchEntry.Entry.Text.Length);
-                        if (CurrentDocument != null)
-                            CurrentDocument.SearchMore(searchEntry.Entry.Text);
+                        CurrentDocument.SearchMore(searchEntry.Entry.Text);
+                        args.RetVal = true;
+                    } else if (DocumentNotebook.Page == SHELL) {
+                        if (history.SearchMore(searchEntry.ActiveText)) {
+                            Shell.Text = history.update();
+                            UpdateUpDownArrows();
+                        }
                     }
-                    args.RetVal = true;
                 } else if (args.Event.Key == Gdk.Key.Return) {
                     if (CurrentDocument != null) {
                         CurrentDocument.SearchNext(searchEntry.ActiveText);
                         args.RetVal = true;
+                    } else if (DocumentNotebook.Page == SHELL) {
+                        if (history.SearchPrevious(searchEntry.ActiveText)) {
+                            Shell.Text = history.update();
+                            UpdateUpDownArrows();
+                        }
                     }
                 } // else, don't handle
             } else if (Focus == Shell) {
@@ -1975,6 +1984,11 @@ namespace Calico {
         {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchMore(searchEntry.ActiveText);
+            } else if (DocumentNotebook.Page == SHELL) {
+                if (history.SearchMore(searchEntry.ActiveText)) {
+                    Shell.Text = history.update();
+                    UpdateUpDownArrows();
+                }
             }
         }
 
@@ -1982,6 +1996,11 @@ namespace Calico {
         {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchNext(searchEntry.ActiveText);
+            } else if (DocumentNotebook.Page == SHELL) {
+                if (history.SearchNext(searchEntry.ActiveText)) {
+                    Shell.Text = history.update();
+                    UpdateUpDownArrows();
+                }
             }
             searchEntry.Entry.GrabFocus();
         }
@@ -1990,6 +2009,11 @@ namespace Calico {
         {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchPrevious(searchEntry.ActiveText);
+            } else if (DocumentNotebook.Page == SHELL) {
+                if (history.SearchPrevious(searchEntry.ActiveText)) {
+                    Shell.Text = history.update();
+                    UpdateUpDownArrows();
+                }
             }
             searchEntry.Entry.GrabFocus();
         }
