@@ -76,6 +76,7 @@ namespace Jigsaw
 		// If true, automatically show properties dialog when drop new block
 		internal bool _autoProperties = false;
 		
+		// Ref to internal search helper object
 		public SearchHelper _searchHelper = null;
 		
 //		// Variables to support search
