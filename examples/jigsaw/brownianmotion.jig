@@ -1,150 +1,171 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
-    <block id="1" typeName="Jigsaw.CControlStart" left="340" top="20">
-        <edge id="1" name="Out" linkedTo="3" />
+    <module name="Shapes.dll" />
+    <module name="Myro.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="340" top="25">
+        <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CControlEnd" left="340" top="310">
-        <edge id="2" name="In" linkedTo="12" />
-        <property name="Label" value="stop script" />
-        <property name="Message" value="" />
-    </block>
-    <block id="3" typeName="Jigsaw.CMethodBlock" left="340" top="50">
+    <block id="2" typeName="Jigsaw.CMethodBlock" left="360" top="55">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeWindow" return_type="Graphics+WindowClass, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="title" type="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="'Calico Graphics'" />
             <parameter name="width" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="300" />
             <parameter name="height" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="300" />
         </method>
-        <edge id="3" name="In" linkedTo="1" />
-        <edge id="4" name="Out" linkedTo="5" />
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
         <property name="Label" value="win=makeWindow('Calico Graphics', 300, 300)" />
         <property name="Message" value="" />
         <property name="Variable" value="win" />
         <property name="title" value="'Calico Graphics'" />
         <property name="width" value="300" />
         <property name="height" value="300" />
-        <property name="Statement" value="win=Shapes.makeWindow('Calico Graphics', 300, 300)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="4" typeName="Jigsaw.CMethodBlock" left="340" top="70">
+    <block id="3" typeName="Jigsaw.CMethodBlock" left="360" top="75">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeCircle" return_type="Graphics+Circle, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="point" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
             <parameter name="radius" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
-        <edge id="5" name="In" linkedTo="4" />
-        <edge id="6" name="Out" linkedTo="9" />
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="6" />
         <property name="Label" value="circle=makeCircle((150, 150), 3)" />
         <property name="Message" value="" />
         <property name="Variable" value="circle" />
         <property name="point" value="(150, 150)" />
         <property name="radius" value="3" />
-        <property name="Statement" value="circle=Shapes.makeCircle((150, 150), 3)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="5" typeName="Jigsaw.CAssignment" left="340" top="110">
-        <edge id="7" name="In" linkedTo="10" />
-        <edge id="8" name="Out" linkedTo="11" />
-        <property name="Label" value="win.mode = &quot;bitmap&quot;" />
-        <property name="Message" value="" />
-        <property name="Variable" value="win.mode" />
-        <property name="Expression" value="&quot;bitmap&quot;" />
-    </block>
-    <block id="6" typeName="Jigsaw.CMethodBlock" left="340" top="90">
+    <block id="4" typeName="Jigsaw.CMethodBlock" left="360" top="95">
         <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="shape" type="Graphics+Shape, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
             <parameter name="window" type="Graphics+WindowClass, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
         </method>
-        <edge id="9" name="In" linkedTo="6" />
-        <edge id="10" name="Out" linkedTo="7" />
+        <edge id="6" name="In" linkedTo="5" />
+        <edge id="7" name="Out" linkedTo="8" />
         <property name="Label" value="draw(circle, win)" />
         <property name="Message" value="" />
         <property name="Variable" value="" />
         <property name="shape" value="circle" />
         <property name="window" value="win" />
-        <property name="Statement" value="Shapes.draw(circle, win)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="7" typeName="Jigsaw.CControlRepeat" left="340" top="130">
-        <edge id="11" name="In" linkedTo="8" />
-        <edge id="12" name="Out" linkedTo="2" />
-        <edge id="13" name="Loop" linkedTo="14" />
-        <property name="Label" value="repeat 10 times" />
+    <block id="5" typeName="Jigsaw.CAssignment" left="360" top="115">
+        <edge id="8" name="In" linkedTo="7" />
+        <edge id="9" name="Out" linkedTo="10" />
+        <property name="Label" value="win.mode = &quot;bitmap&quot;" />
         <property name="Message" value="" />
-        <property name="Repetitions" value="10" />
+        <property name="Variable" value="win.mode" />
+        <property name="Expression" value="&quot;bitmap&quot;" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="8" typeName="Jigsaw.CMethodBlock" left="360" top="150">
+    <block id="6" typeName="Jigsaw.CControlWhile" left="360" top="135">
+        <edge id="10" name="In" linkedTo="9" />
+        <edge id="11" name="Out" linkedTo="-1" />
+        <edge id="12" name="Loop" linkedTo="13" />
+        <property name="Label" value="while (True)" />
+        <property name="Message" value="" />
+        <property name="WhileTest" value="True" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CMethodBlock" left="380" top="155">
         <method assembly_name="Myro" type_name="Myro" method_name="pickOne" return_type="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="items" type="System.Object[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
-        <edge id="14" name="In" linkedTo="13" />
-        <edge id="15" name="Out" linkedTo="16" />
+        <edge id="13" name="In" linkedTo="12" />
+        <edge id="14" name="Out" linkedTo="15" />
         <property name="Label" value="dx=pickOne([-1, 0, 1])" />
-        <property name="Message" value="name 'Myro' is not defined" />
+        <property name="Message" value="" />
         <property name="Variable" value="dx" />
         <property name="items" value="[-1, 0, 1]" />
-        <property name="Statement" value="dx=Myro.pickOne([-1, 0, 1])" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="9" typeName="Jigsaw.CMethodBlock" left="360" top="170">
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="380" top="175">
         <method assembly_name="Myro" type_name="Myro" method_name="pickOne" return_type="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="items" type="System.Object[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
-        <edge id="16" name="In" linkedTo="15" />
-        <edge id="17" name="Out" linkedTo="22" />
+        <edge id="15" name="In" linkedTo="14" />
+        <edge id="16" name="Out" linkedTo="17" />
         <property name="Label" value="dy=pickOne([-1, 0, 1])" />
         <property name="Message" value="" />
         <property name="Variable" value="dy" />
         <property name="items" value="[-1, 0, 1]" />
-        <property name="Statement" value="dy=Myro.pickOne([-1, 0, 1])" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="10" typeName="Jigsaw.CMethodBlock" left="360" top="210">
+    <block id="9" typeName="Jigsaw.CAssignment" left="380" top="195">
+        <edge id="17" name="In" linkedTo="16" />
+        <edge id="18" name="Out" linkedTo="19" />
+        <property name="Label" value="p1 = circle.center.x, circle.center.y" />
+        <property name="Message" value="" />
+        <property name="Variable" value="p1" />
+        <property name="Expression" value="circle.center.x, circle.center.y" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="10" typeName="Jigsaw.CMethodBlock" left="380" top="215">
         <method assembly_name="Shapes" type_name="Shapes" method_name="move" return_type="System.Void, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="shape" type="Graphics+Shape, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
             <parameter name="dx" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
             <parameter name="dy" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
-        <edge id="18" name="In" linkedTo="23" />
-        <edge id="19" name="Out" linkedTo="24" />
+        <edge id="19" name="In" linkedTo="18" />
+        <edge id="20" name="Out" linkedTo="21" />
         <property name="Label" value="move(circle, dx, dy)" />
         <property name="Message" value="" />
         <property name="Variable" value="" />
         <property name="shape" value="circle" />
         <property name="dx" value="dx" />
         <property name="dy" value="dy" />
-        <property name="Statement" value="Shapes.move(circle, dx, dy)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="11" typeName="Jigsaw.CMethodBlock" left="360" top="250">
+    <block id="11" typeName="Jigsaw.CAssignment" left="380" top="235">
+        <edge id="21" name="In" linkedTo="20" />
+        <edge id="22" name="Out" linkedTo="23" />
+        <property name="Label" value="p2 = circle.center.x, circle.center.y" />
+        <property name="Message" value="" />
+        <property name="Variable" value="p2" />
+        <property name="Expression" value="circle.center.x, circle.center.y" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="12" typeName="Jigsaw.CMethodBlock" left="380" top="255">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeLine" return_type="Graphics+Line, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="p1" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
             <parameter name="p2" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
-        <edge id="20" name="In" linkedTo="25" />
-        <edge id="21" name="Out" linkedTo="26" />
+        <edge id="23" name="In" linkedTo="22" />
+        <edge id="24" name="Out" linkedTo="25" />
         <property name="Label" value="line=makeLine(p1, p2)" />
         <property name="Message" value="" />
         <property name="Variable" value="line" />
         <property name="p1" value="p1" />
         <property name="p2" value="p2" />
-        <property name="Statement" value="line=Shapes.makeLine(p1, p2)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="12" typeName="Jigsaw.CAssignment" left="360" top="190">
-        <edge id="22" name="In" linkedTo="17" />
-        <edge id="23" name="Out" linkedTo="18" />
-        <property name="Label" value="p1 = circle.center" />
+    <block id="13" typeName="Jigsaw.CMethodBlock" left="380" top="275">
+        <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void">
+            <parameter name="shape" type="Graphics+Shape" default="" />
+            <parameter name="window" type="Graphics+WindowClass" default="" />
+        </method>
+        <edge id="25" name="In" linkedTo="24" />
+        <edge id="26" name="Out" linkedTo="-1" />
+        <property name="Label" value="draw(line, win)" />
         <property name="Message" value="" />
-        <property name="Variable" value="p1" />
-        <property name="Expression" value="circle.center" />
-    </block>
-    <block id="13" typeName="Jigsaw.CAssignment" left="360" top="230">
-        <edge id="24" name="In" linkedTo="19" />
-        <edge id="25" name="Out" linkedTo="20" />
-        <property name="Label" value="p2 = circle.center" />
-        <property name="Message" value="" />
-        <property name="Variable" value="p2" />
-        <property name="Expression" value="circle.center" />
-    </block>
-    <block id="14" typeName="Jigsaw.CStatement" left="360" top="270">
-        <edge id="26" name="In" linkedTo="21" />
-        <edge id="27" name="Out" linkedTo="-1" />
-        <property name="Label" value="circle.StackOnTop()" />
-        <property name="Message" value="" />
-        <property name="Statement" value="circle.StackOnTop()" />
+        <property name="shape" value="line" />
+        <property name="window" value="win" />
+        <fill_color R="0.554624566833779" G="0.797228516450724" B="0.88213175390015" A="1" />
+        <line_color R="0.221849826733512" G="0.31889140658029" B="0.35285270156006" A="1" />
     </block>
 </jigsaw>
