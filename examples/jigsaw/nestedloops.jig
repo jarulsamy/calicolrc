@@ -1,1 +1,97 @@
-<jigsaw><block id="1" typeName="Jigsaw.CControlStart" left="425" top="110"><edge id="1" name="Out" linkedTo="13" /><property name="Label" value="when program starts" /><property name="Message" value="" /></block><block id="2" typeName="Jigsaw.CControlRepeat" left="425" top="160"><edge id="2" name="In" linkedTo="14" /><edge id="3" name="Out" linkedTo="7" /><edge id="4" name="Loop" linkedTo="15" /><property name="Label" value="repeat 3 times" /><property name="Message" value="" /><property name="Repetitions" value="3" /></block><block id="3" typeName="Jigsaw.CIOPrint" left="465" top="220"><edge id="5" name="In" linkedTo="10" /><edge id="6" name="Out" linkedTo="19" /><property name="Label" value="print I" /><property name="Message" value="" /><property name="Expression" value="I" /></block><block id="4" typeName="Jigsaw.CControlEnd" left="425" top="360"><edge id="7" name="In" linkedTo="3" /><property name="Label" value="stop script" /><property name="Message" value="" /></block><block id="5" typeName="Jigsaw.CControlRepeat" left="445" top="200"><edge id="8" name="In" linkedTo="16" /><edge id="9" name="Out" linkedTo="17" /><edge id="10" name="Loop" linkedTo="5" /><property name="Label" value="repeat 3 times" /><property name="Message" value="" /><property name="Repetitions" value="3" /></block><block id="6" typeName="Jigsaw.CAssignment" left="465" top="280"><edge id="11" name="In" linkedTo="22" /><edge id="12" name="Out" linkedTo="-1" /><property name="Label" value="let J = J+ 1" /><property name="Message" value="" /><property name="Variable" value="J" /><property name="Expression" value="J+ 1" /></block><block id="7" typeName="Jigsaw.CAssignment" left="425" top="140"><edge id="13" name="In" linkedTo="1" /><edge id="14" name="Out" linkedTo="2" /><property name="Label" value="let I = 1" /><property name="Message" value="" /><property name="Variable" value="I" /><property name="Expression" value="1" /></block><block id="8" typeName="Jigsaw.CAssignment" left="445" top="180"><edge id="15" name="In" linkedTo="4" /><edge id="16" name="Out" linkedTo="8" /><property name="Label" value="let J = 1" /><property name="Message" value="" /><property name="Variable" value="J" /><property name="Expression" value="1" /></block><block id="9" typeName="Jigsaw.CAssignment" left="445" top="320"><edge id="17" name="In" linkedTo="9" /><edge id="18" name="Out" linkedTo="-1" /><property name="Label" value="let I = I+ 1" /><property name="Message" value="" /><property name="Variable" value="I" /><property name="Expression" value="I+ 1" /></block><block id="10" typeName="Jigsaw.CIOPrint" left="465" top="240"><edge id="19" name="In" linkedTo="6" /><edge id="20" name="Out" linkedTo="21" /><property name="Label" value="print J" /><property name="Message" value="" /><property name="Expression" value="J" /></block><block id="11" typeName="Jigsaw.CIOPrint" left="465" top="260"><edge id="21" name="In" linkedTo="20" /><edge id="22" name="Out" linkedTo="11" /><property name="Label" value="print '---'" /><property name="Message" value="" /><property name="Expression" value="'---'" /></block></jigsaw>
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <block id="1" typeName="Jigsaw.CControlStart" left="330" top="20">
+        <edge id="1" name="Start" linkedTo="2" />
+        <property name="Label" value="when program starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CAssignment" left="350" top="50">
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="I = 1" />
+        <property name="Message" value="" />
+        <property name="Variable" value="I" />
+        <property name="Expression" value="1" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CControlRepeat" left="350" top="70">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="-1" />
+        <edge id="6" name="Loop" linkedTo="7" />
+        <property name="Label" value="repeat 3 times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="3" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CAssignment" left="370" top="90">
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="9" />
+        <property name="Label" value="J = 1" />
+        <property name="Message" value="" />
+        <property name="Variable" value="J" />
+        <property name="Expression" value="1" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CControlRepeat" left="370" top="110">
+        <edge id="9" name="In" linkedTo="8" />
+        <edge id="10" name="Out" linkedTo="12" />
+        <edge id="11" name="Loop" linkedTo="14" />
+        <property name="Label" value="repeat 3 times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="3" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="6" typeName="Jigsaw.CAssignment" left="370" top="230">
+        <edge id="12" name="In" linkedTo="10" />
+        <edge id="13" name="Out" linkedTo="-1" />
+        <property name="Label" value="I = I+ 1" />
+        <property name="Message" value="" />
+        <property name="Variable" value="I" />
+        <property name="Expression" value="I+ 1" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CIOPrint" left="390" top="130">
+        <edge id="14" name="In" linkedTo="11" />
+        <edge id="15" name="Out" linkedTo="16" />
+        <property name="Label" value="print(I)" />
+        <property name="Message" value="" />
+        <property name="Expression" value="I" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CIOPrint" left="390" top="150">
+        <edge id="16" name="In" linkedTo="15" />
+        <edge id="17" name="Out" linkedTo="18" />
+        <property name="Label" value="print(J)" />
+        <property name="Message" value="" />
+        <property name="Expression" value="J" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="9" typeName="Jigsaw.CIOPrint" left="390" top="170">
+        <edge id="18" name="In" linkedTo="17" />
+        <edge id="19" name="Out" linkedTo="20" />
+        <property name="Label" value="print('---')" />
+        <property name="Message" value="" />
+        <property name="Expression" value="'---'" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="10" typeName="Jigsaw.CAssignment" left="390" top="190">
+        <edge id="20" name="In" linkedTo="19" />
+        <edge id="21" name="Out" linkedTo="-1" />
+        <property name="Label" value="J = J+ 1" />
+        <property name="Message" value="" />
+        <property name="Variable" value="J" />
+        <property name="Expression" value="J+ 1" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+</jigsaw>
