@@ -41,8 +41,17 @@ public static class Graphics
 {
 
 	public static int gui_thread_id = -1;
+	public static string startup_path;
+	public static string os_name;
+	public static bool warn_missing_dot = false;
 	public delegate void InvokeDelegate ();
-
+	
+    public static void initialize_module(string startup_path, 
+  					                     string os_name) {
+    	Graphics.startup_path = startup_path;
+    	Graphics.os_name = os_name;
+	}
+	
 	public static void Invoke (InvokeDelegate invoke)
 	{
 		if (needInvoke ())
@@ -5224,9 +5233,6 @@ public static class Graphics
 		}
 		
 		public static string processDot(string text) {
-			string os_name = "Linux";
-			string startup_path = "/home/dblank/Calico/trunk/bin";
-			bool warn_missing_dot = false;
 			string retval = null;
 		    Process myProcess = new Process();
 
@@ -5239,8 +5245,8 @@ public static class Graphics
 		    try {
 		      myProcess.StartInfo.UseShellExecute = false;
 		
-		      if (os_name == "Windows") {
-		        string file = startup_path;
+		      if (Graphics.os_name == "Windows") {
+		        string file = Graphics.startup_path;
 		        //file = Path.Combine(file, "bin");
 		        file = Path.Combine(file, "windows");
 		        file = Path.Combine(file, "dot");
