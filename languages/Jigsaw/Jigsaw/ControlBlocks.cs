@@ -420,9 +420,9 @@ namespace Jigsaw
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
 			} catch (Exception ex){
@@ -660,9 +660,9 @@ namespace Jigsaw
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
 			} catch (Exception ex){
@@ -965,9 +965,9 @@ namespace Jigsaw
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
 			} catch (Exception ex){
@@ -1370,9 +1370,9 @@ namespace Jigsaw
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 			
 			} catch (Exception ex){
@@ -1819,9 +1819,9 @@ namespace Jigsaw
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
-					o.AppendFormat ("{0}pass\n", sindent2);
+//				} else {
+//					string sindent2 = new string (' ', 2*(indent+1));
+//					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
 			} catch (Exception ex){

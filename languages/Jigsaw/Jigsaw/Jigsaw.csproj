@@ -70,8 +70,8 @@
       <HintPath>..\..\..\bin\Microsoft.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="System.Dynamic" />
-    <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Private>False</Private>
+    <Reference Include="Mono.Cairo">
+      <HintPath>..\..\..\..\..\..\Program Files\Mono-2.10.8\lib\mono\4.0\Mono.Cairo.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
