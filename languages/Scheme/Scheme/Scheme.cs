@@ -2418,7 +2418,10 @@ public class Scheme {
 
   public int Count {
 	get {
-	  return 0;
+	  if (cdr(this) == EmptyList)
+	    return 1;
+	  else
+	    return 1 + ((Cons)cdr(this)).Count;
 	}
   }
 
