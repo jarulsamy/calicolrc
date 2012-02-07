@@ -25,7 +25,7 @@ using System.IO;
 using Calico;
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
-public class Column : IEnumerable<string> {
+public class Column : IEnumerable<object> {
 	Gtk.ListStore liststore;
 	string column = null;
 	Document document;
@@ -72,13 +72,23 @@ public class Column : IEnumerable<string> {
 		}
 	}
 	
-	public IEnumerator<string> GetEnumerator ()
+	public IEnumerator<object> GetEnumerator ()
 	{
-		Gtk.TreeIter iter;
-		for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
-			liststore.GetIterFromString(out iter, row_or_y.ToString());
-			yield return ((string)liststore.GetValue(iter, x + 1));		
-		}
+	  Gtk.TreeIter iter;
+	  if (column == null) {
+	    for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
+	      liststore.GetIterFromString(out iter, row_or_y.ToString());
+	      yield return liststore.GetValue(iter, x + 1);		
+	    }
+	  } else {
+	    char c;
+	    Char.TryParse(column.ToUpper(), out c);
+	    int offset = c - 'A' + 1;
+	    for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
+	      liststore.GetIterFromString(out iter, row_or_y.ToString());
+	      yield return liststore.GetValue(iter, offset);
+	    }
+	  }
 	}
 
 	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
@@ -178,7 +188,7 @@ public class SpreadsheetWidget : Gtk.TreeView {
 	}
 }
 
-public class CalicoSpreadsheetDocument : Document
+public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 {
 	public SpreadsheetWidget sheet;	
 	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
@@ -209,6 +219,18 @@ public class CalicoSpreadsheetDocument : Document
 		}
 	}
 		
+	public IEnumerator<object> GetEnumerator ()
+	{
+	  for (int x = 0; x < 26; x++) {
+	    yield return new Column(this, sheet.liststore, x);
+	  }
+	}
+
+	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+	{
+		return GetEnumerator();
+	}
+	
 	public Column this[string column] {
 		get {
 			return new Column(this, sheet.liststore, column);
