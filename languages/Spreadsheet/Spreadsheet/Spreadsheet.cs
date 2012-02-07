@@ -25,7 +25,7 @@ using System.IO;
 using Calico;
 using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 
-public class Column {
+public class Column : IEnumerable<string> {
 	Gtk.ListStore liststore;
 	string column = null;
 	Document document;
@@ -71,6 +71,21 @@ public class Column {
 			document.UpdateDocument();
 		}
 	}
+	
+	public IEnumerator<string> GetEnumerator ()
+	{
+		Gtk.TreeIter iter;
+		for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
+			liststore.GetIterFromString(out iter, row_or_y.ToString());
+			yield return ((string)liststore.GetValue(iter, x + 1));		
+		}
+	}
+
+	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+	{
+		return GetEnumerator();
+	}
+	
 }
 
 public class SpreadsheetWidget : Gtk.TreeView {
