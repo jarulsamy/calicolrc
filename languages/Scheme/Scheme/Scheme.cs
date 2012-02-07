@@ -53,7 +53,7 @@ public class Config {
   }
 }
 
-public class Symbol {
+public class Symbol : IList {
   string id;
   int val;
   
@@ -72,6 +72,78 @@ public class Symbol {
   
   public override string ToString() {
 	return this.id;
+  }
+
+  // Items necessary for it to be an IList
+  // FIXME: make EmptyList a real list
+  public bool IsFixedSize {
+	get {
+	  return false;
+	}
+  }
+
+  public bool IsReadOnly {
+	get {
+	  return false;
+	}
+  }
+
+  public bool IsSynchronized {
+	get {
+	  return false;
+	}
+  }
+
+  public void CopyTo(System.Array array, int index) {
+  }
+
+  public int Add(object value) {
+	return 0; // should return count
+  }
+
+  public int Count {
+    get {
+      return 0;
+    }
+  }
+
+  public void Remove(object value) {
+  }
+
+  public void RemoveAt(int index) {
+  }
+
+  public void Clear() {
+  }
+
+  public bool Contains(object value) {
+	return false;
+  }
+
+  public int IndexOf(object value) {
+	return -1;
+  }
+
+  public void Insert(int index, object value) {
+  }
+
+  public object this[int index] {
+	get {
+	  throw new Exception("EmptyList does not contain any elements.");
+	}
+	set { // value is the item
+	}
+  }
+  public object SyncRoot {
+	get {
+	  return this;
+	}
+  }
+  public IEnumerator GetEnumerator() {
+    // FIXME: return enumerator that returns nothing
+    // Refer to the IEnumerator documentation for an example of
+    // implementing an enumerator.
+    throw new Exception("The method or operation is not implemented.");
   }
 }
 
