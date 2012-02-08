@@ -34,7 +34,7 @@ def treeToList(tree):
     retval.append(treeToList(tree.right))
     return retval
 
-class Queue:
+class Stack:
     def __init__(self, start=None):
         self.list = [] if start == None else start
 
@@ -43,10 +43,14 @@ class Queue:
             self.list.append(item)
 
     def next(self):
-        return self.list.pop()
+        return self.list.pop(-1)
 
     def is_empty(self):
         return len(self.list) == 0
+
+class Queue(Stack):
+    def next(self):
+        return self.list.pop(0)
 
 def search(items, match):
     while not items.is_empty():
@@ -66,9 +70,9 @@ def reset_color(tree):
     if tree.right:
         reset_color(tree.right)
 
-tree = makeRandomTree(5)
+#tree = makeRandomTree(5)
 g = Graph()
 g.layout(treeToList(tree))
 win = Window(1000, 300)
 g.draw(win, {"label": "Random Graph", "default_shape": "box", "line_type": "line"})
-print(search(Queue([tree]), 302))
+#print(search(Stack([tree]), 302))
