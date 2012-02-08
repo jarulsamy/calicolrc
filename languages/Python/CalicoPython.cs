@@ -109,8 +109,12 @@ namespace CalicoPython
 		
 		public override void ConfigureTrace ()
 		{
+		    try {
 			if (trace)
 				IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
+		    } catch { 
+		       Console.Error.WriteLine("Error in setting trace.");
+		    }
 		}
 		
         public override void PostSetup(MainWindow calico) {
