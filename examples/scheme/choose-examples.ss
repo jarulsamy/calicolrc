@@ -204,7 +204,7 @@
 (define show-tree
    (lambda (tree)
       (using "Graphics")
-      (define g (Graphics.Graph))
+      (define! g (Graphics.Graph))
       (g.layout tree 1 0 2) ;; left-index root-index right-index
       (g.draw)))
 
@@ -216,6 +216,8 @@
 (define guess-path
   (lambda (n tree)
     (require (not (empty? tree)))
+    (let ((node (g.getNode (root tree))))
+       (node.setFill (Graphics.Color "pink")))
     (if (= (root tree) n)
         '()
         (choose

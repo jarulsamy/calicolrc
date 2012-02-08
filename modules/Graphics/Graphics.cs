@@ -4917,12 +4917,12 @@ public static class Graphics
 			return null;
 		}
 		
-		public List<Shape> getEdgeLines(string id) {
-			return (List<Shape>)edges[id]["line"];
+		public List<Shape> getEdgeLines(object id) {
+			return (List<Shape>)edges[id.ToString()]["line"];
 		}
 
-		public Shape getNode(string id) {
-			return (Shape)vertices[id]["shape"];
+		public Shape getNode(object id) {
+			return (Shape)vertices[id.ToString()]["shape"];
 		}
 
 		public void addEdge(string nameFrom, string nameTo) {
@@ -4958,7 +4958,7 @@ public static class Graphics
 					if (list[left] is IList && ((IList)list[left]).Count > 0) {
 						edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
 						edges += recurseEdges((IList)list[left], left, root, right);
-					} else {
+					} else if (list[left] != null && ((IList)list[left]).Count > 0) {
 						edges += String.Format("  {0}:left -> {1};\n", list[root], list[left]);
 					}
 				}
@@ -4966,7 +4966,7 @@ public static class Graphics
 					if (list[right] is IList && ((IList)list[right]).Count > 0) {
 						edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
 						edges += recurseEdges((IList)list[right], left, root, right);
-					} else {
+					} else if (list[right] != null && ((IList)list[right]).Count > 0) {
 						edges += String.Format("  {0}:right -> {1};\n", list[root], list[right]);
 					}
 				}

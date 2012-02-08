@@ -70,9 +70,9 @@ def reset_color(tree):
     if tree.right:
         reset_color(tree.right)
 
-#tree = makeRandomTree(5)
+tree = makeRandomTree(5)
 g = Graph()
 g.layout(treeToList(tree))
 win = Window(1000, 300)
 g.draw(win, {"label": "Random Graph", "default_shape": "box", "line_type": "line"})
-#print(search(Stack([tree]), 302))
+print(search(Stack([tree]), 302))
