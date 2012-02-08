@@ -4945,55 +4945,60 @@ public static class Graphics
                 			(graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
 		}
 
-		public string recurseEdges(IList list) {
+		public string recurseEdges(IList list, int left, int root, int right) {
 			string edges = "";
 			if (list == null || list.Count == 0) {
+				// Pass
 			} else {
-				if (list[0] != null) {
-					if (list[0] is IList  && ((IList)list[0]).Count == 3) {
-						edges += String.Format("  {0}:left -> {1};\n", list[1], ((IList)list[0])[1]);
-						edges += recurseEdges((IList)list[0]);
+				if (left < list.Count && list[left] != null) {
+					if (list[left] is IList) {
+						edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
+						edges += recurseEdges((IList)list[left], left, root, right);
 					} else {
-						edges += String.Format("  {0}:left -> {1};\n", list[1], list[0]);
+						edges += String.Format("  {0}:left -> {1};\n", list[root], list[left]);
 					}
 				}
-				if (list[2] != null) {
-					if (list[2] is IList && ((IList)list[2]).Count == 3) {
-						edges += String.Format("  {0}:right -> {1};\n", list[1], ((IList)list[2])[1]);
-						edges += recurseEdges((IList)list[2]);
+				if (right < list.Count && list[right] != null) {
+					if (list[right] is IList) {
+						edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
+						edges += recurseEdges((IList)list[right], left, root, right);
 					} else {
-						edges += String.Format("  {0}:right -> {1};\n", list[1], list[2]);
+						edges += String.Format("  {0}:right -> {1};\n", list[root], list[right]);
 					}
 				}
 			}
 			return edges;
 		}
 		
-		public string recurseNodes(IList list) {
+		public string recurseNodes(IList list, int left, int root, int right) {
 			string nodes = "";
-			if (list != null && list.Count == 3) {
-				// Left
-				if (list[0] is IList)
-					nodes += recurseNodes((IList)list[0]);
-				else if (list[0] != null)
-					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[0].ToString());
-				// Middle
-				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[1].ToString());
-				// Right
-				if (list[2] is IList)
-					nodes += recurseNodes((IList)list[2]);
-				else if (list[2] != null)
-					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[2].ToString());
+			if (list != null) {
+				// Left:
+				if (left < list.Count && list[left] is IList)
+					nodes += recurseNodes((IList)list[left], left, root, right);
+				else if (left < list.Count && list[left] != null)
+					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[left].ToString());
+				// Root:
+				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[root].ToString());
+				// Right:
+				if (right < list.Count && list[right] is IList)
+					nodes += recurseNodes((IList)list[right], left, root, right);
+				else if (right < list.Count && list[right] != null)
+					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[right].ToString());
 			}
 			return nodes;
 		}
 
 		public void layout(IList list) {
+			layout(list, 0, 1, 2);
+		}
+		
+		public void layout(IList list, int left, int root, int right) {
 			string edges = "digraph {\n";
 			edges += @"  node [label=""\\N"", shape=record];";
 			edges += "\n";
-			edges += recurseNodes(list);
-			edges += recurseEdges(list);
+			edges += recurseNodes(list, left, root, right); // left, root, right
+			edges += recurseEdges(list, left, root, right); // left, root, right
 			edges += "}";
 			layout(edges);
 		}
