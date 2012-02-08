@@ -1,7 +1,7 @@
 # Search
 
 from random import random
-from Graphics import Graph
+from Graphics import Graph, Window, Color
 
 class Tree:
     def __init__(self, left, item, right):
@@ -34,12 +34,6 @@ def treeToList(tree):
     retval.append(treeToList(tree.right))
     return retval
 
-tree = makeRandomTree(5)
-
-g = Graph()
-g.layout(treeToList(tree))
-g.draw({"label": "Random Graph", "default_shape": "box", "line_type": "line"})
-
 class Queue:
     def __init__(self, start=None):
         self.list = [] if start == None else start
@@ -57,8 +51,24 @@ class Queue:
 def search(items, match):
     while not items.is_empty():
         node = items.next()
+        shape = g.getNode(str(node.item))
+        shape.fill = Color("pink")
         if node.item == match:
-            return match
-        items.append( node.expand() )
+            return True
+        items.append(*node.expand())
+    return False
 
-search(Queue([tree]), 323)
+def reset_color(tree):
+    node = g.getNode(str(tree.item))
+    node.fill = Color("white")
+    if tree.left:
+        reset_color(tree.left)
+    if tree.right:
+        reset_color(tree.right)
+
+tree = makeRandomTree(5)
+g = Graph()
+g.layout(treeToList(tree))
+win = Window(1000, 300)
+g.draw(win, {"label": "Random Graph", "default_shape": "box", "line_type": "line"})
+print(search(Queue([tree]), 302))

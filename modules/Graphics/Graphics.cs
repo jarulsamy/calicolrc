@@ -4921,6 +4921,10 @@ public static class Graphics
 			return (List<Shape>)edges[id]["line"];
 		}
 
+		public Shape getNode(string id) {
+			return (Shape)vertices[id]["shape"];
+		}
+
 		public void addEdge(string nameFrom, string nameTo) {
 			string recordFrom = null;
 			string recordTo = null;
@@ -4951,7 +4955,7 @@ public static class Graphics
 				// Pass
 			} else {
 				if (left < list.Count && list[left] != null) {
-					if (list[left] is IList) {
+					if (list[left] is IList && ((IList)list[left]).Count > 0) {
 						edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
 						edges += recurseEdges((IList)list[left], left, root, right);
 					} else {
@@ -4959,7 +4963,7 @@ public static class Graphics
 					}
 				}
 				if (right < list.Count && list[right] != null) {
-					if (list[right] is IList) {
+					if (list[right] is IList && ((IList)list[right]).Count > 0) {
 						edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
 						edges += recurseEdges((IList)list[right], left, root, right);
 					} else {
@@ -4972,7 +4976,7 @@ public static class Graphics
 		
 		public string recurseNodes(IList list, int left, int root, int right) {
 			string nodes = "";
-			if (list != null) {
+			if (list != null && list.Count > 0) {
 				// Left:
 				if (left < list.Count && list[left] is IList)
 					nodes += recurseNodes((IList)list[left], left, root, right);
@@ -5143,10 +5147,19 @@ public static class Graphics
 					}
 	                label = labels[1].Trim(); // FIXME: should draw each part
 				}
+				// Add label as tag to objects
+	            if (obj1 != null) {
+	                obj1.tag = label;
+				}
+	            if (obj2 != null) {
+	                obj2.tag = label;
+				}
+				// Draw text:
 	            Graphics.Text text = new Graphics.Text(c, label);
 	            text.fontSize = 10 * scale;
 	            text.color = new Graphics.Color("black");
 	            text.draw(window);
+				// Add group to shape list:
 	            vertices[label] = new Dictionary<string,Shape>();
 	            if (obj1 != null && obj2 != null) {
 	                vertices[label]["shape"] = new Graphics.Group(obj1, obj2);

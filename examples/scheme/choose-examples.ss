@@ -201,6 +201,13 @@
        (26 (20 (17 () ()) ())
 	   (31 () ()))))
 
+(define show-tree
+   (lambda (tree)
+      (using "Graphics")
+      (define g (Graphics.Graph))
+      (g.layout tree 1 0 2) ;; left-index root-index right-index
+      (g.draw)))
+
 (define empty? (lambda (tree) (null? tree)))
 (define root (lambda (tree) (car tree)))
 (define left-branch (lambda (tree) (car (cdr tree))))
@@ -210,11 +217,12 @@
   (lambda (n tree)
     (require (not (empty? tree)))
     (if (= (root tree) n)
-      '()
-      (choose
-	(cons 'left (guess-path n (left-branch tree)))
-	(cons 'right (guess-path n (right-branch tree)))))))
+        '()
+        (choose
+	        (cons 'left (guess-path n (left-branch tree)))
+	        (cons 'right (guess-path n (right-branch tree)))))))
 
+;; (show-tree example-tree)
 ;; (guess-path 17 example-tree) => (right left left)
 
 ;;----------------------------------------------------------------------------
