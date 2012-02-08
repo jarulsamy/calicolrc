@@ -4972,14 +4972,17 @@ public static class Graphics
 		public string recurseNodes(IList list) {
 			string nodes = "";
 			if (list != null && list.Count == 3) {
-				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[1].ToString());
+				// Left
 				if (list[0] is IList)
 					nodes += recurseNodes((IList)list[0]);
-				else
+				else if (list[0] != null)
 					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[0].ToString());
+				// Middle
+				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[1].ToString());
+				// Right
 				if (list[2] is IList)
 					nodes += recurseNodes((IList)list[2]);
-				else
+				else if (list[2] != null)
 					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[2].ToString());
 			}
 			return nodes;
