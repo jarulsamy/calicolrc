@@ -4958,7 +4958,7 @@ public static class Graphics
 					if (list[left] is IList && ((IList)list[left]).Count > 0) {
 						edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
 						edges += recurseEdges((IList)list[left], left, root, right);
-					} else if (list[left] != null && ((IList)list[left]).Count > 0) {
+					} else if (list[left] != null && !(list[left] is IList)) {
 						edges += String.Format("  {0}:left -> {1};\n", list[root], list[left]);
 					}
 				}
@@ -4966,7 +4966,7 @@ public static class Graphics
 					if (list[right] is IList && ((IList)list[right]).Count > 0) {
 						edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
 						edges += recurseEdges((IList)list[right], left, root, right);
-					} else if (list[right] != null && ((IList)list[right]).Count > 0) {
+					} else if (list[right] != null  && !(list[right] is IList)) {
 						edges += String.Format("  {0}:right -> {1};\n", list[root], list[right]);
 					}
 				}
