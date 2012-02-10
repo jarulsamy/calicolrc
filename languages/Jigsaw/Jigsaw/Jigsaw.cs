@@ -383,7 +383,8 @@ namespace Jigsaw
 					System.IO.TextReader tr = new System.IO.StreamReader(filename);
 					UseLibraryMap(tr);
 				} else {	// Assume it's a dll
-					UseLibraryDLL(filename);
+					if (!engine.loadedAssemblies.ContainsKey(filename)) 
+						UseLibraryDLL(filename);
 				}
 			} catch (Exception ex) {
 				Console.Error.WriteLine ("Error loading library: {0}", ex.Message);

@@ -555,20 +555,8 @@ public class MainWindow : Gtk.Window
 			dlg.Destroy();
 			return;
 		}
-		
-		try
-		{	// Decide what to do based on file extension
-			if (filetype == ".map") {
-				System.IO.TextReader tr = new System.IO.StreamReader(filename);
-				js.UseLibraryMap(tr);
-			} else {	// Assume it's a dll
-				StringBuilder sb = js.CreateMapFile(filename);
-				System.IO.TextReader tr = new System.IO.StringReader (sb.ToString ());
-				js.UseLibraryMap(tr);
-			}
-		} catch (Exception ex) {
-			Console.WriteLine ("Error loading library: {0}", ex.Message);
-		}
+		// Load the file:
+		js.UseLibrary(filename);
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
