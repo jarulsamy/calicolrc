@@ -78,9 +78,17 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
-
+		cvs.Modified = false;
 		widget.ShowAll ();
 	}
+	
+    public override bool IsDirty {
+        get { return cvs.Modified; }
+        set { 
+			cvs.Modified = true;
+		}
+    }
+
 	
 	protected void OnJigsawCanvasChanged(object sender, EventArgs a) {
 		Gtk.Application.Invoke( delegate {
@@ -152,7 +160,10 @@ public class CalicoJigsawDocument : Document
        
 	public override bool SaveDocument ()
 	{
-		return cvs.SaveDocument (filename);
+		bool retval = cvs.SaveDocument (filename);
+		if (retval) 
+			cvs.Modified = false;
+		return retval;
 	}
 
 	public override bool SearchMore (string s)
