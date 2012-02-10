@@ -77,8 +77,15 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
+		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 
 		widget.ShowAll ();
+	}
+	
+	protected void OnJigsawCanvasChanged(object sender, EventArgs a) {
+		Gtk.Application.Invoke( delegate {
+			UpdateDocument();
+		});
 	}
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
