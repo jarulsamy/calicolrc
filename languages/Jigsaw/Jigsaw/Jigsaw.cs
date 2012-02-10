@@ -121,46 +121,47 @@ namespace Jigsaw
 			this.AddShape(pnlBlock);
 			
 			// Build tabbed panel for blocks
-			int tabY = 33;
+			int tabY = 0; //33;
+			int os = 34;
 			
 			// ----- Control tab and factory blocks
 			tabY += 33;
-			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0,  tabY, 100, 30, "Control", pnlBlock);
+			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, 30, "Control", pnlBlock);
 			tbCtrl.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbCtrl);
 			allTabs.Add (tbCtrl);
 			
-			CControlStart block20 = new CControlStart(110, 70, pnlBlock);
+			CControlStart block20 = new CControlStart(110, 70-os, pnlBlock);
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
 
-			CControlIf block21 = new CControlIf(110, 150, pnlBlock);
+			CControlIf block21 = new CControlIf(110, 150-os, pnlBlock);
 			this.AddShape(block21);
 			tbCtrl.AddShape(block21);
 
-			CControlIfElse block22 = new CControlIfElse(110, 220, pnlBlock);
+			CControlIfElse block22 = new CControlIfElse(110, 220-os, pnlBlock);
 			this.AddShape(block22);
 			tbCtrl.AddShape(block22);
 			
-			CControlWhile block23 = new CControlWhile(110, 320, pnlBlock);
+			CControlWhile block23 = new CControlWhile(110, 320-os, pnlBlock);
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
 			
-			CControlRepeat block24 = new CControlRepeat(110, 390, pnlBlock);
+			CControlRepeat block24 = new CControlRepeat(110, 390-os, pnlBlock);
 			this.AddShape(block24);
 			tbCtrl.AddShape(block24);
+
+			CControlForeach block27 = new CControlForeach(110, 460-os, pnlBlock);
+			this.AddShape(block27);
+			tbCtrl.AddShape(block27);
 			
-			CControlBreak block25 = new CControlBreak(110, 460, pnlBlock);
+			CControlBreak block25 = new CControlBreak(110, 530-os, pnlBlock);
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
 			
-			CControlEnd block26 = new CControlEnd(110, 500, pnlBlock);
+			CControlEnd block26 = new CControlEnd(110, 570-os, pnlBlock);
 			this.AddShape(block26);
 			tbCtrl.AddShape(block26);
-			
-			CControlForeach block27 = new CControlForeach(110, 540, pnlBlock);
-			this.AddShape(block27);
-			tbCtrl.AddShape(block27);
 			
 			// ----- Statement tab and factory blocks	
 			tabY += 33;
@@ -169,19 +170,19 @@ namespace Jigsaw
 			this.AddShape(tbStats);
 			allTabs.Add (tbStats);
 
-			CAssignment vblock1 = new CAssignment(110, 70, pnlBlock);
+			CAssignment vblock1 = new CAssignment(110, 70-os, pnlBlock);
 			this.AddShape(vblock1);
 			tbStats.AddShape(vblock1);
 
-			CStatement vblock2 = new CStatement(110, 110, pnlBlock);
+			CStatement vblock2 = new CStatement(110, 110-os, pnlBlock);
 			this.AddShape(vblock2);
 			tbStats.AddShape(vblock2);
 			
-			CInlineComment bCmt1 = new CInlineComment(110, 150, pnlBlock);
+			CInlineComment bCmt1 = new CInlineComment(110, 150-os, pnlBlock);
 			this.AddShape(bCmt1);
 			tbStats.AddShape(bCmt1);
 			
-			CComment bCmt2 = new CComment(110, 190, pnlBlock);
+			CComment bCmt2 = new CComment(110, 190-os, pnlBlock);
 			this.AddShape(bCmt2);
 			tbStats.AddShape(bCmt2);
 			
@@ -192,11 +193,11 @@ namespace Jigsaw
 			this.AddShape(tbInOut);
 			allTabs.Add (tbInOut);
 			
-			CIOPrint _cioprint = new CIOPrint(110, 70, pnlBlock);
+			CIOPrint _cioprint = new CIOPrint(110, 70-os, pnlBlock);
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
 			
-			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 110, pnlBlock);
+			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 110-os, pnlBlock);
 			this.AddShape(_ciowritefile);
 			tbInOut.AddShape(_ciowritefile);
 			
@@ -207,15 +208,15 @@ namespace Jigsaw
 			this.AddShape(tbProc);
 			allTabs.Add (tbProc);
 
-			CProcedureStart bProcStart = new CProcedureStart(110, 70, pnlBlock);
+			CProcedureStart bProcStart = new CProcedureStart(110, 70-os, pnlBlock);
 			this.AddShape(bProcStart);
 			tbProc.AddShape(bProcStart);
 			
-			CProcedureReturn bProcRet = new CProcedureReturn(110, 150, pnlBlock);
+			CProcedureReturn bProcRet = new CProcedureReturn(110, 150-os, pnlBlock);
 			this.AddShape(bProcRet);
 			tbProc.AddShape(bProcRet);
 			
-			CProcedureCall bProcCall = new CProcedureCall(110, 190, pnlBlock);
+			CProcedureCall bProcCall = new CProcedureCall(110, 190-os, pnlBlock);
 			this.AddShape(bProcCall);
 			tbProc.AddShape(bProcCall);
 
@@ -1414,7 +1415,7 @@ namespace Jigsaw
 			this.CurrentPath = null;
 			
 			// Created default starting blocks
-			CControlStart b1 = new CControlStart(410, 70);
+			CControlStart b1 = new CControlStart(350, 36);
 			this.AddShape(b1);
 			//CControlEnd   b2 = new CControlEnd(410, 150);;
 			//this.AddShape(b2);

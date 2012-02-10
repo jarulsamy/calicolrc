@@ -238,11 +238,8 @@ namespace Jigsaw
 			{
 				// If end block is connected to start block, add a pass
 				if (this.InEdge.IsConnected) {
-					CBlock b = this.InEdge.LinkedTo.Block;
-					if (b is CControlStart) {
-						string sindent = new string (' ', 2*indent);
-						o.AppendFormat ("{0}pass\n", sindent);
-					}
+					string sindent = new string (' ', indent);
+					o.AppendFormat ("{0}sys.exit(0)\n", sindent);
 				}
 				
 			} catch (Exception ex){
