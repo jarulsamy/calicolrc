@@ -198,6 +198,7 @@ namespace Diagram
 
         // Custom events
         public event CanvasEventHandler SelectionChanged;       // Raised when shape selection changed
+		public event EventHandler CanvasChanged;
         public event CanvasEventHandler ShapesCreated;          // Raised when a new shape is created
         public event CanvasEventHandler ShapesDeleted;          // Raised when a shape is deleted
         public event CanvasEventHandler ShapesMoved;            // Raised when one or more shape are moved
@@ -1018,12 +1019,19 @@ namespace Diagram
             }
         }
 
+        // - - - Allow external class to raise the SelectionChanged event - - - - - - - 
+        public virtual void RaiseCanvasChangedEvent()
+        {
+			CanvasChangedEventArgs evargs = new CanvasChangedEventArgs(this.Modified);
+			CanvasChanged(this, evargs);
+        }
+
         // - - - Allow external class to raise the ShapesCreated event - - -
         public void RaiseShapesCreatedEvent(CShape s)
         {
             if (ShapesCreated != null)
             {
-                this.modified = true;
+                this.Modified = true;
                 ShapeListEventArgs evargs = new ShapeListEventArgs(s);
                 ShapesCreated(this, evargs);
             }
@@ -1034,7 +1042,7 @@ namespace Diagram
         {
             if (ShapesDeleted != null)
             {
-                this.modified = true;
+                this.Modified = true;
                 ShapeListEventArgs evargs = new ShapeListEventArgs(s);
                 ShapesDeleted(this, evargs);
             }
@@ -1045,7 +1053,7 @@ namespace Diagram
         {
             if (ShapesMoved != null)
             {
-                this.modified = true;
+                this.Modified = true;
                 ShapeListEventArgs evargs = new ShapeListEventArgs(shps);
                 ShapesMoved(this, evargs);
             }
@@ -1057,7 +1065,7 @@ namespace Diagram
         {
             if (ShapesSized != null)
             {
-                this.modified = true;
+                this.Modified = true;
                 ShapeListEventArgs evargs = new ShapeListEventArgs(shps);
                 ShapesSized(this, evargs);
             }
@@ -1172,14 +1180,23 @@ namespace Diagram
             this.connectors.Clear();
             this.shapes.Clear();
 
-            this.modified = true;
+            this.Modified = true;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual Boolean Modified
         {
             get { return this.modified; }
-            set { this.modified = value; }
+            set { 
+				if (this.modified != value) {
+					this.modified = value; 
+					try {
+						this.RaiseCanvasChangedEvent();
+					} catch {
+						// Not ready yet
+					}
+				}
+			}
         }
 
         // - - - Create a new point with coordintes equal to the closest grid point. - - -
@@ -1288,7 +1305,7 @@ namespace Diagram
 
             // Add the shape to the list
             this.shapes.Add(shp);
-            this.modified = true;
+            this.Modified = true;
         }
 
         // - - - Add a shape to the connector layer - - -
@@ -1322,7 +1339,7 @@ namespace Diagram
 
             // Add to list of connectors on canvas
             this.connectors.Add(shp);
-            this.modified = true;
+            this.Modified = true;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1339,7 +1356,7 @@ namespace Diagram
             shp.Deselect(this);                     // Eliminate all annotation
             shp.Disconnect();                       // Disconnect any connectors
             this.shapes.Remove(shp);                // Remove from the canvas shape list
-            this.modified = true;                   // Mark as modified
+            this.Modified = true;                   // Mark as modified
             this.RaiseShapesDeletedEvent(shp);      // Raise event
         }
 
@@ -1350,7 +1367,7 @@ namespace Diagram
             con.Deselect(this);                     // Eliminate all annotation
             con.Disconnect();                       // Disconnect from any shapes
             this.connectors.Remove(con);            // Remove from the canvas connector list
-            this.modified = true;                   // Mark as modified
+            this.Modified = true;                   // Mark as modified
             this.RaiseShapesDeletedEvent(con);      // Raise event
         }
 
@@ -1766,6 +1783,20 @@ namespace Diagram
         }
     }
 
+	/// <summary>
+	/// Class for event args of CanvasChanged event
+	/// </summary>
+    public class CanvasChangedEventArgs : EventArgs
+    {
+        public bool Modified;
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CanvasChangedEventArgs(bool value)
+        { 
+			Modified = value;
+		}
+	}
+	
 	/// <summary>
 	/// Class for event args of Shape event involving multiple shapes
 	/// </summary>
@@ -2541,7 +2572,7 @@ namespace Diagram
             this.UpdateDecorators();
 
             //        # Needs saving after any scaling
-            //        self.cvs._modified = True
+            //        self.cvs.Modified = True
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2570,7 +2601,7 @@ namespace Diagram
             this.UpdateDecorators();
 
             // Needs saving after a transformation
-            //cvs.modified = true;
+            //cvs.Modified = true;
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
