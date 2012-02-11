@@ -272,7 +272,7 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	}
 
 	public object GetData(int x, int y) {
-		// Matrix, 0-based, swapped order of params from GetData("A", 1)
+		// Matrix, 0-based
 		Gtk.TreeIter iter;
 		sheet.liststore.GetIterFromString(out iter, x.ToString());
 		return sheet.liststore.GetValue(iter, y + 1);
