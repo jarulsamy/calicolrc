@@ -42,19 +42,19 @@
 	<Match color = "string">CSharpNumber</Match>
 
 	<!-- :symbol -->
-	<Match color = "string">(^|[^\w\d:]):[\w\d]+</Match>
+	<!-- <Match color = "string">(^|[^\w\d:]):[\w\d]+</Match> -->
 
 	<!-- @@class_variable -->
-	<Match color = "keyword.modifier">(^|[^@\w\d])@@\w[\w\d]*</Match>
+	<!-- <Match color = "keyword.modifier">(^|[^@\w\d])@@\w[\w\d]*</Match> -->
 
 	<!-- @instance_variable -->
-	<Match color = "keyword.type">(^|[^@\w\d])@\w[\w\d]*</Match>
+	<!-- <Match color = "keyword.type">(^|[^@\w\d])@\w[\w\d]*</Match> -->
 	
 	<!-- $global_variable -->
-	<Match color = "keyword.jump">(^|[^\$\w\d])\$\w[\w\d]*</Match>
+	<!-- <Match color = "keyword.jump">(^|[^\$\w\d])\$\w[\w\d]*</Match> -->
 	
 	<!-- CONSTant -->
-	<Match color = "comment.keyword.todo">(^|[^\w\d])(?-i)[A-Z][\w\d]*</Match>
+	<!-- <Match color = "comment.keyword.todo">(^|[^\w\d])(?-i)[A-Z][\w\d]*</Match> -->
 
 	<Keywords color = "keyword.access">
 		<Word>self</Word>
@@ -119,7 +119,6 @@
 	  <Word>get</Word>
 	  <Word>group</Word>
 	  <Word>help</Word>
-	  <Word>import</Word>
 	  <Word>int</Word>
 	  <Word>iter?</Word>
 	  <Word>length</Word>
@@ -130,7 +129,6 @@
 	  <Word>list-tail</Word>
 	  <Word>load</Word>
 	  <Word>make-vector</Word>
-	  <Word>map</Word>
 	  <Word>member</Word>
 	  <Word>memq</Word>
 	  <Word>newline</Word>
@@ -162,6 +160,8 @@
           <Word>vector-&gt;list</Word>
           <Word>vector-ref</Word>
           <Word>vector-set!</Word>
+		<Word>choose</Word>
+		<Word>require</Word>
 	</Keywords>
 	
 	<Keywords color = "keyword.iteration">
