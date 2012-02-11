@@ -32,13 +32,6 @@ namespace Jigsaw
 		Idle = 1, Running = 2, Error = 3
 	}
 	
-	// ---- Helper struct for search -----------------------------------------
-//	public struct SearchPair {
-//		public bool Found;
-//		public Widgets.CRoundedTab Tab;
-//		public CBlock Block;
-//	}
-	
 	// -----------------------------------------------------------------------
 	public class Canvas : Diagram.Canvas
 	{	// Subclass of Canvas that adds custom behavior 
@@ -78,12 +71,6 @@ namespace Jigsaw
 		
 		// Ref to internal search helper object
 		public SearchHelper _searchHelper = null;
-		
-//		// Variables to support search
-//		private List<KeyValuePair<Widgets.CRoundedTab,CBlock>> _searchSet = null;
-//		int _searchStart = 0;			// Starting search position
-//		int _searchPos = 0;				// Next position to test in search
-//		bool _searchNext = true;		// true means searching forward. false means searching backward
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
@@ -197,9 +184,17 @@ namespace Jigsaw
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
 			
-			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 110-os, pnlBlock);
-			this.AddShape(_ciowritefile);
-			tbInOut.AddShape(_ciowritefile);
+			CIOAsk _cioask = new CIOAsk(110, 110-os, pnlBlock);
+			this.AddShape(_cioask);
+			tbInOut.AddShape(_cioask);
+
+			CIOTell _ciotell = new CIOTell(110, 150-os, pnlBlock);
+			this.AddShape(_ciotell);
+			tbInOut.AddShape(_ciotell);
+			
+//			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 150-os, pnlBlock);
+//			this.AddShape(_ciowritefile);
+//			tbInOut.AddShape(_ciowritefile);
 			
 			// ----- Procedures tab and factory blocks
 			tabY += 33;

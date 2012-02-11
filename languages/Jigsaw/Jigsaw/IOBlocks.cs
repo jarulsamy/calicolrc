@@ -207,6 +207,214 @@ namespace Jigsaw
 			yield return rr;
 		}
 	}
+	
+	// -----------------------------------------------------------------------
+    public class CIOAsk : CInputOutput
+    {	// Display a message dialog and collect result
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CIOAsk(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
+		{
+			// Properties
+			CStringProperty Question = new CStringProperty("Ask", "question?");
+			CVarNameProperty Answer = new CVarNameProperty("Answer", "X");
+			Question.PropertyChanged += OnPropertyChanged;
+			Answer.PropertyChanged += OnPropertyChanged;
+			_properties["Ask"] = Question;
+			_properties["Answer"] = Answer;
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CIOAsk(Double X, Double Y) : this(X, Y, null) {}
+		
+		// - - - Get properties - - - - - - - - - - - - - - -
+		private String Question 
+		{
+			get
+			{
+				return _properties["Ask"].Text;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		private String Answer 
+		{
+			get 
+			{
+				return _properties["Answer"].Text.Trim();
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs E)
+		{	// Update text when property changes
+			if (this.Answer.Length > 0) {
+				this.Text = String.Format("{0} = Ask: {1}", this.Answer, this.Question);
+			} else {
+				this.Text = String.Format("Ask: {0}", this.Question);
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				rr.Frame = null;
+				yield return rr;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			Gtk.MessageDialog _dlg = new Gtk.MessageDialog(
+				null,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Question,
+				Gtk.ButtonsType.Ok,
+				null);
+			
+			_dlg.Title = "Ask...";
+			_dlg.Markup = this.Question;
+			_dlg.DefaultResponse = Gtk.ResponseType.Ok;
+			
+			Gtk.Entry _entry = new Gtk.Entry();
+			Gtk.HBox hbox = new Gtk.HBox();
+			hbox.PackStart(new Gtk.Label("Ask: "), false, false, 5);
+			hbox.PackEnd(_entry);
+			_dlg.VBox.PackEnd(hbox, true, true, 0);
+			_dlg.ShowAll();
+	
+			Gtk.ResponseType rsp = (Gtk.ResponseType)_dlg.Run ();
+			string answer = _entry.Text;
+			_dlg.Destroy();
+			scope.SetVariable(Answer, answer);
+//			if (rsp == Gtk.ResponseType.Ok) {
+//				scope.SetVariable(Answer, answer);
+//			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+	}
+	
+	// -----------------------------------------------------------------------
+    public class CIOTell : CInputOutput
+    {	// Display a message
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CIOTell(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
+		{
+			// Properties
+			CExpressionProperty Tell = new CExpressionProperty("Tell", "'message'");
+			Tell.PropertyChanged += OnPropertyChanged;
+			_properties["Tell"] = Tell;
+			this.OnPropertyChanged(null, null);
+		}
+		
+		public CIOTell(Double X, Double Y) : this(X, Y, null) {}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs E)
+		{	// Update text when property changes
+			this.Text = String.Format("Tell: {0}",  this["Tell"]);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
+			try {
+				Tell.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
+		{
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				rr.Frame = null;
+				yield return rr;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			try {
+				CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
+				
+				Gtk.MessageDialog _dlg = new Gtk.MessageDialog(
+					null,
+					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+					Gtk.MessageType.Info,
+					Gtk.ButtonsType.Ok,
+					null);
+				
+				_dlg.Title = "Tell...";
+				_dlg.Markup = String.Format ("{0}", Tell.Evaluate(scope));
+				_dlg.DefaultResponse = Gtk.ResponseType.Ok;
+				
+//				Gtk.HBox hbox = new Gtk.HBox();
+//				hbox.PackStart(new Gtk.Label("Tell: "), false, false, 5);
+//				_dlg.VBox.PackEnd(hbox, true, true, 0);
+				_dlg.ShowAll();
+		
+				Gtk.ResponseType rsp = (Gtk.ResponseType)_dlg.Run ();
+				_dlg.Destroy();
+				
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+	}
 
 	// -----------------------------------------------------------------------
     public class CIOWriteToFile : CInputOutput

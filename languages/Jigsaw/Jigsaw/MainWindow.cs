@@ -354,7 +354,7 @@ public class MainWindow : Gtk.Window
 		vb.Add(js);
 		this.Add(vb);
 		
-		js.CanvasChanged += (cvs, e) => Console.WriteLine("Changed!");
+		//js.CanvasChanged += (cvs, e) => Console.WriteLine("Changed!");
 		
 		// Let 'er rip
 		this.ShowAll();
