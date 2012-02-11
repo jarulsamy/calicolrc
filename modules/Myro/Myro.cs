@@ -4383,6 +4383,22 @@ public static class Myro {
     return Graphics.copyPicture(picture);
   }
 
+  public static Dictionary<object,object> makeDictionary() {
+    return new Dictionary<object,object>();
+  }
+
+  public static object getDictionaryItem(IDictionary dict, object key) {
+    return dict[key];
+  }
+
+  public static object setDictionaryItem(IDictionary dict, object key, object value) {
+    return dict[key] = value;
+  }
+
+  public static object [] setDictionaryKeys(IDictionary dict) {
+    return dict.Keys;
+  }
+
   public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
       int width=300,
       int height=300) {
