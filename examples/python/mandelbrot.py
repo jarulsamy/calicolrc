@@ -28,7 +28,7 @@ xa = -2.0
 xb = 1.0
 ya = -1.5
 yb = 1.5
-maxIt = 255 # max iterations allowed
+maxIt = 32 # max iterations allowed
 
 for y in range(pic.height):
     zy = y * (yb - ya) / (pic.height - 1)  + ya

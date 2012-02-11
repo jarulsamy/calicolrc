@@ -21,7 +21,7 @@
 (define test
    (lambda ()
      (using "Graphics")
-     (define win (Graphics.Window "Hello"))
+     (define win (Graphics.Window "Hello1"))
      (define line (Graphics.Line (Graphics.Point 0 0)
                                  (Graphics.Point 100 100)))
      (line.draw win)
@@ -30,12 +30,12 @@
 (define test2
    (lambda ()
       (using "Graphics")
-      (let (win (Graphics.Window "Hello"))
-           (line (Graphics.Line (Graphics.Point 0 0)
-                                (Graphics.Point 100 100)))
+      (let ((win (Graphics.Window "Hello2"))
+            (line (Graphics.Line (Graphics.Point 0 0)
+                                (Graphics.Point 100 100))))
          (line.draw win)
          (line.rotate 90))))
 
- (test)
- (test2)
+(test)
+(test2)
  
