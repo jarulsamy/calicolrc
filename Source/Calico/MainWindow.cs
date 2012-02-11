@@ -317,6 +317,20 @@ namespace Calico {
         public Gtk.TreeView LocalTreeView {
             get { return treeview2; }
         }
+
+        protected override bool OnScrollEvent (Gdk.EventScroll evnt)
+        {
+            // After the other items have handled their scrolls
+            if (Focus == Shell) {
+                if (evnt.Direction == Gdk.ScrollDirection.Up)
+                    KeyUp(true);
+                else if (evnt.Direction == Gdk.ScrollDirection.Down)
+                    KeyDown(true);
+                return true;
+            }
+            else return base.OnScrollEvent (evnt);
+        }
+     
         public Gtk.ScrolledWindow ScrolledWindow {
             get { return scrolledwindow1; }
             set { scrolledwindow1 = value; }
