@@ -2,6 +2,7 @@
 
 from random import random
 from Graphics import Graph, Window, Color
+from Myro import pickOne, ask
 
 class Tree:
     def __init__(self, left, item, right):
@@ -18,12 +19,17 @@ class Tree:
         return retval
 
 MAX = 1000
+rands = set()
 
 def makeRandomTree(n):
     if n == 0: return None
     left = makeRandomTree(n - 1)
     right = makeRandomTree(n - 1)
-    return Tree(left, int(random() * MAX), right)
+    r = int(random() * MAX)
+    while r in rands:
+        r = int(random() * MAX)
+    rands.add(r)
+    return Tree(left, r, right)
 
 def treeToList(tree):
     retval = []
@@ -75,4 +81,10 @@ g = Graph()
 g.layout(treeToList(tree))
 win = Window(1000, 300)
 g.draw(win, {"label": "Random Graph", "default_shape": "box", "line_type": "line"})
-print(search(Stack([tree]), 302))
+number = ask("What number do you want to search for?")
+while number:
+    r = int(number)
+    print(search(Stack([tree]), r))
+    r = pickOne(*rands)
+    number = ask("What number do you want to search for?")
+    reset_color(tree)
