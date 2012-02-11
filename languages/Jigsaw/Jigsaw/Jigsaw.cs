@@ -1682,6 +1682,18 @@ namespace Jigsaw
 			if (sblocks.Count > 1) {
 				o.AppendLine("from Myro import doTogether");
 			}
+			// Look for exit, for sys
+			bool import_sys = false;
+			foreach (CBlock b in allBlocks)
+			{
+				if (b is CControlEnd) {
+					import_sys = true;
+					break;
+				}
+			}
+			if (import_sys) {
+				o.AppendLine("import sys");
+			}
 			o.AppendLine ();
 
 			// Generate all procedures
