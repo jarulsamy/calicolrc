@@ -745,6 +745,20 @@ namespace Calico {
             }
         }
 
+        public void FileSavedAs(Document doc, string filename) {
+            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget)) {
+                    if (documents[widget].filename == filename && documents[widget] != doc) {
+                        // Contents were just overwritten!
+                        documents[widget].filename = null;
+                        documents[widget].IsDirty = true;
+                        documents[widget].UpdateDocument();
+                    }
+                }
+            }
+        }
+
         protected virtual void OnQuitActionActivated(object sender, System.EventArgs e) {
             if (Close()) {
                 Cleanup();

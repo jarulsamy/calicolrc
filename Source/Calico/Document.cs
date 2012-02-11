@@ -189,6 +189,7 @@ namespace Calico {
                     tab_label.Text = basename;
                     tab_label.TooltipText = filename;
                     //self.on_change_file();
+                    calico.FileSavedAs(this, filename); // if that file is open not here, reload it
                 }
             }
             fc.Destroy();
@@ -212,6 +213,9 @@ namespace Calico {
                 tab_label.Text = basename;
             }
             return retval;
+        }
+
+        public virtual void Reload() {
         }
 
         public virtual bool SaveDocument() {
@@ -424,6 +428,7 @@ namespace Calico {
 
         public override bool IsDirty {
             get { return texteditor.Document.IsDirty; }
+            set { if (value) texteditor.Document.Text =  texteditor.Document.Text;} // force it dirty
         }
 
         public override bool Close() {
@@ -543,6 +548,13 @@ namespace Calico {
             texteditor.Insert (0, calico.manager[language].GetUseLibraryString(fullname));
         }
 
+        public override void Reload() {
+            if (System.IO.File.Exists(filename)) {
+                System.IO.TextReader reader = new System.IO.StreamReader(filename);
+                texteditor.Text = reader.ReadToEnd();
+                reader.Close();
+            }
+        }
     }
 }
 
