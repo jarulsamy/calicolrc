@@ -74,6 +74,7 @@ namespace CalicoPython
 				  string ttype, object retval)
 		{
 			Calico.MainWindow.Invoke (delegate {
+				  calico.Print(String.Format("trace: {0}, return {1}", ttype, retval));
 				if (calico.CurrentDocument != null 
 					&& calico.CurrentDocument.filename == frame.f_code.co_filename
 					&& calico.ProgramSpeed.Value != 100) {
