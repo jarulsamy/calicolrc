@@ -73,8 +73,8 @@ namespace CalicoPython
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 				  string ttype, object retval)
 		{
-		  if (ttype == "call")
-			return null;
+		  //if (ttype == "call")
+		  //		return null;
 			Calico.MainWindow.Invoke (delegate {
 				  calico.Print(String.Format("trace: {0}, return {1}", ttype, retval));
 				if (calico.CurrentDocument != null 
