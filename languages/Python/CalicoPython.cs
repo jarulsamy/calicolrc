@@ -28,6 +28,8 @@ namespace CalicoPython
 	public class CalicoPythonEngine : DLREngine
 	{
 	
+	        static string trace_filename = null;
+
 		public CalicoPythonEngine (LanguageManager manager) : base(manager)
 		{
 			dlr_name = "py";
@@ -69,17 +71,13 @@ namespace CalicoPython
 			engine.SetSearchPaths (paths);
 		}
 		
-		static int trace_level = 0;
 		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack (
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 				  string ttype, object retval)
 		{
 		  if (ttype == "call") { 
-			if (trace_level == 1)
+			if (frame.f_code.co_filename != trace_filename)
 		  		return null;
-			trace_level++;
-		  } else if (ttype == "return") { 
-			trace_level--;
 		  }
 		  Calico.MainWindow.Invoke (delegate {
 				if (calico.CurrentDocument != null 
@@ -92,7 +90,7 @@ namespace CalicoPython
 			if (calico.CurrentDocument != null 
 			    && calico.CurrentDocument.filename == frame.f_code.co_filename
 			    && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
-				calico.ProgramSpeed.Value = 0;
+			        //calico.ProgramSpeed.Value = 0;
 				calico.PlayButton.Sensitive = true;
 				calico.PauseButton.Sensitive = false;
 				calico.playResetEvent.WaitOne ();				
@@ -121,8 +119,8 @@ namespace CalicoPython
 		{
 		    try {
 			  if (trace) {
-				trace_level = 0;
-				IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
+			    trace_filename = calico.CurrentDocument.filename;
+			    IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
 			  }
 		    } catch { 
 		       Console.Error.WriteLine("Error in setting trace.");

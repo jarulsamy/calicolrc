@@ -1995,7 +1995,7 @@ namespace Calico {
 
         protected void OnPauseButton1Clicked (object sender, System.EventArgs e)
         {
-            ProgramSpeed.Value = 0;
+	    //ProgramSpeed.Value = 0;
             PlayButton.Sensitive = true;
             PauseButton.Sensitive = false;
         }
