@@ -69,13 +69,19 @@ namespace CalicoPython
 			engine.SetSearchPaths (paths);
 		}
 		
+		static int trace_level = 0;
 		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack (
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 				  string ttype, object retval)
 		{
-		  //if (ttype == "call")
-		  //		return null;
-			Calico.MainWindow.Invoke (delegate {
+		  if (ttype == "call") { 
+			if (trace_level == 1)
+		  		return null;
+			trace_level++;
+		  } else if (ttype == "return") { 
+			trace_level--;
+		  }
+		  Calico.MainWindow.Invoke (delegate {
 				  calico.Print(String.Format("trace: {0}, return {1}", ttype, retval));
 				if (calico.CurrentDocument != null 
 					&& calico.CurrentDocument.filename == frame.f_code.co_filename
