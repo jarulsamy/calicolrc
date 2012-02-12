@@ -81,7 +81,9 @@ namespace CalicoPython
 				}
 				calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
 			});
-			if (calico.CurrentDocument != null && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
+			if (calico.CurrentDocument != null 
+			    && calico.CurrentDocument.filename == frame.f_code.co_filename
+			    && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
 				calico.ProgramSpeed.Value = 0;
 				calico.PlayButton.Sensitive = true;
 				calico.PauseButton.Sensitive = false;
