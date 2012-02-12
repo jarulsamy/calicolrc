@@ -82,7 +82,6 @@ namespace CalicoPython
 			trace_level--;
 		  }
 		  Calico.MainWindow.Invoke (delegate {
-				  calico.Print(String.Format("trace: {0}, return {1}", ttype, retval));
 				if (calico.CurrentDocument != null 
 					&& calico.CurrentDocument.filename == frame.f_code.co_filename
 					&& calico.ProgramSpeed.Value != 100) {
@@ -121,8 +120,10 @@ namespace CalicoPython
 		public override void ConfigureTrace ()
 		{
 		    try {
-			if (trace)
+			  if (trace) {
+				trace_level = 0;
 				IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
+			  }
 		    } catch { 
 		       Console.Error.WriteLine("Error in setting trace.");
 		    }
