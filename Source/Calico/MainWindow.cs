@@ -443,18 +443,22 @@ namespace Calico {
             LocalTreeView.ShowAll();
         }
 
+	public bool ProgramRunning {
+	  get { return ((executeThread != null) || StopButton.Sensitive); }
+	}
+
         [GLib.ConnectBeforeAttribute]
         public void ShellKeyReleaseEvent(object obj, System.EventArgs args) {
-            // This code was interacting with OnKeyPress
-	        if (executeThread == null) {
-                if (_shell.Document.Text == "") {
-                    StartButton.Sensitive = false;
-                    StartAction.Sensitive = false;
-                } else {
-                    StartButton.Sensitive = true;
-                    StartAction.Sensitive = true;
-                }
-    	    }
+	  // This code was interacting with OnKeyPress
+	  if (! ProgramRunning) {
+	    if (_shell.Document.Text == "") {
+	      StartButton.Sensitive = false;
+	      StartAction.Sensitive = false;
+	    } else {
+	      StartButton.Sensitive = true;
+	      StartAction.Sensitive = true;
+	    }
+	  }
         }
 
         public static bool needInvoke() {
@@ -1141,7 +1145,7 @@ namespace Calico {
         }
 
         public void UpdateUpDownArrows() {
-	  if (executeThread == null) {
+	  if (! ProgramRunning) {
             if (history.Position == 0) {
                 history_up.Sensitive = false;
             } else {
@@ -1169,9 +1173,9 @@ namespace Calico {
         }
 
         public bool Execute(string text, string language) {
-            if (executeThread != null) {
-                return false;
-            }
+	    if (ProgramRunning) {
+	      return false;
+	    }
             string prompt = String.Format("{0}> ", CurrentLanguage);
             int count = 2;
             foreach (string line in text.Split('\n')) {
@@ -1208,32 +1212,35 @@ namespace Calico {
             noAction.Sensitive = true;
             if (ProgramSpeed.Value == 0) {
                 PlayButton.Sensitive = true;
+                PauseButton.Sensitive = false;
             } else if (ProgramSpeed.Value < 100) {
+                PlayButton.Sensitive = false;
                 PauseButton.Sensitive = true;
             } else if (CurrentDocument != null && CurrentDocument.HasBreakpointSet) {
+                PlayButton.Sensitive = false;
                 PauseButton.Sensitive = true;
             }
         }
 
         public void OnStopRunning() {
-	        ProgramSpeed.Sensitive = true;
-            PlayButton.Sensitive = false;
-            noAction.Sensitive = false;
-            PauseButton.Sensitive = false;
-            StopButton.Sensitive = false;
-            if (CurrentDocument != null) { // Editor
-                if (CurrentDocument.HasContent) {
-                    StartButton.Sensitive = true; // need something to execute
-                    StartAction.Sensitive = true;
-                } else {
-                    StartButton.Sensitive = false; // need something to execute
-                    StartAction.Sensitive = false;
-                }
-            } else { // Shell
-                StartButton.Sensitive = false; // need something to execute
-                StartAction.Sensitive = false;
-            }
-            executeThread = null;
+	  ProgramSpeed.Sensitive = true;
+	  PlayButton.Sensitive = false;
+	  noAction.Sensitive = false;
+	  PauseButton.Sensitive = false;
+	  StopButton.Sensitive = false;
+	  if (CurrentDocument != null) { // Editor
+	    if (CurrentDocument.HasContent) {
+	      StartButton.Sensitive = true; // need something to execute
+	      StartAction.Sensitive = true;
+	    } else {
+	      StartButton.Sensitive = false; // need something to execute
+	      StartAction.Sensitive = false;
+	    }
+	  } else { // Shell
+	    StartButton.Sensitive = false; // need something to execute
+	    StartAction.Sensitive = false;
+	  }
+	  executeThread = null;
             /*
        if self.calico.last_error != "":
             url = self.make_error_url(self.language, self.calico.last_error)
@@ -1331,59 +1338,52 @@ namespace Calico {
         }
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
-            if (executeThread != null) {
-                StopButton.Sensitive = true;
-                noAction.Sensitive = true;
-            } else {
-                StopButton.Sensitive = false;
-                noAction.Sensitive = false;
-            }
             if (CurrentDocument != null) {
-              Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
-              CurrentDocument.SetOptionsMenu(options_menu);
-	          if (executeThread == null) {
-                if (CurrentDocument.HasContent) {
-                    StartButton.Sensitive = true;
-                    StartAction.Sensitive = true;
-                } else {
-                    StartButton.Sensitive = false;
-                    StartAction.Sensitive = false;
+                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
+                CurrentDocument.SetOptionsMenu(options_menu);
+                if (! ProgramRunning) {
+                    if (CurrentDocument.HasContent) {
+                        StartButton.Sensitive = true;
+                        StartAction.Sensitive = true;
+                    } else {
+                        StartButton.Sensitive = false;
+                        StartAction.Sensitive = false;
+                    }
                 }
-	          }
-    	      SetLanguage(CurrentDocument.language);
-    	      CurrentDocument.widget.Child.GrabFocus();
-              //CurrentDocument.tab_label.Text =
-    	      Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
+                SetLanguage(CurrentDocument.language);
+                CurrentDocument.widget.Child.GrabFocus();
+                //CurrentDocument.tab_label.Text =
+                Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
-    	      if (executeThread == null) {
-                StartButton.Sensitive = false;
-                StartAction.Sensitive = false;
-	          }
-	          Title = String.Format("Calico - {0}", System.Environment.UserName);
-            } else if (DocumentNotebook.Page == SHELL) {
-	          if (executeThread == null) {
-                if (Shell.Document.Text != "") {
-                    StartAction.Sensitive = true;
-                    StartButton.Sensitive = true;
-                } else {
-                    StartAction.Sensitive = false;
+                if (! ProgramRunning) {
                     StartButton.Sensitive = false;
+                    StartAction.Sensitive = false;
                 }
-	          }
-  	          SetLanguage(ShellLanguage);
-    	      // Workaround: had to add this for notebook page selection:
-    	      GLib.Timeout.Add(0, delegate {
-        		  Shell.GrabFocus();
-        		  return false;
-                    });
-    	      Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
+                Title = String.Format("Calico - {0}", System.Environment.UserName);
+            } else if (DocumentNotebook.Page == SHELL) {
+                if (! ProgramRunning) {
+                    if (Shell.Document.Text != "") {
+                        StartAction.Sensitive = true;
+                        StartButton.Sensitive = true;
+                    } else {
+                        StartAction.Sensitive = false;
+                        StartButton.Sensitive = false;
+                    }
+                }
+                SetLanguage(ShellLanguage);
+                // Workaround: had to add this for notebook page selection:
+                GLib.Timeout.Add(0, delegate {
+                    Shell.GrabFocus();
+                    return false;
+                });
+                Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
-	         if (executeThread == null) {
-                StartButton.Sensitive = false;
-                StartAction.Sensitive = false;
-	          }
-	          // Some other page
-	          Title = String.Format("Calico - {0}", System.Environment.UserName);
+                if (! ProgramRunning) {
+                    StartButton.Sensitive = false;
+                    StartAction.Sensitive = false;
+                }
+                // Some other page
+                Title = String.Format("Calico - {0}", System.Environment.UserName);
             }
         }
 
@@ -1995,19 +1995,20 @@ namespace Calico {
 
         protected void OnPauseButton1Clicked (object sender, System.EventArgs e)
         {
-	    //ProgramSpeed.Value = 0;
-            PlayButton.Sensitive = true;
-            PauseButton.Sensitive = false;
+	  manager[CurrentLanguage].engine.RequestPause();
+	  playResetEvent.Reset();
+	  PlayButton.Sensitive = true;
+	  PauseButton.Sensitive = false;
         }
 
         protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)
         {
-            if (executeThread != null) { // Running prgram
-                if (((Gtk.Scale)o).Value == 0) {
-                    PlayButton.Sensitive = true;
-                    playResetEvent.Reset();
-                }
-            }
+	  if (ProgramRunning) {
+	    if (((Gtk.Scale)o).Value == 0) {
+	      PlayButton.Sensitive = true;
+	      playResetEvent.Reset();
+	    }
+	  }
         }
 
         protected void OnLocalsTabActionActivated (object sender, System.EventArgs e)

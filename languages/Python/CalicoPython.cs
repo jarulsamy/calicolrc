@@ -29,6 +29,7 @@ namespace CalicoPython
 	{
 	
 	        static string trace_filename = null;
+	        static bool trace_pause = false;
 
 		public CalicoPythonEngine (LanguageManager manager) : base(manager)
 		{
@@ -71,43 +72,48 @@ namespace CalicoPython
 			engine.SetSearchPaths (paths);
 		}
 		
+		public override void RequestPause () {
+		  trace_pause = true;
+		}
+
 		public IronPython.Runtime.Exceptions.TracebackDelegate OnTraceBack (
 				  IronPython.Runtime.Exceptions.TraceBackFrame frame, 
 				  string ttype, object retval)
 		{
+		  // If in another file, don't stop:
 		  if (ttype == "call") { 
-			if (frame.f_code.co_filename != trace_filename)
-		  		return null;
+		    if (frame.f_code.co_filename != trace_filename)
+		      return null;
 		  }
+		  // If in correct file, and speed is less than full speed, show line:
 		  Calico.MainWindow.Invoke (delegate {
-				if (calico.CurrentDocument != null 
-					&& calico.CurrentDocument.filename == frame.f_code.co_filename
-					&& calico.ProgramSpeed.Value != 100) {
-					calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
-				}
-				calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
-			});
-			if (calico.CurrentDocument != null 
-			    && calico.CurrentDocument.filename == frame.f_code.co_filename
-			    && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) {
-			        //calico.ProgramSpeed.Value = 0;
-				calico.PlayButton.Sensitive = true;
-				calico.PauseButton.Sensitive = false;
-				calico.playResetEvent.WaitOne ();				
-				if (calico.ProgramSpeed.Value == 0) {
-					calico.playResetEvent.Reset ();
-				}
-			} else if (calico.ProgramSpeed.Value == 0) {
-				calico.playResetEvent.WaitOne ();
-				if (calico.ProgramSpeed.Value == 0) {
-					calico.playResetEvent.Reset ();
-				}
-			} else {
-				int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
-				// Force at least a slight sleep, else no GUI controls
-				System.Threading.Thread.Sleep (Math.Max (pause, 1));
-			}
-			return OnTraceBack;
+		      if (calico.CurrentDocument != null 
+			  && calico.CurrentDocument.filename == frame.f_code.co_filename
+			  && calico.ProgramSpeed.Value != 100) {
+			calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
+		      }
+		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
+		    });
+		  // If a stopping criteria:
+		  if ((calico.CurrentDocument != null 
+		       && calico.CurrentDocument.filename == frame.f_code.co_filename
+		       && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) 
+		      || calico.ProgramSpeed.Value == 0 
+		      || trace_pause) {
+		    calico.PlayButton.Sensitive = true;
+		    calico.PauseButton.Sensitive = false;
+		    calico.playResetEvent.WaitOne ();
+		    if (calico.ProgramSpeed.Value == 0 || trace_pause) {
+		      calico.playResetEvent.Reset ();
+		    }
+		    trace_pause = false;
+		  } else { // then we are in a delay:
+		    int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
+		    // Force at least a slight sleep, else no GUI controls
+		    System.Threading.Thread.Sleep (Math.Max (pause, 1));
+		  }
+		  // return the call back for this frame trace
+		  return OnTraceBack;
 		}
 		
 		public override object GetDefaultContext ()
@@ -120,6 +126,7 @@ namespace CalicoPython
 		    try {
 			  if (trace) {
 			    trace_filename = calico.CurrentDocument.filename;
+			    trace_pause = false;
 			    IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
 			  }
 		    } catch { 

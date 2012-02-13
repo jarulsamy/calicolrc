@@ -97,6 +97,10 @@ namespace Calico {
             trace = false;
         }
 
+        public virtual void RequestPause () {
+            // request running program to pause
+        }
+
         public virtual void ConfigureTrace() {
         }
 

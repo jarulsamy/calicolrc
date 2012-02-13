@@ -379,12 +379,14 @@ namespace Calico {
         }
 
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
-            if (texteditor.Document.Text == "") {
-                calico.StartButton.Sensitive = false;
-                calico.StartAction.Sensitive = false;
-            } else {
-                calico.StartButton.Sensitive = true;
-                calico.StartAction.Sensitive = true;
+            if (! calico.ProgramRunning) {
+                if (texteditor.Document.Text == "") {
+                    calico.StartButton.Sensitive = false;
+                    calico.StartAction.Sensitive = false;
+                } else {
+                    calico.StartButton.Sensitive = true;
+                    calico.StartAction.Sensitive = true;
+                }
             }
         }
 
