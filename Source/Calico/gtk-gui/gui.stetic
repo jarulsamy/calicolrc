@@ -68,7 +68,7 @@
       <action id="saveAsAction">
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Alt&gt;&lt;Mod2&gt;a</property>
-        <property name="Label" translatable="yes">Save _As</property>
+        <property name="Label" translatable="yes">Save _As...</property>
         <property name="ShortLabel" translatable="yes">Save _As</property>
         <property name="StockId">gtk-save-as</property>
         <signal name="Activated" handler="OnSaveAsActionActivated" />
@@ -295,7 +295,7 @@
       </action>
       <action id="printAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">_Print</property>
+        <property name="Label" translatable="yes">_Print...</property>
         <property name="ShortLabel" translatable="yes">_Print</property>
         <property name="StockId">gtk-print</property>
         <signal name="Activated" handler="OnPrintActionActivated" />
@@ -312,9 +312,9 @@
         <property name="ShortLabel" translatable="yes">Clear Output tab</property>
         <signal name="Activated" handler="OnClearOutputActionActivated" />
       </action>
-      <action id="ExportAction1">
+      <action id="ExportAsPythonAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Export...</property>
+        <property name="Label" translatable="yes">Export as Python...</property>
         <property name="ShortLabel" translatable="yes">Export...</property>
         <signal name="Activated" handler="OnExportAction1Activated" />
       </action>
@@ -415,7 +415,7 @@
                 <node type="Menuitem" action="saveAsAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="printAction" />
-                <node type="Menuitem" action="ExportAction1" />
+                <node type="Menuitem" action="ExportAsPythonAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
               </node>

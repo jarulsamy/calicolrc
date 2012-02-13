@@ -1338,7 +1338,11 @@ namespace Calico {
         }
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
+            Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
             if (CurrentDocument != null) {
+                // Set save as python menu:
+                saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+                // Set options menu:
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
                 CurrentDocument.SetOptionsMenu(options_menu);
                 if (! ProgramRunning) {
@@ -1355,12 +1359,14 @@ namespace Calico {
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
+                saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     StartButton.Sensitive = false;
                     StartAction.Sensitive = false;
                 }
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
+                saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     if (Shell.Document.Text != "") {
                         StartAction.Sensitive = true;
@@ -1378,6 +1384,7 @@ namespace Calico {
                 });
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
+                saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     StartButton.Sensitive = false;
                     StartAction.Sensitive = false;
@@ -1926,6 +1933,8 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchStop();
                 CurrentDocument.widget.Child.GrabFocus();
+            } else if (DocumentNotebook.Page == SHELL) {
+                Shell.GrabFocus();
             }
         }
 

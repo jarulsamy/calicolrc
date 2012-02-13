@@ -308,6 +308,9 @@ namespace Calico {
             ((Gtk.Menu)options_menu.Submenu).Add(submenu);
             options_menu.ShowAll();
         }
+        public virtual bool CanSaveAsPython() {
+            return false;
+        }
     }
 
     public class TextDocument : Document {
