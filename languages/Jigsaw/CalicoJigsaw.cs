@@ -160,8 +160,10 @@ public class CalicoJigsawDocument : Document
 	{
 		cvs.Stop();
 		string filename = cvs.OnFileSaveAsPython(null, null);
-		if (filename != null)
-			calico.Open(filename);
+		if (filename != null) {
+			calico.FileSavedAs(this, filename); // already opened, updated
+			calico.Open(filename);	
+		}
 	}
        
 	public override bool SaveDocument ()

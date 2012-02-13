@@ -36,7 +36,7 @@ namespace Calico {
         // label for notebook page
         public Gtk.Button close_button;
         // tab close button
-        bool _isDirty = true;
+        bool _isDirty = false;
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
@@ -432,8 +432,8 @@ namespace Calico {
         }
 
         public override bool IsDirty {
-            get { return texteditor.Document.IsDirty; }
-            set { if (value) texteditor.Document.Text =  texteditor.Document.Text;} // force it dirty
+            get { return texteditor.Document.IsDirty || base.IsDirty; }
+            set { base.IsDirty = value; } // force it dirty
         }
 
         public override bool Close() {
@@ -457,6 +457,7 @@ namespace Calico {
                     texteditor.Document.Text = texteditor.Document.Text;
                 }
                 texteditor.Document.SetNotDirtyState();
+                base.IsDirty = false;
                 return true;
             } catch {
                 return false;
