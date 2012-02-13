@@ -1535,7 +1535,7 @@ namespace Calico {
             LocalList = new Gtk.ListStore(typeof(string), typeof(string));
             foreach(object key in locals.Keys) {
                 string vname = key.ToString();
-                if (! vname.StartsWith("_") && vname != "calico") {
+                if (! vname.StartsWith("_") && vname != "calico" && locals.ContainsKey(key)) {
                     string repr = Repr(locals[key]);
                     LocalList.AppendValues(vname, repr);
                 }

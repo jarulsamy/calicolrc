@@ -156,8 +156,8 @@
     </block>
     <block id="13" typeName="Jigsaw.CMethodBlock" left="380" top="275">
         <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void">
-            <parameter name="shape" type="Graphics+Shape" default="" />
-            <parameter name="window" type="Graphics+WindowClass" default="" />
+            <parameter name="shape" type="Graphics+Shape" default="System.DBNull" />
+            <parameter name="window" type="Graphics+WindowClass" default="System.DBNull" />
         </method>
         <edge id="25" name="In" linkedTo="24" />
         <edge id="26" name="Out" linkedTo="-1" />
