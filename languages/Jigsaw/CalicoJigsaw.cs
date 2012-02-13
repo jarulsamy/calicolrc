@@ -151,11 +151,17 @@ public class CalicoJigsawDocument : Document
 	public override bool HasBreakpointSet {
 		get { return cvs.HasBreakPointSet (); }
 	}
-
-	public override void Export (Calico.MainWindow calico)
+	
+	public override bool CanSaveAsPython() {
+		return true;
+	}
+	
+	public override void Export(Calico.MainWindow calico)
 	{
-		string filename = cvs.Export ();
-		calico.Open (filename);
+		cvs.Stop();
+		string filename = cvs.OnFileSaveAsPython(null, null);
+		if (filename != null)
+			calico.Open(filename);
 	}
        
 	public override bool SaveDocument ()

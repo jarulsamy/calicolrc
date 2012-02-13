@@ -1142,68 +1142,6 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//		protected bool ShowContextMenu(Diagram.Canvas cvs, int X, int Y) {
-//			// Create the context menu for this block
-//			
-//			// Cache info
-//			_X = X;
-//			_Y = Y;
-//	
-//			// Create and show context menu
-//			Gtk.Menu mnu = new Gtk.Menu();
-//			
-//			Gtk.MenuItem mnuNew = new Gtk.MenuItem("New");
-//			mnuNew.Activated += OnFileNew;
-//			Gtk.MenuItem mnuOpen = new Gtk.MenuItem("Open...");
-//			mnuOpen.Activated += OnFileOpen;
-//			Gtk.MenuItem mnuSave = new Gtk.MenuItem("Save");
-//			mnuSave.Activated += OnFileSave;
-//			Gtk.MenuItem mnuSaveAs = new Gtk.MenuItem("Save As...");
-//			mnuSaveAs.Activated += OnFileSaveAs;
-//			//Gtk.MenuItem mnuProps = new Gtk.MenuItem("Inspect");
-//			//mnuProps.Activated += OnInspectorShow;
-//			Gtk.MenuItem mnuZoomIn = new Gtk.MenuItem("Zoom in");
-//			mnuZoomIn.Activated += OnViewZoomIn;
-//			Gtk.MenuItem mnuZoomOut = new Gtk.MenuItem("Zoom out");
-//			mnuZoomOut.Activated += OnViewZoomOut;
-//			Gtk.MenuItem mnuResetZoom = new Gtk.MenuItem("Zoom reset");
-//			mnuResetZoom.Activated += OnViewZoom100;
-//			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle inset");
-//			mnuToggleInset.Activated += OnViewToggleInset;
-//			
-//			mnu.Append(mnuNew);
-//			mnu.Append(mnuOpen);
-//			mnu.Append( new Gtk.SeparatorMenuItem() );
-//			mnu.Append(mnuSave);
-//			mnu.Append(mnuSaveAs);
-//			mnu.Append( new Gtk.SeparatorMenuItem() );
-//			//mnu.Append(mnuProps);
-//			//mnu.Append( new Gtk.SeparatorMenuItem() );
-//			mnu.Append(mnuZoomIn);
-//			mnu.Append(mnuZoomOut);
-//			mnu.Append(mnuResetZoom);
-//			mnu.Append( new Gtk.SeparatorMenuItem() );
-//			mnu.Append(mnuToggleInset);
-//			
-//			mnu.ShowAll();
-//			mnu.Popup();
-//			
-//			return true;
-//		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public string Export()
-		{
-			// FIXME: ask for filename
-			// allow cancel
-			string filename = System.IO.Path.GetFullPath("Jigsaw.py");
-	        using (StreamWriter outfile = new StreamWriter(filename)) {
-	            outfile.Write(this.ToPython());
-	        }
-			return filename;
-		}
-				
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnInspectorShow(object sender, EventArgs e)
 		{
 			this.ShowInspectorWindow();
@@ -1304,7 +1242,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void OnFileSaveAsPython(object sender, EventArgs e)
+		public string OnFileSaveAsPython(object sender, EventArgs e)
 		{
 			// Get top level window
 			Gtk.Window toplevel = null;
@@ -1329,11 +1267,11 @@ namespace Jigsaw
 			
 			// Collect the path
 			int response = fc.Run();
-			
+			String ppath = null;
 			// Save the path and go to OnFileSave for the actual save
 			if (response == (int)Gtk.ResponseType.Accept) 
 			{
-				String ppath = fc.Filename;
+				ppath = fc.Filename;
 				
 				// Add .py extension if missing
 				if (!ppath.EndsWith(".py", StringComparison.OrdinalIgnoreCase))	ppath += ".py";
@@ -1350,6 +1288,8 @@ namespace Jigsaw
 				// Must call Destroy() to close FileChooserDialog window.
 				fc.Destroy();
 			}
+			
+			return ppath;
 		}
 		
 		// - - - Query to save if unsaved changes - - -
