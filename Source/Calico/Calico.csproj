@@ -57,10 +57,6 @@
     <Reference Include="Mono.Posix">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Mono.TextEditor">
-      <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.Scripting">
       <HintPath>..\..\bin\Microsoft.Scripting.dll</HintPath>
       <Private>False</Private>
@@ -75,6 +71,10 @@
     </Reference>
     <Reference Include="Mono.Cairo">
       <HintPath>..\..\bin\Mono.Cairo.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.TextEditor">
+      <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

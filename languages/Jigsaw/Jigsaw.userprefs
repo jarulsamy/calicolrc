@@ -2,6 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
     <Files>
+      <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
+      <File FileName="CalicoJigsaw.cs" Line="80" Column="11" />
+      <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
       <File FileName="Jigsaw\Jigsaw.cs" Line="1694" Column="24" />
       <File FileName="Jigsaw\Diagram.cs" Line="201" Column="29" />
       <File FileName="Jigsaw\MainWindow.cs" Line="357" Column="13" />
