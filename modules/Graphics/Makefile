@@ -16,7 +16,8 @@ all: ../Graphics.dll ../Shapes.dll
 		-out:../Graphics.dll 
 
 ../Shapes.dll: Shapes.cs Graphics.cs
-	gmcs -target:library Shapes.cs  \
+	MONO_PATH=../../bin gmcs -sdk:4 -target:library \
+		Shapes.cs  \
 		-lib:../../bin \
 		-lib:../ \
 		-r:../../bin/Mono.Cairo.dll \

@@ -1907,8 +1907,6 @@ public static class Graphics
 
 		public void resize (int width, int height)
 		{
-			Console.Error.WriteLine ("resizing");
-
 			this.width = width;
 			this.height = height;
 			resetSurfaces ();
