@@ -1,10 +1,9 @@
 ## assumes all strings end in \0
 
-def grep(regexp, text):
-    return match(regexp + "\0", text + "\0")
-
 ## match: search for regexp anywhere in text ##
 def match(regexp, text):
+    regexp += "\0"
+    text += "\0"
     if (regexp[0] == '^'):
         return match_here(regexp[1:], text)
     while text:
