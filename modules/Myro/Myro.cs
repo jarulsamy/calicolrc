@@ -475,15 +475,15 @@ public static class Myro {
     }
 
     public void Dispose() {
-      //Console.WriteLine("Dispose()");
+      Console.WriteLine("Dispose()");
       Dispose(true);
       GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing) {
-      //Console.WriteLine("Dispose({0})", disposing);
+      Console.WriteLine("Dispose({0})", disposing);
       if (!disposed) {
-		//Console.WriteLine("Myro: Shutting down audio...");
+		Console.WriteLine("Myro: Shutting down audio...");
 		if (initialized) {
 		  Sdl.SDL_AudioQuit(); 
 		}
@@ -492,7 +492,7 @@ public static class Myro {
     }
 
     ~AudioManager() {
-      //Console.WriteLine("~AudioManager()");
+      Console.WriteLine("~AudioManager()");
       Dispose(false);
     }
   }
@@ -4395,8 +4395,8 @@ public static class Myro {
     return dict[key] = value;
   }
 
-  public static object [] setDictionaryKeys(IDictionary dict) {
-    return dict.Keys;
+  public static object [] getDictionaryKeys(IDictionary dict) {
+    return (object []) dict.Keys;
   }
 
   public static Graphics.WindowClass makeWindow(string title="Calico Graphics",
@@ -4855,6 +4855,7 @@ public static class Myro {
 
   public static void close_module()
   {
+    Console.WriteLine("close_module");
     audio_manager.Dispose();
   }
   /*
@@ -5214,4 +5215,11 @@ public static class Myro {
       return Double.Parse(v);
     }
   }
+	
+	public static void Main() {
+		Myro.initialize_module("/home/dblank/Calico-dev/trunk/bin", "Posix");
+		beep(.3, 400);
+		Myro.close_module();
+	}
+	
 }

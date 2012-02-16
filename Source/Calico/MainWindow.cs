@@ -607,6 +607,9 @@ namespace Calico {
                 string dir = System.IO.Path.GetDirectoryName(filename);
                 System.IO.Directory.SetCurrentDirectory(dir);
             }
+            if (language != null) {
+                ShellLanguage = language;
+            }
             if (page != null && lineno != 0) {
                 return page.GotoLine(lineno);
             }
@@ -1317,6 +1320,7 @@ namespace Calico {
             Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 CurrentLanguage = language;
+                ShellLanguage = language;
                 manager[CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
             }));
