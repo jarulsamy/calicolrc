@@ -496,6 +496,8 @@ namespace Calico {
                         // Force an update; works nicely as it keeps cursor in same place:
                         // FIXME: Interaction with ShellOnKeyPress?
                         Shell.Document.Text = Shell.Document.Text;
+                        // FAIL:
+                        //Shell.Document.CommitUpdateAll();
                     } catch {
                         // pass
                     }
