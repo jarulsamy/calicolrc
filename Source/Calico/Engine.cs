@@ -107,6 +107,11 @@ namespace Calico {
         public virtual object GetDefaultContext() {
             return null;
         }
+
+        public virtual void PrintLine(string message) {
+        }
+        public virtual void PrintLine(Tag tag, string message) {
+        }
     }
     
     public class DLREngine : Engine {
@@ -185,6 +190,22 @@ namespace Calico {
 		  }
         }
 		
+        public override void PrintLine(string message) {
+            if (manager.stderr != null) {
+                manager.stderr.PrintLine(message);
+            } else {
+                Console.Error.WriteLine(message);
+            }
+        }
+
+        public override void PrintLine(Calico.Tag tag, string message) {
+            if (manager.stderr != null) {
+                manager.stderr.PrintLine(tag, message);
+            } else {
+                Console.Error.WriteLine(message);
+            }
+        }
+
         public override bool ReadyToExecute(string text) {
             // If more than one line in DLR, wait for a blank line
             string [] lines = text.Split('\n');
@@ -246,7 +267,7 @@ namespace Calico {
                     }
                 } catch (Exception e) {
                     Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                    manager.stderr.PrintLine(eo.FormatException(e));
+                    PrintLine(eo.FormatException(e));
                     return false;
                 }
             }
@@ -260,12 +281,14 @@ namespace Calico {
                 manager.stderr.Print("[Script stopped----------]\n");
               } else {
                 Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                manager.stderr.PrintLine(eo.FormatException(e));
+                PrintLine(eo.FormatException(e));
               }
               return false;
             }
-            if (ok)
-                manager.stderr.PrintLine(Tag.Info, "Ok");
+            if (ok) {
+                if (manager.stderr != null)
+                    PrintLine(Tag.Info, "Ok");
+            }
             return true;
         }
 
@@ -281,7 +304,7 @@ namespace Calico {
                 }
             } catch (Exception e) {
                 Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                manager.stderr.PrintLine(eo.FormatException(e));
+                PrintLine(eo.FormatException(e));
                 return false;
             }
             ConfigureTrace();
@@ -295,11 +318,11 @@ namespace Calico {
                     manager.stderr.Print("[Script stopped----------]\n");
                 } else {
                     Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                    manager.stderr.PrintLine(eo.FormatException(e));
+                    PrintLine(eo.FormatException(e));
                 }
                 return false;
             }
-            manager.stderr.PrintLine(Tag.Info, "Done");
+            PrintLine(Tag.Info, "Done");
             return true;
         }
 
