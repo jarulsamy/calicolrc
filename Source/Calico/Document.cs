@@ -453,7 +453,11 @@ namespace Calico {
                 if (possible_new_mime_type != null &&
                     texteditor.Document.MimeType != possible_new_mime_type) {
                     texteditor.Document.MimeType = possible_new_mime_type;
-                    // HACK: reformat text:
+                    // FAIL:
+                    //texteditor.Document.UpdateHighlighting();
+                    //texteditor.Document.CommitUpdateAll();
+                    //Mono.TextEditor.Highlighting.SyntaxModeService.WaitUpdate(texteditor.Document);
+                    // HACK:
                     texteditor.Document.Text = texteditor.Document.Text;
                 }
                 texteditor.Document.SetNotDirtyState();
