@@ -110,6 +110,7 @@ namespace Calico {
 
         public virtual void PrintLine(string message) {
         }
+
         public virtual void PrintLine(Tag tag, string message) {
         }
     }

@@ -681,12 +681,36 @@ namespace Calico {
             return true;
         }
 
-        protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
-            if (Close()) {
+        public bool RequestQuit() {
+            bool retval = Close();
+            if (retval) {
                 Cleanup();
+                // Close up anything
+                foreach (System.Reflection.Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                    if (assembly != null) {
+                        // close_module if possible
+                        try {
+                            foreach (Type type in assembly.GetTypes()) {
+                                System.Reflection.MethodInfo method;
+                                try {
+                                    method = type.GetMethod("close_module");
+                                    if (method != null)
+                                        method.Invoke(type, new object [] {});
+                                } catch {
+                                }
+                            }
+                        } catch {
+                            continue;
+                        }
+                    }
+                }
                 Gtk.Application.Quit();
-                a.RetVal = true;
             }
+            return retval;
+        }
+
+        protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
+            a.RetVal = RequestQuit();
         }
 
         public void PickNew() {
@@ -783,10 +807,7 @@ namespace Calico {
         }
 
         protected virtual void OnQuitActionActivated(object sender, System.EventArgs e) {
-            if (Close()) {
-                Cleanup();
-                Gtk.Application.Quit();
-            }
+            RequestQuit();
         }
 
         protected virtual void OnCopyActionActivated(object sender, System.EventArgs e) {

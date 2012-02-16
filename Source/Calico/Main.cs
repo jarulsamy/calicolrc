@@ -105,7 +105,7 @@ namespace Calico {
                 }
             }
             //  Or load directly:
-            //languages["python"] = CalicoPythonLanguage.MakeLanguage();
+            //languages["python"] = CalicoPython.CalicoPythonLanguage.MakeLanguage();
             //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager(path, languages);
