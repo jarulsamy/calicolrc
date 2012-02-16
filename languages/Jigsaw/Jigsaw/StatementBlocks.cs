@@ -141,7 +141,167 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
+	
+	// -----------------------------------------------------------------------
+    public class CRandom : CBlock
+    {	// Random number generator
+		
+		private bool _inOnPropertyChanged = false;
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CRandom(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)	}),
+				palette ) 
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkGreen;
+			this.FillColor = Diagram.Colors.LightGreen;;
+			this.Sizable = false;
+			
+			// Properties
+			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
+			CExpressionProperty Min = new CExpressionProperty("Min", "0");
+			CExpressionProperty Max = new CExpressionProperty("Max", "100");
+			CStatementProperty Stat = new CStatementProperty("Statement", "pass");
 
+			VarName.PropertyChanged += OnPropertyChanged;
+			Min.PropertyChanged += OnPropertyChanged;
+			Max.PropertyChanged += OnPropertyChanged;
+			Stat.PropertyChanged += OnPropertyChanged;
+			Stat._Visible = false;
+			
+			_properties["Variable"] = VarName;
+			_properties["Min"] = Min;
+			_properties["Max"] = Max;
+			_properties["Statement"] = Stat;
+			this.OnPropertyChanged(null, null);
+		}
+		public CRandom(Double X, Double Y) : this(X, Y, null) {}
+		
+		// - - - Get return variable name - - - - - - - - - - - - - - -
+		private String VariableName 
+		{
+			get 
+			{
+				return _properties["Variable"].Text.Trim();
+			}
+		}
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			if (_inOnPropertyChanged) return;
+			_inOnPropertyChanged = true;
+			
+			if (this.VariableName.Length > 0) {
+				this.Text = String.Format("{0} = random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
+				this["Statement"] = String.Format("{0} = Common.Utils.random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
+			} else {
+				this.Text = String.Format("random({0}, {1})", this["Min"], this["Max"]);
+				this["Statement"] = String.Format("Common.Utils.random({0}, {1})", this["Min"], this["Max"]);
+			}
+			_inOnPropertyChanged = false;
+		}
+		
+		// - - - Generate and return Python statement - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Utils.random({0}, {1})", this["Min"], this["Max"]);
+			if (this.VariableName.Length > 0) 
+				code = String.Format("{0} = Common.Utils.random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
+			
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CRandom.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+			try {
+				Stat.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{	// Execute a variable assignment
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Do the assignment
+			try {
+				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+				Stat.Evaluate(scope);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
+	
 	// -----------------------------------------------------------------------
     public class CStatement : CBlock
     {	// Generic Python statement block shape class

@@ -96,6 +96,7 @@ namespace Jigsaw
 			_engine.EngineReset += OnEngineReset;
 			_engine.EngineError += OnEngineError;
 			_engine.Reset(this, _inspector);
+			_engine.LoadAssembly( System.IO.Path.Combine(this._modulePath, "Common.dll"));
 			//_engine.Reset(this); //, _inspector);
 			
 			// Set up all widgets
@@ -165,11 +166,15 @@ namespace Jigsaw
 			this.AddShape(vblock2);
 			tbStats.AddShape(vblock2);
 			
-			CInlineComment bCmt1 = new CInlineComment(110, 150-os, pnlBlock);
+			CRandom sRandomBlock = new CRandom(110, 150-os, pnlBlock);
+			this.AddShape(sRandomBlock);
+			tbStats.AddShape(sRandomBlock);
+			
+			CInlineComment bCmt1 = new CInlineComment(110, 190-os, pnlBlock);
 			this.AddShape(bCmt1);
 			tbStats.AddShape(bCmt1);
 			
-			CComment bCmt2 = new CComment(110, 190-os, pnlBlock);
+			CComment bCmt2 = new CComment(110, 230-os, pnlBlock);
 			this.AddShape(bCmt2);
 			tbStats.AddShape(bCmt2);
 			

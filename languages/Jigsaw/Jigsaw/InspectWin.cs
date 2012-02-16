@@ -332,7 +332,7 @@ namespace Jigsaw
 		
 		protected string _Name;
 		protected string _Text;
-		protected bool _Visible = true;
+		internal bool _Visible = true;
 		
 		// Event that is raised whenever a property value is changed. 
 		public event EventHandler PropertyChanged;

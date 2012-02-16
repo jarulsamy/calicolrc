@@ -271,31 +271,10 @@ namespace Jigsaw
 			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			Gtk.MessageDialog _dlg = new Gtk.MessageDialog(
-				null,
-				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-				Gtk.MessageType.Question,
-				Gtk.ButtonsType.Ok,
-				null);
 			
-			_dlg.Title = "Ask...";
-			_dlg.Markup = this.Question;
-			_dlg.DefaultResponse = Gtk.ResponseType.Ok;
-			
-			Gtk.Entry _entry = new Gtk.Entry();
-			Gtk.HBox hbox = new Gtk.HBox();
-			hbox.PackStart(new Gtk.Label("Ask: "), false, false, 5);
-			hbox.PackEnd(_entry);
-			_dlg.VBox.PackEnd(hbox, true, true, 0);
-			_dlg.ShowAll();
-	
-			Gtk.ResponseType rsp = (Gtk.ResponseType)_dlg.Run ();
-			string answer = _entry.Text;
-			_dlg.Destroy();
+			string question = this.Question;
+			string answer = Common.Dialogs.Ask (question);
 			scope.SetVariable(Answer, answer);
-//			if (rsp == Gtk.ResponseType.Ok) {
-//				scope.SetVariable(Answer, answer);
-//			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
@@ -369,25 +348,8 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			try {
 				CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
-				
-				Gtk.MessageDialog _dlg = new Gtk.MessageDialog(
-					null,
-					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-					Gtk.MessageType.Info,
-					Gtk.ButtonsType.Ok,
-					null);
-				
-				_dlg.Title = "Tell...";
-				_dlg.Markup = String.Format ("{0}", Tell.Evaluate(scope));
-				_dlg.DefaultResponse = Gtk.ResponseType.Ok;
-				
-//				Gtk.HBox hbox = new Gtk.HBox();
-//				hbox.PackStart(new Gtk.Label("Tell: "), false, false, 5);
-//				_dlg.VBox.PackEnd(hbox, true, true, 0);
-				_dlg.ShowAll();
-		
-				Gtk.ResponseType rsp = (Gtk.ResponseType)_dlg.Run ();
-				_dlg.Destroy();
+				string msg = String.Format ("{0}", Tell.Evaluate(scope));
+				Common.Dialogs.Tell (msg);
 				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);

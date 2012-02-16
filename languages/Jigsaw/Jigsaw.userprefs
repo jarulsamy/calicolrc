@@ -1,22 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
       <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
-      <File FileName="CalicoJigsaw.cs" Line="80" Column="11" />
-      <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1694" Column="24" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="82" Column="25" />
       <File FileName="Jigsaw\Diagram.cs" Line="201" Column="29" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="357" Column="13" />
-      <File FileName="CalicoJigsaw.cs" Line="80" Column="11" />
-      <File FileName="Jigsaw\StatementBlocks.cs" Line="1" Column="10" />
-      <File FileName="Jigsaw\ControlBlocks.cs" Line="231" Column="21" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="363" Column="9" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="186" Column="8" />
+      <File FileName="Jigsaw\InspectWin.cs" Line="332" Column="3" />
+      <File FileName="Jigsaw\Engine.cs" Line="246" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>
