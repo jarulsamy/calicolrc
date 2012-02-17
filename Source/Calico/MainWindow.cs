@@ -184,10 +184,12 @@ namespace Calico {
                 if (language.name == "python") {
                     // FIXME: get from defaults, preferred lang
                     CurrentLanguage = language.name;
-                    ShellLanguage = language.name;
+                    if (manager.languages.ContainsKey(language.name) && manager.languages[language.name].IsTextLanguage)
+                        ShellLanguage = language.name;
                 } else if (CurrentLanguage == null) {
                     CurrentLanguage = language.name;
-                    ShellLanguage = language.name;
+                    if (manager.languages.ContainsKey(language.name) && manager.languages[language.name].IsTextLanguage)
+                        ShellLanguage = language.name;
                 }
                 // FIXME: select default language initially
                 // unique name, label, mnemonic, accel, tooltip, user data
@@ -519,7 +521,8 @@ namespace Calico {
             if (languages_by_count.ContainsKey(lang_count)) {
                 Language language = languages_by_count[lang_count];
                 SetLanguage(language.name);
-                ShellLanguage = language.name;
+                if (manager.languages.ContainsKey(language.name) && manager.languages[language.name].IsTextLanguage)
+                    ShellLanguage = language.name;
                 DocumentNotebook.Page = SHELL;
             }
         }
@@ -607,7 +610,7 @@ namespace Calico {
                 string dir = System.IO.Path.GetDirectoryName(filename);
                 System.IO.Directory.SetCurrentDirectory(dir);
             }
-            if (language != null) {
+            if (language != null && manager.languages.ContainsKey(language) && manager.languages[language].IsTextLanguage) {
                 ShellLanguage = language;
             }
             if (page != null && lineno != 0) {
@@ -821,6 +824,8 @@ namespace Calico {
                     clipboard.Text = text;
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.CopyClipboard(clipboard);
+            } else if (CurrentDocument != null && CurrentDocument.HasSelection) {
+                clipboard.Text = CurrentDocument.Selection.ToString();
             }
         }
 
@@ -874,6 +879,8 @@ namespace Calico {
         protected virtual string CleanUpText(string text) {
             // Prevent weird characters like Word smart quotes.
             // First, replace all of those that we know about:
+            if (text == null)
+                return "";
             text = text.Replace('\u2013', '-');
             text = text.Replace('\u2014', '-');
             text = text.Replace('\u2015', '-');
@@ -901,6 +908,8 @@ namespace Calico {
                 ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
+            } else if (CurrentDocument != null) {
+                CurrentDocument.Paste(clipboard.WaitForText());
             }
         }
 
@@ -1320,7 +1329,8 @@ namespace Calico {
             Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 CurrentLanguage = language;
-                ShellLanguage = language;
+                if (manager.languages.ContainsKey(language) && manager.languages[language].IsTextLanguage)
+                    ShellLanguage = language;
                 manager[CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
             }));

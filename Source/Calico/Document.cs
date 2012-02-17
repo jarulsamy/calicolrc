@@ -115,6 +115,10 @@ namespace Calico {
         public virtual object Selection {
             get {return null;}
         }
+		
+		public virtual bool Paste(object obj) {
+			return false;
+		}
 
         public virtual bool IsDirty {
             get { return _isDirty; }
