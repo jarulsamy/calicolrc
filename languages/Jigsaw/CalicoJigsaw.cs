@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using System.IO;
 using Calico;
 
@@ -192,6 +193,29 @@ public class CalicoJigsawDocument : Document
 	public override void UseLibrary (string filename)
 	{
 		cvs.UseLibrary (filename);
+	}
+	
+	public override object Selection {
+		get { 
+			if (cvs.HasSelection()) {
+				return ((Jigsaw.CBlock)cvs.GetSelection()).ToXml(cvs);
+			} else
+				return null;
+		}
+	}
+	
+	public override bool Paste(object obj) {
+		if (obj is string) {
+			Jigsaw.XmlWrapper xr = new Jigsaw.XmlWrapper(obj.ToString(), true);
+			bool retval = cvs.ProcessXml(xr);
+			cvs.Reset(); // invalidates
+			return retval;
+		}
+		return false;
+	}
+	
+	public override bool HasSelection {
+		get { return cvs.HasSelection(); }
 	}
 	
 	public override void Stop ()

@@ -1735,7 +1735,7 @@ namespace Diagram
         // Write XML representation of selected object on the canvas
         public void SelectedToXml(XmlWriter w)
         {
-            w.WriteStartElement("canvas");
+            w.WriteStartElement("jigsaw");
             //w.WriteAttributeString("backColor", ColorTranslator.ToHtml(this.BackColor));
 
             // Write all shapes
@@ -1746,7 +1746,7 @@ namespace Diagram
                 s._id = idCount;        // Assign temp id to shape
                 s.ToXml(w);
             }
-
+						
             // Write all connectors
             foreach (CConnector s in this.SelectedConnectors())
             {
@@ -3105,7 +3105,7 @@ namespace Diagram
             this.UpdateDecorators();
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // CShape subclasses must provide a method that outputs an 
         // XML representation of itself to the given XmlWriter
         // Output XML representation of this shape.

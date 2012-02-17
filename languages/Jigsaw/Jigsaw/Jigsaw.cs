@@ -32,6 +32,26 @@ namespace Jigsaw
 		Idle = 1, Running = 2, Error = 3
 	}
 	
+	public class XmlWrapper : XmlTextReader {
+		string filename = null;
+		string contents = null;
+		
+		public XmlWrapper(string filename) : base(filename) {
+			this.filename = filename;
+		}
+		
+		public XmlWrapper(string contents, bool text) : base(new StringReader(contents)) {
+			this.contents = contents;
+		}
+		
+		public XmlWrapper Clone() {
+			if (filename != null)
+				return new XmlWrapper(filename);
+			else 
+				return new XmlWrapper(contents, true);
+		}
+	}
+			
 	// -----------------------------------------------------------------------
 	public class Canvas : Diagram.Canvas
 	{	// Subclass of Canvas that adds custom behavior 
@@ -1087,6 +1107,34 @@ namespace Jigsaw
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			foreach (CBlock b in AllBlocks()) b.Deactivate(cvs);
 		}
+
+		// - - - Checks to see if a block is selected - - - - -
+		public bool HasSelection()
+		{
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock b = (CBlock)s;
+					if (!b.IsFactory && b.Selected) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		// - - - Returns selected block - - - - -
+		public object GetSelection()
+		{
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock b = (CBlock)s;
+					if (!b.IsFactory && b.Selected) {
+						return b;
+					}
+				}
+			}
+			return null;
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
@@ -1422,6 +1470,16 @@ namespace Jigsaw
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool ReadFile(string filename) {
+			// Start by wiping out what's there
+			this.DeleteAllBlocks();
+			CurrentPath = filename;
+			
+			XmlWrapper xr = null;
+			xr = new XmlWrapper(filename);
+			return ProcessXml(xr);
+		}
+
+		public bool ProcessXml(XmlWrapper xr) {
 				// Temp vars to hold parse vals
 				string name, val, typeName;
 				double R, G, B, A;
@@ -1430,18 +1488,11 @@ namespace Jigsaw
 				CEdge tEdge = null;
 				CEdge tLinkedEdge = null;
 				
-				// Start by wiping out what's there
-				this.DeleteAllBlocks();
-				CurrentPath = filename;
-				
 				// First Step : Read XML and create all blocks 
 				// Build dictionaries of CBlock and CEdge references
 				Dictionary<string,CBlock> blocks = new Dictionary<string, CBlock>();
 				Dictionary<string,CEdge> edges = new Dictionary<string, CEdge>();
 				
-				XmlReader xr = null;
-
-				xr = new XmlTextReader(filename);
 				// FIXME: add a unserialize to Block to get additional info
 				while (xr.Read()) {
 					
@@ -1536,11 +1587,11 @@ namespace Jigsaw
 					}
 				}
 				
-				xr.Close();
-				xr = null;
+				//xr.Close();
+				//xr = null;
 				
 				// === Second step : Reread XML and link up edges
-				xr = new XmlTextReader(filename);
+				xr = xr.Clone(); // = new XmlTextReader(filename);
 
 				while (xr.Read()) {
 					
@@ -2283,6 +2334,65 @@ namespace Jigsaw
 			}
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // CBlock subclasses must provide a method that outputs an 
+        // XML representation of itself as a string.
+		public virtual string ToXml(Canvas cvs) 
+		{
+			StringBuilder sb = new StringBuilder();
+			XmlWriterSettings settings = new XmlWriterSettings();
+			settings.Indent = true;
+			settings.IndentChars = "    ";
+			settings.Encoding = Encoding.ASCII;
+			using (XmlWriter xw = XmlWriter.Create(sb, settings)) {
+				// Maintain a stack of blocks to be converted and we progress down through the tree
+				List<CBlock> toXml = new List<CBlock>();
+				toXml.Add(this);
+				
+	            // Number shapes
+	            int idCount = 0;
+				int eIdCount = 0;
+	            foreach (CBlock b in cvs.AllBlocks())
+	            {	// Assign temp id to block
+	                idCount++;
+	                b._id = idCount;
+					
+					// Assign temp ids to all edges
+					foreach (CEdge e in b.Edges) {
+						eIdCount++;
+						e._id = eIdCount;
+					}
+	            }
+
+				xw.WriteStartElement("jigsaw");
+				while (toXml.Count > 0) {
+					// Get the block on top of the stack
+					CBlock nextBlock = toXml[0];
+					toXml.RemoveAt(0);
+					
+					// Add all output child blocks to list of blocks to be output
+					foreach (CEdge e in nextBlock.Edges) {
+						if ( e.Type != EdgeType.In && e.IsConnected ) 
+							toXml.Add(e.LinkedTo.Block);
+					}
+					// Process the block
+					nextBlock.ToXml(xw);
+				}
+				// End jigsaw:
+				xw.WriteEndElement();
+
+				// Reset numbers:
+	            // Must close by resetting all temp ids to 0 (unassigned)
+	            // otherwise subsequent save may be incorrect.
+	            foreach (CBlock b in cvs.AllBlocks())
+	            {
+	                b._id = 0;
+					foreach (CEdge e in b.Edges) e._id = 0;
+	            }
+			}
+			return sb.ToString();
+		}
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void ToXml(XmlWriter w)
         {	// CBlock subclasses must provide a method that outputs an 
