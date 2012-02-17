@@ -4,7 +4,7 @@
 ;; dblank@brynmawr.edu
 ;; http://cs.brynmawr.edu/~dblank
 
-;; temporary - to access various utilities (define*? etc.)
+;; to access various utilities (define*? etc.)
 (load "rm-transformer.ss")
 
 (define *code* 
@@ -16,38 +16,21 @@
 
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
-(define *ignore-definitions* '(
-                             void-value
-			     scheme-REP-k
-			     scheme-REP-handler
-			     scheme-REP-fail
-			     start
-			     restart
-			     read-line
-			     raw-read-line
-			     Main
-			     read-content 
-			     string->integer 
-			     string->decimal 
-			     string->rational
-			     tagged-list
-			     testall
-			     group
-			     get-current-time
-			     range
-			     print-parsed-sexps
-			     true?
-			     type?
-			     make-initial-env-extended
-			     make_binding_proc
-			     first-frame
-			     set-first-frame!
-			     make-proc
-                             make-vector
-			     make-binding
-                             dlr-env-lookup
-                             dlr-env-contains
-			     ))
+(define *ignore-definitions*
+  '(void-value scheme-REP-k scheme-REP-handler scheme-REP-fail start restart read-line
+	       raw-read-line Main read-content string->integer string->decimal
+	       string->rational tagged-list testall group get-current-time range
+	       true? type? make-initial-env-extended make_binding_proc first-frame
+	       set-first-frame! make-proc make-binding dlr-env-lookup
+	       dlr-env-contains
+	       execute execute-loop execute-string execute-file read-eval-print-loop
+	       aunparse unparse qq-expand-cps_ qq-expand-list-cps_
+	       init-cont init-cont2 init-cont3 init-handler init-handler2 init-fail
+	       ;; defined in Scheme.cs:
+	       asexp-tag asexp? length^ list?^ symbol?^ car^ cdr^ cadr^ cddr^ caddr^ cdddr^ cadddr^
+	       tagged-list^ list-of-asexp? map^ safe-print make-safe
+	       ))
+
 (define *function-signatures* '())
 
 (define *function-definitions* '())
@@ -58,6 +41,10 @@
   ;; use csharp function names in this format:
   ;; ((function-name return-type (param-types...))...)
   '(
+    (increment-scan-counters "void" ())
+    (initialize-scan-counters "void" ())
+    (mark-token-start "void" ())
+    (execute-next-expression "void" ())
     (symbol<? "bool" ())
     (string<? "bool" ())
     (apply-extension "void" ())
@@ -69,18 +56,19 @@
     (scan-file "void" ("object"))
     (apply-state "object" ("object" "object"))
     (read-string "void" ("object"))
-    (read-file "void" ("object"))
-    (read-next-sexp "void" ("object")) 
+;;    (read-file "void" ("object"))
     (pc "Function" ("null"))
     (Main "void" ("string []"))
-    (execute "object" ("string"))
+    (execute-rm "object" ("string" "object"))
+    (execute-loop-rm "object" ("object"))
+    (execute-string "void" ("string"))
     (execute-file "void" ("string"))
     (make-toplevel-env "object" ())
-    (make-macro-env "object" ())
+    (make-macro-env^ "object" ())
     (make-empty-environment "object" ())
-    (display-prim "void" ())
-    (pretty-print-prim "void" ())
-    (newline-prim "void" ())
+;;    (display-prim "void" ())
+;;    (pretty-print-prim "void" ())
+;;    (newline-prim "void" ())
     (ends-with-newline? "bool" ("string"))
     (parse-string "void" ())
     (get-parsed-sexps "void" ())
@@ -90,32 +78,30 @@
     (set-binding-docstring! "void" ())
     (set-first-frame! "void" ())
     (try-parse "bool" ())
-
-    (tagged-list "Func<object,bool>" ("object" "Predicate2" "object"))
+    (tagged-list^ "Func<object,bool>" ("object" "Predicate2" "object"))
     (sort "object" ("Predicate2" "object"))
-
-    (quote? "Func<object,bool>" ())
-    (func? "Func<object,bool>" ())
-    (quasiquote? "Func<object,bool>" ())
-    (unquote? "Func<object,bool>" ())
-    (unquote-splicing? "Func<object,bool>" ())
-    (if-then? "Func<object,bool>" ())
-    (if-else? "Func<object,bool>" ())
-    (assignment? "Func<object,bool>" ())
-    (define? "Func<object,bool>" ())
-    (define!? "Func<object,bool>" ())
-    (define-syntax? "Func<object,bool>" ())
-    (begin? "Func<object,bool>" ())
-    (lambda? "Func<object,bool>" ())
-    (raise? "Func<object,bool>" ())
-    (dict? "Func<object,bool>" ())
-    (try? "Func<object,bool>" ())
-    (catch? "Func<object,bool>" ())
-    (finally? "Func<object,bool>" ())
-    (help? "Func<object,bool>" ())
-    (choose? "Func<object,bool>" ())
+    (quote?^ "Func<object,bool>" ())
+    (quasiquote?^ "Func<object,bool>" ())
+    (unquote?^ "Func<object,bool>" ())
+    (unquote-splicing?^ "Func<object,bool>" ())
+    (if-then?^ "Func<object,bool>" ())
+    (if-else?^ "Func<object,bool>" ())
+    (assignment?^ "Func<object,bool>" ())
+    (func?^ "Func<object,bool>" ())
+    (define?^ "Func<object,bool>" ())
+    (define!?^ "Func<object,bool>" ())
+    (define-syntax?^ "Func<object,bool>" ())
+    (begin?^ "Func<object,bool>" ())
+    (lambda?^ "Func<object,bool>" ())
+    (raise?^ "Func<object,bool>" ())
+    (dict?^ "Func<object,bool>" ())
+    (help?^ "Func<object,bool>" ())
+    (choose?^ "Func<object,bool>" ())
+    (try?^ "Func<object,bool>" ())
+    (catch?^ "Func<object,bool>" ())
+    (finally?^ "Func<object,bool>" ())
     (get-reserved-keywords "object" ())
-
+    (safe-print "void" ())
     ))
 
 (define *system-ignore-definitions*
@@ -148,11 +134,12 @@
      (else (begin (map (lambda (old_new)
 			 (set! name (replace name (car old_new) (cadr old_new))))
 		       '((#\> "to_")(#\< "LessThan")(#\* "_star")(#\= "_is_")
-			 (#\- #\_)(#\? "_q")(#\! "_b")(#\/ #\_)))
+			 (#\- #\_)(#\? "_q")(#\! "_b")(#\/ #\_) (#\^ "_hat")))
 		  name)))))
 
 (define convert-file
   (lambda (filename . opt)
+    (printf "Converting ~a to C#...\n" filename)
     (set! *function-definitions* '())
     (set! *variable-definitions* '())
     (set! *applications* '())
@@ -286,7 +273,7 @@
 	    (format "return((~a) ~a) " 
 		    return-cast 
 		    sargs)))
-       ((or (eq? name 'apply) (eq? name 'map) (eq? name 'for-each) (eq? name 'apply*))
+       ((or (eq? name 'apply) (eq? name 'map) (eq? name 'map^) (eq? name 'for-each) (eq? name 'apply*))
 	(let ((sargs (glue (join-list (map (lambda (type arg)
 					     (if (equal? return-cast "") 
 						 (format "(~a)~a" type (convert-exp arg proc-name))
@@ -469,6 +456,7 @@
 	((char=? exp #\space) "' '")
 	((char=? exp #\tab) "'\\t'")
 	((char=? exp #\nul) "NULL")
+	((char=? exp #\page) "'\\f'")
 	((char=? exp #\backspace) "BACKSPACE")
 	((char=? exp #\\) "BACKSLASH")
 	((char=? exp #\`) "BACKQUOTE")
@@ -477,7 +465,8 @@
 	((char=? exp #\') "SINGLEQUOTE")
 	((char=? exp #\~) "TILDE")
 	(else (format "'~a'" exp))))
-      ((string? exp) (format "\"~a\"" (replace exp #\newline "\\n")))
+      ((string? exp)
+       (format "\"~a\"" (replace (replace (replace exp #\\ "\\\\") #\newline "\\n") #\tab "\\t")))
       ((symbol? exp) (format "~a" (proper-name exp)))
       (else (format "~a" exp)))))
 
@@ -506,11 +495,11 @@
     (apply string-append (map (lambda (x) (format "~a" x)) things))))
 
 (define replace
-  (lambda (s old new)
+  (lambda (s old-char new-char)
     (list->string 
      (sreplace 
       (string->list 
-       (format "~a" s)) old new '()))))
+       (format "~a" s)) old-char new-char '()))))
 
 (define string->chars
   (lambda (s)

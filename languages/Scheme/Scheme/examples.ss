@@ -9,12 +9,12 @@
 
 (define-syntax time 
   [(time ?exp) (let* ((run (lambda () ?exp))
-		      (start (current-time))
-		      (result (run))
-		      (end (current-time)))
-		 (display (list 'took (- end start) 'seconds))
-		 (newline)
-		 result)])
+                      (start (current-time))
+                      (result (run))
+                      (end (current-time)))
+                 (display (list 'took (- end start) 'seconds))
+                 (newline)
+                 result)])
 
 ;;---------------------------------------------------------------------
 ;; collect is like list comprehension in Python
@@ -30,8 +30,8 @@
     (if (null? values)
       '()
       (if (pred? (car values))
-	  (cons (f (car values)) (filter-map f pred? (cdr values)))
-	  (filter-map f pred? (cdr values))))))
+          (cons (f (car values)) (filter-map f pred? (cdr values)))
+          (filter-map f pred? (cdr values))))))
 
 ;;---------------------------------------------------------------------
 ;; for loops
@@ -52,16 +52,16 @@
     (if (< n 1)
       'done
       (begin
-	(f)
-	(for-repeat (- n 1) f)))))
+        (f)
+        (for-repeat (- n 1) f)))))
 
 (define for-iterate
   (lambda (i values f)
     (if (null? values)
       'done
       (begin
-	(f (car values) i)
-	(for-iterate (+ i 1) (cdr values) f)))))
+        (f (car values) i)
+        (for-iterate (+ i 1) (cdr values) f)))))
 
 (define matrix2d
   '((10 20)
@@ -160,6 +160,7 @@
     (test-call/cc)
     (test-loop)
     (test-macros)
+    (test-quasiquote)
     ))
 
 (define verify
@@ -169,9 +170,16 @@
     (if (equal? exp answer)
       (print 'passed)
       (begin
-	(display "failed: ")
-	(display answer)
-	(newline)))))
+        (display "failed: ")
+        (display answer)
+        (newline)))))
+
+(define test-quasiquote
+  (lambda ()
+    (print "testing quasiquote")
+    (verify '(a banana cherry orange `#(d ,banana ,@c))
+	    (let ((a 1) (b 'banana) (c '(cherry orange))) `(a ,b ,@c `#(d ,,b ,@c))))
+    (for x at (i) in '(a b c d e f g h i j) do (print `(,x is letter ,(+ i 1))))))
 
 (define test-mu-lambda
   (lambda ()
@@ -186,9 +194,9 @@
       ((lambda (a b . z) (list a b z)) 1 2 3))
     (verify '(1 2 ())
       ((lambda (a b . z) (list a b z)) 1 2))
-    (verify "not enough arguments given"
+    (verify "runtime error: not enough arguments in application at line 198, char 12 of examples.ss"
       (try ((lambda (a b . z) (list a b z)) 1)
-	   (catch e e)))
+           (catch e e)))
     ))
 
 (define test-define
@@ -245,8 +253,8 @@
               (finally (print 'two) 7))) (catch e e)))
     (verify 77
       (try (* 10 (try (begin (print 'one) (raise 'oops) 5)
-		      (catch ex (print (list 'ex: ex)) (raise 'bar) 4)))
-	   (catch x (print 'hello) 77)))
+                      (catch ex (print (list 'ex: ex)) (raise 'bar) 4)))
+           (catch x (print 'hello) 77)))
     (verify 3
       (try 3 (finally (print 'hi) 4)))
     (verify 'ok
@@ -314,16 +322,16 @@
   (verify 5
     (let ((r 5))
       (case 'banana
-	(apple 'no)
-	((cherry banana) 1 2 r)
-	(else 'no))))
+        (apple 'no)
+        ((cherry banana) 1 2 r)
+        (else 'no))))
   (verify '((6) orange 5)
     (let ((r 5))
       (record-case (cons 'banana (cons 'orange (cons (* 2 3) '())))
-	(apple (a b c) (list c b a r))
-	((cherry banana) (a . b) (list b a r))
-	((orange) () 'no)
-	(else 2 3 4)))))
+        (apple (a b c) (list c b a r))
+        ((cherry banana) (a . b) (list b a r))
+        ((orange) () 'no)
+        (else 2 3 4)))))
 
 (test-all)
 (exit)

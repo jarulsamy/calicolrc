@@ -20,24 +20,59 @@
 ;; - define*
 ;; - no internal define/define*'s
 
+;; assumes all definitions are in indiana style, not mit style
+(define skip-definition?
+  (lambda (x)
+    (and (list? x)
+	 (not (null? x))
+	 (memq (car x) '(define define* define+ define-datatype))
+	 (memq (cadr x) *ignore-definitions*))))
+
+;; these definitions will not be included in the transformed output code
+(define *ignore-definitions*
+  '(Main
+    ;; unannotated functions and datatypes
+    expression syntactic-sugar? make-pattern-macro macro-clauses expand-once process-macro-clauses
+    mit-define-transformer and-transformer or-transformer cond-transformer let-transformer
+    letrec-transformer create-letrec-assignments let*-transformer nest-let*-bindings
+    case-transformer case-clauses->simple-cond-clauses case-clauses->cond-clauses
+    record-case-transformer record-case-clauses->cond-clauses
+    parse parse-error parse-entries parse-all mit-style? tagged-list
+    quote? quasiquote? unquote? unquote-splicing? if-then? if-else? assignment? func?
+    define? define!? define-syntax? begin? lambda? raise? dict? help? choose? try?
+    try-body catch? catch-var catch-exps finally? finally-exps application?
+    unparse expand-macro parse-string parse-file print-parsed-sexps get-parsed-sexps
+    parse-sexps
+    qqtest qq1 qq-expand1 qq-expand1-list qq2 qq-expand2 qq-expand2-list qq-expand-cps_ qq-expand-list-cps_
+    read-sexp read-abbreviation read-sexp-sequence close-sexp-sequence read-vector-sequence
+    read-next-sexp improper-list?^ improper-list-of-asexp?
+    unannotate reannotate reannotate-seq scan-string scan-file read-string read-datum read-file
+    read-file-loop print-file print-file-loop
+    aread-string aread-datum aread-file aread-file-loop aparse-string aparse-file aprint-parsed-sexps
+    aget-parsed-sexps
+    up aup print-sub unify-patterns unify-pairs instantiate
+    ))
+
 ;;-------------------------------------------------------------------------------
 ;; recognized datatypes
 
 (define make-all-datatypes
   (lambda ()
     (list
-      (make-datatype 'continuation 'cont '((k k2) value))
+      (make-datatype 'continuation 'cont '((k k2 REP-k) value))
       (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))
       (make-datatype 'continuation3 'cont3 '((k k2) value1 value2 value3))
+      (make-datatype 'continuation4 'cont4 '((k k2) value1 value2 value3 value4))
       (make-datatype 'fail-continuation 'fail '((fail)))
       (make-datatype 'handler 'handler '((handler) exception))
       (make-datatype 'handler2 'handler2 '((handler) exception fail))
-      (make-datatype 'procedure 'proc '((proc) args env2 handler fail k2))
-      (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer) datum k))
+      (make-datatype 'procedure 'proc '((proc) args env2 info handler fail k2))
+      (make-datatype 'floopproc 'fproc '((proc) args k-env k2))
+      (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer mit-define-transformer^) datum k))
       )))
 
 ;; determines the order of the free variables in data-structure records
-(define record-field-order '(formals runt body env env2 handler fail k k2))
+(define record-field-order '(formals runt body env env2 k-env info handler fail k k2))
 
 ;;-------------------------------------------------------------------------------
 ;; (make-datatype <long-name> <short-name> (<app-symbols> <arg1> <arg2> ...))
@@ -311,7 +346,11 @@
 		  (set! function-defs (reverse function-defs))
 		  (set! other-defs (reverse other-defs)))
 		 ;; skip top level calls to load
-		 ((load? exp) (read-transformed-exps input-port))
+		 ((load? exp)
+		  (read-transformed-exps input-port))
+		 ((skip-definition? exp)
+		  (printf "skipping ~a definition\n" (cadr exp))
+		  (read-transformed-exps input-port))
 		 ;; must transform the expression before calling the recursion
 		 (else (let ((texp ((transform '()) exp)))
 			 (cond
@@ -434,6 +473,7 @@
       (cond
         ((null? code) code)
 	((literal? code) code)
+	((vector? code) code)
 	((symbol? code) code)
 	((datatype-lambda? code)
 	 (let* ((dt (get-datatype 'datatype-lambda? code all-datatypes))
@@ -617,6 +657,7 @@
     (cond
       ((null? code) '())
       ((literal? code) '())
+      ((vector? code) '())
       ((datatype-lambda? code) (all-free (cddr code) (union (cadr code) params)))
       ((symbol? code) (if (memq code params) '() (list code)))
       (else
@@ -634,7 +675,7 @@
 	  (let (bindings . bodies) (free (let-transformer code (lambda (v) v)) params))
 	  (let* (bindings . bodies) (free (let*-transformer code (lambda (v) v)) params))
 	  (letrec (decls . bodies) (free (letrec-transformer code (lambda (v) v)) params))
-	  (set! (var rhs-exp) (free rhs-exp params))
+	  (set! (var rhs-exp) (union var (free rhs-exp params)))
 	  (begin exps (all-free exps params))
 	  ((define define*) (name . bodies)
 	    (if (mit-style? code)
@@ -799,6 +840,7 @@
 	  (cond
 	    ((null? exp) exp)
 	    ((literal? exp) exp)
+	    ((vector? exp) exp)
 	    ((symbol? exp) (if (eq? exp old-var) new-var exp))
 	    (else
 	     (record-case exp
@@ -909,6 +951,7 @@
 	  (cond
 	    ((null? exp) #f)
 	    ((literal? exp) #f)
+	    ((vector? exp) #f)
 	    ((symbol? exp) #f)
 	    (else
 	      (record-case exp

@@ -102,23 +102,24 @@
           (search-frames (cdr frames) variable))))))
 
 (define* lookup-value
-  (lambda (variable env handler fail k)
-    (lookup-binding variable env handler fail
+  (lambda (variable env var-info handler fail k)
+    (lookup-binding variable env var-info handler fail
       (lambda-cont2 (binding fail)
 	(k (binding-value binding) fail)))))
 
 (define* lookup-binding
-  (lambda (variable env handler fail k)
+  (lambda (variable env var-info handler fail k)
     (let ((binding (search-env env variable)))
       (if binding
 	(k binding fail)
 	(split-variable variable fail
 	  (lambda-cont2 (components fail)
-            (if (dlr-env-contains variable)
-                (k (dlr-env-lookup variable) fail)
-                (if components
-		    (lookup-variable-components components "" env handler fail k)
-                    (handler (format "unbound variable ~a" variable) fail)))))))))
+	    (if (dlr-env-contains variable)
+	      (k (dlr-env-lookup variable) fail)
+	      (if components
+		(lookup-variable-components components "" env handler fail k)
+		(runtime-error (format "unbound variable ~a" variable) var-info handler fail)))))))))
+;;                    (handler (format "unbound variable ~a" variable) fail)))))))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist
 (define* lookup-binding-in-first-frame

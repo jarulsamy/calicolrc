@@ -267,18 +267,19 @@
 	(cond
 	 ((null? code) code)
 	 ((literal? code) code)
+	 ((vector? code) code)
 	 ((symbol? code) code)
 	 ;; should catch lambda-cont, lambda-whatever, etc. here
 	 (else
 	  (record-case code
+;;	    (quote (datum) code)
 	    (quote (datum)
 	      (if *include-define*-in-registerized-code?*
 		(expand-quote datum)
 		code))
-;;	    (quote (datum) code)
 	    (quasiquote (datum)
 	      (if *generate-low-level-registerized-code?*
-		(transform (expand-quasiquote datum (lambda (v) v)))
+		(transform (qq-expand-cps_ datum 0 (lambda (v) v)))
 		(list 'quasiquote (transform-quasiquote datum))))
 	    (if (test . conseqs)
 	      `(if ,@(map transform (cdr code))))
@@ -438,7 +439,7 @@
 	 (cond
 	   ((vector? datum) (list->vector (transform-quasiquote (vector->list datum))))
 	   ((not (pair? datum)) datum)
-	   ;; doesn't handle nested quasiquotes yet
+	   ;; doesn't handle nested quasiquotes
 	   ((quasiquote? datum) datum)
 	   ((unquote? datum) (list 'unquote (transform (cadr datum))))
 	   ((unquote-splicing? (car datum))
@@ -476,16 +477,23 @@
 
 (define rc-clause->let
   (lambda (var formals conseqs)
-    (letrec
-      ((make-bindings
-	 (lambda (i formals)
-	   (if (null? formals)
-	     '()
-	     (cons (list (car formals) `(list-ref ,var ,i))
-		   (make-bindings (+ i 1) (cdr formals)))))))
-      (if (null? formals)
-	conseqs
-	(list `(let ,(make-bindings 1 formals) ,@conseqs))))))
+    (let ((free-vars (free conseqs '())))
+      (letrec
+	((make-bindings
+	   (lambda (i formals)
+	     (cond
+	       ((null? formals) '())
+	       ((memq (car formals) free-vars)
+		(cons (list (car formals) `(list-ref ,var ,i))
+		      (make-bindings (+ i 1) (cdr formals))))
+	       ;; record-case formal is not used in conseqs, so no need to include it in the let
+	       (else (make-bindings (+ i 1) (cdr formals)))))))
+	(if (null? formals)
+	    conseqs
+	    (let ((let-bindings (make-bindings 1 formals)))
+	      (if (null? let-bindings)
+		  conseqs
+		  (list `(let ,let-bindings ,@conseqs)))))))))
 
 (define sort-assignments
   (lambda (assigns)
@@ -641,6 +649,7 @@
     (cond
       ((null? code) `(return* ,code))
       ((literal? code) `(return* ,code))
+      ((vector? code) `(return* ,code))
       ((symbol? code) `(return* ,code))
       (else
         (record-case code

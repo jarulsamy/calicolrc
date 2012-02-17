@@ -12,6 +12,10 @@
   (syntax-rules ()
     [(_ formals body ...) (lambda formals body ...)]))
 
+(define-syntax lambda-cont4
+  (syntax-rules ()
+    [(_ formals body ...) (lambda formals body ...)]))
+
 (define-syntax lambda-fail
   (syntax-rules ()
     [(_ formals body ...) (lambda formals body ...)]))

@@ -20,11 +20,13 @@
 ;; The core grammar
 ;;
 ;; <exp> ::= <literal>
+;;         | <vector>
 ;;         | (quote <datum>)
 ;;         | (quasiquote <datum>)
 ;;         | <var>
 ;;         | (if <exp> <exp> <exp>)
 ;;         | (set! <var> <exp>)
+;;         | (func <exp>)
 ;;         | (define <var> <exp>)
 ;;         | (define <var> <docstring> <exp>)
 ;;         | (define-syntax <keyword> (<pattern> <pattern>) ...)
@@ -45,8 +47,6 @@
    (datum anything?))
   (var-exp
     (id symbol?))
-  (func-exp
-    (exp expression?))
   (if-exp
    (test-exp expression?)
    (then-exp expression?)
@@ -54,6 +54,8 @@
   (assign-exp
     (var symbol?)
     (rhs-exp expression?))
+  (func-exp
+    (exp expression?))
   (define-exp
     (id symbol?)
     (docstring string?)
@@ -63,17 +65,17 @@
     (docstring string?)
     (rhs-exp expression?))
   (define-syntax-exp
-    (keyword symbol?)
+    (name symbol?)
     (clauses (list-of (list-of pattern?))))
   (begin-exp
     (exps (list-of expression?)))
   (lambda-exp
     (formals (list-of symbol?))
-    (body expression?))
+    (bodies (list-of expression?)))
   (mu-lambda-exp
     (formals (list-of symbol?))
     (runt symbol?)
-    (body expression?))
+    (bodies (list-of expression?)))
   (app-exp
     (operator expression?)
     (operands (list-of expression?)))
@@ -92,7 +94,7 @@
   (raise-exp
     (exp expression?))
   (dict-exp
-    (pairs (list-of (list-of expression?))))
+    (entries (list-of (list-of expression?))))
   (help-exp
     (var symbol?))
   (choose-exp
@@ -124,7 +126,7 @@
 
 (define* expand-once
   (lambda (datum handler fail k)
-    (lookup-value (car datum) macro-env handler fail
+    (lookup-value (car datum) macro-env 'none handler fail
       (lambda-cont2 (macro fail)
 	(if (pattern-macro? macro)
 	  (process-macro-clauses (macro-clauses macro) datum handler fail k)
@@ -136,7 +138,7 @@
 (define* process-macro-clauses
   (lambda (clauses datum handler fail k)
     (if (null? clauses)
-      (handler (format "no matching clause found for ~a" datum) fail)
+      (parse-error "no matching clause found for" datum handler fail)
       (let ((left-pattern (caar clauses))
 	    (right-pattern (cadar clauses)))
 	(unify-patterns left-pattern datum
@@ -171,22 +173,26 @@
 			(else-code (lambda () (or ,@(cdr exps)))))
 		    (if bool bool (else-code)))))))))
 
+(define* macro-error
+  (lambda (transformer-name datum)
+    (error transformer-name "bad concrete syntax: ~a" datum)))
+
 ;; correctly handles single-expression clauses and avoids variable capture
 (define cond-transformer
   (lambda-macro (datum k)
     (let ((clauses (cdr datum)))
       (if (null? clauses)
-	(error 'cond-transformer "bad concrete syntax: ~a" datum)
+	(macro-error 'cond-transformer datum)
 	(let ((first-clause (car clauses))
 	      (other-clauses (cdr clauses)))
 	  (if (or (null? first-clause) (not (list? first-clause)))
-	    (error 'cond-transformer "bad concrete syntax: ~a" datum)
+	    (macro-error 'cond-transformer datum)
 	    (let ((test-exp (car first-clause))
 		  (then-exps (cdr first-clause)))
 	      (cond
 		((eq? test-exp 'else)
 		 (cond
-		   ((null? then-exps) (error 'cond-transformer "bad concrete syntax: (~a)" 'else))
+		   ((null? then-exps) (macro-error 'cond-transformer '(else)))
 		   ((null? (cdr then-exps)) (k (car then-exps)))
 		   (else (k `(begin ,@then-exps)))))
 		((null? then-exps)
@@ -336,39 +342,26 @@
 		      (cons `((memq (car ,var) ',(car clause)) (apply ,name (cdr ,var)))
 			    new-clauses)))))))))))
 
-(define make-macro-env
-  (lambda ()
-    (make-initial-environment
-      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case)
-      (list and-transformer
-	    or-transformer
-	    cond-transformer
-	    let-transformer
-	    letrec-transformer
-	    let*-transformer
-	    case-transformer
-	    record-case-transformer))))
-
-(define macro-env (make-macro-env))
-
 ;;--------------------------------------------------------------------------
 
 (define* parse
   (lambda (datum handler fail k)
     (cond
+      ((null? datum) (k (lit-exp datum) fail))
       ((literal? datum) (k (lit-exp datum) fail))
+      ((vector? datum) (k (lit-exp datum) fail))
+      ((symbol? datum) (k (var-exp datum) fail))
       ((quote? datum) (k (lit-exp (cadr datum)) fail))
       ((quasiquote? datum)
-       (expand-quasiquote (cadr datum)
-	 (lambda-cont (v)
-	   (parse v handler fail k))))
-      ((unquote? datum) (handler (format "misplaced ~a" datum) fail))
-      ((unquote-splicing? datum) (handler (format "misplaced ~a" datum) fail))
-      ((symbol? datum) (k (var-exp datum) fail))
+       (qq-expand-cps_ (cadr datum) 0
+	 (lambda-cont (expansion)
+	   (parse expansion handler fail k))))
+      ((unquote? datum) (parse-error "misplaced" datum handler fail))
+      ((unquote-splicing? datum) (parse-error "misplaced" datum handler fail))
       ((syntactic-sugar? datum)
        (expand-once datum handler fail
-	 (lambda-cont2 (v fail)
-	   (parse v handler fail k))))
+	 (lambda-cont2 (expansion fail)
+	   (parse expansion handler fail k))))
       ((if-then? datum)
        (parse (cadr datum) handler fail
 	 (lambda-cont2 (v1 fail)
@@ -387,9 +380,10 @@
        (parse (caddr datum) handler fail
 	 (lambda-cont2 (v fail)
 	   (k (assign-exp (cadr datum) v) fail))))
-      ((func? datum) (parse (cadr datum) handler fail
-                       (lambda-cont2 (e fail)
-                         (k (func-exp e) fail))))
+      ((func? datum)
+       (parse (cadr datum) handler fail
+	 (lambda-cont2 (e fail)
+	   (k (func-exp e) fail))))
       ((define? datum)
        (cond
 	 ((mit-style? datum)
@@ -404,7 +398,7 @@
 	  (parse (cadddr datum) handler fail
 	    (lambda-cont2 (body fail)
 	      (k (define-exp (cadr datum) (caddr datum) body) fail))))
-	 (else (handler (format "bad concrete syntax: ~a" datum) fail))))
+	 (else (parse-error "bad concrete syntax:" datum handler fail))))
       ((define!? datum)
        (cond
 	 ((mit-style? datum)
@@ -419,22 +413,22 @@
 	  (parse (cadddr datum) handler fail
 	    (lambda-cont2 (body fail)
 	      (k (define!-exp (cadr datum) (caddr datum) body) fail))))
-	 (else (handler (format "bad concrete syntax: ~a" datum) fail))))
+	 (else (parse-error "bad concrete syntax:" datum handler fail))))
       ((define-syntax? datum)
        (k (define-syntax-exp (cadr datum) (cddr datum)) fail))
       ((begin? datum)
        (parse-all (cdr datum) handler fail
 	 (lambda-cont2 (v fail)
 	   (cond
-	     ((null? v) (handler (format "bad concrete syntax: ~a" datum) fail))
+	     ((null? v) (parse-error "bad concrete syntax:" datum handler fail))
 	     ((null? (cdr v)) (k (car v) fail))
 	     (else (k (begin-exp v) fail))))))
       ((lambda? datum)
-       (parse (cons 'begin (cddr datum)) handler fail
-	 (lambda-cont2 (body fail)
+       (parse-all (cddr datum) handler fail
+	 (lambda-cont2 (bodies fail)
 	   (if (list? (cadr datum))
-	     (k (lambda-exp (cadr datum) body) fail)
-	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) body) fail)))))
+	     (k (lambda-exp (cadr datum) bodies) fail)
+	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) bodies) fail)))))
       ((try? datum)
        (cond
 	 ((= (length datum) 2)
@@ -465,19 +459,19 @@
 		    (lambda-cont2 (fexps fail)
 		      (let ((cvar (catch-var (caddr datum))))
 			(k (try-catch-finally-exp body cvar cexps fexps) fail)))))))))
-	 (else (handler (format "bad try syntax: ~a" datum) fail))))
+	 (else (parse-error "bad try syntax:" datum handler fail))))
       ((raise? datum)
        (parse (cadr datum) handler fail
 	 (lambda-cont2 (v fail)
 	   (k (raise-exp v) fail))))
       ((dict? datum)
-       (parse-pairs (cdr datum) handler fail
+       (parse-entries (cdr datum) handler fail
 	 (lambda-cont2 (v1 fail)
 	   (k (dict-exp v1) fail))))
       ((help? datum)
        (if (symbol? (cadr datum))
 	 (k (help-exp (cadr datum)) fail)
-	 (handler (format "bad concrete syntax: ~a" datum) fail)))
+	 (parse-error "bad concrete syntax:" datum handler fail)))
       ((choose? datum)
        (parse-all (cdr datum) handler fail
 	 (lambda-cont2 (exps fail)
@@ -488,17 +482,22 @@
 	   (parse-all (cdr datum) handler fail
 	     (lambda-cont2 (v2 fail)
 	       (k (app-exp v1 v2) fail))))))
-      (else (handler (format "bad concrete syntax: ~a" datum) fail)))))
+      (else (parse-error "bad concrete syntax:" datum handler fail)))))
 
-(define* parse-pairs
-  (lambda (pairs handler fail k)
-    (if (null? pairs)
+(define* parse-error
+  (lambda (msg datum handler fail)
+    (handler (format "parse error: ~a ~s" msg datum) fail)))
+
+;; for dicts
+(define* parse-entries
+  (lambda (entries handler fail k)
+    (if (null? entries)
       (k '() fail)
-      (parse (caar pairs) handler fail
+      (parse (caar entries) handler fail
 	(lambda-cont2 (a fail)
-	  (parse (cadar pairs) handler fail
+	  (parse (cadar entries) handler fail
 	    (lambda-cont2 (b fail)
-              (parse-pairs (cdr pairs) handler fail
+              (parse-entries (cdr entries) handler fail
 		(lambda-cont2 (results fail)
 		  (k (cons (list a b) results) fail))))))))))
 
@@ -512,54 +511,7 @@
 	    (lambda-cont2 (b fail)
 	      (k (cons a b) fail))))))))
 
-(define* expand-quasiquote
-  (lambda (datum k)
-    (cond
-      ((vector? datum)
-       (expand-quasiquote (vector->list datum)
-	 (lambda-cont (ls) (k `(list->vector ,ls)))))
-      ((not (pair? datum)) (k `(quote ,datum)))
-      ;; doesn't handle nested quasiquotes yet
-      ((quasiquote? datum) (k `(quote ,datum)))
-      ((unquote? datum) (k (cadr datum)))
-      ((unquote-splicing? (car datum))
-       (if (null? (cdr datum))
-	 (k (cadr (car datum)))
-	 (expand-quasiquote (cdr datum)
-	   (lambda-cont (v) (k `(append ,(cadr (car datum)) ,v))))))
-      ((quasiquote-list? datum)
-       (expand-quasiquote-list datum
-	 (lambda-cont (v)
-	   (k `(list ,@v)))))
-      (else
-	(expand-quasiquote (car datum)
-	  (lambda-cont (v1)
-	    (expand-quasiquote (cdr datum)
-	      (lambda-cont (v2)
-		(k `(cons ,v1 ,v2))))))))))
-
-(define* expand-quasiquote-list
-  (lambda (datum k)
-    (if (null? datum)
-      (k '())
-      (expand-quasiquote (car datum)
-	(lambda-cont (v1)
-	  (expand-quasiquote-list (cdr datum)
-	    (lambda-cont (v2)
-	       (k (cons v1 v2)))))))))
-
-(define quasiquote-list?
-  (lambda (datum)
-    (or (null? datum)
-	(and (pair? datum)
-	     ;; doesn't handle nested quasiquotes yet
-	     (not (quasiquote? datum))
-	     (not (unquote? datum))
-	     (not (unquote-splicing? datum))
-	     ;; doesn't handle nested quasiquotes yet
-	     (not (quasiquote? (car datum)))
-	     (not (unquote-splicing? (car datum)))
-	     (quasiquote-list? (cdr datum))))))
+;; quasiquote code goes here
 
 (define head
   (lambda (formals)
@@ -584,8 +536,7 @@
     (or (number? datum)
 	(boolean? datum)
 	(char? datum)
-	(string? datum)
-	(vector? datum))))
+	(string? datum))))
 
 (define anything?
   (lambda (datum) #t))
@@ -598,13 +549,13 @@
 	   (eq? (car datum) tag)))))
 
 (define quote? (tagged-list 'quote = 2))
-(define func? (tagged-list 'func = 2))
 (define quasiquote? (tagged-list 'quasiquote = 2))
-(define unquote? (tagged-list 'unquote = 2))
-(define unquote-splicing? (tagged-list 'unquote-splicing = 2))
+(define unquote? (tagged-list 'unquote >= 2))   ;; >= for use with alan bawden's qq-expand algorithm
+(define unquote-splicing? (tagged-list 'unquote-splicing >= 2))
 (define if-then? (tagged-list 'if = 3))
 (define if-else? (tagged-list 'if = 4))
 (define assignment? (tagged-list 'set! = 3))
+(define func? (tagged-list 'func = 2))
 (define define? (tagged-list 'define >= 3))
 (define define!? (tagged-list 'define! >= 3))
 (define define-syntax? (tagged-list 'define-syntax >= 3))
@@ -640,17 +591,885 @@
 	 (memq x (get-reserved-keywords)))))
 
 ;;------------------------------------------------------------------------
+;; annotated s-expressions
+
+(define let-transformer^
+  (lambda-macro (adatum k)
+    (if (symbol?^ (cadr^ adatum))
+      ;; named let
+      (let* ((name (cadr^ adatum))
+	     (bindings (caddr^ adatum))
+	     (vars (map^ car^ bindings))
+	     (exps (map^ cadr^ bindings))
+	     (bodies (cdddr^ adatum)))
+	(k `(letrec ((,name (lambda ,vars ,@bodies))) (,name ,@exps))))
+      ;; ordinary let
+      (let* ((bindings (cadr^ adatum))
+	     (vars (map^ car^ bindings))
+	     (exps (map^ cadr^ bindings))
+	     (bodies (cddr^ adatum)))
+	(k `((lambda ,vars ,@bodies) ,@exps))))))
+
+(define letrec-transformer^
+  (lambda-macro (adatum k)
+    (let* ((decls (cadr^ adatum))
+	   (vars (map^ car^ decls))
+	   (procs (map^ cadr^ decls))
+	   (bodies (cddr^ adatum)))
+      (create-letrec-assignments^ vars procs
+	(lambda-cont2 (bindings assigns)
+	  (k `(let ,bindings ,@assigns ,@bodies)))))))
+
+(define* create-letrec-assignments^
+  (lambda (vars procs k2)
+    (if (null? vars)
+      (k2 '() '())
+      (create-letrec-assignments^ (cdr vars) (cdr procs)
+	(lambda-cont2 (bindings assigns)
+	  (k2 (cons `(,(car vars) 'undefined) bindings)
+	      (cons `(set! ,(car vars) ,(car procs)) assigns)))))))
+
+(define mit-define-transformer^
+  (lambda-macro (adatum k)
+    (let ((name (car^ (cadr^ adatum)))
+	  (formals (cdr^ (cadr^ adatum)))
+	  (bodies (cddr^ adatum)))
+      (k `(define ,name (lambda ,formals ,@bodies))))))
+
+(define and-transformer^
+  (lambda-macro (adatum k)
+    (let ((exps (cdr^ adatum)))
+      (cond
+	((null? exps) (k '#t))
+	((null? (cdr exps)) (k (car exps)))
+	(else (k `(if ,(car exps) (and ,@(cdr exps)) #f)))))))
+
+;; avoids variable capture
+(define or-transformer^
+  (lambda-macro (adatum k)
+    (let ((exps (cdr^ adatum)))
+      (cond
+	((null? exps) (k '#f))
+	((null? (cdr exps)) (k (car exps)))
+	(else (k `(let ((bool ,(car exps))
+			(else-code (lambda () (or ,@(cdr exps)))))
+		    (if bool bool (else-code)))))))))
+
+;; correctly handles single-expression clauses and avoids variable capture
+(define cond-transformer^
+  (lambda-macro (adatum k)
+    (let ((clauses (cdr^ adatum)))
+      (if (null? clauses)
+	(amacro-error 'cond-transformer^ adatum)
+	(let ((first-clause (car clauses))
+	      (other-clauses (cdr clauses)))
+	  (if (or (null?^ first-clause) (not (list?^ first-clause)))
+	    (amacro-error 'cond-transformer^ adatum)
+	    (let ((test-exp (car^ first-clause))
+		  (then-exps (cdr^ first-clause)))
+	      (cond
+		((eq?^ test-exp 'else)
+		 (cond
+		   ((null? then-exps) (amacro-error 'cond-transformer^ '(else)))
+		   ((null? (cdr then-exps)) (k (car then-exps)))
+		   (else (k `(begin ,@then-exps)))))
+		((null? then-exps)
+		 (if (null? other-clauses)
+		   (k `(let ((bool ,test-exp))
+			 (if bool bool)))
+		   (k `(let ((bool ,test-exp)
+			     (else-code (lambda () (cond ,@other-clauses))))
+			 (if bool bool (else-code))))))
+		((null? other-clauses)
+		 (if (null? (cdr then-exps))
+		   (k `(if ,test-exp ,(car then-exps)))
+		   (k `(if ,test-exp (begin ,@then-exps)))))
+		((null? (cdr then-exps))
+		 (k `(if ,test-exp ,(car then-exps) (cond ,@other-clauses))))
+		(else (k `(if ,test-exp (begin ,@then-exps) (cond ,@other-clauses))))))))))))
+
+(define let*-transformer^
+  (lambda-macro (adatum k)
+    (let ((bindings (get-sexp (cadr^ adatum)))
+	  (bodies (cddr^ adatum)))
+      (nest-let*-bindings^ bindings bodies k))))
+
+(define* nest-let*-bindings^
+  (lambda (bindings bodies k)
+    (if (or (null? bindings)
+	    (null? (cdr bindings)))
+	(k `(let ,bindings ,@bodies))
+	(nest-let*-bindings^ (cdr bindings) bodies
+	  (lambda-cont (v)
+	    (k `(let (,(car bindings)) ,v)))))))
+
+;; avoids variable capture
+(define case-transformer^
+  (lambda-macro (adatum k)
+    (let ((exp (cadr^ adatum))
+	  (clauses (cddr^ adatum)))
+      ;; if exp is a variable, no need to introduce r binding
+      (if (symbol?^ exp)
+	(case-clauses->simple-cond-clauses^ exp clauses
+	  (lambda-cont (new-clauses)
+	    (k `(cond ,@new-clauses))))
+	(case-clauses->cond-clauses^ 'r clauses
+	  (lambda-cont2 (bindings new-clauses)
+	    (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses)))))))))
+
+(define* case-clauses->simple-cond-clauses^
+  (lambda (var clauses k)
+    (if (null? clauses)
+      (k '())
+      (case-clauses->simple-cond-clauses^ var (cdr clauses)
+	(lambda-cont (new-clauses)
+	  (let ((clause (car clauses)))
+	    (cond
+	      ((eq?^ (car^ clause) 'else)
+	       (k (cons clause new-clauses)))
+	      ((symbol?^ (car^ clause))
+	       (k (cons `((eq? ,var ',(get-sexp (car^ clause))) ,@(cdr^ clause)) new-clauses)))
+	      (else (k (cons `((memq ,var ',(get-sexp (car^ clause))) ,@(cdr^ clause))
+			     new-clauses))))))))))
+
+(define* case-clauses->cond-clauses^
+  (lambda (var clauses k2)
+    (if (null? clauses)
+      (k2 '() '())
+      (case-clauses->cond-clauses^ var (cdr clauses)
+	(lambda-cont2 (bindings new-clauses)
+	  (let ((clause (car clauses)))
+	    (if (eq?^ (car^ clause) 'else)
+	      (k2 (cons `(else-code (lambda () ,@(cdr^ clause))) bindings)
+		  (cons '(else (else-code)) new-clauses))
+	      (if (symbol?^ (car^ clause))
+		(let ((name (get-sexp (car^ clause))))
+		  (k2 (cons `(,name (lambda () ,@(cdr^ clause))) bindings)
+		      (cons `((eq? ,var ',(car^ clause)) (,name)) new-clauses)))
+		(let ((name (get-sexp (car^ (car^ clause)))))
+		  (k2 (cons `(,name (lambda () ,@(cdr^ clause))) bindings)
+		      (cons `((memq ,var ',(car^ clause)) (,name)) new-clauses)))))))))))
+
+;; avoids variable capture
+(define record-case-transformer^
+  (lambda-macro (adatum k)
+    (let ((exp (cadr^ adatum))
+	  (clauses (cddr^ adatum)))
+      ;; if exp is a variable, no need to introduce r binding
+      (if (symbol?^ exp)
+	(record-case-clauses->cond-clauses^ exp clauses
+	  (lambda-cont2 (bindings new-clauses)
+	    (k `(let ,bindings (cond ,@new-clauses)))))
+	(record-case-clauses->cond-clauses^ 'r clauses
+	  (lambda-cont2 (bindings new-clauses)
+	    (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses)))))))))
+
+(define* record-case-clauses->cond-clauses^
+  (lambda (var clauses k2)
+    (if (null? clauses)
+      (k2 '() '())
+      (record-case-clauses->cond-clauses^ var (cdr clauses)
+	(lambda-cont2 (bindings new-clauses)
+	  (let ((clause (car clauses)))
+	    (if (eq?^ (car^ clause) 'else)
+	      (k2 (cons `(else-code (lambda () ,@(cdr^ clause))) bindings)
+		  (cons `(else (else-code)) new-clauses))
+	      (if (symbol?^ (car^ clause))
+		(let ((name (get-sexp (car^ clause))))
+		  (k2 (cons `(,name (lambda ,(cadr^ clause) ,@(cddr^ clause))) bindings)
+		      (cons `((eq? (car ,var) ',(car^ clause)) (apply ,name (cdr ,var)))
+			    new-clauses)))
+		(let ((name (get-sexp (car^ (car^ clause)))))
+		  (k2 (cons `(,name (lambda ,(cadr^ clause) ,@(cddr^ clause))) bindings)
+		      (cons `((memq (car ,var) ',(car^ clause)) (apply ,name (cdr ,var)))
+			    new-clauses)))))))))))
+
+;;(define make-macro-env
+;;  (lambda ()
+;;    (make-initial-environment
+;;      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case)
+;;      (list and-transformer
+;;	    or-transformer
+;;	    cond-transformer
+;;	    let-transformer
+;;	    letrec-transformer
+;;	    let*-transformer
+;;	    case-transformer
+;;	    record-case-transformer))))
+
+(define make-macro-env^
+  (lambda ()
+    (make-initial-environment
+      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case)
+      (list and-transformer^
+	    or-transformer^
+	    cond-transformer^
+	    let-transformer^
+	    letrec-transformer^
+	    let*-transformer^
+	    case-transformer^
+	    record-case-transformer^))))
+
+(define macro-env (make-macro-env^))
+
+(define* amacro-error
+  (lambda (transformer-name adatum)
+    (unannotate-cps adatum
+      (lambda-cont (datum)
+	(error transformer-name "bad concrete syntax: ~a" datum)))))
+
+(define make-pattern-macro^
+  (lambda (clauses aclauses)
+    (list 'pattern-macro clauses aclauses)))
+
+(define macro-clauses^
+  (lambda (macro)
+    (cadr macro)))
+
+(define macro-aclauses^
+  (lambda (macro)
+    (caddr macro)))
+
+(define-datatype aexpression aexpression?
+  (lit-aexp
+    (datum anything?)
+    (info source-info?))
+  (var-aexp
+    (id symbol?)
+    (info source-info?))
+  (if-aexp
+    (test-aexp aexpression?)
+    (then-aexp aexpression?)
+    (else-aexp aexpression?)
+    (info source-info?))
+  (assign-aexp
+    (var symbol?)
+    (rhs-exp aexpression?)
+    (var-info source-info?)
+    (info source-info?))
+  (func-aexp
+    (exp aexpression?)
+    (info source-info?))
+  (define-aexp
+    (id symbol?)
+    (docstring string?)
+    (rhs-exp aexpression?)
+    (info source-info?))
+  (define!-aexp
+    (id symbol?)
+    (docstring string?)
+    (rhs-exp aexpression?)
+    (info source-info?))
+  (define-syntax-aexp
+    (name symbol?)
+    (clauses (list-of (list-of pattern?)))
+    (aclauses list-of-asexp?)
+    (info source-info?))
+  (begin-aexp
+    (exps (list-of aexpression?))
+    (info source-info?))
+  (lambda-aexp
+    (formals (list-of symbol?))
+    (bodies (list-of aexpression?))
+    (info source-info?))
+  (mu-lambda-aexp
+    (formals (list-of symbol?))
+    (runt symbol?)
+    (bodies (list-of aexpression?))
+    (info source-info?))
+  (app-aexp
+    (operator aexpression?)
+    (operands (list-of aexpression?))
+    (info source-info?))
+  (try-catch-aexp
+    (body aexpression?)
+    (catch-var symbol?)
+    (catch-exps (list-of aexpression?))
+    (info source-info?))
+  (try-finally-aexp
+    (body aexpression?)
+    (finally-exps (list-of aexpression?))
+    (info source-info?))
+  (try-catch-finally-aexp
+    (body aexpression?)
+    (catch-var symbol?)
+    (catch-exps (list-of aexpression?))
+    (finally-exps (list-of aexpression?))
+    (info source-info?))
+  (raise-aexp
+    (exp aexpression?)
+    (info source-info?))
+  (dict-aexp
+    (entries (list-of (list-of aexpression?)))
+    (info source-info?))
+  (help-aexp
+    (var symbol?)
+    (var-info source-info?)  ;; probably don't need this, but doesn't hurt
+    (info source-info?))
+  (choose-aexp
+    (exps (list-of aexpression?))
+    (info source-info?))
+  )
+
+(define application?^
+  (lambda (asexp)
+    (and (list?^ asexp)
+	 (not (null?^ asexp))
+	 (not (reserved-keyword? (get-sexp (car^ asexp)))))))
+
+(define mit-style?^
+  (lambda (asexp)
+    (not (symbol?^ (cadr^ asexp)))))
+
+(define literal?^
+  (lambda (asexp)
+    (let ((s (get-sexp asexp)))
+      (or (number? s) (boolean? s) (char? s) (string? s)))))
+
+(define syntactic-sugar?^
+  (lambda (asexp)
+    (and (pair?^ asexp)
+	 (symbol?^ (car^ asexp))
+	 (true? (search-env macro-env (get-sexp (car^ asexp)))))))
+
+(define tagged-list^
+  (lambda (tag op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq? (get-sexp (car^ asexp)) tag)))))
+
+(define quote?^ (tagged-list^ 'quote = 2))
+(define quasiquote?^ (tagged-list^ 'quasiquote = 2))
+(define unquote?^ (tagged-list^ 'unquote >= 2))
+(define unquote-splicing?^ (tagged-list^ 'unquote-splicing >= 2))
+(define if-then?^ (tagged-list^ 'if = 3))
+(define if-else?^ (tagged-list^ 'if = 4))
+(define assignment?^ (tagged-list^ 'set! = 3))
+(define func?^ (tagged-list^ 'func = 2))
+(define define?^ (tagged-list^ 'define >= 3))
+(define define!?^ (tagged-list^ 'define! >= 3))
+(define define-syntax?^ (tagged-list^ 'define-syntax >= 3))
+(define begin?^ (tagged-list^ 'begin >= 2))
+(define lambda?^ (tagged-list^ 'lambda >= 3))
+(define raise?^ (tagged-list^ 'raise = 2))
+(define dict?^ (tagged-list^ 'dict >= 1))
+(define help?^ (tagged-list^ 'help = 2))
+(define choose?^ (tagged-list^ 'choose >= 1))
+(define try?^ (tagged-list^ 'try >= 2))
+(define try-body^ (lambda (x) (cadr^ x)))
+(define catch?^ (tagged-list^ 'catch >= 3))
+(define catch-var^ (lambda (x) (cadr^ x)))
+(define catch-exps^ (lambda (x) (cddr^ x)))
+(define finally?^ (tagged-list^ 'finally >= 2))
+(define finally-exps^ (lambda (x) (cdr (get-sexp x))))
+
+;; <adatum> ::= (asexp <sexp> <info>)
+
+(define* aparse
+  (lambda (adatum handler fail k)
+    (let ((info (get-source-info adatum)))
+      (cond
+        ((null?^ adatum) (k (lit-aexp (get-sexp adatum) info) fail))
+	((literal?^ adatum) (k (lit-aexp (get-sexp adatum) info) fail))
+	((vector?^ adatum)
+	 (unannotate-cps adatum
+	   (lambda-cont (v)
+	     (k (lit-aexp v info) fail))))
+	((symbol?^ adatum) (k (var-aexp (get-sexp adatum) info) fail))
+	((quote?^ adatum)
+	 (unannotate-cps (cadr^ adatum)
+	   (lambda-cont (v)
+	     (k (lit-aexp v info) fail))))
+	((quasiquote?^ adatum)
+	 (qq-expand-cps (cadr^ adatum) 0
+	   (lambda-cont (v)
+	     (reannotate-cps v
+	       (lambda-cont (aexpansion)
+		 (let ((info (get-source-info adatum)))
+		   (if (original-source-info? adatum)
+		     (aparse (replace-info aexpansion (snoc 'quasiquote info)) handler fail k)
+		     (aparse (replace-info aexpansion info) handler fail k))))))))
+	((unquote?^ adatum) (aparse-error "misplaced" adatum handler fail))
+	((unquote-splicing?^ adatum) (aparse-error "misplaced" adatum handler fail))
+	((syntactic-sugar?^ adatum)
+	 (expand-once^ adatum handler fail
+	   (lambda-cont2 (aexpansion fail)
+	     (aparse aexpansion handler fail k))))
+	((if-then?^ adatum)
+	 (aparse (cadr^ adatum) handler fail
+	   (lambda-cont2 (v1 fail)
+	     (aparse (caddr^ adatum) handler fail
+	       (lambda-cont2 (v2 fail)
+		 (k (if-aexp v1 v2 (lit-aexp #f 'none) info) fail))))))
+	((if-else?^ adatum)
+	 (aparse (cadr^ adatum) handler fail
+	   (lambda-cont2 (v1 fail)
+	     (aparse (caddr^ adatum) handler fail
+	       (lambda-cont2 (v2 fail)
+		 (aparse (cadddr^ adatum) handler fail
+		   (lambda-cont2 (v3 fail)
+		     (k (if-aexp v1 v2 v3 info) fail))))))))
+	((assignment?^ adatum)
+	 (aparse (caddr^ adatum) handler fail
+	   (lambda-cont2 (v fail)
+	     (let ((var-info (get-source-info (cadr^ adatum))))
+	       (k (assign-aexp (get-sexp (cadr^ adatum)) v var-info info) fail)))))
+	((func?^ adatum)
+	 (aparse (cadr^ adatum) handler fail
+	   (lambda-cont2 (e fail)
+	     (k (func-aexp e info) fail))))
+	((define?^ adatum)
+	 (cond
+	   ((mit-style?^ adatum)
+	    (mit-define-transformer^ adatum
+	      (lambda-cont (v)
+		(reannotate-cps v
+		  (lambda-cont (expansion)
+		    (aparse (replace-info expansion info) handler fail k))))))
+	   ((= (length^ adatum) 3) ;; (define <var> <body>)
+	    (aparse (caddr^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(k (define-aexp (get-sexp (cadr^ adatum)) "" body info) fail))))
+	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define <var> <docstring> <body>)
+	    (aparse (cadddr^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(k (define-aexp (get-sexp (cadr^ adatum)) (get-sexp (caddr^ adatum)) body info) fail))))
+	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
+	((define!?^ adatum)
+	 (cond
+	   ((mit-style?^ adatum)
+	    (mit-define-transformer^ adatum
+	      (lambda-cont (v)
+		(reannotate-cps v
+		  (lambda-cont (expansion)
+		    (aparse (replace-info expansion info) handler fail k))))))
+	   ((= (length^ adatum) 3) ;; (define! <var> <body>)
+	    (aparse (caddr^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(k (define!-aexp (get-sexp (cadr^ adatum)) "" body info) fail))))
+	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define! <var> <docstring> <body>)
+	    (aparse (cadddr^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(k (define!-aexp (get-sexp (cadr^ adatum)) (get-sexp (caddr^ adatum)) body info) fail))))
+	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
+	((define-syntax?^ adatum)
+	 (let ((name (get-sexp (cadr^ adatum)))
+	       (aclauses (cddr^ adatum)))
+	   (unannotate-cps aclauses
+	     (lambda-cont (clauses)
+	       (k (define-syntax-aexp name clauses aclauses info) fail)))))
+	((begin?^ adatum)
+	 (aparse-all (cdr^ adatum) handler fail
+	   (lambda-cont2 (v fail)
+	     (cond
+	       ((null? v) (aparse-error "bad concrete syntax:" adatum handler fail))
+	       ((null? (cdr v)) (k (car v) fail))
+	       (else (k (begin-aexp v info) fail))))))
+	((lambda?^ adatum)
+	 (aparse-all (cddr^ adatum) handler fail
+	   (lambda-cont2 (bodies fail)
+	     (unannotate-cps (cadr^ adatum)
+	       (lambda-cont (formals)
+		 (if (list? formals)
+		   (k (lambda-aexp formals bodies info) fail)
+		   (k (mu-lambda-aexp (head formals) (last formals) bodies info) fail)))))))
+	((try?^ adatum)
+	 ;; fix: this code is horrendously UGLY!
+	 (cond
+	   ((= (length^ adatum) 2)
+	    ;; (try <body>)
+	    (aparse (try-body^ adatum) handler fail k))
+	   ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
+	    ;; (try <body> (catch <var> <exp> ...))
+	    (aparse (try-body^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(aparse-all (catch-exps^ (caddr^ adatum)) handler fail
+		  (lambda-cont2 (cexps fail)
+		    (let ((cvar (get-sexp (catch-var^ (caddr^ adatum)))))
+		      (k (try-catch-aexp body cvar cexps info) fail)))))))
+	   ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
+	    ;; (try <body> (finally <exp> ...))
+	    (aparse (try-body^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(aparse-all (finally-exps^ (caddr^ adatum)) handler fail
+		  (lambda-cont2 (fexps fail)
+		    (k (try-finally-aexp body fexps info) fail))))))
+	   ((and (= (length^ adatum) 4) (catch?^ (caddr^ adatum)) (finally?^ (cadddr^ adatum)))
+	    ;; (try <body> (catch <var> <exp> ...) (finally <exp> ...))
+	    (aparse (try-body^ adatum) handler fail
+	      (lambda-cont2 (body fail)
+		(aparse-all (catch-exps^ (caddr^ adatum)) handler fail
+		  (lambda-cont2 (cexps fail)
+		    (aparse-all (finally-exps^ (cadddr^ adatum)) handler fail
+		      (lambda-cont2 (fexps fail)
+			(let ((cvar (get-sexp (catch-var^ (caddr^ adatum)))))
+			  (k (try-catch-finally-aexp body cvar cexps fexps info) fail)))))))))
+	   (else (aparse-error "bad try syntax:" adatum handler fail))))
+	((raise?^ adatum)
+	 (aparse (cadr^ adatum) handler fail
+	   (lambda-cont2 (v fail)
+	     (k (raise-aexp v info) fail))))
+	((dict?^ adatum)
+	 (aparse-entries (cdr^ adatum) handler fail
+	   (lambda-cont2 (entries fail)
+	     (k (dict-aexp entries info) fail))))
+	((help?^ adatum)
+	 (if (symbol?^ (cadr^ adatum))
+	   (let ((var (get-sexp (cadr^ adatum)))
+		 (var-info (get-source-info (cadr^ adatum))))
+	     (k (help-aexp var var-info info) fail))
+	   (aparse-error "bad concrete syntax:" adatum handler fail)))
+	((choose?^ adatum)
+	 (aparse-all (cdr^ adatum) handler fail
+	   (lambda-cont2 (exps fail)
+	     (k (choose-aexp exps info) fail))))
+	((application?^ adatum)
+	 (aparse (car^ adatum) handler fail
+	   (lambda-cont2 (v1 fail)
+	     (aparse-all (cdr^ adatum) handler fail
+	       (lambda-cont2 (v2 fail)
+		 (k (app-aexp v1 v2 info) fail))))))
+	(else (aparse-error "bad concrete syntax:" adatum handler fail))))))
+
+(define* aparse-error
+  (lambda (msg adatum handler fail)
+    (let ((info (get-source-info adatum)))
+      (unannotate-cps adatum
+	(lambda-cont (datum)
+	  (handler (format "parse error: ~a ~s ~a" msg datum
+			   (where-at (get-start-line info) (get-start-char info) (get-srcfile info)))
+		   fail))))))
+
+(define* expand-once^
+  (lambda (adatum handler fail k)  ;; k receives 2 args: asexp, fail
+    (lookup-value (get-sexp (car^ adatum)) macro-env 'none handler fail
+      (lambda-cont2 (macro fail)
+	(if (pattern-macro? macro)
+	  (process-macro-clauses^ (macro-clauses^ macro) (macro-aclauses^ macro) adatum handler fail k)
+	  ;; macro transformer functions take 1-arg continuations:
+	  (macro adatum
+	    (lambda-cont (v)
+	      (reannotate-cps v
+		(lambda-cont (expansion)
+		  (if (has-source-info? expansion)
+		    (k expansion fail)
+		    (let ((info (get-source-info adatum)))
+		      (if (original-source-info? adatum)
+			(let ((macro-keyword (get-sexp (car^ adatum))))
+			  (k (replace-info expansion (snoc macro-keyword info)) fail))
+			(k (replace-info expansion info) fail)))))))))))))
+
+(define* process-macro-clauses^
+  (lambda (clauses aclauses adatum handler fail k)  ;; k receives 2 args: asexp, fail
+    (if (null? clauses)
+      (aparse-error "no matching clause found for" adatum handler fail)
+      (let ((left-pattern (caar clauses))
+	    (right-pattern (cadar clauses))
+	    (aleft-pattern (car^ (car aclauses)))
+	    (aright-pattern (cadr^ (car aclauses))))
+	(unannotate-cps adatum
+	  (lambda-cont (datum)
+	    (unify-patterns^ left-pattern datum aleft-pattern adatum
+	      (lambda-cont (subst)
+		(if subst
+		  (instantiate^ right-pattern subst aright-pattern (lambda-cont2 (v av) (k av fail)))
+		  (process-macro-clauses^ (cdr clauses) (cdr aclauses) adatum handler fail k))))))))))
+
+;; for dicts
+(define* aparse-entries
+  (lambda (entries handler fail k)
+    (if (null? entries)
+      (k '() fail)
+      (aparse-all (get-sexp (car entries)) handler fail
+	(lambda-cont2 (a fail)
+	  (aparse-entries (cdr entries) handler fail
+	    (lambda-cont2 (b fail)
+	      (k (cons a b) fail))))))))
+
+(define* aparse-all
+  (lambda (adatum-list handler fail k)
+    (if (null? adatum-list)
+      (k '() fail)
+      (aparse (car adatum-list) handler fail
+	(lambda-cont2 (a fail)
+	  (aparse-all (cdr adatum-list) handler fail
+	    (lambda-cont2 (b fail)
+	      (k (cons a b) fail))))))))
+
+(define* aparse-sexps
+  (lambda (tokens src handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k '() fail)
+      (read-asexp tokens src handler fail
+	(lambda-cont4 (adatum end tokens-left fail)
+	  (aparse adatum handler fail
+	    (lambda-cont2 (exp fail)
+	      (aparse-sexps tokens-left src handler fail
+		(lambda-cont2 (v fail)
+		  (k (cons exp v) fail))))))))))
+
+;;--------------------------------------------------------------------------------------------
+;; quasiquote expansion
+;;
+;; based on Appendix B of Alan Bawden's paper "Quasiquotation in Lisp", with some optimizations
+;;
+;; this version matches the functionality of Petite's quasiquote expander
+
+;; for testing only
+(define qqtest
+  (lambda (s)
+    (let ((datum (read-string s)))
+      (if (not (and (list? datum) (= (length datum) 2) (eq? (car datum) 'quasiquote)))
+	(begin
+	  (printf "Not a quasiquote expression!\n")
+	  (reset)))
+      (let ((adatum (aread-string s)))
+	(qq-expand-cps (cadr^ adatum) 0
+	  (lambda-cont (v)
+	    (reannotate-cps v
+	      (lambda-cont (aexpansion)
+		(replace-info aexpansion (snoc 'quasiquote (get-source-info adatum)))))))))))
+
+;; expands annotated code
+(define* qq-expand-cps
+  (lambda (ax depth k)
+    (cond
+      ((quasiquote?^ ax)
+       (qq-expand-cps (^cdr^ ax) (+ depth 1)
+	 (lambda-cont (v)
+	   (k `(cons 'quasiquote ,v)))))
+      ((or (unquote?^ ax) (unquote-splicing?^ ax))
+       (cond
+	 ((> depth 0)
+	  (qq-expand-cps (^cdr^ ax) (- depth 1)
+	    (lambda-cont (v)
+	      (k `(cons ',(car^ ax) ,v)))))
+	 ((and (unquote?^ ax) (not (null? (cdr^ ax))) (null? (cddr^ ax))) (k (cadr^ ax)))
+	 (else (k `(quote ,ax))))) ;; illegal
+      ((vector?^ ax)
+       (qq-expand-cps (retag (vector->list^ ax) 'none) depth
+	 (lambda-cont (v)
+	   (k `(list->vector ,v)))))
+      ((not (pair?^ ax)) (k `',ax))
+      ((null? (cdr^ ax)) (qq-expand-list-cps (car^ ax) depth k))
+      (else (qq-expand-list-cps (car^ ax) depth
+	      (lambda-cont (v1)
+		(qq-expand-cps (^cdr^ ax) depth
+		  (lambda-cont (v2)
+		    (k `(append ,v1 ,v2))))))))))
+
+;; expands annotated code
+(define* qq-expand-list-cps
+  (lambda (ax depth k)
+    (cond
+      ((quasiquote?^ ax)
+       (qq-expand-cps (^cdr^ ax) (+ depth 1)
+	 (lambda-cont (v)
+	   (k `(list (cons 'quasiquote ,v))))))
+      ((or (unquote?^ ax) (unquote-splicing?^ ax))
+       (cond
+	 ((> depth 0)
+	  (qq-expand-cps (^cdr^ ax) (- depth 1)
+	    (lambda-cont (v)
+	      (k `(list (cons ',(car^ ax) ,v))))))
+	 ((unquote?^ ax) (k `(list . ,(^cdr^ ax))))
+	 ((null? (cddr^ ax)) (k (cadr^ ax)))
+	 (else (k `(append . ,(^cdr^ ax))))))
+      ((vector?^ ax)
+       (qq-expand-cps ax depth
+	 (lambda-cont (v)
+	   (k `(list ,v)))))
+      ((not (pair?^ ax)) (k `'(,ax)))
+      ((null? (cdr^ ax))
+       (qq-expand-list-cps (car^ ax) depth
+	 (lambda-cont (v)
+	   (k `(list ,v)))))
+      (else (qq-expand-list-cps (car^ ax) depth
+	      (lambda-cont (v1)
+		(qq-expand-cps (^cdr^ ax) depth
+		  (lambda-cont (v2)
+		    (k `(list (append ,v1 ,v2)))))))))))
+
+;; expands unannotated code
+(define* qq-expand-cps_
+  (lambda (x depth k)
+    (cond
+      ((quasiquote? x)
+       (qq-expand-cps_ (cdr x) (+ depth 1)
+	 (lambda-cont (v)
+	   (k `(cons 'quasiquote ,v)))))
+      ((or (unquote? x) (unquote-splicing? x))
+       (cond
+	 ((> depth 0)
+	  (qq-expand-cps_ (cdr x) (- depth 1)
+	    (lambda-cont (v)
+	      (k `(cons ',(car x) ,v)))))
+	 ((and (unquote? x) (not (null? (cdr x))) (null? (cddr x))) (k (cadr x)))
+	 (else (k `(quote ,x))))) ;; illegal
+      ((vector? x)
+       (qq-expand-cps_ (vector->list x) depth
+	 (lambda-cont (v)
+	   (k `(list->vector ,v)))))
+      ((not (pair? x)) (k `',x))
+      ((null? (cdr x)) (qq-expand-list-cps_ (car x) depth k))
+      (else (qq-expand-list-cps_ (car x) depth
+	      (lambda-cont (v1)
+		(qq-expand-cps_ (cdr x) depth
+		  (lambda-cont (v2)
+		    (k `(append ,v1 ,v2))))))))))
+
+;; expands unannotated code
+(define* qq-expand-list-cps_
+  (lambda (x depth k)
+    (cond
+      ((quasiquote? x)
+       (qq-expand-cps_ (cdr x) (+ depth 1)
+	 (lambda-cont (v)
+	   (k `(list (cons 'quasiquote ,v))))))
+      ((or (unquote? x) (unquote-splicing? x))
+       (cond
+	 ((> depth 0)
+	  (qq-expand-cps_ (cdr x) (- depth 1)
+	    (lambda-cont (v)
+	      (k `(list (cons ',(car x) ,v))))))
+	 ((unquote? x) (k `(list . ,(cdr x))))
+	 ((null? (cddr x)) (k (cadr x)))
+	 (else (k `(append . ,(cdr x))))))
+      ((vector? x)
+       (qq-expand-cps_ x depth
+	 (lambda-cont (v)
+	   (k `(list ,v)))))
+      ((not (pair? x)) (k `'(,x)))
+      ((null? (cdr x))
+       (qq-expand-list-cps_ (car x) depth
+	 (lambda-cont (v)
+	   (k `(list ,v)))))
+      (else (qq-expand-list-cps_ (car x) depth
+	      (lambda-cont (v1)
+		(qq-expand-cps_ (cdr x) depth
+		  (lambda-cont (v2)
+		    (k `(list (append ,v1 ,v2)))))))))))
+
+;;------------------------------------------------------------------------
 ;; for manual testing only in scheme
+
+(define unparse
+  (lambda (exp)
+    (cases expression exp
+      (lit-exp (datum)
+	(cond
+	  ((literal? datum) datum)
+	  ((vector? datum) datum)
+	  (else `(quote ,datum))))
+      (var-exp (id) id)
+      (if-exp (test-exp then-exp else-exp)
+	`(if ,(unparse test-exp) ,(unparse then-exp) ,(unparse else-exp)))
+      (assign-exp (var rhs-exp)
+	`(set! ,var ,(unparse rhs-exp)))
+      (func-exp (exp)
+	`(func ,(unparse exp)))
+      (define-exp (id docstring rhs-exp)
+	(if (string=? docstring "")
+	  `(define ,id ,(unparse rhs-exp))
+	  `(define ,id ,docstring ,(unparse rhs-exp))))
+      (define!-exp (id docstring rhs-exp)
+	(if (string=? docstring "")
+	  `(define! ,id ,(unparse rhs-exp))
+	  `(define! ,id ,docstring ,(unparse rhs-exp))))
+      (define-syntax-exp (name clauses)
+	`(define-syntax ,name ,@clauses))
+      (begin-exp (exps)
+	`(begin ,@(map unparse exps)))
+      (lambda-exp (formals bodies)
+	`(lambda ,formals ,@(map unparse bodies)))
+      (mu-lambda-exp (formals runt bodies)
+	`(lambda (,@formals . ,runt) ,@(map unparse bodies)))
+      (app-exp (operator operands)
+	`(,(unparse operator) ,@(map unparse operands)))
+      (try-catch-exp (body catch-var catch-exps)
+	`(try ,(unparse body) (catch ,catch-var ,@(map unparse catch-exps))))
+      (try-finally-exp (body finally-exps)
+	`(try ,(unparse body) (finally ,@(map unparse finally-exps))))
+      (try-catch-finally-exp (body catch-var catch-exps finally-exps)
+	`(try ,(unparse body)
+	      (catch ,catch-var ,@(map unparse catch-exps))
+	      (finally ,@(map unparse finally-exps))))
+      (raise-exp (exp)
+	`(raise ,(unparse exp)))
+      (dict-exp (entries)
+	`(dict ,@(map (lambda (b) `(,(unparse (car b)) ,(unparse (cadr b)))) entries)))
+      (help-exp (var)
+	`(help ,var))
+      (choose-exp (exps)
+	`(choose ,@(map unparse exps)))
+      (else (error 'unparse "bad abstract syntax: ~s" exp)))))
+
+(define aunparse
+  (lambda (aexp)
+    (cases aexpression aexp
+      (lit-aexp (datum info)
+	(cond
+	  ((literal? datum) datum)
+	  ((vector? datum) datum)
+	  (else `(quote ,datum))))
+      (var-aexp (id info) id)
+      (if-aexp (test-aexp then-aexp else-aexp info)
+	`(if ,(aunparse test-aexp) ,(aunparse then-aexp) ,(aunparse else-aexp)))
+      (assign-aexp (var rhs-exp var-info info)
+	`(set! ,var ,(aunparse rhs-exp)))
+      (func-aexp (exp info)
+	`(func ,(aunparse exp)))
+      (define-aexp (id docstring rhs-exp info)
+	(if (string=? docstring "")
+	  `(define ,id ,(aunparse rhs-exp))
+	  `(define ,id ,docstring ,(aunparse rhs-exp))))
+      (define!-aexp (id docstring rhs-exp info)
+	(if (string=? docstring "")
+	  `(define! ,id ,(aunparse rhs-exp))
+	  `(define! ,id ,docstring ,(aunparse rhs-exp))))
+      (define-syntax-aexp (name clauses aclauses info)
+	`(define-syntax ,name ,@clauses))
+      (begin-aexp (exps info)
+	`(begin ,@(map aunparse exps)))
+      (lambda-aexp (formals bodies info)
+	`(lambda ,formals ,@(map aunparse bodies)))
+      (mu-lambda-aexp (formals runt bodies info)
+	`(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
+      (app-aexp (operator operands info)
+	`(,(aunparse operator) ,@(map aunparse operands)))
+      (try-catch-aexp (body catch-var catch-exps info)
+	`(try ,(aunparse body) (catch ,catch-var ,@(map aunparse catch-exps))))
+      (try-finally-aexp (body finally-exps info)
+	`(try ,(aunparse body) (finally ,@(map aunparse finally-exps))))
+      (try-catch-finally-aexp (body catch-var catch-exps finally-exps info)
+	`(try ,(aunparse body)
+	      (catch ,catch-var ,@(map aunparse catch-exps))
+	      (finally ,@(map aunparse finally-exps))))
+      (raise-aexp (exp info)
+	`(raise ,(aunparse exp)))
+      (dict-aexp (entries info)
+	`(dict ,@(map (lambda (b) `(,(aunparse (car b)) ,(aunparse (cadr b)))) entries)))
+      (help-aexp (var var-info info)
+	`(help ,var))
+      (choose-aexp (exps info)
+	`(choose ,@(map aunparse exps)))
+      (else (error 'aunparse "bad abstract syntax: ~s" aexp)))))
+
+(define expand-macro
+  (lambda (transformer sexp)
+    (transformer sexp init-cont)))
 
 (define parse-string
   (lambda (string)
-    (read-datum string init-handler2 init-fail
+    (read-datum string 'stdin init-handler2 init-fail
       (lambda-cont3 (datum tokens-left fail)
 	(parse datum init-handler2 init-fail init-cont2)))))
 
-;;(define parse-file
-;;  (lambda (filename)
-;;    (get-parsed-sexps filename)))
+(define parse-file
+  (lambda (filename)
+    (get-parsed-sexps filename)))
 
 (define print-parsed-sexps
   (lambda (filename)
@@ -658,18 +1477,294 @@
 
 (define get-parsed-sexps
   (lambda (filename)
-    (scan-input (read-content filename) init-handler2 init-fail
+    (scan-input (read-content filename) filename init-handler2 init-fail
       (lambda-cont2 (tokens fail)
-	(parse-sexps tokens init-handler2 init-fail init-cont2)))))
+	(parse-sexps tokens filename init-handler2 init-fail init-cont2)))))
 
 (define* parse-sexps
-  (lambda (tokens handler fail k)
+  (lambda (tokens src handler fail k)
     (if (token-type? (first tokens) 'end-marker)
       (k '() fail)
-      (read-sexp tokens handler fail
+      (read-sexp tokens src handler fail
 	(lambda-cont3 (datum tokens-left fail)
 	  (parse datum handler fail
 	    (lambda-cont2 (exp fail)
-	      (parse-sexps tokens-left handler fail
+	      (parse-sexps tokens-left src handler fail
 		(lambda-cont2 (v fail)
 		  (k (cons exp v) fail))))))))))
+
+(define aparse-string
+  (lambda (string)
+    (aread-datum string 'stdin init-handler2 init-fail
+      (lambda-cont3 (adatum tokens-left fail)
+	(aparse adatum init-handler2 init-fail init-cont2)))))
+
+(define aparse-file
+  (lambda (filename)
+    (aget-parsed-sexps filename)))
+
+(define aprint-parsed-sexps
+  (lambda (filename)
+    (for-each pretty-print (aget-parsed-sexps filename))))
+
+(define aget-parsed-sexps
+  (lambda (filename)
+    (scan-input (read-content filename) filename init-handler2 init-fail
+      (lambda-cont2 (tokens fail)
+	(aparse-sexps tokens filename init-handler2 init-fail init-cont2)))))
+
+;;--------------------------------------------------------------------------------------------
+;; not used - for possible future reference
+
+;; based on Alan Bawden's paper "Quasiquotation in Lisp"
+
+;; for testing only
+(define qq1
+  (lambda (s)
+    (let ((datum (read-string s)))
+      (if (not (and (list? datum) (= (length datum) 2) (eq? (car datum) 'quasiquote)))
+	(begin
+	  (printf "Not a quasiquote expression!\n")
+	  (reset)))
+      (qq-expand1 (cadr datum)))))
+
+;; non-CPS Appendix A algorithm, with some optimizations
+(define qq-expand1
+  (lambda (x)
+    (cond
+      ((quasiquote? x) (qq-expand1 (qq-expand1 (cadr x))))
+      ((unquote? x) (cadr x))
+      ((unquote-splicing? x) `(quote ,x))  ;; illegal
+      ((pair? x)
+       (cond
+	 ((null? (cdr x)) (qq-expand1-list (car x)))
+	 ((unquote? (car x)) `(cons ,(cadr (car x)) ,(qq-expand1 (cdr x))))
+	 (else `(append ,(qq-expand1-list (car x)) ,(qq-expand1 (cdr x))))))
+      ((vector? x) `(list->vector ,(qq-expand1 (vector->list x))))
+      (else `(quote ,x)))))
+
+(define qq-expand1-list
+  (lambda (x)
+    (cond
+      ((quasiquote? x) (qq-expand1-list (qq-expand1 (cadr x))))
+      ((unquote? x) `(list ,(cadr x)))
+      ((unquote-splicing? x) (cadr x))
+      ((pair? x)
+       (cond
+	 ((null? (cdr x)) `(list ,(qq-expand1-list (car x))))
+	 ((unquote? (car x)) `(list (cons ,(cadr (car x)) ,(qq-expand1 (cdr x)))))
+	 (else `(list (append ,(qq-expand1-list (car x)) ,(qq-expand1 (cdr x)))))))
+      ((vector? x) `(list ,(qq-expand1 x)))
+      (else `(quote (,x))))))
+
+;; for testing only
+(define qq2
+  (lambda (s)
+    (let ((datum (read-string s)))
+      (if (not (and (list? datum) (= (length datum) 2) (eq? (car datum) 'quasiquote)))
+	(begin
+	  (printf "Not a quasiquote expression!\n")
+	  (reset)))
+      (qq-expand2 (cadr datum) 0))))
+
+;; non-CPS Appendix B algorithm, with some optimizations
+(define qq-expand2
+  (lambda (x depth)
+    (cond
+      ((quasiquote? x) `(cons 'quasiquote ,(qq-expand2 (cdr x) (+ depth 1))))
+      ((or (unquote? x) (unquote-splicing? x))
+       (cond
+	 ((> depth 0) `(cons ',(car x) ,(qq-expand2 (cdr x) (- depth 1))))
+	 ((and (unquote? x) (not (null? (cdr x))) (null? (cddr x))) (cadr x))
+	 (else `(quote ,x))))  ;; illegal
+      ((vector? x) `(list->vector ,(qq-expand2 (vector->list x) depth)))
+      ((not (pair? x)) `',x)
+      ((null? (cdr x)) (qq-expand2-list (car x) depth))
+      (else `(append ,(qq-expand2-list (car x) depth) ,(qq-expand2 (cdr x) depth))))))
+
+(define qq-expand2-list
+  (lambda (x depth)
+    (cond
+      ((quasiquote? x) `(list (cons 'quasiquote ,(qq-expand2 (cdr x) (+ depth 1)))))
+      ((or (unquote? x) (unquote-splicing? x))
+       (cond
+	 ((> depth 0) `(list (cons ',(car x) ,(qq-expand2 (cdr x) (- depth 1)))))
+	 ((unquote? x) `(list . ,(cdr x)))
+	 ((null? (cddr x)) (cadr x))
+	 (else `(append . ,(cdr x)))))
+      ((vector? x) `(list ,(qq-expand2 x depth)))
+      ((not (pair? x)) `'(,x))
+      ((null? (cdr x)) `(list ,(qq-expand2-list (car x) depth)))
+      (else `(list (append ,(qq-expand2-list (car x) depth) ,(qq-expand2 (cdr x) depth)))))))
+
+;;;; walks through unannotated and annotated expressions in parallel, guided by unannotated expression
+;;(define qq-expand
+;;  (lambda (x ax depth)
+;;    (cond
+;;      ((quasiquote? x) `(cons 'quasiquote ,(qq-expand (cdr x) (^cdr^ ax) (+ depth 1))))
+;;      ((or (unquote? x) (unquote-splicing? x))
+;;       (cond
+;;	 ((> depth 0) `(cons ',(car^ ax) ,(qq-expand (cdr x) (^cdr^ ax) (- depth 1))))
+;;	 ((and (unquote? x) (not (null? (cdr x))) (null? (cddr x))) (cadr^ ax))
+;;	 (else `(quote ,ax))))  ;; illegal
+;;      ((vector? x) `(list->vector ,(qq-expand (vector->list x) (retag (vector->list^ ax) 'none) depth)))
+;;      ((not (pair? x)) `',ax)
+;;      ((null? (cdr x)) (qq-expand-list (car x) (car^ ax) depth))
+;;      (else `(append ,(qq-expand-list (car x) (car^ ax) depth) ,(qq-expand (cdr x) (^cdr^ ax) depth))))))
+
+;;;; walks through unannotated and annotated expressions in parallel, guided by unannotated expression
+;;(define qq-expand-list
+;;  (lambda (x ax depth)
+;;    (cond
+;;      ((quasiquote? x) `(list (cons 'quasiquote ,(qq-expand (cdr x) (^cdr^ ax) (+ depth 1)))))
+;;      ((or (unquote? x) (unquote-splicing? x))
+;;       (cond
+;;	 ((> depth 0) `(list (cons ',(car^ ax) ,(qq-expand (cdr x) (^cdr^ ax) (- depth 1)))))
+;;	 ((unquote? x) `(list . ,(^cdr^ ax)))
+;;	 ((null? (cddr x)) (cadr^ ax))
+;;	 (else `(append . ,(^cdr^ ax)))))
+;;      ((vector? x) `(list ,(qq-expand x ax depth)))
+;;      ((not (pair? x)) `'(,ax))
+;;      ((null? (cdr x)) `(list ,(qq-expand-list (car x) (car^ ax) depth)))
+;;      (else `(list (append ,(qq-expand-list (car x) (car^ ax) depth) ,(qq-expand (cdr x) (^cdr^ ax) depth)))))))
+
+;;--------------------------------------------------------------------------------------------
+;; my version - not correct
+
+;;(define* expand-quasiquote
+;;  (lambda (adatum k)
+;;    (cond
+;;      ((vector?^ adatum)
+;;       (expand-quasiquote^ (vector->list^ adatum)
+;;	 (lambda-cont (ls) (k `(list->vector ,ls)))))
+;;      ((not (pair?^ adatum)) (k `(quote ,adatum)))
+;;      ;; doesn't handle nested quasiquotes yet
+;;      ((quasiquote?^ adatum) (k `(quote ,adatum)))
+;;      ((unquote?^ adatum) (k (cadr^ adatum)))
+;;      ((unquote-splicing? (car^ adatum))
+;;       (if (null? (cdr^ adatum))
+;;	 (k (cadr^ (car^ adatum)))
+;;	 (expand-quasiquote^ (^cdr^ adatum)
+;;	   (lambda-cont (v) (k `(append ,(cadr^ (car^ adatum)) ,v))))))
+;;      ((quasiquote-list?^ adatum)
+;;       (expand-quasiquote-list^ (get-sexp adatum)
+;;	 (lambda-cont (v)
+;;	   (k `(list ,@v)))))
+;;      (else
+;;	(expand-quasiquote^ (car^ adatum)
+;;	  (lambda-cont (v1)
+;;	    (expand-quasiquote^ (^cdr^ adatum)
+;;	      (lambda-cont (v2)
+;;		(k `(cons ,v1 ,v2))))))))))
+
+;;(define* expand-quasiquote-list^  ;; maps expand-quasiquote to an arbitrary flat list
+;;  (lambda (asexps k)
+;;    (if (null? asexps)
+;;      (k '())
+;;      (expand-quasiquote^ (car asexps)
+;;	(lambda-cont (v1)
+;;	  (expand-quasiquote-list^ (cdr asexps)
+;;	    (lambda-cont (v2)
+;;	      (k (cons v1 v2)))))))))
+
+;;(define quasiquote-list?^
+;;  (lambda (adatum)
+;;    (or (null?^ adatum)
+;;	(and (pair?^ adatum)
+;;	     ;; doesn't handle nested quasiquotes yet
+;;	     (not (quasiquote?^ adatum))
+;;	     (not (unquote?^ adatum))
+;;	     (not (unquote-splicing?^ adatum))
+;;	     ;; doesn't handle nested quasiquotes yet
+;;	     (not (quasiquote?^ (car^ adatum)))
+;;	     (not (unquote-splicing?^ (car^ adatum)))
+;;	     (quasiquote-list?^ (^cdr^ adatum))))))
+
+;;--------------------------------------------------------------------------------------------
+;; temporary - stuff for testing
+
+;;(define a 'apple)
+;;(define b 'banana)
+;;(define c '(cherry orange))
+;;(define m 2)
+;;(define n 3)
+;;(define abc '(a b c))
+
+;;;;(define parseexp (lambda (e) (parse e init-handler2 init-fail init-cont2)))
+
+;;;(define-syntax for ((for ?exp times do . ?bodies) (for-repeat ?exp (lambda () . ?bodies))))
+
+;;(define for-macro
+;;  (lambda ()
+;;    (cases expression (car (parse-file "for-macro.ss"))
+;;      (define-syntax-exp (name clauses)
+;;	(make-pattern-macro clauses))
+;;      (else (error 'for-macro "huh?")))))
+
+;;(define collect-macro
+;;  (lambda ()
+;;    (cases expression (car (parse-file "collect-macro.ss"))
+;;      (define-syntax-exp (name clauses)
+;;	(make-pattern-macro clauses))
+;;      (else (error 'collect-macro "huh?")))))
+
+;;(define for-macro^
+;;  (lambda ()
+;;    (cases aexpression (car (aparse-file "for-macro.ss"))
+;;      (define-syntax-aexp (name clauses aclauses info)
+;;	(make-pattern-macro^ clauses aclauses))
+;;      (else (error 'for-macro^ "huh?")))))
+
+;;(define collect-macro^
+;;  (lambda ()
+;;    (cases aexpression (car (aparse-file "collect-macro.ss"))
+;;      (define-syntax-aexp (name clauses aclauses info)
+;;	(make-pattern-macro^ clauses aclauses))
+;;      (else (error 'collect-macro^ "huh?")))))
+
+;;(define make-macro-env
+;;  (lambda ()
+;;    (make-initial-environment
+;;      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case 'for 'collect)
+;;      (list and-transformer
+;;	    or-transformer
+;;	    cond-transformer
+;;	    let-transformer
+;;	    letrec-transformer
+;;	    let*-transformer
+;;	    case-transformer
+;;	    record-case-transformer
+;;	    (for-macro)      ;; for testing only
+;;	    (collect-macro)  ;; for testing only
+;;))))
+
+;;(define make-macro-env^
+;;  (lambda ()
+;;    (make-initial-environment
+;;      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case) ;; 'for 'collect)
+;;      (list and-transformer^
+;;	    or-transformer^
+;;	    cond-transformer^
+;;	    let-transformer^
+;;	    letrec-transformer^
+;;	    let*-transformer^
+;;	    case-transformer^
+;;	    record-case-transformer^
+;;;;	    (for-macro^)      ;; for testing only
+;;;;	    (collect-macro^)  ;; for testing only
+;;))))
+
+;;(define macro-env (make-macro-env^))
+
+;;;;(define macro-env 'undefined)
+
+;;;;(define pmacro (lookup-value 'for macro-env init-handler2 init-fail init-cont2))
+
+;;(define check
+;;    (lambda (f)
+;;      (let ((exps #f) (aexps #f))
+;;        (set! macro-env (make-macro-env))
+;;        (set! exps (parse-file f))
+;;        (set! macro-env (make-macro-env^))
+;;        (set! aexps (aparse-file f))
+;;        (equal? (map unparse exps) (map aunparse aexps)))))

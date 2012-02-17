@@ -36,7 +36,7 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text) {
-    object result = PJScheme.execute(text);
+    object result = PJScheme.execute_string_rm(text);
     if (result == null) {
        return true;
     }
@@ -52,7 +52,7 @@ public class CalicoSchemeEngine : Engine
 
   public override bool ExecuteFile(string filename) {
     System.Console.WriteLine("Run filename '{0}'!", filename);
-    PJScheme.execute_file(filename);
+    PJScheme.execute_file_rm(filename);
     return true;
   }
 

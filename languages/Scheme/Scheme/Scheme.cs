@@ -470,12 +470,13 @@ public class Scheme {
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
-  public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
-  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
   public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
+  public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
+  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
   public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
-  public static Proc make_vector_proc = new Proc("list->vector", (Procedure1) make_vector, 1, 1);
+  public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
+  public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
   public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
   public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
   public static Proc memq_proc = new Proc("memq", (Procedure2Bool) memq, 2, 2);
@@ -489,13 +490,21 @@ public class Scheme {
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
-  public static Proc display_prim_proc = new Proc("display", (Procedure1Void) display, 1, 0);
-  public static Proc pretty_print_prim_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
-  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
+  public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
+  public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
+  //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
   public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
+  public static Proc car_hat_proc = new Proc("car^",(Procedure1)car_hat, 1, 1);
+  public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)cdr_hat, 1, 1);
+  public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)cadr_hat, 1, 1);
+  public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)cddr_hat, 1, 1);
+  public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)caddr_hat, 1, 1);
+  public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)cdddr_hat, 1, 1);
+  public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)cadddr_hat, 1, 1);
+  public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
 
   public static char TILDE = '~';
   public static char NULL = '\0';
@@ -561,7 +570,7 @@ public class Scheme {
   }
 
   public static object make_proc(params object[] args) {
-	return cons(symbol("procedure"), vector_to_list(args));
+	return cons(symbol("procedure"), list(args));
   }
 
   public static object make_binding (object variable, object value) {
@@ -600,11 +609,12 @@ public class Scheme {
  	set_env_b(env, symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1));
  	set_env_b(env, symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1));
  	set_env_b(env, symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2));
+// why "list?" and not "iterator?" here ????
  	set_env_b(env, symbol("iterator?"), new Proc("list?", (Procedure1Bool)iterator_q, 1, 2));
  	set_env_b(env, symbol("symbol?"), new Proc("symbol?", (Procedure1Bool)symbol_q, 1, 2));
  	set_env_b(env, symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2));
  	set_env_b(env, symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1));
-	set_env_b(env, symbol("vector->list"), new Proc("vector->list", (Procedure1)my_vector_to_list, 1, 1));
+	set_env_b(env, symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1));
  	set_env_b(env, symbol("pair?"), new Proc("pair?", (Procedure1Bool)pair_q, 1, 2));
  	set_env_b(env, symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2));
  	set_env_b(env, symbol("string?"), new Proc("string?", (Procedure1Bool)string_q, 1, 2));
@@ -988,7 +998,7 @@ public class Scheme {
 	// FIXME: compare on empty list assumes proper list
 	// fix to work with improper lists
 	while (!Eq(current1, EmptyList)) {
-	  apply(proc, car(current1));
+	  apply(proc, list(car(current1)));
 	  current1 = cdr(current1);
 	}
   }
@@ -1085,25 +1095,13 @@ public class Scheme {
 	return (bool) procedure_q(obj);
   }
 
-  public static object make_vector_size(object size) {
+  public static object make_vector(object size) {
     int len = (int) size;
     object[] retval = new object[len];
     for (int i = 0; i < len; i++) {
       retval[i] = 0;
     }
     return new Vector(retval);
-  }
-
-  public static object make_vector(object lyst) {
-	trace(2, "called: make_vector\n");
-	int len = (int) length(lyst);
-	object current = lyst;
-	object[] retval = new object[len];
-	for (int i = 0; i < len; i++) {
-	  retval[i] = car(current);
-	  current = cdr(current);
-	}
-	return new Vector(retval);
   }
 
   public static object vector_set_b(object vector, object index, object value) {
@@ -1115,28 +1113,28 @@ public class Scheme {
   }
 
   public static object vector_ref(object vector, object index) {
-	trace(2, "called: vector_ref\n");
+    trace(2, "called: vector_ref\n");
     Vector v = (Vector) vector;
     int pos = (int) index;
     return v.get(pos);
   }
 
   public static object vector_length(object vector) {
-	trace(2, "called: vector_length\n");
+    trace(2, "called: vector_length\n");
     Vector v = (Vector) vector;
     return v.length();
   }
 
   public static object list_to_vector(object lyst) {
-	trace(2, "called: list_to_vector\n");
-	int len = (int) length(lyst);
-	object current = lyst;
-	object[] retval = new object[len];
-	for (int i = 0; i < len; i++) {
-	  retval[i] = car(current);
-	  current = cdr(current);
-	}
-	return retval;
+    trace(2, "called: list_to_vector\n");
+    int len = (int) length(lyst);
+    object current = lyst;
+    object[] retval = new object[len];
+    for (int i = 0; i < len; i++) {
+      retval[i] = car(current);
+      current = cdr(current);
+    }
+    return new Vector(retval);
   }
 
   public static object [] list_to_array(object lyst) {
@@ -2289,6 +2287,7 @@ public class Scheme {
 	return Append(car(obj), cadr(obj));
   }
 
+  // you have to be kidding - set_cdr???!!!!!
   public static object Append(object obj1, object obj2) {
     if (! list_q(obj2)) {
       throw new Exception(string.Format("error in append: need two lists"));
@@ -2398,6 +2397,34 @@ public class Scheme {
 	newline();
   }  
 
+  public static void safe_print(object arg) {
+    config.NEED_NEWLINE = false;
+    object sarg = make_safe(arg);
+    pretty_print(sarg);
+  }
+
+  // need to cps/registerize this to avoid reliance on C-sharp's stack
+  public static object make_safe(object x) {
+    if (procedure_object_q(x))
+      return (symbol("<procedure>"));
+    else if (environment_object_q(x))
+      return (symbol("<environment>"));
+    else if (pair_q(x))
+      return (cons(make_safe(car(x)), make_safe(cdr(x))));
+    else if (vector_q(x))
+      return (list_to_vector(make_safe(vector_to_list(x))));
+    else
+      return (x);
+  }
+
+  public static bool procedure_object_q(object x) {
+    return (procedure_q(x) || (pair_q(x) && Eq(car(x), symbol("procedure"))));
+  }
+
+  public static bool environment_object_q(object x) {
+    return (pair_q(x) && Eq(car(x), symbol("environment")));
+  }
+
   public static bool isTokenType(List<object> token, string tokenType) {
 	return Equal(token[0], tokenType);
   }
@@ -2431,10 +2458,6 @@ public class Scheme {
   }
 
   public static object vector_to_list(object obj) {
-	return list(obj);
-  }
-
-  public static object my_vector_to_list(object obj) {
     return ((Vector)obj).ToList();
   }
 
@@ -2449,6 +2472,104 @@ public class Scheme {
 	return (obj1.ToString() + obj2.ToString());
   }
 
+  //--------------------------------------------------------------------------------------------
+  // support for annotated s-expressions
+
+  public static object asexp_tag = new Cons(symbol("tag"), EmptyList);
+
+  public static bool asexp_q(object x) {
+    return (pair_q(x) && Eq(car(x), asexp_tag));
+  }
+
+  public static object get_sexp(object asexp) {
+    return (cadr(asexp));
+  }
+
+  public static int length_hat(object asexp) {
+    return ((int)length(get_sexp(asexp)));
+  }
+
+  public static bool list_q_hat(object x) {
+    return (asexp_q(x) && list_of_asexp_q(get_sexp(x)));
+  }
+
+  public static bool symbol_q_hat(object asexp) { return (symbol_q(get_sexp(asexp))); }
+  public static object car_hat(object asexp) { return (car(get_sexp(asexp))); }
+  public static object cdr_hat(object asexp) { return (cdr(get_sexp(asexp))); }
+  public static object cadr_hat(object asexp) { return (cadr(get_sexp(asexp))); }
+  public static object cddr_hat(object asexp) { return (cddr(get_sexp(asexp))); }
+  public static object caddr_hat(object asexp) { return (caddr(get_sexp(asexp))); }
+  public static object cdddr_hat(object asexp) { return (cdddr(get_sexp(asexp))); }
+  public static object cadddr_hat(object asexp) { return (cadddr(get_sexp(asexp))); }
+
+  public static object map_hat(object proc, object asexp) {
+    return (map(proc, get_sexp(asexp)));
+   }
+
+  public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
+    trace(10, "called: tagged_list_hat\n");
+    return (object x) => {
+      bool retval = (list_q_hat(x) &&
+		     (((Predicate2)pred)(length_hat(x), value)) &&
+		     symbol_q_hat(car_hat(x)) &&
+		     Eq(get_sexp(car_hat(x)), string_to_symbol(test_string)));
+      return retval;
+    };
+  }
+
+  static object x_reg = null;
+  static object k_reg = null;
+  static bool value_reg = false;
+  static Function pc = null;
+
+  public static bool list_of_asexp_q(object x) {
+    x_reg = x;
+    k_reg = EmptyList;
+    pc = list_of_asexp1;
+    while (pc != null) pc();
+    return value_reg;
+  }
+
+  public static void list_of_asexp1() {
+    if (null_q(x_reg)) {
+      value_reg = true;
+      pc = list_of_asexp2;
+    } else if (pair_q(x_reg)) {
+      if (asexp_q(car(x_reg))) {
+	k_reg = cons(x_reg, k_reg);
+	x_reg = cdr(x_reg);
+	pc = list_of_asexp1;
+      } else {
+	value_reg = false;
+	pc = list_of_asexp2;
+      }
+    } else {
+      value_reg = false;
+      pc = list_of_asexp2;
+    }
+  }
+
+  public static void list_of_asexp2() {
+    if (null_q(k_reg)) {
+      pc = null;
+    } else {
+      object x = car(k_reg);
+      object k = cdr(k_reg);
+      if (value_reg) {
+	k_reg = k;
+	pc = list_of_asexp2;
+      } else if (asexp_q(cdr(x))) {
+	k_reg = k;
+	x_reg = get_sexp(cdr(x));
+	pc = list_of_asexp1;
+      } else {
+	k_reg = k;
+	pc = list_of_asexp2;
+      }
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------
 
   public class Cons : IList {
   public object car;
@@ -2628,7 +2749,7 @@ public class Vector {
   }
 
   public object ToList() {
-    return vector_to_list(values);
+    return list(values);
   }
 
   public void set(int index, object value) {
@@ -2636,12 +2757,14 @@ public class Vector {
   }
 
   public override string ToString() {
-	string retval = "";
+    string retval = "";
     for (int i = 0; i < values.Length; i++) {
-      retval += " ";
-	  retval += values[i].ToString();
-	}
-	return String.Format("(vector{0})", retval);
+      retval += values[i].ToString();
+      if (i < values.Length-1) {
+	retval += " ";
+      }
+    }
+    return String.Format("#{0}({1})", values.Length, retval);
   }
   
 }
