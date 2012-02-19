@@ -1612,10 +1612,13 @@ namespace Jigsaw
 							edgeId = int.Parse(xr.GetAttribute("linkedTo"));
 							if (edgeId > 0) {
 								id = int.Parse(xr.GetAttribute("id"));
-								tEdge = edges["e"+id.ToString()];
-								tLinkedEdge = edges["e"+edgeId.ToString()];
-								tEdge.LinkedTo = tLinkedEdge;
-								tLinkedEdge.LinkedTo = tEdge;
+								if (edges.ContainsKey("e"+id.ToString()) && 
+							    	edges.ContainsKey("e"+edgeId.ToString())) {
+									tEdge = edges["e"+id.ToString()];
+									tLinkedEdge = edges["e"+edgeId.ToString()];
+									tEdge.LinkedTo = tLinkedEdge;
+									tLinkedEdge.LinkedTo = tEdge;
+								}
 							}
 						}
 					}
