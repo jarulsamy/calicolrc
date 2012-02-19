@@ -816,13 +816,16 @@ namespace Jigsaw
 				if (value <= 0.0) {
 					// Do nothing if too small
 					return;
+				} else if (value > 99.0) {
+					// Turn off updating if > 99
+					if (_updateDisplay == true) {
+						Console.WriteLine ("Turbo mode!");
+						newTimeOut = 1;
+						UpdateDisplay = false;
+					}
 				} else if ( _engine.TimeOut == newTimeOut) {
 					// Do nothing if value hasn't changed
 					return;
-				} else if (value >= 100) {
-					// Turn off updating if 100 or greater
-					Console.WriteLine ("Turbo mode!");
-					UpdateDisplay = false;
 				} else {
 					// Otherwise turn updating back on
 					UpdateDisplay = true;

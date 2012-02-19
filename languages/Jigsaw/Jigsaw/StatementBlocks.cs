@@ -145,9 +145,7 @@ namespace Jigsaw
 	// -----------------------------------------------------------------------
     public class CRandom : CBlock
     {	// Random number generator
-		
-		private bool _inOnPropertyChanged = false;
-		
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CRandom(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
@@ -164,18 +162,14 @@ namespace Jigsaw
 			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
 			CExpressionProperty Min = new CExpressionProperty("Min", "0");
 			CExpressionProperty Max = new CExpressionProperty("Max", "100");
-			CStatementProperty Stat = new CStatementProperty("Statement", "pass");
 
 			VarName.PropertyChanged += OnPropertyChanged;
 			Min.PropertyChanged += OnPropertyChanged;
 			Max.PropertyChanged += OnPropertyChanged;
-			Stat.PropertyChanged += OnPropertyChanged;
-			Stat._Visible = false;
 			
 			_properties["Variable"] = VarName;
 			_properties["Min"] = Min;
 			_properties["Max"] = Max;
-			_properties["Statement"] = Stat;
 			this.OnPropertyChanged(null, null);
 		}
 		public CRandom(Double X, Double Y) : this(X, Y, null) {}
@@ -192,17 +186,12 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
-			if (_inOnPropertyChanged) return;
-			_inOnPropertyChanged = true;
 			
 			if (this.VariableName.Length > 0) {
 				this.Text = String.Format("{0} = random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
-				this["Statement"] = String.Format("{0} = Common.Utils.random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
 			} else {
 				this.Text = String.Format("random({0}, {1})", this["Min"], this["Max"]);
-				this["Statement"] = String.Format("Common.Utils.random({0}, {1})", this["Min"], this["Max"]);
 			}
-			_inOnPropertyChanged = false;
 		}
 		
 		// - - - Generate and return Python statement - - - - -
@@ -241,9 +230,11 @@ namespace Jigsaw
 		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing a print involves evaluting the given exression
-			CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+			CExpressionProperty Min = (CExpressionProperty)_properties["Min"];
+			CExpressionProperty Max = (CExpressionProperty)_properties["Max"];
 			try {
-				Stat.Compile(engine);
+				Min.Compile(engine);
+				Max.Compile(engine);
 			} catch (Exception ex) {
 				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
@@ -269,8 +260,12 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Do the assignment
 			try {
-				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
-				Stat.Evaluate(scope);
+				CExpressionProperty Min = (CExpressionProperty)_properties["Min"];
+				CExpressionProperty Max = (CExpressionProperty)_properties["Max"];
+				double min = Double.Parse (Min.Evaluate(scope).ToString ());
+				double max = Double.Parse (Max.Evaluate(scope).ToString ());
+				double val = Common.Utils.random(min, max);
+				scope.SetVariable(VariableName, val);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
