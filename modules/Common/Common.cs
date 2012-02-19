@@ -30,15 +30,79 @@ namespace Common
 {
 	public static class Utils
 	{
-		public static double random(double min, double max) {
-			Random r = new Random();
-			return min + (max-min)*r.NextDouble();
+		// singleton
+		public readonly static Randomizer Random = new Randomizer(); 
+
+		public static void setSeed(int value) {
+			Random.seed = value;
+		}
+
+		public static int getSeed() {
+			return Random.seed;
+		}
+
+		public static int randint(int start, int end) {
+			return (int)(Random.random() * (end - start + 1) + start);
+  		}
+		
+		public static double randomNumber() {
+			return Random.random();
 		}
 		
-		public static double random(double max) {
-			return random (0.0, max);
+		public static double random() {
+			return Random.random();
+		}
+
+		public static double random(double end) {
+			return random(0.0, end);
+  		}
+
+		public static double random(double start, double end) {
+			return Random.random() * (end - start) + start;
+  		}
+		
+		public static string flipCoin() {
+			if (Random.random() < .5) {
+				return "heads";
+			} else {
+				return "tails";
+			}
 		}
 		
+		public static bool heads() {
+			return (flipCoin() == "heads");
+		}
+		
+		public static bool tails() {
+			return (flipCoin() == "tails");
+		}
+		
+		public class Randomizer {
+			int _seed; 
+			Random _random = new Random();
+			
+			public Randomizer() : this(0) {	}
+			
+			public Randomizer(int seed) {
+			  if (seed != 0)
+			    this.seed = seed;
+			}
+		
+			public int seed {
+			  get { 
+			    return _seed; 
+			  }
+			  set { 
+			    _seed = value; 
+			    _random = new Random(_seed);
+			  }
+			}
+	
+			public double random() {
+			  return _random.NextDouble();
+			}
+		}
+				
 		public static void beep() {
 			SystemSounds.Beep.Play();
 		}
