@@ -1323,6 +1323,66 @@ public static class Myro {
   public static void setPassword(string password) {
     robot.setPassword(password);
   }
+  
+  // s2
+  public static object getEncoders(bool zero = false) {
+    return robot.getEncoders(zero);
+  }
+
+  public static object getMicrophone() {
+    return robot.getMicrophone();
+  }
+  
+  public static object getPosition()
+  {
+    return robot.getPosition();
+  }
+  
+  public static int getAngle()
+  {
+    return robot.getAngle();
+  }
+  
+  public static void setTurn(int angle, string turnType = "to", string radOrDeg = "rad")
+  {
+    robot.setTurn(angle, turnType, radOrDeg);
+  }
+
+  public static void setPosition(uint x, uint y)
+  {
+    robot.setPosition(x, y);
+  }
+
+  public static void setAngle(uint a)
+  {
+    robot.setAngle(a);
+  }
+
+
+  public static void setBeginPath(int speed=7)
+  {
+    robot.setBeginPath(speed);
+  }
+
+  public static void setMove(int x, int y, string moveType = "to")
+  {
+    robot.setMove(x, y, moveType);
+  }
+
+  public static void setArc(int x, int y, int radius, string arcType = "to")
+  {
+    robot.setArc(x, y, radius, arcType);
+  }
+  
+  public static void setEndPath()
+  {
+    robot.setEndPath();
+  }
+  
+  public static void setS2Volume(int level)
+  {
+    robot.setS2Volume(level);
+  }
 
   public static string flipCoin() {
     if (Random.random() < .5) {
@@ -1899,6 +1959,66 @@ public static class Myro {
     public virtual int getStall() {
       return 0; 
     }
+
+    // s2
+    public virtual object getEncoders(bool zero = false)
+    {
+      return null;
+    }
+
+    public virtual int getMicrophone()
+    {
+      return 0;
+    }
+
+    public virtual object getPosition()
+    {
+      return null;
+    }
+
+
+    public virtual int getAngle()
+    {
+      return 0;
+    }
+
+    public virtual void setAngle(uint angle)
+    {
+      
+    }
+    
+    public virtual void setBeginPath(int speed=7)
+    {
+      
+    }
+
+    public virtual void setTurn(int angle, string turnType = "to", string radOrDeg = "rad")
+    {
+      
+    }
+
+    public virtual void setMove(int x, int y, string moveType = "to")
+    {
+      
+    }
+
+    public virtual void setArc(int x, int y, int radius, string arcType = "to")
+    {
+      
+    }
+
+    public virtual void setEndPath()
+    {
+    }
+
+    public virtual void setS2Volume(int level)
+    {
+    }
+
+    public virtual void setPosition(uint x, uint y)
+    {
+    }
+
     
     public virtual double getBattery() {
       return 0.0;
@@ -2789,6 +2909,35 @@ public static class Myro {
     static byte SEND_IR_MESSAGE = 151;
     static byte SET_IR_EMITTERS = 152;
 
+
+
+    static byte SET_START_PROGRAM2=153;   // initiate scribbler2 programming process
+    static byte SET_RESET_SCRIBBLER2=154; // hard reset scribbler2
+    static byte SET_SCRIB_BATCH=155;      // upload scribbler2 firmware
+    static byte GET_ROBOT_ID=156;
+    static byte SET_VOLUME         = 160; //Format 160 volume (0-100) Percent Volume Level
+    static byte SET_PATH           = 161; //Format 161 begin_or_end speed         0            1           2
+    //                                begin=0 end=1   hSpeedByte lSpeedByte
+    static byte SET_MOVE            = 162; //Format 162 type hXByte lXByte hYByte lYByte
+    static byte SET_ARC             = 163; //Format 163 type hXByte lXByte hYByte lYByte hRadByte lRadByte
+    static byte SET_TURN            = 164; //Format 164 type hAngleByte lAngleByte
+    static byte GET_POSN            = 165; //Format 165
+    static byte SET_POSN            = 166; //Format 166 x0Byte x1Byte x2Byte x3Byte y0Byte y1Byte y2Byte y3Byte
+    static byte GET_ANGLE           = 167; //Format 167
+    static byte SET_ANGLE           = 168; //Format 168 angle0Byte angle1Byte angle2Byte angle3Byte
+    static byte GET_MIC_ENV         = 169; //Format 169
+    static byte GET_MOTOR_STATS     = 170; //Format 170
+    static byte GET_ENCODERS        = 171; //Format 171 type    
+
+    static byte BEGIN_PATH          = 0;  //Used with SET_PATH to say beginning of a path
+    static byte  END_PATH            = 1;  //Used with SET_PATH to say end of a path
+    static byte BY             = 4;       //Used in movement commands, by means how much you wish to move by
+    static byte TO             = 2;       //Used in movement commands, to means the heading you want to turn to
+    static byte DEG            = 1;       //Used in movement commands, specifies using degress instead of S2 angle units
+
+
+
+
     static byte PACKET_LENGTH     =  9;
         
     // #### Camera Addresses ####
@@ -3002,6 +3151,25 @@ public static class Myro {
 	write_packet(value);
 	read(Scribbler.PACKET_LENGTH); // read the echo
 	retval = read(bytes);
+      }
+      return retval;
+    }
+
+    List GetInt(byte[] value, int bytes)
+    {
+      List retval = new List();
+      byte [] retvalBytes;
+      lock (this) { // lock robot
+	write_packet(value);
+	read(Scribbler.PACKET_LENGTH); // read the echo
+	retvalBytes = read(bytes);
+      }
+      for (int p = 0; p < retvalBytes.Length; p += 4) {
+	byte [] bigEndian = new byte[4];
+	for (int i = 0; i < 4; i += 1) {
+	  bigEndian[i] = retvalBytes[p+3-i];
+	}
+        retval.append(BitConverter.ToInt32(bigEndian, 0));
       }
       return retval;
     }
@@ -3667,6 +3835,169 @@ public static class Myro {
       return (PythonDictionary)get("config");
     }
 
+    //S2
+
+    public override object getEncoders(bool zero = false) {      
+      byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+      buffer[0] = Scribbler.GET_ENCODERS;
+      if (zero) buffer[1] = 0; else buffer[1]  = 1;     
+      return GetInt(buffer, 8);
+    }
+
+
+    public override int getMicrophone() {      
+      byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+      buffer[0] = Scribbler.GET_MIC_ENV;
+      return (int)GetInt(buffer, 4)[0];
+    }
+
+
+    public override object getPosition()
+    {
+      byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+      buffer[0] = Scribbler.GET_POSN;
+      return GetInt(buffer, 8); 
+    }
+
+    public override int getAngle()
+    {
+      byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+      buffer[0] = Scribbler.GET_ANGLE;
+      return (int)GetInt(buffer, 4)[0];
+    }
+
+    public override void setPosition(uint x, uint y)
+    {
+      byte [] buffer = { Scribbler.SET_POSN, 
+			 (byte)((x >> 24) & 0xff), 
+			 (byte)((x >> 16) & 0xff), 
+			 (byte)((x >> 8) & 0xff), 
+			 (byte)(x & 0xff),
+			 (byte)((y >> 24) & 0xff), 
+			  (byte)((y >> 16) & 0xff), 
+			 (byte)((y >> 8) & 0xff), 
+			 (byte)(y & 0xff)};
+      set(buffer);
+    }
+    
+
+    public override void setAngle(uint a)
+    {
+      byte [] buffer = {  Scribbler.SET_ANGLE, 
+			  (byte)((a >> 24) & 0xff), 
+			  (byte)((a >> 16) & 0xff), 
+			  (byte)((a >> 8) & 0xff), 
+			  (byte)(a & 0xff)};
+      set(buffer);
+    }
+
+    public override void setBeginPath(int speed=7)
+    {
+      write_packet(Scribbler.SET_PATH, 
+		   Scribbler.BEGIN_PATH, 
+		   0,
+		   (byte) speed);
+    }
+
+    public bool _IsInTransit()
+    {    
+      byte b = GetBytes(Scribbler.GET_MOTOR_STATS, 5)[4];
+      if (b == 0) return true; else return false;
+    }
+    
+    public override void setTurn(int angle, string turnType = "to", string radOrDeg = "rad")
+    {
+      if (turnType == "to" && radOrDeg == "rad"){
+	byte [] buffer = {Scribbler.SET_TURN, Scribbler.TO, (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
+	set(buffer);
+      }
+      else if (turnType == "by" && radOrDeg == "rad"){
+        byte [] buffer = {Scribbler.SET_TURN, Scribbler.BY, (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};  
+	set(buffer);
+      }    
+      else if (turnType == "to" && radOrDeg == "deg"){
+	byte [] buffer = {Scribbler.SET_TURN, (byte)(Scribbler.TO + Scribbler.DEG), (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
+	set(buffer);
+      }
+      else if(turnType == "by" && radOrDeg == "deg"){	  
+	byte [] buffer = {Scribbler.SET_TURN, (byte)(Scribbler.BY + Scribbler.DEG), (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
+	set(buffer);
+      }
+      bool scribblerBusy = true;
+      while(scribblerBusy)
+	{	  
+	  scribblerBusy = _IsInTransit();
+	  if(scribblerBusy)Thread.Sleep((int)(1));
+
+	}
+    }
+
+    public override void setMove(int x, int y, string moveType = "to")
+    {
+      if (moveType == "to")
+	{
+	  byte [] buffer = {Scribbler.SET_MOVE, Scribbler.TO, (byte)((x >> 8) & 0xff), (byte)(x & 0xff),				 				  				  (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
+	  set(buffer);
+	}
+      else
+	{
+	  byte [] buffer = {Scribbler.SET_MOVE, Scribbler.BY, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
+			    (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
+	  set(buffer);
+	}
+      
+      bool scribblerBusy = true;
+      while(scribblerBusy)
+	{	  
+	  scribblerBusy = _IsInTransit();
+	  if(scribblerBusy)Thread.Sleep((int)(1));
+
+	}
+    }
+
+
+    public override void setArc(int x, int y, int radius, string arcType = "to")
+    {
+      if (arcType == "to")
+	{
+	  byte [] buffer = {Scribbler.SET_ARC, Scribbler.TO, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
+			    (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
+			    (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
+	  set(buffer);
+      }
+      else
+	{
+	  byte [] buffer = {Scribbler.SET_ARC, Scribbler.BY, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
+			    (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
+			    (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
+	  set(buffer);
+	}
+      
+      bool scribblerBusy = true;
+      while(scribblerBusy)
+	{	  
+	  scribblerBusy = _IsInTransit();
+	  if(scribblerBusy)Thread.Sleep((int)(1));
+
+	}
+    }
+
+    public override void setEndPath()
+    {
+      write_packet(Scribbler.SET_PATH, 
+		   Scribbler.END_PATH, 
+		   0,
+		   7);
+    }
+    
+
+    public override void setS2Volume(int level)
+    {
+      byte [] bytes ={Scribbler.SET_VOLUME, 
+		      (byte)level};
+      set(bytes);
+    }
+    
     public byte read_byte() {
       byte [] bytes = new byte[1];
       lock(serial)
