@@ -216,6 +216,10 @@ namespace Jigsaw
 			CIOTell _ciotell = new CIOTell(110, 150-os, pnlBlock);
 			this.AddShape(_ciotell);
 			tbInOut.AddShape(_ciotell);
+
+			CBeep sBeep = new CBeep(110, 190-os, pnlBlock);
+			this.AddShape(sBeep);
+			tbInOut.AddShape(sBeep);
 			
 //			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 150-os, pnlBlock);
 //			this.AddShape(_ciowritefile);

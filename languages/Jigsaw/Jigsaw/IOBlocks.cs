@@ -217,7 +217,7 @@ namespace Jigsaw
 			: base(X, Y, palette )
 		{
 			// Properties
-			CStringProperty Question = new CStringProperty("Ask", "question?");
+			CExpressionProperty Question = new CExpressionProperty("Ask", "'Question: '");
 			CVarNameProperty Answer = new CVarNameProperty("Answer", "X");
 			Question.PropertyChanged += OnPropertyChanged;
 			Answer.PropertyChanged += OnPropertyChanged;
@@ -250,10 +250,56 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			if (this.Answer.Length > 0) {
-				this.Text = String.Format("{0} = Ask: {1}", this.Answer, this.Question);
+				this.Text = String.Format("{0} = Ask: {1} ?", this.Answer, this.Question);
 			} else {
-				this.Text = String.Format("Ask: {0}", this.Question);
+				this.Text = String.Format("Ask: {0} ?", this.Question);
 			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CExpressionProperty Ask = (CExpressionProperty)_properties["Ask"];
+			try {
+				Ask.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+
+		// - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Dialogs.ask({0})", this.Question);
+			if (this.Answer.Length > 0) {
+				code = String.Format("{0} = {1}", this.Answer, code);
+			}
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CIOAsk.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -272,9 +318,20 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
-			string question = this.Question;
-			string answer = Common.Dialogs.Ask (question);
-			scope.SetVariable(Answer, answer);
+			try {
+				CExpressionProperty Ask = (CExpressionProperty)_properties["Ask"];
+				string question = String.Format ("{0}", Ask.Evaluate(scope));
+				object answer = Common.Dialogs.ask (question);
+				scope.SetVariable(Answer, answer);
+				
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
@@ -331,6 +388,35 @@ namespace Jigsaw
 			return true;
 		}
 		
+		// - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Dialogs.tell({0})", _properties["Tell"].Text);
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CIOTell.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
 		{
@@ -349,7 +435,7 @@ namespace Jigsaw
 			try {
 				CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
 				string msg = String.Format ("{0}", Tell.Evaluate(scope));
-				Common.Dialogs.Tell (msg);
+				Common.Dialogs.tell (msg);
 				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -377,6 +463,131 @@ namespace Jigsaw
 			yield return rr;
 		}
 	}
+
+	// -----------------------------------------------------------------------
+    public class CBeep : CBlock
+    {	// System beep
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public CBeep(Double X, Double Y, Widgets.CBlockPalette palette = null) 
+			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
+				new Diagram.CPoint(X, Y),
+				new Diagram.CPoint(X + 175, Y + 20)	}),
+				palette ) 
+		{
+			this.LineWidth = 2;
+			this.LineColor = Diagram.Colors.DarkBlue;
+			this.FillColor = Diagram.Colors.LightBlue;
+			this.Sizable = false;
+			
+			// Properties
+			CStatementProperty Stat = new CStatementProperty("Statement", "Common.Utils.beep()");
+			//Stat.PropertyChanged += OnPropertyChanged;
+			Stat._Visible = false;
+			_properties["Statement"] = Stat;
+			this.OnPropertyChanged(null, null);
+		}
+		public CBeep(Double X, Double Y) : this(X, Y, null) {}
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = "beep()";
+		}
+		
+		// - - - Generate and return Python statement - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Utils.beep()");
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', 2*indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CBeep.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+			try {
+				Stat.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{	// Execute a variable assignment
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = BlockState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Evaluate
+			try {
+				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+				Stat.Evaluate(scope);
+
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = BlockState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == BlockState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = BlockState.Idle;
+			yield return rr;
+		}
+    }
 
 	// -----------------------------------------------------------------------
     public class CIOWriteToFile : CInputOutput

@@ -301,7 +301,7 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
-	
+
 	// -----------------------------------------------------------------------
     public class CStatement : CBlock
     {	// Generic Python statement block shape class

@@ -1202,13 +1202,13 @@ namespace Diagram
         // - - - Create a new point with coordintes equal to the closest grid point. - - -
         public CPoint SnapToGrid(CPoint pnt)
         {
+			if (pnt == null) return null;
             double gs = this.gridsize;
             return new CPoint((double)Math.Floor((pnt.X / gs) + 0.5) * gs,
                               (double)Math.Floor((pnt.Y / gs) + 0.5) * gs);
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Return a List<CShape> of selected shapes and connectors
+        // - - - Return a List<CShape> of selected shapes and connectors - - - - - - -
         public List<CShape> SelectedShapesAndConnectors()
         {
             List<CShape> tmp = new List<CShape>();
