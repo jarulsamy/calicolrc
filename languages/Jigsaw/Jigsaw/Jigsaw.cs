@@ -2023,6 +2023,7 @@ namespace Jigsaw
 			// @@@ It will fail with blocks that require more than height to size properly.
 			// @@@ The Clone method should copy shape including overall size and internal sizing params.
 			clone.Height = this.Height;
+			clone.Text = this.Text;
 			
 			// Clone edges if requested
 			if (cloneEdges) {
@@ -2596,6 +2597,8 @@ namespace Jigsaw
 			mnuProps.Activated += OnPropertiesShow;
 			//Gtk.MenuItem mnuInspect = new Gtk.MenuItem("Inspector");
 			//mnuInspect.Activated += OnInspectorShow;
+			Gtk.MenuItem mnuHelp = new Gtk.MenuItem("Help");
+			mnuHelp.Activated += OnHelpShow;
 			
 			mnu.Append(mnuDelBlock);
 			mnu.Append(mnuDelStack);
@@ -2606,6 +2609,8 @@ namespace Jigsaw
 			mnu.Append(mnuBreak);
 			mnu.Append(mnuProps);
 			//mnu.Append(mnuInspect);
+			mnu.Append( new Gtk.SeparatorMenuItem() );
+			mnu.Append(mnuHelp);
 			
 			mnu.ShowAll();
 			mnu.Popup();
@@ -2618,6 +2623,19 @@ namespace Jigsaw
 		{
 			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
 			_cvs = null;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnHelpShow(object sender, EventArgs e)
+		{
+			string target = String.Format ("http://calicoproject.org/Calico_Jigsaw#{0}", this.GetType ().ToString ());
+			Console.WriteLine ("Navigating to {0}", target);
+			try
+			{
+				 System.Diagnostics.Process.Start(target);
+			} catch (System.Exception other) {
+				  Console.WriteLine(other.Message);
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

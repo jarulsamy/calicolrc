@@ -63,6 +63,7 @@ namespace Jigsaw
 								this.types, this.defaults, this.return_type);
 			clone.FillColor = this.FillColor;
 			clone.LineColor = this.LineColor;
+			clone.Text = this.Text;
 			return clone;
 		}
 		
