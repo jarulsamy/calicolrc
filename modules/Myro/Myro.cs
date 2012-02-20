@@ -6053,11 +6053,12 @@ public static class Myro
 	
 	public static void Main ()
 	{
-		Myro.initialize_module ("/home/dblank/Calico-dev/trunk/bin", "Posix");
-		beep (.1, 400);
-		beep (.1, 400);
-		beep (.1, 400);
-		beep (.1, 400);
+		//Myro.initialize_module ("/home/dblank/Calico-dev/trunk/bin", "Posix");
+		Myro.initialize_module (@"c:\Users\dblank\Calico\bin", "Windows");
+		Myro.beep (.1, 400);
+		Myro.beep (.1, 800);
+		Myro.beep (.1, 1200);
+		Myro.beep (.1, 800);
 		Myro.close_module ();
 	}
 	

@@ -115,6 +115,10 @@ namespace Calico {
         public virtual object Selection {
             get {return null;}
         }
+
+        public virtual bool AlwaysAllowSpeedAdjustment {
+            get { return false; }
+        }
 		
 		public virtual bool Paste(object obj) {
 			return false;
@@ -282,6 +286,15 @@ namespace Calico {
             return false;
         }
         public virtual void Stop() {
+        }
+
+        public virtual void OnPlayButton() {
+            calico.playResetEvent.Set();
+        }
+
+        public virtual void OnPauseButton() {
+            calico.manager[language].engine.RequestPause();
+            calico.playResetEvent.Reset();
         }
 
         public virtual string [] GetAuthors() {

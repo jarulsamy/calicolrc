@@ -1467,7 +1467,10 @@ namespace Calico {
                         if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
                             manager[CurrentLanguage].engine.SetTraceOn(this);
                         } else {
-                            ProgramSpeed.Sensitive = false;
+                            if (CurrentDocument.AlwaysAllowSpeedAdjustment)
+                                ProgramSpeed.Sensitive = true;
+                            else
+                                ProgramSpeed.Sensitive = false;
                             manager[CurrentLanguage].engine.SetTraceOff();
                         }
                         // If a language can handle it, it will run it
@@ -1734,10 +1737,12 @@ namespace Calico {
 
         protected void OnPlayButtonClicked (object sender, System.EventArgs e)
         {
-            playResetEvent.Set();
-            if (ProgramSpeed.Value != 0) {
-                PlayButton.Sensitive = false;
-                PauseButton.Sensitive = true;
+            if (CurrentDocument != null) {
+                CurrentDocument.OnPlayButton();
+                if (ProgramSpeed.Value != 0) {
+                    PlayButton.Sensitive = false;
+                    PauseButton.Sensitive = true;
+                }
             }
         }
 
@@ -2044,10 +2049,11 @@ namespace Calico {
 
         protected void OnPauseButton1Clicked (object sender, System.EventArgs e)
         {
-	  manager[CurrentLanguage].engine.RequestPause();
-	  playResetEvent.Reset();
-	  PlayButton.Sensitive = true;
-	  PauseButton.Sensitive = false;
+	        if (CurrentDocument != null) {
+                CurrentDocument.OnPauseButton();
+	            PlayButton.Sensitive = true;
+	            PauseButton.Sensitive = false;
+            }
         }
 
         protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)

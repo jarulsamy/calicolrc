@@ -80,6 +80,7 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
+		calico.ProgramSpeed.Value = cvs.TimeOut;
 		widget.ShowAll ();
 	}
 	
@@ -117,7 +118,10 @@ public class CalicoJigsawDocument : Document
 	
 	public void ChangeTimeOut(object sender, EventArgs args) {
 		Gtk.HScale s = (Gtk.HScale)sender;
+		// convert from Calico units to Jigsaw units
 		cvs.TimeOut = s.Value;
+		if (s.Value <= 0.0)
+			cvs.Pause();
 	}
 	
 	public override void ExecuteFileInBackground ()
@@ -152,6 +156,10 @@ public class CalicoJigsawDocument : Document
 	public override bool HasBreakpointSet {
 		get { return cvs.HasBreakPointSet (); }
 	}
+	
+    public override bool AlwaysAllowSpeedAdjustment {
+        get { return true; }
+    }
 	
 	public override bool CanSaveAsPython() {
 		return true;
@@ -223,6 +231,18 @@ public class CalicoJigsawDocument : Document
 		cvs.Stop ();
 		calico.OnStopRunning();
 	}
+	
+	public override void OnPlayButton() {
+		if (calico.ProgramSpeed.Value == 0)
+			cvs.Step();
+		else
+			cvs.Run();
+	}
+	
+	public override void OnPauseButton() {
+		cvs.Pause();
+	}
+
 	public override string [] GetAuthors() 
 	{
         return new string[] {"Mark Russo <russomf@gmail.com>"};
