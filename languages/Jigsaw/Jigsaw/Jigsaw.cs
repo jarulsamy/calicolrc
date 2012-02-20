@@ -1598,7 +1598,7 @@ namespace Jigsaw
 					}
 				}
 				
-				//xr.Close();
+				xr.Close();
 				//xr = null;
 				
 				// === Second step : Reread XML and link up edges
