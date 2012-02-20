@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
-    <block id="1" typeName="Jigsaw.CControlStart" left="320" top="45">
-        <edge id="1" name="Out" linkedTo="14" />
+    <module name="Common.dll" />
+    <module name="Graphics.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="320" top="50">
+        <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CProcedureStart" left="530" top="30">
-        <edge id="2" name="Out" linkedTo="3" />
+    <block id="2" typeName="Jigsaw.CAssignment" left="340" top="80">
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="yellow = (252, 227, 166)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="yellow" />
+        <property name="Expression" value="(252, 227, 166)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CAssignment" left="340" top="100">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="41" />
+        <property name="Label" value="url = &quot;http://cs.brynmawr.edu/~dblank/images/doug-sm.jpg&quot;" />
+        <property name="Message" value="" />
+        <property name="Variable" value="url" />
+        <property name="Expression" value="&quot;http://cs.brynmawr.edu/~dblank/images/doug-sm.jpg&quot;" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CProcedureStart" left="545" top="20">
+        <edge id="6" name="Start" linkedTo="7" />
         <property name="Label" value="define obamicon (picture)" />
         <property name="Message" value="" />
         <property name="Procedure Name" value="obamicon" />
@@ -15,80 +39,189 @@
         <property name="Param3" value="" />
         <property name="Param4" value="" />
         <property name="Param5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
     </block>
-    <block id="3" typeName="Jigsaw.CAssignment" left="530" top="60">
-        <edge id="3" name="In" linkedTo="2" />
-        <edge id="4" name="Out" linkedTo="5" />
+    <block id="5" typeName="Jigsaw.CAssignment" left="565" top="50">
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="9" />
         <property name="Label" value="black = 0, 51, 76" />
         <property name="Message" value="" />
         <property name="Variable" value="black" />
         <property name="Expression" value="0, 51, 76" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="4" typeName="Jigsaw.CAssignment" left="530" top="80">
-        <edge id="5" name="In" linkedTo="4" />
-        <edge id="6" name="Out" linkedTo="7" />
+    <block id="6" typeName="Jigsaw.CAssignment" left="565" top="70">
+        <edge id="9" name="In" linkedTo="8" />
+        <edge id="10" name="Out" linkedTo="11" />
         <property name="Label" value="red = 217, 26, 33" />
         <property name="Message" value="" />
         <property name="Variable" value="red" />
         <property name="Expression" value="217, 26, 33" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="5" typeName="Jigsaw.CAssignment" left="530" top="100">
-        <edge id="7" name="In" linkedTo="6" />
-        <edge id="8" name="Out" linkedTo="25" />
+    <block id="7" typeName="Jigsaw.CAssignment" left="565" top="90">
+        <edge id="11" name="In" linkedTo="10" />
+        <edge id="12" name="Out" linkedTo="13" />
         <property name="Label" value="blue = (112, 150, 158)" />
         <property name="Message" value="" />
         <property name="Variable" value="blue" />
         <property name="Expression" value="(112, 150, 158)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CStatement" left="320" top="300">
-        <edge id="9" name="In" linkedTo="-1" />
-        <edge id="10" name="Out" linkedTo="11" />
-        <property name="Label" value="X = (lambda a: 42)(1)" />
-        <property name="Message" value="" />
-        <property name="Statement" value="X = (lambda a: 42)(1)" />
-    </block>
-    <block id="7" typeName="Jigsaw.CIOPrint" left="320" top="320">
-        <edge id="11" name="In" linkedTo="10" />
-        <edge id="12" name="Out" linkedTo="13" />
-        <property name="Label" value="print(X)" />
-        <property name="Message" value="" />
-        <property name="Expression" value="X" />
-    </block>
-    <block id="8" typeName="Jigsaw.CControlEnd" left="320" top="340">
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="565" top="110">
+        <method assembly_name="Myro" type_name="Myro" method_name="getPixels" return_type="System.Collections.IEnumerable">
+            <parameter name="picture" type="Graphics+Picture" default="System.DBNull" />
+        </method>
         <edge id="13" name="In" linkedTo="12" />
-        <property name="Label" value="stop script" />
+        <edge id="14" name="Out" linkedTo="15" />
+        <property name="Label" value="pixels=getPixels(picture)" />
         <property name="Message" value="" />
+        <property name="Variable" value="pixels" />
+        <property name="picture" value="picture" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="9" typeName="Jigsaw.CAssignment" left="320" top="75">
-        <edge id="14" name="In" linkedTo="1" />
-        <edge id="15" name="Out" linkedTo="16" />
-        <property name="Label" value="yellow = (252, 227, 166)" />
+    <block id="9" typeName="Jigsaw.CControlForeach" left="565" top="130">
+        <edge id="15" name="In" linkedTo="14" />
+        <edge id="16" name="Out" linkedTo="18" />
+        <edge id="17" name="Loop" linkedTo="19" />
+        <property name="Label" value="for each pixel in pixels" />
         <property name="Message" value="" />
-        <property name="Variable" value="yellow" />
-        <property name="Expression" value="(252, 227, 166)" />
+        <property name="Sequence" value="pixels" />
+        <property name="Variable" value="pixel" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="10" typeName="Jigsaw.CAssignment" left="320" top="95">
-        <edge id="16" name="In" linkedTo="15" />
-        <edge id="17" name="Out" linkedTo="18" />
-        <property name="Label" value="url = &quot;http://cs.brynmawr.edu/~dblank/images/doug-sm.jpg&quot;" />
+    <block id="10" typeName="Jigsaw.CProcedureReturn" left="565" top="450">
+        <edge id="18" name="In" linkedTo="16" />
+        <property name="Label" value="return picture" />
         <property name="Message" value="" />
-        <property name="Variable" value="url" />
-        <property name="Expression" value="&quot;http://cs.brynmawr.edu/~dblank/images/doug-sm.jpg&quot;" />
+        <property name="Expression" value="picture" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
     </block>
-    <block id="11" typeName="Jigsaw.CMethodBlock" left="320" top="115">
-        <method assembly_name="Myro" type_name="Myro" method_name="makePicture" return_type="Graphics+Picture">
+    <block id="11" typeName="Jigsaw.CMethodBlock" left="585" top="150">
+        <method assembly_name="Myro" type_name="Myro" method_name="getGray" return_type="System.Int32">
+            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
+        </method>
+        <edge id="19" name="In" linkedTo="17" />
+        <edge id="20" name="Out" linkedTo="21" />
+        <property name="Label" value="gray=getGray(pixel)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="gray" />
+        <property name="pixel" value="pixel" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="12" typeName="Jigsaw.CControlIfElse" left="585" top="170">
+        <edge id="21" name="In" linkedTo="20" />
+        <edge id="22" name="Out" linkedTo="-1" />
+        <edge id="23" name="If" linkedTo="25" />
+        <edge id="24" name="Else" linkedTo="27" />
+        <property name="Label" value="if gray &gt; 182" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="gray &gt; 182" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="13" typeName="Jigsaw.CMethodBlock" left="605" top="190">
+        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
+            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
+            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
+        </method>
+        <edge id="25" name="In" linkedTo="23" />
+        <edge id="26" name="Out" linkedTo="-1" />
+        <property name="Label" value="setRGB(pixel, yellow)" />
+        <property name="Message" value="" />
+        <property name="pixel" value="pixel" />
+        <property name="rgb" value="yellow" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="14" typeName="Jigsaw.CControlIfElse" left="605" top="230">
+        <edge id="27" name="In" linkedTo="24" />
+        <edge id="28" name="Out" linkedTo="-1" />
+        <edge id="29" name="If" linkedTo="31" />
+        <edge id="30" name="Else" linkedTo="33" />
+        <property name="Label" value="if gray &gt; 121" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="gray &gt; 121" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="15" typeName="Jigsaw.CMethodBlock" left="625" top="250">
+        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
+            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
+            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
+        </method>
+        <edge id="31" name="In" linkedTo="29" />
+        <edge id="32" name="Out" linkedTo="-1" />
+        <property name="Label" value="setRGB(pixel, blue)" />
+        <property name="Message" value="" />
+        <property name="pixel" value="pixel" />
+        <property name="rgb" value="blue" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="16" typeName="Jigsaw.CControlIfElse" left="625" top="290">
+        <edge id="33" name="In" linkedTo="30" />
+        <edge id="34" name="Out" linkedTo="-1" />
+        <edge id="35" name="If" linkedTo="37" />
+        <edge id="36" name="Else" linkedTo="39" />
+        <property name="Label" value="if gray &gt; 60" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="gray &gt; 60" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="17" typeName="Jigsaw.CMethodBlock" left="645" top="310">
+        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
+            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
+            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
+        </method>
+        <edge id="37" name="In" linkedTo="35" />
+        <edge id="38" name="Out" linkedTo="-1" />
+        <property name="Label" value="setRGB(pixel, red)" />
+        <property name="Message" value="" />
+        <property name="pixel" value="pixel" />
+        <property name="rgb" value="red" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="18" typeName="Jigsaw.CMethodBlock" left="645" top="350">
+        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
+            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
+            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
+        </method>
+        <edge id="39" name="In" linkedTo="36" />
+        <edge id="40" name="Out" linkedTo="-1" />
+        <property name="Label" value="setRGB(pixel, black)" />
+        <property name="Message" value="" />
+        <property name="pixel" value="pixel" />
+        <property name="rgb" value="black" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="19" typeName="Jigsaw.CMethodBlock" left="340" top="120">
+        <method assembly_name="Graphics" type_name="Graphics" method_name="makePicture" return_type="Graphics+Picture">
             <parameter name="filename" type="System.String" default="System.DBNull" />
         </method>
-        <edge id="18" name="In" linkedTo="17" />
-        <edge id="19" name="Out" linkedTo="20" />
+        <edge id="41" name="In" linkedTo="5" />
+        <edge id="42" name="Out" linkedTo="43" />
         <property name="Label" value="pic=makePicture(url)" />
         <property name="Message" value="" />
         <property name="Variable" value="pic" />
         <property name="filename" value="url" />
+        <fill_color R="0.771479701051246" G="0.892293508580091" B="0.677036193980387" A="1" />
+        <line_color R="0.308591880420499" G="0.356917403432036" B="0.270814477592155" A="1" />
     </block>
-    <block id="12" typeName="Jigsaw.CProcedureCall" left="320" top="135">
-        <edge id="20" name="In" linkedTo="19" />
-        <edge id="21" name="Out" linkedTo="22" />
+    <block id="20" typeName="Jigsaw.CProcedureCall" left="340" top="140">
+        <edge id="43" name="In" linkedTo="42" />
+        <edge id="44" name="Out" linkedTo="45" />
         <property name="Label" value="X = obamicon(pic)" />
         <property name="Message" value="" />
         <property name="Variable" value="X" />
@@ -98,134 +231,39 @@
         <property name="Arg3" value="" />
         <property name="Arg4" value="" />
         <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
     </block>
-    <block id="13" typeName="Jigsaw.CMethodBlock" left="320" top="155">
+    <block id="21" typeName="Jigsaw.CMethodBlock" left="340" top="160">
         <method assembly_name="Myro" type_name="Myro" method_name="show" return_type="System.Void">
             <parameter name="picture" type="Graphics+Picture" default="System.DBNull" />
             <parameter name="title" type="System.String" default="Myro Camera" />
         </method>
-        <edge id="22" name="In" linkedTo="21" />
-        <edge id="23" name="Out" linkedTo="24" />
+        <edge id="45" name="In" linkedTo="44" />
+        <edge id="46" name="Out" linkedTo="47" />
         <property name="Label" value="show(X, &quot;Myro Camera&quot;)" />
         <property name="Message" value="" />
         <property name="picture" value="X" />
         <property name="title" value="&quot;Myro Camera&quot;" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="14" typeName="Jigsaw.CControlEnd" left="320" top="175">
-        <edge id="24" name="In" linkedTo="23" />
-        <property name="Label" value="stop script" />
+    <block id="22" typeName="Jigsaw.CStatement" left="340" top="180">
+        <edge id="47" name="In" linkedTo="46" />
+        <edge id="48" name="Out" linkedTo="49" />
+        <property name="Label" value="X = (lambda a: 42)(1)" />
         <property name="Message" value="" />
+        <property name="Statement" value="X = (lambda a: 42)(1)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="15" typeName="Jigsaw.CMethodBlock" left="530" top="120">
-        <method assembly_name="Myro" type_name="Myro" method_name="getPixels" return_type="System.Collections.IEnumerable">
-            <parameter name="picture" type="Graphics+Picture" default="System.DBNull" />
-        </method>
-        <edge id="25" name="In" linkedTo="8" />
-        <edge id="26" name="Out" linkedTo="27" />
-        <property name="Label" value="pixels=getPixels(picture)" />
-        <property name="Message" value="" />
-        <property name="Variable" value="pixels" />
-        <property name="picture" value="picture" />
-    </block>
-    <block id="16" typeName="Jigsaw.CControlForeach" left="530" top="140">
-        <edge id="27" name="In" linkedTo="26" />
-        <edge id="28" name="Out" linkedTo="30" />
-        <edge id="29" name="Loop" linkedTo="31" />
-        <property name="Label" value="for each pixel in pixels" />
-        <property name="Message" value="" />
-        <property name="Sequence" value="pixels" />
-        <property name="Variable" value="pixel" />
-    </block>
-    <block id="17" typeName="Jigsaw.CProcedureReturn" left="530" top="460">
-        <edge id="30" name="In" linkedTo="28" />
-        <property name="Label" value="return picture" />
-        <property name="Message" value="" />
-        <property name="Expression" value="picture" />
-    </block>
-    <block id="18" typeName="Jigsaw.CMethodBlock" left="550" top="160">
-        <method assembly_name="Myro" type_name="Myro" method_name="getGray" return_type="System.Int32">
-            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
-        </method>
-        <edge id="31" name="In" linkedTo="29" />
-        <edge id="32" name="Out" linkedTo="33" />
-        <property name="Label" value="gray=getGray(pixel)" />
-        <property name="Message" value="" />
-        <property name="Variable" value="gray" />
-        <property name="pixel" value="pixel" />
-    </block>
-    <block id="19" typeName="Jigsaw.CControlIfElse" left="550" top="180">
-        <edge id="33" name="In" linkedTo="32" />
-        <edge id="34" name="Out" linkedTo="-1" />
-        <edge id="35" name="If" linkedTo="37" />
-        <edge id="36" name="Else" linkedTo="39" />
-        <property name="Label" value="if gray &gt; 182" />
-        <property name="Message" value="" />
-        <property name="IfTest" value="gray &gt; 182" />
-    </block>
-    <block id="20" typeName="Jigsaw.CMethodBlock" left="570" top="200">
-        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
-            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
-            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
-        </method>
-        <edge id="37" name="In" linkedTo="35" />
-        <edge id="38" name="Out" linkedTo="-1" />
-        <property name="Label" value="setRGB(pixel, yellow)" />
-        <property name="Message" value="" />
-        <property name="pixel" value="pixel" />
-        <property name="rgb" value="yellow" />
-    </block>
-    <block id="21" typeName="Jigsaw.CControlIfElse" left="570" top="240">
-        <edge id="39" name="In" linkedTo="36" />
-        <edge id="40" name="Out" linkedTo="-1" />
-        <edge id="41" name="If" linkedTo="43" />
-        <edge id="42" name="Else" linkedTo="45" />
-        <property name="Label" value="if gray &gt; 121" />
-        <property name="Message" value="" />
-        <property name="IfTest" value="gray &gt; 121" />
-    </block>
-    <block id="22" typeName="Jigsaw.CMethodBlock" left="590" top="260">
-        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
-            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
-            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
-        </method>
-        <edge id="43" name="In" linkedTo="41" />
-        <edge id="44" name="Out" linkedTo="-1" />
-        <property name="Label" value="setRGB(pixel, blue)" />
-        <property name="Message" value="" />
-        <property name="pixel" value="pixel" />
-        <property name="rgb" value="blue" />
-    </block>
-    <block id="23" typeName="Jigsaw.CControlIfElse" left="590" top="300">
-        <edge id="45" name="In" linkedTo="42" />
-        <edge id="46" name="Out" linkedTo="-1" />
-        <edge id="47" name="If" linkedTo="49" />
-        <edge id="48" name="Else" linkedTo="51" />
-        <property name="Label" value="if gray &gt; 60" />
-        <property name="Message" value="" />
-        <property name="IfTest" value="gray &gt; 60" />
-    </block>
-    <block id="24" typeName="Jigsaw.CMethodBlock" left="610" top="320">
-        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
-            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
-            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
-        </method>
-        <edge id="49" name="In" linkedTo="47" />
+    <block id="23" typeName="Jigsaw.CIOPrint" left="340" top="200">
+        <edge id="49" name="In" linkedTo="48" />
         <edge id="50" name="Out" linkedTo="-1" />
-        <property name="Label" value="setRGB(pixel, red)" />
+        <property name="Label" value="print(X)" />
         <property name="Message" value="" />
-        <property name="pixel" value="pixel" />
-        <property name="rgb" value="red" />
-    </block>
-    <block id="25" typeName="Jigsaw.CMethodBlock" left="610" top="360">
-        <method assembly_name="Myro" type_name="Myro" method_name="setRGB" return_type="System.Void">
-            <parameter name="pixel" type="Graphics+Pixel" default="System.DBNull" />
-            <parameter name="rgb" type="System.Collections.IList" default="System.DBNull" />
-        </method>
-        <edge id="51" name="In" linkedTo="48" />
-        <edge id="52" name="Out" linkedTo="-1" />
-        <property name="Label" value="setRGB(pixel, black)" />
-        <property name="Message" value="" />
-        <property name="pixel" value="pixel" />
-        <property name="rgb" value="black" />
+        <property name="Expression" value="X" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
     </block>
 </jigsaw>

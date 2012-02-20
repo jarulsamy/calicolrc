@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
+    <module name="Common.dll" />
     <block id="1" typeName="Jigsaw.CControlStart" left="330" top="20">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />

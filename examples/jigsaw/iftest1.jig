@@ -1,1 +1,78 @@
-<jigsaw><block id="1" typeName="Jigsaw.CControlStart" left="390" top="100"><edge id="1" name="Out" linkedTo="5" /><property name="Label" value="when program starts" /><property name="Message" value="" /></block><block id="2" typeName="Jigsaw.CControlIf" left="390" top="150"><edge id="2" name="In" linkedTo="6" /><edge id="3" name="Out" linkedTo="12" /><edge id="4" name="If" linkedTo="7" /><property name="Label" value="if X&lt; 10" /><property name="Message" value="" /><property name="IfTest" value="X&lt; 10" /></block><block id="3" typeName="Jigsaw.CAssignment" left="390" top="130"><edge id="5" name="In" linkedTo="1" /><edge id="6" name="Out" linkedTo="2" /><property name="Label" value="let X = 6" /><property name="Message" value="" /><property name="Variable" value="X" /><property name="Expression" value="6" /></block><block id="4" typeName="Jigsaw.CControlRepeat" left="410" top="170"><edge id="7" name="In" linkedTo="4" /><edge id="8" name="Out" linkedTo="-1" /><edge id="9" name="Loop" linkedTo="10" /><property name="Label" value="repeat X times" /><property name="Message" value="" /><property name="Repetitions" value="X" /></block><block id="5" typeName="Jigsaw.CIOPrint" left="430" top="190"><edge id="10" name="In" linkedTo="9" /><edge id="11" name="Out" linkedTo="-1" /><property name="Label" value="print X" /><property name="Message" value="" /><property name="Expression" value="X" /></block><block id="6" typeName="Jigsaw.CControlIf" left="390" top="250"><edge id="12" name="In" linkedTo="3" /><edge id="13" name="Out" linkedTo="17" /><edge id="14" name="If" linkedTo="15" /><property name="Label" value="if X&gt;= 10" /><property name="Message" value="" /><property name="IfTest" value="X&gt;= 10" /></block><block id="7" typeName="Jigsaw.CIOPrint" left="410" top="270"><edge id="15" name="In" linkedTo="14" /><edge id="16" name="Out" linkedTo="-1" /><property name="Label" value="print 'Too many to print'" /><property name="Message" value="" /><property name="Expression" value="'Too many to print'" /></block><block id="8" typeName="Jigsaw.CControlEnd" left="390" top="310"><edge id="17" name="In" linkedTo="13" /><property name="Label" value="stop script" /><property name="Message" value="" /></block></jigsaw>
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="390" top="70">
+        <edge id="1" name="Start" linkedTo="2" />
+        <property name="Label" value="when program starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CIOAsk" left="410" top="100">
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="X = Ask: 'How many?'" />
+        <property name="Message" value="" />
+        <property name="Ask" value="'How many?'" />
+        <property name="Answer" value="X" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CStatement" left="410" top="120">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="6" />
+        <property name="Label" value="X = int(X)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="X = int(X)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CControlIf" left="410" top="140">
+        <edge id="6" name="In" linkedTo="5" />
+        <edge id="7" name="Out" linkedTo="9" />
+        <edge id="8" name="If" linkedTo="12" />
+        <property name="Label" value="if X &lt; 10" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="X &lt; 10" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CControlIf" left="410" top="240">
+        <edge id="9" name="In" linkedTo="7" />
+        <edge id="10" name="Out" linkedTo="-1" />
+        <edge id="11" name="If" linkedTo="15" />
+        <property name="Label" value="if X&gt;= 10" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="X&gt;= 10" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="6" typeName="Jigsaw.CControlRepeat" left="430" top="160">
+        <edge id="12" name="In" linkedTo="8" />
+        <edge id="13" name="Out" linkedTo="-1" />
+        <edge id="14" name="Loop" linkedTo="17" />
+        <property name="Label" value="repeat X times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="X" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CIOTell" left="430" top="260">
+        <edge id="15" name="In" linkedTo="11" />
+        <edge id="16" name="Out" linkedTo="-1" />
+        <property name="Label" value="Tell: 'Too many!'" />
+        <property name="Message" value="" />
+        <property name="Tell" value="'Too many!'" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CIOPrint" left="450" top="180">
+        <edge id="17" name="In" linkedTo="14" />
+        <edge id="18" name="Out" linkedTo="-1" />
+        <property name="Label" value="print(X)" />
+        <property name="Message" value="" />
+        <property name="Expression" value="X" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+</jigsaw>
