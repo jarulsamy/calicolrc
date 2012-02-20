@@ -250,9 +250,9 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			if (this.Answer.Length > 0) {
-				this.Text = String.Format("{0} = Ask: {1} ?", this.Answer, this.Question);
+				this.Text = String.Format("{0} = Ask: {1}", this.Answer, this.Question);
 			} else {
-				this.Text = String.Format("Ask: {0} ?", this.Question);
+				this.Text = String.Format("Ask: {0}", this.Question);
 			}
 		}
 		

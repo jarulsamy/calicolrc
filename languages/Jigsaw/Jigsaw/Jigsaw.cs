@@ -444,7 +444,7 @@ namespace Jigsaw
 		{
 			// Load and build blocks from assembly dllfile
 			List<CBlock > blocks = new List<CBlock> ();
-			int y = 70;
+			int y = 34;
 			CBlock block = null;
 
 			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
@@ -1952,183 +1952,6 @@ namespace Jigsaw
 				_searchHelper = new SearchHelper(this, true);
 			return _searchHelper.More(s);
 		}
-		
-//		// - - - Build a list of tab-block KeyValuePair items to use for search - - - 
-//		internal void BuildSearchSet() 
-//		{
-//			_searchSet = new List<KeyValuePair<Widgets.CRoundedTab,CBlock>>();
-//			KeyValuePair<Widgets.CRoundedTab,CBlock> item;
-//			CBlock bb = null;
-//			
-//			// Build a list of items to search
-//			foreach (Widgets.CRoundedTab t in allTabs) {
-//				foreach (WeakReference wr in t._shapes) {
-//					Diagram.CShape shp = wr.Target as Diagram.CShape;
-//					if (shp is CBlock) {
-//						bb = (CBlock) shp;
-//						item = new KeyValuePair<Widgets.CRoundedTab, CBlock>(t,bb);
-//						_searchSet.Add ( item  );
-//					}
-//				}
-//			}
-//			
-//		}
-//		
-//	    // - - - Cancel a search and cleanup - - - - - - - 
-//	    public void SearchCancel() {
-//	        if (_searchSet != null) _searchSet.Clear ();
-//			_searchSet = null;
-//			_searchPos = 0;
-//	    }
-//		
-//	    // - - -
-//	    public bool SearchMore(string s) {
-//	        return SearchNext (s);
-//	    }
-//		
-//	    // - - - Look for the next block matching the search string - - - - - - - 
-//	    public bool SearchNext(string s) {
-//
-//			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
-//			CBlock bb;
-//			Widgets.CRoundedTab tt;
-//			bool foundMatch = false;
-//			string ss = s.ToLower();
-//			
-//			if (_searchSet == null) {	// If first time to search, init search set
-//				this.BuildSearchSet();
-//				_searchStart = 0;
-//				_searchPos = _searchStart;
-//				_searchNext = true;
-//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
-//				SearchCancel();						 // Reset in case want to search again
-//				return false;
-//			}
-//			
-//			int numItems = _searchSet.Count;
-//			
-//			// If currently searching backward, and switch direction to forward, reset starting position to current
-//			if (_searchNext == false) _searchStart = _searchPos;
-//			_searchNext = true;
-//			
-//			// Perform search
-//			foundMatch = false;
-//			while (true) {
-//				
-//				item = _searchSet[_searchPos];
-//				bb = item.Value;
-//				string txt = bb.Text.ToLower();
-//				
-//				// A match is found
-//				if (txt.Contains ( ss )) {
-//					foundMatch = true;
-//					
-//					// Select the tab
-//					tt = item.Key;
-//					tt.SetToggle(this, true);
-//					
-//					// Shift all factory blocks up
-//					double dY = 70.0 - bb.Top; 
-//					foreach (WeakReference wrshp in tt._shapes)
-//					{
-//						Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-//						if (shp != null) {
-//							shp.Top += dY;
-//						}
-//					}
-//					
-//					// Select the found block
-//					this.DeselectAll();
-//					bb.Select(this);
-//				}
-//				
-//				this.Invalidate();
-//				
-//				// Set next item to test
-//				_searchPos = (_searchPos + 1) % numItems;
-//				
-//				// If found a match this time, return true
-//				if (foundMatch) return true;
-//				
-//				if (_searchPos == _searchStart) {
-//					SearchCancel();						 // Reset in case want to search again
-//					return false;
-//				}
-//			}
-//	    }
-//
-//	    // - - - Look for the previous block matching the search string - - - - - - - 
-//	    public bool SearchPrevious(string s) {
-//			KeyValuePair<Widgets.CRoundedTab, CBlock> item;
-//			CBlock bb;
-//			bool foundMatch = false;
-//			Widgets.CRoundedTab tt;
-//			string ss = s.ToLower();
-//			
-//			// Init search set, if necessary
-//			if (_searchSet == null) {
-//				this.BuildSearchSet();
-//				_searchStart = _searchSet.Count-1;
-//				_searchPos = _searchStart;
-//				_searchNext = false;
-//			} else if (_searchPos == _searchStart) { // If not first time, check for completion
-//				SearchCancel();						 // Reset in case want to search again
-//				return false;
-//			}
-//			
-//			// If currently searching forward, and switch direction to backward, reset starting position to current
-//			if (_searchNext == true) _searchStart = _searchPos;
-//			_searchNext = false;
-//			
-//			// Perform search
-//			int numItems = _searchSet.Count;
-//			foundMatch = false;
-//			while (true) {
-//				
-//				item = _searchSet[_searchPos];
-//				bb = item.Value;
-//				string txt = bb.Text.ToLower();
-//				
-//				// A match is found
-//				if (txt.Contains ( ss )) {
-//					foundMatch = true;
-//					
-//					// Select the tab
-//					tt = item.Key;
-//					tt.SetToggle(this, true);
-//					
-//					// Shift all factory blocks up
-//					double dY = 70.0 - bb.Top; 
-//					foreach (WeakReference wrshp in tt._shapes)
-//					{
-//						Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-//						if (shp != null) {
-//							shp.Top += dY;
-//						}
-//					}
-//					
-//					// Select the found block
-//					this.DeselectAll();
-//					bb.Select(this);
-//				}
-//				
-//				this.Invalidate();
-//				
-//				// Set next item to test
-//				_searchPos = (_searchPos - 1) % numItems;
-//				if (_searchPos < 0) _searchPos += numItems;
-//				//Console.WriteLine ("{0} {1}", _searchPos, _searchStart);
-//				
-//				// If found a mathc this time, return true
-//				if (foundMatch) return true;
-//				
-//				if (_searchPos == _searchStart) {
-//					SearchCancel();						 // Reset in case want to search again
-//					return false;
-//				}
-//			}
-//	    }
-		
 	}
 	
 	// -----------------------------------------------------------------------
@@ -2210,7 +2033,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public string this[string key]
+		public virtual string this[string key]
 		{	// Access property values
 			get { return _properties[key].Text;  }
 			set { _properties[key].Text = value; }

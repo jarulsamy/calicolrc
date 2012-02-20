@@ -469,6 +469,8 @@ namespace Jigsaw
 	// --- Generic Python statement block shape class --------------------------------
     public class CComment : CBlock
     {
+		private bool _suppressOnPropertyChanged = false;
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
@@ -483,17 +485,74 @@ namespace Jigsaw
 			
 			// Properties
 			CStringProperty comment = new CStringProperty("Comment", "Comment");
+			CIntegerProperty width = new CIntegerProperty("Width", 175);
+			CIntegerProperty height = new CIntegerProperty("Height", 40);
+			width.Visible = false;
+			height.Visible = false;
+			
 			comment.PropertyChanged += OnPropertyChanged;
+			width.PropertyChanged += OnPropertyChanged;
+			height.PropertyChanged += OnPropertyChanged;
+			
 			_properties["Comment"] = comment;
+			_properties["Width"] = width;
+			_properties["Height"] = height;
+			
+			this.Transformed += OnTransformed;;
+			
 			this.OnPropertyChanged(null, null);
 		}
 		
 		public CComment(Double X, Double Y) : this(X, Y, null) {}
 		
-        // - - - Update text when property changes - - - - - - - - - - - -
+        // - - - Update text and size when property changes - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
+			if (_suppressOnPropertyChanged == true) return;
+			_suppressOnPropertyChanged = true;
+			
 			this.Text = String.Format("{0}", this["Comment"]);
+			
+			CIntegerProperty width = (CIntegerProperty)_properties["Width"];
+			CIntegerProperty height = (CIntegerProperty)_properties["Height"];
+			this.Width = width.Value;
+			this.Height = height.Value;
+			
+			_suppressOnPropertyChanged = false;
+		}
+
+		// - - - When block changes size, save in properties so saved to file - - - 
+        public void OnTransformed (Diagram.CShape shp, Diagram.ShapeEventArgs e)
+        {
+			// The size has already changed. Just update properties. Don't re-resize.
+			_suppressOnPropertyChanged = true;
+			
+			CIntegerProperty width = (CIntegerProperty)_properties["Width"];
+			CIntegerProperty height = (CIntegerProperty)_properties["Height"];
+			width.Value = (int)this.Width;
+			height.Value = (int)this.Height;
+			
+			_suppressOnPropertyChanged = false;
+        }
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override string this[string key]
+		{	// Override property access to set shape width and height
+			get { 
+				return _properties[key].Text;  
+			}
+			set { 
+				_properties[key].Text = value;
+				
+				switch (key) {
+				case "Width":
+					this.Width = Double.Parse (value);
+					break;
+				case "Height":
+					this.Height = Double.Parse (value);
+					break;
+				}
+			}
 		}
 		
 		// - - - Return a list of all edges - - - - - - - - - - - - - - - -

@@ -1926,6 +1926,7 @@ namespace Diagram
         public event ShapeEventHandler MouseUp;
         public event ShapeEventHandler Click;
         public event ShapeEventHandler DoubleClick;
+		public event ShapeEventHandler Transformed;
 
         // A list of connectors connected to this shape. This is maintained by CConnector methods
         public List<CConnector> Connectors = new List<CConnector>();
@@ -2213,8 +2214,7 @@ namespace Diagram
             }
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the Click event
+        // - - -  Allow external class to raise the Click event - - - - - - - - 
         public void RaiseClick(Canvas cvs)
         {
             if (Click != null)
@@ -2235,8 +2235,7 @@ namespace Diagram
             }
         }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the DoubleClick event
+		// - - - Allow external class to raise the DoubleClick event - - - - - - - - - - - 
         public void RaiseDoubleClick(Canvas cvs)
         {
             if (Click != null)
@@ -2245,6 +2244,27 @@ namespace Diagram
                 {
                     ShapeEventArgs evargs = new ShapeEventArgs(this);
                     DoubleClick(this, evargs);
+                }
+                catch (Exception ex)
+                {
+                    if (cvs != null)
+                    {
+                        cvs.RaiseCanvasError(ex.Message);
+                    }
+                    Console.Error.WriteLine(ex.Message);
+                }
+            }
+        }
+
+		// - - - Raise Transformed event - - - - - - - - - - - 
+        public void RaiseTransformed(Canvas cvs)
+        {
+            if (Transformed != null)
+            {
+                try
+                {
+                    ShapeEventArgs evargs = new ShapeEventArgs(this);
+                    Transformed(this, evargs);
                 }
                 catch (Exception ex)
                 {
@@ -2599,7 +2619,9 @@ namespace Diagram
             this.UpdateBoundingBox();
             this.UpdateHandles();
             this.UpdateDecorators();
-
+			
+			this.RaiseTransformed(_cvs);
+			
             // Needs saving after a transformation
             //cvs.Modified = true;
         }
@@ -3091,8 +3113,7 @@ namespace Diagram
             // If desired, can be overriden by subclasses
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Nudge location of this shape by dx, dy
+        // - - - Nudge location of this shape by dx, dy - - - - - - - - - -
         public void Nudge(double dx, double dy)
         {
             foreach (CPoint p in this.points)
@@ -3105,7 +3126,7 @@ namespace Diagram
             this.UpdateDecorators();
         }
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Outputs shape as XML - - - - - - - - - -
         // CShape subclasses must provide a method that outputs an 
         // XML representation of itself to the given XmlWriter
         // Output XML representation of this shape.
@@ -3119,14 +3140,12 @@ namespace Diagram
             w.WriteEndElement();
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Override to write custom Xml content of a shape.
+        // - - - Override to write custom Xml content of a shape - - - - - - - - -
         protected virtual void WriteXmlTags(XmlWriter w)
         {
         }
 
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Write the base standard attributes shared by all shapes
+        // - - - Write the base standard attributes shared by all shapes - - - - - - - -
         protected virtual void WriteXmlAttributes(XmlWriter w)
         {
             // Get object assembly and full name
