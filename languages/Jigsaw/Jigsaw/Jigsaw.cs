@@ -1487,6 +1487,10 @@ namespace Jigsaw
 		}
 
 		public bool ProcessXml(XmlWrapper xr) {
+			return ProcessXml (xr, 0, 0);
+		}
+
+		public bool ProcessXml(XmlWrapper xr, int dx, int dy) {
 				// Temp vars to hold parse vals
 				string name, val, typeName;
 				double R, G, B, A;
@@ -1519,8 +1523,8 @@ namespace Jigsaw
 						
 						case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
 							typeName = xr.GetAttribute("typeName");
-							X = int.Parse(xr.GetAttribute("left"));
-							Y = int.Parse(xr.GetAttribute("top"));
+							X = int.Parse(xr.GetAttribute("left")) + dx;
+							Y = int.Parse(xr.GetAttribute("top")) + dy;
 							id = int.Parse(xr.GetAttribute("id"));
 							Type typ = Type.GetType(typeName);
 							System.Object[] args = new System.Object[] {X, Y};

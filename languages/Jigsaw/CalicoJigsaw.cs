@@ -215,7 +215,7 @@ public class CalicoJigsawDocument : Document
 	public override bool Paste(object obj) {
 		if (obj is string) {
 			Jigsaw.XmlWrapper xr = new Jigsaw.XmlWrapper(obj.ToString(), true);
-			bool retval = cvs.ProcessXml(xr);
+			bool retval = cvs.ProcessXml(xr, 10, 10);
 			cvs.Reset(); // invalidates
 			return retval;
 		}
