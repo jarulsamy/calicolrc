@@ -2168,30 +2168,30 @@ namespace Calico {
         }
 
         public void beep(double duration, double frequency1, double frequency2) {
-	    audio_initialized = true;
-            frequencies[0] = frequency1;
-            frequencies[1] = frequency2;
-            times[0] = 0;
-            times[1] = 0;
-            SdlDotNet.Audio.AudioStream stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
-                                              SdlDotNet.Audio.AudioFormat.Unsigned8,
-                                              SdlDotNet.Audio.SoundChannel.Mono,
-                                              samples,
-                                              new SdlDotNet.Audio.AudioCallback(Callback),
-                                              null);
             ManualResetEvent ev = new ManualResetEvent(false);
-            // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+	    audio_initialized = true;
+	    frequencies[0] = frequency1;
+	    frequencies[1] = frequency2;
+	    times[0] = 0;
+	    times[1] = 0;
+	    SdlDotNet.Audio.AudioStream stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
+						  SdlDotNet.Audio.AudioFormat.Unsigned8,
+						  SdlDotNet.Audio.SoundChannel.Mono,
+						  samples,
+						  new SdlDotNet.Audio.AudioCallback(Callback),
+						  null);
             Invoke( delegate {
-                SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
-                SdlDotNet.Audio.Mixer.OpenAudio(stream);
-                Tao.Sdl.Sdl.SDL_PauseAudio(0);
-                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
-                Tao.Sdl.Sdl.SDL_PauseAudio(1);
-                stream.Close();
-                ev.Set();
+		  // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+		  SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
+		  SdlDotNet.Audio.Mixer.OpenAudio(stream);
+		  Tao.Sdl.Sdl.SDL_PauseAudio(0);
+		  Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+		  Tao.Sdl.Sdl.SDL_PauseAudio(1);
+		  stream.Close();
+		  this.Present();
+		  ev.Set();
             });
             ev.WaitOne();
-            this.Present();
         }
 
         public void Callback(IntPtr userData, IntPtr stream, int len)
