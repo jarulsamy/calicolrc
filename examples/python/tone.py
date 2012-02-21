@@ -3,11 +3,11 @@ import Graphics
 import math
 
 def makeTone(freq):
-    slice = (1/100000 * 360 * math.pi/180) # time in radians
+    slice = (1/44100 * 360 * math.pi/180) # time in radians
     def wave(array, position):
         for i in range(len(array)):
             angle = position * slice * freq
-            array[i] = math.cos(angle) * 127
+            array[i] = 127 + math.cos(angle) * 127
             position += 1
     return wave
 
@@ -16,7 +16,7 @@ def plotSound(function, width=500):
     array = [0] * width
     function(array, 0)
     for i in range(width):
-        Graphics.Dot((i, array[i] + 127)).draw(win)
+        Graphics.Dot((i, array[i])).draw(win)
 
 f880 = makeTone(880)
 plotSound(f880)

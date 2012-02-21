@@ -2150,60 +2150,122 @@ namespace Calico {
         const short samples = 2048;
         const double pi2 = 360 * Math.PI / 180.0;
         const double slice = 1.0 / playbackFreq * pi2;
-        byte [] buffer8 = new byte[samples];
+        byte[] buffer8 = new byte[samples];
         double volume = 1.0;
-        double [] frequencies = new double [2];
-        double [] times = new double [2];
-	bool audio_initialized = false;
+        double[] frequencies = new double [2];
+        double[] phases = new double [2] {0.0, 0.0};
+        bool audio_initialized = false;
+        SdlDotNet.Audio.AudioStream stream = null;
+        SdlDotNet.Audio.AudioCallback audioCallback = null;
+        Func<int[],int,object> audio_function = null;
+        int audio_index = 0;
 
         public void play(string filename) {
+            // This stream is different
+            if (! audio_initialized) {
+                initialize_audio();
+            }
+            // mixer.openstream()
+            // pause(0)
         }
 
-        public void play (double duration, Func<int[],int,object> function)
-        {
+        public void setPhases(double phase1, double phase2) {
+            phases[0] = phase1;
+            phases[1] = phase2;
+        }
+
+        public void play(double duration, Func<int[],int,object> function) {
+            if (! audio_initialized) {
+                initialize_audio();
+            }
+            audio_function = function;
+            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
+            if (duration > 0) {
+                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
+            }
+            audio_function = null;
         }
 
         public void beep(double duration, double frequency) {
             beep(duration, frequency, -1);
         }
 
-        public void beep(double duration, double frequency1, double frequency2) {
+        public void initialize_audio() {
             ManualResetEvent ev = new ManualResetEvent(false);
-	    audio_initialized = true;
-	    frequencies[0] = frequency1;
-	    frequencies[1] = frequency2;
-	    times[0] = 0;
-	    times[1] = 0;
-	    SdlDotNet.Audio.AudioStream stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
-						  SdlDotNet.Audio.AudioFormat.Unsigned8,
-						  SdlDotNet.Audio.SoundChannel.Mono,
-						  samples,
-						  new SdlDotNet.Audio.AudioCallback(Callback),
-						  null);
-            Invoke( delegate {
-		  // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-		  SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
-		  SdlDotNet.Audio.Mixer.OpenAudio(stream);
-		  Tao.Sdl.Sdl.SDL_PauseAudio(0);
-		  Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
-		  Tao.Sdl.Sdl.SDL_PauseAudio(1);
-		  stream.Close();
-		  this.Present();
-		  ev.Set();
+            audio_initialized = true;
+            audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
+            stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
+						   SdlDotNet.Audio.AudioFormat.Unsigned8,
+						   SdlDotNet.Audio.SoundChannel.Mono,
+						   samples,
+						   audioCallback,
+						   null);
+            Invoke(delegate {
+                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+                SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
+                SdlDotNet.Audio.Mixer.OpenAudio(stream);
+                ev.Set();
             });
             ev.WaitOne();
         }
 
-        public void Callback(IntPtr userData, IntPtr stream, int len)
-        {
-            for (int buf_pos = 0; buf_pos < len; buf_pos++ )
-            {
-                buffer8[buf_pos] = (byte)(127 + Math.Cos(times[0]) * volume * 127);
-                times[0] += frequencies[0] * slice;
-                if (times[0] > pi2)
-                    times[0] -= pi2;
+        public void beep(double duration, double frequency1, double frequency2) {
+            if (! audio_initialized) {
+                initialize_audio();
             }
-            System.Runtime.InteropServices.Marshal.Copy(buffer8, 0, stream, len);
+            frequencies [0] = frequency1;
+            frequencies [1] = frequency2;
+            phases[1] = phases[0]; // set the phases to be the same
+            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
+            if (duration > 0) {
+                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
+            }
+        }
+
+        public void Callback(IntPtr userData, IntPtr stream, int len) {
+            if (audio_function != null) {
+                int [] buffer = new int[len];
+                try {
+                    audio_function(buffer, audio_index);
+                    audio_index += len;
+                } catch (Exception e) {
+                    Console.Error.WriteLine("Error in audio function");
+                    Console.Error.WriteLine(e.Message);
+                    return;
+                }
+                byte [] mybuffer8 = new byte[len];
+                for (int i = 0; i < len; i++) {
+                    mybuffer8[i] = (byte)buffer[i];
+                }
+                System.Runtime.InteropServices.Marshal.Copy(mybuffer8, 0, stream, len);
+            } else {
+                for (int buf_pos = 0; buf_pos < len; buf_pos++) {
+                    double sum = 0.0;
+                    int count = 0;
+                    if (frequencies[0] != -1) {
+                        sum += (byte)(127 + Math.Cos(phases [0]) * volume * 127);
+                        count++;
+                    }
+                    if (frequencies[1] != -1) {
+                        sum += (byte)(127 + Math.Cos(phases [1]) * volume * 127);
+                        count++;
+                    }
+                    if (count > 0) {
+                        buffer8 [buf_pos] = (byte)(sum /count);
+                        phases [0] += frequencies [0] * slice;
+                        phases [1] += frequencies [1] * slice;
+                        if (phases [0] > pi2) {
+                            phases [0] -= pi2;
+                        }
+                        if (phases [1] > pi2) {
+                            phases [1] -= pi2;
+                        }
+                    }
+                }
+                System.Runtime.InteropServices.Marshal.Copy(buffer8, 0, stream, len);
+            }
         }
     }
 }
