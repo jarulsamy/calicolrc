@@ -2184,7 +2184,6 @@ namespace Calico {
                 Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
                 Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
             }
-            audio_function = null;
         }
 
         public void beep(double duration, double frequency) {
@@ -2214,6 +2213,7 @@ namespace Calico {
             if (! audio_initialized) {
                 initialize_audio();
             }
+            audio_function = null;
             frequencies [0] = frequency1;
             frequencies [1] = frequency2;
             phases[1] = phases[0]; // set the phases to be the same
