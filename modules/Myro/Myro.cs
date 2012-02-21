@@ -1308,6 +1308,14 @@ public static class Myro
 			return robot.getObstacle (position);
 	}
 
+	public static object getDistance (params object [] position)
+	{
+		if (position == null || position.Length == 0)
+			return robot.getDistance ();
+		else
+			return robot.getDistance (position);
+	}
+
 	public static object getLight (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -2081,6 +2089,11 @@ public static class Myro
 		{
 			return null;
 		}
+
+		public virtual object getDistance (params object [] position)
+		{
+			return null;
+		}
     
 		public virtual object getLight (params object [] position)
 		{
@@ -2795,6 +2808,57 @@ public static class Myro
 				return retval;
 		}
     
+
+		public override object getDistance (params object [] positions)
+		{
+			string key = null; 
+			List retval = new List ();
+			if (positions.Length == 0)
+			  positions = new object[2] {0, 1};
+			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
+				positions = new object[2] {0, 1};
+			lock (this) {
+				foreach (object position in positions) {
+					if (position is int) {
+						if (((int)position) == 0) {
+							key = "distance-left";
+						} else if (((int)position) == 2) {
+							key = "distance-right";
+						} else {
+							throw new Exception ("invalid position in getDistance()");
+						}
+					} else if (position is double) {
+						if (((double)position) == 0) {
+							key = "distance-left";
+						} else if (((double)position) == 1) {
+							key = "distance-center";
+						} else {
+							throw new Exception ("invalid position in getDistance()");
+						}
+					} else if (position is string) {
+						if (((string)position) == "left") {
+							key = "distance-left";
+						} else if (((string)position) == "right") {
+							key = "distance-right";
+						} else {
+							throw new Exception ("invalid position in getDistance()");
+						}
+					} else {
+						throw new Exception ("invalid position in getDistance()");
+					}
+					if (readings.Contains (key)) {
+					  retval.append (readings [key]);
+					} else {
+					  retval.append (0);
+					}
+				}
+			}
+			if (retval.Count == 1)
+				return retval [0];
+			else 
+				return retval;
+		}
+    
 		public override object getLight (params object [] positions)
 		{
 			string key = null; 
@@ -3189,6 +3253,10 @@ public static class Myro
 	    static byte GET_MIC_ENV         = 169; //Format 169
 	    static byte GET_MOTOR_STATS     = 170; //Format 170
 	    static byte GET_ENCODERS        = 171; //Format 171 type    
+	    static byte GET_IR_EX           = 172;
+  	    static byte GET_LINE_EX         = 173;
+   	    static byte GET_DISTANCE_EX     = 175;
+
 	
 	    static byte BEGIN_PATH          = 0;  //Used with SET_PATH to say beginning of a path
 	    static byte  END_PATH            = 1;  //Used with SET_PATH to say end of a path
@@ -3458,6 +3526,23 @@ public static class Myro
 			return retval;
 		}
 
+
+		
+		List GetByte (byte[] value, int bytes)
+		{
+			List retval = new List ();
+			byte [] retvalBytes;
+			lock (this) { // lock robot
+				write_packet (value);
+				read (Scribbler.PACKET_LENGTH); // read the echo
+				retvalBytes = read (bytes);
+			}
+			for (int p = 0; p < retvalBytes.Length; p += 1) {
+			  retval.append ((int)retvalBytes [p]);
+			}
+			return retval;
+		}
+
 		public override object get (string sensor="all")
 		{
 			return get (sensor, null);
@@ -3467,6 +3552,7 @@ public static class Myro
 		{
 			object retval = null;
 			sensor = sensor.ToLower ();
+			Console.WriteLine(sensor + " " + position);
 			if (sensor == "config") {
 				if (dongle == null) {
 					return dict ("ir", 2, "line", 2, "stall", 1, "light", 3);
@@ -3533,12 +3619,15 @@ public static class Myro
 						return bytes2ints (GetBytes (Scribbler.GET_IR_ALL, 2));
 					} else if (sensor == "obstacle") {
 						return list (getObstacle1 ("left"), 
-                getObstacle1 ("center"), 
-                getObstacle1 ("right"));
+							     getObstacle1 ("center"), 
+							     getObstacle1 ("right"));
+					} else if (sensor == "distance") {
+						return list (getDistance1 ("left"), 
+							     getDistance1 ("right"));
 					} else if (sensor == "bright") {
 						return list (getBright ("left"), 
-                getBright ("middle"), 
-                getBright ("right"));
+							     getBright ("middle"), 
+							     getBright ("right"));
 					} else if (sensor == "data") {
 						return getData ();
 					} else if (sensor == "all") {
@@ -3614,6 +3703,8 @@ public static class Myro
 						retvals.append (getData ((int)pos));
 					} else if (sensor == "obstacle") {
 						retvals.append (getObstacle1 (pos));
+					} else if (sensor == "distance") {
+						retvals.append (getDistance1 (pos));
 					} else if (sensor == "bright") {
 						retvals.append (getBright ((string)pos));
 					} else {
@@ -3911,6 +4002,44 @@ public static class Myro
 			return read_2byte ();
 		}
 
+	  public override object getDistance (params object [] position)
+		{
+			if (position == null || position.Length == 0) {
+				return get ("distance");
+			} else {
+				return get ("distance", position);
+			}
+		}
+
+
+
+	  int getDistance1 (object position)
+	  {
+	    byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
+	    buffer [0] = Scribbler.GET_DISTANCE_EX;
+	    
+	    if (position as string != null) {
+	      string value = (string)position;
+	      if (value == "left") {
+		buffer[1] = 0;
+	      } else if (value == "right") {
+		buffer[1] = 1;
+	      } else {
+		throw new Exception ();
+	      }
+	    } else {
+	      int value = (int)position;
+	      if (value == 0) {
+		buffer[1] = 0;
+	      } else if (value == 2) {
+		buffer[1] = 1;
+	      } else {
+		throw new Exception ();
+	      }
+	    }
+	    return (int)GetByte(buffer, 1)[0];
+	  }
+	  
 		public override object getLight (params object [] position)
 		{
 			if (position == null || position.Length == 0) {
@@ -4090,7 +4219,8 @@ public static class Myro
 		public override void beep (double duration, double frequency)
 		{
 			lock (this) { // lock robot
-				set_speaker ((int)frequency, (int)(duration * 1000));
+				set_speaker ((int)frequency, (int)(duration * 900));
+				// 100% of the intended delay
 				Thread.Sleep ((int)(duration * 1000));
 				read (Scribbler.PACKET_LENGTH + 11);
 			}
@@ -4099,6 +4229,7 @@ public static class Myro
 		public override void beep (double duration, double frequency, double frequency2)
 		{
 			set_speaker_2 ((int)frequency, (int)frequency2, (int)(duration * 1000));
+			// 100% of the intended delay
 			Thread.Sleep ((int)(duration * 1000));
 			read (Scribbler.PACKET_LENGTH + 11);
 		}
