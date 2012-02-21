@@ -711,6 +711,9 @@ namespace Calico {
                         }
                     }
                 }
+		if (audio_initialized) {	 
+		  Tao.Sdl.Sdl.SDL_AudioQuit ();
+		}
                 Gtk.Application.Quit();
             }
             return retval;
@@ -2151,6 +2154,7 @@ namespace Calico {
         double volume = 1.0;
         double [] frequencies = new double [2];
         double [] times = new double [2];
+	bool audio_initialized = false;
 
         public void play(string filename) {
         }
@@ -2164,6 +2168,7 @@ namespace Calico {
         }
 
         public void beep(double duration, double frequency1, double frequency2) {
+	    audio_initialized = true;
             frequencies[0] = frequency1;
             frequencies[1] = frequency2;
             times[0] = 0;
