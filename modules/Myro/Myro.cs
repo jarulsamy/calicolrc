@@ -3410,7 +3410,7 @@ public static class Myro
 		{
 			object retval = null;
 			sensor = sensor.ToLower ();
-			Console.WriteLine(sensor + " " + position);
+
 			if (sensor == "config") {
 				if (dongle == null) {
 					return dict ("ir", 2, "line", 2, "stall", 1, "light", 3);
@@ -4077,7 +4077,7 @@ public static class Myro
 		public override void beep (double duration, double frequency)
 		{
 			lock (this) { // lock robot
-				set_speaker ((int)frequency, (int)(duration * 900));
+				set_speaker ((int)frequency, (int)(duration * 1000));
 				// 100% of the intended delay
 				Thread.Sleep ((int)(duration * 1000));
 				read (Scribbler.PACKET_LENGTH + 11);
