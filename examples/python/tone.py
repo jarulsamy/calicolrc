@@ -18,7 +18,7 @@ def plotSound(function, width=500):
     for i in range(width):
         Graphics.Dot((i, array[i])).draw(win)
 
-f880 = makeTone(880)
-plotSound(f880)
-Myro.play(1, f880)
+tone = makeTone(440)
+plotSound(tone)
+Myro.play(1, tone)
 
