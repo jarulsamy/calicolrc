@@ -46,10 +46,9 @@ public static class Graphics
 	public static bool warn_missing_dot = false;
 	public delegate void InvokeDelegate ();
 	
-    public static void initialize_module(string startup_path, 
-  					                     string os_name) {
-    	Graphics.startup_path = startup_path;
-    	Graphics.os_name = os_name;
+    public static void initialize_module(Calico.MainWindow calico) {
+    	Graphics.startup_path = calico.path;
+    	Graphics.os_name = calico.OS;
 	}
 	
 	public static void Invoke (InvokeDelegate invoke)
