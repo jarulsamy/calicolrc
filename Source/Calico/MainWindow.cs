@@ -253,6 +253,7 @@ namespace Calico {
             UpdateZoom();
             addToRecentsMenu(null);
             searchbox.Hide();
+            this.Present();
             // End of GUI setup
             //GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
@@ -2140,6 +2141,64 @@ namespace Calico {
                 HistoryPage.Child.Show();
                 ToolNotebook.Page = 3;
             }
+        }
+
+        const int playbackFreq = 44100;
+        const short samples = 2048;
+        const double pi2 = 360 * Math.PI / 180.0;
+        const double slice = 1.0 / playbackFreq * pi2;
+        byte [] buffer8 = new byte[samples];
+        double volume = 1.0;
+        double [] frequencies = new double [2];
+        double [] times = new double [2];
+
+        public void play(string filename) {
+        }
+
+        public void play (double duration, Func<int[],int,object> function)
+        {
+        }
+
+        public void beep(double duration, double frequency) {
+            beep(duration, frequency, -1);
+        }
+
+        public void beep(double duration, double frequency1, double frequency2) {
+            frequencies[0] = frequency1;
+            frequencies[1] = frequency2;
+            times[0] = 0;
+            times[1] = 0;
+            SdlDotNet.Audio.AudioStream stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
+                                              SdlDotNet.Audio.AudioFormat.Unsigned8,
+                                              SdlDotNet.Audio.SoundChannel.Mono,
+                                              samples,
+                                              new SdlDotNet.Audio.AudioCallback(Callback),
+                                              null);
+            ManualResetEvent ev = new ManualResetEvent(false);
+            // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+            Invoke( delegate {
+                SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
+                SdlDotNet.Audio.Mixer.OpenAudio(stream);
+                Tao.Sdl.Sdl.SDL_PauseAudio(0);
+                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                Tao.Sdl.Sdl.SDL_PauseAudio(1);
+                stream.Close();
+                ev.Set();
+            });
+            ev.WaitOne();
+            this.Present();
+        }
+
+        public void Callback(IntPtr userData, IntPtr stream, int len)
+        {
+            for (int buf_pos = 0; buf_pos < len; buf_pos++ )
+            {
+                buffer8[buf_pos] = (byte)(127 + Math.Cos(times[0]) * volume * 127);
+                times[0] += frequencies[0] * slice;
+                if (times[0] > pi2)
+                    times[0] -= pi2;
+            }
+            System.Runtime.InteropServices.Marshal.Copy(buffer8, 0, stream, len);
         }
     }
 }

@@ -243,5 +243,8 @@ public static class Shapes {
     public static void step(Graphics.WindowClass window, double time) {
       window.step(time);
     }
+	public static void setBorder(Graphics.Shape shape, int width) {
+  	  shape.border = width;
+	}
 }
 

@@ -32,8 +32,8 @@ using IronPython.Runtime;
 // List
 using System.Collections.Generic;
 // IList
-using System.Collections;// IEnumerator
-using Tao.Sdl;
+using System.Collections;
+using Tao.Sdl;// IEnumerator
 
 public static class Extensions
 {
@@ -62,11 +62,11 @@ public static class Myro
 	public static Robot robot;
 	public static Simulation simulation;
 	public static int gui_thread_id = -1;
-	public readonly static Computer computer = new Computer ();
 	static string dialogResponse = null;
 	static string REVISION = "$Revision: $";
 	static string startup_path = null;
 	static string os_name = null;
+	static Calico.MainWindow calico = null;
 	static string speech_name = "default";
 	static bool warn_missing_speak = true;
 	static PythonDictionary voices = new PythonDictionary ();
@@ -255,19 +255,19 @@ public static class Myro
 					try {
 						beep (.25, (int)freqs [0]);
 					} catch {
-						computer.beep (.25, (int)freqs [0]);
+						Myro.calico.beep (.25, (int)freqs [0]);
 					}
 				} else if (freqs [0] == null) {
 					try {
 						beep (.25, (int)freqs [1]);
 					} catch {
-						computer.beep (.25, (int)freqs [1]);
+						Myro.calico.beep (.25, (int)freqs [1]);
 					}
 				} else {
 					try {
 						beep (.25, (int)freqs [0], (int)freqs [1]);
 					} catch {
-						computer.beep (.25, (int)freqs [0], (int)freqs [1]);
+						Myro.calico.beep (.25, (int)freqs [0], (int)freqs [1]);
 					}
 				}
 			}
@@ -368,121 +368,6 @@ public static class Myro
 		}
 	}
 
-	public class AudioManager : IDisposable
-	{
-        const int playbackFreq = 44100;
-        const int samples = 2048;
-        const double pi2 = 360 * Math.PI / 180.0;
-        private bool disposed = false;
-		private bool initialized = false;
-        SdlDotNet.Audio.AudioStream stream;
-        byte[] buffer8;
-
-        double time = 0;
-        double volume;
-        double frequency1 = -1;
-        double frequency2 = -1;
-
-        public AudioManager()
-        {
-            stream = new SdlDotNet.Audio.AudioStream(playbackFreq, 
-			                                         SdlDotNet.Audio.AudioFormat.Unsigned8, 
-			                                         SdlDotNet.Audio.SoundChannel.Mono, 
-			                                         samples, 
-			                                         new SdlDotNet.Audio.AudioCallback(Callback), 
-			                                         null);
-            buffer8 = new byte[samples];
-            volume = 1.0;
-
-            // BUG: OpenAudio (or lower) apparently requires a visible screen for some reason:
-            SdlDotNet.Graphics.Video.SetVideoMode(1, 1);
-            SdlDotNet.Audio.Mixer.OpenAudio(stream);
-            // BUG: close (or hide) it
-            SdlDotNet.Graphics.Video.Close();
-			initialized = true;
-        }
-
-        public void beep(double duration, double freq) {
-            frequency1 = freq;
-			frequency2 = -1;
-            Tao.Sdl.Sdl.SDL_PauseAudio(0);
-            Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
-            Tao.Sdl.Sdl.SDL_PauseAudio(1);
-        }
-		
-        public void beep(double duration, double frequency1, double frequency2) {
-            this.frequency1 = frequency1;
-			this.frequency2 = frequency2;
-            Tao.Sdl.Sdl.SDL_PauseAudio(0);
-            Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
-            Tao.Sdl.Sdl.SDL_PauseAudio(1);
-        }
-
-		public void play (double duration, Func<int[],int,object> function)
-		{
-		}
-
-        void Callback(IntPtr userData, IntPtr stream, int len)
-        {
-            double slice = 1.0 / playbackFreq * pi2; 
-            for (int buf_pos = 0; buf_pos < len; buf_pos++ )
-            {
-                buffer8[buf_pos] = (byte)(127 + Math.Cos(time) * volume * 127);
-                time += frequency1 * slice;
-                if (time > pi2)
-                    time -= pi2;
-            }
-            Marshal.Copy(buffer8, 0, stream, len);
-        }
-
-        /// <summary>
-        /// Destroy object
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Destroy object
-        /// </summary>
-        public void Close()
-        {
-            Dispose();
-        }
-
-        /// <summary>
-        /// Destroy object
-        /// </summary>
-        ~AudioManager()
-        {
-            Dispose(false);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-				if (initialized) {
-					Sdl.SDL_AudioQuit (); 
-				}
-                if (disposing)
-                {
-                    if (this.stream != null)
-                    {
-                        this.stream.Dispose();
-                        this.stream = null;
-                    }
-                }
-                this.disposed = true;
-            }
-        }
-	}
-	
 	public class Gamepads
 	{
    
@@ -1165,7 +1050,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency);
 		else {
-			computer.beep (duration, frequency);
+			Myro.calico.beep (duration, frequency);
 		}
 	}
 
@@ -1174,7 +1059,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			computer.beep (duration, frequency, frequency2);
+			Myro.calico.beep (duration, frequency, frequency2);
 		}
 	}
 
@@ -1184,7 +1069,7 @@ public static class Myro
 			robot.beep (duration, frequency);
 		else 
 			{
-			computer.beep (duration, frequency);
+			Myro.calico.beep (duration, frequency);
 		}
 	}
 
@@ -1193,7 +1078,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			computer.beep (duration, frequency, frequency2);
+			Myro.calico.beep (duration, frequency, frequency2);
 		}
 	}
 
@@ -1202,7 +1087,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency);
 		else {
-			computer.beep (duration, frequency);
+			Myro.calico.beep (duration, frequency);
 		}
 	}
 
@@ -1211,31 +1096,29 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			computer.beep (duration, frequency, frequency2);
+			Myro.calico.beep (duration, frequency, frequency2);
 		}
 	}
 
 	public static void play (string filename)
 	{
-		// play audio file
-		SdlDotNet.Audio.Music music = new SdlDotNet.Audio.Music (filename);
-		music.Play ();
+		calico.play (filename);
 	}
 
 	public static void play (double duration, Func<int[],int,object> function)
 	{
-		computer.play (duration, function);
+		calico.play (duration, function);
 	}
 
 	/*
   public static void play(double duration, Func<int[],double,double,object> function) {
     // play a function
-    //audio_manager.play(duration, function);
+    //audioManager.play(duration, function);
   }
 
   public static void play(double duration, Func<int,object> function) {
     // play a function
-    audio_manager.play(duration, function);
+    audioManager.play(duration, function);
   }
   */
 
@@ -2020,13 +1903,13 @@ public static class Myro
 		public virtual void beep (double duration, double frequency, double frequency2)
 		{
 			// Override in subclassed robots
-			computer.beep (duration, frequency, frequency2);
+			Myro.calico.beep (duration, frequency, frequency2);
 		}
     
 		public virtual void beep (double duration, double frequency)
 		{
 			// Override in subclassed robots
-			computer.beep (duration, frequency);
+			Myro.calico.beep (duration, frequency);
 		}
     
 		public virtual void reboot ()
@@ -2399,31 +2282,6 @@ public static class Myro
 	public static bool Contains (object item, params object[] items)
 	{
 		return ((IList<object>)items).Contains (item);
-	}
-
-	public class Computer: Robot
-	{
-		public AudioManager audio_manager;
-		
-		public override void beep (double duration, double frequency)
-		{
-			if (audio_manager == null)
-				audio_manager = new AudioManager();
-			audio_manager.beep (duration, frequency);
-		}
-
-		public override void beep (double duration, double frequency1, double frequency2)
-		{
-			if (audio_manager == null)
-				audio_manager = new AudioManager();
-			audio_manager.beep (duration, frequency1, frequency2);
-		}
-		
-		public void play (double duration, Func<int[],int,object> function) {
-			if (audio_manager == null)
-				audio_manager = new AudioManager();
-			audio_manager.play (duration, function);
-		}
 	}
 
 	public class SimScribbler : Robot
@@ -5524,11 +5382,11 @@ public static class Myro
 		return retval;
 	}
 
-	public static void initialize_module (string startup_path, 
-                       string os_name)
+	public static void initialize_module (Calico.MainWindow calico)
 	{
-		Myro.startup_path = startup_path;
-		Myro.os_name = os_name;
+		Myro.startup_path = calico.path;
+		Myro.os_name = calico.OS;
+		Myro.calico = calico;
 		voices ["af"] = "Afrikaans Male";
 		voices ["af+f1"] = "Afrikaans Female";
 		voices ["bs"] = "Bosnian Male";
@@ -5787,12 +5645,6 @@ public static class Myro
 		frequencies ["c8"] = 4186.0;
 	}
 
-	public static void close_module ()
-	{
-		//Console.WriteLine ("close_module");
-		if (computer.audio_manager != null)
-			computer.audio_manager.Dispose ();
-	}
 	/*
   public class StringComparer: IComparer<string> {
     public int Compare(string x, string y) {
@@ -6180,17 +6032,6 @@ public static class Myro
 		} else {
 			return Double.Parse (v);
 		}
-	}
-	
-	public static void Main ()
-	{
-		//Myro.initialize_module ("/home/dblank/Calico-dev/trunk/bin", "Posix");
-		Myro.initialize_module (@"c:\Users\dblank\Calico\bin", "Windows");
-		Myro.beep (.1, 400);
-		Myro.beep (.1, 800);
-		Myro.beep (.1, 1200);
-		Myro.beep (.1, 800);
-		Myro.close_module ();
 	}
 	
 }

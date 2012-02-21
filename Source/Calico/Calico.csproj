@@ -69,12 +69,19 @@
       <HintPath>..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Mono.Cairo">
+    <Reference Include="Mono.Cairo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
       <HintPath>..\..\bin\Mono.Cairo.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.TextEditor">
       <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="SdlDotNet">
+      <HintPath>..\..\modules\SdlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.Sdl">
+      <HintPath>..\..\modules\Tao.Sdl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
