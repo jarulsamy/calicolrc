@@ -183,6 +183,35 @@ namespace Reflection
        		        xw.WriteEndElement();
                 }
 			}
+
+			public void SaveAsCSharp (string filename)
+			{
+			  	// This will make a CSharp file from a DLL
+				string indent = "    ";
+				System.IO.StreamWriter sw = new System.IO.StreamWriter (filename);
+				sw.WriteLine("public class {");
+				foreach (string type_name in getTypeNames(assembly)) {
+					Type type = getType (assembly, type_name);
+					foreach (MethodInfo mi in getStaticMethods(type)) {
+						string parameters = "";
+						string arguments = "";
+					    foreach (ParameterInfo pi in mi.GetParameters()) {
+							if (parameters != "")
+								parameters += ", ";
+							parameters += String.Format("{0} {1}", pi.ParameterType.Name, pi.Name);
+							if (arguments != "")
+								arguments += ", ";
+							arguments += pi.Name;
+					    }
+						sw.WriteLine ("{0}public static {1} {2} ({3}) {{", indent, mi.ReturnType.ToString(), mi.Name, parameters);
+						sw.WriteLine ("{0}{0}return {1}.{2}({3});", indent, type_name, mi.Name, arguments);
+						sw.Write ("{0}", indent);
+						sw.WriteLine("}");
+					}
+				}
+				sw.WriteLine("}");
+				sw.Close ();
+			}
 					
 			public bool CheckSignature(string type_name, string method_name, List<Type> types) {
 				string key = String.Format("{0}.{1}({2})", type_name, method_name, ListToString(types));
