@@ -62,7 +62,7 @@ public class Math {
     public static System.Decimal Floor (Decimal d) {
         return System.Math.Floor(d);
     }
-    public static double IEEERemainder (double x, double y) {
+    public static double Mod (double x, double y) {
         return System.Math.IEEERemainder(x, y);
     }
     public static double Log (double d) {
