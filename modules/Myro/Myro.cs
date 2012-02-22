@@ -705,9 +705,9 @@ public static class Myro
 	public static void initialize (string port, int baud=38400)
 	{
 		bool need_port = true;
-		if (port != null && (port.StartsWith ("COM") || port.StartsWith ("com"))) {
-			port = @"\\.\" + port;             // "comment
-		}
+		//if (port != null && (port.StartsWith ("COM") || port.StartsWith ("com"))) {
+		//	port = @"\\.\" + port;             // "comment
+		//}
 		if (Myro.robot is Scribbler) {
 			if (((Scribbler)(Myro.robot)).serial is SerialPort) {
 				SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
@@ -1103,6 +1103,11 @@ public static class Myro
 	public static void play (string filename)
 	{
 		calico.play (filename);
+	}
+
+	public static void setPhases (double phase1, double phase2)
+	{
+		calico.setPhases(phase1, phase2);
 	}
 
 	public static void play (double duration, Func<int[],int,object> function)
@@ -3156,9 +3161,9 @@ public static class Myro
 		public Scribbler (string port, int baud)
 		{
 
-			if (port.StartsWith ("COM") || port.StartsWith ("com")) {
-				port = @"\\.\" + port;             // "comment
-			}
+			//if (port.StartsWith ("COM") || port.StartsWith ("com")) {
+			//	port = @"\\.\" + port;             // "comment
+			//}
 
 			serial = new SerialPort (port, baud);
 			lock (serial) {
