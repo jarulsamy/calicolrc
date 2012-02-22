@@ -1,23 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <map>
+    <method assembly_name="Myro" type_name="Extensions" method_name="Slice">
+        <parameter name="source" type="T[]" default="" />
+        <parameter name="start" type="System.Int32" default="" />
+        <parameter name="end" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Gamepads" method_name="Same">
+        <parameter name="o1" type="System.Object" default="" />
+        <parameter name="o2" type="System.Object" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="ask">
+        <parameter name="question" type="System.Object" default="" />
+        <parameter name="title" type="System.String" default="" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="ask" />
     <method assembly_name="Myro" type_name="Myro" method_name="ask">
-        <parameter name="question" type="System.Object" default="'What?'" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="ask">
-        <parameter name="question" type="System.Object" default="'What?'" />
-        <parameter name="title" type="System.String" default="'Information'" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
-        <parameter name="question" type="System.String" default="'Which?'" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
-        <parameter name="question" type="System.String" default="'Which?'" />
-        <parameter name="choices" type="IronRuby.Builtins.RubyArray" default="" />
+        <parameter name="question" type="System.Object" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
         <parameter name="question" type="System.String" default="" />
-        <parameter name="choices" type="IronPython.Runtime.List" default="" />
+        <parameter name="choices" type="System.Collections.IList" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="askQuestion">
+        <parameter name="question" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="backward">
         <parameter name="power" type="System.Double" default="" />
@@ -53,12 +58,11 @@
         <parameter name="frequency" type="System.Int32" default="" />
         <parameter name="frequency2" type="System.Int32" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="close_module" />
-    <method assembly_name="Myro" type_name="Myro" method_name="Color">
-        <parameter name="rgb" type="System.Collections.IList" default="" />
-    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="Color">
         <parameter name="color" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="Color">
+        <parameter name="rgb" type="System.Collections.IList" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="Contains">
         <parameter name="item" type="System.Object" default="" />
@@ -71,6 +75,7 @@
     <method assembly_name="Myro" type_name="Myro" method_name="DialogHandler">
         <parameter name="obj" type="System.Object" default="" />
         <parameter name="args" type="System.EventArgs" default="" />
+        <parameter name="dialog" type="Gtk.Dialog" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="doTogether">
         <parameter name="objects" type="System.Collections.IList[]" default="" />
@@ -84,10 +89,10 @@
     <method assembly_name="Myro" type_name="Myro" method_name="flipCoin" />
     <method assembly_name="Myro" type_name="Myro" method_name="forward">
         <parameter name="power" type="System.Double" default="" />
+        <parameter name="time" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="forward">
         <parameter name="power" type="System.Double" default="" />
-        <parameter name="time" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="gamepad">
         <parameter name="dict" type="IronPython.Runtime.PythonDictionary" default="" />
@@ -98,16 +103,17 @@
         <parameter name="position" type="System.Object[]" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="get">
-        <parameter name="tuple" type="System.Collections.IList" default="" />
-        <parameter name="position" type="System.Int32" default="" />
+        <parameter name="sensor" type="System.String" default="all" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="get">
-        <parameter name="sensor" type="System.String" default="all" />
+        <parameter name="tuple" type="System.Collections.IList" default="" />
+        <parameter name="position" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getAll" />
     <method assembly_name="Myro" type_name="Myro" method_name="getAlpha">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getAngle" />
     <method assembly_name="Myro" type_name="Myro" method_name="getBattery" />
     <method assembly_name="Myro" type_name="Myro" method_name="getBlob" />
     <method assembly_name="Myro" type_name="Myro" method_name="getBlue">
@@ -116,10 +122,10 @@
     <method assembly_name="Myro" type_name="Myro" method_name="getBright">
         <parameter name="window" type="System.Int32" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getBright" />
     <method assembly_name="Myro" type_name="Myro" method_name="getBright">
         <parameter name="window" type="System.String" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getBright" />
     <method assembly_name="Myro" type_name="Myro" method_name="getColor">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
@@ -133,61 +139,74 @@
     <method assembly_name="Myro" type_name="Myro" method_name="getData">
         <parameter name="position" type="System.Int32[]" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getDictionaryItem">
+        <parameter name="dict" type="System.Collections.IDictionary" default="" />
+        <parameter name="key" type="System.Object" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getDictionaryKeys">
+        <parameter name="dict" type="System.Collections.IDictionary" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getDistance">
+        <parameter name="position" type="System.Object[]" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getEncoders">
+        <parameter name="zero" type="System.Boolean" default="False" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getFilenames">
         <parameter name="path" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
-        <parameter name="index" type="System.Int32" default="" />
-        <parameter name="what" type="System.String" default="" />
+        <parameter name="whats" type="IronPython.Runtime.List" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
         <parameter name="index" type="System.Int32" default="" />
         <parameter name="whats" type="IronPython.Runtime.List" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
-        <parameter name="index" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
+        <parameter name="indices" type="IronPython.Runtime.List" default="" />
         <parameter name="what" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
         <parameter name="indices" type="IronPython.Runtime.List" default="" />
         <parameter name="whats" type="IronPython.Runtime.List" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
+        <parameter name="index" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
+        <parameter name="index" type="System.Int32" default="" />
+        <parameter name="what" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
+        <parameter name="what" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepad" />
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="iterable" type="System.Collections.IList" default="" />
         <parameter name="whats" type="IronPython.Runtime.List" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepad">
-        <parameter name="indices" type="IronPython.Runtime.List" default="" />
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="iterable" type="System.Collections.IList" default="" />
         <parameter name="what" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="what" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="index" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="index" type="System.Int32" default="" />
+        <parameter name="what" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="index" type="System.Int32" default="" />
+        <parameter name="whats" type="IronPython.Runtime.List" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
+        <parameter name="iterable" type="System.Collections.IList" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow" />
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="index" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="iterable" type="System.Collections.IList" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="iterable" type="System.Collections.IList" default="" />
-        <parameter name="what" type="System.String" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="iterable" type="System.Collections.IList" default="" />
-        <parameter name="whats" type="IronPython.Runtime.List" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="index" type="System.Int32" default="" />
-        <parameter name="what" type="System.String" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="what" type="System.String" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="getGamepadNow">
-        <parameter name="index" type="System.Int32" default="" />
-        <parameter name="whats" type="IronPython.Runtime.List" default="" />
-    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getGray">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
@@ -195,10 +214,10 @@
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getHeight">
-        <parameter name="window" type="Graphics+WindowClass" default="" />
+        <parameter name="picture" type="Graphics+Picture" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getHeight">
-        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="window" type="Graphics+WindowClass" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getInfo" />
     <method assembly_name="Myro" type_name="Myro" method_name="getIR">
@@ -213,15 +232,16 @@
     <method assembly_name="Myro" type_name="Myro" method_name="getLine">
         <parameter name="position" type="System.Object[]" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getMicrophone" />
     <method assembly_name="Myro" type_name="Myro" method_name="getMouse" />
     <method assembly_name="Myro" type_name="Myro" method_name="getMouseNow" />
     <method assembly_name="Myro" type_name="Myro" method_name="getMouseState" />
     <method assembly_name="Myro" type_name="Myro" method_name="getName" />
     <method assembly_name="Myro" type_name="Myro" method_name="getNoteFromFrequency">
-        <parameter name="frequency" type="System.Int32" default="" />
+        <parameter name="frequency" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getNoteFromFrequency">
-        <parameter name="frequency" type="System.Double" default="" />
+        <parameter name="frequency" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getObstacle">
         <parameter name="position" type="System.Object[]" default="" />
@@ -235,19 +255,20 @@
     <method assembly_name="Myro" type_name="Myro" method_name="getPixels">
         <parameter name="picture" type="Graphics+Picture" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getPosition" />
     <method assembly_name="Myro" type_name="Myro" method_name="getRed">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getRegion">
         <parameter name="picture" type="Graphics+Picture" default="" />
-        <parameter name="iterable" type="System.Collections.IList" default="" />
+        <parameter name="p" type="Graphics+Point" default="" />
         <parameter name="width" type="System.Int32" default="" />
         <parameter name="height" type="System.Int32" default="" />
         <parameter name="degrees" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getRegion">
         <parameter name="picture" type="Graphics+Picture" default="" />
-        <parameter name="p" type="Graphics+Point" default="" />
+        <parameter name="iterable" type="System.Collections.IList" default="" />
         <parameter name="width" type="System.Int32" default="" />
         <parameter name="height" type="System.Int32" default="" />
         <parameter name="degrees" type="System.Double" default="" />
@@ -263,17 +284,17 @@
     <method assembly_name="Myro" type_name="Myro" method_name="getSimulation" />
     <method assembly_name="Myro" type_name="Myro" method_name="getStall" />
     <method assembly_name="Myro" type_name="Myro" method_name="getVoice" />
-    <method assembly_name="Myro" type_name="Myro" method_name="getVoiceName" />
     <method assembly_name="Myro" type_name="Myro" method_name="getVoiceName">
         <parameter name="name" type="System.String" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="getVoiceName" />
     <method assembly_name="Myro" type_name="Myro" method_name="getVoiceNames" />
     <method assembly_name="Myro" type_name="Myro" method_name="getVoices" />
     <method assembly_name="Myro" type_name="Myro" method_name="getWidth">
-        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="window" type="Graphics+WindowClass" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getWidth">
-        <parameter name="window" type="Graphics+WindowClass" default="" />
+        <parameter name="picture" type="Graphics+Picture" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="getWindow" />
     <method assembly_name="Myro" type_name="Myro" method_name="getWindow">
@@ -286,13 +307,13 @@
         <parameter name="pixel" type="Graphics+Pixel" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="heads" />
+    <method assembly_name="Myro" type_name="Myro" method_name="init">
+        <parameter name="port" type="System.String" default="" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="init" />
     <method assembly_name="Myro" type_name="Myro" method_name="init">
         <parameter name="port" type="System.String" default="" />
         <parameter name="baud" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="init">
-        <parameter name="port" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="initialize">
         <parameter name="port" type="System.String" default="" />
@@ -300,8 +321,7 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="initialize" />
     <method assembly_name="Myro" type_name="Myro" method_name="initialize_module">
-        <parameter name="startup_path" type="System.String" default="" />
-        <parameter name="os_name" type="System.String" default="" />
+        <parameter name="calico" type="Calico.MainWindow" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="input">
         <parameter name="question" type="System.Object" default="" />
@@ -311,10 +331,15 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="joystick" />
     <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
-        <parameter name="color" type="System.String" default="" />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
+        <parameter name="a" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
-        <parameter name="rgb" type="System.Collections.IList" default="" />
+        <parameter name="r" type="System.Int32" default="" />
+        <parameter name="g" type="System.Int32" default="" />
+        <parameter name="b" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
         <parameter name="r" type="System.Double" default="" />
@@ -323,20 +348,19 @@
         <parameter name="a" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
-        <parameter name="r" type="System.Int32" default="" />
-        <parameter name="g" type="System.Int32" default="" />
-        <parameter name="b" type="System.Int32" default="" />
-        <parameter name="a" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
         <parameter name="r" type="System.Double" default="" />
         <parameter name="g" type="System.Double" default="" />
         <parameter name="b" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
-        <parameter name="r" type="System.Int32" default="" />
-        <parameter name="g" type="System.Int32" default="" />
-        <parameter name="b" type="System.Int32" default="" />
+        <parameter name="color" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="makeColor">
+        <parameter name="rgb" type="System.Collections.IList" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="makeDictionary" />
+    <method assembly_name="Myro" type_name="Myro" method_name="makePicture">
+        <parameter name="filename" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makePicture">
         <parameter name="x" type="System.Int32" default="" />
@@ -346,9 +370,6 @@
     <method assembly_name="Myro" type_name="Myro" method_name="makePicture">
         <parameter name="x" type="System.Int32" default="" />
         <parameter name="y" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="makePicture">
-        <parameter name="filename" type="System.String" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makePicture">
         <parameter name="window" type="Graphics+WindowClass" default="" />
@@ -363,7 +384,7 @@
         <parameter name="items" type="System.Object[]" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="makeWindow">
-        <parameter name="title" type="System.String" default="'Calico Graphics'" />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
     </method>
@@ -398,10 +419,10 @@
         <parameter name="s" type="System.String" default="" />
         <parameter name="length" type="System.Int32" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="penDown" />
     <method assembly_name="Myro" type_name="Myro" method_name="penDown">
         <parameter name="color" type="System.String" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="penDown" />
     <method assembly_name="Myro" type_name="Myro" method_name="penUp" />
     <method assembly_name="Myro" type_name="Myro" method_name="pickAColor" />
     <method assembly_name="Myro" type_name="Myro" method_name="pickAFile" />
@@ -457,6 +478,10 @@
     <method assembly_name="Myro" type_name="Myro" method_name="savePicture">
         <parameter name="list" type="IronPython.Runtime.List" default="" />
         <parameter name="filename" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="savePicture">
+        <parameter name="list" type="IronPython.Runtime.List" default="" />
+        <parameter name="filename" type="System.String" default="" />
         <parameter name="delay" type="System.Int16" default="" />
         <parameter name="repeat" type="System.Boolean" default="" />
     </method>
@@ -481,6 +506,18 @@
         <parameter name="pixel" type="Graphics+Pixel" default="" />
         <parameter name="value" type="System.Byte" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setAngle">
+        <parameter name="a" type="System.UInt32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setArc">
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+        <parameter name="radius" type="System.Int32" default="" />
+        <parameter name="arcType" type="System.String" default="to" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setBeginPath">
+        <parameter name="speed" type="System.Int32" default="7" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setBlue">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
         <parameter name="value" type="System.Byte" default="" />
@@ -494,9 +531,15 @@
         <parameter name="position" type="System.Int32" default="" />
         <parameter name="value" type="System.Int32" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setDictionaryItem">
+        <parameter name="dict" type="System.Collections.IDictionary" default="" />
+        <parameter name="key" type="System.Object" default="" />
+        <parameter name="value" type="System.Object" default="" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setEchoMode">
         <parameter name="value" type="System.Int32" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setEndPath" />
     <method assembly_name="Myro" type_name="Myro" method_name="setForwardness">
         <parameter name="value" type="System.Object" default="" />
     </method>
@@ -521,6 +564,11 @@
     <method assembly_name="Myro" type_name="Myro" method_name="setLEDFront">
         <parameter name="value" type="System.Object" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setMove">
+        <parameter name="x" type="System.Int32" default="" />
+        <parameter name="y" type="System.Int32" default="" />
+        <parameter name="moveType" type="System.String" default="to" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setName">
         <parameter name="name" type="System.String" default="" />
     </method>
@@ -531,17 +579,25 @@
     <method assembly_name="Myro" type_name="Myro" method_name="setPassword">
         <parameter name="password" type="System.String" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="setPixel">
-        <parameter name="picture" type="Graphics+Picture" default="" />
-        <parameter name="col" type="System.Int32" default="" />
-        <parameter name="row" type="System.Int32" default="" />
-        <parameter name="color" type="Graphics+Color" default="" />
+    <method assembly_name="Myro" type_name="Myro" method_name="setPhases">
+        <parameter name="phase1" type="System.Double" default="" />
+        <parameter name="phase2" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setPixel">
         <parameter name="picture" type="Graphics+Picture" default="" />
         <parameter name="col" type="System.Int32" default="" />
         <parameter name="row" type="System.Int32" default="" />
         <parameter name="pixel" type="Graphics+Pixel" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setPixel">
+        <parameter name="picture" type="Graphics+Picture" default="" />
+        <parameter name="col" type="System.Int32" default="" />
+        <parameter name="row" type="System.Int32" default="" />
+        <parameter name="color" type="Graphics+Color" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setPosition">
+        <parameter name="x" type="System.UInt32" default="" />
+        <parameter name="y" type="System.UInt32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setRed">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
@@ -565,6 +621,12 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setRGB">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
+        <parameter name="red" type="System.Int32" default="" />
+        <parameter name="green" type="System.Int32" default="" />
+        <parameter name="blue" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setRGB">
+        <parameter name="pixel" type="Graphics+Pixel" default="" />
         <parameter name="red" type="System.Single" default="" />
         <parameter name="green" type="System.Single" default="" />
         <parameter name="blue" type="System.Single" default="" />
@@ -579,12 +641,6 @@
         <parameter name="pixel" type="Graphics+Pixel" default="" />
         <parameter name="rgb" type="System.Collections.IList" default="" />
     </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="setRGB">
-        <parameter name="pixel" type="Graphics+Pixel" default="" />
-        <parameter name="red" type="System.Int32" default="" />
-        <parameter name="green" type="System.Int32" default="" />
-        <parameter name="blue" type="System.Int32" default="" />
-    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setRGBA">
         <parameter name="pixel" type="Graphics+Pixel" default="" />
         <parameter name="red" type="System.Byte" default="" />
@@ -592,8 +648,16 @@
         <parameter name="blue" type="System.Byte" default="" />
         <parameter name="alpha" type="System.Byte" default="" />
     </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setS2Volume">
+        <parameter name="level" type="System.Int32" default="" />
+    </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setSeed">
         <parameter name="value" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="setTurn">
+        <parameter name="angle" type="System.Int32" default="" />
+        <parameter name="turnType" type="System.String" default="to" />
+        <parameter name="radOrDeg" type="System.String" default="rad" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="setup" />
     <method assembly_name="Myro" type_name="Myro" method_name="setVoice">
@@ -610,7 +674,7 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="show">
         <parameter name="picture" type="Graphics+Picture" default="" />
-        <parameter name="title" type="System.String" default="'Myro Camera'" />
+        <parameter name="title" type="System.String" default="Myro Camera" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="song2text">
         <parameter name="song" type="IronPython.Runtime.List" default="" />
@@ -621,25 +685,25 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="speak">
         <parameter name="text" type="System.String" default="" />
-        <parameter name="async" type="System.Boolean" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="speak">
-        <parameter name="text" type="System.String" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="speak">
-        <parameter name="text" type="System.String" default="" />
         <parameter name="async" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="speak">
+        <parameter name="text" type="System.String" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="speak">
+        <parameter name="text" type="System.String" default="" />
+        <parameter name="async" type="System.Boolean" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="stop" />
     <method assembly_name="Myro" type_name="Myro" method_name="tails" />
     <method assembly_name="Myro" type_name="Myro" method_name="takePicture">
-        <parameter name="mode" type="System.String" default="'jpeg'" />
+        <parameter name="mode" type="System.String" default="jpeg" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="timer">
         <parameter name="seconds" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="to_l">
-        <parameter name="obj" type="IronRuby.Builtins.RubyArray" default="" />
+        <parameter name="obj" type="System.Collections.IList" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="to_s">
         <parameter name="obj" type="System.Object" default="" />
@@ -653,38 +717,38 @@
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="turnLeft">
         <parameter name="power" type="System.Double" default="" />
+        <parameter name="time" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="turnLeft">
         <parameter name="power" type="System.Double" default="" />
-        <parameter name="time" type="System.Double" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="turnRight">
-        <parameter name="power" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="turnRight">
         <parameter name="power" type="System.Double" default="" />
         <parameter name="time" type="System.Double" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="turnRight">
+        <parameter name="power" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="uninit" />
     <method assembly_name="Myro" type_name="Myro" method_name="Vector">
-        <parameter name="x" type="System.Double" default="" />
-        <parameter name="y" type="System.Double" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="Vector">
         <parameter name="x" type="System.Int32" default="" />
         <parameter name="y" type="System.Int32" default="" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="Vector">
+        <parameter name="x" type="System.Double" default="" />
+        <parameter name="y" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="wait">
         <parameter name="seconds" type="System.Double" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="Window">
-        <parameter name="width" type="System.Int32" default="" />
-        <parameter name="height" type="System.Int32" default="" />
-    </method>
-    <method assembly_name="Myro" type_name="Myro" method_name="Window">
-        <parameter name="title" type="System.String" default="'Calico Graphics'" />
+        <parameter name="title" type="System.String" default="Calico Graphics" />
         <parameter name="width" type="System.Int32" default="300" />
         <parameter name="height" type="System.Int32" default="300" />
+    </method>
+    <method assembly_name="Myro" type_name="Myro" method_name="Window">
+        <parameter name="width" type="System.Int32" default="" />
+        <parameter name="height" type="System.Int32" default="" />
     </method>
     <method assembly_name="Myro" type_name="Myro" method_name="yesno">
         <parameter name="question" type="System.String" default="" />
