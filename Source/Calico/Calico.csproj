@@ -6,7 +6,7 @@
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{38638E60-3AAC-4335-BD83-1221D05C1A86}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Calico</RootNamespace>
     <AssemblyName>Calico</AssemblyName>
     <ReleaseVersion>2.0.0</ReleaseVersion>
