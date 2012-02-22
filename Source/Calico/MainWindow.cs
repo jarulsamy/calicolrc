@@ -2165,18 +2165,22 @@ namespace Calico {
         double[] frequencies = new double [2];
         double[] phases = new double [2] {0.0, 0.0};
         bool audio_initialized = false;
+        bool sound_initialized = false;
         SdlDotNet.Audio.AudioStream stream = null;
         SdlDotNet.Audio.AudioCallback audioCallback = null;
         Func<int[],int,object> audio_function = null;
         int audio_index = 0;
 
+        public SdlDotNet.Audio.Sound makeSound(string filename) {
+            SdlDotNet.Audio.Mixer.Open();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound;
+        }
+
         public void play(string filename) {
-            // This stream is different
-            if (! audio_initialized) {
-                initialize_audio();
-            }
-            // mixer.openstream()
-            // pause(0)
+            SdlDotNet.Audio.Mixer.Open();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            sound.Play();
         }
 
         public void setPhases(double phase1, double phase2) {
@@ -2205,15 +2209,28 @@ namespace Calico {
             audio_initialized = true;
             audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
             stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
-						   SdlDotNet.Audio.AudioFormat.Unsigned8,
-						   SdlDotNet.Audio.SoundChannel.Mono,
-						   samples,
-						   audioCallback,
-						   null);
+                        SdlDotNet.Audio.AudioFormat.Unsigned8,
+                        SdlDotNet.Audio.SoundChannel.Mono,
+                        samples,
+                        audioCallback,
+                        null);
             Invoke(delegate {
                 // BUG: OpenAudio (or lower) apparently requires a *visible* screen
                 SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
+                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
                 SdlDotNet.Audio.Mixer.OpenAudio(stream);
+                ev.Set();
+            });
+            ev.WaitOne();
+        }
+
+        public void initialize_sound() {
+            ManualResetEvent ev = new ManualResetEvent(false);
+            sound_initialized = true;
+            Invoke(delegate {
+                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+                SdlDotNet.Graphics.Video.SetVideoMode(300, 1);
+                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
                 ev.Set();
             });
             ev.WaitOne();
