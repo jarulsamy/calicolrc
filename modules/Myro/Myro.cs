@@ -72,6 +72,7 @@ public static class Myro
 	static PythonDictionary voices = new PythonDictionary ();
 	public readonly static PythonDictionary frequencies = new PythonDictionary ();
 	public readonly static Gamepads gamepads = new Gamepads ();
+	public readonly static Robot computer = new Robot();
 
 	public static void set_gui_thread_id (int gui_thread_id)
 	{
