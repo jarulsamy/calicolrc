@@ -37,6 +37,7 @@ namespace Calico {
         public Gtk.Button close_button;
         // tab close button
         bool _isDirty = false;
+        double _speedValue = 100;
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
@@ -328,6 +329,11 @@ namespace Calico {
         public virtual bool CanSaveAsPython() {
             return false;
         }
+
+        public virtual double SpeedValue {
+            get { return _speedValue; }
+            set { _speedValue = value; }
+        }
     }
 
     public class TextDocument : Document {
@@ -355,6 +361,7 @@ namespace Calico {
             texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
             texteditor.ButtonPressEvent += OnPopupMenu;
             widget.ShowAll();
+            calico.ProgramSpeed.Value = SpeedValue;
         }
 
         Gdk.Point menuPopupLocation;

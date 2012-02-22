@@ -69,19 +69,18 @@ public class CalicoJigsawDocument : Document
 	base(calico, filename, "jigsaw")
 	{
 		cvs = new Jigsaw.Canvas (
-			System.IO.Path.Combine (calico.path, "../modules"), 100, 100, 3000, 2000);
+	               System.IO.Path.Combine (calico.path, "../modules"), 100, 100, 3000, 2000);
 		widget.AddWithViewport (cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
-		calico.ProgramSpeed.ChangeValue += ChangeTimeOut;
 		cvs.JigsawStop += new EventHandler(OnJigsawStop);
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
-		calico.ProgramSpeed.Value = cvs.TimeOut;
 		widget.ShowAll ();
+        calico.ProgramSpeed.Value = cvs.TimeOut;
 	}
 	
     public override bool IsDirty {
@@ -116,12 +115,14 @@ public class CalicoJigsawDocument : Document
 		calico.OnStopRunning();		
 	}
 	
-	public void ChangeTimeOut(object sender, EventArgs args) {
-		Gtk.HScale s = (Gtk.HScale)sender;
-		// convert from Calico units to Jigsaw units
-		cvs.TimeOut = s.Value;
-		if (s.Value <= 0.0)
-			cvs.Pause();
+	public override double SpeedValue {
+		get {return cvs.TimeOut;}
+		set {
+			// convert from Calico units to Jigsaw units
+			cvs.TimeOut = value;
+			if (value <= 0.0)
+				cvs.Pause();
+		}
 	}
 	
 	public override void ExecuteFileInBackground ()

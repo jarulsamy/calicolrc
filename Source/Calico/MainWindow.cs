@@ -1386,6 +1386,8 @@ namespace Calico {
             if (CurrentDocument != null) {
                 // Set save as python menu:
                 saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+                ProgramSpeed.Sensitive = true;
+                ProgramSpeed.Value = CurrentDocument.SpeedValue;
                 // Set options menu:
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
                 CurrentDocument.SetOptionsMenu(options_menu);
@@ -1403,6 +1405,7 @@ namespace Calico {
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
             } else if (DocumentNotebook.Page == HOME) {
+                ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     StartButton.Sensitive = false;
@@ -1410,6 +1413,7 @@ namespace Calico {
                 }
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
             } else if (DocumentNotebook.Page == SHELL) {
+                ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     if (Shell.Document.Text != "") {
@@ -1428,6 +1432,7 @@ namespace Calico {
                 });
                 Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
+                ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
                     StartButton.Sensitive = false;
@@ -1443,6 +1448,7 @@ namespace Calico {
             // Shell
         }
 
+        /*
         public virtual void trace_on() {
 	        // FIXME: doesn't work; appears to need to be set before starting
     	    ProgramSpeed.Value = 50;
@@ -1450,6 +1456,7 @@ namespace Calico {
             manager[CurrentLanguage].engine.SetTraceOn(this);
             manager[CurrentLanguage].engine.ConfigureTrace();
 	    }
+        */
 
         public virtual void trace_off() {
             manager[CurrentLanguage].engine.SetTraceOff();
@@ -2062,12 +2069,15 @@ namespace Calico {
 
         protected void OnDebugSpeedChangeValue (object o, Gtk.ChangeValueArgs args)
         {
-	  if (ProgramRunning) {
-	    if (((Gtk.Scale)o).Value == 0) {
-	      PlayButton.Sensitive = true;
-	      playResetEvent.Reset();
-	    }
-	  }
+            if (CurrentDocument != null) {
+              CurrentDocument.SpeedValue = ((Gtk.Scale)o).Value;
+        	  if (ProgramRunning) {
+        	    if (((Gtk.Scale)o).Value == 0) {
+        	      PlayButton.Sensitive = true;
+        	      playResetEvent.Reset();
+        	    }
+        	  }
+            }
         }
 
         protected void OnLocalsTabActionActivated (object sender, System.EventArgs e)

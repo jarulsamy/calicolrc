@@ -89,7 +89,7 @@
         <edge id="15" name="In" linkedTo="14" />
         <edge id="16" name="Out" linkedTo="18" />
         <edge id="17" name="Loop" linkedTo="19" />
-        <property name="Label" value="for each pixel in pixels" />
+        <property name="Label" value="for each X in pixels" />
         <property name="Message" value="" />
         <property name="Sequence" value="pixels" />
         <property name="Variable" value="pixel" />
@@ -253,7 +253,7 @@
         <edge id="48" name="Out" linkedTo="49" />
         <property name="Label" value="X = (lambda a: 42)(1)" />
         <property name="Message" value="" />
-        <property name="Statement" value="X = (lambda a: 42)(1)" />
+        <property name="Statement" value="" />
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>

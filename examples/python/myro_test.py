@@ -1,5 +1,5 @@
 from Myro import *
-init()
+init("COM5")
 pic = takePicture()
 show(pic)
 backward(1, 1)

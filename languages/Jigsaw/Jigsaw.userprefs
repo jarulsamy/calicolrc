@@ -1,18 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CalicoJigsaw.cs">
     <Files>
-      <File FileName="CalicoJigsaw.cs" Line="243" Column="15" />
       <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
-      <File FileName="CalicoJigsaw.cs" Line="218" Column="32" />
+      <File FileName="CalicoJigsaw.cs" Line="72" Column="46" />
+      <File FileName="..\..\modules\Myro\Myro.cs" Line="4582" Column="1" />
       <File FileName="Jigsaw\Diagram.cs" Line="201" Column="29" />
       <File FileName="Jigsaw\MainWindow.cs" Line="353" Column="3" />
       <File FileName="Jigsaw\Jigsaw.cs" Line="1600" Column="1" />
+      <File FileName="make.bat" Line="2" Column="33" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
+            <Node name="References" expanded="True" />
             <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
