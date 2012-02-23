@@ -210,7 +210,7 @@ public class Math {
         return System.Math.Truncate(d);
     }
 
-    double Erf(double x) {
+    public double Erf(double x) {
       // constants
       double a1 =  0.254829592;
       double a2 = -0.284496736;
@@ -232,15 +232,15 @@ public class Math {
       return sign*y;
     }
 
-    double Asinh(double x) {
+    public double Asinh(double x) {
       return Log(x + Sqrt(Pow(x, 2) + 1));
     }
 
-    double Acosh(double x) {
+    public double Acosh(double x) {
       return Log(x + Sqrt(Pow(x, 2) - 1));
     }
 
-    double Atanh(double x) {
+    public double Atanh(double x) {
       return (Log(1 + x) - Log(1 - x))/2;
     }
 }
