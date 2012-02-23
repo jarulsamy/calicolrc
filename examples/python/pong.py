@@ -41,13 +41,14 @@ text.draw(win)
 
 def main():
     while True:
-        if getKeyPressed() == "q":
+        key = getKeyPressed()
+        if key == "q":
             left.move(0, -5)
-        elif getKeyPressed() == "a":
+        elif key == "a":
             left.move(0, 5)
-        if getKeyPressed() == "p":
+        if key == "p":
             right.move(0, -5)
-        elif getKeyPressed() == "l":
+        elif key == "l":
             right.move(0, 5)
         win.step(.01)
 
