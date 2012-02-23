@@ -2172,13 +2172,15 @@ namespace Calico {
         int audio_index = 0;
 
         public SdlDotNet.Audio.Sound makeSound(string filename) {
-            SdlDotNet.Audio.Mixer.Open();
+            if (! sound_initialized)
+                initialize_sound();
             SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
             return sound;
         }
 
         public void play(string filename) {
-            SdlDotNet.Audio.Mixer.Open();
+            if (! sound_initialized)
+                initialize_sound();
             SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
             sound.Play();
         }
@@ -2216,7 +2218,7 @@ namespace Calico {
                         null);
             Invoke(delegate {
                 // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-                SdlDotNet.Graphics.Video.SetVideoMode(100, 20);
+                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
                 SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
                 SdlDotNet.Audio.Mixer.OpenAudio(stream);
                 ev.Set();
@@ -2229,8 +2231,9 @@ namespace Calico {
             sound_initialized = true;
             Invoke(delegate {
                 // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-                SdlDotNet.Graphics.Video.SetVideoMode(300, 1);
+                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
                 SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+                SdlDotNet.Audio.Mixer.Open();
                 ev.Set();
             });
             ev.WaitOne();

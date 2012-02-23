@@ -1106,6 +1106,11 @@ public static class Myro
 		calico.play (filename);
 	}
 
+	public static object makeSound (string filename)
+	{
+		return calico.makeSound(filename);
+	}
+
 	public static void setPhases (double phase1, double phase2)
 	{
 		calico.setPhases(phase1, phase2);

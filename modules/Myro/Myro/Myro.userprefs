@@ -1,14 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../Myro.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Users\dblank\Desktop\Calico\modules\Myro\Myro.cs">
     <Files>
-      <File FileName="../Myro.cs" Line="479" Column="21" />
+      <File FileName="c:\Users\dblank\Desktop\Calico\modules\Myro\Myro.cs" Line="286" Column="20" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Myro" expanded="True">
-            <Node name="Myro.cs" selected="True" />
+            <Node name="References" expanded="True" selected="True" />
           </Node>
         </State>
       </Pad>
