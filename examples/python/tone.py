@@ -98,13 +98,13 @@ def plotMoreSound(function, color, width=500):
 
 #Myro.play(0, wave)
 
-#tone440 = makeTone(440)
-#tone441 = makeTone(441)
-#tone = make2Tone(440, 441)
+tone440 = makeTone(440)
+tone441 = makeTone(441)
+tone = make2Tone(440, 441)
 
-#plotSound(tone)
-#plotMoreSound(tone440, "red")
-#plotMoreSound(tone441, "blue")
+plotSound(tone)
+plotMoreSound(tone440, "red")
+plotMoreSound(tone441, "blue")
 
-#Myro.play(2, tone)
+Myro.play(2, tone)
 
