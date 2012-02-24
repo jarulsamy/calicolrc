@@ -2208,7 +2208,6 @@ namespace Calico {
 
         public void initialize_audio() {
             ManualResetEvent ev = new ManualResetEvent(false);
-            audio_initialized = true;
             audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
             stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
                         SdlDotNet.Audio.AudioFormat.Unsigned8,
@@ -2224,11 +2223,11 @@ namespace Calico {
                 ev.Set();
             });
             ev.WaitOne();
+            audio_initialized = true;
         }
 
         public void initialize_sound() {
             ManualResetEvent ev = new ManualResetEvent(false);
-            sound_initialized = true;
             Invoke(delegate {
                 // BUG: OpenAudio (or lower) apparently requires a *visible* screen
                 SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
@@ -2237,6 +2236,7 @@ namespace Calico {
                 ev.Set();
             });
             ev.WaitOne();
+            sound_initialized = true;
         }
 
         public void beep(double duration, double frequency1, double frequency2) {
