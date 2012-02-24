@@ -519,20 +519,8 @@ public static class Graphics
 	}
   
 	public static Picture makePicture (WindowClass window)
-	{ //, string filename) {
-		ManualResetEvent ev = new ManualResetEvent (false);
-		Gdk.Pixbuf pixbuf = null;
-		Invoke (delegate {
-			Gdk.Drawable drawable = window.getDrawable ();
-			Gdk.Colormap colormap = drawable.Colormap;
-			int _width = 0;
-			int _height = 0;
-			drawable.GetSize (out _width, out _height);
-			pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
-			ev.Set ();
-		});
-		ev.WaitOne ();
-		return new Picture (pixbuf);
+	{ 
+		return new Picture (window);
 	}
 
 	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
@@ -3297,6 +3285,31 @@ public static class Graphics
                  new Point (_pixbuf.Width, 0),
                  new Point (_pixbuf.Width, _pixbuf.Height), 
                  new Point (0, _pixbuf.Height));
+		}
+		
+		public Picture (WindowClass window) : this(true)
+		{ 
+			ManualResetEvent ev = new ManualResetEvent (false);
+			Gdk.Pixbuf pixbuf = null;
+			Invoke (delegate {
+				Gdk.Drawable drawable = window.getDrawable ();
+				Gdk.Colormap colormap = drawable.Colormap;
+				int _width = 0;
+				int _height = 0;
+				drawable.GetSize (out _width, out _height);
+				pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
+				ev.Set ();
+			});
+			ev.WaitOne ();
+			// Now, do what Picture(pixbuf) does:
+			_pixbuf = pixbuf;
+			if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			}
+			set_points (new Point (0, 0), 
+                 new Point (_pixbuf.Width, 0),
+                 new Point (_pixbuf.Width, _pixbuf.Height), 
+                 new Point (0, _pixbuf.Height));			
 		}
 
 		public Picture (bool has_pen) : base(has_pen)
