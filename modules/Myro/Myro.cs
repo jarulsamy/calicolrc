@@ -1511,8 +1511,7 @@ public static class Myro
 		return Graphics.makeWindow (title, width, height);
 	}
 
-	public static Graphics.WindowClass Window (int width,
-                                            int height)
+	public static Graphics.WindowClass Window (int width, int height)
 	{
 		return makeWindow ("Calico Graphics", width, height);
 	}

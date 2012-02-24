@@ -1149,6 +1149,7 @@ public static class Graphics
 		public double simulationStepTime = 0.01;
 		public string state = "init";
 		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
+		Gtk.ScrolledWindow _scrolledWindow = null;
 
 		public WindowClass (string title="Calico Graphics",
                   int width=300, 
@@ -1172,10 +1173,27 @@ public static class Graphics
 			KeyReleaseEvent += HandleKeyReleaseCallbacks;
 			//ConfigureEvent += configureEventBefore;
 			DeleteEvent += OnDelete;
-			Add (_canvas);
+			Add(_canvas);
 			ShowAll ();
 		}
-
+		
+		public void addScrollbars(int width, int height) {
+			if (Child == _canvas) {
+				Invoke( delegate {
+					Remove(_canvas);
+					_scrolledWindow = new Gtk.ScrolledWindow();
+					Add(_scrolledWindow);
+					_scrolledWindow.Add (_canvas);
+					_canvas.resize(width, height);
+					_scrolledWindow.Show();
+				});
+			} else {
+				Invoke( delegate {
+					_canvas.resize(width, height);
+				});
+			}
+		}
+		
 		public void clear ()
 		{
 			clear (true);
@@ -1214,6 +1232,10 @@ public static class Graphics
 			});
 			if (redraw)
 				QueueDraw ();
+		}
+		
+		public Gtk.ScrolledWindow ScrolledWindow {
+			get { return _scrolledWindow; }
 		}
 
 		public Microsoft.Xna.Framework.Vector2 gravity {
@@ -1859,20 +1881,29 @@ public static class Graphics
 		public FarseerPhysics.Dynamics.World world;
 		public object document;
 		private int width = 800, height = 600 ;
-		public Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-		// FIXME: w,h of Window?
-							       (int)800, 
-							       (int)600);
+		public Cairo.ImageSurface surface = null;
 		public Cairo.ImageSurface finalsurface;
 		public bool need_to_draw_surface = false;
     
+		public Canvas (string mode, int width, int height) : base(null, null)
+		{
+			this.mode = mode;
+			resize (width, height);
+		}
+    
+		public Canvas (string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v)
+		{
+			this.mode = mode;
+			resize (width, height);
+		}
+        
 		public string mode {
 			get {
 				return _mode;
 			}
 			set {
 				if (value == "manual" || value == "auto" || value == "physics" || 
-	    value == "bitmap" || value == "bitmapmanual") {
+	    			value == "bitmap" || value == "bitmapmanual") {
 					_mode = value;
 	  
 					if (value == "physics")
@@ -1908,24 +1939,10 @@ public static class Graphics
 		{
 			this.width = width;
 			this.height = height;
+			SetSize((uint)width, (uint)height);
 			resetSurfaces ();
 		}
 
-		public Canvas (string mode, int width, int height) : base(null, null)
-		{
-			this.mode = mode;
-			resize (width, height);
-		}
-    
-		public Canvas (string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v)
-		{
-			surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-				       width,
-				       height);	  
-			this.mode = mode;
-			resize (width, height);
-		}
-        
 		protected override bool OnExposeEvent (Gdk.EventExpose args)
 		{
 			using (Cairo.Context g = Gdk.CairoHelper.Create(args.Window)) {
