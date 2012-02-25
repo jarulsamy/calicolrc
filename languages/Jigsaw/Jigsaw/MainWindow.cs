@@ -711,19 +711,19 @@ public class MainWindow : Gtk.Window
 		if (src.Length == 0) return;
 		bool found = js.SearchMore(src);
 
-		if (!found) {
-			// Inform user of unfortunate outcome
-			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-				this,
-				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-				Gtk.MessageType.Info,
-				Gtk.ButtonsType.Ok,
-				String.Format ("Nothing more found matching {0}", src));
-			dlg2.Title = "Nothing found";
-			
-			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-			dlg2.Destroy();
-		}
+//		if (!found) {
+//			// Inform user of unfortunate outcome
+//			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+//				this,
+//				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+//				Gtk.MessageType.Info,
+//				Gtk.ButtonsType.Ok,
+//				String.Format ("Nothing more found matching {0}", src));
+//			dlg2.Title = "Nothing found";
+//			
+//			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+//			dlg2.Destroy();
+//		}
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -733,19 +733,19 @@ public class MainWindow : Gtk.Window
 		if (src.Length == 0) return;
 		bool found = js.SearchNext(src);
 		
-		if (!found) {
-			// Inform user of unfortunate outcome
-			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-				this,
-				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-				Gtk.MessageType.Info,
-				Gtk.ButtonsType.Ok,
-				String.Format ("Nothing more found matching {0}", src));
-			dlg2.Title = "Nothing found";
-			
-			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-			dlg2.Destroy();
-		}
+//		if (!found) {
+//			// Inform user of unfortunate outcome
+//			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+//				this,
+//				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+//				Gtk.MessageType.Info,
+//				Gtk.ButtonsType.Ok,
+//				String.Format ("Nothing more found matching {0}", src));
+//			dlg2.Title = "Nothing found";
+//			
+//			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+//			dlg2.Destroy();
+//		}
 	}
 		
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -755,19 +755,19 @@ public class MainWindow : Gtk.Window
 		if (src.Length == 0) return;
 		bool found = js.SearchPrevious(src);
 		
-		if (!found) {
-			// Inform user of unfortunate outcome
-			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-				this,
-				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-				Gtk.MessageType.Info,
-				Gtk.ButtonsType.Ok,
-				String.Format ("Nothing more found matching {0}", src));
-			dlg2.Title = "Nothing found";
-			
-			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-			dlg2.Destroy();
-		}
+//		if (!found) {
+//			// Inform user of unfortunate outcome
+//			Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+//				this,
+//				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+//				Gtk.MessageType.Info,
+//				Gtk.ButtonsType.Ok,
+//				String.Format ("Nothing more found matching {0}", src));
+//			dlg2.Title = "Nothing found";
+//			
+//			Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+//			dlg2.Destroy();
+//		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

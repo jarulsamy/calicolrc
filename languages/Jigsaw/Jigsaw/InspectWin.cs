@@ -475,7 +475,8 @@ namespace Jigsaw
 		{
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Statements);
 			_Compiled = _Source.Compile();
-			Text = _Source.GetCode();
+			string code = _Source.GetCode();
+			if (code.Length > 0) Text = code;
 		}
 		
 		// - - - Replaces statement with given string and compile - - - - - - -
@@ -483,7 +484,8 @@ namespace Jigsaw
 		{
 			_Source = engine.CreateScriptSourceFromString(statement, Microsoft.Scripting.SourceCodeKind.Statements);
 			_Compiled = _Source.Compile();
-			Text = _Source.GetCode();
+			string code = _Source.GetCode();
+			if (code.Length > 0) Text = code;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -505,7 +507,7 @@ namespace Jigsaw
 			if (_Source != null)
 				w.WriteAttributeString("value", _Source.GetCode());
 			else
-				w.WriteAttributeString("value", "");
+				w.WriteAttributeString("value", Text);
 			w.WriteEndElement();
 		}
 	}

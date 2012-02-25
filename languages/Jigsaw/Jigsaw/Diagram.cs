@@ -711,6 +711,10 @@ namespace Diagram
 				this.DoTranslate(0.0, 20.0);
 			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
 				this.DoTranslate(0.0, -20.0);
+			} else if (scl.Direction == Gdk.ScrollDirection.Left) {
+				this.DoTranslate(-20.0, 0.0);
+			} else if (scl.Direction == Gdk.ScrollDirection.Right) {
+				this.DoTranslate(20.0, 0.0);
 			}
 		}
 		
