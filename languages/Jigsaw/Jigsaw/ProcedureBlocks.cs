@@ -24,7 +24,7 @@ namespace Jigsaw
         public CProcedureStart(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 60) }),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 60) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -300,7 +300,7 @@ namespace Jigsaw
         public CProcedureCall(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)	}),
 				palette ) 
 		{
 			this.LineWidth = 2;
@@ -527,7 +527,7 @@ namespace Jigsaw
         public CProcedureReturn(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 20)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 				palette) 
 		{
 			this.LineWidth = 2;

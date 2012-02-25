@@ -16,7 +16,7 @@ namespace Jigsaw
         public CAssignment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)	}),
 				palette ) 
 		{
 			this.LineWidth = 2;
@@ -150,7 +150,7 @@ namespace Jigsaw
         public CRandom(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)	}),
 				palette ) 
 		{
 			this.LineWidth = 2;
@@ -305,7 +305,7 @@ namespace Jigsaw
         public CStatement(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)	}),
 				palette ) 
 		{
 			this.LineWidth = 2;
@@ -421,7 +421,7 @@ namespace Jigsaw
         public CInlineComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)	}),
 				palette )
 		{
 			this.LineWidth = 2;
@@ -475,7 +475,7 @@ namespace Jigsaw
         public CComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 40)	}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 40)	}),
 				palette )
 		{
 			this.LineWidth = 2;
@@ -485,7 +485,7 @@ namespace Jigsaw
 			
 			// Properties
 			CStringProperty comment = new CStringProperty("Comment", "Comment");
-			CIntegerProperty width = new CIntegerProperty("Width", 175);
+			CIntegerProperty width = new CIntegerProperty("Width", CBlock.BlockWidth);
 			CIntegerProperty height = new CIntegerProperty("Height", 40);
 			width.Visible = false;
 			height.Visible = false;

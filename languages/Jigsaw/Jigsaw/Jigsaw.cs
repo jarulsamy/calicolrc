@@ -125,7 +125,7 @@ namespace Jigsaw
 			
 			// Add block panel background to canvas
 			//Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
-			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
+			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
 			this.AddShape(pnlBlock);
 			
 			// Build tabbed panel for blocks
@@ -1411,7 +1411,7 @@ namespace Jigsaw
 			this.CurrentPath = null;
 			
 			// Created default starting blocks
-			CControlStart b1 = new CControlStart(350, 36);
+			CControlStart b1 = new CControlStart(125 + CBlock.BlockWidth + 20, 36);
 			this.AddShape(b1);
 			//CControlEnd   b2 = new CControlEnd(410, 150);;
 			//this.AddShape(b2);
@@ -1975,6 +1975,7 @@ namespace Jigsaw
 		protected Dictionary<String, CProperty> _properties;
 		
 		private Widgets.CBlockPalette _palette = null;	// Reference to block palette, if a factory
+		public static int BlockWidth = 275;                    // default block size
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CBlock(List<Diagram.CPoint> pts, Widgets.CBlockPalette palette = null) : base(pts)

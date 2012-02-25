@@ -17,7 +17,7 @@ namespace Jigsaw
         public CControlStart(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 60) }),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 60) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -218,7 +218,7 @@ namespace Jigsaw
         public CControlEnd(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 20)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -323,7 +323,7 @@ namespace Jigsaw
         public CControlRepeat(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50) }),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 50) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -609,7 +609,7 @@ namespace Jigsaw
         public CControlIf(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 50)}),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -888,7 +888,7 @@ namespace Jigsaw
         public CControlIfElse(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 80)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 80)}),
 				palette)
 		{
 			this.LineWidth = 2;
@@ -1320,7 +1320,7 @@ namespace Jigsaw
         public CControlWhile(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50) }),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 50) }),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -1607,7 +1607,7 @@ namespace Jigsaw
         public CControlBreak(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 20)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 				palette) 
 		{
 			this.LineWidth = 2;
@@ -1719,7 +1719,7 @@ namespace Jigsaw
         public CControlForeach(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] {
 				new Diagram.CPoint(X, Y), 
-				new Diagram.CPoint(X + 175, Y + 50) }),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 50) }),
 				palette) 
 		{
 			this.LineWidth = 2;

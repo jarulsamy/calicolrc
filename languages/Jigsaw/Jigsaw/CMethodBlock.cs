@@ -24,7 +24,7 @@ namespace Jigsaw
         public CMethodBlock(Double X, Double Y, Widgets.CBlockPalette palette = null) 
 			: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 				new Diagram.CPoint(X, Y),
-				new Diagram.CPoint(X + 175, Y + 20)}),
+				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 				palette)
 		{
 			assembly_name = "";
@@ -47,7 +47,7 @@ namespace Jigsaw
 				    Widgets.CBlockPalette palette = null) 
 				: base(new List<Diagram.CPoint>(new Diagram.CPoint[] { 
 					new Diagram.CPoint(X, Y),
-					new Diagram.CPoint(X + 175, Y + 20)}),
+					new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 					palette )
 		{
 			setValues(assembly_name, type_name, method_name, names, types, defaults, return_type);

@@ -11,8 +11,8 @@ def wave(array, position):
     """
     # Fill the array with bytes (unsigned 8-bit values)
     for i in range(len(array)):
-        angle1 = position * gslice * gfreq
-        array[i] = (127 + math.cos(angle1) * 127)
+        angle = position * gslice * gfreq
+        array[i] = (127 + math.cos(angle) * 127)
         position += 1
 
 def makeTone(freq1):
