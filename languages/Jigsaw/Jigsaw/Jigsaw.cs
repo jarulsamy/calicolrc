@@ -956,6 +956,7 @@ namespace Jigsaw
 		void OnEngineStep(object sender, EventArgs e)
 		{	
 			if (_updateDisplay) this.Invalidate();
+			while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
 			
 			// Update the locals display
 			//_inspector.DisplayLocals(_engine);
