@@ -47,8 +47,8 @@ public class CalicoFSharpEngine : Engine
 	   startInfo.Arguments = (
 		   //		   "\"" + fsi + "\" " +
 		   "--readline- " + 
-		   "--lib:\"" + path + "\..\..\modules\" " +
-		   "--lib:\"" + path + "\..\..\bin " +
+		   "--lib:\"" + path + "\\..\\..\\modules\" " +
+		   "--lib:\"" + path + "\\..\\..\\bin " +
 		   "--lib:\"" + gtk + "\" " +
 		   "--lib:\"" + gdk + "\" " +
 		   "--lib:\"" + glib + "\" " +
@@ -124,7 +124,16 @@ public class CalicoFSharpEngine : Engine
 	 }
 	 
 	 public override bool ReadyToExecute(string text) {
-	   return false;
+	   string [] lines = text.Split('\n');
+	   int last = lines.Length - 1;
+	   if (lines[last].Trim() == "") {
+		 return true;
+	   } else if (lines[last].StartsWith(" ")) {
+		 return false;
+	   } else if (! lines[last].Trim().EndsWith(";;")) {
+		 return false;
+	   }
+	   return true;
 	 }
 }
 
