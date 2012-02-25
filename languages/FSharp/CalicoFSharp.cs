@@ -167,6 +167,6 @@ public class CalicoFSharpLanguage : Language
 	  
   public override string GetUseLibraryString(string fullname) {
 	string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
-	return String.Format("#using \"{0}\"\n", bname);
+	return String.Format("open {0}\n", bname);
   }
 }
