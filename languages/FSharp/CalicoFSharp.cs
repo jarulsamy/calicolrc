@@ -47,8 +47,8 @@ public class CalicoFSharpEngine : Engine
 	   startInfo.Arguments = (
 		   //		   "\"" + fsi + "\" " +
 		   "--readline- " + 
-		   "--lib:\"" + path + "../modules\" " +
-		   "--lib:\"" + path + ". " +
+		   "--lib:\"" + path + "\..\..\modules\" " +
+		   "--lib:\"" + path + "\..\..\bin " +
 		   "--lib:\"" + gtk + "\" " +
 		   "--lib:\"" + gdk + "\" " +
 		   "--lib:\"" + glib + "\" " +
