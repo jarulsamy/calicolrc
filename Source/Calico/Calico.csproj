@@ -77,12 +77,6 @@
       <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SdlDotNet">
-      <HintPath>..\..\modules\SdlDotNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Tao.Sdl">
-      <HintPath>..\..\modules\Tao.Sdl.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />

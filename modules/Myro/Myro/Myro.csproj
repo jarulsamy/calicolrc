@@ -88,10 +88,6 @@
       <HintPath>..\..\SdlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Calico">
-      <HintPath>..\..\..\bin\Calico.exe</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.Dynamic">
       <HintPath>..\..\..\bin\Microsoft.Dynamic.dll</HintPath>
     </Reference>

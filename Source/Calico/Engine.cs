@@ -166,7 +166,7 @@ namespace Calico {
 				  try {
 					method = type.GetMethod("initialize_module");
                     if (method != null)
-					    method.Invoke(type, new object [] {calico});
+					    method.Invoke(type, new object [] {calico.path, calico.OS});
 				  } catch {
 				  }
 				  try {

@@ -66,14 +66,281 @@ public static class Myro
 	static string REVISION = "$Revision: $";
 	static string startup_path = null;
 	static string os_name = null;
-	static Calico.MainWindow calico = null;
 	static string speech_name = "default";
 	static bool warn_missing_speak = true;
 	static PythonDictionary voices = new PythonDictionary ();
 	public readonly static PythonDictionary frequencies = new PythonDictionary ();
 	public readonly static Gamepads gamepads = new Gamepads ();
-	public readonly static Robot computer = new Robot();
+	public readonly static Computer computer = new Computer();
 
+	public static void initialize_module (string path, string os)
+	{
+		Myro.startup_path = path;
+		Myro.os_name = os;
+		voices ["af"] = "Afrikaans Male";
+		voices ["af+f1"] = "Afrikaans Female";
+		voices ["bs"] = "Bosnian Male";
+		voices ["bs+f1"] = "Bosnian Female";
+		voices ["ca"] = "Catalan Male";
+		voices ["ca+f1"] = "Catalan Female";
+		voices ["cs"] = "Czech Male";
+		voices ["cs+f1"] = "Czech Female";
+		voices ["cy"] = "Welsh Male";
+		voices ["cy+f1"] = "Welsh Female";
+		voices ["da"] = "Danish Male";
+		voices ["da+f1"] = "Danish Female";
+		voices ["de"] = "German Male";
+		voices ["de+f1"] = "German Female";
+		voices ["el"] = "Greek Male";
+		voices ["el+f1"] = "Greek Female";
+		voices ["en"] = "Default Male";
+		voices ["en+f1"] = "Default Female";
+		voices ["en-sc"] = "English-Scottish Male";
+		voices ["en-sc+f1"] = "English-Scottish Female";
+		voices ["en-uk"] = "Englsih-British Male";
+		voices ["en-uk+f1"] = "English-British Female";
+		voices ["en-uk-north"] = "English-British-Lancashire Male";
+		voices ["en-uk-north+f1"] = "English-British-Lancashire Female";
+		voices ["en-uk-rp"] = "English-British-RP Male";
+		voices ["en-uk-rp+f1"] = "English-British-RP Female";
+		voices ["en-uk-wmids"] = "English-British-WMIDS Male";
+		voices ["en-uk-wmids+f1"] = "English-British-WMIDS Female";
+		voices ["en-us"] = "English-US Male";
+		voices ["en-us+f1"] = "English-US Female";
+		voices ["en-wi"] = "English-West-Indies Male";
+		voices ["en-wi+f1"] = "English-West-Indies Female";
+		voices ["eo"] = "Esperanto Male";
+		voices ["eo+f1"] = "Esperanto Female";
+		voices ["es"] = "Spanish Male";
+		voices ["es+f1"] = "Spanish Female";
+		voices ["es-la"] = "Spanish-Latin-American Male";
+		voices ["es-la+f1"] = "Spanish-Latin-American Female";
+		voices ["fi"] = "Finnish Male";
+		voices ["fi+f1"] = "Finnish Female";
+		voices ["fr"] = "French Male";
+		voices ["fr+f1"] = "French Female";
+		voices ["fr-be"] = "French-Belgium Male";
+		voices ["fr-be+f1"] = "French-Belgium Female";
+		voices ["grc"] = "Greek-Ancient Male";
+		voices ["grc+f1"] = "Greek-Ancient Female";
+		voices ["hi"] = "Hindi Male";
+		voices ["hi+f1"] = "Hindi Female";
+		voices ["hr"] = "Croatian Male";
+		voices ["hr+f1"] = "Croatian Female";
+		voices ["hu"] = "Hungarian Male";
+		voices ["hu+f1"] = "Hungarian Female";
+		voices ["hy"] = "Armenian Male";
+		voices ["hy+f1"] = "Armenian Female";
+		voices ["hy-west"] = "Armenian-West Male";
+		voices ["hy-west+f1"] = "Armenian-West Female";
+		voices ["id"] = "Indonesian Male";
+		voices ["id+f1"] = "Indonesian Female";
+		voices ["is"] = "Icelandic Male";
+		voices ["is+f1"] = "Icelandic Female";
+		voices ["it"] = "Italian Male";
+		voices ["it+f1"] = "Italian Female";
+		voices ["jbo"] = "Lojban Male";
+		voices ["jbo+f1"] = "Lojban Female";
+		voices ["ku"] = "Kurdish Male";
+		voices ["ku+f1"] = "Kurdish Female";
+		voices ["la"] = "Latin Male";
+		voices ["la+f1"] = "Latin Female";
+		voices ["lv"] = "Latvian Male";
+		voices ["lv+f1"] = "Latvian Female";
+		voices ["mk"] = "Macedonian Male";
+		voices ["mk+f1"] = "Macedonian Female";
+		voices ["nci"] = "Nahautl-Classical Male";
+		voices ["nci+f1"] = "Nahautl-ClassicalFemale";
+		voices ["nl"] = "Dutch Male";
+		voices ["nl+f1"] = "Dutch Female";
+		voices ["no"] = "Norwegian Male";
+		voices ["no+f1"] = "Norweigian Female";
+		voices ["pap"] = "Papiamento Male";
+		voices ["pap+f1"] = "Papiamento Female";
+		voices ["pl"] = "Polish Male";
+		voices ["pl+f1"] = "Polish Female";
+		voices ["pt"] = "Brazil Male";
+		voices ["pt+f1"] = "Brazil Female";
+		voices ["pt-pt"] = "Portugal Male";
+		voices ["pt-pt+f1"] = "Portugal Female";
+		voices ["ro"] = "Romanian Male";
+		voices ["ro+f1"] = "Romanian Female";
+		voices ["ru"] = "Russian Male";
+		voices ["ru+f1"] = "Russian Female";
+		voices ["sk"] = "Slovak Male";
+		voices ["sk+f1"] = "Slovak Female";
+		voices ["sq"] = "Albanian Male";
+		voices ["sq+f1"] = "Albanian Female";
+		voices ["sr"] = "Serbian Male";
+		voices ["sr+f1"] = "Serbian Female";
+		voices ["sv"] = "Swedish Male";
+		voices ["sv+f1"] = "Swahili Female";
+		voices ["sw"] = "Swahili Male";
+		voices ["sw+f1"] = "Swahili Female";
+		voices ["ta"] = "Tamil Male";
+		voices ["ta+f1"] = "Tamil Female";
+		voices ["tr"] = "Turkish Male";
+		voices ["tr+f1"] = "Turkish Female";
+		voices ["vi"] = "Vietnam Male";
+		voices ["vi+f1"] = "Vietnam Female";
+		voices ["zh"] = "Mandarin Male";
+		voices ["zh+f1"] = "Mandarin Female";
+		voices ["zh-yue"] = "Cantonese Male";
+		voices ["zh-yue+f1"] = "Cantonese Female";
+
+		frequencies ["rest"] = 0.0;
+		frequencies ["pause"] = 0.0;
+		frequencies ["a0"] = 27.50;
+		frequencies ["a#0"] = 29.14;
+		frequencies ["bb0"] = 29.14;
+		frequencies ["b0"] = 30.87;
+		frequencies ["c1"] = 32.70;
+		frequencies ["c#1"] = 34.65;
+		frequencies ["db1"] = 34.65;
+		frequencies ["d1"] = 36.71;
+		frequencies ["d#1"] = 38.89;
+		frequencies ["eb1"] = 38.89;
+		frequencies ["e1"] = 41.20;
+		frequencies ["f1"] = 43.65;
+		frequencies ["f#1"] = 46.25;
+		frequencies ["gb1"] = 46.25;
+		frequencies ["g1"] = 49.00;
+		frequencies ["g#1"] = 51.91;
+		frequencies ["ab1"] = 51.91;
+		frequencies ["a1"] = 55.00;
+		frequencies ["a#1"] = 58.27;
+		frequencies ["bb1"] = 58.27;
+		frequencies ["b1"] = 61.74;
+		frequencies ["c2"] = 65.41;
+		frequencies ["c#2"] = 69.30;
+		frequencies ["db2"] = 69.30;
+		frequencies ["d2"] = 73.42;
+		frequencies ["d#2"] = 77.78;
+		frequencies ["eb2"] = 77.78;
+		frequencies ["e2"] = 82.41;
+		frequencies ["f2"] = 87.31;
+		frequencies ["f#2"] = 92.50;
+		frequencies ["gb2"] = 92.50;
+		frequencies ["g2"] = 98.00;
+		frequencies ["g#2"] = 103.80;
+		frequencies ["ab2"] = 103.80;
+		frequencies ["a2"] = 110.00;
+		frequencies ["a#2"] = 116.50;
+		frequencies ["bb2"] = 116.50;
+		frequencies ["b2"] = 123.471;
+		frequencies ["c3"] = 130.8;
+		frequencies ["c#3"] = 138.6;
+		frequencies ["db3"] = 138.6;
+		frequencies ["d3"] = 146.8;
+		frequencies ["d#3"] = 155.6;
+		frequencies ["eb3"] = 155.6;
+		frequencies ["e3"] = 164.8;
+		frequencies ["f3"] = 174.6;
+		frequencies ["f#3"] = 185.0;
+		frequencies ["gb3"] = 185.0;
+		frequencies ["g3"] = 196.0;
+		frequencies ["g#3"] = 207.7;
+		frequencies ["ab3"] = 207.7;
+		frequencies ["a3"] = 220.0;
+		frequencies ["a#3"] = 233.1;
+		frequencies ["bb3"] = 233.1;
+		frequencies ["b3"] = 246.9;
+		frequencies ["c4"] = 261.6;
+		frequencies ["c#4"] = 277.2;
+		frequencies ["db4"] = 277.2;
+		frequencies ["d4"] = 293.7;
+		frequencies ["d#4"] = 311.1;
+		frequencies ["eb4"] = 311.1;
+		frequencies ["e4"] = 329.6;
+		frequencies ["f4"] = 349.2;
+		frequencies ["f#4"] = 370.0;
+		frequencies ["gb4"] = 370.0;
+		frequencies ["g4"] = 392.0;
+		frequencies ["g#4"] = 415.3;
+		frequencies ["ab4"] = 415.3;
+		frequencies ["a4"] = 440.0;
+		frequencies ["a#4"] = 466.2;
+		frequencies ["bb4"] = 466.2;
+		frequencies ["b4"] = 493.9;
+		frequencies ["c5"] = 523.3;
+		frequencies ["c#5"] = 554.4;
+		frequencies ["db5"] = 554.4;
+		frequencies ["d5"] = 587.3;
+		frequencies ["d#5"] = 622.3;
+		frequencies ["eb5"] = 622.3;
+		frequencies ["e5"] = 659.3;
+		frequencies ["f5"] = 698.5;
+		frequencies ["f#5"] = 740.0;
+		frequencies ["gb5"] = 740.0;
+		frequencies ["g5"] = 784.0;
+		frequencies ["g#5"] = 830.6;
+		frequencies ["ab5"] = 830.6;
+		frequencies ["a5"] = 880.0;
+		frequencies ["a#5"] = 932.3;
+		frequencies ["bb5"] = 932.3;
+		frequencies ["b5"] = 987.8;
+		// -------------------- default octave
+		frequencies ["c"] = 523.3;
+		frequencies ["c#"] = 554.4;
+		frequencies ["db"] = 554.4;
+		frequencies ["d"] = 587.3;
+		frequencies ["d#"] = 622.3;
+		frequencies ["eb"] = 622.3;
+		frequencies ["e"] = 659.3;
+		frequencies ["f"] = 698.5;
+		frequencies ["f#"] = 740.0;
+		frequencies ["gb"] = 740.0;
+		frequencies ["g"] = 784.0;
+		frequencies ["g#"] = 830.6;
+		frequencies ["ab"] = 830.6;
+		frequencies ["a"] = 880.0;
+		frequencies ["a#"] = 932.3;
+		frequencies ["bb"] = 932.3;
+		frequencies ["b"] = 987.8;
+		// --------------------
+		frequencies ["c6"] = 1047.0;
+		frequencies ["c#6"] = 1109.0;
+		frequencies ["db6"] = 1109.0;
+		frequencies ["d6"] = 1175.0;
+		frequencies ["d#6"] = 1245.0;
+		frequencies ["eb6"] = 1245.0;
+		frequencies ["e6"] = 1319.0;
+		frequencies ["f6"] = 1397.0;
+		frequencies ["f#6"] = 1480.0;
+		frequencies ["gb6"] = 1480.0;
+		frequencies ["g6"] = 1568.0;
+		frequencies ["g#6"] = 1661.0;
+		frequencies ["ab6"] = 1661.0;
+		frequencies ["a6"] = 1760.0;
+		frequencies ["a#6"] = 1865.0;
+		frequencies ["bb6"] = 1865.0;
+		frequencies ["b6"] = 1976.0;
+		frequencies ["c7"] = 2093.0;
+		frequencies ["c#7"] = 2217.0;
+		frequencies ["db7"] = 2217.0;
+		frequencies ["d7"] = 2349.0;
+		frequencies ["d#7"] = 2489.0;
+		frequencies ["eb7"] = 2489.0;
+		frequencies ["e7"] = 2637.0;
+		frequencies ["f7"] = 2794.0;
+		frequencies ["f#7"] = 2960.0;
+		frequencies ["gb7"] = 2960.0;
+		frequencies ["g7"] = 3136.0;
+		frequencies ["g#7"] = 3322.0;
+		frequencies ["ab7"] = 3322.0;
+		frequencies ["a7"] = 3520.0;
+		frequencies ["a#7"] = 3729.0;
+		frequencies ["bb7"] = 3729.0;
+		frequencies ["b7"] = 3951.0;
+		frequencies ["c8"] = 4186.0;
+	}
+
+	public static void close_module() {
+		if (Myro.computer.audio_initialized || Myro.computer.sound_initialized) {	 
+		  Tao.Sdl.Sdl.SDL_AudioQuit ();
+		}
+	}
+		
 	public static void set_gui_thread_id (int gui_thread_id)
 	{
 		Myro.gui_thread_id = gui_thread_id;
@@ -256,19 +523,19 @@ public static class Myro
 					try {
 						beep (.25, (int)freqs [0]);
 					} catch {
-						Myro.calico.beep (.25, (int)freqs [0]);
+						Myro.computer.beep (.25, (int)freqs [0]);
 					}
 				} else if (freqs [0] == null) {
 					try {
 						beep (.25, (int)freqs [1]);
 					} catch {
-						Myro.calico.beep (.25, (int)freqs [1]);
+						Myro.computer.beep (.25, (int)freqs [1]);
 					}
 				} else {
 					try {
 						beep (.25, (int)freqs [0], (int)freqs [1]);
 					} catch {
-						Myro.calico.beep (.25, (int)freqs [0], (int)freqs [1]);
+						Myro.computer.beep (.25, (int)freqs [0], (int)freqs [1]);
 					}
 				}
 			}
@@ -1046,12 +1313,21 @@ public static class Myro
 		robot.reboot ();
 	}
 
+	public static void stopBeep ()
+	{
+		if (robot != null)
+			robot.beep (0.001, 0);
+		else {
+			Myro.computer.stopBeep ();
+		}
+	}
+
 	public static void beep (double duration, double frequency)
 	{
 		if (robot != null)
 			robot.beep (duration, frequency);
 		else {
-			Myro.calico.beep (duration, frequency);
+			Myro.computer.beep (duration, frequency);
 		}
 	}
 
@@ -1060,7 +1336,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			Myro.calico.beep (duration, frequency, frequency2);
+			Myro.computer.beep (duration, frequency, frequency2);
 		}
 	}
 
@@ -1070,7 +1346,7 @@ public static class Myro
 			robot.beep (duration, frequency);
 		else 
 			{
-			Myro.calico.beep (duration, frequency);
+			Myro.computer.beep (duration, frequency);
 		}
 	}
 
@@ -1079,7 +1355,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			Myro.calico.beep (duration, frequency, frequency2);
+			Myro.computer.beep (duration, frequency, frequency2);
 		}
 	}
 
@@ -1088,7 +1364,7 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency);
 		else {
-			Myro.calico.beep (duration, frequency);
+			Myro.computer.beep (duration, frequency);
 		}
 	}
 
@@ -1097,28 +1373,28 @@ public static class Myro
 		if (robot != null)
 			robot.beep (duration, frequency, frequency2);
 		else {
-			Myro.calico.beep (duration, frequency, frequency2);
+			Myro.computer.beep (duration, frequency, frequency2);
 		}
 	}
 
 	public static void play (string filename)
 	{
-		calico.play (filename);
+		Myro.computer.play (filename);
 	}
 
 	public static object makeSound (string filename)
 	{
-		return calico.makeSound(filename);
+		return Myro.computer.makeSound(filename);
 	}
 
 	public static void setPhases (double phase1, double phase2)
 	{
-		calico.setPhases(phase1, phase2);
+		Myro.computer.setPhases(phase1, phase2);
 	}
 
 	public static void play (double duration, Func<int[],int,object> function)
 	{
-		calico.play (duration, function);
+		Myro.computer.play (duration, function);
 	}
 
 	/*
@@ -1913,13 +2189,19 @@ public static class Myro
 		public virtual void beep (double duration, double frequency, double frequency2)
 		{
 			// Override in subclassed robots
-			Myro.calico.beep (duration, frequency, frequency2);
+			Myro.computer.beep (duration, frequency, frequency2);
 		}
     
 		public virtual void beep (double duration, double frequency)
 		{
 			// Override in subclassed robots
-			Myro.calico.beep (duration, frequency);
+			Myro.computer.beep (duration, frequency);
+		}
+    
+		public virtual void stopBeep ()
+		{
+			// Override in subclassed robots
+			Myro.computer.stopBeep ();
 		}
     
 		public virtual void reboot ()
@@ -2293,7 +2575,164 @@ public static class Myro
 	{
 		return ((IList<object>)items).Contains (item);
 	}
+		
+	public class Computer
+	{
+        public bool audio_initialized = false;
+        public bool sound_initialized = false;
 
+		const int playbackFreq = 44100;
+        const short samples = 2048;
+        const double pi2 = 360 * Math.PI / 180.0;
+        const double slice = 1.0 / playbackFreq * pi2;
+        byte[] buffer8 = new byte[samples];
+        double volume = 1.0;
+        double[] frequencies = new double [2];
+        double[] phases = new double [2] {0.0, 0.0};
+        SdlDotNet.Audio.AudioStream stream = null;
+        SdlDotNet.Audio.AudioCallback audioCallback = null;
+        Func<int[],int,object> audio_function = null;
+        int audio_index = 0;
+
+		public Computer ()
+		{
+		}
+		
+		public SdlDotNet.Audio.Sound makeSound(string filename) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound;
+        }
+
+        public void play(string filename) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            sound.Play();
+        }
+
+        public void setPhases(double phase1, double phase2) {
+            phases[0] = phase1;
+            phases[1] = phase2;
+        }
+
+        public void play(double duration, Func<int[],int,object> function) {
+            if (! audio_initialized) {
+                initialize_audio();
+            }
+            audio_function = function;
+            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
+            if (duration > 0) {
+                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
+            }
+        }
+
+        public void beep(double duration, double frequency) {
+            beep(duration, frequency, -1);
+        }
+
+        public void initialize_audio() {
+            ManualResetEvent ev = new ManualResetEvent(false);
+            audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
+            stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
+                        SdlDotNet.Audio.AudioFormat.Unsigned8,
+                        SdlDotNet.Audio.SoundChannel.Mono,
+                        samples,
+                        audioCallback,
+                        null);
+            Invoke(delegate {
+                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
+                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+                SdlDotNet.Audio.Mixer.OpenAudio(stream);
+                ev.Set();
+            });
+            ev.WaitOne();
+            audio_initialized = true;
+        }
+
+        public void initialize_sound() {
+            ManualResetEvent ev = new ManualResetEvent(false);
+            Invoke(delegate {
+                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
+                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+                SdlDotNet.Audio.Mixer.Open();
+                ev.Set();
+            });
+            ev.WaitOne();
+            sound_initialized = true;
+        }
+
+        public void beep(double duration, double frequency1, double frequency2) {
+            if (! audio_initialized) {
+                initialize_audio();
+            }
+            audio_function = null;
+            frequencies [0] = frequency1;
+            frequencies [1] = frequency2;
+            phases[1] = phases[0]; // set the phases to be the same
+            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
+            if (duration > 0) {
+                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
+            }
+        }
+
+        public void stopBeep() {
+            if (! audio_initialized) {
+                initialize_audio();
+            }
+            Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
+        }
+
+        public void Callback(IntPtr userData, IntPtr stream, int len) {
+            if (audio_function != null) {
+                int [] buffer = new int[len];
+                try {
+                    audio_function(buffer, audio_index);
+                    audio_index += len;
+                } catch (Exception e) {
+                    Console.Error.WriteLine("Error in audio function");
+                    Console.Error.WriteLine(e.Message);
+                    return;
+                }
+                byte [] mybuffer8 = new byte[len];
+                for (int i = 0; i < len; i++) {
+                    mybuffer8[i] = (byte)buffer[i];
+                }
+                System.Runtime.InteropServices.Marshal.Copy(mybuffer8, 0, stream, len);
+            } else {
+                for (int buf_pos = 0; buf_pos < len; buf_pos++) {
+                    double sum = 0.0;
+                    int count = 0;
+                    if (frequencies[0] != -1) {
+                        sum += (byte)(127 + Math.Cos(phases [0]) * volume * 127);
+                        count++;
+                    }
+                    if (frequencies[1] != -1) {
+                        sum += (byte)(127 + Math.Cos(phases [1]) * volume * 127);
+                        count++;
+                    }
+                    if (count > 0) {
+                        buffer8 [buf_pos] = (byte)(sum /count);
+                        phases [0] += frequencies [0] * slice;
+                        phases [1] += frequencies [1] * slice;
+                        if (phases [0] > pi2) {
+                            phases [0] -= pi2;
+                        }
+                        if (phases [1] > pi2) {
+                            phases [1] -= pi2;
+                        }
+                    }
+                }
+                System.Runtime.InteropServices.Marshal.Copy(buffer8, 0, stream, len);
+            }
+        }
+	}	
+	
 	public class SimScribbler : Robot
 	{
 		public Graphics.Rectangle frame;
@@ -5390,269 +5829,6 @@ public static class Myro
 		}
 		// return
 		return retval;
-	}
-
-	public static void initialize_module (Calico.MainWindow calico)
-	{
-		Myro.startup_path = calico.path;
-		Myro.os_name = calico.OS;
-		Myro.calico = calico;
-		voices ["af"] = "Afrikaans Male";
-		voices ["af+f1"] = "Afrikaans Female";
-		voices ["bs"] = "Bosnian Male";
-		voices ["bs+f1"] = "Bosnian Female";
-		voices ["ca"] = "Catalan Male";
-		voices ["ca+f1"] = "Catalan Female";
-		voices ["cs"] = "Czech Male";
-		voices ["cs+f1"] = "Czech Female";
-		voices ["cy"] = "Welsh Male";
-		voices ["cy+f1"] = "Welsh Female";
-		voices ["da"] = "Danish Male";
-		voices ["da+f1"] = "Danish Female";
-		voices ["de"] = "German Male";
-		voices ["de+f1"] = "German Female";
-		voices ["el"] = "Greek Male";
-		voices ["el+f1"] = "Greek Female";
-		voices ["en"] = "Default Male";
-		voices ["en+f1"] = "Default Female";
-		voices ["en-sc"] = "English-Scottish Male";
-		voices ["en-sc+f1"] = "English-Scottish Female";
-		voices ["en-uk"] = "Englsih-British Male";
-		voices ["en-uk+f1"] = "English-British Female";
-		voices ["en-uk-north"] = "English-British-Lancashire Male";
-		voices ["en-uk-north+f1"] = "English-British-Lancashire Female";
-		voices ["en-uk-rp"] = "English-British-RP Male";
-		voices ["en-uk-rp+f1"] = "English-British-RP Female";
-		voices ["en-uk-wmids"] = "English-British-WMIDS Male";
-		voices ["en-uk-wmids+f1"] = "English-British-WMIDS Female";
-		voices ["en-us"] = "English-US Male";
-		voices ["en-us+f1"] = "English-US Female";
-		voices ["en-wi"] = "English-West-Indies Male";
-		voices ["en-wi+f1"] = "English-West-Indies Female";
-		voices ["eo"] = "Esperanto Male";
-		voices ["eo+f1"] = "Esperanto Female";
-		voices ["es"] = "Spanish Male";
-		voices ["es+f1"] = "Spanish Female";
-		voices ["es-la"] = "Spanish-Latin-American Male";
-		voices ["es-la+f1"] = "Spanish-Latin-American Female";
-		voices ["fi"] = "Finnish Male";
-		voices ["fi+f1"] = "Finnish Female";
-		voices ["fr"] = "French Male";
-		voices ["fr+f1"] = "French Female";
-		voices ["fr-be"] = "French-Belgium Male";
-		voices ["fr-be+f1"] = "French-Belgium Female";
-		voices ["grc"] = "Greek-Ancient Male";
-		voices ["grc+f1"] = "Greek-Ancient Female";
-		voices ["hi"] = "Hindi Male";
-		voices ["hi+f1"] = "Hindi Female";
-		voices ["hr"] = "Croatian Male";
-		voices ["hr+f1"] = "Croatian Female";
-		voices ["hu"] = "Hungarian Male";
-		voices ["hu+f1"] = "Hungarian Female";
-		voices ["hy"] = "Armenian Male";
-		voices ["hy+f1"] = "Armenian Female";
-		voices ["hy-west"] = "Armenian-West Male";
-		voices ["hy-west+f1"] = "Armenian-West Female";
-		voices ["id"] = "Indonesian Male";
-		voices ["id+f1"] = "Indonesian Female";
-		voices ["is"] = "Icelandic Male";
-		voices ["is+f1"] = "Icelandic Female";
-		voices ["it"] = "Italian Male";
-		voices ["it+f1"] = "Italian Female";
-		voices ["jbo"] = "Lojban Male";
-		voices ["jbo+f1"] = "Lojban Female";
-		voices ["ku"] = "Kurdish Male";
-		voices ["ku+f1"] = "Kurdish Female";
-		voices ["la"] = "Latin Male";
-		voices ["la+f1"] = "Latin Female";
-		voices ["lv"] = "Latvian Male";
-		voices ["lv+f1"] = "Latvian Female";
-		voices ["mk"] = "Macedonian Male";
-		voices ["mk+f1"] = "Macedonian Female";
-		voices ["nci"] = "Nahautl-Classical Male";
-		voices ["nci+f1"] = "Nahautl-ClassicalFemale";
-		voices ["nl"] = "Dutch Male";
-		voices ["nl+f1"] = "Dutch Female";
-		voices ["no"] = "Norwegian Male";
-		voices ["no+f1"] = "Norweigian Female";
-		voices ["pap"] = "Papiamento Male";
-		voices ["pap+f1"] = "Papiamento Female";
-		voices ["pl"] = "Polish Male";
-		voices ["pl+f1"] = "Polish Female";
-		voices ["pt"] = "Brazil Male";
-		voices ["pt+f1"] = "Brazil Female";
-		voices ["pt-pt"] = "Portugal Male";
-		voices ["pt-pt+f1"] = "Portugal Female";
-		voices ["ro"] = "Romanian Male";
-		voices ["ro+f1"] = "Romanian Female";
-		voices ["ru"] = "Russian Male";
-		voices ["ru+f1"] = "Russian Female";
-		voices ["sk"] = "Slovak Male";
-		voices ["sk+f1"] = "Slovak Female";
-		voices ["sq"] = "Albanian Male";
-		voices ["sq+f1"] = "Albanian Female";
-		voices ["sr"] = "Serbian Male";
-		voices ["sr+f1"] = "Serbian Female";
-		voices ["sv"] = "Swedish Male";
-		voices ["sv+f1"] = "Swahili Female";
-		voices ["sw"] = "Swahili Male";
-		voices ["sw+f1"] = "Swahili Female";
-		voices ["ta"] = "Tamil Male";
-		voices ["ta+f1"] = "Tamil Female";
-		voices ["tr"] = "Turkish Male";
-		voices ["tr+f1"] = "Turkish Female";
-		voices ["vi"] = "Vietnam Male";
-		voices ["vi+f1"] = "Vietnam Female";
-		voices ["zh"] = "Mandarin Male";
-		voices ["zh+f1"] = "Mandarin Female";
-		voices ["zh-yue"] = "Cantonese Male";
-		voices ["zh-yue+f1"] = "Cantonese Female";
-
-		frequencies ["rest"] = 0.0;
-		frequencies ["pause"] = 0.0;
-		frequencies ["a0"] = 27.50;
-		frequencies ["a#0"] = 29.14;
-		frequencies ["bb0"] = 29.14;
-		frequencies ["b0"] = 30.87;
-		frequencies ["c1"] = 32.70;
-		frequencies ["c#1"] = 34.65;
-		frequencies ["db1"] = 34.65;
-		frequencies ["d1"] = 36.71;
-		frequencies ["d#1"] = 38.89;
-		frequencies ["eb1"] = 38.89;
-		frequencies ["e1"] = 41.20;
-		frequencies ["f1"] = 43.65;
-		frequencies ["f#1"] = 46.25;
-		frequencies ["gb1"] = 46.25;
-		frequencies ["g1"] = 49.00;
-		frequencies ["g#1"] = 51.91;
-		frequencies ["ab1"] = 51.91;
-		frequencies ["a1"] = 55.00;
-		frequencies ["a#1"] = 58.27;
-		frequencies ["bb1"] = 58.27;
-		frequencies ["b1"] = 61.74;
-		frequencies ["c2"] = 65.41;
-		frequencies ["c#2"] = 69.30;
-		frequencies ["db2"] = 69.30;
-		frequencies ["d2"] = 73.42;
-		frequencies ["d#2"] = 77.78;
-		frequencies ["eb2"] = 77.78;
-		frequencies ["e2"] = 82.41;
-		frequencies ["f2"] = 87.31;
-		frequencies ["f#2"] = 92.50;
-		frequencies ["gb2"] = 92.50;
-		frequencies ["g2"] = 98.00;
-		frequencies ["g#2"] = 103.80;
-		frequencies ["ab2"] = 103.80;
-		frequencies ["a2"] = 110.00;
-		frequencies ["a#2"] = 116.50;
-		frequencies ["bb2"] = 116.50;
-		frequencies ["b2"] = 123.471;
-		frequencies ["c3"] = 130.8;
-		frequencies ["c#3"] = 138.6;
-		frequencies ["db3"] = 138.6;
-		frequencies ["d3"] = 146.8;
-		frequencies ["d#3"] = 155.6;
-		frequencies ["eb3"] = 155.6;
-		frequencies ["e3"] = 164.8;
-		frequencies ["f3"] = 174.6;
-		frequencies ["f#3"] = 185.0;
-		frequencies ["gb3"] = 185.0;
-		frequencies ["g3"] = 196.0;
-		frequencies ["g#3"] = 207.7;
-		frequencies ["ab3"] = 207.7;
-		frequencies ["a3"] = 220.0;
-		frequencies ["a#3"] = 233.1;
-		frequencies ["bb3"] = 233.1;
-		frequencies ["b3"] = 246.9;
-		frequencies ["c4"] = 261.6;
-		frequencies ["c#4"] = 277.2;
-		frequencies ["db4"] = 277.2;
-		frequencies ["d4"] = 293.7;
-		frequencies ["d#4"] = 311.1;
-		frequencies ["eb4"] = 311.1;
-		frequencies ["e4"] = 329.6;
-		frequencies ["f4"] = 349.2;
-		frequencies ["f#4"] = 370.0;
-		frequencies ["gb4"] = 370.0;
-		frequencies ["g4"] = 392.0;
-		frequencies ["g#4"] = 415.3;
-		frequencies ["ab4"] = 415.3;
-		frequencies ["a4"] = 440.0;
-		frequencies ["a#4"] = 466.2;
-		frequencies ["bb4"] = 466.2;
-		frequencies ["b4"] = 493.9;
-		frequencies ["c5"] = 523.3;
-		frequencies ["c#5"] = 554.4;
-		frequencies ["db5"] = 554.4;
-		frequencies ["d5"] = 587.3;
-		frequencies ["d#5"] = 622.3;
-		frequencies ["eb5"] = 622.3;
-		frequencies ["e5"] = 659.3;
-		frequencies ["f5"] = 698.5;
-		frequencies ["f#5"] = 740.0;
-		frequencies ["gb5"] = 740.0;
-		frequencies ["g5"] = 784.0;
-		frequencies ["g#5"] = 830.6;
-		frequencies ["ab5"] = 830.6;
-		frequencies ["a5"] = 880.0;
-		frequencies ["a#5"] = 932.3;
-		frequencies ["bb5"] = 932.3;
-		frequencies ["b5"] = 987.8;
-		// -------------------- default octave
-		frequencies ["c"] = 523.3;
-		frequencies ["c#"] = 554.4;
-		frequencies ["db"] = 554.4;
-		frequencies ["d"] = 587.3;
-		frequencies ["d#"] = 622.3;
-		frequencies ["eb"] = 622.3;
-		frequencies ["e"] = 659.3;
-		frequencies ["f"] = 698.5;
-		frequencies ["f#"] = 740.0;
-		frequencies ["gb"] = 740.0;
-		frequencies ["g"] = 784.0;
-		frequencies ["g#"] = 830.6;
-		frequencies ["ab"] = 830.6;
-		frequencies ["a"] = 880.0;
-		frequencies ["a#"] = 932.3;
-		frequencies ["bb"] = 932.3;
-		frequencies ["b"] = 987.8;
-		// --------------------
-		frequencies ["c6"] = 1047.0;
-		frequencies ["c#6"] = 1109.0;
-		frequencies ["db6"] = 1109.0;
-		frequencies ["d6"] = 1175.0;
-		frequencies ["d#6"] = 1245.0;
-		frequencies ["eb6"] = 1245.0;
-		frequencies ["e6"] = 1319.0;
-		frequencies ["f6"] = 1397.0;
-		frequencies ["f#6"] = 1480.0;
-		frequencies ["gb6"] = 1480.0;
-		frequencies ["g6"] = 1568.0;
-		frequencies ["g#6"] = 1661.0;
-		frequencies ["ab6"] = 1661.0;
-		frequencies ["a6"] = 1760.0;
-		frequencies ["a#6"] = 1865.0;
-		frequencies ["bb6"] = 1865.0;
-		frequencies ["b6"] = 1976.0;
-		frequencies ["c7"] = 2093.0;
-		frequencies ["c#7"] = 2217.0;
-		frequencies ["db7"] = 2217.0;
-		frequencies ["d7"] = 2349.0;
-		frequencies ["d#7"] = 2489.0;
-		frequencies ["eb7"] = 2489.0;
-		frequencies ["e7"] = 2637.0;
-		frequencies ["f7"] = 2794.0;
-		frequencies ["f#7"] = 2960.0;
-		frequencies ["gb7"] = 2960.0;
-		frequencies ["g7"] = 3136.0;
-		frequencies ["g#7"] = 3322.0;
-		frequencies ["ab7"] = 3322.0;
-		frequencies ["a7"] = 3520.0;
-		frequencies ["a#7"] = 3729.0;
-		frequencies ["bb7"] = 3729.0;
-		frequencies ["b7"] = 3951.0;
-		frequencies ["c8"] = 4186.0;
 	}
 
 	/*
