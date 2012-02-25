@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -328,7 +329,13 @@ namespace Jigsaw
 			// Recreate globals and reload all assemblies
 			globals = new Dictionary<string, object>();
 			foreach (string dllPath in loadedAssemblies.Keys) LoadAssembly(dllPath);
-			
+
+			// A list of CControlStart block ScriptScopes
+			List<ScriptScope> scopes = new List<ScriptScope> ();
+
+			// A list of CProcedureStart blocks that are accumulated
+			List<CProcedureStart> procStartBlocks = new List<CProcedureStart> ();
+
 			// Reset all blocks
 			foreach (Diagram.CShape s in cvs.shapes) {
 				if (s is CBlock) {								// If a shape is a block ...
@@ -339,14 +346,42 @@ namespace Jigsaw
 					if (b.IsFactory == false) {					// If block is not a factory block ...
 						b.Compile(engine, cvs);					// Ask block to compile itself
 						
-						if (s is CControlStart) {				// If also a ControlStart block ...
+						// If also a ControlStart block ...
+						if (s is CControlStart) {
 							CControlStart cs = (CControlStart)s;
 							CallStack stack = new CallStack(globals);					// Add new runner to call stack
 							ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
 							stack.AppendFrame( (CControlStart)s, scope );
 							_callStacks.Add(stack);
+							scopes.Add (scope);					// Temporarily save reference to new start block scope
+						}
+						
+						// If also a CProcedureStart block, accumulate ref
+						if (s is CProcedureStart) {
+							CProcedureStart ps = (CProcedureStart)s;
+							procStartBlocks.Add (ps);			// Temporarily save ref to procedure start blocks							
 						}
 					}
+				}
+			}
+			
+			// When we're all done, look to see if there are any procedures.
+			// If so, get python of procedure and eval in scope of all start blocks 
+			// to make them available to functions that use procedures as data.
+			foreach (CProcedureStart ps in procStartBlocks) {
+				StringBuilder sb = new StringBuilder();
+				if (ps.ToPython(sb, 0) == true) {
+					string py = sb.ToString();
+					foreach (ScriptScope ss in scopes) {
+						try
+						{
+							engine.Execute(py, ss);
+						} catch (Exception ex) {
+							Console.WriteLine ("Error in Engine.Reset: {0}", ex.Message);
+						}
+					}
+				} else {
+					Console.WriteLine ("Error in Engine.Reset: Could not generate source code for procedure {0}", ps.ProcedureName);
 				}
 			}
 			
