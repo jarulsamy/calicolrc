@@ -10,7 +10,7 @@ REM SET LANG=es_ES.UTF8
 SET PATH=%PATH%;%CD%\bin;%CD%\modules
 REM SET MONO_LOG_LEVEL=debug
 
-bin\Calico.exe %*
+start /MIN bin\Calico.exe %*
 
 REM Report an error, if one, and pause to let user see it:
 if errorlevel 1 (
