@@ -42,8 +42,10 @@ public class CalicoFSharpEngine : Engine
 	   string fsi = System.IO.Path.Combine(path, "fsi.exe");
 	   ProcessStartInfo startInfo = new ProcessStartInfo();
 	   // FIXME: on windows, run directly; on others need mono in path
-	   startInfo.FileName = "mono";
-	   startInfo.Arguments = ("\"" + fsi + "\" " +
+	   //startInfo.FileName = "mono";
+	   startInfo.FileName = fsi;
+	   startInfo.Arguments = (
+		   //		   "\"" + fsi + "\" " +
 		   "--readline- " + 
 		   "--lib:\"" + path + "../modules\" " +
 		   "--lib:\"" + path + ". " +
