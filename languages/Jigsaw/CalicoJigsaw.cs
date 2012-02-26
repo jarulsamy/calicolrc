@@ -136,7 +136,14 @@ public class CalicoJigsawDocument : Document
 		calico.Print (Calico.Tag.Info, "Running Jigsaw script...\n");
 		Gtk.Application.Invoke (delegate {
 			cvs.Reset ();
-			cvs.Run ();
+			//Console.WriteLine(cvs.TimeOut);
+			if (cvs.TimeOut <= 7.0) {
+				calico.PauseButton.Sensitive = false;
+				cvs.Step ();
+			} else {
+				calico.PauseButton.Sensitive = true;
+				cvs.Run ();
+			}
 		});
 	}
 	/*
