@@ -486,6 +486,7 @@
             <child>
               <widget class="Gtk.Button" id="_printButton">
                 <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Print a script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-print LargeToolbar</property>
@@ -504,6 +505,7 @@
             <child>
               <widget class="Gtk.Button" id="_newButton">
                 <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Create a new script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-new LargeToolbar</property>
@@ -522,6 +524,7 @@
             <child>
               <widget class="Gtk.Button" id="_openButton">
                 <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Open an existing script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-open LargeToolbar</property>
@@ -540,6 +543,7 @@
             <child>
               <widget class="Gtk.Button" id="_saveButton">
                 <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Save script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-save LargeToolbar</property>
@@ -570,6 +574,7 @@
               <widget class="Gtk.Button" id="_stopButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
+                <property name="Tooltip" translatable="yes">Stop a running script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-no LargeToolbar</property>
@@ -589,6 +594,7 @@
               <widget class="Gtk.Button" id="_startButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
+                <property name="Tooltip" translatable="yes">Run a script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-yes LargeToolbar</property>
@@ -608,6 +614,7 @@
               <widget class="Gtk.HScale" id="debugSpeed">
                 <property name="MemberName" />
                 <property name="WidthRequest">100</property>
+                <property name="Tooltip" translatable="yes">Run fast (far-left), Single-step (far-right)</property>
                 <property name="CanFocus">True</property>
                 <property name="Inverted">True</property>
                 <property name="Upper">100</property>
@@ -629,6 +636,7 @@
               <widget class="Gtk.Button" id="_pauseButton1">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
+                <property name="Tooltip" translatable="yes">Pause a running script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-media-pause LargeToolbar</property>
@@ -648,6 +656,7 @@
               <widget class="Gtk.Button" id="_playButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
+                <property name="Tooltip" translatable="yes">Continue a paused script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-media-play LargeToolbar</property>
@@ -693,6 +702,7 @@
                 <child>
                   <widget class="Gtk.ComboBoxEntry" id="searchEntry">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Text to search for</property>
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes" />
                     <signal name="Changed" handler="OnSearchEntryChanged" />
@@ -707,6 +717,7 @@
                 <child>
                   <widget class="Gtk.Button" id="searchNextButton">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Find next matching text</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
                     <property name="Icon">stock:gtk-go-down LargeToolbar</property>
@@ -725,10 +736,11 @@
                 <child>
                   <widget class="Gtk.Button" id="searchPrevButton">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Find Previous matching text</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
                     <property name="Icon">stock:gtk-go-up LargeToolbar</property>
-                    <property name="Label" translatable="yes" />
+                    <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
                     <signal name="Clicked" handler="OnSearchPrevButtonClicked" />
@@ -743,6 +755,7 @@
                 <child>
                   <widget class="Gtk.Button" id="searchStopButton">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Close search</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
                     <property name="Icon">stock:gtk-close LargeToolbar</property>
@@ -869,6 +882,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="button4">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Go to Getting Started webpage</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-dialog-authentication LargeToolbar</property>
@@ -886,6 +900,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="button26">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Go to Help overview webpage</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-help LargeToolbar</property>
@@ -919,6 +934,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="button3">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Create a new script</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-new LargeToolbar</property>
@@ -936,6 +952,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="button7">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Open an existing script</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-open LargeToolbar</property>
@@ -969,6 +986,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="buttonRecentlyUsed">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Open a recently used script</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-edit LargeToolbar</property>
@@ -986,6 +1004,7 @@
                                         <child>
                                           <widget class="Gtk.Button" id="buttonWhatsNew">
                                             <property name="MemberName" />
+                                            <property name="Tooltip" translatable="yes">Go to What's new webpage</property>
                                             <property name="CanFocus">True</property>
                                             <property name="Type">TextAndIcon</property>
                                             <property name="Icon">stock:gtk-dialog-info LargeToolbar</property>
@@ -1031,6 +1050,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label2">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Home tab</property>
                     <property name="LabelProp" translatable="yes">Home</property>
                     <property name="WidthChars">8</property>
                   </widget>
@@ -1071,6 +1091,7 @@
                                   <widget class="Gtk.Button" id="history_up">
                                     <property name="MemberName" />
                                     <property name="Sensitive">False</property>
+                                    <property name="Tooltip" translatable="yes">Previous interactive code</property>
                                     <property name="Type">TextAndIcon</property>
                                     <property name="Icon">stock:gtk-go-up Menu</property>
                                     <property name="Label" translatable="yes" />
@@ -1089,6 +1110,7 @@
                                   <widget class="Gtk.Button" id="history_down">
                                     <property name="MemberName" />
                                     <property name="Sensitive">False</property>
+                                    <property name="Tooltip" translatable="yes">Next interactive code</property>
                                     <property name="Type">TextAndIcon</property>
                                     <property name="Icon">stock:gtk-go-down Menu</property>
                                     <property name="Label" translatable="yes" />
@@ -1156,6 +1178,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label1">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Enter code interactively</property>
                     <property name="LabelProp" translatable="yes">Shell</property>
                     <property name="WidthChars">8</property>
                   </widget>
@@ -1193,6 +1216,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label3">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Results of running code</property>
                     <property name="LabelProp" translatable="yes">Output</property>
                   </widget>
                   <packing>
@@ -1218,6 +1242,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label4">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Variables and their values</property>
                     <property name="LabelProp" translatable="yes">Environment</property>
                   </widget>
                   <packing>
@@ -1244,6 +1269,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label5">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Local variables</property>
                     <property name="LabelProp" translatable="yes">Locals</property>
                   </widget>
                   <packing>
@@ -1271,6 +1297,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label999">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Past interactive code</property>
                     <property name="LabelProp" translatable="yes">History</property>
                   </widget>
                   <packing>

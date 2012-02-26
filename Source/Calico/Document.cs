@@ -299,7 +299,13 @@ namespace Calico {
         }
 
         public virtual string [] GetAuthors() {
-            return new string[] {};
+            return new string[] {
+                "Douglas Blank <dblank@cs.brynmawr.edu>",
+                "Keith O'Hara <kohara@bard.edu>",
+                "Jim Marshall <jmarshall@sarahlawrence.edu>",
+                "Mark Russo <russomf@gmail.com>",
+                "Jennifer Kay <kay@rowan.edu>"
+            };
         }
 
         public virtual void OnAbout() {
