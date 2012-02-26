@@ -946,11 +946,9 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Step()
 		{
-			//if (!_isRunning) engine.Reset(this);
 			if (!_isRunning) engine.Reset(this, _inspector);
 			_isRunning = true;
-			//_engine.Stop();
-			_engine.Step();
+			_engine.Step(true);
 			RaiseJigsawStep();
 		}
 		
@@ -963,8 +961,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineRun(object sender, EventArgs e)
 		{
-//			bRun.Enabled = false;
-//			bStop.Enabled = true;
 			this.Invalidate();
 		}
 		

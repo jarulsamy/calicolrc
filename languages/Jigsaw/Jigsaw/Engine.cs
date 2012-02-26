@@ -426,7 +426,7 @@ namespace Jigsaw
 		}
 		
 		// - - Advance the entire system one step - - - - - - - - - - -
-		public bool Step()
+		public bool Step(bool force = false)
 		{
 			// Exit if already running a step to prevent reentrance
 			if (_inStep == true) return false;
@@ -438,7 +438,7 @@ namespace Jigsaw
 			{
 				CallStack stack = _callStacks[i];
 				
-				if (stack.Enabled) 
+				if (stack.Enabled || force) 
 				{
 					enabledCount++;
 					

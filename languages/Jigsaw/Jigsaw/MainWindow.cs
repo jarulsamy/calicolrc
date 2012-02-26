@@ -78,7 +78,7 @@ public class MainWindow : Gtk.Window
 		muFile.Append(miOpen);
 		miOpen.AddAccelerator("activate", agrp, (int)'O', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 		
-		Gtk.MenuItem miFileSep1 = new Gtk.MenuItem();
+		Gtk.SeparatorMenuItem miFileSep1 = new Gtk.SeparatorMenuItem();
 		muFile.Append(miFileSep1);
 		
 		Gtk.MenuItem miSave = new Gtk.MenuItem("_Save");
