@@ -69,7 +69,15 @@ public class CalicoSchemeEngine : Engine
 
 public class CalicoSchemeDocument : TextDocument {
 
-    public CalicoSchemeDocument(MainWindow calico, string filename, string language, string mimetype) :
+	public override string [] GetAuthors() 
+	{
+        return new string[] {
+			"Jim Marshall <jmarshall@sarahlawrence.edu>",
+			"Doug Blank <dblank@cs.brynmawr.edu>"
+		};
+    }
+
+	public CalicoSchemeDocument(MainWindow calico, string filename, string language, string mimetype) :
             	   base(calico, filename, language, mimetype) {
     }
 

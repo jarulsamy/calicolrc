@@ -154,6 +154,13 @@ namespace CalicoPython
 		{
 		}
 		
+		public override string [] GetAuthors() 
+		{
+    	    return new string[] {
+				"Microsoft Corporation",
+				"The IronPython Team"
+			};
+    	}
 	}
 	
 	public class CalicoPythonLanguage : Language

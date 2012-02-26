@@ -259,9 +259,13 @@ public class CalicoJigsawDocument : Document
 
 	public override string [] GetAuthors() 
 	{
-        return new string[] {"Mark Russo <russomf@gmail.com>"};
+        return new string[] {
+			"Mark Russo <russomf@gmail.com>",
+			"Doug Blank <dblank@cs.brynmawr.edu>"
+		};
     }
-    public override void SetOptionsMenu(Gtk.MenuItem options_menu) {
+
+	public override void SetOptionsMenu(Gtk.MenuItem options_menu) {
         options_menu.Submenu = new Gtk.Menu();
 		// Toggle inset:
 		Gtk.MenuItem menu = new Gtk.MenuItem("Toggle Inset");

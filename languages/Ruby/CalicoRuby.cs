@@ -58,7 +58,14 @@ public class CalicoRubyDocument : TextDocument {
     public CalicoRubyDocument(MainWindow calico, string filename, string language, string mimetype) :
          	   base(calico, filename, language, mimetype) {
     }
-
+	
+	public override string [] GetAuthors() 
+	{
+	    return new string[] {
+			"Microsoft Corporation",
+			"The IronRuby Team"
+		};
+	}
 }
 	
 public class CalicoRubyLanguage : Language {
