@@ -77,8 +77,10 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
+		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
+		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;
 		widget.ShowAll ();
 	}
@@ -94,6 +96,10 @@ public class CalicoJigsawDocument : Document
 		Gtk.Application.Invoke( delegate {
 			UpdateDocument();
 		});
+	}
+	
+	protected void OnJigsawRunBlockStack(object sender, EventArgs a) {
+		calico.OnStartRunning();
 	}
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
@@ -279,6 +285,7 @@ public class CalicoJigsawDocument : Document
 		menu.Show();
 		// Auto-view properties:
 		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
+		miViewAutoProps.Active = true;
 		miViewAutoProps.Activated += (sender, a) => { cvs.AutoProperties = (sender as Gtk.CheckMenuItem).Active; };
 		((Gtk.Menu)options_menu.Submenu).Add(miViewAutoProps);
 		miViewAutoProps.Show();
