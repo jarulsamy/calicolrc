@@ -95,6 +95,9 @@ namespace Jigsaw
 		// This is where returned values are saved by called procedures before being fetched by calling procedures
 		public object RetVal = null;
 		
+		// If true, this call stack is enabled. If false, call stack is paused.
+		public bool Enabled = false;
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CallStack(Dictionary<string,object> globals) {
 			_stack = new List<StackFrame>();
@@ -178,7 +181,7 @@ namespace Jigsaw
 	public class Engine
 	{
 		private List<CallStack> _callStacks = null;
-		private InspectorWindow _inspector = null;
+		//private InspectorWindow _inspector = null;
 		private bool _inStep = false;		// true if currently executing a single step
 		
 		public ScriptRuntimeSetup scriptRuntimeSetup;
@@ -230,6 +233,9 @@ namespace Jigsaw
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).PrintFunction = true;
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).AllowWithStatement = true;
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
+			
+			//%%%
+			GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 		}
 		
 		// - - - Load assembly into global scope - - - - - - - - - - - -
@@ -349,10 +355,13 @@ namespace Jigsaw
 						// If also a ControlStart block ...
 						if (s is CControlStart) {
 							CControlStart cs = (CControlStart)s;
-							CallStack stack = new CallStack(globals);					// Add new runner to call stack
-							ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
-							stack.AppendFrame( (CControlStart)s, scope );
-							_callStacks.Add(stack);
+							
+							ScriptScope scope = this.RunBlockStack( cs );
+//							CallStack stack = new CallStack(globals);					// Add new runner to call stack
+//							ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
+//							stack.AppendFrame( cs, scope );
+//							_callStacks.Add(stack);
+							
 							scopes.Add (scope);					// Temporarily save reference to new start block scope
 						}
 						
@@ -388,7 +397,18 @@ namespace Jigsaw
 			RaiseEngineReset();
 			return true;
 		}
-
+		
+		// - - -
+		public ScriptScope RunBlockStack( CBlock b, bool enabled = false ) {
+			CallStack stack = new CallStack(globals);					// Add new runner to call stack
+			ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
+			stack.AppendFrame( b, scope );
+			_callStacks.Add(stack);
+			stack.Enabled = enabled;
+			
+			return scope;
+		}
+		
 		// - - - Build and return a new ScriptScope based on a ChainedDictionary - - - - -
 		public ScriptScope CreateScope(Dictionary<string,object> globals)
 		{
@@ -412,117 +432,119 @@ namespace Jigsaw
 			if (_inStep == true) return false;
 			_inStep = true;
 			
+			int enabledCount = 0;
+			
 			for (int i=_callStacks.Count-1; i>=0; i--)
 			{
 				CallStack stack = _callStacks[i];
 				
-				if (stack.Count > 0) {							// Get the top-most block runner
-					StackFrame frame = stack.GetTopFrame();	
+				if (stack.Enabled) 
+				{
+					enabledCount++;
 					
-					bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
-					RunnerResponse rr = frame.Current;			// Check the response
-					
-					// At any time, if requested to stop, wipe out all call stacks and exit
-					if (rr.Action == EngineAction.Stop) {
-						Stop ();
-						break;
-					}
-					
-					// React to other requests from execution blocks
-					if (rslt == false) {						// The enumerator is done. Pop frame from stack.
-						stack.PopFrame(frame);					// Enumerator has passed the end of the collection
-					} else {
-						switch (rr.Action) {					// Take appropriate action as directed by current runner
-						case EngineAction.Pause:				// Pause the engine
-							this.Pause();
-							break;
-						case EngineAction.Remove:				// Remove top frame and continue
-							stack.PopFrame(frame);
-							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
-							break;
-						case EngineAction.Return:				// Procedure returning
-							stack.PopProcedure();				// Pop all the way up to procedure call
-							stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
-							break;								// When proc call continues, it will pick up retval
-						case EngineAction.Replace:				// This implements the blocks sequence
-							stack.PopFrame(frame);				// Current frame is removed
-							stack.PushFrame(rr.Frame);			// Next frame pushed, as indicated by runner
-							rr.Frame.MoveNext();
-							break;
-						case EngineAction.Add:					// Pushes a new frame on to the stack
-							stack.PushFrame(rr.Frame);
-							rr.Frame.MoveNext();
-							break;
-						case EngineAction.Break:
-							CBlock bnext = stack.PopBreak();	// Return block connected to out edge, if there is one
-							if (bnext != null) {				// Scope was hidden in RetVal. Get it and make next frame.
-								ScriptScope scope = (ScriptScope) rr.RetVal;
-								StackFrame frame2 = bnext.Frame(scope, stack);
-								stack.PushFrame(frame2);			// Push next frame and get started
-								frame2.MoveNext();
-							}
-							break;
-						case EngineAction.Error:
-							RaiseEngineError();
-							break;
-						case EngineAction.NoAction:
+					if (stack.Count > 0) 							// Get the top-most block runner
+					{
+						StackFrame frame = stack.GetTopFrame();	
+						
+						bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
+						RunnerResponse rr = frame.Current;			// Check the response
+						
+						// At any time, if requested to stop, wipe out all call stacks and exit
+						if (rr.Action == EngineAction.Stop) {
+							Stop ();
 							break;
 						}
+						
+						// React to other requests from execution blocks
+						if (rslt == false) {						// The enumerator is done. Pop frame from stack.
+							stack.PopFrame(frame);					// Enumerator has passed the end of the collection
+						} else {
+							switch (rr.Action) {					// Take appropriate action as directed by current runner
+							case EngineAction.Pause:				// Pause the engine
+								this.Pause();
+								break;
+							case EngineAction.Remove:				// Remove top frame and continue
+								stack.PopFrame(frame);
+								stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
+								break;
+							case EngineAction.Return:				// Procedure returning
+								stack.PopProcedure();				// Pop all the way up to procedure call
+								stack.RetVal = rr.RetVal;			// Copy returned value to temp location in stack
+								break;								// When proc call continues, it will pick up retval
+							case EngineAction.Replace:				// This implements the blocks sequence
+								stack.PopFrame(frame);				// Current frame is removed
+								stack.PushFrame(rr.Frame);			// Next frame pushed, as indicated by runner
+								rr.Frame.MoveNext();
+								break;
+							case EngineAction.Add:					// Pushes a new frame on to the stack
+								stack.PushFrame(rr.Frame);
+								rr.Frame.MoveNext();
+								break;
+							case EngineAction.Break:
+								CBlock bnext = stack.PopBreak();	// Return block connected to out edge, if there is one
+								if (bnext != null) {				// Scope was hidden in RetVal. Get it and make next frame.
+									ScriptScope scope = (ScriptScope) rr.RetVal;
+									StackFrame frame2 = bnext.Frame(scope, stack);
+									stack.PushFrame(frame2);			// Push next frame and get started
+									frame2.MoveNext();
+								}
+								break;
+							case EngineAction.Error:
+								RaiseEngineError();
+								break;
+							case EngineAction.NoAction:
+								break;
+							}
+						}
+	
+					} else {
+						// If call stack is empty, the block runner stack has completed execution.
+						// Remove stack from list of all stacks.
+						_callStacks.RemoveAt(i);
 					}
-
-				} else {
-					// If call stack is empty, the block runner stack has completed execution.
-					// Remove stack from list of all stacks.
-					_callStacks.RemoveAt(i);
 				}
 			}
 			
 			//_inspector.Update (globals);
-			
-			_inStep = false;
-			RaiseEngineStep();
+			if (enabledCount > 0) RaiseEngineStep();
 			
 			// Check for nothing more to run
 			if (_callStacks.Count == 0) this.Stop();
 			
+			_inStep = false;
 			return true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			_timerContinue = true;
+			//%%% _timerContinue = true;
+			foreach (CallStack s in _callStacks) s.Enabled = true;
 			
-			// Dealing with cross-thread issues...
-			GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+			//%%% GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 			RaiseEngineRun();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
-			_timerContinue = false;
+			//%%%_timerContinue = false;
+			foreach (CallStack s in _callStacks) s.Enabled = false;
 			RaiseEngineStop();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
-			_timerContinue = false;
+			//%%%_timerContinue = false;
+			foreach (CallStack s in _callStacks) s.Enabled = false;
 			RaiseEnginePause();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		private bool OnTimerElapsed()
 		{
-			// Exit if requested
-			if (_timerContinue == false) return false;
-			
-			// Execute one step
-			this.Step();
-			
-			// If the step advanced the engine to a completion point, stop
-			if (!this.IsRunning) this.Stop();
+			//%%% Console.WriteLine ("OnTimerElapsed: {0}", DateTime.Now.ToString ());
 			
 			// Install new timeout if requested and stop this one
 			if (_timerReset) {
@@ -531,9 +553,41 @@ namespace Jigsaw
 				return false;
 			}
 			
+			// Exit if requested
+			//%%% if (_timerContinue == false) return true; //false;
+			
+			// Execute one step
+			this.Step();
+			
+			// If the step advanced the engine to a completion point, stop
+			if (!this.IsRunning) this.Stop();
+			
 			// Return the current state indicating the desire to continue
-			return _timerContinue;
+			return true; //_timerContinue;
 		}
+		
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		private bool OnTimerElapsed()
+//		{
+//			// Exit if requested
+//			if (_timerContinue == false) return false;
+//			
+//			// Execute one step
+//			this.Step();
+//			
+//			// If the step advanced the engine to a completion point, stop
+//			if (!this.IsRunning) this.Stop();
+//			
+//			// Install new timeout if requested and stop this one
+//			if (_timerReset) {
+//				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+//				_timerReset = false;
+//				return false;
+//			}
+//			
+//			// Return the current state indicating the desire to continue
+//			return _timerContinue;
+//		}
 		
 		// - - Raise the EngineRun event  - - - - - - - - - - - - - - 
         public void RaiseEngineRun()

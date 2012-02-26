@@ -910,6 +910,13 @@ namespace Jigsaw
             	JigsawError(this, e);
             }
         }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void RunBlockStack(CBlock b)
+		{
+			// Push block onto call stack enabled immediately
+			_engine.RunBlockStack(b, true);
+		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
@@ -1156,24 +1163,15 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {
-			// Intercept right-mouse on canvas
-//			if (e.Button == Diagram.MouseButtons.Right) 
-//			{
-//				this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
-//				return;
-//				
-//			} else {
+        	if (this.Mode == Diagram.EMode.Editing)
+        	{
+	            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
+				if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
+	            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
+				this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
 				
-            	if (this.Mode == Diagram.EMode.Editing)
-            	{
-		            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
-					if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
-		            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
-					this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
-					
-					this.Invalidate();										// Redraw
-				}
-//			}
+				this.Invalidate();										// Redraw
+			}
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2605,6 +2603,9 @@ namespace Jigsaw
 			
 			Gtk.MenuItem mnuToBack = new Gtk.MenuItem("Send to Back");
 			mnuToBack.Activated += OnSendToBack;
+
+			Gtk.MenuItem mnuRun = new Gtk.MenuItem("Run");
+			mnuRun.Activated += OnRunBlockStack;
 			
 			Gtk.MenuItem mnuBreak = new Gtk.MenuItem("Toggle Breakpoint");
 			mnuBreak.Activated += OnToggleBreakpoint;
@@ -2621,6 +2622,7 @@ namespace Jigsaw
 			mnu.Append(mnuToFront);
 			mnu.Append(mnuToBack);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
+			mnu.Append(mnuRun);
 			mnu.Append(mnuBreak);
 			mnu.Append(mnuProps);
 			//mnu.Append(mnuInspect);
@@ -2657,6 +2659,14 @@ namespace Jigsaw
 		protected virtual void OnToggleBreakpoint(object sender, EventArgs e)
 		{
 			this.ToggleBreakPoint();
+			_cvs.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected virtual void OnRunBlockStack(object sender, EventArgs e)
+		{
+			Jigsaw.Canvas js = (Jigsaw.Canvas)_cvs;
+			js.RunBlockStack(this);
 			_cvs.Invalidate();
 		}
 		
