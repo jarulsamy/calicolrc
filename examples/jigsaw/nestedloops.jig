@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
     <module name="Common.dll" />
-    <block id="1" typeName="Jigsaw.CControlStart" left="330" top="20">
+    <module name="Shapes.dll" />
+    <module name="Myro.dll" />
+    <module name="Graphics.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="460" top="20">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CAssignment" left="350" top="50">
+    <block id="2" typeName="Jigsaw.CAssignment" left="480" top="50">
         <edge id="2" name="In" linkedTo="1" />
         <edge id="3" name="Out" linkedTo="4" />
         <property name="Label" value="I = 1" />
@@ -18,7 +21,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="3" typeName="Jigsaw.CControlRepeat" left="350" top="70">
+    <block id="3" typeName="Jigsaw.CControlRepeat" left="480" top="70">
         <edge id="4" name="In" linkedTo="3" />
         <edge id="5" name="Out" linkedTo="-1" />
         <edge id="6" name="Loop" linkedTo="7" />
@@ -28,7 +31,7 @@
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="4" typeName="Jigsaw.CAssignment" left="370" top="90">
+    <block id="4" typeName="Jigsaw.CAssignment" left="500" top="90">
         <edge id="7" name="In" linkedTo="6" />
         <edge id="8" name="Out" linkedTo="9" />
         <property name="Label" value="J = 1" />
@@ -38,7 +41,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="5" typeName="Jigsaw.CControlRepeat" left="370" top="110">
+    <block id="5" typeName="Jigsaw.CControlRepeat" left="500" top="110">
         <edge id="9" name="In" linkedTo="8" />
         <edge id="10" name="Out" linkedTo="12" />
         <edge id="11" name="Loop" linkedTo="14" />
@@ -48,7 +51,7 @@
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CAssignment" left="370" top="230">
+    <block id="6" typeName="Jigsaw.CAssignment" left="500" top="230">
         <edge id="12" name="In" linkedTo="10" />
         <edge id="13" name="Out" linkedTo="-1" />
         <property name="Label" value="I = I+ 1" />
@@ -58,7 +61,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="7" typeName="Jigsaw.CIOPrint" left="390" top="130">
+    <block id="7" typeName="Jigsaw.CIOPrint" left="520" top="130">
         <edge id="14" name="In" linkedTo="11" />
         <edge id="15" name="Out" linkedTo="16" />
         <property name="Label" value="print(I)" />
@@ -67,7 +70,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="8" typeName="Jigsaw.CIOPrint" left="390" top="150">
+    <block id="8" typeName="Jigsaw.CIOPrint" left="520" top="150">
         <edge id="16" name="In" linkedTo="15" />
         <edge id="17" name="Out" linkedTo="18" />
         <property name="Label" value="print(J)" />
@@ -76,7 +79,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="9" typeName="Jigsaw.CIOPrint" left="390" top="170">
+    <block id="9" typeName="Jigsaw.CIOPrint" left="520" top="170">
         <edge id="18" name="In" linkedTo="17" />
         <edge id="19" name="Out" linkedTo="20" />
         <property name="Label" value="print('---')" />
@@ -85,7 +88,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="10" typeName="Jigsaw.CAssignment" left="390" top="190">
+    <block id="10" typeName="Jigsaw.CAssignment" left="520" top="190">
         <edge id="20" name="In" linkedTo="19" />
         <edge id="21" name="Out" linkedTo="-1" />
         <property name="Label" value="J = J+ 1" />

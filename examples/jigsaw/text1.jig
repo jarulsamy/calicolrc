@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
     <module name="Common.dll" />
+    <module name="Shapes.dll" />
     <module name="Graphics.dll" />
-    <block id="1" typeName="Jigsaw.CControlStart" left="350" top="36">
+    <block id="1" typeName="Jigsaw.CControlStart" left="455" top="21">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CMethodBlock" left="370" top="66">
+    <block id="2" typeName="Jigsaw.CMethodBlock" left="475" top="51">
         <method assembly_name="Graphics" type_name="Graphics" method_name="makeWindow" return_type="Graphics+WindowClass">
             <parameter name="title" type="System.String" default="Calico Graphics" />
             <parameter name="width" type="System.Int32" default="300" />
@@ -26,7 +27,7 @@
         <fill_color R="0.771479701051246" G="0.892293508580091" B="0.677036193980387" A="1" />
         <line_color R="0.308591880420499" G="0.356917403432036" B="0.270814477592155" A="1" />
     </block>
-    <block id="3" typeName="Jigsaw.CControlRepeat" left="370" top="86">
+    <block id="3" typeName="Jigsaw.CControlRepeat" left="475" top="71">
         <edge id="4" name="In" linkedTo="3" />
         <edge id="5" name="Out" linkedTo="-1" />
         <edge id="6" name="Loop" linkedTo="7" />
@@ -36,7 +37,7 @@
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="4" typeName="Jigsaw.CRandom" left="390" top="106">
+    <block id="4" typeName="Jigsaw.CRandom" left="495" top="91">
         <edge id="7" name="In" linkedTo="6" />
         <edge id="8" name="Out" linkedTo="9" />
         <property name="Label" value="X = random(0.0, 300.0)" />
@@ -47,7 +48,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="5" typeName="Jigsaw.CRandom" left="390" top="126">
+    <block id="5" typeName="Jigsaw.CRandom" left="495" top="111">
         <edge id="9" name="In" linkedTo="8" />
         <edge id="10" name="Out" linkedTo="11" />
         <property name="Label" value="Y = random(0.0, 300.0)" />
@@ -58,10 +59,10 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CMethodBlock" left="390" top="146">
+    <block id="6" typeName="Jigsaw.CMethodBlock" left="495" top="131">
         <method assembly_name="Graphics" type_name="Text" method_name="Text" return_type="Text">
-            <parameter name="iterable" type="System.Collections.IList" default="" />
-            <parameter name="text" type="System.String" default="" />
+            <parameter name="iterable" type="System.Collections.IList" default="System.DBNull" />
+            <parameter name="text" type="System.String" default="System.DBNull" />
         </method>
         <edge id="11" name="In" linkedTo="10" />
         <edge id="12" name="Out" linkedTo="13" />
@@ -73,7 +74,7 @@
         <fill_color R="0.771479701051246" G="0.892293508580091" B="0.677036193980387" A="1" />
         <line_color R="0.308591880420499" G="0.356917403432036" B="0.270814477592155" A="1" />
     </block>
-    <block id="7" typeName="Jigsaw.CStatement" left="390" top="166">
+    <block id="7" typeName="Jigsaw.CStatement" left="495" top="151">
         <edge id="13" name="In" linkedTo="12" />
         <edge id="14" name="Out" linkedTo="-1" />
         <property name="Label" value="t.draw(w)" />

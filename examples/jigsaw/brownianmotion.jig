@@ -3,14 +3,14 @@
     <module name="Common.dll" />
     <module name="Shapes.dll" />
     <module name="Myro.dll" />
-    <block id="1" typeName="Jigsaw.CControlStart" left="340" top="25">
+    <block id="1" typeName="Jigsaw.CControlStart" left="460" top="25">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CMethodBlock" left="360" top="55">
+    <block id="2" typeName="Jigsaw.CMethodBlock" left="480" top="55">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeWindow" return_type="Graphics+WindowClass, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="title" type="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="'Calico Graphics'" />
             <parameter name="width" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="300" />
@@ -27,7 +27,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="3" typeName="Jigsaw.CMethodBlock" left="360" top="75">
+    <block id="3" typeName="Jigsaw.CMethodBlock" left="480" top="75">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeCircle" return_type="Graphics+Circle, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="point" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
             <parameter name="radius" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
@@ -42,7 +42,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="4" typeName="Jigsaw.CMethodBlock" left="360" top="95">
+    <block id="4" typeName="Jigsaw.CMethodBlock" left="480" top="95">
         <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="shape" type="Graphics+Shape, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
             <parameter name="window" type="Graphics+WindowClass, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
@@ -57,7 +57,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="5" typeName="Jigsaw.CAssignment" left="360" top="115">
+    <block id="5" typeName="Jigsaw.CAssignment" left="480" top="115">
         <edge id="8" name="In" linkedTo="7" />
         <edge id="9" name="Out" linkedTo="10" />
         <property name="Label" value="win.mode = &quot;bitmap&quot;" />
@@ -67,7 +67,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CControlWhile" left="360" top="135">
+    <block id="6" typeName="Jigsaw.CControlWhile" left="480" top="135">
         <edge id="10" name="In" linkedTo="9" />
         <edge id="11" name="Out" linkedTo="-1" />
         <edge id="12" name="Loop" linkedTo="13" />
@@ -77,7 +77,7 @@
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="7" typeName="Jigsaw.CMethodBlock" left="380" top="155">
+    <block id="7" typeName="Jigsaw.CMethodBlock" left="500" top="155">
         <method assembly_name="Myro" type_name="Myro" method_name="pickOne" return_type="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="items" type="System.Object[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
@@ -90,7 +90,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="8" typeName="Jigsaw.CMethodBlock" left="380" top="175">
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="500" top="175">
         <method assembly_name="Myro" type_name="Myro" method_name="pickOne" return_type="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="items" type="System.Object[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
         </method>
@@ -103,7 +103,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="9" typeName="Jigsaw.CAssignment" left="380" top="195">
+    <block id="9" typeName="Jigsaw.CAssignment" left="500" top="195">
         <edge id="17" name="In" linkedTo="16" />
         <edge id="18" name="Out" linkedTo="19" />
         <property name="Label" value="p1 = circle.center.x, circle.center.y" />
@@ -113,7 +113,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="10" typeName="Jigsaw.CMethodBlock" left="380" top="215">
+    <block id="10" typeName="Jigsaw.CMethodBlock" left="500" top="215">
         <method assembly_name="Shapes" type_name="Shapes" method_name="move" return_type="System.Void, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <parameter name="shape" type="Graphics+Shape, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" default="System.DBNull" />
             <parameter name="dx" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
@@ -130,7 +130,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="11" typeName="Jigsaw.CAssignment" left="380" top="235">
+    <block id="11" typeName="Jigsaw.CAssignment" left="500" top="235">
         <edge id="21" name="In" linkedTo="20" />
         <edge id="22" name="Out" linkedTo="23" />
         <property name="Label" value="p2 = circle.center.x, circle.center.y" />
@@ -140,7 +140,7 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="12" typeName="Jigsaw.CMethodBlock" left="380" top="255">
+    <block id="12" typeName="Jigsaw.CMethodBlock" left="500" top="255">
         <method assembly_name="Shapes" type_name="Shapes" method_name="makeLine" return_type="Graphics+Line, Graphics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <parameter name="p1" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
             <parameter name="p2" type="System.Collections.IList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" default="System.DBNull" />
@@ -155,7 +155,7 @@
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
-    <block id="13" typeName="Jigsaw.CMethodBlock" left="380" top="275">
+    <block id="13" typeName="Jigsaw.CMethodBlock" left="500" top="275">
         <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void">
             <parameter name="shape" type="Graphics+Shape" default="System.DBNull" />
             <parameter name="window" type="Graphics+WindowClass" default="System.DBNull" />
