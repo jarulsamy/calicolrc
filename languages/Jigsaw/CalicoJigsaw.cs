@@ -79,10 +79,10 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
+		calico.ProgramSpeed.Value = cvs.TimeOut;
 		widget.ShowAll ();
-        calico.ProgramSpeed.Value = cvs.TimeOut;
 	}
-	
+
     public override bool IsDirty {
         get { return cvs.Modified; }
         set { 
@@ -90,7 +90,6 @@ public class CalicoJigsawDocument : Document
 		}
     }
 
-	
 	protected void OnJigsawCanvasChanged(object sender, EventArgs a) {
 		Gtk.Application.Invoke( delegate {
 			UpdateDocument();
@@ -104,26 +103,33 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
 	{
+		// This is fired when Jigsaw Steps
 	}
 	
 	protected void OnJigsawPause(object sender, EventArgs a)
 	{
+		// This is fired when Jigsaw pauses, such as hits a breakpoint
+		calico.PlayButton.Sensitive = true;
 	}
 	
 	protected void OnJigsawError(object sender, EventArgs a)
 	{
+		// This is fired when Jigsaw has an error
 		calico.OnStopRunning();		
 	}
 	
 	public override double SpeedValue {
 		get {return cvs.TimeOut;}
 		set {
-			// convert from Calico units to Jigsaw units
 			cvs.TimeOut = value;
-			if (value <= 0.0)
+			if (value <= 0.0 && cvs.IsRunning) {
 				cvs.Pause();
+				Gtk.Application.Invoke (delegate {
+					calico.PauseButton.Sensitive = false;
+				});
+			}
 		}
-	}
+	}	
 	
 	public override void ExecuteFileInBackground ()
 	{

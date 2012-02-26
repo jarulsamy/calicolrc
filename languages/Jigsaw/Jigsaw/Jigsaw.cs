@@ -852,6 +852,15 @@ namespace Jigsaw
 			}
 		}
 
+		// - - - Get internal flag indicating if running - - - - - - -
+		public bool IsRunning 
+		{
+			get
+			{
+				return _isRunning;
+			}
+		}
+
 		// - - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
         public void RaiseJigsawRun()
         {
