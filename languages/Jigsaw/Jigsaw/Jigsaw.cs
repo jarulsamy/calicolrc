@@ -2794,18 +2794,17 @@ namespace Jigsaw
 				// If dropped on the palette, delete the block
 				if (js.pnlBlock.ContainsPoint( this.Center.X, this.Center.Y, js )) {
 					_cvs = js;
-					this.OnDeleteStack(null, null);
-					//js.DeleteStack(this);
+					this.OnDeleteStack(null, null);;
 					return;
 					
 				} else {
-					// Otherwise, set dropped varuiable and continue
+					// Otherwise, set dropped variable and continue
 					dropped = this;
 				}
 				
 			} else {
 				// If a factory block is dropped on the palette, do nothing
-				if (js.pnlBlock.ContainsPoint( this.Outline.Left, this.Outline.Top, js)) {
+				if (js.pnlBlock.ContainsPoint( this.Outline.Center.X, this.Outline.Center.Y, js)) {
 					return;
 				} else {
 					// When a factory object is dropped, create a new instance.

@@ -1,8 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw\Jigsaw.cs" Line="963" Column="4" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="2839" Column="4" />
       <File FileName="Jigsaw\Engine.cs" Line="440" Column="5" />
       <File FileName="Jigsaw\ProcedureBlocks.cs" Line="476" Column="1" />
       <File FileName="Jigsaw\ControlBlocks.cs" Line="1872" Column="1" />
@@ -13,7 +13,7 @@
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>
