@@ -86,8 +86,8 @@ namespace Jigsaw
 		// True if to update block display while running
 		private bool _updateDisplay = true;
 		
-		// If true, automatically show properties dialog when drop new block
-		internal bool _autoProperties = false;
+		// If true, automatically show properties dialog when dropping new block
+		internal bool _autoProperties = true; //false;
 		
 		// Ref to internal search helper object
 		public SearchHelper _searchHelper = null;
@@ -2665,7 +2665,40 @@ namespace Jigsaw
 			js.RunBlockStack(this);
 			_cvs.Invalidate();
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public override void OnDoubleClick(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+        {	// Handle double click event
+			_cvs = cvs;
+			if (this.IsFactory == false) this.OnRunBlockStack(null, null);
+			
+			// @@@ Is any of the following necessary? (From base class)
+			
+//            // If the canvas is in the editing state
+//            if (cvs.Mode == EMode.Editing)
+//            {
+//                // If the shape is not selected and the shift key is not down deselect all shapes
+//                //if (this.Selected == false && Control.ModifierKeys != Keys.Shift) cvs.DeselectAll();
+//				if (this.Selected == false && (cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) 
+//					cvs.DeselectAll();
+//
+//                // Select this shape
+//                this.Select(cvs);
+//				
+//				// If double-clicked on a non-factory block, show View Window
+//				if (this.IsFactory == false) cvs.ShowPropertiesWindow();
+//				
+//                // Indicate that the canvas selection has changed
+//                cvs.RaiseSelectionChangedEvent();
+//				
+//				// Reset handler
+//				cvs.handler = cvs;
+//				
+//                // Redraw
+//                cvs.Invalidate();
+//            }
+        }
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnDeleteBlock(object sender, EventArgs e)
 		{
@@ -2842,7 +2875,8 @@ namespace Jigsaw
 			
 			// If in auto properties dialog mode, automatically show the dialog
 			bool popup = (cvs as Jigsaw.Canvas)._autoProperties;
-			if (this.IsFactory && popup) dropped.OnDoubleClick(cvs, null);
+			//if (this.IsFactory && popup) dropped.OnDoubleClick(cvs, null);
+			if (this.IsFactory && popup) cvs.ShowPropertiesWindow();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

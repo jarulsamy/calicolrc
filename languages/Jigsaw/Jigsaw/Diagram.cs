@@ -56,8 +56,7 @@ namespace Diagram
 	
     // -----------------------------------------------------------------------
     public enum EMode
-    {	// Current operational modes for the Canvas object
-		// Canvas modes. Starts out in Editing mode.
+    {	// Current operational modes for the Canvas object. Starts out in Editing mode.
         Editing,  Drawing, 
 		
 		// Following modes are reserved for EditMode and DrawMode. Both start as Idle.
@@ -2838,8 +2837,7 @@ namespace Diagram
             {
                 // If the shape is not selected and the shift key is not down deselect all shapes
                 //if (this.Selected == false && Control.ModifierKeys != Keys.Shift) cvs.DeselectAll();
-				if (this.Selected == false 
-				    && (cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) 
+				if (this.Selected == false && (cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) 
 					cvs.DeselectAll();
 
                 // Select this shape

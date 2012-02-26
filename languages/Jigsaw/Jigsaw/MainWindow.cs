@@ -160,6 +160,7 @@ public class MainWindow : Gtk.Window
 		muView.Append(new Gtk.MenuItem());
 		
 		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
+		miViewAutoProps.Active = true;
 		miViewAutoProps.Activated += new EventHandler(OnViewAutoProps);
 		muView.Append(miViewAutoProps);
 
