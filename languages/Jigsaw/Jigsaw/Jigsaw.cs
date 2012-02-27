@@ -989,7 +989,7 @@ namespace Jigsaw
 //			bStop.Enabled = false;
 //			bRun.Enabled = true;
 			//_isRunning = false;
-			_engine.Reset(this, _inspector);
+			//_engine.Reset(this, _inspector);
 			this.Invalidate();
 			RaiseJigsawStop();
 		}

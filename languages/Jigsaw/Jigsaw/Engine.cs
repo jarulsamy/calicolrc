@@ -446,10 +446,9 @@ namespace Jigsaw
 				
 				if (stack.Enabled || force) 
 				{
-					enabledCount++;
-					
 					if (stack.Count > 0) 							// Get the top-most block runner
 					{
+						enabledCount++;
 						StackFrame frame = stack.GetTopFrame();	
 						
 						bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
@@ -514,8 +513,10 @@ namespace Jigsaw
 			//_inspector.Update (globals);
 			if (enabledCount > 0) RaiseEngineStep();
 			
+			//Console.WriteLine ("CallStacks {0}, Enabled {1}", _callStacks.Count, enabledCount);
+			
 			// Check for nothing more to run
-			if (_callStacks.Count == 0) this.Stop();
+			if (_callStacks.Count == 0 && enabledCount == 0) this.Stop();
 			
 			_inStep = false;
 			return true;
