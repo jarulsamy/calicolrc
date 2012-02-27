@@ -73,6 +73,7 @@ public class CalicoJigsawDocument : Document
 		widget.AddWithViewport (cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
+		cvs.JigsawRun += new EventHandler(OnJigsawRun);		
 		cvs.JigsawStop += new EventHandler(OnJigsawStop);
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
@@ -98,13 +99,14 @@ public class CalicoJigsawDocument : Document
 		});
 	}
 	
-	protected void OnJigsawRunBlockStack(object sender, EventArgs a) {
+	protected void OnJigsawRun(object sender, EventArgs a) {
 		calico.OnStartRunning();
 	}
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
-		calico.OnStopRunning();
+		if (!cvs.IsRunning)
+			calico.OnStopRunning();
 	}
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
