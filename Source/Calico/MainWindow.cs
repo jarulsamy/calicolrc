@@ -621,7 +621,7 @@ namespace Calico {
         }
 
         public void TryToClose(Document document) {
-            if (Close(document) != "Cancel") {
+            if ((!document.IsDirty) || (Close(document) != "Cancel")) {
                 int page_num = DocumentNotebook.PageNum(document.widget);
                 DocumentNotebook.RemovePage(page_num);
             }
@@ -706,7 +706,7 @@ namespace Calico {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
                 if (documents.ContainsKey(widget)) {
                     document = documents[widget];
-                    if (document.IsDirty || document.filename == null) {
+                    if (document.IsDirty) {
                         string answer = Close(document);
                         if (answer == "Cancel")
                             return false;
