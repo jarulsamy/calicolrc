@@ -251,6 +251,7 @@ public class CalicoJigsawDocument : Document
 	public override void Stop ()
 	{
 		cvs.Stop ();
+		cvs.Reset();
 		calico.OnStopRunning();
 	}
 	
