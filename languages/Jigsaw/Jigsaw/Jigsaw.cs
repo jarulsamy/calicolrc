@@ -2663,6 +2663,7 @@ namespace Jigsaw
 		{
 			Jigsaw.Canvas js = (Jigsaw.Canvas)_cvs;
 			js.RunBlockStack(this);
+			js.RaiseJigsawRun();
 			_cvs.Invalidate();
 		}
 
