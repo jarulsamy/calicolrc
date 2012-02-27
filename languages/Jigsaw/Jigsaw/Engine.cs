@@ -307,7 +307,13 @@ namespace Jigsaw
 		{	// Determine if the program is running
 			get {
 				if (_callStacks == null) return false;
-				if (_callStacks.Count > 0) return true;
+				if (_callStacks.Count > 0) {
+					foreach (CallStack cs in _callStacks) {
+						if (cs.Enabled == true) {
+							return true;
+						}
+					}
+				}
 				return false;
 			}
 		}

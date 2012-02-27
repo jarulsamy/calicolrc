@@ -81,7 +81,7 @@ namespace Jigsaw
 		private List<Widgets.CRoundedTab> allTabs = null;
 		
 		// A flag to help track running state
-		private bool _isRunning = false;
+		//private bool _isRunning = false;
 		
 		// True if to update block display while running
 		private bool _updateDisplay = true;
@@ -857,7 +857,7 @@ namespace Jigsaw
 		{
 			get
 			{
-				return _isRunning;
+				return _engine.IsRunning; //_isRunning;
 			}
 		}
 
@@ -921,8 +921,9 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			if (!_isRunning) engine.Reset(this, _inspector);
-			_isRunning = true;
+			//if (!_isRunning) engine.Reset(this, _inspector);
+			//_isRunning = true;
+			if (!_engine.IsRunning) engine.Reset(this, _inspector);
 			_engine.Run();
 			RaiseJigsawRun();
 		}
@@ -933,7 +934,7 @@ namespace Jigsaw
 			_engine.Stop();
 			//_engine.Reset(this, _inspector);
 			//_engine.Reset(this);
-			_isRunning = false;
+			//_isRunning = false;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -946,8 +947,9 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Step()
 		{
-			if (!_isRunning) engine.Reset(this, _inspector);
-			_isRunning = true;
+			//if (!_isRunning) engine.Reset(this, _inspector);
+			//_isRunning = true;
+			if (!_engine.IsRunning) engine.Reset(this, _inspector);
 			_engine.Step(true);
 			RaiseJigsawStep();
 		}
@@ -986,7 +988,7 @@ namespace Jigsaw
 		{	
 //			bStop.Enabled = false;
 //			bRun.Enabled = true;
-			_isRunning = false;
+			//_isRunning = false;
 			_engine.Reset(this, _inspector);
 			this.Invalidate();
 			RaiseJigsawStop();
