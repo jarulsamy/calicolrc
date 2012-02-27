@@ -621,7 +621,7 @@ namespace Calico {
         }
 
         public void TryToClose(Document document) {
-            if (document.Close()) {
+            if (Close(document) != "Cancel") {
                 int page_num = DocumentNotebook.PageNum(document.widget);
                 DocumentNotebook.RemovePage(page_num);
             }
@@ -682,11 +682,80 @@ namespace Calico {
             config.Save();
         }
 
+        public string Close(Document document) {
+            while (true) {
+                string answer = SaveAbandonCancel(document.basename);
+                if (answer == "Cancel") {
+                    return "Cancel";
+                } else if (answer == "Abandon changes") {
+                    return "Abandon changes";
+                } else { // Save
+                    bool result = document.Save();
+                    if (result) {
+                        return "Save";
+                    }
+                }
+            }
+        }
+
         public bool Close() {
             // Delete Window
             // FIXME: ask to save files, or cancel
+            Document document;
+            for (int i = 0; i < DocumentNotebook.NPages; i++) {
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
+                if (documents.ContainsKey(widget)) {
+                    document = documents[widget];
+                    if (document.IsDirty || document.filename == null) {
+                        string answer = Close(document);
+                        if (answer == "Cancel")
+                            return false;
+                        else if (answer == "Abandon changes") {
+                            // ok, continue
+                        } else { // saved
+                            // ok, continue
+                        }
+                    }
+                }
+            }
             return true;
         }
+
+         public static string SaveAbandonCancel (string title)
+         {
+             ManualResetEvent ev = new ManualResetEvent (false);
+             dialogResponse = null;
+             Invoke (delegate {
+                 Gtk.Dialog fc = new Gtk.Dialog (title, null, 0);
+                 fc.VBox.PackStart (new Gtk.Label ("Save this file?"));
+                 fc.VBox.PackStart (new Gtk.Label (title));
+
+                 Gtk.Button button = new Gtk.Button ("Save");
+                 fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+                 button.Clicked += (o, a) => DialogHandler (o, a, fc);
+
+                 button = new Gtk.Button ("Abandon changes");
+                 button.Clicked += (o, a) => DialogHandler (o, a, fc);
+                 fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+
+                 button = new Gtk.Button ("Cancel");
+                 button.Clicked += (o, a) => DialogHandler (o, a, fc);
+                 fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+
+                 fc.ShowAll ();
+                 fc.Run ();
+                 fc.Destroy ();
+                 ev.Set ();
+             });
+             ev.WaitOne ();
+             return dialogResponse;
+         }
+
+         public static void DialogHandler (object obj, System.EventArgs args, Gtk.Dialog dialog)
+         {
+             dialogResponse = ((Gtk.Button)obj).Label;
+             dialog.Respond (Gtk.ResponseType.Ok);
+         }
 
         public bool RequestQuit() {
             bool retval = Close();
@@ -717,7 +786,8 @@ namespace Calico {
         }
 
         protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
-            a.RetVal = RequestQuit();
+            // set RetVal to true to keep window
+            a.RetVal = ! RequestQuit();
         }
 
         public void PickNew() {
@@ -751,11 +821,6 @@ namespace Calico {
             } else {
                 Open();
             }
-        }
-
-        public static void DialogHandler(object obj, System.EventArgs args, Gtk.Dialog dialog) {
-            dialogResponse = ((Gtk.Button)obj).Label;
-            dialog.Respond(Gtk.ResponseType.Ok);
         }
 
         protected virtual void OnNewActionActivated(object sender, System.EventArgs e) {
