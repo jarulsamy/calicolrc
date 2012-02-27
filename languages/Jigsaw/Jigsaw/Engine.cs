@@ -361,13 +361,7 @@ namespace Jigsaw
 						// If also a ControlStart block ...
 						if (s is CControlStart) {
 							CControlStart cs = (CControlStart)s;
-							
 							ScriptScope scope = this.RunBlockStack( cs );
-//							CallStack stack = new CallStack(globals);					// Add new runner to call stack
-//							ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
-//							stack.AppendFrame( cs, scope );
-//							_callStacks.Add(stack);
-							
 							scopes.Add (scope);					// Temporarily save reference to new start block scope
 						}
 						
@@ -402,6 +396,35 @@ namespace Jigsaw
 			
 			RaiseEngineReset();
 			return true;
+		}
+		
+		// - - - Recompile a stack of blocks
+		public bool CompileStack(CBlock start, Jigsaw.Canvas cvs) {
+			
+			try
+			{
+				List<CBlock> stack = new List<CBlock>();
+				stack.Add (start);
+				
+				while (stack.Count > 0) {
+					// Compile the top of the stack
+					CBlock b = stack[0];
+					stack.RemoveAt (0);
+					b.Compile(this.engine, cvs);
+					
+					// Add all subordinate blocks to the stack
+					foreach (CEdge e in b.Edges) {
+						if (e.Type != EdgeType.In && e.LinkedTo != null) {
+							stack.Add ( e.LinkedTo.Block );
+						}
+					}
+				}
+				
+				return true;
+			} catch (Exception ex) {
+				Console.WriteLine ("Error on Engine.CompileStack: {0}", ex.Message);
+				return false;
+			}
 		}
 		
 		// - - -

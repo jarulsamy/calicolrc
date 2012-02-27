@@ -2664,6 +2664,9 @@ namespace Jigsaw
 		protected virtual void OnRunBlockStack(object sender, EventArgs e)
 		{
 			Jigsaw.Canvas js = (Jigsaw.Canvas)_cvs;
+			
+			js.engine.CompileStack(this, js);
+			
 			js.RunBlockStack(this);
 			js.RaiseJigsawRun();
 			_cvs.Invalidate();

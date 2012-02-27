@@ -829,6 +829,7 @@ public class MainWindow : Gtk.Window
 	protected void OnEngineStop(object sender, EventArgs a)
 	{	
 		js.Stop();
+		js.Reset();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
