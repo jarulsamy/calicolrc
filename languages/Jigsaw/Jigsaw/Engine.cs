@@ -566,7 +566,7 @@ namespace Jigsaw
 			this.Step();
 			
 			// If the step advanced the engine to a completion point, stop
-			if (!this.IsRunning) this.Stop();
+			//if (!this.IsRunning) this.Stop();
 			
 			// Return the current state indicating the desire to continue
 			return true; //_timerContinue;

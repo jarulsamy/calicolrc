@@ -949,7 +949,7 @@ namespace Jigsaw
 		{
 			//if (!_isRunning) engine.Reset(this, _inspector);
 			//_isRunning = true;
-			if (!_engine.IsRunning) engine.Reset(this, _inspector);
+			//if (!_engine.IsRunning) engine.Reset(this, _inspector);
 			_engine.Step(true);
 			RaiseJigsawStep();
 		}
