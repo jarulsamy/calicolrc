@@ -39,7 +39,7 @@ public class CalicoFSharpEngine : Engine
 	   string gdk = make_path("gdk-sharp");
 	   string glib = make_path("glib-sharp");
 	   string atk = make_path("atk-sharp");
-	   string fsi = System.IO.Path.Combine(path, "fsi.exe");
+	   string fsi = System.IO.Path.Combine(path, "..\\languages\\FSharp\\fsi.exe");
 	   ProcessStartInfo startInfo = new ProcessStartInfo();
 	   // FIXME: on windows, run directly; on others need mono in path
 		string arguments = "";
