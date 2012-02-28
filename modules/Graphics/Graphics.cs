@@ -2158,7 +2158,7 @@ public static class Graphics
 			return getScreenPoint (points [0]);
 		}
 
-		public Point getP2 ()
+		public virtual Point getP2 ()
 		{
 			return getScreenPoint (points [2]);
 		}
@@ -2954,6 +2954,12 @@ public static class Graphics
 			close_path = false;
 			fill = null;
 		}
+
+		public override Point getP2 ()
+		{
+			return getScreenPoint (points [1]);
+		}
+
 	}
 
 	public class Curve : Shape

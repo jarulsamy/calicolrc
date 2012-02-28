@@ -1009,7 +1009,7 @@ public static class Myro
 				if (port.StartsWith ("sim")) {
 					if (simulation == null) {
 						simulation = new Simulation ();
-						Thread.Sleep ((int)(1 * 1000));
+						//Thread.Sleep ((int)(5 * 1000));
 					} else {
 						simulation.setup ();
 					}
@@ -1034,7 +1034,7 @@ public static class Myro
 		public List<Robot> robots = new List<Robot> ();
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-		public double extra_simulation_time = 0.1;
+		public double extra_simulation_time = 0.0;
 
 		public Simulation () : this(640, 480)
 		{
@@ -1083,16 +1083,16 @@ public static class Myro
 			wall.draw (window);      
 
 			Graphics.Rectangle pyramid = new Graphics.Rectangle (
-		  new Graphics.Point (100, 100), 
-		  new Graphics.Point (150, 150));
+		  		new Graphics.Point (100, 100), 
+		  		new Graphics.Point (150, 150));
 			pyramid.color = makeColor ("orange");
 			pyramid.rotate (45);
 			pyramid.bodyType = "static";
 			pyramid.draw (window);      
 
 			Graphics.Circle ball = new Graphics.Circle (
-		  new Graphics.Point (200, height - 150), 
-		  25);
+		  		new Graphics.Point (200, height - 150), 
+		  		25);
 			ball.color = makeColor ("blue");
 			ball.draw (window);      
 		}
@@ -1118,45 +1118,47 @@ public static class Myro
 					lock (robot) {
 						robot.stall = false;
 						robot.frame.body.LinearVelocity = Graphics.VectorRotate (
-                  Graphics.Vector (robot.velocity, 0), 
-		  robot.frame.body.Rotation);
+                  			Graphics.Vector (robot.velocity, 0), 
+		  					robot.frame.body.Rotation);
 						// Get sensor readings
 						robot.readings.clear ();
 						if (!window.IsRealized)
 							return;
+						Graphics.Point p1 = null;
+						Graphics.Point p2 = null;
 						lock (window.canvas.shapes) {
 							foreach (KeyValuePair<object,object> kvp in robot.sensors) {
 								string key = (string)kvp.Key;
 								Graphics.Line line = (Graphics.Line)kvp.Value;
-								Graphics.Point p1 = robot.frame.getScreenPoint (line.getP1 ());
-								Graphics.Point p2 = robot.frame.getScreenPoint (line.getP2 ());
+								p1 = robot.frame.getScreenPoint (line.getP1 ());
+								p2 = robot.frame.getScreenPoint (line.getP2 ());
 								if (!window.IsRealized)
 									return;
 								window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-									robot.readings [key] = hit;
-									return 1; 
-								}, 
-		  Graphics.Vector (((float)p1.x) / MeterInPixels, 
-				  ((float)p1.y) / MeterInPixels), 
-		  Graphics.Vector (((float)p2.x) / MeterInPixels, 
-				  ((float)p2.y) / MeterInPixels));
+										robot.readings [key] = hit;
+										return 1; 
+									}, 
+		  							Graphics.Vector (((float)p1.x) / MeterInPixels, 
+				  					((float)p1.y) / MeterInPixels), 
+		  							Graphics.Vector (((float)p2.x) / MeterInPixels, 
+				  					((float)p2.y) / MeterInPixels));
 							}
 							foreach (Graphics.Shape light in simulation.lights) {
 								foreach (Graphics.Shape light_sensor in robot.light_sensors) {
 									Graphics.Point c = new Graphics.Point (light_sensor.center);
 									c.x -= 6; // hack to get outside of bounding box
-									Graphics.Point p1 = robot.frame.getScreenPoint (c);
-									Graphics.Point p2 = light.center;
+									p1 = robot.frame.getScreenPoint (c);
+									p2 = light.center;
 									if (!window.IsRealized)
 										return;
 									window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-										robot.readings [light_sensor.tag] = hit;
-										return 1; 
-									}, 
-		    Graphics.Vector (((float)p1.x) / MeterInPixels, 
-				    ((float)p1.y) / MeterInPixels), 
-		    Graphics.Vector (((float)p2.x) / MeterInPixels, 
-				    ((float)p2.y) / MeterInPixels));
+											robot.readings [light_sensor.tag] = hit;
+											return 1; 
+										}, 
+		    							Graphics.Vector (((float)p1.x) / MeterInPixels, 
+				    					((float)p1.y) / MeterInPixels), 
+		    							Graphics.Vector (((float)p2.x) / MeterInPixels, 
+				    					((float)p2.y) / MeterInPixels));
 									if (robot.readings.Contains (light_sensor.tag)) {
 										robot.readings [light_sensor.tag] = (float)5000.0; // blocked
 									} else {
@@ -1932,7 +1934,7 @@ public static class Myro
 			y = args.Event.Y;
 			center_x = window.width / 2;
 			center_y = window.height / 2;
-			r = -(center_x - x) / (center_x - radius);
+			r = (center_x - x) / (center_x - radius);
 			t = (center_y - y) / (center_y - radius);
 			r = Math.Min (Math.Max (r, -1), 1);
 			t = Math.Min (Math.Max (t, -1), 1);
@@ -1951,7 +1953,7 @@ public static class Myro
 				y = args.Event.Y;
 				center_x = window.width / 2;
 				center_y = window.height / 2;
-				r = -(center_x - x) / (center_x - radius);
+				r = (center_x - x) / (center_x - radius);
 				t = (center_y - y) / (center_y - radius);
 				r = Math.Min (Math.Max (r, -1), 1);
 				t = Math.Min (Math.Max (t, -1), 1);
@@ -2598,6 +2600,27 @@ public static class Myro
 		{
 		}
 		
+		public void playSong (List song)
+		{
+			playSong (song, 1.0);
+		}
+    
+		public void playSong (List song, double speed)
+		{
+			foreach (IList tup in song) {
+				if (tup.Count == 2) {
+					double f = System.Convert.ToDouble (tup [0]); 
+					double d = System.Convert.ToDouble (tup [1]);
+					beep (d, f);
+				} else if (tup.Count == 3) {
+					double f1 = System.Convert.ToDouble (tup [0]); 
+					double f2 = System.Convert.ToDouble (tup [1]); 
+					double d = System.Convert.ToDouble (tup [2]);
+					beep (d * speed, f1, f2);
+				}
+			}
+		}
+    
 		public SdlDotNet.Audio.Sound makeSound(string filename) {
             if (! sound_initialized)
                 initialize_sound();
@@ -6072,7 +6095,15 @@ public static class Myro
 
 	public static void playSong (List song)
 	{
-		robot.playSong (song);
+		playSong (song, 1.0);
+	}
+
+	public static void playSong (List song, double speed)
+	{
+		if (robot != null)
+			robot.playSong (song, speed);
+		else
+			computer.playSong(song, speed);
 	}
 
 	public static void saveSong (List song, string filename, int append)
@@ -6218,6 +6249,5 @@ public static class Myro
 		} else {
 			return Double.Parse (v);
 		}
-	}
-	
+	}	
 }
