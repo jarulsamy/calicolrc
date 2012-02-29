@@ -52,7 +52,14 @@ public class CalicoSchemeEngine : Engine
 
   public override bool ExecuteFile(string filename) {
     System.Console.WriteLine("Run filename '{0}'!", filename);
-    PJScheme.execute_file_rm(filename);
+    object obj = PJScheme.execute_file_rm(filename);
+    if (obj != null) {
+      string str = obj.ToString();
+      if (str != "") {
+	Console.Error.WriteLine(str);
+	return false;
+      }
+    }
     return true;
   }
 
