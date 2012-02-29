@@ -39,38 +39,43 @@ public class CalicoFSharpEngine : Engine
 	   string gdk = make_path("gdk-sharp");
 	   string glib = make_path("glib-sharp");
 	   string atk = make_path("atk-sharp");
-	   string fsi = System.IO.Path.Combine(path, "..\\languages\\FSharp\\fsi.exe");
+	   string fsi = combine(path, "fsi.exe");
 	   ProcessStartInfo startInfo = new ProcessStartInfo();
 	   // FIXME: on windows, run directly; on others need mono in path
-		string arguments = "";
-		if (System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
-	   		startInfo.FileName = fsi;
-		} else {
-	   		startInfo.FileName = "mono";
-			arguments = "\"" + fsi + "\" ";
-		}
+	   string arguments = "";
+	   if (System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
+	     startInfo.FileName = fsi;
+	   } else {
+	     startInfo.FileName = "mono";
+	     arguments = "\"" + fsi + "\" ";
+	   }
 	   startInfo.Arguments = (
-			arguments + 
-		   "--readline- " + 
-		   "--lib:\"" + path + "\\..\\..\\modules\" " +
-		   "--lib:\"" + path + "\\..\\..\\bin " +
-		   "--lib:\"" + gtk + "\" " +
-		   "--lib:\"" + gdk + "\" " +
-		   "--lib:\"" + glib + "\" " +
-		   "--lib:\"" + atk + "\" " +
-		   "-r:atk-sharp.dll " +
-		   "-r:gdk-sharp.dll " +
-		   "-r:glib-sharp.dll " +
-		   "-r:Myro.dll " + 
-		   "-r:gtk-sharp.dll " +
-		   "-r:Mono.Cairo.dll " + 
-		   "-r:Myro.dll " + 
-		   "-r:Graphics.dll");
+				  arguments + 
+				  "--readline- " + 
+				  "--lib:\"" + combine(path, "..", "..", "modules") +"\" " +
+				  "--lib:\"" + combine(path, "..", "..", "bin") + "\" "
+				  //"--lib:\"" + gtk + "\" " +
+				  //"--lib:\"" + gdk + "\" " +
+				  //"--lib:\"" + glib + "\" " +
+				  //"--lib:\"" + atk + "\" " +
+				  //"-r:atk-sharp.dll " +
+				  //"-r:gdk-sharp.dll " +
+				  //"-r:glib-sharp.dll " +
+				  //"-r:Myro.dll " + 
+				  //"-r:gtk-sharp.dll " +
+				  //"-r:Mono.Cairo.dll " + 
+				  //"-r:Myro.dll " + 
+				  //"-r:Graphics.dll"
+				  );
 	   startInfo.UseShellExecute = false;
 	   startInfo.RedirectStandardError = true;
 	   startInfo.CreateNoWindow = true;
 	   startInfo.RedirectStandardOutput = true;
 	   startInfo.RedirectStandardInput = true;
+
+	   //System.Console.WriteLine(startInfo.FileName);
+	   //System.Console.WriteLine(startInfo.Arguments);
+
 	   
 	   process = Process.Start(startInfo);
 	   process.EnableRaisingEvents = true;
@@ -78,6 +83,17 @@ public class CalicoFSharpEngine : Engine
 	   process.ErrorDataReceived += new DataReceivedEventHandler(errorHandler);
 	   process.BeginOutputReadLine();
 	   process.BeginErrorReadLine();
+     }
+
+     public static string combine(params string [] items) {
+       string retval = "";
+       foreach (string item in items) {
+	 if (retval == "")
+	   retval = item;
+	 else
+	   retval = System.IO.Path.Combine(retval, item);
+       }
+       return retval;
      }
 	 
      public static string make_path(string assembly) {
