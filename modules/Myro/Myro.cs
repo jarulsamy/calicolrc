@@ -3695,7 +3695,7 @@ public static class Myro
 				conf_gray_window (1, 64, 0, 190, 191, 1, 1);
 				conf_gray_window (2, 128, 0, 254, 191, 1, 1);
 				set_ir_power (135);
-				conf_rle (90, 4, 0, 255, 51, 136, 190, 255);
+				conf_rle (0, 255, 51, 136, 190, 255, 90, 4);
 			}
 			if (info.Contains ("robot")) {
 				loadFudge ();
@@ -5329,10 +5329,9 @@ public static class Myro
 			return Graphics.PyTuple (0, 254, minU, maxU, minV, maxV);
 		}
     
-		public void conf_rle (int delay = 90, int smooth_thresh = 4,
-        int y_low=0, int y_high=254,
-        int u_low=51, int u_high=136,
-        int v_low=190, int v_high=254)
+	  public void conf_rle (int y_low=0, int y_high=254,
+				int u_low=51, int u_high=136,
+				int v_low=190, int v_high=254, int delay = 90, int smooth_thresh = 4)
 		{
 			write (Scribbler.SET_RLE);
 			write ((byte)delay);
