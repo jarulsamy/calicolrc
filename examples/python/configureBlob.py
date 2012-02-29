@@ -11,7 +11,7 @@ def configureBlob():
     while getMouseState() == "down":
         p2 = getMouseNow()
 
-    r = Rectangle(p1, p1)
+    r = Rectangle(p1, p2)
     r.outline = None
     r.color = Color(255, 255, 0, 64)
     r.draw(w)
