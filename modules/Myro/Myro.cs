@@ -5321,7 +5321,7 @@ public static class Myro
 			// Note that we use the default values for
 			// several parameters, most importantly the Y value
 			// defaults to a range of 0-254
-			conf_rle (minU, maxU, minV, maxV);
+			conf_rle (0, 254, minU, maxU, minV, maxV);
 
 			// Return a tupal of parameters suitable for the configureBlob
 			// function, to be shown to the user.
