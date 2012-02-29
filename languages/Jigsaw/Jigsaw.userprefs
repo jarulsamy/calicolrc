@@ -1,18 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw\Jigsaw.cs" Line="2113" Column="14" />
-      <File FileName="Jigsaw\Engine.cs" Line="405" Column="5" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="822" Column="17" />
+      <File FileName="Jigsaw\Engine.cs" Line="580" Column="1" />
       <File FileName="Jigsaw\ControlBlocks.cs" Line="1542" Column="31" />
       <File FileName="Jigsaw\CMethodBlock.cs" Line="223" Column="79" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="826" Column="3" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="284" Column="44" />
+      <File FileName="CalicoJigsaw.cs" Line="134" Column="14" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="MainWindow.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>

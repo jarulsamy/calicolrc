@@ -810,20 +810,21 @@ namespace Jigsaw
 		{
 			set
 			{
-				// Slowest rate is once every 2 seconds.
-				uint newTimeOut = (uint)(2000.0/value);
+				uint newTimeOut = 100;
+				if (value > 0.0) newTimeOut = (uint)(2000.0/value);
 				
 				if (value <= 0.0) {
-					// Do nothing if too small
+					// If 0.0, pause
+					this.Pause ();
 					return;
 				} else if (value > 99.0) {
-					// Turn off updating if > 99
+					// Turn off updating
 					if (_updateDisplay == true) {
 						Console.WriteLine ("Turbo mode!");
-						newTimeOut = 1;
+						newTimeOut = 1;		// As fast as possible
 						UpdateDisplay = false;
 					}
-				} else if ( _engine.TimeOut == newTimeOut) {
+				} else if ( _engine.TimeOut == newTimeOut ) {
 					// Do nothing if value hasn't changed
 					return;
 				} else {

@@ -281,7 +281,7 @@ public class MainWindow : Gtk.Window
 		tbRunStop.Sensitive = false;
 		tb.Add(tbRunStop);
 		
-		Gtk.HScale hsRunSlider = new Gtk.HScale(1, 100, 1);
+		Gtk.HScale hsRunSlider = new Gtk.HScale(0, 100, 1);
 		hsRunSlider.Value = 10.0;
 		hsRunSlider.ValuePos = Gtk.PositionType.Right;
 		hsRunSlider.SetSizeRequest(100, 10);
