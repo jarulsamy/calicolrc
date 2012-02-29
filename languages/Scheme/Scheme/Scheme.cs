@@ -467,6 +467,8 @@ public class Scheme {
   public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) Equal, -1, 2);
   public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
   public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
+  public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
+  public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
@@ -1707,6 +1709,14 @@ public class Scheme {
 	}
 	throw new Exception(String.Format("unable to compare {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
+  }
+
+  public static bool LessThanOrEqual(object obj) {
+	return (LessThan(car(obj), cadr(obj)) || Equal(car(obj), cadr(obj)));
+  }
+
+  public static bool GreaterThanOrEqual(object obj) {
+	return (GreaterThan(car(obj), cadr(obj)) || Equal(car(obj), cadr(obj)));
   }
 
   public static bool GreaterThan(object args) {

@@ -739,6 +739,26 @@
        (runtime-error "> called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply > args) fail)))))
 
+;; <=
+(define lt-or-eq-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-at-least? 2 args))
+       (runtime-error "incorrect number of arguments to <=" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "<= called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply <= args) fail)))))
+
+;; >=
+(define gt-or-eq-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-at-least? 2 args))
+       (runtime-error "incorrect number of arguments to >=" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error ">= called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply >= args) fail)))))
+
 ;; =
 (define equal-sign-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1219,7 +1239,7 @@
 	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector)
+	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>=)
       (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim print-prim
 	    display-prim newline-prim load-prim length-prim null?-prim cons-prim car-prim cdr-prim cadr-prim
 	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim equal-sign-prim
@@ -1227,7 +1247,7 @@
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
 	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim)))))
+	    make-vector-prim lt-or-eq-prim gt-or-eq-prim)))))
 
 (define toplevel-env (make-toplevel-env))
 
