@@ -128,15 +128,7 @@ public class CalicoJigsawDocument : Document
 	
 	public override double SpeedValue {
 		get {return cvs.TimeOut;}
-		set {
-			cvs.TimeOut = value;
-			if (value <= 0.0 && cvs.IsRunning) {
-				cvs.Pause();
-				Gtk.Application.Invoke (delegate {
-					calico.PauseButton.Sensitive = false;
-				});
-			}
-		}
+		set {cvs.TimeOut = value;}
 	}	
 	
 	public override void ExecuteFileInBackground ()
@@ -145,7 +137,7 @@ public class CalicoJigsawDocument : Document
 		Gtk.Application.Invoke (delegate {
 			cvs.Reset ();
 			//Console.WriteLine(cvs.TimeOut);
-			if (cvs.TimeOut <= 7.0) {
+			if (cvs.TimeOut <= 1.0) {
 				calico.PauseButton.Sensitive = false;
 				cvs.Step ();
 			} else {
