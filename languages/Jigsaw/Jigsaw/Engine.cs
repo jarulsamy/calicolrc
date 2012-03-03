@@ -541,6 +541,7 @@ namespace Jigsaw
 			// Check for nothing more to run
 			if (_callStacks.Count == 0 && enabledCount == 0) this.Stop();
 			
+			//System.GC.Collect();		// Force garbage collection
 			_inStep = false;
 			return true;
 		}

@@ -1972,7 +1972,7 @@ namespace Jigsaw
 		public CEdge InEdge;							// By default, all Blocks have one main input edge and one main output edge
 		public CEdge OutEdge;		
 		
-		protected int _textYOffset = 0;					// Y offset for when a block's text
+		protected int _textYOffset = 12;				// Y offset for when a block's text
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
 		internal bool _breakStop = false;				// If true, marks a block as a stopping point for popping frames from stack 
 														// when a break is executed. Should be set to true for all loops.
@@ -2020,7 +2020,6 @@ namespace Jigsaw
 		public override Diagram.CShape Clone(double X, double Y) 
 		{	// Method to clone a CBlock at X,Y
 			// This method is used when a factory object is dropped on a canvas and a new clone is created
-			
 			return this.Clone(X, Y, true);
 		}
 
@@ -2062,22 +2061,6 @@ namespace Jigsaw
 				//this.TextProp.Text = value;
 			}
         }
-		
-		// This is a special internal method used when a program file is opened.
-		// Each block subclass should override and handle their special properties by name.
-//		internal virtual bool SetProperty(string name, string val)
-//		{
-//			string lname = name.ToLower();
-//			switch(lname) {
-//			case "text":
-//				this["Label"] = val;
-//				//TextProp.Text = val;
-//				break;
-//			default:
-//				return false;
-//			}
-//			return true;
-//		}
 
 		// This is a special internal method used when a program file is openned.
 		// Each block subclass should override and handle their special properties by name.
@@ -2381,26 +2364,54 @@ namespace Jigsaw
 	            double x = this.left;
 	            double y = this.top;
 	            double w = this.width;
-	            //double h = this.height;
+	            double h = this.height;
 				
-				double cx = x + 0.5*w;
-				double cy = y + 0.5*20;
-
-				//int layoutWidth, layoutHeight;
+//				double cx = x + 0.5*w;
+//				double cy = y + 0.5*20;
+//				int layoutWidth, layoutHeight;
 				
+				// Get ready to render block text
 				g.Color = this.TextColor;
-
-				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
-				Pango.FontDescription desc = Pango.FontDescription.FromString(
-						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
-				layout.FontDescription = desc;
-				layout.Alignment = Pango.Alignment.Left; //Center;
-				layout.Ellipsize = Pango.EllipsizeMode.End;
-				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
+				TextExtents te = g.TextExtents(text);
 				
-				layout.SetText(text);
-				g.MoveTo(x+10.0, y+3.0+_textYOffset);
-				Pango.CairoHelper.ShowLayout(g, layout);
+				// If text is larger than block, clip to a more narrow region and add ellipses.
+				// Otherwise, standard clip and display.
+				if (te.Width >= w) {
+					g.Save ();
+					g.Rectangle(x, y+6.0+_textYOffset, w-12.0, -h);
+					g.Clip ();
+					g.MoveTo(x+10.0, y+3.0+_textYOffset);
+					g.ShowText(text);
+					g.Restore ();
+					g.MoveTo (x+w-11.0, y+3.0+_textYOffset);
+					g.ShowText("...");
+				} else {
+					g.Save ();
+					g.Rectangle(x, y+6.0+_textYOffset, w, -h);
+					g.Clip ();
+					g.MoveTo(x+10.0, y+3.0+_textYOffset);
+					g.ShowText(text);
+					g.Restore ();
+				}
+				
+//				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+//				Pango.FontDescription desc = Pango.FontDescription.FromString(
+//						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+//				layout.FontDescription = desc;
+//				layout.Alignment = Pango.Alignment.Left; //Center;
+//				layout.Ellipsize = Pango.EllipsizeMode.End;
+//				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
+//				
+//				layout.SetText(text);
+//				g.MoveTo(x+10.0, y+3.0+_textYOffset);
+//				Pango.CairoHelper.ShowLayout(g, layout);
+//				
+//				// Clean up?
+//				layout.FontDescription = null;
+//				desc.Dispose();
+//				layout.Dispose();
             }
 		}
 		

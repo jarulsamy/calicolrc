@@ -389,7 +389,7 @@ namespace Jigsaw
 			get { return _Visible; }
 			set {
 				_Visible = value;
-				this.RaisePropertyChanged();
+				//this.RaisePropertyChanged();	// This serves no purpose on this property
 			}
 		}
 		

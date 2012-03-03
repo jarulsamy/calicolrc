@@ -29,7 +29,7 @@ namespace Jigsaw
 			double offsetX = 0.5*this.Width + 10.0;
 			this.StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
 			
-			_textYOffset = 10;							// Block text offset
+			_textYOffset = 22;							// Block text offset
 		}
 		
 		public CControlStart(Double X, Double Y) : this(X, Y, null) {}
@@ -1176,44 +1176,47 @@ namespace Jigsaw
             double x = this.left;
             double y = this.top;
 			
-			// If absolute positioning, convert x and y back to screen coordinates
-			//if (this.Dock == Diagram.DockSide.Left) g.InverseTransformPoint(ref x, ref y);
-			
-            double w = this.width;
+            //double w = this.width;
             //double h = this.height;
 			
-			double cx = x + 0.5*w;
-			double cy = y + 0.5*20;
-			g.Color = this.TextColor;
-
-			double teHeight, teWidth;
-			int layoutWidth, layoutHeight;
-
-			Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
-			Pango.FontDescription desc = Pango.FontDescription.FromString(
-					   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
-			layout.FontDescription = desc;
-			layout.Alignment = Pango.Alignment.Left; //Center;
-
-			if (this.Text.Length > 0)
-            {
-				layout.SetText(text);
-				layout.GetSize(out layoutWidth, out layoutHeight);
-				teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-				teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-				//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset);
-				g.MoveTo(x+10.0, y+3.0+_textYOffset);
-				Pango.CairoHelper.ShowLayout(g, layout);
-            }
+			// Use base class method to draw top label
+			base.DrawLabels(g);
 			
-			layout.SetText("else");
-			layout.GetSize(out layoutWidth, out layoutHeight);
-			teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-			teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-			//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset+20+_ibh);
-			g.MoveTo(x + 10.0, y + 3.0 + _textYOffset + 20 + _ibh);
-			Pango.CairoHelper.ShowLayout(g, layout);
-			
+			// Add else-part
+			g.MoveTo(x + 10.0, y + 20.0 + 3.0 + _ibh + _textYOffset);
+			g.ShowText("else");
+
+//			double cx = x + 0.5*w;
+//			double cy = y + 0.5*20;
+//			g.Color = this.TextColor;
+//
+//			double teHeight, teWidth;
+//			int layoutWidth, layoutHeight;
+//
+//			Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+//			Pango.FontDescription desc = Pango.FontDescription.FromString(
+//					   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+//			layout.FontDescription = desc;
+//			layout.Alignment = Pango.Alignment.Left; //Center;
+//
+//			if (this.Text.Length > 0)
+//            {
+//				layout.SetText(text);
+//				layout.GetSize(out layoutWidth, out layoutHeight);
+//				teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+//				teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+//				//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset);
+//				g.MoveTo(x+10.0, y+3.0+_textYOffset);
+//				Pango.CairoHelper.ShowLayout(g, layout);
+//            }
+//			
+//			layout.SetText("else");
+//			layout.GetSize(out layoutWidth, out layoutHeight);
+//			teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
+//			teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
+//			//g.MoveTo(cx - 0.5*teWidth, cy - 0.5*teHeight + textYOffset+20+_ibh);
+//			g.MoveTo(x + 10.0, y + 3.0 + _textYOffset + 20 + _ibh);
+//			Pango.CairoHelper.ShowLayout(g, layout);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

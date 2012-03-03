@@ -36,7 +36,7 @@ namespace Jigsaw
 			double offsetX = 0.5*this.Width + 10.0;
 			StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
 
-			_textYOffset = 10;							// Block text offset
+			_textYOffset = 20;							// Block text offset
 			
 			// Properties
 			CVarNameProperty ProcName = new CVarNameProperty("Procedure Name", "MyProc");

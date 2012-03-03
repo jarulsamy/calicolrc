@@ -470,6 +470,7 @@ namespace Jigsaw
     public class CComment : CBlock
     {
 		private bool _suppressOnPropertyChanged = false;
+		private string[] words = null;	// List of words in comment
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public CComment(Double X, Double Y, Widgets.CBlockPalette palette = null) 
@@ -483,6 +484,9 @@ namespace Jigsaw
 			this.FillColor = Diagram.Colors.LightYellow;;
 			this.Sizable = true;
 			
+			// Handle case when shape is transformed in some way
+			this.Transformed += OnTransformed;
+
 			// Properties
 			CStringProperty comment = new CStringProperty("Comment", "Comment");
 			CIntegerProperty width = new CIntegerProperty("Width", CBlock.BlockWidth);
@@ -498,8 +502,6 @@ namespace Jigsaw
 			_properties["Width"] = width;
 			_properties["Height"] = height;
 			
-			this.Transformed += OnTransformed;;
-			
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -508,11 +510,12 @@ namespace Jigsaw
         // - - - Update text and size when property changes - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
+			string comment = String.Format("{0}", this["Comment"]);
+			this.Text = comment;
+			
 			if (_suppressOnPropertyChanged == true) return;
 			_suppressOnPropertyChanged = true;
-			
-			this.Text = String.Format("{0}", this["Comment"]);
-			
+
 			CIntegerProperty width = (CIntegerProperty)_properties["Width"];
 			CIntegerProperty height = (CIntegerProperty)_properties["Height"];
 			this.Width = width.Value;
@@ -535,6 +538,16 @@ namespace Jigsaw
 			_suppressOnPropertyChanged = false;
         }
 		
+		// - - Override Text property to also split into words
+        public override String Text
+        {
+            get { return this.text; }
+            set {
+				base.Text = value;
+				words = value.Split (' ');		// Pre-split comment into words on spaces when changed
+			}
+        }
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override string this[string key]
 		{	// Override property access to set shape width and height
@@ -566,31 +579,81 @@ namespace Jigsaw
 		// - - - Draw comment so it wraps within the block shape - - - - - - -
 		protected override void DrawLabels(Cairo.Context g)
 		{
-			if (this.Text.Length > 0)
+			if (this.Text.Length > 0 && words.Length > 0)
             {
 	            double x = this.left;
 	            double y = this.top;
 	            double w = this.width;
-	            //double h = this.height;
-				
-				double cx = x + 0.5*w;
-				double cy = y + 0.5*20;
+	            double h = this.height;
 
-				//int layoutWidth, layoutHeight;
-				
+				g.Save ();
+				g.Rectangle(x, y, w-1.0, h-1.0);
+				g.Clip ();
 				g.Color = this.TextColor;
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				g.SetFontSize(this.fontSize);
 
-				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
-				Pango.FontDescription desc = Pango.FontDescription.FromString(
-						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
-				layout.FontDescription = desc;
-				layout.Alignment = Pango.Alignment.Left; //Center;
-				//layout.Ellipsize = Pango.EllipsizeMode.End;
-				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
+				// Do word wrap. Slightly insane.
 				
-				layout.SetText(text);
-				g.MoveTo(x+10.0, y+3.0+_textYOffset);
-				Pango.CairoHelper.ShowLayout(g, layout);
+				// @@@ Note that in the following there are several hard-coded 
+				// size tweaks that probably ought to be a function of the font size, 
+				// not fixed values. Some day this should be fixed.
+				double xx = x+10.0;
+				double yy = y+3.0+_textYOffset;
+				double ws = 5.0;						// Word spacing
+				double ls = this.fontSize + 2.0;		// Line spacing
+				int i = 0;								// Word counter
+				string word = words[i];					// First word
+				TextExtents te = g.TextExtents(word);	// Word extents
+
+				for (;;) {
+					// Render one word at next position
+					g.MoveTo(xx, yy);
+					g.ShowText(word);
+					
+					// Move to next x position and next word
+					xx = xx + te.Width + ws;
+					i++;
+					if (i < words.Length) {
+						word = words[i];
+						
+						// Get extents for next word
+						te = g.TextExtents(word);
+
+						// If the next word would be rendered outside the clip region, 
+						// move to next line. Otherwise, continue.
+						if ( xx + te.Width > x + w ) {
+							xx = x + 10.0;
+							yy = yy + ls;
+						}
+						
+					} else {
+						break;
+					}
+				}
+				
+				g.Restore();
+				
+//				g.Color = this.TextColor;
+//				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+//				g.SetFontSize(this.fontSize);
+//				//TextExtents te = g.TextExtents(text);
+//				g.MoveTo(x+10.0, y+3.0+_textYOffset);
+//				g.ShowText(text);
+				
+				
+//				g.Color = this.TextColor;
+//				Pango.Layout layout = Pango.CairoHelper.CreateLayout(g);
+//				Pango.FontDescription desc = Pango.FontDescription.FromString(
+//						   String.Format("{0} {1} {2}", this.fontFace, this.fontWeight, this.fontSize));
+//				layout.FontDescription = desc;
+//				layout.Alignment = Pango.Alignment.Left; //Center;
+//				//layout.Ellipsize = Pango.EllipsizeMode.End;
+//				layout.Width = (int)((w-10.0)*Pango.Scale.PangoScale);
+//				
+//				layout.SetText(text);
+//				g.MoveTo(x+10.0, y+3.0+_textYOffset);
+//				Pango.CairoHelper.ShowLayout(g, layout);
             }
 		}
 
