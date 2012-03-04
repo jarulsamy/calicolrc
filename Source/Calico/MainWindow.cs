@@ -622,8 +622,11 @@ namespace Calico {
 
         public void TryToClose(Document document) {
             if ((!document.IsDirty) || (Close(document) != "Cancel")) {
-                int page_num = DocumentNotebook.PageNum(document.widget);
-                DocumentNotebook.RemovePage(page_num);
+                bool result = document.Close(); // any cleanup?
+                if (result) {
+                    int page_num = DocumentNotebook.PageNum(document.widget);
+                    DocumentNotebook.RemovePage(page_num);
+                }
             }
         }
 
@@ -690,7 +693,7 @@ namespace Calico {
                 } else if (answer == "Abandon changes") {
                     return "Abandon changes";
                 } else { // Save
-                    bool result = document.Save();
+                    bool result = document.Save(); // save doc
                     if (result) {
                         return "Save";
                     }
@@ -700,7 +703,6 @@ namespace Calico {
 
         public bool Close() {
             // Delete Window
-            // FIXME: ask to save files, or cancel
             Document document;
             for (int i = 0; i < DocumentNotebook.NPages; i++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(i);
@@ -716,6 +718,10 @@ namespace Calico {
                             // ok, continue
                         }
                     }
+                    // clean or dirty, shut it down:
+                    bool result = document.Close(); // any cleanup?
+                    if (! result)
+                        return false;
                 }
             }
             return true;
@@ -2225,5 +2231,9 @@ namespace Calico {
             }
         }
 
+        protected void OnNotebookDocsChangeCurrentPage (object o, Gtk.ChangeCurrentPageArgs args)
+        {
+            Console.WriteLine("change! {0}", o);
+        }
     }
 }

@@ -811,6 +811,7 @@
                 <property name="CurrentPage">0</property>
                 <property name="Scrollable">True</property>
                 <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
+                <signal name="ChangeCurrentPage" handler="OnNotebookDocsChangeCurrentPage" />
                 <child>
                   <widget class="Gtk.HBox" id="hbox1">
                     <property name="MemberName" />
