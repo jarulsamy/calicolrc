@@ -105,8 +105,11 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
-		if (!cvs.IsRunning)
-			calico.OnStopRunning();
+		if (!cvs.IsRunning) {
+			if (calico.CurrentDocument == this)
+				// FIXME: only do this when this is the toplevel doc which was running
+				calico.OnStopRunning();
+		}
 	}
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
