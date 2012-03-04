@@ -257,6 +257,13 @@ public class CalicoJigsawDocument : Document
 	public override void OnPauseButton() {
 		cvs.Pause();
 	}
+	
+	public override bool Close() {
+		// cleanup, return true if no problems
+		cvs.HidePropertiesWindow();
+		cvs.Stop();
+		return true;
+	}
 
 	public override string [] GetAuthors() 
 	{

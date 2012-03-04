@@ -310,6 +310,12 @@ namespace Diagram
 			_propertyWin.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void HidePropertiesWindow()
+		{
+			_propertyWin.Hide();
+		}
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		internal void Invalidate()
 		{	// Indicate that the canvas must be redrawn
