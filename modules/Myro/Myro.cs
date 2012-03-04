@@ -5772,7 +5772,11 @@ public static class Myro
 		// Call the function, and put the result in the
 		// list in the given position.
 		return () => {  
-			list [position] = func.Invoke ();
+		  try {  
+		    list[position] = func.Invoke ();
+		  } catch (Exception e) {
+		    list[position] = e.Message;
+		  }
 		}; 
 	}
 
@@ -5784,8 +5788,12 @@ public static class Myro
 		// Take a function, return list, and position
 		// Call the function, and put the result in the
 		// list in the given position.
-		return () => {  
-			list [position] = func.Invoke (args);
+		return () => {
+		  try {  
+		    list[position] = func.Invoke (args);
+		  } catch (Exception e) {
+		    list[position] = e.Message;
+		  }
 		}; 
 	}
 
