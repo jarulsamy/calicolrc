@@ -170,6 +170,7 @@ public class CalicoFSharpLanguage : Language
   public CalicoFSharpLanguage () : 
 	  base("fsharp",  "FSharp", new string[] { "fs" }, "text/x-fsharp")
   {
+    LineComment = "//";
   }
   
   public override void MakeEngine (LanguageManager manager)

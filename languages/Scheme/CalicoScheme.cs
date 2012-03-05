@@ -95,6 +95,7 @@ public class CalicoSchemeLanguage : Language
 	public CalicoSchemeLanguage () : 
         base("scheme",  "Scheme", new string[] { "ss", "scm", "s" }, "text/x-scheme")
 	{
+	  LineComment = ";;";
 	}
     
 	public override void MakeEngine (LanguageManager manager)

@@ -168,6 +168,7 @@ namespace CalicoPython
 		public CalicoPythonLanguage () : 
 			base("python",  "Python", new string[] { "py", "pyw" }, "text/x-python")
 		{
+		  LineComment = "##";
 		}
 		
 		public override void MakeEngine (LanguageManager manager)

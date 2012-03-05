@@ -270,9 +270,9 @@
         <property name="Label" translatable="yes">Recently opened</property>
         <property name="ShortLabel" translatable="yes">Recent Scripts</property>
       </action>
-      <action id="ShowAction">
+      <action id="TabsAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Show</property>
+        <property name="Label" translatable="yes">Tabs</property>
         <property name="ShortLabel" translatable="yes">Show</property>
       </action>
       <action id="EnvironmentTabAction">
@@ -445,7 +445,7 @@
                 <node type="Menuitem" action="zoomOutAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="selectFontAction" />
-                <node type="Menu" action="ShowAction">
+                <node type="Menu" action="TabsAction">
                   <node type="Menuitem" action="EnvironmentTabAction" />
                   <node type="Menuitem" action="LocalsTabAction" />
                   <node type="Menuitem" action="HistoryTabAction" />

@@ -901,16 +901,6 @@ namespace Calico {
             }
         }
 
-        protected virtual string CommentText(string text) {
-            // FIXME: this isn't right... need to get entire lines
-            text = "## " + text.Replace("\n", "\n## ");
-            return text;
-        }
-
-        protected virtual string UnCommentText(string text) {
-            return text;
-        }
-
         string [] RSplit(string s) {
             string [] data = s.Split(' ');
             string left = "";
@@ -1043,15 +1033,23 @@ namespace Calico {
             }
         }
 
-        public static int CommentLine(Mono.TextEditor.TextEditorData data, Mono.TextEditor.LineSegment line) {
+        public static int CommentLine(Mono.TextEditor.TextEditorData data,
+                Mono.TextEditor.LineSegment line,
+                string line_comment) {
             // FIXME: get comment string from language
-            data.Insert(line.Offset, "## ");
+            data.Insert(line.Offset, String.Format("{0} ", line_comment));
             return 1;
         }
 
-        public static int UnCommentLine(Mono.TextEditor.TextEditorData data, Mono.TextEditor.LineSegment line) {
+        public static int UnCommentLine(Mono.TextEditor.TextEditorData data,
+                Mono.TextEditor.LineSegment line,
+                string line_comment) {
+            char c1 = line_comment[0];
+            char c2 = line_comment[1];
             // FIXME: get comment string from language
-            if (data.Document.GetCharAt(line.Offset) == '#' && data.Document.GetCharAt(line.Offset + 1) == '#' && data.Document.GetCharAt(line.Offset + 2) == ' ') {
+            if (data.Document.GetCharAt(line.Offset    ) == c1 &&
+                data.Document.GetCharAt(line.Offset + 1) == c2 &&
+                data.Document.GetCharAt(line.Offset + 2) == ' ') {
                 data.Remove(line.Offset, 3);
                 return 1;
             } else {
@@ -1066,6 +1064,15 @@ namespace Calico {
 
         protected virtual void OnCommentRegionActionActivated(object sender, System.EventArgs e) {
             if (Focus is Mono.TextEditor.TextEditor) {
+                // Shell or Text Editor
+                string language = "python";
+                string line_comment = "##";
+                if (DocumentNotebook.Page == SHELL)
+                    language = ShellLanguage;
+                else
+                    language = CurrentLanguage;
+                if (manager.languages.ContainsKey(language) && manager.languages[language].IsTextLanguage)
+                    line_comment = manager.languages[language].LineComment;
                 Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
@@ -1074,7 +1081,7 @@ namespace Calico {
                 int first = -1;
                 int last = 0;
                 foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
-                    last = CommentLine(data, line);
+                    last = CommentLine(data, line, line_comment);
                     if (first < 0)
                         first = last;
                 }
@@ -1093,6 +1100,14 @@ namespace Calico {
 
         protected virtual void OnUncommentRegionActionActivated(object sender, System.EventArgs e) {
             if (Focus is Mono.TextEditor.TextEditor) {
+                string language = "python";
+                string line_comment = "##";
+                if (DocumentNotebook.Page == SHELL)
+                    language = ShellLanguage;
+                else
+                    language = CurrentLanguage;
+                if (manager.languages.ContainsKey(language) && manager.languages[language].IsTextLanguage)
+                    line_comment = manager.languages[language].LineComment;
                 Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
@@ -1101,7 +1116,7 @@ namespace Calico {
                 int first = -1;
                 int last = 0;
                 foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
-                    last = UnCommentLine(data, line);
+                    last = UnCommentLine(data, line, line_comment);
                     if (first < 0)
                         first = last;
                 }

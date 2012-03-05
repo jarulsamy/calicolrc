@@ -72,6 +72,7 @@ public class CalicoRubyLanguage : Language {
 
     public CalicoRubyLanguage() :
 	    base("ruby", "Ruby", new string[] { "rb"}, "text/x-ruby") {
+	  LineComment = "##";
 	}
 
     public override void MakeEngine(LanguageManager manager) {
