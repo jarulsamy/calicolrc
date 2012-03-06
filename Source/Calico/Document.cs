@@ -179,24 +179,24 @@ namespace Calico {
                 fc.Hide();
                 // FIXME: check to see if already exists
                 // ask to overwrite
-                filename = fc.Filename;
-                if (System.IO.File.Exists(filename)) {
+                if (System.IO.File.Exists(fc.Filename)) {
                     bool yesno = MainWindow.yesno(
-                        String.Format("The file\n{0}\nexists. Overwrite it?", filename));
+                        String.Format("The file\n{0}\nexists. Overwrite it?", fc.Filename));
                     if (!yesno)
                         return false;
                 }
+                filename = fc.Filename;
+                // Update GUI:
+                language = calico.manager.GetLanguageFromExtension(filename);
+                basename = System.IO.Path.GetFileName(filename);
+                tab_label.Text = basename;
+                tab_label.TooltipText = filename;
+                // Already agreed to overwrite:
                 retval = Save();
                 if (retval) {
                     // Set CurrentDirectory here:
                     string dir = System.IO.Path.GetDirectoryName(filename);
                     System.IO.Directory.SetCurrentDirectory(dir);
-                    // Update GUI:
-                    tab_label.TooltipText = filename;
-                    language = calico.manager.GetLanguageFromExtension(filename);
-                    basename = System.IO.Path.GetFileName(filename);
-                    tab_label.Text = basename;
-                    tab_label.TooltipText = filename;
                     //self.on_change_file();
                     calico.FileSavedAs(this, filename); // if that file is open not here, reload it
                 }
@@ -213,15 +213,7 @@ namespace Calico {
                     // fail.. let's try SaveAs...
                 }
             }
-            bool retval = SaveAs();
-            if (retval) {
-                // if successful
-                // change name of tab/filename/basefile
-                basename = System.IO.Path.GetFileName(filename);
-                tab_label.TooltipText = filename;
-                tab_label.Text = basename;
-            }
-            return retval;
+            return SaveAs();
         }
 
         public virtual void Reload() {
