@@ -55,6 +55,58 @@ public static class Extensions
 	}
 }
 
+public static class SerialPortCache {
+  public static Dictionary<string,SerialPort> ports = new Dictionary<string,SerialPort>();
+
+  public static bool Contains(string port) {
+    foreach(string key in ports.Keys) {
+      if (key == port)
+	return true;
+    }
+    return false;
+  }											 
+
+  public static SerialPort getSerialPort(string port, int baud) {
+    SerialPort serial;
+    if (Contains(port)) {
+      serial = ports[port];
+      if (serial.IsOpen) {
+	if (serial.PortName.Equals(port) && serial.BaudRate == baud) {
+	  return serial; // ok, return it
+	} else {
+	  // It exists, but wrong port/baud, so close it:
+	  serial.Close (); 
+	  ports.Remove(port);
+	  return SerialPortCache.getSerialPort(port, baud); // call again, now that it is removed
+	}
+      } else { // closed
+	if ((serial.PortName.Equals(port) || port == null) && serial.BaudRate == baud) {
+	  serial.Open ();
+	  return serial;
+	} else {
+	  // It exists, closed, and wrong port or baud
+	  serial.Close (); 
+	  ports.Remove(port);
+	  return SerialPortCache.getSerialPort(port, baud); // call again, now that it is removed
+	}
+      }
+    } else { // not in ports
+      serial = new SerialPort(port, baud);
+      serial.ReadTimeout = 1000; // milliseconds
+      serial.WriteTimeout = 1000; // milliseconds
+      try {
+	serial.Open();
+      } catch {
+	Console.Error.WriteLine (String.Format ("ERROR: unable to open port '{0}'", 
+						port));
+	return null;
+      }
+      ports[port] = serial;
+      return serial;
+    }
+  }
+}
+
 public static class Myro
 {
 	//public readonly static List __all__ = new List() {"robot"};
