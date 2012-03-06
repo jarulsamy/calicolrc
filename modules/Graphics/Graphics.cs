@@ -1472,17 +1472,25 @@ public static class Graphics
     
 		public int height {
 			get {
-				int _width, _height;
-				this.GetSize (out _width, out _height);
-				return _height;
+			  if (Child == _canvas) {
+			    int _width, _height;
+			    this.GetSize (out _width, out _height);
+			    return _height;
+			  } else { // scrollbars
+			    return _canvas.height;
+			  }
 			}
 		}
 
 		public int width {
 			get {
+			  if (Child == _canvas) {
 				int _width, _height;
 				this.GetSize (out _width, out _height);
 				return _width;
+			  } else { // scrollbars
+			    return _canvas.width;
+			  }
 			}
 		}
 
@@ -1868,7 +1876,7 @@ public static class Graphics
 		private string _mode;
 		public FarseerPhysics.Dynamics.World world;
 		public object document;
-		private int width = 800, height = 600 ;
+		public int width = 800, height = 600 ;
 		public Cairo.ImageSurface surface = null;
 		public Cairo.ImageSurface finalsurface;
 		public bool need_to_draw_surface = false;
