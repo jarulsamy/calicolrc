@@ -2797,15 +2797,15 @@ namespace Jigsaw
 			cvs.TransformPoint(sw, sh, out xmax, out ymax);
 			
 			// Auto-translate based on mouse position, not block boundaries
-			double margin = 50.0;
+			double margin = 10.0;
 			if (cvs.mouseExact.Y < ymin + margin) {
-				cvs.DoTranslate( 0.0, 40.0);
+				cvs.DoTranslate( 0.0, margin);
 			} else if (cvs.mouseExact.X < xmin + margin) {
-				cvs.DoTranslate( 40.0, 0.0);
+				cvs.DoTranslate( margin, 0.0);
 			} else if (cvs.mouseExact.Y > ymax - margin) {
-				cvs.DoTranslate( 0.0, -40.0);
+				cvs.DoTranslate( 0.0, -margin);
 			} else if (cvs.mouseExact.X > xmax - margin) {
-				cvs.DoTranslate(-40.0, 0.0);
+				cvs.DoTranslate(-margin, 0.0);
 			}
 
 //			if (this.Outline.Top < ymin) {
