@@ -89,7 +89,8 @@ namespace CalicoPython
 		  Calico.MainWindow.Invoke (delegate {
 		      if (calico.CurrentDocument != null 
 			  && calico.CurrentDocument.filename == frame.f_code.co_filename
-			  && calico.ProgramSpeed.Value != 100) {
+			  && (calico.ProgramSpeed.Value != 100
+			      || calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno))) {
 			calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
 		      }
 		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
@@ -100,12 +101,16 @@ namespace CalicoPython
 		       && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) 
 		      || calico.ProgramSpeed.Value == 0 
 		      || trace_pause) {
-		    calico.PlayButton.Sensitive = true;
-		    calico.PauseButton.Sensitive = false;
+		    Calico.MainWindow.Invoke (delegate {
+			calico.PlayButton.Sensitive = true;
+			calico.PauseButton.Sensitive = false;
+			if (ttype == "return")
+			  calico.Print(String.Format("Trace: Will return {0}\n", retval));
+			else 
+			  calico.Print(String.Format("Trace: Paused!\n"));
+		      });
 		    calico.playResetEvent.WaitOne ();
-		    if (calico.ProgramSpeed.Value == 0 || trace_pause) {
-		      calico.playResetEvent.Reset ();
-		    }
+		    calico.playResetEvent.Reset ();
 		    trace_pause = false;
 		  } else { // then we are in a delay:
 		    int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
