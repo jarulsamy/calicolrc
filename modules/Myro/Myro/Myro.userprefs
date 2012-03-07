@@ -4,14 +4,15 @@
     <Files>
       <File FileName="..\..\..\languages\Jigsaw\CalicoJigsaw.cs" Line="110" Column="75" />
       <File FileName="..\..\..\languages\Jigsaw\CalicoJigsaw.cs" Line="110" Column="75" />
-      <File FileName="..\..\Graphics\Graphics.cs" Line="49" Column="63" />
-      <File FileName="c:\Users\dblank\Desktop\Calico\modules\Myro\Myro.cs" Line="72" Column="6" />
+      <File FileName="..\..\Graphics\Graphics.cs" Line="562" Column="31" />
+      <File FileName="c:\Users\dblank\Desktop\Calico\modules\Myro\Myro.cs" Line="2787" Column="39" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Myro" expanded="True">
             <Node name="References" expanded="True" />
+            <Node name="Myro.cs" selected="True" />
           </Node>
         </State>
       </Pad>

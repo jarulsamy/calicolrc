@@ -137,7 +137,7 @@
         <edge id="28" name="In" linkedTo="22" />
         <edge id="29" name="Out" linkedTo="37" />
         <property name="Label" value="s1.Play()" />
-        <property name="Message" value="" />
+        <property name="Message" value="No free channels available" />
         <property name="Statement" value="s1.Play()" />
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
@@ -222,7 +222,7 @@
         <edge id="45" name="In" linkedTo="38" />
         <edge id="46" name="Out" linkedTo="49" />
         <property name="Label" value="s1.Play()" />
-        <property name="Message" value="No free channels available" />
+        <property name="Message" value="" />
         <property name="Statement" value="s1.Play()" />
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />

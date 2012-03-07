@@ -1435,7 +1435,27 @@ public static class Myro
 	{
 		Myro.computer.play (filename);
 	}
+	
+    public static void playUntilDone(string filename) {
+		Myro.computer.playUntilDone (filename);
+    }
 
+    public static void playUntilDone(SdlDotNet.Audio.Sound sound) {
+		Myro.computer.playUntilDone (sound);
+    }
+
+    public static SdlDotNet.Audio.Channel play(string filename, int loop, double seconds) {
+		return Myro.computer.play (filename, loop, seconds);
+    }
+
+    public static SdlDotNet.Audio.Channel play(string filename, int loop) {
+		return Myro.computer.play (filename, loop);
+    }
+
+    public static SdlDotNet.Audio.Channel play(string filename, bool loop_forever) {
+		return Myro.computer.play (filename, loop_forever);
+    }
+	
 	public static object makeSound (string filename)
 	{
 		return Myro.computer.makeSound(filename);
@@ -2680,11 +2700,47 @@ public static class Myro
             return sound;
         }
 
-        public void play(string filename) {
+        public void playUntilDone(string filename) {
             if (! sound_initialized)
                 initialize_sound();
             SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            sound.Play();
+            SdlDotNet.Audio.Channel channel = sound.Play();
+			while (channel.IsPlaying())
+				Thread.Sleep(100);
+        }
+
+        public void playUntilDone(SdlDotNet.Audio.Sound sound) {
+            SdlDotNet.Audio.Channel channel = sound.Play();
+			while (channel.IsPlaying())
+				Thread.Sleep(100);
+        }
+
+        public SdlDotNet.Audio.Channel play(string filename) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound.Play();
+        }
+
+        public SdlDotNet.Audio.Channel play(string filename, int loop, double seconds) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound.Play(loop, (int)(seconds * 100));
+        }
+
+        public SdlDotNet.Audio.Channel play(string filename, int loop) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound.Play(loop);
+        }
+
+        public SdlDotNet.Audio.Channel play(string filename, bool loop_forever) {
+            if (! sound_initialized)
+                initialize_sound();
+            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
+            return sound.Play(loop_forever);
         }
 
         public void setPhases(double phase1, double phase2) {
@@ -2694,7 +2750,7 @@ public static class Myro
 
         public void play(double duration, Func<int[],int,object> function) {
             if (! audio_initialized) {
-                initialize_audio();
+                initialize_tone();
             }
             audio_function = function;
             Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
@@ -2708,7 +2764,7 @@ public static class Myro
             beep(duration, frequency, -1);
         }
 
-        public void initialize_audio() {
+        public void initialize_tone() {
             ManualResetEvent ev = new ManualResetEvent(false);
             audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
             stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
@@ -2735,6 +2791,7 @@ public static class Myro
                 SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
                 SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
                 SdlDotNet.Audio.Mixer.Open();
+				SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
                 ev.Set();
             });
             ev.WaitOne();
@@ -2743,7 +2800,7 @@ public static class Myro
 
         public void beep(double duration, double frequency1, double frequency2) {
             if (! audio_initialized) {
-                initialize_audio();
+                initialize_tone();
             }
             audio_function = null;
             frequencies [0] = frequency1;
@@ -2758,7 +2815,7 @@ public static class Myro
 
         public void stopBeep() {
             if (! audio_initialized) {
-                initialize_audio();
+                initialize_tone();
             }
             Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
         }
