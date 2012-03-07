@@ -206,14 +206,18 @@ namespace Calico {
         }
 
         public virtual bool Save() {
-            if (filename != null) {
-                try {
-                    return SaveDocument();
-                } catch {
-                    // fail.. let's try SaveAs...
+            if (IsDirty) { // only Save if this is dirty
+                if (filename != null) {
+                    try {
+                        return SaveDocument();
+                    } catch {
+                        // fail.. let's try SaveAs...
+                    }
                 }
+                return SaveAs();
+            } else {
+                return true;
             }
-            return SaveAs();
         }
 
         public virtual void Reload() {
