@@ -420,7 +420,7 @@ public static class Myro
 			return true; // need to invoke!
 		}
 	}
-
+	
 	static void invoke_function (Func<object,object> function, object args)
 	{
 		try {
@@ -2180,9 +2180,16 @@ public static class Myro
 		}
 	}
 
-	public static void wait (double seconds)
-	{
-		Thread.Sleep ((int)(seconds * 1000));
+	public static void wait(double seconds) {
+		if (seconds < .1)
+			Thread.Sleep ((int)(seconds * 1000)); 
+		else {
+			double start = currentTime ();
+			while (seconds > currentTime () - start) {
+				while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+				Thread.Sleep (100); 
+			}
+		}
 	}
 
 	public static double currentTime ()
@@ -2568,7 +2575,7 @@ public static class Myro
 		public void forward (double speed, double interval)
 		{
 			move (speed, 0);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
     
@@ -2585,7 +2592,7 @@ public static class Myro
 		public void translate (double speed, double interval)
 		{
 			move (speed, 0);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
     
@@ -2597,7 +2604,7 @@ public static class Myro
 		public void rotate (double speed, double interval)
 		{
 			move (0, speed);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
     
@@ -2609,7 +2616,7 @@ public static class Myro
 		public void backward (double speed, double interval)
 		{
 			move (-speed, 0);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
 
@@ -2621,7 +2628,7 @@ public static class Myro
 		public void turnLeft (double speed, double interval)
 		{
 			move (0, speed);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
 
@@ -2633,7 +2640,7 @@ public static class Myro
 		public void turnRight (double speed, double interval)
 		{
 			move (0, -speed);
-			Thread.Sleep ((int)(interval * 1000)); 
+			wait (interval);
 			stop ();
 		}
     
@@ -2706,13 +2713,13 @@ public static class Myro
             SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
             SdlDotNet.Audio.Channel channel = sound.Play();
 			while (channel.IsPlaying())
-				Thread.Sleep(100);
+				wait (.1);
         }
 
         public void playUntilDone(SdlDotNet.Audio.Sound sound) {
             SdlDotNet.Audio.Channel channel = sound.Play();
 			while (channel.IsPlaying())
-				Thread.Sleep(100);
+				wait (.1);
         }
 
         public SdlDotNet.Audio.Channel play(string filename) {
@@ -2755,7 +2762,8 @@ public static class Myro
             audio_function = function;
             Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
             if (duration > 0) {
-                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                //Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+				wait (duration);
                 Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
             }
         }
@@ -2808,7 +2816,8 @@ public static class Myro
             phases[1] = phases[0]; // set the phases to be the same
             Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
             if (duration > 0) {
-                Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+                //Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+				wait (duration);
                 Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
             }
         }
@@ -4599,7 +4608,7 @@ public static class Myro
 					}
 				}
 				//#print "Got", retval
-				Thread.Sleep (100); 
+				wait (.1); 
 				//time.sleep(.1)
 				write_packet (Scribbler.GET_INFO, 32, 32, 32, 32, 32, 32, 32, 32);
 				lock (serial) {
@@ -4660,7 +4669,7 @@ public static class Myro
 			lock (this) { // lock robot
 				set_speaker ((int)frequency, (int)(duration * 1000));
 				// 100% of the intended delay
-				Thread.Sleep ((int)(duration * 1000));
+				wait (duration);
 				read (Scribbler.PACKET_LENGTH + 11);
 			}
 		}
@@ -4669,7 +4678,7 @@ public static class Myro
 		{
 			set_speaker_2 ((int)frequency, (int)frequency2, (int)(duration * 1000));
 			// 100% of the intended delay
-			Thread.Sleep ((int)(duration * 1000));
+			wait (duration);
 			read (Scribbler.PACKET_LENGTH + 11);
 		}
 
