@@ -306,6 +306,7 @@ namespace Diagram
 		public void ShowPropertiesWindow()
 		{
 			_propertyWin.SetPosition(Gtk.WindowPosition.Mouse);
+			_propertyWin.Deiconify();
 			_propertyWin.ShowAll();
 			_propertyWin.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
@@ -1896,22 +1897,26 @@ namespace Diagram
                                                                 // It is used as shape refs by connectors when serialized to Xml.
         private String name = "";                               // Code name of this object
         protected String text = "";                             // Text to be drawn in shape
+//		protected int textWidth = 0;							// Text metrics
+//		protected int textHeight = 0;
+//		protected int textXBearing = 0;
+//		protected int textYBearing = 0;
         private Cairo.Color textColor = Colors.Black;           // Color of text
         private Cairo.Color lineColor = Colors.Black;
         private int lineWidth = 1;
-//        private StringAlignment horizontalAlign = StringAlignment.Center;
-//        private StringAlignment verticalAlign = StringAlignment.Center;
-//        private Pango.Alignment horizontalAlign = Pango.Alignment.Center;
-//        private Pango.Alignment verticalAlign = Pango.Alignment.Center;
-//        private DashStyle lineStyle = DashStyle.Solid;
 		private double[] dashStyle = null; //new double[] {1.0};
         private Cairo.Color fillColor = Colors.White;
-        internal String fontFace = "Arial";
+        internal String fontFace = "Arial"; //"Consolas"; //"courier new"; //
         internal double fontSize = 12.0;
         internal FontSlant fontSlant = FontSlant.Normal;
 		internal FontWeight fontWeight = FontWeight.Bold;
         protected Boolean selected = false;
         private System.Object tag = null;                       // An arbitrary object that tags this object
+//        private StringAlignment horizontalAlign = StringAlignment.Center;
+//        private StringAlignment verticalAlign = StringAlignment.Center;
+//        private Pango.Alignment horizontalAlign = Pango.Alignment.Center;
+//        private Pango.Alignment verticalAlign = Pango.Alignment.Center;
+//        private DashStyle lineStyle = DashStyle.Solid;
 
         protected Boolean visible = true;
         public Boolean Draggable = true;
@@ -1963,7 +1968,6 @@ namespace Diagram
             this.textColor = textColor;
             this.lineColor = lineColor;
             this.lineWidth = lineWidth;
-            //this.lineStyle = lineStyle;
             this.fillColor = fillColor;
             this.visible = visible;
             this.Draggable = draggable;
@@ -2405,7 +2409,7 @@ namespace Diagram
             get { return this.text; }
             set { this.text = value; }
         }
-
+		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         [DescriptionAttribute("Shape text color"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
         public virtual Color TextColor
@@ -3836,7 +3840,7 @@ namespace Diagram
             if (this.Text.Length > 0)
             {
 				g.Color = this.TextColor;
-				g.SelectFontFace("arial", FontSlant.Normal, FontWeight.Normal);
+				g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
 				g.SetFontSize(8.0);
 				TextExtents te = g.TextExtents(this.Text);
 				g.MoveTo(this.Left - te.Width/2.0 - te.XBearing, this.Top - te.Height - te.YBearing); 

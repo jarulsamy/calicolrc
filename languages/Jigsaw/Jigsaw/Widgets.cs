@@ -553,6 +553,7 @@ namespace Widgets
 			this.LineWidth = 0;
 			this.LineColor = Diagram.Colors.Silver;
 			this.FillColor = Diagram.Colors.Silver;
+			this.fontFace = "Arial"; 
 			//this.FontStyle = FontStyle.Bold;
 			this.Selectable = false;
 			this.SetToggle(null, false);

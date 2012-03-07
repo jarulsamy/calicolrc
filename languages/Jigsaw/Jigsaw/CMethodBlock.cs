@@ -252,7 +252,7 @@ namespace Jigsaw
 		public override IEnumerator<RunnerResponse> Runner( ScriptScope scope, CallStack stack ) 
 		{
 			// - - - Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -267,7 +267,7 @@ namespace Jigsaw
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
 				this["Message"] = ex.Message;
-				this.State = BlockState.Error;
+				this.State = RunningState.Error;
 				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
@@ -275,7 +275,7 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 	
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -288,7 +288,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 		

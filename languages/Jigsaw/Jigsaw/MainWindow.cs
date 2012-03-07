@@ -168,23 +168,23 @@ public class MainWindow : Gtk.Window
 		Gtk.Menu muRun = new Gtk.Menu();
 		
 		miRunRun = new Gtk.MenuItem("_Run");
-		miRunRun.Activated += new EventHandler(OnEngineRun);
+		miRunRun.Activated += new EventHandler(OnUIRun);
 		muRun.Append(miRunRun);		
 		miRunRun.AddAccelerator("activate", agrp, (int)Gdk.Key.F5, Gdk.ModifierType.None, Gtk.AccelFlags.Visible);
 
 		miRunPause = new Gtk.MenuItem("_Pause");
-		miRunPause.Activated += new EventHandler(OnEnginePause);
+		miRunPause.Activated += new EventHandler(OnUIPause);
 		muRun.Append(miRunPause);
 		miRunPause.Sensitive = false;
 		miRunPause.AddAccelerator("activate", agrp, (int)Gdk.Key.Break, Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 
 		miRunStep = new Gtk.MenuItem("St_ep");
-		miRunStep.Activated += new EventHandler(OnEngineStep);
+		miRunStep.Activated += new EventHandler(OnUIStep);
 		muRun.Append(miRunStep);
 		miRunStep.AddAccelerator("activate", agrp, (int)Gdk.Key.F11, Gdk.ModifierType.ShiftMask, Gtk.AccelFlags.Visible);
 
 		miRunStop = new Gtk.MenuItem("_Stop");
-		miRunStop.Activated += new EventHandler(OnEngineStop);
+		miRunStop.Activated += new EventHandler(OnUIStop);
 		muRun.Append(miRunStop);
 		miRunStop.Sensitive = false;
 		miRunStop.AddAccelerator("activate", agrp, (int)Gdk.Key.F5, Gdk.ModifierType.ShiftMask, Gtk.AccelFlags.Visible);
@@ -257,26 +257,26 @@ public class MainWindow : Gtk.Window
 		
 		Gtk.Image imRunRun = new Gtk.Image(Gtk.Stock.MediaPlay, Gtk.IconSize.SmallToolbar);
 		tbRunRun = new Gtk.Button(imRunRun);
-		tbRunRun.Clicked += new EventHandler(OnEngineRun);
+		tbRunRun.Clicked += new EventHandler(OnUIRun);
 		tbRunRun.TooltipText = "Run the program from the beginning";
 		tb.Add(tbRunRun);
 
 		Gtk.Image imRunPause = new Gtk.Image(Gtk.Stock.MediaPause, Gtk.IconSize.SmallToolbar);
 		tbRunPause = new Gtk.Button(imRunPause);
-		tbRunPause.Clicked += new EventHandler(OnEnginePause);
+		tbRunPause.Clicked += new EventHandler(OnUIPause);
 		tbRunPause.TooltipText = "Pause the program";
 		tbRunPause.Sensitive = false;
 		tb.Add(tbRunPause);
 		
 		Gtk.Image imRunStep = new Gtk.Image(Gtk.Stock.Execute, Gtk.IconSize.SmallToolbar);
 		tbRunStep = new Gtk.Button(imRunStep);
-		tbRunStep.Clicked += new EventHandler(OnEngineStep);
+		tbRunStep.Clicked += new EventHandler(OnUIStep);
 		tbRunStep.TooltipText = "Advance program one step";
 		tb.Add(tbRunStep);
 		
 		Gtk.Image imRunStop = new Gtk.Image(Gtk.Stock.MediaStop, Gtk.IconSize.SmallToolbar);
 		tbRunStop = new Gtk.Button(imRunStop);
-		tbRunStop.Clicked += new EventHandler(OnEngineStop);
+		tbRunStop.Clicked += new EventHandler(OnUIStop);
 		tbRunStop.TooltipText = "Stop and reset the program";
 		tbRunStop.Sensitive = false;
 		tb.Add(tbRunStop);
@@ -354,9 +354,7 @@ public class MainWindow : Gtk.Window
 		
 		vb.Add(js);
 		this.Add(vb);
-		
-		//js.CanvasChanged += (cvs, e) => Console.WriteLine("Changed!");
-		
+
 		// Let 'er rip
 		this.ShowAll();
 	}
@@ -370,7 +368,9 @@ public class MainWindow : Gtk.Window
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawRun(object sender, EventArgs a)
-	{	
+	{
+		//Console.WriteLine ("MainWindow.OnJigsawRun()");
+		
 		// Set toolbar sensitive status
 		tbRunPause.Sensitive = true;
 		tbRunStop.Sensitive = true;
@@ -387,6 +387,8 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
+		//Console.WriteLine ("MainWindow.OnJigsawStop()");
+		
 		tbRunRun.Sensitive = true;
 		tbRunStep.Sensitive = true;
 		tbRunStop.Sensitive = false;
@@ -402,6 +404,8 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawStep(object sender, EventArgs a)
 	{	
+		//Console.WriteLine ("MainWindow.OnJigsawStep()");
+		
 		tbRunStep.Sensitive = true;
 		tbRunStop.Sensitive = true;
 		tbRunRun.Sensitive = true;
@@ -417,6 +421,8 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawPause(object sender, EventArgs a)
 	{	
+		//Console.WriteLine ("MainWindow.OnJigsawPause()");
+		
 		tbRunStep.Sensitive = true;
 		tbRunStop.Sensitive = true;
 		tbRunRun.Sensitive = true;
@@ -814,26 +820,26 @@ public class MainWindow : Gtk.Window
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnEngineRun(object sender, EventArgs a)
+	protected void OnUIRun(object sender, EventArgs a)
 	{	
 		js.Run();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnEnginePause(object sender, EventArgs a)
+	protected void OnUIPause(object sender, EventArgs a)
 	{	
 		js.Pause();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnEngineStop(object sender, EventArgs a)
+	protected void OnUIStop(object sender, EventArgs a)
 	{	
 		js.Stop();
 		js.Reset();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnEngineStep(object sender, EventArgs a)
+	protected void OnUIStep(object sender, EventArgs a)
 	{	
 		js.Step();
 	}

@@ -60,19 +60,13 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public IEnumerator<RunnerResponse> Runner
 		{
-			get
-			{
-				return _runner;
-			}
+			get	{ return _runner; }
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public RunnerResponse Current
 		{
-			get
-			{
-				return _runner.Current;
-			}
+			get { return _runner.Current; }
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -138,7 +132,7 @@ namespace Jigsaw
 		public void PopProcedure() {
 			// Keep popping runners until entire procedure is removed, or call stack is empty
 			while ( _stack.Count > 0 && !(_stack[0]._block is CProcedureCall)) {
-				_stack[0]._block.State = BlockState.Idle;
+				_stack[0]._block.State = RunningState.Idle;
 				_stack.RemoveAt(0);
 			}
 		}
@@ -147,7 +141,7 @@ namespace Jigsaw
 		public CBlock PopBreak() {
 			// Pop inner-most loop or conditional to respond to break statement
 			while ( _stack.Count > 0 && _stack[0]._block._breakStop == false) {
-				_stack[0]._block.State = BlockState.Idle;
+				_stack[0]._block.State = RunningState.Idle;
 				_stack.RemoveAt(0);
 			}
 			
@@ -160,7 +154,7 @@ namespace Jigsaw
 				nextBlock = b.OutEdge.LinkedTo.Block;
 			}
 
-			_stack[0]._block.State = BlockState.Idle;
+			_stack[0]._block.State = RunningState.Idle;
 			_stack.RemoveAt(0);
 			
 			return nextBlock;
@@ -196,13 +190,8 @@ namespace Jigsaw
 		// List of all paths to DLLs that are loaded. Paths are stored in keys to be unique
 		internal Dictionary<string, bool> loadedAssemblies = new Dictionary<string, bool>();
 		
-		// -- This boolean is used by the GLib.TimeoutHandler method in Run
-		// and is returned by OnTimerElapsed. When OnTimerElapsed returns true, 
-		// GLib.TimeoutHandler reschedules it automatically. When it returns false,
-		// It is not rescheduled. When the Jigsaw program is running, _timerContinue is set to true
-		// so OnTimerElapsed contineus to be rescheduled and continues to run. 
-		// To stop the run, _timerContinue is set to false.
-		
+		// The following private variables manage the timer.
+		private bool _timerRunning = false;		// True if timer is running
 		private bool _timerContinue = false;	// false to stop timer
 		private bool _timerReset = false;		// true to stop and start timer with new timeout
 		private uint _timeOut = 100;			// timer timeout value
@@ -235,7 +224,7 @@ namespace Jigsaw
 			((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
 			
 			//%%%
-			GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+			//GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 		}
 		
 		// - - - Load assembly into global scope - - - - - - - - - - - -
@@ -306,15 +295,16 @@ namespace Jigsaw
 		public bool IsRunning
 		{	// Determine if the program is running
 			get {
-				if (_callStacks == null) return false;
-				if (_callStacks.Count > 0) {
-					foreach (CallStack cs in _callStacks) {
-						if (cs.Enabled == true) {
-							return true;
-						}
-					}
-				}
-				return false;
+				return _timerRunning;
+//				if (_callStacks == null) return false;
+//				if (_callStacks.Count > 0) {
+//					foreach (CallStack cs in _callStacks) {
+//						if (cs.Enabled == true) {
+//							return true;
+//						}
+//					}
+//				}
+//				return false;
 			}
 		}
 		
@@ -327,9 +317,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool Reset(Jigsaw.Canvas cvs, InspectorWindow inspector)
 		{
-			// Save reference to the InspectorWindow
-			//_inspector = inspector;
-			//_inspector.ClearGlobals();
+			//Console.WriteLine ("Engine.Reset()");
 			
 			// Recreate top level list of all call stacks. 
 			// There can be more than one because Jigsaw allows multiple stacks to run simultaneously.
@@ -352,7 +340,7 @@ namespace Jigsaw
 			foreach (Diagram.CShape s in cvs.shapes) {
 				if (s is CBlock) {								// If a shape is a block ...
 					CBlock b = (CBlock)s;
-					b.State = BlockState.Idle;					// Set block state to Idle
+					b.State = RunningState.Idle;					// Set block state to Idle
 					b["Message"] = "";							// Clear current block message
 					
 					if (b.IsFactory == false) {					// If block is not a factory block ...
@@ -361,7 +349,7 @@ namespace Jigsaw
 						// If also a ControlStart block ...
 						if (s is CControlStart) {
 							CControlStart cs = (CControlStart)s;
-							ScriptScope scope = this.RunBlockStack( cs );
+							ScriptScope scope = this.LoadBlockStack( cs );
 							scopes.Add (scope);					// Temporarily save reference to new start block scope
 						}
 						
@@ -399,8 +387,8 @@ namespace Jigsaw
 		}
 		
 		// - - - Recompile a stack of blocks
-		public bool CompileStack(CBlock start, Jigsaw.Canvas cvs) {
-			
+		public bool CompileStack(CBlock start, Jigsaw.Canvas cvs) 
+		{
 			try
 			{
 				List<CBlock> stack = new List<CBlock>();
@@ -427,8 +415,8 @@ namespace Jigsaw
 			}
 		}
 		
-		// - - -
-		public ScriptScope RunBlockStack( CBlock b, bool enabled = false ) {
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public ScriptScope LoadBlockStack( CBlock b, bool enabled = false ) {
 			CallStack stack = new CallStack(globals);					// Add new runner to call stack
 			ScriptScope scope = this.CreateScope(globals, globals);		// For the main start block, there is no local scope
 			stack.AppendFrame( b, scope );
@@ -455,19 +443,18 @@ namespace Jigsaw
 		}
 		
 		// - - Advance the entire system one step - - - - - - - - - - -
-		public bool Step(bool force = false)
+		public bool Step(bool runOnce = false)
 		{
-			// Exit if already running a step to prevent reentrance
+			// Block reentrance
 			if (_inStep == true) return false;
 			_inStep = true;
 			
 			int enabledCount = 0;
-			
 			for (int i=_callStacks.Count-1; i>=0; i--)
 			{
 				CallStack stack = _callStacks[i];
 				
-				if (stack.Enabled || force) 
+				if (stack.Enabled || runOnce) 
 				{
 					if (stack.Count > 0) 							// Get the top-most block runner
 					{
@@ -534,12 +521,18 @@ namespace Jigsaw
 			}
 			
 			//_inspector.Update (globals);
-			if (enabledCount > 0) RaiseEngineStep();
+			RaiseEngineStep ();
 			
-			//Console.WriteLine ("CallStacks {0}, Enabled {1}", _callStacks.Count, enabledCount);
+			// If at least one stack is enabled, make sure the timer is started
+			if (enabledCount > 0 && !runOnce) {
+				this.StartTimer();			// Enure timer is running
+			}
 			
-			// Check for nothing more to run
-			if (_callStacks.Count == 0 && enabledCount == 0) this.Stop();
+			// If no call stacks, or none enabled, stop timer
+			if (enabledCount == 0 || _callStacks.Count == 0) {
+				this.StopTimer();
+				RaiseEngineStop ();
+			}
 			
 			//System.GC.Collect();		// Force garbage collection
 			_inStep = false;
@@ -549,44 +542,70 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			//%%% _timerContinue = true;
+			//Console.WriteLine ("Engine.Run()");
+			if (_callStacks.Count == 0)	return;
 			foreach (CallStack s in _callStacks) s.Enabled = true;
-			
-			//%%% GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
-			RaiseEngineRun();
+			RaiseEngineRun();				// Inidicate running is starting
+			this.Step ();					// Kick-start running
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
-			//%%%_timerContinue = false;
+			//Console.WriteLine ("Engine.Stop()");
 			foreach (CallStack s in _callStacks) s.Enabled = false;
-			RaiseEngineStop();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
-			//%%%_timerContinue = false;
+			//Console.WriteLine ("Engine.Pause()");
 			foreach (CallStack s in _callStacks) s.Enabled = false;
 			RaiseEnginePause();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		private bool OnTimerElapsed()
+		private bool StartTimer() 
 		{
-			//%%% Console.WriteLine ("OnTimerElapsed: {0}", DateTime.Now.ToString ());
-			
+			// The timer is started if not already running and if there is a valid timeout value	
+			if (_timerRunning == false && _timeOut > 0.0) {
+				//Console.WriteLine ("Engine.StartTimer()");
+				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+				_timerContinue = true;
+				_timerRunning = true;
+				return true;
+			}
+			return false;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		private void StopTimer() 
+		{
+			_timerContinue = false;
+			_timerRunning = false;
+			//Console.WriteLine ("Engine.StopTimer()");
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		private bool OnTimerElapsed()
+		{			
 			// Install new timeout if requested and stop this one
-			if (_timerReset) {
+			if (_timerReset == true) {
 				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 				_timerReset = false;
+				//Console.WriteLine ("OnTimerElapsed: Timer Reset");
 				return false;
 			}
 			
 			// Exit if requested
-			//%%% if (_timerContinue == false) return true; //false;
+			if (_timerContinue == false) {
+				_timerRunning = false;
+				//Console.WriteLine ("OnTimerElapsed: Timer Stopped");
+				return false;
+			}
 			
+			//Console.WriteLine ("OnTimerElapsed: {0}", DateTime.Now.ToString ());
+
 			// Execute one step
 			this.Step();
 			
@@ -594,7 +613,7 @@ namespace Jigsaw
 			//if (!this.IsRunning) this.Stop();
 			
 			// Return the current state indicating the desire to continue
-			return true; //_timerContinue;
+			return _timerContinue;
 		}
 		
 //		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

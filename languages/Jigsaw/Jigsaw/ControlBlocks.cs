@@ -63,7 +63,7 @@ namespace Jigsaw
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -85,7 +85,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 		
@@ -264,7 +264,7 @@ namespace Jigsaw
 		{
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -280,7 +280,7 @@ namespace Jigsaw
 			rr.Frame = null;
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 
@@ -450,7 +450,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -473,13 +473,13 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				this.State = BlockState.Error;
+				this.State = RunningState.Error;
 				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 			
 			// Execute the repetition
 			while ( count <= maxreps )
@@ -499,7 +499,7 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -512,7 +512,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 				
@@ -737,7 +737,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			
@@ -759,12 +759,12 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				this.State = BlockState.Error;
+				this.State = RunningState.Error;
 				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 			
 			// Execute the repetition
 			if ( doIf )
@@ -778,7 +778,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -791,7 +791,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 				
@@ -1051,7 +1051,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -1073,12 +1073,12 @@ namespace Jigsaw
 
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-				this.State = BlockState.Error;
+				this.State = RunningState.Error;
 				rr.Action = EngineAction.Error;
 				rr.Frame = null;
 			}
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 			
 			// Execute the if-part or else-part
 			if ( doIf )
@@ -1098,7 +1098,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -1111,7 +1111,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		}
@@ -1450,7 +1450,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -1472,13 +1472,13 @@ namespace Jigsaw
 	
 				} catch (Exception ex) {
 					this["Message"] = ex.Message;
-					this.State = BlockState.Error;
+					this.State = RunningState.Error;
 					rr.Action = EngineAction.Error;
 					rr.Frame = null;
 				}
 				
 				// Go into a loop while block remains in an error state
-				while (this.State == BlockState.Error) yield return rr;
+				while (this.State == RunningState.Error) yield return rr;
 			
 				// Next perform one iteration of the enclosed stack
 				if (doWhile == true) {
@@ -1503,7 +1503,7 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -1516,7 +1516,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 				
@@ -1637,7 +1637,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			
@@ -1649,12 +1649,12 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 			
 			rr.Action = EngineAction.Break;
 			rr.Frame = null;
 			rr.RetVal = scope;
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 
 		}
@@ -1852,7 +1852,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -1869,13 +1869,13 @@ namespace Jigsaw
 				sequence = (IEnumerable)Sequence.Evaluate(scope);
 			} catch (Exception ex) {
 				this["Message"] = ex.Message;
-                this.State = BlockState.Error;
+                this.State = RunningState.Error;
                 rr.Action = EngineAction.Error;
                 rr.Frame = null;
 			}
 			
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 			
 			// Execute the repetition
 			foreach (object item in sequence)
@@ -1896,7 +1896,7 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 			// Go into a loop while block remains in an error state
-			while (this.State == BlockState.Error) yield return rr;
+			while (this.State == RunningState.Error) yield return rr;
 
 			// If connected, replace this runner with the next runner to the stack.
 			if (this.OutEdge.IsConnected) {
@@ -1909,7 +1909,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 				

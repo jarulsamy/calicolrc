@@ -26,10 +26,10 @@ namespace Jigsaw
 		In = 1, Out = 2
 	}
 	
-	// --- Enumerates block states -------------------------------------------
-	public enum BlockState
+	// --- Enumerates running states -------------------------------------------
+	public enum RunningState
 	{
-		Idle = 1, Running = 2, Error = 3
+		Idle = 1, Running = 2, Paused = 3, Error = 4
 	}
 	
 	public class XmlWrapper : XmlTextReader {
@@ -51,7 +51,7 @@ namespace Jigsaw
 				return new XmlWrapper(contents, true);
 		}
 	}
-			
+	
 	// -----------------------------------------------------------------------
 	public class Canvas : Diagram.Canvas
 	{	// Subclass of Canvas that adds custom behavior 
@@ -70,6 +70,9 @@ namespace Jigsaw
 
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
+
+		// Current state of Jigsaw object
+		private RunningState _state = RunningState.Idle;
 		
 		// Path to look for modules to load
 		private string _modulePath = null;
@@ -79,10 +82,7 @@ namespace Jigsaw
 		
 		// List of all tab widgets
 		private List<Widgets.CRoundedTab> allTabs = null;
-		
-		// A flag to help track running state
-		//private bool _isRunning = false;
-		
+
 		// True if to update block display while running
 		private bool _updateDisplay = true;
 		
@@ -277,6 +277,13 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public RunningState State {
+			get {
+				return _state;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public string ModulePath
 		{
 			// Returns the absolute module path for DLLs
@@ -339,7 +346,7 @@ namespace Jigsaw
 					xw.WriteEndElement();
 					
 				  	foreach (string type_name in Reflection.Utils.getTypeNames(dllfile))
-					{	//Console.WriteLine (type_name);
+					{
 						Type type = Reflection.Utils.getType(dllfile, type_name);
 						
 						// Write constructors
@@ -815,7 +822,10 @@ namespace Jigsaw
 				
 				if (value <= 0.0) {
 					// If 0.0, pause
-					this.Pause ();
+					if (this.State != RunningState.Paused) {
+						this.Pause ();
+						Console.WriteLine ("Stepping...");
+					}
 					return;
 				} else if (value > 99.0) {
 					// Turn off updating
@@ -828,6 +838,7 @@ namespace Jigsaw
 					// Do nothing if value hasn't changed
 					return;
 				} else {
+					if (this.State == RunningState.Paused) this.Run();
 					// Otherwise turn updating back on
 					UpdateDisplay = true;
 				}
@@ -915,42 +926,40 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void RunBlockStack(CBlock b)
 		{
-			// Push block onto call stack enabled immediately
-			_engine.RunBlockStack(b, true);
+			// Load block onto call stack enabled
+			_engine.LoadBlockStack(b, true);
+			
+			// If engine is not running, kick start by calling step
+			if (!_engine.IsRunning) _engine.Step ();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			//if (!_isRunning) engine.Reset(this, _inspector);
-			//_isRunning = true;
+			//Console.WriteLine ("Jigsaw.Run()");
 			if (!_engine.IsRunning) engine.Reset(this, _inspector);
 			_engine.Run();
-			RaiseJigsawRun();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
+			//Console.WriteLine ("Jigsaw.Stop()");
 			_engine.Stop();
-			//_engine.Reset(this, _inspector);
-			//_engine.Reset(this);
-			//_isRunning = false;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
+			//Console.WriteLine ("Jigsaw.Pause()");
+			if (this.State == RunningState.Paused) return;
 			_engine.Pause();
-			RaiseJigsawPause();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Step()
 		{
-			//if (!_isRunning) engine.Reset(this, _inspector);
-			//_isRunning = true;
-			//if (!_engine.IsRunning) engine.Reset(this, _inspector);
+			//Console.WriteLine ("Jigsaw.Step()");
 			_engine.Step(true);
 			RaiseJigsawStep();
 		}
@@ -958,12 +967,15 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Reset()
 		{
+			//Console.WriteLine ("Jigsaw.Reset()");
 			engine.Reset(this, _inspector);
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineRun(object sender, EventArgs e)
 		{
+			_state = RunningState.Running;
+			RaiseJigsawRun();
 			this.Invalidate();
 		}
 		
@@ -972,39 +984,43 @@ namespace Jigsaw
 		{	
 			if (_updateDisplay) this.Invalidate();
 			while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
-			
-			// Update the locals display
-			//_inspector.DisplayLocals(_engine);
+			//RaiseJigsawStep ();	// This is done in Step()
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineReset(object sender, EventArgs e)
 		{	
-			// What else to do here?
+			//Console.WriteLine ("Jigsaw.OnEngineReset()");
 			this.Invalidate();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineStop(object sender, EventArgs e)
-		{	
-//			bStop.Enabled = false;
-//			bRun.Enabled = true;
-			//_isRunning = false;
-			//_engine.Reset(this, _inspector);
+		{
+			//Console.WriteLine ("Jigsaw.OnEngineStop() - State={0}", this._state);
+			
+			// If running and not paused, go to idle and raise a stopped event.
+			// If paused, do not stop. Need to maintain state.
+			if (_state != RunningState.Paused) {
+				_state = RunningState.Idle;
+				RaiseJigsawStop();
+			}
 			this.Invalidate();
-			RaiseJigsawStop();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEnginePause(object sender, EventArgs e)
 		{	
+			//Console.WriteLine ("Jigsaw.OnEnginePause()");
+			_state = RunningState.Paused;
 			this.Invalidate();
 			RaiseJigsawPause();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEngineError(object sender, EventArgs e)
-		{	
+		{
+			_state = RunningState.Error;
 			RaiseJigsawError();
 		}
 		
@@ -1218,6 +1234,7 @@ namespace Jigsaw
 		public void ShowInspectorWindow()
 		{
 			_inspector.ShowAll();
+			_inspector.Deiconify();
 			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
 			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
 		}
@@ -1968,7 +1985,7 @@ namespace Jigsaw
 	// -----------------------------------------------------------------------
 	public class CBlock : Diagram.CShape
 	{	// Base block class
-		protected BlockState _state = BlockState.Idle;	// Current state of this block
+		protected RunningState _state = RunningState.Idle;	// Current state of this block
 		public CEdge InEdge;							// By default, all Blocks have one main input edge and one main output edge
 		public CEdge OutEdge;		
 		
@@ -2010,7 +2027,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public BlockState State
+		public RunningState State
 		{	// State getter/setter 
 			get { return _state;  }
 			set { _state = value; }
@@ -2051,13 +2068,13 @@ namespace Jigsaw
 			set { _properties[key].Text = value; }
 		}
 		
-		// - - Override Text property of blocks to also set the TextProp value when assigned
+		// - - Override Text property of basic shapes
         public override String Text
         {
             get { return this.text; }
             set {
 				this.text = value;
-				this["Label"] = value;
+				this["Label"] = value;		// Also set block label
 				//this.TextProp.Text = value;
 			}
         }
@@ -2120,7 +2137,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Always place this block of code at the top of all block runners
-			this.State = BlockState.Running;				// Indicate that the block is running
+			this.State = RunningState.Running;				// Indicate that the block is running
 			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
@@ -2144,7 +2161,7 @@ namespace Jigsaw
 			}
 			
 			// Indicate that the block is no longer running
-			this.State = BlockState.Idle;
+			this.State = RunningState.Idle;
 			yield return rr;
 		}
 		
@@ -2300,7 +2317,7 @@ namespace Jigsaw
 			SetPath(g);
 			
 			// Set fill color based on block state
-			if (this._state == BlockState.Running) {
+			if (this._state == RunningState.Running) {
 				g.Color = Diagram.Colors.White;
 			} else {
 				g.Color = this.FillColor;
@@ -2339,7 +2356,7 @@ namespace Jigsaw
 			}
 			
 			// If in an error state, draw an x over top of the block
-			if (this._state == BlockState.Error) {
+			if (this._state == RunningState.Error) {
 				g.Color = new Color(1.0, 0.0, 0.0, 0.5);
 				g.LineWidth = 5;
 				g.MoveTo(x, y);

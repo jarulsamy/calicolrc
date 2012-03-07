@@ -1,18 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CalicoJigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="CalicoJigsaw.cs" Line="110" Column="75" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\Engine.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\Diagram.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="449" Column="20" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="828" Column="7" />
+      <File FileName="Jigsaw\Engine.cs" Line="240" Column="10" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="References" expanded="True" />
             <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
@@ -28,7 +25,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\dblank\Desktop\Calico\languages\Jigsaw\Jigsaw\MainWindow.cs" line="357" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
