@@ -57,7 +57,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat("{0}{1} = {2}\n", sindent, this.VariableName, this["Expression"]);
 				
 				if (this.OutEdge.IsConnected) {
@@ -208,7 +208,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
@@ -333,7 +333,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat("{0}{1}\n", sindent, this["Statement"]);
 				
 				if (this.OutEdge.IsConnected) {
@@ -449,7 +449,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat("{0}# {1}\n", sindent, this["Comment"]);
 				
 				if (this.OutEdge.IsConnected) {

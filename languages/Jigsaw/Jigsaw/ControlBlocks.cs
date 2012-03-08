@@ -95,7 +95,7 @@ namespace Jigsaw
 			// This generates main statements right at the top level
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				if (this.StartEdge.IsConnected) {
 					CBlock b = this.StartEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
@@ -238,7 +238,7 @@ namespace Jigsaw
 			{
 				// If end block is connected to start block, add a pass
 				if (this.InEdge.IsConnected) {
-					string sindent = new string (' ', indent);
+					string sindent = new string (' ', Constant.SPACES * indent);
 					o.AppendFormat ("{0}sys.exit(0)\n", sindent);
 				}
 				
@@ -403,14 +403,14 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
-				o.AppendFormat ("{0}for _ in xrange({1}):\n", sindent, this["Repetitions"]);
+				string sindent = new string (' ', Constant.SPACES * indent);
+				o.AppendFormat ("{0}for _ in range({1}):\n", sindent, this["Repetitions"]);
 
 				if (this.LoopEdge.IsConnected) {
 					CBlock b = this.LoopEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 			
@@ -643,14 +643,14 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat ("{0}if {1}:\n", sindent, this["IfTest"]);
 
 				if (this.IfEdge.IsConnected) {
 					CBlock b = this.IfEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -658,7 +658,7 @@ namespace Jigsaw
 					CBlock b = this.OutEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
 //				} else {
-//					string sindent2 = new string (' ', 2*(indent+1));
+//					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 //					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -938,14 +938,14 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat ("{0}if {1}:\n", sindent, this["IfTest"]);
 
 				if (this.IfEdge.IsConnected) {
 					CBlock b = this.IfEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -955,7 +955,7 @@ namespace Jigsaw
 					CBlock b = this.ElseEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -1356,14 +1356,14 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat ("{0}while ({1}):\n", sindent, this["WhileTest"]);
 
 				if (this.LoopEdge.IsConnected) {
 					CBlock b = this.LoopEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -1697,7 +1697,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat("{0}{1}\n", sindent, this.ToPython ());
 				
 			} catch (Exception ex){
@@ -1805,14 +1805,14 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat ("{0}for {1} in {2}:\n", sindent, this["Variable"], this["Sequence"]);
 
 				if (this.LoopEdge.IsConnected) {
 					CBlock b = this.LoopEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 			

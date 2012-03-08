@@ -164,7 +164,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				string code = String.Format("def {0}({1}):", this.ProcedureName, this.argListString);
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				
@@ -172,7 +172,7 @@ namespace Jigsaw
 					CBlock b = this.StartEdge.LinkedTo.Block;
 					b.ToPython(o, indent+1);
 				} else {
-					string sindent2 = new string (' ', 2*(indent+1));
+					string sindent2 = new string (' ', Constant.SPACES * (indent+1));
 					o.AppendFormat ("{0}pass\n", sindent2);
 				}
 				
@@ -427,7 +427,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
@@ -670,7 +670,7 @@ namespace Jigsaw
 		{
 			try
 			{
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				o.AppendFormat("{0}{1}\n", sindent, this.ToPython ());
 				
 			} catch (Exception ex){

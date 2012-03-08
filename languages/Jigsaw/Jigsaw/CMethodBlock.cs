@@ -201,7 +201,7 @@ namespace Jigsaw
 			try
 			{
 				string code = this.ToPython();
-				string sindent = new string (' ', 2*indent);
+				string sindent = new string (' ', Constant.SPACES * indent);
 				
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				

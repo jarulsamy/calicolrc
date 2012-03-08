@@ -19,6 +19,9 @@ using Microsoft.Scripting.Hosting;
 namespace Jigsaw
 {
 	// -----------------------------------------------------------------------
+	public static class Constant {
+		public const int SPACES = 4; // used in ToPython indent level
+	}
 	
 	// --- Enumerates block edge types -------------------------------------
 	public enum EdgeType

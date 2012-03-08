@@ -2,9 +2,16 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw\MainWindow.cs" Line="449" Column="20" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="828" Column="7" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="296" Column="37" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="23" Column="64" />
       <File FileName="Jigsaw\Engine.cs" Line="240" Column="10" />
+      <File FileName="..\..\modules\Reflection\Reflection.cs" Line="190" Column="21" />
+      <File FileName="Jigsaw\ControlBlocks.cs" Line="406" Column="42" />
+      <File FileName="Jigsaw\Diagram.cs" Line="22" Column="30" />
+      <File FileName="Jigsaw\IOBlocks.cs" Line="509" Column="57" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="452" Column="57" />
+      <File FileName="Jigsaw\CMethodBlock.cs" Line="204" Column="37" />
+      <File FileName="Jigsaw\ProcedureBlocks.cs" Line="178" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
