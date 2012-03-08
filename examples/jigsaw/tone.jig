@@ -3,49 +3,16 @@
     <module name="Common.dll" />
     <module name="Math.dll" />
     <module name="Myro.dll" />
+    <module name="Shapes.dll" />
     <block id="1" typeName="Jigsaw.CControlStart" left="420" top="26">
-        <edge id="1" name="Start" linkedTo="2" />
+        <edge id="1" name="Start" linkedTo="16" />
         <property name="Label" value="when program starts" />
         <property name="Message" value="" />
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="2" typeName="Jigsaw.CAssignment" left="440" top="56">
-        <edge id="2" name="In" linkedTo="1" />
-        <edge id="3" name="Out" linkedTo="4" />
-        <property name="Label" value="freq = 440" />
-        <property name="Message" value="" />
-        <property name="Variable" value="freq" />
-        <property name="Expression" value="440" />
-        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
-        <line_color R="0" G="0.391" B="0" A="1" />
-    </block>
-    <block id="3" typeName="Jigsaw.CAssignment" left="440" top="76">
-        <edge id="4" name="In" linkedTo="3" />
-        <edge id="5" name="Out" linkedTo="6" />
-        <property name="Label" value="slice = (1/44100.0 * 360 * Math.PI/180)" />
-        <property name="Message" value="" />
-        <property name="Variable" value="slice" />
-        <property name="Expression" value="(1/44100.0 * 360 * Math.PI/180)" />
-        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
-        <line_color R="0" G="0.391" B="0" A="1" />
-    </block>
-    <block id="4" typeName="Jigsaw.CMethodBlock" left="440" top="96">
-        <method assembly_name="Myro" type_name="Myro" method_name="play" return_type="System.Void">
-            <parameter name="duration" type="System.Double" default="System.DBNull" />
-            <parameter name="function" type="System.Func`3[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="System.DBNull" />
-        </method>
-        <edge id="6" name="In" linkedTo="5" />
-        <edge id="7" name="Out" linkedTo="-1" />
-        <property name="Label" value="play(1, tone)" />
-        <property name="Message" value="" />
-        <property name="duration" value="1" />
-        <property name="function" value="tone" />
-        <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
-        <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
-    </block>
-    <block id="5" typeName="Jigsaw.CProcedureStart" left="415" top="151">
-        <edge id="8" name="Start" linkedTo="9" />
+    <block id="2" typeName="Jigsaw.CProcedureStart" left="415" top="151">
+        <edge id="2" name="Start" linkedTo="3" />
         <property name="Label" value="define tone (array, position)" />
         <property name="Message" value="" />
         <property name="Procedure Name" value="tone" />
@@ -57,10 +24,30 @@
         <fill_color R="0.844" G="0.746" B="0.844" A="1" />
         <line_color R="0.56" G="0" B="0.5" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CControlForeach" left="435" top="181">
-        <edge id="9" name="In" linkedTo="8" />
-        <edge id="10" name="Out" linkedTo="-1" />
-        <edge id="11" name="Loop" linkedTo="12" />
+    <block id="3" typeName="Jigsaw.CAssignment" left="435" top="181">
+        <edge id="3" name="In" linkedTo="2" />
+        <edge id="4" name="Out" linkedTo="5" />
+        <property name="Label" value="freq = 440" />
+        <property name="Message" value="" />
+        <property name="Variable" value="freq" />
+        <property name="Expression" value="440" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CAssignment" left="435" top="201">
+        <edge id="5" name="In" linkedTo="4" />
+        <edge id="6" name="Out" linkedTo="7" />
+        <property name="Label" value="slice = (1/44100.0 * 360 * Math.PI/180)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="slice" />
+        <property name="Expression" value="(1/44100.0 * 360 * Math.PI/180)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CControlForeach" left="435" top="221">
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="-1" />
+        <edge id="9" name="Loop" linkedTo="10" />
         <property name="Label" value="for each i in range(len(array))" />
         <property name="Message" value="" />
         <property name="Sequence" value="range(len(array))" />
@@ -68,9 +55,9 @@
         <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
         <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
     </block>
-    <block id="7" typeName="Jigsaw.CAssignment" left="455" top="201">
-        <edge id="12" name="In" linkedTo="11" />
-        <edge id="13" name="Out" linkedTo="14" />
+    <block id="6" typeName="Jigsaw.CAssignment" left="455" top="241">
+        <edge id="10" name="In" linkedTo="9" />
+        <edge id="11" name="Out" linkedTo="12" />
         <property name="Label" value="angle = position * slice * freq" />
         <property name="Message" value="" />
         <property name="Variable" value="angle" />
@@ -78,9 +65,9 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="8" typeName="Jigsaw.CAssignment" left="455" top="221">
-        <edge id="14" name="In" linkedTo="13" />
-        <edge id="15" name="Out" linkedTo="16" />
+    <block id="7" typeName="Jigsaw.CAssignment" left="455" top="261">
+        <edge id="12" name="In" linkedTo="11" />
+        <edge id="13" name="Out" linkedTo="14" />
         <property name="Label" value="array[i] = int(127 + Math.Cos(angle) * 127)" />
         <property name="Message" value="" />
         <property name="Variable" value="array[i]" />
@@ -88,9 +75,9 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="9" typeName="Jigsaw.CAssignment" left="455" top="241">
-        <edge id="16" name="In" linkedTo="15" />
-        <edge id="17" name="Out" linkedTo="-1" />
+    <block id="8" typeName="Jigsaw.CAssignment" left="455" top="281">
+        <edge id="14" name="In" linkedTo="13" />
+        <edge id="15" name="Out" linkedTo="-1" />
         <property name="Label" value="position = position + 1" />
         <property name="Message" value="" />
         <property name="Variable" value="position" />
@@ -98,9 +85,32 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="10" typeName="Jigsaw.CAssignment" left="740" top="51">
-        <edge id="18" name="In" linkedTo="-1" />
+    <block id="9" typeName="Jigsaw.CStatement" left="440" top="56">
+        <edge id="16" name="In" linkedTo="1" />
+        <edge id="17" name="Out" linkedTo="18" />
+        <property name="Label" value="drawTone(tone)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="drawTone(tone)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="10" typeName="Jigsaw.CMethodBlock" left="440" top="76">
+        <method assembly_name="Myro" type_name="Myro" method_name="play" return_type="System.Void">
+            <parameter name="duration" type="System.Double" default="System.DBNull" />
+            <parameter name="function" type="System.Func`3[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" default="System.DBNull" />
+        </method>
+        <edge id="18" name="In" linkedTo="17" />
         <edge id="19" name="Out" linkedTo="-1" />
+        <property name="Label" value="play(1, tone)" />
+        <property name="Message" value="" />
+        <property name="duration" value="1" />
+        <property name="function" value="tone" />
+        <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
+        <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
+    </block>
+    <block id="11" typeName="Jigsaw.CAssignment" left="745" top="31">
+        <edge id="20" name="In" linkedTo="-1" />
+        <edge id="21" name="Out" linkedTo="-1" />
         <property name="Label" value="array = [0 for i in range(100)]" />
         <property name="Message" value="" />
         <property name="Variable" value="array" />
@@ -108,9 +118,9 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
-    <block id="11" typeName="Jigsaw.CProcedureCall" left="740" top="81">
-        <edge id="20" name="In" linkedTo="-1" />
-        <edge id="21" name="Out" linkedTo="-1" />
+    <block id="12" typeName="Jigsaw.CProcedureCall" left="745" top="66">
+        <edge id="22" name="In" linkedTo="-1" />
+        <edge id="23" name="Out" linkedTo="-1" />
         <property name="Label" value="tone(array, 0)" />
         <property name="Message" value="" />
         <property name="Variable" value="" />
@@ -122,5 +132,162 @@
         <property name="Arg5" value="" />
         <fill_color R="0.844" G="0.746" B="0.844" A="1" />
         <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="13" typeName="Jigsaw.CProcedureCall" left="750" top="106">
+        <edge id="24" name="In" linkedTo="-1" />
+        <edge id="25" name="Out" linkedTo="-1" />
+        <property name="Label" value="drawTone(tone)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="Procedure Name" value="drawTone" />
+        <property name="Arg1" value="tone" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="14" typeName="Jigsaw.CProcedureStart" left="760" top="161">
+        <edge id="26" name="Start" linkedTo="27" />
+        <property name="Label" value="define drawTone (function)" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="drawTone" />
+        <property name="Param1" value="function" />
+        <property name="Param2" value="" />
+        <property name="Param3" value="" />
+        <property name="Param4" value="" />
+        <property name="Param5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="15" typeName="Jigsaw.CAssignment" left="780" top="191">
+        <edge id="27" name="In" linkedTo="26" />
+        <edge id="28" name="Out" linkedTo="29" />
+        <property name="Label" value="width = 44100" />
+        <property name="Message" value="" />
+        <property name="Variable" value="width" />
+        <property name="Expression" value="44100" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="16" typeName="Jigsaw.CMethodBlock" left="780" top="211">
+        <method assembly_name="Shapes" type_name="Shapes" method_name="makeWindow" return_type="Graphics+WindowClass">
+            <parameter name="title" type="System.String" default="Calico Graphics" />
+            <parameter name="width" type="System.Int32" default="300" />
+            <parameter name="height" type="System.Int32" default="300" />
+        </method>
+        <edge id="29" name="In" linkedTo="28" />
+        <edge id="30" name="Out" linkedTo="31" />
+        <property name="Label" value="win=makeWindow(&quot;Sound Plot&quot;, 500, 250)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="win" />
+        <property name="title" value="&quot;Sound Plot&quot;" />
+        <property name="width" value="500" />
+        <property name="height" value="250" />
+        <fill_color R="0.530329046319392" G="0.659975322503585" B="0.800140128843552" A="1" />
+        <line_color R="0.212131618527757" G="0.263990129001434" B="0.320056051537421" A="1" />
+    </block>
+    <block id="17" typeName="Jigsaw.CStatement" left="780" top="231">
+        <edge id="31" name="In" linkedTo="30" />
+        <edge id="32" name="Out" linkedTo="33" />
+        <property name="Label" value="win.addScrollbars(width/2, 255)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="win.addScrollbars(width/2, 255)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="18" typeName="Jigsaw.CMethodBlock" left="780" top="251">
+        <method assembly_name="Shapes" type_name="Shapes" method_name="setMode" return_type="System.Void">
+            <parameter name="window" type="Graphics+WindowClass" default="System.DBNull" />
+            <parameter name="mode" type="System.String" default="System.DBNull" />
+        </method>
+        <edge id="33" name="In" linkedTo="32" />
+        <edge id="34" name="Out" linkedTo="35" />
+        <property name="Label" value="setMode(win, &quot;bitmap&quot;)" />
+        <property name="Message" value="" />
+        <property name="window" value="win" />
+        <property name="mode" value="&quot;bitmap&quot;" />
+        <fill_color R="0.530329046319392" G="0.659975322503585" B="0.800140128843552" A="1" />
+        <line_color R="0.212131618527757" G="0.263990129001434" B="0.320056051537421" A="1" />
+    </block>
+    <block id="19" typeName="Jigsaw.CAssignment" left="780" top="271">
+        <edge id="35" name="In" linkedTo="34" />
+        <edge id="36" name="Out" linkedTo="37" />
+        <property name="Label" value="array = [0] * width" />
+        <property name="Message" value="" />
+        <property name="Variable" value="array" />
+        <property name="Expression" value="[0] * width" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="20" typeName="Jigsaw.CStatement" left="780" top="291">
+        <edge id="37" name="In" linkedTo="36" />
+        <edge id="38" name="Out" linkedTo="39" />
+        <property name="Label" value="function(array, 0)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="function(array, 0)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="21" typeName="Jigsaw.CAssignment" left="780" top="311">
+        <edge id="39" name="In" linkedTo="38" />
+        <edge id="40" name="Out" linkedTo="41" />
+        <property name="Label" value="prev = (0, width)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="prev" />
+        <property name="Expression" value="(0, width)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="22" typeName="Jigsaw.CControlForeach" left="780" top="331">
+        <edge id="41" name="In" linkedTo="40" />
+        <edge id="42" name="Out" linkedTo="-1" />
+        <edge id="43" name="Loop" linkedTo="44" />
+        <property name="Label" value="for each i in range(0, width, 2)" />
+        <property name="Message" value="" />
+        <property name="Sequence" value="range(0, width, 2)" />
+        <property name="Variable" value="i" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="23" typeName="Jigsaw.CMethodBlock" left="800" top="351">
+        <method assembly_name="Shapes" type_name="Shapes" method_name="makeLine" return_type="Graphics+Line">
+            <parameter name="p1" type="System.Collections.IList" default="System.DBNull" />
+            <parameter name="p2" type="System.Collections.IList" default="System.DBNull" />
+        </method>
+        <edge id="44" name="In" linkedTo="43" />
+        <edge id="45" name="Out" linkedTo="46" />
+        <property name="Label" value="line=makeLine(prev, (i/2, array[i]))" />
+        <property name="Message" value="" />
+        <property name="Variable" value="line" />
+        <property name="p1" value="prev" />
+        <property name="p2" value="(i/2, array[i])" />
+        <fill_color R="0.530329046319392" G="0.659975322503585" B="0.800140128843552" A="1" />
+        <line_color R="0.212131618527757" G="0.263990129001434" B="0.320056051537421" A="1" />
+    </block>
+    <block id="24" typeName="Jigsaw.CMethodBlock" left="800" top="371">
+        <method assembly_name="Shapes" type_name="Shapes" method_name="draw" return_type="System.Void">
+            <parameter name="shape" type="Graphics+Shape" default="System.DBNull" />
+            <parameter name="window" type="Graphics+WindowClass" default="System.DBNull" />
+        </method>
+        <edge id="46" name="In" linkedTo="45" />
+        <edge id="47" name="Out" linkedTo="48" />
+        <property name="Label" value="draw(line, win)" />
+        <property name="Message" value="" />
+        <property name="shape" value="line" />
+        <property name="window" value="win" />
+        <fill_color R="0.530329046319392" G="0.659975322503585" B="0.800140128843552" A="1" />
+        <line_color R="0.212131618527757" G="0.263990129001434" B="0.320056051537421" A="1" />
+    </block>
+    <block id="25" typeName="Jigsaw.CAssignment" left="800" top="391">
+        <edge id="48" name="In" linkedTo="47" />
+        <edge id="49" name="Out" linkedTo="-1" />
+        <property name="Label" value="prev = (i/2, array[i])" />
+        <property name="Message" value="" />
+        <property name="Variable" value="prev" />
+        <property name="Expression" value="(i/2, array[i])" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
     </block>
 </jigsaw>
