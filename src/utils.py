@@ -306,7 +306,7 @@ class Chat:
             print("READXML:", self.user, xml)
 
     def OnWriteXml(self, sender, xml):
-        self.calico.update_status()
+        #self.calico.update_status()
         if self.debug:
             print("WRITEXML:", self.user, xml)
 

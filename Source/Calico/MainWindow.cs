@@ -55,6 +55,7 @@ namespace Calico {
         public History history;
         public TabCompletion completion = null;
         static string dialogResponse;
+        public Chat connection;
 
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
@@ -2250,5 +2251,34 @@ namespace Calico {
         {
             Console.WriteLine("change! {0}", o);
         }
+
+
+
+        public static double currentTime ()
+        {
+            System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime (1970, 1, 1);
+            return t.TotalSeconds;
+        }
+
+        public static void wait(double seconds) {
+            if (seconds < .1)
+                Thread.Sleep ((int)(seconds * 1000));
+            else {
+                double start = currentTime ();
+                while (seconds > currentTime () - start) {
+                    while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+                    Thread.Sleep (100);
+                }
+            }
+         }
+
+        protected void OnRegisterActionActivated (object sender, System.EventArgs e)
+        {
+        }
+
+        protected void OnLoginActionActivated (object sender, System.EventArgs e)
+        {
+        }
+
     }
 }

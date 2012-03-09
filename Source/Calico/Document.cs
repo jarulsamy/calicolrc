@@ -135,7 +135,11 @@ namespace Calico {
         }
 
         public bool IsWritable(string filename) {
+            if (filename == null)
+                return false;
             string directory = System.IO.Path.GetDirectoryName(filename);
+            if (directory == null)
+                return false;
             string tempfile = System.IO.Path.Combine(directory, "tempfile.tmp");
             bool retval = true;
             try {

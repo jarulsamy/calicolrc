@@ -77,6 +77,9 @@
       <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="agsXMPP">
+      <HintPath>..\..\modules\agsXMPP.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -97,6 +100,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Printing.cs" />
     <Compile Include="DebugTextMarker.cs" />
+    <Compile Include="Chat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -390,6 +390,18 @@
         <property name="Active">False</property>
         <signal name="Activated" handler="OnHistoryTabActionActivated" />
       </action>
+      <action id="RegisterAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Register...</property>
+        <property name="ShortLabel" translatable="yes">Register...</property>
+        <signal name="Activated" handler="OnRegisterActionActivated" />
+      </action>
+      <action id="LoginAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Login...</property>
+        <property name="ShortLabel" translatable="yes">Login...</property>
+        <signal name="Activated" handler="OnLoginActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -416,6 +428,9 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="printAction" />
                 <node type="Menuitem" action="ExportAsPythonAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="RegisterAction" />
+                <node type="Menuitem" action="LoginAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
               </node>
