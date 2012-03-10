@@ -7,6 +7,7 @@ def search(word, board):
     Function to search for a word in a Boggle Board
     which is represented by a 1D list of letters.
     """
+    print(locals())
     # first, get all of the first letter matches in board:
     starts = [(x,y) for x in range(4) for y in range(4) if board[x + y * 4] == word[0]]
     # Now, for each first letter matches, search around for rest of word:
@@ -33,19 +34,20 @@ def search_around(word, pos, board, x, y, avoid):
             if 0 <= dx + x < 4 and 0 <= dy + y < 4: # in range?
                 if board[(dx + x) + (dy + y) * 4] == word[pos]: # correct letter?
                     if ((dx + x), (dy + y)) not in avoid: # not used before?
-                        return search_around(word,
+                        if search_around(word,
                                              pos + 1,
                                              board,
                                              dx + x,
                                              dy + y,
-                                             avoid + [(dx + x, dy + y)]) # continue
+                                             avoid + [(dx + x, dy + y)]): # continue
+                            return True
     # If not found in everything around (x,y) return False:
     return False
 
 ## Test:
-## b = ['a', 'b', 'e', 'd',
-##      'o', 'g', 'l', 'o',
-##      'b', 't', 'f', 't',
-##      'z', 'g', 'g', 'h']
+b = ['a', 'b', 'e', 'd',
+     'o', 'g', 'l', 'o',
+     'b', 't', 'f', 't',
+     'z', 'g', 'g', 'h']
 ##
-## search("glob", b)
+search("glob", b)
