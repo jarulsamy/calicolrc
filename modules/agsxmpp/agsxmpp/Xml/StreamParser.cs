@@ -151,7 +151,9 @@ namespace agsXMPP.Xml
                             break;
                         case TOK.DATA_CHARS:
                         case TOK.DATA_NEWLINE:
-                            AddText(utf.GetString(b, off, ct.TokenEnd - off));
+							// DSB: newline after a <?xml> line should not be handled this way
+							if (m_root != null)
+                            	AddText(utf.GetString(b, off, ct.TokenEnd - off));
                             break;
                         case TOK.CHAR_REF:
                         case TOK.MAGIC_ENTITY_REF:

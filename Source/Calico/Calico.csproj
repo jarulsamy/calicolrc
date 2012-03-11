@@ -78,7 +78,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="agsXMPP">
-      <HintPath>..\..\modules\agsXMPP.dll</HintPath>
+      <HintPath>..\..\bin\agsXMPP.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

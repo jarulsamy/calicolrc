@@ -1,6 +1,24 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Xml\StreamParser.cs">
+    <Files>
+      <File FileName="XmppConnection.cs" Line="1" Column="1" />
+      <File FileName="..\..\..\Source\Calico\Chat.cs" Line="1" Column="1" />
+      <File FileName="XmppClientConnection.cs" Line="1" Column="1" />
+      <File FileName="Xml\StreamParser.cs" Line="189" Column="28" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="agsXMPP2010" expanded="True">
+            <Node name="Xml" expanded="True">
+              <Node name="StreamParser.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

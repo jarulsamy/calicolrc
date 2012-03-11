@@ -2351,6 +2351,7 @@ namespace Calico {
 
         protected void OnRegisterActionActivated (object sender, System.EventArgs e)
         {
+            connection = new Chat(this, "sigcse01", "password");
         }
 
         protected void OnLoginActionActivated (object sender, System.EventArgs e)

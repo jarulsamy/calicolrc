@@ -283,7 +283,7 @@ class Chat:
         self.status = _("online")
         self.send("", "2") # make this my only login
         if self.alert:
-            self.calico.alert(_("You are now logged in as '%s'.") % self.user)
+            self.calico.Print(_("You are now logged in as '%s'.") % self.user)
             self.send("admin", "[broadcast]\nroom: %s\n%s" % ("General",
                 "%s has joined the discussion" % self.user))
         if self.debug:
@@ -296,7 +296,7 @@ class Chat:
     def OnAuthError(self, sender, xml):
         self.status = _("rejected")
         if self.alert:
-            self.calico.alert(_("You were not allowed to log in.") + "\n" +
+            self.calico.Print(_("You were not allowed to log in.") + "\n" +
                               _("Please check your ID and password."))
         if self.debug:
             print("AUTHERROR:", self.user, xml)
@@ -323,9 +323,10 @@ class Chat:
                 line1, message = rest.split("\n", 1) # from
                 fromheader, address = [item.strip() for item in line1.split(":")]
                 name, domain = address.split("@")
-                if self.calico.chat:
-                    self.calico.chat.display_message(name, message)
-                    return
+                #if self.calico.chat:
+                #    self.calico.chat.display_message(name, message)
+                self.calico.Print("%s -> %s" % (name, message))
+                return
         elif str(msg.Body).startswith("[blast]"):
             line0, rest = str(msg.Body).split("\n", 1) # [blast]
             if "\n" in rest:
@@ -339,15 +340,15 @@ class Chat:
                 return
         elif str(msg.Body).startswith("[result]"):
             line0, rest = str(msg.Body).split("\n", 1) # [blast]
-            self.calico.alert(rest)
+            self.calico.Print(rest)
             return
         elif str(msg.Body).startswith("[update]"):
-            if self.calico.chat:
+            if True:
                 line0, rest = str(msg.Body).split("\n", 1) # [update]
                 line1, rest = rest.split("\n", 1) # room:
                 header, value = [item.strip() for item in line1.split(":", 1)]
-                if header == "room":
-                    self.calico.chat.room = value
+                #if header == "room":
+                #    self.calico.chat.room = value
             return
         elif str(msg.Body).startswith("[info]"):
             # ignore
