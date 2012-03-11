@@ -93,6 +93,7 @@ namespace CalicoPython
 			      || calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno))) {
 			calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
 		      }
+		      //calico.Print(calico.Repr(((IDictionary<object,object>)frame.f_locals).Keys));
 		      calico.UpdateLocal((IDictionary<object,object>)frame.f_locals);
 		    });
 		  // If a stopping criteria:

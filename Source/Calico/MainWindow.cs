@@ -1309,14 +1309,14 @@ namespace Calico {
 	    if (ProgramRunning) {
 	      return false;
 	    }
-            string prompt = String.Format("{0}> ", CurrentLanguage);
+            string prompt = String.Format("{0}> ", CurrentLanguage.PadLeft(8, ' '));
             int count = 2;
             foreach (string line in text.Split('\n')) {
                 Print(Tag.Info, prompt);
                 // black
                 Print(line + "\n");
                 // blue
-                prompt = String.Format(".....{0}>", count);
+                prompt = String.Format("{0}> ", count.ToString().PadLeft(8, '.'), count);
                 count += 1;
             }
             if (text == "") {
@@ -1632,12 +1632,21 @@ namespace Calico {
 
         public static bool HasMethod(object obj, string methodName) {
             if (obj != null) {
-	            Type type = obj.GetType();
-	            return type.GetMethod(methodName) != null;
+             Type type = obj.GetType();
+             return type.GetMethod(methodName) != null;
             } else {
                 return false;
             }
-	    }
+        }
+
+        public static bool HasField(object obj, string fieldName) {
+            if (obj != null) {
+             Type type = obj.GetType();
+             return type.GetField(fieldName) != null;
+            } else {
+                return false;
+            }
+        }
 
         public static string InvokeMethod(object obj, string methodName, params object [] args) {
 	        var type = obj.GetType();
@@ -1651,13 +1660,23 @@ namespace Calico {
 
         public string Repr(object obj) {
             string repr = null;
-    	    if (HasMethod(obj, "__repr__")) {
+            if (HasField(obj, "Value")) {
+            //if (obj is IronPython.Runtime.ClosureCell) {
+            //obj = ((IronPython.Runtime.ClosureCell)obj).Value;
+                System.Reflection.FieldInfo fi = obj.GetType().GetField("Value");
+                obj = fi.GetValue(obj);
+                return Repr(obj);
+            } else if (obj is Microsoft.Scripting.Runtime.Uninitialized) {
+                repr = "<Uninitialized value>";
+            } else if (HasMethod(obj, "__repr__")) {
                 // FIXME: make sure there is a python
                 repr = InvokeMethod(obj, "__repr__", manager["python"].engine.GetDefaultContext());
     	    } else if (HasMethod(obj, "to_s")) {
                 repr = InvokeMethod(obj, "to_s");
             } else if (obj is Array) {
                 repr = (string)ArrayToString((object[]) obj);
+            } else if (obj is string) {
+                repr = String.Format("'{0}'", obj);
             }
             if (repr == null) {
                 if (obj != null)
@@ -1674,15 +1693,17 @@ namespace Calico {
         }
 
         public void UpdateLocal(IDictionary<object,object> locals) {
-            LocalList = new Gtk.ListStore(typeof(string), typeof(string));
+            //LocalList = new Gtk.ListStore(typeof(string), typeof(string));
+            LocalList.Clear();
             foreach(object key in locals.Keys) {
                 string vname = key.ToString();
-                if (! vname.StartsWith("_") && vname != "calico" && locals.ContainsKey(key)) {
+                if (! vname.StartsWith("_") && vname != "calico") {
                     string repr = Repr(locals[key]);
+                    //Console.WriteLine(locals[key]);
                     LocalList.AppendValues(vname, repr);
                 }
             }
-            LocalTreeView.Model = LocalList;
+            //LocalTreeView.Model = LocalList;
         }
 
         public bool UpdateEnvironment() {
