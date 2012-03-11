@@ -57,6 +57,19 @@ namespace Calico {
         static string dialogResponse;
         public Chat connection;
 
+        enum TargetType {
+            String,
+            RootWindow,
+            Filename,
+         };
+
+        private static Gtk.TargetEntry [] target_table = new Gtk.TargetEntry [] {
+             //new Gtk.TargetEntry ("STRING", 0, (uint) TargetType.String ),
+             //new Gtk.TargetEntry ("text/plain", 0, (uint) TargetType.String),
+             new Gtk.TargetEntry ("text/uri-list", 0, (uint) TargetType.Filename),
+             //new Gtk.TargetEntry ("application/x-rootwindow-drop", 0, (uint) TargetType.RootWindow)
+         };
+
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));
@@ -254,10 +267,53 @@ namespace Calico {
             UpdateZoom();
             addToRecentsMenu(null);
             searchbox.Hide();
+            // Drop onto:
+            Gtk.Drag.DestSet (this, Gtk.DestDefaults.All, target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
+            this.DragDataReceived += new Gtk.DragDataReceivedHandler (HandleDragDataReceived);
+            // Dragable:
+            //Gtk.Drag.SourceSet (StartButton, Gdk.ModifierType.Button1Mask | Gdk.ModifierType.Button3Mask,
+            //     target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
+            //StartButton.DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
+            // All done, show if minimized:
             this.Present();
             // End of GUI setup
             //GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
+
+        private void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
+        {
+            if (args.SelectionData.Length >=0 && args.SelectionData.Format == 8) {
+                string filenames = Encoding.UTF8.GetString(args.SelectionData.Data, 0, args.SelectionData.Length);
+                foreach (string filename in filenames.Split('\n')) {
+                    string sfilename = filename.Replace("\r", "").Trim();
+                    //Console.WriteLine ("Received '{0}'", sfilename);
+                    Uri uri;
+                    try {
+                        uri = new Uri(sfilename);
+                    } catch {
+                        continue;
+                    }
+                    //Console.WriteLine ("Uri! '{0}'", uri);
+                    sfilename = System.IO.Path.GetFullPath(uri.AbsolutePath);
+                    //Console.WriteLine ("Filename! '{0}'", sfilename);
+                    if (System.IO.File.Exists(sfilename)) {
+                        Open(sfilename);
+                    }
+                }
+                Gtk.Drag.Finish (args.Context, true, false, args.Time);
+            }
+            Gtk.Drag.Finish (args.Context, false, false, args.Time);
+        }
+
+        /*
+        private static void HandleSourceDragDataGet (object sender, Gtk.DragDataGetArgs args)
+        {
+            if (args.Info == (uint) TargetType.RootWindow)
+                Console.WriteLine ("I was dropped on the rootwin");
+            else
+                args.SelectionData.Text = "I'm data!";
+        }
+        */
 
         // ------------------------------------------------------------
         public Document CurrentDocument {
