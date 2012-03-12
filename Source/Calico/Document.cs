@@ -196,7 +196,7 @@ namespace Calico {
                 tab_label.Text = basename;
                 tab_label.TooltipText = filename;
                 // Already agreed to overwrite:
-                retval = Save();
+                retval = Save(true); // force saveas
                 if (retval) {
                     // Set CurrentDirectory here:
                     string dir = System.IO.Path.GetDirectoryName(filename);
@@ -210,7 +210,11 @@ namespace Calico {
         }
 
         public virtual bool Save() {
-            if (IsDirty) { // only Save if this is dirty
+            return Save(false);
+        }
+
+        public virtual bool Save(bool force) {
+            if (IsDirty || force) { // only Save if this is dirty
                 if (filename != null) {
                     try {
                         return SaveDocument();
