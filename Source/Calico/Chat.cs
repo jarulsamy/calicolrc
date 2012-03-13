@@ -77,17 +77,18 @@ namespace Calico {
             Send("", "2"); // make this my only login
             if (alert) {
                 calico.Print(String.Format("You are now logged in as '{0}'.\n", user));
-                Send("admin", String.Format("[broadcast]\nroom: {0}\n{1} has joined the discussion",
+                Send("admin", String.Format("[broadcast]\nroom: {0}\n{1} has joined the discussion\n",
                                             "General",
                                             user));
             }
             if (debug) {
-                calico.Print(String.Format("LOGIN: {0}", user));
+                calico.Print(String.Format("LOGIN: {0}\n", user));
                 //self.client.SendMyPresence()
             }
         }
 
         public void OnMessage(object sender, agsXMPP.protocol.client.Message msg) {
+            calico.Print(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
             messages.Add(new List<string>() {msg.From, msg.Body});
         }
 

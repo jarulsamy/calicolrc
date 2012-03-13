@@ -107,6 +107,7 @@ namespace Calico {
             PostBuild();
             foreach (Gtk.TextTag tag in tags.Values) {
                 Output.Buffer.TagTable.Add(tag);
+                //ChatOutput.Buffer.TagTable.Add(tag);
                 // TextView
             }
             Output.WrapMode = Gtk.WrapMode.Char; // FIXME: config
@@ -251,12 +252,20 @@ namespace Calico {
             }
             if (debug_handler)
                 GLib.ExceptionManager.UnhandledException += HandleException;
-            // Set EnvironmentPage to match displayed state:
-            //IsUpdateEnvironment = true;
-            //EnvironmentTabAction.Active = true;
+            // Hide things that shouldn't be seen yet:
+            searchbox.Hide();
+            ChatNotebook.Hide();
             EnvironmentPage.Child.Hide();
             LocalsPage.Child.Hide();
             HistoryPage.Child.Hide();
+            ChatPrint("Chat commands:\n" +
+                "    MESSAGE\n" +
+                "    @USER MESSAGE\n" + "" +
+                "    /join CONF\n" +
+                "    /list\n" +
+                "    /create CONF\n" +
+                "    /help\n");
+
             history = new History((List<string>)this.config.values["shell"]["history"]);
             ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of previous history]\n");
             foreach(string text in (List<string>)this.config.values["shell"]["history"]) {
@@ -266,7 +275,6 @@ namespace Calico {
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
-            searchbox.Hide();
             // Drop onto:
             Gtk.Drag.DestSet (this, Gtk.DestDefaults.All, target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
             this.DragDataReceived += new Gtk.DragDataReceivedHandler (HandleDragDataReceived);
@@ -277,7 +285,6 @@ namespace Calico {
             // All done, show if minimized:
             this.Present();
             // End of GUI setup
-            //GLib.Timeout.Add(100, new GLib.TimeoutHandler( UpdateEnvironment ));
         }
 
         private void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
@@ -1521,6 +1528,30 @@ namespace Calico {
             }
         }
 
+        public void ChatPrint(string format) {
+            ChatPrint(Tag.Normal, format);
+        }
+
+        public void ChatPrint(Tag tag, string format) {
+            // These Write functions are the only approved methods of output
+            Thread.Sleep(1); // Force a context switch, even for an instant
+            if (Debug) {
+                Console.Write(format);
+            } else {
+                Invoke(delegate {
+                    lock (ChatOutput) {
+                        Gtk.TextIter end = ChatOutput.Buffer.EndIter;
+                        string colorname = MainWindow.tagnames[tag];
+                        ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
+                        end = ChatOutput.Buffer.EndIter;
+                        Gtk.TextMark mark = ChatOutput.Buffer.GetMark("insert");
+                        ChatOutput.Buffer.MoveMark(mark, end);
+                        ChatOutput.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+                    }
+                });
+            }
+        }
+
         public void ScrollToEnd() { // Made to be called by itself, from anywhere
             Invoke(delegate {
                 Gtk.TextIter end = Output.Buffer.EndIter;
@@ -2360,5 +2391,12 @@ namespace Calico {
         {
         }
 
+        protected void OnChatTabActionActivated (object sender, System.EventArgs e)
+        {
+            if (ChatNotebook.Visible)
+                ChatNotebook.Hide();
+            else
+                ChatNotebook.Show();
+        }
     }
 }
