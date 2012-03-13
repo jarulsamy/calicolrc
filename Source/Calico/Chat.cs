@@ -7,7 +7,7 @@ namespace Calico {
     
         string server = "myro.roboteducation.org";
         int port = 5222;
-        List<string> messages = new List<string>();
+        List<List<string>> messages = new List<List<string>>();
         agsXMPP.XmppClientConnection client;
         Calico.MainWindow calico;
         string user;
@@ -27,22 +27,16 @@ namespace Calico {
             this.debug = debug;
 
             client = new agsXMPP.XmppClientConnection(server, port);
-            //client.UseSSL = false;
-            //client.AutoRoster = false;
-            //client.UseCompression = false;
-            // Not supported //client.UseSso = false;
-            //client.UseStartTLS = false;
-
             status = "offline";
             alert = true;
 
-            //client.OnReadXml   += new agsXMPP.XmlHandler(OnReadXml);
-            //client.OnWriteXml  += new agsXMPP.XmlHandler(OnWriteXml);
-            //client.OnLogin     += OnLogin;
-            //client.OnMessage   += new agsXMPP.protocol.client.MessageHandler(OnMessage);
-            //client.OnError     += new agsXMPP.ErrorHandler(OnError);
-            //client.OnAuthError += new agsXMPP.XmppElementHandler(OnAuthError);
-            //client.OnClose     += OnClose;
+            client.OnReadXml   += new agsXMPP.XmlHandler(OnReadXml);
+            client.OnWriteXml  += new agsXMPP.XmlHandler(OnWriteXml);
+            client.OnLogin     += OnLogin;
+            client.OnMessage   += new agsXMPP.protocol.client.MessageHandler(OnMessage);
+            client.OnError     += new agsXMPP.ErrorHandler(OnError);
+            client.OnAuthError += new agsXMPP.XmppElementHandler(OnAuthError);
+            client.OnClose     += OnClose;
 
             try {
                 client.Open(user, password, "CalicoClient", 5);
@@ -51,18 +45,19 @@ namespace Calico {
             }
         }
 
-        public void send(string to, string text) {
+        public void Send(string to, string text) {
             client.Send(
                 new agsXMPP.protocol.client.Message(String.Format("{0}@{1}", to, server),
                                                     agsXMPP.protocol.client.MessageType.chat,
                                                     text));
         }
 
-        public string [] receive() {
-            string [] retval;
+        public List<List<string>> Receive() {
+            List<List<string>> retval = new List<List<string>>();
             lock (messages) {
-                retval = new string [messages.Count];
-                messages.CopyTo(retval);
+                foreach(List<string> message in messages) {
+                    retval.Add(message);
+                }
                 messages.Clear();
             }
             return retval;
@@ -79,12 +74,12 @@ namespace Calico {
                 return;
             }
             status = "online";
-            send("", "2"); // make this my only login
+            Send("", "2"); // make this my only login
             if (alert) {
-                calico.Print(String.Format("You are now logged in as '{0}'.", user));
-                send("admin", String.Format("[broadcast]\nroom: {0}\n{1}",
+                calico.Print(String.Format("You are now logged in as '{0}'.\n", user));
+                Send("admin", String.Format("[broadcast]\nroom: {0}\n{1} has joined the discussion",
                                             "General",
-                                            String.Format("{0} has joined the discussion", user)));
+                                            user));
             }
             if (debug) {
                 calico.Print(String.Format("LOGIN: {0}", user));
@@ -93,6 +88,7 @@ namespace Calico {
         }
 
         public void OnMessage(object sender, agsXMPP.protocol.client.Message msg) {
+            messages.Add(new List<string>() {msg.From, msg.Body});
         }
 
         public void OnError(object sender, Exception e) {
@@ -102,8 +98,12 @@ namespace Calico {
         public void OnAuthError(object sender, agsXMPP.Xml.Dom.Element element) {
         }
     
-        public void OnClose(object sender) {
+        public void Close() {
             client.Close();
+        }
+
+        public void OnClose(object sender) {
+            Close();
         }
     }
 }

@@ -843,6 +843,8 @@ namespace Calico {
                         }
                     }
                 }
+                if (connection != null)
+                    connection.Close();
                 Gtk.Application.Quit();
             }
             return retval;
