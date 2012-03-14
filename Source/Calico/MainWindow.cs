@@ -264,7 +264,7 @@ namespace Calico {
                 "    /join CONF\n" +
                 "    /list\n" +
                 "    /create CONF\n" +
-                "    /help\n");
+                "    /help\n", true);
 
             history = new History((List<string>)this.config.values["shell"]["history"]);
             ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of previous history]\n");
@@ -590,6 +590,23 @@ namespace Calico {
                     ShellLanguage = language.name;
                 DocumentNotebook.Page = SHELL;
             }
+        }
+
+        public bool Create(string filename) {
+            // Open a file, or Create it if it doesn't exist
+            string language = manager.GetLanguageFromExtension(filename);
+            return Create(filename, language);
+        }
+
+        public bool Create(string filename, string language) {
+            // Open a file, or Create it if it doesn't exist
+            filename = System.IO.Path.GetFullPath(filename);
+            if (! System.IO.File.Exists(filename)) {
+                // Create it, if it doesn't exist:
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+                sw.Close();
+            }
+            return Open(filename, language);
         }
 
         public bool Open() {
@@ -1303,6 +1320,19 @@ namespace Calico {
                 } else {
                     completion = null;
                 }
+            } else if (Focus == ChatCommand) { // This is a TextView
+                if (args.Event.Key == Gdk.Key.Return) {
+                    // if control key is down, too, just insert a return
+                    if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                        // Don't handle!
+                        return;
+                    }
+                    string text = ChatCommand.Buffer.Text;
+                    ChatCommand.Buffer.Text = "";
+                    //ChatOutput.Buffer.InsertAtCursor(text.TrimEnd() + "\n");
+                    connection.Send("t123", text);
+                    args.RetVal = true;
+                }
             } else if (Focus is Mono.TextEditor.TextEditor) {
                 // Handle not dirty
                 // not shell
@@ -1529,26 +1559,38 @@ namespace Calico {
         }
 
         public void ChatPrint(string format) {
-            ChatPrint(Tag.Normal, format);
+            ChatPrint(Tag.Normal, format, false);
+        }
+
+        public void ChatPrint(string format, bool force) {
+            ChatPrint(Tag.Normal, format, force);
         }
 
         public void ChatPrint(Tag tag, string format) {
+            ChatPrint(tag, format, false);
+        }
+
+        public void ChatPrint(Tag tag, string format, bool force) {
             // These Write functions are the only approved methods of output
             Thread.Sleep(1); // Force a context switch, even for an instant
             if (Debug) {
                 Console.Write(format);
             } else {
-                Invoke(delegate {
-                    lock (ChatOutput) {
-                        Gtk.TextIter end = ChatOutput.Buffer.EndIter;
-                        string colorname = MainWindow.tagnames[tag];
-                        ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
-                        end = ChatOutput.Buffer.EndIter;
-                        Gtk.TextMark mark = ChatOutput.Buffer.GetMark("insert");
-                        ChatOutput.Buffer.MoveMark(mark, end);
-                        ChatOutput.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
-                    }
-                });
+                if (ChatNotebook.Visible || force) {
+                    Invoke(delegate {
+                        lock (ChatOutput) {
+                            Gtk.TextIter end = ChatOutput.Buffer.EndIter;
+                            string colorname = MainWindow.tagnames[tag];
+                            ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
+                            end = ChatOutput.Buffer.EndIter;
+                            Gtk.TextMark mark = ChatOutput.Buffer.GetMark("insert");
+                            ChatOutput.Buffer.MoveMark(mark, end);
+                            ChatOutput.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+                        }
+                    });
+                } else {
+                    Print(tag, format);
+                }
             }
         }
 
@@ -1877,6 +1919,8 @@ namespace Calico {
         {
             Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                 if (documents.ContainsKey(widget))
@@ -1888,6 +1932,8 @@ namespace Calico {
         {
             Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                 if (documents.ContainsKey(widget)) {
@@ -1903,6 +1949,8 @@ namespace Calico {
               ((int)config.GetValue("config", "font-size")) + 1024);
             Shell.Options.FontName = GetFont().ToString();
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+            ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
 	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                 if (documents.ContainsKey(widget)) {
@@ -1919,6 +1967,8 @@ namespace Calico {
                     ((int)config.GetValue("config", "font-size")) - 1024);
                  Shell.Options.FontName = GetFont().ToString();
                 Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+                ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
+                ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
     	        for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
                     Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                     if (documents.ContainsKey(widget)) {
@@ -2384,19 +2434,48 @@ namespace Calico {
 
         protected void OnRegisterActionActivated (object sender, System.EventArgs e)
         {
-            connection = new Chat(this, "sigcse01", "password");
+            string email = "t123@mailinator.com", user = "t123", password = "password", keyword = "owls";
+            Chat chat = new Chat(this, "testname", "password");
+            wait(5);
+            chat.Send("admin", String.Format(
+                "register\n" +
+                "email: {0}\n" +
+                "username: {1}\n" +
+                "password: {2}\n" +
+                "keyword: {3}\n", email, user, password, keyword));
+            // send a special message to create account
+            // wait for response:
+            List<List<string>> messages = chat.Receive();
+            int count = 0;
+            while (messages.Count == 0 && count < 10) {
+                messages = chat.Receive();
+                wait(1);
+                Print(_("   waiting for confirmation...\n"));
+                count++;
+            }
+            Print(_("Received messages:\n"));
+            foreach (List<string> message in messages) {
+                Print(message[0]);
+                Print(" ");
+                Print(message[1]);
+                Print("\n");
+                }
+            chat.Close();
         }
 
         protected void OnLoginActionActivated (object sender, System.EventArgs e)
         {
+            connection = new Chat(this, "t123", "password");
         }
 
         protected void OnChatTabActionActivated (object sender, System.EventArgs e)
         {
             if (ChatNotebook.Visible)
                 ChatNotebook.Hide();
-            else
+            else {
                 ChatNotebook.Show();
+                ChatCommand.GrabFocus();
+            }
         }
     }
 }

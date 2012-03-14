@@ -39,7 +39,7 @@ namespace Calico {
             client.OnClose     += OnClose;
 
             try {
-                client.Open(user, password, "CalicoClient", 5);
+                client.Open(user, password, "Calico", 5);
             } catch (Exception e) {
                 calico.Print(Tag.Error, e.Message);
             }
@@ -88,7 +88,7 @@ namespace Calico {
         }
 
         public void OnMessage(object sender, agsXMPP.protocol.client.Message msg) {
-            calico.Print(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
+            calico.ChatPrint(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
             messages.Add(new List<string>() {msg.From, msg.Body});
         }
 
