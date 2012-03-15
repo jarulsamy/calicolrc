@@ -10,9 +10,9 @@ namespace Calico {
         List<List<string>> messages = new List<List<string>>();
         agsXMPP.XmppClientConnection client;
         Calico.MainWindow calico;
-        string user;
+        public string user;
         string password;
-        string status;
+        public string status;
         bool alert;
         bool debug;
 
@@ -88,7 +88,23 @@ namespace Calico {
         }
 
         public void OnMessage(object sender, agsXMPP.protocol.client.Message msg) {
-            calico.ChatPrint(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
+            // Handle system messages here
+            //calico.ChatPrint(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
+            if (msg.Body.ToString().StartsWith("[blast]")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [blast]
+                if (lines.Length >= 5) {
+                    string [] address  = lines[1].Split(new char[] {':'}, 2);  // from:
+                    string [] type     = lines[2].Split(new char [] {':'}, 2); // type:
+                    string [] filename = lines[3].Split(new char [] {':'}, 2); // file:
+                    System.Text.StringBuilder code = new System.Text.StringBuilder();
+                    for (int i = 4; i < lines.Length; i++) {
+                        code.AppendLine(lines[i]);                             // code
+                    }
+                    calico.ReceiveBlast(address[1].Trim(), type[1].Trim(), filename[1].Trim(), code.ToString());
+                    return;
+                }
+                calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
+            }
             messages.Add(new List<string>() {msg.From, msg.Body});
         }
 

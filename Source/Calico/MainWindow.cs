@@ -225,6 +225,8 @@ namespace Calico {
                 //DragDataReceived += SelectionReceived;
                 radioitem.Data["id"] = count + 1;
                 count++;
+                if (language.name == "python") // FIXME: get lang preference from config
+                    radioitem.Active = true;
             }
             switch_menu.Submenu.ShowAll();
             
@@ -335,6 +337,9 @@ namespace Calico {
                 } else
                     return null;
             }
+        }
+        public Gtk.ToggleAction ChatTab {
+            get { return ChatTabAction; }
         }
         public Gtk.UIManager GUIManager {
             get { return UIManager; }
@@ -2466,6 +2471,9 @@ namespace Calico {
         protected void OnLoginActionActivated (object sender, System.EventArgs e)
         {
             connection = new Chat(this, "t123", "password");
+            ChatTab.Active = true;
+            vpaned1.Show();
+            ChatCommand.GrabFocus();
         }
 
         protected void OnChatTabActionActivated (object sender, System.EventArgs e)
@@ -2475,6 +2483,35 @@ namespace Calico {
             else {
                 vpaned1.Show();
                 ChatCommand.GrabFocus();
+            }
+        }
+
+        public void ReceiveBlast(string address, string type, string filename, string code) {
+            string tempPath = System.IO.Path.GetTempPath();
+            filename = System.IO.Path.Combine(tempPath, filename);
+            string language = manager.GetLanguageFromExtension(filename);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+            sw.Write(code);
+            sw.Close();
+            Invoke ( delegate {
+                Open(filename, language);
+            });
+        }
+
+        protected void OnBlastScriptActionActivated (object sender, System.EventArgs e)
+        {
+            // Blast a script:
+            if (connection != null && CurrentDocument != null) {
+                connection.Send("t123",
+                                String.Format("[blast]\n" +
+                                    "from: {0}\n" +
+                                    "type: {1}\n" +
+                                    "file: {2}\n" +
+                                    "{3}",
+                                    connection.user,
+                                    CurrentDocument.DocumentType,
+                                    CurrentDocument.basename,
+                                    CurrentDocument.GetText()));
             }
         }
     }

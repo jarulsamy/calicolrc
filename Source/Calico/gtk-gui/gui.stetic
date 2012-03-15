@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="740 526">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="733 525">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -410,6 +410,12 @@
         <property name="Active">False</property>
         <signal name="Activated" handler="OnChatTabActionActivated" />
       </action>
+      <action id="BlastScriptAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Blast Script...</property>
+        <property name="ShortLabel" translatable="yes">Blast Script...</property>
+        <signal name="Activated" handler="OnBlastScriptActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -487,6 +493,7 @@
                 <node type="Menuitem" action="AboutAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="ToggleBreakpointAction" />
+                <node type="Menuitem" action="BlastScriptAction" />
                 <node type="Menu" action="OptionsAction1" />
               </node>
               <node type="Menu" action="HelpAction">
@@ -827,17 +834,17 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">532</property>
+            <property name="Position">520</property>
             <child>
               <widget class="Gtk.VPaned" id="vpaned2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">276</property>
+                <property name="Position">286</property>
                 <child>
                   <widget class="Gtk.Notebook" id="notebook_docs">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="CurrentPage">1</property>
+                    <property name="CurrentPage">0</property>
                     <property name="Scrollable">True</property>
                     <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                     <signal name="ChangeCurrentPage" handler="OnNotebookDocsChangeCurrentPage" />
@@ -1348,7 +1355,7 @@
               <widget class="Gtk.VPaned" id="vpaned1">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">130</property>
+                <property name="Position">125</property>
                 <child>
                   <widget class="Gtk.Frame" id="frame1">
                     <property name="MemberName" />
@@ -1399,6 +1406,9 @@
                   </widget>
                 </child>
               </widget>
+              <packing>
+                <property name="Resize">False</property>
+              </packing>
             </child>
           </widget>
           <packing>

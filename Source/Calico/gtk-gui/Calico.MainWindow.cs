@@ -65,6 +65,7 @@ namespace Calico
 		private global::Gtk.Action RegisterAction;
 		private global::Gtk.Action LoginAction;
 		private global::Gtk.ToggleAction ChatTabAction;
+		private global::Gtk.Action BlastScriptAction;
 		private global::Gtk.VBox vbox1;
 		private global::Gtk.MenuBar menubar2;
 		private global::Gtk.HBox hbox4;
@@ -330,6 +331,9 @@ namespace Calico
 			this.ChatTabAction = new global::Gtk.ToggleAction ("ChatTabAction", global::Mono.Unix.Catalog.GetString ("Chat Tab"), null, null);
 			this.ChatTabAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Chat Tab");
 			w1.Add (this.ChatTabAction, null);
+			this.BlastScriptAction = new global::Gtk.Action ("BlastScriptAction", global::Mono.Unix.Catalog.GetString ("Blast Script..."), null, null);
+			this.BlastScriptAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Blast Script...");
+			w1.Add (this.BlastScriptAction, null);
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "Calico.MainWindow";
@@ -373,11 +377,12 @@ namespace Calico
 					" action=\'ResetShellAction\'/><menuitem name=\'ClearOutputAction\' action=\'ClearOutp" +
 					"utAction\'/></menu><menu name=\'ToolsAction\' action=\'ToolsAction\'><menuitem name=\'" +
 					"AboutAction\' action=\'AboutAction\'/><separator/><menuitem name=\'ToggleBreakpointA" +
-					"ction\' action=\'ToggleBreakpointAction\'/><menu name=\'OptionsAction1\' action=\'Opti" +
-					"onsAction1\'/></menu><menu name=\'HelpAction\' action=\'HelpAction\'><menuitem name=\'" +
-					"aboutAction\' action=\'aboutAction\'/><menuitem name=\'GettingStartedAction\' action=" +
-					"\'GettingStartedAction\'/><menuitem name=\'HelpAction1\' action=\'HelpAction1\'/><menu" +
-					"item name=\'WhatSNewAction\' action=\'WhatSNewAction\'/></menu></menubar></ui>");
+					"ction\' action=\'ToggleBreakpointAction\'/><menuitem name=\'BlastScriptAction\' actio" +
+					"n=\'BlastScriptAction\'/><menu name=\'OptionsAction1\' action=\'OptionsAction1\'/></me" +
+					"nu><menu name=\'HelpAction\' action=\'HelpAction\'><menuitem name=\'aboutAction\' acti" +
+					"on=\'aboutAction\'/><menuitem name=\'GettingStartedAction\' action=\'GettingStartedAc" +
+					"tion\'/><menuitem name=\'HelpAction1\' action=\'HelpAction1\'/><menuitem name=\'WhatSN" +
+					"ewAction\' action=\'WhatSNewAction\'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add (this.menubar2);
@@ -757,17 +762,17 @@ namespace Calico
 			this.hpaned1 = new global::Gtk.HPaned ();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 532;
+			this.hpaned1.Position = 520;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vpaned2 = new global::Gtk.VPaned ();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 276;
+			this.vpaned2.Position = 286;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook ();
 			this.notebook_docs.CanFocus = true;
 			this.notebook_docs.Name = "notebook_docs";
-			this.notebook_docs.CurrentPage = 1;
+			this.notebook_docs.CurrentPage = 0;
 			this.notebook_docs.Scrollable = true;
 			// Container child notebook_docs.Gtk.Notebook+NotebookChild
 			this.hbox2 = new global::Gtk.HBox ();
@@ -1250,7 +1255,7 @@ namespace Calico
 			this.vpaned1 = new global::Gtk.VPaned ();
 			this.vpaned1.CanFocus = true;
 			this.vpaned1.Name = "vpaned1";
-			this.vpaned1.Position = 130;
+			this.vpaned1.Position = 125;
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.frame1 = new global::Gtk.Frame ();
 			this.frame1.Name = "frame1";
@@ -1286,6 +1291,8 @@ namespace Calico
 			this.GtkScrolledWindow2.Add (this.ChatOutput);
 			this.vpaned1.Add (this.GtkScrolledWindow2);
 			this.hpaned1.Add (this.vpaned1);
+			global::Gtk.Paned.PanedChild w216 = ((global::Gtk.Paned.PanedChild)(this.hpaned1 [this.vpaned1]));
+			w216.Resize = false;
 			this.vbox1.Add (this.hpaned1);
 			global::Gtk.Box.BoxChild w217 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hpaned1]));
 			w217.Position = 3;
@@ -1355,8 +1362,8 @@ namespace Calico
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 740;
-			this.DefaultHeight = 526;
+			this.DefaultWidth = 733;
+			this.DefaultHeight = 525;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.KeyPressEvent += new global::Gtk.KeyPressEventHandler (this.OnKeyPressEvent);
@@ -1399,6 +1406,7 @@ namespace Calico
 			this.RegisterAction.Activated += new global::System.EventHandler (this.OnRegisterActionActivated);
 			this.LoginAction.Activated += new global::System.EventHandler (this.OnLoginActionActivated);
 			this.ChatTabAction.Activated += new global::System.EventHandler (this.OnChatTabActionActivated);
+			this.BlastScriptAction.Activated += new global::System.EventHandler (this.OnBlastScriptActionActivated);
 			this._printButton.Clicked += new global::System.EventHandler (this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler (this.OnNewButtonClicked);
 			this._openButton.Clicked += new global::System.EventHandler (this.OnOpenButtonClicked);
