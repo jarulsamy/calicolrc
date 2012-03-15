@@ -416,6 +416,21 @@
         <property name="ShortLabel" translatable="yes">Blast Script...</property>
         <signal name="Activated" handler="OnBlastScriptActionActivated" />
       </action>
+      <action id="zoom100Action">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">_Normal Size</property>
+        <property name="ShortLabel" translatable="yes">_Normal Size</property>
+        <property name="StockId">gtk-zoom-100</property>
+        <signal name="Activated" handler="OnZoom100ActionActivated" />
+      </action>
+      <action id="PropertyTabAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Property Tab</property>
+        <property name="ShortLabel" translatable="yes">Property Tab</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Activated" handler="OnPropertyTabActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -472,6 +487,7 @@
               <node type="Menu" action="ViewAction">
                 <node type="Menuitem" action="zoomInAction" />
                 <node type="Menuitem" action="zoomOutAction" />
+                <node type="Menuitem" action="zoom100Action" />
                 <node type="Separator" />
                 <node type="Menuitem" action="selectFontAction" />
                 <node type="Menu" action="TabsAction">
@@ -479,6 +495,7 @@
                   <node type="Menuitem" action="LocalsTabAction" />
                   <node type="Menuitem" action="HistoryTabAction" />
                   <node type="Menuitem" action="ChatTabAction" />
+                  <node type="Menuitem" action="PropertyTabAction" />
                 </node>
               </node>
               <node type="Menu" action="ShellAction1">
@@ -1229,122 +1246,158 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Notebook" id="notebook_tools">
+                  <widget class="Gtk.HPaned" id="hpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="CurrentPage">3</property>
-                    <property name="Scrollable">True</property>
+                    <property name="Position">260</property>
                     <child>
-                      <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
-                        <property name="MemberName" />
-                        <property name="ShadowType">In</property>
-                        <child>
-                          <widget class="Gtk.TextView" id="textview1">
-                            <property name="MemberName" />
-                            <property name="CanFocus">True</property>
-                            <property name="ShowScrollbars">True</property>
-                            <property name="Editable">False</property>
-                            <property name="AcceptsTab">False</property>
-                            <property name="Text" translatable="yes" />
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="Gtk.Label" id="label3">
-                        <property name="MemberName" />
-                        <property name="Tooltip" translatable="yes">Results of running code</property>
-                        <property name="LabelProp" translatable="yes">Output</property>
-                      </widget>
-                      <packing>
-                        <property name="type">tab</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
-                        <property name="MemberName" />
-                        <property name="ShadowType">In</property>
-                        <child>
-                          <widget class="Gtk.TreeView" id="treeview1">
-                            <property name="MemberName" />
-                            <property name="CanFocus">True</property>
-                            <property name="ShowScrollbars">True</property>
-                          </widget>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="Position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.Label" id="label4">
-                        <property name="MemberName" />
-                        <property name="Tooltip" translatable="yes">Variables and their values</property>
-                        <property name="LabelProp" translatable="yes">Environment</property>
-                      </widget>
-                      <packing>
-                        <property name="type">tab</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.ScrolledWindow" id="scrolledwindow2">
+                      <widget class="Gtk.Notebook" id="notebook_tools">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="ShadowType">In</property>
+                        <property name="CurrentPage">2</property>
+                        <property name="Scrollable">True</property>
                         <child>
-                          <widget class="Gtk.TreeView" id="treeview2">
+                          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+                            <property name="MemberName" />
+                            <property name="ShadowType">In</property>
+                            <child>
+                              <widget class="Gtk.TextView" id="textview1">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="ShowScrollbars">True</property>
+                                <property name="Editable">False</property>
+                                <property name="AcceptsTab">False</property>
+                                <property name="Text" translatable="yes" />
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Label" id="label3">
+                            <property name="MemberName" />
+                            <property name="Tooltip" translatable="yes">Results of running code</property>
+                            <property name="LabelProp" translatable="yes">Output</property>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
+                            <property name="MemberName" />
+                            <property name="ShadowType">In</property>
+                            <child>
+                              <widget class="Gtk.TreeView" id="treeview1">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="ShowScrollbars">True</property>
+                              </widget>
+                            </child>
+                          </widget>
+                          <packing>
+                            <property name="Position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Label" id="label4">
+                            <property name="MemberName" />
+                            <property name="Tooltip" translatable="yes">Variables and their values</property>
+                            <property name="LabelProp" translatable="yes">Environment</property>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.ScrolledWindow" id="scrolledwindow2">
                             <property name="MemberName" />
                             <property name="CanFocus">True</property>
-                            <property name="ShowScrollbars">True</property>
+                            <property name="ShadowType">In</property>
+                            <child>
+                              <widget class="Gtk.TreeView" id="treeview2">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="ShowScrollbars">True</property>
+                              </widget>
+                            </child>
                           </widget>
+                          <packing>
+                            <property name="Position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Label" id="label5">
+                            <property name="MemberName" />
+                            <property name="Tooltip" translatable="yes">Local variables</property>
+                            <property name="LabelProp" translatable="yes">Locals</property>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.ScrolledWindow" id="scrolledwindow4">
+                            <property name="MemberName" />
+                            <property name="CanFocus">True</property>
+                            <property name="ShadowType">In</property>
+                            <child>
+                              <widget class="Gtk.TextView" id="historyview">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="Editable">False</property>
+                                <property name="Text" translatable="yes" />
+                              </widget>
+                            </child>
+                          </widget>
+                          <packing>
+                            <property name="Position">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="Gtk.Label" id="label999">
+                            <property name="MemberName" />
+                            <property name="Tooltip" translatable="yes">Past interactive code</property>
+                            <property name="LabelProp" translatable="yes">History</property>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                          </packing>
                         </child>
                       </widget>
                       <packing>
-                        <property name="Position">2</property>
+                        <property name="Resize">False</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="Gtk.Label" id="label5">
-                        <property name="MemberName" />
-                        <property name="Tooltip" translatable="yes">Local variables</property>
-                        <property name="LabelProp" translatable="yes">Locals</property>
-                      </widget>
-                      <packing>
-                        <property name="type">tab</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.ScrolledWindow" id="scrolledwindow4">
+                      <widget class="Gtk.Notebook" id="property_notebook">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="ShadowType">In</property>
+                        <property name="CurrentPage">0</property>
                         <child>
-                          <widget class="Gtk.TextView" id="historyview">
+                          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow4">
                             <property name="MemberName" />
-                            <property name="CanFocus">True</property>
-                            <property name="Editable">False</property>
-                            <property name="Text" translatable="yes" />
+                            <property name="ShadowType">In</property>
+                            <child>
+                              <widget class="Gtk.TreeView" id="treeview3">
+                                <property name="MemberName" />
+                                <property name="CanFocus">True</property>
+                                <property name="ShowScrollbars">True</property>
+                              </widget>
+                            </child>
                           </widget>
                         </child>
+                        <child>
+                          <widget class="Gtk.Label" id="label6">
+                            <property name="MemberName" />
+                            <property name="LabelProp" translatable="yes">Properties</property>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                          </packing>
+                        </child>
                       </widget>
-                      <packing>
-                        <property name="Position">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.Label" id="label999">
-                        <property name="MemberName" />
-                        <property name="Tooltip" translatable="yes">Past interactive code</property>
-                        <property name="LabelProp" translatable="yes">History</property>
-                      </widget>
-                      <packing>
-                        <property name="type">tab</property>
-                      </packing>
                     </child>
                   </widget>
-                  <packing>
-                    <property name="Resize">False</property>
-                  </packing>
                 </child>
               </widget>
               <packing>

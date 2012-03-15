@@ -114,7 +114,6 @@ namespace Calico {
             //Output.CopyClipboard += OutputCopiedText;
             // Setup clipboard, and Gui:
             clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
-            DocumentNotebook.CurrentPage = 0;
             Title = String.Format("Calico - {0}", System.Environment.UserName);
             
             manager.SetCalico(this);
@@ -260,6 +259,8 @@ namespace Calico {
             EnvironmentPage.Child.Hide();
             LocalsPage.Child.Hide();
             HistoryPage.Child.Hide();
+            property_notebook.Hide();
+            // Update rest of GUI:
             ChatPrint("Chat commands:\n" +
                 "    MESSAGE\n" +
                 "    @USER MESSAGE\n" + "" +
@@ -277,6 +278,7 @@ namespace Calico {
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
+            DocumentNotebook.CurrentPage = 0;
             // Drop onto:
             Gtk.Drag.DestSet (this, Gtk.DestDefaults.All, target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
             this.DragDataReceived += new Gtk.DragDataReceivedHandler (HandleDragDataReceived);
@@ -1409,7 +1411,7 @@ namespace Calico {
 	    if (ProgramRunning) {
 	      return false;
 	    }
-            string prompt = String.Format("{0}> ", CurrentLanguage.PadLeft(8, ' '));
+            string prompt = String.Format("{0}> ", CurrentLanguage.PadRight(8, '>'));
             int count = 2;
             foreach (string line in text.Split('\n')) {
                 Print(Tag.Info, prompt);
@@ -2490,7 +2492,7 @@ namespace Calico {
             string tempPath = System.IO.Path.GetTempPath();
             filename = System.IO.Path.Combine(tempPath, filename);
             string language = manager.GetLanguageFromExtension(filename);
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename, false, Encoding.ASCII);
             sw.Write(code);
             sw.Close();
             Invoke ( delegate {
@@ -2512,6 +2514,21 @@ namespace Calico {
                                     CurrentDocument.DocumentType,
                                     CurrentDocument.basename,
                                     CurrentDocument.GetText()));
+            }
+        }
+
+        protected void OnZoom100ActionActivated (object sender, System.EventArgs e)
+        {
+            config.SetValue("config", "font-size", "int", 10240); // default
+            UpdateZoom();
+        }
+
+        protected void OnPropertyTabActionActivated (object sender, System.EventArgs e)
+        {
+            if (property_notebook.Visible) {
+                property_notebook.Hide();
+            } else {
+                property_notebook.Show();
             }
         }
     }

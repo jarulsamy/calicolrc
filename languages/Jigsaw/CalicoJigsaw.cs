@@ -99,6 +99,10 @@ public class CalicoJigsawDocument : Document
 		});
 	}
 	
+	public override string GetText() {
+		return cvs.ToXml();
+	}
+	
 	protected void OnJigsawRun(object sender, EventArgs a) {
 		calico.OnStartRunning();
 	}

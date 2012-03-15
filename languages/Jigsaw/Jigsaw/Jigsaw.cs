@@ -1256,6 +1256,21 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public string ToXml() 
+		{
+	       	XmlWriterSettings settings = new XmlWriterSettings();
+	       	settings.Indent = true;
+			settings.IndentChars = "    ";
+			settings.Encoding = Encoding.ASCII;
+			StringBuilder sb = new StringBuilder();
+			using (XmlWriter xw = XmlWriter.Create(sb, settings)) {
+				this.ToXml(xw);
+			}
+			// FIXME: why does this have utf-16 when we explicitly say ASCII?
+			return sb.ToString().Replace ("encoding=\"utf-16\"?>", "encoding=\"us-ascii\"?>");
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnFileSave(object sender, EventArgs e)
 		{	// Save to current file
 			

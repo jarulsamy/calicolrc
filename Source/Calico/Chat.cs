@@ -20,6 +20,11 @@ namespace Calico {
             this(calico, user, password, true) {
         }
 
+        public static string ParseFrom(string sfrom) {
+            string [] parts = sfrom.Split(new char [] {'@'});
+            return parts[0];
+        }
+
         public Chat(Calico.MainWindow calico, string user, string password, bool debug) {
             this.calico = calico;
             this.user = user;
@@ -104,8 +109,18 @@ namespace Calico {
                     return;
                 }
                 calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
+            } else if (msg.Body.ToString().StartsWith("[data]")) {
+                messages.Add(new List<string>() {msg.From, msg.Body});
+            } else if (msg.Body.ToString().StartsWith("[info]")) {
+                calico.Print(Tag.Info,
+                   String.Format("Chat info: {0}\n", msg.Body));
+            } else if (msg.Body.ToString().StartsWith("[broadcast]")) {
+                calico.ChatPrint(Tag.Info,
+                   String.Format("{0}\n", msg.Body));
+            } else {
+                calico.ChatPrint(Tag.Info,
+                   String.Format("{0}:\n{1}\n", ParseFrom(msg.From), msg.Body));
             }
-            messages.Add(new List<string>() {msg.From, msg.Body});
         }
 
         public void OnError(object sender, Exception e) {
