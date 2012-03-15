@@ -254,7 +254,7 @@ namespace Calico {
                 GLib.ExceptionManager.UnhandledException += HandleException;
             // Hide things that shouldn't be seen yet:
             searchbox.Hide();
-            ChatNotebook.Hide();
+            vpaned1.Hide();
             EnvironmentPage.Child.Hide();
             LocalsPage.Child.Hide();
             HistoryPage.Child.Hide();
@@ -1576,7 +1576,7 @@ namespace Calico {
             if (Debug) {
                 Console.Write(format);
             } else {
-                if (ChatNotebook.Visible || force) {
+                if (vpaned1.Visible || force) {
                     Invoke(delegate {
                         lock (ChatOutput) {
                             Gtk.TextIter end = ChatOutput.Buffer.EndIter;
@@ -2470,10 +2470,10 @@ namespace Calico {
 
         protected void OnChatTabActionActivated (object sender, System.EventArgs e)
         {
-            if (ChatNotebook.Visible)
-                ChatNotebook.Hide();
+            if (vpaned1.Visible)
+                vpaned1.Hide();
             else {
-                ChatNotebook.Show();
+                vpaned1.Show();
                 ChatCommand.GrabFocus();
             }
         }
