@@ -1,7 +1,10 @@
 from Graphics import *
 import Myro
 
-def draw(obj, event):
+def rescale(obj, event):
+    for shape in list(bc.win.canvas.shapes):
+        if shape.tag == "rescale":
+            bc.win.canvas.shapes.Remove(shape)
     bc.draw()
 
 class BarChart:
@@ -24,7 +27,7 @@ class BarChart:
         self.background.draw(self.win)
         self.button = Button((self.width - 70, self.height - 50), "Rescale")
         self.button.draw(self.win)
-        self.button.connect("click", draw)
+        self.button.connect("click", rescale)
 
         title = Text((self.width/2,self.top/2), self.title)
         title.color = Color("black")
@@ -73,7 +76,11 @@ class BarChart:
                 x2 = self.left + (count * col_width) + col_off/2 + col_width - col_off
                 # Height is 90% of available
                 y2 = self.height - self.bottom - ((self.bins.get(bin, 0) + scale/fps * diffs.get(bin, 0))/self.max_count * (self.height - self.top - self.bottom) * self.use_height)
-                self.bars[bin].set_points(Point(x1, y1), Point(x1, y2), Point(x2, y2), Point(x2, y1))
+                try: # if rescale while drawing
+                    self.bars[bin].set_points(Point(x1, y1), Point(x1, y2), Point(x2, y2), Point(x2, y1))
+                    self.text[bin].text = str(self.bins.get(bin, 0))
+                except:
+                    pass
                 count += 1
             self.win.step(1/fps)
         self.bins = new_bins
@@ -96,6 +103,7 @@ class BarChart:
         count = 0
         self.bins = bins
         self.bars = {}
+        self.text = {}
         for bin in sorted(bins.keys()):
             # Bottom left:
             x1 = self.left + (count * col_width) + col_off/2
@@ -111,6 +119,7 @@ class BarChart:
             text = Text((x1 + 10, y1 - 10), str(bins[bin]))
             text.fontSize = 8
             text.draw(self.win)
+            self.text[bin] = text
             count += 1
 
         # Draw legend:
@@ -127,6 +136,7 @@ class BarChart:
             count += 1
 
         # Draw ticks:
+
         for percent in range(0, int(110 + (1.0 - self.use_height) * 200), 10):
             x = self.left
             y = self.height - self.bottom - (percent/100 * (self.height - self.top - self.bottom) * self.use_height)
@@ -136,6 +146,7 @@ class BarChart:
             text.fontSize = 8
             text.color = Color("black")
             text.draw(self.win)
+            text.tag = "rescale"
 
 
 if __name__ == "<module>":
@@ -143,6 +154,6 @@ if __name__ == "<module>":
     #BarChart("test 3", 640, 480, range(10))
     bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
     def animate():
-        while True:
+        while bc.win.Visible:
             bc.animate([Myro.pickOne(*range(4)) for x in range(100)])
     animate()

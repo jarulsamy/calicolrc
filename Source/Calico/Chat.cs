@@ -115,8 +115,12 @@ namespace Calico {
                 calico.Print(Tag.Info,
                    String.Format("Chat info: {0}\n", msg.Body));
             } else if (msg.Body.ToString().StartsWith("[broadcast]")) {
+                string [] lines = msg.Body.ToString().Split('\n');
+                string [] sfrom = lines[1].Split(':');
                 calico.ChatPrint(Tag.Info,
-                   String.Format("{0}\n", msg.Body));
+                   String.Format("{0}:\n{1}\n", ParseFrom(sfrom[1].Trim()), lines[2]));
+            } else if (msg.From.ToString().StartsWith("myro.roboteducation.org")) {
+                // system message
             } else {
                 calico.ChatPrint(Tag.Info,
                    String.Format("{0}:\n{1}\n", ParseFrom(msg.From), msg.Body));

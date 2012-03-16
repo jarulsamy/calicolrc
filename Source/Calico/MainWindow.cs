@@ -493,7 +493,8 @@ namespace Calico {
         }
 
         public void HandleException(GLib.UnhandledExceptionArgs args) {
-            Print(Tag.Error, String.Format("Exception: {0}", args.ExceptionObject.ToString()));
+            Print(Tag.Error, String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
+            OnStopRunning();
         }
 
         public void PostBuild() {

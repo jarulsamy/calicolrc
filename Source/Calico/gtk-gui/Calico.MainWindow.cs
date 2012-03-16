@@ -1291,6 +1291,8 @@ namespace Calico
 			this.label6.ShowAll ();
 			this.hpaned2.Add (this.property_notebook);
 			this.vpaned2.Add (this.hpaned2);
+			global::Gtk.Paned.PanedChild w213 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.hpaned2]));
+			w213.Resize = false;
 			this.hpaned1.Add (this.vpaned2);
 			global::Gtk.Paned.PanedChild w214 = ((global::Gtk.Paned.PanedChild)(this.hpaned1 [this.vpaned2]));
 			w214.Resize = false;
@@ -1407,6 +1409,8 @@ namespace Calico
 			}
 			this.DefaultWidth = 733;
 			this.DefaultHeight = 525;
+			this.property_notebook.Hide ();
+			this.vpaned1.Hide ();
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.KeyPressEvent += new global::Gtk.KeyPressEventHandler (this.OnKeyPressEvent);

@@ -1371,6 +1371,7 @@
                     <child>
                       <widget class="Gtk.Notebook" id="property_notebook">
                         <property name="MemberName" />
+                        <property name="Visible">False</property>
                         <property name="CanFocus">True</property>
                         <property name="CurrentPage">0</property>
                         <child>
@@ -1398,6 +1399,9 @@
                       </widget>
                     </child>
                   </widget>
+                  <packing>
+                    <property name="Resize">False</property>
+                  </packing>
                 </child>
               </widget>
               <packing>
@@ -1407,6 +1411,7 @@
             <child>
               <widget class="Gtk.VPaned" id="vpaned1">
                 <property name="MemberName" />
+                <property name="Visible">False</property>
                 <property name="CanFocus">True</property>
                 <property name="Position">125</property>
                 <child>
