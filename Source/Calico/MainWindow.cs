@@ -289,6 +289,10 @@ namespace Calico {
             // All done, show if minimized:
             this.Present();
             // End of GUI setup
+            GLib.Timeout.Add(1000, delegate {
+                while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+                return true;
+            });
         }
 
         private void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
