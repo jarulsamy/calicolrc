@@ -5473,6 +5473,58 @@ public static class Myro
 			yield return (currentTime() - start);
 		}
 	}
+	
+	public static Func<object> freeze(Func<object> function) {
+		return () => function.Invoke();
+	}
+
+	public static Func<object> freeze(Func<object,object> function, object arg1) {
+		return () => function.Invoke(arg1);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object> function, object arg1, object arg2) {
+		return () => function.Invoke(arg1, arg2);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object> function, object arg1, object arg2, object arg3) {
+		return () => function.Invoke(arg1, arg2, arg3);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8, object arg9) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+	}
+	
+	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8, object arg9, object arg10) {
+		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+	}
+	
+	public static object thaw(Func<object> thunk) {
+		return thunk.Invoke();
+	}
 
 	// Graphics.cs
 
