@@ -5935,78 +5935,51 @@ public static class Myro
 		picture.setRegion (p, width, height, degrees, color);
 	}
 
-	static Action functionInvoke (Func<object> func, List list, 
-                      int position)
+	static Action functionInvoke (Func<object> func, List list, int position)
 	{
 		// Take a function, return list, and position
-		// Call the function, and put the result in the
-		// list in the given position.
-		return () => {  
-		  try {  
-		    list[position] = func.Invoke ();
-		  } catch (Exception e) {
-		    list[position] = e.Message;
-		  }
-		}; 
-	}
-
-	static Action functionInvokeWithArgs (Func<object,Array> func, 
-                       object [] args,
-                       List list, 
-                      int position)
-	{
-		// Take a function, return list, and position
-		// Call the function, and put the result in the
+		// Return an Action that when called will
+		// call the function, and put the result in the
 		// list in the given position.
 		return () => {
 		  try {  
-		    list[position] = func.Invoke (args);
+		    list[position] = func();
+		  } catch (Exception e) {
+		    list[position] = e.Message;
+		  }
+		};
+	}
+
+	static Action functionInvokeWithArgs (Func<object,object> func, 
+                       object [] args,
+                       List list, 
+                       int position)
+	{
+		// Take a function, arsg, return list, and position
+		// Return an Action that when called will
+		// call the function, and put the result in the
+		// list in the given position.
+		return () => {
+		  try {  
+		    list[position] = func(args);
 		  } catch (Exception e) {
 		    list[position] = e.Message;
 		  }
 		}; 
 	}
 
-	public static List doTogether (params IList [] objects)
+	public static List doTogether (IList<dynamic> functions)
 	{
 		List retval = new List ();
 		List threads = new List ();
 		int position = 0; 
 		// For each function, make a return list, and thread list
-		foreach (IList list in objects) {
-			// FIXME: what signature? Not: object [], IList, or Array
-			Func<object,Array> function = (Func<object,Array>)list [0];
-			object [] args = ((object[])list).Slice (1, list.Count);
+		foreach (dynamic function in functions) {
+			Func<object> func = IronPython.Runtime.Converter.Convert<Func<object>>(function);
 			retval.append (null);
 			Thread thread = new Thread (
-           new ThreadStart (
-                functionInvokeWithArgs (function, args, retval, position)));
-			thread.IsBackground = true;
-			threads.append (thread);
-			position++;
-		}
-		// Start each thread
-		foreach (Thread t in threads) {
-			t.Start ();
-		}
-		// Wait for them all to finish
-		foreach (Thread t in threads) {
-			t.Join ();
-		}
-		// return
-		return retval;
-	}
-
-	public static List doTogether (params Func<object> [] functions)
-	{
-		List retval = new List ();
-		List threads = new List ();
-		int position = 0; 
-		// For each function, make a return list, and thread list
-		foreach (Func<object> function in functions) {
-			retval.append (null);
-			Thread thread = new Thread (
-           new ThreadStart (functionInvoke (function, retval, position)));
+           			new ThreadStart( functionInvoke(func, retval, position) )
+				);
 			thread.IsBackground = true;
 			threads.append (thread);
 			position++;
