@@ -91,6 +91,8 @@
     <Reference Include="Microsoft.Dynamic">
       <HintPath>..\..\..\bin\Microsoft.Dynamic.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">

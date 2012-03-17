@@ -53,6 +53,21 @@ public static class Extensions
 		}
 		return res;
 	}
+
+	public static object[] Slice (this IList source, int start, int end)
+	{
+		// Handles negative ends.
+		if (end < 0) {
+			end = source.Count + end;
+		}
+		int len = end - start;
+		// Return new array.
+		object[] res = new object[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
 }
 
 public static class SerialPortCache {
@@ -431,6 +446,10 @@ public static class Myro
 			Console.Error.WriteLine ("Error in function");
 			Console.Error.WriteLine (e.Message);
 		}        
+	}
+	
+	static public object [] slice(IList list, int start, int end) {
+		return list.Slice(start, end);
 	}
 
 	public static void gamepad (PythonDictionary dict)
@@ -5950,7 +5969,25 @@ public static class Myro
 		};
 	}
 
-	static Action functionInvokeWithArgs (Func<object,object> func, 
+	static Action functionInvokeWithArg (Func<object,object> func, 
+                       object arg,
+                       List list, 
+                       int position)
+	{
+		// Take a function, arsg, return list, and position
+		// Return an Action that when called will
+		// call the function, and put the result in the
+		// list in the given position.
+		return () => {
+		  try {  
+		    list[position] = func(arg);
+		  } catch (Exception e) {
+		    list[position] = e.Message;
+		  }
+		}; 
+	}
+	
+	static Action functionInvokeWithArgs (object ofunc, 
                        object [] args,
                        List list, 
                        int position)
@@ -5961,11 +5998,81 @@ public static class Myro
 		// list in the given position.
 		return () => {
 		  try {  
-		    list[position] = func(args);
+		    list[position] = callFunc(ofunc, args.Length, args);
 		  } catch (Exception e) {
 		    list[position] = e.Message;
 		  }
 		}; 
+	}
+
+	public static object callFunc(object func, int len, object [] args) {
+		if (len == 1) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object>>(func)(args[0]);
+		else if (len == 2) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object>>(func)(args[0], args[1]);
+		else if (len == 3) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object>>(func)(args[0], args[1], args[2]);
+		else if (len == 4) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3]);
+		else if (len == 5) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4]);
+		else if (len == 6) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5]);
+		else if (len == 7) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+		else if (len == 8) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+		else if (len == 9) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+		else if (len == 10) 
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+		else
+			throw new Exception("invalid arguments in callFun");
+	}
+		
+	// doTogether(f1, f2, ...)
+	// doTogether([f1, f2, ...])
+	// doTogether([f1, f2, ...], arg)
+	// doTogether(f1, [a1, a2, ...])
+	// doTogether([f1 a1 ...], [f2 a2 ...], ...)
+	
+	public static List doTogether (params Func<object> [] functions)
+	{
+		List retval = new List ();
+		List threads = new List ();
+		int position = 0; 
+		// For each function, make a return list, and thread list
+		foreach (dynamic function in functions) {
+			Func<object> func = IronPython.Runtime.Converter.Convert<Func<object>>(function);
+			retval.append (null);
+			Thread thread = new Thread (
+           			new ThreadStart( functionInvoke(func, retval, position) )
+				);
+			thread.IsBackground = true;
+			threads.append (thread);
+			position++;
+		}
+		// Start each thread
+		foreach (Thread t in threads) {
+			t.Start ();
+		}
+		// Wait for them all to finish
+		try {
+			foreach (Thread t in threads) {
+				t.Join ();
+			}
+		} catch { 
+			// error in joining, probably an abort
+		} finally {
+			foreach (Thread t in threads) {
+				try {
+					t.Abort ();
+				} catch {
+				}
+			}
+		}
+		// return
+		return retval;
 	}
 
 	public static List doTogether (IList<dynamic> functions)
@@ -5979,6 +6086,139 @@ public static class Myro
 			retval.append (null);
 			Thread thread = new Thread (
            			new ThreadStart( functionInvoke(func, retval, position) )
+				);
+			thread.IsBackground = true;
+			threads.append (thread);
+			position++;
+		}
+		// Start each thread
+		foreach (Thread t in threads) {
+			t.Start ();
+		}
+		// Wait for them all to finish
+		try {
+			foreach (Thread t in threads) {
+				t.Join ();
+			}
+		} catch { 
+			// error in joining, probably an abort
+		} finally {
+			foreach (Thread t in threads) {
+				try {
+					t.Abort ();
+				} catch {
+				}
+			}
+		}
+		// return
+		return retval;
+	}
+	
+	public static List doTogether (IList farg1, IList farg2, params IList [] fargs)
+	{
+		List retval = new List ();
+		List threads = new List ();
+		int position = 0; 
+		// Second:
+		//Func<object,object[]> func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(farg1[0]);
+		retval.append (null);
+		Thread thread = new Thread (
+           			new ThreadStart( functionInvokeWithArgs(farg1[0], farg1.Slice (1, farg1.Count), retval, position))
+			);
+		threads.append(thread);
+		position++;
+		// Second:
+		//func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(farg2[0]);
+		retval.append (null);
+		thread = new Thread (
+           			new ThreadStart( functionInvokeWithArgs(farg2[0], farg2.Slice (1, farg2.Count), retval, position))
+			);
+			thread.IsBackground = true;
+		threads.append(thread);
+		position++;
+		// For each function, make a return list, and thread list
+		foreach (IList list in fargs) {
+			//func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(list[0]);
+			retval.append (null);
+			thread = new Thread (
+           			new ThreadStart( functionInvokeWithArgs(list[0], list.Slice (1, list.Count), retval, position) )
+				);
+			thread.IsBackground = true;
+			threads.append (thread);
+			position++;
+		}
+		// Start each thread
+		foreach (Thread t in threads) {
+			t.Start ();
+		}
+		// Wait for them all to finish
+		try {
+			foreach (Thread t in threads) {
+				t.Join ();
+			}
+		} catch { 
+			// error in joining, probably an abort
+		} finally {
+			foreach (Thread t in threads) {
+				try {
+					t.Abort ();
+				} catch {
+				}
+			}
+		}
+		// return
+		return retval;
+	}
+
+	public static List doTogether (IList<dynamic> functions, object arg)
+	{
+		List retval = new List ();
+		List threads = new List ();
+		int position = 0; 
+		// For each function, make a return list, and thread list
+		foreach (dynamic function in functions) {
+			Func<object,object> func = IronPython.Runtime.Converter.Convert<Func<object,object>>(function);
+			retval.append (null);
+			Thread thread = new Thread (
+           			new ThreadStart( functionInvokeWithArg(func, arg, retval, position) )
+				);
+			thread.IsBackground = true;
+			threads.append (thread);
+			position++;
+		}
+		// Start each thread
+		foreach (Thread t in threads) {
+			t.Start ();
+		}
+		// Wait for them all to finish
+		try {
+			foreach (Thread t in threads) {
+				t.Join ();
+			}
+		} catch { 
+			// error in joining, probably an abort
+		} finally {
+			foreach (Thread t in threads) {
+				try {
+					t.Abort ();
+				} catch {
+				}
+			}
+		}
+		// return
+		return retval;
+	}
+	
+	public static List doTogether (Func<object,object> function, IList<object> args)
+	{
+		List retval = new List ();
+		List threads = new List ();
+		int position = 0; 
+		// For each function, make a return list, and thread list
+		foreach (object arg in args) { 
+			retval.append (null);
+			Thread thread = new Thread (
+           			new ThreadStart( functionInvokeWithArg(function, arg, retval, position) )
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
