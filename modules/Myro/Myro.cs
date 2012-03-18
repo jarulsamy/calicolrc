@@ -6042,11 +6042,10 @@ public static class Myro
 		List threads = new List ();
 		int position = 0; 
 		// For each function, make a return list, and thread list
-		foreach (dynamic function in functions) {
-			Func<object> func = IronPython.Runtime.Converter.Convert<Func<object>>(function);
+		foreach (Func<object> function in functions) {
 			retval.append (null);
 			Thread thread = new Thread (
-           			new ThreadStart( functionInvoke(func, retval, position) )
+           			new ThreadStart( functionInvoke(function, retval, position) )
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -6074,7 +6073,7 @@ public static class Myro
 		// return
 		return retval;
 	}
-
+	
 	public static List doTogether (IList<dynamic> functions)
 	{
 		List retval = new List ();
