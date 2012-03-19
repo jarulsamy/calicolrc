@@ -102,10 +102,16 @@ namespace Calico {
                     string [] type     = lines[2].Split(new char [] {':'}, 2); // type:
                     string [] filename = lines[3].Split(new char [] {':'}, 2); // file:
                     System.Text.StringBuilder code = new System.Text.StringBuilder();
-                    for (int i = 4; i < lines.Length; i++) {
+                    for (int i = 4; i < lines.Length - 1; i++) {
                         code.AppendLine(lines[i]);                             // code
                     }
-                    calico.ReceiveBlast(address[1].Trim(), type[1].Trim(), filename[1].Trim(), code.ToString());
+                    // Last line, no return:
+                    code.Append(lines[lines.Length - 1]);
+                    // Receive blast:
+                    if (address[1] != this.user)
+                        calico.ReceiveBlast(address[1].Trim(), type[1].Trim(), filename[1].Trim(), code.ToString());
+                    else
+                        calico.Print("Blast sent!\n");
                     return;
                 }
                 calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));

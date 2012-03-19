@@ -2446,7 +2446,10 @@ namespace Calico {
 
         protected void OnRegisterActionActivated (object sender, System.EventArgs e)
         {
-            string email = "t123@mailinator.com", user = "t123", password = "password", keyword = "owls";
+            Dictionary<string,string> response = ask(new List<string>() {"Email", "User", "Password", "Keyword"}, "Register new user");
+            if (response == null)
+                return;
+            string email = response["Email"], user = response["User"], password = response["Password"], keyword = response["Keyword"];
             Chat chat = new Chat(this, "testname", "password");
             wait(5);
             chat.Send("admin", String.Format(
@@ -2477,7 +2480,12 @@ namespace Calico {
 
         protected void OnLoginActionActivated (object sender, System.EventArgs e)
         {
-            connection = new Chat(this, "t123", "password");
+            Dictionary<string,string> response = (Dictionary<string,string>) ask(new List<string>() {"User", "Password"}, "title");
+            if (response == null)
+                return;
+            connection = new Chat(this,
+                                  response["User"].ToString(),
+                                  response["Password"].ToString());
             ChatTab.Active = true;
             vpaned1.Show();
             ChatCommand.GrabFocus();
@@ -2493,16 +2501,79 @@ namespace Calico {
             }
         }
 
+        public static Dictionary<string,string> ask (IList<string> question, string title)
+        {
+             ManualResetEvent ev = new ManualResetEvent (false);
+             Dictionary<string,Gtk.Entry> entries = new Dictionary<string,Gtk.Entry> ();
+             Dictionary<string,string> responses = null;
+             Invoke (delegate {
+                 Gtk.MessageDialog fc = new Gtk.MessageDialog (null,
+                                       0, Gtk.MessageType.Question,
+                                       Gtk.ButtonsType.OkCancel,
+                                       title);
+                 foreach (string choice in (List<string>)question) {
+                     Gtk.HBox hbox = new Gtk.HBox ();
+                     Gtk.Label label = new Gtk.Label (choice);
+                     Gtk.Entry entry = new Gtk.Entry ();
+                     entries [choice] = entry;
+                     hbox.PackStart (label);
+                     hbox.PackStart (entry);
+                     fc.VBox.PackStart (hbox);
+                 }
+                 fc.ShowAll ();
+                 if (fc.Run () == (int)Gtk.ResponseType.Ok) {
+                     responses = new Dictionary<string,string> ();
+                     foreach (string choice in entries.Keys) {
+                         responses [choice] = ((Gtk.Entry)entries [choice]).Text;
+                     }
+                 }
+                 fc.Destroy ();
+                 ev.Set ();
+             });
+             ev.WaitOne ();
+             return responses;
+         }
+
+         public static string AcceptBlast (string title)
+         {
+             ManualResetEvent ev = new ManualResetEvent (false);
+             dialogResponse = null;
+             Invoke (delegate {
+                 Gtk.Dialog fc = new Gtk.Dialog (title, null, 0);
+                 fc.VBox.PackStart (new Gtk.Label ("Accept this script?"));
+                 fc.VBox.PackStart (new Gtk.Label (title));
+
+                 Gtk.Button button = new Gtk.Button ("Accept");
+                 fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+                 button.Clicked += (o, a) => DialogHandler (o, a, fc);
+
+                 button = new Gtk.Button ("Decline");
+                 button.Clicked += (o, a) => DialogHandler (o, a, fc);
+                 fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+
+                 fc.ShowAll ();
+                 fc.Run ();
+                 fc.Destroy ();
+                 ev.Set ();
+             });
+             ev.WaitOne ();
+             return dialogResponse;
+         }
+
         public void ReceiveBlast(string address, string type, string filename, string code) {
-            string tempPath = System.IO.Path.GetTempPath();
-            filename = System.IO.Path.Combine(tempPath, filename);
-            string language = manager.GetLanguageFromExtension(filename);
-            System.IO.StreamWriter sw = new System.IO.StreamWriter(filename, false, Encoding.ASCII);
-            sw.Write(code);
-            sw.Close();
-            Invoke ( delegate {
-                Open(filename, language);
-            });
+            if (AcceptBlast(String.Format("Blast: Accept '{0}' from '{1}'?", filename, address)) == "Accept") {
+                string tempPath = System.IO.Path.GetTempPath();
+                filename = System.IO.Path.Combine(tempPath, filename);
+                string language = manager.GetLanguageFromExtension(filename);
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename, false, Encoding.ASCII);
+                sw.Write(code);
+                sw.Close();
+                Invoke ( delegate {
+                    Open(filename, language);
+                });
+            } else {
+                Print(String.Format("Blast '{0}' from '{1}' declined.", filename, address));
+            }
         }
 
         protected void OnBlastScriptActionActivated (object sender, System.EventArgs e)
