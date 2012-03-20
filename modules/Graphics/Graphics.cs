@@ -1144,6 +1144,7 @@ public static class Graphics
                   int height=300) : base(title)
 		{
 			_canvas = new Canvas ("auto", width, height);
+			//DoubleBuffered = false;
 			AllowGrow = true;
 			AllowShrink = true;
 			SetDefaultSize (width, height);
@@ -2176,14 +2177,19 @@ public static class Graphics
 			// p is relative to center, rotate, and scale; returns
 			// screen coordinate of p
 			double px = 0, py = 0;
-			using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-				Point temp = screen_coord (center);
-				g.Translate (temp.x, temp.y);
-				g.Rotate (_rotation);
-				g.Scale (_scaleFactor, _scaleFactor);
-				px = System.Convert.ToDouble (iterable [0]);
-				py = System.Convert.ToDouble (iterable [1]);
-				g.UserToDevice (ref px, ref py);
+			//Cairo.Context g = new Cairo.Context(surface);
+			// FIXME: all this for a Context?!
+			using (Cairo.ImageSurface draw = new Cairo.ImageSurface (Cairo.Format.Argb32, 70, 150)){
+	    		using (Cairo.Context g = new Cairo.Context(draw)) {
+					//using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					Point temp = screen_coord (center);
+					g.Translate (temp.x, temp.y);
+					g.Rotate (_rotation);
+					g.Scale (_scaleFactor, _scaleFactor);
+					px = System.Convert.ToDouble (iterable [0]);
+					py = System.Convert.ToDouble (iterable [1]);
+					g.UserToDevice (ref px, ref py);
+				}
 			}
 			return new Point (px, py);
 		}
