@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.3";
+        public static string Version = "2.0.4";
         public static bool IsLoadModules = true;
 
 		/*
@@ -89,8 +89,8 @@ namespace Calico {
                                 MethodInfo method;
                                 try {
                                     method = type.GetMethod("MakeLanguage");
-                                } catch {
-                                    Print("Failure; skipping language file...'{0}'", f.FullName);
+                                } catch (Exception e) {
+                                    Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
                                     continue;
                                 }
                                 if (method != null) {
@@ -109,6 +109,25 @@ namespace Calico {
             //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager(path, languages);
+            // Load Calico languages that depend on other Calico languages:
+            foreach (DirectoryInfo d in dir.GetDirectories("*"))
+            {
+                foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
+                {
+                    try {
+                        Calico.DLREngine engine = ((Calico.DLREngine)languages["python"].engine);
+                        var scope = engine.engine.ExecuteFile(f.FullName);
+                        Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
+                        Language language = (Language)method();
+                        languages[language.name] = language;
+                        manager.Register(language); // This may fail, which won't add language
+                        language.engine.Setup(path);
+                        language.engine.Start(path);
+                    } catch (Exception e) {
+                        Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
+                   }
+                }
+            }
            // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {
