@@ -236,7 +236,12 @@ namespace Calico {
             languages_menu.Submenu = new Gtk.Menu();
             foreach (string language in (IList<string>)config.GetValue("config", "known-languages")) {
                 Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language);
-                languages_menu.Add(menu_item);
+                if (((IList<string>)config.GetValue("config", "ignore-languages")).Contains(language))
+                    menu_item.Active = false;
+                else
+                    menu_item.Active = true;
+                menu_item.Activated += OnChangeActiveLanguages;
+                ((Gtk.Menu)languages_menu.Submenu).Add(menu_item);
             }
             languages_menu.Submenu.ShowAll();
 
@@ -405,6 +410,19 @@ namespace Calico {
         }
         public Gtk.TreeView LocalTreeView {
             get { return treeview2; }
+        }
+
+        void OnChangeActiveLanguages (object sender, EventArgs e)
+        {
+            Gtk.MenuItem languages_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/LanguagesAction");
+            if (languages_menu == null)
+                throw new Exception("/menubar2/CalicoAction/LanguagesAction");
+            IList<string> ignore_languages = (IList<string>)config.GetValue("config", "ignore-languages");
+            ignore_languages.Clear();
+            foreach (Gtk.CheckMenuItem menu_item in ((Gtk.Menu)languages_menu.Submenu).AllChildren) {
+                if (!menu_item.Active)
+                    ignore_languages.Add(((Gtk.Label)menu_item.Child).LabelProp);
+            }
         }
 
         protected override bool OnScrollEvent (Gdk.EventScroll evnt)
@@ -787,7 +805,17 @@ namespace Calico {
                     history.RemoveRange(0, history.Count - max);
                 }
             }
-            config.Save();
+            try {
+                config.Save();
+            } catch {
+                // Something is no longer valid. Let's just make a new one then
+                config.Initialize();
+                try {
+                    config.Save();
+                } catch {
+                    // Just ignore
+                }
+            }
         }
 
         public string Close(Document document) {

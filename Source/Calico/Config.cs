@@ -42,6 +42,7 @@ namespace Calico {
                     Load();
                 } catch {
                     Console.WriteLine("Skipping invalid config.xml file...");
+                    Initialize(); // reset!
                 }
             } else {
                 Save();
