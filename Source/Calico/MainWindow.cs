@@ -601,6 +601,7 @@ namespace Calico {
                 if (manager.languages.ContainsKey(language.name) && manager.languages[language.name].IsTextLanguage)
                     ShellLanguage = language.name;
                 DocumentNotebook.Page = SHELL;
+                Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             }
         }
 
