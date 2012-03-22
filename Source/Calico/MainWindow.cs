@@ -1663,7 +1663,7 @@ namespace Calico {
                 ProgramSpeed.Sensitive = true;
                 ProgramSpeed.Value = CurrentDocument.SpeedValue;
                 // Set options menu:
-                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ToolsAction/OptionsAction1");
+                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
                 CurrentDocument.SetOptionsMenu(options_menu);
                 if (! ProgramRunning) {
                     if (CurrentDocument.HasContent) {

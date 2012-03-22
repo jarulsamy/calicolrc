@@ -884,7 +884,7 @@ namespace Calico
 			this.hpaned1 = new global::Gtk.HPaned ();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 498;
+			this.hpaned1.Position = 493;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vpaned2 = new global::Gtk.VPaned ();
 			this.vpaned2.CanFocus = true;
@@ -1286,7 +1286,7 @@ namespace Calico
 			this.hpaned2 = new global::Gtk.HPaned ();
 			this.hpaned2.CanFocus = true;
 			this.hpaned2.Name = "hpaned2";
-			this.hpaned2.Position = 1;
+			this.hpaned2.Position = 293;
 			// Container child hpaned2.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook ();
 			this.notebook_tools.CanFocus = true;
