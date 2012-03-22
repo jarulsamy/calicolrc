@@ -229,6 +229,17 @@ namespace Calico {
             }
             switch_menu.Submenu.ShowAll();
             
+            // Languages to config items:
+            Gtk.MenuItem languages_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/LanguagesAction");
+            if (languages_menu == null)
+                throw new Exception("/menubar2/CalicoAction/LanguagesAction");
+            languages_menu.Submenu = new Gtk.Menu();
+            foreach (string language in (IList<string>)config.GetValue("config", "known-languages")) {
+                Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language);
+                languages_menu.Add(menu_item);
+            }
+            languages_menu.Submenu.ShowAll();
+
             // Set optional items of TextArea
             Shell.Options.ShowFoldMargin = false;
             Shell.Options.ShowIconMargin = false;
@@ -2607,6 +2618,21 @@ namespace Calico {
             } else {
                 property_notebook.Show();
             }
+        }
+
+        protected void OnButton8Clicked (object sender, System.EventArgs e)
+        {
+            OnZoomInActionActivated(sender, e);
+        }
+
+        protected void OnButton9Clicked (object sender, System.EventArgs e)
+        {
+            OnZoomOutActionActivated(sender, e);
+        }
+
+        protected void OnButton10Clicked (object sender, System.EventArgs e)
+        {
+            OnZoom100ActionActivated(sender, e);
         }
     }
 }

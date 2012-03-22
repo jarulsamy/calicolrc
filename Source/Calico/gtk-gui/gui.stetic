@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="733 525">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="698 525">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -348,14 +348,14 @@
         <property name="ShortLabel" translatable="yes">What's new...</property>
         <signal name="Activated" handler="OnWhatSNewActionActivated" />
       </action>
-      <action id="ToolsAction">
+      <action id="ScriptAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Tools</property>
+        <property name="Label" translatable="yes">Script</property>
         <property name="ShortLabel" translatable="yes">Tools</property>
       </action>
       <action id="AboutAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">About...</property>
+        <property name="Label" translatable="yes">About</property>
         <property name="ShortLabel" translatable="yes">About...</property>
         <signal name="Activated" handler="OnAboutActionActivated" />
       </action>
@@ -371,9 +371,9 @@
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />
       </action>
-      <action id="OptionsAction1">
+      <action id="ScriptOptionsAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Options</property>
+        <property name="Label" translatable="yes">Script Options</property>
         <property name="ShortLabel" translatable="yes">Options</property>
       </action>
       <action id="FindPreviousAction">
@@ -430,6 +430,26 @@
         <property name="DrawAsRadio">False</property>
         <property name="Active">False</property>
         <signal name="Activated" handler="OnPropertyTabActionActivated" />
+      </action>
+      <action id="CalicoAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Calico</property>
+        <property name="ShortLabel" translatable="yes">Calico</property>
+      </action>
+      <action id="AddonsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Addons</property>
+        <property name="ShortLabel" translatable="yes">Addons</property>
+      </action>
+      <action id="InstallNewAddonAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Install New Addon...</property>
+        <property name="ShortLabel" translatable="yes">Install New Addon...</property>
+      </action>
+      <action id="LanguagesAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Languages</property>
+        <property name="ShortLabel" translatable="yes">Languages</property>
       </action>
     </action-group>
     <property name="MemberName" />
@@ -506,12 +526,18 @@
                 <node type="Menuitem" action="ResetShellAction" />
                 <node type="Menuitem" action="ClearOutputAction" />
               </node>
-              <node type="Menu" action="ToolsAction">
+              <node type="Menu" action="ScriptAction">
                 <node type="Menuitem" action="AboutAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="ToggleBreakpointAction" />
                 <node type="Menuitem" action="BlastScriptAction" />
-                <node type="Menu" action="OptionsAction1" />
+                <node type="Menu" action="ScriptOptionsAction" />
+              </node>
+              <node type="Menu" action="CalicoAction">
+                <node type="Menu" action="AddonsAction">
+                  <node type="Menuitem" action="InstallNewAddonAction" />
+                </node>
+                <node type="Menu" action="LanguagesAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="aboutAction" />
@@ -537,7 +563,7 @@
                 <property name="Tooltip" translatable="yes">Print a script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-print LargeToolbar</property>
+                <property name="Icon">stock:gtk-print SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
@@ -556,7 +582,7 @@
                 <property name="Tooltip" translatable="yes">Create a new script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-new LargeToolbar</property>
+                <property name="Icon">stock:gtk-new SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
@@ -575,7 +601,7 @@
                 <property name="Tooltip" translatable="yes">Open an existing script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-open LargeToolbar</property>
+                <property name="Icon">stock:gtk-open SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
@@ -594,7 +620,7 @@
                 <property name="Tooltip" translatable="yes">Save script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-save LargeToolbar</property>
+                <property name="Icon">stock:gtk-save SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
@@ -619,20 +645,85 @@
               </packing>
             </child>
             <child>
+              <widget class="Gtk.Button" id="button8">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-zoom-in Menu</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnButton8Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">5</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="button9">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-zoom-out Menu</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnButton9Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">6</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="button10">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-zoom-100 Menu</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnButton10Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">7</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="vseparator3">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="Position">8</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="_stopButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
                 <property name="Tooltip" translatable="yes">Stop a running script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-no LargeToolbar</property>
+                <property name="Icon">stock:gtk-no SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnStopButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">5</property>
+                <property name="Position">9</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -645,14 +736,14 @@
                 <property name="Tooltip" translatable="yes">Run a script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-yes LargeToolbar</property>
+                <property name="Icon">stock:gtk-yes SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnStartButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">6</property>
+                <property name="Position">10</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -675,7 +766,7 @@
                 <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
               </widget>
               <packing>
-                <property name="Position">7</property>
+                <property name="Position">11</property>
                 <property name="AutoSize">False</property>
                 <property name="Expand">False</property>
               </packing>
@@ -687,14 +778,14 @@
                 <property name="Tooltip" translatable="yes">Pause a running script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-media-pause LargeToolbar</property>
+                <property name="Icon">stock:gtk-media-pause SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnPauseButton1Clicked" />
               </widget>
               <packing>
-                <property name="Position">8</property>
+                <property name="Position">12</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -707,14 +798,14 @@
                 <property name="Tooltip" translatable="yes">Continue a paused script</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-media-play LargeToolbar</property>
+                <property name="Icon">stock:gtk-media-play SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnPlayButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">9</property>
+                <property name="Position">13</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -750,6 +841,7 @@
                 <child>
                   <widget class="Gtk.ComboBoxEntry" id="searchEntry">
                     <property name="MemberName" />
+                    <property name="WidthRequest">119</property>
                     <property name="Tooltip" translatable="yes">Text to search for</property>
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes" />
@@ -768,7 +860,7 @@
                     <property name="Tooltip" translatable="yes">Find next matching text</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-go-down LargeToolbar</property>
+                    <property name="Icon">stock:gtk-go-down SmallToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
@@ -787,7 +879,7 @@
                     <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Find Previous matching text</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-go-up LargeToolbar</property>
+                    <property name="Icon">stock:gtk-go-up SmallToolbar</property>
                     <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
@@ -806,7 +898,7 @@
                     <property name="Tooltip" translatable="yes">Close search</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-close LargeToolbar</property>
+                    <property name="Icon">stock:gtk-close SmallToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
@@ -822,7 +914,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">10</property>
+                <property name="Position">14</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -851,12 +943,12 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">520</property>
+            <property name="Position">498</property>
             <child>
               <widget class="Gtk.VPaned" id="vpaned2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">286</property>
+                <property name="Position">280</property>
                 <child>
                   <widget class="Gtk.Notebook" id="notebook_docs">
                     <property name="MemberName" />
@@ -1249,7 +1341,7 @@
                   <widget class="Gtk.HPaned" id="hpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">260</property>
+                    <property name="Position">1</property>
                     <child>
                       <widget class="Gtk.Notebook" id="notebook_tools">
                         <property name="MemberName" />
@@ -1413,7 +1505,7 @@
                 <property name="MemberName" />
                 <property name="Visible">False</property>
                 <property name="CanFocus">True</property>
-                <property name="Position">125</property>
+                <property name="Position">115</property>
                 <child>
                   <widget class="Gtk.Frame" id="frame1">
                     <property name="MemberName" />

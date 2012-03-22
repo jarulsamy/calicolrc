@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from pylogo.interpreter import Logo
 from pylogo.reader import StringTokenizer
-from pylogo.common import EOF, LogoError
+from pylogo.common import EOF, LogoError, LogoOutput
 
 import System
 import Calico
@@ -25,6 +25,9 @@ class LogoEngine(Calico.Engine):
             else:
                 System.Console.Error.WriteLine(e)
             v = None
+        except LogoOutput, e:
+            ##System.Console.Error.WriteLine(e)
+            v = e.message
         except KeyboardInterrupt:
             if tokenizer.context:
                 tokenizer.context = []
@@ -50,7 +53,13 @@ class LogoEngine(Calico.Engine):
         print("Run filename '%s'!" % filename)
         try:
             Logo.import_logo(filename)
-        except:
+        except LogoOutput, e:
+            ##System.Console.Error.WriteLine(e)
+            print(e.message)
+            return True
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
             return False
         return True
 
