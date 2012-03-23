@@ -16,37 +16,46 @@ class LogoEngine(Calico.Engine):
         pass
 
     def Execute(self, text):
+        Logo.REP(StringTokenizer(text))
+        print("Ok")
+        return True
+
+    def ExecuteOld(self, text):
         Logo.push_tokenizer(StringTokenizer(text))
+        # FIXME: stay in loop until EOF, or error occurs
         try:
-            v = Logo.expr_top()
-        except LogoError, e:
-            if str(e) != str(e.description):
-                System.Console.Error.WriteLine("%s: %s" % (e.description, e))
-            else:
-                System.Console.Error.WriteLine(e)
-            v = None
-        except LogoOutput, e:
-            ##System.Console.Error.WriteLine(e)
-            v = e.message
-        except KeyboardInterrupt:
-            if tokenizer.context:
-                tokenizer.context = []
-                System.Console.Error.WriteLine('Aborted')
-            else:
-                System.Console.Error.WriteLine("Bye")
-                return False
-        except SystemExit:
-            return False
-        except Exception, e:
-            import traceback
-            traceback.print_exc()
-            v = None
+            while True:
+                try:
+                    v = Logo.expr_top()
+                except LogoError, e:
+                    if str(e) != str(e.description):
+                        System.Console.Error.WriteLine("%s: %s" % (e.description, e))
+                    else:
+                        System.Console.Error.WriteLine(e)
+                    break
+                except LogoOutput, e:
+                    ##System.Console.Error.WriteLine(e)
+                    v = e.message
+                except KeyboardInterrupt:
+                    if tokenizer.context:
+                        tokenizer.context = []
+                        System.Console.Error.WriteLine('Aborted')
+                    else:
+                        System.Console.Error.WriteLine("Bye")
+                        return False
+                except SystemExit:
+                    return False
+                except Exception, e:
+                    import traceback
+                    traceback.print_exc()
+                    break
+                if v is EOF:
+                    break
+                if v is not None:
+                    print("%s" % repr(v))
         finally:
             Logo.pop_tokenizer()
-        if v is EOF:
-            return False
-        if v is not None:
-            print("%s" % repr(v))
+        print("Ok")
         return True
 
     def ExecuteFile(self, filename):
@@ -70,7 +79,7 @@ class LogoEngine(Calico.Engine):
 class LogoDocument(Calico.TextDocument):
     def GetAuthors(self):
         return System.Array[str]([
-            "Jim Marshall <jmarshall@sarahlawrence.edu>",
+            "Ian Bicking <ianb@colorstudy.com>",
             "Doug Blank <dblank@cs.brynmawr.edu>"
         ])
 

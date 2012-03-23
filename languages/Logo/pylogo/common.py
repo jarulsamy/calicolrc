@@ -128,6 +128,7 @@ def error_for_file(errorFile, row=None, col=None):
         l = errorFile.row_line(row)
         if l is not None:
             s += l
+            s += '\n'
             s += '%s^\n' % (' '*col)
     else:
         s = 'File %s\n' % name

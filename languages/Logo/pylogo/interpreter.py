@@ -5,6 +5,7 @@ interpreter for pylogo
 A Logo interpreter.
 """
 
+import System
 
 from types import *
 from pylogo import reader
@@ -682,6 +683,43 @@ class Interpreter(object):
                     import traceback
                     traceback.print_exc()
                     v = None
+                if v is EOF:
+                    break
+                if v is not None:
+                    print("%s" % repr(v))
+        finally:
+            self.pop_tokenizer()
+
+    def REP(self, tokenizer):
+        """
+        Read-Eval-Print, i.e., eval(string)
+        """
+        self.push_tokenizer(tokenizer)
+        try:
+            while 1:
+                try:
+                    v = self.expr_top()
+                except LogoError, e:
+                    if str(e) != str(e.description):
+                        System.Console.Error.WriteLine("%s: %s" % (e.description, e))
+                    else:
+                        System.Console.Error.WriteLine(e)
+                    v = None
+                    break
+                except KeyboardInterrupt:
+                    if tokenizer.context:
+                        tokenizer.context = []
+                        System.Console.Error.WriteLine('Aborted')
+                    else:
+                        System.Console.Error.WriteLine("Bye")
+                        break
+                except SystemExit:
+                    break
+                except Exception, e:
+                    import traceback
+                    traceback.print_exc()
+                    v = None
+                    break
                 if v is EOF:
                     break
                 if v is not None:
