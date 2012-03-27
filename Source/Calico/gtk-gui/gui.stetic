@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="698 525">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="747 525">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -812,6 +812,24 @@
               </packing>
             </child>
             <child>
+              <widget class="Gtk.Button" id="butterfly">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">resource:Calico.icon-1.png</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+              </widget>
+              <packing>
+                <property name="PackType">End</property>
+                <property name="Position">14</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.HBox" id="searchbox">
                 <property name="MemberName" />
                 <child>
@@ -914,7 +932,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">14</property>
+                <property name="Position">15</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -943,7 +961,7 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">493</property>
+            <property name="Position">563</property>
             <child>
               <widget class="Gtk.VPaned" id="vpaned2">
                 <property name="MemberName" />
@@ -1526,7 +1544,7 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="Gtk.Label" id="GtkLabel28">
+                      <widget class="Gtk.Label" id="GtkLabel29">
                         <property name="MemberName" />
                         <property name="LabelProp" translatable="yes">Chat</property>
                         <property name="UseMarkup">True</property>

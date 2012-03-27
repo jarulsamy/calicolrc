@@ -56,6 +56,8 @@ namespace Calico {
         public TabCompletion completion = null;
         static string dialogResponse;
         public Chat connection;
+        int animationSequence = 0;
+        Gtk.Image [] animationImages = new Gtk.Image [2];
 
         enum TargetType {
             String,
@@ -305,10 +307,33 @@ namespace Calico {
             // All done, show if minimized:
             this.Present();
             // End of GUI setup
-            GLib.Timeout.Add(1000, delegate {
-                while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
-                return true;
-            });
+            // Load images for animation:
+            System.Reflection.Assembly thisExe;
+            thisExe = System.Reflection.Assembly.GetExecutingAssembly();
+            System.IO.Stream file;
+            int c = 0;
+            foreach(string filename in new string [] {"Calico.icon-1.png", "Calico.icon-2.png"}) {
+                file = thisExe.GetManifestResourceStream(filename);
+                animationImages[c++] = new Gtk.Image(file);
+            }
+            butterfly.Image = animationImages[0];
+            // Start up background updater
+            GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        private bool UpdateGUI() {
+            if (StopButton.Sensitive) { // Program is running
+                animationSequence = ++animationSequence % animationImages.Length;
+                butterfly.Image = animationImages[animationSequence];
+            } else if (animationSequence != 0) {
+                animationSequence = 0;
+                butterfly.Image = animationImages[0];
+            } // else don't change image
+            // update any pending requests
+            while (Gtk.Application.EventsPending ())
+                Gtk.Application.RunIteration ();
+            // keep updating:
+            return true;
         }
 
         private void HandleDragDataReceived (object sender, Gtk.DragDataReceivedArgs args)
