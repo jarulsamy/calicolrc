@@ -374,9 +374,9 @@ def dribble(filename):
 _plists = {}
 
 def _getplist(plistname):
-    if not _plists.has_key(plistname.lower()):
-        _plists[plistname.lower()] = {}
-    return _plists[plistname.lower()]
+    if not _plists.has_key(plistname):
+        _plists[plistname] = {}
+    return _plists[plistname]
 
 def pprop(plistname, propname, value):
     """
@@ -385,7 +385,7 @@ def pprop(plistname, propname, value):
     command.  Adds a property to the ``plistname`` property list with
     name ``propname`` and value ``value``.
     """
-    _getplist(plistname)[propname.lower()] = value
+    _getplist(plistname)[propname] = value
 
 def gprop(plistname, propname):
     """
@@ -396,7 +396,7 @@ def gprop(plistname, propname):
     property.
     """
     try:
-        return _getplist(plistname)[propname.lower()]
+        return _getplist(plistname)[propname]
     except KeyError:
         return LogoList([])
 
@@ -408,7 +408,7 @@ def remprop(plistname, propname):
     property list named ``plistname``.
     """
     try:
-        del _getplist(plistname)[propname.lower()]
+        del _getplist(plistname)[propname]
     except KeyError:
         pass
 
@@ -438,7 +438,7 @@ def plistp(plistname):
     you haven't put any properties in it, PLIST of that name outputs
     an empty list, rather than giving an error message.)
     """
-    if not _plists.has_key(plistname.lower()):
+    if not _plists.has_key(plistname):
         return False
     return not not _getplist(plistname)
 

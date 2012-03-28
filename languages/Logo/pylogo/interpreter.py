@@ -232,7 +232,7 @@ class Interpreter(object):
         elif tok in ('/', '*'):
             raise LogoError("Operator not expected: %s" % tok)
 
-        elif tok == '"' or tok.lower() == 'quote':
+        elif tok == '"' or tok == 'quote':
             tok = self.tokenizer.next()
             return tok
 
@@ -265,8 +265,8 @@ class Interpreter(object):
                     return val
                 else:
                     self.tokenizer.next()
-                if self.special_forms.has_key(func.lower()):
-                    special_form = self.special_forms[func.lower()]
+                if self.special_forms.has_key(func):
+                    special_form = self.special_forms[func]
                     val = special_form(self, greedy=True)
                     next_tok = self.tokenizer.next()
                     if next_tok != ')':
@@ -294,8 +294,8 @@ class Interpreter(object):
         else:
             if not reader.is_word(tok):
                 raise LogoSyntaxError("Unknown token: %r" % tok)
-            if tok.lower() in self.special_forms:
-                special_form = self.special_forms[tok.lower()]
+            if tok in self.special_forms:
+                special_form = self.special_forms[tok]
                 val = special_form(self, greedy=False)
                 return val
             else:
@@ -370,14 +370,14 @@ class Interpreter(object):
         while 1:
             tok = self.tokenizer.next()
             if (lastNewline and isinstance(tok, str)
-                and tok.lower() == 'end'):
+                and tok == 'end'):
                 break
             lastNewline = (tok == '\n')
             if tok is EOF:
                 raise LogoEndOfCode("The end of the file was not expected in a TO; use END")
             body.append(tok)
         func = UserFunction(name, vars, default, body)
-        self.set_function(name.lower(), func)
+        self.set_function(name, func)
         self.tokenizer.pop_context()
         return func
 
@@ -541,6 +541,10 @@ class Interpreter(object):
         for n in names:
             self.set_function(n, import_function)
 
+    def import_dlr_function(self, import_function, names=None):
+        for n in names:
+            self.set_function(n, import_function)
+
     def import_module(self, mod):
         """
         Import a module (either a module object, or the string name of
@@ -563,12 +567,15 @@ class Interpreter(object):
         main_func = None
         for n in dir(mod):
             obj = getattr(mod, n)
-            if type(obj) is FunctionType:
+            ##print(obj, type(obj))
+            if type(obj) is BuiltinFunctionType:
+                self.import_dlr_function(obj, ["%s.%s" % (mod.__name__, n)])
+            elif type(obj) is FunctionType:
                 if n == main_name:
                     main_func = obj
                 name = obj.func_name
-                if defs.has_key(name.lower()):
-                    useName, arity, aliases = defs.get(name.lower())
+                if defs.has_key(name):
+                    useName, arity, aliases = defs.get(name)
                     if arity is not None:
                         obj.arity = arity
                     if useName:
@@ -612,14 +619,14 @@ class Interpreter(object):
             if not l or l.startswith('#') or l.startswith(';'):
                 continue
             funcName, rest = l.split(':', 1)
-            funcName = funcName.strip().lower()
+            funcName = funcName.strip()
             arity = None
             aliases = []
             useName = True
             for n in rest.split():
                 if n == '*':
                     useName = False
-                elif n.lower().startswith('arity:'):
+                elif n.startswith('arity:'):
                     arity = int(n[6:])
                 else:
                     aliases.append(n)
@@ -762,12 +769,12 @@ class Interpreter(object):
             except (AttributeError, NameError):
                 pass
             logo_attrs = getattr(actor, '_logo_attrs', None)
-            if logo_attrs is not None and v.lower() in logo_attrs:
-                return getattr(actor, v, logo_attrs[v.lower()])
+            if logo_attrs is not None and v in logo_attrs:
+                return getattr(actor, v, logo_attrs[v])
         return self.get_nonactor_variable(v)
 
     def get_function(self, name):
-        lower = name.lower()
+        lower = name
         for actor in self.actors:
             attrs = getattr(actor, '_logo_attrs', {})
             if lower in attrs:
@@ -777,7 +784,7 @@ class Interpreter(object):
                 continue
             if hasattr(func, 'logo_aware'):
                 return func
-            if isinstance(func, (FunctionType, MethodType)):
+            if isinstance(func, (BuiltinFunctionType, FunctionType, MethodType)):
                 return func
         return self.get_nonactor_function(name)
 
@@ -807,10 +814,13 @@ def arity(func):
     try:
         args, varargs, varkw, defaults = inspect.getargspec(func)
     except TypeError, e:
-        e.args += (repr(func),)
-        raise
+        try:
+            args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue]
+        except TypeError, e:
+            e.args += (repr(func),)
+            raise
     a = len(args) - len(defaults or [])
-    if func.func_dict.get('logo_aware'):
+    if hasattr(func, "func_dict") and func.func_dict.get('logo_aware'):
         a -= 1
     return a + offset
 
@@ -918,17 +928,17 @@ class RootFrame(Interpreter):
         return self.tokenizers[:]
 
     def get_nonactor_variable(self, v):
-        v = v.lower()
+        v = v
         if self.vars.has_key(v):
             return self.vars[v]
         raise LogoNameError(
             "Variable :%s has not been set." % v)
 
     def set_variable(self, v, value):
-        self.vars[v.lower()] = value
+        self.vars[v] = value
 
     def set_variable_local(self, v, value):
-        self.vars[v.lower()] = value
+        self.vars[v] = value
 
     def _set_variable_if_present(self, v, value):
         if self.vars.has_key(v):
@@ -942,12 +952,13 @@ class RootFrame(Interpreter):
 
     def get_nonactor_function(self, name):
         try:
-            return self.functions[name.lower()]
+            return self.functions[name]
         except KeyError:
-            raise LogoNameError("I don't know how  to %s" % name)
+            ##print(self.functions.keys())
+            raise LogoNameError("I don't know how to '%s'" % name)
 
     def set_function(self, name, func):
-        self.functions[name.lower()] = func
+        self.functions[name] = func
 
     def variable_names(self):
         return self.vars.keys()
@@ -963,10 +974,10 @@ class RootFrame(Interpreter):
         return d
 
     def erase_name(self, name):
-        if self.vars.has_key(name.lower()):
-            del self.vars[name.lower()]
-        if self.functions.has_key(name.lower()):
-            del self.functions[name.lower()]
+        if self.vars.has_key(name):
+            del self.vars[name]
+        if self.functions.has_key(name):
+            del self.functions[name]
 
     def make_local(self, v):
         raise LogoSyntaxError(
@@ -1014,7 +1025,7 @@ class Frame(RootFrame):
         return self.__class__(self, tokenizer=tokenizer or self.tokenizer)
 
     def get_nonactor_variable(self, v):
-        v = v.lower()
+        v = v
         if self.vars.has_key(v):
             return self.vars[v]
         if self.local_vars.has_key(v):
@@ -1027,7 +1038,7 @@ class Frame(RootFrame):
         return self.parent.get_variable(v)
 
     def set_variable(self, v, value):
-        v = v.lower()
+        v = v
         if not self._set_variable_if_present(v, value):
             self.vars[v] = value
 
@@ -1056,15 +1067,15 @@ class Frame(RootFrame):
         return self.parent._set_variable_names(d)
 
     def erase_name(self, name):
-        if self.vars.has_key(name.lower()):
-            del self.vars[name.lower()]
+        if self.vars.has_key(name):
+            del self.vars[name]
         self.parent.erase_name(name)
 
     def make_local(self, v):
         self.local_vars[v] = None
 
     def set_variable_local(self, v, value):
-        self.vars[v.lower()] = value
+        self.vars[v] = value
 
     def add_command(self, add_command, *args, **kw):
         return self.root.add_command(add_command, *args, **kw)

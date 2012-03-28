@@ -16,11 +16,11 @@ def getlogoattr(obj, attr, default=NoDefault):
 
 def _findattr(obj, attr):
     for name, value in obj.__dict__.items():
-        if name.lower() == attr.lower():
+        if name == attr:
             return name
         if hasattr(value, 'aliases'):
             for alias in value.aliases:
-                if alias.lower() == attr.lower():
+                if alias == attr:
                     return name
     return None
 
@@ -53,9 +53,8 @@ def update_logo_attrs(obj):
             attrs.update(o._logo_attrs)
             break
         for name, value in o.__dict__.iteritems():
-            if getattr(value, 'logo_expose', False):
-                if name.lower() != name:
-                    attrs[name.lower()] = name
+            if getattr(value, 'logo_expose', False):    
+                attrs[name] = name
             if hasattr(value, 'aliases'):
                 for alias in value.aliases:
                     attrs[alias] = name

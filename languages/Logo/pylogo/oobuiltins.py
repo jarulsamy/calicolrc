@@ -86,7 +86,7 @@ class Reader(object):
         """
         return self.input.tell()
 
-    @logofunc(aliases=["eof?"])
+    @logofunc(name="eof?")
     def eofp(self):
         """
         EOFP
@@ -342,7 +342,7 @@ def erasefile(filename):
 # @@: Not applicable: SETREAD, SETWRITE
 # @@: Not the same: READER, WRITER
 
-@logofunc(aliases=["file?"])
+@logofunc(name="file?")
 def filep(filename):
     """
     FILEP filename

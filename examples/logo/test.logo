@@ -52,21 +52,19 @@ ae remove "a [a b c] [b c]
 ae remove 5 [1 5 2 3] [1 2 3]
 ;; Not same order:
 ;; ae remdup [1 5 3 2 3 1 5 4] [1 5 3 2 4]
-assert wordp "this
 assert word? "this
-assert not wordp 1
 assert not word? [1 2]
-assert emptyp []
+assert empty? []
 assert empty? butfirst "a
 assert not empty? [1 2]
 assert not empty? "a
-assert equalp 1 1
+assert equal? 1 1
 assert equal? "a "a
 assert not equal? [1 2] 1
 assert before? 1 3
 ; leading dots are not working...
 ;assert not .eq [1 2] [1 2]
-assert memberp 3 [1 2 3]
+assert member? 3 [1 2 3]
 assert member? "a "cat
 assert substring? "or "bored
 assert number? 3
@@ -98,7 +96,7 @@ ae (round cos 90 3) 0.0
 ae iseq 1 4 [1 2 3 4]
 ae rseq 3 5 9 [3 3.25 3.5 3.75 4 4.25 4.5 4.75 5]
 ae rseq 3 5 5 [3 3.5 4 4.5 5]
-assert lessp 2 3
+assert less? 2 3
 assert greater? 4 2
 assert random 100
 assert 2 < 3
@@ -165,5 +163,5 @@ dountil [make :y :y + 1] [:y > 0]
 ae :y 1
 
 
-
-bye
+;; FIXME:
+;; bye

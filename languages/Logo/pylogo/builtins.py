@@ -376,7 +376,7 @@ def dotsetbf(lst, value):
 
 ## Predicates
 
-@logofunc(aliases=['word?'])
+@logofunc(name='word?')
 def wordp(thing):
     """
     WORDP thing
@@ -386,7 +386,7 @@ def wordp(thing):
     """
     return type(thing) is str
 
-@logofunc(aliases=['list?'])
+@logofunc(name='list?')
 def listp(val):
     """
     LISTP thing
@@ -396,7 +396,7 @@ def listp(val):
     """
     return isinstance(val, list)
 
-@logofunc(aliases=['empty?'])
+@logofunc(name='empty?')
 def emptyp(thing):
     """
     EMPTYP thing
@@ -407,7 +407,7 @@ def emptyp(thing):
     """
     return thing == '' or thing == [] or thing == () or thing == {}
 
-@logofunc(aliases=['equal?'])
+@logofunc(name='equal?')
 def equalp(thing1, thing2):
     """
     EQUALP thing1 thing2
@@ -430,7 +430,7 @@ def equalp(thing1, thing2):
     """
     return thing1 == thing2
 
-@logofunc(aliases=['before?'])
+@logofunc(name='before?')
 def beforep(word1, word2):
     """
     BEFOREP word1 word2
@@ -456,7 +456,7 @@ def doteq(thing1, thing2):
     """
     return thing1 is thing2
 
-@logofunc(aliases=['member?'])
+@logofunc(name='member?')
 def memberp(thing1, l):
     """
     MEMBERP thing1 thing2
@@ -469,7 +469,7 @@ def memberp(thing1, l):
     """
     return thing1 in l
 
-@logofunc(aliases=['substring?'])
+@logofunc(name='substring?')
 def substringp(thing1, thing2):
     """
     SUBSTRINGP thing1 thing2
@@ -482,7 +482,7 @@ def substringp(thing1, thing2):
     return type(thing2) is str and type(thing1) is str \
            and thing2.find(thing1) != -1
 
-@logofunc(aliases=['number?'])
+@logofunc(name='number?')
 def numberp(thing):
     """
     NUMBERP thing
@@ -942,7 +942,7 @@ def rseq(from_num, to_num, length):
 ##############################
 ## Predicates
 
-@logofunc(aliases=['less?'])
+@logofunc(name='less?')
 def lessp(num1, num2):
     """
     LESSP num1 num2
@@ -953,7 +953,7 @@ def lessp(num1, num2):
     """
     return num1 < num2
 
-@logofunc(aliases=['greater?'])
+@logofunc(name='greater?')
 def greaterp(num1, num2):
     """
     GREATERP num1 num2
@@ -1220,7 +1220,7 @@ def thing(interp, v):
 ##############################
 ## Predicates
 
-@logofunc(aliases=['procedure?'], aware=True)
+@logofunc(name='procedure?', aware=True)
 def procedurep(interp, name):
     """
     PROCEDUREP name
@@ -1230,7 +1230,7 @@ def procedurep(interp, name):
     """
     return interp.root.functions.has_key(name)
 
-@logofunc(aliases=['primitive?'], aware=True)
+@logofunc(name='primitive?', aware=True)
 def primitivep(interp, name):
     """
     PRIMITIVEP name
@@ -1245,7 +1245,7 @@ def primitivep(interp, name):
         return False
     return not isinstance(func, intepreter.UserFunction)
 
-@logofunc(aliases=['defined?'], aware=True)
+@logofunc(name='defined?', aware=True)
 def definedp(interp, name):
     """
     DEFINEDP name
@@ -1259,7 +1259,7 @@ def definedp(interp, name):
         return False
     return isinstance(func, intepreter.UserFunction)
     
-@logofunc(aliases=['name?'], aware=True)
+@logofunc(name='name?', aware=True)
 def namep(interp, name):
     """
     NAMEP name
@@ -1382,6 +1382,14 @@ def _load_python(interp, name):
         name = name[:-3]
     mod = __import__(name)
     interp.import_module(mod)
+
+@logofunc(name="dir", aware=True)
+def mydir(interp):
+	return sorted(interp.functions.keys())
+
+@logofunc(name="vars", aware=True)
+def myvars(interp):
+	return sorted(interp.vars)
 
 @logofunc(name='help', aware=True)
 def logo_help(interp, name):
@@ -1821,7 +1829,7 @@ def catch(interp, block, *args):
             if not args:
                 break
             if isinstance(args[0], str):
-                if e.__class__.__name__.lower() == args[0].lower():
+                if e.__class__.__name__ == args[0]:
                     handler = args[1]
                     break
             elif isinstance(e, args[0]):

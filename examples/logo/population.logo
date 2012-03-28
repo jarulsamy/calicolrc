@@ -22,7 +22,7 @@ end
 
 to try :number 0
   ; This is a way of doing a default:
-  if :number = none [make :number 100]
+  if :number = None [make :number 100]
   make :girl 0
   make :boy 0
   repeat :number [reproduce]
