@@ -911,12 +911,12 @@ namespace Calico
 			this.hpaned1 = new global::Gtk.HPaned ();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 563;
+			this.hpaned1.Position = 467;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vpaned2 = new global::Gtk.VPaned ();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 280;
+			this.vpaned2.Position = 288;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook ();
 			this.notebook_docs.CanFocus = true;
@@ -1313,7 +1313,7 @@ namespace Calico
 			this.hpaned2 = new global::Gtk.HPaned ();
 			this.hpaned2.CanFocus = true;
 			this.hpaned2.Name = "hpaned2";
-			this.hpaned2.Position = 293;
+			this.hpaned2.Position = 309;
 			// Container child hpaned2.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook ();
 			this.notebook_tools.CanFocus = true;
@@ -1434,7 +1434,7 @@ namespace Calico
 			this.vpaned1 = new global::Gtk.VPaned ();
 			this.vpaned1.CanFocus = true;
 			this.vpaned1.Name = "vpaned1";
-			this.vpaned1.Position = 115;
+			this.vpaned1.Position = 114;
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.frame1 = new global::Gtk.Frame ();
 			this.frame1.Name = "frame1";
@@ -1541,7 +1541,7 @@ namespace Calico
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 747;
+			this.DefaultWidth = 675;
 			this.DefaultHeight = 525;
 			this.property_notebook.Hide ();
 			this.vpaned1.Hide ();
@@ -1590,6 +1590,7 @@ namespace Calico
 			this.BlastScriptAction.Activated += new global::System.EventHandler (this.OnBlastScriptActionActivated);
 			this.zoom100Action.Activated += new global::System.EventHandler (this.OnZoom100ActionActivated);
 			this.PropertyTabAction.Activated += new global::System.EventHandler (this.OnPropertyTabActionActivated);
+			this.InstallNewAddonAction.Activated += new global::System.EventHandler (this.OnInstallNewAddonActionActivated);
 			this._printButton.Clicked += new global::System.EventHandler (this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler (this.OnNewButtonClicked);
 			this._openButton.Clicked += new global::System.EventHandler (this.OnOpenButtonClicked);

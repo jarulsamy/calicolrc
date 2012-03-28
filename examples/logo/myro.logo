@@ -1,0 +1,8 @@
+;; Logo examples of loading a CLR library
+
+import "Myro
+
+Myro.init "sim 0
+Myro.forward 1 1
+
+Myro.beep 1 440 440

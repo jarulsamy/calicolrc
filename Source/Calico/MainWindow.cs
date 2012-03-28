@@ -2353,6 +2353,22 @@ namespace Calico {
             return retval;
         }
 
+        public static void inform(string information) {
+            ManualResetEvent ev = new ManualResetEvent(false);
+            Invoke(delegate {
+                Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                                       0, Gtk.MessageType.Info,
+                                       Gtk.ButtonsType.Ok,
+                                       information);
+                fc.ShowAll();
+                fc.Run();
+                fc.Destroy();
+                ev.Set();
+                });
+            ev.WaitOne();
+        }
+
+
         protected void OnButton26Clicked (object sender, System.EventArgs e)
         {
             // Help
@@ -2686,6 +2702,11 @@ namespace Calico {
         protected void OnButton10Clicked (object sender, System.EventArgs e)
         {
             OnZoom100ActionActivated(sender, e);
+        }
+
+        protected void OnInstallNewAddonActionActivated (object sender, System.EventArgs e)
+        {
+            inform("No addons are current available");
         }
     }
 }
