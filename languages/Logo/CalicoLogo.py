@@ -48,12 +48,12 @@ class LogoEngine(Calico.Engine):
         for f in dir.GetFiles("*.dll"):
             assembly_name = f.FullName
             #print("Loading", assembly_name)
-            clr.AddReference(assembly_name)
             dllname = f.Name.split(".")[0]
             try:
+                clr.AddReference(f.Name)
                 __import__(dllname)
             except:
-                #print("   pass...")
+                #print("Error loading", dllname, assembly_name)
                 pass
 ##             assembly = System.Reflection.Assembly.LoadFile(assembly_name)
 ##             if assembly:
