@@ -43,6 +43,37 @@ class LogoEngine(Calico.Engine):
         ## Return True if expression parses ok.
         return True
 
+    def PostSetup(self, calico):
+        dir = System.IO.DirectoryInfo(System.IO.Path.Combine(calico.path, "..", "modules"))
+        for f in dir.GetFiles("*.dll"):
+            assembly_name = f.FullName
+            #print("Loading", assembly_name)
+            clr.AddReference(assembly_name)
+            dllname = f.Name.split(".")[0]
+            try:
+                __import__(dllname)
+            except:
+                #print("   pass...")
+                pass
+##             assembly = System.Reflection.Assembly.LoadFile(assembly_name)
+##             if assembly:
+##                 ## initialize_module if possible
+##                 try:
+##                     for type in assembly.GetTypes():
+##                         try:
+##                             method = type.GetMethod("initialize_module")
+##                             if method:
+##                                 method.Invoke(type, Array[object]([calico.path, calico.OS]))
+##                         except:
+##                             try:
+##                                 method = type.GetMethod("set_gui_thread_id")
+##                                 if method:
+##                                     method.Invoke(type, Array[object]([MainWindow.gui_thread_id]));
+##                             except:
+##                                 pass
+##                 except:
+##                  continue
+
 class LogoDocument(Calico.TextDocument):
     Logo = Logo
     def GetAuthors(self):
