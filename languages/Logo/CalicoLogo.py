@@ -56,7 +56,7 @@ class LogoLanguage(Calico.Language):
         self.name = "logo"
         self.proper_name = "Logo"
         self.extensions = System.Array[str](["logo"])
-        self.mimetype = "text/plain"
+        self.mimetype = "text/x-logo"
         self.LineComment = ";;"
 
     def MakeEngine(self, manager):
@@ -66,7 +66,8 @@ class LogoLanguage(Calico.Language):
         return LogoDocument(calico, filename, self.name, self.mimetype)
 
     def GetUseLibraryString(self, fullname):
-        pass
+        basename = System.IO.Path.GetFileNameWithoutExtension(fullname)
+        return "import \"%s\n" % basename
 
 def MakeLanguage():
     return LogoLanguage()
