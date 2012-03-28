@@ -3299,7 +3299,7 @@ public static class Graphics
 				_pixbuf = new Gdk.Pixbuf (filename);
 			}
 			if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			  _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			}
 			set_points (new Point (0, 0), 
                  new Point (_pixbuf.Width, 0),
@@ -4921,7 +4921,7 @@ public static class Graphics
 			return nameTo;
 		}
 	}
-	
+
 	public class Graph
 	{
 		public static double graph_count = 1;
@@ -4934,8 +4934,8 @@ public static class Graphics
 			{"fill", "white"},
 			{"line_type", "curve"},
 		};
-		public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
-		public Graphviz4Net.Dot.DotGraph<string> graph = null;
+	  public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
+	  public Graphviz4Net.Dot.DotGraph<string> graph = null;
 		public Dictionary<string,Node> graphNodes = new Dictionary<string,Node>();
 		public List<Edge> graphEdges = new List<Edge>();
 		public string pre_text;
@@ -5409,5 +5409,6 @@ public static class Graphics
 			}
 		}
 	}
+
 }
 
