@@ -9,7 +9,11 @@ import System
 
 from types import *
 from pylogo import reader
-import inspect, os, sys
+import os, sys
+try:
+    import inspect
+except:
+    pass
 from pylogo.common import *
 from pylogo.objectintrospect import getlogoattr, update_logo_attrs
 import imp
@@ -813,9 +817,12 @@ def arity(func):
         offset = -1
     try:
         args, varargs, varkw, defaults = inspect.getargspec(func)
-    except TypeError, e:
+    except:
         try:
-            args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue]
+            if hasattr(func, "Targets"):
+                args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue]
+            else:
+                args, defaults = [], []
         except TypeError, e:
             e.args += (repr(func),)
             raise
