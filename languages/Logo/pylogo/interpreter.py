@@ -826,7 +826,12 @@ def arity(func):
     except:
         try:
             if hasattr(func, "Targets"):
-                args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue]
+                ## FIXME:
+                ##args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue != None and p.DefaultValue != System.DBNull]
+                if func.Targets.Length > 1 or (func.Targets.Length == 1 and any([p for p in func.Targets[0].GetParameters() if p != None])):
+                    args, defaults = [], [1] # makes -1
+                else:
+                    args, defaults = list(func.Targets[0].GetParameters()), [p for p in list(func.Targets[0].GetParameters()) if p.DefaultValue]
             else:
                 args, defaults = [], []
         except TypeError, e:

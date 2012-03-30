@@ -87,5 +87,8 @@
     <Reference Include="Mono.Cairo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
       <HintPath>..\..\..\bin\Mono.Cairo.dll</HintPath>
     </Reference>
+    <Reference Include="Myro">
+      <HintPath>..\..\Myro.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
