@@ -1337,6 +1337,20 @@ def erall(interp):
     erase(interp, procedures(interp))
 
 @logofunc(aware=True)
+def init(interp):
+    """
+    INIT
+
+    command.
+    """
+    # @@: No buried makes this dangerous
+    erall(interp)
+    from pylogo import builtins
+    interp.import_module(builtins)
+    from pylogo import oobuiltins
+    interp.import_module(oobuiltins)
+
+@logofunc(aware=True)
 def erps(interp):
     """
     ERPS
@@ -1854,11 +1868,11 @@ def logo_setattr(obj, attr, *args):
 def logo_none():
     return None
 
-@logofunc(name='true')
+@logofunc(name='True')
 def logo_rue():
     return True
 
-@logofunc(name='false')
+@logofunc(name='False')
 def logo_alse():
     return False
 
@@ -1904,12 +1918,12 @@ def sync(interp, sec):
         time.sleep(t)
     interp.set_variable('synctimestamp', time.time())
 
-@logofunc(name='import', aware=True)
-def logo_import(interp, name):
+@logofunc(name='import', aware=True, arity=-1)
+def logo_import(interp, name, pattern=None):
     if isinstance(name, list):
         name = '.'.join(name)
     try:
-        interp.import_module(name)
+        interp.import_module(name, pattern)
     except ImportError:
         #try:
             interp.import_module('pylogo.%s' % name)

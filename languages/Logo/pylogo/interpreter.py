@@ -18,6 +18,7 @@ from pylogo.common import *
 from pylogo.objectintrospect import getlogoattr, update_logo_attrs
 import imp
 import threading
+import re
 
 class Interpreter(object):
     """
@@ -549,7 +550,7 @@ class Interpreter(object):
         for n in names:
             self.set_function(n, import_function)
 
-    def import_module(self, mod):
+    def import_module(self, mod, pattern=None):
         """
         Import a module (either a module object, or the string name of
         the module), moving all of its exported functions into the
@@ -560,6 +561,8 @@ class Interpreter(object):
         contains one line for each annotated function (# or ; for
         comment lines).  See loadDefs for more.
         """
+        if pattern and pattern == "*":
+            pattern = ".*"
         if type(mod) is str:
             mod = load_module(mod)
         #print "Importing %s" % mod.__name__
@@ -573,7 +576,10 @@ class Interpreter(object):
             obj = getattr(mod, n)
             ##print(obj, type(obj))
             if type(obj) is BuiltinFunctionType:
-                self.import_dlr_function(obj, ["%s.%s" % (mod.__name__, n)])
+                if pattern and re.match(pattern, n):
+                    self.import_dlr_function(obj, [n])
+                else:
+                    self.import_dlr_function(obj, ["%s.%s" % (mod.__name__, n)])
             elif type(obj) is FunctionType:
                 if n == main_name:
                     main_func = obj
