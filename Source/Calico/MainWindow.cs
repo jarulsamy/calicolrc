@@ -121,7 +121,8 @@ namespace Calico {
             manager.SetCalico(this);
             // FIXME: move to Python language
             manager["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "del division, with_statement, print_function", false);
+                                             "import sys as _sys; _sys.setrecursionlimit(1000);" +
+                "del division, with_statement, print_function, _sys", false);
             if (! Debug) {
                 manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
             }
@@ -2112,7 +2113,8 @@ namespace Calico {
             manager.SetCalico(this);
             // FIXME: move to Python language
             manager["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "del division, with_statement, print_function", false);
+                                             "import sys as _sys; _sys.setrecursionlimit(1000);" +
+                                             "del division, with_statement, print_function, _sys", false);
             manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
             manager.PostSetup(this);
             Print(Tag.Info, "Shell reset!\n");
