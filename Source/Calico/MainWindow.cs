@@ -489,6 +489,9 @@ namespace Calico {
         public Gtk.Button PauseButton {
             get { return _pauseButton1; }
         }
+        public Gtk.Notebook PropertyNotebook {
+            get { return property_notebook; }
+        }
         public string CurrentProperLanguage {
             get {
                 if (CurrentLanguage != null && manager.languages.ContainsKey(CurrentLanguage))
