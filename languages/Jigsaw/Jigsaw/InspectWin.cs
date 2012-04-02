@@ -6,21 +6,21 @@ using System.Collections.Generic;
 
 namespace Jigsaw
 {
-	public class PropertyWindow : Gtk.Window
+	public class PropertyWindow : Gtk.ScrolledWindow //Gtk.Window
 	{
 		private Gtk.TreeView propTree = null;		// Property List
 		private Gtk.ListStore propList = null;		// List of properties for the Property Tree
 		private Jigsaw.Canvas cvs = null;
 		
-		public PropertyWindow(Diagram.Canvas _cvs) : base(Gtk.WindowType.Toplevel)
+		public PropertyWindow(Diagram.Canvas _cvs) //: base(Gtk.WindowType.Toplevel)
 		{
-			this.Title = "Jigsaw Property Window";
-			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
-			this.Resize(300, 200);
-			this.KeepAbove = true;
-			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
-			this.ParentWindow = _cvs.ParentWindow;
-			this.DestroyWithParent = true;
+//			this.Title = "Jigsaw Property Window";
+//			this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "plugin.png"));
+//			this.Resize(300, 200);
+//			this.KeepAbove = true;
+//			this.DeleteEvent += DoDeleteEvent;		// Invoked when Inspector is closed
+//			this.ParentWindow = _cvs.ParentWindow;
+//			this.DestroyWithParent = true;
 			
 			this.cvs = (Jigsaw.Canvas)_cvs;			// Jigsaw canvas and all event handlers
 			this.cvs.SelectionChanged += OnJigsawSelectionChanged;

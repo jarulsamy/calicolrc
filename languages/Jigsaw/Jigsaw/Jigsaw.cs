@@ -1228,19 +1228,19 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnInspectorShow(object sender, EventArgs e)
-		{
-			this.ShowInspectorWindow();
-		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ShowInspectorWindow()
-		{
-			_inspector.ShowAll();
-			_inspector.Deiconify();
-			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
-			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
-		}
+//		protected void OnInspectorShow(object sender, EventArgs e)
+//		{
+//			this.ShowInspectorWindow();
+//		}
+//
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void ShowInspectorWindow()
+//		{
+//			_inspector.ShowAll();
+//			_inspector.Deiconify();
+//			_inspector.SetPosition(Gtk.WindowPosition.Mouse);
+//			_inspector.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
+//		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool SaveDocument(string filename) 
@@ -1998,6 +1998,7 @@ namespace Jigsaw
 				_searchHelper = new SearchHelper(this, true);
 			return _searchHelper.More(s);
 		}
+
 	}
 	
 	// -----------------------------------------------------------------------
@@ -2654,8 +2655,8 @@ namespace Jigsaw
 			
 			Gtk.MenuItem mnuBreak = new Gtk.MenuItem("Toggle Breakpoint");
 			mnuBreak.Activated += OnToggleBreakpoint;
-			Gtk.MenuItem mnuProps = new Gtk.MenuItem("Properties");
-			mnuProps.Activated += OnPropertiesShow;
+			//Gtk.MenuItem mnuProps = new Gtk.MenuItem("Properties");
+			//mnuProps.Activated += OnPropertiesShow;
 			//Gtk.MenuItem mnuInspect = new Gtk.MenuItem("Inspector");
 			//mnuInspect.Activated += OnInspectorShow;
 			Gtk.MenuItem mnuHelp = new Gtk.MenuItem("Help");
@@ -2669,7 +2670,7 @@ namespace Jigsaw
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuRun);
 			mnu.Append(mnuBreak);
-			mnu.Append(mnuProps);
+			//mnu.Append(mnuProps);
 			//mnu.Append(mnuInspect);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuHelp);
@@ -2681,11 +2682,11 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnInspectorShow(object sender, EventArgs e)
-		{
-			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
-			_cvs = null;
-		}
+//		protected void OnInspectorShow(object sender, EventArgs e)
+//		{
+//			(_cvs as Jigsaw.Canvas).ShowInspectorWindow();
+//			_cvs = null;
+//		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected void OnHelpShow(object sender, EventArgs e)
@@ -2725,31 +2726,6 @@ namespace Jigsaw
 			_cvs = cvs;
 			if (this.IsFactory == false) this.OnRunBlockStack(null, null);
 			
-			// @@@ Is any of the following necessary? (From base class)
-			
-//            // If the canvas is in the editing state
-//            if (cvs.Mode == EMode.Editing)
-//            {
-//                // If the shape is not selected and the shift key is not down deselect all shapes
-//                //if (this.Selected == false && Control.ModifierKeys != Keys.Shift) cvs.DeselectAll();
-//				if (this.Selected == false && (cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) 
-//					cvs.DeselectAll();
-//
-//                // Select this shape
-//                this.Select(cvs);
-//				
-//				// If double-clicked on a non-factory block, show View Window
-//				if (this.IsFactory == false) cvs.ShowPropertiesWindow();
-//				
-//                // Indicate that the canvas selection has changed
-//                cvs.RaiseSelectionChangedEvent();
-//				
-//				// Reset handler
-//				cvs.handler = cvs;
-//				
-//                // Redraw
-//                cvs.Invalidate();
-//            }
         }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2927,9 +2903,9 @@ namespace Jigsaw
 			js.BringStackToFront(dropped);
 			
 			// If in auto properties dialog mode, automatically show the dialog
-			bool popup = (cvs as Jigsaw.Canvas)._autoProperties;
-			//if (this.IsFactory && popup) dropped.OnDoubleClick(cvs, null);
-			if (this.IsFactory && popup) cvs.ShowPropertiesWindow();
+//			bool popup = (cvs as Jigsaw.Canvas)._autoProperties;
+//			if (this.IsFactory && popup) dropped.OnDoubleClick(cvs, null);
+//			if (this.IsFactory && popup) cvs.ShowPropertiesWindow();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,15 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\MainWindow.cs">
     <Files>
-      <File FileName="CalicoJigsaw.cs" Line="103" Column="16" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1269" Column="68" />
+      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="730" Column="4" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="20" Column="2" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="37" Column="1" />
+      <File FileName="Jigsaw\InspectWin.cs" Line="33" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="Jigsaw.cs" selected="True" />
+            <Node name="MainWindow.cs" selected="True" />
           </Node>
         </State>
       </Pad>

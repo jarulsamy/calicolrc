@@ -71,6 +71,9 @@
     <Reference Include="Common">
       <HintPath>..\..\..\modules\Common.dll</HintPath>
     </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="plugin.png">

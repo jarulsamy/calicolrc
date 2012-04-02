@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Xml;
 using System.Text;
+using System.Threading;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -45,6 +47,8 @@ public class MainWindow : Gtk.Window
 	Gtk.MenuItem miRunStep = null;
 	Gtk.MenuItem miRunStop = null;
 	
+	Gtk.Notebook output_notebook = null;
+	Gtk.Notebook property_notebook = null;
 	Gtk.MessageDialog _dlg = null;		// Var that temporarily holds dialog while showing
 	Gtk.Entry _entry = null;
 	private string _modulePath = null;
@@ -59,7 +63,7 @@ public class MainWindow : Gtk.Window
 		this.DefaultHeight = 600;
 		this.DeleteEvent += new Gtk.DeleteEventHandler (this.OnDeleteEvent);
 		
-		// - - - VBox
+		// - - - Top level VBox that holds stack of menu, toolbar, vpaned, ...
 		Gtk.VBox vb = new Gtk.VBox(false, 0);
 		
 		Gtk.AccelGroup agrp = new Gtk.AccelGroup();
@@ -147,10 +151,10 @@ public class MainWindow : Gtk.Window
 		muView.Append(miViewToggleInset);
 		miViewToggleInset.AddAccelerator("activate", agrp, (int)'T', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 
-		Gtk.MenuItem miViewProperties = new Gtk.MenuItem("_Properties");
-		miViewProperties.Activated += new EventHandler(OnViewProperties);
-		muView.Append(miViewProperties);
-		miViewProperties.AddAccelerator("activate", agrp, (int)'P', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
+//		Gtk.MenuItem miViewProperties = new Gtk.MenuItem("_Properties");
+//		miViewProperties.Activated += new EventHandler(OnViewProperties);
+//		muView.Append(miViewProperties);
+//		miViewProperties.AddAccelerator("activate", agrp, (int)'P', Gdk.ModifierType.ControlMask, Gtk.AccelFlags.Visible);
 
 //		Gtk.MenuItem miViewInspector = new Gtk.MenuItem("_Inspector");
 //		miViewInspector.Activated += new EventHandler(OnViewInspector);
@@ -159,10 +163,10 @@ public class MainWindow : Gtk.Window
 
 		muView.Append(new Gtk.MenuItem());
 		
-		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
-		miViewAutoProps.Active = true;
-		miViewAutoProps.Activated += new EventHandler(OnViewAutoProps);
-		muView.Append(miViewAutoProps);
+//		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
+//		miViewAutoProps.Active = true;
+//		miViewAutoProps.Activated += new EventHandler(OnViewAutoProps);
+//		muView.Append(miViewAutoProps);
 
 		// Run Menu
 		Gtk.Menu muRun = new Gtk.Menu();
@@ -322,6 +326,50 @@ public class MainWindow : Gtk.Window
 		
 		vb.PackStart (tb, false, false, 0);
 		
+		_modulePath = System.IO.Path.GetFullPath("../../modules");		
+		js = new Jigsaw.Canvas(_modulePath, 900, 400, 3000, 2000);		
+		js.JigsawRun += new EventHandler(OnJigsawRun);
+		js.JigsawStop += new EventHandler(OnJigsawStop);
+		js.JigsawStep += new EventHandler(OnJigsawStep);
+		js.JigsawPause += new EventHandler(OnJigsawPause);
+		//js.JigsawError += new EventHandler(OnJigsawError);
+		
+		// Init slider
+		hsRunSlider.Value = js.TimeOut;
+		
+		// Set up the vertical paned container that divides Jigsaw and the base notebook
+		Gtk.VPaned vpaned = new Gtk.VPaned();
+		vpaned.Add1 (js);
+		
+		// Create notebook and notebook pages
+		output_notebook = new Gtk.Notebook();
+		output_notebook.WidthRequest = 500;
+		property_notebook = new Gtk.Notebook();
+		
+		// Redirect output to the custom console wrapping a TextView
+		ConsoleWidget console = new ConsoleWidget();
+		output_notebook.AppendPage(console, new Gtk.Label("Output"));
+		
+		// Add properties window to new tab
+		property_notebook.AppendPage(new Jigsaw.PropertyWindow(js), new Gtk.Label("Properties"));
+		
+		// Add Notebook to bottom of vpaned
+		Gtk.HPaned hpaned = new Gtk.HPaned();
+		hpaned.Add1 (output_notebook);
+		hpaned.Add2 (property_notebook);
+		vpaned.Add2 (hpaned);
+		//vpaned.Add2 (notebook);
+		
+		// Add vpaned to vertical box
+		vb.Add (vpaned);
+		
+//		vb.Add(js);
+		
+		this.Add(vb);
+		
+		// Let 'er rip
+		this.ShowAll();
+
 		// Embedded scrolled window
 //		Gtk.ScrolledWindow sw = new Gtk.ScrolledWindow ();
 //		sw.CanFocus = true;
@@ -340,25 +388,8 @@ public class MainWindow : Gtk.Window
 		// For running directly from Calico/languages/Jigsaw outside of Calico:
 		//js = new Jigsaw.Canvas(System.IO.Path.Combine("..", "..", "modules"), 
 		//                       900, 600, 3000, 2000);	
-		
-		_modulePath = System.IO.Path.GetFullPath("../../modules");		
-		js = new Jigsaw.Canvas(_modulePath, 900, 600, 3000, 2000);		
-		js.JigsawRun += new EventHandler(OnJigsawRun);
-		js.JigsawStop += new EventHandler(OnJigsawStop);
-		js.JigsawStep += new EventHandler(OnJigsawStep);
-		js.JigsawPause += new EventHandler(OnJigsawPause);
-		//js.JigsawError += new EventHandler(OnJigsawError);
-		
-		// Init slider
-		hsRunSlider.Value = js.TimeOut;
-		
-		vb.Add(js);
-		this.Add(vb);
-
-		// Let 'er rip
-		this.ShowAll();
 	}
-	
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnSliderChangeValue(object sender, EventArgs a)
 	{	
@@ -802,22 +833,22 @@ public class MainWindow : Gtk.Window
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnViewProperties(object sender, EventArgs a)
-	{	
-		js.ShowPropertiesWindow();
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnViewAutoProps(object sender, EventArgs a)
-	{	// Set mode to automatically view the properties dialog to match checked state of menu
-		js.AutoProperties = (sender as Gtk.CheckMenuItem).Active;
-	}
+//	protected void OnViewProperties(object sender, EventArgs a)
+//	{	
+//		js.ShowPropertiesWindow();
+//	}
+	
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//	protected void OnViewAutoProps(object sender, EventArgs a)
+//	{	// Set mode to automatically view the properties dialog to match checked state of menu
+//		js.AutoProperties = (sender as Gtk.CheckMenuItem).Active;
+//	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-	protected void OnViewInspector(object sender, EventArgs a)
-	{	
-		js.ShowInspectorWindow();
-	}
+//	protected void OnViewInspector(object sender, EventArgs a)
+//	{	
+//		js.ShowInspectorWindow();
+//	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnUIRun(object sender, EventArgs a)
@@ -842,5 +873,66 @@ public class MainWindow : Gtk.Window
 	protected void OnUIStep(object sender, EventArgs a)
 	{	
 		js.Step();
+	}
+}
+
+// --- A widget to help redirect stdout and stderr to a TextArea in the IDE
+// --- Patterned after Katadin.Debugger, http://www.koders.com/csharp/fidDA0CFC55ECD5E2373D22E96CB991C035B9E57DF5.aspx?s=file
+public class ConsoleWidget : Gtk.ScrolledWindow
+{
+    private class ConsoleWidgetWriter : TextWriter
+    {
+        private Gtk.TextView view;
+    
+        public ConsoleWidgetWriter(Gtk.TextView view)
+        {
+            this.view = view;
+        }
+        
+        public override Encoding Encoding
+        {
+            get
+            {
+                return Encoding.Unicode;
+            }
+		}
+        
+        public override void Write(string s)
+        {
+			Gtk.Application.Invoke(delegate
+            {
+                Gtk.TextIter iter = view.Buffer.EndIter;
+                view.Buffer.Insert(ref iter, s);
+                view.ScrollToIter(iter, 0, false, 0, 0);
+            });
+        }
+
+		public override void WriteLine(string s)
+        {
+            Write(s + "\n");
+        }
+		
+        public override void WriteLine()
+        {
+            Write("\n");
+        }
+    }
+
+    private Gtk.TextView view;
+    
+    public ConsoleWidget()
+    {
+		view = new Gtk.TextView();
+		view.CanFocus = true;
+		view.Editable = false;
+		view.AcceptsTab = false;
+		view.CursorVisible = true;
+		view.LeftMargin = 5;
+		view.RightMargin = 5;
+		Add(view);
+		
+		ConsoleWidgetWriter consoleWriter = new ConsoleWidgetWriter(view);
+		Console.SetOut(consoleWriter);
+		Console.SetError(consoleWriter);
 	}
 }

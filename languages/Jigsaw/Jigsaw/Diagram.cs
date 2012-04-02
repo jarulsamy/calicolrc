@@ -303,19 +303,19 @@ namespace Diagram
         }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void ShowPropertiesWindow()
-		{
-			_propertyWin.SetPosition(Gtk.WindowPosition.Mouse);
-			_propertyWin.Deiconify();
-			_propertyWin.ShowAll();
-			_propertyWin.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
-		}
+//		public virtual void ShowPropertiesWindow()
+//		{
+//			_propertyWin.SetPosition(Gtk.WindowPosition.Mouse);
+//			_propertyWin.Deiconify();
+//			_propertyWin.ShowAll();
+//			_propertyWin.KeepAbove = true;	// The Mono 2.6.7 runtime needs this here for the Window to stay above others
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void HidePropertiesWindow()
-		{
-			_propertyWin.Hide();
-		}
+//		public void HidePropertiesWindow()
+//		{
+//			_propertyWin.Hide();
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		internal void Invalidate()
@@ -862,10 +862,10 @@ namespace Diagram
         }
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected void OnPropertiesShow(object sender, EventArgs e)
-		{
-			this.ShowPropertiesWindow();
-		}
+//		protected void OnPropertiesShow(object sender, EventArgs e)
+//		{
+//			this.ShowPropertiesWindow();
+//		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public virtual void CancelProcess(Canvas cvs)
@@ -1771,6 +1771,14 @@ namespace Diagram
                 s._id = 0;
             }
         }
+			
+		// - - -
+		public void ShowPropertiesWindow() {
+			
+		}
+		public void HidePropertiesWindow() {
+			
+		}
     }
 
     /// <summary>
@@ -2068,7 +2076,7 @@ namespace Diagram
 			mnuToBack.Activated += OnSendToBack;
 			
 			Gtk.MenuItem mnuProps = new Gtk.MenuItem("Properties");
-			mnuProps.Activated += OnPropertiesShow;
+//			mnuProps.Activated += OnPropertiesShow;
 			
 			mnu.Append(mnuDelShape);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
@@ -2084,11 +2092,11 @@ namespace Diagram
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		protected virtual void OnPropertiesShow(object sender, EventArgs e)
-		{
-			_cvs.ShowPropertiesWindow();
-			_cvs = null;
-		}
+//		protected virtual void OnPropertiesShow(object sender, EventArgs e)
+//		{
+//			_cvs.ShowPropertiesWindow();
+//			_cvs = null;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		protected virtual void OnDeleteShape(object sender, EventArgs e)
@@ -2854,7 +2862,7 @@ namespace Diagram
                 this.Select(cvs);
 				
 				// If double-clicked on a non-factory block, show View Window
-				if (this.IsFactory == false) cvs.ShowPropertiesWindow();
+//				if (this.IsFactory == false) cvs.ShowPropertiesWindow();
 				
                 // Indicate that the canvas selection has changed
                 cvs.RaiseSelectionChangedEvent();
