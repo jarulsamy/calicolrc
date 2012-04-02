@@ -80,6 +80,13 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
+		
+		Gtk.Notebook nb = calico.PropertyNotebook;
+		nb.WidthRequest = 500;
+		while( nb.NPages > 0 ) nb.RemovePage(0);
+		nb.AppendPage(new Jigsaw.PropertyWindow(cvs), new Gtk.Label("Properties"));
+		nb.Visible = true;
+		
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;
