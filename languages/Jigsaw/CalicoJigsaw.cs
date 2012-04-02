@@ -82,8 +82,7 @@ public class CalicoJigsawDocument : Document
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		
 		Gtk.Notebook nb = calico.PropertyNotebook;
-		nb.WidthRequest = 500;
-		while( nb.NPages > 0 ) nb.RemovePage(0);
+		//while( nb.NPages > 0 ) nb.RemovePage(0);
 		nb.AppendPage(new Jigsaw.PropertyWindow(cvs), new Gtk.Label("Properties"));
 		nb.Visible = true;
 		
