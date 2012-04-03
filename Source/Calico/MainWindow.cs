@@ -410,9 +410,6 @@ namespace Calico {
         public Gtk.Notebook ToolNotebook {
             get { return notebook_tools; }
         }
-        public Gtk.Notebook PropertyNotebook {
-            get { return property_notebook; }
-        }
         public Document this[int page_num] {
             get {
                 if (page_num > 1) {
