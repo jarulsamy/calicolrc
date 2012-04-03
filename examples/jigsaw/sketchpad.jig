@@ -2,6 +2,7 @@
 <jigsaw>
     <module name="Common.dll" />
     <module name="Shapes.dll" />
+    <module name="Graphics.dll" />
     <block id="1" typeName="Jigsaw.CControlStart" left="445" top="26">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
@@ -207,6 +208,16 @@
         <property name="Label" value="X1 = 0" />
         <property name="Message" value="" />
         <property name="Variable" value="X1" />
+        <property name="Expression" value="0" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="18" typeName="Jigsaw.CAssignment" left="780" top="41">
+        <edge id="37" name="In" linkedTo="-1" />
+        <edge id="38" name="Out" linkedTo="-1" />
+        <property name="Label" value="X = 0" />
+        <property name="Message" value="" />
+        <property name="Variable" value="X" />
         <property name="Expression" value="0" />
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />

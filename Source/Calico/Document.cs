@@ -76,6 +76,11 @@ namespace Calico {
             return null;
         }
 
+        public virtual Gtk.Widget GetPropertyNotebookWidget() {
+            // By default, return null
+            return null;
+        }
+
         public virtual void UseLibrary (string fullname)
         {
             // pass

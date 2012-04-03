@@ -410,6 +410,9 @@ namespace Calico {
         public Gtk.Notebook ToolNotebook {
             get { return notebook_tools; }
         }
+        public Gtk.Notebook PropertyNotebook {
+            get { return property_notebook; }
+        }
         public Document this[int page_num] {
             get {
                 if (page_num > 1) {
@@ -1684,7 +1687,17 @@ namespace Calico {
             });
         }
 
+        protected void OnNotebookDocsChangeCurrentPage (object o, Gtk.ChangeCurrentPageArgs args)
+        {
+            Console.WriteLine("change! {0}", o);
+        }
+
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
+            // Always start by wiping out and hiding properties
+            Gtk.Notebook nb = this.PropertyNotebook;
+            while( nb.NPages > 0 ) nb.RemovePage(0);
+            nb.Visible = false;
+
             Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
             if (CurrentDocument != null) {
                 // Set save as python menu:
@@ -1707,6 +1720,16 @@ namespace Calico {
                 CurrentDocument.widget.Child.GrabFocus();
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
+
+                // Looks for property notebook widget from current document.
+                // Adds as new page in property notebook if one is provided.
+                Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
+                if (propWidget != null) {
+                    nb.AppendPage( propWidget, new Gtk.Label("Properties"));
+                    nb.Visible = true;
+                    nb.ShowAll();
+                }
+
             } else if (DocumentNotebook.Page == HOME) {
                 ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
@@ -2504,13 +2527,6 @@ namespace Calico {
                 ToolNotebook.Page = 3;
             }
         }
-
-        protected void OnNotebookDocsChangeCurrentPage (object o, Gtk.ChangeCurrentPageArgs args)
-        {
-            Console.WriteLine("change! {0}", o);
-        }
-
-
 
         public static double currentTime ()
         {

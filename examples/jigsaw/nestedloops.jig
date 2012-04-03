@@ -98,4 +98,13 @@
         <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
         <line_color R="0" G="0.391" B="0" A="1" />
     </block>
+    <block id="11" typeName="Jigsaw.CIOPrint" left="915" top="41">
+        <edge id="22" name="In" linkedTo="-1" />
+        <edge id="23" name="Out" linkedTo="-1" />
+        <property name="Label" value="print('Hello')" />
+        <property name="Message" value="" />
+        <property name="Expression" value="'Hello'" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
 </jigsaw>

@@ -65,8 +65,7 @@ public class CalicoJigsawDocument : Document
 {
 	public Jigsaw.Canvas cvs = null;
     
-	public CalicoJigsawDocument (Calico.MainWindow calico, string filename) : 
-	base(calico, filename, "jigsaw")
+	public CalicoJigsawDocument (Calico.MainWindow calico, string filename) : base(calico, filename, "jigsaw")
 	{
 		cvs = new Jigsaw.Canvas (
 	               System.IO.Path.Combine (calico.path, "../modules"), 100, 100, 3000, 2000);
@@ -80,16 +79,17 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
-		
-		Gtk.Notebook nb = calico.PropertyNotebook;
-		//while( nb.NPages > 0 ) nb.RemovePage(0);
-		nb.AppendPage(new Jigsaw.PropertyWindow(cvs), new Gtk.Label("Properties"));
-		nb.Visible = true;
-		
+
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;
 		widget.ShowAll ();
+	}
+
+	public override Gtk.Widget GetPropertyNotebookWidget() {
+		// Return Property Notebook Widget
+		Jigsaw.PropertyWindow p = new Jigsaw.PropertyWindow(cvs);
+		return (Gtk.Widget)p;
 	}
 
     public override bool IsDirty {
