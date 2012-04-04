@@ -26,7 +26,7 @@ import Gtk
 import Gdk
 import Cairo
 
-filename = "examples/images/blankenship.jpg"
+filename = "../images/blankenship.jpg"
 _pixbuf = Gdk.Pixbuf(filename)
 _pixbuf.HasAlpha
 format = Cairo.Format.Rgb24
@@ -37,7 +37,7 @@ surface = Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height)
 
 
 from Graphics import *
-init()
+Init()
 #win = Window()
 
 class MyWindow(Gtk.Window):

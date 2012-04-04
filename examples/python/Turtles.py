@@ -22,6 +22,7 @@ from Graphics import *
 import random
 
 win = Window("Turtles!")
+win.mode = "manual"
 
 turtles = []
 for t in range(1000):
@@ -39,9 +40,11 @@ for step in range(10):
     for t in turtles:
         t.move(random.random() * 6 - 3, 
                random.random() * 6 - 3)
+    win.step()
 
 for t in range(1000):
     turtles[t].color = makeColor(random.choice(["red", "green", "blue", "black"]))
+win.update()
 
 """
 for steps in range(100): 
