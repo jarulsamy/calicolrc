@@ -1270,7 +1270,7 @@ namespace Calico
 			this.hpaned2 = new global::Gtk.HPaned ();
 			this.hpaned2.CanFocus = true;
 			this.hpaned2.Name = "hpaned2";
-			this.hpaned2.Position = 314;
+			this.hpaned2.Position = 359;
 			// Container child hpaned2.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook ();
 			this.notebook_tools.CanFocus = true;
@@ -1381,6 +1381,8 @@ namespace Calico
 			this.property_notebook.SetTabLabel (this.GtkScrolledWindow4, this.label6);
 			this.label6.ShowAll ();
 			this.hpaned2.Add (this.property_notebook);
+			global::Gtk.Paned.PanedChild w249 = ((global::Gtk.Paned.PanedChild)(this.hpaned2 [this.property_notebook]));
+			w249.Resize = false;
 			this.vpaned2.Add (this.hpaned2);
 			global::Gtk.Paned.PanedChild w250 = ((global::Gtk.Paned.PanedChild)(this.vpaned2 [this.hpaned2]));
 			w250.Resize = false;
@@ -1500,6 +1502,7 @@ namespace Calico
 			}
 			this.DefaultWidth = 787;
 			this.DefaultHeight = 533;
+			this.property_notebook.Hide ();
 			this.vpaned1.Hide ();
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);

@@ -1360,7 +1360,7 @@
                   <widget class="Gtk.HPaned" id="hpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">314</property>
+                    <property name="Position">359</property>
                     <child>
                       <widget class="Gtk.Notebook" id="notebook_tools">
                         <property name="MemberName" />
@@ -1482,6 +1482,7 @@
                     <child>
                       <widget class="Gtk.Notebook" id="property_notebook">
                         <property name="MemberName" />
+                        <property name="Visible">False</property>
                         <property name="CanFocus">True</property>
                         <property name="CurrentPage">0</property>
                         <child>
@@ -1507,6 +1508,9 @@
                           </packing>
                         </child>
                       </widget>
+                      <packing>
+                        <property name="Resize">False</property>
+                      </packing>
                     </child>
                   </widget>
                   <packing>
