@@ -1139,6 +1139,9 @@ namespace Calico {
                 if (text != null)
                     ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
                 ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
+                //if (CurrentDocument != null) {
+                //    CurrentDocument.IsDirty = true;
+                //}
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
             } else if (CurrentDocument != null) {
@@ -1454,18 +1457,25 @@ namespace Calico {
         }
 
         public void UpdateUpDownArrows() {
-	  if (! ProgramRunning) {
-            if (history.Position == 0) {
-                history_up.Sensitive = false;
-            } else {
-                history_up.Sensitive = true;
-            }
-            if (history.Position == history.Last) {
-                history_down.Sensitive = false;
-            } else {
-                history_down.Sensitive = true;
-            }
-	  }
+    	  if (! ProgramRunning) {
+                if (history.Position == 0) {
+                    history_up.Sensitive = false;
+                } else {
+                    history_up.Sensitive = true;
+                }
+                if (history.Position == history.Last) {
+                    history_down.Sensitive = false;
+                } else {
+                    history_down.Sensitive = true;
+                }
+                if (Shell.Document.Text != "") {
+                    StartAction.Sensitive = true;
+                    StartButton.Sensitive = true;
+                } else {
+                    StartAction.Sensitive = false;
+                    StartButton.Sensitive = false;
+                }
+    	  }
         }
 
         public bool ExecuteShell() {
@@ -2724,7 +2734,7 @@ namespace Calico {
 
         protected void OnInstallNewAddonActionActivated (object sender, System.EventArgs e)
         {
-            inform("No addons are current available");
+            inform("No addons are currently available");
         }
     }
 }
