@@ -1965,6 +1965,7 @@ public static class Graphics
 		public Point center;
 		public string tag;
 		public WindowClass window;
+	        public Shape drawn_on_shape = null;
 		internal double _rotation; // internally radians
 		internal double _scaleFactor; // percent
 		public FarseerPhysics.Dynamics.World world;
@@ -2664,23 +2665,32 @@ public static class Graphics
 					shape.shapes.Add (this);
 			}
 			window = shape.window;
+			drawn_on_shape = shape;
 			QueueDraw ();
 		}
     
 		public void undraw ()
 		{
-			Invoke (delegate {
-				if (window != null) {
-					lock (window.getCanvas().shapes) {
-						if (window.getCanvas ().shapes.Contains (this)) {
-							window.getCanvas ().shapes.Remove (this);
-							if (window is WindowClass)
-								((WindowClass)window).QueueDraw ();
-							window = null;
-						}
-					}
-				}
-			});
+		  Invoke (delegate {
+		      if (drawn_on_shape != null) {
+			lock (drawn_on_shape.shapes) {
+			  if (drawn_on_shape.shapes.Contains (this)) {
+			    drawn_on_shape.shapes.Remove (this);
+			  }
+			}
+			drawn_on_shape = null;
+		      }
+		      if (window != null) {
+			lock (window.getCanvas().shapes) {
+			  if (window.getCanvas ().shapes.Contains (this)) {
+			    window.getCanvas ().shapes.Remove (this);
+			    if (window is WindowClass)
+			      ((WindowClass)window).QueueDraw ();
+			    window = null;
+			  }
+			}
+		      }
+		    });
 		}
     
 		public Gradient gradient {
@@ -5339,9 +5349,9 @@ public static class Graphics
 		      myProcess.Start();
 			  retval = myProcess.StandardOutput.ReadToEnd();			  
 			  myProcess.WaitForExit();
-		#pragma warning disable 0168
+		#pragma warning disable 219
 		    } catch (Exception e) {
-		#pragma warning restore 0168
+		#pragma warning restore 219
 		      if (warn_missing_dot) {
 		        Console.WriteLine("WARNING: missing dot command");
 		        warn_missing_dot = false; // just once

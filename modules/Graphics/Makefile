@@ -9,6 +9,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:../../bin/Mono.Cairo.dll \
 		-r:IronPython \
 		-r:Microsoft.Dynamic \
+		-r:Graphviz4Net \
 		-r:System.Drawing \
 		-r:FarseerPhysics.dll \
 		-r:GifLib.dll \
@@ -24,6 +25,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:IronPython \
 		-r:Graphics \
 		-r:Microsoft.Dynamic \
+		-r:Graphviz4Net \
 		-r:System.Drawing \
 		-r:Mono.Cairo \
 		-r:FarseerPhysics.dll \
