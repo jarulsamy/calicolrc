@@ -4,7 +4,7 @@
     <Files>
       <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="178" Column="23" />
       <File FileName="Jigsaw\MainWindow.cs" Line="422" Column="3" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="33" Column="2" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="20" Column="3" />
       <File FileName="Jigsaw\Engine.cs" Line="382" Column="4" />
       <File FileName="Jigsaw\Main.cs" Line="5" Column="2" />
     </Files>

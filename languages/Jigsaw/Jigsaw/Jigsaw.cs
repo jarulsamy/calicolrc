@@ -17,7 +17,7 @@ using Microsoft.Scripting.Hosting;
 // When a block is dropped, if an edge is activated, a connection is made.
 
 namespace Jigsaw
-{
+{	
 	// -----------------------------------------------------------------------
 	public static class Constant {
 		public const int SPACES = 4; // used in ToPython indent level
