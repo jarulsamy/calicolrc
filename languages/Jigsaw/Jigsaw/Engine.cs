@@ -41,7 +41,14 @@ namespace Jigsaw
 		public RunnerResponse()
 		{}
 	}
-	
+
+	// -----------------------------------------------------------------------
+	public enum EngineState {
+		Stopped = 0,
+		Paused = 1,
+		Running = 2
+	}
+
 	// -----------------------------------------------------------------------
 	public class StackFrame
 	{
@@ -177,6 +184,8 @@ namespace Jigsaw
 		private List<CallStack> _callStacks = null;
 		//private InspectorWindow _inspector = null;
 		private bool _inStep = false;		// true if currently executing a single step
+		private bool _inTimeout = false;	// true of in the timeout handler
+		private bool _turbo = false;		// true if in turbo mode
 		
 		public ScriptRuntimeSetup scriptRuntimeSetup;
 		public ScriptRuntime scriptRuntime;
@@ -191,10 +200,13 @@ namespace Jigsaw
 		internal Dictionary<string, bool> loadedAssemblies = new Dictionary<string, bool>();
 		
 		// The following private variables manage the timer.
-		private bool _timerRunning = false;		// True if timer is running
-		private bool _timerContinue = false;	// false to stop timer
-		private bool _timerReset = false;		// true to stop and start timer with new timeout
+		//private bool _timerRunning = false;		// true if a program is running, not the timer
+		//private bool _timerContinue = false;	// false to stop timer
+		private uint _timerID = 0;				// ID of currently installed timeout handler
+		//private bool _timerReset = false;		// true to stop and start timer with new timeout
 		private uint _timeOut = 100;			// timer timeout value
+		//private bool _isRunning = false;		// true if a program is running, not the timer
+		private EngineState _state = EngineState.Stopped;
 		
 		// Engine events
 		public event EventHandler EngineRun;
@@ -282,8 +294,30 @@ namespace Jigsaw
 		{
 			set
 			{
+				//Console.WriteLine ("new timeout {0}", value);
+				// Reset timeout value
 				_timeOut = value;
-				_timerReset = true;
+
+				// Remove any existing timeout handler
+				if (_timerID > 0) {
+					GLib.Source.Remove(_timerID);
+					_timerID = 0;
+				}
+
+				// Manage turbo flag
+				if (!_turbo && _timeOut <= 20) {
+					_turbo = true;
+					Console.WriteLine ("Turbo on");
+				} else if (_turbo && _timeOut > 20) {
+					_turbo = false;
+					Console.WriteLine ("Turbo off");
+				}
+
+				// If currently running, then reset timer now
+				if (_state == EngineState.Running) {
+					// Reset timeout handler
+					_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+				}
 			}
 			get
 			{
@@ -292,22 +326,32 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public bool IsRunning
-		{	// Determine if the program is running
+//		public bool IsRunning
+//		{	// Determine if the program is running
+//			get {
+//				return _isRunning;
+//
+//				//return _timerRunning;
+////				if (_callStacks == null) return false;
+////				if (_callStacks.Count > 0) {
+////					foreach (CallStack cs in _callStacks) {
+////						if (cs.Enabled == true) {
+////							return true;
+////						}
+////					}
+////				}
+////				return false;
+//			}
+//		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public EngineState State
+		{
 			get {
-				return _timerRunning;
-//				if (_callStacks == null) return false;
-//				if (_callStacks.Count > 0) {
-//					foreach (CallStack cs in _callStacks) {
-//						if (cs.Enabled == true) {
-//							return true;
-//						}
-//					}
-//				}
-//				return false;
+				return _state;
 			}
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public List<CallStack> CallStacks
 		{	// Return the list if CallStacks currently in the engine
@@ -335,6 +379,9 @@ namespace Jigsaw
 
 			// A list of CProcedureStart blocks that are accumulated
 			List<CProcedureStart> procStartBlocks = new List<CProcedureStart> ();
+
+			// Reset the timeout parameter. This also resets turbo mode if appropriate.
+			this.TimeOut = _timeOut;
 
 			// Reset all blocks
 			foreach (Diagram.CShape s in cvs.shapes) {
@@ -445,10 +492,14 @@ namespace Jigsaw
 		// - - Advance the entire system one step - - - - - - - - - - -
 		public bool Step(bool runOnce = false)
 		{
+			//Console.WriteLine ("Engine.Step");
 			// Block reentrance
 			if (_inStep == true) return false;
 			_inStep = true;
-			
+
+			// Take care of any pending events so we are up to date
+			while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+
 			int enabledCount = 0;
 			for (int i=_callStacks.Count-1; i>=0; i--)
 			{
@@ -463,10 +514,10 @@ namespace Jigsaw
 						
 						bool rslt = frame.MoveNext();				// Advance block runner and see if fell off end
 						RunnerResponse rr = frame.Current;			// Check the response
-						
+
 						// At any time, if requested to stop, wipe out all call stacks and exit
 						if (rr.Action == EngineAction.Stop) {
-							Stop ();
+							this.Stop ();
 							break;
 						}
 						
@@ -505,6 +556,7 @@ namespace Jigsaw
 								}
 								break;
 							case EngineAction.Error:
+								this.Stop ();
 								RaiseEngineError();
 								break;
 							case EngineAction.NoAction:
@@ -521,17 +573,19 @@ namespace Jigsaw
 			}
 			
 			//_inspector.Update (globals);
-			RaiseEngineStep ();
+			if (!_turbo) RaiseEngineStep ();
 			
 			// If at least one stack is enabled, make sure the timer is started
 			if (enabledCount > 0 && !runOnce) {
-				this.StartTimer();			// Enure timer is running
+				if (_timerID == 0 && _timeOut > 0.0) {
+					_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+					_state = EngineState.Running;
+				}
 			}
 			
-			// If no call stacks, or none enabled, stop timer
-			if (enabledCount == 0 || _callStacks.Count == 0) {
-				this.StopTimer();
-				RaiseEngineStop ();
+			// If no call stacks, or none enabled and not paused, stop
+			if ((enabledCount == 0 && _state != EngineState.Paused) || _callStacks.Count == 0 ) {
+				this.Stop ();
 			}
 			
 			//System.GC.Collect();		// Force garbage collection
@@ -553,67 +607,123 @@ namespace Jigsaw
 		public void Stop()
 		{
 			//Console.WriteLine ("Engine.Stop()");
+			if (_timerID > 0) {
+				GLib.Source.Remove(_timerID);
+				_timerID = 0;
+			}
+			if (_turbo) {
+				_turbo = false;   // Testing turbo mode
+				Console.WriteLine ("Turbo off");
+			}
 			foreach (CallStack s in _callStacks) s.Enabled = false;
+			_state = EngineState.Stopped;
+			RaiseEngineStop ();	// Testing turbo mode
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
 			//Console.WriteLine ("Engine.Pause()");
+			if (_timerID > 0) {
+				GLib.Source.Remove(_timerID);
+				_timerID = 0;
+			}
+//			if (_turbo) {
+//				_turbo = false;   // Testing turbo mode
+//				Console.WriteLine ("Turbo off");
+//			}
 			foreach (CallStack s in _callStacks) s.Enabled = false;
+			_state = EngineState.Paused;
 			RaiseEnginePause();
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		private bool StartTimer() 
-		{
-			// The timer is started if not already running and if there is a valid timeout value	
-			if (_timerRunning == false && _timeOut > 0.0) {
-				//Console.WriteLine ("Engine.StartTimer()");
-				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
-				_timerContinue = true;
-				_timerRunning = true;
-				return true;
-			}
-			return false;
-		}
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		private bool StartTimer() 
+//		{
+//			// Start timer if not already started
+//			if (_timerID == 0 && _timeOut > 0.0) {
+//				_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+//				return true;
+//			}
+//
+//			// The timer is started if not already running and if there is a valid timeout value	
+////			if (_timerRunning == false && _timeOut > 0.0) {
+////				//Console.WriteLine ("Engine.StartTimer()");
+////				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+////				_timerContinue = true;
+////				_timerRunning = true;
+////				return true;			// Call timer repeatedly
+////			}
+//
+//			return false;
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		private void StopTimer() 
-		{
-			_timerContinue = false;
-			_timerRunning = false;
-			//Console.WriteLine ("Engine.StopTimer()");
-		}
+//		private void StopTimer() 
+//		{
+//			if (_timerID > 0) {
+//				GLib.Source.Remove (_timerID);
+//				_timerID = 0;
+//			}
+//			_turbo = false;
+//			//_timerContinue = false;
+//			//_timerRunning = false;
+//			//Console.WriteLine ("Engine.StopTimer()");
+//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		private bool OnTimerElapsed()
-		{			
+		{
 			// Install new timeout if requested and stop this one
-			if (_timerReset == true) {
-				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
-				_timerReset = false;
-				//Console.WriteLine ("OnTimerElapsed: Timer Reset");
-				return false;
-			}
+//			if (_timerReset == true) {
+//				GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+//				_timerReset = false;
+//				return false;				// Terminate last timer and new one will take over
+//			}
+			
+//			Console.WriteLine (_timeOut);
+			
+			// Install new timeout if requested and stop this one
+//			if (_timerReset == true) {
+//				if (_timeOut <= 20) {
+//					_turbo = true;					// Testing turbo mode
+//					while(_turbo) this.Step (true);	// Testing turbo mode
+//					_timerReset = false;
+//					return false;
+//				} else {
+//					_turbo = false;
+//					GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
+//					_timerReset = false;
+//					return false;
+//				}
+//			}
 			
 			// Exit if requested
-			if (_timerContinue == false) {
-				_timerRunning = false;
-				//Console.WriteLine ("OnTimerElapsed: Timer Stopped");
-				return false;
-			}
+//			if (_timerContinue == false) {
+//				_timerRunning = false;
+//				//Console.WriteLine ("OnTimerElapsed: Timer Stopped");
+//				return false;
+//			}
 			
 			//Console.WriteLine ("OnTimerElapsed: {0}", DateTime.Now.ToString ());
 
-			// Execute one step
-			this.Step();
-			
+			if (_inTimeout) return true;
+			_inTimeout = true;
+
+			// Execute one step, unless in turbo mode, then execute multiple steps
+			do {
+				this.Step();
+			} while (_turbo);
+
+			_inTimeout = false;
+
+			return true;
+
 			// If the step advanced the engine to a completion point, stop
 			//if (!this.IsRunning) this.Stop();
 			
 			// Return the current state indicating the desire to continue
-			return _timerContinue;
+			//return _timerContinue;
 		}
 		
 //		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

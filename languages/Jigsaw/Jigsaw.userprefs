@@ -1,22 +1,23 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\InspectWin.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="197" Column="3" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="59" Column="15" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="344" Column="38" />
-      <File FileName="Jigsaw\InspectWin.cs" Line="24" Column="4" />
+      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="178" Column="23" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="422" Column="3" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="33" Column="2" />
+      <File FileName="Jigsaw\Engine.cs" Line="382" Column="4" />
+      <File FileName="Jigsaw\Main.cs" Line="5" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="InspectWin.cs" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
-        <State expanded="True" selected="True" />
+        <State selected="True" />
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State>

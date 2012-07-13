@@ -280,7 +280,7 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public RunningState State {
+		public new RunningState State {
 			get {
 				return _state;
 			}
@@ -490,7 +490,11 @@ namespace Jigsaw
 					foreach (System.Reflection.ParameterInfo pi in mi.GetParameters()) {
 						param_names.Add (pi.Name);
 						param_type_names.Add (pi.ParameterType.FullName);
-						param_defaults.Add (pi.DefaultValue.ToString ());
+						try {
+							param_defaults.Add (pi.DefaultValue.ToString ());
+						} catch {
+							param_defaults.Add ("");
+						}
 					}
 					string return_type = mi.ReturnType.ToString ();
 					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
@@ -822,7 +826,8 @@ namespace Jigsaw
 			{
 				uint newTimeOut = 100;
 				if (value > 0.0) newTimeOut = (uint)(2000.0/value);
-				
+				UpdateDisplay = true;
+
 				if (value <= 0.0) {
 					// If 0.0, pause
 					if (this.State != RunningState.Paused) {
@@ -830,20 +835,11 @@ namespace Jigsaw
 						Console.WriteLine ("Stepping...");
 					}
 					return;
-				} else if (value > 99.0) {
-					// Turn off updating
-					if (_updateDisplay == true) {
-						Console.WriteLine ("Turbo mode!");
-						newTimeOut = 1;		// As fast as possible
-						UpdateDisplay = false;
-					}
 				} else if ( _engine.TimeOut == newTimeOut ) {
 					// Do nothing if value hasn't changed
 					return;
 				} else {
 					if (this.State == RunningState.Paused) this.Run();
-					// Otherwise turn updating back on
-					UpdateDisplay = true;
 				}
 
 				_engine.TimeOut = newTimeOut;
@@ -868,13 +864,13 @@ namespace Jigsaw
 		}
 
 		// - - - Get internal flag indicating if running - - - - - - -
-		public bool IsRunning 
-		{
-			get
-			{
-				return _engine.IsRunning; //_isRunning;
-			}
-		}
+//		public bool IsRunning 
+//		{
+//			get
+//			{
+//				return _engine.IsRunning; //_isRunning;
+//			}
+//		}
 
 		// - - - Raise the JigsawRun event  - - - - - - - - - - - - - - 
         public void RaiseJigsawRun()
@@ -933,28 +929,25 @@ namespace Jigsaw
 			_engine.LoadBlockStack(b, true);
 			
 			// If engine is not running, kick start by calling step
-			if (!_engine.IsRunning) _engine.Step ();
+			if (_engine.State != EngineState.Running) _engine.Step ();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			//Console.WriteLine ("Jigsaw.Run()");
-			if (!_engine.IsRunning) engine.Reset(this, _inspector);
+			if (_engine.State != EngineState.Paused) _engine.Reset(this, _inspector);
 			_engine.Run();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
-			//Console.WriteLine ("Jigsaw.Stop()");
 			_engine.Stop();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
-			//Console.WriteLine ("Jigsaw.Pause()");
 			if (this.State == RunningState.Paused) return;
 			_engine.Pause();
 		}
@@ -962,7 +955,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Step()
 		{
-			//Console.WriteLine ("Jigsaw.Step()");
 			_engine.Step(true);
 			RaiseJigsawStep();
 		}
@@ -970,7 +962,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Reset()
 		{
-			//Console.WriteLine ("Jigsaw.Reset()");
 			engine.Reset(this, _inspector);
 		}
 		
@@ -986,7 +977,7 @@ namespace Jigsaw
 		void OnEngineStep(object sender, EventArgs e)
 		{	
 			if (_updateDisplay) this.Invalidate();
-			while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+			//while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
 			//RaiseJigsawStep ();	// This is done in Step()
 		}
 		
@@ -1014,7 +1005,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		void OnEnginePause(object sender, EventArgs e)
 		{	
-			//Console.WriteLine ("Jigsaw.OnEnginePause()");
 			_state = RunningState.Paused;
 			this.Invalidate();
 			RaiseJigsawPause();

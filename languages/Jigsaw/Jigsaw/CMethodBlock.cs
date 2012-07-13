@@ -264,8 +264,16 @@ namespace Jigsaw
 			// - - - Execute the statement - - - - - - - - - - - - - - - -
 			try {
 				_compiled.Execute(scope);
+//				Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
+//					null,
+//					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+//					Gtk.MessageType.Error,
+//					Gtk.ButtonsType.Ok,
+//					"After Execute"
+//				);
+//				Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
+//				dlg2.Destroy();
 			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
 				this["Message"] = ex.Message;
 				this.State = RunningState.Error;
 				rr.Action = EngineAction.Error;

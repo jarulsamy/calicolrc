@@ -26,7 +26,6 @@ using Calico;
 
 public class CalicoJigsawEngine : Engine
 {
-	
 	public class MyTextWriter : TextWriter
 	{
 		Calico.CustomStream custom;
@@ -115,11 +114,12 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
-		if (!cvs.IsRunning) {
+		//if (!cvs.IsRunning) {
+		//if (cvs.State != Jigsaw.RunningState.Running) {
 			if (calico.CurrentDocument == this)
 				// FIXME: only do this when this is the toplevel doc which was running
 				calico.OnStopRunning();
-		}
+		//}
 	}
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
