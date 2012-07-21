@@ -74,6 +74,12 @@ public static class Processing
 		{"MITER", LineJoin.Miter}
 	};
 
+	private static Dictionary<string, Cairo.Format> _imageFormat = new Dictionary<string, Format>() {
+		{"RGB", Format.RGB24},
+		{"ARGB", Format.ARGB32},
+		{"ALPHA", Format.A8}	//grayscale alpha channel
+	};
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void window(int w, int h) 
 	{	// Create window on new thread
@@ -340,6 +346,25 @@ public static class Processing
     }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static PImage createImage(int width, int height, string format) 
+	{	// Create a new PImage object
+
+		// Validate the format string
+		if (!_imageFormat.ContainsKey(format)) {
+			string[] skeys = new string[_imageFormat.Count];
+			_imageFormat.Keys.CopyTo(skeys, 0);
+			string jskeys = String.Join (", ", skeys);
+			string msg = String.Format ("Unrecognized image format: '{0}'. Try {1}", format, jskeys);
+			debug (msg, 2);
+			return null;
+		}
+
+		// Create the image
+		Format frmt = _imageFormat[format];
+		return new PImage(width, height, frmt);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static PImage loadImage(string path) 
 	{	// Load an image into the PImage object
 
@@ -356,18 +381,8 @@ public static class Processing
 			return null;
 		}
 
-		// Check file type
-		if (System.IO.Path.GetExtension(path).ToLower () != ".png") {
-			println ("Error: File not a PNG image file");
-			return null;
-		}
-
-		try {
-			img = new PImage(path);
-		} catch (Exception e) {
-			println ("Error: ", e.Message);
-			return null;
-		}
+		// Attempt to open the file
+		img = new PImage(path);
 
 		return img;
 	}
@@ -385,11 +400,7 @@ public static class Processing
 			}
 		} );
 	}
-
-	public static void image(PImage img, double x, double y)
-	{
-		image (img, x, y, img.width (), img.height ());
-	}
+	public static void image(PImage img, double x, double y) { image (img, x, y, img.width (), img.height ()); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void keepAbove(bool ku)
@@ -985,6 +996,9 @@ public static class Processing
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
 	}
+	public static void setPixel(int x, int y, byte r, byte g, byte b) { setPixel(x, y, r, g, b, 255); }
+	public static void setPixel(int x, int y, byte gray, byte a) { setPixel(x, y, gray, gray, gray, a); }
+	public static void setPixel(int x, int y, byte gray) { setPixel(x, y, gray, gray, gray, 255); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void setPixel(int x, int y, uint c) 
@@ -1116,30 +1130,218 @@ public class PImage
 {
 	// internal cache of loaded image
 	internal ImageSurface _img = null;
+	private Gdk.Pixbuf _pixbuf = null;					// Internal pixbuf used by loadPixels and updatePixels
+	private int _width = 0;
+	private int _height = 0;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage(string path)
 	{
-		_img = new ImageSurface(path);
+		// Check file type
+		string ext = System.IO.Path.GetExtension(path).ToLower ();
+
+		// Load from file 
+		switch (ext) {
+		case ".png":
+			_img = new ImageSurface(path);
+			_width = _img.Width;
+			_height = _img.Height;
+			break;
+		case ".gif":
+		case ".jpg":	// See http://mono.1490590.n4.nabble.com/checking-the-Gdk-Pixbuf-support-for-JPEG-td3747144.html
+		case ".jpeg":
+		case ".tif":
+		case ".tiff":
+		case ".xpm":
+		case ".xbm":
+			Gdk.Pixbuf pb = new Gdk.Pixbuf(path);
+			if (!pb.HasAlpha) pb = pb.AddAlpha (false, 0, 0, 0); 
+			_img = new ImageSurface(Format.Argb32, pb.Width, pb.Height);
+			_width = pb.Width;
+			_height = pb.Height;
+			using (Context g = new Cairo.Context(_img)) {
+				Gdk.CairoHelper.SetSourcePixbuf(g, pb, 0.0, 0.0);
+				g.Paint ();
+			};
+			break;
+		default:
+			string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
+			throw new Exception(msg);
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PImage(int width, int height, Cairo.Format format)
+	{	// Create a new PImage from a Cairo ImageSurface
+		_img = new ImageSurface(format, width, height);
+		_width = width;
+		_height = height;
+	}
+	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
+	public PImage() : this(300, 300, Cairo.Format.ARGB32) { }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public int width() {
-		if (_img != null) {
-			return _img.Width;
-		}
-		return 0;
+		return _width;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public int height() {
-		if (_img != null) {
-			return _img.Height;
-		}
-		return 0;
+		return _height;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void loadPixels() 
+	{	// Copy pixels from current image to pixbuf
+		if (_img  == null) return;
+
+		Gdk.Pixbuf pixbuf = null;
+
+		// Create a new pixmap and context
+		Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, 24);
+		using (Context g = Gdk.CairoHelper.Create(pm)) {
+			// Paint internal Cairo image onto pixmap
+			g.SetSourceSurface (_img, 0, 0);
+			g.Paint ();
+		}
+
+		// Convert pixmap to pixbuf
+		Gdk.Colormap colormap = pm.Colormap;
+		pixbuf = Gdk.Pixbuf.FromDrawable (pm, colormap, 0, 0, 0, 0, _width, _height);
+
+		if (pixbuf != null) {
+			_pixbuf = pixbuf;
+			if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void updatePixels() 
+	{	// Copy pixels from pixbuf to image
+		if (_img  == null) return;
+		if (_pixbuf == null) return;
+
+		using (Context g = new Cairo.Context(_img)) {
+			Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
+			g.Paint ();
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void setPixel(int x, int y, byte r, byte g, byte b, byte a) 
+	{	// Set an individual pixel in the pixbuf
+		if (_pixbuf == null) return;
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
+	}
+	public void setPixel(int x, int y, byte r, byte g, byte b) { setPixel(x, y, r, g, b, 255); }
+	public void setPixel(int x, int y, byte g, byte a) { setPixel(x, y, g, g, g, a); }
+	public void setPixel(int x, int y, byte g) { setPixel(x, y, g, g, g, 255); }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void setPixel(int x, int y, uint c) 
+	{	// Set an individual pixel in the pixbuf
+		if (_pixbuf == null) return;
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, red (c));
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, green (c));
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, blue (c));
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, alpha (c));
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public uint getPixel(int x, int y) 
+	{	// Set an individual pixel in the pixbuf
+		if (_pixbuf == null) return 0;
+		byte r = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0);
+		byte g = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1);
+		byte b = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2);
+		byte a = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3);
+		return color (r, g, b, a);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public byte blue(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		 return (byte)((c & 0x000000FF));
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public byte green(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		 return (byte)((c & 0x0000FF00) >> 8);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public byte red(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		 return (byte)((c & 0x00FF0000) >> 16);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public byte alpha(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		 return (byte)((c & 0xFF000000) >> 24);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public uint color(byte r, byte g, byte b, byte a)
+	{	// Create color from color byte components
+		 return (uint)( b | (g << 8) | (r << 16) | (a << 24));
+	}
+	public uint color(byte r, byte g, byte b) { return color(r, g, b, 255); }
+	public uint color(byte g, byte a) { return color(g, g, g, a); }
+	public uint color(byte g) { return color(g, g, g, 255); }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void resize(int w, int h) 
+	{	// reset image size
+		if (_img == null) return;
+		Cairo.ImageSurface timg = new Cairo.ImageSurface(_img.Format, w, h);
+
+		// TODO: This doesn't do what it is supposed to yet !!!
+		// This is supposed to resize the image data.
+		// At the moment it just copies 
+		// FIX!!!
+
+		// If the internal image already exists, copy to the new one
+		using (Context g = new Context(timg)) {
+			g.SetSource(_img);
+			g.Paint ();
+		}
+		_img = timg;
+
+		_width = w;
+		_height = h;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void save(string path, bool force) 
+	{	// Save image to a file
+		if (_img == null) return;
+
+		// Check if exists and not to overwrite.
+		if (System.IO.File.Exists(path) == true && force == false) {
+			throw new Exception("That path already exists. Use save(path, True) to force the file to be overwritten.");
+		}
+
+		// Check extension
+		string ext = System.IO.Path.GetExtension(path).ToLower ();
+		ext = ext.Replace (".", "");
+		if (ext.Length == 0) {
+			throw new Exception("Image file must have a valid extension, such as .png or .jpg");
+		}
+
+		// Load image data into a pixbuf
+		loadPixels();
+
+		// Try to do the save
+		_pixbuf.Save (path, ext);
+
+	}
+	public void save(string path) { save(path, false); }
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 

@@ -2,7 +2,9 @@ from Processing import *
 
 window(500, 500)
 background(255)
-im = loadImage("blueslug.png")
+#im = loadImage("blueslug.png")
+im = loadImage("natura-morta.jpg")
+#im = loadImage("butterfly.gif")
 
 # Draw actual size with corner in upper left
 imageMode('CORNER')
