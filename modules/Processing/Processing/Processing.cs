@@ -8,6 +8,30 @@ using Gtk;
 
 //p.DashStyle = this.LineStyle;
 
+// ------------------ Shared Constants -----------------------------------
+internal enum EllipseMode
+{
+	CENTER = 0,
+	CORNER = 1,
+ 	RADIUS = 2,
+	CORNERS = 3
+}
+
+internal enum RectMode
+{
+	CENTER = 0,
+	CORNER = 1,
+	RADIUS = 2,
+	CORNERS = 3,
+}
+
+internal enum ImageMode
+{
+	CENTER = 0,
+	CORNER = 1,
+	CORNERS = 2,
+}
+
 // -------------------------------------------------------------------------
 public static class Processing
 {
@@ -16,6 +40,7 @@ public static class Processing
 	private static System.Timers.Timer _tmr = null;
 	private static int _guiThreadId = -1;						// Thread id of window. -1 means not assigned
 	private static Gdk.Pixbuf _pixbuf = null;					// Internal pixbuf used by loadPixels and updatePixels
+	private static List<PKnot> _shape = null;					// Cache of points for a shape under construction
 
 	private static int _width;									// Cache of window size
 	private static int _height;
@@ -40,6 +65,8 @@ public static class Processing
 	private delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
+
+	//public static int 
 
 	// String-constant maps
 	private static Dictionary<string, RectMode> _rectMode = new Dictionary<string,RectMode> () {
@@ -344,6 +371,46 @@ public static class Processing
             handler(null, e);
         }
     }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void beginShape() 
+	{	// Start a new shape
+		_shape = new List<PKnot>();
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void vertex(double x, double y)
+	{	// Add a simple vertex to a shape under construction
+		_shape.Add(new PKnot(x, y));
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void curveVertex(double x, double y)
+	{// TODO: Implement
+		vertex (x, y);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void bezierVertex(double cx1, double cy1, double cx2, double cy2, double x, double y)
+	{	// TODO: Implement
+		vertex (x, y);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void endShape(bool close)
+	{	// Finish up and render
+		if (_p == null) return;
+
+		_invoke ( delegate { 
+			try {
+				_p.spline( _shape, close );
+				if (_immediateMode) _p.redraw ();
+			} catch (Exception e) {
+				debug (String.Format ("endShape(): {0}", e.Message), 2);
+			}
+		} );
+	}
+	public static void endShape() { endShape (true); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static PImage createImage(int width, int height, string format) 
@@ -943,6 +1010,60 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double mag(double x, double y)
+	{	// Computes magnitude of a vector
+		return Math.Sqrt (x*x + y*y);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double dist(double x1, double y1, double x2, double y2)
+	{	// Computes the distance between two points
+		double dx = (x2 - x1);
+		double dy = (y2 - y1);
+		return mag (dx, dy);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double max(params double[] vals)
+	{	// Compute the maximum value of several numbers
+		double tmax = vals[0];
+		for (int i=1; i<vals.Length; i++) tmax = Math.Max (tmax, vals[i]);
+		return tmax;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double min(params double[] vals)
+	{	// Compute the minimum value of several numbers
+		double tmin = vals[0];
+		for (int i=1; i<vals.Length; i++) tmin = Math.Min (tmin, vals[i]);
+		return tmin;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int floor(double val)
+	{
+		return (int)Math.Floor (val);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int ceil(double val)
+	{
+		return (int)Math.Ceiling (val);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double round(double val)
+	{
+		return round (val, 0);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double round(double val, int ndigits)
+	{
+		return Math.Round (val, ndigits);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static double radians(double degrees)
 	{
 		return degrees * (3.14159265358979323846/180.0);
@@ -1098,31 +1219,6 @@ public static class Processing
 //			_p._img.Data[n+3] = b[3];
 //		}
 	}
-}
-
-
-// ------------------ Shared Constants -----------------------------------
-internal enum EllipseMode
-{
-	CENTER = 0,
-	CORNER = 1,
- 	RADIUS = 2,
-	CORNERS = 3
-}
-
-internal enum RectMode
-{
-	CENTER = 0,
-	CORNER = 1,
-	RADIUS = 2,
-	CORNERS = 3,
-}
-
-internal enum ImageMode
-{
-	CENTER = 0,
-	CORNER = 1,
-	CORNERS = 2,
 }
 
 // ------------------ PWindow ----------------------------------------------
@@ -1345,6 +1441,18 @@ public class PImage
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
+// ------------------ PKnot ----------------------------------------------
+internal class PKnot 
+{	// Class to hold knots in splines
+	public double x;
+	public double y;
+
+	public PKnot(double x, double y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
 // ------------------ PWindow ----------------------------------------------
 internal class PWindow : Gtk.Window
 {
@@ -1426,6 +1534,8 @@ internal class PWindow : Gtk.Window
 		if (_toStroke) {
 			if (_smooth) g.Antialias = Antialias.Subpixel;
 			g.Color = _strokeColor;
+			g.LineCap = _strokeCap;
+			g.LineJoin = _strokeJoin;
 			g.LineWidth = _strokeWeight;
 			g.Stroke ();
 		}
@@ -1801,7 +1911,7 @@ internal class PWindow : Gtk.Window
 			// Must return to uniform device space before stroking in order to prevent lines from being deformed by scaling.
 			g.Restore();
 
-			_fill2 (g);		// Use the non-filling variant of fill
+			_fill2 (g);		// Use the non-preserving variant of fill
 
 			// Do it again but only stroke the perimeter of the arc
 			g.Save();
@@ -1815,6 +1925,28 @@ internal class PWindow : Gtk.Window
 			// Must return to uniform device space before stroking in order to prevent lines from being deformed by scaling.
 			g.Restore();
 
+			_stroke (g);
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void spline(List<PKnot> knots, bool close) 
+	{	// Render a spline given a list of knots
+		if (knots.Count == 0) return;
+
+		using (Context g = new Context(_img)) {
+			g.Matrix = _mat;
+			g.Save();
+			
+			// Path
+			g.MoveTo(knots[0].x, knots[0].y);
+			for (int i=1; i<knots.Count; i++) {
+				g.LineTo(knots[i].x, knots[i].y);
+			}
+			if (close) g.ClosePath();
+			g.Restore();
+
+			_fill (g);
 			_stroke (g);
 		}
 	}
