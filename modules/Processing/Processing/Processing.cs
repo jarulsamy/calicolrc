@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Timers;
 using System.Threading;
 using System.Collections.Generic;
@@ -53,6 +54,12 @@ public static class Processing
 		{"CENTER", EllipseMode.CENTER},
 		{"RADIUS", EllipseMode.RADIUS},
 		{"CORNERS", EllipseMode.CORNERS}
+	};
+
+	private static Dictionary<string, ImageMode> _imageMode = new Dictionary<string,ImageMode> () {
+		{"CORNER", ImageMode.CORNER},
+		{"CENTER", ImageMode.CENTER},
+		{"CORNERS", ImageMode.CORNERS}
 	};
 
 	private static Dictionary<string, Cairo.LineCap> _strokeCap = new Dictionary<string,Cairo.LineCap> () {
@@ -333,6 +340,58 @@ public static class Processing
     }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static PImage loadImage(string path) 
+	{	// Load an image into the PImage object
+
+		PImage img = null;
+
+		// Make a complete path, if not rooted
+		if (!System.IO.Path.IsPathRooted(path)) {
+			path = System.IO.Path.Combine ( Directory.GetCurrentDirectory(), path );
+		}
+
+		// Check if the file exists
+		if (!File.Exists (path) ) {
+			println ("Error: Can't find image file at ", path);
+			return null;
+		}
+
+		// Check file type
+		if (System.IO.Path.GetExtension(path).ToLower () != ".png") {
+			println ("Error: File not a PNG image file");
+			return null;
+		}
+
+		try {
+			img = new PImage(path);
+		} catch (Exception e) {
+			println ("Error: ", e.Message);
+			return null;
+		}
+
+		return img;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void image(PImage img, double x, double y, double w, double h) 
+	{
+		// Draw the image
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.image (img, x, y, w, h);
+			} catch (Exception e) {
+				debug (String.Format ("image(): {0}", e.Message), 2);
+			}
+		} );
+	}
+
+	public static void image(PImage img, double x, double y)
+	{
+		image (img, x, y, img.width (), img.height ());
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void keepAbove(bool ku)
 	{	// Set flag to tell current window if to remain aboove all others
 		if (_p == null) return;
@@ -443,6 +502,12 @@ public static class Processing
 	public static void rectMode( string mode )
 	{
 		_invoke ( delegate { _p.rectMode (_rectMode[mode]); } );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void imageMode( string mode )
+	{
+		_invoke ( delegate { _p.imageMode (_imageMode[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1039,6 +1104,45 @@ internal enum RectMode
 	CORNERS = 3,
 }
 
+internal enum ImageMode
+{
+	CENTER = 0,
+	CORNER = 1,
+	CORNERS = 2,
+}
+
+// ------------------ PWindow ----------------------------------------------
+public class PImage
+{
+	// internal cache of loaded image
+	internal ImageSurface _img = null;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PImage(string path)
+	{
+		_img = new ImageSurface(path);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public int width() {
+		if (_img != null) {
+			return _img.Width;
+		}
+		return 0;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public int height() {
+		if (_img != null) {
+			return _img.Height;
+		}
+		return 0;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+}
+
 // ------------------ PWindow ----------------------------------------------
 internal class PWindow : Gtk.Window
 {
@@ -1058,6 +1162,7 @@ internal class PWindow : Gtk.Window
 	private LineJoin _strokeJoin = LineJoin.Round;				// Default line join
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
+	private static ImageMode _imageMode = ImageMode.CORNER;
 
 	private Matrix _mat = new Matrix();							// Cairo transform matrix. Init to identity.
 	private List<Matrix> _stack = new List<Matrix>();
@@ -1301,6 +1406,12 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void imageMode(ImageMode mode) 
+	{
+		_imageMode = mode;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void background(double r, double g, double b, double a) 
 	{	// Fill background with a color
 		using (Context cx = new Context(_img)) {
@@ -1504,6 +1615,44 @@ internal class PWindow : Gtk.Window
 
 			_stroke (g);
 		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void image(PImage img, double x, double y, double w, double h) 
+	{	// Render an image into the rectangle sepcified
+
+		// Calculate position and scale parameters based on image mode
+		double ww = img.width ();		// Default is CORNER
+		double hh = img.height ();
+		double sx = w/ww;
+		double sy = h/hh;
+
+		switch (_imageMode) {
+		case ImageMode.CENTER:
+			x = x - 0.5*w;
+			y = y - 0.5*h;
+			//sx = w/ww;		// Same as default
+			//sy = h/hh;
+			break;
+		case ImageMode.CORNERS:
+			// In this mode, w is x2, h is y2
+			sx = (w - x)/ww;
+			sy = (h - y)/hh;
+			break;
+		default: // ImageMode.CORNER:
+			break;
+		}
+
+		//Console.WriteLine ("{0} {1} {2} {3}", x, y, sx, sy);
+		using (Context g = new Context(_img)) {
+			g.Matrix = _mat;
+			g.Save ();
+			g.Translate (x, y);
+			g.Scale ( sx, sy );
+			img._img.Show (g, 0, 0);
+			g.Restore ();
+		}
+		redraw ();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
