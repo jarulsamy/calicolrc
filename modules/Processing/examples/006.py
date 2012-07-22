@@ -12,6 +12,8 @@ frameRate(1)
 # Function that will handle internal timer elapsed event
 def draw(o, e):
     line( random(600), random(400), random(600), random(400))
+    #println(frameCount())
+    #println(focused())
 
 def doMousePressed(o, e):
     global onLoop

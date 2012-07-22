@@ -54,6 +54,8 @@ public static class Processing
 	private static Gdk.Key _key;
 	private static uint _keyCode = 0;
 
+	private static long _millis;								// The number of milliseconds when the window was created
+
 	public static event ButtonPressEventHandler onMousePressed;	// Mouse events
 	public static event ButtonReleaseEventHandler onMouseReleased;
 	public static event MotionNotifyEventHandler onMouseMoved;
@@ -66,45 +68,68 @@ public static class Processing
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
-	//public static int 
+	// Constants
+	public static readonly int CENTER = 0;
+	public static readonly int CORNER = 1;
+	public static readonly int RADIUS = 2;
+	public static readonly int CORNERS = 3;
+	public static readonly int SQUARE = 4;
+	public static readonly int ROUND = 5;
+	public static readonly int PROJECT = 6;
+	public static readonly int BEVEL = 7;
+	public static readonly int MITER = 8;
+	public static readonly int RGB = 9;
+	public static readonly int ARGB = 10;
+	public static readonly int ALPHA = 11;
 
 	// String-constant maps
-	private static Dictionary<string, RectMode> _rectMode = new Dictionary<string,RectMode> () {
-		{"CORNER", RectMode.CORNER},
-		{"CENTER", RectMode.CENTER},
-		{"RADIUS", RectMode.RADIUS},
-		{"CORNERS", RectMode.CORNERS}
+	private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
+		{"CORNER", RectMode.CORNER}, {"CENTER", RectMode.CENTER}, {"RADIUS", RectMode.RADIUS}, {"CORNERS", RectMode.CORNERS}
 	};
 
-	private static Dictionary<string, EllipseMode> _ellipseMode = new Dictionary<string,EllipseMode> () {
-		{"CORNER", EllipseMode.CORNER},
-		{"CENTER", EllipseMode.CENTER},
-		{"RADIUS", EllipseMode.RADIUS},
-		{"CORNERS", EllipseMode.CORNERS}
+	private static Dictionary<string, EllipseMode> _ellipseModeStr = new Dictionary<string,EllipseMode> () {
+		{"CORNER", EllipseMode.CORNER}, {"CENTER", EllipseMode.CENTER}, {"RADIUS", EllipseMode.RADIUS}, {"CORNERS", EllipseMode.CORNERS}
 	};
 
-	private static Dictionary<string, ImageMode> _imageMode = new Dictionary<string,ImageMode> () {
-		{"CORNER", ImageMode.CORNER},
-		{"CENTER", ImageMode.CENTER},
-		{"CORNERS", ImageMode.CORNERS}
+	private static Dictionary<string, ImageMode> _imageModeStr = new Dictionary<string,ImageMode> () {
+		{"CORNER", ImageMode.CORNER}, {"CENTER", ImageMode.CENTER}, {"CORNERS", ImageMode.CORNERS}
 	};
 
-	private static Dictionary<string, Cairo.LineCap> _strokeCap = new Dictionary<string,Cairo.LineCap> () {
-		{"SQUARE", LineCap.Butt},
-		{"ROUND", LineCap.Round},
-		{"PROJECT", LineCap.Square}
+	private static Dictionary<string, Cairo.LineCap> _strokeCapStr = new Dictionary<string,Cairo.LineCap> () {
+		{"SQUARE", LineCap.Butt}, {"ROUND", LineCap.Round}, {"PROJECT", LineCap.Square}
 	};
 
-	private static Dictionary<string, Cairo.LineJoin> _strokeJoin = new Dictionary<string,Cairo.LineJoin> () {
-		{"BEVEL", LineJoin.Bevel},
-		{"ROUND", LineJoin.Round},
-		{"MITER", LineJoin.Miter}
+	private static Dictionary<string, Cairo.LineJoin> _strokeJoinStr = new Dictionary<string,Cairo.LineJoin> () {
+		{"BEVEL", LineJoin.Bevel}, {"ROUND", LineJoin.Round}, {"MITER", LineJoin.Miter}
 	};
 
-	private static Dictionary<string, Cairo.Format> _imageFormat = new Dictionary<string, Format>() {
-		{"RGB", Format.RGB24},
-		{"ARGB", Format.ARGB32},
-		{"ALPHA", Format.A8}	//grayscale alpha channel
+	private static Dictionary<string, Cairo.Format> _imageFormatStr = new Dictionary<string, Format>() {
+		{"RGB", Format.RGB24}, {"ARGB", Format.ARGB32}, {"ALPHA", Format.A8}	//grayscale alpha channel
+	};
+
+	// Integer-constant maps
+	private static Dictionary<int, RectMode> _rectModeInt = new Dictionary<int,RectMode> () {
+		{CORNER, RectMode.CORNER}, {CENTER, RectMode.CENTER}, {RADIUS, RectMode.RADIUS}, {CORNERS, RectMode.CORNERS}
+	};
+
+	private static Dictionary<int, EllipseMode> _ellipseModeInt = new Dictionary<int,EllipseMode> () {
+		{CORNER, EllipseMode.CORNER}, {CENTER, EllipseMode.CENTER}, {RADIUS, EllipseMode.RADIUS}, {CORNERS, EllipseMode.CORNERS}
+	};
+
+	private static Dictionary<int, ImageMode> _imageModeInt = new Dictionary<int,ImageMode> () {
+		{CORNER, ImageMode.CORNER}, {CENTER, ImageMode.CENTER}, {CORNERS, ImageMode.CORNERS}
+	};
+
+	private static Dictionary<int, Cairo.LineCap> _strokeCapInt = new Dictionary<int,Cairo.LineCap> () {
+		{SQUARE, LineCap.Butt}, {ROUND, LineCap.Round}, {PROJECT, LineCap.Square}
+	};
+
+	private static Dictionary<int, Cairo.LineJoin> _strokeJoinInt = new Dictionary<int,Cairo.LineJoin> () {
+		{BEVEL, LineJoin.Bevel}, {ROUND, LineJoin.Round}, {MITER, LineJoin.Miter}
+	};
+
+	private static Dictionary<int, Cairo.Format> _imageFormatInt = new Dictionary<int, Format>() {
+		{RGB, Format.RGB24}, {ARGB, Format.ARGB32}, {ALPHA, Format.A8}
 	};
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -142,6 +167,8 @@ public static class Processing
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
 
+		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+
 		// This hangs when used with Jigsaw. Why?	
 		ev.WaitOne();
 	}
@@ -170,6 +197,9 @@ public static class Processing
 
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
+
+		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -200,6 +230,8 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
+
+		_millis = 0;
 
 		_p = null;
 	}
@@ -385,14 +417,14 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void curveVertex(double x, double y)
-	{// TODO: Implement
-		vertex (x, y);
+	public static void bezierVertex(double cx1, double cy1, double cx2, double cy2, double x, double y)
+	{	// Add a bezier vertex to a shape under construction
+		_shape.Add(new PBezierKnot(x, y, cx1, cy1, cx2, cy2));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void bezierVertex(double cx1, double cy1, double cx2, double cy2, double x, double y)
-	{	// TODO: Implement
+	public static void curveVertex(double x, double y)
+	{// TODO: Implement
 		vertex (x, y);
 	}
 
@@ -406,7 +438,7 @@ public static class Processing
 				_p.spline( _shape, close );
 				if (_immediateMode) _p.redraw ();
 			} catch (Exception e) {
-				debug (String.Format ("endShape(): {0}", e.Message), 2);
+				debug (String.Format ("endShape(): {0}", e.Message), 1);
 			}
 		} );
 	}
@@ -414,20 +446,39 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static PImage createImage(int width, int height, string format) 
-	{	// Create a new PImage object
+	{	// Create a new PImage object given a string format
 
 		// Validate the format string
-		if (!_imageFormat.ContainsKey(format)) {
-			string[] skeys = new string[_imageFormat.Count];
-			_imageFormat.Keys.CopyTo(skeys, 0);
+		if (!_imageFormatStr.ContainsKey(format)) {
+			string[] skeys = new string[_imageFormatStr.Count];
+			_imageFormatStr.Keys.CopyTo(skeys, 0);
 			string jskeys = String.Join (", ", skeys);
 			string msg = String.Format ("Unrecognized image format: '{0}'. Try {1}", format, jskeys);
 			debug (msg, 2);
 			return null;
 		}
+		Format frmt = _imageFormatStr[format];
 
 		// Create the image
-		Format frmt = _imageFormat[format];
+		return new PImage(width, height, frmt);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static PImage createImage(int width, int height, int format) 
+	{	// Create a new PImage object given an integer format
+
+		// Validate the format int
+		if (!_imageFormatInt.ContainsKey(format)) {
+			string[] skeys = new string[_imageFormatStr.Count];
+			_imageFormatStr.Keys.CopyTo(skeys, 0);
+			string jskeys = String.Join (", ", skeys);
+			string msg = String.Format ("Unrecognized image format: '{0}'. Try {1}", format, jskeys);
+			debug (msg, 2);
+			return null;
+		}
+		Format frmt = _imageFormatInt[format];
+
+		// Create the image
 		return new PImage(width, height, frmt);
 	}
 
@@ -463,7 +514,7 @@ public static class Processing
 			try {
 				_p.image (img, x, y, w, h);
 			} catch (Exception e) {
-				debug (String.Format ("image(): {0}", e.Message), 2);
+				debug (String.Format ("image(): {0}", e.Message), 1);
 			}
 		} );
 	}
@@ -480,6 +531,20 @@ public static class Processing
 				debug(String.Format ("keepAbove() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		});
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static bool focused()
+	{	// Check if window has focus
+		if (_p == null) return false;
+		return _p.focused;			// Should this be invoked on GUI thread?
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static long frameCount()
+	{	// Return the number of times the exposed event was fired by the PWindow
+		if (_p == null) return 0;
+		return _p.frameCount;			// Should this be invoked on GUI thread?
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -573,31 +638,51 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void ellipseMode( string mode )
 	{
-		_invoke ( delegate { _p.ellipseMode (_ellipseMode[mode]); } );
+		_invoke ( delegate { _p.ellipseMode (_ellipseModeStr[mode]); } );
 	}
-	
+	public static void ellipseMode( int mode )
+	{
+		_invoke ( delegate { _p.ellipseMode (_ellipseModeInt[mode]); } );
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void rectMode( string mode )
 	{
-		_invoke ( delegate { _p.rectMode (_rectMode[mode]); } );
+		_invoke ( delegate { _p.rectMode (_rectModeStr[mode]); } );
+	}
+	public static void rectMode( int mode )
+	{
+		_invoke ( delegate { _p.rectMode (_rectModeInt[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void imageMode( string mode )
 	{
-		_invoke ( delegate { _p.imageMode (_imageMode[mode]); } );
+		_invoke ( delegate { _p.imageMode (_imageModeStr[mode]); } );
+	}
+	public static void imageMode( int mode )
+	{
+		_invoke ( delegate { _p.imageMode (_imageModeInt[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void strokeCap( string style )
 	{
-		_invoke ( delegate { _p.strokeCap (_strokeCap[style]); } );
+		_invoke ( delegate { _p.strokeCap (_strokeCapStr[style]); } );
+	}
+	public static void strokeCap( int style )
+	{
+		_invoke ( delegate { _p.strokeCap (_strokeCapInt[style]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void strokeJoin( string style )
 	{
-		_invoke ( delegate { _p.strokeJoin (_strokeJoin[style]); } );
+		_invoke ( delegate { _p.strokeJoin (_strokeJoinStr[style]); } );
+	}
+	public static void strokeJoin( int style )
+	{
+		_invoke ( delegate { _p.strokeJoin (_strokeJoinInt[style]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -608,7 +693,7 @@ public static class Processing
 			try {
 				_p.redraw ();
 			} catch (Exception e) {
-				debug (String.Format ("redraw: {0}", e.Message), 2);
+				debug (String.Format ("redraw: {0}", e.Message), 1);
 			}
 		} );
 	}
@@ -650,6 +735,55 @@ public static class Processing
 	public static double frameRate()
 	{	// Gets timer interval
 		return _tmr.Interval;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static long millis()
+	{	// Gets the number of milliseconds the window has existed, if there is one
+		if (_p == null) return 0;
+		return (DateTime.Now.Ticks * 10000 - _millis);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int second()
+	{	// Gets the number of seconds on the system clock [0, 59]
+		if (_p == null) return 0;
+		return DateTime.Now.Second;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int minute()
+	{	// Gets the number of minutes on the system clock [0, 59]
+		if (_p == null) return 0;
+		return DateTime.Now.Minute;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int hour()
+	{	// Gets the number of hours on the system clock [0, 24]
+		if (_p == null) return 0;
+		return DateTime.Now.Hour;
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int day()
+	{	// Gets the number of days on the system clock [1, 31]
+		if (_p == null) return 0;
+		return DateTime.Now.Day;
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int month()
+	{	// Gets the number of months on the system clock [1, 12]
+		if (_p == null) return 0;
+		return DateTime.Now.Month;
+	}
+		
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static int year()
+	{	// Gets the year
+		if (_p == null) return 0;
+		return DateTime.Now.Year;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -806,7 +940,7 @@ public static class Processing
 			try {
 				_p.popMatrix ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("popMatrix() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("popMatrix() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -819,7 +953,7 @@ public static class Processing
 			try {
 				_p.resetMatrix ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("resetMatrix() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("resetMatrix() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -832,7 +966,7 @@ public static class Processing
 			try {
 				_p.translate (tx, ty);
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("translate() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("translate() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -845,7 +979,7 @@ public static class Processing
 			try {
 				_p.scale (sx, sy);
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("scale() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("scale() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -859,7 +993,7 @@ public static class Processing
 			try {
 				_p.rotate (a);
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("rotate() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("rotate() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -891,7 +1025,7 @@ public static class Processing
 				_p.point(x, y);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("point() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("point() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -906,7 +1040,7 @@ public static class Processing
 				_p.line(x1, y1, x2, y2);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("line() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("line() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -921,7 +1055,7 @@ public static class Processing
 				_p.ellipse(x, y, w, h);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("ellipse() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("ellipse() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -935,7 +1069,7 @@ public static class Processing
 				_p.arc(x, y, w, h, start, stop);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("arc() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("arc() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -950,7 +1084,7 @@ public static class Processing
 				_p.rect(x, y, w, h);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("rect() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("rect() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -964,7 +1098,7 @@ public static class Processing
 				_p.triangle(x1, y1, x2, y2, x3, y3);
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
-				if (_debugLevel > 1) Console.WriteLine ("triangle() ignored extra tick: {0}", e.ToString());
+				debug ( String.Format("triangle() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -1441,16 +1575,54 @@ public class PImage
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
-// ------------------ PKnot ----------------------------------------------
+// ------------------ PKnot support ---------------------------------------
+internal enum PKnotType {
+	VERTEX, CURVE, BEZIER
+}
+
 internal class PKnot 
 {	// Class to hold knots in splines
 	public double x;
 	public double y;
+	public PKnotType type;
 
-	public PKnot(double x, double y) {
+	public PKnot(double x, double y, PKnotType type) {
 		this.x = x;
 		this.y = y;
+		this.type = type;
 	}
+	public PKnot(double x, double y) : this(x, y, PKnotType.VERTEX) {}
+
+	public virtual void draw(Context g) {
+		g.LineTo(x, y);
+	}
+}
+
+internal class PBezierKnot : PKnot
+{	// Bezier knot
+	public double cx1, cy1, cx2, cy2;
+
+	public PBezierKnot(double x, double y, double cx1, double cy1, double cx2, double cy2) 
+		: base(x, y) {
+		this.cx1 = cx1;
+		this.cy1 = cy1;
+		this.cx2 = cx2;
+		this.cy2 = cy2;
+	}
+
+	public override void draw(Context g) {
+		g.CurveTo (cx1, cy1, cx2, cy2, x, y);
+	}
+}
+
+internal class PCurveKnot : PKnot
+{	// Curve knot
+	public PCurveKnot(double x, double y) : base(x, y) {}
+
+	// TODO: Implement this method
+//	public override void draw(Context g) {
+//		g.CurveTo (cx1, cy1, cx2, cy2, x, y);
+//	}
 }
 
 // ------------------ PWindow ----------------------------------------------
@@ -1462,6 +1634,7 @@ internal class PWindow : Gtk.Window
 
 	private double _width;										// Internal cache of window size
 	private double _height;
+	private long _frameCount;									// Count the number of times the expose event was fired
 	private bool _smooth = false;								// True if to perform subpixel smoothing
 	private bool _toFill = true;								// True if to fill a shape
 	private Color _fillColor = new Color(1.0, 1.0, 1.0);		// Current fill color
@@ -1483,6 +1656,7 @@ internal class PWindow : Gtk.Window
 	public PWindow (int w, int h, bool needsQuit ) : base(WindowType.Toplevel)
 	{
 		_needsQuit = needsQuit;
+		_frameCount = 0;
 
 		// Create window with drawing area
 		this.size(w, h);
@@ -1526,6 +1700,7 @@ internal class PWindow : Gtk.Window
 			g.SetSource(_img);
 			g.Paint ();
 		}
+		_frameCount++;		// Count the number of frames 
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1685,6 +1860,22 @@ internal class PWindow : Gtk.Window
 	{	// Reset the current transformation matrix to the identity matrix
 		_mat.InitIdentity();
 		_stack.Clear ();
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public bool focused
+	{	// True if window is focused
+		get {
+			return this.HasToplevelFocus;
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public long frameCount
+	{	// Return the number of times the expose event fired on this window
+		get {
+			return _frameCount;
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1940,10 +2131,11 @@ internal class PWindow : Gtk.Window
 			
 			// Path
 			g.MoveTo(knots[0].x, knots[0].y);
-			for (int i=1; i<knots.Count; i++) {
-				g.LineTo(knots[i].x, knots[i].y);
+			for (int i=1; i<knots.Count; i++) knots[i].draw (g);
+			if (close) {
+				knots[0].draw (g);
+				g.ClosePath();
 			}
-			if (close) g.ClosePath();
 			g.Restore();
 
 			_fill (g);

@@ -2,7 +2,7 @@ from Processing import *
 
 window(600, 400)    # Create a window
 background(200)     # Color background
-ellipseMode("CENTER")
+ellipseMode(CENTER)
 
 def draw(o,e):
     background(200)

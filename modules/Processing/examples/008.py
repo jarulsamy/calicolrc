@@ -3,7 +3,7 @@ from Processing import *
 window(500, 500)
 
 # Create a new image
-im = createImage(100, 100, "ARGB")
+im = createImage(100, 100, ARGB)
 
 # Modify its pixels
 im.loadPixels()
@@ -13,7 +13,7 @@ for i in range(100):
 im.updatePixels()
 
 # Draw it to the window
-image(im, 0, 0)
+image(im, 100, 100)
 
 # Save it to a file - only "png" and "jpeg" are supported
 im.save("test.jpeg", True)

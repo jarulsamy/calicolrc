@@ -13,7 +13,7 @@ def happyFace( x, y, diam ):
     fill(255, 255, 0)
     stroke(0)
     strokeWeight(2)
-    ellipseMode('CENTER')
+    ellipseMode(CENTER)
     ellipse(x, y, diam, diam )
 
     # Smile

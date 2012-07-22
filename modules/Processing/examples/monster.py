@@ -18,7 +18,7 @@ arc(107, 200, 14, 160, PI, 2*PI)
 arc(293, 200, 14, 165, PI, 2*PI)
 # Face is made up of four quads, so we will use arcs to draw them
 # Quad1
-ellipseMode('CENTER')
+ellipseMode(CENTER)
 fill(242, 111, 10)
 arc(200, 200, 200, 120, 0, PI/2.0)
 

@@ -6,7 +6,7 @@ smooth()
 
 # Head
 fill(0)
-ellipseMode('CENTER')
+ellipseMode(CENTER)
 ellipse(200, 160, 60, 80)
 
 # eyes
