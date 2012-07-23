@@ -53,8 +53,8 @@ public static class Processing
 	private static bool _keyPressed = false;
 	private static Gdk.Key _key;
 	private static uint _keyCode = 0;
-
 	private static long _millis;								// The number of milliseconds when the window was created
+	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
 	public static event ButtonPressEventHandler onMousePressed;	// Mouse events
 	public static event ButtonReleaseEventHandler onMouseReleased;
@@ -66,7 +66,6 @@ public static class Processing
 
 	private delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
-	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
 	// Constants
 	public static readonly int CENTER = 0;
@@ -177,6 +176,17 @@ public static class Processing
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
 
+		// Reset all internal state variables
+		_mouseX = 0.0;
+		_mouseY = 0.0;
+		_pmouseX = 0.0;
+		_pmouseY = 0.0;
+		_mousePressed = false;
+		_mouseButton = 0;
+		_keyPressed = false;
+		 _key = (Gdk.Key)0;
+		_keyCode = 0;
+		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 
 		// This hangs when used with Jigsaw. Why?	
@@ -215,7 +225,17 @@ public static class Processing
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
 
-		// Reset parameters
+		// Reset all internal state variables
+		_mouseX = 0.0;
+		_mouseY = 0.0;
+		_pmouseX = 0.0;
+		_pmouseY = 0.0;
+		_mousePressed = false;
+		_mouseButton = 0;
+		_keyPressed = false;
+		 _key = (Gdk.Key)0;
+		_keyCode = 0;
+		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 	}
 
@@ -248,7 +268,6 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
-
 		_millis = 0;
 
 		_p = null;
@@ -1465,7 +1484,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void loadPixels() 
+	public static void loadPixels()
 	{	// Copy pixels from current image to pixels array
 		if (_p == null) return;
 		if (_p._img  == null) return;
@@ -1474,33 +1493,42 @@ public static class Processing
 		Gdk.Pixbuf pixbuf = null;
 
 		_invoke ( delegate {
-			try {
-				// Create a new pixmap and context
-				Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, _p.GdkWindow.Depth);
-				using (Context ctx = Gdk.CairoHelper.Create(pm)) {
+			if (_p != null) {
+				Context g = null;
+				try {
+					// Create a new pixmap and context
+					Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, _p.GdkWindow.Depth);
+					//using (Context ctx = Gdk.CairoHelper.Create(pm)) {
+					g = Gdk.CairoHelper.Create(pm);
 					// Paint internal Cairo image onto pixmap
-					ctx.SetSourceSurface (_p._img, 0, 0);
-					ctx.Paint ();
+					g.SetSourceSurface (_p._img, 0, 0);
+					g.Paint ();
+					//}
+					((IDisposable) g).Dispose();
+					 g = null;
+
+					// Convert pixmap to pixbuf
+					Gdk.Colormap colormap = pm.Colormap;
+					pixbuf = Gdk.Pixbuf.FromDrawable (pm, colormap, 0, 0, 0, 0, _width, _height);
+
+					// Creates a pixbuf from window
+		//			Gdk.Drawable drawable = _p.GdkWindow;			// Gets data from window, not internal image. Causes problem when another window on top.
+		//			Gdk.Colormap colormap = drawable.Colormap;
+		//			int w = 0;
+		//			int h = 0;
+		//			drawable.GetSize (out w, out h);
+		//			pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, w, h);
+
+				} catch (Exception ex) {
+					if (g != null) ((IDisposable) g).Dispose();
+					g = null;
+					debug ("Processing.loadPixels(): " + ex.Message, 2);
 				}
-
-				// Convert pixmap to pixbuf
-				Gdk.Colormap colormap = pm.Colormap;
-				pixbuf = Gdk.Pixbuf.FromDrawable (pm, colormap, 0, 0, 0, 0, _width, _height);
-
-				// Creates a pixbuf from window
-	//			Gdk.Drawable drawable = _p.GdkWindow;			// Gets data from window, not internal image. Causes problem when another window on top.
-	//			Gdk.Colormap colormap = drawable.Colormap;
-	//			int w = 0;
-	//			int h = 0;
-	//			drawable.GetSize (out w, out h);
-	//			pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, w, h);
-
-			} catch (Exception ex) {
-				debug (ex.Message, 2);
 			}
 			ev.Set ();
 		});
 		ev.WaitOne ();
+
 		if (pixbuf != null) {
 			_pixbuf = pixbuf;
 			if (!_pixbuf.HasAlpha) {
@@ -1512,24 +1540,46 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void updatePixels() 
 	{	// Copy pixels from pixbuf to image
-		if (_p == null) return;
-		if (_p._img  == null) return;
-		if (_pixbuf == null) return;
+		try
+		{
+			if (_p == null) return;
+			if (_p._img  == null) return;
+			if (_pixbuf == null) return;
 
-		ManualResetEvent ev = new ManualResetEvent (false);
-		_invoke ( delegate {
-			try {
-				using (Context g = new Cairo.Context(_p._img)) {
-					Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
-					g.Paint ();
+			ManualResetEvent ev = new ManualResetEvent (false);
+			_invoke ( delegate {
+				if (_p != null && _pixbuf != null) {
+					Context g = null;
+					try {
+						//using (Context g = new Cairo.Context(_p._img)) {
+						g = new Cairo.Context(_p._img);
+						Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
+						g.Paint ();
+						//}
+						((IDisposable) g).Dispose();
+						g = null;
+						if (_immediateMode) _p.redraw ();
+					} catch (Exception ex) {
+						if (g != null) ((IDisposable) g).Dispose();
+						g = null;
+						debug ( "updatePixels(): " + ex.Message, 2);
+					}
+
+//					try
+//					{
+//						_p._updatePixels(_pixbuf, _immediateMode);
+//
+//					} catch (Exception ex) {
+//						Console.WriteLine ("Processing.updatePixels(): " + ex.Message);
+//					}
 				}
-				_p.redraw ();
-			} catch (Exception ex) {
-				debug ( ex.Message, 2);
-			}
-			ev.Set ();
-		});
-		ev.WaitOne ();
+				
+				ev.Set ();
+			});
+			ev.WaitOne ();
+		} catch (Exception ex) {
+			Console.WriteLine ("Processing.updatePixels: " + ex.Message);
+		}
 
 //		int nPixels = _width * _height;
 //		for (int i=0; i<nPixels; i++) {
@@ -1901,6 +1951,28 @@ internal class PWindow : Gtk.Window
 			g.Fill ();
 		}
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	internal void _updatePixels(Gdk.Pixbuf _pixbuf, bool _immediateMode)
+//	{
+//		//Console.WriteLine ("in _p._updatePixels");
+//		Context g = null;
+//		try {
+//			//using (Context g = new Cairo.Context(_p._img)) {
+//			g = new Cairo.Context(_img);
+//			Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
+//			g.Paint ();
+//			//}
+//			((IDisposable) g).Dispose();
+//			g = null;
+//			if (_immediateMode) redraw ();
+//		} catch (Exception ex) {
+//			if (g != null) ((IDisposable) g).Dispose();
+//			g = null;
+//			Console.WriteLine ( "PWindow.updatePixels(): " + ex.Message);
+//		}
+//		//Console.WriteLine ("out _p._updatePixels");
+//	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void redraw() 
@@ -2437,7 +2509,7 @@ internal class PWindow : Gtk.Window
 			img._img.Show (g, 0, 0);
 			g.Restore ();
 		}
-		redraw ();
+		this.QueueDraw ();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

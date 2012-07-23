@@ -4,8 +4,6 @@
 
 from Processing import *
 
-PI = 3.1415926
-
 window(400, 400)
 background(188, 183, 8)
 smooth()
