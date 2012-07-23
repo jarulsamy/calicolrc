@@ -2,6 +2,7 @@ from Processing import *
 
 window(500, 300)
 background(0, 0, 200)
+immediateMode(False)
 
 def noise():
     background(0, 0, 200)
@@ -14,4 +15,8 @@ def noise():
     delay(1)
 
 for i in range(1000):
-    noise()
+    try:
+        noise()
+    except:
+        print("Woops")
+        break

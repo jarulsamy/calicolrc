@@ -81,6 +81,11 @@ public static class Processing
 	public static readonly int RGB = 9;
 	public static readonly int ARGB = 10;
 	public static readonly int ALPHA = 11;
+	public static readonly bool CLOSE = true;
+	public static readonly double PI = 3.141592653589793238;
+	public static readonly double HALF_PI = 0.5*Processing.PI;
+	public static readonly double QUARTER_PI = 0.25*Processing.PI;
+	public static readonly double TWO_PI = 2.0*Processing.PI;
 
 	// String-constant maps
 	private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
@@ -154,6 +159,11 @@ public static class Processing
 			_p._cvs.KeyPressEvent += _onKeyPressEvent;
 			_p._cvs.KeyReleaseEvent += _onKeyReleaseEvent;
 			_p.windowClosed += _onWindowClosed;
+
+			_p.rectMode ( RectMode.CORNER );
+			_p.ellipseMode ( EllipseMode.CENTER );
+			_p.imageMode ( ImageMode.CORNER );
+
 			_p.ShowAll ();
 
 			ev.Set ();
@@ -187,7 +197,14 @@ public static class Processing
 		_p._cvs.ButtonPressEvent += _onButtonPressEvent;
 		_p._cvs.ButtonReleaseEvent += _onButtonReleaseEvent;
 		_p._cvs.MotionNotifyEvent += _onMotionNotifyEvent;
+		_p._cvs.KeyPressEvent += _onKeyPressEvent;
+		_p._cvs.KeyReleaseEvent += _onKeyReleaseEvent;
 		_p.windowClosed += _onWindowClosed;
+
+		_p.rectMode ( RectMode.CORNER );
+		_p.ellipseMode ( EllipseMode.CENTER );
+		_p.imageMode ( ImageMode.CORNER );
+
 		_p.ShowAll ();
 
 		// Set up helper objects
@@ -198,8 +215,8 @@ public static class Processing
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
 
+		// Reset parameters
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
-
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -207,6 +224,7 @@ public static class Processing
 	{	// PWindow was closed on its own. Clean up.
 		_cleanup ();
 		e.RetVal = false;
+		//throw new Exception("Window closed");
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -413,36 +431,53 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void vertex(double x, double y)
 	{	// Add a simple vertex to a shape under construction
-		_shape.Add(new PKnot(x, y));
+		_shape.Add(new PKnot(x, y, PKnotType.VERTEX));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void bezierVertex(double cx1, double cy1, double cx2, double cy2, double x, double y)
 	{	// Add a bezier vertex to a shape under construction
-		_shape.Add(new PBezierKnot(x, y, cx1, cy1, cx2, cy2));
+		_shape.Add(new PKnot(x, y, cx1, cy1, cx2, cy2, PKnotType.BEZIER));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void curveVertex(double x, double y)
-	{// TODO: Implement
-		vertex (x, y);
+	{	// Add a curve vertex to the shape
+		_shape.Add(new PKnot(x, y, PKnotType.CURVE));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void endShape(bool close)
-	{	// Finish up and render
+	public static void curveTightness(double tightness)
+	{
 		if (_p == null) return;
 
 		_invoke ( delegate { 
 			try {
-				_p.spline( _shape, close );
+				_p.curveTightness(tightness);
+			} catch (Exception e) {
+				debug (String.Format ("curveTightness(): {0}", e.Message), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void endShape(bool toClose)
+	{	// Finish up and render
+		if (_p == null) return;
+
+		ManualResetEvent ev = new ManualResetEvent(false);
+		_invoke ( delegate { 
+			try {
+				_p.spline( _shape, toClose );
 				if (_immediateMode) _p.redraw ();
+				ev.Set ();
 			} catch (Exception e) {
 				debug (String.Format ("endShape(): {0}", e.Message), 1);
 			}
 		} );
+		ev.WaitOne();
 	}
-	public static void endShape() { endShape (true); }
+	public static void endShape() { endShape (false); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static PImage createImage(int width, int height, string format) 
@@ -604,16 +639,20 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void size(int w, int h) 
 	{	// Set window size
-		if (_p == null) return;
 
-		ManualResetEvent ev = new ManualResetEvent(false);
-		_invoke ( delegate {
-			_p.size(w, h);
-			ev.Set ();
-		} );
-		_width = w;
-		_height = h;
-		ev.WaitOne();
+		// If no window, create one of the proper size
+		if (_p == null) {
+			window(w, h);
+		} else {
+			ManualResetEvent ev = new ManualResetEvent(false);
+			_invoke ( delegate {
+				_p.size(w, h);
+				ev.Set ();
+			} );
+			_width = w;
+			_height = h;
+			ev.WaitOne();
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -813,12 +852,12 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void print(params object[] items) 
-	{	// Print a message to the console
-		string[] sitems = new string[items.Length];
-		for (int i=0; i<items.Length; i++) sitems[i] = items[i].ToString ();
-		Console.Write ( String.Join(" ", sitems) );
-	}
+//	public static void print(params object[] items) 
+//	{	// Print a message to the console
+//		string[] sitems = new string[items.Length];
+//		for (int i=0; i<items.Length; i++) sitems[i] = items[i].ToString ();
+//		Console.Write ( String.Join(" ", sitems) );
+//	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void println(params object[] items) 
@@ -1002,7 +1041,6 @@ public static class Processing
 	public static void background(double r, double g, double b, double a) 
 	{	// Fill the background of the window
 		if (_p == null) return;
-		//Application.Invoke ( delegate {
 		_invoke ( delegate { 
 			try {
 				_p.background(r, g, b, a);
@@ -1208,6 +1246,15 @@ public static class Processing
 	{
 		return radians * (180.0/3.14159265358979323846);
 	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static uint color(byte r, byte g, byte b, byte a)
+	{	// Create color from color byte components
+		 return (uint)( b | (g << 8) | (r << 16) | (a << 24));
+	}
+	public static uint color(byte r, byte g, byte b) { return color(r, g, b, 255); }
+	public static uint color(byte g, byte a) { return color(g, g, g, a); }
+	public static uint color(byte g) { return color(g, g, g, 255); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static byte blue(uint c)
@@ -1234,17 +1281,156 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static uint color(byte r, byte g, byte b, byte a)
-	{	// Create color from color byte components
-		 return (uint)( b | (g << 8) | (r << 16) | (a << 24));
+	private static void _HSB2color( float hu, float sa, float br, out uint c)
+	{	// Build an RGBA color from hue saturation and brightness
+
+		// Adapted from http://www.unifycommunity.com/wiki/index.php?title=HSBColor
+        float r = br;
+        float g = br;
+        float b = br;
+
+        if (sa != 0)
+        {
+            float max = br;
+            float dif = br * sa;
+            float min = br - dif;
+
+            float h = hu * 360f;
+
+            if (h < 60f)
+            {
+                r = max;
+                g = h * dif / 60f + min;
+                b = min;
+            }
+            else if (h < 120f)
+            {
+                r = -(h - 120f) * dif / 60f + min;
+                g = max;
+                b = min;
+            }
+            else if (h < 180f)
+            {
+                r = min;
+                g = max;
+                b = (h - 120f) * dif / 60f + min;
+            }
+            else if (h < 240f)
+            {
+                r = min;
+                g = -(h - 240f) * dif / 60f + min;
+                b = max;
+            }
+            else if (h < 300f)
+            {
+                r = (h - 240f) * dif / 60f + min;
+                g = min;
+                b = max;
+            }
+            else if (h <= 360f)
+            {
+                r = max;
+                g = min;
+                b = -(h - 360f) * dif / 60 + min;
+            }
+            else
+            {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+        }
+
+		byte rbyte = (byte)(constrain (r, 0.0, 1.0)*255);
+		byte gbyte = (byte)(constrain (g, 0.0, 1.0)*255);
+		byte bbyte = (byte)(constrain (b, 0.0, 1.0)*255);
+		c = color (rbyte, gbyte, bbyte, 255);
 	}
-	public static uint color(byte r, byte g, byte b) { return color(r, g, b, 255); }
-	public static uint color(byte g, byte a) { return color(g, g, g, a); }
-	public static uint color(byte g) { return color(g, g, g, 255); }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void _color2HSB( uint c, out float hu, out float sa, out float br, out float al)
+	{	// Extract hue, saturation, brightness and alpha elements from an RGB color
+
+		float r = red (c);
+		float g = green (c);
+		float b = blue (c);
+		float a = alpha (c);
+
+		// Adapted from http://www.unifycommunity.com/wiki/index.php?title=HSBColor
+
+        hu = 0.0f;
+		sa = 0.0f;
+		br = 0.0f;
+		al = a;
+
+        float max = Math.Max(r, Math.Max(g, b));
+
+        if (max <= 0) return;
+
+        float min = Math.Min(r, Math.Min(g, b));
+        float dif = max - min;
+
+        if (max > min)
+        {
+            if (g == max)
+            {
+                hu = (b - r) / dif * 60f + 120f;
+            }
+            else if (b == max)
+            {
+                hu = (r - g) / dif * 60f + 240f;
+            }
+            else if (b > g)
+            {
+                hu = (g - b) / dif * 60f + 360f;
+            }
+            else
+            {
+                hu = (g - b) / dif * 60f;
+            }
+            if (hu < 0)
+            {
+                hu = hu + 360f;
+            }
+        }
+        else
+        {
+            hu = 0;
+        }
+
+        hu *= 1f / 360f;
+        sa = (dif / max) * 1f;
+        br = max;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static float hue(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		float hu, sa, br, al;
+		_color2HSB(c, out hu, out sa, out br, out al);
+        return hu;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static float saturation(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		float hu, sa, br, al;
+		_color2HSB(c, out hu, out sa, out br, out al);
+        return sa;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static float brightness(uint c)
+	{	// Extract color byte from a color (unsigned int)
+		float hu, sa, br, al;
+		_color2HSB(c, out hu, out sa, out br, out al);
+        return br;
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void setPixel(int x, int y, byte r, byte g, byte b, byte a) 
 	{	// Set an individual pixel in the pixbuf
+		if (_p == null) return;
 		if (_pixbuf == null) return;
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
@@ -1258,6 +1444,7 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void setPixel(int x, int y, uint c) 
 	{	// Set an individual pixel in the pixbuf
+		if (_p == null) return;
 		if (_pixbuf == null) return;
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, red (c));
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, green (c));
@@ -1268,6 +1455,7 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static uint getPixel(int x, int y) 
 	{	// Set an individual pixel in the pixbuf
+		if (_p == null) return 0;
 		if (_pixbuf == null) return 0;
 		byte r = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0);
 		byte g = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1);
@@ -1581,9 +1769,11 @@ internal enum PKnotType {
 }
 
 internal class PKnot 
-{	// Class to hold knots in splines
-	public double x;
-	public double y;
+{	// Class to hold knots for splines
+	public double x, y;
+	public double cx1, cy1, cx2, cy2;		// Control points for bezier and curve vertexes
+	public double a;						// Angle of control points, for curve vertexes only
+	public double d;						// length of segment from previous knot
 	public PKnotType type;
 
 	public PKnot(double x, double y, PKnotType type) {
@@ -1591,38 +1781,13 @@ internal class PKnot
 		this.y = y;
 		this.type = type;
 	}
-	public PKnot(double x, double y) : this(x, y, PKnotType.VERTEX) {}
-
-	public virtual void draw(Context g) {
-		g.LineTo(x, y);
-	}
-}
-
-internal class PBezierKnot : PKnot
-{	// Bezier knot
-	public double cx1, cy1, cx2, cy2;
-
-	public PBezierKnot(double x, double y, double cx1, double cy1, double cx2, double cy2) 
-		: base(x, y) {
+	public PKnot(double x, double y, double cx1, double cy1, double cx2, double cy2, PKnotType type) 
+		: this(x, y, type) {
 		this.cx1 = cx1;
 		this.cy1 = cy1;
 		this.cx2 = cx2;
 		this.cy2 = cy2;
 	}
-
-	public override void draw(Context g) {
-		g.CurveTo (cx1, cy1, cx2, cy2, x, y);
-	}
-}
-
-internal class PCurveKnot : PKnot
-{	// Curve knot
-	public PCurveKnot(double x, double y) : base(x, y) {}
-
-	// TODO: Implement this method
-//	public override void draw(Context g) {
-//		g.CurveTo (cx1, cy1, cx2, cy2, x, y);
-//	}
 }
 
 // ------------------ PWindow ----------------------------------------------
@@ -1643,6 +1808,7 @@ internal class PWindow : Gtk.Window
 	private double _strokeWeight = 1.0;							// Thickness of stroked lines
 	private LineCap _strokeCap = LineCap.Round;					// Default line cap
 	private LineJoin _strokeJoin = LineJoin.Round;				// Default line join
+	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
 	private static ImageMode _imageMode = ImageMode.CORNER;
@@ -1914,6 +2080,13 @@ internal class PWindow : Gtk.Window
 		_imageMode = mode;
 	}
 
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void curveTightness(double tightness)
+	{
+		_tightness = tightness;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void background(double r, double g, double b, double a) 
 	{	// Fill background with a color
@@ -1964,9 +2137,11 @@ internal class PWindow : Gtk.Window
 				break;
 			case RectMode.RADIUS:
 				// TODO:
+				Console.WriteLine("rectMode DEBUG not implemented");
 				break;
 			case RectMode.CORNERS:
-				// TODO:
+				w = w - x;
+				h = h - y;
 				break;
 			default: //RectMode.CORNER:
 				// Nothing to do
@@ -2121,21 +2296,106 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public void spline(List<PKnot> knots, bool close) 
+	public void spline(List<PKnot> knots, bool toClose) 
 	{	// Render a spline given a list of knots
-		if (knots.Count == 0) return;
+		PKnot ph, pi, pj, pk;
 
+		int n = knots.Count;
+		if (n == 0) return;
+
+		double t = _tightness;
+
+		// Remove duplicates
+		for (int i=n-1; i>0; i--) {
+			if (knots[i].x == knots[i-1].x && knots[i].y == knots[i-1].y)
+				knots.RemoveAt(i);
+		}
+		n = knots.Count;
+
+		// Draw the spline
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save();
-			
-			// Path
-			g.MoveTo(knots[0].x, knots[0].y);
-			for (int i=1; i<knots.Count; i++) knots[i].draw (g);
-			if (close) {
-				knots[0].draw (g);
-				g.ClosePath();
+
+			// If less than 3 knots, draw a straight line from first to last point, which may be the same point
+			if (n < 3) 
+			{
+				g.MoveTo (knots[0].x, knots[0].y);
+				g.LineTo (knots[1].x, knots[1].y);
+
+			} else {	// 3 or more points
+
+				// Start by calculating all angles and distances, even if never used.
+				for (int j=0; j<n; j++) {
+					int i = (j-1+n) % n;
+					int k = (j+1+n) % n;
+					pi = knots[i];
+					pj = knots[j];
+					pk = knots[k];
+					double dx = pk.x-pi.x;
+					double dy = pk.y-pi.y;
+
+					// If points are the same, then the angle is perpenticular to the segment joining i and j
+					if (dx == 0.0 && dy == 0.0) {
+						pj.a = Math.Atan2 (pj.y-pi.y, pj.x-pi.x) + Processing.HALF_PI;
+					} else {
+						pj.a = Math.Atan2 (dy, dx);
+					}
+					dx = pj.x-pi.x;
+					dy = pj.y-pi.y;
+					pj.d = Math.Sqrt (dx*dx + dy*dy);
+				}
+
+				// Init the end of the drawing loop
+				int end = n+1;
+
+				// If not to close the shape, make some adjustments
+				if (!toClose) {
+					ph = knots[n-2];
+					pi = knots[n-1];
+					pj = knots[0];
+					pk = knots[1];
+					pj.a = Math.Atan2 (pk.y-pj.y, pk.x-pj.x);
+					pi.a = Math.Atan2 (pi.y-ph.y, pi.x-ph.x);
+					end = n;	// Don't draw the last segment
+				}
+
+				// Draw all points
+				g.MoveTo (knots[0].x, knots[0].y);
+				for (int jj=1; jj<end; jj++)
+				{
+					int i = (jj-1+n) % n;
+					int j = (jj  +n) % n;
+					int k = (jj+1+n) % n;
+					pi = knots[i];
+					pj = knots[j];
+					pk = knots[k];
+
+					switch (pj.type) {
+					case PKnotType.VERTEX:
+						g.LineTo (pj.x, pj.y);
+						break;
+
+					case PKnotType.BEZIER:
+						g.CurveTo (pj.cx1, pj.cy1, pj.cx2, pj.cy2, pj.x, pj.y);
+						break;
+
+					case PKnotType.CURVE:
+						// TODO: Move draw method to classes?
+
+						// Calculate control points
+						pj.cx1 = t*pj.d * Math.Cos (pi.a) + pi.x;
+						pj.cy1 = t*pj.d * Math.Sin (pi.a) + pi.y;
+						pj.cx2 = pj.x - t*pj.d * Math.Cos (pj.a);
+						pj.cy2 = pj.y - t*pj.d * Math.Sin (pj.a);
+
+						g.CurveTo (pj.cx1, pj.cy1, pj.cx2, pj.cy2, pj.x, pj.y);
+						break;
+					}
+				}
 			}
+
+			if (toClose) g.ClosePath();
 			g.Restore();
 
 			_fill (g);
@@ -2169,7 +2429,6 @@ internal class PWindow : Gtk.Window
 			break;
 		}
 
-		//Console.WriteLine ("{0} {1} {2} {3}", x, y, sx, sy);
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save ();
