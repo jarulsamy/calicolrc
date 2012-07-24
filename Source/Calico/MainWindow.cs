@@ -138,18 +138,7 @@ namespace Calico {
                 Language language = manager[lang];
                 DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", language.name))));
                 if (dir.Exists) {
-                    Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
-                    ((Gtk.Menu)examples_menu.Submenu).Add(menu);
-                    menu.Submenu = new Gtk.Menu();
-                    foreach (FileInfo f in dir.GetFiles("*.*")) {
-                        if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
-                            Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
-                            ((Gtk.Menu)menu.Submenu).Add(fmenu);
-                            var fullname = f.FullName;
-                            fmenu.Activated += delegate { Open(fullname); };
-                        }
-                    }
-                    menu.Submenu.ShowAll();
+                    process_example_dir(examples_menu, language.proper_name, dir, language);
                 }
             }
             examples_menu.Submenu.ShowAll();
@@ -320,6 +309,25 @@ namespace Calico {
             butterfly.Image = animationImages[0];
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        public void process_example_dir(Gtk.MenuItem root_menu, string menu_name, DirectoryInfo dir, Language language) {
+            Gtk.MenuItem menu = new Gtk.MenuItem(menu_name);
+            ((Gtk.Menu)root_menu.Submenu).Add(menu);
+            menu.Submenu = new Gtk.Menu();
+            foreach (FileInfo f in dir.GetFiles("*.*")) {
+                if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
+                    Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
+                    ((Gtk.Menu)menu.Submenu).Add(fmenu);
+                    var fullname = f.FullName;
+                    fmenu.Activated += delegate { Open(fullname); };
+                }
+            }
+            menu.Submenu.ShowAll();
+            foreach (DirectoryInfo d in dir.GetDirectories("*.*")) {
+                if (!d.Name.StartsWith("."))
+                    process_example_dir(menu, d.Name, d, language);
+            }
         }
 
         private bool UpdateGUI() {
