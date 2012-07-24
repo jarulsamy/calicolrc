@@ -1,3 +1,5 @@
+from Processing import *
+
 # Ladybug
 
 window(400, 400)
