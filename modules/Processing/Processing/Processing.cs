@@ -21,7 +21,7 @@ $Id: $
 
 using System;
 using System.IO;
-using System.Timers;
+//using System.Timers;
 using System.Threading;
 using System.Collections.Generic;
 using Cairo;
@@ -58,7 +58,9 @@ public static class Processing
 {
 	private static PWindow _p = null;							// Reference to internal window
 	private static Random _rand = new Random();					// Random number generation help
-	private static System.Timers.Timer _tmr = null;
+	private static PTimer _tmr = null;
+//	private static System.Timers.Timer _tmr = null;
+//	private static System.Threading.Timer _tmr = null;
 	private static int _guiThreadId = -1;						// Thread id of window. -1 means not assigned
 	private static Gdk.Pixbuf _pixbuf = null;					// Internal pixbuf used by loadPixels and updatePixels
 	private static List<PKnot> _shape = null;					// Cache of points for a shape under construction
@@ -76,6 +78,8 @@ public static class Processing
 	private static uint _keyCode = 0;
 	private static long _millis;								// The number of milliseconds when the window was created
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
+//	private static int _timeout = 0;
+//	private static bool _enabled = false;
 
 	public static event ButtonPressEventHandler onMousePressed;	// Mouse events
 	public static event ButtonReleaseEventHandler onMouseReleased;
@@ -83,7 +87,8 @@ public static class Processing
 	public static event MotionNotifyEventHandler onMouseDragged;
 	public static event KeyPressEventHandler onKeyPressed;		// Key events
 	public static event KeyReleaseEventHandler onKeyReleased;
-	public static event ElapsedEventHandler onLoop;
+	public static event EventHandler<PElapsedEventArgs> onLoop;
+	//public static event ElapsedEventHandler onLoop;
 
 	private delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
@@ -101,11 +106,14 @@ public static class Processing
 	public static readonly int RGB = 9;
 	public static readonly int ARGB = 10;
 	public static readonly int ALPHA = 11;
+	public static readonly int RIGHT = 12;
+	public static readonly int LEFT = 13;
 	public static readonly bool CLOSE = true;
 	public static readonly double PI = 3.141592653589793238;
 	public static readonly double HALF_PI = 0.5*Processing.PI;
 	public static readonly double QUARTER_PI = 0.25*Processing.PI;
 	public static readonly double TWO_PI = 2.0*Processing.PI;
+
 
 	// String-constant maps
 	private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
@@ -191,10 +199,11 @@ public static class Processing
 		} );
 
 		// Set up helper objects
-		_tmr = new System.Timers.Timer();
+		_tmr = new PTimer();
 		_tmr.Elapsed += _onLoop;
-
-		// Is the following line necessary?
+//		_tmr = new System.Timers.Timer();
+//		_tmr.Elapsed += _onLoop;
+//		_tmr = new System.Threading.Timer( new System.Threading.TimerCallback(_onLoop) );
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
 
 		// Reset all internal state variables
@@ -205,7 +214,7 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
-		 _key = (Gdk.Key)0;
+		_key = (Gdk.Key)0;
 		_keyCode = 0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
@@ -239,9 +248,11 @@ public static class Processing
 		_p.ShowAll ();
 
 		// Set up helper objects
-		_tmr = new System.Timers.Timer();
+		_tmr = new PTimer();
 		_tmr.Elapsed += _onLoop;
-		//_rand = new Random();
+//		_tmr = new System.Timers.Timer();
+//		_tmr.Elapsed += _onLoop;
+//		_tmr = new System.Threading.Timer( new System.Threading.TimerCallback(_onLoop) );
 
 		// Is the following line necessary?
 		//_tmr.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke)_p;
@@ -254,7 +265,7 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
-		 _key = (Gdk.Key)0;
+		_key = (Gdk.Key)0;
 		_keyCode = 0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
@@ -265,7 +276,6 @@ public static class Processing
 	{	// PWindow was closed on its own. Clean up.
 		_cleanup ();
 		e.RetVal = false;
-		//throw new Exception("Window closed");
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -276,6 +286,7 @@ public static class Processing
 			_tmr.Elapsed -= _onLoop;
 		}
 		_tmr = null;
+//		_tmr.Change (System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
 
 		// Unhook event handlers.
 		onLoop = null;
@@ -283,6 +294,8 @@ public static class Processing
 		onMouseReleased = null;
 		onMouseDragged = null;
 		onMouseMoved = null;
+		onKeyPressed = null;
+		onKeyReleased = null;
 
 		// Reset various other flags and settings
 		_guiThreadId = -1;
@@ -323,11 +336,24 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private static void _onLoop (object o, ElapsedEventArgs e)
+	private static void _onLoop (object o, PElapsedEventArgs e)
 	{	// Handle timer elapsed events
-		raiseTimerElapsed(e);
+		raiseTimerElapsed(o, e);
 		resetMatrix();
 	}
+
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	private static void _onLoop (object o, ElapsedEventArgs e)
+//	{	// Handle timer elapsed events
+//		raiseTimerElapsed(o, e);
+//		resetMatrix();
+//	}
+
+//	private static void _onLoop (object o)
+//	{	// Handle timer elapsed events
+//		raiseTimerElapsed(o);
+//		resetMatrix();
+//	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onMotionNotifyEvent (object o, Gtk.MotionNotifyEventArgs args)
@@ -367,6 +393,7 @@ public static class Processing
 		raiseMouseReleased(args);
 	}
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onKeyPressEvent(object o, KeyPressEventArgs args)
 	{
 		_keyPressed = true;
@@ -375,6 +402,7 @@ public static class Processing
 		raiseKeyPressed(args);
 	}
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onKeyReleaseEvent(object o, KeyReleaseEventArgs args)
 	{
 		_keyPressed = false;
@@ -384,13 +412,34 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private static void raiseTimerElapsed(ElapsedEventArgs e)
+//	private static void raiseTimerElapsed(ElapsedEventArgs e)
+//	{
+//        ElapsedEventHandler handler = onLoop;
+//
+//        if (handler != null)
+//        {
+//            handler(null, e);
+//        }
+//    }
+
+//	private static void raiseTimerElapsed(object o, ElapsedEventArgs a)
+//	{
+//        ElapsedEventHandler handler = onLoop;
+//
+//        if (handler != null)
+//        {
+//            handler(o, a);
+//        }
+//    }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void raiseTimerElapsed(object o, PElapsedEventArgs a)
 	{
-        ElapsedEventHandler handler = onLoop;
+        EventHandler<PElapsedEventArgs> handler = onLoop;
 
         if (handler != null)
         {
-            handler(null, e);
+            handler(o, a);
         }
     }
 
@@ -789,6 +838,33 @@ public static class Processing
 		while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
 	}
 
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	public static void noLoop()
+//	{
+//		_tmr.Change (System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+//		_enabled = false;
+//	}
+//
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	public static void loop()
+//	{
+//		_tmr.Change (0, _timeout);
+//		_enabled = true;
+//	}
+//
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	public static void frameRate(int fr)
+//	{	// Sets timer interval
+//		_timeout = fr;
+//		if (_enabled) loop ();
+//	}
+//
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	public static long frameRate()
+//	{	// Gets timer interval
+//		return _timeout;
+//	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void noLoop()
 	{
@@ -802,7 +878,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void frameRate(double fr)
+	public static void frameRate(uint fr)
 	{	// Sets timer interval
 		bool enabled = _tmr.Enabled;
 		_tmr.Stop ();
@@ -1191,6 +1267,46 @@ public static class Processing
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
 				debug(String.Format ("quad() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void textSize(double s) 
+	{
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.textSize (s);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("textSize() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void text(string txt, double x, double y, double w, double h) 
+	{	// Draw text
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.text(txt, x, y, w, h);
+				if (_immediateMode) _p.redraw ();
+			} catch (System.NullReferenceException e){
+				debug(String.Format ("text() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	public static void text(string txt, double x, double y) 
+	{	// Draw text
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.text(txt, x, y);
+				if (_immediateMode) _p.redraw ();
+			} catch (System.NullReferenceException e){
+				debug(String.Format ("text() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
@@ -1613,8 +1729,115 @@ public static class Processing
 //		}
 	}
 }
+// ------------------ PTimer ----------------------------------------------
 
-// ------------------ PWindow ----------------------------------------------
+public class PElapsedEventArgs : EventArgs {
+	public long tickCount = 0;
+	public PElapsedEventArgs(long tickCount) : base() {
+		this.tickCount = tickCount;
+	}
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+internal class PTimer
+{
+	private bool _enabled = false;			// true if timer 
+	private uint _timerID = 0;				// ID of currently installed timeout handler
+	private uint _timeOut = 0;				// interval in milliseconds
+	private bool _inTimeout = false;		// Flag to prevent reentrance
+	private long _tickCount = 0;			// Keep count of the number of ticks fired
+	public event EventHandler<PElapsedEventArgs> Elapsed = null;
+//	public event ElapsedEventHandler Elapsed = null;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PTimer()
+	{
+		_enabled = false;
+		_timerID = 0;
+		_timeOut = 0;
+		_inTimeout = false;
+		_tickCount = 0;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void Start()
+	{	// Start Timeout. Remove any existing timeout handler that is running.
+		if (_timeOut == 0) return;
+		Stop();					// If running, stop first before installing TimeoutHandler
+		_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(_onTimerElapsed));
+		_enabled = true;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void Stop()
+	{ 	// Remove any existing timeout handler
+		if (_timerID > 0) {
+			GLib.Source.Remove(_timerID);
+			_timerID = 0;
+		}
+		_enabled = false;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private bool _onTimerElapsed()
+	{	// Internal timeout handler
+		if (_inTimeout) return true;
+		_inTimeout = true;
+
+		// Count ticks
+		System.Threading.Interlocked.Increment(ref _tickCount);
+
+		// Raise onLoop event
+        EventHandler<PElapsedEventArgs> handler = Elapsed;
+		PElapsedEventArgs args = new PElapsedEventArgs(_tickCount);
+        if (handler != null) handler(this, args);
+		
+		_inTimeout = false;
+		return true;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public uint Interval
+	{	// Set/get the timeout interval
+		set	{
+			// Reset timeout value
+			_timeOut = value;
+
+			// If currently enabled, then restart now
+			if (_enabled) Start();
+		}
+		get	{
+			return _timeOut;
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public bool Enabled
+	{	// Property get/set as alternative interface to Start()/Stop() methods
+		set {
+			if (value == true) {
+				Start();
+			} else {
+				Stop();
+			}
+		}
+		get{
+			return _enabled;
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public long TickCount
+	{	// Return internal tick count
+		get {
+			return _tickCount;
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+}
+
+// ------------------ PImage ----------------------------------------------
 public class PImage
 {
 	// internal cache of loaded image
@@ -1880,6 +2103,8 @@ internal class PWindow : Gtk.Window
 	private LineCap _strokeCap = LineCap.Round;					// Default line cap
 	private LineJoin _strokeJoin = LineJoin.Round;				// Default line join
 	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
+	private double _textSize = 12.0;							// Default text size
+	private double _textScaleFactor = 120.0/72.0;				// (screen resolution / dots per inch)
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
 	private static ImageMode _imageMode = ImageMode.CORNER;
@@ -1894,6 +2119,7 @@ internal class PWindow : Gtk.Window
 	{
 		_needsQuit = needsQuit;
 		_frameCount = 0;
+		_textScaleFactor = 120.0/72.0;		// (screen resolution / dots per inch)  TODO: How to get screen resolution?
 
 		// Create window with drawing area
 		this.size(w, h);
@@ -2173,11 +2399,16 @@ internal class PWindow : Gtk.Window
 		_imageMode = mode;
 	}
 
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void curveTightness(double tightness)
 	{
 		_tightness = tightness;
+	}
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void textSize(double s)
+	{
+		_textSize = s;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2531,6 +2762,39 @@ internal class PWindow : Gtk.Window
 			g.Restore ();
 		}
 		this.QueueDraw ();
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void text(string txt, double x, double y, double w, double h) 
+	{	// Draw text to the context
+		using (Context g = new Context(_img)) {
+			g.Matrix = _mat;
+			g.Save ();
+			g.Translate (x, y);
+			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
+			g.Scale (s, s);
+			g.ShowText (txt);
+			g.Restore ();
+			_fill (g);
+			_stroke (g);
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void text(string txt, double x, double y) 
+	{	// Draw text to the context
+
+		using (Context g = new Context(_img)) {
+			g.Matrix = _mat;
+			g.Save ();
+			g.Translate (x, y);
+			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
+			g.Scale (s, s);
+			g.ShowText (txt);
+			g.Restore ();
+			_fill (g);
+			_stroke (g);
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
