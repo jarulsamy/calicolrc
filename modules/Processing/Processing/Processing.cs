@@ -43,14 +43,29 @@ internal enum RectMode
 	CENTER = 0,
 	CORNER = 1,
 	RADIUS = 2,
-	CORNERS = 3,
+	CORNERS = 3
 }
 
 internal enum ImageMode
 {
 	CENTER = 0,
 	CORNER = 1,
-	CORNERS = 2,
+	CORNERS = 2
+}
+
+internal enum TextAlign
+{
+	LEFT = 0,
+	CENTER = 1,
+	RIGHT = 2
+}
+
+internal enum TextYAlign
+{
+	TOP = 0,
+	BOTTOM = 1,
+	CENTER = 2,
+	BASELINE = 3
 }
 
 // -------------------------------------------------------------------------
@@ -108,6 +123,9 @@ public static class Processing
 	public static readonly int ALPHA = 11;
 	public static readonly int RIGHT = 12;
 	public static readonly int LEFT = 13;
+	public static readonly int TOP = 14;
+	public static readonly int BOTTOM = 15;
+	public static readonly int BASELINE = 16;
 	public static readonly bool CLOSE = true;
 	public static readonly double PI = 3.141592653589793238;
 	public static readonly double HALF_PI = 0.5*Processing.PI;
@@ -163,6 +181,22 @@ public static class Processing
 
 	private static Dictionary<int, Cairo.Format> _imageFormatInt = new Dictionary<int, Format>() {
 		{RGB, Format.RGB24}, {ARGB, Format.ARGB32}, {ALPHA, Format.A8}
+	};
+
+	private static Dictionary<string, TextAlign> _textAlignStr = new Dictionary<string, TextAlign>() {
+		{"LEFT", TextAlign.LEFT}, {"CENTER", TextAlign.CENTER}, {"RIGHT", TextAlign.RIGHT}
+	};
+
+	private static Dictionary<int, TextAlign> _textAlignInt = new Dictionary<int, TextAlign>() {
+		{LEFT, TextAlign.LEFT}, {CENTER, TextAlign.CENTER}, {RIGHT, TextAlign.RIGHT}
+	};
+
+	private static Dictionary<string, TextYAlign> _textYAlignStr = new Dictionary<string, TextYAlign>() {
+		{"TOP", TextYAlign.TOP}, {"CENTER", TextYAlign.CENTER}, {"BOTTOM", TextYAlign.BOTTOM}, {"BASELINE", TextYAlign.BASELINE}
+	};
+
+	private static Dictionary<int, TextYAlign> _textYAlignInt = new Dictionary<int, TextYAlign>() {
+		{LEFT, TextYAlign.TOP}, {CENTER, TextYAlign.CENTER}, {BOTTOM, TextYAlign.BOTTOM}, {BASELINE, TextYAlign.BASELINE}
 	};
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -812,7 +846,24 @@ public static class Processing
 	{
 		_invoke ( delegate { _p.strokeJoin (_strokeJoinInt[style]); } );
 	}
-
+	
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void textAlign( string align )
+	{
+		_invoke ( delegate { _p.textAlign (_textAlignStr[align]); } );
+	}
+	public static void textAlign( int align )
+	{
+		_invoke ( delegate { _p.textAlign (_textAlignInt[align]); } );
+	}
+	public static void textAlign( string align, string yalign )
+	{
+		_invoke ( delegate { _p.textAlign (_textAlignStr[align], _textYAlignStr[yalign]); } );
+	}
+	public static void textAlign( int align, int yalign )
+	{
+		_invoke ( delegate { _p.textAlign (_textAlignInt[align], _textYAlignInt[yalign]); } );
+	}
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void redraw() 
 	{	// Try to cause the window to redraw itself by queuing up a draw
@@ -2104,6 +2155,8 @@ internal class PWindow : Gtk.Window
 	private LineJoin _strokeJoin = LineJoin.Round;				// Default line join
 	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
 	private double _textSize = 12.0;							// Default text size
+	private TextAlign _textAlignX = TextAlign.LEFT;				// Text alignment mode in x-direction
+	private TextYAlign _textAlignY = TextYAlign.TOP;			// Text alignment mode in x-direction
 	private double _textScaleFactor = 120.0/72.0;				// (screen resolution / dots per inch)
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
@@ -2409,6 +2462,20 @@ internal class PWindow : Gtk.Window
 	public void textSize(double s)
 	{
 		_textSize = s;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void textAlign(TextAlign align)
+	{
+		_textAlignX = align;
+		_textAlignY = TextYAlign.TOP;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void textAlign(TextAlign align, TextYAlign yalign)
+	{
+		_textAlignX = align;
+		_textAlignY = yalign;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2767,9 +2834,40 @@ internal class PWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void text(string txt, double x, double y, double w, double h) 
 	{	// Draw text to the context
+
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save ();
+			TextExtents te = g.TextExtents(txt);
+
+			// If a box is specified, compute the new location of the text within the box using the _textAlign parameter
+			switch (_textAlignX) {
+			case TextAlign.LEFT:
+				//x = x - te.XBearing;
+				break;
+			case TextAlign.CENTER:
+				x = x + 0.5*(w-te.Width); // - te.XBearing;
+				break;
+			case TextAlign.RIGHT:
+				x = x + w - te.Width - te.XBearing;
+				break;
+			}
+
+			switch (_textAlignY) {
+			case TextYAlign.TOP:
+				y = y + te.Height - te.YBearing;
+				break;
+			case TextYAlign.CENTER:
+				y = y + 0.5*(h + te.Height) - te.YBearing;
+				break;
+			case TextYAlign.BOTTOM:
+				y = y + h - te.Height;
+				break;
+			case TextYAlign.BASELINE:
+				y = y + h - te.Height - te.YBearing;
+				break;
+			}
+
 			g.Translate (x, y);
 			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
 			g.Scale (s, s);
@@ -2783,7 +2881,6 @@ internal class PWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void text(string txt, double x, double y) 
 	{	// Draw text to the context
-
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save ();
