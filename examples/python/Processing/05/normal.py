@@ -1,4 +1,5 @@
-# Grow a 2D normal distribution
+# Build a 2D normal or uniform distribution
+# by overlapping semitransparent circles
 
 from Processing import *
 import math
@@ -10,8 +11,11 @@ noStroke()
 smooth()
 
 def draw(o, e):
+    # A uniform distribution
     #x = random(0,width())
     #y = random(0,height())
+
+    # A normal distribution
     x = map( normal(), -3.0, 3.0, 0, width() )
     y = map( normal(), -3.0, 3.0, 0, width() )
     ellipse(x, y, 10, 10)
