@@ -1,15 +1,15 @@
 from Processing import *
 
 window(500, 300)
-background(0, 0, 200)
+background(0)
 
 # Allow all pixel manipulation without updating the screen
 immediateMode(False)
 
 def noise():
-    background(0, 0, 200)
+    background(0)
     loadPixels()
-    for i in range(1000):
+    for i in range(5000):
         x = random(500)
         y = random(300)
         setPixel(x, y, 255, 255, 255, 255)
