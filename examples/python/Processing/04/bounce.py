@@ -1,4 +1,4 @@
-# bounce
+# bounce.py
 
 # Copyright  2012 Mark F. Russo
 # Bryn Mawr College, Department of Computer Science
@@ -39,6 +39,6 @@ def draw(o, e):
     background(255)
     ellipse(sx, sy, 20, 20)
 
-frameRate(1)
+frameRate(10)
 onLoop += draw
 loop()
