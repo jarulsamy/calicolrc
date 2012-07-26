@@ -32,11 +32,13 @@ text("Center Bottom", 50, 50, 400, 400)
 textAlign(RIGHT, BOTTOM)
 text("Over here", 50, 50, 400, 400)
 
-## textAlign(LEFT, BASELINE)
-## text("Base left", 50, 50, 400, 400)
-## 
-## textAlign(CENTER, BASELINE)
-## text("Base Center", 50, 50, 400, 400)
-## 
-## textAlign(RIGHT, BASELINE)
-## text("Base right", 50, 50, 400, 400)
+textAlign(LEFT, BASELINE)
+text("Base left", 50, 50, 400, 400)
+
+textAlign(CENTER, BASELINE)
+text("Base Center", 50, 50, 400, 400)
+
+textAlign(RIGHT, BASELINE)
+text("Base right", 50, 50, 400, 400)
+
+print( "The width of ABC is " + str(textWidth("ABC")))
