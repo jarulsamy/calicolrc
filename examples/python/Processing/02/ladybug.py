@@ -1,4 +1,5 @@
 # Ladybug
+from Processing import *
 
 window(400, 400)
 background(255)
