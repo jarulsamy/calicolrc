@@ -20,8 +20,4 @@ def noise():
     delay(1)
 
 for i in range(1000):
-    try:
-        noise()
-    except:
-        exit()
-        break
+    noise()

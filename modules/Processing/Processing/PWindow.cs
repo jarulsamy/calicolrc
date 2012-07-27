@@ -43,7 +43,7 @@ internal class PWindow : Gtk.Window
 	private Color _strokeColor = new Color(0.0, 0.0, 0.0);		// Current stroke color
 	private double _strokeWeight = 1.0;							// Thickness of stroked lines
 	private LineCap _strokeCap = LineCap.Round;					// Default line cap
-	private LineJoin _strokeJoin = LineJoin.Round;				// Default line join
+	private LineJoin _strokeJoin = LineJoin.Miter;				// Default line join 
 	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
 	private double _textSize = 12.0;							// Default text size
 	private TextAlign _textAlignX = TextAlign.LEFT;				// Text alignment mode in x-direction
@@ -529,31 +529,31 @@ internal class PWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void arc(double x, double y, double w, double h, double start, double stop) 
 	{	// Draw an arc
+		double hw = 0.5*w;
+		double hh = 0.5*h;
+
+		// Init center x/y as if using CORNER mode
+		double cx = x + hw;
+		double cy = y + hh;
+
+		switch (_ellipseMode) {
+		case EllipseMode.CENTER:
+			cx = x;
+			cy = y;
+			break;
+		case EllipseMode.RADIUS:
+			// TODO:
+			break;
+		case EllipseMode.CORNERS:
+			// TODO:
+			break;
+		default: //EllipseMode.CORNER:
+			cx = x + hw;
+			cy = y + hh;
+			break;
+		}
+
 		using (Context g = new Context(_img)) {
-			double hw = 0.5*w;
-			double hh = 0.5*h;
-
-			// Init center x/y as if using CORNER mode
-			double cx = x + hw;
-			double cy = y + hh;
-
-			switch (_ellipseMode) {
-			case EllipseMode.CENTER:
-				cx = x;
-				cy = y;
-				break;
-			case EllipseMode.RADIUS:
-				// TODO:
-				break;
-			case EllipseMode.CORNERS:
-				// TODO:
-				break;
-			default: //EllipseMode.CORNER:
-				cx = x + hw;
-				cy = y + hh;
-				break;
-			}
-
 			g.Matrix = _mat;
 
 			// Draw the body of the arc, and fill (if to fill)
@@ -562,13 +562,19 @@ internal class PWindow : Gtk.Window
 			// Path
 			g.Translate(cx, cy);
 			g.Scale(1.0, h/w);
-			g.MoveTo(Math.Cos (start)*hw, Math.Sin (start)*hw);
+			g.MoveTo (0.0, 0.0);
+			g.LineTo(Math.Cos (start)*hw, Math.Sin (start)*hw);
 			g.Arc(0.0, 0.0, hw, start, stop);
+			g.ClosePath();
 			
 			// Must return to uniform device space before stroking in order to prevent lines from being deformed by scaling.
 			g.Restore();
 
 			_fill2 (g);		// Use the non-preserving variant of fill
+		}
+
+		using (Context g = new Context(_img)) {
+			g.Matrix = _mat;
 
 			// Do it again but only stroke the perimeter of the arc
 			g.Save();
