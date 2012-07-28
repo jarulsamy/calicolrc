@@ -856,12 +856,14 @@ public static class Processing
 	{
 		_tmr.Stop ();
 	}
+	public static void stopLoop() { noLoop (); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void loop()
 	{
 		_tmr.Start ();
 	}
+	public static void startLoop() { loop (); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void frameRate(uint fr)
@@ -991,6 +993,7 @@ public static class Processing
 	public static void fill(double r, double g, double b) { fill (r, g, b, 255); }
 	public static void fill(double g, double a) { fill (g, g, g, a); }
 	public static void fill(double g) { fill (g, g, g, 255); }
+	public static void fill( uint c ) { fill ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void noFill() 
@@ -1022,6 +1025,7 @@ public static class Processing
 	public static void stroke(double r, double g, double b) { stroke (r, g, b, 255); }
 	public static void stroke(double g, double a) { stroke (g, g, g, a); }
 	public static void stroke(double g) { stroke (g, g, g, 255); }
+	public static void stroke( uint c ) { stroke ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void noStroke() 
@@ -1155,6 +1159,7 @@ public static class Processing
 	public static void background(double r, double g, double b) { background (r, g, b, 255.0); }
 	public static void background(double g, double a) { background (g, g, g, a); }
 	public static void background(double g) { background (g, g, g, 255.0); }
+	public static void background( uint c ) { background ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void point(double x, double y) 
