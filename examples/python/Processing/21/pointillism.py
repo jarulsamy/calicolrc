@@ -3,7 +3,7 @@
 from Processing import *
 
 # Load the picture, create a window of the same size, and draw the picture
-img = loadImage("bmc3.jpg")
+img = loadImage("images/bmc3.jpg")
 window( img.width(), img.height() )
 image(img, 0, 0)
 
