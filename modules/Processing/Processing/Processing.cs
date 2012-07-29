@@ -930,6 +930,84 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static bool toBoolean(object o)
+	{	// Try to convert the object to a boolean
+		return Convert.ToBoolean (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static byte toByte(object o)
+	{	// Try to convert the object to a byte
+		return Convert.ToByte (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static char toChar(object o)
+	{
+		return Convert.ToChar(o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static Single toFloat(object o)
+	{
+		return Convert.ToSingle (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static double toDouble(object o)
+	{
+		return Convert.ToDouble (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static Int32 toInt(object o)
+	{
+		return Convert.ToInt32 (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static Int64 toLong(object o)
+	{
+		return Convert.ToInt64 (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static string toString(object o)
+	{
+		return Convert.ToString (o);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static string toHex(object o)
+	{
+		int v = Convert.ToInt32(o);
+		return String.Format("{0:X}", v);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static string toBinary(object o)
+	{
+		int v = Convert.ToInt32(o);
+		return Convert.ToString (v, 2);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static Int32 fromHex(string hex)
+	{
+		 return Convert.ToInt32(hex, 16);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static Int32 fromBinary(string bits)
+	{
+		int bitCount = 8;
+		if (bits.Length == bitCount && bits[0] == '1')
+            return Convert.ToInt32(bits.PadLeft(32, '1'),2);
+        else
+            return Convert.ToInt32(bits,2);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void smooth() {
 		if (_p == null) return;
 		//Application.Invoke ( delegate {
@@ -973,7 +1051,7 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	internal static void debug(string msg, int level) 
-	{	// 0: verbose, 1: information, 2: unhandled exceptions
+	{	// 0: verbose, 1: information, 2: serious exceptions
 		if (level >= _debugLevel) Console.WriteLine (msg);
 	}
 
