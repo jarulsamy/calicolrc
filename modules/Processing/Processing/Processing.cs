@@ -866,18 +866,21 @@ public static class Processing
 	public static void startLoop() { loop (); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void frameRate(uint fr)
+	public static uint frameRate(uint fps)
 	{	// Sets timer interval
+		uint fr = Convert.ToUInt32(1000.0/Convert.ToDouble(fps));
 		bool enabled = _tmr.Enabled;
 		_tmr.Stop ();
 		_tmr.Interval = fr;
 		if (enabled) _tmr.Start ();
+		return fps;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static double frameRate()
+	public static uint frameRate()
 	{	// Gets timer interval
-		return _tmr.Interval;
+		uint fps = Convert.ToUInt32(Convert.ToDouble (_tmr.Interval)/1000.0);
+		return fps;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
