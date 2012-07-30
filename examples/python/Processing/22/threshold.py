@@ -4,7 +4,8 @@
 from Processing import *
 
 # Load the image to process
-img = loadImage("colony.jpg")
+img = loadImage("obama.jpg")
+#img = loadImage("colony.jpg")
 
 # Create a window of the same size
 w = int( img.width() )

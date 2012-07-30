@@ -79,5 +79,5 @@ def draw(o, e):
 
 # Set up looping
 onLoop += draw
-frameRate(10)
+frameRate(100)
 loop()

@@ -16,7 +16,7 @@ cY = 100.0
 
 window(500, 500)
 smooth()
-frameRate(20)
+frameRate(50)
 
 def doLoop(o, e) :
     global walkPose, speed, cX, cY

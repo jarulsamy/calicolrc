@@ -49,5 +49,5 @@ def draw(o, e):
 
 # Set up looping
 onLoop += draw
-frameRate(25)
+frameRate(40)
 loop()

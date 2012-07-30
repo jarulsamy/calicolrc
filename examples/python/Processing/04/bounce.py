@@ -39,6 +39,6 @@ def draw(o, e):
     background(255)
     ellipse(sx, sy, 20, 20)
 
-frameRate(10)
+frameRate(100)
 onLoop += draw
 loop()

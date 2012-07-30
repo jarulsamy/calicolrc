@@ -1,4 +1,4 @@
-# code.py
+# cone.py
 
 from Processing import *
 
