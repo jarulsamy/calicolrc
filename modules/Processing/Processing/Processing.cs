@@ -101,6 +101,7 @@ public static class Processing
 
 	private delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	private delegate double DoubleDelegate ();					// A delegate that takes no args and returns a double
+	private delegate PImage PImageDelegate ();
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 
 	// Constants
@@ -354,9 +355,22 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _invokeDouble( DoubleDelegate fxn ) 
-	{	// Invoke a double delegate on thread if necessary
+	{	// Invoke a delegate that returns a double on thread if necessary
 
 		double val = 0.0;
+		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
+		{
+			Application.Invoke ( delegate{ val = fxn(); } );
+		} else {
+			fxn();
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void _invokePImage( PImageDelegate fxn ) 
+	{	// Invoke a delegate that returns a PImage on thread if necessary
+
+		PImage val = null;
 		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
 		{
 			Application.Invoke ( delegate{ val = fxn(); } );
@@ -1646,8 +1660,8 @@ public static class Processing
             hu = 0;
         }
 
-        hu *= 1f / 360f;
-        sa = (dif / max) * 1f;
+		hu *= 255f / 360f;; //1f / 360f;
+        sa = (dif / max) * 255f; //(dif / max) * 1f;
         br = max;
 	}
 
@@ -1710,6 +1724,26 @@ public static class Processing
 		byte b = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2);
 		byte a = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3);
 		return color (r, g, b, a);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static PImage get(int x, int y, int width, int height)	
+	{	// Get a portion of the existing image as a new PImage and return it.
+		if (_p == null) return null;
+		ManualResetEvent ev = new ManualResetEvent(false);
+
+		PImage img = null;
+		_invokePImage ( delegate { 
+			try {
+				img = _p.get (x, y, width, height);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("get() ignored extra tick: {0}", e.ToString()), 1);
+			}
+			ev.Set ();
+			return img;
+		} );
+		ev.WaitOne();
+		return img;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1977,6 +2011,18 @@ public class PImage
 	public PImage() : this(300, 300, Cairo.Format.ARGB32) { }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PImage get(int x, int y, int width, int height)
+	{	// Create a new image from a portion of the existing image.
+		PImage img = new PImage(width, height);
+
+		using (Context g = new Context(img._img)) {
+			_img.Show (g, -x, -y);
+		}
+
+		return img;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public int width() {
 		return _width;
 	}
@@ -1987,7 +2033,7 @@ public class PImage
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public void loadPixels() 
+	public void loadPixels()
 	{	// Copy pixels from current image to pixbuf
 		if (_img  == null) return;
 

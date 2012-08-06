@@ -420,21 +420,20 @@ internal class PWindow : Gtk.Window
 	{	// Draw a rectangle and optionally fill and stroke
 		using (Context g = new Context(_img)) {
 
-			double hw = 0.5*w;
-			double hh = 0.5*h;
-
 			switch (_rectMode) {
 			case RectMode.CENTER:
-				x = x - hw;
-				y = y - hh;
+				x = x - 0.5*w;
+				y = y - 0.5*h;
 				break;
 			case RectMode.RADIUS:
-				// TODO:
-				Console.WriteLine("rectMode DEBUG not implemented");
+				x = x - w;
+				y = y - h;
+				w = 2.0*w;
+				h = 2.0*h;
 				break;
 			case RectMode.CORNERS:
-				w = w - x;
-				h = h - y;
+				w = w - x;	// x2
+				h = h - y;	// y2
 				break;
 			default: //RectMode.CORNER:
 				// Nothing to do
@@ -496,10 +495,13 @@ internal class PWindow : Gtk.Window
 				cy = y;
 				break;
 			case EllipseMode.RADIUS:
-				// TODO:
+				cx = x;
+				cy = y;
+				w = 2.0*w;
+				h = 2.0*h;
 				break;
 			case EllipseMode.CORNERS:
-				// TODO:
+				// TODO
 				break;
 			default: //EllipseMode.CORNER:
 				cx = x + hw;
@@ -542,7 +544,10 @@ internal class PWindow : Gtk.Window
 			cy = y;
 			break;
 		case EllipseMode.RADIUS:
-			// TODO:
+			cx = x;
+			cy = y;
+			w = 2.0*w;
+			h = 2.0*h;
 			break;
 		case EllipseMode.CORNERS:
 			// TODO:
@@ -698,6 +703,18 @@ internal class PWindow : Gtk.Window
 			_fill (g);
 			_stroke (g);
 		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PImage get(int x, int y, int width, int height)
+	{	// Create a new image from a portion of the existing image.
+		PImage img = new PImage(width, height);
+
+		using (Context g = new Context(img._img)) {
+			_img.Show (g, -x, -y);
+		}
+
+		return img;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
