@@ -49,6 +49,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			this.Text = String.Format("print({0})", this["Expression"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python statement - - - - - - - - - - -
@@ -254,6 +255,7 @@ namespace Jigsaw
 			} else {
 				this.Text = String.Format("Ask: {0}", this.Question);
 			}
+			RaiseBlockChanged();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -372,6 +374,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			this.Text = String.Format("Tell: {0}",  this["Tell"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -493,6 +496,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			this.Text = "beep()";
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python statement - - - - -
@@ -613,6 +617,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			this.Text = String.Format("write {0} to {1}", this["Expression"], this["FilePath"]);
+			RaiseBlockChanged();
 		}
 	}
 }

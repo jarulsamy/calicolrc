@@ -396,6 +396,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			this.Text = String.Format("repeat {0} times", this["Repetitions"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python if statement - - - - -
@@ -636,6 +637,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			this.Text = String.Format("if {0}", this["IfTest"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - 
@@ -931,6 +933,7 @@ namespace Jigsaw
 		{	// Update text when property changes
 			
 			this.Text = String.Format("if {0}", this["IfTest"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python if statement - - - - -
@@ -1349,6 +1352,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			this.Text = String.Format("while ({0})", this["WhileTest"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python if statement - - - - -
@@ -1798,6 +1802,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			this.Text = String.Format("for each {0} in {1}", this["Variable"], this["Sequence"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python if statement - - - - -

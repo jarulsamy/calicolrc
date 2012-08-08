@@ -50,6 +50,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			this.Text = String.Format("{0} = {1}", this.VariableName, this["Expression"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python assignment - - - - -
@@ -192,6 +193,7 @@ namespace Jigsaw
 			} else {
 				this.Text = String.Format("random({0}, {1})", this["Min"], this["Max"]);
 			}
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python statement - - - - -
@@ -326,6 +328,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			this.Text = String.Format("{0}", this["Statement"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python statement - - - - - - - - - - -
@@ -442,6 +445,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			this.Text = String.Format("{0}", this["Comment"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - Generate and return Python statement - - - - - - - - - - -
@@ -520,7 +524,8 @@ namespace Jigsaw
 			CIntegerProperty height = (CIntegerProperty)_properties["Height"];
 			this.Width = width.Value;
 			this.Height = height.Value;
-			
+			RaiseBlockChanged();
+
 			_suppressOnPropertyChanged = false;
 		}
 
@@ -534,7 +539,8 @@ namespace Jigsaw
 			CIntegerProperty height = (CIntegerProperty)_properties["Height"];
 			width.Value = (int)this.Width;
 			height.Value = (int)this.Height;
-			
+			RaiseBlockChanged();
+
 			_suppressOnPropertyChanged = false;
         }
 		

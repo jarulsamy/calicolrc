@@ -294,7 +294,6 @@ namespace Jigsaw
 		{
 			set
 			{
-				//Console.WriteLine ("new timeout {0}", value);
 				// Reset timeout value
 				_timeOut = value;
 
@@ -305,17 +304,20 @@ namespace Jigsaw
 				}
 
 				// Manage turbo flag
+
+				// If turbo is not on and timeout setting warrents it, then turn on
 				if (!_turbo && _timeOut <= 20) {
 					_turbo = true;
 					Console.WriteLine ("Turbo on");
+
+				// If turbo is on and new timeout is too slow, turn it off
 				} else if (_turbo && _timeOut > 20) {
 					_turbo = false;
 					Console.WriteLine ("Turbo off");
 				}
 
-				// If currently running, then reset timer now
+				// If currently running, then reset timeout handler now
 				if (_state == EngineState.Running) {
-					// Reset timeout handler
 					_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 				}
 			}
@@ -606,16 +608,22 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
-			//Console.WriteLine ("Engine.Stop()");
+			// Remove any existing timeout handler
 			if (_timerID > 0) {
 				GLib.Source.Remove(_timerID);
 				_timerID = 0;
 			}
+
+			// If turbo flag is on, turn off
 			if (_turbo) {
 				_turbo = false;   // Testing turbo mode
 				Console.WriteLine ("Turbo off");
 			}
+
+			// Disable all call stacks
 			foreach (CallStack s in _callStacks) s.Enabled = false;
+
+			// Update state to Stopped
 			_state = EngineState.Stopped;
 			RaiseEngineStop ();	// Testing turbo mode
 		}
@@ -623,16 +631,18 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Pause()
 		{
-			//Console.WriteLine ("Engine.Pause()");
+			if (_state == EngineState.Paused) return;
+
+			// Remove any existing timeout handler
 			if (_timerID > 0) {
 				GLib.Source.Remove(_timerID);
 				_timerID = 0;
 			}
-//			if (_turbo) {
-//				_turbo = false;   // Testing turbo mode
-//				Console.WriteLine ("Turbo off");
-//			}
+
+			// Disable all call stacks
 			foreach (CallStack s in _callStacks) s.Enabled = false;
+
+			// Update state to Paused
 			_state = EngineState.Paused;
 			RaiseEnginePause();
 		}

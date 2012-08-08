@@ -157,6 +157,7 @@ namespace Jigsaw
 		{
 			// Update block text
 			this.Text = String.Format("define {0} ({1})", this.ProcedureName, argListString);
+			RaiseBlockChanged();
 		}
 		
 		// - - - 
@@ -371,6 +372,7 @@ namespace Jigsaw
 			} else {
 				this.Text = String.Format("{0}({1})", this.ProcedureName, paramListString);
 			}
+			RaiseBlockChanged();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -558,6 +560,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			this.Text = String.Format("return {0}", this["Expression"]);
+			RaiseBlockChanged();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

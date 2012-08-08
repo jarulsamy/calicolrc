@@ -824,25 +824,29 @@ namespace Jigsaw
 		{
 			set
 			{
-				uint newTimeOut = 100;
-				if (value > 0.0) newTimeOut = (uint)(2000.0/value);
+				uint newTimeOut;
 				UpdateDisplay = true;
 
+				// if timeout is too small, and not already paused, then pause and be done
 				if (value <= 0.0) {
-					// If 0.0, pause
 					if (this.State != RunningState.Paused) {
-						this.Pause ();
+						_engine.Pause ();
 						Console.WriteLine ("Stepping...");
 					}
 					return;
-				} else if ( _engine.TimeOut == newTimeOut ) {
-					// Do nothing if value hasn't changed
-					return;
-				} else {
-					if (this.State == RunningState.Paused) this.Run();
 				}
 
+				// Compute a new timeout
+				newTimeOut = (uint)(2000.0/value);
+
+				// If the new timeout hasn't changed, then nothing to do
+				if ( _engine.TimeOut == newTimeOut ) return;
+
+				// If get this far, then we have a new timeout to set
 				_engine.TimeOut = newTimeOut;
+
+				// If currently paused and a new timeout was set, then start running
+				if (this.State == RunningState.Paused) this.Run();
 			}
 			get
 			{
@@ -1016,7 +1020,13 @@ namespace Jigsaw
 			_state = RunningState.Error;
 			RaiseJigsawError();
 		}
-		
+
+		// - - - Update Modified when block changes - - - - - - - - - - - -
+		public void OnBlockChanged(object sender, EventArgs e)
+		{
+			this.Modified = true;
+		}
+
 		// - - - Return a list of all non-factory blocks - - - - - - -
 		// TODO: Change to an enumerator
 		public List<CBlock> AllBlocks()
@@ -1063,6 +1073,13 @@ namespace Jigsaw
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void AddBlock(CBlock b)
+		{	// Add a block to the canvas
+			this.AddShape (b);
+			b.BlockChanged += OnBlockChanged;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DeleteBlock(CBlock b) 
 		{	// Properly delete given block 
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
@@ -1070,6 +1087,7 @@ namespace Jigsaw
 			b.Deactivate(cvs);
 			b.Disconnect();
 			b.StopOutline (cvs);
+			b.BlockChanged -= OnBlockChanged;
 			cvs.DeleteShape(b);
 		}
 		
@@ -1108,6 +1126,7 @@ namespace Jigsaw
 				b.Deselect(cvs);
 				b.Deactivate(cvs);
 				b.Disconnect();
+				b.BlockChanged -= OnBlockChanged;
 				cvs.DeleteShape(b);
 			}
 		}
@@ -1444,14 +1463,7 @@ namespace Jigsaw
 			
 			// Created default starting blocks
 			CControlStart b1 = new CControlStart(125 + CBlock.BlockWidth + 20, 36);
-			this.AddShape(b1);
-			//CControlEnd   b2 = new CControlEnd(410, 150);;
-			//this.AddShape(b2);
-			
-			// Connect and reposition
-			//b1.OutEdge.LinkedTo = b2.InEdge;
-			//b2.InEdge.LinkedTo = b1.OutEdge;
-			//b2.RepositionBlocks(b2.InEdge);
+			this.AddBlock(b1); //this.AddShape(b1);
 			
 			// Reset modified flag
 			this.Modified = false;
@@ -1562,7 +1574,7 @@ namespace Jigsaw
 							System.Object[] args = new System.Object[] {X, Y};
 							tBlock = (CBlock)Activator.CreateInstance(typ, args);
 							blocks["b"+id.ToString()] = tBlock;
-							this.AddShape(tBlock);
+							this.AddBlock(tBlock); //this.AddShape(tBlock);
 							break;
 							
 						case "edge":		// <edge id="3" name="Out" type="Out" linkedTo="4" />
@@ -2008,8 +2020,10 @@ namespace Jigsaw
 		protected Dictionary<String, CProperty> _properties;
 		
 		private Widgets.CBlockPalette _palette = null;	// Reference to block palette, if a factory
-		public static int BlockWidth = 275;                    // default block size
-		
+		public static int BlockWidth = 275;             // default block size
+
+		public event EventHandler BlockChanged;			// Raised when blocked changed and file needs resaving
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CBlock(List<Diagram.CPoint> pts, Widgets.CBlockPalette palette = null) : base(pts)
 		{	// Constructor
@@ -2041,7 +2055,17 @@ namespace Jigsaw
 			get { return _state;  }
 			set { _state = value; }
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public virtual void RaiseBlockChanged()
+        {
+            if (BlockChanged != null)
+            {
+				EventArgs e = new EventArgs();
+				BlockChanged(this, e);
+			}
+        }
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override Diagram.CShape Clone(double X, double Y) 
 		{	// Method to clone a CBlock at X,Y
@@ -2861,7 +2885,7 @@ namespace Jigsaw
 				} else {
 					// When a factory object is dropped, create a new instance.
 					dropped = (CBlock)this.Clone(this.Outline.Left, this.Outline.Top);
-					cvs.AddShape( dropped );
+					(cvs as Jigsaw.Canvas).AddBlock( dropped ); //cvs.AddShape( dropped );
 				}
 			}
 			

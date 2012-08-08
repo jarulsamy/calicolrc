@@ -170,12 +170,14 @@ namespace Jigsaw
 					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListStringNames);
 				} else {
 					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListString);
+					RaiseBlockChanged();
 				}
  			} else {
 				if (IsFactory) {
 					this.Text = String.Format("{0}({1})", method_name, paramListStringNames);
 				} else {
 					this.Text = String.Format("{0}({1})", method_name, paramListString);
+					RaiseBlockChanged();
 				}
 			}
 		}

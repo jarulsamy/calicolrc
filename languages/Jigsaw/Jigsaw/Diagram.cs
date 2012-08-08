@@ -1284,9 +1284,9 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Add a shape to the shape layer
         public void AddShape(CShape shp)
-        {
+        {	// Add a shape to the shape layer
+
             // Generate a unique name for this shape, if it does not have one
             if (shp.Name.Length == 0)
             {
