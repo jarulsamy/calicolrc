@@ -363,15 +363,13 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public bool Reset(Jigsaw.Canvas cvs, InspectorWindow inspector)
 		{
-			//Console.WriteLine ("Engine.Reset()");
-			
 			// Recreate top level list of all call stacks. 
 			// There can be more than one because Jigsaw allows multiple stacks to run simultaneously.
 			if (_callStacks == null) 
 				_callStacks = new List<CallStack>();
 			else
 				_callStacks.Clear();
-			
+
 			// Recreate globals and reload all assemblies
 			globals = new Dictionary<string, object>();
 			foreach (string dllPath in loadedAssemblies.Keys) LoadAssembly(dllPath);
@@ -387,21 +385,23 @@ namespace Jigsaw
 
 			// Reset all blocks
 			foreach (Diagram.CShape s in cvs.shapes) {
+
 				if (s is CBlock) {								// If a shape is a block ...
 					CBlock b = (CBlock)s;
+
 					b.State = RunningState.Idle;					// Set block state to Idle
 					b["Message"] = "";							// Clear current block message
-					
+
 					if (b.IsFactory == false) {					// If block is not a factory block ...
 						b.Compile(engine, cvs);					// Ask block to compile itself
-						
+
 						// If also a ControlStart block ...
 						if (s is CControlStart) {
 							CControlStart cs = (CControlStart)s;
 							ScriptScope scope = this.LoadBlockStack( cs );
 							scopes.Add (scope);					// Temporarily save reference to new start block scope
 						}
-						
+
 						// If also a CProcedureStart block, accumulate ref
 						if (s is CProcedureStart) {
 							CProcedureStart ps = (CProcedureStart)s;
@@ -430,7 +430,7 @@ namespace Jigsaw
 					Console.WriteLine ("Error in Engine.Reset: Could not generate source code for procedure {0}", ps.ProcedureName);
 				}
 			}
-			
+
 			RaiseEngineReset();
 			return true;
 		}

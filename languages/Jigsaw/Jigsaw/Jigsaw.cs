@@ -1535,155 +1535,157 @@ namespace Jigsaw
 		}
 
 		public bool ProcessXml(XmlWrapper xr, int dx, int dy) {
-				// Temp vars to hold parse vals
-				string name, val, typeName;
-				double R, G, B, A;
-				int X, Y, id, edgeId;
-				CBlock tBlock = null;
-				CEdge tEdge = null;
-				CEdge tLinkedEdge = null;
+			// Temp vars to hold parse vals
+			string name, val, typeName;
+			double R, G, B, A;
+			int X, Y, id, edgeId;
+			CBlock tBlock = null;
+			CEdge tEdge = null;
+			CEdge tLinkedEdge = null;
+			
+			// First Step : Read XML and create all blocks 
+			// Build dictionaries of CBlock and CEdge references
+			Dictionary<string,CBlock> blocks = new Dictionary<string, CBlock>();
+			Dictionary<string,CEdge> edges = new Dictionary<string, CEdge>();
+			
+			// FIXME: add a unserialize to Block to get additional info
+			while (xr.Read()) {
 				
-				// First Step : Read XML and create all blocks 
-				// Build dictionaries of CBlock and CEdge references
-				Dictionary<string,CBlock> blocks = new Dictionary<string, CBlock>();
-				Dictionary<string,CEdge> edges = new Dictionary<string, CEdge>();
-				
-				// FIXME: add a unserialize to Block to get additional info
-				while (xr.Read()) {
+				switch (xr.NodeType) {
+				case XmlNodeType.Element:
+					name = xr.Name.ToLower();
 					
-					switch (xr.NodeType) {
-					case XmlNodeType.Element:
-						name = xr.Name.ToLower();
+					switch (name) {
+					case "jigsaw":
+						break;
+					
+					case "module":
+						string modName = xr.GetAttribute("name");
+						string mpath = System.IO.Path.Combine( ModulePath, modName );
+						if (!engine.loadedAssemblies.ContainsKey(mpath)) UseLibrary (mpath);
+						break;
+					
+					case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
+						typeName = xr.GetAttribute("typeName");
+						X = int.Parse(xr.GetAttribute("left")) + dx;
+						Y = int.Parse(xr.GetAttribute("top")) + dy;
+						id = int.Parse(xr.GetAttribute("id"));
+						Type typ = Type.GetType(typeName);
+						System.Object[] args = new System.Object[] {X, Y};
+						tBlock = (CBlock)Activator.CreateInstance(typ, args);
+						blocks["b"+id.ToString()] = tBlock;
+						this.AddBlock(tBlock); //this.AddShape(tBlock);
+						break;
 						
-						switch (name) {
-						case "jigsaw":
-							break;
+					case "edge":		// <edge id="3" name="Out" type="Out" linkedTo="4" />
+						name = xr.GetAttribute("name");
+						edgeId = int.Parse(xr.GetAttribute("id"));
+						edges["e"+edgeId.ToString()] = tBlock.GetEdgeByName(name);
+						break;
 						
-						case "module":
-							string modName = xr.GetAttribute("name");
-							string mpath = System.IO.Path.Combine( ModulePath, modName );
-							if (!engine.loadedAssemblies.ContainsKey(mpath)) UseLibrary (mpath);
-							break;
-						
-						case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
-							typeName = xr.GetAttribute("typeName");
-							X = int.Parse(xr.GetAttribute("left")) + dx;
-							Y = int.Parse(xr.GetAttribute("top")) + dy;
-							id = int.Parse(xr.GetAttribute("id"));
-							Type typ = Type.GetType(typeName);
-							System.Object[] args = new System.Object[] {X, Y};
-							tBlock = (CBlock)Activator.CreateInstance(typ, args);
-							blocks["b"+id.ToString()] = tBlock;
-							this.AddBlock(tBlock); //this.AddShape(tBlock);
-							break;
-							
-						case "edge":		// <edge id="3" name="Out" type="Out" linkedTo="4" />
+					case "property":	// <property name="variable" value="X" />
+						// Add a property to the block
+						try {
 							name = xr.GetAttribute("name");
-							edgeId = int.Parse(xr.GetAttribute("id"));
-							edges["e"+edgeId.ToString()] = tBlock.GetEdgeByName(name);
-							break;
-							
-						case "property":	// <property name="variable" value="X" />
-							// Add a property to the block
-							try {
-								name = xr.GetAttribute("name");
-								val = xr.GetAttribute("value");
-								tBlock[name] = val;
-								//tBlock.SetProperty(name, val);
-							} catch (Exception ex) {
-								Console.WriteLine("Error in Jigsaw.ReadFile while reading property {0}: {1}", name, ex.Message);
-							}
-							break;
-						
-						case "fill_color":
-							R = double.Parse(xr.GetAttribute("R"));
-							G = double.Parse(xr.GetAttribute("G"));
-							B = double.Parse(xr.GetAttribute("B"));
-							A = double.Parse(xr.GetAttribute("A"));
-							tBlock.FillColor = new Color(R,G,B,A);
-							break;
-						
-						case "line_color":
-							R = double.Parse(xr.GetAttribute("R"));
-							G = double.Parse(xr.GetAttribute("G"));
-							B = double.Parse(xr.GetAttribute("B"));
-							A = double.Parse(xr.GetAttribute("A"));
-							tBlock.LineColor = new Color(R,G,B,A);
-							break;
-						
-						default:
-						    tBlock.ReadXmlTag(xr);
-							break;
+							val = xr.GetAttribute("value");
+							//Console.WriteLine ("ProcessXml {0} {1} {2}", tBlock.Text, name, val);
+							//foreach (CProperty p in tBlock.Properties) Console.WriteLine ("{0} {1}", tBlock.Text, p.Name);
+							tBlock[name] = val;
+							//tBlock.SetProperty(name, val);
+						} catch (Exception ex) {
+							Console.WriteLine("Error in Jigsaw.ReadFile while reading property {0}: {1}", name, ex.Message);
 						}
-						
 						break;
-						
-					case XmlNodeType.Text:
-						//string content;
-						//content = xr.Value;
-						//Console.WriteLine("content {0}", content);
-						break;
-						
-					case XmlNodeType.EndElement:
-						name = xr.Name.ToLower();
-
-						switch (name) {
-						case "jigsaw":
-							break;
-						case "block":
-							tBlock = null;
-							break;
-						default:
-						  tBlock.ReadXmlEndElement(xr);
-						  break;
-						}
-						
-						break;
-					}
-				}
-				
-				xr.Close();
-				//xr = null;
-				
-				// === Second step : Reread XML and link up edges
-				xr = xr.Clone(); // = new XmlTextReader(filename);
-
-				while (xr.Read()) {
 					
-					if (xr.NodeType == XmlNodeType.Element) {
-						name = xr.Name.ToLower();
-						
-						if (name == "block") {
-							// Get a reference to the current block
-							id = int.Parse(xr.GetAttribute("id"));
-							tBlock = blocks["b"+id.ToString()];
+					case "fill_color":
+						R = double.Parse(xr.GetAttribute("R"));
+						G = double.Parse(xr.GetAttribute("G"));
+						B = double.Parse(xr.GetAttribute("B"));
+						A = double.Parse(xr.GetAttribute("A"));
+						tBlock.FillColor = new Color(R,G,B,A);
+						break;
+					
+					case "line_color":
+						R = double.Parse(xr.GetAttribute("R"));
+						G = double.Parse(xr.GetAttribute("G"));
+						B = double.Parse(xr.GetAttribute("B"));
+						A = double.Parse(xr.GetAttribute("A"));
+						tBlock.LineColor = new Color(R,G,B,A);
+						break;
+					
+					default:
+					    tBlock.ReadXmlTag(xr);
+						break;
+					}
+					
+					break;
+					
+				case XmlNodeType.Text:
+					//string content;
+					//content = xr.Value;
+					//Console.WriteLine("content {0}", content);
+					break;
+					
+				case XmlNodeType.EndElement:
+					name = xr.Name.ToLower();
 
-						} else if (name == "edge") {
-							// Link block edges
-							edgeId = int.Parse(xr.GetAttribute("linkedTo"));
-							if (edgeId > 0) {
-								id = int.Parse(xr.GetAttribute("id"));
-								if (edges.ContainsKey("e"+id.ToString()) && 
-							    	edges.ContainsKey("e"+edgeId.ToString())) {
-									tEdge = edges["e"+id.ToString()];
-									tLinkedEdge = edges["e"+edgeId.ToString()];
-									tEdge.LinkedTo = tLinkedEdge;
-									tLinkedEdge.LinkedTo = tEdge;
-								}
+					switch (name) {
+					case "jigsaw":
+						break;
+					case "block":
+						tBlock = null;
+						break;
+					default:
+					  tBlock.ReadXmlEndElement(xr);
+					  break;
+					}
+					
+					break;
+				}
+			}
+			
+			xr.Close();
+			//xr = null;
+			
+			// === Second step : Reread XML and link up edges
+			xr = xr.Clone(); // = new XmlTextReader(filename);
+
+			while (xr.Read()) {
+				
+				if (xr.NodeType == XmlNodeType.Element) {
+					name = xr.Name.ToLower();
+					
+					if (name == "block") {
+						// Get a reference to the current block
+						id = int.Parse(xr.GetAttribute("id"));
+						tBlock = blocks["b"+id.ToString()];
+
+					} else if (name == "edge") {
+						// Link block edges
+						edgeId = int.Parse(xr.GetAttribute("linkedTo"));
+						if (edgeId > 0) {
+							id = int.Parse(xr.GetAttribute("id"));
+							if (edges.ContainsKey("e"+id.ToString()) && 
+						    	edges.ContainsKey("e"+edgeId.ToString())) {
+								tEdge = edges["e"+id.ToString()];
+								tLinkedEdge = edges["e"+edgeId.ToString()];
+								tEdge.LinkedTo = tLinkedEdge;
+								tLinkedEdge.LinkedTo = tEdge;
 							}
 						}
 					}
 				}
-				
-				xr.Close();
-				xr = null;
-				
-				// === Third step : reposition all blocks at top of stacks
-				foreach (CBlock b in blocks.Values) {
-					if (!b.InEdge.IsConnected)
-						b.RepositionBlocks(null);
-				}
-				return true;
+			}
+			
+			xr.Close();
+			xr = null;
+			
+			// === Third step : reposition all blocks at top of stacks
+			foreach (CBlock b in blocks.Values) {
+				if (!b.InEdge.IsConnected)
+					b.RepositionBlocks(null);
+			}
+			return true;
 		}
 
 		// - - - Generate a Python version of the program - - - - - - - - - - -
@@ -2094,9 +2096,9 @@ namespace Jigsaw
 			return clone;
 		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - Access property values - - - - - - - - - - - - - - - - -
 		public virtual string this[string key]
-		{	// Access property values
+		{
 			get { return _properties[key].Text;  }
 			set { _properties[key].Text = value; }
 		}
@@ -2843,8 +2845,8 @@ namespace Jigsaw
 //				cvs.DoTranslate(-40.0, 0.0);
 //			}
 			
-			// Set modified flag
-			js.Modified = true;
+			// Set modified flag if not a factory block
+			if (this.IsFactory == false) js.Modified = true;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

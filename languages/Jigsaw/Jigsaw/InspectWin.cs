@@ -433,7 +433,7 @@ namespace Jigsaw
 		{
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Expression);
 			_Compiled = _Source.Compile();
-			Text = _Source.GetCode();
+			_Text = _Source.GetCode();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -476,7 +476,7 @@ namespace Jigsaw
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Statements);
 			_Compiled = _Source.Compile();
 			string code = _Source.GetCode();
-			if (code.Length > 0) Text = code;
+			if (code.Length > 0) _Text = code;
 		}
 		
 		// - - - Replaces statement with given string and compile - - - - - - -

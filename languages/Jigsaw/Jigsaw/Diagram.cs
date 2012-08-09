@@ -1127,9 +1127,8 @@ namespace Diagram
                 }
             }
         }
-		
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - 
-        // Allow external class to raise the MouseUp event
+	
+        // - - - - Allow external class to raise the MouseUp event - - - - - - - 
         public void RaiseCanvasMouseUp(MouseEventArgs e)
         {
             if (CanvasMouseUp != null)
@@ -1200,6 +1199,7 @@ namespace Diagram
             set { 
 				if (this.modified != value) {
 					this.modified = value; 
+					//Console.WriteLine ("Modified {0} at {1}", value, DateTime.Now.ToString ());
 					try {
 						this.RaiseCanvasChangedEvent();
 					} catch {

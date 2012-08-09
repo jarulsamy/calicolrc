@@ -309,7 +309,7 @@ namespace Jigsaw
 			// to do the constructing
 			if (r.Name == "method") {
 				setValues(assembly_name, type_name, method_name, param_names, types, defaults, return_type);
-			} 
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
