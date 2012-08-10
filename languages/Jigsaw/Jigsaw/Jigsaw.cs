@@ -1536,21 +1536,25 @@ namespace Jigsaw
 
 		public bool ProcessXml(XmlWrapper xr, int dx, int dy) {
 			// Temp vars to hold parse vals
-			string name, val, typeName;
-			double R, G, B, A;
-			int X, Y, id, edgeId;
+			string name, val, typeName = "";
+			double R, G, B, A, X=0.0, Y=0.0;
+			int id=0, edgeId=0;
 			CBlock tBlock = null;
+			CMethodBlock tMethodBlock = null;
 			CEdge tEdge = null;
 			CEdge tLinkedEdge = null;
+			Type typ;
+			System.Object[] args = null;
 			
 			// First Step : Read XML and create all blocks 
-			// Build dictionaries of CBlock and CEdge references
+
+			// Build dictionaries of CBlock and CEdge objects
 			Dictionary<string,CBlock> blocks = new Dictionary<string, CBlock>();
 			Dictionary<string,CEdge> edges = new Dictionary<string, CEdge>();
 			
 			// FIXME: add a unserialize to Block to get additional info
-			while (xr.Read()) {
-				
+			while (xr.Read())
+			{
 				switch (xr.NodeType) {
 				case XmlNodeType.Element:
 					name = xr.Name.ToLower();
@@ -1570,19 +1574,49 @@ namespace Jigsaw
 						X = int.Parse(xr.GetAttribute("left")) + dx;
 						Y = int.Parse(xr.GetAttribute("top")) + dy;
 						id = int.Parse(xr.GetAttribute("id"));
-						Type typ = Type.GetType(typeName);
-						System.Object[] args = new System.Object[] {X, Y};
+
+						// This will be set to a non-null value if we are dealing with a CMethodBlock.
+						// Otherwise, it remains null as a signal that we do not have one.
+						tMethodBlock = null;
+
+						typ = Type.GetType(typeName);
+						args = new System.Object[] {X, Y};
 						tBlock = (CBlock)Activator.CreateInstance(typ, args);
 						blocks["b"+id.ToString()] = tBlock;
 						this.AddBlock(tBlock); //this.AddShape(tBlock);
 						break;
-						
+
+					case "method":	//<method assembly_name="Processing" type_name="Processing" method_name="year" return_type="System.Int32" />
+						string methodAssembly = xr.GetAttribute("assembly_name");
+						string methodType = xr.GetAttribute("type_name");
+						string methodName = xr.GetAttribute("method_name");
+						string methodReturnType = xr.GetAttribute("return_type");
+
+						tMethodBlock = (CMethodBlock)tBlock;
+						tMethodBlock.AssemblyName = methodAssembly;
+						tMethodBlock.MethodName = methodName;
+						tMethodBlock.TypeName = methodType;
+						tMethodBlock.ReturnType = methodReturnType;
+
+						break;
+
+					case "parameter":
+						// Add parameters as block properties. This tag is only found with MethodBlocks.
+						string paramName = xr.GetAttribute("name");
+						string paramType = xr.GetAttribute("type");
+						string paramDefault = xr.GetAttribute("default");
+						tMethodBlock.ParamNames.Add ( paramName );
+						tMethodBlock.ParamTypes.Add ( paramType );
+						tMethodBlock.ParamDefaults.Add ( paramDefault );
+						tMethodBlock.AddExpressionProperty(paramName, paramType, paramDefault);
+						break;
+
 					case "edge":		// <edge id="3" name="Out" type="Out" linkedTo="4" />
 						name = xr.GetAttribute("name");
 						edgeId = int.Parse(xr.GetAttribute("id"));
 						edges["e"+edgeId.ToString()] = tBlock.GetEdgeByName(name);
 						break;
-						
+
 					case "property":	// <property name="variable" value="X" />
 						// Add a property to the block
 						try {
@@ -1590,10 +1624,11 @@ namespace Jigsaw
 							val = xr.GetAttribute("value");
 							//Console.WriteLine ("ProcessXml {0} {1} {2}", tBlock.Text, name, val);
 							//foreach (CProperty p in tBlock.Properties) Console.WriteLine ("{0} {1}", tBlock.Text, p.Name);
-							tBlock[name] = val;
 							//tBlock.SetProperty(name, val);
+							tBlock[name] = val;
+
 						} catch (Exception ex) {
-							Console.WriteLine("Error in Jigsaw.ReadFile while reading property {0}: {1}", name, ex.Message);
+							Console.WriteLine("Error in Jigsaw.Canvas.ProcessXml while reading property {0}: {1}", name, ex.Message);
 						}
 						break;
 					
@@ -1650,9 +1685,10 @@ namespace Jigsaw
 			// === Second step : Reread XML and link up edges
 			xr = xr.Clone(); // = new XmlTextReader(filename);
 
-			while (xr.Read()) {
-				
-				if (xr.NodeType == XmlNodeType.Element) {
+			while (xr.Read()) 
+			{	
+				if (xr.NodeType == XmlNodeType.Element) 
+				{
 					name = xr.Name.ToLower();
 					
 					if (name == "block") {

@@ -8,14 +8,15 @@ namespace Jigsaw
 {
 	public class CMethodBlock : CBlock
 	{
-		string assembly_name;
-		public string type_name;
-		public string method_name;
-		public List<string> param_names;
-		List<string> types;
-		List<string> defaults;
-		public string return_type;
-		public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
+		public string AssemblyName;
+		public string TypeName;
+		public string MethodName;
+		public List<string> ParamNames;
+		public List<string> ParamTypes;
+		public List<string> ParamDefaults;
+		private string _returnType = "System.Void";
+		//public string ReturnType;
+		//public static Dictionary<string,double> VariableNames = new Dictionary<string, double>();
 		
 		private string _source = null;
 		private Microsoft.Scripting.Hosting.CompiledCode _compiled = null;
@@ -27,13 +28,14 @@ namespace Jigsaw
 				new Diagram.CPoint(X + CBlock.BlockWidth, Y + 20)}),
 				palette)
 		{
-			assembly_name = "";
-			type_name = "";
-			method_name = "";
-			param_names = new List<string>();
-			types = new List<string>();
-			defaults = new List<string>();
-			return_type = "System.Void";
+			setValues("", "", "", new List<string>(), new List<string>(), new List<string>(), "System.Void");
+//			assembly_name = "";
+//			type_name = "";
+//			method_name = "";
+//			param_names = new List<string>();
+//			types = new List<string>();
+//			defaults = new List<string>();
+//			return_type = "System.Void";
 		}
 		
 		public CMethodBlock(Double X, Double Y, 
@@ -56,23 +58,191 @@ namespace Jigsaw
 		public CMethodBlock(Double X, Double Y) : this(X, Y, null) {}
 		
 		// - - - 
+	    public void setValues(string assembly_name, 
+				  string type_name, 
+				  string method_name, 
+				  List<string> names,
+				  List<string> types,
+				  List<string> defaults,
+		          string return_type
+		          )
+		{
+			this.AssemblyName = assembly_name;
+			this.TypeName = type_name;
+			this.MethodName = method_name;			// Name of function/constructor to call
+			this.ParamNames = names;				// Names of all parameters
+			this.ParamTypes = types;				// Parameter type strings
+			this.ParamDefaults = defaults;			// Parameter default values (as strings)
+
+			this.LineWidth = 2;						// Default block visual characteristics
+			this.LineColor = Diagram.Colors.DarkBlue;
+			this.FillColor = Diagram.Colors.LightBlue;
+			this.Sizable = false;
+
+			// Make a variable property to hold values *returned* from functions
+			this.ReturnType = return_type;
+
+			// Create parameters as block properties
+			if (names != null) {
+				for (int i = 0; i < names.Count; i++) {
+					AddExpressionProperty(names[i], types[i], defaults[i]);
+				}
+			}
+
+			// Make a variable property to hold values *returned* from functions
+//			this._returnType = return_type;			// Return type string
+//			if (!return_type.ToString().Equals("System.Void")) {
+//				CVarNameProperty tvar = new CVarNameProperty("Variable", "");
+//				tvar.PropertyChanged += OnPropertyChanged;
+//				_properties["Variable"] = tvar;
+//			}
+
+//			// Make all properties to hold function arguments
+//			CExpressionProperty tprop = null;
+//			
+//			// Create parameters
+//			if (names != null)
+//			{
+//				for (int i = 0; i < names.Count; i++)
+//				{
+//					String formatted_default = "";
+//					
+//					// FIXME: make a default of the appropriate type if one not given
+//					if (defaults[i] == null || defaults[i] == "") {
+//						formatted_default = String.Format("{0}", 0);
+//						
+//					} else if (types[i] == "System.String") {
+//						formatted_default = String.Format("\"{0}\"", defaults[i]);
+//						
+//					} else if (!(defaults[i].Equals("System.DBNull"))) {
+//						formatted_default = String.Format("{0}", defaults[i]);
+//						
+//					} else {
+//						formatted_default = String.Format("{0}", 0);
+//					}
+//					
+//					tprop = new CExpressionProperty(names[i], formatted_default);
+//					tprop.PropertyChanged += OnPropertyChanged;
+//				    _properties[names[i]] = tprop;
+//				}
+//			}
+
+			// Setup and init Property
+			this.OnPropertyChanged(null, null);
+		}
+
+		// - - - Create a new expression property with appropriate default for the block - - -
+		public bool AddExpressionProperty(string propName, string propType, string propDefault = null) 
+		{
+			String formattedDefault = "";
+
+			try 
+			{
+				// FIXME: make a default of the appropriate type if one not given
+				if (propDefault == null || propDefault == "") {
+					formattedDefault = String.Format("{0}", 0);
+					
+				} else if (propType == "System.String") {
+					formattedDefault = String.Format("\"{0}\"", propDefault);
+					
+				} else if (!(propDefault.Equals("System.DBNull"))) {
+					formattedDefault = String.Format("{0}", propDefault);
+					
+				} else {
+					formattedDefault = String.Format("{0}", 0);
+				}
+
+				// If the property already exists, delete it first
+				if (_properties.ContainsKey (propName)) {
+					_properties[propName].PropertyChanged -= OnPropertyChanged;
+					_properties.Remove (propName);
+				}
+
+				// Add the new property
+				CExpressionProperty tprop = new CExpressionProperty(propName, formattedDefault);
+				tprop.PropertyChanged += OnPropertyChanged;
+			    _properties[propName] = tprop;
+
+				this.OnPropertyChanged(null, null);
+
+				return true;
+			}
+			catch (Exception ex) {
+				Console.WriteLine ("Error in CMethodBlock.AddProperty: {0}", ex.Message);
+				return false;
+			}
+		}
+
+		// - - - Sets or modifies the return type of the method block - - - 
+		public string ReturnType
+		{
+			set {
+				// Make a variable property to hold values *returned* from functions
+				this._returnType = value;			// Return type string
+
+				// Delete current Variable property, if exists
+				if (_properties.ContainsKey ("Variable")) {
+					_properties["Variable"].PropertyChanged -= OnPropertyChanged;
+					_properties.Remove ("Variable");
+				}
+
+				if (value != "System.Void") {
+					CVarNameProperty tvar = new CVarNameProperty("Variable", "");
+					tvar.PropertyChanged += OnPropertyChanged;
+					_properties["Variable"] = tvar;
+				}
+
+				this.OnPropertyChanged(null, null);
+			}
+			get
+			{
+				return _returnType;
+			}
+		}
+
+        // - - - Update text when property changes - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{
+			// Get variable name to assign, if one was set
+			string varname = "";
+			if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
+			
+			// Build string to display in block
+			if (varname.Length > 0) {
+				if (IsFactory) {
+					this.Text = String.Format("{0}={1}({2})", varname, MethodName, paramListStringNames);
+				} else {
+					this.Text = String.Format("{0}={1}({2})", varname, MethodName, paramListString);
+					RaiseBlockChanged();
+				}
+ 			} else {
+				if (IsFactory) {
+					this.Text = String.Format("{0}({1})", MethodName, paramListStringNames);
+				} else {
+					this.Text = String.Format("{0}({1})", MethodName, paramListString);
+					RaiseBlockChanged();
+				}
+			}
+		}
+				
+		// - - - 
 		public override CBlock Clone(double X, double Y, bool cloneEdges) 
 		{	// Clone this block. Optionally clone edges.
 			CBlock clone = (CBlock)base.Clone(X, Y, cloneEdges);
-			((CMethodBlock)clone).setValues(this.assembly_name, this.type_name, this.method_name, this.param_names, 
-								this.types, this.defaults, this.return_type);
+			((CMethodBlock)clone).setValues(this.AssemblyName, this.TypeName, this.MethodName, this.ParamNames, 
+								this.ParamTypes, this.ParamDefaults, this.ReturnType);
 			clone.FillColor = this.FillColor;
 			clone.LineColor = this.LineColor;
 			clone.Text = this.Text;
 			return clone;
 		}
-		
-        // - - - Private util to build delimited parameter name list string - - - - - -
+
+		// - - - Private util to build delimited parameter name list string - - - - - -
 		private string paramListString
 		{
 			get {
 				List<String> paramlist = new List<String>();
-				foreach (string pname in param_names) {
+				foreach (string pname in ParamNames) {
 					if (_properties.ContainsKey(pname) && _properties[pname].Text.Length > 0) 
 						paramlist.Add (_properties[pname].Text);
 				}
@@ -84,7 +254,7 @@ namespace Jigsaw
 		{
 			get {
 				List<String> paramlist = new List<String>();
-				foreach (string pname in param_names) {
+				foreach (string pname in ParamNames) {
 					if (_properties.ContainsKey(pname)) 
 						paramlist.Add (pname);
 				}
@@ -92,96 +262,6 @@ namespace Jigsaw
 			}
 		}
 
-		// - - - 
-	    public void setValues(string assembly_name, 
-				  string type_name, 
-				  string method_name, 
-				  List<string> names,
-				  List<string> types,
-				  List<string> defaults,
-		          string return_type
-		          )
-		{
-			this.assembly_name = assembly_name;
-			this.type_name = type_name;
-			this.method_name = method_name;			// Name of function/constructor to call
-			this.param_names = names;				// Names of all parameters
-			this.types = types;						// Parameter type strings
-			this.defaults = defaults;				// Parameter default values (as strings)
-			this.return_type = return_type;			// Return type string
-			
-			this.LineWidth = 2;						// Default block visual characteristics
-			this.LineColor = Diagram.Colors.DarkBlue;
-			this.FillColor = Diagram.Colors.LightBlue;
-			this.Sizable = false;
-			
-			// Make a variable property to hold values *returned* from functions
-			if (! return_type.ToString().Equals("System.Void")) {
-				CVarNameProperty tvar = new CVarNameProperty("Variable", "");
-				tvar.PropertyChanged += OnPropertyChanged;
-				_properties["Variable"] = tvar;
-			}
-			
-			// Make all properties to hold function arguments
-			CExpressionProperty tprop = null;
-			
-			// Create parameters
-			if (names != null)
-			{
-				for (int i = 0; i < names.Count; i++)
-				{
-					String formatted_default = "";
-					
-					// FIXME: make a default of the appropriate type if one not given
-					if (defaults[i] == null || defaults[i] == "") {
-						formatted_default = String.Format("{0}", 0);
-						
-					} else if (types[i] == "System.String") {
-						formatted_default = String.Format("\"{0}\"", defaults[i]);
-						
-					} else if (!(defaults[i].Equals("System.DBNull"))) {
-						formatted_default = String.Format("{0}", defaults[i]);
-						
-					} else {
-						formatted_default = String.Format("{0}", 0);
-					}
-					
-					tprop = new CExpressionProperty(names[i], formatted_default);
-					tprop.PropertyChanged += OnPropertyChanged;
-				    _properties[names[i]] = tprop;					
-					
-				}
-			}
-
-			// Setup and init Property
-			this.OnPropertyChanged(null, null);
-		}
-		
-        // - - - Update text when property changes - - - - - - - - - - - -
-		public void OnPropertyChanged(object sender, EventArgs e)
-		{
-			// Get variable name to assign, if one was set
-			string varname = "";
-			if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
-			
-			// Build string to display in block
-			if (varname.Length > 0) {
-				if (IsFactory) {
-					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListStringNames);
-				} else {
-					this.Text = String.Format("{0}={1}({2})", varname, method_name, paramListString);
-					RaiseBlockChanged();
-				}
- 			} else {
-				if (IsFactory) {
-					this.Text = String.Format("{0}({1})", method_name, paramListStringNames);
-				} else {
-					this.Text = String.Format("{0}({1})", method_name, paramListString);
-					RaiseBlockChanged();
-				}
-			}
-		}
-		
 		// - - - Generate and return Python procedure call - - - - - - - - -
 		private string ToPython ()
 		{
@@ -190,7 +270,7 @@ namespace Jigsaw
 			if (_properties.ContainsKey("Variable")) varname = _properties["Variable"].Text;
 			
 			// Build Python
-			string code = String.Format("{0}.{1}({2})", assembly_name, method_name, paramListString);
+			string code = String.Format("{0}.{1}({2})", AssemblyName, MethodName, paramListString);
 			if (varname.Length > 0) code = String.Format("{0} = {1}", varname, code);
 			this._source = code;
 			
@@ -246,7 +326,7 @@ namespace Jigsaw
 		{
 			get 
 			{
-				return new List<string>() {assembly_name};
+				return new List<string>() {AssemblyName};
 			}
 		}
 		
@@ -308,7 +388,7 @@ namespace Jigsaw
 			// end of method, call SetValues, even though we have all of the info; we need
 			// to do the constructing
 			if (r.Name == "method") {
-				setValues(assembly_name, type_name, method_name, param_names, types, defaults, return_type);
+				setValues(AssemblyName, TypeName, MethodName, ParamNames, ParamTypes, ParamDefaults, ReturnType);
 			}
 		}
 		
@@ -317,23 +397,23 @@ namespace Jigsaw
 		{
 			if (xr.Name == "method")
 			{
-				assembly_name = xr.GetAttribute("assembly_name");
-				type_name = xr.GetAttribute("type_name");
-				method_name = xr.GetAttribute("method_name");
-				return_type = xr.GetAttribute("return_type");
+				AssemblyName = xr.GetAttribute("assembly_name");
+				TypeName = xr.GetAttribute("type_name");
+				MethodName = xr.GetAttribute("method_name");
+				ReturnType = xr.GetAttribute("return_type");
 				
 			} else if (xr.Name == "parameter") {
 				
 				string parameter_name = xr.GetAttribute("name");
 				string parameter_type = xr.GetAttribute("type");
 				string parameter_default = xr.GetAttribute("default");
-				param_names.Add(parameter_name);
-				types.Add(parameter_type);
+				ParamNames.Add(parameter_name);
+				ParamTypes.Add(parameter_type);
 				
 				if (!parameter_default.Equals("")) {
-					defaults.Add(parameter_default);
+					ParamDefaults.Add(parameter_default);
 				} else {
-					defaults.Add("System.DBNull");
+					ParamDefaults.Add("System.DBNull");
 				}
 			}
 		}
@@ -344,16 +424,16 @@ namespace Jigsaw
 			// Write the method tag first, so when we read it first
 			// and make the full CMethodBlock before the variables
 			xw.WriteStartElement("method");
-			xw.WriteAttributeString("assembly_name", assembly_name);
-			xw.WriteAttributeString("type_name", type_name);
-			xw.WriteAttributeString("method_name", method_name);
-			xw.WriteAttributeString("return_type", return_type);
+			xw.WriteAttributeString("assembly_name", AssemblyName);
+			xw.WriteAttributeString("type_name", TypeName);
+			xw.WriteAttributeString("method_name", MethodName);
+			xw.WriteAttributeString("return_type", ReturnType);
 			
-		    for (int n = 0; n < param_names.Count; n++) {
+		    for (int n = 0; n < ParamNames.Count; n++) {
 				xw.WriteStartElement("parameter");
-				xw.WriteAttributeString("name", param_names[n]);
-				xw.WriteAttributeString("type", types[n]);
-				xw.WriteAttributeString("default", defaults[n].ToString());
+				xw.WriteAttributeString("name", ParamNames[n]);
+				xw.WriteAttributeString("type", ParamTypes[n]);
+				xw.WriteAttributeString("default", ParamDefaults[n].ToString());
 				xw.WriteEndElement();
 		    }
 	  		xw.WriteEndElement();

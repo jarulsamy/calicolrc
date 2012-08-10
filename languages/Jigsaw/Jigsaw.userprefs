@@ -1,20 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\CMethodBlock.cs">
     <Files>
-      <File FileName="Jigsaw\Diagram.cs" Line="1131" Column="82" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="733" Column="11" />
-      <File FileName="Jigsaw\Engine.cs" Line="396" Column="16" />
-      <File FileName="Jigsaw\ControlBlocks.cs" Line="1610" Column="18" />
-      <File FileName="Jigsaw\StatementBlocks.cs" Line="34" Column="4" />
+      <File FileName="Jigsaw\Diagram.cs" Line="2442" Column="1" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="1627" Column="40" />
       <File FileName="Jigsaw\InspectWin.cs" Line="514" Column="2" />
-      <File FileName="Jigsaw\CMethodBlock.cs" Line="96" Column="27" />
+      <File FileName="Jigsaw\CMethodBlock.cs" Line="29" Column="13" />
+      <File FileName="Jigsaw\ControlBlocks.cs" Line="9" Column="17" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="Jigsaw.cs" selected="True" />
+            <Node name="CMethodBlock.cs" selected="True" />
           </Node>
         </State>
       </Pad>
