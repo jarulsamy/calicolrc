@@ -1391,9 +1391,10 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public static void text(string txt, double x, double y, double w, double h) 
+	public static void text(object obj, double x, double y, double w, double h) 
 	{	// Draw text
 		if (_p == null) return;
+		string txt = obj.ToString ();
 		_invoke ( delegate { 
 			try {
 				_p.text(txt, x, y, w, h);
@@ -1404,9 +1405,10 @@ public static class Processing
 		} );
 	}
 
-	public static void text(string txt, double x, double y) 
+	public static void text(object obj, double x, double y) 
 	{	// Draw text
 		if (_p == null) return;
+		string txt = obj.ToString ();
 		_invoke ( delegate { 
 			try {
 				_p.text(txt, x, y);
@@ -1745,6 +1747,7 @@ public static class Processing
 		ev.WaitOne();
 		return img;
 	}
+	public static PImage get() { return get(0, 0, _width, _height); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public static void loadPixels()
@@ -2031,6 +2034,43 @@ public class PImage
 	public int height() {
 		return _height;
 	}
+
+//	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	public void image(PImage img, double x, double y, double w, double h) 
+//	{	// Render an image into the rectangle specified
+//
+//		// Calculate position and scale parameters based on image mode
+////		double ww = img.width ();		// Default is CORNER
+////		double hh = img.height ();
+////		double sx = w/ww;
+////		double sy = h/hh;
+//
+////		switch (_imageMode) {
+////		case ImageMode.CENTER:
+////			x = x - 0.5*w;
+////			y = y - 0.5*h;
+////			//sx = w/ww;		// Same as default
+////			//sy = h/hh;
+////			break;
+////		case ImageMode.CORNERS:
+////			// In this mode, w is x2, h is y2
+////			sx = (w - x)/ww;
+////			sy = (h - y)/hh;
+////			break;
+////		default: // ImageMode.CORNER:
+////			break;
+////		}
+//
+//		using (Context g = new Context(_img)) {
+////			g.Matrix = _mat;
+//			g.Save ();
+//			g.Translate (x, y);
+////			g.Scale ( sx, sy );
+//			img._img.Show (g, 0, 0);
+//			g.Restore ();
+//		}
+////		this.QueueDraw ();
+//	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void loadPixels()
