@@ -59,7 +59,7 @@ internal class PWindow : Gtk.Window
 	public event DeleteEventHandler windowClosed;				// Raised when window is closed
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public PWindow (int w, int h, bool needsQuit ) : base(WindowType.Toplevel)
+	public PWindow (int w, int h, int x, int y, bool needsQuit ) : base(WindowType.Toplevel)
 	{
 		_needsQuit = needsQuit;
 		_frameCount = 0;
@@ -67,6 +67,7 @@ internal class PWindow : Gtk.Window
 
 		// Create window with drawing area
 		this.size(w, h);
+		if (x > -10000) this.Move (x, y);
 
 		this.DeleteEvent += onDeleteEvent;
 
@@ -82,6 +83,7 @@ internal class PWindow : Gtk.Window
 
 		this.ShowAll ();
 	}
+	public PWindow (int w, int h, bool needsQuit ): this(w, h, -10000, -10000, needsQuit) {}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	protected void onDeleteEvent (object o, DeleteEventArgs args)

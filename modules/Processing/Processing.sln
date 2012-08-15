@@ -16,6 +16,6 @@ Global
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Processing\Processing.csproj
-		outputpath = Processing\bin\Release
+		outputpath = .
 	EndGlobalSection
 EndGlobal
