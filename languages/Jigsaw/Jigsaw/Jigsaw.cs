@@ -453,37 +453,85 @@ namespace Jigsaw
 		public bool UseLibraryDLL(string dllfile, Color fill_color, Color line_color)
 		{
 			// Load and build blocks from assembly dllfile
-			List<CBlock > blocks = new List<CBlock> ();
-			int y = 34;
+			List<CBlock > blocks = new List<CBlock> ();								// List of new blocks
+			List<String> tabNames = new List<string>();								// List of new tab names
+			Dictionary<CBlock, String> tabMap = new Dictionary<CBlock, String>();	// Assign blocks to new tab names
+			Dictionary<String,int> blockCount = new Dictionary<string, int>();		// Count number of blocks on tab
+			Dictionary<String,int> blockPos = new Dictionary<string, int>();		// Track position of new blocks in a tab
+
+			Widgets.CRoundedTab tab = null;
 			CBlock block = null;
 
 			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
 			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
 
+			// Init default tab data structures
+			tabNames.Add (assembly_name);
+			blockPos[assembly_name] = 34;
+			blockCount[assembly_name] = 0;
+
 			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
 				Type type = Reflection.Utils.getType (assembly, type_name);
 
-				foreach (System.Reflection.ConstructorInfo ci in Reflection.Utils.getConstructors(type)) {
-					List<string > param_names = new List<string> ();
-					List<string > param_type_names = new List<string> ();
-					List<string > param_defaults = new List<string> ();
-					foreach (System.Reflection.ParameterInfo pi in ci.GetParameters()) {
-						param_names.Add (pi.Name);
-						param_type_names.Add (pi.ParameterType.FullName);
-						param_defaults.Add (pi.DefaultValue.ToString ());
-					}
-					string return_type = type_name;
-					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
-                                                    param_names, param_type_names, param_defaults,
-                                                    return_type, pnlBlock);
-					block.Visible = false;
-					block.LineColor = line_color;
-					block.FillColor = fill_color;
-					blocks.Add (block);
-					y += 40;
-				}
+				// Skip constructors for now
+//				foreach (System.Reflection.ConstructorInfo ci in Reflection.Utils.getConstructors(type)) {
+//
+//					// Look for attributes and skip if tab name is set to null
+//					object[] attrs = ci.GetCustomAttributes(false); 
+//					if (attrs.Length > 0) {
+//						if ( attrs[0].GetType() == typeof(JigsawTabAttribute) ){
+//						//if ( attrs[0].GetType().ToString () == typeof(JigsawTabAttribute).ToString () ) {
+//							// If null is set for tab name, do not display
+//							JigsawTabAttribute tattr = (JigsawTabAttribute)attrs[0];
+//							if ( tattr.Name == null ) continue;
+//						}
+//					}
+//
+//					List<string > param_names = new List<string> ();
+//					List<string > param_type_names = new List<string> ();
+//					List<string > param_defaults = new List<string> ();
+//					foreach (System.Reflection.ParameterInfo pi in ci.GetParameters()) {
+//						param_names.Add (pi.Name);
+//						param_type_names.Add (pi.ParameterType.FullName);
+//						param_defaults.Add (pi.DefaultValue.ToString ());
+//					}
+//					string return_type = type_name;
+//					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
+//                                                    param_names, param_type_names, param_defaults,
+//                                                    return_type, pnlBlock);
+//					block.Visible = false;
+//					block.LineColor = line_color;
+//					block.FillColor = fill_color;
+//					blocks.Add (block);
+//					y += 40;
+//				}
 
 				foreach (System.Reflection.MethodInfo mi in Reflection.Utils.getStaticMethods(type)) {
+
+					string tabName = assembly_name;		// Default tab name
+
+					// Look for attributes and skip if tab name is set to null
+					object[] attrs = mi.GetCustomAttributes(false); 
+
+					if (attrs.Length > 0) {
+						//if (attrs[0].GetType ().ToString() == typeof(JigsawTabAttribute).ToString ())
+						//Console.WriteLine ("{0} {1}", mi.Name, attrs[0].GetType ());
+						if ( attrs[0].GetType() == typeof(JigsawTabAttribute) )
+						{
+							JigsawTabAttribute tattr = (JigsawTabAttribute)attrs[0];
+							if ( tattr.Name == null ) {		// If null is set for tab name, do not make block
+								continue;
+							} else {						// Save tab data
+								tabName = tattr.Name;
+								if (!tabNames.Contains (tabName)) {
+									tabNames.Add (tabName);
+									blockPos[tabName] = 34;
+									blockCount[tabName] = 0;
+								}
+							}
+						}
+					}
+
 					List<string > param_names = new List<string> ();
 					List<string > param_type_names = new List<string> ();
 					List<string > param_defaults = new List<string> ();
@@ -496,7 +544,9 @@ namespace Jigsaw
 							param_defaults.Add ("");
 						}
 					}
+
 					string return_type = mi.ReturnType.ToString ();
+					int y = blockPos[tabName];
 					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
                                                 param_names, param_type_names, param_defaults,
                                                 return_type, pnlBlock);
@@ -504,47 +554,178 @@ namespace Jigsaw
 					block.LineColor = line_color;
 					block.FillColor = fill_color;
 					blocks.Add (block);
-					y += 40;
+					tabMap[block] = tabName;
+					blockPos[tabName] = y + 40;
+					blockCount[tabName]++;
 				}
 			}
-			// Get next available tab location
+
+			// Get next available tab location on tab pallette
 			double tabY = 0.0;
 			foreach (Widgets.CRoundedTab tt in allTabs) {
 				if (tt.Top > tabY)
 					tabY = tt.Top;
 			}
 
-			// Add tab
-			tabY += 33.0;
-			Widgets.CRoundedTab tab = new Widgets.CRoundedTab (0, tabY, 100, 30, assembly_name, pnlBlock);
-			tab.Dock = Diagram.DockSide.Left;
-			this.AddShape (tab);
-			pnlBlock.BringToFront (this);
+			// Add all new tabs and blocks
+			foreach (String tabName in tabNames) 
+			{
+				// Skip empty tabs
+				if (blockCount[tabName] == 0) continue;
 
-			// Add this tab to all other tabs
-			foreach (Widgets.CRoundedTab tt in allTabs)
-				tt.AddTab (tab);
+				// Add tab if has at least one block
+				tabY += 33.0;
+				tab = new Widgets.CRoundedTab (0, tabY, 100, 30, tabName, pnlBlock);
+				tab.Dock = Diagram.DockSide.Left;
+				this.AddShape (tab);
+				pnlBlock.BringToFront (this);
 
-			// Add all other tabs to this tab
-			tab.AddTabs (allTabs);
+				foreach (Widgets.CRoundedTab tt in allTabs) tt.AddTab (tab);	// Add this tab to all other tabs
+				tab.AddTabs (allTabs);											// Add all other tabs to this tab
+				allTabs.Add (tab);												// Add this tab to list of all tabs
 
-			// Add this tab to list of all tabs
-			allTabs.Add (tab);
-
-			// Add blocks
-			foreach (CBlock cblock in blocks) {
-				this.AddShape (cblock);
-				tab.AddShape (cblock);
+				// Add blocks to tab
+				foreach (CBlock cblock in blocks) {
+					if ( tabMap[cblock] == tabName ) {
+						this.AddShape (cblock);
+						tab.AddShape (cblock);
+					}
+				}
 			}
 
-			// Select the new tab
-			tab.SetToggle (this, true);
+			// Select the last new tab
+			if (tab != null) tab.SetToggle (this, true);
 
 			// Redraw
 			this.Invalidate ();
 
 			return true;
 		}
+
+//		// - - - Use Library with given colors - - - - - - - - - - - - - - - - - - - -
+//		public bool UseLibraryDLL(string dllfile, Color fill_color, Color line_color)
+//		{
+//			// Load and build blocks from assembly dllfile
+//			List<CBlock > blocks = new List<CBlock> ();
+//			//Dictionary<String,CBlock> tabMap = new Dictionary<string, CBlock>();
+//
+//			int y = 34;
+//			CBlock block = null;
+//
+//			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
+//			System.Reflection.Assembly assembly = engine.LoadAssembly (dllfile);
+//
+//			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
+//				Type type = Reflection.Utils.getType (assembly, type_name);
+//
+//				// Skip constructors for now
+//				foreach (System.Reflection.ConstructorInfo ci in Reflection.Utils.getConstructors(type)) {
+//
+//					// Look for attributes and skip if tab name is set to null
+//					object[] attrs = ci.GetCustomAttributes(false); 
+//					if (attrs.Length > 0) {
+//						if ( attrs[0].GetType() == typeof(JigsawTabAttribute) ){
+//						//if ( attrs[0].GetType().ToString () == typeof(JigsawTabAttribute).ToString () ) {
+//							// If null is set for tab name, do not display
+//							JigsawTabAttribute tattr = (JigsawTabAttribute)attrs[0];
+//							if ( tattr.Name == null ) continue;
+//						}
+//					}
+//
+//					List<string > param_names = new List<string> ();
+//					List<string > param_type_names = new List<string> ();
+//					List<string > param_defaults = new List<string> ();
+//					foreach (System.Reflection.ParameterInfo pi in ci.GetParameters()) {
+//						param_names.Add (pi.Name);
+//						param_type_names.Add (pi.ParameterType.FullName);
+//						param_defaults.Add (pi.DefaultValue.ToString ());
+//					}
+//					string return_type = type_name;
+//					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
+//                                                    param_names, param_type_names, param_defaults,
+//                                                    return_type, pnlBlock);
+//					block.Visible = false;
+//					block.LineColor = line_color;
+//					block.FillColor = fill_color;
+//					blocks.Add (block);
+//					y += 40;
+//				}
+//
+//				foreach (System.Reflection.MethodInfo mi in Reflection.Utils.getStaticMethods(type)) {
+//
+//					// Look for attributes and skip if tab name is set to null
+//					object[] attrs = mi.GetCustomAttributes(false); 
+//					if (attrs.Length > 0) {
+//						if ( attrs[0].GetType() == typeof(JigsawTabAttribute) ){
+//							// If null is set for tab name, do not make block
+//							JigsawTabAttribute tattr = (JigsawTabAttribute)attrs[0];
+//							if ( tattr.Name == null ) continue;
+//						}
+//					}
+//
+//					List<string > param_names = new List<string> ();
+//					List<string > param_type_names = new List<string> ();
+//					List<string > param_defaults = new List<string> ();
+//					foreach (System.Reflection.ParameterInfo pi in mi.GetParameters()) {
+//						param_names.Add (pi.Name);
+//						param_type_names.Add (pi.ParameterType.FullName);
+//						try {
+//							param_defaults.Add (pi.DefaultValue.ToString ());
+//						} catch {
+//							param_defaults.Add ("");
+//						}
+//					}
+//					string return_type = mi.ReturnType.ToString ();
+//					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
+//                                                param_names, param_type_names, param_defaults,
+//                                                return_type, pnlBlock);
+//					block.Visible = false;
+//					block.LineColor = line_color;
+//					block.FillColor = fill_color;
+//					blocks.Add (block);
+//					y += 40;
+//				}
+//			}
+//
+//
+//			// Get next available tab location
+//			double tabY = 0.0;
+//			foreach (Widgets.CRoundedTab tt in allTabs) {
+//				if (tt.Top > tabY)
+//					tabY = tt.Top;
+//			}
+//
+//			// Add tab
+//			tabY += 33.0;
+//			Widgets.CRoundedTab tab = new Widgets.CRoundedTab (0, tabY, 100, 30, assembly_name, pnlBlock);
+//			tab.Dock = Diagram.DockSide.Left;
+//			this.AddShape (tab);
+//			pnlBlock.BringToFront (this);
+//
+//			// Add this tab to all other tabs
+//			foreach (Widgets.CRoundedTab tt in allTabs)
+//				tt.AddTab (tab);
+//
+//			// Add all other tabs to this tab
+//			tab.AddTabs (allTabs);
+//
+//			// Add this tab to list of all tabs
+//			allTabs.Add (tab);
+//
+//			// Add blocks
+//			foreach (CBlock cblock in blocks) {
+//				this.AddShape (cblock);
+//				tab.AddShape (cblock);
+//			}
+//
+//			// Select the new tab
+//			tab.SetToggle (this, true);
+//
+//			// Redraw
+//			this.Invalidate ();
+//
+//			return true;
+//		}
 
 		// - - - Load and build blocks from assembly map xml - - - - - - - - - - - - - - -
 		public bool UseLibraryMap(TextReader tr)
