@@ -1506,8 +1506,10 @@ public static class Myro
       string title="Myro Camera")
 	{
 		Graphics.WindowClass win = Graphics.makeWindowFast (title,
-        picture.width, picture.height);
+        (int)(picture.width*picture.scaleFactor), (int)(picture.height*picture.scaleFactor));
 		picture.draw (win);
+		picture.setX(picture.width*picture.scaleFactor/2);
+		picture.setY(picture.height*picture.scaleFactor/2);
 	}
 
 	public static void setOption (string key, object value)
@@ -3604,7 +3606,9 @@ public static class Myro
 		public byte[] gray_header = null;
 		public byte emitters = 0x1 | 0x2 | 0x4;
 		private byte[] _lastSensors;
-    
+	    private int imagewidth = 256; // defaults for fluke1
+	    private int imageheight = 192;  
+
 		//static byte SOFT_RESET=33;
 		static byte GET_ALL = 65 ;
 		//static byte GET_ALL_BINARY=66  ;
@@ -3784,6 +3788,11 @@ public static class Myro
 			if (serial != null)
 				setup ();
 		}
+	  
+	  public Boolean isFluke2(){
+	    string[] version = dongle.Split('.');
+	    return (version[0].Equals("3"));
+	  }
     
 		public override void setup ()
 		{
@@ -3800,6 +3809,10 @@ public static class Myro
                 (string)info ["robot"], (string)info ["robot-version"]);
 				}
 				dongle = (string)info ["fluke"];
+				if (isFluke2()){
+				  imagewidth = 1280;
+				  imageheight = 800;
+				}
 			} else if (info.Contains ("dongle")) {
 				dongle = (string)info ["dongle"];
 				Console.WriteLine ("You are using:\n   Fluke, version {0}", info ["dongle"]);
@@ -3822,17 +3835,21 @@ public static class Myro
 				beep (.03, 349);
 				beep (.03, 523);
 				Console.WriteLine ("Hello, my name is '{0}'!", getName ());
+				if (isFluke2()){
+				  serial.ReadTimeout = 5000; // milliseconds
+				}
 			}
 			if (dongle != null) {
+				
 				set_cam_param (Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
 				set_cam_param (Scribbler.CAM_COMB,
               Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
 				// Config grayscale on window 0, 1, 2
-				conf_gray_window (0, 2, 0, 128, 191, 1, 1);
-				conf_gray_window (1, 64, 0, 190, 191, 1, 1);
-				conf_gray_window (2, 128, 0, 254, 191, 1, 1);
-				set_ir_power (135);
-				conf_rle (0, 255, 51, 136, 190, 255, 90, 4);
+				conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
+				conf_gray_window (1, imagewidth/4, 0, 3*imagewidth/4 - 2, imageheight-1, 1, 1);
+				conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
+				//set_ir_power (135); // hack for fluke2
+				conf_rle (0, 255, 51, 136, 190, 255, 90, 4);				
 			}
 			if (info.Contains ("robot")) {
 				loadFudge ();
@@ -4573,6 +4590,10 @@ public static class Myro
 			int numpixs = read_2byte ();
 			int xloc = (int)read_byte ();
 			int yloc = (int)read_byte ();
+			if (isFluke2()){
+			  xloc <<= 3;
+			  yloc <<= 2;
+			}
 			return list (numpixs, xloc, yloc);
 		}
 
@@ -5062,8 +5083,8 @@ public static class Myro
 
 		public override Graphics.Picture takePicture (string mode="jpeg")
 		{
-			int width = 256;
-			int height = 192;
+			int width = imagewidth;
+			int height = imageheight;
 			Graphics.Picture p = null;
 			if (mode == "color") {
 				byte [] a = grab_array_yuv ();
@@ -5073,31 +5094,31 @@ public static class Myro
 				byte [] buffer = grab_jpeg_color (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, 256, 192);
+				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
 			} else if (mode == "jpeg-fast") {
 				byte [] buffer = grab_jpeg_color (0);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, 256, 192);
+				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
 			} else if (mode == "gray" || mode == "grey") {
 				byte [] buffer = grab_jpeg_gray (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, 256, 192);
+				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
 			} else if (mode == "grayjpeg") {
 				byte [] buffer = grab_jpeg_gray (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, 256, 192);
+				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
 			} else if (mode == "grayjpeg-fast") {
 				byte [] buffer = grab_jpeg_gray (0);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, 256, 192);
+				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
 			} else if (mode == "grayraw" || mode == "greyraw") {
-				conf_window (0, 1, 0, 255, 191, 2, 2);
+				conf_window (0, 1, 0, imagewidth-1, imageheight-1, 2, 2);
 				byte [] a = grab_gray_array ();
-				conf_gray_window (0, 2, 0, 128, 191, 1, 1);
+				conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
 				p = new Graphics.Picture (width, height, a, 1);
 			} else if (mode == "blob") {
 				byte [] a = grab_blob_array (); 
@@ -5108,8 +5129,8 @@ public static class Myro
   
 		public byte [] grab_array_yuv ()
 		{ // YUV color
-			int width = 256;
-			int height = 192;
+			int width = imagewidth;
+			int height = imageheight;
 			int size = width * height;
 			byte [] buffer = new byte [size * 3];
 			int vy, vu, y1v, y1u, uy, uv, y2u, y2v;
@@ -5215,18 +5236,18 @@ public static class Myro
     
 		public byte [] read_jpeg_scan ()
 		{
-			byte [] bytes = new byte[100000];
+		    byte [] bytes = new byte[100000]; // kjo hack fluke 2
 			byte last_byte = 0;
 			int count = 0;
 			lock (serial) {
-				while (true) {
-					serial.Read (bytes, count, 1);
+				while (true && count < bytes.Length) {
+					int n = serial.Read (bytes, count, 1);
 					if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
 						// End-of-image marker
 						break;
 					}
 					last_byte = bytes [count];
-					count++;
+					count +=n;
 				}
 			}
 			read_uint32 ();   // Start
@@ -5243,8 +5264,8 @@ public static class Myro
 
 		public byte [] grab_blob_array ()
 		{ // blob, RLE
-			int width = 256;
-			int height = 192;
+			int width = imagewidth;
+			int height = imageheight;
 			byte [] blobs = new byte[height * width * 3];  // RGB
 			byte [] buffer;
 			lock (this) { // lock robot
@@ -5264,6 +5285,12 @@ public static class Myro
 						px += 1;
 						counter = (counter << 8) | buffer [px];
 						px += 1;
+						//Fluke 2 large image requires a 3 byte counter
+						if (isFluke2()){
+							counter = (counter << 8) | buffer[px];
+		                   	px += 1;						
+						}
+						
 						if (inside) {
 							val = 0;
 							inside = false;
@@ -5289,8 +5316,8 @@ public static class Myro
 		public byte [] grab_gray_array ()
 		{
 			byte [] line;
-			int width = 128;
-			int height = 96;
+			int width = imagewidth;
+			int height = imageheight;
 			int size = width * height; 
 			lock (this) { // lock robot
 				write (Scribbler.GET_WINDOW);
@@ -5336,6 +5363,17 @@ public static class Myro
 		public void conf_window (int window, int X_LOW, int Y_LOW, 
         int X_HIGH, int Y_HIGH, int X_STEP, int Y_STEP)
 		{
+		  if (isFluke2()){
+			write (Scribbler.SET_WINDOW);
+			write ((byte)window);
+			write_2byte (X_LOW);
+			write_2byte (Y_LOW);
+			write_2byte (X_HIGH);
+			write_2byte (Y_HIGH);
+			write ((byte)X_STEP);
+			write ((byte)Y_STEP);
+		  }
+		  else{
 			write (Scribbler.SET_WINDOW);
 			write ((byte)window);
 			write ((byte)X_LOW);
@@ -5344,6 +5382,7 @@ public static class Myro
 			write ((byte)Y_HIGH);
 			write ((byte)X_STEP);
 			write ((byte)Y_STEP);
+		  }
 		}
 
 		public void setSingleData (int position, int value)
