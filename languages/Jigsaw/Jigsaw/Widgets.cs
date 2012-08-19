@@ -544,15 +544,17 @@ namespace Widgets
 		internal CBlockPalette _palette = null;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette)
+		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette,
+							Cairo.Color fillColor, Cairo.Color lineColor)
 			: base(x, y, w, h)
 		{
 			_palette = palette;
 			this.Text = label;
 			this.Radius = 5;
 			this.LineWidth = 0;
-			this.LineColor = Diagram.Colors.Silver;
-			this.FillColor = Diagram.Colors.Silver;
+			this.LineColor = lineColor; //Diagram.Colors.Silver;
+			this.FillColor = fillColor; //Diagram.Colors.Silver;
+			this.OriginalFillColor = fillColor;
 			this.fontFace = "Arial"; 
 			//this.FontStyle = FontStyle.Bold;
 			this.Selectable = false;
@@ -636,7 +638,7 @@ namespace Widgets
 			_toggled = val;
 			
 			if (_toggled) this.FillColor = Diagram.Colors.Honeydew;
-			else		  this.FillColor = Diagram.Colors.Silver;
+			else		  this.FillColor = this.OriginalFillColor;
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes

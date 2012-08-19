@@ -21,7 +21,7 @@ namespace Jigsaw
 		{
 			this.LineWidth = 2;
 			this.LineColor = Diagram.Colors.DarkGreen;
-			this.FillColor = Diagram.Colors.LightGreen;;
+			this.FillColor = Diagram.Colors.LightGreen;
 			this.Sizable = false;
 			
 			// Properties

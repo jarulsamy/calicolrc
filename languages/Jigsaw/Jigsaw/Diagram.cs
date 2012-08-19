@@ -1914,6 +1914,7 @@ namespace Diagram
         private int lineWidth = 1;
 		private double[] dashStyle = null; //new double[] {1.0};
         private Cairo.Color fillColor = Colors.White;
+        private Cairo.Color originalFillColor = Colors.White;
         internal String fontFace = "Arial"; //"Consolas"; //"courier new"; //
         internal double fontSize = 12.0;
         internal FontSlant fontSlant = FontSlant.Normal;
@@ -2464,6 +2465,13 @@ namespace Diagram
         {
             get { return this.fillColor; }
             set { this.fillColor = value; }
+        }
+
+        [DescriptionAttribute("Brush color"), CategoryAttribute("Appearance"), BrowsableAttribute(true)]
+        public virtual Color OriginalFillColor
+        {
+            get { return this.originalFillColor; }
+            set { this.originalFillColor = value; }
         }
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

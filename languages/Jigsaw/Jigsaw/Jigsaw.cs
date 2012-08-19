@@ -95,6 +95,9 @@ namespace Jigsaw
 		// Ref to internal search helper object
 		public SearchHelper _searchHelper = null;
 		
+		// Left tab height
+		public int tabHeight = 33;
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
@@ -134,10 +137,11 @@ namespace Jigsaw
 			// Build tabbed panel for blocks
 			int tabY = 0; //33;
 			int os = 34;
-			
+						
 			// ----- Control tab and factory blocks
-			tabY += 33;
-			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, 30, "Control", pnlBlock);
+			tabY += tabHeight;
+			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Control", pnlBlock,
+											Diagram.Colors.PaleGoldenrod, Diagram.Colors.DarkGoldenrod);
 			tbCtrl.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbCtrl);
 			allTabs.Add (tbCtrl);
@@ -175,8 +179,9 @@ namespace Jigsaw
 			tbCtrl.AddShape(block26);
 			
 			// ----- Statement tab and factory blocks	
-			tabY += 33;
-			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, 30, "Statements", pnlBlock);
+			tabY += tabHeight;
+			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Statements", pnlBlock,
+												Diagram.Colors.LightGreen, Diagram.Colors.DarkGreen);
 			tbStats.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbStats);
 			allTabs.Add (tbStats);
@@ -202,8 +207,9 @@ namespace Jigsaw
 			tbStats.AddShape(bCmt2);
 			
 			// ----- IO tab and factory blocks
-			tabY += 33;
-			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, 30, "Input/Output", pnlBlock);
+			tabY += tabHeight;
+			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Input/Output", pnlBlock,
+												Diagram.Colors.LightBlue, Diagram.Colors.DarkBlue);
 			tbInOut.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbInOut);
 			allTabs.Add (tbInOut);
@@ -229,8 +235,9 @@ namespace Jigsaw
 //			tbInOut.AddShape(_ciowritefile);
 			
 			// ----- Procedures tab and factory blocks
-			tabY += 33;
-			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, 30, "Procedures", pnlBlock);
+			tabY += tabHeight;
+			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Procedures", pnlBlock,
+												Diagram.Colors.Thistle, Diagram.Colors.Purple);
 			tbProc.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbProc);
 			allTabs.Add (tbProc);
@@ -299,6 +306,25 @@ namespace Jigsaw
 					_modulePath = System.IO.Path.GetFullPath(value); 
 			}
 		}
+
+		public List<Color> makeColor(string assembname) {
+			// Find a good, random, same-for-everyone color for this DLL:
+			// Make a hash from name:
+			int hash = 17;
+			foreach (char c in assembname) hash = hash * 31 + c.GetHashCode();
+			hash = Math.Abs(hash);
+			
+			// Get the color from the color dictionary:
+			//Dictionary<string,Color> dict = Widgets.Colors.colors;
+			//List<string> names = new List<string>(dict.Keys);
+			//Color fill_color = dict[names[hash % names.Count]];
+			Random rnd = new Random(hash);
+			Color fill_color = new Cairo.Color( rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5);
+			
+			// Make the line color be a little darker than fill:
+			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
+			return new List<Color>() {fill_color, line_color};
+		}
 		
 		// - - - Create XML map file in StringBuilder object - - - - - - - - -
 		public StringBuilder CreateMapFile(string dllfile)
@@ -318,21 +344,9 @@ namespace Jigsaw
 					xw.WriteAttributeString("path", dllfile);
 					xw.WriteElementString("docstring", "");
 					
-					// Find a good, random, same-for-everyone color for this DLL:
-					// Make a hash from name:
-					int hash = 17;
-					foreach (char c in assembname) hash = hash * 31 + c.GetHashCode();
-					hash = Math.Abs(hash);
-					
-					// Get the color from the color dictionary:
-					//Dictionary<string,Color> dict = Widgets.Colors.colors;
-					//List<string> names = new List<string>(dict.Keys);
-					//Color fill_color = dict[names[hash % names.Count]];
-					Random rnd = new Random(hash);
-					Color fill_color = new Cairo.Color( rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5);
-					
-					// Make the line color be a little darker than fill:
-					Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
+					List<Color> colors = makeColor(assembname);
+					Color fill_color = colors[0];
+					Color line_color = colors[1];
 					
 					xw.WriteStartElement("fill_color");
 					xw.WriteAttributeString("red", String.Format("{0:0.000}", fill_color.R)); //"0.6758"); 
@@ -427,30 +441,6 @@ namespace Jigsaw
 	
 		// - - - Use Library and assign random color - - - - - - - - - - - - - - - - - - - -
 		public bool UseLibraryDLL(string dllfile)
-		{
-			string assembly_name = System.IO.Path.GetFileNameWithoutExtension (dllfile);
-			
-			// Find a good, random, same-for-everyone color for this DLL:
-			// Make a hash from name:
-			int hash = 17;
-			foreach (char c in assembly_name) hash = hash * 31 + c.GetHashCode();
-			hash = Math.Abs(hash);
-			
-			// Get the color from the color dictionary:
-//			Dictionary<string,Color> dict = Widgets.Colors.colors;
-//			List<string> names = new List<string>(dict.Keys);
-//			Color fill_color = dict[names[hash % names.Count]];
-			Random rnd = new Random(hash);
-			Color fill_color = new Cairo.Color( rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5, rnd.NextDouble()*0.5+0.5);
-
-			// Make the line color be a little darker than fill:
-			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
-			
-			return UseLibraryDLL(dllfile, fill_color, line_color);
-		}
-		
-		// - - - Use Library with given colors - - - - - - - - - - - - - - - - - - - -
-		public bool UseLibraryDLL(string dllfile, Color fill_color, Color line_color)
 		{
 			// Load and build blocks from assembly dllfile
 			List<CBlock > blocks = new List<CBlock> ();								// List of new blocks
@@ -551,6 +541,9 @@ namespace Jigsaw
                                                 param_names, param_type_names, param_defaults,
                                                 return_type, pnlBlock);
 					block.Visible = false;
+					List<Color> colors = makeColor(tabName);
+					Color fill_color = colors[0];
+					Color line_color = colors[1];
 					block.LineColor = line_color;
 					block.FillColor = fill_color;
 					blocks.Add (block);
@@ -574,8 +567,9 @@ namespace Jigsaw
 				if (blockCount[tabName] == 0) continue;
 
 				// Add tab if has at least one block
-				tabY += 33.0;
-				tab = new Widgets.CRoundedTab (0, tabY, 100, 30, tabName, pnlBlock);
+				tabY += tabHeight;
+				List<Color> colors = makeColor(tabName);
+				tab = new Widgets.CRoundedTab (0, tabY, 100, tabHeight-3, tabName, pnlBlock, colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape (tab);
 				pnlBlock.BringToFront (this);
@@ -886,8 +880,10 @@ namespace Jigsaw
 				}
 				
 				// Add tab
-				tabY += 33.0;
-				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, 30, assembly_name, pnlBlock);
+				tabY += tabHeight;
+				List<Color> colors = makeColor(assembly_name);
+				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, assembly_name, pnlBlock,
+												colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape(tab);
 				pnlBlock.BringToFront(this);
