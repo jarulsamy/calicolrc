@@ -3855,9 +3855,6 @@ public static class Myro
 				beep (.03, 349);
 				beep (.03, 523);
 				Console.WriteLine ("Hello, my name is '{0}'!", getName ());
-				if (isFluke2()){
-				  serial.ReadTimeout = 8000; // milliseconds
-				}
 			}
 			if (dongle != null) {
 			  			       
@@ -5126,6 +5123,9 @@ public static class Myro
 		{
 			int width = imagewidth;
 			int height = imageheight;
+			if (isFluke2()){ // images can take a long time
+			  serial.ReadTimeout = 8000; // milliseconds
+			}
 			Graphics.Picture p = null;
 			if (mode == "color") {
 				byte [] a = grab_array_yuv ();
@@ -5164,6 +5164,9 @@ public static class Myro
 			} else if (mode == "blob") {
 				byte [] a = grab_blob_array (); 
 				p = new Graphics.Picture (width, height, a);
+			}
+			if (isFluke2()){
+			  serial.ReadTimeout = 1000; // milliseconds
 			}
 			return p;
 		}
