@@ -3386,7 +3386,7 @@ public static class Graphics
                  new Point (0, _pixbuf.Height));
 		}
 
-		public Picture (System.Drawing.Bitmap bitmap, int width, int height) : this(true)
+	  public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true)
 		{
 			// Colorspace, has_alpha, bits_per_sample, width, height:
 			// FIXME: convert bitmap.palette to colormap
@@ -3394,9 +3394,11 @@ public static class Graphics
 			if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
 			}
-			for (int x=0; x < _pixbuf.Width; x += 2) {
+			int xstep = 1;
+			if (fluke1) xstep = 2;
+			for (int x=0; x < _pixbuf.Width; x += xstep) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					System.Drawing.Color pixel = bitmap.GetPixel (x / 2, y);
+					System.Drawing.Color pixel = bitmap.GetPixel (x / xstep, y);
 					// First pixel
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 0, pixel.R);
@@ -3406,16 +3408,18 @@ public static class Graphics
                             x * _pixbuf.NChannels + 2, pixel.B);
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 3, pixel.A);
-					// Second pixel
-					int x2 = x + 1;
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x2 * _pixbuf.NChannels + 0, pixel.R);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x2 * _pixbuf.NChannels + 1, pixel.G);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x2 * _pixbuf.NChannels + 2, pixel.B);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x2 * _pixbuf.NChannels + 3, pixel.A);
+					if (fluke1){
+					  // Second pixel
+					  int x2 = x + 1;
+					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+							     x2 * _pixbuf.NChannels + 0, pixel.R);
+					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+							     x2 * _pixbuf.NChannels + 1, pixel.G);
+					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+							     x2 * _pixbuf.NChannels + 2, pixel.B);
+					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+							     x2 * _pixbuf.NChannels + 3, pixel.A);
+					}
 				}
 			}
 			set_points (new Point (0, 0), 
