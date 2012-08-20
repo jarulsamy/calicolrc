@@ -3836,20 +3836,20 @@ public static class Myro
 				beep (.03, 523);
 				Console.WriteLine ("Hello, my name is '{0}'!", getName ());
 				if (isFluke2()){
-				  serial.ReadTimeout = 5000; // milliseconds
+				  serial.ReadTimeout = 8000; // milliseconds
 				}
 			}
 			if (dongle != null) {
-				
-				set_cam_param (Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
-				set_cam_param (Scribbler.CAM_COMB,
-              Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
-				// Config grayscale on window 0, 1, 2
-				conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
-				conf_gray_window (1, imagewidth/4, 0, 3*imagewidth/4 - 2, imageheight-1, 1, 1);
-				conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
-				//set_ir_power (135); // hack for fluke2
-				conf_rle (0, 255, 51, 136, 190, 255, 90, 4);				
+			  			       
+			  set_cam_param (Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
+			  set_cam_param (Scribbler.CAM_COMB,
+					 Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
+			  // Config grayscale on window 0, 1, 2
+			  conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
+			  conf_gray_window (1, imagewidth/4, 0, 3*imagewidth/4 - 2, imageheight-1, 1, 1);
+			  conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
+			  //set_ir_power (135); // hack for fluke2
+			  conf_rle (0, 255, 51, 136, 190, 255, 90, 4);				
 			}
 			if (info.Contains ("robot")) {
 				loadFudge ();
@@ -5094,27 +5094,27 @@ public static class Myro
 				byte [] buffer = grab_jpeg_color (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
+				p = new Graphics.Picture (bitmap, width, height, !isFluke2());
 			} else if (mode == "jpeg-fast") {
 				byte [] buffer = grab_jpeg_color (0);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
+				p = new Graphics.Picture (bitmap, width, height, !isFluke2());
 			} else if (mode == "gray" || mode == "grey") {
 				byte [] buffer = grab_jpeg_gray (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
+				p = new Graphics.Picture (bitmap, width, height, !isFluke2());
 			} else if (mode == "grayjpeg") {
 				byte [] buffer = grab_jpeg_gray (1);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
+				p = new Graphics.Picture (bitmap, width, height, !isFluke2());
 			} else if (mode == "grayjpeg-fast") {
 				byte [] buffer = grab_jpeg_gray (0);
 				System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
 				System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);
-				p = new Graphics.Picture (bitmap, imagewidth, imageheight);
+				p = new Graphics.Picture (bitmap, width, height, !isFluke2());
 			} else if (mode == "grayraw" || mode == "greyraw") {
 				conf_window (0, 1, 0, imagewidth-1, imageheight-1, 2, 2);
 				byte [] a = grab_gray_array ();
@@ -5236,19 +5236,19 @@ public static class Myro
     
 		public byte [] read_jpeg_scan ()
 		{
-		    byte [] bytes = new byte[100000]; // kjo hack fluke 2
+		    byte [] bytes = new byte[250000]; // kjo hack fluke 2
 			byte last_byte = 0;
 			int count = 0;
 			lock (serial) {
-				while (true && count < bytes.Length) {
-					int n = serial.Read (bytes, count, 1);
-					if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
-						// End-of-image marker
-						break;
-					}
-					last_byte = bytes [count];
-					count +=n;
-				}
+			  while (true && count < bytes.Length) {
+			    int n = serial.Read (bytes, count, 1);
+			    if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
+			      // End-of-image marker
+			      break;
+			    }
+			    last_byte = bytes [count];
+			    count += n;
+			  }
 			}
 			read_uint32 ();   // Start
 			read_uint32 ();   // Read
@@ -5316,8 +5316,8 @@ public static class Myro
 		public byte [] grab_gray_array ()
 		{
 			byte [] line;
-			int width = imagewidth;
-			int height = imageheight;
+			int width = imagewidth/2;
+			int height = imageheight/2;
 			int size = width * height; 
 			lock (this) { // lock robot
 				write (Scribbler.GET_WINDOW);
