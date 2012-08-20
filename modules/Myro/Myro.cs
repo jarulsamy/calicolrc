@@ -1722,9 +1722,14 @@ public static class Myro
 		return robot.getAngle ();
 	}
   
-	public static void setTurn (int angle, string turnType = "to", string radOrDeg = "rad")
+	public static void turnTo (int angle, string radOrDeg = "rad")
 	{
-		robot.setTurn (angle, turnType, radOrDeg);
+		robot.turnTo (angle, radOrDeg);
+	}
+
+	public static void turnBy (int angle, string radOrDeg = "rad")
+	{
+		robot.turnBy (angle, radOrDeg);
 	}
 
 	public static void setPosition (uint x, uint y)
@@ -1742,9 +1747,14 @@ public static class Myro
 		robot.setBeginPath (speed);
 	}
 
-	public static void setMove (int x, int y, string moveType = "to")
+        public static void moveTo (int x, int y)
 	{
-		robot.setMove (x, y, moveType);
+	  robot.moveTo (x, y);
+	}
+
+	public static void moveBy (int x, int y)
+	{
+	        robot.moveBy(x, y);
 	}
 
 	public static void setArc (int x, int y, int radius, string arcType = "to")
@@ -2458,12 +2468,22 @@ public static class Myro
       
 		}
 
-		public virtual void setTurn (int angle, string turnType = "to", string radOrDeg = "rad")
+		public virtual void turnTo (int angle, string radOrDeg = "rad")
 		{
       
 		}
 
-		public virtual void setMove (int x, int y, string moveType = "to")
+		public virtual void turnBy (int angle, string radOrDeg = "rad")
+		{
+      
+		}
+
+  	        public virtual void moveBy (int x, int y)
+		{
+      
+		}
+
+  	        public virtual void moveTo (int x, int y)
 		{
       
 		}
@@ -4665,11 +4685,11 @@ public static class Myro
 						return retDict;
 				}
 			}
-			if (retval [0] == 'P' | retval [0] == 'p') {
+			if (retval [0] == 'P' || retval [0] == 'p') {
 				retval = retval.Substring (1);
 			}
       
-			if (retval [0] == 'P' | retval [0] == 'p') {
+			if (retval [0] == 'P' || retval [0] == 'p') {
 				retval = retval.Substring (1);
 			}
       
@@ -4849,7 +4869,17 @@ public static class Myro
 				return false;
 		}
     
-		public override void setTurn (int angle, string turnType = "to", string radOrDeg = "rad")
+		public override void turnTo (int angle, string radOrDeg = "rad")
+     	        {
+		  setTurn(angle, "to", radOrDeg);
+		}
+
+		public override void turnBy (int angle, string radOrDeg = "rad")
+     	        {
+		  setTurn(angle, "by", radOrDeg);
+		}
+
+		public void setTurn (int angle, string turnType = "to", string radOrDeg = "rad")
 		{
 			if (turnType == "to" && radOrDeg == "rad") {
 				byte [] buffer = {Scribbler.SET_TURN, Scribbler.TO, (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
@@ -4873,7 +4903,18 @@ public static class Myro
 			}
 		}
 
-		public override void setMove (int x, int y, string moveType = "to")
+	  
+    	        public override void moveTo (int x, int y)
+	        {
+		  setMove(x, y, "to");
+		}
+
+		public override void moveBy (int x, int y)
+	        {
+		  setMove(x, y, "by");
+		}
+
+	        public void setMove (int x, int y, string moveType = "to")
 		{
 			if (moveType == "to") {
 				byte [] buffer = {Scribbler.SET_MOVE, Scribbler.TO, (byte)((x >> 8) & 0xff), (byte)(x & 0xff),				 				  				  (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
