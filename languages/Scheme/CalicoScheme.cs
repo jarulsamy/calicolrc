@@ -40,13 +40,13 @@ public class CalicoSchemeEngine : Engine
     if (result == null) {
        return true;
     }
-    string resultString = result.ToString();
+    string resultString = Scheme.repr(result);
     // FIXME: when exceptions have a better format in Scheme:
     if (resultString.StartsWith("(exception ")) {
       System.Console.Error.WriteLine(resultString);
       return false;
     }
-    System.Console.WriteLine(result);
+    System.Console.WriteLine(resultString);
     return true;
   }
 
@@ -54,7 +54,7 @@ public class CalicoSchemeEngine : Engine
     System.Console.WriteLine("Run filename '{0}'!", filename);
     object obj = PJScheme.execute_file_rm(filename);
     if (obj != null) {
-      string str = obj.ToString();
+      string str = Scheme.repr(obj);
       if (str != "") {
 	Console.Error.WriteLine(str);
 	return false;

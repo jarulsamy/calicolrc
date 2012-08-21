@@ -463,8 +463,8 @@ public class Scheme {
   public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
   // FIXME: make these three different:
   public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
-  public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Equal, -1, 2);
-  public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) Equal, -1, 2);
+  public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Eq, -1, 2);
+  public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
   public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
   public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
   public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
@@ -492,6 +492,7 @@ public class Scheme {
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
+  public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
@@ -661,6 +662,7 @@ public class Scheme {
 	set_env_b(env, symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1));
 	set_env_b(env, symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1));
 	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1));
+	set_env_b(env, symbol("atom?"), atom_q_proc);
 	return env;
   }
   
@@ -1447,10 +1449,13 @@ public class Scheme {
 	trace(10, "calling repr\n");
 	if (obj == null) {
 	  return ""; // FIXME: should give void when forced
-	} else if (obj is bool) {
+	} else if (obj is System.Boolean) {
 	  return ((bool)obj) ? "#t" : "#f";
 	} else if (obj is IronPython.Runtime.List) {
 	  return ((IronPython.Runtime.List)obj).__repr__(
+		  IronPython.Runtime.DefaultContext.Default);
+	} else if (obj is IronPython.Runtime.PythonDictionary) {
+	  return ((IronPython.Runtime.PythonDictionary)obj).__repr__(
 		  IronPython.Runtime.DefaultContext.Default);
 	} else if (obj is IronPython.Runtime.PythonTuple) {
 	  return obj.ToString();
@@ -2425,6 +2430,10 @@ public class Scheme {
       return (list_to_vector(make_safe(vector_to_list(x))));
     else
       return (x);
+  }
+
+  public static bool atom_q(object x) {
+    return ((! pair_q(x)) && (! (null_q(x))));
   }
 
   public static bool procedure_object_q(object x) {
