@@ -34,7 +34,7 @@ public class CalicoSchemeEngine : Engine
     base.PostSetup(calico);
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
   }
-
+  
   public override bool Execute(string text) {
     object result = PJScheme.execute_string_rm(text);
     if (result == null) {
@@ -71,6 +71,25 @@ public class CalicoSchemeEngine : Engine
     }
     // else, only if valid parse
     return PJScheme.try_parse(text);
+  }
+
+  public static void Main(string[] args) {
+	LanguageManager manager = new LanguageManager("..", 
+		new Dictionary<string, Language>());
+	CalicoSchemeLanguage scheme = new CalicoSchemeLanguage();
+	scheme.MakeEngine(manager);
+
+	if (args.Length > 0) {
+	  foreach (string file in args) {
+		scheme.engine.ExecuteFile(file);
+	  }
+	} 
+	string line = "";
+	while (line != "(exit)") {
+	  System.Console.Write("scheme>> ");
+	  line = Console.ReadLine();
+	  scheme.engine.Execute(line);
+	}
   }
 }
 

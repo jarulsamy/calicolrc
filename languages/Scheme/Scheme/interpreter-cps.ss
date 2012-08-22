@@ -1236,13 +1236,13 @@
     (make-initial-env-extended
      (make-initial-environment
       (list 'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline 'load 'length
-	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= 'abs 'equal? 'eq? 'memq 'member
+	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
 	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>=)
       (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim print-prim
 	    display-prim newline-prim load-prim length-prim null?-prim cons-prim car-prim cdr-prim cadr-prim
-	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim equal-sign-prim
+	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim equal-sign-prim equal-sign-prim
 	    abs-prim equal?-prim eq?-prim memq-prim member-prim range-prim set-car!-prim set-cdr!-prim
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim

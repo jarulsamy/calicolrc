@@ -377,7 +377,6 @@ public class Scheme {
 	  this.returntype = returntype;
 	}
 	public object Call(object actual) {
-	  trace(1, "calling {0}({1})...\n", repr, actual);
 	  object retval = null;
 	  if (returntype == 0) { // void return
 		if (args == -1) 
@@ -437,7 +436,6 @@ public class Scheme {
 	}
 
 	public object Call(object args1, object args2) {
-	  trace(1, "calling {0}({1} {2})...\n", repr, args1, args2);
 	  object retval = null;
 	  if (returntype == 0) { // return void
 		((Procedure2Void)proc)(args1, args2);
@@ -521,14 +519,6 @@ public class Scheme {
   public static char[] SPLITSLASH = {SLASH};
   public static string NEWLINE_STRING = "\n";
 
-  public static void trace(int level, object fmt, params object[] objs) {
-	if (level <= config.DEBUG) {
-	  for (int i = 1; i < level; i++)
-		printf("    ");
-	  printf(fmt, objs);
-	}
-  }
-
   public static bool true_q (object v) {
 	if (v is bool) {
 	  return ((bool) v);
@@ -553,13 +543,12 @@ public class Scheme {
   }
 
   public static object group(object chars, object delimiter) {
-	trace(10, "calling group({0}, {1})", chars, delimiter);
 	// given list of chars and a delim char, return a list of strings
 	object retval = EmptyList;
 	object buffer = EmptyList;
 	object current1 = chars;
 	while (!Eq(current1, EmptyList)) {
-	  if (Equal(car(current1), delimiter)) {
+	  if (Eq(car(current1), delimiter)) {
 		retval = cons(list_to_string(reverse(buffer)), retval);
 		buffer = EmptyList;
 	  } else {
@@ -605,11 +594,19 @@ public class Scheme {
   }
 
   public static object make_initial_env_extended (object env) {
+    /* The following are already added in interpreter.ss:
+       'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline 'load 'length
+       'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
+       'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
+       'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
+       'vector 'vector-set! 'vector-ref 'make-vector '<= '>=
+    */
   	set_env_b(env, symbol("property"), new Proc("property", (Procedure1)property, -1, 1));
  	set_env_b(env, symbol("debug"), new Proc("debug", (Procedure1)debug, -1, 1));
  	set_env_b(env, symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1));
  	set_env_b(env, symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1));
  	set_env_b(env, symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1));
+ 	set_env_b(env, symbol("rational"), new Proc("int", (Procedure2)ToRational, 2, 1));
  	set_env_b(env, symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1));
  	set_env_b(env, symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2));
 // why "list?" and not "iterator?" here ????
@@ -861,6 +858,10 @@ public class Scheme {
 	}
   }
   
+  public static object ToRational(object obj1, object obj2) {
+    return new Rational((int) obj1, (int)obj2);
+  }
+  
 //   public static object make_macro_env () {
 // 	return ((object)
 // 		list(make_frame(
@@ -927,16 +928,15 @@ public class Scheme {
   }
 
   public static object list_tail(object lyst, object pos) {
-	trace(10, "calling list_tail({0}, {1})\n", lyst, pos);
 	if (null_q(lyst)) {
-	  if (Equal(pos, 0))
+	  if (EqualSign(pos, 0))
 		return EmptyList;
 	  else
 		throw new Exception("list-tail position beyond list");
 	} else if (pair_q(lyst)) {
 	  object current = lyst;
 	  int current_pos = 0;
-	  while (!Equal(current_pos, pos)) {
+	  while (!EqualSign(current_pos, pos)) {
 		current = cdr(current);
 		current_pos++;
 	  }
@@ -946,9 +946,8 @@ public class Scheme {
   }
 
   public static object list_head(object lyst, object pos) {
-	trace(10, "calling list_head({0}, {1})\n", lyst, pos);
 	if (null_q(lyst)) {
-	  if (Equal(pos, 0))
+	  if (EqualSign(pos, 0))
 		return EmptyList;
 	  else
 		throw new Exception("list-head position beyond list");
@@ -957,7 +956,7 @@ public class Scheme {
 	  object current = lyst;
 	  object tail = EmptyList;
 	  int current_pos = 0;
-	  while (!Equal(current_pos, pos)) {
+	  while (!EqualSign(current_pos, pos)) {
 		if (Eq(retval, EmptyList)) {
 		  retval = cons(car(current), EmptyList);
 		  tail = retval;
@@ -1008,7 +1007,6 @@ public class Scheme {
   }
 
   public static object apply(object proc, object args) {
-	trace(1, "called: apply({0}, {1})\n", proc, args);
 	if (proc is Proc)
 	  return ((Proc)proc).Call(args);
 	else {
@@ -1035,7 +1033,6 @@ public class Scheme {
   }
 
   public static object map(object proc, object args) {
-	trace(1, "called:{0}1({1})\n", proc, args);
 	object retval = EmptyList;
 	object tail = retval;
 	object current1 = args;
@@ -1058,7 +1055,6 @@ public class Scheme {
   }
 
   public static object map(object proc, object args1, object args2) {
-	trace(1, "called:{0}2({1} {2})\n", proc, args1, args2);
 	object retval = EmptyList;
 	object tail = EmptyList;
 	object current1 = args1;
@@ -1079,7 +1075,6 @@ public class Scheme {
   }
 
   public static Func<object,bool> tagged_list(object test_string, object pred, object value) {
-	trace(10, "called: tagged_list\n");
 	return (object lyst) => {
 	  if (pair_q(lyst)) {
 		bool retval = (((bool)Eq(car(lyst), string_to_symbol(test_string))) && 
@@ -1109,7 +1104,6 @@ public class Scheme {
   }
 
   public static object vector_set_b(object vector, object index, object value) {
-	trace(2, "called: vector_set_b\n");
     Vector v = (Vector) vector;
     int pos = (int) index;
     v.set(pos, value);
@@ -1117,20 +1111,17 @@ public class Scheme {
   }
 
   public static object vector_ref(object vector, object index) {
-    trace(2, "called: vector_ref\n");
     Vector v = (Vector) vector;
     int pos = (int) index;
     return v.get(pos);
   }
 
   public static object vector_length(object vector) {
-    trace(2, "called: vector_length\n");
     Vector v = (Vector) vector;
     return v.length();
   }
 
   public static object list_to_vector(object lyst) {
-    trace(2, "called: list_to_vector\n");
     int len = (int) length(lyst);
     object current = lyst;
     object[] retval = new object[len];
@@ -1142,7 +1133,6 @@ public class Scheme {
   }
 
   public static object [] list_to_array(object lyst) {
-	trace(2, "called: list_to_array\n");
 	int len = (int) length(lyst);
 	object current = lyst;
 	object[] retval = new object[len];
@@ -1154,17 +1144,13 @@ public class Scheme {
   }
 
   public static object string_ref(object s, object i) {
-	trace(9, "called: string_ref(s, {0})\n", i);
 	return s.ToString()[(int)i];
   }
 
   public static object make_string(object obj) {
-	trace(9, "called: make_string\n");
 	if (obj == null || obj == (object) NULL) {
-	  trace(0, "make_string returned: \"\\0\"\n");
 	  return (object) "\0";
 	}
-	trace(10, "make_string returned: \"{0}\"\n", obj.ToString());
 	return obj.ToString();
   }
 
@@ -1222,12 +1208,10 @@ public class Scheme {
   }
 
   public static bool string_is__q(object o1, object o2) {
-	trace(10, "calling string=?({0}, {1})", o1, o2);
 	return ((o1 is string) && (o2 is string) && ((string)o1) == ((string)o2));
   }
   
   public static object string_to_list(object str) {
-	trace(3, "called: string_to_list: {0}\n", str);
 	object retval = EmptyList;
 	object tail = EmptyList;
 	if (str != null) {
@@ -1295,7 +1279,6 @@ public class Scheme {
   }
 
   public static object dlr_exp_q(object rator) {
-	trace(1, "called: dlr_exp_q({0})\n", rator);
 	return (! pair_q(rator));
   }
   
@@ -1337,7 +1320,6 @@ public class Scheme {
   }
 
   public static bool dlr_env_contains(object variable) {
-    trace(1, "contains?: {0}\n", variable); 
 	bool retval = true;
 	try {
 	  _dlr_env.GetVariable(variable.ToString());
@@ -1348,7 +1330,6 @@ public class Scheme {
   }
 
   public static object dlr_env_lookup(object variable) {
-    trace(1, "lookup: {0}\n", variable); 
 	object retval = null;
 	try {
 	  //retval =
@@ -1361,7 +1342,6 @@ public class Scheme {
   }
 
   public static object dlr_env_list() {
-    trace(1, "dlr_env_list"); 
     object retval = list();
     try {
       foreach (string variable in _dlr_env.GetVariableNames()) {
@@ -1446,9 +1426,8 @@ public class Scheme {
 
   public static string repr(object obj, int depth) {
 	if (depth > 3) return "...";
-	trace(10, "calling repr\n");
 	if (obj == null) {
-	  return ""; // FIXME: should give void when forced
+	  return "<void>"; // FIXME: should give void when forced
 	} else if (obj is System.Boolean) {
 	  return ((bool)obj) ? "#t" : "#f";
 	} else if (obj is IronPython.Runtime.List) {
@@ -1496,7 +1475,6 @@ public class Scheme {
   }
 
   public static string format_list(object args) {
-	trace(10, "calling format_list: {0} length={1}\n", args, length(args));
 	if (pair_q(args)) {
 	  int len = (int)length(args);
 	  if (len == 1)
@@ -1577,41 +1555,7 @@ public class Scheme {
 	}
   }
 
-  public static bool Equal(object obj) {
-	object item = car(obj);
-	object current = cdr(obj);
-	while (!Eq(current, EmptyList)) {
-	  if (! Equal(item, car(current)))
-		return false;
-	  current = cdr(current);
-	}
-	return true;
-  }
-
-  public static bool EqualSign(object obj) {
-	object item = car(obj);
-	object current = cdr(obj);
-	while (!Eq(current, EmptyList)) {
-	  if (! EqualSign(item, car(current)))
-		return false;
-	  current = cdr(current);
-	}
-	return true;
-  }
-
-  public static bool Eq(object obj) {
-	object item = car(obj);
-	object current = cdr(obj);
-	while (!Eq(current, EmptyList)) {
-	  if (! Eq(item, car(current)))
-		return false;
-	  current = cdr(current);
-	}
-	return true;
-  }
-
   public static int cmp(object obj1, object obj2) {
-	trace(11, "calling cmp({0}, {1})\n", obj1, obj2);
 	if (obj1 is Symbol) {
 	  if (obj2 is Symbol) {
 		return cmp(obj1.ToString(), obj2.ToString());
@@ -1626,8 +1570,51 @@ public class Scheme {
 	}
   }
 
+  public static bool Equal(object obj) {
+	object item = car(obj);
+	object current = cdr(obj);
+	while (!Eq(current, EmptyList)) {
+	  if (! Equal(item, car(current)))
+		return false;
+	  current = cdr(current);
+	}
+	return true;
+  }
+
+  public static bool EqualSign(object obj) {
+	object item = car(obj);
+	object current = cdr(obj);
+    return EqualSign(item, car(current));
+  }
+
+  public static bool Eq(object obj) {
+	object item = car(obj);
+	object current = cadr(obj);
+    return Eq(item, current);
+  }
+
   public static bool Eq(object obj1, object obj2) {
-    return (obj1 == obj2); 
+	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	  if ((obj1 is Symbol) && (obj2 is Symbol))
+		return ((Symbol)obj1).Equals(obj2);
+	  else return false;
+	} else if (pair_q(obj1) && pair_q(obj2)) {
+	  if (null_q(obj1) && null_q(obj2))
+		return true;
+	  else if (Equal(car(obj1),  car(obj2))) // FIXME: confusion
+                                             // between internal lists
+                                             // and user's
+		return Equal(cdr(obj1), cdr(obj2));
+	  else
+		return false;
+	} else {
+	  try {
+		bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
+		return retval;
+	  } catch {
+		return false;
+	  }
+	}
   }
 
   public static bool Equal(object obj1, object obj2) {
@@ -1663,10 +1650,33 @@ public class Scheme {
 	  return ((int)obj1) == ((int)obj2);
 	} else if ((obj1 is double) && (obj2 is double)) {
 	  return ((double)obj1) == ((double)obj2);
-	} else  { //if (obj1.GetType().ToString() == obj1.GetType().ToString()) {
-	  return obj1 == obj2;
-	  //	} else {
-	  //	  return obj1.ToString() == obj2.ToString();
+	} else if (obj1 is Rational) {
+      if (obj2 is Rational) {
+        return (((Rational)obj1).Equals((Rational)obj2));
+      } else if (obj2 is int) {
+        return (((double)((Rational)obj1)) == ((int)obj2));
+      } else if (obj2 is double) {
+        return (((double)((Rational)obj1)) == ((double)obj2));
+      } else {
+        throw new Exception("can't compare rational with this object");
+      }
+    } else if (obj2 is Rational) {
+      if (obj1 is Rational) {
+        return (((Rational)obj2).Equals((Rational)obj1));
+      } else if (obj1 is int) {
+        return (((double)((Rational)obj2)) == ((int)obj1));
+      } else if (obj1 is double) {
+        return (((double)((Rational)obj2)) == ((double)obj1));
+      } else {
+        throw new Exception("can't compare rational with this object");
+      }
+    } else {
+      try {
+        bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
+        return retval;
+      } catch {
+        return false;
+      }
 	}
   }
 
@@ -2042,7 +2052,6 @@ public class Scheme {
   // List functions -----------------------------------------------
 
   public static object member(object obj1, object obj2) {
-	trace(11, "calling member({0}, {1})\n", obj1, obj2);
 	if (null_q(obj2)) {
 	  return false;
 	} else if (pair_q(obj2)) {
@@ -2092,9 +2101,7 @@ public class Scheme {
   }
 
   public static object length(object obj) {
-	trace(11, "called: length\n");
 	if (null_q(obj)) {
-	  trace(11, "length returned: {0}\n", 0);
 	  return 0;
 	} else if (pair_q(obj)) {
 	  int len = 0;
@@ -2104,7 +2111,6 @@ public class Scheme {
 		current = cdr(current);
 	  }
 	  if (Eq(current, EmptyList)) {
-		trace(11, "length returned: {0}\n", len);
 		return len;
 	  } else {
 		throw new Exception(
@@ -2120,9 +2126,7 @@ public class Scheme {
   }
   
   public static object length_safe(object obj) {
-	trace(11, "called: length_safe\n");
 	if (null_q(obj)) {
-	  trace(11, "length_safe returned: {0}\n", 0);
 	  return 0;
 	} else if (pair_q(obj)) {
 	  int len = 0;
@@ -2131,7 +2135,6 @@ public class Scheme {
 		len++;
 		current = cdr(current);
 	  }
-	  trace(11, "length_safe returned: {0}\n", len);
 	  return len;
 	}
 	return -1;
@@ -2158,7 +2161,6 @@ public class Scheme {
   }
 
   public static bool list_q(object obj) {
-	trace(11, "called: list?({0})\n", repr(obj));
 	if (null_q(obj)) {
 	  return true;
 	} else if (pair_q(obj)) {
@@ -2526,7 +2528,6 @@ public class Scheme {
    }
 
   public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
-    trace(10, "called: tagged_list_hat\n");
     return (object x) => {
       bool retval = (list_q_hat(x) &&
 		     (((Predicate2)pred)(length_hat(x), value)) &&
