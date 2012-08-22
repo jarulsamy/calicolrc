@@ -9,7 +9,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Scheme</RootNamespace>
     <AssemblyName>PJScheme</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <StartupObject>Scheme</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -35,29 +34,22 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="pjscheme.cs" />
     <Compile Include="Scheme.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="IronPython">
       <HintPath>..\..\..\bin\IronPython.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Scripting.Core, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Microsoft.Scripting.Core">
       <HintPath>..\..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Scripting, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Microsoft.Scripting">
       <HintPath>..\..\..\bin\Microsoft.Scripting.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic">
-    </Reference>
-    <Reference Include="Microsoft.Dynamic, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Microsoft.Dynamic">
       <HintPath>..\..\..\bin\Microsoft.Dynamic.dll</HintPath>
       <Private>False</Private>
     </Reference>

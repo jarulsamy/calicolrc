@@ -6,7 +6,6 @@ CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
 		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
 		-r:Microsoft.Dynamic \
-		-r:Microsoft.VisualBasic \
 		-r:Microsoft.Scripting.dll \
 		-r:Microsoft.Scripting.Core.dll \
 		-r:IronPython.dll \
@@ -21,7 +20,6 @@ CalicoScheme.exe: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
 		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
 		-r:Microsoft.Dynamic \
-		-r:Microsoft.VisualBasic \
 		-r:Microsoft.Scripting.dll \
 		-r:Microsoft.Scripting.Core.dll \
 		-r:IronPython.dll \
