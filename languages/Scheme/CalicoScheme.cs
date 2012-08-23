@@ -80,30 +80,42 @@ public class CalicoSchemeEngine : Engine
 		new Dictionary<string, Language>());
 	CalicoSchemeLanguage scheme = new CalicoSchemeLanguage();
 	scheme.MakeEngine(manager);
+	bool interactive = false;
 
 	if (args.Length > 0) {
 	  foreach (string file in args) {
-		scheme.engine.ExecuteFile(file);
-	  }
-	} 
-	LineEditor le = new LineEditor ("Calico Scheme", 1000);
-	le.TabAtStartCompletes = false;
-	string line, expr = "";
-	string prompt = "scheme>>> ";
-	string indent = "";
-	while ((line = le.Edit(prompt, indent)) != null) {
+		if (file.StartsWith("-")) {
+		  if (file == "-i") {
+			interactive = true;
+		  }
+		} else {
+		  scheme.engine.ExecuteFile(file);
+		}
+	  } 
+	} else {
+	  interactive = true;
+	}
+	
+	if (interactive) {
+	  LineEditor le = new LineEditor ("Calico Scheme", 1000);
+	  le.TabAtStartCompletes = false;
+	  string line, expr = "";
+	  string prompt = "scheme>>> ";
+	  string indent = "";
+	  while ((line = le.Edit(prompt, indent)) != null) {
 	    expr = expr + "\n" + line;
 	    if (scheme.engine.ReadyToExecute(expr)) {
-		scheme.engine.Execute(expr);
-		expr = "";
-		prompt = "scheme>>> ";
-		indent = "";
+		  scheme.engine.Execute(expr);
+		  expr = "";
+		  prompt = "scheme>>> ";
+		  indent = "";
 	    } else {
-		prompt = "......>>> ";
-		Match match = Regex.Match(line, "^\t*");
-		if (match.Success)
+		  prompt = "......>>> ";
+		  Match match = Regex.Match(line, "^\t*");
+		  if (match.Success)
 		    indent = match.Value;
 	    }
+	  }
 	}
   }
 }

@@ -167,7 +167,7 @@
     (db "convert-program: '~s'~%" forms)
     (let ((defs (filter (lambda (x) (or (define? x) (define*? x))) forms)))
       (let ((name (proper-name (string->symbol (car (split filename #\.)))))
-	    (header "using System;\nusing Microsoft.VisualBasic.CompilerServices;\n\n"))
+	    (header "using System;\n\n"))
 	(if (equal? *class* 'undefined)
 	    (set! *class* name))
 	(format "#pragma warning disable 109\n~a public class ~a: Scheme {\n~a\n~a ~a}\n"

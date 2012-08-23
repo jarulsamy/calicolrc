@@ -12,7 +12,7 @@ using System;
 
 public class ObjectType {
     public static int ObjTst(System.Object o1, System.Object o2, bool TextCompare) {
-	check {
+	checked {
 	    // comparing null objects
 	    // if both are null, return 0
 	    // if one is a type, convert the other to its 'null value'

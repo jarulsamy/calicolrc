@@ -823,15 +823,19 @@ public class Scheme {
 		// add assembly to assemblies
 		if (assembly != null) {
 		  config.AddAssembly(assembly);
-          _dlr_runtime.LoadAssembly(assembly);
-		  // then add each type to environment
-          // FIXME: optionally module name
-		  foreach (Type type in assembly.GetTypes()) {
-			if (type.IsPublic) {
-              _dlr_env.SetVariable(type.Name, 
-                  IronPython.Runtime.Types.DynamicHelpers. 
-                  GetPythonTypeFromType(type));
-            }
+		  if (_dlr_runtime != null) {
+			_dlr_runtime.LoadAssembly(assembly);
+			// then add each type to environment
+			// FIXME: optionally module name
+			foreach (Type type in assembly.GetTypes()) {
+			  if (type.IsPublic) {
+				_dlr_env.SetVariable(type.Name, 
+					IronPython.Runtime.Types.DynamicHelpers. 
+					GetPythonTypeFromType(type));
+			  }
+			}
+		  } else {
+			throw new Exception("DLR Runtime not available");
 		  }
 		} else {
 		  throw new Exception(String.Format("external library '{0}' could not be loaded", filename));
@@ -1320,8 +1324,12 @@ public class Scheme {
   	    return retval != null ? retval : symbol("<void>");
 	} else {
       try {
-        retval = _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
-  	    return retval != null ? retval : symbol("<void>");
+		if (_dlr_runtime != null) {
+		  retval = _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+		  return retval != null ? retval : symbol("<void>");
+		} else {
+		  throw new Exception(String.Format("DLR Runtime not available"));
+		}
       } catch {
         return (proc as Closure)(list_to_array(args));
       }
@@ -1331,7 +1339,11 @@ public class Scheme {
   public static bool dlr_env_contains(object variable) {
 	bool retval = true;
 	try {
-	  _dlr_env.GetVariable(variable.ToString());
+	  if (_dlr_env != null) {
+		_dlr_env.GetVariable(variable.ToString());
+	  } else {
+		throw new Exception(String.Format("DLR Environment not available"));
+	  }
 	} catch {
 	  retval = false;
 	}
@@ -1343,7 +1355,10 @@ public class Scheme {
 	try {
 	  //retval =
 	  //_dlr_runtime.Operations.Invoke(_dlr_env.GetVariable(variable.ToString()));
-	  retval = _dlr_env.GetVariable(variable.ToString());
+	  if (_dlr_env != null) 
+		retval = _dlr_env.GetVariable(variable.ToString());
+	  else
+		throw new Exception(String.Format("DLR Environment not available"));
 	} catch {
 	  retval = null;
 	}
@@ -1353,9 +1368,13 @@ public class Scheme {
   public static object dlr_env_list() {
     object retval = list();
     try {
-      foreach (string variable in _dlr_env.GetVariableNames()) {
-		retval = new Cons(variable, retval);
-      }
+	  if (_dlr_env != null) {
+		foreach (string variable in _dlr_env.GetVariableNames()) {
+		  retval = new Cons(variable, retval);
+		}
+	  } else {
+		throw new Exception(String.Format("DLR Environment not available"));
+	  }
     } catch {
     }
     return retval;
@@ -1375,8 +1394,12 @@ public class Scheme {
       //printf("...loop: {0}\n", parts_list);
       // fixme: needs to use args to get method
       try{
-        retobj = _dlr_runtime.Operations.GetMember(retobj, 
-            car(parts_list).ToString());
+		if (_dlr_runtime != null) {
+		  retobj = _dlr_runtime.Operations.GetMember(retobj, 
+			  car(parts_list).ToString());
+		} else {
+		  throw new Exception(String.Format("DLR Runtime not available"));
+		}
       } catch {
 	object binding = make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
         return binding;
@@ -2902,8 +2925,12 @@ public class Vector {
   }
 
   public static void set_global_value_b(object var, object value) {
-    _dlr_env.SetVariable(var.ToString(), 
-        value);
+	if (_dlr_env != null) {
+	  _dlr_env.SetVariable(var.ToString(), 
+		  value);
+	} else {
+	  throw new Exception(String.Format("DLR Environment not available"));
+	}
   }
 
   public static void set_global_docstring_b(object var, object value) {
