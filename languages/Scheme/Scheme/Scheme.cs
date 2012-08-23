@@ -1644,8 +1644,7 @@ public class Scheme {
 	} else {
 	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
         try {
-          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-          return retval;
+          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
         } catch {
           return false;
         }
@@ -1680,8 +1679,7 @@ public class Scheme {
 	} else {
 	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
         try {
-          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-          return retval;
+          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
         } catch {
           return false;
         }
@@ -1725,8 +1723,7 @@ public class Scheme {
     } else {
 	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
         try {
-          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-          return retval;
+          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
         } catch {
           return false;
         }

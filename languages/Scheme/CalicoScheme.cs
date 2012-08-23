@@ -103,7 +103,10 @@ public class CalicoSchemeEngine : Engine
 	  string prompt = "scheme>>> ";
 	  string indent = "";
 	  while ((line = le.Edit(prompt, indent)) != null) {
-	    expr = expr + "\n" + line;
+        if (expr != "")
+          expr = expr + "\n" + line;
+        else
+          expr = line;
 	    if (scheme.engine.ReadyToExecute(expr)) {
 		  scheme.engine.Execute(expr);
 		  expr = "";
