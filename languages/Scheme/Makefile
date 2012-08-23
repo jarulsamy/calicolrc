@@ -1,6 +1,6 @@
 
-CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
-	mcs -debug CalicoScheme.cs \
+CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll getline.cs
+	mcs -debug CalicoScheme.cs getline.cs \
 		-lib:../../bin \
 		-r:PJScheme.dll \
 		-r:Calico.exe \
@@ -13,8 +13,8 @@ CalicoScheme.dll: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
 		-r:Mono.TextEditor \
 		-target:library
 
-CalicoScheme.exe: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll
-	mcs -debug CalicoScheme.cs \
+CalicoScheme.exe: CalicoScheme.cs ../../bin/Calico.exe PJScheme.dll getline.cs
+	mcs -debug CalicoScheme.cs getline.cs \
 		-lib:../../bin \
 		-r:PJScheme.dll \
 		-r:Calico.exe \

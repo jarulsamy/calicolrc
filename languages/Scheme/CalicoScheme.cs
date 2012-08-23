@@ -23,6 +23,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Calico;
+using System.Text.RegularExpressions;
+using Mono.Terminal;
 
 public class CalicoSchemeEngine : Engine
 {
@@ -84,11 +86,24 @@ public class CalicoSchemeEngine : Engine
 		scheme.engine.ExecuteFile(file);
 	  }
 	} 
-	string line = "";
-	while (line != "(exit)") {
-	  System.Console.Write("scheme>> ");
-	  line = Console.ReadLine();
-	  scheme.engine.Execute(line);
+	LineEditor le = new LineEditor ("Calico Scheme", 1000);
+	le.TabAtStartCompletes = false;
+	string line, expr = "";
+	string prompt = "scheme>>> ";
+	string indent = "";
+	while ((line = le.Edit(prompt, indent)) != null) {
+	    expr = expr + "\n" + line;
+	    if (scheme.engine.ReadyToExecute(expr)) {
+		scheme.engine.Execute(expr);
+		expr = "";
+		prompt = "scheme>>> ";
+		indent = "";
+	    } else {
+		prompt = "......>>> ";
+		Match match = Regex.Match(line, "^\t*");
+		if (match.Success)
+		    indent = match.Value;
+	    }
 	}
   }
 }
