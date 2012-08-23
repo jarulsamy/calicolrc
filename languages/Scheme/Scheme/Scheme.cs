@@ -1,4 +1,13 @@
 // Utility Functions for Running Scheme in CSharp
+/*
+  ;; Calico Scheme interpreter with support for choose
+  ;;
+  ;; Written by James B. Marshall and Douglas S. Blank
+  ;; jmarshall@slc.edu
+  ;; http://science.slc.edu/~jmarshall
+  ;; dblank@brynmawr.edu
+  ;; http://cs.brynmawr.edu/~dblank
+*/
 
 using System;
 using System.IO; // File
