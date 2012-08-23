@@ -1639,13 +1639,23 @@ public class Scheme {
 		return Equal(cdr(obj1), cdr(obj2));
 	  else
 		return false;
+    } if (pair_q(obj1) || pair_q(obj2)) {
+			return false;
 	} else {
-	  try {
-		bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-		return retval;
-	  } catch {
-		return false;
-	  }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
+          return retval;
+        } catch {
+          return false;
+        }
+      } else {
+        if (obj1 is BigInteger) {
+          return ((BigInteger)obj1).Equals(obj2);
+        } else {
+          return ((BigInteger)obj2).Equals(obj1);
+        }
+      }
 	}
   }
 
@@ -1665,13 +1675,23 @@ public class Scheme {
 		return Equal(cdr(obj1), cdr(obj2));
 	  else
 		return false;
+    } if (pair_q(obj1) || pair_q(obj2)) {
+			return false;
 	} else {
-	  try {
-		bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-		return retval;
-	  } catch {
-		return false;
-	  }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
+          return retval;
+        } catch {
+          return false;
+        }
+      } else {
+        if (obj1 is BigInteger) {
+          return ((BigInteger)obj1).Equals(obj2);
+        } else {
+          return ((BigInteger)obj2).Equals(obj1);
+        }
+      }
 	}
   }
 
@@ -1703,11 +1723,19 @@ public class Scheme {
         throw new Exception("can't compare rational with this object");
       }
     } else {
-      try {
-        bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
-        return retval;
-      } catch {
-        return false;
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          bool retval = (ObjectType.ObjTst(obj1, obj2, false) == 0);
+          return retval;
+        } catch {
+          return false;
+        }
+      } else {
+        if (obj1 is BigInteger) {
+          return ((BigInteger)obj1).Equals(obj2);
+        } else {
+          return ((BigInteger)obj2).Equals(obj1);
+        }
       }
 	}
   }
@@ -1734,25 +1762,28 @@ public class Scheme {
 		return (((double)((Rational)obj2)) < ((double)obj1));
 	  }
 	} else {
-	  try {
-	        return (ObjectType.ObjTst(obj1, obj2, false) < 0);
-	  } catch {
-		BigInteger b1 = null;
-		BigInteger b2 = null;
-		if (obj1 is int) {
-		  b1 = makeBigInteger((int) obj1);
-		} else if (obj1 is BigInteger) {
-		  b1 = (BigInteger)obj1;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		if (obj2 is int) {
-		  b2 = makeBigInteger((int) obj2);
-		} else if (obj2 is BigInteger) {
-		  b2 = (BigInteger)obj2;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		return b1 < b2;
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+		try {
+		  return (ObjectType.ObjTst(obj1, obj2, false) < 0);
+		} catch {
+		  // ignore and continue
+		}
 	  }
+	  BigInteger b1 = null;
+	  BigInteger b2 = null;
+	  if (obj1 is int) {
+		b1 = makeBigInteger((int) obj1);
+	  } else if (obj1 is BigInteger) {
+		b1 = (BigInteger)obj1;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+	  if (obj2 is int) {
+		b2 = makeBigInteger((int) obj2);
+	  } else if (obj2 is BigInteger) {
+		b2 = (BigInteger)obj2;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+	  return b1 < b2;
 	}
 	throw new Exception(String.Format("unable to compare {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
@@ -1788,25 +1819,28 @@ public class Scheme {
 		return (((double)((Rational)obj2)) > ((double)obj1));
 	  }
 	} else {
-	  try {
-	        return (ObjectType.ObjTst(obj1, obj2, false) > 0);
-	  } catch {
-		BigInteger b1 = null;
-		BigInteger b2 = null;
-		if (obj1 is int) {
-		  b1 = makeBigInteger((int) obj1);
-		} else if (obj1 is BigInteger) {
-		  b1 = (BigInteger)obj1;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		if (obj2 is int) {
-		  b2 = makeBigInteger((int) obj2);
-		} else if (obj2 is BigInteger) {
-		  b2 = (BigInteger)obj2;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		return b1 > b2;
-	  }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          return (ObjectType.ObjTst(obj1, obj2, false) > 0);
+        } catch {
+          // continue
+        }
+      }
+      BigInteger b1 = null;
+      BigInteger b2 = null;
+      if (obj1 is int) {
+        b1 = makeBigInteger((int) obj1);
+      } else if (obj1 is BigInteger) {
+        b1 = (BigInteger)obj1;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+      if (obj2 is int) {
+        b2 = makeBigInteger((int) obj2);
+      } else if (obj2 is BigInteger) {
+        b2 = (BigInteger)obj2;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+      return b1 > b2;
 	}
 	throw new Exception(String.Format("unable to compare {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
@@ -1814,23 +1848,6 @@ public class Scheme {
 
   public static object not(object obj) {
 	return (! true_q(obj));
-  }
-
-  public static bool Equal(object obj1, object op, object obj2) {
-	if (op is string) {
-	  if (((string)op) == "=") {
-		return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-	  } else if (((string)op) == "<") {
-		return (ObjectType.ObjTst(obj1, obj2, false) < 0);
-	  } else if (((string)op) == ">") {
-		return (ObjectType.ObjTst(obj1, obj2, false) > 0);
-	  } else if (((string)op) == "<=") {
-		return (ObjectType.ObjTst(obj1, obj2, false) <= 0);
-	  } else if (((string)op) == ">=") {
-		return (ObjectType.ObjTst(obj1, obj2, false) >= 0);
-	  }
-	} 
-	throw new Exception(String.Format("unknown compare operator: '{0}'", op));
   }
 
   public static object Add(object obj) {
@@ -1903,25 +1920,28 @@ public class Scheme {
 		return (((double)((Rational)obj2)) + ((double)obj1));
 	  }
 	} else {
-	  try {
-		return (ObjectType.AddObj(obj1, obj2));
-	  } catch {
-		BigInteger b1 = null;
-		BigInteger b2 = null;
-		if (obj1 is int) {
-		  b1 = makeBigInteger((int) obj1);
-		} else if (obj1 is BigInteger) {
-		  b1 = (BigInteger)obj1;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		if (obj2 is int) {
-		  b2 = makeBigInteger((int) obj2);
-		} else if (obj2 is BigInteger) {
-		  b2 = (BigInteger)obj2;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		return b1 + b2;
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+		try {
+		  return (ObjectType.AddObj(obj1, obj2));
+		} catch {
+		  // pass
+		}
 	  }
+	  BigInteger b1 = null;
+	  BigInteger b2 = null;
+	  if (obj1 is int) {
+		b1 = makeBigInteger((int) obj1);
+	  } else if (obj1 is BigInteger) {
+		b1 = (BigInteger)obj1;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+	  if (obj2 is int) {
+		b2 = makeBigInteger((int) obj2);
+	  } else if (obj2 is BigInteger) {
+		b2 = (BigInteger)obj2;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+	  return b1 + b2;
 	}
 	throw new Exception(String.Format("unable to add {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
@@ -1945,25 +1965,28 @@ public class Scheme {
 		return (((double)((Rational)obj2)) - ((double)obj1));
 	  }
 	} else {
-	  try {
-		return (ObjectType.SubObj(obj1, obj2));
-	  } catch {
-		BigInteger b1 = null;
-		BigInteger b2 = null;
-		if (obj1 is int) {
-		  b1 = makeBigInteger((int) obj1);
-		} else if (obj1 is BigInteger) {
-		  b1 = (BigInteger)obj1;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		if (obj2 is int) {
-		  b2 = makeBigInteger((int) obj2);
-		} else if (obj2 is BigInteger) {
-		  b2 = (BigInteger)obj2;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		return b1 - b2;
-	  }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          return (ObjectType.SubObj(obj1, obj2));
+        } catch {
+          // ignore and continue
+        }
+      }
+      BigInteger b1 = null;
+      BigInteger b2 = null;
+      if (obj1 is int) {
+        b1 = makeBigInteger((int) obj1);
+      } else if (obj1 is BigInteger) {
+        b1 = (BigInteger)obj1;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+      if (obj2 is int) {
+        b2 = makeBigInteger((int) obj2);
+      } else if (obj2 is BigInteger) {
+        b2 = (BigInteger)obj2;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+      return b1 - b2;
 	}
 	throw new Exception(String.Format("unable to subtract {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
@@ -1990,25 +2013,28 @@ public class Scheme {
 		return (((double)((Rational)obj2)) * ((double)obj1));
 	  }
 	} else {
-	  try {
-		return ObjectType.MulObj(obj1, obj2);
-	  } catch {
-		BigInteger b1 = null;
-		BigInteger b2 = null;
-		if (obj1 is int) {
-		  b1 = makeBigInteger((int) obj1);
-		} else if (obj1 is BigInteger) {
-		  b1 = (BigInteger)obj1;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		if (obj2 is int) {
-		  b2 = makeBigInteger((int) obj2);
-		} else if (obj2 is BigInteger) {
-		  b2 = (BigInteger)obj2;
-		} else
-		  throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		return b1 * b2;
-	  }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          return ObjectType.MulObj(obj1, obj2);
+        } catch {
+          // continue
+        }
+      }
+      BigInteger b1 = null;
+      BigInteger b2 = null;
+      if (obj1 is int) {
+        b1 = makeBigInteger((int) obj1);
+      } else if (obj1 is BigInteger) {
+        b1 = (BigInteger)obj1;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+      if (obj2 is int) {
+        b2 = makeBigInteger((int) obj2);
+      } else if (obj2 is BigInteger) {
+        b2 = (BigInteger)obj2;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+      return b1 * b2;
 	}
 	throw new Exception(String.Format("unable to multiply {0} and {1}", 
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
@@ -2056,25 +2082,28 @@ public class Scheme {
 		  return (((double)obj1) / ((Rational)obj2));
 		}
 	  } else {
-		try {
-		  return (ObjectType.DivObj(obj1, obj2));
-		} catch {
-		  BigInteger b1 = null;
-		  BigInteger b2 = null;
-		  if (obj1 is int) {
-			b1 = makeBigInteger((int) obj1);
-		  } else if (obj1 is BigInteger) {
-			b1 = (BigInteger)obj1;
-		  } else
-			throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
-		  if (obj2 is int) {
-			b2 = makeBigInteger((int) obj2);
-		  } else if (obj2 is BigInteger) {
-			b2 = (BigInteger)obj2;
-		  } else
-			throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
-		  return b1 / b2;
-		}
+        if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+          try {
+            return (ObjectType.DivObj(obj1, obj2));
+          } catch {
+            // ignore and continue
+          }
+        }
+        BigInteger b1 = null;
+        BigInteger b2 = null;
+        if (obj1 is int) {
+          b1 = makeBigInteger((int) obj1);
+        } else if (obj1 is BigInteger) {
+          b1 = (BigInteger)obj1;
+        } else
+          throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+        if (obj2 is int) {
+          b2 = makeBigInteger((int) obj2);
+        } else if (obj2 is BigInteger) {
+          b2 = (BigInteger)obj2;
+        } else
+          throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+        return b1 / b2;
 	  }
 	}
 	throw new Exception(String.Format("unable to divide {0} and {1}", 
