@@ -2619,8 +2619,10 @@ public static class Graphics
 				}
 			} else {
 				lock (win.getCanvas().shapes) {
-					if (! win.getCanvas ().shapes.Contains (this)) 
+					if (! win.getCanvas ().shapes.Contains (this)) {
 						win.getCanvas ().shapes.Add (this);
+						//System.Console.Error.WriteLine("Added to win!");
+					}
 				}
 				// Make sure each subshape is associated with this window
 				// so QueueDraw will redraw:
@@ -2661,8 +2663,10 @@ public static class Graphics
 		{ // Shape
 			// Add this shape to the shape's list.
 			lock (shape.shapes) {
-				if (! shape.shapes.Contains (this)) 
+				if (! shape.shapes.Contains (this)) {
 					shape.shapes.Add (this);
+					//System.Console.Error.WriteLine("Added to shape!");
+				}
 			}
 			window = shape.window;
 			drawn_on_shape = shape;
@@ -2671,11 +2675,11 @@ public static class Graphics
     
 		public void undraw ()
 		{
-		  Invoke (delegate {
-		      if (drawn_on_shape != null) {
+	      if (drawn_on_shape != null) {
 			lock (drawn_on_shape.shapes) {
 			  if (drawn_on_shape.shapes.Contains (this)) {
 			    drawn_on_shape.shapes.Remove (this);
+				//System.Console.Error.WriteLine("Removed from shape!");
 			  }
 			}
 			drawn_on_shape = null;
@@ -2684,13 +2688,13 @@ public static class Graphics
 			lock (window.getCanvas().shapes) {
 			  if (window.getCanvas ().shapes.Contains (this)) {
 			    window.getCanvas ().shapes.Remove (this);
+				//System.Console.Error.WriteLine("Removed from win!");
 			    if (window is WindowClass)
 			      ((WindowClass)window).QueueDraw ();
 			    window = null;
 			  }
 			}
-		      }
-		    });
+	      }
 		}
     
 		public Gradient gradient {

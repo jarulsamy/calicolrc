@@ -79,6 +79,7 @@ class Simulator:
             ## Calico version prior to 2.0.5 need this:
             ##self.claw.shapes.Remove(self.block)
             self.add_block(stack, block=self.block)
+            self.update()
             self.block = None
         else: # pick it up, if one
             if len(self.stacks[stack]) > 0:
@@ -86,6 +87,7 @@ class Simulator:
                 block.undraw()
                 block.moveTo(0, 100 + block_size/2)
                 block.draw(self.claw)
+                self.update()
                 self.block = block
         for p in range(0, int(y - 100), 5):
             self.claw.move(0, -5)
@@ -94,35 +96,62 @@ class Simulator:
     def check(self, color):
         return self.block and same(self.block.fill, Color(color))
 
+    def update(self):
+        self.window.update()
+
 
 sim = Simulator()
 sim.add_block(0, "yellow")
 sim.add_block(0, "red")
 sim.add_block(1, "blue")
+sim.update()
 
+def down():
+    sim.down()
+
+def up():
+    sim.up()
+
+def left():
+    sim.left()
+
+def right():
+    sim.right()
+
+def check(color):
+    return sim.check(color)
 
 def program_1():
-    sim.down()
+    down()
     program_2()
-    if sim.check("blue"):
-        sim.right()
-    sim.down()
-    sim.left()
-    sim.left()
-    sim.down()
+    if check("blue"):
+        right()
+    down()
+    left()
+    left()
+    down()
     program_1()
 
 def program_2():
-    if sim.check("red"):
-        sim.right()
-    sim.down()
-    sim.left()
+    if check("red"):
+        right()
+    down()
+    left()
     program_3()
 
 def program_3():
-    sim.right()
-    sim.right()
-    sim.left()
-    sim.down()
+    right()
+    right()
+    left()
+    down()
 
-program_1()
+def program_4():
+    down()
+    right()
+    right()
+    down()
+    left()
+    left()
+    program_4()
+
+program_4()
