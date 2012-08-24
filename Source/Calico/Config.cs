@@ -53,11 +53,9 @@ namespace Calico {
             SetValue("config", "font-size", "int", 10240); // 10 pt
             SetValue("config", "font-bold", "bool", false);
             SetValue("config", "font-italic", "bool", false);
-            SetValue("config", "known-languages", "strings",
-                    new List<string>() {"Python", "Jigsaw", "Scheme", "Spreadsheet",
-                                        "Dinah", "Ruby", "FSharp", "Logo"});
-            SetValue("config", "ignore-languages", "strings",
-                    new List<string>() {"Dinah", "Logo", "FSharp"});
+            // Languages that are pre-approved, if they exist. You can add to these by checking in menu
+            SetValue("config", "visible-languages", "strings",
+                    new List<string>() {"Python", "Jigsaw", "Scheme", "Spreadsheet", "Ruby", "C#"});
             SetValue("config", "recent-files", "strings", new List<string>());
             SetValue("config", "recent-files-size", "int", 15);
 	        SetValue("calico", "font", "string", "Courier");

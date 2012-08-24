@@ -134,8 +134,12 @@ namespace Calico {
             if (examples_menu == null)
                 throw new Exception("/menubar2/FileAction/ExamplesAction");
             examples_menu.Submenu = new Gtk.Menu();
+            // Menu items for Examples:
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager[lang];
+                // Skip if not visible:
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                    continue;
                 DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", language.name))));
                 if (dir.Exists) {
                     process_example_dir(examples_menu, language.proper_name, dir, language);
@@ -148,8 +152,12 @@ namespace Calico {
             if (file_menu == null)
                 throw new Exception("/menubar2/FileAction/NewAction");
             file_menu.Submenu = new Gtk.Menu();
+            // Menu item for New file:
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
+                // Skip if not a visible language:
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                    continue;
                 Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
                 ((Gtk.Menu)file_menu.Submenu).Add(menu);
                 menu.Activated += delegate { Open(null, language.name); };
@@ -183,9 +191,13 @@ namespace Calico {
             int count = 0;
             language_group = null;
             Gtk.RadioMenuItem radioitem;
+            // Menu item for "Switch Shell to ..."
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
-                if (! language.IsTextLanguage)
+                if (! language.IsTextLanguage) // Skip non-text languages
+                    continue;
+                // Skip non-visible languages:
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
                     continue;
                 if (language.name == "python") {
                     // FIXME: get from defaults, preferred lang
@@ -226,12 +238,14 @@ namespace Calico {
             if (languages_menu == null)
                 throw new Exception("/menubar2/CalicoAction/LanguagesAction");
             languages_menu.Submenu = new Gtk.Menu();
-            foreach (string language in (IList<string>)config.GetValue("config", "known-languages")) {
-                Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language);
-                if (((IList<string>)config.GetValue("config", "ignore-languages")).Contains(language))
-                    menu_item.Active = false;
-                else
+            // Menu item for marking Visible languages:
+            foreach (KeyValuePair<string, Language> pair in manager.languages) {
+                Language language = pair.Value;
+                Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language.proper_name);
+                if (((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
                     menu_item.Active = true;
+                else
+                    menu_item.Active = false;
                 menu_item.Activated += OnChangeActiveLanguages;
                 ((Gtk.Menu)languages_menu.Submenu).Add(menu_item);
             }
@@ -451,11 +465,11 @@ namespace Calico {
             Gtk.MenuItem languages_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/LanguagesAction");
             if (languages_menu == null)
                 throw new Exception("/menubar2/CalicoAction/LanguagesAction");
-            IList<string> ignore_languages = (IList<string>)config.GetValue("config", "ignore-languages");
-            ignore_languages.Clear();
+            IList<string> visible_languages = (IList<string>)config.GetValue("config", "visible-languages");
+            visible_languages.Clear();
             foreach (Gtk.CheckMenuItem menu_item in ((Gtk.Menu)languages_menu.Submenu).AllChildren) {
-                if (!menu_item.Active)
-                    ignore_languages.Add(((Gtk.Label)menu_item.Child).LabelProp);
+                if (menu_item.Active)
+                    visible_languages.Add(((Gtk.Label)menu_item.Child).LabelProp);
             }
         }
 

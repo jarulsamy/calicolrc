@@ -82,9 +82,7 @@ namespace Calico {
                 {
                     foreach (FileInfo f in d.GetFiles("Calico*.dll"))
                     {
-                        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
-                        if (((IList<string>)config.GetValue("config", "ignore-languages")).Contains(match.Groups[1].ToString()))
-                            continue;
+                        //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
                         //Print("Loading {0}...", f.FullName);
                         Assembly assembly = Assembly.LoadFrom(f.FullName);
                         if (assembly != null) {
@@ -117,9 +115,7 @@ namespace Calico {
             {
                 foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
                 {
-                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).py");
-                    if (((IList<string>)config.GetValue("config", "ignore-languages")).Contains(match.Groups[1].ToString()))
-                        continue;
+                    //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).py");
                     try {
                         Calico.DLREngine engine = ((Calico.DLREngine)languages["python"].engine);
                         var scope = engine.engine.ExecuteFile(f.FullName);

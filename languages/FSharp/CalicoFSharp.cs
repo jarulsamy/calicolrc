@@ -168,7 +168,7 @@ public class CalicoFSharpDocument : TextDocument {
 public class CalicoFSharpLanguage : Language
 {
   public CalicoFSharpLanguage () : 
-	  base("fsharp",  "FSharp", new string[] { "fs" }, "text/x-fsharp")
+	  base("fsharp",  "F#", new string[] { "fs" }, "text/x-fsharp")
   {
     LineComment = "//";
   }
