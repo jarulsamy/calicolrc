@@ -1116,7 +1116,11 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Run()
 		{
-			if (_engine.State != EngineState.Paused) _engine.Reset(this, _inspector);
+			if (_engine.State != EngineState.Paused) {
+				Console.WriteLine ("Resetting");
+				Console.WriteLine (_engine.State);
+				_engine.Reset(this, _inspector);
+			}
 			_engine.Run();
 		}
 		
@@ -2390,7 +2394,7 @@ namespace Jigsaw
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
 				rr.Action = EngineAction.Pause;				// so that engine can stop
-				rr.Frame = null;
+				//rr.Frame = null;
 				yield return rr;
 			}
 			
@@ -2552,8 +2556,7 @@ namespace Jigsaw
 			// Block subclasses only need to define the graphics path, fill color and text.
 			// Draw block on the canvas
 			
-            // Cannot draw with negative width or height, 
-            // so use bounding box points to draw
+            // Cannot draw with negative width or height, so use bounding box points to draw
             double x = this.left;
             double y = this.top;
             double w = this.width;

@@ -314,7 +314,7 @@ namespace Jigsaw
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
 				rr.Action = EngineAction.Pause;				// so that engine can stop
-				rr.Frame = null;
+				//rr.Frame = null;
 				yield return rr;
 			}
 			
@@ -430,7 +430,7 @@ namespace Jigsaw
 			yield return rr;
 			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
 				rr.Action = EngineAction.Pause;				// so that engine can stop
-				rr.Frame = null;
+				//rr.Frame = null;
 				yield return rr;
 			}
 			

@@ -494,7 +494,6 @@ namespace Jigsaw
 		// - - Advance the entire system one step - - - - - - - - - - -
 		public bool Step(bool runOnce = false)
 		{
-			//Console.WriteLine ("Engine.Step");
 			// Block reentrance
 			if (_inStep == true) return false;
 			_inStep = true;
@@ -577,9 +576,9 @@ namespace Jigsaw
 			//_inspector.Update (globals);
 			if (!_turbo) RaiseEngineStep ();
 			
-			// If at least one stack is enabled, make sure the timer is started
+			// If at least one stack is enabled and not paused, make sure the timer is started
 			if (enabledCount > 0 && !runOnce) {
-				if (_timerID == 0 && _timeOut > 0.0) {
+				if (_timerID == 0 && _timeOut > 0.0 && _state != EngineState.Paused) {
 					_timerID = GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 					_state = EngineState.Running;
 				}
@@ -601,13 +600,17 @@ namespace Jigsaw
 			//Console.WriteLine ("Engine.Run()");
 			if (_callStacks.Count == 0)	return;
 			foreach (CallStack s in _callStacks) s.Enabled = true;
-			RaiseEngineRun();				// Inidicate running is starting
+			_state = EngineState.Running;	// Must set state to signal intention to other parts of program
+			RaiseEngineRun();				// Indicate running is starting
 			this.Step ();					// Kick-start running
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Stop()
 		{
+			// Update state to Stopped
+			_state = EngineState.Stopped;
+
 			// Remove any existing timeout handler
 			if (_timerID > 0) {
 				GLib.Source.Remove(_timerID);
@@ -623,8 +626,6 @@ namespace Jigsaw
 			// Disable all call stacks
 			foreach (CallStack s in _callStacks) s.Enabled = false;
 
-			// Update state to Stopped
-			_state = EngineState.Stopped;
 			RaiseEngineStop ();	// Testing turbo mode
 		}
 
@@ -632,6 +633,9 @@ namespace Jigsaw
 		public void Pause()
 		{
 			if (_state == EngineState.Paused) return;
+
+			// Update state to Paused
+			_state = EngineState.Paused;
 
 			// Remove any existing timeout handler
 			if (_timerID > 0) {
@@ -642,8 +646,6 @@ namespace Jigsaw
 			// Disable all call stacks
 			foreach (CallStack s in _callStacks) s.Enabled = false;
 
-			// Update state to Paused
-			_state = EngineState.Paused;
 			RaiseEnginePause();
 		}
 		

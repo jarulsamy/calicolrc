@@ -480,22 +480,25 @@ namespace Widgets
 			_prevMouseY = null;
 			base.OnMouseUp (cvs, e);
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void Draw(Cairo.Context g)
         {
+//			// @@@
+//			// Get current x and y offset from the current transformation matrix
+//			Matrix m = g.Matrix;
+//			double x = m.X0;
+//			double y = m.Y0;
+//			g.InverseTransformDistance(ref x, ref y);
+//
+//			g.Save ();
+//			g.Translate(-x, -y);
+
+			// Start with the base rounded rectangle
 			base.Draw(g);
-//			this.slider.Top = this.Top+5;
-//			this.slider.Left = this.Left + this.Width - this.slider.Width-5;
-//			this.slider.Height = this.Height - 10;
-//			this.slider.Draw(g);
+
+//			g.Restore ();
 		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//        public override Boolean ContainsPoint(Diagram.CPoint pnt, Diagram.Canvas cvs)
-//        {
-//			return slider.ContainsPoint(pnt, cvs);
-//		}
 	}
 	
 	// -----------------------------------------------------------------------
@@ -582,11 +585,21 @@ namespace Widgets
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void Draw(Cairo.Context g)
         {	// Draw the tab widget
-			
+
+			// @@@
+			// Get current x and y offset from the current transformation matrix
+//			Matrix m = g.Matrix;
+//			double x = m.X0;
+//			double y = m.Y0;
+//			g.InverseTransformDistance(ref x, ref y);
+//
+//			g.Save ();
+//			g.Translate(-x, -y);
+
 			// Start with the base rounded rectangle
 			base.Draw(g);
-			
-			// Add two smaller rectangle for scrolling up and down
+
+//			g.Restore ();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
