@@ -29,8 +29,8 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.5";
-        public static bool IsLoadModules = true;
+        public static string Version = "2.0.6";
+        public static bool IsLoadLanguages = true;
 
 		/*
        private static bool IsApplicationRunningOnMono(string processName)
@@ -77,7 +77,7 @@ namespace Calico {
             // for language in directory, load languages:
 
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
-            if (IsLoadModules) {
+            if (IsLoadLanguages) {
                 foreach (DirectoryInfo d in dir.GetDirectories("*"))
                 {
                     foreach (FileInfo f in d.GetFiles("Calico*.dll"))

@@ -2727,7 +2727,7 @@ namespace Calico {
         protected void OnZoom100ActionActivated (object sender, System.EventArgs e)
         {
             config.SetValue("config", "font-size", "int", 10240); // default
-            UpdateZoom();
+            DefaultZoom();
         }
 
         protected void OnPropertyTabActionActivated (object sender, System.EventArgs e)

@@ -175,7 +175,7 @@ namespace Diagram
 		
 		internal double worldWidth = 3000.0;					// Size of underlying canvas world
 		internal double worldHeight = 2000.0;
-        internal double scale = 1.0;                            // Drawing scale (zoom) factor
+        internal double scale = 1.01;                            // Drawing scale (zoom) factor
 		internal double scaleCenterX = 0.0;						// The point about which scaling is performed (screen coordinates)
 		internal double scaleCenterY = 0.0;
 		internal double offsetX = 0.0;							// The current translation amount
@@ -500,7 +500,7 @@ namespace Diagram
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoZoom(double factor)
 		{	// Perform the zoom
-			this.scale *= factor;
+			Zoom *= factor;
 			
 			// Compute the minimum zoom factor
 			int w, h;
@@ -508,8 +508,8 @@ namespace Diagram
 			double minZoom = Math.Max(w/this.worldWidth, h/this.worldHeight);
 			
 			// Clip zoom factor
-			if (this.scale < minZoom) this.scale = minZoom;
-			if (this.scale > 20.0) this.scale = 20.0;
+			if (this.scale < minZoom) Zoom = minZoom;
+			if (this.scale > 20.0) Zoom = 20.0;
 			
 			//this.scaleCenterX = 0.5*this.Allocation.Width;
 			//this.scaleCenterY = 0.5*this.Allocation.Height;
@@ -525,7 +525,7 @@ namespace Diagram
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoResetZoom() {
-			this.scale = 1.0;
+			Zoom = 1.01;
 			this.offsetX = 0.0;
 			this.offsetY = 0.0;
 			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
@@ -1562,7 +1562,10 @@ namespace Diagram
         {	// Set drawing zoom factor. A number greater than 0.
             get { return this.scale; }
             set {
-				if (value < 0.0) value = 1.0;
+				if (value < 0.0) 
+					value = 1.01;
+				else if (value == 1.0)
+					value = 1.01;
 				this.scale = value;
 			}
         }
