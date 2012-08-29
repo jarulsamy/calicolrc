@@ -476,8 +476,11 @@ namespace Calico {
                 string retval = System.Environment.OSVersion.Platform.ToString();
                 if (retval.StartsWith("Win"))
                     retval = "Windows";
-                return retval;
-                // "Unix" or "Windows" are two common retvals
+		else if (System.IO.Directory.Exists("/Applications")) {
+		    return "Mac";
+		} else {
+		    return retval; // Probably Unix
+		}
             }
         }
         public Gtk.TreeView EnvironmentTreeView {

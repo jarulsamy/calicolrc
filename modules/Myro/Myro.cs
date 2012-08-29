@@ -6516,21 +6516,26 @@ public static class Myro
 
 			if (os_name == "Windows") {
 				string file = startup_path;
-				//file = Path.Combine(file, "bin");
 				file = Path.Combine (file, "windows");
 				file = Path.Combine (file, "eSpeak");
 				myProcess.StartInfo.FileName = Path.Combine (file, "espeak.exe");
+			} else if (os_name == "Mac") {
+				string file = startup_path;
+				file = Path.Combine (file, "mac");
+				file = Path.Combine (file, "eSpeak");
+				myProcess.StartInfo.FileName = Path.Combine (file, "speak");
+				myProcess.EnvironmentVariables.Add("ESPEAK_DATA_PATH", file);
 			} else {
-				if (File.Exists ("/usr/bin/speak")) {
-					// assumes espeak is in /usr/bin/ on macs
-					myProcess.StartInfo.FileName = "speak";
-				} else if (File.Exists ("/usr/local/bin/speak")) {
-					// or look for espeak is in /usr/local/bin/ on macs
-					myProcess.StartInfo.FileName = "speak";
-				} else {
-					// assumes in path
-					myProcess.StartInfo.FileName = "espeak";
-				}
+			    if (File.Exists ("/usr/bin/speak")) {
+				// assumes espeak is in /usr/bin/ on macs
+				myProcess.StartInfo.FileName = "speak";
+			    } else if (File.Exists ("/usr/local/bin/speak")) {
+				// or look for espeak is in /usr/local/bin/ on macs
+				myProcess.StartInfo.FileName = "speak";
+			    } else {
+				// assumes in path
+				myProcess.StartInfo.FileName = "espeak";
+			    }
 			}
 			myProcess.StartInfo.CreateNoWindow = true;
 			myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" -f " + textpath);
