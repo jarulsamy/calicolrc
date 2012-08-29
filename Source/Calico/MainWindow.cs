@@ -138,7 +138,7 @@ namespace Calico {
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager[lang];
                 // Skip if not visible:
-                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
                     continue;
                 DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", language.name))));
                 if (dir.Exists) {
@@ -156,7 +156,7 @@ namespace Calico {
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
                 // Skip if not a visible language:
-                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
                     continue;
                 Gtk.MenuItem menu = new Gtk.MenuItem(language.proper_name);
                 ((Gtk.Menu)file_menu.Submenu).Add(menu);
@@ -197,7 +197,7 @@ namespace Calico {
                 if (! language.IsTextLanguage) // Skip non-text languages
                     continue;
                 // Skip non-visible languages:
-                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
                     continue;
                 if (language.name == "python") {
                     // FIXME: get from defaults, preferred lang
@@ -242,7 +242,7 @@ namespace Calico {
             foreach (KeyValuePair<string, Language> pair in manager.languages) {
                 Language language = pair.Value;
                 Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language.proper_name);
-                if (((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.proper_name))
+                if (((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
                     menu_item.Active = true;
                 else
                     menu_item.Active = false;
@@ -468,8 +468,10 @@ namespace Calico {
             IList<string> visible_languages = (IList<string>)config.GetValue("config", "visible-languages");
             visible_languages.Clear();
             foreach (Gtk.CheckMenuItem menu_item in ((Gtk.Menu)languages_menu.Submenu).AllChildren) {
-                if (menu_item.Active)
-                    visible_languages.Add(((Gtk.Label)menu_item.Child).LabelProp);
+                if (menu_item.Active) {
+                    Language language = GetLanguageFromProperName(((Gtk.Label)menu_item.Child).LabelProp);
+                    visible_languages.Add(language.name); 
+                }
             }
         }
 
@@ -529,6 +531,24 @@ namespace Calico {
                     }
                 }
             }
+        }
+
+        public Language GetLanguageFromName(string name) {
+            foreach (string lang in manager.getLanguages()) {
+                if (name == manager.languages[lang].name) {
+                    return manager.languages[lang];
+                }
+            }
+            return null;
+        }
+
+        public Language GetLanguageFromProperName(string proper_name) {
+            foreach (string lang in manager.getLanguages()) {
+                if (proper_name == manager.languages[lang].proper_name) {
+                    return manager.languages[lang];
+                }
+            }
+            return null;
         }
 
         public Document GetDocument(string name) {

@@ -34,10 +34,10 @@ namespace Calico {
         public Microsoft.Scripting.Hosting.ScriptRuntimeSetup scriptRuntimeSetup;
         public bool UseSharedScope = true;
 
-        public LanguageManager(string path, Dictionary<string,Language> langs) {
+        public LanguageManager(IList<string> visible_languages, string path, Dictionary<string,Language> langs) {
             languages = new Dictionary<string, Language>();
             foreach (string name in langs.Keys) {
-                Register(langs[name]); // This may fail, which won't add language
+                Register(langs[name], visible_languages.Contains(name)); // This may fail, which won't add language
             }
             Setup(path);
             Start(path);
@@ -47,11 +47,13 @@ namespace Calico {
             // In case it needs it for DLR languages
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string language in getLanguages()) {
-                try {
-                    languages[language].engine.Setup(path);
-                } catch {
-                    Console.Error.WriteLine("Language failed to initialize: {0}", language);
-                    languages.Remove(language);
+                if (languages[language].engine != null) {
+                    try {
+                        languages[language].engine.Setup(path);
+                    } catch (Exception e) {
+                        Console.Error.WriteLine("Language failed to initialize: {0} {1}", language, e.Message);
+                        languages.Remove(language);
+                    }
                 }
             }
             // Language neutral scope:
@@ -87,20 +89,22 @@ namespace Calico {
             return keys;
         }
 
-        public void Register(Language language) {
-            try {
-                language.MakeEngine(this); // Makes a default engine
-            } catch {
-                Console.WriteLine("Register failed; skipping language {0}", language.name);
-                return;
+        public void Register(Language language, bool visible) {
+            if (visible) {
+                try {
+                    language.MakeEngine(this); // Makes a default engine
+                } catch {
+                    Console.WriteLine("Register failed; skipping language {0}", language.name);
+                    return;
+                }
             }
             languages[language.name] = language; // ok, save it
         }
 
         public void SetCalico(MainWindow calico) {
             this.calico = calico;
-            scope.SetVariable("calico", calico);
-
+            if (scope != null)
+                scope.SetVariable("calico", calico);
         }
 
         public void SetRedirects(CustomStream stdout, CustomStream stderr) {
@@ -108,19 +112,22 @@ namespace Calico {
             this.stderr = stderr;
             this.stdout = stdout;
             foreach (string language in languages.Keys) {
-                languages[language].engine.SetRedirects(this.stdout, this.stderr);
+                if (languages[language].engine != null)
+                    languages[language].engine.SetRedirects(this.stdout, this.stderr);
             }
         }
 
         public void Start(string path) {
             foreach (string language in languages.Keys) {
-                languages[language].engine.Start(path);
+                if (languages[language].engine != null)
+                    languages[language].engine.Start(path);
             }
         }
 
         public void PostSetup(MainWindow calico) {
             foreach (string language in languages.Keys) {
-                languages[language].engine.PostSetup(calico);
+                if (languages[language].engine != null)
+                    languages[language].engine.PostSetup(calico);
             }
         }
 

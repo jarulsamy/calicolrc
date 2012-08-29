@@ -84,6 +84,7 @@ namespace Calico {
                     {
                         //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
                         //Print("Loading {0}...", f.FullName);
+                        //string loading = match.Groups[1].ToString().ToLower();
                         Assembly assembly = Assembly.LoadFrom(f.FullName);
                         if (assembly != null) {
                             foreach (Type type in assembly.GetTypes()) {
@@ -95,7 +96,13 @@ namespace Calico {
                                     continue;
                                 }
                                 if (method != null) {
-                                    Language language = (Language)method.Invoke(type, new object[]{});
+                                    Language language = null;
+                                    try {
+                                        language = (Language)method.Invoke(type, new object[]{});
+                                    } catch (Exception e) {
+                                        Print("Failure; skipping old language file '{0}': {1}", f.Name, e.Message);
+                                        continue;
+                                    }
                                     languages[language.name] = language;
                                     //Print("Registering language...'{0}'", language.name);
                                     break;
@@ -109,20 +116,23 @@ namespace Calico {
             //languages["python"] = CalicoPython.CalicoPythonLanguage.MakeLanguage();
             //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
             // Now, let's load engines
-            Calico.LanguageManager manager = new Calico.LanguageManager(path, languages);
+            Calico.LanguageManager manager = new Calico.LanguageManager((IList<string>)config.GetValue("config", "visible-languages"), path, languages);
             // Load Calico languages that depend on other Calico languages:
             foreach (DirectoryInfo d in dir.GetDirectories("*"))
             {
                 foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
                 {
-                    //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).py");
+                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
+                    //Print("Loading {0}...", f.FullName);
+                    string loading = match.Groups[1].ToString().ToLower();
                     try {
                         Calico.DLREngine engine = ((Calico.DLREngine)languages["python"].engine);
                         var scope = engine.engine.ExecuteFile(f.FullName);
                         Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
                         Language language = (Language)method();
                         languages[language.name] = language;
-                        manager.Register(language); // This may fail, which won't add language
+                        bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(loading);
+                        manager.Register(language, visible); // This may fail, which won't add language
                         language.engine.Setup(path);
                         language.engine.Start(path);
                     } catch (Exception e) {
