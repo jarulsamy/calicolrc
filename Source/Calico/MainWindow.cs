@@ -495,8 +495,9 @@ namespace Calico {
             IList<string> visible_languages = (IList<string>)config.GetValue("config", "visible-languages");
             visible_languages.Clear();
             foreach (Gtk.CheckMenuItem menu_item in ((Gtk.Menu)languages_menu.Submenu).AllChildren) {
-                if (menu_item.Active) {
-                    Language language = GetLanguageFromProperName(((Gtk.Label)menu_item.Child).LabelProp);
+                Language language = GetLanguageFromProperName(((Gtk.Label)menu_item.Child).LabelProp);
+                System.Console.WriteLine(language.name);
+                if (menu_item.Active || language.name.Equals("python")) {
                     visible_languages.Add(language.name); 
                 }
             }
@@ -1030,18 +1031,20 @@ namespace Calico {
         }
 
         public void PickNew() {
-            string [] prop_languages = manager.getLanguagesProper();
-            if (prop_languages.Length > 1) {
+            if (manager.languages.Count > 1) {
                 ManualResetEvent ev = new ManualResetEvent(false);
                 dialogResponse = null;
                 Invoke(delegate {
                     Gtk.Dialog fc = new Gtk.Dialog("Select item type", this, 0);
+                    fc.SetSizeRequest(200, -1);
                     fc.VBox.PackStart(new Gtk.Label("Create a new item"));
-                    string [] langs = manager.getLanguagesProper();
-                    foreach (string choice in langs) {
-                        Gtk.Button button = new Gtk.Button(choice);
+                    foreach (string lang in manager.getLanguages()) {
+                        Language language = manager[lang];
+                        if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
+                            continue;
+                        Gtk.Button button = new Gtk.Button(language.proper_name);
                         button.Clicked += (o, a) => DialogHandler(o, a, fc);
-                        if (langs.Length > 5) {
+                        if (manager.languages.Count > 5) {
                             fc.VBox.PackStart(button, true, true, 5);
                         } else {
                             fc.AddActionWidget(button, Gtk.ResponseType.Ok);
@@ -1869,13 +1872,13 @@ namespace Calico {
                 bool retval = CurrentDocument.Save();
                 if (retval) {
                     // if select, just send that
-                    if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {
-                        string text = (string)CurrentDocument.Selection;
-                        history.last(text.TrimEnd());
-                        ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
-                        history.add("");
-                        Execute(text.TrimEnd(), CurrentLanguage);
-                    } else { // run as a file, if something selected
+                    //if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {
+                    //    string text = (string)CurrentDocument.Selection;
+                    //    history.last(text.TrimEnd());
+                    //    ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
+                    //    history.add("");
+                    //    Execute(text.TrimEnd(), CurrentLanguage);
+                    // run as a file, if something selected
                         SetLanguage(CurrentLanguage);
                         if (ProgramSpeed.Value < 100 || CurrentDocument.HasBreakpointSet) {
                             manager[CurrentLanguage].engine.SetTraceOn(this);
@@ -1892,7 +1895,7 @@ namespace Calico {
                         // If document handles running, it manages UI itself
                         CurrentDocument.ExecuteFileInBackground();
                         ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Run file]\n");
-                    }
+                    //}
                 }
             } else if (DocumentNotebook.Page == SHELL) {
                 string text = Shell.Document.Text;

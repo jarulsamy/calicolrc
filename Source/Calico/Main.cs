@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.6";
+        public static string Version = "2.0.7";
         public static bool IsLoadLanguages = true;
 
 		/*
@@ -65,7 +65,12 @@ namespace Calico {
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
-            Config config = new Config(config_path);
+            Config config;
+            if (((IList<string>)args).Contains("--reset")) {
+                config = new Config(config_path, true);
+            } else {
+                config = new Config(config_path);
+            }
             // Setup translations:
             string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
@@ -190,6 +195,7 @@ namespace Calico {
             Print(_("  StartCalico --exec FILENAMEs           Run FILENAMEs standalone with graphics"));
             Print(_("  StartCalico --exec --nogui FILENAMEs   Run FILENAMEs standalone no graphics"));
             Print(_("  StartCalico --version                  Displays the version number ({0})"), Version);
+            Print(_("  StartCalico --reset                    Resets config settings to factory defaults"));
             Print(_("  StartCalico --help                     Displays this message"));
             Print("");
         }

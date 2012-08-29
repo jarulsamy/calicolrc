@@ -28,7 +28,11 @@ namespace Calico {
         public string filename;
         public Dictionary<string, Dictionary<string,object>> values = new Dictionary<string, Dictionary<string,object>>();
         public Dictionary<string, Dictionary<string,string>> types = new Dictionary<string, Dictionary<string,string>>();
-        public Config(string filename) {
+
+        public Config(string filename) : this(filename, false) {
+        }
+
+        public Config(string filename, bool reset) {
             this.filename = filename;
             // Check path:
             string directory = System.IO.Path.GetDirectoryName(filename);
@@ -36,16 +40,21 @@ namespace Calico {
                 System.IO.Directory.CreateDirectory(directory);
             }
             Initialize();
-            // Load file, if exists:
-            if (System.IO.File.Exists(filename)) {
-                try {
-                    Load();
-                } catch {
-                    Console.WriteLine("Skipping invalid config.xml file...");
-                    Initialize(); // reset!
-                }
-            } else {
+            if (reset) {
+                // Don't load anything else
                 Save();
+            } else {
+                // Load file, if exists:
+                if (System.IO.File.Exists(filename)) {
+                    try {
+                        Load();
+                    } catch {
+                        Console.WriteLine("Skipping invalid config.xml file...");
+                        Initialize(); // reset!
+                    }
+                } else {
+                    Save();
+                }
             }
         }
         public void Initialize() {
@@ -54,6 +63,7 @@ namespace Calico {
             SetValue("config", "font-bold", "bool", false);
             SetValue("config", "font-italic", "bool", false);
             // Languages that are pre-approved, if they exist. You can add to these by checking in menu
+            SetValue("calico", "version", "double", 2.0);
             SetValue("config", "visible-languages", "strings", // Language system name (not proper name)
                     new List<string>() {"python", "jigsaw", "scheme", "spreadsheet", "ruby", "csharp"});
             SetValue("config", "recent-files", "strings", new List<string>());
@@ -130,6 +140,8 @@ namespace Calico {
         public object makeValue(string type, string value) {
             if (type == "int") {
                 return System.Int32.Parse(value);
+            } else if (type == "double") {
+                return System.Double.Parse(value);
             } else if (type == "bool") {
                 return value == "true";
             } else if (type == "string") {
