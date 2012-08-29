@@ -28,6 +28,24 @@ using Calico;
 
 namespace Calico {
 
+    public class ToolWindow : Gtk.Window {
+        MainWindow calico;
+        public ToolWindow(string title, MainWindow calico) :
+                base(title) {
+            this.calico = calico;
+        }    
+            
+        protected override bool OnDeleteEvent (Gdk.Event e)
+        {
+            calico.NotebookPane.Unparent();
+            calico.VPaned2.Add2(calico.NotebookPane);
+            this.Hide();
+            calico.tool_window = null;
+            return true;
+        }   
+        
+    }
+    
     public partial class MainWindow : Gtk.Window {
         public Config config;
         public Gtk.Clipboard clipboard;
@@ -58,6 +76,7 @@ namespace Calico {
         public Chat connection;
         int animationSequence = 0;
         Gtk.Image [] animationImages = new Gtk.Image [2];
+        public Gtk.Window tool_window = null;
 
         enum TargetType {
             String,
@@ -395,6 +414,14 @@ namespace Calico {
         */
 
         // ------------------------------------------------------------
+        public Gtk.HPaned NotebookPane {
+            get {return hpaned2;}
+        }
+        
+        public Gtk.VPaned VPaned2 {
+            get {return vpaned2; }
+        }
+        
         public Document CurrentDocument {
             get {
                 int page_num = DocumentNotebook.Page;
@@ -2777,6 +2804,28 @@ namespace Calico {
         protected void OnInstallNewAddonActionActivated (object sender, System.EventArgs e)
         {
             inform("No addons are currently available");
+        }
+  
+        protected void OnButton11Clicked (object sender, System.EventArgs e)
+        {
+            // If output tabs are in pane:
+            // Create new window, unparent output tabs etc, and show
+            Gtk.Application.Invoke(delegate {
+                if (tool_window == null) {
+                    tool_window = new ToolWindow("Calico Tools", this);
+                    NotebookPane.Reparent(tool_window);
+                    int width, height;
+                    this.GetSize(out width, out height);
+                    tool_window.SetSizeRequest(width, height);
+                    tool_window.Show();
+                } else {
+                    NotebookPane.Unparent();
+                    vpaned2.Add2(NotebookPane);
+                    tool_window.Hide();
+                    tool_window = null;
+                }
+            });
+            // else put back
         }
     }
 }

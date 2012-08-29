@@ -711,6 +711,24 @@
               </packing>
             </child>
             <child>
+              <widget class="Gtk.Button" id="button11">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-copy Menu</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnButton11Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">9</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
               <widget class="Gtk.Button" id="_stopButton">
                 <property name="MemberName" />
                 <property name="Sensitive">False</property>
@@ -724,7 +742,7 @@
                 <signal name="Clicked" handler="OnStopButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">9</property>
+                <property name="Position">10</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -744,7 +762,7 @@
                 <signal name="Clicked" handler="OnStartButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">10</property>
+                <property name="Position">11</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -767,7 +785,7 @@
                 <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
               </widget>
               <packing>
-                <property name="Position">11</property>
+                <property name="Position">12</property>
                 <property name="AutoSize">False</property>
                 <property name="Expand">False</property>
               </packing>
@@ -786,7 +804,7 @@
                 <signal name="Clicked" handler="OnPauseButton1Clicked" />
               </widget>
               <packing>
-                <property name="Position">12</property>
+                <property name="Position">13</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -806,7 +824,7 @@
                 <signal name="Clicked" handler="OnPlayButtonClicked" />
               </widget>
               <packing>
-                <property name="Position">13</property>
+                <property name="Position">14</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -824,7 +842,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">14</property>
+                <property name="Position">15</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -933,7 +951,7 @@
               </widget>
               <packing>
                 <property name="PackType">End</property>
-                <property name="Position">15</property>
+                <property name="Position">16</property>
                 <property name="AutoSize">True</property>
                 <property name="Expand">False</property>
                 <property name="Fill">False</property>
@@ -1365,7 +1383,7 @@
                       <widget class="Gtk.Notebook" id="notebook_tools">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="CurrentPage">2</property>
+                        <property name="CurrentPage">0</property>
                         <property name="Scrollable">True</property>
                         <child>
                           <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -1548,7 +1566,7 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="Gtk.Label" id="GtkLabel29">
+                      <widget class="Gtk.Label" id="GtkLabel30">
                         <property name="MemberName" />
                         <property name="LabelProp" translatable="yes">Chat</property>
                         <property name="UseMarkup">True</property>
