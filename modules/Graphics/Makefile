@@ -2,14 +2,14 @@
 all: ../Graphics.dll ../Shapes.dll
 
 ../Graphics.dll: Graphics.cs
-	MONO_PATH=../../bin gmcs -target:library \
+	MONO_PATH=../../bin mcs -sdk:4 -target:library \
 		Graphics.cs  \
 		-lib:../../bin \
 		-lib:../ \
                 -lib:Graphviz4Net.Core/obj/Release/\
 		-r:../../bin/Mono.Cairo.dll \
 		-r:IronPython \
- 		-r:Graphviz4Net.dll\
+		-r:Graphviz4Net.dll\
 		-r:Microsoft.Dynamic \
 		-r:Graphviz4Net \
 		-r:System.Drawing \

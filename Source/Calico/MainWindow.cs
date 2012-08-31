@@ -476,11 +476,10 @@ namespace Calico {
                 string retval = System.Environment.OSVersion.Platform.ToString();
                 if (retval.StartsWith("Win"))
                     retval = "Windows";
-		else if (System.IO.Directory.Exists("/Applications")) {
-		    return "Mac";
-		} else {
-		    return retval; // Probably Unix
-		}
+		        else if (System.IO.Directory.Exists("/Applications")) {
+		            return "Mac";
+		        } 
+		        return retval; // Probably Unix
             }
         }
         public Gtk.TreeView EnvironmentTreeView {
@@ -1679,6 +1678,11 @@ namespace Calico {
                 Invoke(OnStopRunning);
             }
         }
+
+        public void ExecuteFileInBackground(string filename) {
+	    string language = manager.GetLanguageFromExtension(filename);
+	    ExecuteFileInBackground(filename, language);
+	}
 
         public void ExecuteFileInBackground(string filename, string language) {
             // This is run from text documents that don't run themselves:

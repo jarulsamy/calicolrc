@@ -2119,6 +2119,16 @@ public static class Graphics
 		{ // Shape
 		}
 
+		public virtual void removeFromPhysics ()
+		{ // Shape
+			//if (body != null) {
+			//	body.UserData = null; // point back to this shape
+			//	body.FixtureList[0].UserData = null; // point back to this shape
+			//}
+			body.DestroyFixture(body.FixtureList[0]);
+			body = null;
+		}
+
 		public virtual void updateFromPhysics ()
 		{
 			// get from body, put in sprite
@@ -2686,6 +2696,9 @@ public static class Graphics
 		      }
 		      if (window != null) {
 			lock (window.getCanvas().shapes) {
+   			  if (window._canvas.world != null) {
+					removeFromPhysics ();
+		      }
 			  if (window.getCanvas ().shapes.Contains (this)) {
 			    window.getCanvas ().shapes.Remove (this);
 				//System.Console.Error.WriteLine("Removed from win!");

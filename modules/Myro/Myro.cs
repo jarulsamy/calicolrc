@@ -1,7 +1,7 @@
 /*
 Calico - Scripting Environment
 
-Copyright (c) 2011, Doug Blank <dblank@cs.brynmawr.edu>
+Copyright (c) 2011-2012, Doug Blank <dblank@cs.brynmawr.edu>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1100,73 +1100,92 @@ public static class Myro
 
 	public class Simulation
 	{
-		public Graphics.WindowClass window;
-		public Thread thread;
-		public List<Robot> robots = new List<Robot> ();
-		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
-		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-		public double extra_simulation_time = 0.0;
+	    public Graphics.WindowClass window;
+	    public Thread thread;
+	    public List<Robot> robots = new List<Robot> ();
+	    public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
+	    public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
+	    public double extra_simulation_time = 0.0;
+	    
+	    public Simulation(string title, int width, int height, Graphics.Color color) {
+		window = makeWindow (title, width, height);
+		groundColor = color;
+		window.setBackground(groundColor);
+		window.mode = "physics";
+		window.gravity = Graphics.Vector (0, 0); // turn off gravity
+	    }
 
-		public Simulation () : this(640, 480)
-		{
+	    public Simulation () : this(640, 480, true) {
+	    }
+
+	    public Simulation (int width, int height) : this(width, height, true) {
+	    }
+
+	    public Simulation (int width, int height, bool load_default)
+	    {
+		window = makeWindow ("Myro Simulation", width, height);
+		window.setBackground (groundColor);
+		window.mode = "physics";
+		window.gravity = Graphics.Vector (0, 0); // turn off gravity
+		
+		if (load_default) {
+		    // Non-physical things here:
+		    addLight(new Graphics.Point(width - 100, height - 100), 
+					50, new Graphics.Color("yellow"));
+		    addWall(new Graphics.Point (0, 0), 
+			    new Graphics.Point (5, height));
+		    addWall(new Graphics.Point (5, 0), 
+			    new Graphics.Point (width - 5, 5));
+		    addWall(new Graphics.Point (width - 5, 0), 
+			    new Graphics.Point (width, height));
+		    addWall(new Graphics.Point (0, height - 5), 
+			    new Graphics.Point (width - 5, height));
+		    Graphics.Rectangle pyramid = new Graphics.Rectangle (
+									 new Graphics.Point (100, 100), 
+									 new Graphics.Point (150, 150));
+		    pyramid.color = makeColor ("orange");
+		    pyramid.rotate (45);
+		    pyramid.bodyType = "static";
+		    addShape(pyramid);
+		    Graphics.Circle ball = new Graphics.Circle (
+								new Graphics.Point (200, height - 150), 
+								25);
+		    ball.color = makeColor ("blue");
+		    addShape(ball);      
 		}
+	    }
+	    
+	    public void addLight (IList list, int radius, Graphics.Color color) {
+		// Non-physical things here:
+		window.mode = "auto";
+		Graphics.Circle light = new Graphics.Circle (new Graphics.Point (list[0], list[1]), radius);
+		light.gradient = new Graphics.Gradient ("radial", 
+							new Graphics.Point (0, 0), 
+							10, 
+							new Graphics.Color ("yellow"),
+							new Graphics.Point (0, 0), 
+							radius, 
+							groundColor);
+		light.outline = groundColor;
+		lights.Add (light);
+		light.draw (window);
+		window.mode = "physics";
+	    }
 
-		public Simulation (int width, int height)
-		{
-			window = makeWindow ("Myro Simulation", width, height);
-			window.setBackground (groundColor);
-			// Non-physical things here:
-			Graphics.Circle light = new Graphics.Circle (
-	       new Graphics.Point (width - 100, 
-				  height - 100), 50);
-			light.gradient = new Graphics.Gradient ("radial", 
-					 new Graphics.Point (0, 0), 
-					 10, 
-					 new Graphics.Color ("yellow"),
-					 new Graphics.Point (0, 0), 
-					 50, 
-					 groundColor);
-			light.outline = groundColor;
-			lights.Add (light);
-			light.draw (window);
-      
-			window.mode = "physics";
-			window.gravity = Graphics.Vector (0, 0); // turn off gravity
-
-			Graphics.Rectangle wall = new Graphics.Rectangle (new Graphics.Point (0, 0), 
-						       new Graphics.Point (5, height));
-			wall.bodyType = "static";
-			wall.draw (window);
-
-			wall = new Graphics.Rectangle (new Graphics.Point (5, 0), 
-				    new Graphics.Point (width - 5, 5));
-			wall.bodyType = "static";
-			wall.draw (window);
-
-			wall = new Graphics.Rectangle (new Graphics.Point (width - 5, 0), 
-				    new Graphics.Point (width, height));
-			wall.bodyType = "static";
-			wall.draw (window);
-
-			wall = new Graphics.Rectangle (new Graphics.Point (0, height - 5), 
-				    new Graphics.Point (width - 5, height));
-			wall.bodyType = "static";
-			wall.draw (window);      
-
-			Graphics.Rectangle pyramid = new Graphics.Rectangle (
-		  		new Graphics.Point (100, 100), 
-		  		new Graphics.Point (150, 150));
-			pyramid.color = makeColor ("orange");
-			pyramid.rotate (45);
-			pyramid.bodyType = "static";
-			pyramid.draw (window);      
-
-			Graphics.Circle ball = new Graphics.Circle (
-		  		new Graphics.Point (200, height - 150), 
-		  		25);
-			ball.color = makeColor ("blue");
-			ball.draw (window);      
-		}
+	    public void addWall(IList ul, IList lr) {
+		addWall(ul, lr, new Graphics.Color("purple"));
+	    }
+	    public void addWall(IList ul, IList lr, Graphics.Color color) {
+		Graphics.Rectangle wall = new Graphics.Rectangle (new Graphics.Point (ul[0], ul[1]), 
+								  new Graphics.Point (lr[0], lr[1]));
+		wall.fill = color;
+		wall.bodyType = "static";
+		wall.draw (window);
+	    }
+    
+	    public void addShape(Graphics.Shape shape) {
+		shape.draw(window);
+	    }
     
 		public void setup ()
 		{
@@ -6524,7 +6543,7 @@ public static class Myro
 				file = Path.Combine (file, "mac");
 				file = Path.Combine (file, "eSpeak");
 				myProcess.StartInfo.FileName = Path.Combine (file, "speak");
-				myProcess.EnvironmentVariables.Add("ESPEAK_DATA_PATH", file);
+				Environment.SetEnvironmentVariable("ESPEAK_DATA_PATH", file);
 			} else {
 			    if (File.Exists ("/usr/bin/speak")) {
 				// assumes espeak is in /usr/bin/ on macs
