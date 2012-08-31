@@ -1043,62 +1043,26 @@ public static class Myro
 
 	public static void initialize (string port, int baud=38400)
 	{
-		bool need_port = true;
-		//if (port != null && (port.StartsWith ("COM") || port.StartsWith ("com"))) {
-		//	port = @"\\.\" + port;             // "comment
-		//}
-		if (Myro.robot is Scribbler) {
-			if (((Scribbler)(Myro.robot)).serial is SerialPort) {
-				SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
-				if (serial.IsOpen) {
-					if (port == null) 
-						need_port = false;
-					else if (serial.PortName.Equals (port) && serial.BaudRate == baud) {
-						need_port = false;
-					} else {
-						// It exists, but wrong port/baud, so close it:
-						serial.Close (); // and need_port
-					}
-				} else { // already closed
-					if ((serial.PortName.Equals (port) || port == null) && serial.BaudRate == baud) {
-						need_port = false;
-						serial.Open ();
-					} else {
-						need_port = true;
-					}
-				}
-			} // not a serial port
-		} else if (Myro.robot is SimScribbler) {
-			// do nothing if simulator
-			need_port = false;
-		}
-		if (need_port) {
-			if (port == null) {
-				port = (string)ask ("Port");
-			}
-			if (port != null) {
-				if (port.StartsWith ("sim")) {
-					if (simulation == null) {
-						simulation = new Simulation ();
-						//Thread.Sleep ((int)(5 * 1000));
-					} else {
-						simulation.setup ();
-					}
-					robot = new SimScribbler (simulation);
-				} else {
-					robot = new Scribbler (port, baud);
-				}
-			} else {
-				Console.WriteLine ("init() cancelled");
-			}
+	    // assumes a single robot will be used
+	    if (Myro.robot != null) 
+		Myro.robot.reInitialize(port, baud);
+	    else {
+		if (port.StartsWith ("sim")) {
+		    if (simulation == null) {
+			simulation = new Simulation ();
+			//Thread.Sleep ((int)(5 * 1000));
+		    } else {
+			simulation.setup();
+		    }
+		    robot = new SimScribbler(simulation);
 		} else {
-			robot.setup ();
+		    // defaults to Scribbler in this interface
+		    Myro.robot = new Scribbler(port, baud);
 		}
-		if (simulation != null)
-			simulation.setup ();
+	    }
 	}
 
-	public class Simulation
+	public class Simulation 
 	{
 	    public Graphics.WindowClass window;
 	    public Thread thread;
@@ -1187,7 +1151,7 @@ public static class Myro
 		shape.draw(window);
 	    }
     
-		public void setup ()
+	    public void setup ()
 		{
 			Console.WriteLine ("You are using:");
 			Console.WriteLine ("   Simulated Fluke, version 1.0.0");
@@ -1535,6 +1499,10 @@ public static class Myro
 	{
 		robot.setOption (key, value);
 	}
+
+        public static void reInitialize(string port, int baud) {
+	    robot.reInitialize(port, baud);
+        }
 
 	public static void setup ()
 	{
@@ -2345,6 +2313,9 @@ public static class Myro
 			return null;
 		}
     
+	        public virtual void reInitialize(string port, int baud) {
+		}
+
 		public virtual void setup ()
 		{
 		}
@@ -3798,7 +3769,41 @@ public static class Myro
 
 		public Scribbler (SerialPort serial)
 		{
-			setup ();
+		    setup ();
+		}
+
+		public override void reInitialize(string port, int baud) {
+		    bool need_port = true;
+		    SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+		    if (serial.IsOpen) {
+			if (port == null) 
+			    need_port = false;
+			else if (serial.PortName.Equals (port) && serial.BaudRate == baud) {
+			    need_port = false;
+			} else {
+			    // It exists, but wrong port/baud, so close it:
+			    serial.Close (); // and need_port
+			}
+		    } else { // already closed
+			if ((serial.PortName.Equals (port) || port == null) && serial.BaudRate == baud) {
+			    need_port = false;
+			    serial.Open ();
+			} else {
+			    need_port = true;
+			}
+		    }
+		    if (need_port) {
+			if (port == null) {
+			    port = (string)ask ("Port");
+			}
+			if (port != null) {
+			    robot = new Scribbler (port, baud);
+			} else {
+			    Console.WriteLine ("init() cancelled");
+			}
+		    } else {
+			robot.setup();
+		    }
 		}
 
 		public Scribbler (string port):  this(port, 38400)
@@ -3807,7 +3812,6 @@ public static class Myro
     
 		public Scribbler (string port, int baud)
 		{
-
 			//if (port.StartsWith ("COM") || port.StartsWith ("com")) {
 			//	port = @"\\.\" + port;             // "comment
 			//}
