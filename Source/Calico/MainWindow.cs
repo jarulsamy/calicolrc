@@ -2826,7 +2826,8 @@ namespace Calico {
                     NotebookPane.Reparent(tool_window);
                     int width, height;
                     this.GetSize(out width, out height);
-                    tool_window.SetSizeRequest(width, height);
+                    //tool_window.SetSizeRequest(width, height);
+		    tool_window.SetDefaultSize(width, height);
                     tool_window.Show();
                 } else {
                     NotebookPane.Unparent();
