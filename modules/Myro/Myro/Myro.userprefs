@@ -5,7 +5,7 @@
       <File FileName="../../../languages/Jigsaw/CalicoJigsaw.cs" Line="94" Column="2" />
       <File FileName="../../../languages/FSharp/CalicoFSharp.cs" Line="167" Column="2" />
       <File FileName="../../../languages/Python/CalicoPython.cs" Line="80" Column="44" />
-      <File FileName="../Myro.cs" Line="1138" Column="32" />
+      <File FileName="../Myro.cs" Line="1065" Column="26" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
