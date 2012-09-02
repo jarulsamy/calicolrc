@@ -191,6 +191,7 @@ public class SpreadsheetWidget : Gtk.TreeView {
 public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 {
 	public SpreadsheetWidget sheet;	
+	public int maxrow;
 	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
 	base(calico, filename, "spreadsheet")
 	{
@@ -238,8 +239,13 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	}
 
 	bool SaveRow(Csv.writer writer, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
-		object [] content = new object[26];
+		int maxcol = 1;
 		for (int i = 1; i < 27; i++) {
+		    if (model.GetValue(iter, i) != "")
+			maxcol = i;
+		}
+		object [] content = new object[maxcol];
+		for (int i = 1; i <= maxcol; i++) {
 			content[i-1] = model.GetValue(iter, i);
 		}
 		writer.WriteFields(content);
@@ -278,11 +284,41 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 		return sheet.liststore.GetValue(iter, y + 1);
 	}
 
+	public void FindMaxRow() {
+	    maxrow = 0;
+	    int currow = 0;
+	    sheet.liststore.Foreach((model, path, iter) => 
+		{
+		    currow++;
+		    if (ContainsData(model, path, iter)) {
+			maxrow = currow;
+		    }
+		    return false;
+		}
+				    );
+	}
+
+	public bool ContainsData(Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
+	    for (int i = 1; i < 27; i++) {
+		if (model.GetValue(iter, i) != "") 
+		    return true;
+	    }
+	    return false;
+	}
+
 	public override bool SaveDocument()
 	{
 		try {
 			Csv.writer writer = new Csv.writer(filename);
-			sheet.liststore.Foreach((model, path, iter) => SaveRow(writer, model, path, iter));
+			FindMaxRow();
+			int currow = 0;
+			sheet.liststore.Foreach((model, path, iter) => {
+				currow++;
+				if (currow <= maxrow)
+				    SaveRow(writer, model, path, iter);
+				return false;
+			    }
+			    );
 			writer.Close();
 			IsDirty = false;
 			UpdateDocument();	
