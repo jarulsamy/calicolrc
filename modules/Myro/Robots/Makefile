@@ -1,3 +1,6 @@
+
+all: Scribbler.dll SimScribbler.dll
+
 Scribbler.dll: Scribbler.cs ../Myro.cs
 	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \

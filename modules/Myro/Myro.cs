@@ -1096,27 +1096,13 @@ public static class Myro
 				} else {
 					simulation.setup ();
 				}
+				// defaults to SimScribbler in this interface
 				robot = makeRobot ("SimScribbler", simulation); 
 			} else {
 				// defaults to Scribbler in this interface
 				Myro.robot = makeRobot ("Scribbler", port, baud);
 			}
 		}
-	}
-
-	public static Robot makeRobot (string robot_type)
-	{
-		return loadRobot (robot_type);
-	}
-
-	public static Robot makeRobot (string robot_type, Simulation simulation)
-	{
-		return loadRobot (robot_type, simulation);
-	}
-
-	public static Robot makeRobot (string robot_type, string port, int baud)
-	{
-		return loadRobot (robot_type, port, baud);
 	}
 
 	public static Type[] getTypesOfArgs (object [] objects)
@@ -1130,37 +1116,35 @@ public static class Myro
 		return retval;
 	}
 
-	public static Robot loadRobot (string robot_type, params object [] args)
+	public static Robot makeRobot (string robot_type, params object [] args)
 	{
-		string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
-		if (path.StartsWith ("\\")) {
-			path = path.Substring (1);
-		}
-		DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
-		foreach (FileInfo f in d.GetFiles("*.dll")) {
-			//System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "(.*).dll");
-			System.Console.WriteLine ("Loading {0}...", f.FullName);
-			//string loading = match.Groups[1].ToString().ToLower();
-			Assembly assembly = Assembly.LoadFrom (f.FullName);
-			if (assembly != null) {
-				foreach (Type type in assembly.GetTypes()) {
-					Console.WriteLine (type.Name);
-					Type [] types = getTypesOfArgs (args);
-					ConstructorInfo constructor = type.GetConstructor (types);
-					if (constructor != null) {
-						Robot robot;
-						try {
-							robot = (Robot)constructor.Invoke (args);
-						} catch (Exception e) {
-							System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
-							continue;
-						}
-						return robot;
-					}
-				}
+	    string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
+	    if (path.StartsWith ("\\")) {
+		path = path.Substring (1);
+	    }
+	    DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
+	    foreach (FileInfo f in d.GetFiles("*.dll")) {
+		//System.Console.WriteLine ("Loading {0}...", f.FullName);
+		Assembly assembly = Assembly.LoadFrom (f.FullName);
+		if (assembly != null) {
+		    foreach (Type type in assembly.GetTypes()) {
+			Type [] types = getTypesOfArgs (args);
+			ConstructorInfo constructor = type.GetConstructor (types);
+			if (constructor != null) {
+			    Robot robot;
+			    try {
+				robot = (Robot)constructor.Invoke (args);
+			    } catch (Exception e) {
+				//System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
+				continue;
+			    }
+			    return robot;
 			}
+		    }
 		}
-		return null;
+	    }
+	    throw new Exception(String.Format("Unable to make robot of type '{0}'; did you give proper arguments?",
+					      robot_type));
 	}
 
 	public class Simulation
