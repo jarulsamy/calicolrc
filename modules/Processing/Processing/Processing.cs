@@ -205,26 +205,35 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab(null)]
 	public static void window(int w, int h) 
-	{	// Create window on new thread
-
-		// Destroy existing window, if there is one. Get it's position.
-		int[] wchars = exit ();
-
+	{
 		// Create new window. Do not return until window creation is done.
 		ManualResetEvent ev = new ManualResetEvent(false);
 		Application.Invoke ( delegate {
+
+			// Destroy currently open window, if there is one, and capture current location and size.
+			int[] wchars = exit ();
+
+			// Initialize Gtk
 			Application.Init ();
 
+			// Create a new window with appropriate attributes
 			if (wchars != null) {
-				int x = wchars[0]; int y = wchars[1];
+				int x = wchars[0]; 
+				int y = wchars[1];
 				_p = new PWindow(w, h, x, y, true);
 			} else {
 				_p = new PWindow(w, h, true);
 			}
 
+			// Init window parameters
 			_width = w;
 			_height = h;
 			_guiThreadId = Thread.CurrentThread.ManagedThreadId;
+			_p.rectMode ( RectMode.CORNER );
+			_p.ellipseMode ( EllipseMode.CENTER );
+			_p.imageMode ( ImageMode.CORNER );
+
+			// Attach all event handlers
 			_p._cvs.ButtonPressEvent += _onButtonPressEvent;
 			_p._cvs.ButtonReleaseEvent += _onButtonReleaseEvent;
 			_p._cvs.MotionNotifyEvent += _onMotionNotifyEvent;
@@ -232,13 +241,13 @@ public static class Processing
 			_p._cvs.KeyReleaseEvent += _onKeyReleaseEvent;
 			_p.windowClosed += _onWindowClosed;
 
-			_p.rectMode ( RectMode.CORNER );
-			_p.ellipseMode ( EllipseMode.CENTER );
-			_p.imageMode ( ImageMode.CORNER );
-
+			// Show the new window
 			_p.ShowAll ();
 
+			// Signal the manual reset event
 			ev.Set ();
+
+			// Run the new window main loop
 			Application.Run ();
 		} );
 
@@ -264,7 +273,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void window2(int w, int h) 
 	{	// Create window on current thread, not a new one. Jigsaw needs this.
 
@@ -347,7 +356,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int[] exit() 
 	{	// Try to destroy and clean up the window
 		int x, y, w, h;
@@ -368,7 +377,7 @@ public static class Processing
 			//Runtime.DispatchService.GuiDispatch (new StatefulMessageHandler (UpdateGui), n);
 		}
 
-		// Clean up all other various do-dads
+		// Clean up all other various doo-dads
 		_cleanup ();
 
 		return wchars;
@@ -555,35 +564,35 @@ public static class Processing
     }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void beginShape() 
 	{	// Start a new shape
 		_shape = new List<PKnot>();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void vertex(double x, double y)
 	{	// Add a simple vertex to a shape under construction
 		_shape.Add(new PKnot(x, y, PKnotType.VERTEX));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void bezierVertex(double cx1, double cy1, double cx2, double cy2, double x, double y)
 	{	// Add a bezier vertex to a shape under construction
 		_shape.Add(new PKnot(x, y, cx1, cy1, cx2, cy2, PKnotType.BEZIER));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void curveVertex(double x, double y)
 	{	// Add a curve vertex to the shape
 		_shape.Add(new PKnot(x, y, PKnotType.CURVE));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void curveTightness(double tightness)
 	{
 		if (_p == null) return;
@@ -598,7 +607,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void endShape(bool toClose)
 	{	// Finish up and render
 		if (_p == null) return;
@@ -615,11 +624,11 @@ public static class Processing
 		} );
 		ev.WaitOne();
 	}
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void endShape() { endShape (false); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static PImage createImage(int width, int height, string format) 
 	{	// Create a new PImage object given a string format
 
@@ -639,7 +648,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static PImage createImage(int width, int height, int format) 
 	{	// Create a new PImage object given an integer format
 
@@ -659,7 +668,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static PImage loadImage(string path) 
 	{	// Load an image into the PImage object
 
@@ -683,7 +692,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void image(PImage img, double x, double y, double w, double h) 
 	{
 		// Draw the image
@@ -696,11 +705,11 @@ public static class Processing
 			}
 		} );
 	}
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void image(PImage img, double x, double y) { image (img, x, y, img.width (), img.height ()); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void keepAbove(bool ku)
 	{	// Set flag to tell current window if to remain aboove all others
 		if (_p == null) return;
@@ -714,7 +723,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static bool focused()
 	{	// Check if window has focus
 		if (_p == null) return false;
@@ -722,7 +731,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static long frameCount()
 	{	// Return the number of times the exposed event was fired by the PWindow
 		if (_p == null) return 0;
@@ -730,70 +739,70 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static double mouseX()
 	{	// Get mouse position
 		return _mouseX;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static double mouseY()
 	{	// Get mouse position
 		return _mouseY;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static double pmouseX()
 	{	// Get previous mouse position
 		return _pmouseX;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static double pmouseY()
 	{	// Get previous mouse position
 		return _pmouseY;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static bool isMousePressed()
 	{	// True if mouse is currently pressed
 		return _mousePressed;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static uint mouseButton()
 	{	// Number of mouse button currently pressed. 1 for left mouse button, 2 for center mouse button, 3 for right mouse button
 		return _mouseButton;
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static bool isKeyPressed()
 	{	// True if key is currently pressed
 		return _keyPressed;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static Gdk.Key key()
 	{	// Return key pressed
 		return _key;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Input")]
+	[JigsawTab("P/Input")]
 	public static uint keyCode()
 	{	// Return integer code of key pressed
 		return _keyCode;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void size(int w, int h) 
 	{	// Set window size
 
@@ -813,21 +822,21 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static double width() 
 	{	// Get the width of the window
 		return _width;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static double height() 
 	{	// Get the height of the window
 		return _height;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void immediateMode( bool value )
 	{
 		//Application.Invoke ( delegate { _immediateMode = value; } );
@@ -835,89 +844,89 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void ellipseMode( string mode )
 	{
 		_invoke ( delegate { _p.ellipseMode (_ellipseModeStr[mode]); } );
 	}
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void ellipseMode( int mode )
 	{
 		_invoke ( delegate { _p.ellipseMode (_ellipseModeInt[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void rectMode( string mode )
 	{
 		_invoke ( delegate { _p.rectMode (_rectModeStr[mode]); } );
 	}
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void rectMode( int mode )
 	{
 		_invoke ( delegate { _p.rectMode (_rectModeInt[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void imageMode( string mode )
 	{
 		_invoke ( delegate { _p.imageMode (_imageModeStr[mode]); } );
 	}
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void imageMode( int mode )
 	{
 		_invoke ( delegate { _p.imageMode (_imageModeInt[mode]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void strokeCap( string style )
 	{
 		_invoke ( delegate { _p.strokeCap (_strokeCapStr[style]); } );
 	}
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void strokeCap( int style )
 	{
 		_invoke ( delegate { _p.strokeCap (_strokeCapInt[style]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void strokeJoin( string style )
 	{
 		_invoke ( delegate { _p.strokeJoin (_strokeJoinStr[style]); } );
 	}
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void strokeJoin( int style )
 	{
 		_invoke ( delegate { _p.strokeJoin (_strokeJoinInt[style]); } );
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void textAlign( string align )
 	{
 		_invoke ( delegate { _p.textAlign (_textAlignStr[align]); } );
 	}
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void textAlign( int align )
 	{
 		_invoke ( delegate { _p.textAlign (_textAlignInt[align]); } );
 	}
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void textAlign( string align, string yalign )
 	{
 		_invoke ( delegate { _p.textAlign (_textAlignStr[align], _textYAlignStr[yalign]); } );
 	}
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void textAlign( int align, int yalign )
 	{
 		_invoke ( delegate { _p.textAlign (_textAlignInt[align], _textYAlignInt[yalign]); } );
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void redraw() 
 	{	// Try to cause the window to redraw itself by queuing up a draw
 		if (_p == null) return;
@@ -931,14 +940,14 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void delay(int millis) 
 	{	
 		Thread.Sleep (millis);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void doEvents() 
 	{	// Process any pending events
 		while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
@@ -950,7 +959,7 @@ public static class Processing
 	{
 		_tmr.Stop ();
 	}
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void stopLoop() { noLoop (); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -959,11 +968,11 @@ public static class Processing
 	{
 		_tmr.Start ();
 	}
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void startLoop() { loop (); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static uint frameRate(uint fps)
 	{	// Sets timer interval
 		uint fr = Convert.ToUInt32(1000.0/Convert.ToDouble(fps));
@@ -975,7 +984,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static uint frameRate()
 	{	// Gets timer interval
 		uint fps = Convert.ToUInt32(Convert.ToDouble (_tmr.Interval)/1000.0);
@@ -983,7 +992,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static long millis()
 	{	// Gets the number of milliseconds the window has existed, if there is one
 		if (_p == null) return 0;
@@ -991,7 +1000,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int second()
 	{	// Gets the number of seconds on the system clock [0, 59]
 		if (_p == null) return 0;
@@ -999,7 +1008,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int minute()
 	{	// Gets the number of minutes on the system clock [0, 59]
 		if (_p == null) return 0;
@@ -1007,7 +1016,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int hour()
 	{	// Gets the number of hours on the system clock [0, 24]
 		if (_p == null) return 0;
@@ -1015,7 +1024,7 @@ public static class Processing
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int day()
 	{	// Gets the number of days on the system clock [1, 31]
 		if (_p == null) return 0;
@@ -1023,7 +1032,7 @@ public static class Processing
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int month()
 	{	// Gets the number of months on the system clock [1, 12]
 		if (_p == null) return 0;
@@ -1031,7 +1040,7 @@ public static class Processing
 	}
 		
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static int year()
 	{	// Gets the year
 		if (_p == null) return 0;
@@ -1039,63 +1048,63 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static bool toBoolean(object o)
 	{	// Try to convert the object to a boolean
 		return Convert.ToBoolean (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static byte toByte(object o)
 	{	// Try to convert the object to a byte
 		return Convert.ToByte (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static char toChar(object o)
 	{
 		return Convert.ToChar(o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static Single toFloat(object o)
 	{
 		return Convert.ToSingle (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static double toDouble(object o)
 	{
 		return Convert.ToDouble (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static Int32 toInt(object o)
 	{
 		return Convert.ToInt32 (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static Int64 toLong(object o)
 	{
 		return Convert.ToInt64 (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static string toString(object o)
 	{
 		return Convert.ToString (o);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static string toHex(object o)
 	{
 		int v = Convert.ToInt32(o);
@@ -1103,7 +1112,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static string toBinary(object o)
 	{
 		int v = Convert.ToInt32(o);
@@ -1111,14 +1120,14 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static Int32 fromHex(string hex)
 	{
 		 return Convert.ToInt32(hex, 16);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Data")]
+	[JigsawTab("P/Data")]
 	public static Int32 fromBinary(string bits)
 	{
 		int bitCount = 8;
@@ -1129,7 +1138,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void smooth() {
 		if (_p == null) return;
 		//Application.Invoke ( delegate {
@@ -1143,7 +1152,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void noSmooth() {
 		if (_p == null) return;
 		//Application.Invoke ( delegate { 
@@ -1157,7 +1166,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	[JigsawTab("Proc | IO")]
+//	[JigsawTab("P/IO")]
 //	public static void print(params object[] items) 
 //	{	// Print a message to the console
 //		string[] sitems = new string[items.Length];
@@ -1181,7 +1190,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void fill(double r, double g, double b, double a) 
 	{	// Set fill color for all drawing moving forward
 		if (_p == null) return;
@@ -1194,17 +1203,17 @@ public static class Processing
 			}
 		});
 	}
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void fill(double r, double g, double b) { fill (r, g, b, 255); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void fill(double g, double a) { fill (g, g, g, a); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void fill(double g) { fill (g, g, g, 255); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void fill( uint c ) { fill ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void noFill() 
 	{	// Turn off fill color
 		if (_p == null) return;
@@ -1219,7 +1228,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void stroke(double r, double g, double b, double a) 
 	{	// Set stroke color for all drawing moving forward
 		if (_p == null) return;
@@ -1232,17 +1241,17 @@ public static class Processing
 			}
 		});
 	}
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void stroke(double r, double g, double b) { stroke (r, g, b, 255); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void stroke(double g, double a) { stroke (g, g, g, a); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void stroke(double g) { stroke (g, g, g, 255); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void stroke( uint c ) { stroke ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void noStroke() 
 	{	// Turn off stroke
 		if (_p == null) return;
@@ -1257,7 +1266,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static double strokeWeight(double w) 
 	{	// Set and/or return stroke weight
 		if (_p == null) return -1.0;
@@ -1281,7 +1290,7 @@ public static class Processing
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void pushMatrix() 
 	{
 		if (_p == null) return;
@@ -1295,7 +1304,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void popMatrix() 
 	{
 		if (_p == null) return;
@@ -1309,7 +1318,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void resetMatrix() 
 	{
 		if (_p == null) return;
@@ -1323,7 +1332,7 @@ public static class Processing
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void translate(double tx, double ty) 
 	{
 		if (_p == null) return;
@@ -1337,7 +1346,7 @@ public static class Processing
 	}
 		
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void scale(double sx, double sy) 
 	{
 		if (_p == null) return;
@@ -1349,11 +1358,11 @@ public static class Processing
 			}
 		} );
 	}
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void scale(double s) { scale (s, s); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Environ")]
+	[JigsawTab("P/Environ")]
 	public static void rotate(double a) 
 	{
 		if (_p == null) return;
@@ -1367,7 +1376,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void background(double r, double g, double b, double a) 
 	{	// Fill the background of the window
 		if (_p == null) return;
@@ -1380,17 +1389,17 @@ public static class Processing
 			}
 		} );
 	}
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void background(double r, double g, double b) { background (r, g, b, 255.0); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void background(double g, double a) { background (g, g, g, a); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void background(double g) { background (g, g, g, 255.0); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static void background( uint c ) { background ( red (c), green (c), blue (c), alpha (c) ); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void point(double x, double y) 
 	{	// Draw a point
 		if (_p == null) return;
@@ -1405,7 +1414,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void line(double x1, double y1, double x2, double y2) 
 	{	// Draw a line
 		if (_p == null) return;
@@ -1421,7 +1430,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void ellipse(double x, double y, double w, double h) 
 	{	// Draw an ellipse
 		if (_p == null) return;
@@ -1437,7 +1446,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void arc(double x, double y, double w, double h, double start, double stop) 
 	{	// Draw an ellipse
 		if (_p == null) return;
@@ -1452,7 +1461,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void rect(double x, double y, double w, double h) 
 	{	// Draw a rectangle
 		if (_p == null) return;
@@ -1468,7 +1477,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void triangle(double x1, double y1, double x2, double y2, double x3, double y3) 
 	{	// Draw a triangle
 		if (_p == null) return;
@@ -1483,7 +1492,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Shapes")]
+	[JigsawTab("P/Shapes")]
 	public static void quad(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) 
 	{	// Draw a quad
 		if (_p == null) return;
@@ -1498,7 +1507,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void textSize(double s) 
 	{
 		if (_p == null) return;
@@ -1512,7 +1521,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static double textWidth(string txt) 
 	{
 		if (_p == null) return -1.0;
@@ -1533,7 +1542,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void text(object obj, double x, double y, double w, double h) 
 	{	// Draw text
 		if (_p == null) return;
@@ -1548,7 +1557,7 @@ public static class Processing
 		} );
 	}
 
-	[JigsawTab("Proc | Text")]
+	[JigsawTab("P/Text")]
 	public static void text(object obj, double x, double y) 
 	{	// Draw text
 		if (_p == null) return;
@@ -1564,29 +1573,29 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double random(double min, double max) 
 	{	// Generate a random number between min and max
 		return map( _rand.NextDouble(), 0.0, 1.0, min, max );
 	}
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double random(double max) { return random (0.0, max); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static void randomSeed(int seed) {
 		_rand = new Random(seed);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double map(double n, double min1, double max1, double min2, double max2) 
 	{	// Map a number from one range to another
 		return ((n - min1)/(max1 - min1)) * (max2 - min2) + min2;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double constrain(double n, double min, double max) 
 	{	// Constrain a number to a range
 		if (n < min) n = min;
@@ -1595,14 +1604,14 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double mag(double x, double y)
 	{	// Computes magnitude of a vector
 		return Math.Sqrt (x*x + y*y);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double dist(double x1, double y1, double x2, double y2)
 	{	// Computes the distance between two points
 		double dx = (x2 - x1);
@@ -1611,7 +1620,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double max(params double[] vals)
 	{	// Compute the maximum value of several numbers
 		double tmax = vals[0];
@@ -1620,7 +1629,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double min(params double[] vals)
 	{	// Compute the minimum value of several numbers
 		double tmin = vals[0];
@@ -1629,83 +1638,83 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static int floor(double val)
 	{
 		return (int)Math.Floor (val);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static int ceil(double val)
 	{
 		return (int)Math.Ceiling (val);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double round(double val)
 	{
 		return round (val, 0);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double round(double val, int ndigits)
 	{
 		return Math.Round (val, ndigits);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double radians(double degrees)
 	{
 		return degrees * (PI/180.0);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Math")]
+	[JigsawTab("P/Math")]
 	public static double degrees(double radians)
 	{
 		return radians * (180.0/PI);
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static uint color(byte r, byte g, byte b, byte a)
 	{	// Create color from color byte components
 		 return (uint)( b | (g << 8) | (r << 16) | (a << 24));
 	}
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static uint color(byte r, byte g, byte b) { return color(r, g, b, 255); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static uint color(byte g, byte a) { return color(g, g, g, a); }
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static uint color(byte g) { return color(g, g, g, 255); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static byte blue(uint color)
 	{	// Extract color byte from a color (unsigned int)
 		 return (byte)((color & 0x000000FF));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static byte green(uint color)
 	{	// Extract color byte from a color (unsigned int)
 		 return (byte)((color & 0x0000FF00) >> 8);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static byte red(uint color)
 	{	// Extract color byte from a color (unsigned int)
 		 return (byte)((color & 0x00FF0000) >> 16);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTabAttribute("Proc | Color")]
+	[JigsawTabAttribute("P/Color")]
 	public static byte alpha(uint color)
 	{	// Extract color byte from a color (unsigned int)
 		 return (byte)((color & 0xFF000000) >> 24);
@@ -1835,7 +1844,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static float hue(uint c)
 	{	// Extract color byte from a color (unsigned int)
 		float hu, sa, br, al;
@@ -1844,7 +1853,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static float saturation(uint c)
 	{	// Extract color byte from a color (unsigned int)
 		float hu, sa, br, al;
@@ -1853,7 +1862,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Color")]
+	[JigsawTab("P/Color")]
 	public static float brightness(uint c)
 	{	// Extract color byte from a color (unsigned int)
 		float hu, sa, br, al;
@@ -1862,7 +1871,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, byte r, byte g, byte b, byte a) 
 	{	// Set an individual pixel in the pixbuf
 		if (_p == null) return;
@@ -1872,15 +1881,15 @@ public static class Processing
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
 		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
 	}
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, byte r, byte g, byte b) { setPixel(x, y, r, g, b, 255); }
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, byte gray, byte a) { setPixel(x, y, gray, gray, gray, a); }
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, byte gray) { setPixel(x, y, gray, gray, gray, 255); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, uint c) 
 	{	// Set an individual pixel in the pixbuf
 		if (_p == null) return;
@@ -1892,7 +1901,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static uint getPixel(int x, int y) 
 	{	// Set an individual pixel in the pixbuf
 		if (_p == null) return 0;
@@ -1905,7 +1914,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static PImage get(int x, int y, int width, int height)	
 	{	// Get a portion of the existing image as a new PImage and return it.
 		if (_p == null) return null;
@@ -1924,11 +1933,11 @@ public static class Processing
 		ev.WaitOne();
 		return img;
 	}
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static PImage get() { return get(0, 0, _width, _height); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void loadPixels()
 	{	// Copy pixels from current image to pixels array
 		if (_p == null) return;
@@ -1983,7 +1992,7 @@ public static class Processing
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("Proc | Images")]
+	[JigsawTab("P/Images")]
 	public static void updatePixels() 
 	{	// Copy pixels from pixbuf to image
 		try
