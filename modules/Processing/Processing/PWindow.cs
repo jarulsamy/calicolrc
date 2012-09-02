@@ -47,7 +47,7 @@ internal class PWindow : Gtk.Window
 	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
 	private double _textSize = 12.0;							// Default text size
 	private TextAlign _textAlignX = TextAlign.LEFT;				// Text alignment mode in x-direction
-	private TextYAlign _textAlignY = TextYAlign.TOP;			// Text alignment mode in x-direction
+	private TextYAlign _textAlignY = TextYAlign.TOP;			// Text alignment mode in y-direction
 	private double _textScaleFactor = 120.0/72.0;				// (screen resolution / dots per inch)
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
@@ -764,6 +764,7 @@ internal class PWindow : Gtk.Window
 			g.Matrix = _mat;
 			g.Save ();
 			TextExtents te = g.TextExtents(txt);
+			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
 
 			// If a box is specified, compute the new location of the text within the box using the _textAlign parameter
 			switch (_textAlignX) {
@@ -771,30 +772,29 @@ internal class PWindow : Gtk.Window
 				//x = x - te.XBearing;
 				break;
 			case TextAlign.CENTER:
-				x = x + 0.5*w - 0.5*te.Width * _textScaleFactor;
+				x = x + 0.5*w - 0.5*te.Width * s + 1.5*s;			// Last factor is fudge factor
 				break;
 			case TextAlign.RIGHT:
-				x = x + w - te.Width * _textScaleFactor;
+				x = x + w - te.Width * s + te.XBearing * s + 3.0*s;	// Last factor is fudge factor
 				break;
 			}
 
 			switch (_textAlignY) {
 			case TextYAlign.TOP:
-				y = y + te.Height * _textScaleFactor;
+				y = y + te.Height * s;
 				break;
 			case TextYAlign.CENTER:
-				y = y + 0.5*h - 0.5*te.Height * _textScaleFactor;
+				y = y + 0.5*h + 0.5*te.Height * s;
 				break;
 			case TextYAlign.BOTTOM:
-				y = y + h - te.Height * _textScaleFactor;
+				y = y + h + te.YBearing;
 				break; 
 			case TextYAlign.BASELINE:
-				y = y + h - (te.Height + te.YBearing) * _textScaleFactor;
+				y = y + h;
 				break;
 			}
 
 			g.Translate (x, y);
-			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
 			g.Scale (s, s);
 			g.ShowText (txt);
 			g.Restore ();
