@@ -20,17 +20,23 @@ $Id: $
 */
 using System;
 using System.Runtime.InteropServices;
+
 // Marshal
 using System.Diagnostics;
+
 // Process
 using System.IO;
+
 // DirectoryInfo, FileInfo
 using System.IO.Ports;
+
 // SerialPort
 using System.Threading;
 using IronPython.Runtime;
+
 // List
 using System.Collections.Generic;
+
 // IList
 using System.Collections;
 using Tao.Sdl;
@@ -71,56 +77,59 @@ public static class Extensions
 	}
 }
 
-public static class SerialPortCache {
-  public static Dictionary<string,SerialPort> ports = new Dictionary<string,SerialPort>();
+public static class SerialPortCache
+{
+	public static Dictionary<string,SerialPort> ports = new Dictionary<string,SerialPort> ();
 
-  public static bool Contains(string port) {
-    foreach(string key in ports.Keys) {
-      if (key == port)
-	return true;
-    }
-    return false;
-  }											 
+	public static bool Contains (string port)
+	{
+		foreach (string key in ports.Keys) {
+			if (key == port)
+				return true;
+		}
+		return false;
+	}
 
-  public static SerialPort getSerialPort(string port, int baud) {
-    SerialPort serial;
-    if (Contains(port)) {
-      serial = ports[port];
-      if (serial.IsOpen) {
-	if (serial.PortName.Equals(port) && serial.BaudRate == baud) {
-	  return serial; // ok, return it
-	} else {
-	  // It exists, but wrong port/baud, so close it:
-	  serial.Close (); 
-	  ports.Remove(port);
-	  return SerialPortCache.getSerialPort(port, baud); // call again, now that it is removed
-	}
-      } else { // closed
-	if ((serial.PortName.Equals(port) || port == null) && serial.BaudRate == baud) {
-	  serial.Open ();
-	  return serial;
-	} else {
-	  // It exists, closed, and wrong port or baud
-	  serial.Close (); 
-	  ports.Remove(port);
-	  return SerialPortCache.getSerialPort(port, baud); // call again, now that it is removed
-	}
-      }
-    } else { // not in ports
-      serial = new SerialPort(port, baud);
-      serial.ReadTimeout = 1000; // milliseconds
-      serial.WriteTimeout = 1000; // milliseconds
-      try {
-	serial.Open();
-      } catch {
-	Console.Error.WriteLine (String.Format ("ERROR: unable to open port '{0}'", 
+	public static SerialPort getSerialPort (string port, int baud)
+	{
+		SerialPort serial;
+		if (Contains (port)) {
+			serial = ports [port];
+			if (serial.IsOpen) {
+				if (serial.PortName.Equals (port) && serial.BaudRate == baud) {
+					return serial; // ok, return it
+				} else {
+					// It exists, but wrong port/baud, so close it:
+					serial.Close (); 
+					ports.Remove (port);
+					return SerialPortCache.getSerialPort (port, baud); // call again, now that it is removed
+				}
+			} else { // closed
+				if ((serial.PortName.Equals (port) || port == null) && serial.BaudRate == baud) {
+					serial.Open ();
+					return serial;
+				} else {
+					// It exists, closed, and wrong port or baud
+					serial.Close (); 
+					ports.Remove (port);
+					return SerialPortCache.getSerialPort (port, baud); // call again, now that it is removed
+				}
+			}
+		} else { // not in ports
+			serial = new SerialPort (port, baud);
+			serial.ReadTimeout = 1000; // milliseconds
+			serial.WriteTimeout = 1000; // milliseconds
+			try {
+				serial.Open ();
+			} catch {
+				Console.Error.WriteLine (String.Format ("ERROR: unable to open port '{0}'", 
 						port));
-	return null;
-      }
-      ports[port] = serial;
-      return serial;
-    }
-  }
+				return null;
+			}
+			ports [port] = serial;
+			return serial;
+		}
+	}
 }
 
 public static class Myro
@@ -139,7 +148,7 @@ public static class Myro
 	static PythonDictionary voices = new PythonDictionary ();
 	public readonly static PythonDictionary frequencies = new PythonDictionary ();
 	public readonly static Gamepads gamepads = new Gamepads ();
-	public readonly static Computer computer = new Computer();
+	public readonly static Computer computer = new Computer ();
 
 	public static void initialize_module (string path, string os)
 	{
@@ -403,9 +412,10 @@ public static class Myro
 		frequencies ["c8"] = 4186.0;
 	}
 
-	public static void close_module() {
+	public static void close_module ()
+	{
 		if (Myro.computer.audio_initialized || Myro.computer.sound_initialized) {	 
-		  Tao.Sdl.Sdl.SDL_AudioQuit ();
+			Tao.Sdl.Sdl.SDL_AudioQuit ();
 		}
 	}
 		
@@ -449,8 +459,9 @@ public static class Myro
 		}        
 	}
 	
-	static public object [] slice(IList list, int start, int end) {
-		return list.Slice(start, end);
+	static public object [] slice (IList list, int start, int end)
+	{
+		return list.Slice (start, end);
 	}
 
 	public static void gamepad (PythonDictionary dict)
@@ -1058,7 +1069,8 @@ public static class Myro
 		initialize (null);
 	}
 
-        public static void init(string robot_type, string port) {
+	public static void init (string robot_type, string port)
+	{
 	}
 
 	public static void init (string port)
@@ -1073,162 +1085,183 @@ public static class Myro
 
 	public static void initialize (string port, int baud=38400)
 	{
-	    // assumes a single robot will be used
-	    if (Myro.robot != null) 
-		Myro.robot.reinit(port, baud);
-	    else {
-		if (port.StartsWith ("sim")) {
-		    if (simulation == null) {
-			simulation = new Simulation ();
-			//Thread.Sleep ((int)(5 * 1000));
-		    } else {
-			simulation.setup();
-		    }
-		    robot = makeRobot("SimScribbler", simulation); 
-		} else {
-		    // defaults to Scribbler in this interface
-		    Myro.robot = makeRobot("Scribbler", port, baud);
-		}
+		// assumes a single robot will be used
+		if (Myro.robot != null) 
+			Myro.robot.reinit (port, baud);
+		else {
+			if (port.StartsWith ("sim")) {
+				if (simulation == null) {
+					simulation = new Simulation ();
+					//Thread.Sleep ((int)(5 * 1000));
+				} else {
+					simulation.setup ();
+				}
+				robot = makeRobot ("SimScribbler", simulation); 
+			} else {
+				// defaults to Scribbler in this interface
+				Myro.robot = makeRobot ("Scribbler", port, baud);
+			}
 		}
 	}
 
-	    public static Robot makeRobot(string robot_type) {
-		return loadRobot(robot_type);
-	    }
+	public static Robot makeRobot (string robot_type)
+	{
+		return loadRobot (robot_type);
+	}
 
-	    public static Robot makeRobot(string robot_type, Simulation simulation) {
-		return loadRobot(robot_type, simulation);
-	    }
+	public static Robot makeRobot (string robot_type, Simulation simulation)
+	{
+		return loadRobot (robot_type, simulation);
+	}
 
-	    public static Robot makeRobot(string robot_type, string port, int baud) {
-		return loadRobot(robot_type, port, baud);
-	    }
+	public static Robot makeRobot (string robot_type, string port, int baud)
+	{
+		return loadRobot (robot_type, port, baud);
+	}
 
-	    public static Robot loadRobot(string robot_type, params object [] args) {
-			string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
-	        if (path.StartsWith("\\")) {
-	            path = path.Substring(1);
-	        }
-	        DirectoryInfo d = new DirectoryInfo(System.IO.Path.Combine(path, "Robots"));		
-			foreach (FileInfo f in d.GetFiles("*.dll")) {
-			    //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "(.*).dll");
-			    System.Console.WriteLine("Loading {0}...", f.FullName);
-			    //string loading = match.Groups[1].ToString().ToLower();
-			    Assembly assembly = Assembly.LoadFrom(f.FullName);
-			    if (assembly != null) {
+	public static Type[] getTypesOfArgs (object [] objects)
+	{
+		Type [] retval = new Type[objects.Length];
+		int count = 0;
+		foreach (object obj in objects) {
+			retval [count] = obj.GetType ();
+			count++;
+		}
+		return retval;
+	}
+
+	public static Robot loadRobot (string robot_type, params object [] args)
+	{
+		string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
+		if (path.StartsWith ("\\")) {
+			path = path.Substring (1);
+		}
+		DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
+		foreach (FileInfo f in d.GetFiles("*.dll")) {
+			//System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "(.*).dll");
+			System.Console.WriteLine ("Loading {0}...", f.FullName);
+			//string loading = match.Groups[1].ToString().ToLower();
+			Assembly assembly = Assembly.LoadFrom (f.FullName);
+			if (assembly != null) {
 				foreach (Type type in assembly.GetTypes()) {
-				    MethodInfo method;
-				    try {
-					method = type.GetMethod(robot_type);
-				    } catch (Exception e) {
-					continue;
-				    }
-				    if (method != null) {
-					Robot robot;
-					try {
-					    robot = (Robot)method.Invoke(type, args);
-					} catch (Exception e) {
-					    System.Console.WriteLine("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
-					    continue;
+					Console.WriteLine (type.Name);
+					Type [] types = getTypesOfArgs (args);
+					ConstructorInfo constructor = type.GetConstructor (types);
+					if (constructor != null) {
+						Robot robot;
+						try {
+							robot = (Robot)constructor.Invoke (args);
+						} catch (Exception e) {
+							System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
+							continue;
+						}
+						return robot;
 					}
-					return robot;
-				    }
 				}
-		    }
+			}
 		}
 		return null;
 	}
 
-	public class Simulation 
+	public class Simulation
 	{
-	    public Graphics.WindowClass window;
-	    public Thread thread;
-	    public List<Robot> robots = new List<Robot> ();
-	    public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
-	    public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-	    public double extra_simulation_time = 0.0;
+		public Graphics.WindowClass window;
+		public Thread thread;
+		public List<Robot> robots = new List<Robot> ();
+		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
+		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
+		public double extra_simulation_time = 0.0;
 	    
-	    public Simulation(string title, int width, int height, Graphics.Color color) {
-		window = makeWindow (title, width, height);
-		groundColor = color;
-		window.setBackground(groundColor);
-		window.mode = "physics";
-		window.gravity = Graphics.Vector (0, 0); // turn off gravity
-	    }
+		public Simulation (string title, int width, int height, Graphics.Color color)
+		{
+			window = makeWindow (title, width, height);
+			groundColor = color;
+			window.setBackground (groundColor);
+			window.mode = "physics";
+			window.gravity = Graphics.Vector (0, 0); // turn off gravity
+		}
 
-	    public Simulation () : this(640, 480, true) {
-	    }
+		public Simulation () : this(640, 480, true)
+		{
+		}
 
-	    public Simulation (int width, int height) : this(width, height, true) {
-	    }
+		public Simulation (int width, int height) : this(width, height, true)
+		{
+		}
 
-	    public Simulation (int width, int height, bool load_default)
-	    {
-		window = makeWindow ("Myro Simulation", width, height);
-		window.setBackground (groundColor);
-		window.mode = "physics";
-		window.gravity = Graphics.Vector (0, 0); // turn off gravity
+		public Simulation (int width, int height, bool load_default)
+		{
+			window = makeWindow ("Myro Simulation", width, height);
+			window.setBackground (groundColor);
+			window.mode = "physics";
+			window.gravity = Graphics.Vector (0, 0); // turn off gravity
 		
-		if (load_default) {
-		    // Non-physical things here:
-		    addLight(new Graphics.Point(width - 100, height - 100), 
-					50, new Graphics.Color("yellow"));
-		    addWall(new Graphics.Point (0, 0), 
+			if (load_default) {
+				// Non-physical things here:
+				addLight (new Graphics.Point (width - 100, height - 100), 
+					50, new Graphics.Color ("yellow"));
+				addWall (new Graphics.Point (0, 0), 
 			    new Graphics.Point (5, height));
-		    addWall(new Graphics.Point (5, 0), 
+				addWall (new Graphics.Point (5, 0), 
 			    new Graphics.Point (width - 5, 5));
-		    addWall(new Graphics.Point (width - 5, 0), 
+				addWall (new Graphics.Point (width - 5, 0), 
 			    new Graphics.Point (width, height));
-		    addWall(new Graphics.Point (0, height - 5), 
+				addWall (new Graphics.Point (0, height - 5), 
 			    new Graphics.Point (width - 5, height));
-		    Graphics.Rectangle pyramid = new Graphics.Rectangle (
+				Graphics.Rectangle pyramid = new Graphics.Rectangle (
 									 new Graphics.Point (100, 100), 
 									 new Graphics.Point (150, 150));
-		    pyramid.color = makeColor ("orange");
-		    pyramid.rotate (45);
-		    pyramid.bodyType = "static";
-		    addShape(pyramid);
-		    Graphics.Circle ball = new Graphics.Circle (
+				pyramid.color = makeColor ("orange");
+				pyramid.rotate (45);
+				pyramid.bodyType = "static";
+				addShape (pyramid);
+				Graphics.Circle ball = new Graphics.Circle (
 								new Graphics.Point (200, height - 150), 
 								25);
-		    ball.color = makeColor ("blue");
-		    addShape(ball);      
+				ball.color = makeColor ("blue");
+				addShape (ball);      
+			}
+			setup();
 		}
-	    }
 	    
-	    public void addLight (IList list, int radius, Graphics.Color color) {
-		// Non-physical things here:
-		window.mode = "auto";
-		Graphics.Circle light = new Graphics.Circle (new Graphics.Point (list[0], list[1]), radius);
-		light.gradient = new Graphics.Gradient ("radial", 
+		public void addLight (IList list, int radius, Graphics.Color color)
+		{
+			// Non-physical things here:
+			window.mode = "auto";
+			Graphics.Circle light = new Graphics.Circle (new Graphics.Point (list [0], list [1]), radius);
+			light.gradient = new Graphics.Gradient ("radial", 
 							new Graphics.Point (0, 0), 
 							10, 
 							new Graphics.Color ("yellow"),
 							new Graphics.Point (0, 0), 
 							radius, 
 							groundColor);
-		light.outline = groundColor;
-		lights.Add (light);
-		light.draw (window);
-		window.mode = "physics";
-	    }
+			light.outline = groundColor;
+			lights.Add (light);
+			light.draw (window);
+			window.mode = "physics";
+		}
 
-	    public void addWall(IList ul, IList lr) {
-		addWall(ul, lr, new Graphics.Color("purple"));
-	    }
-	    public void addWall(IList ul, IList lr, Graphics.Color color) {
-		Graphics.Rectangle wall = new Graphics.Rectangle (new Graphics.Point (ul[0], ul[1]), 
-								  new Graphics.Point (lr[0], lr[1]));
-		wall.fill = color;
-		wall.bodyType = "static";
-		wall.draw (window);
-	    }
+		public void addWall (IList ul, IList lr)
+		{
+			addWall (ul, lr, new Graphics.Color ("purple"));
+		}
+
+		public void addWall (IList ul, IList lr, Graphics.Color color)
+		{
+			Graphics.Rectangle wall = new Graphics.Rectangle (new Graphics.Point (ul [0], ul [1]), 
+								  new Graphics.Point (lr [0], lr [1]));
+			wall.fill = color;
+			wall.bodyType = "static";
+			wall.draw (window);
+		}
     
-	    public void addShape(Graphics.Shape shape) {
-		shape.draw(window);
-	    }
+		public void addShape (Graphics.Shape shape)
+		{
+			shape.draw (window);
+		}
     
-	    public void setup ()
+		public void setup ()
 		{
 			if (thread == null || !thread.IsAlive) {
 				thread = new Thread (new ThreadStart (loop));
@@ -1241,7 +1274,7 @@ public static class Myro
 		{
 			while (window.IsRealized) {
 				foreach (Robot robot in robots) {
-					robot.draw_simulation();
+					robot.draw_simulation ();
 				}
 				if (!window.IsRealized)
 					return;
@@ -1253,8 +1286,8 @@ public static class Myro
 
 	public static void uninit ()
 	{
-	    if (Myro.robot != null)
-		Myro.robot.uninit();
+		if (Myro.robot != null)
+			Myro.robot.uninit ();
 	}
 
 	public static string repeat (string s, int times)
@@ -1414,8 +1447,7 @@ public static class Myro
 	{
 		if (robot != null)
 			robot.beep (duration, frequency);
-		else 
-			{
+		else {
 			Myro.computer.beep (duration, frequency);
 		}
 	}
@@ -1452,34 +1484,39 @@ public static class Myro
 		Myro.computer.play (filename);
 	}
 	
-    public static void playUntilDone(string filename) {
+	public static void playUntilDone (string filename)
+	{
 		Myro.computer.playUntilDone (filename);
-    }
+	}
 
-    public static void playUntilDone(SdlDotNet.Audio.Sound sound) {
+	public static void playUntilDone (SdlDotNet.Audio.Sound sound)
+	{
 		Myro.computer.playUntilDone (sound);
-    }
+	}
 
-    public static SdlDotNet.Audio.Channel play(string filename, int loop, double seconds) {
+	public static SdlDotNet.Audio.Channel play (string filename, int loop, double seconds)
+	{
 		return Myro.computer.play (filename, loop, seconds);
-    }
+	}
 
-    public static SdlDotNet.Audio.Channel play(string filename, int loop) {
+	public static SdlDotNet.Audio.Channel play (string filename, int loop)
+	{
 		return Myro.computer.play (filename, loop);
-    }
+	}
 
-    public static SdlDotNet.Audio.Channel play(string filename, bool loop_forever) {
+	public static SdlDotNet.Audio.Channel play (string filename, bool loop_forever)
+	{
 		return Myro.computer.play (filename, loop_forever);
-    }
+	}
 	
 	public static object makeSound (string filename)
 	{
-		return Myro.computer.makeSound(filename);
+		return Myro.computer.makeSound (filename);
 	}
 
 	public static void setPhases (double phase1, double phase2)
 	{
-		Myro.computer.setPhases(phase1, phase2);
+		Myro.computer.setPhases (phase1, phase2);
 	}
 
 	public static void play (double duration, Func<int[],int,object> function)
@@ -1503,10 +1540,10 @@ public static class Myro
       string title="Myro Camera")
 	{
 		Graphics.WindowClass win = Graphics.makeWindowFast (title,
-        (int)(picture.width*picture.scaleFactor), (int)(picture.height*picture.scaleFactor));
+        (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
 		picture.draw (win);
-		picture.setX(picture.width*picture.scaleFactor/2);
-		picture.setY(picture.height*picture.scaleFactor/2);
+		picture.setX (picture.width * picture.scaleFactor / 2);
+		picture.setY (picture.height * picture.scaleFactor / 2);
 	}
 
 	public static void setOption (string key, object value)
@@ -1514,9 +1551,10 @@ public static class Myro
 		robot.setOption (key, value);
 	}
 
-        public static void reinit(string port, int baud) {
-	    robot.reinit(port, baud);
-        }
+	public static void reinit (string port, int baud)
+	{
+		robot.reinit (port, baud);
+	}
 
 	public static void setup ()
 	{
@@ -1702,7 +1740,7 @@ public static class Myro
 	}
 	
   
-  // s2
+	// s2
 	public static object getEncoders (bool zero = false)
 	{
 		return robot.getEncoders (zero);
@@ -1748,14 +1786,14 @@ public static class Myro
 		robot.setBeginPath (speed);
 	}
 
-        public static void moveTo (int x, int y)
+	public static void moveTo (int x, int y)
 	{
-	  robot.moveTo (x, y);
+		robot.moveTo (x, y);
 	}
 
 	public static void moveBy (int x, int y)
 	{
-	        robot.moveBy(x, y);
+		robot.moveBy (x, y);
 	}
 
 	public static void setArc (int x, int y, int radius, string arcType = "to")
@@ -1809,7 +1847,7 @@ public static class Myro
 
 	public static List getFilenames (string path)
 	{
-		List<string> retval = new List<string> ();
+		List<string > retval = new List<string> ();
 		List filenames = new List ();
 		string directory = "";
 		string pattern;
@@ -2212,13 +2250,15 @@ public static class Myro
 		}
 	}
 
-	public static void wait(double seconds) {
+	public static void wait (double seconds)
+	{
 		if (seconds < .1)
-			Thread.Sleep ((int)(seconds * 1000)); 
+			Thread.Sleep ((int)(seconds * 1000));
 		else {
 			double start = currentTime ();
 			while (seconds > currentTime () - start) {
-				while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
+				while (Gtk.Application.EventsPending ())
+					Gtk.Application.RunIteration ();
 				Thread.Sleep (100); 
 			}
 		}
@@ -2327,10 +2367,12 @@ public static class Myro
 			return null;
 		}
     
-	        public virtual void reinit(string port, int baud) {
+		public virtual void reinit (string port, int baud)
+		{
 		}
 
-	        public virtual void uninit() {
+		public virtual void uninit ()
+		{
 		}
 
 		public virtual void setup ()
@@ -2485,12 +2527,12 @@ public static class Myro
       
 		}
 
-  	        public virtual void moveBy (int x, int y)
+		public virtual void moveBy (int x, int y)
 		{
       
 		}
 
-  	        public virtual void moveTo (int x, int y)
+		public virtual void moveTo (int x, int y)
 		{
       
 		}
@@ -2712,21 +2754,20 @@ public static class Myro
 		
 	public class Computer
 	{
-        public bool audio_initialized = false;
-        public bool sound_initialized = false;
-
+		public bool audio_initialized = false;
+		public bool sound_initialized = false;
 		const int playbackFreq = 44100;
-        const short samples = 2048;
-        const double pi2 = 360 * Math.PI / 180.0;
-        const double slice = 1.0 / playbackFreq * pi2;
-        byte[] buffer8 = new byte[samples];
-        double volume = 1.0;
-        double[] frequencies = new double [2];
-        double[] phases = new double [2] {0.0, 0.0};
-        SdlDotNet.Audio.AudioStream stream = null;
-        SdlDotNet.Audio.AudioCallback audioCallback = null;
-        Func<int[],int,object> audio_function = null;
-        int audio_index = 0;
+		const short samples = 2048;
+		const double pi2 = 360 * Math.PI / 180.0;
+		const double slice = 1.0 / playbackFreq * pi2;
+		byte[] buffer8 = new byte[samples];
+		double volume = 1.0;
+		double[] frequencies = new double [2];
+		double[] phases = new double [2] {0.0, 0.0};
+		SdlDotNet.Audio.AudioStream stream = null;
+		SdlDotNet.Audio.AudioCallback audioCallback = null;
+		Func<int[],int,object> audio_function = null;
+		int audio_index = 0;
 
 		public Computer ()
 		{
@@ -2753,178 +2794,193 @@ public static class Myro
 			}
 		}
     
-		public SdlDotNet.Audio.Sound makeSound(string filename) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            return sound;
-        }
+		public SdlDotNet.Audio.Sound makeSound (string filename)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			return sound;
+		}
 
-        public void playUntilDone(string filename) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            SdlDotNet.Audio.Channel channel = sound.Play();
+		public void playUntilDone (string filename)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Channel channel = sound.Play ();
 			while (channel.IsPlaying())
 				wait (.1);
-        }
+		}
 
-        public void playUntilDone(SdlDotNet.Audio.Sound sound) {
-            SdlDotNet.Audio.Channel channel = sound.Play();
+		public void playUntilDone (SdlDotNet.Audio.Sound sound)
+		{
+			SdlDotNet.Audio.Channel channel = sound.Play ();
 			while (channel.IsPlaying())
 				wait (.1);
-        }
+		}
 
-        public SdlDotNet.Audio.Channel play(string filename) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            return sound.Play();
-        }
+		public SdlDotNet.Audio.Channel play (string filename)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			return sound.Play ();
+		}
 
-        public SdlDotNet.Audio.Channel play(string filename, int loop, double seconds) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            return sound.Play(loop, (int)(seconds * 100));
-        }
+		public SdlDotNet.Audio.Channel play (string filename, int loop, double seconds)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			return sound.Play (loop, (int)(seconds * 100));
+		}
 
-        public SdlDotNet.Audio.Channel play(string filename, int loop) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            return sound.Play(loop);
-        }
+		public SdlDotNet.Audio.Channel play (string filename, int loop)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			return sound.Play (loop);
+		}
 
-        public SdlDotNet.Audio.Channel play(string filename, bool loop_forever) {
-            if (! sound_initialized)
-                initialize_sound();
-            SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound(filename);
-            return sound.Play(loop_forever);
-        }
+		public SdlDotNet.Audio.Channel play (string filename, bool loop_forever)
+		{
+			if (! sound_initialized)
+				initialize_sound ();
+			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			return sound.Play (loop_forever);
+		}
 
-        public void setPhases(double phase1, double phase2) {
-            phases[0] = phase1;
-            phases[1] = phase2;
-        }
+		public void setPhases (double phase1, double phase2)
+		{
+			phases [0] = phase1;
+			phases [1] = phase2;
+		}
 
-        public void play(double duration, Func<int[],int,object> function) {
-            if (! audio_initialized) {
-                initialize_tone();
-            }
-            audio_function = function;
-            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
-            if (duration > 0) {
-                //Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+		public void play (double duration, Func<int[],int,object> function)
+		{
+			if (! audio_initialized) {
+				initialize_tone ();
+			}
+			audio_function = function;
+			Tao.Sdl.Sdl.SDL_PauseAudio (0); // start
+			if (duration > 0) {
+				//Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
 				wait (duration);
-                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
-            }
-        }
+				Tao.Sdl.Sdl.SDL_PauseAudio (1); // pause
+			}
+		}
 
-        public void beep(double duration, double frequency) {
-            beep(duration, frequency, -1);
-        }
+		public void beep (double duration, double frequency)
+		{
+			beep (duration, frequency, -1);
+		}
 
-        public void initialize_tone() {
-            ManualResetEvent ev = new ManualResetEvent(false);
-            audioCallback = new SdlDotNet.Audio.AudioCallback(Callback);
-            stream = new SdlDotNet.Audio.AudioStream(playbackFreq,
+		public void initialize_tone ()
+		{
+			ManualResetEvent ev = new ManualResetEvent (false);
+			audioCallback = new SdlDotNet.Audio.AudioCallback (Callback);
+			stream = new SdlDotNet.Audio.AudioStream (playbackFreq,
                         SdlDotNet.Audio.AudioFormat.Unsigned8,
                         SdlDotNet.Audio.SoundChannel.Mono,
                         samples,
                         audioCallback,
                         null);
-            Invoke(delegate {
-                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
-                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-                SdlDotNet.Audio.Mixer.OpenAudio(stream);
-                ev.Set();
-            });
-            ev.WaitOne();
-            audio_initialized = true;
-        }
+			Invoke (delegate {
+				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
+				SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+				SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+				SdlDotNet.Audio.Mixer.OpenAudio (stream);
+				ev.Set ();
+			});
+			ev.WaitOne ();
+			audio_initialized = true;
+		}
 
-        public void initialize_sound() {
-            ManualResetEvent ev = new ManualResetEvent(false);
-            Invoke(delegate {
-                // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-                SdlDotNet.Graphics.Video.SetVideoMode(250, 1);
-                SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-                SdlDotNet.Audio.Mixer.Open();
+		public void initialize_sound ()
+		{
+			ManualResetEvent ev = new ManualResetEvent (false);
+			Invoke (delegate {
+				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
+				SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+				SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+				SdlDotNet.Audio.Mixer.Open ();
 				SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
-                ev.Set();
-            });
-            ev.WaitOne();
-            sound_initialized = true;
-        }
+				ev.Set ();
+			});
+			ev.WaitOne ();
+			sound_initialized = true;
+		}
 
-        public void beep(double duration, double frequency1, double frequency2) {
-            if (! audio_initialized) {
-                initialize_tone();
-            }
-            audio_function = null;
-            frequencies [0] = frequency1;
-            frequencies [1] = frequency2;
-            phases[1] = phases[0]; // set the phases to be the same
-            Tao.Sdl.Sdl.SDL_PauseAudio(0); // start
-            if (duration > 0) {
-                //Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
+		public void beep (double duration, double frequency1, double frequency2)
+		{
+			if (! audio_initialized) {
+				initialize_tone ();
+			}
+			audio_function = null;
+			frequencies [0] = frequency1;
+			frequencies [1] = frequency2;
+			phases [1] = phases [0]; // set the phases to be the same
+			Tao.Sdl.Sdl.SDL_PauseAudio (0); // start
+			if (duration > 0) {
+				//Tao.Sdl.Sdl.SDL_Delay((int)(duration * 1000));
 				wait (duration);
-                Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
-            }
-        }
+				Tao.Sdl.Sdl.SDL_PauseAudio (1); // pause
+			}
+		}
 
-        public void stopBeep() {
-            if (! audio_initialized) {
-                initialize_tone();
-            }
-            Tao.Sdl.Sdl.SDL_PauseAudio(1); // pause
-        }
+		public void stopBeep ()
+		{
+			if (! audio_initialized) {
+				initialize_tone ();
+			}
+			Tao.Sdl.Sdl.SDL_PauseAudio (1); // pause
+		}
 
-        public void Callback(IntPtr userData, IntPtr stream, int len) {
-            if (audio_function != null) {
-                int [] buffer = new int[len];
-                try {
-                    audio_function(buffer, audio_index);
-                    audio_index += len;
-                } catch (Exception e) {
-                    Console.Error.WriteLine("Error in audio function");
-                    Console.Error.WriteLine(e.Message);
-                    return;
-                }
-                byte [] mybuffer8 = new byte[len];
-                for (int i = 0; i < len; i++) {
-                    mybuffer8[i] = (byte)buffer[i];
-                }
-                System.Runtime.InteropServices.Marshal.Copy(mybuffer8, 0, stream, len);
-            } else {
-                for (int buf_pos = 0; buf_pos < len; buf_pos++) {
-                    double sum = 0.0;
-                    int count = 0;
-                    if (frequencies[0] != -1) {
-                        sum += (byte)(127 + Math.Cos(phases [0]) * volume * 127);
-                        count++;
-                    }
-                    if (frequencies[1] != -1) {
-                        sum += (byte)(127 + Math.Cos(phases [1]) * volume * 127);
-                        count++;
-                    }
-                    if (count > 0) {
-                        buffer8 [buf_pos] = (byte)(sum /count);
-                        phases [0] += frequencies [0] * slice;
-                        phases [1] += frequencies [1] * slice;
-                        if (phases [0] > pi2) {
-                            phases [0] -= pi2;
-                        }
-                        if (phases [1] > pi2) {
-                            phases [1] -= pi2;
-                        }
-                    }
-                }
-                System.Runtime.InteropServices.Marshal.Copy(buffer8, 0, stream, len);
-            }
-        }
+		public void Callback (IntPtr userData, IntPtr stream, int len)
+		{
+			if (audio_function != null) {
+				int [] buffer = new int[len];
+				try {
+					audio_function (buffer, audio_index);
+					audio_index += len;
+				} catch (Exception e) {
+					Console.Error.WriteLine ("Error in audio function");
+					Console.Error.WriteLine (e.Message);
+					return;
+				}
+				byte [] mybuffer8 = new byte[len];
+				for (int i = 0; i < len; i++) {
+					mybuffer8 [i] = (byte)buffer [i];
+				}
+				System.Runtime.InteropServices.Marshal.Copy (mybuffer8, 0, stream, len);
+			} else {
+				for (int buf_pos = 0; buf_pos < len; buf_pos++) {
+					double sum = 0.0;
+					int count = 0;
+					if (frequencies [0] != -1) {
+						sum += (byte)(127 + Math.Cos (phases [0]) * volume * 127);
+						count++;
+					}
+					if (frequencies [1] != -1) {
+						sum += (byte)(127 + Math.Cos (phases [1]) * volume * 127);
+						count++;
+					}
+					if (count > 0) {
+						buffer8 [buf_pos] = (byte)(sum / count);
+						phases [0] += frequencies [0] * slice;
+						phases [1] += frequencies [1] * slice;
+						if (phases [0] > pi2) {
+							phases [0] -= pi2;
+						}
+						if (phases [1] > pi2) {
+							phases [1] -= pi2;
+						}
+					}
+				}
+				System.Runtime.InteropServices.Marshal.Copy (buffer8, 0, stream, len);
+			}
+		}
 	}	
 	
 	public static IEnumerable timer (double seconds)
@@ -2935,56 +2991,68 @@ public static class Myro
 		}
 	}
 	
-	public static Func<object> freeze(Func<object> function) {
-		return () => function.Invoke();
+	public static Func<object> freeze (Func<object> function)
+	{
+		return () => function.Invoke ();
 	}
 
-	public static Func<object> freeze(Func<object,object> function, object arg1) {
-		return () => function.Invoke(arg1);
+	public static Func<object> freeze (Func<object,object> function, object arg1)
+	{
+		return () => function.Invoke (arg1);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object> function, object arg1, object arg2) {
-		return () => function.Invoke(arg1, arg2);
+	public static Func<object> freeze (Func<object,object,object> function, object arg1, object arg2)
+	{
+		return () => function.Invoke (arg1, arg2);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object> function, object arg1, object arg2, object arg3) {
-		return () => function.Invoke(arg1, arg2, arg3);
+	public static Func<object> freeze (Func<object,object,object,object> function, object arg1, object arg2, object arg3)
+	{
+		return () => function.Invoke (arg1, arg2, arg3);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4);
+	public static Func<object> freeze (Func<object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5);
+	public static Func<object> freeze (Func<object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+	public static Func<object> freeze (Func<object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
-									object arg7) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+	public static Func<object> freeze (Func<object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
-									object arg7, object arg8) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+	public static Func<object> freeze (Func<object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
-									object arg7, object arg8, object arg9) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+	public static Func<object> freeze (Func<object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8, object arg9)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 	}
 	
-	public static Func<object> freeze(Func<object,object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
-									object arg7, object arg8, object arg9, object arg10) {
-		return () => function.Invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+	public static Func<object> freeze (Func<object,object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
+									object arg7, object arg8, object arg9, object arg10)
+	{
+		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 	}
 	
-	public static object thaw(Func<object> thunk) {
-		return thunk.Invoke();
+	public static object thaw (Func<object> thunk)
+	{
+		return thunk.Invoke ();
 	}
 
 	// Graphics.cs
@@ -3403,11 +3471,11 @@ public static class Myro
 		// call the function, and put the result in the
 		// list in the given position.
 		return () => {
-		  try {  
-		    list[position] = func();
-		  } catch (Exception e) {
-		    list[position] = e.Message;
-		  }
+			try {  
+				list [position] = func ();
+			} catch (Exception e) {
+				list [position] = e.Message;
+			}
 		};
 	}
 
@@ -3421,11 +3489,11 @@ public static class Myro
 		// call the function, and put the result in the
 		// list in the given position.
 		return () => {
-		  try {  
-		    list[position] = func(arg);
-		  } catch (Exception e) {
-		    list[position] = e.Message;
-		  }
+			try {  
+				list [position] = func (arg);
+			} catch (Exception e) {
+				list [position] = e.Message;
+			}
 		}; 
 	}
 	
@@ -3439,37 +3507,38 @@ public static class Myro
 		// call the function, and put the result in the
 		// list in the given position.
 		return () => {
-		  try {  
-		    list[position] = callFunc(ofunc, args.Length, args);
-		  } catch (Exception e) {
-		    list[position] = e.Message;
-		  }
+			try {  
+				list [position] = callFunc (ofunc, args.Length, args);
+			} catch (Exception e) {
+				list [position] = e.Message;
+			}
 		}; 
 	}
 
-	public static object callFunc(object func, int len, object [] args) {
+	public static object callFunc (object func, int len, object [] args)
+	{
 		if (len == 1) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object>>(func)(args[0]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object>> (func) (args [0]);
 		else if (len == 2) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object>>(func)(args[0], args[1]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object>> (func) (args [0], args [1]);
 		else if (len == 3) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object>>(func)(args[0], args[1], args[2]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object>> (func) (args [0], args [1], args [2]);
 		else if (len == 4) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3]);
 		else if (len == 5) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4]);
 		else if (len == 6) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4], args [5]);
 		else if (len == 7) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4], args [5], args [6]);
 		else if (len == 8) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4], args [5], args [6], args [7]);
 		else if (len == 9) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4], args [5], args [6], args [7], args [8]);
 		else if (len == 10) 
-			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object,object>>(func)(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+			return IronPython.Runtime.Converter.Convert<Func<object,object,object,object,object,object,object,object,object,object,object>> (func) (args [0], args [1], args [2], args [3], args [4], args [5], args [6], args [7], args [8], args [9]);
 		else
-			throw new Exception("invalid arguments in callFun");
+			throw new Exception ("invalid arguments in callFun");
 	}
 		
 	// doTogether(f1, f2, ...)
@@ -3487,7 +3556,7 @@ public static class Myro
 		foreach (Func<object> function in functions) {
 			retval.append (null);
 			Thread thread = new Thread (
-           			new ThreadStart( functionInvoke(function, retval, position) )
+           			new ThreadStart (functionInvoke (function, retval, position))
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -3523,10 +3592,10 @@ public static class Myro
 		int position = 0; 
 		// For each function, make a return list, and thread list
 		foreach (dynamic function in functions) {
-			Func<object> func = IronPython.Runtime.Converter.Convert<Func<object>>(function);
+			Func<object > func = IronPython.Runtime.Converter.Convert<Func<object>> (function);
 			retval.append (null);
 			Thread thread = new Thread (
-           			new ThreadStart( functionInvoke(func, retval, position) )
+           			new ThreadStart (functionInvoke (func, retval, position))
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -3564,25 +3633,25 @@ public static class Myro
 		//Func<object,object[]> func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(farg1[0]);
 		retval.append (null);
 		Thread thread = new Thread (
-           			new ThreadStart( functionInvokeWithArgs(farg1[0], farg1.Slice (1, farg1.Count), retval, position))
+           			new ThreadStart (functionInvokeWithArgs (farg1 [0], farg1.Slice (1, farg1.Count), retval, position))
 			);
-		threads.append(thread);
+		threads.append (thread);
 		position++;
 		// Second:
 		//func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(farg2[0]);
 		retval.append (null);
 		thread = new Thread (
-           			new ThreadStart( functionInvokeWithArgs(farg2[0], farg2.Slice (1, farg2.Count), retval, position))
+           			new ThreadStart (functionInvokeWithArgs (farg2 [0], farg2.Slice (1, farg2.Count), retval, position))
 			);
-			thread.IsBackground = true;
-		threads.append(thread);
+		thread.IsBackground = true;
+		threads.append (thread);
 		position++;
 		// For each function, make a return list, and thread list
 		foreach (IList list in fargs) {
 			//func = IronPython.Runtime.Converter.Convert<Func<object,object[]>>(list[0]);
 			retval.append (null);
 			thread = new Thread (
-           			new ThreadStart( functionInvokeWithArgs(list[0], list.Slice (1, list.Count), retval, position) )
+           			new ThreadStart (functionInvokeWithArgs (list [0], list.Slice (1, list.Count), retval, position))
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -3618,10 +3687,10 @@ public static class Myro
 		int position = 0; 
 		// For each function, make a return list, and thread list
 		foreach (dynamic function in functions) {
-			Func<object,object> func = IronPython.Runtime.Converter.Convert<Func<object,object>>(function);
+			Func<object,object > func = IronPython.Runtime.Converter.Convert<Func<object,object>> (function);
 			retval.append (null);
 			Thread thread = new Thread (
-           			new ThreadStart( functionInvokeWithArg(func, arg, retval, position) )
+           			new ThreadStart (functionInvokeWithArg (func, arg, retval, position))
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -3659,7 +3728,7 @@ public static class Myro
 		foreach (object arg in args) { 
 			retval.append (null);
 			Thread thread = new Thread (
-           			new ThreadStart( functionInvokeWithArg(function, arg, retval, position) )
+           			new ThreadStart (functionInvokeWithArg (function, arg, retval, position))
 				);
 			thread.IsBackground = true;
 			threads.append (thread);
@@ -3857,18 +3926,18 @@ public static class Myro
 				file = Path.Combine (file, "mac");
 				file = Path.Combine (file, "eSpeak");
 				myProcess.StartInfo.FileName = Path.Combine (file, "speak");
-				Environment.SetEnvironmentVariable("ESPEAK_DATA_PATH", file);
+				Environment.SetEnvironmentVariable ("ESPEAK_DATA_PATH", file);
 			} else {
-			    if (File.Exists ("/usr/bin/speak")) {
-				// assumes espeak is in /usr/bin/ on macs
-				myProcess.StartInfo.FileName = "speak";
-			    } else if (File.Exists ("/usr/local/bin/speak")) {
-				// or look for espeak is in /usr/local/bin/ on macs
-				myProcess.StartInfo.FileName = "speak";
-			    } else {
-				// assumes in path
-				myProcess.StartInfo.FileName = "espeak";
-			    }
+				if (File.Exists ("/usr/bin/speak")) {
+					// assumes espeak is in /usr/bin/ on macs
+					myProcess.StartInfo.FileName = "speak";
+				} else if (File.Exists ("/usr/local/bin/speak")) {
+					// or look for espeak is in /usr/local/bin/ on macs
+					myProcess.StartInfo.FileName = "speak";
+				} else {
+					// assumes in path
+					myProcess.StartInfo.FileName = "espeak";
+				}
 			}
 			myProcess.StartInfo.CreateNoWindow = true;
 			myProcess.StartInfo.Arguments = ("-v \"" + speech_name + "\" -f " + textpath);
@@ -3916,7 +3985,7 @@ public static class Myro
 		if (robot != null)
 			robot.playSong (song, speed);
 		else
-			computer.playSong(song, speed);
+			computer.playSong (song, speed);
 	}
 
 	public static void saveSong (List song, string filename, int append)
@@ -4040,6 +4109,7 @@ public static class Myro
 			}
 		}
 	}
+
 #pragma warning restore 0168
 
 	static double getDuration (string v, int line, string text)
