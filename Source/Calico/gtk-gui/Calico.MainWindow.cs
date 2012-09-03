@@ -160,7 +160,7 @@ namespace Calico
 		private global::Gtk.Statusbar statusbar2;
 		private global::Gtk.Label label10;
 		private global::Gtk.Label label11;
-        
+		
 		protected virtual void Build ()
 		{
 			global::Stetic.Gui.Initialize (this);

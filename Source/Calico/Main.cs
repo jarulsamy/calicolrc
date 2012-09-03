@@ -60,7 +60,7 @@ namespace Calico {
            return (processFound == 1);
        }
 		 */
-        [STAThread]
+        //[STAThread]
         public static void Main(string[] args) {
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
@@ -127,7 +127,7 @@ namespace Calico {
             {
                 foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
                 {
-                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
+                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).py");
                     //Print("Loading {0}...", f.FullName);
                     string loading = match.Groups[1].ToString().ToLower();
                     try {
@@ -138,8 +138,10 @@ namespace Calico {
                         languages[language.name] = language;
                         bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(loading);
                         manager.Register(language, visible); // This may fail, which won't add language
-                        language.engine.Setup(path);
-                        language.engine.Start(path);
+                        if (language.engine != null) {
+                            language.engine.Setup(path);
+                            language.engine.Start(path);
+                        }
                     } catch (Exception e) {
                         Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
                    }

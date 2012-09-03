@@ -498,7 +498,6 @@ namespace Calico {
             visible_languages.Clear();
             foreach (Gtk.CheckMenuItem menu_item in ((Gtk.Menu)languages_menu.Submenu).AllChildren) {
                 Language language = GetLanguageFromProperName(((Gtk.Label)menu_item.Child).LabelProp);
-                System.Console.WriteLine(language.name);
                 if (menu_item.Active || language.name.Equals("python")) {
                     visible_languages.Add(language.name); 
                 }
