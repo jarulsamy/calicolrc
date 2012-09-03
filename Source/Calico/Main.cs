@@ -127,9 +127,18 @@ namespace Calico {
             {
                 foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
                 {
-                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).py");
+                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
                     //Print("Loading {0}...", f.FullName);
                     string loading = match.Groups[1].ToString().ToLower();
+                    string def_language = match.Groups[2].ToString().ToLower();
+                    if (def_language == "dll" || 
+                        def_language == "cs" || 
+                        def_language == "exe" || 
+                        def_language.EndsWith("~") || 
+                        def_language == "mdb")
+                        continue;
+                    //Console.WriteLine(def_language); FIXME: need general interface for the following:
+                    // GetVariable, extend classes, call a method from C#
                     try {
                         Calico.DLREngine engine = ((Calico.DLREngine)languages["python"].engine);
                         var scope = engine.engine.ExecuteFile(f.FullName);
