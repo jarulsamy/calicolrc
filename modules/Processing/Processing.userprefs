@@ -1,15 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" ActiveRuntime="MS.NET" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Processing\PWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="133" Column="11" />
+      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="959" Column="7" />
       <File FileName="Processing\PWindow.cs" Line="776" Column="11" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Processing" expanded="True">
-            <Node name="PWindow.cs" selected="True" />
+            <Node name="Processing.cs" selected="True" />
           </Node>
         </State>
       </Pad>

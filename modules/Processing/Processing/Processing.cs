@@ -135,7 +135,6 @@ public static class Processing
 	public static readonly double QUARTER_PI = 0.25*Processing.PI;
 	public static readonly double TWO_PI = 2.0*Processing.PI;
 
-
 	// String-constant maps
 	private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
 		{"CORNER", RectMode.CORNER}, {"CENTER", RectMode.CENTER}, {"RADIUS", RectMode.RADIUS}, {"CORNERS", RectMode.CORNERS}
@@ -948,7 +947,7 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
-	public static void doEvents() 
+	public static void doEvents()
 	{	// Process any pending events
 		while (Gtk.Application.EventsPending ()) Gtk.Application.RunIteration ();
 	}
@@ -957,7 +956,7 @@ public static class Processing
 	[JigsawTab(null)]
 	public static void noLoop()
 	{
-		_tmr.Stop ();
+		if (_tmr != null) _tmr.Stop ();
 	}
 	[JigsawTab("P/Environ")]
 	public static void stopLoop() { noLoop (); }
@@ -1018,7 +1017,7 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
 	public static int hour()
-	{	// Gets the number of hours on the system clock [0, 24]
+	{	// Gets the number of hours on the system clock [0, 23]
 		if (_p == null) return 0;
 		return DateTime.Now.Hour;
 	}
