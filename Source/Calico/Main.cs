@@ -60,7 +60,7 @@ namespace Calico {
            return (processFound == 1);
        }
 		 */
-        //[STAThread]
+        [STAThread]
         public static void Main(string[] args) {
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
