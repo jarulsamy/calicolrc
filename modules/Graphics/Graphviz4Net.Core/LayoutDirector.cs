@@ -5,7 +5,7 @@ namespace Graphviz4Net
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Windows;
+    //using System.Windows;
     using Dot;
     using Dot.AntlrParser;
     using Graphs;

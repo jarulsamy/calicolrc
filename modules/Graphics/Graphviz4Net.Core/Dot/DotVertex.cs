@@ -1,7 +1,7 @@
 ﻿
 namespace Graphviz4Net.Dot
 {
-    using System.Windows;
+    //using System.Windows;
     using System.Collections.Generic;
     using Graphs;
 
@@ -47,7 +47,7 @@ namespace Graphviz4Net.Dot
             get { return Utils.ParseInvariantNullableDouble(this.Attributes.GetValue("height")); }
         }
 
-        public Point? Position
+	    public Point? Position
         {
             get
             {

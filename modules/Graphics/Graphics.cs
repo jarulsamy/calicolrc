@@ -5158,7 +5158,7 @@ public static class Graphics
 	            if (v.Position == null) {
 	                continue;
 				}
-	            Point c = translate(((System.Windows.Point)v.Position).X, ((System.Windows.Point)v.Position).Y);
+	            Point c = translate(((Graphviz4Net.Point)v.Position).X, ((Graphviz4Net.Point)v.Position).Y);
 	            int width = (int)(((double)v.Width) * 72 * scale);
 				int height = (int)(((double)v.Height) * 72 * scale);
 				string shape;
@@ -5257,7 +5257,7 @@ public static class Graphics
 	            edges[index] = new Dictionary<string,object>();
 	            edges[index]["line"] = new List<Shape>();
 				List<Point> points = new List<Point>();
-				foreach(System.Windows.Point p in e.Path) {
+				foreach(Graphviz4Net.Point p in e.Path) {
 	            	points.Add(new Graphics.Point(translate(p.X, p.Y)));
 				}
 				string color;
@@ -5319,8 +5319,8 @@ public static class Graphics
 	                edges[index]["destination_arrow"] = arrow;
 				}
 	            if (e.LabelPos != null) {
-	                Point p = translate(((System.Windows.Point)e.LabelPos).X, 
-										((System.Windows.Point)e.LabelPos).Y);
+	                Point p = translate(((Graphviz4Net.Point)e.LabelPos).X, 
+										((Graphviz4Net.Point)e.LabelPos).Y);
 	                Text text = new Graphics.Text(p, e.Label);
 	                text.fontSize = 10 * scale;
 	                text.color = new Graphics.Color("black");

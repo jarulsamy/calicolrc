@@ -5,7 +5,7 @@ namespace Graphviz4Net.Dot
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Windows;
+    //using System.Windows;
     using Graphs;
 
     public class DotEdge<TVertexId> : Edge<DotVertex<TVertexId>>
