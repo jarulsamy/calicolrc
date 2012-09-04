@@ -250,6 +250,9 @@ public static class Processing
 			Application.Run ();
 		} );
 
+		// This hangs when used with Jigsaw. Why?	
+		ev.WaitOne();
+
 		// Set up helper objects
 		_tmr = new PTimer();
 		_tmr.Elapsed += _onLoop;
@@ -268,7 +271,7 @@ public static class Processing
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 
 		// This hangs when used with Jigsaw. Why?	
-		ev.WaitOne();
+		//ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
