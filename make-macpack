@@ -1,0 +1,58 @@
+Calico.app: make-macpack
+	rm -rf Calico.app
+	macpack -m:console -a:bin/Calico.exe \
+		-n:Calico \
+		-r:/Library/Frameworks/Mono.framework/Versions/Current/lib \
+		-r:bin/Antlr3.Runtime.dll \
+		-r:bin/ICSharpCode.SharpZipLib.dll \
+		-r:bin/IronPython.Modules.dll \
+		-r:bin/IronPython.dll \
+		-r:bin/IronPythonTest.dll \
+		-r:bin/IronRuby.Libraries.Yaml.dll \
+		-r:bin/IronRuby.Libraries.dll \
+		-r:bin/IronRuby.Rack.dll \
+		-r:bin/IronRuby.dll \
+		-r:bin/Microsoft.Dynamic.dll \
+		-r:bin/Microsoft.Scripting.AspNet.dll \
+		-r:bin/Microsoft.Scripting.Core.dll \
+		-r:bin/Microsoft.Scripting.Debugging.dll \
+		-r:bin/Microsoft.Scripting.ExtensionAttribute.dll \
+		-r:bin/Microsoft.Scripting.Metadata.dll \
+		-r:bin/Microsoft.Scripting.dll \
+		-r:bin/Mono.CSharp.dll \
+		-r:bin/Mono.Cairo.dll \
+		-r:bin/Mono.TextEditor.Other.dll \
+		-r:bin/Mono.TextEditor.Windows.dll \
+		-r:bin/Mono.TextEditor.dll \
+		-r:bin/SDL.dll \
+		-r:bin/SDL_gfx.dll \
+		-r:bin/SDL_image.dll \
+		-r:bin/SDL_mixer.dll \
+		-r:bin/SDL_net.dll \
+		-r:bin/SDL_ttf.dll \
+		-r:bin/SdlDotNet.dll \
+		-r:bin/Tao.Cg.dll \
+		-r:bin/Tao.DevIl.dll \
+		-r:bin/Tao.FFmpeg.dll \
+		-r:bin/Tao.FreeGlut.dll \
+		-r:bin/Tao.FreeType.dll \
+		-r:bin/Tao.Glfw.dll \
+		-r:bin/Tao.Lua.dll \
+		-r:bin/Tao.Ode.dll \
+		-r:bin/Tao.OpenAl.dll \
+		-r:bin/Tao.OpenGl.dll \
+		-r:bin/Tao.PhysFs.dll \
+		-r:bin/Tao.Platform.Windows.dll \
+		-r:bin/Tao.Platform.X11.dll \
+		-r:bin/Tao.Sdl.dll \
+		-r:bin/TracerX-Logger.dll \
+		-r:bin/agsXMPP.dll \
+		-r:bin/lua5.1.dll \
+		-r:bin/lua51.dll \
+		-r:bin/windows/dot/libgtk-win32-2.0-0.dll
+	cp -r languages Calico.app/Contents/
+	cp -r modules Calico.app/Contents/
+	cp -r locale Calico.app/Contents/
+	cp bin/abstract-butterfly-* Calico.app/Contents/Resources/
+	cp -r bin/SyntaxModes Calico.app/Contents/Resources/
+	cp -r bin/Lib Calico.app/Contents/Resources/
