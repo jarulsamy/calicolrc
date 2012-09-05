@@ -634,6 +634,10 @@ namespace Calico {
             // Had to add this here, as Stetic didn't like it
             _shell = new Mono.TextEditor.TextEditor();
             _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
+            _shell.DragDataReceived += (o, args) => {
+                StartButton.Sensitive = true;
+                StartAction.Sensitive = true;
+            };
             ScrolledWindow.Add(_shell);
             ScrolledWindow.ShowAll();
             // Environment table:
@@ -1209,12 +1213,10 @@ namespace Calico {
         protected virtual void OnPasteActionActivated(object sender, System.EventArgs e) {
             if (Focus is Mono.TextEditor.TextEditor) {
                 string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
-                if (text != null)
+                if (text != null) {
                     ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+		}
                 ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
-                //if (CurrentDocument != null) {
-                //    CurrentDocument.IsDirty = true;
-                //}
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
             } else if (CurrentDocument != null) {
@@ -1431,9 +1433,10 @@ namespace Calico {
                     Mono.TextEditor.Caret caret = Shell.Caret;
                     int line = caret.Line;
                     int line_count = Shell.Document.LineCount;
-                    if (line != line_count) {
+                    if (line != line_count) { // caret.line not at bottom
                         completion = null;
                         args.RetVal = false;
+                        return;
                     }
                     // else, execute text
                     // extra line at end signals ready_to_execute:
@@ -2839,3 +2842,5 @@ namespace Calico {
         }
     }
 }
+
+// enter not on bottom row inserts, not executes

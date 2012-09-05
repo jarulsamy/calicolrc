@@ -68,7 +68,7 @@ public class CalicoSchemeEngine : Engine
   public override bool ReadyToExecute(string text) {
     //Return True if expression parses ok.
     string [] lines = text.Split('\n');
-    if (lines[lines.Length - 1] == "") {
+    if (lines[lines.Length - 1].Trim() == "") {
       return true; // force it
     }
     // else, only if valid parse
@@ -76,8 +76,9 @@ public class CalicoSchemeEngine : Engine
   }
 
   public static void Main(string[] args) {
-	LanguageManager manager = new LanguageManager("..", 
-		new Dictionary<string, Language>());
+      LanguageManager manager = new LanguageManager(new List<string>(){"scheme"}, 
+						    "..", 
+						    new Dictionary<string, Language>());
 	CalicoSchemeLanguage scheme = new CalicoSchemeLanguage();
 	scheme.MakeEngine(manager);
 	bool interactive = false;
