@@ -62,8 +62,10 @@ namespace Calico {
 		 */
         [STAThread]
         public static void Main(string[] args) {
+            System.Console.WriteLine("Loading Calico version {0}...", Version);
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            System.Console.WriteLine("    looking for config in \"{0}\"...", config_path);
             config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
             Config config;
             if (((IList<string>)args).Contains("--reset")) {
