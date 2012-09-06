@@ -1433,11 +1433,13 @@ namespace Calico {
                     Mono.TextEditor.Caret caret = Shell.Caret;
                     int line = caret.Line;
                     int line_count = Shell.Document.LineCount;
-                    if (line != line_count) { // caret.line not at bottom
-                        completion = null;
-                        args.RetVal = false;
-                        return;
-                    }
+                    // This needs to be better written, and maybe dealt with 
+                    // in each of the languages. Remove from here.
+                    //if (line != line_count) { // caret.line not at bottom
+                    //    completion = null;
+                    //    args.RetVal = false;
+                    //    return;
+                    //}
                     // else, execute text
                     // extra line at end signals ready_to_execute:
                     string text = Shell.Document.Text;
