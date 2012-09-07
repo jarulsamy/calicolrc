@@ -1591,6 +1591,10 @@ namespace Calico {
             return true;
         }
 
+        public bool Eval(string text, string language) {
+            return manager[language].engine.Execute(text, false);
+        }
+
         public void ExecuteInBackground(string text) {
             // This is the only approved method of running code
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {

@@ -36,7 +36,21 @@ public class CalicoSchemeEngine : Engine
     base.PostSetup(calico);
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
   }
-  
+
+	public override bool Execute(string text, bool ok) {
+    object result = PJScheme.execute_string_rm(text);
+    if (result == null) {
+       return true;
+    }
+    string resultString = Scheme.repr(result);
+    // FIXME: when exceptions have a better format in Scheme:
+    if (resultString.StartsWith("(exception ")) {
+      return false;
+    }
+    return true;
+	}
+
+
   public override bool Execute(string text) {
     object result = PJScheme.execute_string_rm(text);
     if (result == null) {
