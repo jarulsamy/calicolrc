@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-13 17:31-0400\n"
+"POT-Creation-Date: 2012-09-09 08:16-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgstr ""
 msgid "No matches found."
 msgstr ""
 
-#: ../src/calico.py:497
+#: ../src/calico.py:497 ../Source/Calico/MainWindow.cs:1170
 msgid "Scripting Environment"
 msgstr ""
 
@@ -74,7 +74,7 @@ msgstr ""
 msgid "(c) 2011, Institute for Personal Robots in Education"
 msgstr ""
 
-#: ../src/calico.py:504
+#: ../src/calico.py:504 ../Source/Calico/MainWindow.cs:1179
 msgid "Calico Project"
 msgstr ""
 
@@ -106,6 +106,7 @@ msgstr ""
 
 #: ../src/calico.py:565 ../src/calico.py:601 ../src/document.py:113
 #: ../src/editor.py:269 ../src/editor.py:409 ../src/utils.py:164
+#: ../Source/Calico/MainWindow.cs:1083 ../Source/Calico/Document.cs:182
 msgid "Cancel"
 msgstr ""
 
@@ -134,7 +135,7 @@ msgstr ""
 msgid "Calico Project, Version %s, on %s"
 msgstr ""
 
-#: ../src/calico.py:640
+#: ../src/calico.py:640 ../Source/Calico/Main.cs:203
 msgid "Start calico with the following options:"
 msgstr ""
 
@@ -300,17 +301,17 @@ msgstr ""
 
 #: ../src/chat.py:139
 msgid ""
-"\r\n"
-"Chat commands:\r\n"
-"   MESSGE        - send a message to\r\n"
-"                   all in conference\r\n"
-"   @USER MESSAGE - send a message to\r\n"
-"                   USER\r\n"
-"   /join CONF    - join a conference\r\n"
-"   /list         - list conferences\r\n"
-"   /create CONF  - create conference\r\n"
-"   /help         - this help message\r\n"
-"\r\n"
+"\n"
+"Chat commands:\n"
+"   MESSGE        - send a message to\n"
+"                   all in conference\n"
+"   @USER MESSAGE - send a message to\n"
+"                   USER\n"
+"   /join CONF    - join a conference\n"
+"   /list         - list conferences\n"
+"   /create CONF  - create conference\n"
+"   /help         - this help message\n"
+"\n"
 msgstr ""
 
 #: ../src/chat.py:166
@@ -331,11 +332,11 @@ msgstr ""
 msgid "New %s Script"
 msgstr ""
 
-#: ../src/document.py:110
+#: ../src/document.py:110 ../Source/Calico/Document.cs:179
 msgid "Enter the file to save"
 msgstr ""
 
-#: ../src/document.py:114
+#: ../src/document.py:114 ../Source/Calico/Document.cs:183
 msgid "Save"
 msgstr ""
 
@@ -397,11 +398,12 @@ msgstr ""
 msgid "Calico Editor"
 msgstr ""
 
-#: ../src/editor.py:266
+#: ../src/editor.py:266 ../Source/Calico/MainWindow.cs:1083
 msgid "Select the file to open"
 msgstr ""
 
 #: ../src/editor.py:270 ../src/utils.py:165
+#: ../Source/Calico/MainWindow.cs:1083
 msgid "Open"
 msgstr ""
 
@@ -558,4 +560,88 @@ msgstr ""
 
 #: ../src/window.py:184 ../src/window.py:193
 msgid "Examples"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:171 ../Source/Calico/Main.cs:201
+#, csharp-format
+msgid "Using Mono runtime version {0}"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:200
+#, csharp-format
+msgid "Calico Project, version {0} on {1}"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:204
+msgid "  StartCalico                            Defaults to shell"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:205
+msgid ""
+"  StartCalico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:206
+msgid ""
+"  StartCalico --lang=LANGUAGE            Sets default language (python, etc.)"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:207
+msgid "  StartCalico --chat                     Brings up chat window"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:208
+msgid ""
+"  StartCalico --exec FILENAMEs           Run FILENAMEs standalone with "
+"graphics"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:209
+msgid ""
+"  StartCalico --exec --nogui FILENAMEs   Run FILENAMEs standalone no graphics"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:210
+#, csharp-format
+msgid ""
+"  StartCalico --version                  Displays the version number ({0})"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:211
+msgid ""
+"  StartCalico --reset                    Resets config settings to factory "
+"defaults"
+msgstr ""
+
+#: ../Source/Calico/Main.cs:212
+msgid "  StartCalico --help                     Displays this message"
+msgstr ""
+
+#: ../Source/Calico/MainWindow.cs:1171
+#, csharp-format
+msgid "Running on {0}"
+msgstr ""
+
+#: ../Source/Calico/MainWindow.cs:1174
+msgid "(c) 2011-2012, Institute for Personal Robots in Education"
+msgstr ""
+
+#: ../Source/Calico/MainWindow.cs:1677
+msgid "Stopping...\n"
+msgstr ""
+
+#: ../Source/Calico/MainWindow.cs:2664
+msgid "   waiting for confirmation...\n"
+msgstr ""
+
+#: ../Source/Calico/MainWindow.cs:2667
+msgid "Received messages:\n"
+msgstr ""
+
+#: ../Source/Calico/Document.cs:325
+msgid "for Calico"
+msgstr ""
+
+#: ../Source/Calico/Document.cs:326
+msgid "(c) 2012, Institute for Personal Robots in Education"
 msgstr ""
