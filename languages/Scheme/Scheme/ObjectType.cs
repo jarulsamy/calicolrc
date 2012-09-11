@@ -257,7 +257,7 @@ public class ObjectType
 				Double dbl1 = Convert.ToDouble (o1);
 				Double dbl2 = Convert.ToDouble (o2);
 	    
-				return dbl1 + dbl2;
+				return dbl1 - dbl2;
 			} else if ((o1 is Single) || (o2 is Single)) {
 				Single f1 = Convert.ToSingle (o1);
 				Single f2 = Convert.ToSingle (o2);
