@@ -51,6 +51,10 @@ namespace Calico {
             return true;
         }
 
+        public virtual object Eval(string text) {
+            return null;
+        }
+
         public virtual bool Execute(string text, bool ok) {
             return true;
         }

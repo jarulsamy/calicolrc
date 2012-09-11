@@ -2863,20 +2863,28 @@ public static class Myro
 		public void initialize_tone ()
 		{
 			ManualResetEvent ev = new ManualResetEvent (false);
-			audioCallback = new SdlDotNet.Audio.AudioCallback (Callback);
-			stream = new SdlDotNet.Audio.AudioStream (playbackFreq,
-                        SdlDotNet.Audio.AudioFormat.Unsigned8,
-                        SdlDotNet.Audio.SoundChannel.Mono,
-                        samples,
-                        audioCallback,
-                        null);
+			try {
+			    audioCallback = new SdlDotNet.Audio.AudioCallback (Callback);
+			    stream = new SdlDotNet.Audio.AudioStream (playbackFreq,
+								      SdlDotNet.Audio.AudioFormat.Unsigned8,
+								      SdlDotNet.Audio.SoundChannel.Mono,
+								      samples,
+								      audioCallback,
+								      null);
+			} catch {
+			    throw new Exception("Unable to initialize tone");
+			}
 			Invoke (delegate {
 				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
-				SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-				SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-				SdlDotNet.Audio.Mixer.OpenAudio (stream);
-				ev.Set ();
-			});
+				try {
+				    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+				    SdlDotNet.Audio.Mixer.OpenAudio (stream);
+				    ev.Set ();
+				} catch {
+				    throw new Exception("Unable to initialize OpenAudio");
+				}
+			    });
 			ev.WaitOne ();
 			audio_initialized = true;
 		}
@@ -2886,11 +2894,15 @@ public static class Myro
 			ManualResetEvent ev = new ManualResetEvent (false);
 			Invoke (delegate {
 				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
-				SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-				SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-				SdlDotNet.Audio.Mixer.Open ();
-				SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
-				ev.Set ();
+				try {
+				    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+				    SdlDotNet.Audio.Mixer.Open ();
+				    SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
+				    ev.Set ();
+				} catch {
+				    throw new Exception("Unable to initialize sound");
+				}
 			});
 			ev.WaitOne ();
 			sound_initialized = true;
