@@ -1301,7 +1301,11 @@ namespace Calico {
 
         static void SelectLineBlock(Mono.TextEditor.TextEditorData data, int endLineNr, int startLineNr) {
             Mono.TextEditor.LineSegment endLine = data.Document.GetLine(endLineNr);
-            data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 1, endLineNr, endLine.Length);
+            try {
+                data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 1, endLineNr, endLine.Length);
+            } catch {
+                // Not a valid selection area, just skip it.
+            }
         }
 
         protected virtual void OnCommentRegionActionActivated(object sender, System.EventArgs e) {
