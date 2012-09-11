@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.9";
+        public static string Version = "2.0.10";
         public static bool IsLoadLanguages = true;
 
 		/*
