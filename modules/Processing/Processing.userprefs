@@ -1,19 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" ActiveRuntime="MS.NET" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Processing\PWindow.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="101" Column="62" />
-      <File FileName="Processing\PWindow.cs" Line="776" Column="11" />
+      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="1215" Column="21" />
+      <File FileName="Processing\PWindow.cs" Line="798" Column="19" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Processing" expanded="True">
-            <Node name="Processing.cs" selected="True" />
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

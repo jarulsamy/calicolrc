@@ -796,7 +796,7 @@ internal class PWindow : Gtk.Window
 
 			g.Translate (x, y);
 			g.Scale (s, s);
-			g.ShowText (txt);
+			g.TextPath (txt);
 			g.Restore ();
 			_fill (g);
 			_stroke (g);
@@ -812,7 +812,7 @@ internal class PWindow : Gtk.Window
 			g.Translate (x, y);
 			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
 			g.Scale (s, s);
-			g.ShowText (txt);
+			g.TextPath (txt);
 			g.Restore ();
 			_fill (g);
 			_stroke (g);
