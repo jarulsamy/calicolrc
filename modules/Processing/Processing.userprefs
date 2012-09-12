@@ -1,8 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" ActiveRuntime="MS.NET" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Processing\PWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="1215" Column="21" />
+      <File FileName="c:\Programs\Calico\trunk\modules\Processing\Processing\Processing.cs" Line="472" Column="26" />
       <File FileName="Processing\PWindow.cs" Line="798" Column="19" />
     </Files>
   </MonoDevelop.Ide.Workbench>

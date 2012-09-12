@@ -92,7 +92,9 @@ public static class Processing
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
 	[method: JigsawTab(null)]
-	public static event ButtonPressEventHandler onMousePressed;	// Mouse events
+	public static event ButtonReleaseEventHandler onMouseClicked;	// Mouse events
+	[method: JigsawTab(null)]
+	public static event ButtonPressEventHandler onMousePressed;
 	[method: JigsawTab(null)]
 	public static event ButtonReleaseEventHandler onMouseReleased;
 	[method: JigsawTab(null)]
@@ -340,6 +342,7 @@ public static class Processing
 
 		// Unhook event handlers.
 		onLoop = null;
+		onMouseClicked = null;
 		onMousePressed = null;
 		onMouseReleased = null;
 		onMouseDragged = null;
@@ -461,11 +464,14 @@ public static class Processing
 	{	// Reraise the event from the main class
 		_mousePressed = false;
 		_mouseButton = 0;
+		bool _needsMouseClicked = false;
+		if ( Math.Abs(_pmouseX - _mouseX) < 2 && Math.Abs (_pmouseY - _mouseY) < 2) _needsMouseClicked = true;
 		_pmouseX = _mouseX;
 		_pmouseY = _mouseY;
 		_mouseX = args.Event.X;
 		_mouseY = args.Event.Y;
 		raiseMouseReleased(args);
+		if (_needsMouseClicked) raiseMouseClicked(args);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -532,6 +538,18 @@ public static class Processing
             handler(null, e);
         }
     }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void raiseMouseClicked(ButtonReleaseEventArgs e)
+	{
+		ButtonReleaseEventHandler handler = onMouseClicked;
+		
+		// Event will be null if there are no subscribers
+		if (handler != null)
+		{
+			handler(null, e);
+		}
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMouseReleased(ButtonReleaseEventArgs e)
