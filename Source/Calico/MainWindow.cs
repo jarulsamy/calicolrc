@@ -416,7 +416,7 @@ namespace Calico {
 
         // ------------------------------------------------------------
         public Gtk.HPaned NotebookPane {
-            get {return hpaned2;}
+            get {return hpaned3;}
         }
         
         public Gtk.VPaned VPaned2 {
@@ -2854,7 +2854,12 @@ namespace Calico {
 
         protected void OnSwapVerticalClicked (object sender, System.EventArgs e)
         {
-            throw new System.NotImplementedException ();
+            Gtk.Application.Invoke(delegate {
+                if (tool_window == null) { // Good
+                    NotebookPane.Reparent();
+                } else { // ignore
+                }
+            });
         }
 
         protected void OnSwapHorizontalClicked (object sender, System.EventArgs e)

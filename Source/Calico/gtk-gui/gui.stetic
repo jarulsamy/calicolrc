@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="839 533">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="802 527">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -1031,17 +1031,17 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">367</property>
+            <property name="Position">771</property>
             <child>
               <widget class="Gtk.HPaned" id="hpaned2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">361</property>
+                <property name="Position">549</property>
                 <child>
                   <widget class="Gtk.VPaned" id="vpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">284</property>
+                    <property name="Position">295</property>
                     <child>
                       <widget class="Gtk.Notebook" id="notebook_docs">
                         <property name="MemberName" />
@@ -1434,7 +1434,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">355</property>
+                        <property name="Position">544</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />
@@ -1601,7 +1601,7 @@
                     <property name="MemberName" />
                     <property name="Visible">False</property>
                     <property name="CanFocus">True</property>
-                    <property name="Position">121</property>
+                    <property name="Position">151</property>
                     <child>
                       <widget class="Gtk.Frame" id="frame1">
                         <property name="MemberName" />
