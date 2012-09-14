@@ -384,16 +384,17 @@ namespace Calico {
                 string filenames = Encoding.UTF8.GetString(args.SelectionData.Data, 0, args.SelectionData.Length);
                 foreach (string filename in filenames.Split('\n')) {
                     string sfilename = filename.Replace("\r", "").Trim();
-                    //Console.WriteLine ("Received '{0}'", sfilename);
+                    //sfilename = sfilename.Replace("%20", " ");
+                    Console.WriteLine ("Received '{0}'", sfilename);
                     Uri uri;
                     try {
                         uri = new Uri(sfilename);
                     } catch {
                         continue;
                     }
-                    //Console.WriteLine ("Uri! '{0}'", uri);
+                    Console.WriteLine ("Uri! '{0}'", uri);
                     sfilename = System.IO.Path.GetFullPath(uri.AbsolutePath);
-                    //Console.WriteLine ("Filename! '{0}'", sfilename);
+                    Console.WriteLine ("Filename! '{0}'", sfilename);
                     if (System.IO.File.Exists(sfilename)) {
                         Open(sfilename);
                     }
@@ -2849,6 +2850,16 @@ namespace Calico {
                 }
             });
             // else put back
+        }
+
+        protected void OnSwapVerticalClicked (object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException ();
+        }
+
+        protected void OnSwapHorizontalClicked (object sender, System.EventArgs e)
+        {
+            throw new System.NotImplementedException ();
         }
     }
 }
