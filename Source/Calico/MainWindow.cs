@@ -384,17 +384,17 @@ namespace Calico {
                 string filenames = Encoding.UTF8.GetString(args.SelectionData.Data, 0, args.SelectionData.Length);
                 foreach (string filename in filenames.Split('\n')) {
                     string sfilename = filename.Replace("\r", "").Trim();
-                    //sfilename = sfilename.Replace("%20", " ");
-                    Console.WriteLine ("Received '{0}'", sfilename);
+                    //Console.WriteLine ("Received '{0}'", sfilename);
                     Uri uri;
                     try {
                         uri = new Uri(sfilename);
                     } catch {
                         continue;
                     }
-                    Console.WriteLine ("Uri! '{0}'", uri);
+                    //Console.WriteLine ("Uri! '{0}'", uri);
                     sfilename = System.IO.Path.GetFullPath(uri.AbsolutePath);
-                    Console.WriteLine ("Filename! '{0}'", sfilename);
+                    sfilename = sfilename.Replace("%20", " ");
+                    //Console.WriteLine ("Filename! '{0}'", sfilename);
                     if (System.IO.File.Exists(sfilename)) {
                         Open(sfilename);
                     }
@@ -2840,11 +2840,14 @@ namespace Calico {
                     int width, height;
                     this.GetSize(out width, out height);
                     //tool_window.SetSizeRequest(width, height);
-		    tool_window.SetDefaultSize(width, height);
+		            tool_window.SetDefaultSize(width, height);
                     tool_window.Show();
                 } else {
                     NotebookPane.Unparent();
-                    vpaned2.Add2(NotebookPane);
+                    if (vpaned2.Child2 == null)
+                        vpaned2.Add2(NotebookPane);
+                    else
+                        vpaned2.Add1(NotebookPane);
                     tool_window.Hide();
                     tool_window = null;
                 }
@@ -2856,15 +2859,36 @@ namespace Calico {
         {
             Gtk.Application.Invoke(delegate {
                 if (tool_window == null) { // Good
-                    NotebookPane.Reparent();
-                } else { // ignore
+                    if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
+                        vpaned2.Remove(NotebookPane);
+                        vpaned2.Remove(notebook_docs);
+                        vpaned2.Add1(NotebookPane);
+                        vpaned2.Add2(notebook_docs);
+                    } else if (vpaned2.Child2 == notebook_docs && vpaned2.Child1 == NotebookPane) {
+                        vpaned2.Remove(NotebookPane);
+                        vpaned2.Remove(notebook_docs);
+                        vpaned2.Add1(notebook_docs);
+                        vpaned2.Add2(NotebookPane);
+                    } // else ignore, in horizontal position
+                } else { // ignore, it is in other window
                 }
             });
         }
 
         protected void OnSwapHorizontalClicked (object sender, System.EventArgs e)
         {
-            throw new System.NotImplementedException ();
+            Gtk.Application.Invoke(delegate {
+                if (tool_window == null) { // Good
+                    if (hpaned1.Child2 == null) {
+                        //NotebookPane.Reparent(hpaned1);
+                        vpaned2.Remove(NotebookPane);
+                        hpaned1.Pack2(NotebookPane, true, false); // expand, don't shrink away
+                    } else {
+                        NotebookPane.Reparent(vpaned2);
+                    }
+                } else { // ignore, it is in other window
+                }
+            });
         }
     }
 }

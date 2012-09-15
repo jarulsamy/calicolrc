@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="802 527">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="839 527">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -1031,12 +1031,12 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">771</property>
+            <property name="Position">640</property>
             <child>
               <widget class="Gtk.HPaned" id="hpaned2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">549</property>
+                <property name="Position">455</property>
                 <child>
                   <widget class="Gtk.VPaned" id="vpaned2">
                     <property name="MemberName" />
@@ -1434,7 +1434,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">544</property>
+                        <property name="Position">449</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />
