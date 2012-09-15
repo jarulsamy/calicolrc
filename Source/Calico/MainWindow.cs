@@ -38,7 +38,10 @@ namespace Calico {
         protected override bool OnDeleteEvent (Gdk.Event e)
         {
             calico.NotebookPane.Unparent();
-            calico.VPaned2.Add2(calico.NotebookPane);
+            if (calico.VPaned2.Child2 == null)
+                calico.VPaned2.Add2(calico.NotebookPane);
+            else
+                calico.VPaned2.Add1(calico.NotebookPane);
             this.Hide();
             calico.tool_window = null;
             return true;
@@ -2858,7 +2861,7 @@ namespace Calico {
         protected void OnSwapVerticalClicked (object sender, System.EventArgs e)
         {
             Gtk.Application.Invoke(delegate {
-                if (tool_window == null) { // Good
+                if (tool_window == null) { // Good, only do swap if in window
                     if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
                         vpaned2.Remove(NotebookPane);
                         vpaned2.Remove(notebook_docs);
@@ -2869,22 +2872,52 @@ namespace Calico {
                         vpaned2.Remove(notebook_docs);
                         vpaned2.Add1(notebook_docs);
                         vpaned2.Add2(NotebookPane);
-                    } // else ignore, in horizontal position
+                    } else { // else, in horizontal position
+                        hpaned1.Remove(NotebookPane);
+                        if (vpaned2.Child1 == null) {
+                            vpaned2.Add1(NotebookPane);
+                        } else {
+                            vpaned2.Add2(NotebookPane);
+                        }
+                    }
                 } else { // ignore, it is in other window
                 }
             });
         }
 
+        private bool ResizeOutput() {
+            NotebookPane.SetSizeRequest(-1, -1);
+            // keep updating?
+            return false;
+        }
+
         protected void OnSwapHorizontalClicked (object sender, System.EventArgs e)
         {
             Gtk.Application.Invoke(delegate {
-                if (tool_window == null) { // Good
-                    if (hpaned1.Child2 == null) {
-                        //NotebookPane.Reparent(hpaned1);
+                if (tool_window == null) { // Good, only do swap if in window
+                    if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
+                        // swap:
+                        hpaned1.Remove(NotebookPane);
+                        hpaned1.Remove(hpaned2);
+                        hpaned1.Add1(NotebookPane);
+                        hpaned1.Add2(hpaned2);
+                    } else if (hpaned1.Child2 == hpaned2 && hpaned1.Child1 == NotebookPane) { // they are next to each other
+                        // swap:
+                        hpaned1.Remove(NotebookPane);
+                        hpaned1.Remove(hpaned2);
+                        hpaned1.Add1(hpaned2);
+                        hpaned1.Add2(NotebookPane);
+                    } else { // else, in vertical position
+                        // remove from vpaned, and add to hpaned:
                         vpaned2.Remove(NotebookPane);
-                        hpaned1.Pack2(NotebookPane, true, false); // expand, don't shrink away
-                    } else {
-                        NotebookPane.Reparent(vpaned2);
+                        if (hpaned1.Child1 == null)
+                            hpaned1.Pack1(NotebookPane, true, false);
+                        else
+                            hpaned1.Pack2(NotebookPane, true, false);
+                        //Console.WriteLine(NotebookPane.WidthRequest);
+                        if (NotebookPane.WidthRequest == -1) // creating this
+                            NotebookPane.SetSizeRequest(hpaned1.Allocation.Width/2, -1);
+                            GLib.Timeout.Add(1, ResizeOutput);
                     }
                 } else { // ignore, it is in other window
                 }
