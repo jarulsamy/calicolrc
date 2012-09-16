@@ -11,7 +11,7 @@ namespace Calico {
         agsXMPP.XmppClientConnection client;
         Calico.MainWindow calico;
         public string user;
-        string password;
+        public string password;
         public string status;
         bool alert;
         bool debug;

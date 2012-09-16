@@ -350,7 +350,20 @@ namespace Calico {
             set { _speedValue = value; }
         }
     }
-
+ 
+    public class MyTextEditor : Mono.TextEditor.TextEditor {
+        public MyTextEditor() : base() {
+        }
+        public MyTextEditor(Mono.TextEditor.Document doc, Mono.TextEditor.ITextEditorOptions options) : base(doc, options) {
+        }
+        protected override void OnDragDataReceived (Gdk.DragContext context, Int32 x, Int32 y, Gtk.SelectionData selection_data, UInt32 info, UInt32 time_) {
+            // This is overriden because there seems to be an error in the base class:
+            // Selection constructor tries to use line 0, line 0
+            // FIXME: add in appropriate place
+            Text += selection_data.Text;
+       }
+    }
+    
     public class TextDocument : Document {
         public Mono.TextEditor.TextEditor texteditor;
         public Mono.TextEditor.TextEditorOptions options;
@@ -368,7 +381,8 @@ namespace Calico {
             } else {
                 // FIXME: new file? invalid path? no longer exists?
             }
-            texteditor = new Mono.TextEditor.TextEditor(document, options);
+            texteditor = new MyTextEditor(document, options);
+            //texteditor.DragDataReceived += HandleTexteditorDragDataReceived;
             if (mimetype != null)
                 texteditor.Document.MimeType = mimetype;
             widget.Add(texteditor);
@@ -377,6 +391,12 @@ namespace Calico {
             texteditor.ButtonPressEvent += OnPopupMenu;
             widget.ShowAll();
             calico.ProgramSpeed.Value = SpeedValue;
+        }
+  
+        [GLib.ConnectBeforeAttribute]
+        void HandleTexteditorDragDataReceived (object o, Gtk.DragDataReceivedArgs args)
+        {
+            args.RetVal = false;
         }
 
         Gdk.Point menuPopupLocation;

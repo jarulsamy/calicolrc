@@ -636,7 +636,7 @@ namespace Calico {
 
         public void PostBuild() {
             // Had to add this here, as Stetic didn't like it
-            _shell = new Mono.TextEditor.TextEditor();
+            _shell = new MyTextEditor();
             _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
             _shell.DragDataReceived += (o, args) => {
                 StartButton.Sensitive = true;
@@ -1290,6 +1290,7 @@ namespace Calico {
         public static int UnCommentLine(Mono.TextEditor.TextEditorData data,
                 Mono.TextEditor.LineSegment line,
                 string line_comment) {
+            // FIXME: assumes a two-char comment string OR allow string
             char c1 = line_comment[0];
             char c2 = line_comment[1];
             // FIXME: get comment string from language
@@ -1438,9 +1439,9 @@ namespace Calico {
                         return;
                     }
                     // if cursor in middle, insert a Return
-                    Mono.TextEditor.Caret caret = Shell.Caret;
-                    int line = caret.Line;
-                    int line_count = Shell.Document.LineCount;
+                    //Mono.TextEditor.Caret caret = Shell.Caret;
+                    //int line = caret.Line;
+                    //int line_count = Shell.Document.LineCount;
                     // This needs to be better written, and maybe dealt with 
                     // in each of the languages. Remove from here.
                     //if (line != line_count) { // caret.line not at bottom
