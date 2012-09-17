@@ -258,8 +258,7 @@ public class Rational {
   
   public static Rational operator -(int i, Rational f1) {
 	int lcm = LCM(f1.denominator, 1);
-	return new Rational((f1.numerator * lcm/f1.denominator -
-			i * lcm/1),
+	return new Rational((i * lcm/1) - (f1.numerator * lcm/f1.denominator),
 		lcm);
   }
 
