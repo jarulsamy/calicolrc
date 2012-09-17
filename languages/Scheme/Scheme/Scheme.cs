@@ -1957,9 +1957,9 @@ public class Scheme {
 	  if (obj1 is Rational) {
 		return (((Rational)obj1) - ((Rational)obj2));
 	  } else if (obj1 is int) {
-		return (((Rational)obj2) - ((int)obj1));
+		return (((int)obj1) - ((Rational)obj2));
 	  } else if (obj1 is double) {
-		return (((double)((Rational)obj2)) - ((double)obj1));
+		return (((double)((double)obj1)) - ((Rational)obj2));
 	  }
 	} else {
 	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
