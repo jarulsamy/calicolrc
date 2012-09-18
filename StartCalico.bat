@@ -18,5 +18,7 @@ SET MONO_PATH=%CD%\mono\lib\4.0;%CD%\mono\lib\gtk-sharp-2.0;%CD%\bin;%CD%\mono\l
 REM Start up Calico in the background with no terminal:
 "C:\Program Files (x86)\Mono-2.10.8\bin\mono.exe" bin\Calico.exe %*
 
+PAUSE
+
 REM Change back to where we were:
 cd %PD%

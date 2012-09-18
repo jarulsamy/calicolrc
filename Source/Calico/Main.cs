@@ -29,7 +29,7 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.0.10";
+        public static string Version = "2.0.12";
         public static bool IsLoadLanguages = true;
 
 		/*
@@ -82,6 +82,8 @@ namespace Calico {
             
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
+            System.Console.WriteLine("    looking for languages in \"{0}\"...", 
+                                     System.IO.Path.Combine(path, "..", "languages"));
 
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
             if (IsLoadLanguages) {
@@ -158,7 +160,48 @@ namespace Calico {
                    }
                 }
             }
-           // Global settings:
+            string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
+            System.Console.WriteLine("    looking for local languages in \"{0}\"...", local_lang_path);
+            dir = new DirectoryInfo(local_lang_path);
+            if (dir.Exists) {
+                foreach (DirectoryInfo d in dir.GetDirectories("*"))
+                {
+                    foreach (FileInfo f in d.GetFiles("Calico*.py")) // FIXME: allow other languages
+                    {
+                        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
+                        //Print("Loading {0}...", f.FullName);
+                        string loading = match.Groups[1].ToString().ToLower();
+                        string def_language = match.Groups[2].ToString().ToLower();
+                        if (def_language == "dll" || 
+                            def_language == "cs" || 
+                            def_language == "exe" || 
+                            def_language.EndsWith("~") || 
+                            def_language == "mdb")
+                            continue;
+                        //Console.WriteLine(def_language); FIXME: need general interface for the following:
+                        // GetVariable, extend classes, call a method from C#
+                        try {
+                            Calico.DLREngine engine = ((Calico.DLREngine)languages["python"].engine);
+                            var scope = engine.engine.ExecuteFile(f.FullName);
+                            Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
+                            Language language = (Language)method();
+                            languages[language.name] = language;
+                            bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(loading);
+                            manager.Register(language, visible); // This may fail, which won't add language
+                            if (language.engine != null) {
+                                language.engine.Setup(path);
+                                language.engine.Start(path);
+                            }
+                        } catch (Exception e) {
+                            Print("Failure; skipping local language file '{0}': {1}", f.Name, e.Message);
+                        }
+                    }
+                }
+            }
+            // End of loading languages
+            // -------------------------------------------
+            // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;

@@ -195,3 +195,6 @@ def exp(value):
 def tanh(value):
     return math.tanh(value)
 
+import os
+
+print(os.path.dirname(__file__))
