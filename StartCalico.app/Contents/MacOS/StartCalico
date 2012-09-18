@@ -13,4 +13,4 @@ fi ;
 #cd $DIR
 # requires language-pack-es and language-pack-gnome-es
 # export LANGUAGE=es_ES.utf8
-mono $MONO_OPTIONS "$DIR/../../../bin/Calico.exe"
+/Library/Frameworks/Mono.framework/Commands/mono $MONO_OPTIONS "$DIR/../../../bin/Calico.exe"
