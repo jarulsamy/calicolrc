@@ -1,3 +1,4 @@
-rm Calico-2.0.8-mac.zip
-zip -r Calico-2.0.8-mac.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/modules/*/*" "Calico/StartCalico.bat" "Calico/StartCalico" "Calico/languages/Jigsaw/Jigsaw/*" "Calico/server/*" "Calico/plugins/*" "Calico/README.txt" "Calico/NOTES" "Calico/make-zip.bat" "Calico/Makefile" "Calico/make-zip*" 
-zip -g Calico-2.0.8-mac.zip Calico/modules/Myro/Robots/*.dll
+rm Calico-2.0.12-mac.zip
+zip -r Calico-2.0.12-mac.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/modules/*/*" "Calico/StartCalico.bat" "Calico/StartCalico" "Calico/languages/Jigsaw/Jigsaw/*" "Calico/server/*" "Calico/plugins/*" "Calico/README.txt" "Calico/NOTES" "Calico/make-zip.bat" "Calico/Makefile" "Calico/make-zip*" 
+zip -g Calico-2.0.12-mac.zip Calico/modules/Myro/Robots/*.dll
+zip -g Calico-2.0.12-mac.zip Calico/Frameworks -x "*/External/*"
