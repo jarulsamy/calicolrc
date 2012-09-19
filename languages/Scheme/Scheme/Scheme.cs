@@ -1291,7 +1291,14 @@ public class Scheme {
   }
 
   public static object dlr_exp_q(object rator) {
-	return (! pair_q(rator));
+      //Console.WriteLine("dlr-exp? {0}");
+      //return (! pair_q(rator));
+      return ((rator is IronPython.Runtime.Types.BuiltinFunction) ||
+	      (rator is IronPython.Runtime.PythonFunction) ||
+	      (rator is MethodNeedsArgs) ||
+	      (rator is Method) ||
+	      (rator is IronPython.Runtime.Types.PythonType) ||
+	      (rator is Closure));
   }
   
   public static Type[] get_types(object [] objects) {
@@ -1321,18 +1328,16 @@ public class Scheme {
 	  retval = method.Invoke(((MethodNeedsArgs)proc).classobj, 
 			       list_to_array(args));
   	    return retval != null ? retval : symbol("<void>");
+	} else if (proc is Closure) {
+	    return (proc as Closure)(list_to_array(args));
 	} else {
-      try {
-		if (_dlr_runtime != null) {
-		  retval = _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
-		  return retval != null ? retval : symbol("<void>");
-		} else {
-		  throw new Exception(String.Format("DLR Runtime not available"));
-		}
-      } catch {
-        return (proc as Closure)(list_to_array(args));
-      }
-    }
+	    if (_dlr_runtime != null) {
+		retval = _dlr_runtime.Operations.Invoke(proc, list_to_array(args));
+		return retval != null ? retval : symbol("<void>");
+	    } else {
+		throw new Exception(String.Format("DLR Runtime not available"));
+	    }
+	}
   }
 
   public static bool dlr_env_contains(object variable) {
@@ -2847,85 +2852,87 @@ public class Vector {
 }
 
   public static void Main(string [] args) {
+	printf ("  (1): {0}\n",
+		PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
 	// Math:
 //	if (false) {
 //		printf ("  (using \"Graphics\"): {0}\n",
 //			PJScheme.execute("(using \"Graphics\")"));
 //		} else {
-	printf ("  Add(1,1), Result: {0}, Should be: {1}\n", 
-		Add(1, 1), 1 + 1);
-	printf ("  Multiply(10,2), Result: {0}, Should be: {1}\n", 
-		Multiply(10, 2), 10 * 2);
-	printf ("  Divide(5,2), Result: {0}, Should be: {1}\n", 
-		Divide(5, 2), 5/2.0);
-	printf ("  Subtract(22,7), Result: {0}, Should be: {1}\n", 
-		Subtract(22, 7), 22 - 7);
-	// -----------------------------------
-	// Equal tests:
-	printf("hello == hello: {0}\n", Equal("hello", "hello"));
-	printf("hello == hel: {0}\n", Equal("hello", "hel"));
-	printf("hello == helloo: {0}\n", Equal("hello", "helloo"));
-	printf("4.1 == 4: {0}\n", Equal(4.1, 4));
-	printf("hello == true: {0}\n", Equal("hello", true));
-	
-	printf("() == (): {0}\n", Equal(list(), list()));
-
-	object t = list(2);
-	printf("t = list(2): {0}\n", t);
-	printf("list? t: {0}\n", list_q(t));
-	printf("null? t: {0}\n", null_q(t));
-
-	//cons("a", EmptyList).ToString();
-	printf("cons('a', ()): {0}\n", cons("a", EmptyList));
-	
-	t = cons("b", cons("a", t));
-	t = cons("c", cons("a", t));
-	t = cons("d", cons("a", t));
-	printf("t = : {0}\n", t);
-
-	printf("null? cdr(t): {0} {1}\n", 
-		null_q(cdr(t)), 
-		cdr(t));
-	printf("null? cddr(t): {0}\n", null_q(cddr(t)));
-
-	//	printf("null? cdddr(t): {0}\n", null_q(cdddr(t)));
- 	printf("Member test: \n");
-	t = cons("hello", t);
-	printf("t = {0}\n", repr(t));
-	printf("member(hello, t) : {0}\n", repr(member("hello", t)));
-	printf("member(a, t) : {0}\n", repr(member("a", t)));
-	printf("member(c, t) : {0}\n", repr(member("c", t)));
-	printf("(): {0}\n", repr(list()));
-	printf("list(t): {0}\n", repr(list(t)));
-	printf("length(list(t)): {0}\n", length(list(t)));
-	printf("length(cdr(list(t))): {0}\n", length(cdr(list(t))));
-	printf("length(car(list(t))): {0}\n", length(car(list(t))));
-	printf("cons(\"X\", list(t))): {0}\n", repr(cons("X", list(t))));
-	printf("x is: {0}\n", repr("x"));
-	printf("t is: {0}\n", repr(t));
-	printf("list(): {0}\n", list());
-	printf("cons('a', list()): {0}\n", cons("a", list()));
-	printf("cons('a', 'b'): {0}\n", cons("a", "b"));
-
-	printf("cons('a', null): {0}\n", cons("a", null));
-
-	printf("string-append('test', NULL): \"{0}\"\n", 	 
-		string_append ((object) "test",
-			(object) make_string ((object) NULL)));
-
-	int val = 15;
-	printf("BigInteger, long, int:\n");
-	printf("  {0}: {1} == {2} == WRONG! {3}\n", val,
-		bigfact(makeBigInteger(val)), longfact(val), intfact(val));
-	printf("Multiply:\n");
-	printf("15: {0} \n", Multiply(Multiply( Multiply( intfact(12), 13), 14), 15));
-
-	printf("1827391823712983712983712938: {0}\n", BigIntegerParse("1827391823712983712983712938"));
-
-    printf("display(list_to_vector( list(1, 2, 3))): ");
-    display(list_to_vector( list(1, 2, 3)));
-    printf("\n");
+//	printf ("  Add(1,1), Result: {0}, Should be: {1}\n", 
+//		Add(1, 1), 1 + 1);
+//	printf ("  Multiply(10,2), Result: {0}, Should be: {1}\n", 
+//		Multiply(10, 2), 10 * 2);
+//	printf ("  Divide(5,2), Result: {0}, Should be: {1}\n", 
+//		Divide(5, 2), 5/2.0);
+//	printf ("  Subtract(22,7), Result: {0}, Should be: {1}\n", 
+//		Subtract(22, 7), 22 - 7);
+//	// -----------------------------------
+//	// Equal tests:
+//	printf("hello == hello: {0}\n", Equal("hello", "hello"));
+//	printf("hello == hel: {0}\n", Equal("hello", "hel"));
+//	printf("hello == helloo: {0}\n", Equal("hello", "helloo"));
+//	printf("4.1 == 4: {0}\n", Equal(4.1, 4));
+//	printf("hello == true: {0}\n", Equal("hello", true));
+//	
+//	printf("() == (): {0}\n", Equal(list(), list()));
+//
+//	object t = list(2);
+//	printf("t = list(2): {0}\n", t);
+//	printf("list? t: {0}\n", list_q(t));
+//	printf("null? t: {0}\n", null_q(t));
+//
+//	//cons("a", EmptyList).ToString();
+//	printf("cons('a', ()): {0}\n", cons("a", EmptyList));
+//	
+//	t = cons("b", cons("a", t));
+//	t = cons("c", cons("a", t));
+//	t = cons("d", cons("a", t));
+//	printf("t = : {0}\n", t);
+//
+//	printf("null? cdr(t): {0} {1}\n", 
+//		null_q(cdr(t)), 
+//		cdr(t));
+//	printf("null? cddr(t): {0}\n", null_q(cddr(t)));
+//
+//	//	printf("null? cdddr(t): {0}\n", null_q(cdddr(t)));
+// 	printf("Member test: \n");
+//	t = cons("hello", t);
+//	printf("t = {0}\n", repr(t));
+//	printf("member(hello, t) : {0}\n", repr(member("hello", t)));
+//	printf("member(a, t) : {0}\n", repr(member("a", t)));
+//	printf("member(c, t) : {0}\n", repr(member("c", t)));
+//	printf("(): {0}\n", repr(list()));
+//	printf("list(t): {0}\n", repr(list(t)));
+//	printf("length(list(t)): {0}\n", length(list(t)));
+//	printf("length(cdr(list(t))): {0}\n", length(cdr(list(t))));
+//	printf("length(car(list(t))): {0}\n", length(car(list(t))));
+//	printf("cons(\"X\", list(t))): {0}\n", repr(cons("X", list(t))));
+//	printf("x is: {0}\n", repr("x"));
+//	printf("t is: {0}\n", repr(t));
+//	printf("list(): {0}\n", list());
+//	printf("cons('a', list()): {0}\n", cons("a", list()));
+//	printf("cons('a', 'b'): {0}\n", cons("a", "b"));
+//
+//	printf("cons('a', null): {0}\n", cons("a", null));
+//
+//	printf("string-append('test', NULL): \"{0}\"\n", 	 
+//		string_append ((object) "test",
+//			(object) make_string ((object) NULL)));
+//
+//	int val = 15;
+//	printf("BigInteger, long, int:\n");
+//	printf("  {0}: {1} == {2} == WRONG! {3}\n", val,
+//		bigfact(makeBigInteger(val)), longfact(val), intfact(val));
+//	printf("Multiply:\n");
+//	printf("15: {0} \n", Multiply(Multiply( Multiply( intfact(12), 13), 14), 15));
+//
+//	printf("1827391823712983712983712938: {0}\n", BigIntegerParse("1827391823712983712983712938"));
+//
+//    printf("display(list_to_vector( list(1, 2, 3))): ");
+//    display(list_to_vector( list(1, 2, 3)));
+//    printf("\n");
 //		}
   }
 
