@@ -207,9 +207,11 @@
 		      (if *generate-apply-functions-with-record-case-code?*
  		       `(,define-sym ,apply-name
  			  (lambda (,obj-name ,@arg-names)
- 			    (record-case (cdr ,obj-name)
- 			      ,@(reverse clauses)
- 			      (else (error (quote ,apply-name) ,error-string ,obj-name)))))
+			    (if (pair? ,obj-name)
+				(record-case (cdr ,obj-name)
+				    ,@(reverse clauses)
+				    (else (error (quote ,apply-name) ,error-string ,obj-name)))
+				(error (quote ,apply-name) "invalid procedure: ~a" ,obj-name))))
 		       `(,define-sym ,apply-name
 			  (lambda (,obj-name ,@arg-names)
 			    (apply+ (caddr ,obj-name) ,@arg-names (cdddr ,obj-name))))))
