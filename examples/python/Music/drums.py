@@ -5,11 +5,11 @@ import Common
 import Myro
 
 t = .3
-s1 = Myro.makeSound("../sounds/closed-hat-trimmed.wav")
-s2 = Myro.makeSound("../sounds/crash-trimmed.wav")
-s3 = Myro.makeSound("../sounds/kick-trimmed.wav")
-s4 = Myro.makeSound("../sounds/open-hat-trimmed.wav")
-s5 = Myro.makeSound("../sounds/snare-trimmed.wav")
+s1 = Myro.makeSound("../../sounds/closed-hat-trimmed.wav")
+s2 = Myro.makeSound("../../sounds/crash-trimmed.wav")
+s3 = Myro.makeSound("../../sounds/kick-trimmed.wav")
+s4 = Myro.makeSound("../../sounds/open-hat-trimmed.wav")
+s5 = Myro.makeSound("../../sounds/snare-trimmed.wav")
 for _ in xrange(3):
   for _ in xrange(4 * 2):
     s1.Play()

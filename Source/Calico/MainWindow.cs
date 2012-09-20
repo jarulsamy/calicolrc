@@ -162,9 +162,12 @@ namespace Calico {
                 // Skip if not visible:
                 if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name))
                     continue;
-                DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", language.name))));
-                if (dir.Exists) {
-                    process_example_dir(examples_menu, language.proper_name, dir, language);
+                string examples_path = language.getExamplesPath(path);
+                if (examples_path != null) {
+                    DirectoryInfo dir = new DirectoryInfo(examples_path);
+                    if (dir.Exists) {
+                        process_example_dir(examples_menu, language.proper_name, dir, language);
+                    }
                 }
             }
             examples_menu.Submenu.ShowAll();
@@ -628,12 +631,12 @@ namespace Calico {
                     Shell.Insert(0, text);
             }
         }
-
+        
         public void HandleException(GLib.UnhandledExceptionArgs args) {
             Print(Tag.Error, String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
             OnStopRunning();
         }
-
+        
         public void PostBuild() {
             // Had to add this here, as Stetic didn't like it
             _shell = new MyTextEditor();
@@ -1721,6 +1724,10 @@ namespace Calico {
 
         public void Print(string format) {
             Print(Tag.Normal, format);
+        }
+
+        public void Error(string format) {
+            Print(Tag.Error, format);
         }
 
         public void Print(Tag tag, string format) {

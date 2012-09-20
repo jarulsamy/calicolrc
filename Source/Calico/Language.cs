@@ -60,5 +60,9 @@ namespace Calico {
         {
             return "";
         }
+        
+        public virtual string getExamplesPath(string path) {
+            return System.IO.Path.Combine(path, System.IO.Path.Combine("..", System.IO.Path.Combine("examples", name)));
+        }
     }    
 }
