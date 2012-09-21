@@ -2284,6 +2284,17 @@ namespace Calico {
 
         public string GetMimeType(string filename) {
             string strExtension = System.IO.Path.GetExtension(filename);
+            // First, let's look in languages:
+            foreach (string lang in manager.getLanguages()) {
+                Language language = manager[lang];
+                foreach (string ext in language.extensions) {
+                    if (("." + ext) == strExtension) {
+                        return language.mimetype;
+                    }
+                }
+            }
+            // else, let's look here:   
+                
             switch (strExtension) {
             case ".htm":
                 return "text/html";
