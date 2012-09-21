@@ -24,7 +24,7 @@ class MyEngine(Calico.Engine):
         fp = file(filename)
         text = "".join(fp.readlines())
         fp.close()
-        self.Execute("CLEAR\n" + text + "\nRUN") ## add a "CLEAR" and "RUN"
+        self.Execute("NEW\n" + text + "\nRUN") ## add a "NEW" and "RUN"
         return True
 
     def ReadyToExecute(self, text):

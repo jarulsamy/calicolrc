@@ -64,6 +64,10 @@ class BasicInterpreter:
             if isinstance(x,float) and x == int(x):
                 x = int(x)
             self.x = x
+        def run(self):
+            retval = self.eval()
+            if retval != None: # Probably Immediate Mode (interactive)
+                print(repr(retval))
         def eval(self):
             return self.x
         def __str__(self):
@@ -77,22 +81,29 @@ class BasicInterpreter:
             self.vars = vars
             self.x = x
             self.i = i
+        def run(self):
+            retval = self.eval()
+            if self.i.ip==-1 and retval != None: # Immediate Mode (interactive)
+                print(repr(retval))
         def eval(self):
-            #print("eval of %s" % self.name)
+            #print("eval of %s" % self.x)
+            #print(self.vars)
+            retval = None
             if self.x in self.vars:
-                return self.vars[self.x]
+                retval = self.vars[self.x]
+            elif self.x.upper() in BasicInterpreter.lib_functions:
+                retval = BasicInterpreter.lib_functions[self.x.upper()]
             else:
                 try:
-                    #print(self.name, self.i.library, self.i.vars)
+                    #print(self.x, self.i.library, self.i.vars)
                     retval = eval(self.x, self.i.library, self.i.vars)
-                    return retval
                 except:
-                    pass
-                # Doesn't exist:
-                if self.x.endswith('$'):
-                    return ""
-                else:
-                    return 0
+                    # Doesn't exist:
+                    if self.x.endswith('$'):
+                        retval = ""
+                    else:
+                        retval = 0
+            return retval
         def __str__(self):
             return self.x
 
@@ -116,30 +127,41 @@ class BasicInterpreter:
             return "NOT("+str(self.x)+")"
     
     class BinOp:
-        def __init__(self,a,b,op):
+        def __init__(self,a,b,op, name):
             self.a = a
             self.b = b
             self.op = op
+            self.name = name
         def eval(self):
             return self.op(self.a.eval(),self.b.eval())
         def __str__(self):
-            return "("+str(self.a)+" "+self.op+" "+str(self.b)+")"
+            return "("+str(self.a)+" "+self.name+" "+str(self.b)+")"
 
     class FCall:
-        def __init__(self,f,parms,i):
+        def __init__(self,f,parms,i, name):
             self.f = f
             self.parms = parms
             self.i = i
+            self.name = name
         def run(self):
-            return self.eval()
+            retval = self.eval()
+            if self.i.ip==-1 and retval != None: # Immediate Mode (interactive)
+                print(repr(retval))
         def eval(self):
+            retval = None
             if callable(self.f):
-                return self.f(*[x.eval() for x in self.parms])
+                retval = self.f(*[x.eval() for x in self.parms])
             else:
                 f = eval(self.f, self.i.library, self.i.vars)
-                return f(*[x.eval() for x in self.parms])
+                retval = f(*[x.eval() for x in self.parms])
+            #if self.i.ip==-1: # Immediate Mode (interactive)
+            #    print(retval)
+            return retval
         def __str__(self):
-            return self.f+"("+",".join(map(str,self.parms))+")"
+            if callable(self.f):
+                return self.f.__name__+"("+",".join(map(str,self.parms))+")"
+            else:
+                return self.f+"("+",".join(map(str,self.parms))+")"
 
     binops = [
       {'*':   lambda x,y: x*y,
@@ -464,8 +486,10 @@ class BasicInterpreter:
             if (tk.curtoken,tk.value) == (Tokenizer.SPECIAL,"("):
                 if i.upper() in BasicInterpreter.lib_functions:
                     f = BasicInterpreter.lib_functions[i.upper()]
+                    name = i.upper()
                 else:
                     f = i # just the name
+                    name = i
                 parms = []
                 tk.skip()
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
@@ -476,7 +500,7 @@ class BasicInterpreter:
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
                     raise Exception("Syntax error (')' expected)")
                 tk.skip()
-                return BasicInterpreter.FCall(f,parms,self)
+                return BasicInterpreter.FCall(f,parms,self, name)
             elif i=="NOT":
                 return BasicInterpreter.Not(self.parse_term(tk))
             else:
@@ -506,7 +530,7 @@ class BasicInterpreter:
                 name = tk.skip()
                 bop = BasicInterpreter.binops[level-1][name.upper()]
                 b = self.parse_expr(tk,level-1)
-                a = BasicInterpreter.BinOp(a,b,bop)
+                a = BasicInterpreter.BinOp(a,b,bop,name.upper())
             return a
     
     def parse_statement(self,tk):
@@ -611,14 +635,19 @@ class BasicInterpreter:
             tk.skip()
             return BasicInterpreter.If(self,expr)
         else:
-            if tk.curtoken != Tokenizer.IDENT:
+            # Numbers can't be here, as that is a linenumber
+            if tk.curtoken == Tokenizer.STRING:
+                return BasicInterpreter.Literal(tk.skip())
+            elif tk.curtoken != Tokenizer.IDENT:
                 raise Exception("Syntax error")
             varname = tk.skip()
             if (tk.curtoken,tk.value) == (Tokenizer.SPECIAL,"("): # side-effect function call
                 if varname.upper() in BasicInterpreter.lib_functions:
                     f = BasicInterpreter.lib_functions[varname.upper()]
+                    name = varname.upper()
                 else:
                     f = varname
+                    name = varname
                 parms = []
                 tk.skip()
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
@@ -629,9 +658,15 @@ class BasicInterpreter:
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
                     raise Exception("Syntax error (')' expected)")
                 tk.skip()
-                return BasicInterpreter.FCall(f,parms,self)
+                return BasicInterpreter.FCall(f,parms,self, name)
             if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,"="):
-                raise Exception("Syntax error ('=' expected)")
+                # raise Exception("Syntax error ('=' expected)") 
+                tk.skip()
+                if tk.curtoken:
+                    raise Exception("Syntax error (extra characters)")
+                return BasicInterpreter.Variable(self.vars,
+                                                 varname,
+                                                 self)
             tk.skip()
             return BasicInterpreter.Assign(self.vars,
                                            varname,
