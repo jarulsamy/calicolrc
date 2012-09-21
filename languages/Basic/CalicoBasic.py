@@ -55,8 +55,6 @@ class MyLanguage(Calico.Language):
         self.engine = MyEngine(manager)
 
     def MakeDocument(self, calico, filename):
-        Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
-            os.path.join(os.path.dirname(__file__), "SyntaxModes"))
         return MyDocument(calico, filename, self.name, self.mimetype)
 
     def GetUseLibraryString(self, fullname):
@@ -66,4 +64,6 @@ class MyLanguage(Calico.Language):
     	return os.path.join(os.path.dirname(__file__), "examples")
 
 def MakeLanguage():
+    Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
+        os.path.join(os.path.dirname(__file__), "SyntaxModes"))
     return MyLanguage()

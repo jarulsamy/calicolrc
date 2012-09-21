@@ -72,10 +72,12 @@
 		<Word>load</Word>
 		<Word>save</Word>
 		<Word>input</Word>
+		<Word>import</Word>
 		<Word>NEW</Word>
 		<Word>LOAD</Word>
 		<Word>SAVE</Word>
 		<Word>INPUT</Word>
+		<Word>IMPORT</Word>
 	</Keywords>
 	
 	<Keywords color = "keyword.iteration">
