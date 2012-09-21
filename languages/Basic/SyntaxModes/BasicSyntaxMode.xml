@@ -1,0 +1,177 @@
+<!-- BasicSyntaxMode.xml
+
+ Author:
+   Doug Blank <doug.blank@gmail.com>
+
+ Copyright (c) 2011 Doug Blank
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE. -->
+ 
+<SyntaxMode name = "Basic" mimeTypes="text/x-basic">
+	<Property name="LineComment">REM</Property>
+	<Property name="StringQuote">"</Property>
+	
+	<EolSpan color = "comment" rule="Comment" tagColor="comment.tag">REM</EolSpan>
+	
+	<Span color = "string" rule="String" stopateol = "true" escape='\'>
+		<Begin>"</Begin>
+		<End>"</End>
+	</Span>
+
+	<Span color = "string" rule="String" stopateol = "true" escape='\'>
+		<Begin>/</Begin>
+		<End>/</End>
+	</Span>
+
+	<Match color = "string">CSharpNumber</Match>
+
+	<!-- :symbol -->
+	<!-- <Match color = "string">(^|[^\w\d:]):[\w\d]+</Match> -->
+
+	<!-- @@class_variable -->
+	<!-- <Match color = "keyword.modifier">(^|[^@\w\d])@@\w[\w\d]*</Match> -->
+
+	<!-- @instance_variable -->
+	<!-- <Match color = "keyword.type">(^|[^@\w\d])@\w[\w\d]*</Match> -->
+	
+	<!-- $global_variable -->
+	<!-- <Match color = "keyword.jump">(^|[^\$\w\d])\$\w[\w\d]*</Match> -->
+	
+	<!-- CONSTant -->
+	<!-- <Match color = "comment.keyword.todo">(^|[^\w\d])(?-i)[A-Z][\w\d]*</Match> -->
+
+	<Keywords color = "keyword.operator">
+		<Word>and</Word>
+		<Word>or</Word>
+		<Word>xor</Word>
+		<Word>mod</Word>
+		<Word>AND</Word>
+		<Word>OR</Word>
+		<Word>XOR</Word>
+		<Word>MOD</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.selection">
+		<Word>new</Word>
+		<Word>load</Word>
+		<Word>save</Word>
+		<Word>input</Word>
+		<Word>NEW</Word>
+		<Word>LOAD</Word>
+		<Word>SAVE</Word>
+		<Word>INPUT</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.iteration">
+		<Word>for</Word>
+		<Word>run</Word>
+		<Word>to</Word>
+		<Word>step</Word>
+		<Word>next</Word>
+		<Word>FOR</Word>
+		<Word>RUN</Word>
+		<Word>TO</Word>
+		<Word>STEP</Word>
+		<Word>NEXT</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.jump">
+		<Word>goto</Word>
+		<Word>gosub</Word>
+		<Word>return</Word>
+		<Word>end</Word>
+		<Word>GOTO</Word>
+		<Word>GOSUB</Word>
+		<Word>RETURN</Word>
+		<Word>END</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.exceptions">
+	</Keywords>
+	
+	<Keywords color = "constant.language">
+		<Word>clear</Word>
+		<Word>if</Word>
+		<Word>then</Word>
+		<Word>CLEAR</Word>
+		<Word>IF</Word>
+		<Word>THEN</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.modifier">
+	</Keywords>
+	
+	<Keywords color = "keyword.namespace">
+		<Word>using</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.property">		
+		<Word>len</Word>
+		<Word>print</Word>
+		<Word>str$</Word>
+		<Word>left$</Word>
+		<Word>right$</Word>
+		<Word>mid$</Word>
+		<Word>val</Word>
+		<Word>int</Word>
+		<Word>abs</Word>
+		<Word>sin</Word>
+		<Word>cos</Word>
+		<Word>tan</Word>
+		<Word>atn</Word>
+		<Word>sqr</Word>
+		<Word>log</Word>
+		<Word>exp</Word>
+		<Word>time</Word>
+		<Word>rnd</Word>
+		<Word>LEN</Word>
+		<Word>PRINT</Word>
+		<Word>STR$</Word>
+		<Word>LEFT$</Word>
+		<Word>RIGHT$</Word>
+		<Word>MID$</Word>
+		<Word>VAL</Word>
+		<Word>INT</Word>
+		<Word>ABS</Word>
+		<Word>SIN</Word>
+		<Word>COS</Word>
+		<Word>TAN</Word>
+		<Word>ATN</Word>
+		<Word>SQR</Word>
+		<Word>LOG</Word>
+		<Word>EXP</Word>
+		<Word>TIME</Word>
+		<Word>RND</Word>
+	</Keywords>
+	
+	<Keywords color = "keyword.declaration">
+	</Keywords>
+		
+	<Rule name = "Comment">
+		<Keywords color="comment.keyword.todo" ignorecase="True">
+			<Word>TODO</Word>
+			<Word>FIXME</Word>
+			<Word>HACK</Word>
+			<Word>UNDONE</Word>
+		</Keywords>	
+	</Rule>
+	
+	<Rule name = "String">
+	</Rule>
+</SyntaxMode>
