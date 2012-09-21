@@ -684,6 +684,7 @@ class BasicInterpreter:
         self.last_line = 0
 
     def process(self,L):
+        #print(L)
         tk = Tokenizer(L)
         line = None
         if tk.curtoken == Tokenizer.NUMBER:
@@ -753,7 +754,7 @@ class BasicInterpreter:
                 return
             if not ok:
                 return
-            while not (self.ip == -1 or self.ip > len(self.program)):
+            while (self.ip != -1 and self.ip < len(self.program)):
                 (line, s) = self.program[self.ip]
                 if line >= 0:
                     self.last_line = line
@@ -784,6 +785,14 @@ class BasicInterpreter:
                     print("Error in line %i" % last_line)
                     self.ip = -1
 
-#t = Tokenizer("FOR N=2 to limit")
-#basic = BasicInterpreter(calico)
-#basic.parse_statement(t)
+## basic = BasicInterpreter(calico)
+## basic.Execute("""NEW
+## 10 n = 5
+## 20 total = 1
+## 30 if n = 1 then goto 100
+## 40 total = total * n
+## 50 n = n - 1
+## 60 goto 30
+## 100 print total
+## RUN
+## """)

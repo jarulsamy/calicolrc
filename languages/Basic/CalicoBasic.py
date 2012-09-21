@@ -28,7 +28,7 @@ class MyEngine(Calico.Engine):
         return True
 
     def ReadyToExecute(self, text):
-        return True
+        return text.split("\n")[-1].strip() == ""
 
     def PostSetup(self, calico):
         self.interpreter = basic.BasicInterpreter(calico)
