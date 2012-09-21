@@ -1,7 +1,7 @@
 100 T = 0
 102 PRINT "Prime numbers counting"
 105 INPUT "Limit ? ";LIMIT: LIMIT=INT(LIMIT)
-110 FOR N=2 TO limit
+110 FOR N=2 TO LIMIT
 120 GOSUB 200
 130 NEXT
 140 PRINT "There are ";T;" primes smaller than ";LIMIT+1

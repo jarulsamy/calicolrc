@@ -7,6 +7,9 @@ import re
 import sys
 import clr
 
+def Compare(tok1, value1, tok2, value2):
+    return (tok1 == tok2) and (value1 != None and value1.upper() == value2)
+
 class Tokenizer:
     NUMBER  = "NUMBER"
     STRING  = "STRING"
@@ -42,8 +45,7 @@ class Tokenizer:
                     ident = re.match(r'[a-zA-Z_][a-zA-Z0-9_\.]*[\$%]?',s)
                     if ident:
                         self.curtoken = Tokenizer.IDENT
-                        self.value = ident.group(0).upper()
-                        self.name = ident.group(0) # original case
+                        self.value = ident.group(0)
                         self.cp += len(ident.group(0))
                     else:
                         if re.match(r'<=|>=|<>',s):
@@ -71,11 +73,10 @@ class BasicInterpreter:
                 return repr(self.x)
 
     class Variable:
-        def __init__(self,vars,x, i, name):
+        def __init__(self,vars,x, i):
             self.vars = vars
             self.x = x
             self.i = i
-            self.name = name
         def eval(self):
             #print("eval of %s" % self.name)
             if self.x in self.vars:
@@ -83,7 +84,7 @@ class BasicInterpreter:
             else:
                 try:
                     #print(self.name, self.i.library, self.i.vars)
-                    retval = eval(self.name, self.i.library, self.i.vars)
+                    retval = eval(self.x, self.i.library, self.i.vars)
                     return retval
                 except:
                     pass
@@ -115,21 +116,19 @@ class BasicInterpreter:
             return "NOT("+str(self.x)+")"
     
     class BinOp:
-        def __init__(self,a,b,op,name):
+        def __init__(self,a,b,op):
             self.a = a
             self.b = b
             self.op = op
-            self.name = name
         def eval(self):
             return self.op(self.a.eval(),self.b.eval())
         def __str__(self):
-            return "("+str(self.a)+" "+self.name+" "+str(self.b)+")"
+            return "("+str(self.a)+" "+self.op+" "+str(self.b)+")"
 
     class FCall:
-        def __init__(self,f,parms,name,i):
+        def __init__(self,f,parms,i):
             self.f = f
             self.parms = parms
-            self.name = name
             self.i = i
         def run(self):
             return self.eval()
@@ -140,7 +139,7 @@ class BasicInterpreter:
                 f = eval(self.f, self.i.library, self.i.vars)
                 return f(*[x.eval() for x in self.parms])
         def __str__(self):
-            return self.name+"("+",".join(map(str,self.parms))+")"
+            return self.f+"("+",".join(map(str,self.parms))+")"
 
     binops = [
       {'*':   lambda x,y: x*y,
@@ -216,19 +215,17 @@ class BasicInterpreter:
             return "GOTO %i" % self.line
 
     class Assign:
-        def __init__(self, vars, var, expr, i, name):
+        def __init__(self, vars, var, expr):
             self.vars = vars
             self.var = var
             self.expr = expr
-            self.i = i
-            self.name = name
         def run(self):
             #print("assign %s" % self)
             #print(self.expr)
             #print(self.vars)
-            self.vars[self.name] = self.expr.eval()
+            self.vars[self.var] = self.expr.eval()
         def __str__(self):
-            return self.name+" = "+str(self.expr)
+            return self.var+" = "+str(self.expr)
 
     class List:
         def __init__(self,i):
@@ -465,10 +462,10 @@ class BasicInterpreter:
         elif tk.curtoken == Tokenizer.IDENT:
             i = tk.skip()
             if (tk.curtoken,tk.value) == (Tokenizer.SPECIAL,"("):
-                if i in BasicInterpreter.lib_functions:
-                    f = BasicInterpreter.lib_functions[i]
+                if i.upper() in BasicInterpreter.lib_functions:
+                    f = BasicInterpreter.lib_functions[i.upper()]
                 else:
-                    f = tk.name
+                    f = i # just the name
                 parms = []
                 tk.skip()
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
@@ -479,11 +476,11 @@ class BasicInterpreter:
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
                     raise Exception("Syntax error (')' expected)")
                 tk.skip()
-                return BasicInterpreter.FCall(f,parms,i, self)
+                return BasicInterpreter.FCall(f,parms,self)
             elif i=="NOT":
                 return BasicInterpreter.Not(self.parse_term(tk))
             else:
-                return BasicInterpreter.Variable(self.vars, i, self, tk.name)
+                return BasicInterpreter.Variable(self.vars, i, self)
         elif tk.curtoken == Tokenizer.SPECIAL:
             if tk.value == "(":
                 tk.skip()
@@ -505,15 +502,15 @@ class BasicInterpreter:
                 level = len(BasicInterpreter.binops)
             a = self.parse_expr(tk,level-1)
             while (tk.curtoken in (Tokenizer.SPECIAL, Tokenizer.IDENT) and
-                   tk.value in BasicInterpreter.binops[level-1]):
+                   tk.value.upper() in BasicInterpreter.binops[level-1]):
                 name = tk.skip()
-                bop = BasicInterpreter.binops[level-1][name]
+                bop = BasicInterpreter.binops[level-1][name.upper()]
                 b = self.parse_expr(tk,level-1)
-                a = BasicInterpreter.BinOp(a,b,bop,name)
+                a = BasicInterpreter.BinOp(a,b,bop)
             return a
     
     def parse_statement(self,tk):
-        if (tk.curtoken,tk.value) == (Tokenizer.IDENT,"PRINT"):
+        if (tk.curtoken, tk.value.upper()) == (Tokenizer.IDENT,"PRINT"):
             tk.skip()
             exprlist = []
             semi = False
@@ -527,56 +524,56 @@ class BasicInterpreter:
                         break
                     exprlist.append(self.parse_expr(tk))
             return BasicInterpreter.Print(exprlist,semi)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"GOTO"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"GOTO"):
             tk.skip()
             if tk.curtoken != Tokenizer.NUMBER:
                 raise Exception("Syntax error (line number expected)")
             return BasicInterpreter.Goto(self,tk.skip())
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"REM"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"REM"):
             comment = tk.string[tk.cp:]
             tk.cp = len(tk.string)
             tk.skip()
             return BasicInterpreter.Rem(comment)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"GOSUB"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"GOSUB"):
             tk.skip()
             if tk.curtoken != Tokenizer.NUMBER:
                 raise Exception("Syntax error (line number expected)")
             return BasicInterpreter.Gosub(self,tk.skip())
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"RETURN"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"RETURN"):
             tk.skip()
             return BasicInterpreter.Return(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"LIST"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"LIST"):
             tk.skip()
             return BasicInterpreter.List(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"RUN"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"RUN"):
             tk.skip()
             return BasicInterpreter.Run(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"RENUM"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"RENUM"):
             tk.skip()
             return BasicInterpreter.Renum(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"IMPORT"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"IMPORT"):
             tk.skip()
             return BasicInterpreter.Import(self,self.parse_expr(tk))
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"CLEAR"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"CLEAR"):
             tk.skip()
             return BasicInterpreter.Clear(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"NEW"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"NEW"):
             tk.skip()
             return BasicInterpreter.New(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"END"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"END"):
             tk.skip()
             return BasicInterpreter.End(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"LOAD"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"LOAD"):
             tk.skip()
             return BasicInterpreter.Load(self,self.parse_expr(tk))
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"SAVE"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"SAVE"):
             tk.skip()
             return BasicInterpreter.Save(self,self.parse_expr(tk))
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"INPUT"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"INPUT"):
             tk.skip()
             if tk.curtoken == Tokenizer.STRING:
                 prompt = tk.skip()
-                if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,";"):
+                if (tk.curtoken,tk.value.upper()) != (Tokenizer.SPECIAL,";"):
                     raise Exception("Syntax error (';' expected)")
                 tk.skip()
             else:
@@ -584,10 +581,10 @@ class BasicInterpreter:
             if tk.curtoken != Tokenizer.IDENT:
                 raise Exception("Syntax error (INPUT variable expected)")
             return BasicInterpreter.Input(self,tk.skip(),prompt)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"NEXT"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"NEXT"):
             tk.skip()
             return BasicInterpreter.Next(self)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"FOR"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"FOR"):
             tk.skip()
             if tk.curtoken != Tokenizer.IDENT:
                 raise Exception("Syntax error (FOR variable expected)")
@@ -596,20 +593,20 @@ class BasicInterpreter:
                 raise Exception("Syntax error ('=' expected)")
             tk.skip()
             expr1 = self.parse_expr(tk)
-            if (tk.curtoken,tk.value) != (Tokenizer.IDENT,"TO"):
+            if (tk.curtoken,tk.value.upper()) != (Tokenizer.IDENT,"TO"):
                 raise Exception("Syntax error (TO expected)")
             tk.skip()
             expr2 = self.parse_expr(tk)
-            if (tk.curtoken,tk.value) == (Tokenizer.IDENT,"STEP"):
+            if Compare(tk.curtoken, tk.value, Tokenizer.IDENT, "STEP"):
                 tk.skip()
                 expr3 = self.parse_expr(tk)
             else:
                 expr3 = BasicInterpreter.Literal(1)
             return BasicInterpreter.For(self,var,expr1,expr2,expr3)
-        elif (tk.curtoken,tk.value) == (Tokenizer.IDENT,"IF"):
+        elif (tk.curtoken,tk.value.upper()) == (Tokenizer.IDENT,"IF"):
             tk.skip()
             expr = self.parse_expr(tk)
-            if (tk.curtoken,tk.value) != (Tokenizer.IDENT,"THEN"):
+            if (tk.curtoken,tk.value.upper()) != (Tokenizer.IDENT,"THEN"):
                 raise Exception("Syntax error ('THEN' expected)")
             tk.skip()
             return BasicInterpreter.If(self,expr)
@@ -617,12 +614,11 @@ class BasicInterpreter:
             if tk.curtoken != Tokenizer.IDENT:
                 raise Exception("Syntax error")
             varname = tk.skip()
-            oname = tk.name
             if (tk.curtoken,tk.value) == (Tokenizer.SPECIAL,"("): # side-effect function call
-                if varname in BasicInterpreter.lib_functions:
-                    f = BasicInterpreter.lib_functions[varname]
+                if varname.upper() in BasicInterpreter.lib_functions:
+                    f = BasicInterpreter.lib_functions[varname.upper()]
                 else:
-                    f = oname
+                    f = varname
                 parms = []
                 tk.skip()
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
@@ -633,13 +629,13 @@ class BasicInterpreter:
                 if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,")"):
                     raise Exception("Syntax error (')' expected)")
                 tk.skip()
-                return BasicInterpreter.FCall(f,parms,varname, self)
+                return BasicInterpreter.FCall(f,parms,self)
             if (tk.curtoken,tk.value) != (Tokenizer.SPECIAL,"="):
                 raise Exception("Syntax error ('=' expected)")
             tk.skip()
             return BasicInterpreter.Assign(self.vars,
                                            varname,
-                                           self.parse_expr(tk), self, oname)
+                                           self.parse_expr(tk))
 
     def __init__(self, calico):
         self.calico = calico
@@ -753,3 +749,6 @@ class BasicInterpreter:
                     print("Error in line %i" % last_line)
                     self.ip = -1
 
+#t = Tokenizer("FOR N=2 to limit")
+#basic = BasicInterpreter(calico)
+#basic.parse_statement(t)
