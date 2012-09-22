@@ -68,6 +68,8 @@ class BasicInterpreter:
             retval = self.eval()
             if retval != None: # Probably Immediate Mode (interactive)
                 print(repr(retval))
+            else:
+                raise Exception("Literal cannot be a statement in a program: '%s'" % self.x)
         def eval(self):
             return self.x
         def __str__(self):
@@ -85,6 +87,9 @@ class BasicInterpreter:
             retval = self.eval()
             if self.i.ip==-1 and retval != None: # Immediate Mode (interactive)
                 print(repr(retval))
+            else:
+                raise Exception("Variable cannot be a statement in a program: '%s'" % self.x)
+
         def eval(self):
             #print("eval of %s" % self.x)
             #print(self.vars)
