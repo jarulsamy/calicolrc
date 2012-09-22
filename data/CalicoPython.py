@@ -7,6 +7,8 @@ import clr                 # Allows connection to CLR/DLR bits
 clr.AddReference("Calico") # Add reference to the main Calico.exe
 import System
 import Calico
+clr.AddReference("Mono.TextEditor") 
+import Mono.TextEditor
 
 # Now, define the Document, Engine, and Language classes:
 class MyLanguageEngine(Calico.Engine):
@@ -100,4 +102,6 @@ def MakeLanguage():
     Make an instance of the Language, and return it. Usually you do this
     just once, even for non-visible languages.
     """
+    Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
+        os.path.join(os.path.dirname(__file__), "SyntaxModes"))
     return MyLanguage()
