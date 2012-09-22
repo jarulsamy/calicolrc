@@ -35,7 +35,7 @@
 1050 count = 0
 1060 return
 
-1100 rem Play move 'x' using color 'col'
+1100 REM Play move 'x' using color 'col'
 1110 count = count+1
 1120 if x=1 then a1=col: return
 1130 if x=2 then a2=col: return
