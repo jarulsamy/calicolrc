@@ -33,7 +33,7 @@ class MyLanguageEngine(Calico.Engine):
         """
         This is the code that will interprete a file.
         """
-        print("Run filename '%s'!" % filename)
+        print("Run filename '%%s'!" %% filename)
         fp = open(filename)
         text = "".join(fp.readlines())
         fp.close()

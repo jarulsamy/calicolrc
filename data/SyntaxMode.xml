@@ -23,7 +23,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE. -->
  
-<SyntaxMode name = "Basic" mimeTypes="%(mime_type)s">
+<SyntaxMode name = "%(name)s" mimeTypes="%(mime_type)s">
 	<Property name="LineComment">REM</Property>
 	<Property name="StringQuote">"</Property>
 	
