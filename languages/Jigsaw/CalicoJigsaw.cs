@@ -314,7 +314,7 @@ public class CalicoJigsawDocument : Document
 public class CalicoJigsawLanguage : Language
 {
 	public CalicoJigsawLanguage () : 
-        base("jigsaw",  "Jigsaw", new string[] { "jig", "xml" }, null)
+        base("jigsaw",  "Jigsaw", new string[] { "jig"}, null)
 	{
 		IsTextLanguage = false;
 	}
