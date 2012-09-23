@@ -105,6 +105,9 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
+	    // FIXME: URI to path
+	    // string path = Uri.UnescapeDataString(uri.Path);
+	    // Path.GetDirectoryName(path);
             Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
                 System.IO.Path.Combine(path, "SyntaxModes"));
             // Colors by name:
@@ -426,6 +429,9 @@ namespace Calico {
                     //Console.WriteLine ("Uri! '{0}'", uri);
                     sfilename = System.IO.Path.GetFullPath(uri.AbsolutePath);
                     sfilename = sfilename.Replace("%20", " ");
+		    // FIXME: URI to path
+		    // string path = Uri.UnescapeDataString(uri.Path);
+		    // Path.GetDirectoryName(path);
                     //Console.WriteLine ("Filename! '{0}'", sfilename);
                     if (System.IO.File.Exists(sfilename)) {
                         Open(sfilename);
