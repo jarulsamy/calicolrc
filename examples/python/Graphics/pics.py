@@ -22,7 +22,7 @@ from Graphics import *
 from Myro import wait
 import random
 
-filename = "../images/blankenship.jpg"
+filename = "../../images/blankenship.jpg"
 win = Window("Laura")
 pic = Picture(filename)
 pic.draw(win)
@@ -34,9 +34,7 @@ def reverse():
     count = 0
     for p in pixels:
         p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
-        if count % 100 == 0:
-            win.update()
-            wait(.001)
+        win.update()
         count += 1
     win.mode = 'auto'
 

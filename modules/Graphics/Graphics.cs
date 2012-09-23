@@ -2125,8 +2125,10 @@ public static class Graphics
 			//	body.UserData = null; // point back to this shape
 			//	body.FixtureList[0].UserData = null; // point back to this shape
 			//}
+		    if (body != null) {
 			body.DestroyFixture(body.FixtureList[0]);
 			body = null;
+		    }
 		}
 
 		public virtual void updateFromPhysics ()

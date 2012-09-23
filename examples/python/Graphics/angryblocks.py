@@ -61,6 +61,7 @@ def mouseUp(obj, event):
         head.undraw()
         dragging = False
         vec = Vector(event.x - ball.x, ball.y - event.y)
+        print(vec)
         ball.body.ApplyForce(vec)
 
 def mouseDown(obj, event):
