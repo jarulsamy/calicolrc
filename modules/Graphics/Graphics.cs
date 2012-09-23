@@ -3659,6 +3659,30 @@ public static class Graphics
 			}
 		}
 
+		public void flipHorizontal ()
+		{
+		    for (int x = 0; x < width/2; x++) {
+			for (int y = 0; y < height; y++) {
+			    Color c1 = this.getPixel (x, y).getColor ();
+			    Color c2 = this.getPixel (width - x - 1, y).getColor ();
+			    setColor(x, y, c2);
+			    setColor(width - x - 1, y, c1);
+			}
+		    }
+		}
+
+		public void flipVertical ()
+		{
+		    for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height/2; y++) {
+			    Color c1 = this.getPixel (x, y).getColor ();
+			    Color c2 = this.getPixel (x, height - y - 1).getColor ();
+			    setColor(x, y, c2);
+			    setColor(x, height - y - 1, c1);
+			}
+		    }
+		}
+
 		public void setRegion (IList iterable, int width, int height, double degrees,
                           Picture picture)
 		{
@@ -3960,6 +3984,21 @@ public static class Graphics
 			y = wrap_height (y);
 			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                             x * _pixbuf.NChannels + 3, value);
+			QueueDraw ();
+		}
+
+		public void setAlpha (byte value)
+		{
+			for (int x = 0; x < width; x++) {
+			    for (int y = 0; y < height; y++) {
+				if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
+				    // Don't change alpha here
+				} else {
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, value);
+				}
+			    }
+			}
 			QueueDraw ();
 		}
 

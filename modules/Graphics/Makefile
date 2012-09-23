@@ -2,7 +2,7 @@
 all: ../Graphics.dll ../Shapes.dll
 
 ../Graphics.dll: Graphics.cs
-	MONO_PATH=../../bin mcs -sdk:4 -target:library \
+	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Graphics.cs  \
 		-lib:../../bin \
 		-lib:../ \
@@ -19,13 +19,14 @@ all: ../Graphics.dll ../Shapes.dll
 		-out:../Graphics.dll 
 
 ../Shapes.dll: Shapes.cs Graphics.cs
-	MONO_PATH=../../bin gmcs -sdk:4 -target:library \
+	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Shapes.cs  \
 		-lib:../../bin \
 		-lib:../ \
 		-r:../../bin/Mono.Cairo.dll \
 		-r:IronPython \
 		-r:Graphics \
+		-r:Myro \
 		-r:Microsoft.Dynamic \
 		-r:Graphviz4Net \
 		-r:System.Drawing \
