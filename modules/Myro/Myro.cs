@@ -2182,17 +2182,28 @@ public static class Myro
 			if (question is List) {
 				foreach (string choice in (List)question) {
 					Gtk.HBox hbox = new Gtk.HBox ();
-					Gtk.Label label = new Gtk.Label (choice);
+					Gtk.Label label = new Gtk.Label (choice + ":");
 					Gtk.Entry entry = new Gtk.Entry ();
 					responses [choice] = entry;
 					hbox.PackStart (label);
 					hbox.PackStart (entry);
 					fc.VBox.PackStart (hbox);
 				}
+			} else 	if (question is IDictionary) {
+			    foreach (Object choice in ((IDictionary)question).Keys) {
+					Gtk.HBox hbox = new Gtk.HBox ();
+					Gtk.Label label = new Gtk.Label (choice.ToString() + ":");
+					Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
+					responses [choice.ToString()] = entry;
+					hbox.PackStart (label);
+					hbox.PackStart (entry);
+					fc.VBox.PackStart (hbox);
+				}
+
 			} else {
 				string choice = (string)question;
 				Gtk.HBox hbox = new Gtk.HBox ();
-				Gtk.Label label = new Gtk.Label (choice);
+				Gtk.Label label = new Gtk.Label (choice + ":");
 				Gtk.Entry entry = new Gtk.Entry ();
 				myentry = entry;
 				hbox.PackStart (label);
@@ -2206,6 +2217,12 @@ public static class Myro
 						responses [choice] = ((Gtk.Entry)responses [choice]).Text;
 					}
 					retval = responses;
+				} else if (question is IDictionary) {
+					foreach (string choice in responses.Keys) {
+						responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+					}
+					retval = responses;
+
 				} else {
 					retval = myentry.Text;
 				}
