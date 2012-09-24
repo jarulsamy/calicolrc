@@ -149,7 +149,7 @@ namespace Calico {
                         Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
                         Language language = (Language)method();
                         languages[language.name] = language;
-                        bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(loading);
+                        bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name);
                         manager.Register(language, visible); // This may fail, which won't add language
                         if (language.engine != null) {
                             language.engine.Setup(path);
@@ -187,7 +187,7 @@ namespace Calico {
                             Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
                             Language language = (Language)method();
                             languages[language.name] = language;
-                            bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(loading);
+                            bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name);
                             manager.Register(language, visible); // This may fail, which won't add language
                             if (language.engine != null) {
                                 language.engine.Setup(path);

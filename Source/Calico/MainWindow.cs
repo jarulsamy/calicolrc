@@ -1607,7 +1607,7 @@ namespace Calico {
                         completion = null;
                         args.RetVal = true;
                         // nothing to do, but handled
-                    } else if (manager [CurrentLanguage].engine.ReadyToExecute(text)) {
+                    } else if (manager[CurrentLanguage].engine != null && manager [CurrentLanguage].engine.ReadyToExecute(text)) {
                         history.last(text.TrimEnd());
                         ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
                         history.add("");
