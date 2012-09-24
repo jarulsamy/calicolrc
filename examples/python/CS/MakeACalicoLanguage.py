@@ -3,6 +3,8 @@ import os
 
 data = {"name": "Test", "system_name": "test", "mime_type": "text/x-test", "extension": "test"}
 
+data = Myro.ask(data, "Fill in data")
+
 def mkdirs(path): # missing in IronPython os?
     parts = os.path.split(path)
     root = ""
