@@ -133,7 +133,6 @@ namespace Calico {
                 {
                     System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
                     //Print("Loading {0}...", f.FullName);
-                    string loading = match.Groups[1].ToString().ToLower();
                     string def_language = match.Groups[2].ToString().ToLower();
                     if (def_language == "dll" || 
                         def_language == "cs" || 
@@ -171,7 +170,6 @@ namespace Calico {
                     {
                         System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
                         //Print("Loading {0}...", f.FullName);
-                        string loading = match.Groups[1].ToString().ToLower();
                         string def_language = match.Groups[2].ToString().ToLower();
                         if (def_language == "dll" || 
                             def_language == "cs" || 
@@ -199,6 +197,14 @@ namespace Calico {
                     }
                 }
             }
+            // If a language isn't in the manager, it doesn't exist; remove it
+            List<string> vlangs = new List<string>();
+            foreach (string lang in ((IList<string>)config.GetValue("config", "visible-languages"))) {
+                if (manager.languages.ContainsKey(lang)) {
+                    vlangs.Add(lang);
+                }
+            }
+            config.SetValue("config", "visible-languages", vlangs);
             // End of loading languages
             // -------------------------------------------
             // Global settings:

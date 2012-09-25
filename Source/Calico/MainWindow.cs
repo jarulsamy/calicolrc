@@ -186,8 +186,8 @@ namespace Calico {
             }
             file_menu.Submenu = new Gtk.Menu();
             // Menu item for New file:
-            foreach (KeyValuePair<string, Language> pair in manager.languages) {
-                Language language = pair.Value;
+            foreach (string language_name in manager.getLanguages()) {
+                Language language = manager[language_name];
                 // Skip if not a visible language:
                 if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name)) {
                     continue;
@@ -235,8 +235,8 @@ namespace Calico {
             }
             languages_menu.Submenu = new Gtk.Menu();
             // Menu item for marking Visible languages:
-            foreach (KeyValuePair<string, Language> pair in manager.languages) {
-                Language language = pair.Value;
+            foreach (string lang in manager.getLanguages()) {
+                Language language = manager[lang];
                 Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem(language.proper_name);
                 if (((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name)) {
                     menu_item.Active = true;
@@ -328,8 +328,8 @@ namespace Calico {
             language_group = null;
             Gtk.RadioMenuItem radioitem;
             // Menu item for "Switch Shell to ..."
-            foreach (KeyValuePair<string, Language> pair in manager.languages) {
-                Language language = pair.Value;
+            foreach (string language_name in manager.getLanguages()) {
+                Language language = manager[language_name];
                 if (! language.IsTextLanguage) {
                     // Skip non-text languages
                     continue;
