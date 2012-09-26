@@ -2055,6 +2055,10 @@ namespace Calico {
 
         protected virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
+                if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(CurrentLanguage)) {
+                    Error(String.Format("Error: '{0}' is not an active language\n", CurrentLanguage));
+                    return;
+                }
                 bool retval = CurrentDocument.Save();
                 if (retval) {
                     // if select, just send that

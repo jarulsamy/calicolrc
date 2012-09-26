@@ -43,20 +43,23 @@ namespace Calico {
         }
         
         public virtual void InitializeConfig() {
+            // Just used for init and load
             config = new Config();
             config.SetValue(System.String.Format("{0}-language", name), "reset-shell-on-run", "bool", true);
         }
 
         public virtual void LoadConfig(Config global_config) {
-            // Load the Global Config into the Language Config
+            // Load the Config into the Global Config
             string section = System.String.Format("{0}-language", name);
-            if (global_config.HasValue(section)) {
-                foreach(string setting in global_config.GetValue(section)) {
-                    config.SetValue(
-                        section, 
-                        setting, 
-                        global_config.types[section][setting], 
-                        global_config.values[section][setting]);
+            if (config != null && config.HasValue(section)) {
+                foreach(string setting in config.GetValue(section)) {
+                    if (! global_config.HasValue(section, setting)) {
+                        global_config.SetValue(
+                            section, 
+                            setting, 
+                            config.types[section][setting], 
+                            config.values[section][setting]);
+                    } // else already been defined
                 }
             }
         }
