@@ -1860,6 +1860,10 @@ namespace Calico {
                 if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                     ShellLanguage = language;
                 }
+                if (config.HasValue(String.Format("{0}-language", language), "reset-shell-on-run") && 
+                    ((bool)config.GetValue(String.Format("{0}-language", language), "reset-shell-on-run"))) {
+                    ResetShell();
+                }
                 manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
             }));
@@ -2381,11 +2385,8 @@ namespace Calico {
         protected void OnSpinbutton1Input(object o, Gtk.InputArgs args) {
             //Console.WriteLine("Input: {0}", args);
         }
-
-        protected void OnResetShellActionActivated(object sender, System.EventArgs e) {
-            // If running:
-            AbortThread();
-            // Now, reset the shell:
+  
+        protected void ResetShell() {
             manager.Setup(path);
             manager.Start(path);
             manager.SetCalico(this);
@@ -2396,6 +2397,13 @@ namespace Calico {
             manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
             manager.PostSetup(this);
             Print(Tag.Info, "Shell reset!\n");
+        }
+        
+        protected void OnResetShellActionActivated(object sender, System.EventArgs e) {
+            // If running:
+            AbortThread();
+            // Now, reset the shell:
+            ResetShell();
         }
 
         protected void OnExportAction1Activated(object sender, System.EventArgs e) {
