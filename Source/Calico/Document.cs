@@ -336,11 +336,27 @@ namespace Calico {
             //menu.Detach();
             //options_menu.Submenu = null;
             options_menu.Submenu = new Gtk.Menu();
-            Gtk.MenuItem submenu = new Gtk.MenuItem("Empty");
-            submenu.Sensitive = false;
-            ((Gtk.Menu)options_menu.Submenu).Add(submenu);
+            string section = String.Format("{0}-language", language);
+            if (calico.config.HasValue(section, "reset-shell-on-run")) {
+                bool reset_shell_on_run = (bool)calico.config.GetValue(section, "reset-shell-on-run");
+                Gtk.CheckMenuItem reset_shell_on_run_menu_item = new Gtk.CheckMenuItem("Reset Shell on Run");
+                reset_shell_on_run_menu_item.Active = reset_shell_on_run;
+                reset_shell_on_run_menu_item.Activated += OnChangeResetShellOnRun;
+                ((Gtk.Menu)options_menu.Submenu).Add(reset_shell_on_run_menu_item);
+            } else {
+                Gtk.MenuItem submenu = new Gtk.MenuItem("Empty");
+                submenu.Sensitive = false;
+                ((Gtk.Menu)options_menu.Submenu).Add(submenu);
+            }
             options_menu.ShowAll();
         }
+
+        public void OnChangeResetShellOnRun (object sender, EventArgs e)
+        {
+            string section = String.Format("{0}-language", language);
+            calico.config.SetValue(section, "reset-shell-on-run", ((Gtk.CheckMenuItem)sender).Active);
+        }
+     
         public virtual bool CanSaveAsPython() {
             return false;
         }

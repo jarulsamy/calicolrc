@@ -204,6 +204,11 @@ namespace Calico {
                     vlangs.Add(lang);
                 }
             }
+            foreach (string lang in manager.getLanguages()) {
+                Language language = manager[lang];
+                language.InitializeConfig();
+                language.LoadConfig(config);
+            }
             config.SetValue("config", "visible-languages", vlangs);
             // End of loading languages
             // -------------------------------------------

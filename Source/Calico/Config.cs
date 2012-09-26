@@ -29,6 +29,9 @@ namespace Calico {
         public Dictionary<string, Dictionary<string,object>> values = new Dictionary<string, Dictionary<string,object>>();
         public Dictionary<string, Dictionary<string,string>> types = new Dictionary<string, Dictionary<string,string>>();
 
+        public Config() {
+        }
+
         public Config(string filename) : this(filename, false) {
         }
 
@@ -76,6 +79,9 @@ namespace Calico {
         public object GetValue(string section, string setting) {
             return values[section][setting];
         }
+        public Dictionary<string,object>.KeyCollection GetValue(string section) {
+            return values[section].Keys;
+        }
         public void SetValue(string section, string setting, string type, object value) {
             if (!values.ContainsKey(section)) {
                 values[section] = new Dictionary<string,object>();
@@ -85,7 +91,17 @@ namespace Calico {
             types[section][setting] = type;
         }
         public void SetValue(string section, string setting, object value) {
+            if (!types[section].ContainsKey(setting)) {
+                throw new Exception(
+                    String.Format("Config setting '{0}.{1}' needs to exist before setting", section, setting));
+            }
             values[section][setting] = value;
+        }
+        public bool HasValue(string section) {
+            return (values.ContainsKey(section));
+        }
+        public bool HasValue(string section, string setting) {
+            return (values.ContainsKey(section) && values[section].ContainsKey(setting));
         }
         public void Load() {
             // Loads the file on top of those already loaded
@@ -112,6 +128,7 @@ namespace Calico {
                         if (!values.ContainsKey(section)) {
                             // allow new sections defined in file
                             values[section] = new Dictionary<string, object>();
+                            types[section] = new Dictionary<string, string>();
                         }
                     } else if (xr.Name.ToLower() == "setting") {
                         list = null;
@@ -127,10 +144,13 @@ namespace Calico {
                     break;
                 case XmlNodeType.EndElement: // section or setting
                     if (node_type == "setting") {
-                        if (type == "strings")
+                        if (type == "strings") {
                             values[section][setting] = list;
-                        else
+                            types[section][setting] = "strings";
+                        } else {
                             values[section][setting] = makeValue(type, value);
+                            types[section][setting] = type;
+                        }
                     }
                     break;
                 }
