@@ -48,9 +48,6 @@ class MyLanguage(Calico.Language):
         self.mimetype = "text/x-basic"
         self.LineComment = "REM "
         
-    def getExamples(self, menu):
-    	pass
-
     def MakeEngine(self, manager):
         self.engine = MyEngine(manager)
 
@@ -58,7 +55,9 @@ class MyLanguage(Calico.Language):
         return MyDocument(calico, filename, self.name, self.mimetype)
 
     def GetUseLibraryString(self, fullname):
-        return ""
+        filename = os.path.basename(fullname)
+        fileName, fileExtension = os.path.splitext(filename)
+        return "IMPORT \"%s\"" % fileName
         
     def getExamplesPath(self, root_path):
     	return os.path.join(os.path.dirname(__file__), "examples")
