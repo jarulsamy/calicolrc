@@ -54,7 +54,7 @@
 	<!-- <Match color = "keyword.jump">(^|[^\$\w\d])\$\w[\w\d]*</Match> -->
 	
 	<!-- CONSTant -->
-	<!-- <Match color = "comment.keyword.todo">(^|[^\w\d])(?-i)[A-Z][\w\d]*</Match> -->
+	<!-- <Match color = "string">[\w\d\-_]+</Match> -->
 
 	<Keywords color = "keyword.access">
 		<Word>self</Word>
