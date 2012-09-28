@@ -466,6 +466,10 @@ public class Scheme {
   // ProcedureN - N is arg count coming in
   // -1, 1, 2 - number of pieces to call app with (-1 is all)
   // 0, 1, 2 - return type 0 = void, 1 = object, 2 = bool
+
+    public enum ReturnType { ReturnVoid=0, ReturnObject=1, ReturnBool=2 };
+    public enum TakesType { TakesAll=-1, TakesOne=1, TakesTwo=2 };
+
   public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
   // FIXME: make these three different:
   public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
@@ -499,6 +503,9 @@ public class Scheme {
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
+  public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
+  public static Proc string_append_proc = new Proc("string-append", (Procedure1) string_append, -1, 1);
+  public static Proc error_proc = new Proc("error", (Procedure1Void) error_prim, -1, 0);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
@@ -666,8 +673,11 @@ public class Scheme {
 	set_env_b(env, symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1));
 	set_env_b(env, symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1));
 	set_env_b(env, symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1));
-	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1));
+	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)); 
 	set_env_b(env, symbol("atom?"), atom_q_proc);
+	set_env_b(env, symbol("string-append"), string_append_proc);
+	set_env_b(env, symbol("error"), error_proc);
+	set_env_b(env, symbol("assq"), assq_proc);
 	return env;
   }
   
@@ -1266,9 +1276,13 @@ public class Scheme {
 	  return retval;
   }
 
+  public static void error_prim(object x) {
+      error(car(x), cadr(x), list_to_array(cddr(x)));
+  }
+
   public static void error(object code, object msg, params object[] rest) {
 	config.NEED_NEWLINE = false;
-	Console.WriteLine("Error in {0}: {1}", (code.ToString()), format(msg, rest));
+	Console.Error.WriteLine("Error in {0}: {1}", (code.ToString()), format(msg, rest));
   }
 
   public static void newline() {
@@ -2494,6 +2508,22 @@ public class Scheme {
       return (list_to_vector(make_safe(vector_to_list(x))));
     else
       return (x);
+  }
+
+  public static string string_append(object x) {
+      if (null_q(x))
+	  return "";
+      else 
+	  return (car(x).ToString() + string_append(cdr(x)));
+  }
+
+  public static object assq(object x, object ls) {
+      if (null_q(ls)) 
+	  return false;
+      else if (Eq(x, caar(ls)))
+	  return cdar(ls);
+      else
+	  return assq(x, cdr(ls));
   }
 
   public static bool atom_q(object x) {
