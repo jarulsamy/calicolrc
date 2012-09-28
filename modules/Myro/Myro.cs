@@ -2182,7 +2182,7 @@ public static class Myro
 			if (question is List) {
 				foreach (string choice in (List)question) {
 					Gtk.HBox hbox = new Gtk.HBox ();
-					Gtk.Label label = new Gtk.Label (choice + ":");
+					Gtk.Label label = new Gtk.Label (choice.Replace("_", "__") + ":");
 					Gtk.Entry entry = new Gtk.Entry ();
 					responses [choice] = entry;
 					hbox.PackStart (label);
@@ -2192,7 +2192,7 @@ public static class Myro
 			} else 	if (question is IDictionary) {
 			    foreach (Object choice in ((IDictionary)question).Keys) {
 					Gtk.HBox hbox = new Gtk.HBox ();
-					Gtk.Label label = new Gtk.Label (choice.ToString() + ":");
+					Gtk.Label label = new Gtk.Label (choice.ToString().Replace("_", "__") + ":");
 					Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
 					responses [choice.ToString()] = entry;
 					hbox.PackStart (label);
