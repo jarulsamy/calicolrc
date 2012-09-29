@@ -37,6 +37,21 @@ using System;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;// Vector2, Matrix
 
+public static class Extensions
+{
+    // Can't use extension methods to override existing methods
+    public static string MyString<T> (this T[] array)
+    {
+	string retval = "";
+	foreach( object item in array) {
+	    if (retval != "")
+		retval += ", ";
+	    retval += item.ToString();
+	}
+	return "[" + retval + "]";
+    }
+}
+
 public static class Graphics
 {
 
@@ -1082,7 +1097,10 @@ public static class Graphics
 			return String.Format ("<Color (r={0},g={1},b={2},a={3})>", 
                            red, green, blue, alpha);
 		}
-    
+		public string __repr__ ()
+		{
+		    return ToString();
+		}    
 	}
 
 	public class Gradient
@@ -1710,6 +1728,10 @@ public static class Graphics
 			return String.Format ("<Window (title='{0}',width={1},height={2})>", 
                            Title, width, height);
 		}
+		public string __repr__ ()
+		{
+		    return ToString();
+		}
 	}
   
 	public static void ShowAll (object o)
@@ -1760,13 +1782,18 @@ public static class Graphics
 			this.x = dot.x;
 			this.y = dot.y;
 		}
-    
+
 		public double distance (Point p)
 		{
 			return Math.Sqrt (Math.Pow (x - p.x, 2) + Math.Pow (y - p.y, 2));
 		}
 
 		public override string ToString ()
+		{
+			return String.Format ("<Point (x={0},y={1})>", x, y);
+		}
+
+		public string __repr__ ()
 		{
 			return String.Format ("<Point (x={0},y={1})>", x, y);
 		}
@@ -2552,6 +2579,63 @@ public static class Graphics
 			if (body != null)
 				updatePhysics ();
 			QueueDraw ();
+		}
+
+		public virtual void moveShape (double dx, double dy)
+		{
+		    // move points relative to center point
+		    // this will appear when shape rotates about center
+		    for (int i = 0; i < points.Length; i++) {
+			points [i].x += dx;
+			points [i].y += dy;
+		    }
+		    if (body != null)
+			updatePhysics ();
+		    QueueDraw ();
+		}
+
+		public virtual void moveShapeTo (double dx, double dy)
+		{
+		    // move points relative to center point
+		    // this will appear when shape rotates about center
+		    for (int i = 0; i < points.Length; i++) {
+			points [i].x -= (dx + center.x);
+			points [i].y -= (dy + center.y);
+		    }
+		    if (body != null)
+			updatePhysics ();
+		    QueueDraw ();
+		}
+
+	        public virtual void connect(Shape s2) {
+		    // Connect two shapes together
+		    // The shape's center is now shared
+		    // with the second shape
+		    double dx = center.x;
+		    double dy = center.y;
+		    s2.center = center;
+		    s2.moveShape(dx, dy);
+		}
+
+	        public virtual void disconnect(Shape s2) {
+		    // Disconnect two shapes who share a center
+		    double dx = center.x;
+		    double dy = center.y;
+		    s2.center = new Point(0, 0);
+		    s2.set_points();
+		    s2.moveTo(dx, dy);
+		}
+
+		public virtual void recenter ()
+		{
+		    double dx = x;
+		    double dy = y;
+		    set_points();
+		    center.x = dx;
+		    center.y = dy;
+		    if (body != null)
+			updatePhysics ();
+		    QueueDraw ();
 		}
 
 		public virtual void moveTo (double x, double y)
@@ -4099,6 +4183,10 @@ public static class Graphics
 			return String.Format ("<Picture (width={0}, height={1})>", width, height);
 		}
 
+		public string __repr__ ()
+		{
+		    return ToString();
+		}
 	} // -- end of Picture class
 
 
