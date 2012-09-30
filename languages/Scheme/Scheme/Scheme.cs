@@ -678,6 +678,7 @@ public class Scheme {
 	set_env_b(env, symbol("string-append"), string_append_proc);
 	set_env_b(env, symbol("error"), error_proc);
 	set_env_b(env, symbol("assq"), assq_proc);
+	set_env_b(env, symbol("safe-print"), safe_print_proc);
 	return env;
   }
   
@@ -1471,11 +1472,12 @@ public class Scheme {
   }
 
   public static string repr(object obj) {
+      Dictionary<> id = 
 	return repr(obj, 0);
   }
 
   public static string repr(object obj, int depth) {
-	if (depth > 3) return "...";
+	if (depth > 10) return "...";
 	if (obj == null) {
 	  return "<void>"; // FIXME: should give void when forced
 	} else if (obj is System.Boolean) {
