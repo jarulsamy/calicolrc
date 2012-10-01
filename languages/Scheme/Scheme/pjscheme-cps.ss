@@ -1907,14 +1907,9 @@
   (lambda-macro (adatum k)
     (let ((exp (cadr^ adatum))
 	  (clauses (cddr^ adatum)))
-      ;; if exp is a variable, no need to introduce r binding
-      (if (symbol?^ exp)
-	(case-clauses->simple-cond-clauses^ exp clauses
-	  (lambda-cont (new-clauses)
-	    (k `(cond ,@new-clauses))))
-	(case-clauses->cond-clauses^ 'r clauses
+      (case-clauses->cond-clauses^ 'r clauses
 	  (lambda-cont2 (bindings new-clauses)
-	    (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses)))))))))
+	    (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses))))))))
 
 (define* case-clauses->simple-cond-clauses^
   (lambda (var clauses k)
@@ -1954,14 +1949,9 @@
   (lambda-macro (adatum k)
     (let ((exp (cadr^ adatum))
 	  (clauses (cddr^ adatum)))
-      ;; if exp is a variable, no need to introduce r binding
-      (if (symbol?^ exp)
-	(record-case-clauses->cond-clauses^ exp clauses
-	  (lambda-cont2 (bindings new-clauses)
-	    (k `(let ,bindings (cond ,@new-clauses)))))
-	(record-case-clauses->cond-clauses^ 'r clauses
-	  (lambda-cont2 (bindings new-clauses)
-	    (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses)))))))))
+      (record-case-clauses->cond-clauses^ 'r clauses
+	(lambda-cont2 (bindings new-clauses)
+	  (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses))))))))
 
 (define* record-case-clauses->cond-clauses^
   (lambda (var clauses k2)
@@ -1983,6 +1973,40 @@
 		      (cons `((memq (car ,var) ',(car^ clause)) (apply ,name (cdr ,var)))
 			    new-clauses)))))))))))
 
+(define define-datatype-transformer^
+  (lambda-macro (adatum k)
+    (let* ((datatype-name (get-sexp (cadr^ adatum)))
+	   (type-tester-name
+	     (string->symbol (string-append (symbol->string datatype-name) "?"))))
+      (if (not (eq?^ (cadr (cdr^ adatum)) type-tester-name))
+	;; type tester function must be named type-tester-name
+	(amacro-error 'define-datatype-transformer^ adatum)
+	(let* ((variants (cddr (cdr^ adatum)))
+	       (tester-def `(define ,type-tester-name
+			      (lambda (x)
+				(and (pair? x)
+				     (eq? (car x) ',datatype-name))))))
+	  (k `(begin
+		,tester-def
+		,@(map (lambda (variant)
+			 (let ((variant-name (get-sexp (car^ variant))))
+			   `(define ,variant-name (lambda args (cons ',variant-name args)))))
+		       variants))))))))
+
+(define cases-transformer^
+  (lambda-macro (adatum k)
+    (let* ((type-name (get-sexp (cadr^ adatum)))
+	   (type-tester-name
+	     (string->symbol (string-append (symbol->string type-name) "?")))
+	   (exp (caddr^ adatum))
+	   (clauses (cdddr^ adatum)))
+      (record-case-clauses->cond-clauses^ 'r clauses
+	(lambda-cont2 (bindings new-clauses)
+	  (k `(let ((r ,exp) ,@bindings)
+		(if (not (,type-tester-name r))
+		  (error 'cases "~a is not a valid ~a" r ',type-name)
+		  (cond ,@new-clauses)))))))))
+
 ;;(define make-macro-env
 ;;  (lambda ()
 ;;    (make-initial-environment
@@ -1999,7 +2023,7 @@
 (define make-macro-env^
   (lambda ()
     (make-initial-environment
-      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case)
+      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case 'define-datatype 'cases)
       (list and-transformer^
 	    or-transformer^
 	    cond-transformer^
@@ -2007,7 +2031,9 @@
 	    letrec-transformer^
 	    let*-transformer^
 	    case-transformer^
-	    record-case-transformer^))))
+	    record-case-transformer^
+	    define-datatype-transformer^
+	    cases-transformer^))))
 
 (define macro-env (make-macro-env^))
 
