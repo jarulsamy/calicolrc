@@ -633,7 +633,6 @@ public class Scheme {
  	set_env_b(env, symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2));
  	set_env_b(env, symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1));
 	set_env_b(env, symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1));
- 	set_env_b(env, symbol("pair?"), new Proc("pair?", (Procedure1Bool)pair_q, 1, 2));
  	set_env_b(env, symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2));
  	set_env_b(env, symbol("string?"), new Proc("string?", (Procedure1Bool)string_q, 1, 2));
  	set_env_b(env, symbol("length"), new Proc("length", (Procedure1)length, 1, 1));
