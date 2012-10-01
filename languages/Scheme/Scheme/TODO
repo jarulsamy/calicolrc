@@ -6,6 +6,7 @@ Bugs
 2. make pretty-print safer and useful
 3. exceptions/continuations allow fix and continue?
 4. (External '(func2) '(1234)) ;; static func, with args (wrong type = loop)
+5. Need a cd (change-dir)
 
 scheme-to-csharp
 ================
