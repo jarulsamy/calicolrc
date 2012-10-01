@@ -60,8 +60,8 @@
    (body aexpression?)
    (finally-exps (list-of aexpression?))
    (info source-info?))
- (try-catch-finally-aexp (body aexpression?) (catch-var symbol?)
-   (catch-exps (list-of aexpression?))
+ (try-catch-finally-aexp (body aexpression?)
+   (catch-var symbol?) (catch-exps (list-of aexpression?))
    (finally-exps (list-of aexpression?)) (info source-info?))
  (raise-aexp (exp aexpression?) (info source-info?))
  (dict-aexp
@@ -96,7 +96,7 @@
        (reannotate-seq-cps (cdr x) (make-cont '<cont-3> value k)))
       (<cont-8> () (halt* value))
       (<cont-9> (bindings k)
-       (apply-cont k `(let ((unquote (car bindings))) ,value)))
+       (apply-cont k `(let (,(car bindings)) ,value)))
       (<cont-10> (clauses var k)
        (let ((clause (car clauses)))
          (cond
@@ -310,17 +310,14 @@
                  (lookup-variable-components (cdr components) new-path
                    result handler value2 k)))))
       (<cont2-6> (bodies k)
-       (apply-cont k `(let (unquote value1) ,@value2 ,@bodies)))
+       (apply-cont k `(let ,value1 ,@value2 ,@bodies)))
       (<cont2-7> (procs vars k2)
        (apply-cont2
          k2
          (cons `(,(car vars) 'undefined) value1)
          (cons `(set! ,(car vars) ,(car procs)) value2)))
       (<cont2-8> (exp k)
-       (apply-cont
-         k
-         `(let ((r ,exp) (unquote-splicing value1))
-            (cond (unquote-splicing value2)))))
+       (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))
       (<cont2-9> (clauses var k2)
        (let ((clause (car clauses)))
          (if (eq?^ (car^ clause) 'else)
@@ -353,9 +350,7 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name
-                          (lambda (unquote (cadr^ clause))
-                            ,@(cddr^ clause)))
+                       `(,name (lambda ,(cadr^ clause) ,@(cddr^ clause)))
                        value1)
                      (cons
                        `((eq? (car ,var) ',(car^ clause))
@@ -365,9 +360,7 @@
                    (apply-cont2
                      k2
                      (cons
-                       `(,name
-                          (lambda (unquote (cadr^ clause))
-                            ,@(cddr^ clause)))
+                       `(,name (lambda ,(cadr^ clause) ,@(cddr^ clause)))
                        value1)
                      (cons
                        `((memq (car ,var) ',(car^ clause))
@@ -376,10 +369,10 @@
       (<cont2-11> (exp type-name type-tester-name k)
        (apply-cont
          k
-         `(let ((r ,exp) (unquote-splicing value1))
+         `(let ((r ,exp) ,@value1)
             (if (not (,type-tester-name r))
                 (error 'cases "~a is not a valid ~a" r ',type-name)
-                (cond (unquote-splicing value2))))))
+                (cond ,@value2)))))
       (<cont2-12> (v1 info k)
        (apply-cont2 k (app-aexp v1 value1 info) value2))
       (<cont2-13> (adatum info handler k)
@@ -1457,13 +1450,12 @@
                   (bodies (cdddr^ datum)))
              (apply-cont
                k
-               `(letrec ((,name (lambda (unquote vars) ,@bodies)))
-                  (,name ,@exps))))
+               `(letrec ((,name (lambda ,vars ,@bodies))) (,name ,@exps))))
            (let* ((bindings (cadr^ datum))
                   (vars (map^ car^ bindings))
                   (exps (map^ cadr^ bindings))
                   (bodies (cddr^ datum)))
-             (apply-cont k `((lambda (unquote vars) ,@bodies) ,@exps)))))
+             (apply-cont k `((lambda ,vars ,@bodies) ,@exps)))))
       (<macro-2> ()
        (let* ((decls (cadr^ datum))
               (vars (map^ car^ decls))
@@ -1477,10 +1469,7 @@
        (let ((name (car^ (cadr^ datum)))
              (formals (cdr^ (cadr^ datum)))
              (bodies (cddr^ datum)))
-         (apply-cont
-           k
-           `(define (unquote name)
-              (lambda (unquote formals) ,@bodies)))))
+         (apply-cont k `(define ,name (lambda ,formals ,@bodies)))))
       (<macro-4> ()
        (let ((exps (cdr^ datum)))
          (cond
@@ -1526,9 +1515,7 @@
                               k
                               `(let ((bool ,test-exp)
                                      (else-code (lambda ()
-                                                  (cond
-                                                    (unquote-splicing
-                                                     other-clauses)))))
+                                                  (cond ,@other-clauses))))
                                  (if bool bool (else-code))))))
                        ((null? other-clauses)
                         (if (null? (cdr then-exps))
@@ -1541,15 +1528,13 @@
                           k
                           `(if ,test-exp
                                ,(car then-exps)
-                               (cond (unquote-splicing other-clauses)))))
+                               (cond ,@other-clauses))))
                        (else
                         (apply-cont
                           k
                           `(if ,test-exp
                                (begin ,@then-exps)
-                               (cond
-                                 (unquote-splicing
-                                  other-clauses))))))))))))
+                               (cond ,@other-clauses)))))))))))
       (<macro-7> ()
        (let ((bindings (get-sexp (cadr^ datum)))
              (bodies (cddr^ datum)))
@@ -1575,15 +1560,19 @@
          (if (not (eq?^ (cadr (cdr^ datum)) type-tester-name))
              (amacro-error 'define-datatype-transformer^ datum)
              (let* ((variants (cddr (cdr^ datum)))
-                    (variant-names (get-variant-names variants))
-                    (tester-def `(define (unquote type-tester-name)
+                    (variant-names (define-datatype-variant-names
+                                     variants))
+                    (tester-def `(define ,type-tester-name
                                    (lambda (x)
                                      (and (pair? x)
                                           (not (not (memq
                                                       (car x)
-                                                      ',variant-names)))))))
-                    (defines (get-defines variant-names)))
-               (apply-cont k `(begin ,tester-def ,defines))))))
+                                                      ',variant-names))))))))
+               (apply-cont
+                 k
+                 `(begin
+                    ,tester-def
+                    ,@(make-define-datatype-defines variant-names)))))))
       (<macro-11> ()
        (let* ((type-name (get-sexp (cadr^ datum)))
               (type-tester-name (string->symbol
@@ -2530,7 +2519,7 @@
   nest-let*-bindings^
   (lambda (bindings bodies k)
     (if (or (null? bindings) (null? (cdr bindings)))
-        (apply-cont k `(let (unquote bindings) ,@bodies))
+        (apply-cont k `(let ,bindings ,@bodies))
         (nest-let*-bindings^
           (cdr bindings)
           bodies
@@ -2566,24 +2555,24 @@
           (cdr clauses)
           (make-cont2 '<cont2-10> clauses var k2)))))
 
-(define get-variant-names
+(define define-datatype-variant-names
   (lambda (variants)
     (cond
       ((null? variants) '())
       (else
        (cons
          (get-sexp (car^ (car variants)))
-         (get-variant-names (cdr variants)))))))
+         (define-datatype-variant-names (cdr variants)))))))
 
-(define get-defines
-  (lambda (variants)
+(define make-define-datatype-defines
+  (lambda (names)
     (cond
-      ((null? variants) '())
+      ((null? names) '())
       (else
        (cons
-         '(lambda (name)
-            (define (unquote name) (lambda args (cons `,name args))))
-         (get-defines (cdr variants)))))))
+         `(define ,(car names)
+            (lambda args (cons ',(car names) args)))
+         (make-define-datatype-defines (cdr names)))))))
 
 (define make-macro-env^
   (lambda ()
@@ -2977,8 +2966,8 @@
      (define-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
-           `(define (unquote id) ,(aunparse rhs-exp))
-           `(define (unquote id) ,docstring ,(aunparse rhs-exp))))
+           `(define ,id ,(aunparse rhs-exp))
+           `(define ,id ,docstring ,(aunparse rhs-exp))))
      (define!-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
@@ -2986,11 +2975,11 @@
            `(define! ,id ,docstring ,(aunparse rhs-exp))))
      (define-syntax-aexp
        (name clauses aclauses info)
-       `(define-syntax (unquote name) ,@clauses))
+       `(define-syntax ,name ,@clauses))
      (begin-aexp (exps info) `(begin ,@(map aunparse exps)))
      (lambda-aexp
        (formals bodies info)
-       `(lambda (unquote formals) ,@(map aunparse bodies)))
+       `(lambda ,formals ,@(map aunparse bodies)))
      (mu-lambda-aexp
        (formals runt bodies info)
        `(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
@@ -3607,7 +3596,8 @@
         (if (dlr-exp? proc)
             (map2 proc (cdr list1) (cdr list2) env handler fail
               (make-cont2 '<cont2-82> list1 list2 proc k))
-            (apply-proc proc (list (car list1) (car list2)) env 'none handler fail
+            (apply-proc proc (list (car list1) (car list2)) env 'none
+              handler fail
               (make-cont2 '<cont2-81> list1 list2 proc env handler k))))))
 
 (define*
@@ -3634,7 +3624,8 @@
                     (dlr-apply proc (map car arg-list))
                     (for-each-primitive proc (map cdr arg-list) env handler
                       fail k))
-                  (apply-proc proc (map car arg-list) env 'none handler fail
+                  (apply-proc proc (map car arg-list) env 'none handler
+                    fail
                     (make-cont2 '<cont2-85> arg-list proc env handler
                       k))))))))
 
@@ -3720,7 +3711,8 @@
 (define*
   unify-pairs^
   (lambda (pair1 pair2 apair1 apair2 k)
-    (unify-patterns^ (car pair1) (car pair2) (car^ apair1) (car^ apair2)
+    (unify-patterns^ (car pair1) (car pair2) (car^ apair1)
+      (car^ apair2)
       (make-cont '<cont-45> apair1 apair2 pair1 pair2 k))))
 
 (define*

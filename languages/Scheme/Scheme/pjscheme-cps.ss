@@ -1973,22 +1973,19 @@
 		      (cons `((memq (car ,var) ',(car^ clause)) (apply ,name (cdr ,var)))
 			    new-clauses)))))))))))
 
-(define get-variant-names
+(define define-datatype-variant-names
   (lambda (variants)
     (cond
      ((null? variants) '())
-     (else (cons (get-sexp (car^ (car variants))) (get-variant-names (cdr variants)))))))
+     (else (cons (get-sexp (car^ (car variants)))
+		 (define-datatype-variant-names (cdr variants)))))))
 
-(define get-defines
-  (lambda (variants)
+(define make-define-datatype-defines
+  (lambda (names)
     (cond
-     ((null? variants) '())
-     (else (cons '(lambda (name)
-		    (define ,name
-		      (lambda args
-			(cons `,name args))))
-		 (get-defines (cdr variants)))))))
-
+     ((null? names) '())
+     (else (cons `(define ,(car names) (lambda args (cons ',(car names) args)))
+		 (make-define-datatype-defines (cdr names)))))))
 
 ;;		,@(map (lambda (name)
 ;;			 `(define ,name (lambda args (cons ',name args))))
@@ -2003,15 +2000,14 @@
 	;; type tester function must be named type-tester-name
 	(amacro-error 'define-datatype-transformer^ adatum)
 	(let* ((variants (cddr (cdr^ adatum)))
-	       (variant-names (get-variant-names variants))
+	       (variant-names (define-datatype-variant-names variants))
 	       (tester-def `(define ,type-tester-name
 			      (lambda (x)
 				(and (pair? x)
-				     (not (not (memq (car x) ',variant-names)))))))
-	       (defines (get-defines variant-names)))
+				     (not (not (memq (car x) ',variant-names))))))))
 	  (k `(begin
 		,tester-def
-		,defines)))))))
+		,@(make-define-datatype-defines variant-names))))))))
 
 (define cases-transformer^
   (lambda-macro (adatum k)

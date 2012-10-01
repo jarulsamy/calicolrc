@@ -788,10 +788,6 @@
      (else (cons `(define ,(car names) (lambda args (cons ',(car names) args)))
 		 (make-define-datatype-defines (cdr names)))))))
 
-;;		,@(map (lambda (name)
-;;			 `(define ,name (lambda args (cons ',name args))))
-;;		       variant-names))))))))
-
 (define define-datatype-transformer^
   (lambda-macro (adatum k)
     (let* ((datatype-name (get-sexp (cadr^ adatum)))

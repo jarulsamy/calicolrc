@@ -3503,10 +3503,10 @@
                                                       (set! pc amacro-error))
                                                     (let ((variants 'undefined)
                                                           (variant-names 'undefined)
-                                                          (tester-def 'undefined)
-                                                          (defines 'undefined))
+                                                          (tester-def 'undefined))
                                                       (set! variants (cddr (cdr^ datum_reg)))
-                                                      (set! variant-names (get-variant-names variants))
+                                                      (set! variant-names
+                                                        (define-datatype-variant-names variants))
                                                       (set! tester-def
                                                         (append
                                                           (list 'define)
@@ -3535,11 +3535,12 @@
                                                                                       (list (append (list 'car) (list 'x)))
                                                                                       (list
                                                                                         (append (list 'quote) (list variant-names)))))))))))))))))))
-                                                      (set! defines (get-defines variant-names))
                                                       (set! value_reg
                                                         (append
                                                           (list 'begin)
-                                                          (append (list tester-def) (list defines))))
+                                                          (append
+                                                            (list tester-def)
+                                                            (make-define-datatype-defines variant-names))))
                                                       (set! pc apply-cont))))
                                               (if (eq? (car temp_1) '<macro-11>)
                                                   (let ((type-name 'undefined)
@@ -4858,35 +4859,37 @@
           (set! clauses_reg (cdr clauses_reg))
           (set! pc record-case-clauses->cond-clauses^)))))
 
-(define get-variant-names
+(define define-datatype-variant-names
   (lambda (variants)
     (if (null? variants)
         (return* '())
         (return*
           (cons
             (get-sexp (car^ (car variants)))
-            (get-variant-names (cdr variants)))))))
+            (define-datatype-variant-names (cdr variants)))))))
 
-(define get-defines
-  (lambda (variants)
-    (if (null? variants)
+(define make-define-datatype-defines
+  (lambda (names)
+    (if (null? names)
         (return* '())
         (return*
           (cons
-            (list
-              'lambda
-              (list 'name)
-              (list
-                'define
-                (list 'unquote 'name)
+            (append
+              (list 'define)
+              (append
+                (list (car names))
                 (list
-                  'lambda
-                  'args
-                  (list
-                    'cons
-                    (list 'quasiquote (list 'unquote 'name))
-                    'args))))
-            (get-defines (cdr variants)))))))
+                  (append
+                    (list 'lambda)
+                    (append
+                      (list 'args)
+                      (list
+                        (append
+                          (list 'cons)
+                          (append
+                            (list (append (list 'quote) (list (car names))))
+                            (list 'args)))))))))
+            (make-define-datatype-defines (cdr names)))))))
 
 (define make-macro-env^
   (lambda ()
