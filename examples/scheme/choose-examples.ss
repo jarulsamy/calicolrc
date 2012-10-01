@@ -332,7 +332,8 @@
       (color switzerland different from france italy austria germany)
       (color austria different from italy switzerland germany)
       ;; return a coloring that satisfies the constraints
-      (list (list 'portugal portugal)
+      (list
+        (list 'portugal portugal)
 	    (list 'spain spain)
 	    (list 'france france)
 	    (list 'belgium belgium)
@@ -367,7 +368,8 @@
 	      (color switzerland different from france italy austria germany)
 	      (color austria different from italy switzerland germany)
 	      ;; return a coloring that satisfies the constraints
-	      (list (list 'portugal portugal)
+	      (list
+            (list 'portugal portugal)
 		    (list 'spain spain)
 		    (list 'france france)
 		    (list 'belgium belgium)

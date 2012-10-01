@@ -3297,9 +3297,11 @@
 	  (lambda-cont2 (args fail)
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
-		(if (dlr-exp? proc)
-		  (k (dlr-apply proc args) fail)
-		  (proc args env info handler fail k)))))))
+		(cond
+		  ((dlr-exp? proc) (k (dlr-apply proc args) fail))
+		  ((procedure-object? proc) (proc args env info handler fail k))
+		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
+				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: ~s" exp)))))
 
 (define* runtime-error
