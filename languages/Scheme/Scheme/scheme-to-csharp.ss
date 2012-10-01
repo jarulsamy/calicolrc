@@ -29,6 +29,10 @@
 	       ;; defined in Scheme.cs:
 	       asexp-tag asexp? length^ list?^ symbol?^ car^ cdr^ cadr^ cddr^ caddr^ cdddr^ cadddr^
 	       tagged-list^ list-of-asexp? map^ safe-print make-safe
+
+	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
+	       dlr-object? dlr-lookup-components set-global-value!
+	       set-global-docstring! printf-prim using-prim iterator? get_type
 	       ))
 
 (define *function-signatures* '())
@@ -129,7 +133,7 @@
      ((eq? name '/) 'Divide)
      ((eq? name 'string) 'make_string)
      ((eq? name 'operator) 'rator)
-     ((eq? name '1st) 'First)
+;;     ((eq? name '1st) 'First)
      ((eq? name 'char) 'chr)
      (else (begin (map (lambda (old_new)
 			 (set! name (replace name (car old_new) (cadr old_new))))

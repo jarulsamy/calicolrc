@@ -1545,7 +1545,8 @@
 ;;----------------------------------------------------------------------
 ;; main program
 
-(define 1st (lambda (n) (string-ref chars-to-scan n)))
+(define next-avail
+  (lambda (n) (string-ref chars-to-scan n)))
 
 (define remaining (lambda (n) (+ 1 n)))
 
@@ -1564,7 +1565,7 @@
     (set! last-scan-char scan-char)
     (set! last-scan-position scan-position)
     (cond
-      ((char=? (1st chars) #\newline)
+      ((char=? (next-avail chars) #\newline)
        (set! scan-line (+ 1 scan-line))
        (set! scan-char 1))
       (else (set! scan-char (+ 1 scan-char))))
@@ -1595,7 +1596,7 @@
     (record-case action
       (shift (next)
        (increment-scan-counters chars)
-       (apply-action next (cons (1st chars) buffer)
+       (apply-action next (cons (next-avail chars) buffer)
          (remaining chars) src handler fail k))
       (replace (new-char next)
        (increment-scan-counters chars)
@@ -1607,7 +1608,7 @@
          k))
       (goto (state)
        (if (eq? state 'token-start-state) (mark-token-start))
-       (let ((action (apply-state state (1st chars))))
+       (let ((action (apply-state state (next-avail chars))))
          (if (eq? action 'error)
              (unexpected-char-error chars src handler fail)
              (apply-action action buffer chars src handler fail k))))
@@ -1627,7 +1628,7 @@
 (define*
   unexpected-char-error
   (lambda (chars src handler fail)
-    (let ((c (1st chars)))
+    (let ((c (next-avail chars)))
       (if (char=? c #\nul)
           (scan-error "unexpected end of input" scan-line scan-char
             src handler fail)

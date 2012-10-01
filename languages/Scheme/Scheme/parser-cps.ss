@@ -783,16 +783,16 @@
 	;; type tester function must be named type-tester-name
 	(amacro-error 'define-datatype-transformer^ adatum)
 	(let* ((variants (cddr (cdr^ adatum)))
+	       (variant-names (map (lambda (v) (get-sexp (car^ v))) variants))
 	       (tester-def `(define ,type-tester-name
 			      (lambda (x)
 				(and (pair? x)
-				     (eq? (car x) ',datatype-name))))))
+				     (not (not (memq (car x) ',variant-names))))))))
 	  (k `(begin
 		,tester-def
-		,@(map (lambda (variant)
-			 (let ((variant-name (get-sexp (car^ variant))))
-			   `(define ,variant-name (lambda args (cons ',variant-name args)))))
-		       variants))))))))
+		,@(map (lambda (name)
+			 `(define ,name (lambda args (cons ',name args))))
+		       variant-names))))))))
 
 (define cases-transformer^
   (lambda-macro (adatum k)

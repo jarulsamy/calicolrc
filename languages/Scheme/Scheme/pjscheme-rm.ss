@@ -3514,7 +3514,7 @@
                                                     "bad macro-transformer: ~a"
                                                     macro_reg)))))))))))))))
 
-(define 1st
+(define next-avail
   (lambda (n) (return* (string-ref chars-to-scan n))))
 
 (define remaining (lambda (n) (return* (+ 1 n))))
@@ -3533,7 +3533,7 @@
     (set! last-scan-line scan-line)
     (set! last-scan-char scan-char)
     (set! last-scan-position scan-position)
-    (if (char=? (1st chars) #\newline)
+    (if (char=? (next-avail chars) #\newline)
         (begin (set! scan-line (+ 1 scan-line)) (set! scan-char 1))
         (set! scan-char (+ 1 scan-char)))
     (set! scan-position (+ 1 scan-position))))
@@ -3569,7 +3569,7 @@
         (let ((next 'undefined))
           (set! next (list-ref action_reg 1))
           (increment-scan-counters chars_reg)
-          (set! buffer_reg (cons (1st chars_reg) buffer_reg))
+          (set! buffer_reg (cons (next-avail chars_reg) buffer_reg))
           (set! chars_reg (remaining chars_reg))
           (set! action_reg next)
           (set! pc apply-action))
@@ -3594,7 +3594,7 @@
                       (set! state (list-ref action_reg 1))
                       (if (eq? state 'token-start-state) (mark-token-start))
                       (let ((action 'undefined))
-                        (set! action (apply-state state (1st chars_reg)))
+                        (set! action (apply-state state (next-avail chars_reg)))
                         (if (eq? action 'error)
                             (set! pc unexpected-char-error)
                             (begin (set! action_reg action) (set! pc apply-action)))))
@@ -3620,7 +3620,7 @@
   unexpected-char-error
   (lambda ()
     (let ((c 'undefined))
-      (set! c (1st chars_reg))
+      (set! c (next-avail chars_reg))
       (if (char=? c #\nul)
           (begin
             (set! char_reg scan-char)

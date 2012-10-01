@@ -11,6 +11,24 @@
 (load "parser-cps.ss")
 
 ;;----------------------------------------------------------------------------
+;; enables interpreter to be run directly in Petite Chez Scheme, independently of C#
+
+;; dummy versions of functions used in C# code
+(define dlr-exp? (lambda (x) #f))
+(define dlr-apply apply)
+(define dlr-func (lambda (x) x))
+(define dlr-env-contains (lambda (x) #f))
+(define dlr-env-lookup (lambda (x) #f))
+(define dlr-object? (lambda (x) #f))
+(define dlr-lookup-components (lambda (x y) #f))
+(define set-global-value! (lambda (var x) #f))
+(define set-global-docstring! (lambda (var x) #f))
+(define printf-prim printf)
+(define using-prim (lambda ignore #f))
+(define iterator? (lambda ignore #f))
+(define get_type (lambda (x) 'unknown))
+
+;;----------------------------------------------------------------------------
 
 (define read-line
   (lambda (prompt)
@@ -624,6 +642,38 @@
        (runtime-error (format "length called on improper list ~s" ls) info handler fail))
       (else (length-loop (cdr x) (+ sum 1) ls info handler fail k2)))))
 
+;; symbol?
+(define symbol?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to symbol?" info handler fail))
+      (else (k2 (apply symbol? args) fail)))))
+
+;; number?
+(define number?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to number?" info handler fail))
+      (else (k2 (apply number? args) fail)))))
+
+;; boolean?
+(define boolean?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to boolean?" info handler fail))
+      (else (k2 (apply boolean? args) fail)))))
+
+;; string?
+(define string?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string?" info handler fail))
+      (else (k2 (apply string? args) fail)))))
+
 ;; null?
 (define null?-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -631,6 +681,14 @@
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to null?" info handler fail))
       (else (k2 (apply null? args) fail)))))
+
+;; pair?
+(define pair?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to pair?" info handler fail))
+      (else (k2 (apply pair? args) fail)))))
 
 ;; cons
 (define cons-prim
@@ -1229,6 +1287,12 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (apply make-vector args) fail)))
 
+(define error-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (let* ((location (format "Error in ~a: " (car args)))
+	   (message (string-append location (apply format (cdr args)))))
+      (runtime-error message info handler fail))))
+
 ;; this is here as a hook for extending environments in C# etc.
 (define make-initial-env-extended
   (lambda (env) env))
@@ -1237,19 +1301,22 @@
   (lambda ()
     (make-initial-env-extended
      (make-initial-environment
-      (list 'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline 'load 'length
-	    'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
+      (list 'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline
+	    'load 'length 'symbol? 'number? 'boolean? 'string? 'null? 'pair? 'cons 'car 'cdr 'cadr 'caddr
+	    'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>=)
-      (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim print-prim
-	    display-prim newline-prim load-prim length-prim null?-prim cons-prim car-prim cdr-prim cadr-prim
-	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim equal-sign-prim equal-sign-prim
-	    abs-prim equal?-prim eq?-prim memq-prim member-prim range-prim set-car!-prim set-cdr!-prim
+	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error)
+      (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim
+	    print-prim display-prim newline-prim load-prim length-prim symbol?-prim number?-prim boolean?-prim
+	    string?-prim null?-prim pair?-prim cons-prim car-prim cdr-prim cadr-prim
+	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim
+	    equal-sign-prim equal-sign-prim abs-prim equal?-prim eq?-prim memq-prim member-prim range-prim
+	    set-car!-prim set-cdr!-prim
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
 	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim lt-or-eq-prim gt-or-eq-prim)))))
+	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim)))))
 
 (define toplevel-env (make-toplevel-env))
 
