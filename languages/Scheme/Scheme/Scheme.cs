@@ -292,6 +292,8 @@ public class Rational {
 
 public class Scheme {
 
+  public static int CONS_ID = 0;
+
   private static ScriptScope _dlr_env;
   private static ScriptRuntime _dlr_runtime;
 
@@ -511,6 +513,7 @@ public class Scheme {
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
   public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
+  public static Proc get_member_proc = new Proc("get-member", (Procedure2)get_external_member_name, 2, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
   public static Proc car_hat_proc = new Proc("car^",(Procedure1)car_hat, 1, 1);
@@ -679,6 +682,7 @@ public class Scheme {
 	set_env_b(env, symbol("error"), error_proc);
 	set_env_b(env, symbol("assq"), assq_proc);
 	set_env_b(env, symbol("safe-print"), safe_print_proc);
+	set_env_b(env, symbol("get-member"), get_member_proc);
 	return env;
   }
   
@@ -739,6 +743,10 @@ public class Scheme {
 	object the_obj = car(args);
 	object property_list = cdr(args);
 	return call_external_proc(the_obj, property_list, null);
+  }
+
+  public static object get_external_member_name(object obj, object name) {
+      return get_external_member(obj, name.ToString());
   }
 
   public static object get_external_member(object obj, string name) {
@@ -1472,12 +1480,6 @@ public class Scheme {
   }
 
   public static string repr(object obj) {
-//      Dictionary<> id = 
-	return repr(obj, 0);
-  }
-
-  public static string repr(object obj, int depth) {
-	if (depth > 10) return "...";
 	if (obj == null) {
 	  return "<void>"; // FIXME: should give void when forced
 	} else if (obj is System.Boolean) {
@@ -1491,6 +1493,7 @@ public class Scheme {
 	} else if (obj is IronPython.Runtime.PythonTuple) {
 	  return obj.ToString();
 	} else if (obj is Array) {
+	    //System.Console.WriteLine("Here 1");
 	  return (string)array_to_string((object[]) obj);
 	} else if (obj is double) {
 	  string s = obj.ToString();
@@ -1501,28 +1504,46 @@ public class Scheme {
 	} else if (obj is String) {
 	  return String.Format("\"{0}\"", obj);
 	} else if (obj is Symbol) {
+	    //System.Console.WriteLine("Here 2");
 	  return obj.ToString();
 	} else if (pair_q(obj)) {
+	    //System.Console.WriteLine("Here 3");
 	  if (procedure_q(obj)) {
 		return "#<procedure>";
 	  } else if (Eq(car(obj), symbol("environment"))) {
 		return "#<environment>"; //, car(obj));
 	  } else {
-		string retval = "";
-		object current = (Cons)obj;
-		while (pair_q(current)) {
-		  if (retval != "")
-			retval += " ";
-		  retval += repr(car(current), depth + 1);
-		  current = cdr(current);
-		  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			retval += " . " + repr(current, depth + 1); // ...
+	      //System.Console.WriteLine("Here 4");
+	      string retval = "";
+	      object current = (Cons)obj;
+	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
+	      ids[((Cons)current).id] = true;
+	      while (pair_q(current)) {
+		  //System.Console.WriteLine("Here 5");
+		  if (retval != "") {
+		      retval += " ";
+		  } 
+		  object car_current = car(current);
+		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
+		      retval += " ...";
+		      current = null;
+		  } else {
+		      retval += repr(car_current);
+		      current = cdr(current);
+		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
+			  retval += " ...";
+			  current = null;
+		      } else {
+			  if (!pair_q(current) && !Eq(current, EmptyList)) {
+			      retval += " . " + repr(current); // ...
+			  }
+		      }
 		  }
-		}
-		return "(" + retval + ")";
+	      }
+	      return "(" + retval + ")";
 	  }
 	} else {
-	  return obj.ToString();
+	    return obj.ToString();
 	}
   }
 
@@ -2686,10 +2707,13 @@ public class Scheme {
   //--------------------------------------------------------------------------------------------
 
   public class Cons : IList {
-  public object car;
-  public object cdr;
+      public object car;
+      public object cdr;
+      public int id;
   
   public Cons(object a, object b) {
+      Scheme.CONS_ID++;
+      this.id = Scheme.CONS_ID;
 	this.car = a;
 	if (b is object[] || b == null) 
 	  this.cdr = list(b);
