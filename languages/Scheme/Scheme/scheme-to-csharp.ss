@@ -35,6 +35,8 @@
 	       set-global-docstring! printf-prim using-prim iterator? get_type
 	       ))
 
+(define SIGNATURES (make-hash-table))
+
 (define *function-signatures* '())
 
 (define *function-definitions* '())
@@ -141,6 +143,13 @@
 			 (#\- #\_)(#\? "_q")(#\! "_b")(#\/ #\_) (#\^ "_hat")))
 		  name)))))
 
+(define add-to-hash
+  (lambda (key value)
+    (db "add-to-hash: '~s'= ~s" key value)
+    (if (string? key)
+	(put-hash-table! SIGNATURES (string->symbol key) value)
+	(put-hash-table! SIGNATURES key value))))
+
 (define convert-file
   (lambda (filename . opt)
     (printf "Converting ~a to C#...\n" filename)
@@ -148,6 +157,9 @@
     (set! *variable-definitions* '())
     (set! *applications* '())
     (load filename) ;; to get *function-signatures*
+    (set! SIGNATURES (make-hash-table))
+    (map (lambda (lst)  (add-to-hash (car lst) (cdr lst))) *function-signatures*)
+    (map (lambda (lst) (add-to-hash (car lst) (cdr lst))) *system-function-signatures*)
     (call-with-input-file filename
       (lambda (port)
 	(let* ((defs (read-defs port))
@@ -216,14 +228,13 @@
 ")
 
 (define lookup-signature
-  (lambda (name sigs)
-    (db "lookup-signature: '~s'~%" name)
-    ;; sigs: '((procname return-type (param-type ...))...)
-    (cond
-     ((null? sigs) '(()())) ;; no return type, no param types
-     ((equal? (format "~a" name) (format "~a" (caar sigs)))
-      (list (cadar sigs) (caddar sigs))) ;; return-type (params)
-     (else (lookup-signature name (cdr sigs))))))
+  (lambda (name)
+    ;;(printf "lookup-signature: '~s'~%" name)
+    (let ((retval (if (string? name)
+		      (get-hash-table SIGNATURES (string->symbol name) '(()()))
+		      (get-hash-table SIGNATURES name '(()())))))
+      ;;(printf "lookup-signature retval: '~s'~%" retval)
+      retval)))
 
 (define repeat
   (lambda (item times)
@@ -250,7 +261,8 @@
 
 (define format-application
   (lambda (name args return-cast proc-name)
-    (db "get-definition-parameter-types: ~a(~a) => ~a ~%" name args return-cast)
+    ;;(printf "format-application: ~a(~a) => ~a ~%" name args return-cast)
+    ;;(printf "get-definition-parameter-types: ~a(~a) => ~a ~%" name args return-cast)
     (let* ((ret-args (get-definition-parameter-types name args 'app))
 	   (proc-return-type (car (get-definition-parameter-types proc-name args 'def)))
 	   (types (cadr ret-args))
@@ -292,8 +304,8 @@
 
 (define ends-with
   (lambda (sym c)
-    (eq? (car (reverse (string->list (symbol->string sym)))) c)))
-
+    (let ((name (symbol->string sym)))
+      (eq? (string-ref name (- (string-length name) 1)) c))))
 
 (define get-return-type
   (lambda (name params)
@@ -304,16 +316,14 @@
 			   (if (null? params)
 			       "void"
 			       "object"))))
-      (let ((types (lookup-signature name 
-		      (append *function-signatures*
-			      *system-function-signatures*))))
+      (let ((types (lookup-signature name)))
 	(if (null? (car types))
 	    return-type
 	    (car types))))))
 
 (define get-definition-parameter-types
   (lambda (name params kind)
-    (db "get-definition-parameter-types: ~a(~a) ~%" name params)
+    ;;(printf "get-definition-parameter-types: ~a(~a) ~%" name params)
     (if (pair? name)
 	(list '() '())
 	(let ((return-type (if (ends-with name #\?)
@@ -331,9 +341,7 @@
 
 (define lookup-param-types
   (lambda (name defaults)
-    (let* ((sig (lookup-signature name 
-		  (append *function-signatures*
-			  *system-function-signatures*)))
+    (let* ((sig (lookup-signature name))
 	   (return-type (if (null? (car sig))
 			    (car defaults)
 			    (car sig)))
@@ -355,9 +363,7 @@
        ((not (lambda? (caddr def)))
 	;; def = (define name 'undefined)
 	(let* ((pname (proper-name name))
-	       (types (lookup-signature name 
-			(append *function-signatures*
-				*system-function-signatures*))))
+	       (types (lookup-signature name)))
 	  (if (eq? (memq name *variable-definitions*) #f)
 	      (begin
 		;;(printf " adding static variable ~a...~%" name)
@@ -403,11 +409,12 @@
 			       (convert-statement true-part proc-name)
 			       (convert-statement false-part proc-name))))))
 	   (set! (sym exp)
-		 (if (eq? sym 'pc)
-		     (if (eq? exp #f)
-			 "pc = null;\n"
-			 (format "pc = (Function) ~a;\n" (proper-name exp)))
-		     (format "~a = ~a;\n" (proper-name sym) (convert-exp exp proc-name))))
+		 (begin
+		   (if (eq? sym 'pc)
+		       (if (eq? exp #f)
+			   "pc = null;\n"
+			   (format "pc = (Function) ~a;\n" (proper-name exp)))
+		       (format "~a = ~a;\n" (proper-name sym) (convert-exp exp proc-name)))))
 	   (let (bindings . bodies)
 	     (let* ((vars (map car bindings))
 		    (temps (map (lambda (v) (format "object ~a = null;\n"
@@ -479,20 +486,20 @@
     (db "convert-application: ~a(~a) in ~a~%" name args proc-name)
     (if (not (member name *applications*))
 	(set! *applications* (cons name *applications*)))
-    (let ((bool-cargs (map (lambda (e) (format "((bool)~a)" (convert-exp e proc-name))) args))
-	  (cargs (map (lambda (e) (convert-exp e proc-name)) args)))
-      (case name
-	((error) (format "throw new Exception(format(~a + \": \" + ~a, ~a))"
-			 (car cargs)
-			 (cadr cargs)
-			 (caddr cargs)))
-	((and) (format "(~a)" (glue (join-list bool-cargs " && "))))
-	((or) (format "(~a)" (glue (join-list bool-cargs " || "))))
-	((return*)
-	 (if (= (length args) 2) ;; explicit cast in return
-	     (format-application name (cdr args) (car args) proc-name)
-	     (format-application name args "" proc-name))) ;; lookup cast
-	(else (format-application name args "" proc-name))))))
+    (let ((cargs (map (lambda (e) (convert-exp e proc-name)) args)))
+      (let ((bool-cargs (map (lambda (e) (format "((bool)~a)" e)) cargs)))
+	(case name
+	  ((error) (format "throw new Exception(format(~a + \": \" + ~a, ~a))"
+			   (car cargs)
+			   (cadr cargs)
+			   (caddr cargs)))
+	  ((and) (format "(~a)" (glue (join-list bool-cargs " && "))))
+	  ((or) (format "(~a)" (glue (join-list bool-cargs " || "))))
+	  ((return*)
+	   (if (= (length args) 2) ;; explicit cast in return
+	       (format-application name (cdr args) (car args) proc-name)
+	       (format-application name args "" proc-name))) ;; lookup cast
+	  (else (format-application name args "" proc-name)))))))
 
 (define glue
   (lambda (things)

@@ -493,7 +493,7 @@ public class Scheme {
   public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
   public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
   public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
-  public static Proc memq_proc = new Proc("memq", (Procedure2Bool) memq, 2, 2);
+  public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
   public static Proc range_proc = new Proc("range", (Procedure1) range, -1, 1);
   public static Proc reverse_proc = new Proc("reverse", (Procedure1) reverse, 1, 1);
   public static Proc sort_proc = new Proc("sort", (Procedure2) sort, 2, 1);
@@ -503,11 +503,16 @@ public class Scheme {
   public static Proc abs_proc = new Proc("abs", (Procedure1) abs, -1, 1);
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
+  public static Proc symbol_q_proc = new Proc("symbol?", (Procedure1Bool) symbol_q, 1, 2);
+  public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
+  public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
+  public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
+  public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
+  public static Proc format_proc = new Proc("format", (Procedure1) format, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
   public static Proc string_append_proc = new Proc("string-append", (Procedure1) string_append, -1, 1);
-  public static Proc error_proc = new Proc("error", (Procedure1Void) error_prim, -1, 0);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
@@ -676,7 +681,6 @@ public class Scheme {
 	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)); 
 	set_env_b(env, symbol("atom?"), atom_q_proc);
 	set_env_b(env, symbol("string-append"), string_append_proc);
-	set_env_b(env, symbol("error"), error_proc);
 	set_env_b(env, symbol("assq"), assq_proc);
 	set_env_b(env, symbol("safe-print"), safe_print_proc);
 	set_env_b(env, symbol("get-member"), get_member_proc);
@@ -1280,10 +1284,6 @@ public class Scheme {
 	  return retval.numerator;
 	else
 	  return retval;
-  }
-
-  public static void error_prim(object x) {
-      error(car(x), cadr(x), list_to_array(cddr(x)));
   }
 
   public static void error(object code, object msg, params object[] rest) {
@@ -2572,11 +2572,11 @@ public class Scheme {
 	return retval;
   }
 
-  public static bool memq(object obj) {
+  public static object memq(object obj) {
 	return memq(car(obj), cadr(obj));
   }
 
-  public static bool memq(object item1, object list) {
+  public static object memq(object item1, object list) {
 	if (list is Cons) {
 	  object current = list;
 	  while (! Eq(current, EmptyList)) {

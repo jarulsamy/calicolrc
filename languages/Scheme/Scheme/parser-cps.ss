@@ -774,6 +774,26 @@
 		      (cons `((memq (car ,var) ',(car^ clause)) (apply ,name (cdr ,var)))
 			    new-clauses)))))))))))
 
+(define get-variant-names
+  (lambda (variants)
+    (cond
+     ((null? variants) '())
+     (else (cons (get-sexp (car^ (car variants))) (get-variant-names (cdr variants)))))))
+
+(define get-defines
+  (lambda (variants)
+    (cond
+     ((null? variants) '())
+     (else (cons '(lambda (name)
+		    (define ,name
+		      (lambda args
+			(cons `,name args))))
+		 (get-defines (cdr variants)))))))
+
+;;		,@(map (lambda (name)
+;;			 `(define ,name (lambda args (cons ',name args))))
+;;		       variant-names))))))))
+
 (define define-datatype-transformer^
   (lambda-macro (adatum k)
     (let* ((datatype-name (get-sexp (cadr^ adatum)))
@@ -783,16 +803,15 @@
 	;; type tester function must be named type-tester-name
 	(amacro-error 'define-datatype-transformer^ adatum)
 	(let* ((variants (cddr (cdr^ adatum)))
-	       (variant-names (map (lambda (v) (get-sexp (car^ v))) variants))
+	       (variant-names (get-variant-names variants))
 	       (tester-def `(define ,type-tester-name
 			      (lambda (x)
 				(and (pair? x)
-				     (not (not (memq (car x) ',variant-names))))))))
+				     (not (not (memq (car x) ',variant-names)))))))
+	       (defines (get-defines variant-names)))
 	  (k `(begin
 		,tester-def
-		,@(map (lambda (name)
-			 `(define ,name (lambda args (cons ',name args))))
-		       variant-names))))))))
+		,defines)))))))
 
 (define cases-transformer^
   (lambda-macro (adatum k)
@@ -824,7 +843,17 @@
 (define make-macro-env^
   (lambda ()
     (make-initial-environment
-      (list 'and 'or 'cond 'let 'letrec 'let* 'case 'record-case 'define-datatype 'cases)
+      (list 'and 
+	    'or 
+	    'cond 
+	    'let 
+	    'letrec 
+	    'let* 
+	    'case 
+	    'record-case
+	    'define-datatype 
+	    'cases
+	    )
       (list and-transformer^
 	    or-transformer^
 	    cond-transformer^
@@ -834,7 +863,8 @@
 	    case-transformer^
 	    record-case-transformer^
 	    define-datatype-transformer^
-	    cases-transformer^))))
+	    cases-transformer^
+	    ))))
 
 (define macro-env (make-macro-env^))
 
