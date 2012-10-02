@@ -1085,24 +1085,24 @@ public static class Myro
 
 	public static void initialize (string port, int baud=38400)
 	{
-		// assumes a single robot will be used
-		if (Myro.robot != null) 
-			Myro.robot.reinit (port, baud);
-		else {
-			if (port.StartsWith ("sim")) {
-				if (simulation == null) {
-					simulation = new Simulation ();
-					//Thread.Sleep ((int)(5 * 1000));
-				} else {
-					simulation.setup ();
-				}
-				// defaults to SimScribbler in this interface
-				robot = makeRobot ("SimScribbler", simulation); 
-			} else {
-				// defaults to Scribbler in this interface
-				Myro.robot = makeRobot ("Scribbler", port, baud);
-			}
+	    // assumes a single robot will be used
+	    if (port.StartsWith ("sim")) {
+		if (simulation == null || ! simulation.window.Visible) {
+		    simulation = new Simulation ();
+		    //Thread.Sleep ((int)(5 * 1000));
+		} else {
+		    simulation.setup ();
 		}
+		// defaults to SimScribbler in this interface
+		robot = makeRobot ("SimScribbler", simulation); 
+	    } else {
+		if (Myro.robot != null) 
+		    Myro.robot.reinit (port, baud);
+		else {
+		    // defaults to Scribbler in this interface
+		    Myro.robot = makeRobot ("Scribbler", port, baud);
+		}
+	    }
 	}
 
 	public static Type[] getTypesOfArgs (object [] objects)
@@ -1138,6 +1138,7 @@ public static class Myro
 				//System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
 				continue;
 			    }
+			    Myro.robot = robot;
 			    return robot;
 			}
 		    }
