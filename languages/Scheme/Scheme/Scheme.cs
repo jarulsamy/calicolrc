@@ -3027,50 +3027,66 @@ public class Vector {
       // FIXME: how to set docstring?
   }
 
+  public static double currentTime () {
+      System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime (1970, 1, 1);
+      return t.TotalSeconds;
+  }
+
+  public static void wait (double seconds) {
+      if (seconds < .1)
+	  System.Threading.Thread.Sleep ((int)(seconds * 1000));
+      else {
+	  double start = currentTime ();
+	  while (seconds > currentTime () - start) {
+	      while (Gtk.Application.EventsPending ())
+		  Gtk.Application.RunIteration ();
+	      System.Threading.Thread.Sleep (100); 
+	  }
+      }
+  }
+
   public static void handle_debug_info(object exp, object result) {
+      // This should be made fast, as it happens on each step!
       Calico.MainWindow calico;
       object info = PJScheme.rac(exp);
       int start_line = (int)PJScheme.get_start_line(info);
+      if (_dlr_env != null) {
+	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
+	  if (calico != null) {
+	      if (calico.CurrentDocument == null) {
+		  return;
+	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
+		  // don't return! Fall through and wait
+	      } else if (calico.ProgramSpeed.Value == 100) {
+		  return;
+	      }
+	  } else {
+	      return;
+	  }
+      } else {
+	  return;
+      }
+      // We have a calico defined and we should trace and/or stop
+      string filename = PJScheme.get_srcfile(info).ToString();
+      Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
       int start_col = (int)PJScheme.get_start_char(info);
       int end_line = (int)PJScheme.get_end_line(info);
       int end_col = (int)PJScheme.get_end_char(info);
-      string filename = PJScheme.get_srcfile(info).ToString();
-      //printf("selection (~a,~a) (~a,~a) of ~a evaluates to ~a~%",
-      //	     start_line,
-      //	     start_col,
-      //	     end_line,
-      //	     end_col,
-      //	     filename,
-      //	     result);
-
-      Gtk.Application.Invoke( delegate {
-	      if (_dlr_env != null) {
-		  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
-		  if (calico != null) {
-		      if (calico.ProgramSpeed.Value == 100) {
-			  return;
-		      }
-		  }
-	      }
-	      Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
-	      if (document != null) {
-		  document.GotoLine(start_line);
-		  document.texteditor.SetSelection(start_line, start_col, end_line, end_col);
-		  
-		  /*
-		  if (calico.ProgramSpeed.Value == 0) {
-		      calico.PlayButton.Sensitive = true;
-		      calico.PauseButton.Sensitive = false;
-		      calico.Print(String.Format("Trace: Paused!\n"));
-		      calico.playResetEvent.WaitOne ();
-		      calico.playResetEvent.Reset ();
-		  } else { // then we are in a delay:
-		  */
-		  //int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
-		  // Force at least a slight sleep, else no GUI controls
-		  //System.Threading.Thread.Sleep (Math.Max (pause, 1));
-		  //}
-	      }
+      calico.playResetEvent.Reset (); 
+      Calico.MainWindow.Invoke ( delegate {
+	      calico.PlayButton.Sensitive = true;
+	      calico.PauseButton.Sensitive = false;
+	      document.GotoLine(start_line);
+	      document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
 	  });
+      printf("Returning ~a...~%", result);
+      if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
+	  System.Console.WriteLine(String.Format("Trace: Paused!"));
+	  calico.playResetEvent.WaitOne();
+      } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
+	  double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
+	  // Force at least a slight sleep, else no GUI controls
+	  wait(pause);
+      }
   }
 }

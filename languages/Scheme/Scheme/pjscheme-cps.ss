@@ -3299,7 +3299,7 @@
 
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
-   ;;(let ((k (make-debugging-k exp k)))   ;; need to reindent
+   (let ((k (make-debugging-k exp k)))   ;; need to reindent
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
       (var-aexp (id info) (lookup-value id env info handler fail k))
@@ -3391,7 +3391,7 @@
 		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
 				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: ~s" exp)))))
-;;)
+)
 
 (define* runtime-error
   (lambda (msg info handler fail)

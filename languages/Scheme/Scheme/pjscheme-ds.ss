@@ -3200,79 +3200,80 @@
 (define*
   m
   (lambda (exp env handler fail k)
-    (cases aexpression exp
-     (lit-aexp (datum info) (apply-cont2 k datum fail))
-     (var-aexp
-       (id info)
-       (lookup-value id env info handler fail k))
-     (func-aexp
-       (exp info)
-       (m exp env handler fail (make-cont2 '<cont2-65> k)))
-     (if-aexp
-       (test-exp then-exp else-exp info)
-       (m test-exp env handler fail
-          (make-cont2 '<cont2-64> else-exp then-exp env handler k)))
-     (assign-aexp
-       (var rhs-exp var-info info)
-       (m rhs-exp env handler fail
-          (make-cont2 '<cont2-63> var var-info env handler k)))
-     (define-aexp
-       (var docstring rhs-exp info)
-       (m rhs-exp env handler fail
-          (make-cont2 '<cont2-61> docstring var env handler k)))
-     (define!-aexp
-       (var docstring rhs-exp info)
-       (m rhs-exp env handler fail
-          (make-cont2 '<cont2-59> docstring var k)))
-     (define-syntax-aexp
-       (name clauses aclauses info)
-       (lookup-binding-in-first-frame name macro-env handler fail
-         (make-cont2 '<cont2-58> aclauses clauses k)))
-     (begin-aexp
-       (exps info)
-       (eval-sequence exps env handler fail k))
-     (lambda-aexp
-       (formals bodies info)
-       (apply-cont2 k (closure formals bodies env) fail))
-     (mu-lambda-aexp
-       (formals runt bodies info)
-       (apply-cont2 k (mu-closure formals runt bodies env) fail))
-     (try-catch-aexp
-       (body cvar cexps info)
-       (let ((new-handler (try-catch-handler cvar cexps env handler
-                            k)))
-         (m body env new-handler fail k)))
-     (try-finally-aexp
-       (body fexps info)
-       (let ((new-handler (try-finally-handler fexps env handler)))
-         (m body env new-handler fail
-            (make-cont2 '<cont2-57> fexps env handler k))))
-     (try-catch-finally-aexp
-       (body cvar cexps fexps info)
-       (let ((new-handler (try-catch-finally-handler cvar cexps
-                            fexps env handler k)))
-         (m body env new-handler fail
-            (make-cont2 '<cont2-57> fexps env handler k))))
-     (raise-aexp
-       (exp info)
-       (m exp env handler fail (make-cont2 '<cont2-55> handler)))
-     (dict-aexp
-       (pairs info)
-       (apply-cont2 k (list 'dict pairs) fail))
-     (help-aexp
-       (var var-info info)
-       (if (reserved-keyword? var)
-           (apply-cont2 k (format "~a is a keyword" var) fail)
-           (lookup-binding var env var-info handler fail
-             (make-cont2 '<cont2-54> k))))
-     (choose-aexp
-       (exps info)
-       (eval-choices exps env handler fail k))
-     (app-aexp
-       (operator operands info)
-       (m* operands env handler fail
-           (make-cont2 '<cont2-53> operator env info handler k)))
-     (else (error 'm "bad abstract syntax: ~s" exp)))))
+    (let ((k (make-debugging-k exp k)))
+      (cases aexpression exp
+       (lit-aexp (datum info) (apply-cont2 k datum fail))
+       (var-aexp
+         (id info)
+         (lookup-value id env info handler fail k))
+       (func-aexp
+         (exp info)
+         (m exp env handler fail (make-cont2 '<cont2-65> k)))
+       (if-aexp
+         (test-exp then-exp else-exp info)
+         (m test-exp env handler fail
+            (make-cont2 '<cont2-64> else-exp then-exp env handler k)))
+       (assign-aexp
+         (var rhs-exp var-info info)
+         (m rhs-exp env handler fail
+            (make-cont2 '<cont2-63> var var-info env handler k)))
+       (define-aexp
+         (var docstring rhs-exp info)
+         (m rhs-exp env handler fail
+            (make-cont2 '<cont2-61> docstring var env handler k)))
+       (define!-aexp
+         (var docstring rhs-exp info)
+         (m rhs-exp env handler fail
+            (make-cont2 '<cont2-59> docstring var k)))
+       (define-syntax-aexp
+         (name clauses aclauses info)
+         (lookup-binding-in-first-frame name macro-env handler fail
+           (make-cont2 '<cont2-58> aclauses clauses k)))
+       (begin-aexp
+         (exps info)
+         (eval-sequence exps env handler fail k))
+       (lambda-aexp
+         (formals bodies info)
+         (apply-cont2 k (closure formals bodies env) fail))
+       (mu-lambda-aexp
+         (formals runt bodies info)
+         (apply-cont2 k (mu-closure formals runt bodies env) fail))
+       (try-catch-aexp
+         (body cvar cexps info)
+         (let ((new-handler (try-catch-handler cvar cexps env handler
+                              k)))
+           (m body env new-handler fail k)))
+       (try-finally-aexp
+         (body fexps info)
+         (let ((new-handler (try-finally-handler fexps env handler)))
+           (m body env new-handler fail
+              (make-cont2 '<cont2-57> fexps env handler k))))
+       (try-catch-finally-aexp
+         (body cvar cexps fexps info)
+         (let ((new-handler (try-catch-finally-handler cvar cexps
+                              fexps env handler k)))
+           (m body env new-handler fail
+              (make-cont2 '<cont2-57> fexps env handler k))))
+       (raise-aexp
+         (exp info)
+         (m exp env handler fail (make-cont2 '<cont2-55> handler)))
+       (dict-aexp
+         (pairs info)
+         (apply-cont2 k (list 'dict pairs) fail))
+       (help-aexp
+         (var var-info info)
+         (if (reserved-keyword? var)
+             (apply-cont2 k (format "~a is a keyword" var) fail)
+             (lookup-binding var env var-info handler fail
+               (make-cont2 '<cont2-54> k))))
+       (choose-aexp
+         (exps info)
+         (eval-choices exps env handler fail k))
+       (app-aexp
+         (operator operands info)
+         (m* operands env handler fail
+             (make-cont2 '<cont2-53> operator env info handler k)))
+       (else (error 'm "bad abstract syntax: ~s" exp))))))
 
 (define*
   runtime-error

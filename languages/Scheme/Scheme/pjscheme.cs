@@ -10015,362 +10015,377 @@ public class PJScheme:Scheme
 
    new public static void m ()
    {
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) exp_reg),
-	       (object) symbol ("lit-aexp"))))
-	{
-	   object datum = null;
-	   datum = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   value2_reg = fail_reg;
-	   value1_reg = datum;
-	   pc = (Function) apply_cont2;
-	}
-      else
+      {
+	 object k = null;
+	 k = PJScheme.make_debugging_k ((object) exp_reg, (object) k_reg);
 	 if (true_q
 	     (PJScheme.
 	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("var-aexp"))))
-	{
-	   object id = null;
-	   object info = null;
-	   info = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   id = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   var_info_reg = info;
-	   variable_reg = id;
-	   pc = (Function) lookup_value;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("func-aexp"))))
-	{
-	   object exp = null;
-	   exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-65>"),
-				   (object) k_reg);
-	   exp_reg = exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("if-aexp"))))
-	{
-	   object test_exp = null;
-	   object then_exp = null;
-	   object else_exp = null;
-	   else_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   then_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   test_exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-64>"),
-				   (object) else_exp, (object) then_exp,
-				   (object) env_reg, (object) handler_reg,
-				   (object) k_reg);
-	   exp_reg = test_exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("assign-aexp"))))
-	{
-	   object var = null;
-	   object rhs_exp = null;
-	   object var_info = null;
-	   var_info = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   var = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-63>"),
-				   (object) var, (object) var_info,
-				   (object) env_reg, (object) handler_reg,
-				   (object) k_reg);
-	   exp_reg = rhs_exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("define-aexp"))))
-	{
-	   object var = null;
-	   object docstring = null;
-	   object rhs_exp = null;
-	   rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   var = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-61>"),
-				   (object) docstring, (object) var,
-				   (object) env_reg, (object) handler_reg,
-				   (object) k_reg);
-	   exp_reg = rhs_exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("define!-aexp"))))
-	{
-	   object var = null;
-	   object docstring = null;
-	   object rhs_exp = null;
-	   rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   var = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-59>"),
-				   (object) docstring, (object) var,
-				   (object) k_reg);
-	   exp_reg = rhs_exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("define-syntax-aexp"))))
-	{
-	   object name = null;
-	   object clauses = null;
-	   object aclauses = null;
-	   aclauses = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   clauses = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   name = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
-				   (object) aclauses, (object) clauses,
-				   (object) k_reg);
-	   env_reg = macro_env;
-	   var_reg = name;
-	   pc = (Function) lookup_binding_in_first_frame;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("begin-aexp"))))
-	{
-	   object exps = null;
-	   exps = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   exps_reg = exps;
-	   pc = (Function) eval_sequence;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("lambda-aexp"))))
-	{
-	   object formals = null;
-	   object bodies = null;
-	   bodies = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   formals = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   value2_reg = fail_reg;
-	   value1_reg =
-	      PJScheme.closure ((object) formals, (object) bodies,
-				(object) env_reg);
-	   pc = (Function) apply_cont2;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("mu-lambda-aexp"))))
-	{
-	   object formals = null;
-	   object runt = null;
-	   object bodies = null;
-	   bodies = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   runt = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   formals = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   value2_reg = fail_reg;
-	   value1_reg =
-	      PJScheme.mu_closure ((object) formals, (object) runt,
-				   (object) bodies, (object) env_reg);
-	   pc = (Function) apply_cont2;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("try-catch-aexp"))))
-	{
-	   object body = null;
-	   object cvar = null;
-	   object cexps = null;
-	   cexps = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   cvar = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+		  (object) symbol ("lit-aexp"))))
 	   {
-	      object new_handler = null;
-	      new_handler =
-		 PJScheme.try_catch_handler ((object) cvar, (object) cexps,
-					     (object) env_reg,
-					     (object) handler_reg,
-					     (object) k_reg);
-	      handler_reg = new_handler;
-	      exp_reg = body;
-	      pc = (Function) m;
+	      object datum = null;
+	      datum = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      value2_reg = fail_reg;
+	      value1_reg = datum;
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
 	   }
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("try-finally-aexp"))))
-	{
-	   object body = null;
-	   object fexps = null;
-	   fexps = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("var-aexp"))))
 	   {
-	      object new_handler = null;
-	      new_handler =
-		 PJScheme.try_finally_handler ((object) fexps,
-					       (object) env_reg,
-					       (object) handler_reg);
+	      object id = null;
+	      object info = null;
+	      info = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      id = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg = k;
+	      var_info_reg = info;
+	      variable_reg = id;
+	      pc = (Function) lookup_value;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("func-aexp"))))
+	   {
+	      object exp = null;
+	      exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
-				      (object) fexps, (object) env_reg,
-				      (object) handler_reg, (object) k_reg);
-	      handler_reg = new_handler;
-	      exp_reg = body;
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-65>"),
+				      (object) k);
+	      exp_reg = exp;
 	      pc = (Function) m;
 	   }
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("try-catch-finally-aexp"))))
-	{
-	   object body = null;
-	   object cvar = null;
-	   object cexps = null;
-	   object fexps = null;
-	   fexps = PJScheme.list_ref ((object) exp_reg, (object) 4);
-	   cexps = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   cvar = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("if-aexp"))))
 	   {
-	      object new_handler = null;
-	      new_handler =
-		 PJScheme.try_catch_finally_handler ((object) cvar,
-						     (object) cexps,
-						     (object) fexps,
-						     (object) env_reg,
-						     (object) handler_reg,
-						     (object) k_reg);
+	      object test_exp = null;
+	      object then_exp = null;
+	      object else_exp = null;
+	      else_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      then_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      test_exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
-				      (object) fexps, (object) env_reg,
-				      (object) handler_reg, (object) k_reg);
-	      handler_reg = new_handler;
-	      exp_reg = body;
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-64>"),
+				      (object) else_exp, (object) then_exp,
+				      (object) env_reg, (object) handler_reg,
+				      (object) k);
+	      exp_reg = test_exp;
 	      pc = (Function) m;
 	   }
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("raise-aexp"))))
-	{
-	   object exp = null;
-	   exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-55>"),
-				   (object) handler_reg);
-	   exp_reg = exp;
-	   pc = (Function) m;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("dict-aexp"))))
-	{
-	   object pairs = null;
-	   pairs = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   value2_reg = fail_reg;
-	   value1_reg =
-	      PJScheme.list ((object) symbol ("dict"), (object) pairs);
-	   pc = (Function) apply_cont2;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("help-aexp"))))
-	{
-	   object var = null;
-	   object var_info = null;
-	   var_info = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   var = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   if (true_q (PJScheme.reserved_keyword_q ((object) var)))
-	     {
-		value2_reg = fail_reg;
-		value1_reg =
-		   PJScheme.format ((object) "~a is a keyword", (object) var);
-		pc = (Function) apply_cont2;
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("assign-aexp"))))
+	   {
+	      object var = null;
+	      object rhs_exp = null;
+	      object var_info = null;
+	      var_info = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-63>"),
+				      (object) var, (object) var_info,
+				      (object) env_reg, (object) handler_reg,
+				      (object) k);
+	      exp_reg = rhs_exp;
+	      pc = (Function) m;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("define-aexp"))))
+	   {
+	      object var = null;
+	      object docstring = null;
+	      object rhs_exp = null;
+	      rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-61>"),
+				      (object) docstring, (object) var,
+				      (object) env_reg, (object) handler_reg,
+				      (object) k);
+	      exp_reg = rhs_exp;
+	      pc = (Function) m;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("define!-aexp"))))
+	   {
+	      object var = null;
+	      object docstring = null;
+	      object rhs_exp = null;
+	      rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-59>"),
+				      (object) docstring, (object) var,
+				      (object) k);
+	      exp_reg = rhs_exp;
+	      pc = (Function) m;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("define-syntax-aexp"))))
+	   {
+	      object name = null;
+	      object clauses = null;
+	      object aclauses = null;
+	      aclauses = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      clauses = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      name = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
+				      (object) aclauses, (object) clauses,
+				      (object) k);
+	      env_reg = macro_env;
+	      var_reg = name;
+	      pc = (Function) lookup_binding_in_first_frame;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("begin-aexp"))))
+	   {
+	      object exps = null;
+	      exps = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg = k;
+	      exps_reg = exps;
+	      pc = (Function) eval_sequence;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("lambda-aexp"))))
+	   {
+	      object formals = null;
+	      object bodies = null;
+	      bodies = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      formals = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      value2_reg = fail_reg;
+	      value1_reg =
+		 PJScheme.closure ((object) formals, (object) bodies,
+				   (object) env_reg);
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("mu-lambda-aexp"))))
+	   {
+	      object formals = null;
+	      object runt = null;
+	      object bodies = null;
+	      bodies = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      runt = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      formals = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      value2_reg = fail_reg;
+	      value1_reg =
+		 PJScheme.mu_closure ((object) formals, (object) runt,
+				      (object) bodies, (object) env_reg);
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("try-catch-aexp"))))
+	   {
+	      object body = null;
+	      object cvar = null;
+	      object cexps = null;
+	      cexps = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      cvar = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      {
+		 object new_handler = null;
+		 new_handler =
+		    PJScheme.try_catch_handler ((object) cvar, (object) cexps,
+						(object) env_reg,
+						(object) handler_reg,
+						(object) k);
+		 k_reg = k;
+		 handler_reg = new_handler;
+		 exp_reg = body;
+		 pc = (Function) m;
+	      }
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("try-finally-aexp"))))
+	   {
+	      object body = null;
+	      object fexps = null;
+	      fexps = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      {
+		 object new_handler = null;
+		 new_handler =
+		    PJScheme.try_finally_handler ((object) fexps,
+						  (object) env_reg,
+						  (object) handler_reg);
+		 k_reg =
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
+					 (object) fexps, (object) env_reg,
+					 (object) handler_reg, (object) k);
+		 handler_reg = new_handler;
+		 exp_reg = body;
+		 pc = (Function) m;
+	      }
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("try-catch-finally-aexp"))))
+	   {
+	      object body = null;
+	      object cvar = null;
+	      object cexps = null;
+	      object fexps = null;
+	      fexps = PJScheme.list_ref ((object) exp_reg, (object) 4);
+	      cexps = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      cvar = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      body = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      {
+		 object new_handler = null;
+		 new_handler =
+		    PJScheme.try_catch_finally_handler ((object) cvar,
+							(object) cexps,
+							(object) fexps,
+							(object) env_reg,
+							(object) handler_reg,
+							(object) k);
+		 k_reg =
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
+					 (object) fexps, (object) env_reg,
+					 (object) handler_reg, (object) k);
+		 handler_reg = new_handler;
+		 exp_reg = body;
+		 pc = (Function) m;
+	      }
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("raise-aexp"))))
+	   {
+	      object exp = null;
+	      exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-55>"),
+				      (object) handler_reg);
+	      exp_reg = exp;
+	      pc = (Function) m;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("dict-aexp"))))
+	   {
+	      object pairs = null;
+	      pairs = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      value2_reg = fail_reg;
+	      value1_reg =
+		 PJScheme.list ((object) symbol ("dict"), (object) pairs);
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("help-aexp"))))
+	   {
+	      object var = null;
+	      object var_info = null;
+	      var_info = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      if (true_q (PJScheme.reserved_keyword_q ((object) var)))
+		{
+		   value2_reg = fail_reg;
+		   value1_reg =
+		      PJScheme.format ((object) "~a is a keyword",
+				       (object) var);
+		   k_reg = k;
+		   pc = (Function) apply_cont2;
 
-	     }
-	   else
-	     {
-		k_reg =
-		   PJScheme.make_cont2 ((object) symbol ("<cont2-54>"),
-					(object) k_reg);
-		var_info_reg = var_info;
-		variable_reg = var;
-		pc = (Function) lookup_binding;
+		}
+	      else
+		{
+		   k_reg =
+		      PJScheme.make_cont2 ((object) symbol ("<cont2-54>"),
+					   (object) k);
+		   var_info_reg = var_info;
+		   variable_reg = var;
+		   pc = (Function) lookup_binding;
 
-	     }
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("choose-aexp"))))
-	{
-	   object exps = null;
-	   exps = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   exps_reg = exps;
-	   pc = (Function) eval_choices;
-	}
-      else
-	 if (true_q
-	     (PJScheme.
-	      Eq ((object) PJScheme.car ((object) exp_reg),
-		  (object) symbol ("app-aexp"))))
-	{
-	   object rator = null;
-	   object operands = null;
-	   object info = null;
-	   info = PJScheme.list_ref ((object) exp_reg, (object) 3);
-	   operands = PJScheme.list_ref ((object) exp_reg, (object) 2);
-	   rator = PJScheme.list_ref ((object) exp_reg, (object) 1);
-	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-53>"),
-				   (object) rator, (object) env_reg,
-				   (object) info, (object) handler_reg,
-				   (object) k_reg);
-	   exps_reg = operands;
-	   pc = (Function) m_star;
-	}
-      else
-	 throw new
-	    Exception (format
-		       (symbol ("m") + ": " + "bad abstract syntax: ~s",
-			exp_reg));
+		}
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("choose-aexp"))))
+	   {
+	      object exps = null;
+	      exps = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg = k;
+	      exps_reg = exps;
+	      pc = (Function) eval_choices;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("app-aexp"))))
+	   {
+	      object rator = null;
+	      object operands = null;
+	      object info = null;
+	      info = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      operands = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      rator = PJScheme.list_ref ((object) exp_reg, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-53>"),
+				      (object) rator, (object) env_reg,
+				      (object) info, (object) handler_reg,
+				      (object) k);
+	      exps_reg = operands;
+	      pc = (Function) m_star;
+	   }
+	 else
+	    throw new
+	       Exception (format
+			  (symbol ("m") + ": " + "bad abstract syntax: ~s",
+			   exp_reg));
+      }
+
    }
 
    new public static void runtime_error ()
