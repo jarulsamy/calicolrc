@@ -259,13 +259,7 @@
 		    (k v fail)
 		    (read-and-eval-asexps tokens-left src env handler fail k)))))))))))
 
-(define rac
-  (lambda (ls)
-    (cond
-      ((null? (cdr ls)) (car ls))
-      (else (rac (cdr ls))))))
-
-(define display-expression-info
+(define handle-debug-info
   (lambda (exp result)
     (let ((info (rac exp)))
       (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
@@ -282,13 +276,12 @@
     (if (not *tracing-on?*)
       k
       (lambda-cont2 (v fail)
-	(if (not (eq? (car exp) 'lit-aexp))
-	    (display-expression-info exp v))
+	(handle-debug-info exp v)
 	(k v fail)))))
 
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
-   (let ((k (make-debugging-k exp k)))   ;; need to reindent
+   ;;(let ((k (make-debugging-k exp k)))   ;; need to reindent
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
       (var-aexp (id info) (lookup-value id env info handler fail k))
@@ -380,7 +373,7 @@
 		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
 				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: ~s" exp)))))
-)
+;;)
 
 (define* runtime-error
   (lambda (msg info handler fail)

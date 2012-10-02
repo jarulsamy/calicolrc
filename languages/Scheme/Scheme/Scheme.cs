@@ -3021,4 +3021,51 @@ public class Vector {
   public static void set_global_docstring_b(object var, object value) {
       // FIXME: how to set docstring?
   }
+
+  public static void handle_debug_info(object exp, object result) {
+      Calico.MainWindow calico;
+      object info = PJScheme.rac(exp);
+      int start_line = (int)PJScheme.get_start_line(info);
+      int start_col = (int)PJScheme.get_start_char(info);
+      int end_line = (int)PJScheme.get_end_line(info);
+      int end_col = (int)PJScheme.get_end_char(info);
+      string filename = PJScheme.get_srcfile(info).ToString();
+      //printf("selection (~a,~a) (~a,~a) of ~a evaluates to ~a~%",
+      //	     start_line,
+      //	     start_col,
+      //	     end_line,
+      //	     end_col,
+      //	     filename,
+      //	     result);
+
+      Gtk.Application.Invoke( delegate {
+	      if (_dlr_env != null) {
+		  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
+		  if (calico != null) {
+		      if (calico.ProgramSpeed.Value == 100) {
+			  return;
+		      }
+		  }
+	      }
+	      Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
+	      if (document != null) {
+		  document.GotoLine(start_line);
+		  document.texteditor.SetSelection(start_line, start_col, end_line, end_col);
+		  
+		  /*
+		  if (calico.ProgramSpeed.Value == 0) {
+		      calico.PlayButton.Sensitive = true;
+		      calico.PauseButton.Sensitive = false;
+		      calico.Print(String.Format("Trace: Paused!\n"));
+		      calico.playResetEvent.WaitOne ();
+		      calico.playResetEvent.Reset ();
+		  } else { // then we are in a delay:
+		  */
+		  //int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
+		  // Force at least a slight sleep, else no GUI controls
+		  //System.Threading.Thread.Sleep (Math.Max (pause, 1));
+		  //}
+	      }
+	  });
+  }
 }

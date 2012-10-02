@@ -1181,29 +1181,29 @@ public static class Myro
 			window.gravity = Graphics.Vector (0, 0); // turn off gravity
 		
 			if (load_default) {
-				// Non-physical things here:
-				addLight (new Graphics.Point (width - 100, height - 100), 
-					50, new Graphics.Color ("yellow"));
-				addWall (new Graphics.Point (0, 0), 
-			    new Graphics.Point (5, height));
-				addWall (new Graphics.Point (5, 0), 
-			    new Graphics.Point (width - 5, 5));
-				addWall (new Graphics.Point (width - 5, 0), 
-			    new Graphics.Point (width, height));
-				addWall (new Graphics.Point (0, height - 5), 
-			    new Graphics.Point (width - 5, height));
-				Graphics.Rectangle pyramid = new Graphics.Rectangle (
-									 new Graphics.Point (100, 100), 
-									 new Graphics.Point (150, 150));
-				pyramid.color = makeColor ("orange");
-				pyramid.rotate (45);
-				pyramid.bodyType = "static";
-				addShape (pyramid);
-				Graphics.Circle ball = new Graphics.Circle (
-								new Graphics.Point (200, height - 150), 
-								25);
-				ball.color = makeColor ("blue");
-				addShape (ball);      
+			    // Non-physical things here:
+			    addLight (new Graphics.Point (width - 100, height - 100), 
+				      50, new Graphics.Color ("yellow"));
+			    addWall (new Graphics.Point (0, 0), 
+				     new Graphics.Point (5, height));
+			    addWall (new Graphics.Point (5, 0), 
+				     new Graphics.Point (width - 5, 5));
+			    addWall (new Graphics.Point (width - 5, 0), 
+				     new Graphics.Point (width, height));
+			    addWall (new Graphics.Point (0, height - 5), 
+				     new Graphics.Point (width - 5, height));
+			    Graphics.Rectangle pyramid = new Graphics.Rectangle (
+										 new Graphics.Point (100, 100), 
+										 new Graphics.Point (150, 150));
+			    pyramid.color = makeColor ("orange");
+			    pyramid.rotate (45);
+			    pyramid.bodyType = "static";
+			    addShape (pyramid);
+			    Graphics.Circle ball = new Graphics.Circle (
+									new Graphics.Point (200, height - 150), 
+									25);
+			    ball.color = makeColor ("blue");
+			    addShape (ball);      
 			}
 			setup();
 		}

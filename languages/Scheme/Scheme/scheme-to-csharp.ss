@@ -33,6 +33,7 @@
 	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
 	       dlr-object? dlr-lookup-components set-global-value!
 	       set-global-docstring! printf-prim using-prim iterator? get_type
+	       handle-debug-info
 	       ))
 
 (define SIGNATURES (make-hash-table))
@@ -108,6 +109,7 @@
     (finally?^ "Func<object,bool>" ())
     (get-reserved-keywords "object" ())
     (safe-print "void" ())
+    (handle-debug-info "void" ())
     ))
 
 (define *system-ignore-definitions*

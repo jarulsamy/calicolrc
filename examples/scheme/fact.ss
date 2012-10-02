@@ -36,3 +36,4 @@
   "Factorial available and runnable by DLR languages"
   (func fact2))
 
+(fact1 100)
