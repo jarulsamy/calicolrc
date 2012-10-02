@@ -529,6 +529,9 @@ public class Scheme {
   public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)cdddr_hat, 1, 1);
   public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)cadddr_hat, 1, 1);
   public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
+  public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
+    // Add new procedures above here!
+    // Then add low-level C# code below
 
   public static char TILDE = '~';
   public static char NULL = '\0';
@@ -2165,6 +2168,8 @@ public class Scheme {
   public static object array_ref(object array, object pos) {
 	return ((object [])array)[(int) pos];
   }
+
+    // Add new low-level procedures here!
 
   public static object list_ref(object obj, object pos) {
 	//printf("calling list-ref({0}, {1})\n", obj, pos);

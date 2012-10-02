@@ -3250,15 +3250,25 @@
                                                                                                                                                                                                                                                                                     (set! msg_reg message)
                                                                                                                                                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-68>)
-                                                                                                                                                                                                                                                                                      (let ((external-function-object 'undefined))
-                                                                                                                                                                                                                                                                                        (set! external-function-object (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                        (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                                        (set! value1_reg (apply* external-function-object args_reg))
-                                                                                                                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
-                                                                                                                                                                                                                                                                                      (error 'apply-proc
-                                                                                                                                                                                                                                                                                        "bad procedure: ~a"
-                                                                                                                                                                                                                                                                                        proc_reg))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                                                                                                                                                                      (if (not (length-two? args_reg))
+                                                                                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to list-ref")
+                                                                                                                                                                                                                                                                                            (set! pc runtime-error))
+                                                                                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                                            (set! value1_reg (apply list-ref args_reg))
+                                                                                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                                            (set! pc apply-cont2)))
+                                                                                                                                                                                                                                                                                      (if (eq? (car temp_1) '<proc-69>)
+                                                                                                                                                                                                                                                                                          (let ((external-function-object 'undefined))
+                                                                                                                                                                                                                                                                                            (set! external-function-object (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                                            (set! value1_reg (apply* external-function-object args_reg))
+                                                                                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                          (error 'apply-proc
+                                                                                                                                                                                                                                                                                            "bad procedure: ~a"
+                                                                                                                                                                                                                                                                                            proc_reg)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 (define make-macro
   (lambda args (return* (cons 'macro-transformer args))))
@@ -6488,7 +6498,7 @@
            'call-with-current-continuation 'call/cc 'abort 'require
            'cut 'reverse 'append 'list->vector 'dir 'current-time 'map
            'for-each 'env 'using 'not 'printf 'vector 'vector-set!
-           'vector-ref 'make-vector '<= '>= 'error)
+           'vector-ref 'make-vector '<= '>= 'error 'list-ref)
           (list void-prim exit-prim eval-prim parse-prim
            parse-string-prim read-string-prim apply-prim sqrt-prim
            print-prim display-prim newline-prim load-prim length-prim
@@ -6503,11 +6513,11 @@
            current-time-prim map-prim for-each-prim env-prim
            using-primitive not-prim printf-primitive vector-prim
            vector-set!-prim vector-ref-prim make-vector-prim
-           lt-or-eq-prim gt-or-eq-prim error-prim))))))
+           lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim))))))
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc '<proc-68> external-function-object))))
+    (return* (make-proc '<proc-69> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -6913,6 +6923,8 @@
 (define make-vector-prim (make-proc '<proc-66>))
 
 (define error-prim (make-proc '<proc-67>))
+
+(define list-ref-prim (make-proc '<proc-68>))
 
 (define toplevel-env (make-toplevel-env))
 

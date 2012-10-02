@@ -1434,7 +1434,16 @@
                          location
                          (apply format (cdr args)))))
          (runtime-error message info handler fail)))
-      (<proc-68> (external-function-object)
+      (<proc-68> ()
+       (cond
+         ((not (length-two? args))
+          (runtime-error
+            "incorrect number of arguments to list-ref"
+            info
+            handler
+            fail))
+         (else (apply-cont2 k2 (apply list-ref args) fail))))
+      (<proc-69> (external-function-object)
        (apply-cont2
          k2
          (apply* external-function-object args)
@@ -3670,7 +3679,7 @@
          'call-with-current-continuation 'call/cc 'abort 'require
          'cut 'reverse 'append 'list->vector 'dir 'current-time 'map
          'for-each 'env 'using 'not 'printf 'vector 'vector-set!
-         'vector-ref 'make-vector '<= '>= 'error)
+         'vector-ref 'make-vector '<= '>= 'error 'list-ref)
         (list void-prim exit-prim eval-prim parse-prim
          parse-string-prim read-string-prim apply-prim sqrt-prim
          print-prim display-prim newline-prim load-prim length-prim
@@ -3685,11 +3694,11 @@
          current-time-prim map-prim for-each-prim env-prim
          using-primitive not-prim printf-primitive vector-prim
          vector-set!-prim vector-ref-prim make-vector-prim
-         lt-or-eq-prim gt-or-eq-prim error-prim)))))
+         lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim)))))
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc '<proc-68> external-function-object)))
+    (make-proc '<proc-69> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -4023,6 +4032,8 @@
 (define make-vector-prim (make-proc '<proc-66>))
 
 (define error-prim (make-proc '<proc-67>))
+
+(define list-ref-prim (make-proc '<proc-68>))
 
 (define toplevel-env (make-toplevel-env))
 

@@ -5905,6 +5905,27 @@ public class PJScheme:Scheme
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
 		     (object) symbol ("<proc-68>"))))
+	    if (true_q
+		(PJScheme.
+		 not ((object) PJScheme.length_two_q ((object) args_reg))))
+	      {
+		 msg_reg = "incorrect number of arguments to list-ref";
+		 pc = (Function) runtime_error;
+
+	      }
+	    else
+	      {
+		 value2_reg = fail_reg;
+		 value1_reg = apply (list_ref_proc, (object) args_reg);
+		 k_reg = k2_reg;
+		 pc = (Function) apply_cont2;
+
+	      }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) temp_1),
+		     (object) symbol ("<proc-69>"))))
 	   {
 	      object external_function_object = null;
 	      external_function_object =
@@ -11249,14 +11270,14 @@ public class PJScheme:Scheme
 	      make_initial_env_extended ((object) PJScheme.
 					 make_initial_environment ((object)
 								   PJScheme.
-								   list ((object) symbol ("void"), (object) symbol ("exit"), (object) symbol ("eval"), (object) symbol ("parse"), (object) symbol ("parse-string"), (object) symbol ("read-string"), (object) symbol ("apply"), (object) symbol ("sqrt"), (object) symbol ("print"), (object) symbol ("display"), (object) symbol ("newline"), (object) symbol ("load"), (object) symbol ("length"), (object) symbol ("symbol?"), (object) symbol ("number?"), (object) symbol ("boolean?"), (object) symbol ("string?"), (object) symbol ("null?"), (object) symbol ("pair?"), (object) symbol ("cons"), (object) symbol ("car"), (object) symbol ("cdr"), (object) symbol ("cadr"), (object) symbol ("caddr"), (object) symbol ("list"), (object) symbol ("+"), (object) symbol ("-"), (object) symbol ("*"), (object) symbol ("/"), (object) symbol ("<"), (object) symbol (">"), (object) symbol ("="), (object) symbol ("=?"), (object) symbol ("abs"), (object) symbol ("equal?"), (object) symbol ("eq?"), (object) symbol ("memq"), (object) symbol ("member"), (object) symbol ("range"), (object) symbol ("set-car!"), (object) symbol ("set-cdr!"), (object) symbol ("import"), (object) symbol ("get"), (object) symbol ("call-with-current-continuation"), (object) symbol ("call/cc"), (object) symbol ("abort"), (object) symbol ("require"), (object) symbol ("cut"), (object) symbol ("reverse"), (object) symbol ("append"), (object) symbol ("list->vector"), (object) symbol ("dir"), (object) symbol ("current-time"), (object) symbol ("map"), (object) symbol ("for-each"), (object) symbol ("env"), (object) symbol ("using"), (object) symbol ("not"), (object) symbol ("printf"), (object) symbol ("vector"), (object) symbol ("vector-set!"), (object) symbol ("vector-ref"), (object) symbol ("make-vector"), (object) symbol ("<="), (object) symbol (">="), (object) symbol ("error")), (object) PJScheme.list ((object) void_prim, (object) exit_prim, (object) eval_prim, (object) parse_prim, (object) parse_string_prim, (object) read_string_prim, (object) apply_prim, (object) sqrt_prim, (object) print_prim, (object) display_prim, (object) newline_prim, (object) load_prim, (object) length_prim, (object) symbol_q_prim, (object) number_q_prim, (object) boolean_q_prim, (object) string_q_prim, (object) null_q_prim, (object) pair_q_prim, (object) cons_prim, (object) car_prim, (object) cdr_prim, (object) cadr_prim, (object) caddr_prim, (object) list_prim, (object) plus_prim, (object) minus_prim, (object) times_prim, (object) divide_prim, (object) lt_prim, (object) gt_prim, (object) equal_sign_prim, (object) equal_sign_prim, (object) abs_prim, (object) equal_q_prim, (object) eq_q_prim, (object) memq_prim, (object) member_prim, (object) range_prim, (object) set_car_b_prim, (object) set_cdr_b_prim, (object) import_prim, (object) get_prim, (object) call_cc_prim, (object) call_cc_prim, (object) abort_prim, (object) require_prim, (object) cut_prim, (object) reverse_prim, (object) append_prim, (object) list_to_vector_prim, (object) dir_prim, (object) current_time_prim, (object) map_prim, (object) for_each_prim, (object) env_prim, (object) using_primitive, (object) not_prim, (object) printf_primitive, (object) vector_prim, (object) vector_set_b_prim, (object) vector_ref_prim, (object) make_vector_prim, (object) lt_or_eq_prim, (object) gt_or_eq_prim, (object) error_prim))));
+								   list ((object) symbol ("void"), (object) symbol ("exit"), (object) symbol ("eval"), (object) symbol ("parse"), (object) symbol ("parse-string"), (object) symbol ("read-string"), (object) symbol ("apply"), (object) symbol ("sqrt"), (object) symbol ("print"), (object) symbol ("display"), (object) symbol ("newline"), (object) symbol ("load"), (object) symbol ("length"), (object) symbol ("symbol?"), (object) symbol ("number?"), (object) symbol ("boolean?"), (object) symbol ("string?"), (object) symbol ("null?"), (object) symbol ("pair?"), (object) symbol ("cons"), (object) symbol ("car"), (object) symbol ("cdr"), (object) symbol ("cadr"), (object) symbol ("caddr"), (object) symbol ("list"), (object) symbol ("+"), (object) symbol ("-"), (object) symbol ("*"), (object) symbol ("/"), (object) symbol ("<"), (object) symbol (">"), (object) symbol ("="), (object) symbol ("=?"), (object) symbol ("abs"), (object) symbol ("equal?"), (object) symbol ("eq?"), (object) symbol ("memq"), (object) symbol ("member"), (object) symbol ("range"), (object) symbol ("set-car!"), (object) symbol ("set-cdr!"), (object) symbol ("import"), (object) symbol ("get"), (object) symbol ("call-with-current-continuation"), (object) symbol ("call/cc"), (object) symbol ("abort"), (object) symbol ("require"), (object) symbol ("cut"), (object) symbol ("reverse"), (object) symbol ("append"), (object) symbol ("list->vector"), (object) symbol ("dir"), (object) symbol ("current-time"), (object) symbol ("map"), (object) symbol ("for-each"), (object) symbol ("env"), (object) symbol ("using"), (object) symbol ("not"), (object) symbol ("printf"), (object) symbol ("vector"), (object) symbol ("vector-set!"), (object) symbol ("vector-ref"), (object) symbol ("make-vector"), (object) symbol ("<="), (object) symbol (">="), (object) symbol ("error"), (object) symbol ("list-ref")), (object) PJScheme.list ((object) void_prim, (object) exit_prim, (object) eval_prim, (object) parse_prim, (object) parse_string_prim, (object) read_string_prim, (object) apply_prim, (object) sqrt_prim, (object) print_prim, (object) display_prim, (object) newline_prim, (object) load_prim, (object) length_prim, (object) symbol_q_prim, (object) number_q_prim, (object) boolean_q_prim, (object) string_q_prim, (object) null_q_prim, (object) pair_q_prim, (object) cons_prim, (object) car_prim, (object) cdr_prim, (object) cadr_prim, (object) caddr_prim, (object) list_prim, (object) plus_prim, (object) minus_prim, (object) times_prim, (object) divide_prim, (object) lt_prim, (object) gt_prim, (object) equal_sign_prim, (object) equal_sign_prim, (object) abs_prim, (object) equal_q_prim, (object) eq_q_prim, (object) memq_prim, (object) member_prim, (object) range_prim, (object) set_car_b_prim, (object) set_cdr_b_prim, (object) import_prim, (object) get_prim, (object) call_cc_prim, (object) call_cc_prim, (object) abort_prim, (object) require_prim, (object) cut_prim, (object) reverse_prim, (object) append_prim, (object) list_to_vector_prim, (object) dir_prim, (object) current_time_prim, (object) map_prim, (object) for_each_prim, (object) env_prim, (object) using_primitive, (object) not_prim, (object) printf_primitive, (object) vector_prim, (object) vector_set_b_prim, (object) vector_ref_prim, (object) make_vector_prim, (object) lt_or_eq_prim, (object) gt_or_eq_prim, (object) error_prim, (object) list_ref_prim))));
    }
 
    new public static object make_external_proc (object
 						external_function_object)
    {
       return ((object) PJScheme.
-	      make_proc ((object) symbol ("<proc-68>"),
+	      make_proc ((object) symbol ("<proc-69>"),
 			 (object) external_function_object));
    }
 
@@ -11749,6 +11770,8 @@ public class PJScheme:Scheme
       PJScheme.make_proc ((object) symbol ("<proc-66>"));
    static object error_prim =
       PJScheme.make_proc ((object) symbol ("<proc-67>"));
+   static object list_ref_prim =
+      PJScheme.make_proc ((object) symbol ("<proc-68>"));
    static object toplevel_env = PJScheme.make_toplevel_env ();
 
 

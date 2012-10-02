@@ -1309,11 +1309,24 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (apply make-vector args) fail)))
 
+;; error
 (define error-prim
   (lambda-proc (args env2 info handler fail k2)
     (let* ((location (format "Error in ~a: " (car args)))
 	   (message (string-append location (apply format (cdr args)))))
       (runtime-error message info handler fail))))
+
+;; list-ref
+(define list-ref-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to list-ref" info handler fail))
+      (else (k2 (apply list-ref args) fail)))))
+
+;; Add new procedures above here!
+;; Then, add NAME to env
+;; Then, add NAME_proc to Scheme.cs
 
 ;; this is here as a hook for extending environments in C# etc.
 (define make-initial-env-extended
@@ -1328,7 +1341,7 @@
 	    'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error)
+	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref)
       (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim
 	    print-prim display-prim newline-prim load-prim length-prim symbol?-prim number?-prim boolean?-prim
 	    string?-prim null?-prim pair?-prim cons-prim car-prim cdr-prim cadr-prim
@@ -1338,7 +1351,7 @@
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
 	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim)))))
+	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim)))))
 
 (define toplevel-env (make-toplevel-env))
 
