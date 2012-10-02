@@ -9,6 +9,8 @@ data = {"name": "Test",
         "comment": "##"}
 
 data = Myro.ask(data, "New Language Details")
+if data is None:
+    raise Exception("Language Creation Aborted")
 
 def mkdirs(path): # missing in IronPython os?
     parts = os.path.split(path)
