@@ -40,9 +40,6 @@ clr.AddReference("Boo.Lang.Compiler.dll")
 import Boo.Lang.Interpreter
 import Boo.Lang.Compiler
 
-from engine import Engine
-from utils import Language
-
 class InteractiveInterpreter(Boo.Lang.Interpreter.InteractiveInterpreter):
     """
     Subclassed to gain access to privates.
@@ -101,10 +98,6 @@ class BooEngine(Calico.Engine):
         elif lines[-1].startswith(" "):
             return False
         return True
-
-class BooLanguage(Language):
-    def get_engine_class(self):
-        return BooEngine
 
 class BooDocument(Calico.TextDocument):
     """
