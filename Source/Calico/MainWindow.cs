@@ -1887,13 +1887,13 @@ namespace Calico {
             // These Write functions are the only approved methods of output
 	    // FIXME: total hack?! Need to pause long enough, especially in Scheme
 	    //        when lots of text with no newline
-	    Thread.Sleep(format.Length); 
+	    //ManualResetEvent ev = new ManualResetEvent(false);
 	    // FIXME: maybe use a wait/reset thing
             if (Debug) {
                 Console.Write(format);
             } else {
                 Invoke(delegate {
-                    lock (Output) {
+			//lock (this) {
                         if (tag == Tag.Error) {
                             ToolNotebook.Page = 0;
                         } // show output page
@@ -1904,8 +1904,14 @@ namespace Calico {
                         Gtk.TextMark mark = Output.Buffer.GetMark("insert");
                         Output.Buffer.MoveMark(mark, end);
                         Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
-                    }
+			//ev.Set();
+			//}
                 });
+		//ev.WaitOne();
+		//while (Gtk.Application.EventsPending ()) {
+		//    Gtk.Application.RunIteration();
+		//}
+		Thread.Sleep(format.Length * 10); 
             }
         }
 
