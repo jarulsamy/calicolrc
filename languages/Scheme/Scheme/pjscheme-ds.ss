@@ -2599,6 +2599,8 @@
   (lambda (variants)
     (cond
       ((null? variants) '())
+      ((null? (cdr^ (car variants)))
+       (cons '() (define-datatype-variant-tests (cdr variants))))
       (else
        (cons
          (get-sexp (cadr^ (cadr^ (car variants))))
@@ -2608,6 +2610,11 @@
   (lambda (names tests)
     (cond
       ((null? names) '())
+      ((null? (car tests))
+       (cons
+         `(define (unquote (car names))
+            (lambda args (cons ',(car names) args)))
+         (make-define-datatype-defines (cdr names) (cdr tests))))
       (else
        (cons
          `(define (unquote (car names))

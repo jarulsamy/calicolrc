@@ -8986,6 +8986,17 @@ public class PJScheme:Scheme
       if (true_q (PJScheme.null_q ((object) variants)))
 	 return ((object) EmptyList);
       else
+	 if (true_q
+	     (PJScheme.
+	      null_q ((object) PJScheme.
+		      cdr_hat ((object) PJScheme.car ((object) variants)))))
+	 return ((object) PJScheme.
+		 cons ((object) EmptyList,
+		       (object) PJScheme.
+		       define_datatype_variant_tests ((object) PJScheme.
+						      cdr ((object)
+							   variants))));
+      else
 	 return ((object) PJScheme.
 		 cons ((object) PJScheme.
 		       get_sexp ((object) PJScheme.
@@ -9004,6 +9015,22 @@ public class PJScheme:Scheme
    {
       if (true_q (PJScheme.null_q ((object) names)))
 	 return ((object) EmptyList);
+      else
+	 if (true_q
+	     (PJScheme.null_q ((object) PJScheme.car ((object) tests))))
+	 return ((object) PJScheme.
+		 cons ((object) PJScheme.
+		       append ((object) PJScheme.
+			       list ((object) symbol ("define")),
+			       (object) PJScheme.append ((object) PJScheme.
+							 list ((object)
+							       PJScheme.
+							       car ((object)
+								    names)),
+							 (object) PJScheme.
+							 list ((object)
+							       PJScheme.
+							       append ((object) PJScheme.list ((object) symbol ("lambda")), (object) PJScheme.append ((object) PJScheme.list ((object) symbol ("args")), (object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("cons")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("quote")), (object) PJScheme.list ((object) PJScheme.car ((object) names)))), (object) PJScheme.list ((object) symbol ("args")))))))))), (object) PJScheme.make_define_datatype_defines ((object) PJScheme.cdr ((object) names), (object) PJScheme.cdr ((object) tests))));
       else
 	 return ((object) PJScheme.
 		 cons ((object) PJScheme.

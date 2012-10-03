@@ -4904,50 +4904,72 @@
   (lambda (variants)
     (if (null? variants)
         (return* '())
-        (return*
-          (cons
-            (get-sexp (cadr^ (cadr^ (car variants))))
-            (define-datatype-variant-tests (cdr variants)))))))
+        (if (null? (cdr^ (car variants)))
+            (return*
+              (cons '() (define-datatype-variant-tests (cdr variants))))
+            (return*
+              (cons
+                (get-sexp (cadr^ (cadr^ (car variants))))
+                (define-datatype-variant-tests (cdr variants))))))))
 
 (define make-define-datatype-defines
   (lambda (names tests)
     (if (null? names)
         (return* '())
-        (return*
-          (cons
-            (append
-              (list 'define)
-              (append
-                (list (car names))
-                (list
+        (if (null? (car tests))
+            (return*
+              (cons
+                (append
+                  (list 'define)
                   (append
-                    (list 'lambda)
-                    (append
-                      (list 'args)
-                      (list
+                    (list (car names))
+                    (list
+                      (append
+                        (list 'lambda)
                         (append
-                          (list 'if)
-                          (append
-                            (list
-                              (append
-                                (list 'apply)
-                                (append (list (car tests)) (list 'args))))
+                          (list 'args)
+                          (list
                             (append
-                              (list
-                                (append
-                                  (list 'cons)
+                              (list 'cons)
+                              (append
+                                (list (append (list 'quote) (list (car names))))
+                                (list 'args)))))))))
+                (make-define-datatype-defines (cdr names) (cdr tests))))
+            (return*
+              (cons
+                (append
+                  (list 'define)
+                  (append
+                    (list (car names))
+                    (list
+                      (append
+                        (list 'lambda)
+                        (append
+                          (list 'args)
+                          (list
+                            (append
+                              (list 'if)
+                              (append
+                                (list
                                   (append
-                                    (list (append (list 'quote) (list (car names))))
-                                    (list 'args))))
-                              (list
+                                    (list 'apply)
+                                    (append (list (car tests)) (list 'args))))
                                 (append
-                                  (list 'error)
-                                  (append
-                                    (list (append (list 'quote) (list (car names))))
+                                  (list
                                     (append
-                                      (list "'~s' not a valid value")
-                                      (list (append (list 'car) (list 'args))))))))))))))))
-            (make-define-datatype-defines (cdr names) (cdr tests)))))))
+                                      (list 'cons)
+                                      (append
+                                        (list (append (list 'quote) (list (car names))))
+                                        (list 'args))))
+                                  (list
+                                    (append
+                                      (list 'error)
+                                      (append
+                                        (list (append (list 'quote) (list (car names))))
+                                        (append
+                                          (list "'~s' not a valid value")
+                                          (list (append (list 'car) (list 'args))))))))))))))))
+                (make-define-datatype-defines (cdr names) (cdr tests))))))))
 
 (define make-macro-env^
   (lambda ()

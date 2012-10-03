@@ -1885,7 +1885,10 @@ namespace Calico {
 
         public void Print(Tag tag, string format) {
             // These Write functions are the only approved methods of output
-            Thread.Sleep(1); // Force a context switch, even for an instant
+	    // FIXME: total hack?! Need to pause long enough, especially in Scheme
+	    //        when lots of text with no newline
+	    Thread.Sleep(format.Length); 
+	    // FIXME: maybe use a wait/reset thing
             if (Debug) {
                 Console.Write(format);
             } else {

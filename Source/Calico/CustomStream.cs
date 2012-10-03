@@ -38,7 +38,7 @@ namespace Calico {
             //if (bytes[0] == 13)
             //    return;
             string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
-            window.Print(tag, text);
+	    window.Print(tag, text);
         }
 
         public void PrintLine(string text) {
