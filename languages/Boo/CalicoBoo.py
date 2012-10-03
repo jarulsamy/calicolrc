@@ -81,7 +81,7 @@ class BooEngine(Calico.Engine):
         """
         This is the code that will interprete a file.
         """
-        System.WriteLine("Run filename '%s'!" % filename)
+        System.Console.WriteLine("Run filename '%s'!" % filename)
         self.interpreter.EvalCompilerInput(Boo.Lang.Compiler.IO.FileInput(filename))
         return True
 
