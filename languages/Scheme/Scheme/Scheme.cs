@@ -3049,6 +3049,9 @@ public class Vector {
       // This should be made fast, as it happens on each step!
       Calico.MainWindow calico;
       object info = PJScheme.rac(exp);
+      if (Equal(info, symbol("none"))) {
+	  return;
+      }
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
 	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
