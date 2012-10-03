@@ -3066,6 +3066,7 @@ public class Vector {
       } else {
 	  return;
       }
+      //System.Console.WriteLine("stepping!");
       // We have a calico defined and we should trace and/or stop
       string filename = PJScheme.get_srcfile(info).ToString();
       Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
