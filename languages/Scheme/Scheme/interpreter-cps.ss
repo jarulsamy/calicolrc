@@ -262,22 +262,24 @@
 (define handle-debug-info
   (lambda (exp result)
     (let ((info (rac exp)))
-      (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-	      (aunparse exp)
-	      (get-start-line info)
-	      (get-start-char info)
-	      (get-srcfile info)
-	      result))))
+      (if (eq? info 'none)
+	  (printf "~s evaluates to ~a~%" (aunparse exp) result)
+	  (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
+		  (aunparse exp)
+		  (get-start-line info)
+		  (get-start-char info)
+		  (get-srcfile info)
+		  result)))))
 
 (define *tracing-on?* #t)
 
 (define make-debugging-k
   (lambda (exp k)
     (if (not *tracing-on?*)
-      k
-      (lambda-cont2 (v fail)
-	(handle-debug-info exp v)
-	(k v fail)))))
+	k
+	(lambda-cont2 (v fail)
+	  (handle-debug-info exp v)
+	  (k v fail)))))
 
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2

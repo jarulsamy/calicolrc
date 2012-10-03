@@ -418,3 +418,5 @@
                                      (sum c1 c5 c9) ;; diags
                                      (sum c3 c5 c7))))
                             (list c1 c2 c3 c4 c5 c6 c7 c8 c9)))))))))))
+
+(floors2)

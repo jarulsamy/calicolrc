@@ -3530,10 +3530,13 @@
                                                       (set! pc amacro-error))
                                                     (let ((variants 'undefined)
                                                           (variant-names 'undefined)
+                                                          (variant-tests 'undefined)
                                                           (tester-def 'undefined))
                                                       (set! variants (cddr (cdr^ datum_reg)))
                                                       (set! variant-names
                                                         (define-datatype-variant-names variants))
+                                                      (set! variant-tests
+                                                        (define-datatype-variant-tests variants))
                                                       (set! tester-def
                                                         (append
                                                           (list 'define)
@@ -3567,7 +3570,9 @@
                                                           (list 'begin)
                                                           (append
                                                             (list tester-def)
-                                                            (make-define-datatype-defines variant-names))))
+                                                            (make-define-datatype-defines
+                                                              variant-names
+                                                              variant-tests))))
                                                       (set! pc apply-cont))))
                                               (if (eq? (car temp_1) '<macro-11>)
                                                   (let ((type-name 'undefined)
@@ -4895,8 +4900,17 @@
             (get-sexp (car^ (car variants)))
             (define-datatype-variant-names (cdr variants)))))))
 
+(define define-datatype-variant-tests
+  (lambda (variants)
+    (if (null? variants)
+        (return* '())
+        (return*
+          (cons
+            (get-sexp (cadr^ (cadr^ (car variants))))
+            (define-datatype-variant-tests (cdr variants)))))))
+
 (define make-define-datatype-defines
-  (lambda (names)
+  (lambda (names tests)
     (if (null? names)
         (return* '())
         (return*
@@ -4912,11 +4926,28 @@
                       (list 'args)
                       (list
                         (append
-                          (list 'cons)
+                          (list 'if)
                           (append
-                            (list (append (list 'quote) (list (car names))))
-                            (list 'args)))))))))
-            (make-define-datatype-defines (cdr names)))))))
+                            (list
+                              (append
+                                (list 'apply)
+                                (append (list (car tests)) (list 'args))))
+                            (append
+                              (list
+                                (append
+                                  (list 'cons)
+                                  (append
+                                    (list (append (list 'quote) (list (car names))))
+                                    (list 'args))))
+                              (list
+                                (append
+                                  (list 'error)
+                                  (append
+                                    (list (append (list 'quote) (list (car names))))
+                                    (append
+                                      (list "'~s' not a valid value")
+                                      (list (append (list 'car) (list 'args))))))))))))))))
+            (make-define-datatype-defines (cdr names) (cdr tests)))))))
 
 (define make-macro-env^
   (lambda ()
@@ -5734,9 +5765,11 @@
   (lambda (exp result)
     (let ((info 'undefined))
       (set! info (rac exp))
-      (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-        (aunparse exp) (get-start-line info) (get-start-char info)
-        (get-srcfile info) result))))
+      (if (eq? info 'none)
+          (printf "~s evaluates to ~a~%" (aunparse exp) result)
+          (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
+            (aunparse exp) (get-start-line info) (get-start-char info)
+            (get-srcfile info) result)))))
 
 (define make-debugging-k
   (lambda (exp k)

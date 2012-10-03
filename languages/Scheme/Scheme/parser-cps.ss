@@ -781,12 +781,23 @@
      (else (cons (get-sexp (car^ (car variants)))
 		 (define-datatype-variant-names (cdr variants)))))))
 
+(define define-datatype-variant-tests
+  (lambda (variants)
+    (cond
+     ((null? variants) '())
+     (else (cons (get-sexp (cadr^ (cadr^ (car variants))))
+		 (define-datatype-variant-tests (cdr variants)))))))
+
 (define make-define-datatype-defines
-  (lambda (names)
+  (lambda (names tests)
     (cond
      ((null? names) '())
-     (else (cons `(define ,(car names) (lambda args (cons ',(car names) args)))
-		 (make-define-datatype-defines (cdr names)))))))
+     (else (cons `(define ,(car names) 
+		    (lambda args 
+		      (if (apply ,(car tests) args)
+			  (cons ',(car names) args)
+			  (error ',(car names) "'~s' not a valid value" (car args)))))
+		 (make-define-datatype-defines (cdr names) (cdr tests)))))))
 
 (define define-datatype-transformer^
   (lambda-macro (adatum k)
@@ -798,13 +809,14 @@
 	(amacro-error 'define-datatype-transformer^ adatum)
 	(let* ((variants (cddr (cdr^ adatum)))
 	       (variant-names (define-datatype-variant-names variants))
+	       (variant-tests (define-datatype-variant-tests variants))
 	       (tester-def `(define ,type-tester-name
 			      (lambda (x)
 				(and (pair? x)
 				     (not (not (memq (car x) ',variant-names))))))))
 	  (k `(begin
 		,tester-def
-		,@(make-define-datatype-defines variant-names))))))))
+		,@(make-define-datatype-defines variant-names variant-tests))))))))
 
 (define cases-transformer^
   (lambda-macro (adatum k)

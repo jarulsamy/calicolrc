@@ -6409,6 +6409,7 @@ public class PJScheme:Scheme
 		{
 		   object variants = null;
 		   object variant_names = null;
+		   object variant_tests = null;
 		   object tester_def = null;
 		   variants =
 		      PJScheme.cddr ((object) PJScheme.
@@ -6416,6 +6417,9 @@ public class PJScheme:Scheme
 		   variant_names =
 		      PJScheme.
 		      define_datatype_variant_names ((object) variants);
+		   variant_tests =
+		      PJScheme.
+		      define_datatype_variant_tests ((object) variants);
 		   tester_def =
 		      PJScheme.append ((object) PJScheme.
 				       list ((object) symbol ("define")),
@@ -6442,7 +6446,7 @@ public class PJScheme:Scheme
 				       append ((object) PJScheme.
 					       list ((object) tester_def),
 					       (object) PJScheme.
-					       make_define_datatype_defines ((object) variant_names)));
+					       make_define_datatype_defines ((object) variant_names, (object) variant_tests)));
 		   pc = (Function) apply_cont;
 		}
 	   }
@@ -8977,7 +8981,26 @@ public class PJScheme:Scheme
 							   variants))));
    }
 
-   new public static object make_define_datatype_defines (object names)
+   new public static object define_datatype_variant_tests (object variants)
+   {
+      if (true_q (PJScheme.null_q ((object) variants)))
+	 return ((object) EmptyList);
+      else
+	 return ((object) PJScheme.
+		 cons ((object) PJScheme.
+		       get_sexp ((object) PJScheme.
+				 cadr_hat ((object) PJScheme.
+					   cadr_hat ((object) PJScheme.
+						     car ((object)
+							  variants)))),
+		       (object) PJScheme.
+		       define_datatype_variant_tests ((object) PJScheme.
+						      cdr ((object)
+							   variants))));
+   }
+
+   new public static object make_define_datatype_defines (object names,
+							  object tests)
    {
       if (true_q (PJScheme.null_q ((object) names)))
 	 return ((object) EmptyList);
@@ -8994,7 +9017,7 @@ public class PJScheme:Scheme
 							 (object) PJScheme.
 							 list ((object)
 							       PJScheme.
-							       append ((object) PJScheme.list ((object) symbol ("lambda")), (object) PJScheme.append ((object) PJScheme.list ((object) symbol ("args")), (object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("cons")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("quote")), (object) PJScheme.list ((object) PJScheme.car ((object) names)))), (object) PJScheme.list ((object) symbol ("args")))))))))), (object) PJScheme.make_define_datatype_defines ((object) PJScheme.cdr ((object) names))));
+							       append ((object) PJScheme.list ((object) symbol ("lambda")), (object) PJScheme.append ((object) PJScheme.list ((object) symbol ("args")), (object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("if")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("apply")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.car ((object) tests)), (object) PJScheme.list ((object) symbol ("args"))))), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("cons")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("quote")), (object) PJScheme.list ((object) PJScheme.car ((object) names)))), (object) PJScheme.list ((object) symbol ("args"))))), (object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("error")), (object) PJScheme.append ((object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("quote")), (object) PJScheme.list ((object) PJScheme.car ((object) names)))), (object) PJScheme.append ((object) PJScheme.list ((object) "'~s' not a valid value"), (object) PJScheme.list ((object) PJScheme.append ((object) PJScheme.list ((object) symbol ("car")), (object) PJScheme.list ((object) symbol ("args"))))))))))))))))), (object) PJScheme.make_define_datatype_defines ((object) PJScheme.cdr ((object) names), (object) PJScheme.cdr ((object) tests))));
    }
 
    new public static object make_macro_env_hat ()

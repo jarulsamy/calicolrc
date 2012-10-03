@@ -1589,6 +1589,8 @@
              (let* ((variants (cddr (cdr^ datum)))
                     (variant-names (define-datatype-variant-names
                                      variants))
+                    (variant-tests (define-datatype-variant-tests
+                                     variants))
                     (tester-def `(define (unquote type-tester-name)
                                    (lambda (x)
                                      (and (pair? x)
@@ -1599,7 +1601,9 @@
                  k
                  `(begin
                     ,tester-def
-                    ,@(make-define-datatype-defines variant-names)))))))
+                    ,@(make-define-datatype-defines
+                        variant-names
+                        variant-tests)))))))
       (<macro-11> ()
        (let* ((type-name (get-sexp (cadr^ datum)))
               (type-tester-name (string->symbol
@@ -2591,15 +2595,29 @@
          (get-sexp (car^ (car variants)))
          (define-datatype-variant-names (cdr variants)))))))
 
+(define define-datatype-variant-tests
+  (lambda (variants)
+    (cond
+      ((null? variants) '())
+      (else
+       (cons
+         (get-sexp (cadr^ (cadr^ (car variants))))
+         (define-datatype-variant-tests (cdr variants)))))))
+
 (define make-define-datatype-defines
-  (lambda (names)
+  (lambda (names tests)
     (cond
       ((null? names) '())
       (else
        (cons
          `(define (unquote (car names))
-            (lambda args (cons ',(car names) args)))
-         (make-define-datatype-defines (cdr names)))))))
+            (lambda args
+              (if (apply ,(car tests) args)
+                  (cons ',(car names) args)
+                  (error ',(car names)
+                    "'~s' not a valid value"
+                    (car args)))))
+         (make-define-datatype-defines (cdr names) (cdr tests)))))))
 
 (define make-macro-env^
   (lambda ()
@@ -3189,9 +3207,11 @@
 (define handle-debug-info
   (lambda (exp result)
     (let ((info (rac exp)))
-      (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-        (aunparse exp) (get-start-line info) (get-start-char info)
-        (get-srcfile info) result))))
+      (if (eq? info 'none)
+          (printf "~s evaluates to ~a~%" (aunparse exp) result)
+          (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
+            (aunparse exp) (get-start-line info) (get-start-char info)
+            (get-srcfile info) result)))))
 
 (define make-debugging-k
   (lambda (exp k)
