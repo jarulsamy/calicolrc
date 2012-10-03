@@ -68,7 +68,7 @@ class BooEngine(Calico.Engine):
         error = False
         for e in compiler_context.Errors:
             if e.Code != 'BCE0034': # side-effects, don't report
-                System.Error.Write(e)
+                System.Console.Error.WriteLine(e)
                 error = True
         if error:
             return
