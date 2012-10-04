@@ -2627,690 +2627,699 @@
                                 (set! pc reannotate-cps))
                               (if (eq? (car temp_1) '<proc-7>)
                                   (begin
-                                    (set! k_reg (make-cont2 '<cont2-72> handler_reg k2_reg))
-                                    (set! src_reg 'stdin)
-                                    (set! input_reg (car args_reg))
-                                    (set! pc scan-input))
+                                    (set! value2_reg fail_reg)
+                                    (set! value1_reg (aunparse (car args_reg)))
+                                    (set! k_reg k2_reg)
+                                    (set! pc apply-cont2))
                                   (if (eq? (car temp_1) '<proc-8>)
                                       (begin
-                                        (set! k_reg (make-cont2 '<cont2-73> handler_reg k2_reg))
+                                        (set! k_reg (make-cont2 '<cont2-72> handler_reg k2_reg))
                                         (set! src_reg 'stdin)
                                         (set! input_reg (car args_reg))
                                         (set! pc scan-input))
                                       (if (eq? (car temp_1) '<proc-9>)
-                                          (let ((proc 'undefined) (proc-args 'undefined))
-                                            (set! proc-args (cadr args_reg))
-                                            (set! proc (car args_reg))
-                                            (set! args_reg proc-args)
-                                            (set! proc_reg proc)
-                                            (set! pc apply-proc))
+                                          (begin
+                                            (set! k_reg (make-cont2 '<cont2-73> handler_reg k2_reg))
+                                            (set! src_reg 'stdin)
+                                            (set! input_reg (car args_reg))
+                                            (set! pc scan-input))
                                           (if (eq? (car temp_1) '<proc-10>)
-                                              (if (not (length-one? args_reg))
-                                                  (begin
-                                                    (set! msg_reg "incorrect number of arguments to sqrt")
-                                                    (set! pc runtime-error))
-                                                  (if (not (all-numeric? args_reg))
-                                                      (begin
-                                                        (set! msg_reg "sqrt called on non-numeric argument(s)")
-                                                        (set! pc runtime-error))
-                                                      (begin
-                                                        (set! value2_reg fail_reg)
-                                                        (set! value1_reg (apply sqrt args_reg))
-                                                        (set! k_reg k2_reg)
-                                                        (set! pc apply-cont2))))
+                                              (let ((proc 'undefined) (proc-args 'undefined))
+                                                (set! proc-args (cadr args_reg))
+                                                (set! proc (car args_reg))
+                                                (set! args_reg proc-args)
+                                                (set! proc_reg proc)
+                                                (set! pc apply-proc))
                                               (if (eq? (car temp_1) '<proc-11>)
-                                                  (begin
-                                                    (for-each safe-print args_reg)
-                                                    (set! value2_reg fail_reg)
-                                                    (set! value1_reg void-value)
-                                                    (set! k_reg k2_reg)
-                                                    (set! pc apply-cont2))
+                                                  (if (not (length-one? args_reg))
+                                                      (begin
+                                                        (set! msg_reg "incorrect number of arguments to sqrt")
+                                                        (set! pc runtime-error))
+                                                      (if (not (all-numeric? args_reg))
+                                                          (begin
+                                                            (set! msg_reg "sqrt called on non-numeric argument(s)")
+                                                            (set! pc runtime-error))
+                                                          (begin
+                                                            (set! value2_reg fail_reg)
+                                                            (set! value1_reg (apply sqrt args_reg))
+                                                            (set! k_reg k2_reg)
+                                                            (set! pc apply-cont2))))
                                                   (if (eq? (car temp_1) '<proc-12>)
-                                                      (let ((s 'undefined))
-                                                        (set! s (format "~a" (car args_reg)))
-                                                        (set! *need-newline* (true? (not (ends-with-newline? s))))
-                                                        (display s)
+                                                      (begin
+                                                        (for-each safe-print args_reg)
                                                         (set! value2_reg fail_reg)
                                                         (set! value1_reg void-value)
                                                         (set! k_reg k2_reg)
                                                         (set! pc apply-cont2))
                                                       (if (eq? (car temp_1) '<proc-13>)
-                                                          (begin
-                                                            (set! *need-newline* #f)
-                                                            (newline)
+                                                          (let ((s 'undefined))
+                                                            (set! s (format "~a" (car args_reg)))
+                                                            (set! *need-newline* (true? (not (ends-with-newline? s))))
+                                                            (display s)
                                                             (set! value2_reg fail_reg)
                                                             (set! value1_reg void-value)
                                                             (set! k_reg k2_reg)
                                                             (set! pc apply-cont2))
                                                           (if (eq? (car temp_1) '<proc-14>)
-                                                              (if (not (length-one? args_reg))
-                                                                  (begin
-                                                                    (set! msg_reg "incorrect number of arguments to load")
-                                                                    (set! pc runtime-error))
-                                                                  (begin
-                                                                    (set! k_reg k2_reg)
-                                                                    (set! env_reg toplevel-env)
-                                                                    (set! filename_reg (car args_reg))
-                                                                    (set! pc load-file)))
+                                                              (begin
+                                                                (set! *need-newline* #f)
+                                                                (newline)
+                                                                (set! value2_reg fail_reg)
+                                                                (set! value1_reg void-value)
+                                                                (set! k_reg k2_reg)
+                                                                (set! pc apply-cont2))
                                                               (if (eq? (car temp_1) '<proc-15>)
                                                                   (if (not (length-one? args_reg))
                                                                       (begin
-                                                                        (set! msg_reg "incorrect number of arguments to length")
+                                                                        (set! msg_reg "incorrect number of arguments to load")
                                                                         (set! pc runtime-error))
                                                                       (begin
-                                                                        (set! ls_reg (car args_reg))
-                                                                        (set! sum_reg 0)
-                                                                        (set! x_reg (car args_reg))
-                                                                        (set! pc length-loop)))
+                                                                        (set! k_reg k2_reg)
+                                                                        (set! env_reg toplevel-env)
+                                                                        (set! filename_reg (car args_reg))
+                                                                        (set! pc load-file)))
                                                                   (if (eq? (car temp_1) '<proc-16>)
                                                                       (if (not (length-one? args_reg))
                                                                           (begin
-                                                                            (set! msg_reg "incorrect number of arguments to symbol?")
+                                                                            (set! msg_reg "incorrect number of arguments to length")
                                                                             (set! pc runtime-error))
                                                                           (begin
-                                                                            (set! value2_reg fail_reg)
-                                                                            (set! value1_reg (apply symbol? args_reg))
-                                                                            (set! k_reg k2_reg)
-                                                                            (set! pc apply-cont2)))
+                                                                            (set! ls_reg (car args_reg))
+                                                                            (set! sum_reg 0)
+                                                                            (set! x_reg (car args_reg))
+                                                                            (set! pc length-loop)))
                                                                       (if (eq? (car temp_1) '<proc-17>)
                                                                           (if (not (length-one? args_reg))
                                                                               (begin
-                                                                                (set! msg_reg "incorrect number of arguments to number?")
+                                                                                (set! msg_reg
+                                                                                  (format
+                                                                                    "incorrect number of arguments to symbol?: you gave ~s, should have been 1 argument"
+                                                                                    args_reg))
                                                                                 (set! pc runtime-error))
                                                                               (begin
                                                                                 (set! value2_reg fail_reg)
-                                                                                (set! value1_reg (apply number? args_reg))
+                                                                                (set! value1_reg (apply symbol? args_reg))
                                                                                 (set! k_reg k2_reg)
                                                                                 (set! pc apply-cont2)))
                                                                           (if (eq? (car temp_1) '<proc-18>)
                                                                               (if (not (length-one? args_reg))
                                                                                   (begin
-                                                                                    (set! msg_reg "incorrect number of arguments to boolean?")
+                                                                                    (set! msg_reg "incorrect number of arguments to number?")
                                                                                     (set! pc runtime-error))
                                                                                   (begin
                                                                                     (set! value2_reg fail_reg)
-                                                                                    (set! value1_reg (apply boolean? args_reg))
+                                                                                    (set! value1_reg (apply number? args_reg))
                                                                                     (set! k_reg k2_reg)
                                                                                     (set! pc apply-cont2)))
                                                                               (if (eq? (car temp_1) '<proc-19>)
                                                                                   (if (not (length-one? args_reg))
                                                                                       (begin
-                                                                                        (set! msg_reg "incorrect number of arguments to string?")
+                                                                                        (set! msg_reg "incorrect number of arguments to boolean?")
                                                                                         (set! pc runtime-error))
                                                                                       (begin
                                                                                         (set! value2_reg fail_reg)
-                                                                                        (set! value1_reg (apply string? args_reg))
+                                                                                        (set! value1_reg (apply boolean? args_reg))
                                                                                         (set! k_reg k2_reg)
                                                                                         (set! pc apply-cont2)))
                                                                                   (if (eq? (car temp_1) '<proc-20>)
                                                                                       (if (not (length-one? args_reg))
                                                                                           (begin
-                                                                                            (set! msg_reg "incorrect number of arguments to null?")
+                                                                                            (set! msg_reg "incorrect number of arguments to string?")
                                                                                             (set! pc runtime-error))
                                                                                           (begin
                                                                                             (set! value2_reg fail_reg)
-                                                                                            (set! value1_reg (apply null? args_reg))
+                                                                                            (set! value1_reg (apply string? args_reg))
                                                                                             (set! k_reg k2_reg)
                                                                                             (set! pc apply-cont2)))
                                                                                       (if (eq? (car temp_1) '<proc-21>)
                                                                                           (if (not (length-one? args_reg))
                                                                                               (begin
-                                                                                                (set! msg_reg "incorrect number of arguments to pair?")
+                                                                                                (set! msg_reg "incorrect number of arguments to null?")
                                                                                                 (set! pc runtime-error))
                                                                                               (begin
                                                                                                 (set! value2_reg fail_reg)
-                                                                                                (set! value1_reg (apply pair? args_reg))
+                                                                                                (set! value1_reg (apply null? args_reg))
                                                                                                 (set! k_reg k2_reg)
                                                                                                 (set! pc apply-cont2)))
                                                                                           (if (eq? (car temp_1) '<proc-22>)
-                                                                                              (if (not (length-two? args_reg))
+                                                                                              (if (not (length-one? args_reg))
                                                                                                   (begin
-                                                                                                    (set! msg_reg "incorrect number of arguments to cons")
+                                                                                                    (set! msg_reg "incorrect number of arguments to pair?")
                                                                                                     (set! pc runtime-error))
                                                                                                   (begin
                                                                                                     (set! value2_reg fail_reg)
-                                                                                                    (set! value1_reg (apply cons args_reg))
+                                                                                                    (set! value1_reg (apply pair? args_reg))
                                                                                                     (set! k_reg k2_reg)
                                                                                                     (set! pc apply-cont2)))
                                                                                               (if (eq? (car temp_1) '<proc-23>)
-                                                                                                  (if (not (length-one? args_reg))
+                                                                                                  (if (not (length-two? args_reg))
                                                                                                       (begin
-                                                                                                        (set! msg_reg "incorrect number of arguments to car")
+                                                                                                        (set! msg_reg "incorrect number of arguments to cons")
                                                                                                         (set! pc runtime-error))
-                                                                                                      (if (not (pair? (car args_reg)))
-                                                                                                          (begin
-                                                                                                            (set! msg_reg
-                                                                                                              (format "car called on non-pair ~s" (car args_reg)))
-                                                                                                            (set! pc runtime-error))
-                                                                                                          (begin
-                                                                                                            (set! value2_reg fail_reg)
-                                                                                                            (set! value1_reg (apply car args_reg))
-                                                                                                            (set! k_reg k2_reg)
-                                                                                                            (set! pc apply-cont2))))
+                                                                                                      (begin
+                                                                                                        (set! value2_reg fail_reg)
+                                                                                                        (set! value1_reg (apply cons args_reg))
+                                                                                                        (set! k_reg k2_reg)
+                                                                                                        (set! pc apply-cont2)))
                                                                                                   (if (eq? (car temp_1) '<proc-24>)
                                                                                                       (if (not (length-one? args_reg))
                                                                                                           (begin
-                                                                                                            (set! msg_reg "incorrect number of arguments to cdr")
+                                                                                                            (set! msg_reg "incorrect number of arguments to car")
                                                                                                             (set! pc runtime-error))
                                                                                                           (if (not (pair? (car args_reg)))
                                                                                                               (begin
                                                                                                                 (set! msg_reg
-                                                                                                                  (format "cdr called on non-pair ~s" (car args_reg)))
+                                                                                                                  (format "car called on non-pair ~s" (car args_reg)))
                                                                                                                 (set! pc runtime-error))
                                                                                                               (begin
                                                                                                                 (set! value2_reg fail_reg)
-                                                                                                                (set! value1_reg (apply cdr args_reg))
+                                                                                                                (set! value1_reg (apply car args_reg))
                                                                                                                 (set! k_reg k2_reg)
                                                                                                                 (set! pc apply-cont2))))
                                                                                                       (if (eq? (car temp_1) '<proc-25>)
                                                                                                           (if (not (length-one? args_reg))
                                                                                                               (begin
-                                                                                                                (set! msg_reg "incorrect number of arguments to cadr")
+                                                                                                                (set! msg_reg "incorrect number of arguments to cdr")
                                                                                                                 (set! pc runtime-error))
-                                                                                                              (if (not (length-at-least? 2 (car args_reg)))
+                                                                                                              (if (not (pair? (car args_reg)))
                                                                                                                   (begin
                                                                                                                     (set! msg_reg
-                                                                                                                      (format
-                                                                                                                        "cadr called on incorrect list structure ~s"
-                                                                                                                        (car args_reg)))
+                                                                                                                      (format "cdr called on non-pair ~s" (car args_reg)))
                                                                                                                     (set! pc runtime-error))
                                                                                                                   (begin
                                                                                                                     (set! value2_reg fail_reg)
-                                                                                                                    (set! value1_reg (apply cadr args_reg))
+                                                                                                                    (set! value1_reg (apply cdr args_reg))
                                                                                                                     (set! k_reg k2_reg)
                                                                                                                     (set! pc apply-cont2))))
                                                                                                           (if (eq? (car temp_1) '<proc-26>)
                                                                                                               (if (not (length-one? args_reg))
                                                                                                                   (begin
-                                                                                                                    (set! msg_reg "incorrect number of arguments to caddr")
+                                                                                                                    (set! msg_reg "incorrect number of arguments to cadr")
                                                                                                                     (set! pc runtime-error))
-                                                                                                                  (if (not (length-at-least? 3 (car args_reg)))
+                                                                                                                  (if (not (length-at-least? 2 (car args_reg)))
                                                                                                                       (begin
                                                                                                                         (set! msg_reg
                                                                                                                           (format
-                                                                                                                            "caddr called on incorrect list structure ~s"
+                                                                                                                            "cadr called on incorrect list structure ~s"
                                                                                                                             (car args_reg)))
                                                                                                                         (set! pc runtime-error))
                                                                                                                       (begin
                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                        (set! value1_reg (apply caddr args_reg))
+                                                                                                                        (set! value1_reg (apply cadr args_reg))
                                                                                                                         (set! k_reg k2_reg)
                                                                                                                         (set! pc apply-cont2))))
                                                                                                               (if (eq? (car temp_1) '<proc-27>)
-                                                                                                                  (begin
-                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                    (set! value1_reg args_reg)
-                                                                                                                    (set! k_reg k2_reg)
-                                                                                                                    (set! pc apply-cont2))
-                                                                                                                  (if (eq? (car temp_1) '<proc-28>)
-                                                                                                                      (if (not (all-numeric? args_reg))
+                                                                                                                  (if (not (length-one? args_reg))
+                                                                                                                      (begin
+                                                                                                                        (set! msg_reg "incorrect number of arguments to caddr")
+                                                                                                                        (set! pc runtime-error))
+                                                                                                                      (if (not (length-at-least? 3 (car args_reg)))
                                                                                                                           (begin
-                                                                                                                            (set! msg_reg "+ called on non-numeric argument(s)")
+                                                                                                                            (set! msg_reg
+                                                                                                                              (format
+                                                                                                                                "caddr called on incorrect list structure ~s"
+                                                                                                                                (car args_reg)))
                                                                                                                             (set! pc runtime-error))
                                                                                                                           (begin
                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                            (set! value1_reg (apply + args_reg))
+                                                                                                                            (set! value1_reg (apply caddr args_reg))
                                                                                                                             (set! k_reg k2_reg)
-                                                                                                                            (set! pc apply-cont2)))
+                                                                                                                            (set! pc apply-cont2))))
+                                                                                                                  (if (eq? (car temp_1) '<proc-28>)
+                                                                                                                      (begin
+                                                                                                                        (set! value2_reg fail_reg)
+                                                                                                                        (set! value1_reg args_reg)
+                                                                                                                        (set! k_reg k2_reg)
+                                                                                                                        (set! pc apply-cont2))
                                                                                                                       (if (eq? (car temp_1) '<proc-29>)
-                                                                                                                          (if (null? args_reg)
+                                                                                                                          (if (not (all-numeric? args_reg))
                                                                                                                               (begin
-                                                                                                                                (set! msg_reg "incorrect number of arguments to -")
+                                                                                                                                (set! msg_reg "+ called on non-numeric argument(s)")
                                                                                                                                 (set! pc runtime-error))
-                                                                                                                              (if (not (all-numeric? args_reg))
-                                                                                                                                  (begin
-                                                                                                                                    (set! msg_reg "- called on non-numeric argument(s)")
-                                                                                                                                    (set! pc runtime-error))
-                                                                                                                                  (begin
-                                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                                    (set! value1_reg (apply - args_reg))
-                                                                                                                                    (set! k_reg k2_reg)
-                                                                                                                                    (set! pc apply-cont2))))
+                                                                                                                              (begin
+                                                                                                                                (set! value2_reg fail_reg)
+                                                                                                                                (set! value1_reg (apply + args_reg))
+                                                                                                                                (set! k_reg k2_reg)
+                                                                                                                                (set! pc apply-cont2)))
                                                                                                                           (if (eq? (car temp_1) '<proc-30>)
-                                                                                                                              (if (not (all-numeric? args_reg))
+                                                                                                                              (if (null? args_reg)
                                                                                                                                   (begin
-                                                                                                                                    (set! msg_reg "* called on non-numeric argument(s)")
+                                                                                                                                    (set! msg_reg "incorrect number of arguments to -")
                                                                                                                                     (set! pc runtime-error))
-                                                                                                                                  (begin
-                                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                                    (set! value1_reg (apply * args_reg))
-                                                                                                                                    (set! k_reg k2_reg)
-                                                                                                                                    (set! pc apply-cont2)))
-                                                                                                                              (if (eq? (car temp_1) '<proc-31>)
-                                                                                                                                  (if (null? args_reg)
+                                                                                                                                  (if (not (all-numeric? args_reg))
                                                                                                                                       (begin
-                                                                                                                                        (set! msg_reg "incorrect number of arguments to /")
+                                                                                                                                        (set! msg_reg "- called on non-numeric argument(s)")
                                                                                                                                         (set! pc runtime-error))
-                                                                                                                                      (if (not (all-numeric? args_reg))
-                                                                                                                                          (begin
-                                                                                                                                            (set! msg_reg "/ called on non-numeric argument(s)")
-                                                                                                                                            (set! pc runtime-error))
-                                                                                                                                          (if (member 0 (cdr args_reg))
-                                                                                                                                              (begin
-                                                                                                                                                (set! msg_reg "division by zero")
-                                                                                                                                                (set! pc runtime-error))
-                                                                                                                                              (begin
-                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                (set! value1_reg (apply / args_reg))
-                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                (set! pc apply-cont2)))))
+                                                                                                                                      (begin
+                                                                                                                                        (set! value2_reg fail_reg)
+                                                                                                                                        (set! value1_reg (apply - args_reg))
+                                                                                                                                        (set! k_reg k2_reg)
+                                                                                                                                        (set! pc apply-cont2))))
+                                                                                                                              (if (eq? (car temp_1) '<proc-31>)
+                                                                                                                                  (if (not (all-numeric? args_reg))
+                                                                                                                                      (begin
+                                                                                                                                        (set! msg_reg "* called on non-numeric argument(s)")
+                                                                                                                                        (set! pc runtime-error))
+                                                                                                                                      (begin
+                                                                                                                                        (set! value2_reg fail_reg)
+                                                                                                                                        (set! value1_reg (apply * args_reg))
+                                                                                                                                        (set! k_reg k2_reg)
+                                                                                                                                        (set! pc apply-cont2)))
                                                                                                                                   (if (eq? (car temp_1) '<proc-32>)
-                                                                                                                                      (if (not (length-at-least? 2 args_reg))
+                                                                                                                                      (if (null? args_reg)
                                                                                                                                           (begin
-                                                                                                                                            (set! msg_reg "incorrect number of arguments to <")
+                                                                                                                                            (set! msg_reg "incorrect number of arguments to /")
                                                                                                                                             (set! pc runtime-error))
                                                                                                                                           (if (not (all-numeric? args_reg))
                                                                                                                                               (begin
-                                                                                                                                                (set! msg_reg "< called on non-numeric argument(s)")
+                                                                                                                                                (set! msg_reg "/ called on non-numeric argument(s)")
                                                                                                                                                 (set! pc runtime-error))
-                                                                                                                                              (begin
-                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                (set! value1_reg (apply < args_reg))
-                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                (set! pc apply-cont2))))
-                                                                                                                                      (if (eq? (car temp_1) '<proc-33>)
-                                                                                                                                          (if (not (length-at-least? 2 args_reg))
-                                                                                                                                              (begin
-                                                                                                                                                (set! msg_reg "incorrect number of arguments to >")
-                                                                                                                                                (set! pc runtime-error))
-                                                                                                                                              (if (not (all-numeric? args_reg))
+                                                                                                                                              (if (member 0 (cdr args_reg))
                                                                                                                                                   (begin
-                                                                                                                                                    (set! msg_reg "> called on non-numeric argument(s)")
+                                                                                                                                                    (set! msg_reg "division by zero")
                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                   (begin
                                                                                                                                                     (set! value2_reg fail_reg)
-                                                                                                                                                    (set! value1_reg (apply > args_reg))
+                                                                                                                                                    (set! value1_reg (apply / args_reg))
+                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                    (set! pc apply-cont2)))))
+                                                                                                                                      (if (eq? (car temp_1) '<proc-33>)
+                                                                                                                                          (if (not (length-at-least? 2 args_reg))
+                                                                                                                                              (begin
+                                                                                                                                                (set! msg_reg "incorrect number of arguments to <")
+                                                                                                                                                (set! pc runtime-error))
+                                                                                                                                              (if (not (all-numeric? args_reg))
+                                                                                                                                                  (begin
+                                                                                                                                                    (set! msg_reg "< called on non-numeric argument(s)")
+                                                                                                                                                    (set! pc runtime-error))
+                                                                                                                                                  (begin
+                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                    (set! value1_reg (apply < args_reg))
                                                                                                                                                     (set! k_reg k2_reg)
                                                                                                                                                     (set! pc apply-cont2))))
                                                                                                                                           (if (eq? (car temp_1) '<proc-34>)
                                                                                                                                               (if (not (length-at-least? 2 args_reg))
                                                                                                                                                   (begin
-                                                                                                                                                    (set! msg_reg "incorrect number of arguments to <=")
+                                                                                                                                                    (set! msg_reg "incorrect number of arguments to >")
                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                   (if (not (all-numeric? args_reg))
                                                                                                                                                       (begin
-                                                                                                                                                        (set! msg_reg "<= called on non-numeric argument(s)")
+                                                                                                                                                        (set! msg_reg "> called on non-numeric argument(s)")
                                                                                                                                                         (set! pc runtime-error))
                                                                                                                                                       (begin
                                                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                                                        (set! value1_reg (apply <= args_reg))
+                                                                                                                                                        (set! value1_reg (apply > args_reg))
                                                                                                                                                         (set! k_reg k2_reg)
                                                                                                                                                         (set! pc apply-cont2))))
                                                                                                                                               (if (eq? (car temp_1) '<proc-35>)
                                                                                                                                                   (if (not (length-at-least? 2 args_reg))
                                                                                                                                                       (begin
-                                                                                                                                                        (set! msg_reg "incorrect number of arguments to >=")
+                                                                                                                                                        (set! msg_reg "incorrect number of arguments to <=")
                                                                                                                                                         (set! pc runtime-error))
                                                                                                                                                       (if (not (all-numeric? args_reg))
                                                                                                                                                           (begin
-                                                                                                                                                            (set! msg_reg ">= called on non-numeric argument(s)")
+                                                                                                                                                            (set! msg_reg "<= called on non-numeric argument(s)")
                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                           (begin
                                                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                                                            (set! value1_reg (apply >= args_reg))
+                                                                                                                                                            (set! value1_reg (apply <= args_reg))
                                                                                                                                                             (set! k_reg k2_reg)
                                                                                                                                                             (set! pc apply-cont2))))
                                                                                                                                                   (if (eq? (car temp_1) '<proc-36>)
                                                                                                                                                       (if (not (length-at-least? 2 args_reg))
                                                                                                                                                           (begin
-                                                                                                                                                            (set! msg_reg "incorrect number of arguments to =")
+                                                                                                                                                            (set! msg_reg "incorrect number of arguments to >=")
                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                           (if (not (all-numeric? args_reg))
                                                                                                                                                               (begin
-                                                                                                                                                                (set! msg_reg "= called on non-numeric argument(s)")
+                                                                                                                                                                (set! msg_reg ">= called on non-numeric argument(s)")
                                                                                                                                                                 (set! pc runtime-error))
                                                                                                                                                               (begin
                                                                                                                                                                 (set! value2_reg fail_reg)
-                                                                                                                                                                (set! value1_reg (apply = args_reg))
+                                                                                                                                                                (set! value1_reg (apply >= args_reg))
                                                                                                                                                                 (set! k_reg k2_reg)
                                                                                                                                                                 (set! pc apply-cont2))))
                                                                                                                                                       (if (eq? (car temp_1) '<proc-37>)
-                                                                                                                                                          (if (not (length-one? args_reg))
+                                                                                                                                                          (if (not (length-at-least? 2 args_reg))
                                                                                                                                                               (begin
-                                                                                                                                                                (set! msg_reg "incorrect number of arguments to abs")
+                                                                                                                                                                (set! msg_reg "incorrect number of arguments to =")
                                                                                                                                                                 (set! pc runtime-error))
                                                                                                                                                               (if (not (all-numeric? args_reg))
                                                                                                                                                                   (begin
-                                                                                                                                                                    (set! msg_reg "abs called on non-numeric argument(s)")
+                                                                                                                                                                    (set! msg_reg "= called on non-numeric argument(s)")
                                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                                   (begin
                                                                                                                                                                     (set! value2_reg fail_reg)
-                                                                                                                                                                    (set! value1_reg (apply abs args_reg))
+                                                                                                                                                                    (set! value1_reg (apply = args_reg))
                                                                                                                                                                     (set! k_reg k2_reg)
                                                                                                                                                                     (set! pc apply-cont2))))
                                                                                                                                                           (if (eq? (car temp_1) '<proc-38>)
-                                                                                                                                                              (if (not (length-two? args_reg))
+                                                                                                                                                              (if (not (length-one? args_reg))
                                                                                                                                                                   (begin
-                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to equal?")
+                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to abs")
                                                                                                                                                                     (set! pc runtime-error))
-                                                                                                                                                                  (begin
-                                                                                                                                                                    (set! k_reg (make-cont '<cont-37> fail_reg k2_reg))
-                                                                                                                                                                    (set! y_reg (cadr args_reg))
-                                                                                                                                                                    (set! x_reg (car args_reg))
-                                                                                                                                                                    (set! pc equal-objects?)))
-                                                                                                                                                              (if (eq? (car temp_1) '<proc-39>)
-                                                                                                                                                                  (if (not (length-two? args_reg))
+                                                                                                                                                                  (if (not (all-numeric? args_reg))
                                                                                                                                                                       (begin
-                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to eq?")
+                                                                                                                                                                        (set! msg_reg "abs called on non-numeric argument(s)")
                                                                                                                                                                         (set! pc runtime-error))
                                                                                                                                                                       (begin
                                                                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                                                                        (set! value1_reg (apply eq? args_reg))
+                                                                                                                                                                        (set! value1_reg (apply abs args_reg))
                                                                                                                                                                         (set! k_reg k2_reg)
-                                                                                                                                                                        (set! pc apply-cont2)))
+                                                                                                                                                                        (set! pc apply-cont2))))
+                                                                                                                                                              (if (eq? (car temp_1) '<proc-39>)
+                                                                                                                                                                  (if (not (length-two? args_reg))
+                                                                                                                                                                      (begin
+                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to equal?")
+                                                                                                                                                                        (set! pc runtime-error))
+                                                                                                                                                                      (begin
+                                                                                                                                                                        (set! k_reg (make-cont '<cont-37> fail_reg k2_reg))
+                                                                                                                                                                        (set! y_reg (cadr args_reg))
+                                                                                                                                                                        (set! x_reg (car args_reg))
+                                                                                                                                                                        (set! pc equal-objects?)))
                                                                                                                                                                   (if (eq? (car temp_1) '<proc-40>)
                                                                                                                                                                       (if (not (length-two? args_reg))
                                                                                                                                                                           (begin
-                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to memq")
+                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to eq?")
                                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                                           (begin
                                                                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                                                                            (set! value1_reg (apply memq args_reg))
+                                                                                                                                                                            (set! value1_reg (apply eq? args_reg))
                                                                                                                                                                             (set! k_reg k2_reg)
                                                                                                                                                                             (set! pc apply-cont2)))
                                                                                                                                                                       (if (eq? (car temp_1) '<proc-41>)
                                                                                                                                                                           (if (not (length-two? args_reg))
                                                                                                                                                                               (begin
-                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to member")
+                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to memq")
                                                                                                                                                                                 (set! pc runtime-error))
                                                                                                                                                                               (begin
+                                                                                                                                                                                (set! value2_reg fail_reg)
+                                                                                                                                                                                (set! value1_reg (apply memq args_reg))
                                                                                                                                                                                 (set! k_reg k2_reg)
-                                                                                                                                                                                (set! ls_reg (cadr args_reg))
-                                                                                                                                                                                (set! y_reg (cadr args_reg))
-                                                                                                                                                                                (set! x_reg (car args_reg))
-                                                                                                                                                                                (set! pc member-loop)))
+                                                                                                                                                                                (set! pc apply-cont2)))
                                                                                                                                                                           (if (eq? (car temp_1) '<proc-42>)
-                                                                                                                                                                              (if (or (null? args_reg) (length-at-least? 4 args_reg))
+                                                                                                                                                                              (if (not (length-two? args_reg))
                                                                                                                                                                                   (begin
-                                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to range")
+                                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to member")
                                                                                                                                                                                     (set! pc runtime-error))
-                                                                                                                                                                                  (if (not (all-numeric? args_reg))
-                                                                                                                                                                                      (begin
-                                                                                                                                                                                        (set! msg_reg "range called on non-numeric argument(s)")
-                                                                                                                                                                                        (set! pc runtime-error))
-                                                                                                                                                                                      (begin
-                                                                                                                                                                                        (set! value2_reg fail_reg)
-                                                                                                                                                                                        (set! value1_reg (apply range args_reg))
-                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                        (set! pc apply-cont2))))
+                                                                                                                                                                                  (begin
+                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                    (set! ls_reg (cadr args_reg))
+                                                                                                                                                                                    (set! y_reg (cadr args_reg))
+                                                                                                                                                                                    (set! x_reg (car args_reg))
+                                                                                                                                                                                    (set! pc member-loop)))
                                                                                                                                                                               (if (eq? (car temp_1) '<proc-43>)
-                                                                                                                                                                                  (if (not (length-two? args_reg))
+                                                                                                                                                                                  (if (or (null? args_reg) (length-at-least? 4 args_reg))
                                                                                                                                                                                       (begin
-                                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to set-car!")
+                                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to range")
                                                                                                                                                                                         (set! pc runtime-error))
-                                                                                                                                                                                      (if (not (pair? (car args_reg)))
+                                                                                                                                                                                      (if (not (all-numeric? args_reg))
                                                                                                                                                                                           (begin
-                                                                                                                                                                                            (set! msg_reg
-                                                                                                                                                                                              (format "set-car! called on non-pair ~s" (car args_reg)))
+                                                                                                                                                                                            (set! msg_reg "range called on non-numeric argument(s)")
                                                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                                                           (begin
                                                                                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                                                                                            (set! value1_reg (apply set-car! args_reg))
+                                                                                                                                                                                            (set! value1_reg (apply range args_reg))
                                                                                                                                                                                             (set! k_reg k2_reg)
                                                                                                                                                                                             (set! pc apply-cont2))))
                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-44>)
                                                                                                                                                                                       (if (not (length-two? args_reg))
                                                                                                                                                                                           (begin
-                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to set-cdr!")
+                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to set-car!")
                                                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                                                           (if (not (pair? (car args_reg)))
                                                                                                                                                                                               (begin
                                                                                                                                                                                                 (set! msg_reg
-                                                                                                                                                                                                  (format "set-cdr! called on non-pair ~s" (car args_reg)))
+                                                                                                                                                                                                  (format "set-car! called on non-pair ~s" (car args_reg)))
                                                                                                                                                                                                 (set! pc runtime-error))
                                                                                                                                                                                               (begin
                                                                                                                                                                                                 (set! value2_reg fail_reg)
-                                                                                                                                                                                                (set! value1_reg (apply set-cdr! args_reg))
+                                                                                                                                                                                                (set! value1_reg (apply set-car! args_reg))
                                                                                                                                                                                                 (set! k_reg k2_reg)
                                                                                                                                                                                                 (set! pc apply-cont2))))
                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-45>)
-                                                                                                                                                                                          (let ((filename 'undefined))
-                                                                                                                                                                                            (set! filename (car args_reg))
-                                                                                                                                                                                            (if (null? (cdr args_reg))
-                                                                                                                                                                                                (begin
-                                                                                                                                                                                                  (set! k_reg k2_reg)
-                                                                                                                                                                                                  (set! info_reg 'none)
-                                                                                                                                                                                                  (set! env_reg env2_reg)
-                                                                                                                                                                                                  (set! filename_reg filename)
-                                                                                                                                                                                                  (set! pc load-file))
-                                                                                                                                                                                                (let ((module-name 'undefined))
-                                                                                                                                                                                                  (set! module-name (cadr args_reg))
-                                                                                                                                                                                                  (set! k_reg
-                                                                                                                                                                                                    (make-cont2 '<cont2-77> filename env2_reg handler_reg
-                                                                                                                                                                                                      k2_reg))
-                                                                                                                                                                                                  (set! env_reg env2_reg)
-                                                                                                                                                                                                  (set! var_reg module-name)
-                                                                                                                                                                                                  (set! pc lookup-binding-in-first-frame))))
-                                                                                                                                                                                          (if (eq? (car temp_1) '<proc-46>)
+                                                                                                                                                                                          (if (not (length-two? args_reg))
                                                                                                                                                                                               (begin
-                                                                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                                                                (set! env_reg env2_reg)
-                                                                                                                                                                                                (set! pc get-primitive))
-                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-47>)
-                                                                                                                                                                                                  (let ((k 'undefined))
-                                                                                                                                                                                                    (set! k (list-ref temp_1 1))
+                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to set-cdr!")
+                                                                                                                                                                                                (set! pc runtime-error))
+                                                                                                                                                                                              (if (not (pair? (car args_reg)))
+                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                    (set! msg_reg
+                                                                                                                                                                                                      (format "set-cdr! called on non-pair ~s" (car args_reg)))
+                                                                                                                                                                                                    (set! pc runtime-error))
+                                                                                                                                                                                                  (begin
                                                                                                                                                                                                     (set! value2_reg fail_reg)
-                                                                                                                                                                                                    (set! value1_reg (car args_reg))
-                                                                                                                                                                                                    (set! k_reg k)
-                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                    (set! value1_reg (apply set-cdr! args_reg))
+                                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                                    (set! pc apply-cont2))))
+                                                                                                                                                                                          (if (eq? (car temp_1) '<proc-46>)
+                                                                                                                                                                                              (let ((filename 'undefined))
+                                                                                                                                                                                                (set! filename (car args_reg))
+                                                                                                                                                                                                (if (null? (cdr args_reg))
+                                                                                                                                                                                                    (begin
+                                                                                                                                                                                                      (set! k_reg k2_reg)
+                                                                                                                                                                                                      (set! info_reg 'none)
+                                                                                                                                                                                                      (set! env_reg env2_reg)
+                                                                                                                                                                                                      (set! filename_reg filename)
+                                                                                                                                                                                                      (set! pc load-file))
+                                                                                                                                                                                                    (let ((module-name 'undefined))
+                                                                                                                                                                                                      (set! module-name (cadr args_reg))
+                                                                                                                                                                                                      (set! k_reg
+                                                                                                                                                                                                        (make-cont2 '<cont2-77> filename env2_reg handler_reg
+                                                                                                                                                                                                          k2_reg))
+                                                                                                                                                                                                      (set! env_reg env2_reg)
+                                                                                                                                                                                                      (set! var_reg module-name)
+                                                                                                                                                                                                      (set! pc lookup-binding-in-first-frame))))
+                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-47>)
+                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                                    (set! env_reg env2_reg)
+                                                                                                                                                                                                    (set! pc get-primitive))
                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-48>)
-                                                                                                                                                                                                      (if (not (length-one? args_reg))
-                                                                                                                                                                                                          (begin
-                                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to call/cc")
-                                                                                                                                                                                                            (set! pc runtime-error))
-                                                                                                                                                                                                          (let ((proc 'undefined))
-                                                                                                                                                                                                            (set! proc (car args_reg))
-                                                                                                                                                                                                            (if (not (procedure-object? proc))
-                                                                                                                                                                                                                (begin
-                                                                                                                                                                                                                  (set! msg_reg "call/cc called with non-procedure")
-                                                                                                                                                                                                                  (set! pc runtime-error))
-                                                                                                                                                                                                                (let ((fake-k 'undefined))
-                                                                                                                                                                                                                  (set! fake-k (make-proc '<proc-47> k2_reg))
-                                                                                                                                                                                                                  (if (dlr-exp? proc)
-                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                        (set! value2_reg fail_reg)
-                                                                                                                                                                                                                        (set! value1_reg (dlr-apply proc (list fake-k)))
-                                                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                                                        (set! pc apply-cont2))
-                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                        (set! args_reg (list fake-k))
-                                                                                                                                                                                                                        (set! proc_reg proc)
-                                                                                                                                                                                                                        (set! pc apply-proc)))))))
+                                                                                                                                                                                                      (let ((k 'undefined))
+                                                                                                                                                                                                        (set! k (list-ref temp_1 1))
+                                                                                                                                                                                                        (set! value2_reg fail_reg)
+                                                                                                                                                                                                        (set! value1_reg (car args_reg))
+                                                                                                                                                                                                        (set! k_reg k)
+                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-49>)
-                                                                                                                                                                                                          (if (null? args_reg)
+                                                                                                                                                                                                          (if (not (length-one? args_reg))
                                                                                                                                                                                                               (begin
-                                                                                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                                                                                (set! value1_reg void-value)
-                                                                                                                                                                                                                (set! k_reg REP-k)
-                                                                                                                                                                                                                (set! pc apply-cont2))
-                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                                                                                (set! value1_reg (car args_reg))
-                                                                                                                                                                                                                (set! k_reg REP-k)
-                                                                                                                                                                                                                (set! pc apply-cont2)))
-                                                                                                                                                                                                          (if (eq? (car temp_1) '<proc-50>)
-                                                                                                                                                                                                              (if (not (length-one? args_reg))
-                                                                                                                                                                                                                  (begin
-                                                                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to require")
-                                                                                                                                                                                                                    (set! pc runtime-error))
-                                                                                                                                                                                                                  (if (true? (car args_reg))
-                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                        (set! value2_reg fail_reg)
-                                                                                                                                                                                                                        (set! value1_reg 'ok)
-                                                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                                                        (set! pc apply-cont2))
-                                                                                                                                                                                                                      (set! pc apply-fail)))
-                                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-51>)
-                                                                                                                                                                                                                  (if (not (null? args_reg))
-                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to cut")
-                                                                                                                                                                                                                        (set! pc runtime-error))
-                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                        (set! value2_reg REP-fail)
-                                                                                                                                                                                                                        (set! value1_reg 'ok)
-                                                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                                                        (set! pc apply-cont2)))
-                                                                                                                                                                                                                  (if (eq? (car temp_1) '<proc-52>)
-                                                                                                                                                                                                                      (if (not (length-one? args_reg))
+                                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to call/cc")
+                                                                                                                                                                                                                (set! pc runtime-error))
+                                                                                                                                                                                                              (let ((proc 'undefined))
+                                                                                                                                                                                                                (set! proc (car args_reg))
+                                                                                                                                                                                                                (if (not (procedure-object? proc))
+                                                                                                                                                                                                                    (begin
+                                                                                                                                                                                                                      (set! msg_reg "call/cc called with non-procedure")
+                                                                                                                                                                                                                      (set! pc runtime-error))
+                                                                                                                                                                                                                    (let ((fake-k 'undefined))
+                                                                                                                                                                                                                      (set! fake-k (make-proc '<proc-48> k2_reg))
+                                                                                                                                                                                                                      (if (dlr-exp? proc)
                                                                                                                                                                                                                           (begin
-                                                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to reverse")
+                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                            (set! value1_reg (dlr-apply proc (list fake-k)))
+                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                            (set! args_reg (list fake-k))
+                                                                                                                                                                                                                            (set! proc_reg proc)
+                                                                                                                                                                                                                            (set! pc apply-proc)))))))
+                                                                                                                                                                                                          (if (eq? (car temp_1) '<proc-50>)
+                                                                                                                                                                                                              (if (null? args_reg)
+                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                                                                                    (set! value1_reg void-value)
+                                                                                                                                                                                                                    (set! k_reg REP-k)
+                                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                                                                                    (set! value1_reg (car args_reg))
+                                                                                                                                                                                                                    (set! k_reg REP-k)
+                                                                                                                                                                                                                    (set! pc apply-cont2)))
+                                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-51>)
+                                                                                                                                                                                                                  (if (not (length-one? args_reg))
+                                                                                                                                                                                                                      (begin
+                                                                                                                                                                                                                        (set! msg_reg "incorrect number of arguments to require")
+                                                                                                                                                                                                                        (set! pc runtime-error))
+                                                                                                                                                                                                                      (if (true? (car args_reg))
+                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                            (set! value1_reg 'ok)
+                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                          (set! pc apply-fail)))
+                                                                                                                                                                                                                  (if (eq? (car temp_1) '<proc-52>)
+                                                                                                                                                                                                                      (if (not (null? args_reg))
+                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to cut")
                                                                                                                                                                                                                             (set! pc runtime-error))
-                                                                                                                                                                                                                          (if (not (list? args_reg))
-                                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                                (set! msg_reg
-                                                                                                                                                                                                                                  (format
-                                                                                                                                                                                                                                    "reverse called on incorrect list structure ~s"
-                                                                                                                                                                                                                                    (car args_reg)))
-                                                                                                                                                                                                                                (set! pc runtime-error))
-                                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                (set! value1_reg (apply reverse args_reg))
-                                                                                                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                                                                                                (set! pc apply-cont2))))
+                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                            (set! value2_reg REP-fail)
+                                                                                                                                                                                                                            (set! value1_reg 'ok)
+                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                            (set! pc apply-cont2)))
                                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-53>)
-                                                                                                                                                                                                                          (if (not (length-two? args_reg))
+                                                                                                                                                                                                                          (if (not (length-one? args_reg))
                                                                                                                                                                                                                               (begin
-                                                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to append")
+                                                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to reverse")
                                                                                                                                                                                                                                 (set! pc runtime-error))
-                                                                                                                                                                                                                              (if (not (list? (car args_reg)))
+                                                                                                                                                                                                                              (if (not (list? args_reg))
                                                                                                                                                                                                                                   (begin
                                                                                                                                                                                                                                     (set! msg_reg
                                                                                                                                                                                                                                       (format
-                                                                                                                                                                                                                                        "append called on incorrect list structure ~s"
+                                                                                                                                                                                                                                        "reverse called on incorrect list structure ~s"
                                                                                                                                                                                                                                         (car args_reg)))
                                                                                                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                                                                                                   (begin
-                                                                                                                                                                                                                                    (set! k_reg (make-cont '<cont-37> fail_reg k2_reg))
-                                                                                                                                                                                                                                    (set! lists_reg args_reg)
-                                                                                                                                                                                                                                    (set! pc append-all))))
+                                                                                                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                    (set! value1_reg (apply reverse args_reg))
+                                                                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                                                                    (set! pc apply-cont2))))
                                                                                                                                                                                                                           (if (eq? (car temp_1) '<proc-54>)
-                                                                                                                                                                                                                              (if (not (length-one? args_reg))
+                                                                                                                                                                                                                              (if (not (length-two? args_reg))
                                                                                                                                                                                                                                   (begin
-                                                                                                                                                                                                                                    (set! msg_reg
-                                                                                                                                                                                                                                      "incorrect number of arguments to list->vector")
+                                                                                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to append")
                                                                                                                                                                                                                                     (set! pc runtime-error))
                                                                                                                                                                                                                                   (if (not (list? (car args_reg)))
                                                                                                                                                                                                                                       (begin
                                                                                                                                                                                                                                         (set! msg_reg
                                                                                                                                                                                                                                           (format
-                                                                                                                                                                                                                                            "list->vector called on incorrect list structure ~s"
+                                                                                                                                                                                                                                            "append called on incorrect list structure ~s"
                                                                                                                                                                                                                                             (car args_reg)))
                                                                                                                                                                                                                                         (set! pc runtime-error))
                                                                                                                                                                                                                                       (begin
-                                                                                                                                                                                                                                        (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                        (set! value1_reg (apply list->vector args_reg))
-                                                                                                                                                                                                                                        (set! k_reg k2_reg)
-                                                                                                                                                                                                                                        (set! pc apply-cont2))))
+                                                                                                                                                                                                                                        (set! k_reg (make-cont '<cont-37> fail_reg k2_reg))
+                                                                                                                                                                                                                                        (set! lists_reg args_reg)
+                                                                                                                                                                                                                                        (set! pc append-all))))
                                                                                                                                                                                                                               (if (eq? (car temp_1) '<proc-55>)
-                                                                                                                                                                                                                                  (begin
-                                                                                                                                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                    (set! value1_reg (dir args_reg env2_reg))
-                                                                                                                                                                                                                                    (set! k_reg k2_reg)
-                                                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                                                  (if (not (length-one? args_reg))
+                                                                                                                                                                                                                                      (begin
+                                                                                                                                                                                                                                        (set! msg_reg
+                                                                                                                                                                                                                                          "incorrect number of arguments to list->vector")
+                                                                                                                                                                                                                                        (set! pc runtime-error))
+                                                                                                                                                                                                                                      (if (not (list? (car args_reg)))
+                                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                                            (set! msg_reg
+                                                                                                                                                                                                                                              (format
+                                                                                                                                                                                                                                                "list->vector called on incorrect list structure ~s"
+                                                                                                                                                                                                                                                (car args_reg)))
+                                                                                                                                                                                                                                            (set! pc runtime-error))
+                                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                            (set! value1_reg (apply list->vector args_reg))
+                                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                                            (set! pc apply-cont2))))
                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-56>)
                                                                                                                                                                                                                                       (begin
                                                                                                                                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                        (set! value1_reg (get-current-time))
+                                                                                                                                                                                                                                        (set! value1_reg (dir args_reg env2_reg))
                                                                                                                                                                                                                                         (set! k_reg k2_reg)
                                                                                                                                                                                                                                         (set! pc apply-cont2))
                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-57>)
                                                                                                                                                                                                                                           (begin
+                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                            (set! value1_reg (get-current-time))
                                                                                                                                                                                                                                             (set! k_reg k2_reg)
-                                                                                                                                                                                                                                            (set! env_reg env2_reg)
-                                                                                                                                                                                                                                            (set! proc_reg (car args_reg))
-                                                                                                                                                                                                                                            (set! args_reg (cdr args_reg))
-                                                                                                                                                                                                                                            (set! pc map-primitive))
+                                                                                                                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<proc-58>)
                                                                                                                                                                                                                                               (begin
                                                                                                                                                                                                                                                 (set! k_reg k2_reg)
                                                                                                                                                                                                                                                 (set! env_reg env2_reg)
-                                                                                                                                                                                                                                                (set! lists_reg (cdr args_reg))
                                                                                                                                                                                                                                                 (set! proc_reg (car args_reg))
-                                                                                                                                                                                                                                                (set! pc for-each-primitive))
+                                                                                                                                                                                                                                                (set! args_reg (cdr args_reg))
+                                                                                                                                                                                                                                                (set! pc map-primitive))
                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<proc-59>)
                                                                                                                                                                                                                                                   (begin
-                                                                                                                                                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                    (set! value1_reg env2_reg)
                                                                                                                                                                                                                                                     (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                                                                    (set! env_reg env2_reg)
+                                                                                                                                                                                                                                                    (set! lists_reg (cdr args_reg))
+                                                                                                                                                                                                                                                    (set! proc_reg (car args_reg))
+                                                                                                                                                                                                                                                    (set! pc for-each-primitive))
                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-60>)
                                                                                                                                                                                                                                                       (begin
                                                                                                                                                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                        (set! value1_reg (using-prim args_reg env2_reg))
+                                                                                                                                                                                                                                                        (set! value1_reg env2_reg)
                                                                                                                                                                                                                                                         (set! k_reg k2_reg)
                                                                                                                                                                                                                                                         (set! pc apply-cont2))
                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-61>)
-                                                                                                                                                                                                                                                          (if (not (length-one? args_reg))
-                                                                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to not")
-                                                                                                                                                                                                                                                                (set! pc runtime-error))
-                                                                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                (set! value1_reg (not (car args_reg)))
-                                                                                                                                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                                (set! pc apply-cont2)))
+                                                                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                            (set! value1_reg (using-prim args_reg env2_reg))
+                                                                                                                                                                                                                                                            (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<proc-62>)
-                                                                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                                                                (apply printf-prim args_reg)
-                                                                                                                                                                                                                                                                (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                (set! value1_reg void-value)
-                                                                                                                                                                                                                                                                (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                                (set! pc apply-cont2))
-                                                                                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-63>)
+                                                                                                                                                                                                                                                              (if (not (length-one? args_reg))
+                                                                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                                                                    (set! msg_reg "incorrect number of arguments to not")
+                                                                                                                                                                                                                                                                    (set! pc runtime-error))
                                                                                                                                                                                                                                                                   (begin
                                                                                                                                                                                                                                                                     (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                    (set! value1_reg (list->vector args_reg))
+                                                                                                                                                                                                                                                                    (set! value1_reg (not (car args_reg)))
+                                                                                                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                    (set! pc apply-cont2)))
+                                                                                                                                                                                                                                                              (if (eq? (car temp_1) '<proc-63>)
+                                                                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                                                                    (apply printf-prim args_reg)
+                                                                                                                                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                    (set! value1_reg void-value)
                                                                                                                                                                                                                                                                     (set! k_reg k2_reg)
                                                                                                                                                                                                                                                                     (set! pc apply-cont2))
                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-64>)
                                                                                                                                                                                                                                                                       (begin
                                                                                                                                                                                                                                                                         (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                        (set! value1_reg
-                                                                                                                                                                                                                                                                          (vector-set!
-                                                                                                                                                                                                                                                                            (car args_reg)
-                                                                                                                                                                                                                                                                            (cadr args_reg)
-                                                                                                                                                                                                                                                                            (caddr args_reg)))
+                                                                                                                                                                                                                                                                        (set! value1_reg (list->vector args_reg))
                                                                                                                                                                                                                                                                         (set! k_reg k2_reg)
                                                                                                                                                                                                                                                                         (set! pc apply-cont2))
                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-65>)
                                                                                                                                                                                                                                                                           (begin
                                                                                                                                                                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                            (set! value1_reg (apply vector-ref args_reg))
+                                                                                                                                                                                                                                                                            (set! value1_reg
+                                                                                                                                                                                                                                                                              (vector-set!
+                                                                                                                                                                                                                                                                                (car args_reg)
+                                                                                                                                                                                                                                                                                (cadr args_reg)
+                                                                                                                                                                                                                                                                                (caddr args_reg)))
                                                                                                                                                                                                                                                                             (set! k_reg k2_reg)
                                                                                                                                                                                                                                                                             (set! pc apply-cont2))
                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<proc-66>)
                                                                                                                                                                                                                                                                               (begin
                                                                                                                                                                                                                                                                                 (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                                (set! value1_reg (apply make-vector args_reg))
+                                                                                                                                                                                                                                                                                (set! value1_reg (apply vector-ref args_reg))
                                                                                                                                                                                                                                                                                 (set! k_reg k2_reg)
                                                                                                                                                                                                                                                                                 (set! pc apply-cont2))
                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<proc-67>)
-                                                                                                                                                                                                                                                                                  (let ((location 'undefined) (message 'undefined))
-                                                                                                                                                                                                                                                                                    (set! location (format "Error in ~a: " (car args_reg)))
-                                                                                                                                                                                                                                                                                    (set! message
-                                                                                                                                                                                                                                                                                      (string-append location (apply format (cdr args_reg))))
-                                                                                                                                                                                                                                                                                    (set! msg_reg message)
-                                                                                                                                                                                                                                                                                    (set! pc runtime-error))
+                                                                                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                                                                                    (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                                    (set! value1_reg (apply make-vector args_reg))
+                                                                                                                                                                                                                                                                                    (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<proc-68>)
-                                                                                                                                                                                                                                                                                      (if (not (length-two? args_reg))
-                                                                                                                                                                                                                                                                                          (begin
-                                                                                                                                                                                                                                                                                            (set! msg_reg "incorrect number of arguments to list-ref")
-                                                                                                                                                                                                                                                                                            (set! pc runtime-error))
-                                                                                                                                                                                                                                                                                          (begin
-                                                                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                                            (set! value1_reg (apply list-ref args_reg))
-                                                                                                                                                                                                                                                                                            (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                                                            (set! pc apply-cont2)))
+                                                                                                                                                                                                                                                                                      (let ((location 'undefined) (message 'undefined))
+                                                                                                                                                                                                                                                                                        (set! location (format "Error in ~a: " (car args_reg)))
+                                                                                                                                                                                                                                                                                        (set! message
+                                                                                                                                                                                                                                                                                          (string-append location (apply format (cdr args_reg))))
+                                                                                                                                                                                                                                                                                        (set! msg_reg message)
+                                                                                                                                                                                                                                                                                        (set! pc runtime-error))
                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<proc-69>)
-                                                                                                                                                                                                                                                                                          (let ((external-function-object 'undefined))
-                                                                                                                                                                                                                                                                                            (set! external-function-object (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                            (set! value2_reg fail_reg)
-                                                                                                                                                                                                                                                                                            (set! value1_reg (apply* external-function-object args_reg))
-                                                                                                                                                                                                                                                                                            (set! k_reg k2_reg)
-                                                                                                                                                                                                                                                                                            (set! pc apply-cont2))
-                                                                                                                                                                                                                                                                                          (error 'apply-proc
-                                                                                                                                                                                                                                                                                            "bad procedure: ~a"
-                                                                                                                                                                                                                                                                                            proc_reg)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                                                                                                                                                                          (if (not (length-two? args_reg))
+                                                                                                                                                                                                                                                                                              (begin
+                                                                                                                                                                                                                                                                                                (set! msg_reg "incorrect number of arguments to list-ref")
+                                                                                                                                                                                                                                                                                                (set! pc runtime-error))
+                                                                                                                                                                                                                                                                                              (begin
+                                                                                                                                                                                                                                                                                                (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                                                (set! value1_reg (apply list-ref args_reg))
+                                                                                                                                                                                                                                                                                                (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                                                (set! pc apply-cont2)))
+                                                                                                                                                                                                                                                                                          (if (eq? (car temp_1) '<proc-70>)
+                                                                                                                                                                                                                                                                                              (let ((external-function-object 'undefined))
+                                                                                                                                                                                                                                                                                                (set! external-function-object (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                (set! value2_reg fail_reg)
+                                                                                                                                                                                                                                                                                                (set! value1_reg (apply* external-function-object args_reg))
+                                                                                                                                                                                                                                                                                                (set! k_reg k2_reg)
+                                                                                                                                                                                                                                                                                                (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                              (error 'apply-proc
+                                                                                                                                                                                                                                                                                                "bad procedure: ~a"
+                                                                                                                                                                                                                                                                                                proc_reg))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 (define make-macro
   (lambda args (return* (cons 'macro-transformer args))))
@@ -4995,7 +5004,12 @@
                                 (list
                                   (append
                                     (list 'apply)
-                                    (append (list (car tests)) (list 'args))))
+                                    (append
+                                      (list (car tests))
+                                      (list
+                                        (append
+                                          (list 'list)
+                                          (list (append (list 'car) (list 'args))))))))
                                 (append
                                   (list
                                     (append
@@ -5454,226 +5468,261 @@
 
 (define aunparse
   (lambda (aexp)
-    (if (eq? (car aexp) 'lit-aexp)
-        (let ((datum 'undefined))
-          (set! datum (list-ref aexp 1))
-          (if (literal? datum)
-              (return* datum)
-              (if (vector? datum)
-                  (return* datum)
-                  (return* (append (list 'quote) (list datum))))))
-        (if (eq? (car aexp) 'var-aexp)
-            (let ((id 'undefined))
-              (set! id (list-ref aexp 1))
-              (return* id))
-            (if (eq? (car aexp) 'if-aexp)
-                (let ((test-aexp 'undefined)
-                      (then-aexp 'undefined)
-                      (else-aexp 'undefined))
-                  (set! else-aexp (list-ref aexp 3))
-                  (set! then-aexp (list-ref aexp 2))
-                  (set! test-aexp (list-ref aexp 1))
-                  (return*
-                    (append
-                      (list 'if)
+    (let ((ae 'undefined))
+      (set! ae (car aexp))
+      (if (eq? ae 'lit-aexp)
+          (let ((datum 'undefined))
+            (set! datum (cadr aexp))
+            (if (literal? datum)
+                (return* datum)
+                (if (vector? datum)
+                    (return* datum)
+                    (return* (append (list 'quote) (list datum))))))
+          (if (eq? ae 'var-aexp)
+              (let ((id 'undefined) (info 'undefined))
+                (set! info (caddr aexp))
+                (set! id (cadr aexp))
+                (return* id))
+              (if (eq? ae 'if-aexp)
+                  (let ((test-aexp 'undefined)
+                        (then-aexp 'undefined)
+                        (else-aexp 'undefined)
+                        (info 'undefined))
+                    (set! info (car (cddddr aexp)))
+                    (set! else-aexp (cadddr aexp))
+                    (set! then-aexp (caddr aexp))
+                    (set! test-aexp (cadr aexp))
+                    (return*
                       (append
-                        (list (aunparse test-aexp))
+                        (list 'if)
                         (append
-                          (list (aunparse then-aexp))
-                          (list (aunparse else-aexp)))))))
-                (if (eq? (car aexp) 'assign-aexp)
-                    (let ((var 'undefined) (rhs-exp 'undefined))
-                      (set! rhs-exp (list-ref aexp 2))
-                      (set! var (list-ref aexp 1))
-                      (return*
-                        (append
-                          (list 'set!)
-                          (append (list var) (list (aunparse rhs-exp))))))
-                    (if (eq? (car aexp) 'func-aexp)
-                        (let ((exp 'undefined))
-                          (set! exp (list-ref aexp 1))
-                          (return* (append (list 'func) (list (aunparse exp)))))
-                        (if (eq? (car aexp) 'define-aexp)
-                            (let ((id 'undefined)
-                                  (docstring 'undefined)
-                                  (rhs-exp 'undefined))
-                              (set! rhs-exp (list-ref aexp 3))
-                              (set! docstring (list-ref aexp 2))
-                              (set! id (list-ref aexp 1))
-                              (if (string=? docstring "")
-                                  (return*
-                                    (append
-                                      (list 'define)
-                                      (append (list id) (list (aunparse rhs-exp)))))
-                                  (return*
-                                    (append
-                                      (list 'define)
+                          (list (aunparse test-aexp))
+                          (append
+                            (list (aunparse then-aexp))
+                            (list (aunparse else-aexp)))))))
+                  (if (eq? ae 'assign-aexp)
+                      (let ((var 'undefined)
+                            (rhs-exp 'undefined)
+                            (var-info 'undefined)
+                            (info 'undefined))
+                        (set! info (cadddr aexp))
+                        (set! var-info (cadddr aexp))
+                        (set! rhs-exp (caddr aexp))
+                        (set! var (cadr aexp))
+                        (return*
+                          (append
+                            (list 'set!)
+                            (append (list var) (list (aunparse rhs-exp))))))
+                      (if (eq? ae 'func-aexp)
+                          (let ((exp 'undefined) (info 'undefined))
+                            (set! info (caddr aexp))
+                            (set! exp (cadr aexp))
+                            (return* (append (list 'func) (list (aunparse exp)))))
+                          (if (eq? ae 'define-aexp)
+                              (let ((id 'undefined)
+                                    (docstring 'undefined)
+                                    (rhs-exp 'undefined)
+                                    (info 'undefined))
+                                (set! info (car (cddddr aexp)))
+                                (set! rhs-exp (cadddr aexp))
+                                (set! docstring (caddr aexp))
+                                (set! id (cadr aexp))
+                                (if (string=? docstring "")
+                                    (return*
                                       (append
-                                        (list id)
-                                        (append (list docstring) (list (aunparse rhs-exp))))))))
-                            (if (eq? (car aexp) 'define!-aexp)
-                                (let ((id 'undefined)
-                                      (docstring 'undefined)
-                                      (rhs-exp 'undefined))
-                                  (set! rhs-exp (list-ref aexp 3))
-                                  (set! docstring (list-ref aexp 2))
-                                  (set! id (list-ref aexp 1))
-                                  (if (string=? docstring "")
-                                      (return*
+                                        (list 'define)
+                                        (append (list id) (list (aunparse rhs-exp)))))
+                                    (return*
+                                      (append
+                                        (list 'define)
                                         (append
-                                          (list 'define!)
-                                          (append (list id) (list (aunparse rhs-exp)))))
-                                      (return*
-                                        (append
-                                          (list 'define!)
+                                          (list id)
+                                          (append (list docstring) (list (aunparse rhs-exp))))))))
+                              (if (eq? ae 'define!-aexp)
+                                  (let ((id 'undefined)
+                                        (docstring 'undefined)
+                                        (rhs-exp 'undefined)
+                                        (info 'undefined))
+                                    (set! info (car (cddddr aexp)))
+                                    (set! rhs-exp (cadddr aexp))
+                                    (set! docstring (caddr aexp))
+                                    (set! id (cadr aexp))
+                                    (if (string=? docstring "")
+                                        (return*
                                           (append
-                                            (list id)
-                                            (append (list docstring) (list (aunparse rhs-exp))))))))
-                                (if (eq? (car aexp) 'define-syntax-aexp)
-                                    (let ((name 'undefined) (clauses 'undefined))
-                                      (set! clauses (list-ref aexp 2))
-                                      (set! name (list-ref aexp 1))
-                                      (return*
-                                        (append
-                                          (list 'define-syntax)
-                                          (append (list name) clauses))))
-                                    (if (eq? (car aexp) 'begin-aexp)
-                                        (let ((exps 'undefined))
-                                          (set! exps (list-ref aexp 1))
-                                          (return* (append (list 'begin) (map aunparse exps))))
-                                        (if (eq? (car aexp) 'lambda-aexp)
-                                            (let ((formals 'undefined) (bodies 'undefined))
-                                              (set! bodies (list-ref aexp 2))
-                                              (set! formals (list-ref aexp 1))
-                                              (return*
-                                                (append
-                                                  (list 'lambda)
-                                                  (append (list formals) (map aunparse bodies)))))
-                                            (if (eq? (car aexp) 'mu-lambda-aexp)
-                                                (let ((formals 'undefined)
-                                                      (runt 'undefined)
-                                                      (bodies 'undefined))
-                                                  (set! bodies (list-ref aexp 3))
-                                                  (set! runt (list-ref aexp 2))
-                                                  (set! formals (list-ref aexp 1))
-                                                  (return*
-                                                    (append
-                                                      (list 'lambda)
+                                            (list 'define!)
+                                            (append (list id) (list (aunparse rhs-exp)))))
+                                        (return*
+                                          (append
+                                            (list 'define!)
+                                            (append
+                                              (list id)
+                                              (append (list docstring) (list (aunparse rhs-exp))))))))
+                                  (if (eq? ae 'define-syntax-aexp)
+                                      (let ((name 'undefined)
+                                            (clauses 'undefined)
+                                            (aclauses 'undefined)
+                                            (info 'undefined))
+                                        (set! info (car (cddddr aexp)))
+                                        (set! aclauses (cadddr aexp))
+                                        (set! clauses (caddr aexp))
+                                        (set! name (cadr aexp))
+                                        (return*
+                                          (append
+                                            (list 'define-syntax)
+                                            (append (list name) clauses))))
+                                      (if (eq? ae 'begin-aexp)
+                                          (let ((exps 'undefined) (info 'undefined))
+                                            (set! info (caddr aexp))
+                                            (set! exps (cadr aexp))
+                                            (return* (append (list 'begin) (map aunparse exps))))
+                                          (if (eq? ae 'lambda-aexp)
+                                              (let ((formals 'undefined)
+                                                    (bodies 'undefined)
+                                                    (info 'undefined))
+                                                (set! info (caddr aexp))
+                                                (set! bodies (caddr aexp))
+                                                (set! formals (cadr aexp))
+                                                (return*
+                                                  (append
+                                                    (list 'lambda)
+                                                    (append (list formals) (map aunparse bodies)))))
+                                              (if (eq? ae 'mu-lambda-aexp)
+                                                  (let ((formals 'undefined)
+                                                        (runt 'undefined)
+                                                        (bodies 'undefined)
+                                                        (info 'undefined))
+                                                    (set! info (car (cddddr aexp)))
+                                                    (set! bodies (cadddr aexp))
+                                                    (set! runt (caddr aexp))
+                                                    (set! formals (cadr aexp))
+                                                    (return*
                                                       (append
-                                                        (list (append formals runt))
-                                                        (map aunparse bodies)))))
-                                                (if (eq? (car aexp) 'trace-lambda-aexp)
-                                                    (let ((name 'undefined)
-                                                          (formals 'undefined)
-                                                          (bodies 'undefined))
-                                                      (set! bodies (list-ref aexp 3))
-                                                      (set! formals (list-ref aexp 2))
-                                                      (set! name (list-ref aexp 1))
-                                                      (return*
+                                                        (list 'lambda)
                                                         (append
-                                                          (list 'trace-lambda)
+                                                          (list (append formals runt))
+                                                          (map aunparse bodies)))))
+                                                  (if (eq? ae 'trace-lambda-aexp)
+                                                      (let ((name 'undefined)
+                                                            (formals 'undefined)
+                                                            (bodies 'undefined)
+                                                            (info 'undefined))
+                                                        (set! info (car (cddddr aexp)))
+                                                        (set! bodies (cadddr aexp))
+                                                        (set! formals (caddr aexp))
+                                                        (set! name (cadr aexp))
+                                                        (return*
                                                           (append
-                                                            (list name)
-                                                            (append (list formals) (map aunparse bodies))))))
-                                                    (if (eq? (car aexp) 'mu-trace-lambda-aexp)
-                                                        (let ((name 'undefined)
-                                                              (formals 'undefined)
-                                                              (runt 'undefined)
-                                                              (bodies 'undefined))
-                                                          (set! bodies (list-ref aexp 4))
-                                                          (set! runt (list-ref aexp 3))
-                                                          (set! formals (list-ref aexp 2))
-                                                          (set! name (list-ref aexp 1))
-                                                          (return*
+                                                            (list 'trace-lambda)
                                                             (append
-                                                              (list 'trace-lambda)
+                                                              (list name)
+                                                              (append (list formals) (map aunparse bodies))))))
+                                                      (if (eq? ae 'mu-trace-lambda-aexp)
+                                                          (let ((name 'undefined)
+                                                                (formals 'undefined)
+                                                                (runt 'undefined)
+                                                                (bodies 'undefined)
+                                                                (info 'undefined))
+                                                            (set! info (cadr (cddddr aexp)))
+                                                            (set! bodies (car (cddddr aexp)))
+                                                            (set! runt (cadddr aexp))
+                                                            (set! formals (caddr aexp))
+                                                            (set! name (cadr aexp))
+                                                            (return*
                                                               (append
-                                                                (list name)
+                                                                (list 'trace-lambda)
                                                                 (append
-                                                                  (list (append formals runt))
-                                                                  (map aunparse bodies))))))
-                                                        (if (eq? (car aexp) 'app-aexp)
-                                                            (let ((operator 'undefined) (operands 'undefined))
-                                                              (set! operands (list-ref aexp 2))
-                                                              (set! operator (list-ref aexp 1))
-                                                              (return*
-                                                                (append
-                                                                  (list (aunparse operator))
-                                                                  (map aunparse operands))))
-                                                            (if (eq? (car aexp) 'try-catch-aexp)
-                                                                (let ((body 'undefined)
-                                                                      (catch-var 'undefined)
-                                                                      (catch-exps 'undefined))
-                                                                  (set! catch-exps (list-ref aexp 3))
-                                                                  (set! catch-var (list-ref aexp 2))
-                                                                  (set! body (list-ref aexp 1))
-                                                                  (return*
-                                                                    (append
-                                                                      (list 'try)
+                                                                  (list name)
+                                                                  (append
+                                                                    (list (append formals runt))
+                                                                    (map aunparse bodies))))))
+                                                          (if (eq? ae 'app-aexp)
+                                                              (let ((operator 'undefined)
+                                                                    (operands 'undefined)
+                                                                    (info 'undefined))
+                                                                (set! info (cadddr aexp))
+                                                                (set! operands (caddr aexp))
+                                                                (set! operator (cadr aexp))
+                                                                (return*
+                                                                  (append
+                                                                    (list (aunparse operator))
+                                                                    (map aunparse operands))))
+                                                              (if (eq? ae 'try-catch-aexp)
+                                                                  (let ((body 'undefined)
+                                                                        (catch-var 'undefined)
+                                                                        (catch-exps 'undefined)
+                                                                        (info 'undefined))
+                                                                    (set! info (car (cddddr aexp)))
+                                                                    (set! catch-exps (cadddr aexp))
+                                                                    (set! catch-var (caddr aexp))
+                                                                    (set! body (cadr aexp))
+                                                                    (return*
                                                                       (append
-                                                                        (list (aunparse body))
-                                                                        (list
-                                                                          (append
-                                                                            (list 'catch)
-                                                                            (append (list catch-var) (map aunparse catch-exps))))))))
-                                                                (if (eq? (car aexp) 'try-finally-aexp)
-                                                                    (let ((body 'undefined) (finally-exps 'undefined))
-                                                                      (set! finally-exps (list-ref aexp 2))
-                                                                      (set! body (list-ref aexp 1))
-                                                                      (return*
+                                                                        (list 'try)
                                                                         (append
-                                                                          (list 'try)
-                                                                          (append
-                                                                            (list (aunparse body))
-                                                                            (list
-                                                                              (append (list 'finally) (map aunparse finally-exps)))))))
-                                                                    (if (eq? (car aexp) 'try-catch-finally-aexp)
-                                                                        (let ((body 'undefined)
-                                                                              (catch-var 'undefined)
-                                                                              (catch-exps 'undefined)
-                                                                              (finally-exps 'undefined))
-                                                                          (set! finally-exps (list-ref aexp 4))
-                                                                          (set! catch-exps (list-ref aexp 3))
-                                                                          (set! catch-var (list-ref aexp 2))
-                                                                          (set! body (list-ref aexp 1))
-                                                                          (return*
+                                                                          (list (aunparse body))
+                                                                          (list
                                                                             (append
-                                                                              (list 'try)
+                                                                              (list 'catch)
+                                                                              (append (list catch-var) (map aunparse catch-exps))))))))
+                                                                  (if (eq? ae 'try-finally-aexp)
+                                                                      (let ((body 'undefined)
+                                                                            (finally-exps 'undefined)
+                                                                            (info 'undefined))
+                                                                        (set! info (cadddr aexp))
+                                                                        (set! finally-exps (caddr aexp))
+                                                                        (set! body (cadr aexp))
+                                                                        (return*
+                                                                          (append
+                                                                            (list 'try)
+                                                                            (append
+                                                                              (list (aunparse body))
+                                                                              (list
+                                                                                (append (list 'finally) (map aunparse finally-exps)))))))
+                                                                      (if (eq? ae 'try-catch-finally-aexp)
+                                                                          (let ((body 'undefined)
+                                                                                (catch-var 'undefined)
+                                                                                (catch-exps 'undefined)
+                                                                                (finally-exps 'undefined)
+                                                                                (info 'undefined))
+                                                                            (set! info (cadr (cddddr aexp)))
+                                                                            (set! finally-exps (car (cddddr aexp)))
+                                                                            (set! catch-exps (cadddr aexp))
+                                                                            (set! catch-var (caddr aexp))
+                                                                            (set! body (cadr aexp))
+                                                                            (return*
                                                                               (append
-                                                                                (list (aunparse body))
+                                                                                (list 'try)
                                                                                 (append
-                                                                                  (list
-                                                                                    (append
-                                                                                      (list 'catch)
-                                                                                      (append (list catch-var) (map aunparse catch-exps))))
-                                                                                  (list
-                                                                                    (append (list 'finally) (map aunparse finally-exps))))))))
-                                                                        (if (eq? (car aexp) 'raise-aexp)
-                                                                            (let ((exp 'undefined))
-                                                                              (set! exp (list-ref aexp 1))
-                                                                              (return* (append (list 'raise) (list (aunparse exp)))))
-                                                                            (if (eq? (car aexp) 'dict-aexp)
-                                                                                (let ((entries 'undefined))
-                                                                                  (set! entries (list-ref aexp 1))
-                                                                                  (return*
-                                                                                    (append
-                                                                                      (list 'dict)
-                                                                                      (map (lambda (b)
-                                                                                             (append
-                                                                                               (list (aunparse (car b)))
-                                                                                               (list (aunparse (cadr b)))))
-                                                                                           entries))))
-                                                                                (if (eq? (car aexp) 'help-aexp)
-                                                                                    (let ((var 'undefined))
-                                                                                      (set! var (list-ref aexp 1))
-                                                                                      (return* (append (list 'help) (list var))))
-                                                                                    (if (eq? (car aexp) 'choose-aexp)
-                                                                                        (let ((exps 'undefined))
-                                                                                          (set! exps (list-ref aexp 1))
-                                                                                          (return* (append (list 'choose) (map aunparse exps))))
-                                                                                        (error 'aunparse
-                                                                                          "bad abstract syntax: ~s"
-                                                                                          aexp))))))))))))))))))))))))
+                                                                                  (list (aunparse body))
+                                                                                  (append
+                                                                                    (list
+                                                                                      (append
+                                                                                        (list 'catch)
+                                                                                        (append (list catch-var) (map aunparse catch-exps))))
+                                                                                    (list
+                                                                                      (append (list 'finally) (map aunparse finally-exps))))))))
+                                                                          (if (eq? ae 'raise-aexp)
+                                                                              (let ((exp 'undefined) (info 'undefined))
+                                                                                (set! info (caddr aexp))
+                                                                                (set! exp (cadr aexp))
+                                                                                (return* (append (list 'raise) (list (aunparse exp)))))
+                                                                              (if (eq? ae 'help-aexp)
+                                                                                  (let ((var 'undefined)
+                                                                                        (var-info 'undefined)
+                                                                                        (info 'undefined))
+                                                                                    (set! info (cadddr aexp))
+                                                                                    (set! var-info (caddr aexp))
+                                                                                    (set! var (cadr aexp))
+                                                                                    (return* (append (list 'help) (list var))))
+                                                                                  (if (eq? ae 'choose-aexp)
+                                                                                      (let ((exps 'undefined) (info 'undefined))
+                                                                                        (set! info (caddr aexp))
+                                                                                        (set! exps (cadr aexp))
+                                                                                        (return* (append (list 'choose) (map aunparse exps))))
+                                                                                      (error 'unparse
+                                                                                        "bad concrete syntax: ~s"
+                                                                                        aexp))))))))))))))))))))))))
 
 (define dlr-exp? (lambda (x) (return* #f)))
 
@@ -6659,7 +6708,7 @@
            'call-with-current-continuation 'call/cc 'abort 'require
            'cut 'reverse 'append 'list->vector 'dir 'current-time 'map
            'for-each 'env 'using 'not 'printf 'vector 'vector-set!
-           'vector-ref 'make-vector '<= '>= 'error 'list-ref)
+           'vector-ref 'make-vector '<= '>= 'error 'list-ref 'unparse)
           (list void-prim exit-prim eval-prim parse-prim
            parse-string-prim read-string-prim apply-prim sqrt-prim
            print-prim display-prim newline-prim load-prim length-prim
@@ -6674,11 +6723,12 @@
            current-time-prim map-prim for-each-prim env-prim
            using-primitive not-prim printf-primitive vector-prim
            vector-set!-prim vector-ref-prim make-vector-prim
-           lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim))))))
+           lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim
+           unparse-prim))))))
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc '<proc-69> external-function-object))))
+    (return* (make-proc '<proc-70> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -6963,131 +7013,133 @@
 
 (define parse-prim (make-proc '<proc-6>))
 
-(define parse-string-prim (make-proc '<proc-7>))
+(define unparse-prim (make-proc '<proc-7>))
 
-(define read-string-prim (make-proc '<proc-8>))
+(define parse-string-prim (make-proc '<proc-8>))
 
-(define apply-prim (make-proc '<proc-9>))
+(define read-string-prim (make-proc '<proc-9>))
 
-(define sqrt-prim (make-proc '<proc-10>))
+(define apply-prim (make-proc '<proc-10>))
 
-(define print-prim (make-proc '<proc-11>))
+(define sqrt-prim (make-proc '<proc-11>))
 
-(define display-prim (make-proc '<proc-12>))
+(define print-prim (make-proc '<proc-12>))
 
-(define newline-prim (make-proc '<proc-13>))
+(define display-prim (make-proc '<proc-13>))
+
+(define newline-prim (make-proc '<proc-14>))
 
 (define *need-newline* #f)
 
-(define load-prim (make-proc '<proc-14>))
+(define load-prim (make-proc '<proc-15>))
 
 (define load-stack '())
 
-(define length-prim (make-proc '<proc-15>))
+(define length-prim (make-proc '<proc-16>))
 
-(define symbol?-prim (make-proc '<proc-16>))
+(define symbol?-prim (make-proc '<proc-17>))
 
-(define number?-prim (make-proc '<proc-17>))
+(define number?-prim (make-proc '<proc-18>))
 
-(define boolean?-prim (make-proc '<proc-18>))
+(define boolean?-prim (make-proc '<proc-19>))
 
-(define string?-prim (make-proc '<proc-19>))
+(define string?-prim (make-proc '<proc-20>))
 
-(define null?-prim (make-proc '<proc-20>))
+(define null?-prim (make-proc '<proc-21>))
 
-(define pair?-prim (make-proc '<proc-21>))
+(define pair?-prim (make-proc '<proc-22>))
 
-(define cons-prim (make-proc '<proc-22>))
+(define cons-prim (make-proc '<proc-23>))
 
-(define car-prim (make-proc '<proc-23>))
+(define car-prim (make-proc '<proc-24>))
 
-(define cdr-prim (make-proc '<proc-24>))
+(define cdr-prim (make-proc '<proc-25>))
 
-(define cadr-prim (make-proc '<proc-25>))
+(define cadr-prim (make-proc '<proc-26>))
 
-(define caddr-prim (make-proc '<proc-26>))
+(define caddr-prim (make-proc '<proc-27>))
 
-(define list-prim (make-proc '<proc-27>))
+(define list-prim (make-proc '<proc-28>))
 
-(define plus-prim (make-proc '<proc-28>))
+(define plus-prim (make-proc '<proc-29>))
 
-(define minus-prim (make-proc '<proc-29>))
+(define minus-prim (make-proc '<proc-30>))
 
-(define times-prim (make-proc '<proc-30>))
+(define times-prim (make-proc '<proc-31>))
 
-(define divide-prim (make-proc '<proc-31>))
+(define divide-prim (make-proc '<proc-32>))
 
-(define lt-prim (make-proc '<proc-32>))
+(define lt-prim (make-proc '<proc-33>))
 
-(define gt-prim (make-proc '<proc-33>))
+(define gt-prim (make-proc '<proc-34>))
 
-(define lt-or-eq-prim (make-proc '<proc-34>))
+(define lt-or-eq-prim (make-proc '<proc-35>))
 
-(define gt-or-eq-prim (make-proc '<proc-35>))
+(define gt-or-eq-prim (make-proc '<proc-36>))
 
-(define equal-sign-prim (make-proc '<proc-36>))
+(define equal-sign-prim (make-proc '<proc-37>))
 
-(define abs-prim (make-proc '<proc-37>))
+(define abs-prim (make-proc '<proc-38>))
 
-(define equal?-prim (make-proc '<proc-38>))
+(define equal?-prim (make-proc '<proc-39>))
 
-(define eq?-prim (make-proc '<proc-39>))
+(define eq?-prim (make-proc '<proc-40>))
 
-(define memq-prim (make-proc '<proc-40>))
+(define memq-prim (make-proc '<proc-41>))
 
-(define member-prim (make-proc '<proc-41>))
+(define member-prim (make-proc '<proc-42>))
 
-(define range-prim (make-proc '<proc-42>))
+(define range-prim (make-proc '<proc-43>))
 
-(define set-car!-prim (make-proc '<proc-43>))
+(define set-car!-prim (make-proc '<proc-44>))
 
-(define set-cdr!-prim (make-proc '<proc-44>))
+(define set-cdr!-prim (make-proc '<proc-45>))
 
-(define import-prim (make-proc '<proc-45>))
+(define import-prim (make-proc '<proc-46>))
 
-(define get-prim (make-proc '<proc-46>))
+(define get-prim (make-proc '<proc-47>))
 
-(define call/cc-prim (make-proc '<proc-48>))
+(define call/cc-prim (make-proc '<proc-49>))
 
-(define abort-prim (make-proc '<proc-49>))
+(define abort-prim (make-proc '<proc-50>))
 
-(define require-prim (make-proc '<proc-50>))
+(define require-prim (make-proc '<proc-51>))
 
-(define cut-prim (make-proc '<proc-51>))
+(define cut-prim (make-proc '<proc-52>))
 
-(define reverse-prim (make-proc '<proc-52>))
+(define reverse-prim (make-proc '<proc-53>))
 
-(define append-prim (make-proc '<proc-53>))
+(define append-prim (make-proc '<proc-54>))
 
-(define list-to-vector-prim (make-proc '<proc-54>))
+(define list-to-vector-prim (make-proc '<proc-55>))
 
-(define dir-prim (make-proc '<proc-55>))
+(define dir-prim (make-proc '<proc-56>))
 
-(define current-time-prim (make-proc '<proc-56>))
+(define current-time-prim (make-proc '<proc-57>))
 
-(define map-prim (make-proc '<proc-57>))
+(define map-prim (make-proc '<proc-58>))
 
-(define for-each-prim (make-proc '<proc-58>))
+(define for-each-prim (make-proc '<proc-59>))
 
-(define env-prim (make-proc '<proc-59>))
+(define env-prim (make-proc '<proc-60>))
 
-(define using-primitive (make-proc '<proc-60>))
+(define using-primitive (make-proc '<proc-61>))
 
-(define not-prim (make-proc '<proc-61>))
+(define not-prim (make-proc '<proc-62>))
 
-(define printf-primitive (make-proc '<proc-62>))
+(define printf-primitive (make-proc '<proc-63>))
 
-(define vector-prim (make-proc '<proc-63>))
+(define vector-prim (make-proc '<proc-64>))
 
-(define vector-set!-prim (make-proc '<proc-64>))
+(define vector-set!-prim (make-proc '<proc-65>))
 
-(define vector-ref-prim (make-proc '<proc-65>))
+(define vector-ref-prim (make-proc '<proc-66>))
 
-(define make-vector-prim (make-proc '<proc-66>))
+(define make-vector-prim (make-proc '<proc-67>))
 
-(define error-prim (make-proc '<proc-67>))
+(define error-prim (make-proc '<proc-68>))
 
-(define list-ref-prim (make-proc '<proc-68>))
+(define list-ref-prim (make-proc '<proc-69>))
 
 (define toplevel-env (make-toplevel-env))
 

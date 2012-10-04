@@ -526,6 +526,11 @@
       (lambda-cont (adatum)
 	(aparse adatum handler fail k2)))))
 
+;; unparse
+(define unparse-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (aunparse (car args)) fail)))
+
 ;; parse-string
 (define parse-string-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -675,7 +680,9 @@
   (lambda-proc (args env2 info handler fail k2)
     (cond
       ((not (length-one? args))
-       (runtime-error "incorrect number of arguments to symbol?" info handler fail))
+       (runtime-error
+         (format "incorrect number of arguments to symbol?: you gave ~s, should have been 1 argument" args)
+         info handler fail))
       (else (k2 (apply symbol? args) fail)))))
 
 ;; number?
@@ -1347,7 +1354,7 @@
 	    'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref)
+	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref 'unparse)
       (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim
 	    print-prim display-prim newline-prim load-prim length-prim symbol?-prim number?-prim boolean?-prim
 	    string?-prim null?-prim pair?-prim cons-prim car-prim cdr-prim cadr-prim
@@ -1357,7 +1364,7 @@
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
 	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim)))))
+	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim unparse-prim)))))
 
 (define toplevel-env (make-toplevel-env))
 

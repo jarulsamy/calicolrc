@@ -24,7 +24,7 @@
 	       set-first-frame! make-proc make-binding dlr-env-lookup
 	       dlr-env-contains
 	       execute execute-loop execute-string execute-file read-eval-print-loop
-	       aunparse unparse qq-expand-cps_ qq-expand-list-cps_
+	       unparse qq-expand-cps_ qq-expand-list-cps_
 	       init-cont init-cont2 init-cont3 init-handler init-handler2 init-fail
 	       ;; defined in Scheme.cs:
 	       asexp-tag asexp? length^ list?^ symbol?^ car^ cdr^ cadr^ cddr^ caddr^ cdddr^ cadddr^

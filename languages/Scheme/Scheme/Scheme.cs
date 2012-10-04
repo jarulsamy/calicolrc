@@ -530,6 +530,7 @@ public class Scheme {
   public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)cadddr_hat, 1, 1);
   public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
+  public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
     // Add new procedures above here!
     // Then add low-level C# code below
 
@@ -3050,24 +3051,26 @@ public class Vector {
       Calico.MainWindow calico;
       object info = PJScheme.rac(exp);
       if (Equal(info, symbol("none"))) {
-	  return;
+        return;
+      } else {
+        System.Console.WriteLine(String.Format("{0} => {1}", PJScheme.aunparse(exp), result));
       }
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
-	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
-	  if (calico != null) {
+        calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
+        if (calico != null) {
 	      if (calico.CurrentDocument == null) {
-		  return;
+            return;
 	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
-		  // don't return! Fall through and wait
+            // don't return! Fall through and wait
 	      } else if (calico.ProgramSpeed.Value == 100) {
-		  return;
+            return;
 	      }
-	  } else {
+        } else {
 	      return;
-	  }
+        }
       } else {
-	  return;
+        return;
       }
       //System.Console.WriteLine("stepping!");
       // We have a calico defined and we should trace and/or stop
@@ -3078,19 +3081,19 @@ public class Vector {
       int end_col = (int)PJScheme.get_end_char(info);
       calico.playResetEvent.Reset (); 
       Calico.MainWindow.Invoke ( delegate {
-	      calico.PlayButton.Sensitive = true;
-	      calico.PauseButton.Sensitive = false;
-	      document.GotoLine(start_line);
-	      document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
-	  });
+            calico.PlayButton.Sensitive = true;
+            calico.PauseButton.Sensitive = false;
+            document.GotoLine(start_line);
+            document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
+          });
       printf("Returning ~a...~%", result);
       if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
-	  System.Console.WriteLine(String.Format("Trace: Paused!"));
-	  calico.playResetEvent.WaitOne();
+        System.Console.WriteLine(String.Format("Trace: Paused!"));
+        calico.playResetEvent.WaitOne();
       } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
-	  double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
-	  // Force at least a slight sleep, else no GUI controls
-	  wait(pause);
+        double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
+        // Force at least a slight sleep, else no GUI controls
+        wait(pause);
       }
   }
 }

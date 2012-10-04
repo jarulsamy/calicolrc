@@ -43,7 +43,7 @@
     <Word>not</Word>
   </Keywords>
 
-  <Keywords color="keyword.semantic.field">
+  <Keywords color="text.preprocessor">
     <Word>append</Word>
     <Word>apply</Word>
     <Word>caaaar</Word>
@@ -141,7 +141,7 @@
     <Word>require</Word>
   </Keywords>
   
-  <Keywords color="keyrord.semantic.property">
+  <Keywords color="keyword.semantic.property">
     <Word>for-each</Word>
     <Word>map</Word>
   </Keywords>
@@ -151,7 +151,7 @@
     <Word>catch</Word>
   </Keywords>
   
-  <Keywords color="keyword.exceptions">
+  <Keywords color="keyword.semantic.error">
     <Word>raise</Word>
   </Keywords>
   
@@ -167,9 +167,6 @@
   <Keywords color="keyword.namespace">
     <Word>import</Word>
     <Word>using</Word>
-  </Keywords>
-  
-  <Keywords color="keyword.property">		
   </Keywords>
   
   <Keywords color="keyword.semantic.type">
