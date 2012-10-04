@@ -33,6 +33,8 @@
 ;;         | (begin <exp> ...)
 ;;         | (lambda (<formal> ...) <exp> ...)
 ;;         | (lambda <formal> <exp> ...)
+;;         | (trace-lambda name (<formal> ...) <exp> ...)
+;;         | (trace-lambda name <formal> <exp> ...)
 ;;         | (<exp> <exp> ...)
 ;;         | (try <body> (catch <var> <exp> ...))
 ;;         | (try <body> (finally <exp> ...))
@@ -73,6 +75,15 @@
     (formals (list-of symbol?))
     (bodies (list-of expression?)))
   (mu-lambda-exp
+    (formals (list-of symbol?))
+    (runt symbol?)
+    (bodies (list-of expression?)))
+  (trace-lambda-exp
+    (name symbol?)
+    (formals (list-of symbol?))
+    (bodies (list-of expression?)))
+  (mu-trace-lambda-exp
+    (name symbol?)
     (formals (list-of symbol?))
     (runt symbol?)
     (bodies (list-of expression?)))
@@ -429,6 +440,12 @@
 	   (if (list? (cadr datum))
 	     (k (lambda-exp (cadr datum) bodies) fail)
 	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) bodies) fail)))))
+      ((trace-lambda? datum)
+       (parse-all (cdddr datum) handler fail
+	 (lambda-cont2 (bodies fail)
+	   (if (list? (caddr datum))
+	     (k (trace-lambda-exp (cadr datum) (caddr datum) bodies) fail)
+	     (k (mu-trace-lambda-exp (cadr datum) (head (caddr datum)) (last (caddr datum)) bodies) fail)))))
       ((try? datum)
        (cond
 	 ((= (length datum) 2)
@@ -561,6 +578,7 @@
 (define define-syntax? (tagged-list 'define-syntax >= 3))
 (define begin? (tagged-list 'begin >= 2))
 (define lambda? (tagged-list 'lambda >= 3))
+;;(define trace-lambda? (tagged-list 'trace-lambda >= 4)) ;; not needed in C#
 (define raise? (tagged-list 'raise = 2))
 (define dict? (tagged-list 'dict >= 1))
 (define help? (tagged-list 'help = 2))
@@ -945,6 +963,17 @@
     (runt symbol?)
     (bodies (list-of aexpression?))
     (info source-info?))
+  (trace-lambda-aexp
+    (name symbol?)
+    (formals (list-of symbol?))
+    (bodies (list-of aexpression?))
+    (info source-info?))
+  (mu-trace-lambda-aexp
+    (name symbol?)
+    (formals (list-of symbol?))
+    (runt symbol?)
+    (bodies (list-of aexpression?))
+    (info source-info?))
   (app-aexp
     (operator aexpression?)
     (operands (list-of aexpression?))
@@ -1021,6 +1050,7 @@
 (define define-syntax?^ (tagged-list^ 'define-syntax >= 3))
 (define begin?^ (tagged-list^ 'begin >= 2))
 (define lambda?^ (tagged-list^ 'lambda >= 3))
+(define trace-lambda?^ (tagged-list^ 'trace-lambda >= 4))
 (define raise?^ (tagged-list^ 'raise = 2))
 (define dict?^ (tagged-list^ 'dict >= 1))
 (define help?^ (tagged-list^ 'help = 2))
@@ -1143,6 +1173,14 @@
 		 (if (list? formals)
 		   (k (lambda-aexp formals bodies info) fail)
 		   (k (mu-lambda-aexp (head formals) (last formals) bodies info) fail)))))))
+	((trace-lambda?^ adatum)
+	 (aparse-all (cdddr^ adatum) handler fail
+	   (lambda-cont2 (bodies fail)
+	     (unannotate-cps (caddr^ adatum)
+	       (lambda-cont (formals)
+		 (if (list? formals)
+		   (k (trace-lambda-aexp (cadr^ adatum) formals bodies info) fail)
+		   (k (mu-trace-lambda-aexp (cadr^ adatum) (head formals) (last formals) bodies info) fail)))))))
 	((try?^ adatum)
 	 ;; fix: this code is horrendously UGLY!
 	 (cond
@@ -1454,6 +1492,10 @@
 	`(lambda ,formals ,@(map unparse bodies)))
       (mu-lambda-exp (formals runt bodies)
 	`(lambda (,@formals . ,runt) ,@(map unparse bodies)))
+      (trace-lambda-exp (name formals bodies)
+	`(trace-lambda ,name ,formals ,@(map unparse bodies)))
+      (mu-trace-lambda-exp (name formals runt bodies)
+	`(trace-lambda ,name (,@formals . ,runt) ,@(map unparse bodies)))
       (app-exp (operator operands)
 	`(,(unparse operator) ,@(map unparse operands)))
       (try-catch-exp (body catch-var catch-exps)
@@ -1505,6 +1547,10 @@
 	`(lambda ,formals ,@(map aunparse bodies)))
       (mu-lambda-aexp (formals runt bodies info)
 	`(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
+      (trace-lambda-aexp (formals bodies info)
+	`(trace-lambda ,name ,formals ,@(map aunparse bodies)))
+      (mu-trace-lambda-aexp (formals runt bodies info)
+	`(trace-lambda ,name (,@formals . ,runt) ,@(map aunparse bodies)))
       (app-aexp (operator operands info)
 	`(,(aunparse operator) ,@(map aunparse operands)))
       (try-catch-aexp (body catch-var catch-exps info)

@@ -69,6 +69,18 @@ public class PJScheme:Scheme
 	      cons ((object) symbol ("mu-lambda-aexp"), (object) args));
    }
 
+   new public static object trace_lambda_aexp (params object[]args)
+   {
+      return ((object) PJScheme.
+	      cons ((object) symbol ("trace-lambda-aexp"), (object) args));
+   }
+
+   new public static object mu_trace_lambda_aexp (params object[]args)
+   {
+      return ((object) PJScheme.
+	      cons ((object) symbol ("mu-trace-lambda-aexp"), (object) args));
+   }
+
    new public static object app_aexp (params object[]args)
    {
       return ((object) PJScheme.
@@ -438,6 +450,55 @@ public class PJScheme:Scheme
 		 Eq ((object) PJScheme.car ((object) temp_1),
 		     (object) symbol ("<cont-12>"))))
 	   {
+	      object adatum = null;
+	      object bodies = null;
+	      object info = null;
+	      object fail = null;
+	      object k = null;
+	      k = PJScheme.list_ref ((object) temp_1, (object) 5);
+	      fail = PJScheme.list_ref ((object) temp_1, (object) 4);
+	      info = PJScheme.list_ref ((object) temp_1, (object) 3);
+	      bodies = PJScheme.list_ref ((object) temp_1, (object) 2);
+	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
+	      if (true_q (PJScheme.list_q ((object) value_reg)))
+		{
+		   value2_reg = fail;
+		   value1_reg =
+		      PJScheme.trace_lambda_aexp ((object) PJScheme.
+						  cadr_hat ((object) adatum),
+						  (object) value_reg,
+						  (object) bodies,
+						  (object) info);
+		   k_reg = k;
+		   pc = (Function) apply_cont2;
+
+		}
+	      else
+		{
+		   value2_reg = fail;
+		   value1_reg =
+		      PJScheme.mu_trace_lambda_aexp ((object) PJScheme.
+						     cadr_hat ((object)
+							       adatum),
+						     (object) PJScheme.
+						     head ((object)
+							   value_reg),
+						     (object) PJScheme.
+						     last ((object)
+							   value_reg),
+						     (object) bodies,
+						     (object) info);
+		   k_reg = k;
+		   pc = (Function) apply_cont2;
+
+		}
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) temp_1),
+		     (object) symbol ("<cont-13>"))))
+	   {
 	      object bodies = null;
 	      object info = null;
 	      object fail = null;
@@ -475,7 +536,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-13>"))))
+		     (object) symbol ("<cont-14>"))))
 	   {
 	      object aclauses = null;
 	      object name = null;
@@ -500,7 +561,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-14>"))))
+		     (object) symbol ("<cont-15>"))))
 	   {
 	      object info = null;
 	      object handler = null;
@@ -521,7 +582,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-15>"))))
+		     (object) symbol ("<cont-16>"))))
 	   {
 	      object info = null;
 	      object handler = null;
@@ -532,7 +593,7 @@ public class PJScheme:Scheme
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      info = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-14>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-15>"),
 				     (object) info, (object) handler,
 				     (object) fail, (object) k);
 	      x_reg = value_reg;
@@ -542,7 +603,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-16>"))))
+		     (object) symbol ("<cont-17>"))))
 	   {
 	      object adatum = null;
 	      object handler = null;
@@ -587,7 +648,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-17>"))))
+		     (object) symbol ("<cont-18>"))))
 	   {
 	      object adatum = null;
 	      object handler = null;
@@ -598,7 +659,7 @@ public class PJScheme:Scheme
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-16>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-17>"),
 				     (object) adatum, (object) handler,
 				     (object) fail, (object) k);
 	      x_reg = value_reg;
@@ -608,7 +669,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-18>"))))
+		     (object) symbol ("<cont-19>"))))
 	   {
 	      object info = null;
 	      object fail = null;
@@ -626,7 +687,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-19>"))))
+		     (object) symbol ("<cont-20>"))))
 	   {
 	      object msg = null;
 	      object info = null;
@@ -654,7 +715,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-20>"))))
+		     (object) symbol ("<cont-21>"))))
 	   {
 	      object adatum = null;
 	      object fail = null;
@@ -707,7 +768,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-21>"))))
+		     (object) symbol ("<cont-22>"))))
 	   {
 	      object adatum = null;
 	      object fail = null;
@@ -716,7 +777,7 @@ public class PJScheme:Scheme
 	      fail = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-20>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-21>"),
 				     (object) adatum, (object) fail,
 				     (object) k);
 	      x_reg = value_reg;
@@ -726,7 +787,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-22>"))))
+		     (object) symbol ("<cont-23>"))))
 	   {
 	      object aclauses = null;
 	      object adatum = null;
@@ -748,7 +809,7 @@ public class PJScheme:Scheme
 	      if (true_q (value_reg))
 		{
 		   k2_reg =
-		      PJScheme.make_cont2 ((object) symbol ("<cont2-39>"),
+		      PJScheme.make_cont2 ((object) symbol ("<cont2-40>"),
 					   (object) fail, (object) k);
 		   ap_reg = aright_pattern;
 		   s_reg = value_reg;
@@ -772,7 +833,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-23>"))))
+		     (object) symbol ("<cont-24>"))))
 	   {
 	      object aclauses = null;
 	      object adatum = null;
@@ -796,7 +857,7 @@ public class PJScheme:Scheme
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      aclauses = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-22>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-23>"),
 				     (object) aclauses, (object) adatum,
 				     (object) aright_pattern,
 				     (object) clauses, (object) right_pattern,
@@ -812,7 +873,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-24>"))))
+		     (object) symbol ("<cont-25>"))))
 	   {
 	      object v1 = null;
 	      object k = null;
@@ -834,7 +895,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-25>"))))
+		     (object) symbol ("<cont-26>"))))
 	   {
 	      object ax = null;
 	      object depth = null;
@@ -843,7 +904,7 @@ public class PJScheme:Scheme
 	      depth = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      ax = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-24>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-25>"),
 				     (object) value_reg, (object) k);
 	      depth_reg = depth;
 	      ax_reg = PJScheme._hatcdr_hat ((object) ax);
@@ -853,7 +914,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-26>"))))
+		     (object) symbol ("<cont-27>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -869,7 +930,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-27>"))))
+		     (object) symbol ("<cont-28>"))))
 	   {
 	      object ax = null;
 	      object k = null;
@@ -889,7 +950,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-28>"))))
+		     (object) symbol ("<cont-29>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -907,7 +968,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-29>"))))
+		     (object) symbol ("<cont-30>"))))
 	   {
 	      object v1 = null;
 	      object k = null;
@@ -927,7 +988,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-30>"))))
+		     (object) symbol ("<cont-31>"))))
 	   {
 	      object ax = null;
 	      object depth = null;
@@ -936,7 +997,7 @@ public class PJScheme:Scheme
 	      depth = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      ax = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-29>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-30>"),
 				     (object) value_reg, (object) k);
 	      depth_reg = depth;
 	      ax_reg = PJScheme._hatcdr_hat ((object) ax);
@@ -946,7 +1007,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-31>"))))
+		     (object) symbol ("<cont-32>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -962,7 +1023,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-32>"))))
+		     (object) symbol ("<cont-33>"))))
 	   {
 	      object ax = null;
 	      object k = null;
@@ -982,7 +1043,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-33>"))))
+		     (object) symbol ("<cont-34>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -1000,7 +1061,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-34>"))))
+		     (object) symbol ("<cont-35>"))))
 	   {
 	      object handler = null;
 	      object fail = null;
@@ -1009,7 +1070,7 @@ public class PJScheme:Scheme
 	      fail = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-70>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-71>"),
 				      (object) handler, (object) k2);
 	      fail_reg = fail;
 	      handler_reg = handler;
@@ -1020,7 +1081,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-35>"))))
+		     (object) symbol ("<cont-36>"))))
 	   {
 	      object handler = null;
 	      object fail = null;
@@ -1038,7 +1099,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-36>"))))
+		     (object) symbol ("<cont-37>"))))
 	   {
 	      object fail = null;
 	      object k2 = null;
@@ -1053,7 +1114,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-37>"))))
+		     (object) symbol ("<cont-38>"))))
 	   {
 	      object x = null;
 	      object y = null;
@@ -1081,7 +1142,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-38>"))))
+		     (object) symbol ("<cont-39>"))))
 	   {
 	      object i = null;
 	      object v1 = null;
@@ -1112,7 +1173,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-39>"))))
+		     (object) symbol ("<cont-40>"))))
 	   {
 	      object ls = null;
 	      object x = null;
@@ -1153,7 +1214,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-40>"))))
+		     (object) symbol ("<cont-41>"))))
 	   {
 	      object ls1 = null;
 	      object k = null;
@@ -1169,7 +1230,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-41>"))))
+		     (object) symbol ("<cont-42>"))))
 	   {
 	      object lists = null;
 	      object k = null;
@@ -1184,7 +1245,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-42>"))))
+		     (object) symbol ("<cont-43>"))))
 	   {
 	      object pattern = null;
 	      object var = null;
@@ -1212,7 +1273,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-43>"))))
+		     (object) symbol ("<cont-44>"))))
 	   {
 	      object ap2 = null;
 	      object p1 = null;
@@ -1244,7 +1305,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-44>"))))
+		     (object) symbol ("<cont-45>"))))
 	   {
 	      object s_car = null;
 	      object k = null;
@@ -1271,7 +1332,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont-45>"))))
+		     (object) symbol ("<cont-46>"))))
 	   {
 	      object apair1 = null;
 	      object apair2 = null;
@@ -1293,7 +1354,7 @@ public class PJScheme:Scheme
 	      else
 		{
 		   k2_reg =
-		      PJScheme.make_cont2 ((object) symbol ("<cont2-88>"),
+		      PJScheme.make_cont2 ((object) symbol ("<cont2-89>"),
 					   (object) apair2, (object) pair2,
 					   (object) value_reg, (object) k);
 		   ap_reg = PJScheme._hatcdr_hat ((object) apair1);
@@ -2150,6 +2211,26 @@ public class PJScheme:Scheme
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
 		 PJScheme.make_cont ((object) symbol ("<cont-12>"),
+				     (object) adatum, (object) value1_reg,
+				     (object) info, (object) value2_reg,
+				     (object) k);
+	      x_reg = PJScheme.caddr_hat ((object) adatum);
+	      pc = (Function) unannotate_cps;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) temp_1),
+		     (object) symbol ("<cont2-25>"))))
+	   {
+	      object adatum = null;
+	      object info = null;
+	      object k = null;
+	      k = PJScheme.list_ref ((object) temp_1, (object) 3);
+	      info = PJScheme.list_ref ((object) temp_1, (object) 2);
+	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
+	      k_reg =
+		 PJScheme.make_cont ((object) symbol ("<cont-13>"),
 				     (object) value1_reg, (object) info,
 				     (object) value2_reg, (object) k);
 	      x_reg = PJScheme.cadr_hat ((object) adatum);
@@ -2159,7 +2240,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-25>"))))
+		     (object) symbol ("<cont2-26>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2202,7 +2283,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-26>"))))
+		     (object) symbol ("<cont2-27>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2227,7 +2308,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-27>"))))
+		     (object) symbol ("<cont2-28>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2249,7 +2330,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-28>"))))
+		     (object) symbol ("<cont2-29>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2272,7 +2353,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-29>"))))
+		     (object) symbol ("<cont2-30>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2293,7 +2374,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-30>"))))
+		     (object) symbol ("<cont2-31>"))))
 	   {
 	      object info = null;
 	      object k = null;
@@ -2308,7 +2389,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-31>"))))
+		     (object) symbol ("<cont2-32>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2336,7 +2417,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-32>"))))
+		     (object) symbol ("<cont2-33>"))))
 	   {
 	      object v1 = null;
 	      object v2 = null;
@@ -2356,7 +2437,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-33>"))))
+		     (object) symbol ("<cont2-34>"))))
 	   {
 	      object adatum = null;
 	      object v1 = null;
@@ -2369,7 +2450,7 @@ public class PJScheme:Scheme
 	      v1 = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-32>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-33>"),
 				      (object) v1, (object) value1_reg,
 				      (object) info, (object) k);
 	      fail_reg = value2_reg;
@@ -2381,7 +2462,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-34>"))))
+		     (object) symbol ("<cont2-35>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2392,7 +2473,7 @@ public class PJScheme:Scheme
 	      info = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-33>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-34>"),
 				      (object) adatum, (object) value1_reg,
 				      (object) info, (object) handler,
 				      (object) k);
@@ -2405,7 +2486,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-35>"))))
+		     (object) symbol ("<cont2-36>"))))
 	   {
 	      object v1 = null;
 	      object info = null;
@@ -2427,7 +2508,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-36>"))))
+		     (object) symbol ("<cont2-37>"))))
 	   {
 	      object adatum = null;
 	      object info = null;
@@ -2438,7 +2519,7 @@ public class PJScheme:Scheme
 	      info = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-35>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-36>"),
 				      (object) value1_reg, (object) info,
 				      (object) k);
 	      fail_reg = value2_reg;
@@ -2450,7 +2531,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-37>"))))
+		     (object) symbol ("<cont2-38>"))))
 	   {
 	      object handler = null;
 	      object k = null;
@@ -2466,7 +2547,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-38>"))))
+		     (object) symbol ("<cont2-39>"))))
 	   {
 	      object adatum = null;
 	      object handler = null;
@@ -2490,7 +2571,7 @@ public class PJScheme:Scheme
 	      else
 		{
 		   k_reg =
-		      PJScheme.make_cont ((object) symbol ("<cont-21>"),
+		      PJScheme.make_cont ((object) symbol ("<cont-22>"),
 					  (object) adatum,
 					  (object) value2_reg, (object) k);
 		   datum_reg = adatum;
@@ -2503,7 +2584,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-39>"))))
+		     (object) symbol ("<cont2-40>"))))
 	   {
 	      object fail = null;
 	      object k = null;
@@ -2518,7 +2599,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-40>"))))
+		     (object) symbol ("<cont2-41>"))))
 	   {
 	      object a = null;
 	      object k = null;
@@ -2532,7 +2613,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-41>"))))
+		     (object) symbol ("<cont2-42>"))))
 	   {
 	      object entries = null;
 	      object handler = null;
@@ -2541,7 +2622,7 @@ public class PJScheme:Scheme
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      entries = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-40>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-41>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -2552,7 +2633,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-42>"))))
+		     (object) symbol ("<cont2-43>"))))
 	   {
 	      object adatum_list = null;
 	      object handler = null;
@@ -2561,7 +2642,7 @@ public class PJScheme:Scheme
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      adatum_list = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-40>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-41>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -2572,7 +2653,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-43>"))))
+		     (object) symbol ("<cont2-44>"))))
 	   {
 	      object exp = null;
 	      object k = null;
@@ -2586,7 +2667,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-44>"))))
+		     (object) symbol ("<cont2-45>"))))
 	   {
 	      object src = null;
 	      object tokens_left = null;
@@ -2597,7 +2678,7 @@ public class PJScheme:Scheme
 	      tokens_left = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      src = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-43>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-44>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -2609,7 +2690,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-45>"))))
+		     (object) symbol ("<cont2-46>"))))
 	   {
 	      _starlast_fail_star = value2_reg;
 	      final_reg = value1_reg;
@@ -2620,7 +2701,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-46>"))))
+		     (object) symbol ("<cont2-47>"))))
 	   {
 	      k_reg = REP_k;
 	      fail_reg = value2_reg;
@@ -2634,7 +2715,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-47>"))))
+		     (object) symbol ("<cont2-48>"))))
 	   {
 	      final_reg = true;
 	      pc = null;
@@ -2644,9 +2725,9 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-48>"))))
+		     (object) symbol ("<cont2-49>"))))
 	   {
-	      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-47>"));
+	      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-48>"));
 	      fail_reg = value2_reg;
 	      handler_reg = try_parse_handler;
 	      src_reg = symbol ("stdin");
@@ -2658,7 +2739,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-49>"))))
+		     (object) symbol ("<cont2-50>"))))
 	   {
 	      object src = null;
 	      object tokens_left = null;
@@ -2696,7 +2777,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-50>"))))
+		     (object) symbol ("<cont2-51>"))))
 	   {
 	      object src = null;
 	      object tokens_left = null;
@@ -2709,7 +2790,7 @@ public class PJScheme:Scheme
 	      tokens_left = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      src = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-49>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-50>"),
 				      (object) src, (object) tokens_left,
 				      (object) env, (object) handler,
 				      (object) k);
@@ -2723,7 +2804,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-51>"))))
+		     (object) symbol ("<cont2-52>"))))
 	   {
 	      object exp = null;
 	      object k = null;
@@ -2737,7 +2818,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-52>"))))
+		     (object) symbol ("<cont2-53>"))))
 	   {
 	      object args = null;
 	      object env = null;
@@ -2788,7 +2869,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-53>"))))
+		     (object) symbol ("<cont2-54>"))))
 	   {
 	      object rator = null;
 	      object env = null;
@@ -2801,7 +2882,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      rator = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-52>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-53>"),
 				      (object) value1_reg, (object) env,
 				      (object) info, (object) handler,
 				      (object) k);
@@ -2815,7 +2896,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-54>"))))
+		     (object) symbol ("<cont2-55>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -2827,7 +2908,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-55>"))))
+		     (object) symbol ("<cont2-56>"))))
 	   {
 	      object handler = null;
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -2840,7 +2921,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-56>"))))
+		     (object) symbol ("<cont2-57>"))))
 	   {
 	      object v = null;
 	      object k = null;
@@ -2854,7 +2935,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-57>"))))
+		     (object) symbol ("<cont2-58>"))))
 	   {
 	      object fexps = null;
 	      object env = null;
@@ -2865,7 +2946,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      fexps = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-56>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -2877,7 +2958,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-58>"))))
+		     (object) symbol ("<cont2-59>"))))
 	   {
 	      object aclauses = null;
 	      object clauses = null;
@@ -2899,7 +2980,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-59>"))))
+		     (object) symbol ("<cont2-60>"))))
 	   {
 	      object docstring = null;
 	      object var = null;
@@ -2918,7 +2999,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-60>"))))
+		     (object) symbol ("<cont2-61>"))))
 	   {
 	      object docstring = null;
 	      object rhs_value = null;
@@ -2938,7 +3019,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-61>"))))
+		     (object) symbol ("<cont2-62>"))))
 	   {
 	      object docstring = null;
 	      object var = null;
@@ -2951,7 +3032,7 @@ public class PJScheme:Scheme
 	      var = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      docstring = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-60>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-61>"),
 				      (object) docstring, (object) value1_reg,
 				      (object) k);
 	      fail_reg = value2_reg;
@@ -2964,7 +3045,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-62>"))))
+		     (object) symbol ("<cont2-63>"))))
 	   {
 	      object rhs_value = null;
 	      object k = null;
@@ -2993,7 +3074,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-63>"))))
+		     (object) symbol ("<cont2-64>"))))
 	   {
 	      object var = null;
 	      object var_info = null;
@@ -3006,7 +3087,7 @@ public class PJScheme:Scheme
 	      var_info = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      var = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-62>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-63>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3019,7 +3100,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-64>"))))
+		     (object) symbol ("<cont2-65>"))))
 	   {
 	      object else_exp = null;
 	      object then_exp = null;
@@ -3056,7 +3137,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-65>"))))
+		     (object) symbol ("<cont2-66>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -3068,7 +3149,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-66>"))))
+		     (object) symbol ("<cont2-67>"))))
 	   {
 	      object e = null;
 	      object handler = null;
@@ -3083,7 +3164,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-67>"))))
+		     (object) symbol ("<cont2-68>"))))
 	   {
 	      object v1 = null;
 	      object k = null;
@@ -3097,7 +3178,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-68>"))))
+		     (object) symbol ("<cont2-69>"))))
 	   {
 	      object exps = null;
 	      object env = null;
@@ -3108,7 +3189,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      exps = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3120,7 +3201,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-69>"))))
+		     (object) symbol ("<cont2-70>"))))
 	   {
 	      object exps = null;
 	      object env = null;
@@ -3152,7 +3233,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-70>"))))
+		     (object) symbol ("<cont2-71>"))))
 	   {
 	      object handler = null;
 	      object k2 = null;
@@ -3169,7 +3250,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-71>"))))
+		     (object) symbol ("<cont2-72>"))))
 	   {
 	      object handler = null;
 	      object k2 = null;
@@ -3188,7 +3269,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-72>"))))
+		     (object) symbol ("<cont2-73>"))))
 	   {
 	      object handler = null;
 	      object k2 = null;
@@ -3207,7 +3288,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-73>"))))
+		     (object) symbol ("<cont2-74>"))))
 	   {
 	      object k = null;
 	      k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -3225,7 +3306,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-74>"))))
+		     (object) symbol ("<cont2-75>"))))
 	   {
 	      object filename = null;
 	      object env = null;
@@ -3236,7 +3317,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      filename = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-73>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-74>"),
 				      (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3249,7 +3330,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-75>"))))
+		     (object) symbol ("<cont2-76>"))))
 	   {
 	      object filenames = null;
 	      object env = null;
@@ -3273,7 +3354,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-76>"))))
+		     (object) symbol ("<cont2-77>"))))
 	   {
 	      object filename = null;
 	      object env2 = null;
@@ -3303,7 +3384,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-77>"))))
+		     (object) symbol ("<cont2-78>"))))
 	   {
 	      object args = null;
 	      object sym = null;
@@ -3353,7 +3434,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-78>"))))
+		     (object) symbol ("<cont2-79>"))))
 	   {
 	      object iterator = null;
 	      object proc = null;
@@ -3377,7 +3458,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-79>"))))
+		     (object) symbol ("<cont2-80>"))))
 	   {
 	      object iterator = null;
 	      object proc = null;
@@ -3390,7 +3471,7 @@ public class PJScheme:Scheme
 	      proc = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      iterator = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3403,7 +3484,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-80>"))))
+		     (object) symbol ("<cont2-81>"))))
 	   {
 	      object list1 = null;
 	      object proc = null;
@@ -3416,7 +3497,7 @@ public class PJScheme:Scheme
 	      proc = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      list1 = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3429,7 +3510,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-81>"))))
+		     (object) symbol ("<cont2-82>"))))
 	   {
 	      object list1 = null;
 	      object proc = null;
@@ -3451,7 +3532,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-82>"))))
+		     (object) symbol ("<cont2-83>"))))
 	   {
 	      object list1 = null;
 	      object list2 = null;
@@ -3466,7 +3547,7 @@ public class PJScheme:Scheme
 	      list2 = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      list1 = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3480,7 +3561,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-83>"))))
+		     (object) symbol ("<cont2-84>"))))
 	   {
 	      object list1 = null;
 	      object list2 = null;
@@ -3506,7 +3587,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-84>"))))
+		     (object) symbol ("<cont2-85>"))))
 	   {
 	      object lists = null;
 	      object proc = null;
@@ -3519,7 +3600,7 @@ public class PJScheme:Scheme
 	      proc = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      lists = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 				      (object) value1_reg, (object) k);
 	      fail_reg = value2_reg;
 	      handler_reg = handler;
@@ -3532,7 +3613,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-85>"))))
+		     (object) symbol ("<cont2-86>"))))
 	   {
 	      object lists = null;
 	      object proc = null;
@@ -3553,7 +3634,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-86>"))))
+		     (object) symbol ("<cont2-87>"))))
 	   {
 	      object arg_list = null;
 	      object proc = null;
@@ -3577,7 +3658,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-87>"))))
+		     (object) symbol ("<cont2-88>"))))
 	   {
 	      object new_acdr1 = null;
 	      object new_cdr1 = null;
@@ -3588,7 +3669,7 @@ public class PJScheme:Scheme
 	      new_cdr1 = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      new_acdr1 = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-44>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-45>"),
 				     (object) s_car, (object) k);
 	      ap2_reg = value2_reg;
 	      ap1_reg = new_acdr1;
@@ -3600,7 +3681,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-88>"))))
+		     (object) symbol ("<cont2-89>"))))
 	   {
 	      object apair2 = null;
 	      object pair2 = null;
@@ -3611,7 +3692,7 @@ public class PJScheme:Scheme
 	      pair2 = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      apair2 = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k2_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-87>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-88>"),
 				      (object) value2_reg,
 				      (object) value1_reg, (object) s_car,
 				      (object) k);
@@ -3624,7 +3705,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-89>"))))
+		     (object) symbol ("<cont2-90>"))))
 	   {
 	      object a = null;
 	      object aa = null;
@@ -3646,7 +3727,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-90>"))))
+		     (object) symbol ("<cont2-91>"))))
 	   {
 	      object ap = null;
 	      object pattern = null;
@@ -3657,7 +3738,7 @@ public class PJScheme:Scheme
 	      pattern = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      ap = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k2_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-89>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-90>"),
 				      (object) value1_reg,
 				      (object) value2_reg, (object) ap,
 				      (object) k2);
@@ -3670,7 +3751,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<cont2-91>"))))
+		     (object) symbol ("<cont2-92>"))))
 	   {
 	      object s2 = null;
 	      object k2 = null;
@@ -3979,7 +4060,7 @@ public class PJScheme:Scheme
 	      handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      src = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-44>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-45>"),
 				      (object) src, (object) value3_reg,
 				      (object) handler, (object) k);
 	      fail_reg = value4_reg;
@@ -3994,7 +4075,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<cont4-9>"))))
 	   {
 	      _startokens_left_star = value3_reg;
-	      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-46>"));
+	      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-47>"));
 	      fail_reg = value4_reg;
 	      handler_reg = REP_handler;
 	      adatum_reg = value1_reg;
@@ -4016,7 +4097,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      src = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-50>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-51>"),
 				      (object) src, (object) value3_reg,
 				      (object) env, (object) handler,
 				      (object) k);
@@ -4288,7 +4369,7 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      fexps = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-66>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-67>"),
 				      (object) exception_reg,
 				      (object) handler);
 	      handler_reg = handler;
@@ -4328,7 +4409,7 @@ public class PJScheme:Scheme
 						     (object) env,
 						     (object) handler);
 		    k_reg =
-		       PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
+		       PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
 					    (object) fexps, (object) env,
 					    (object) handler, (object) k);
 		    handler_reg = catch_handler;
@@ -4462,7 +4543,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-5>"))))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-34>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-35>"),
 				     (object) handler_reg, (object) fail_reg,
 				     (object) k2_reg);
 	      x_reg = PJScheme.car ((object) args_reg);
@@ -4476,7 +4557,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-6>"))))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-35>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-36>"),
 				     (object) handler_reg, (object) fail_reg,
 				     (object) k2_reg);
 	      x_reg = PJScheme.car ((object) args_reg);
@@ -4490,7 +4571,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-7>"))))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-71>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-72>"),
 				      (object) handler_reg, (object) k2_reg);
 	      src_reg = symbol ("stdin");
 	      input_reg = PJScheme.car ((object) args_reg);
@@ -4504,7 +4585,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-8>"))))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-72>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-73>"),
 				      (object) handler_reg, (object) k2_reg);
 	      src_reg = symbol ("stdin");
 	      input_reg = PJScheme.car ((object) args_reg);
@@ -5262,7 +5343,7 @@ public class PJScheme:Scheme
 	    else
 	      {
 		 k_reg =
-		    PJScheme.make_cont ((object) symbol ("<cont-36>"),
+		    PJScheme.make_cont ((object) symbol ("<cont-37>"),
 					(object) fail_reg, (object) k2_reg);
 		 y_reg = PJScheme.cadr ((object) args_reg);
 		 x_reg = PJScheme.car ((object) args_reg);
@@ -5457,7 +5538,7 @@ public class PJScheme:Scheme
 		   object module_name = null;
 		   module_name = PJScheme.cadr ((object) args_reg);
 		   k_reg =
-		      PJScheme.make_cont2 ((object) symbol ("<cont2-76>"),
+		      PJScheme.make_cont2 ((object) symbol ("<cont2-77>"),
 					   (object) filename,
 					   (object) env2_reg,
 					   (object) handler_reg,
@@ -5674,7 +5755,7 @@ public class PJScheme:Scheme
 	    else
 	      {
 		 k_reg =
-		    PJScheme.make_cont ((object) symbol ("<cont-36>"),
+		    PJScheme.make_cont ((object) symbol ("<cont-37>"),
 					(object) fail_reg, (object) k2_reg);
 		 lists_reg = args_reg;
 		 pc = (Function) append_all;
@@ -9207,7 +9288,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.vector_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-18>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-19>"),
 				     (object) info, (object) fail_reg,
 				     (object) k_reg);
 	      x_reg = adatum_reg;
@@ -9227,7 +9308,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.quote_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-18>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-19>"),
 				     (object) info, (object) fail_reg,
 				     (object) k_reg);
 	      x_reg = PJScheme.cadr_hat ((object) adatum_reg);
@@ -9237,7 +9318,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.quasiquote_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-17>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-18>"),
 				     (object) adatum_reg,
 				     (object) handler_reg, (object) fail_reg,
 				     (object) k_reg);
@@ -9264,7 +9345,7 @@ public class PJScheme:Scheme
 	    if (true_q (PJScheme.syntactic_sugar_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-37>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-38>"),
 				      (object) handler_reg, (object) k_reg);
 	      pc = (Function) expand_once_hat;
 
@@ -9272,7 +9353,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.if_then_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-36>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-37>"),
 				      (object) adatum_reg, (object) info,
 				      (object) handler_reg, (object) k_reg);
 	      adatum_reg = PJScheme.cadr_hat ((object) adatum_reg);
@@ -9282,7 +9363,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.if_else_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-34>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-35>"),
 				      (object) adatum_reg, (object) info,
 				      (object) handler_reg, (object) k_reg);
 	      adatum_reg = PJScheme.cadr_hat ((object) adatum_reg);
@@ -9292,7 +9373,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.assignment_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-31>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-32>"),
 				      (object) adatum_reg, (object) info,
 				      (object) k_reg);
 	      adatum_reg = PJScheme.caddr_hat ((object) adatum_reg);
@@ -9302,7 +9383,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.func_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-30>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-31>"),
 				      (object) info, (object) k_reg);
 	      adatum_reg = PJScheme.cadr_hat ((object) adatum_reg);
 	      pc = (Function) aparse;
@@ -9312,7 +9393,7 @@ public class PJScheme:Scheme
 	    if (true_q (PJScheme.mit_style_q_hat ((object) adatum_reg)))
 	      {
 		 k_reg =
-		    PJScheme.make_cont ((object) symbol ("<cont-15>"),
+		    PJScheme.make_cont ((object) symbol ("<cont-16>"),
 					(object) info, (object) handler_reg,
 					(object) fail_reg, (object) k_reg);
 		 datum_reg = adatum_reg;
@@ -9327,7 +9408,7 @@ public class PJScheme:Scheme
 			       length_hat ((object) adatum_reg), (object) 3)))
 	      {
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-29>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-30>"),
 					 (object) adatum_reg, (object) info,
 					 (object) k_reg);
 		 adatum_reg = PJScheme.caddr_hat ((object) adatum_reg);
@@ -9345,7 +9426,7 @@ public class PJScheme:Scheme
 				       caddr_hat ((object) adatum_reg))))))
 	      {
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-28>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-29>"),
 					 (object) adatum_reg, (object) info,
 					 (object) k_reg);
 		 adatum_reg = PJScheme.cadddr_hat ((object) adatum_reg);
@@ -9362,7 +9443,7 @@ public class PJScheme:Scheme
 	    if (true_q (PJScheme.mit_style_q_hat ((object) adatum_reg)))
 	      {
 		 k_reg =
-		    PJScheme.make_cont ((object) symbol ("<cont-15>"),
+		    PJScheme.make_cont ((object) symbol ("<cont-16>"),
 					(object) info, (object) handler_reg,
 					(object) fail_reg, (object) k_reg);
 		 datum_reg = adatum_reg;
@@ -9377,7 +9458,7 @@ public class PJScheme:Scheme
 			       length_hat ((object) adatum_reg), (object) 3)))
 	      {
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-27>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-28>"),
 					 (object) adatum_reg, (object) info,
 					 (object) k_reg);
 		 adatum_reg = PJScheme.caddr_hat ((object) adatum_reg);
@@ -9395,7 +9476,7 @@ public class PJScheme:Scheme
 				       caddr_hat ((object) adatum_reg))))))
 	      {
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-26>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-27>"),
 					 (object) adatum_reg, (object) info,
 					 (object) k_reg);
 		 adatum_reg = PJScheme.cadddr_hat ((object) adatum_reg);
@@ -9417,7 +9498,7 @@ public class PJScheme:Scheme
 		 PJScheme.get_sexp ((object) PJScheme.
 				    cadr_hat ((object) adatum_reg));
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-13>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-14>"),
 				     (object) aclauses, (object) name,
 				     (object) info, (object) fail_reg,
 				     (object) k_reg);
@@ -9427,7 +9508,7 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.begin_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-25>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-26>"),
 				      (object) adatum_reg, (object) info,
 				      (object) handler_reg, (object) k_reg);
 	      adatum_list_reg = PJScheme.cdr_hat ((object) adatum_reg);
@@ -9437,10 +9518,20 @@ public class PJScheme:Scheme
 	 else if (true_q (PJScheme.lambda_q_hat ((object) adatum_reg)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-24>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-25>"),
 				      (object) adatum_reg, (object) info,
 				      (object) k_reg);
 	      adatum_list_reg = PJScheme.cddr_hat ((object) adatum_reg);
+	      pc = (Function) aparse_all;
+
+	   }
+	 else if (true_q (PJScheme.trace_lambda_q_hat ((object) adatum_reg)))
+	   {
+	      k_reg =
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-24>"),
+				      (object) adatum_reg, (object) info,
+				      (object) k_reg);
+	      adatum_list_reg = PJScheme.cdddr_hat ((object) adatum_reg);
 	      pc = (Function) aparse_all;
 
 	   }
@@ -9599,7 +9690,7 @@ public class PJScheme:Scheme
 	 object info = null;
 	 info = PJScheme.get_source_info ((object) adatum_reg);
 	 k_reg =
-	    PJScheme.make_cont ((object) symbol ("<cont-19>"),
+	    PJScheme.make_cont ((object) symbol ("<cont-20>"),
 				(object) msg_reg, (object) info,
 				(object) handler_reg, (object) fail_reg);
 	 x_reg = adatum_reg;
@@ -9611,7 +9702,7 @@ public class PJScheme:Scheme
    new public static void expand_once_hat ()
    {
       k_reg =
-	 PJScheme.make_cont2 ((object) symbol ("<cont2-38>"),
+	 PJScheme.make_cont2 ((object) symbol ("<cont2-39>"),
 			      (object) adatum_reg, (object) handler_reg,
 			      (object) k_reg);
       var_info_reg = symbol ("none");
@@ -9645,7 +9736,7 @@ public class PJScheme:Scheme
 	   right_pattern = PJScheme.cadar ((object) clauses_reg);
 	   left_pattern = PJScheme.caar ((object) clauses_reg);
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-23>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-24>"),
 				  (object) aclauses_reg, (object) adatum_reg,
 				  (object) aleft_pattern,
 				  (object) aright_pattern,
@@ -9671,7 +9762,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-41>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-42>"),
 				   (object) entries_reg, (object) handler_reg,
 				   (object) k_reg);
 	   adatum_list_reg =
@@ -9695,7 +9786,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-42>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-43>"),
 				   (object) adatum_list_reg,
 				   (object) handler_reg, (object) k_reg);
 	   adatum_reg = PJScheme.car ((object) adatum_list_reg);
@@ -9734,7 +9825,7 @@ public class PJScheme:Scheme
       if (true_q (PJScheme.quasiquote_q_hat ((object) ax_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-28>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-29>"),
 				  (object) k_reg);
 	   depth_reg = PJScheme.Add ((object) depth_reg, (object) 1);
 	   ax_reg = PJScheme._hatcdr_hat ((object) ax_reg);
@@ -9749,7 +9840,7 @@ public class PJScheme:Scheme
 	 if (true_q (PJScheme.GreaterThan ((object) depth_reg, (object) 0)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-27>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-28>"),
 				     (object) ax_reg, (object) k_reg);
 	      depth_reg = PJScheme.Subtract ((object) depth_reg, (object) 1);
 	      ax_reg = PJScheme._hatcdr_hat ((object) ax_reg);
@@ -9783,7 +9874,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.vector_q_hat ((object) ax_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-26>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-27>"),
 				  (object) k_reg);
 	   ax_reg =
 	      PJScheme.retag ((object) PJScheme.
@@ -9814,7 +9905,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-25>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-26>"),
 				  (object) ax_reg, (object) depth_reg,
 				  (object) k_reg);
 	   ax_reg = PJScheme.car_hat ((object) ax_reg);
@@ -9829,7 +9920,7 @@ public class PJScheme:Scheme
       if (true_q (PJScheme.quasiquote_q_hat ((object) ax_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-33>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-34>"),
 				  (object) k_reg);
 	   depth_reg = PJScheme.Add ((object) depth_reg, (object) 1);
 	   ax_reg = PJScheme._hatcdr_hat ((object) ax_reg);
@@ -9844,7 +9935,7 @@ public class PJScheme:Scheme
 	 if (true_q (PJScheme.GreaterThan ((object) depth_reg, (object) 0)))
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-32>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-33>"),
 				     (object) ax_reg, (object) k_reg);
 	      depth_reg = PJScheme.Subtract ((object) depth_reg, (object) 1);
 	      ax_reg = PJScheme._hatcdr_hat ((object) ax_reg);
@@ -9883,7 +9974,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.vector_q_hat ((object) ax_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-31>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-32>"),
 				  (object) k_reg);
 	   pc = (Function) qq_expand_cps;
 
@@ -9906,7 +9997,7 @@ public class PJScheme:Scheme
 	     (PJScheme.null_q ((object) PJScheme.cdr_hat ((object) ax_reg))))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-31>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-32>"),
 				  (object) k_reg);
 	   ax_reg = PJScheme.car_hat ((object) ax_reg);
 	   pc = (Function) qq_expand_list_cps;
@@ -9915,7 +10006,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-30>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-31>"),
 				  (object) ax_reg, (object) depth_reg,
 				  (object) k_reg);
 	   ax_reg = PJScheme.car_hat ((object) ax_reg);
@@ -10020,7 +10111,7 @@ public class PJScheme:Scheme
    new public static bool try_parse (object input)
    {
       load_stack = EmptyList;
-      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-48>"));
+      k_reg = PJScheme.make_cont2 ((object) symbol ("<cont2-49>"));
       fail_reg = _starlast_fail_star;
       handler_reg = try_parse_handler;
       src_reg = symbol ("stdin");
@@ -10059,7 +10150,7 @@ public class PJScheme:Scheme
 	 return ((object) k);
       else
 	 return ((object) PJScheme.
-		 make_cont2 ((object) symbol ("<cont2-51>"), (object) exp,
+		 make_cont2 ((object) symbol ("<cont2-52>"), (object) exp,
 			     (object) k));
    }
 
@@ -10104,7 +10195,7 @@ public class PJScheme:Scheme
 	      object exp = null;
 	      exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-65>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-66>"),
 				      (object) k);
 	      exp_reg = exp;
 	      pc = (Function) m;
@@ -10122,7 +10213,7 @@ public class PJScheme:Scheme
 	      then_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      test_exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-64>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-65>"),
 				      (object) else_exp, (object) then_exp,
 				      (object) env_reg, (object) handler_reg,
 				      (object) k);
@@ -10142,7 +10233,7 @@ public class PJScheme:Scheme
 	      rhs_exp = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-63>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-64>"),
 				      (object) var, (object) var_info,
 				      (object) env_reg, (object) handler_reg,
 				      (object) k);
@@ -10162,7 +10253,7 @@ public class PJScheme:Scheme
 	      docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-61>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-62>"),
 				      (object) docstring, (object) var,
 				      (object) env_reg, (object) handler_reg,
 				      (object) k);
@@ -10182,7 +10273,7 @@ public class PJScheme:Scheme
 	      docstring = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      var = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-59>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-60>"),
 				      (object) docstring, (object) var,
 				      (object) k);
 	      exp_reg = rhs_exp;
@@ -10201,7 +10292,7 @@ public class PJScheme:Scheme
 	      clauses = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      name = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-59>"),
 				      (object) aclauses, (object) clauses,
 				      (object) k);
 	      env_reg = macro_env;
@@ -10260,6 +10351,42 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("trace-lambda-aexp"))))
+	   {
+	      object formals = null;
+	      object bodies = null;
+	      bodies = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      formals = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      value2_reg = fail_reg;
+	      value1_reg =
+		 PJScheme.closure ((object) formals, (object) bodies,
+				   (object) env_reg);
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
+		     (object) symbol ("mu-trace-lambda-aexp"))))
+	   {
+	      object formals = null;
+	      object runt = null;
+	      object bodies = null;
+	      bodies = PJScheme.list_ref ((object) exp_reg, (object) 4);
+	      runt = PJScheme.list_ref ((object) exp_reg, (object) 3);
+	      formals = PJScheme.list_ref ((object) exp_reg, (object) 2);
+	      value2_reg = fail_reg;
+	      value1_reg =
+		 PJScheme.mu_closure ((object) formals, (object) runt,
+				      (object) bodies, (object) env_reg);
+	      k_reg = k;
+	      pc = (Function) apply_cont2;
+	   }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) exp_reg),
 		     (object) symbol ("try-catch-aexp"))))
 	   {
 	      object body = null;
@@ -10298,7 +10425,7 @@ public class PJScheme:Scheme
 						  (object) env_reg,
 						  (object) handler_reg);
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
 					 (object) fexps, (object) env_reg,
 					 (object) handler_reg, (object) k);
 		 handler_reg = new_handler;
@@ -10330,7 +10457,7 @@ public class PJScheme:Scheme
 							(object) handler_reg,
 							(object) k);
 		 k_reg =
-		    PJScheme.make_cont2 ((object) symbol ("<cont2-57>"),
+		    PJScheme.make_cont2 ((object) symbol ("<cont2-58>"),
 					 (object) fexps, (object) env_reg,
 					 (object) handler_reg, (object) k);
 		 handler_reg = new_handler;
@@ -10347,7 +10474,7 @@ public class PJScheme:Scheme
 	      object exp = null;
 	      exp = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-55>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-56>"),
 				      (object) handler_reg);
 	      exp_reg = exp;
 	      pc = (Function) m;
@@ -10389,7 +10516,7 @@ public class PJScheme:Scheme
 	      else
 		{
 		   k_reg =
-		      PJScheme.make_cont2 ((object) symbol ("<cont2-54>"),
+		      PJScheme.make_cont2 ((object) symbol ("<cont2-55>"),
 					   (object) k);
 		   var_info_reg = var_info;
 		   variable_reg = var;
@@ -10422,7 +10549,7 @@ public class PJScheme:Scheme
 	      operands = PJScheme.list_ref ((object) exp_reg, (object) 2);
 	      rator = PJScheme.list_ref ((object) exp_reg, (object) 1);
 	      k_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-53>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-54>"),
 				      (object) rator, (object) env_reg,
 				      (object) info, (object) handler_reg,
 				      (object) k);
@@ -10545,7 +10672,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-69>"),
 				   (object) exps_reg, (object) env_reg,
 				   (object) handler_reg, (object) k_reg);
 	   exp_reg = PJScheme.car ((object) exps_reg);
@@ -10558,7 +10685,7 @@ public class PJScheme:Scheme
    new public static void eval_sequence ()
    {
       k_reg =
-	 PJScheme.make_cont2 ((object) symbol ("<cont2-69>"),
+	 PJScheme.make_cont2 ((object) symbol ("<cont2-70>"),
 			      (object) exps_reg, (object) env_reg,
 			      (object) handler_reg, (object) k_reg);
       exp_reg = PJScheme.car ((object) exps_reg);
@@ -10700,7 +10827,7 @@ public class PJScheme:Scheme
 	   load_stack =
 	      PJScheme.cons ((object) filename_reg, (object) load_stack);
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-74>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-75>"),
 				   (object) filename_reg, (object) env_reg,
 				   (object) handler_reg, (object) k_reg);
 	   src_reg = filename_reg;
@@ -10723,7 +10850,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-75>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-76>"),
 				   (object) filenames_reg, (object) env_reg,
 				   (object) info_reg, (object) handler_reg,
 				   (object) k_reg);
@@ -10815,7 +10942,7 @@ public class PJScheme:Scheme
 	       && ((bool) PJScheme.pair_q ((object) y_reg)))))
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-37>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-38>"),
 				  (object) x_reg, (object) y_reg,
 				  (object) k_reg);
 	   y_reg = PJScheme.car ((object) y_reg);
@@ -10861,7 +10988,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-38>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-39>"),
 				  (object) i_reg, (object) v1_reg,
 				  (object) v2_reg, (object) k_reg);
 	   y_reg = PJScheme.vector_ref ((object) v2_reg, (object) i_reg);
@@ -10894,7 +11021,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-39>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-40>"),
 				  (object) ls_reg, (object) x_reg,
 				  (object) y_reg, (object) info_reg,
 				  (object) handler_reg, (object) fail_reg,
@@ -10912,7 +11039,7 @@ public class PJScheme:Scheme
 	 object sym = null;
 	 sym = PJScheme.car ((object) args_reg);
 	 k_reg =
-	    PJScheme.make_cont2 ((object) symbol ("<cont2-77>"),
+	    PJScheme.make_cont2 ((object) symbol ("<cont2-78>"),
 				 (object) args_reg, (object) sym,
 				 (object) info_reg, (object) handler_reg,
 				 (object) k_reg);
@@ -10934,7 +11061,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-40>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-41>"),
 				  (object) ls1_reg, (object) k_reg);
 	   ls1_reg = PJScheme.cdr ((object) ls1_reg);
 	   pc = (Function) append2;
@@ -10962,7 +11089,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-41>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-42>"),
 				  (object) lists_reg, (object) k_reg);
 	   lists_reg = PJScheme.cdr ((object) lists_reg);
 	   pc = (Function) append_all;
@@ -11118,7 +11245,7 @@ public class PJScheme:Scheme
 	 else
 	   {
 	      k2_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-78>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-79>"),
 				      (object) iterator_reg,
 				      (object) proc_reg, (object) env_reg,
 				      (object) handler_reg, (object) k_reg);
@@ -11158,7 +11285,7 @@ public class PJScheme:Scheme
 	 else
 	   {
 	      k2_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-79>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-80>"),
 				      (object) iterator_reg,
 				      (object) proc_reg, (object) env_reg,
 				      (object) handler_reg, (object) k_reg);
@@ -11184,7 +11311,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.dlr_exp_q ((object) proc_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-81>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-82>"),
 				   (object) list1_reg, (object) proc_reg,
 				   (object) k_reg);
 	   list1_reg = PJScheme.cdr ((object) list1_reg);
@@ -11194,7 +11321,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k2_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-80>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-81>"),
 				   (object) list1_reg, (object) proc_reg,
 				   (object) env_reg, (object) handler_reg,
 				   (object) k_reg);
@@ -11220,7 +11347,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.dlr_exp_q ((object) proc_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-83>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-84>"),
 				   (object) list1_reg, (object) list2_reg,
 				   (object) proc_reg, (object) k_reg);
 	   list2_reg = PJScheme.cdr ((object) list2_reg);
@@ -11231,7 +11358,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k2_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-82>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-83>"),
 				   (object) list1_reg, (object) list2_reg,
 				   (object) proc_reg, (object) env_reg,
 				   (object) handler_reg, (object) k_reg);
@@ -11259,7 +11386,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.dlr_exp_q ((object) proc_reg)))
 	{
 	   k_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-85>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-86>"),
 				   (object) lists_reg, (object) proc_reg,
 				   (object) k_reg);
 	   lists_reg = map (cdr_proc, (object) lists_reg);
@@ -11269,7 +11396,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k2_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-84>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-85>"),
 				   (object) lists_reg, (object) proc_reg,
 				   (object) env_reg, (object) handler_reg,
 				   (object) k_reg);
@@ -11315,7 +11442,7 @@ public class PJScheme:Scheme
 	   else
 	     {
 		k2_reg =
-		   PJScheme.make_cont2 ((object) symbol ("<cont2-86>"),
+		   PJScheme.make_cont2 ((object) symbol ("<cont2-87>"),
 					(object) arg_list, (object) proc_reg,
 					(object) env_reg,
 					(object) handler_reg, (object) k_reg);
@@ -11399,7 +11526,7 @@ public class PJScheme:Scheme
       else
 	{
 	   k_reg =
-	      PJScheme.make_cont ((object) symbol ("<cont-42>"),
+	      PJScheme.make_cont ((object) symbol ("<cont-43>"),
 				  (object) pattern_reg, (object) var_reg,
 				  (object) k_reg);
 	   pattern_reg = PJScheme.car ((object) pattern_reg);
@@ -11423,7 +11550,7 @@ public class PJScheme:Scheme
 	 else
 	   {
 	      k_reg =
-		 PJScheme.make_cont ((object) symbol ("<cont-43>"),
+		 PJScheme.make_cont ((object) symbol ("<cont-44>"),
 				     (object) ap2_reg, (object) p1_reg,
 				     (object) p2_reg, (object) k_reg);
 	      pattern_reg = p2_reg;
@@ -11479,7 +11606,7 @@ public class PJScheme:Scheme
    new public static void unify_pairs_hat ()
    {
       k_reg =
-	 PJScheme.make_cont ((object) symbol ("<cont-45>"),
+	 PJScheme.make_cont ((object) symbol ("<cont-46>"),
 			     (object) apair1_reg, (object) apair2_reg,
 			     (object) pair1_reg, (object) pair2_reg,
 			     (object) k_reg);
@@ -11511,7 +11638,7 @@ public class PJScheme:Scheme
       else if (true_q (PJScheme.pair_q ((object) pattern_reg)))
 	{
 	   k2_reg =
-	      PJScheme.make_cont2 ((object) symbol ("<cont2-90>"),
+	      PJScheme.make_cont2 ((object) symbol ("<cont2-91>"),
 				   (object) ap_reg, (object) pattern_reg,
 				   (object) s_reg, (object) k2_reg);
 	   ap_reg = PJScheme.car_hat ((object) ap_reg);
@@ -11589,7 +11716,7 @@ public class PJScheme:Scheme
 	      s2 = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      s1 = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      k2_reg =
-		 PJScheme.make_cont2 ((object) symbol ("<cont2-91>"),
+		 PJScheme.make_cont2 ((object) symbol ("<cont2-92>"),
 				      (object) s2, (object) k2_reg);
 	      s_reg = s1;
 	      pc = (Function) apply_sub_hat;
@@ -11675,6 +11802,9 @@ public class PJScheme:Scheme
    static Func < object, bool > lambda_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("lambda"),
 				(Predicate2) GreaterOrEqual, (object) 3);
+   static Func < object, bool > trace_lambda_q_hat =
+      PJScheme.tagged_list_hat ((object) symbol ("trace-lambda"),
+				(Predicate2) GreaterOrEqual, (object) 4);
    static Func < object, bool > raise_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("raise"),
 				(Predicate2) EqualSign, (object) 2);
@@ -11696,7 +11826,7 @@ public class PJScheme:Scheme
    static Func < object, bool > finally_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("finally"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   static object REP_k = PJScheme.make_cont2 ((object) symbol ("<cont2-45>"));
+   static object REP_k = PJScheme.make_cont2 ((object) symbol ("<cont2-46>"));
    static object REP_handler =
       PJScheme.make_handler2 ((object) symbol ("<handler2-2>"));
    static object REP_fail = PJScheme.make_fail ((object) symbol ("<fail-1>"));

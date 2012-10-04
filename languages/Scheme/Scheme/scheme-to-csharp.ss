@@ -100,6 +100,7 @@
     (define-syntax?^ "Func<object,bool>" ())
     (begin?^ "Func<object,bool>" ())
     (lambda?^ "Func<object,bool>" ())
+    (trace-lambda?^ "Func<object,bool>" ())
     (raise?^ "Func<object,bool>" ())
     (dict?^ "Func<object,bool>" ())
     (help?^ "Func<object,bool>" ())
