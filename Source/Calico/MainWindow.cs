@@ -1911,7 +1911,7 @@ namespace Calico {
 		//while (Gtk.Application.EventsPending ()) {
 		//    Gtk.Application.RunIteration();
 		//}
-		Thread.Sleep(Math.Max(Math.Min(format.Length * 3, 50), 5)); 
+		Thread.Sleep(1); 
             }
         }
 
