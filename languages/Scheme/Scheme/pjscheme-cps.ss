@@ -2745,7 +2745,7 @@
          (let ((exp (cadr aexp))
                (info (caddr aexp)))
            `(func ,(aunparse exp))))
-        ((eq? ae `define-aexp)
+        ((eq? ae 'define-aexp)
          (let ((id (cadr aexp))
                (docstring (caddr aexp))
                (rhs-exp (cadddr aexp))

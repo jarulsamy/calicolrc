@@ -508,7 +508,7 @@ public class Scheme {
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
   public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
-  public static Proc format_proc = new Proc("format", (Procedure1) format, -1, 1);
+  public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
@@ -1169,8 +1169,17 @@ public class Scheme {
   }
 
   public static object [] list_to_array(object lyst) {
-	int len = (int) length(lyst);
+		return list_to_array(lyst, 0);
+  }
+	
+  public static object [] list_to_array(object lyst, int start) {
+	int len = (int) length(lyst) - start;
 	object current = lyst;
+	int j = 0;
+	while (j < start) {
+		current = cdr(current);
+		j++;
+	}
 	object[] retval = new object[len];
 	for (int i = 0; i < len; i++) {
 	  retval[i] = car(current);
@@ -2408,8 +2417,17 @@ public class Scheme {
 
   // you have to be kidding - set_cdr???!!!!!
   public static object Append(object obj1, object obj2) {
-    if (! list_q(obj2)) {
-      throw new Exception(string.Format("error in append: need two lists"));
+    if (! list_q(obj1)) {
+	throw new Exception(string.Format("error in append: {0} is not a proper list", obj1));
+    } else if (! list_q(obj2)) { // special cases
+	if (null_q(obj1)) { // (append '() 'a) => 'a
+	    return obj2;
+	} else {            // (append '(a b) 'c) => '(a b . c)
+	    Object lyst = (Cons)obj1;
+	    Cons cell = (Cons) rdc(lyst);
+	    set_cdr_b(cell, obj2);
+	    return lyst;
+	}
     } else if (obj1 is object[]) {
       Object lyst = list(obj1);
       if (((int) length(lyst)) > 0) {
@@ -2433,7 +2451,11 @@ public class Scheme {
       throw new Exception(string.Format("error in append: need two lists"));
     }
   }
-
+	
+  public static string format_prim(object obj) {
+	return format(car(obj), list_to_array(obj, 1));
+  }
+	
   public static object sqrt(object obj) {
 	if (pair_q(obj)) {
 	  obj = car(obj);
@@ -2911,8 +2933,9 @@ public class Vector {
 }
 
   public static void Main(string [] args) {
-	printf ("  (1): {0}\n",
-		PJScheme.execute_string_rm("(1)"));
+		PJScheme.execute_string_rm("(error 'thing \"message ~s\" 42)");
+	//printf ("  (1): {0}\n",
+		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
 	// Math:
 //	if (false) {
@@ -3052,8 +3075,10 @@ public class Vector {
       object info = PJScheme.rac(exp);
       if (Equal(info, symbol("none"))) {
         return;
-      } else {
-        System.Console.WriteLine(String.Format("{0} => {1}", PJScheme.aunparse(exp), result));
+	//} else {
+        //System.Console.WriteLine(
+	//	 String.Format("{0} => {1}", 
+	//		       PJScheme.aunparse(exp), result));
       }
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
