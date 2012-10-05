@@ -12337,7 +12337,7 @@ public class PJScheme:Scheme
    static object try_parse_handler =
       PJScheme.make_handler2 ((object) symbol ("<handler2-3>"));
    static object _startracing_on_q_star = true;
-   static object closure_depth = 0;
+   public static object closure_depth = 0;
    static object void_prim =
       PJScheme.make_proc ((object) symbol ("<proc-4>"));
    static object exit_prim =

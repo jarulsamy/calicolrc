@@ -3111,10 +3111,18 @@ public class Vector {
             document.GotoLine(start_line);
             document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
           });
-      printf("Returning ~a...~%", result);
+      if (! Equal(car(exp), symbol("lit-aexp"))) {
+	  printf("{0}{1} => {2}~%", 
+		 string_append(PJScheme.repeat(" |", 
+					       ((int)PJScheme.closure_depth) + 1)),
+		 PJScheme.aunparse(exp),
+		 result);
+      }
       if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
-        System.Console.WriteLine(String.Format("Trace: Paused!"));
-        calico.playResetEvent.WaitOne();
+	  printf("{0}Trace: Paused!~%", 
+		 string_append(PJScheme.repeat(" |", 
+					       ((int)PJScheme.closure_depth) + 1)));
+	  calico.playResetEvent.WaitOne();
       } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
         double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
         // Force at least a slight sleep, else no GUI controls
