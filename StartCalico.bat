@@ -16,7 +16,7 @@ REM Set the MONO_PATH as we no longer use the GAC:
 SET MONO_PATH=%CD%\mono\lib\4.0;%CD%\mono\lib\gtk-sharp-2.0;%CD%\bin;%CD%\mono\lib\2.0;%CD%\mono\lib\3.5;
 
 REM Start up Calico in the background with no terminal:
-"C:\Program Files (x86)\Mono-2.10.8\bin\mono.exe" bin\Calico.exe %*
+"mono\bin\mono.exe" bin\Calico.exe %*
 
 PAUSE
 
