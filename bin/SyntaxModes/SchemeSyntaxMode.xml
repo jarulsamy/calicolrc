@@ -112,6 +112,7 @@
     <Word>null?</Word>
     <Word>pair?</Word>
     <Word>parse</Word>
+    <Word>unparse</Word>
     <Word>parse-string</Word>
     <Word>print</Word>
     <Word>printf</Word>

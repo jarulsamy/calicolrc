@@ -334,7 +334,7 @@
       (mu-lambda-aexp (formals runt bodies info)
 	(k (mu-closure formals runt bodies env) fail))
       (trace-lambda-aexp (name formals bodies info)
-	(k (closure formals bodies env) fail))
+	  (k (trace-closure name formals bodies env) fail))
       (mu-trace-lambda-aexp (name formals runt bodies info)
 	(k (mu-closure formals runt bodies env) fail))
       (try-catch-aexp (body cvar cexps info)
@@ -428,6 +428,29 @@
       (let ((new-fail (lambda-fail () (eval-choices (cdr exps) env handler fail k))))
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
+
+(define closure-depth 0)
+
+;; FIXME: cps or just loop
+(define repeat
+  (lambda (item times)
+    (if (= times 0)
+	'()
+	(cons item (repeat item (- times 1))))))
+
+(define trace-closure
+  (lambda (name formals bodies env)
+    (lambda-proc (args env2 info handler fail k2)
+      (if (= (length args) (length formals))
+	  (begin
+	    (printf "~scall: ~s~%" (apply string-append (repeat " |" closure-depth)) (cons name args))
+	    (set! closure-depth (+ closure-depth 1))
+	    (eval-sequence bodies (extend env formals args) handler fail
+		 (lambda-cont2 (v fail)
+	            (set! closure-depth (- closure-depth 1))
+	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" closure-depth)) v)
+		    (k2 v fail))))
+	  (runtime-error "incorrect number of arguments in application" info handler fail)))))
 
 (define closure
   (lambda (formals bodies env)
