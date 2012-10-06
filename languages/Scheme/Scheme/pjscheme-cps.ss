@@ -3831,6 +3831,35 @@
     (for-each safe-print args)
     (k2 void-value fail)))
 
+;; string-prim 
+(define string-prim 
+  ;; turns a list of char into a string
+  (lambda-proc (args env2 info handler fail k2)
+     ;;(k2 (apply string-append (map (lambda (c) (format "~s" c)) args)) fail)))
+     (k2 (char->string args) fail)))
+
+;; substring
+(define substring-prim 
+  ;; (substring "string" start stop)
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (substring (car args) (cadr args) (caddr args)) fail))) 
+
+;; number->string
+(define number->string-prim 
+  ;; given a number, returns those digits as a string
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (number->string (car args)) fail)))
+
+;; assv
+(define assv-prim 
+  ;; given 'a '((b 1) (a 2)) returns (a 2)
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (assv (car args) (cadr args)) fail)))
+;; memv
+(define memv-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (memv (car args) (cadr args)) fail)))
+
 (define safe-print
   (lambda (arg)
     (set! *need-newline* #f)
@@ -4609,7 +4638,8 @@
 	    'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
 	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
 	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref 'unparse)
+	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref 'unparse 
+	    'string 'substring 'number->string 'assv 'memv)
       (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim
 	    print-prim display-prim newline-prim load-prim length-prim symbol?-prim number?-prim boolean?-prim
 	    string?-prim null?-prim pair?-prim cons-prim car-prim cdr-prim cadr-prim
@@ -4619,7 +4649,8 @@
 	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
 	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
 	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim unparse-prim)))))
+	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim unparse-prim
+	    string-prim substring-prim number->string-prim assv-prim memv-prim)))))
 
 (define toplevel-env (make-toplevel-env))
 

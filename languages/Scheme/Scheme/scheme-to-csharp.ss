@@ -379,7 +379,7 @@
 		      (assign-exp (if (null? (cadr types))
 				      (convert-exp (caddr def) name)
 				      (caadr types))))
-		  (format "static ~a ~a = ~a;\n" ret-type pname assign-exp)))
+		  (format "public static ~a ~a = ~a;\n" ret-type pname assign-exp)))
 	      (begin
 		(printf "skipping duplicate variable definition: ~a~%" name)
 		""))))

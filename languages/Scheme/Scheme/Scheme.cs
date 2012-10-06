@@ -473,9 +473,26 @@ public class Scheme {
     public enum TakesType { TakesAll=-1, TakesOne=1, TakesTwo=2 };
 
   public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
-  // FIXME: make these three different:
+  // FIXME: make these four different:
+    /*
+      1. eq? evaluates to #f unless its parameters represent the same
+      data object in memory;
+      
+      2. eqv? is generally the same as eq? but treats primitive
+      objects (e.g. characters and numbers) specially so that numbers
+      that represent the same value are eqv? even if they do not refer
+      to the same object;
+      
+      3. equal? compares data structures such as lists, vectors and
+      strings to determine if they have congruent structure and eqv?
+      contents.(R5RS sec. 6.1)[3]
+
+      4. = compares numbers
+      
+    */
   public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
   public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Eq, -1, 2);
+  public static Proc Eqv_proc = new Proc("eqv?", (Procedure1Bool) Eqv, -1, 2);
   public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
   public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
   public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
@@ -1676,6 +1693,12 @@ public class Scheme {
     return Eq(item, current);
   }
 
+  public static bool Eqv(object obj) {
+	object item = car(obj);
+	object current = cadr(obj);
+    return Eqv(item, current);
+  }
+
   public static bool Eq(object obj1, object obj2) {
 	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
 	  if ((obj1 is Symbol) && (obj2 is Symbol))
@@ -1688,6 +1711,39 @@ public class Scheme {
                                              // between internal lists
                                              // and user's
 		return Equal(cdr(obj1), cdr(obj2));
+	  else
+		return false;
+    } if (pair_q(obj1) || pair_q(obj2)) {
+			return false;
+	} else {
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+        } catch {
+          return false;
+        }
+      } else {
+        if (obj1 is BigInteger) {
+          return ((BigInteger)obj1).Equals(obj2);
+        } else {
+          return ((BigInteger)obj2).Equals(obj1);
+        }
+      }
+	}
+  }
+
+  public static bool Eqv(object obj1, object obj2) {
+	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	  if ((obj1 is Symbol) && (obj2 is Symbol))
+		return ((Symbol)obj1).Equals(obj2);
+	  else return false;
+	} else if (pair_q(obj1) && pair_q(obj2)) {
+	  if (null_q(obj1) && null_q(obj2))
+		return true;
+	  else if (Eqv(car(obj1),  car(obj2))) // FIXME: confusion
+                                             // between internal lists
+                                             // and user's
+		return Eqv(cdr(obj1), cdr(obj2));
 	  else
 		return false;
     } if (pair_q(obj1) || pair_q(obj2)) {
@@ -2181,6 +2237,14 @@ public class Scheme {
 
     // Add new low-level procedures here!
 
+    public static object number_to_string(object number) {
+	return ((number != null) ? number.ToString() : "");
+    }
+
+    public static object char_to_string(object number) {
+	return ((number != null) ? number.ToString() : "");
+    }
+
   public static object list_ref(object obj, object pos) {
 	//printf("calling list-ref({0}, {1})\n", obj, pos);
 	if (pair_q(obj)) {
@@ -2558,6 +2622,7 @@ public class Scheme {
       return (x);
   }
 
+// FIXME: Rewrite without recursion
   public static string string_append(object x) {
       if (null_q(x))
 	  return "";
@@ -2565,13 +2630,38 @@ public class Scheme {
 	  return (car(x).ToString() + string_append(cdr(x)));
   }
 
+// FIXME: Rewrite without recursion
   public static object assq(object x, object ls) {
       if (null_q(ls)) 
 	  return false;
       else if (Eq(x, caar(ls)))
-	  return cdar(ls);
+	  return car(ls);
       else
 	  return assq(x, cdr(ls));
+  }
+
+// assq compares keys with eq?
+// assv uses eqv? 
+// assoc uses equal?. 
+
+// FIXME: Rewrite without recursion
+  public static object assv(object x, object ls) {
+      if (null_q(ls)) 
+	  return false;
+      else if (Eqv(x, caar(ls)))
+	  return car(ls);
+      else
+	  return assv(x, cdr(ls));
+  }
+
+// FIXME: Rewrite without recursion
+  public static object assoc(object x, object ls) {
+      if (null_q(ls)) 
+	  return false;
+      else if (Equal(x, caar(ls)))
+	  return car(ls);
+      else
+	  return assv(x, cdr(ls));
   }
 
   public static bool atom_q(object x) {
@@ -2605,6 +2695,24 @@ public class Scheme {
   }
 
   public static object memq(object item1, object list) {
+	if (list is Cons) {
+	  object current = list;
+	  while (! Eq(current, EmptyList)) {
+		if (Equal(item1, car(current))) {
+		    return current;
+		}
+		current = cdr(current);
+	  }
+	  return false;
+	}
+	return false;
+  }
+
+  public static object memv(object obj) {
+	return memv(car(obj), cadr(obj));
+  }
+
+  public static object memv(object item1, object list) {
 	if (list is Cons) {
 	  object current = list;
 	  while (! Eq(current, EmptyList)) {
