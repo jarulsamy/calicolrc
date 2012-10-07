@@ -130,89 +130,89 @@ public class PJScheme:Scheme
 	      cons ((object) symbol ("choose-aexp"), (object) args));
    }
 
-   public static Function pc = null;
-   public static object aclauses_reg = symbol ("undefined");
-   public static object action_reg = symbol ("undefined");
-   public static object adatum_list_reg = symbol ("undefined");
-   public static object adatum_reg = symbol ("undefined");
-   public static object ap1_reg = symbol ("undefined");
-   public static object ap2_reg = symbol ("undefined");
-   public static object ap_reg = symbol ("undefined");
-   public static object apair1_reg = symbol ("undefined");
-   public static object apair2_reg = symbol ("undefined");
-   public static object args_reg = symbol ("undefined");
-   public static object asexps_reg = symbol ("undefined");
-   public static object avar_reg = symbol ("undefined");
-   public static object ax_reg = symbol ("undefined");
-   public static object bindings_reg = symbol ("undefined");
-   public static object bodies_reg = symbol ("undefined");
-   public static object buffer_reg = symbol ("undefined");
-   public static object char_reg = symbol ("undefined");
-   public static object chars_reg = symbol ("undefined");
-   public static object clauses_reg = symbol ("undefined");
-   public static object components_reg = symbol ("undefined");
-   public static object datum_reg = symbol ("undefined");
-   public static object depth_reg = symbol ("undefined");
-   public static object entries_reg = symbol ("undefined");
-   public static object env2_reg = symbol ("undefined");
-   public static object env_reg = symbol ("undefined");
-   public static object exception_reg = symbol ("undefined");
-   public static object exp_reg = symbol ("undefined");
-   public static object expected_terminator_reg = symbol ("undefined");
-   public static object exps_reg = symbol ("undefined");
-   public static object fail_reg = symbol ("undefined");
-   public static object filename_reg = symbol ("undefined");
-   public static object filenames_reg = symbol ("undefined");
-   public static object final_reg = symbol ("undefined");
-   public static object generator_reg = symbol ("undefined");
-   public static object handler_reg = symbol ("undefined");
-   public static object i_reg = symbol ("undefined");
-   public static object info_reg = symbol ("undefined");
-   public static object input_reg = symbol ("undefined");
-   public static object iterator_reg = symbol ("undefined");
-   public static object k2_reg = symbol ("undefined");
-   public static object k_reg = symbol ("undefined");
-   public static object keyword_reg = symbol ("undefined");
-   public static object line_reg = symbol ("undefined");
-   public static object list1_reg = symbol ("undefined");
-   public static object list2_reg = symbol ("undefined");
-   public static object lists_reg = symbol ("undefined");
-   public static object ls1_reg = symbol ("undefined");
-   public static object ls2_reg = symbol ("undefined");
-   public static object ls_reg = symbol ("undefined");
-   public static object macro_reg = symbol ("undefined");
-   public static object msg_reg = symbol ("undefined");
-   public static object p1_reg = symbol ("undefined");
-   public static object p2_reg = symbol ("undefined");
-   public static object pair1_reg = symbol ("undefined");
-   public static object pair2_reg = symbol ("undefined");
-   public static object path_reg = symbol ("undefined");
-   public static object pattern_reg = symbol ("undefined");
-   public static object proc_reg = symbol ("undefined");
-   public static object procs_reg = symbol ("undefined");
-   public static object s_reg = symbol ("undefined");
-   public static object src_reg = symbol ("undefined");
-   public static object sum_reg = symbol ("undefined");
-   public static object token_type_reg = symbol ("undefined");
-   public static object tokens_reg = symbol ("undefined");
-   public static object transformer_name_reg = symbol ("undefined");
-   public static object v1_reg = symbol ("undefined");
-   public static object v2_reg = symbol ("undefined");
-   public static object value1_reg = symbol ("undefined");
-   public static object value2_reg = symbol ("undefined");
-   public static object value3_reg = symbol ("undefined");
-   public static object value4_reg = symbol ("undefined");
-   public static object value_reg = symbol ("undefined");
-   public static object var_info_reg = symbol ("undefined");
-   public static object var_reg = symbol ("undefined");
-   public static object variable_reg = symbol ("undefined");
-   public static object vars_reg = symbol ("undefined");
-   public static object x_reg = symbol ("undefined");
-   public static object y_reg = symbol ("undefined");
-   public static object temp_2 = symbol ("undefined");
-   public static object temp_3 = symbol ("undefined");
-   public static object temp_4 = symbol ("undefined");
-   public static object temp_1 = symbol ("undefined");
+   static Function pc = null;
+   static object aclauses_reg = symbol ("undefined");
+   static object action_reg = symbol ("undefined");
+   static object adatum_list_reg = symbol ("undefined");
+   static object adatum_reg = symbol ("undefined");
+   static object ap1_reg = symbol ("undefined");
+   static object ap2_reg = symbol ("undefined");
+   static object ap_reg = symbol ("undefined");
+   static object apair1_reg = symbol ("undefined");
+   static object apair2_reg = symbol ("undefined");
+   static object args_reg = symbol ("undefined");
+   static object asexps_reg = symbol ("undefined");
+   static object avar_reg = symbol ("undefined");
+   static object ax_reg = symbol ("undefined");
+   static object bindings_reg = symbol ("undefined");
+   static object bodies_reg = symbol ("undefined");
+   static object buffer_reg = symbol ("undefined");
+   static object char_reg = symbol ("undefined");
+   static object chars_reg = symbol ("undefined");
+   static object clauses_reg = symbol ("undefined");
+   static object components_reg = symbol ("undefined");
+   static object datum_reg = symbol ("undefined");
+   static object depth_reg = symbol ("undefined");
+   static object entries_reg = symbol ("undefined");
+   static object env2_reg = symbol ("undefined");
+   static object env_reg = symbol ("undefined");
+   static object exception_reg = symbol ("undefined");
+   static object exp_reg = symbol ("undefined");
+   static object expected_terminator_reg = symbol ("undefined");
+   static object exps_reg = symbol ("undefined");
+   static object fail_reg = symbol ("undefined");
+   static object filename_reg = symbol ("undefined");
+   static object filenames_reg = symbol ("undefined");
+   static object final_reg = symbol ("undefined");
+   static object generator_reg = symbol ("undefined");
+   static object handler_reg = symbol ("undefined");
+   static object i_reg = symbol ("undefined");
+   static object info_reg = symbol ("undefined");
+   static object input_reg = symbol ("undefined");
+   static object iterator_reg = symbol ("undefined");
+   static object k2_reg = symbol ("undefined");
+   static object k_reg = symbol ("undefined");
+   static object keyword_reg = symbol ("undefined");
+   static object line_reg = symbol ("undefined");
+   static object list1_reg = symbol ("undefined");
+   static object list2_reg = symbol ("undefined");
+   static object lists_reg = symbol ("undefined");
+   static object ls1_reg = symbol ("undefined");
+   static object ls2_reg = symbol ("undefined");
+   static object ls_reg = symbol ("undefined");
+   static object macro_reg = symbol ("undefined");
+   static object msg_reg = symbol ("undefined");
+   static object p1_reg = symbol ("undefined");
+   static object p2_reg = symbol ("undefined");
+   static object pair1_reg = symbol ("undefined");
+   static object pair2_reg = symbol ("undefined");
+   static object path_reg = symbol ("undefined");
+   static object pattern_reg = symbol ("undefined");
+   static object proc_reg = symbol ("undefined");
+   static object procs_reg = symbol ("undefined");
+   static object s_reg = symbol ("undefined");
+   static object src_reg = symbol ("undefined");
+   static object sum_reg = symbol ("undefined");
+   static object token_type_reg = symbol ("undefined");
+   static object tokens_reg = symbol ("undefined");
+   static object transformer_name_reg = symbol ("undefined");
+   static object v1_reg = symbol ("undefined");
+   static object v2_reg = symbol ("undefined");
+   static object value1_reg = symbol ("undefined");
+   static object value2_reg = symbol ("undefined");
+   static object value3_reg = symbol ("undefined");
+   static object value4_reg = symbol ("undefined");
+   static object value_reg = symbol ("undefined");
+   static object var_info_reg = symbol ("undefined");
+   static object var_reg = symbol ("undefined");
+   static object variable_reg = symbol ("undefined");
+   static object vars_reg = symbol ("undefined");
+   static object x_reg = symbol ("undefined");
+   static object y_reg = symbol ("undefined");
+   static object temp_2 = symbol ("undefined");
+   static object temp_3 = symbol ("undefined");
+   static object temp_4 = symbol ("undefined");
+   static object temp_1 = symbol ("undefined");
    new public static object make_cont (params object[]args)
    {
       return ((object) PJScheme.
@@ -3180,14 +3180,13 @@ public class PJScheme:Scheme
 	   {
 	      object k2 = null;
 	      k2 = PJScheme.list_ref ((object) temp_1, (object) 1);
-	      closure_depth =
-		 PJScheme.Subtract ((object) closure_depth, (object) 1);
+	      PJScheme.decrement_closure_depth ();
 	      PJScheme.printf ((object) "~sreturn: ~s~%",
 			       (object) apply (string_append_proc,
 					       (object) PJScheme.
 					       repeat ((object) " |",
-						       (object)
-						       closure_depth)),
+						       (object) PJScheme.
+						       get_closure_depth ())),
 			       (object) value1_reg);
 	      k_reg = k2;
 	      pc = (Function) apply_cont2;
@@ -4487,13 +4486,13 @@ public class PJScheme:Scheme
 				    (object) apply (string_append_proc,
 						    (object) PJScheme.
 						    repeat ((object) " |",
-							    (object)
-							    closure_depth)),
+							    (object) PJScheme.
+							    get_closure_depth
+							    ())),
 				    (object) PJScheme.cons ((object) name,
 							    (object)
 							    args_reg));
-		   closure_depth =
-		      PJScheme.Add ((object) closure_depth, (object) 1);
+		   PJScheme.increment_closure_depth ();
 		   k_reg =
 		      PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 					   (object) k2_reg);
@@ -4555,13 +4554,13 @@ public class PJScheme:Scheme
 				    (object) apply (string_append_proc,
 						    (object) PJScheme.
 						    repeat ((object) " |",
-							    (object)
-							    closure_depth)),
+							    (object) PJScheme.
+							    get_closure_depth
+							    ())),
 				    (object) PJScheme.cons ((object) name,
 							    (object)
 							    args_reg));
-		   closure_depth =
-		      PJScheme.Add ((object) closure_depth, (object) 1);
+		   PJScheme.increment_closure_depth ();
 		   k_reg =
 		      PJScheme.make_cont2 ((object) symbol ("<cont2-68>"),
 					   (object) k2_reg);
@@ -10771,6 +10770,8 @@ public class PJScheme:Scheme
 
    new public static void m ()
    {
+      if (true_q (_startracing_on_q_star))
+	 PJScheme.highlight_expression ((object) exp_reg);
       {
 	 object k = null;
 	 k = PJScheme.make_debugging_k ((object) exp_reg, (object) k_reg);
@@ -11262,19 +11263,6 @@ public class PJScheme:Scheme
 	   pc = (Function) m;
 	}
 
-   }
-
-   new public static object repeat (object item, object times)
-   {
-      if (true_q (PJScheme.EqualSign ((object) times, (object) 0)))
-	 return ((object) EmptyList);
-      else
-	 return ((object) PJScheme.
-		 cons ((object) item,
-		       (object) PJScheme.repeat ((object) item,
-						 (object) PJScheme.
-						 Subtract ((object) times,
-							   (object) 1))));
    }
 
    new public static object trace_closure (object name, object formals,
@@ -12381,261 +12369,256 @@ public class PJScheme:Scheme
 
    }
 
-   public static object chars_to_scan = symbol ("undefined");
-   public static object scan_line = symbol ("undefined");
-   public static object scan_char = symbol ("undefined");
-   public static object scan_position = symbol ("undefined");
-   public static object last_scan_line = symbol ("undefined");
-   public static object last_scan_char = symbol ("undefined");
-   public static object last_scan_position = symbol ("undefined");
-   public static object token_start_line = symbol ("undefined");
-   public static object token_start_char = symbol ("undefined");
-   public static object token_start_position = symbol ("undefined");
-   public static object let_transformer_hat =
+   static object chars_to_scan = symbol ("undefined");
+   static object scan_line = symbol ("undefined");
+   static object scan_char = symbol ("undefined");
+   static object scan_position = symbol ("undefined");
+   static object last_scan_line = symbol ("undefined");
+   static object last_scan_char = symbol ("undefined");
+   static object last_scan_position = symbol ("undefined");
+   static object token_start_line = symbol ("undefined");
+   static object token_start_char = symbol ("undefined");
+   static object token_start_position = symbol ("undefined");
+   static object let_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-1>"));
-   public static object letrec_transformer_hat =
+   static object letrec_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-2>"));
-   public static object mit_define_transformer_hat =
+   static object mit_define_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-3>"));
-   public static object and_transformer_hat =
+   static object and_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-4>"));
-   public static object or_transformer_hat =
+   static object or_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-5>"));
-   public static object cond_transformer_hat =
+   static object cond_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-6>"));
-   public static object let_star_transformer_hat =
+   static object let_star_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-7>"));
-   public static object case_transformer_hat =
+   static object case_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-8>"));
-   public static object record_case_transformer_hat =
+   static object record_case_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-9>"));
-   public static object define_datatype_transformer_hat =
+   static object define_datatype_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-10>"));
-   public static object cases_transformer_hat =
+   static object cases_transformer_hat =
       PJScheme.make_macro ((object) symbol ("<macro-11>"));
-   public static object macro_env = PJScheme.make_macro_env_hat ();
-   public static Func < object, bool > quote_q_hat =
+   static object macro_env = PJScheme.make_macro_env_hat ();
+   static Func < object, bool > quote_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("quote"),
 				(Predicate2) EqualSign, (object) 2);
-   public static Func < object, bool > quasiquote_q_hat =
+   static Func < object, bool > quasiquote_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("quasiquote"),
 				(Predicate2) EqualSign, (object) 2);
-   public static Func < object, bool > unquote_q_hat =
+   static Func < object, bool > unquote_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("unquote"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   public static Func < object, bool > unquote_splicing_q_hat =
+   static Func < object, bool > unquote_splicing_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("unquote-splicing"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   public static Func < object, bool > if_then_q_hat =
+   static Func < object, bool > if_then_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("if"),
 				(Predicate2) EqualSign, (object) 3);
-   public static Func < object, bool > if_else_q_hat =
+   static Func < object, bool > if_else_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("if"),
 				(Predicate2) EqualSign, (object) 4);
-   public static Func < object, bool > assignment_q_hat =
+   static Func < object, bool > assignment_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("set!"),
 				(Predicate2) EqualSign, (object) 3);
-   public static Func < object, bool > func_q_hat =
+   static Func < object, bool > func_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("func"),
 				(Predicate2) EqualSign, (object) 2);
-   public static Func < object, bool > define_q_hat =
+   static Func < object, bool > define_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("define"),
 				(Predicate2) GreaterOrEqual, (object) 3);
-   public static Func < object, bool > define_b_q_hat =
+   static Func < object, bool > define_b_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("define!"),
 				(Predicate2) GreaterOrEqual, (object) 3);
-   public static Func < object, bool > define_syntax_q_hat =
+   static Func < object, bool > define_syntax_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("define-syntax"),
 				(Predicate2) GreaterOrEqual, (object) 3);
-   public static Func < object, bool > begin_q_hat =
+   static Func < object, bool > begin_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("begin"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   public static Func < object, bool > lambda_q_hat =
+   static Func < object, bool > lambda_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("lambda"),
 				(Predicate2) GreaterOrEqual, (object) 3);
-   public static Func < object, bool > trace_lambda_q_hat =
+   static Func < object, bool > trace_lambda_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("trace-lambda"),
 				(Predicate2) GreaterOrEqual, (object) 4);
-   public static Func < object, bool > raise_q_hat =
+   static Func < object, bool > raise_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("raise"),
 				(Predicate2) EqualSign, (object) 2);
-   public static Func < object, bool > dict_q_hat =
+   static Func < object, bool > dict_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("dict"),
 				(Predicate2) GreaterOrEqual, (object) 1);
-   public static Func < object, bool > help_q_hat =
+   static Func < object, bool > help_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("help"),
 				(Predicate2) EqualSign, (object) 2);
-   public static Func < object, bool > choose_q_hat =
+   static Func < object, bool > choose_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("choose"),
 				(Predicate2) GreaterOrEqual, (object) 1);
-   public static Func < object, bool > try_q_hat =
+   static Func < object, bool > try_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("try"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   public static Func < object, bool > catch_q_hat =
+   static Func < object, bool > catch_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("catch"),
 				(Predicate2) GreaterOrEqual, (object) 3);
-   public static Func < object, bool > finally_q_hat =
+   static Func < object, bool > finally_q_hat =
       PJScheme.tagged_list_hat ((object) symbol ("finally"),
 				(Predicate2) GreaterOrEqual, (object) 2);
-   public static object REP_k =
-      PJScheme.make_cont2 ((object) symbol ("<cont2-46>"));
-   public static object REP_handler =
+   static object REP_k = PJScheme.make_cont2 ((object) symbol ("<cont2-46>"));
+   static object REP_handler =
       PJScheme.make_handler2 ((object) symbol ("<handler2-2>"));
-   public static object REP_fail =
-      PJScheme.make_fail ((object) symbol ("<fail-1>"));
-   public static object _starlast_fail_star = REP_fail;
-   public static object _startokens_left_star = symbol ("undefined");
-   public static object try_parse_handler =
+   static object REP_fail = PJScheme.make_fail ((object) symbol ("<fail-1>"));
+   static object _starlast_fail_star = REP_fail;
+   static object _startokens_left_star = symbol ("undefined");
+   static object try_parse_handler =
       PJScheme.make_handler2 ((object) symbol ("<handler2-3>"));
-   public static object _startracing_on_q_star = true;
-   public static object closure_depth = 0;
-   public static object void_prim =
+   static object _startracing_on_q_star = true;
+   static object void_prim =
       PJScheme.make_proc ((object) symbol ("<proc-5>"));
-   public static object exit_prim =
+   static object exit_prim =
       PJScheme.make_proc ((object) symbol ("<proc-6>"));
-   public static object end_of_session =
+   static object end_of_session =
       PJScheme.list ((object) symbol ("exiting"), (object) symbol ("the"),
 		     (object) symbol ("interpreter"));
-   public static object eval_prim =
+   static object eval_prim =
       PJScheme.make_proc ((object) symbol ("<proc-7>"));
-   public static object parse_prim =
+   static object parse_prim =
       PJScheme.make_proc ((object) symbol ("<proc-8>"));
-   public static object unparse_prim =
+   static object unparse_prim =
       PJScheme.make_proc ((object) symbol ("<proc-9>"));
-   public static object parse_string_prim =
+   static object parse_string_prim =
       PJScheme.make_proc ((object) symbol ("<proc-10>"));
-   public static object read_string_prim =
+   static object read_string_prim =
       PJScheme.make_proc ((object) symbol ("<proc-11>"));
-   public static object apply_prim =
+   static object apply_prim =
       PJScheme.make_proc ((object) symbol ("<proc-12>"));
-   public static object sqrt_prim =
+   static object sqrt_prim =
       PJScheme.make_proc ((object) symbol ("<proc-13>"));
-   public static object print_prim =
+   static object print_prim =
       PJScheme.make_proc ((object) symbol ("<proc-14>"));
-   public static object string_prim =
+   static object string_prim =
       PJScheme.make_proc ((object) symbol ("<proc-15>"));
-   public static object substring_prim =
+   static object substring_prim =
       PJScheme.make_proc ((object) symbol ("<proc-16>"));
-   public static object number_to_string_prim =
+   static object number_to_string_prim =
       PJScheme.make_proc ((object) symbol ("<proc-17>"));
-   public static object assv_prim =
+   static object assv_prim =
       PJScheme.make_proc ((object) symbol ("<proc-18>"));
-   public static object memv_prim =
+   static object memv_prim =
       PJScheme.make_proc ((object) symbol ("<proc-19>"));
-   public static object display_prim =
+   static object display_prim =
       PJScheme.make_proc ((object) symbol ("<proc-20>"));
-   public static object newline_prim =
+   static object newline_prim =
       PJScheme.make_proc ((object) symbol ("<proc-21>"));
-   public static object load_prim =
+   static object load_prim =
       PJScheme.make_proc ((object) symbol ("<proc-22>"));
-   public static object load_stack = EmptyList;
-   public static object length_prim =
+   static object load_stack = EmptyList;
+   static object length_prim =
       PJScheme.make_proc ((object) symbol ("<proc-23>"));
-   public static object symbol_q_prim =
+   static object symbol_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-24>"));
-   public static object number_q_prim =
+   static object number_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-25>"));
-   public static object boolean_q_prim =
+   static object boolean_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-26>"));
-   public static object string_q_prim =
+   static object string_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-27>"));
-   public static object null_q_prim =
+   static object null_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-28>"));
-   public static object pair_q_prim =
+   static object pair_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-29>"));
-   public static object cons_prim =
+   static object cons_prim =
       PJScheme.make_proc ((object) symbol ("<proc-30>"));
-   public static object car_prim =
+   static object car_prim =
       PJScheme.make_proc ((object) symbol ("<proc-31>"));
-   public static object cdr_prim =
+   static object cdr_prim =
       PJScheme.make_proc ((object) symbol ("<proc-32>"));
-   public static object cadr_prim =
+   static object cadr_prim =
       PJScheme.make_proc ((object) symbol ("<proc-33>"));
-   public static object caddr_prim =
+   static object caddr_prim =
       PJScheme.make_proc ((object) symbol ("<proc-34>"));
-   public static object list_prim =
+   static object list_prim =
       PJScheme.make_proc ((object) symbol ("<proc-35>"));
-   public static object plus_prim =
+   static object plus_prim =
       PJScheme.make_proc ((object) symbol ("<proc-36>"));
-   public static object minus_prim =
+   static object minus_prim =
       PJScheme.make_proc ((object) symbol ("<proc-37>"));
-   public static object times_prim =
+   static object times_prim =
       PJScheme.make_proc ((object) symbol ("<proc-38>"));
-   public static object divide_prim =
+   static object divide_prim =
       PJScheme.make_proc ((object) symbol ("<proc-39>"));
-   public static object lt_prim =
-      PJScheme.make_proc ((object) symbol ("<proc-40>"));
-   public static object gt_prim =
-      PJScheme.make_proc ((object) symbol ("<proc-41>"));
-   public static object lt_or_eq_prim =
+   static object lt_prim = PJScheme.make_proc ((object) symbol ("<proc-40>"));
+   static object gt_prim = PJScheme.make_proc ((object) symbol ("<proc-41>"));
+   static object lt_or_eq_prim =
       PJScheme.make_proc ((object) symbol ("<proc-42>"));
-   public static object gt_or_eq_prim =
+   static object gt_or_eq_prim =
       PJScheme.make_proc ((object) symbol ("<proc-43>"));
-   public static object equal_sign_prim =
+   static object equal_sign_prim =
       PJScheme.make_proc ((object) symbol ("<proc-44>"));
-   public static object abs_prim =
+   static object abs_prim =
       PJScheme.make_proc ((object) symbol ("<proc-45>"));
-   public static object equal_q_prim =
+   static object equal_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-46>"));
-   public static object eq_q_prim =
+   static object eq_q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-47>"));
-   public static object memq_prim =
+   static object memq_prim =
       PJScheme.make_proc ((object) symbol ("<proc-48>"));
-   public static object member_prim =
+   static object member_prim =
       PJScheme.make_proc ((object) symbol ("<proc-49>"));
-   public static object range_prim =
+   static object range_prim =
       PJScheme.make_proc ((object) symbol ("<proc-50>"));
-   public static object set_car_b_prim =
+   static object set_car_b_prim =
       PJScheme.make_proc ((object) symbol ("<proc-51>"));
-   public static object set_cdr_b_prim =
+   static object set_cdr_b_prim =
       PJScheme.make_proc ((object) symbol ("<proc-52>"));
-   public static object import_prim =
+   static object import_prim =
       PJScheme.make_proc ((object) symbol ("<proc-53>"));
-   public static object get_prim =
+   static object get_prim =
       PJScheme.make_proc ((object) symbol ("<proc-54>"));
-   public static object call_cc_prim =
+   static object call_cc_prim =
       PJScheme.make_proc ((object) symbol ("<proc-56>"));
-   public static object abort_prim =
+   static object abort_prim =
       PJScheme.make_proc ((object) symbol ("<proc-57>"));
-   public static object require_prim =
+   static object require_prim =
       PJScheme.make_proc ((object) symbol ("<proc-58>"));
-   public static object cut_prim =
+   static object cut_prim =
       PJScheme.make_proc ((object) symbol ("<proc-59>"));
-   public static object reverse_prim =
+   static object reverse_prim =
       PJScheme.make_proc ((object) symbol ("<proc-60>"));
-   public static object append_prim =
+   static object append_prim =
       PJScheme.make_proc ((object) symbol ("<proc-61>"));
-   public static object list_to_vector_prim =
+   static object list_to_vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-62>"));
-   public static object dir_prim =
+   static object dir_prim =
       PJScheme.make_proc ((object) symbol ("<proc-63>"));
-   public static object current_time_prim =
+   static object current_time_prim =
       PJScheme.make_proc ((object) symbol ("<proc-64>"));
-   public static object map_prim =
+   static object map_prim =
       PJScheme.make_proc ((object) symbol ("<proc-65>"));
-   public static object for_each_prim =
+   static object for_each_prim =
       PJScheme.make_proc ((object) symbol ("<proc-66>"));
-   public static object env_prim =
+   static object env_prim =
       PJScheme.make_proc ((object) symbol ("<proc-67>"));
-   public static object using_primitive =
+   static object using_primitive =
       PJScheme.make_proc ((object) symbol ("<proc-68>"));
-   public static object not_prim =
+   static object not_prim =
       PJScheme.make_proc ((object) symbol ("<proc-69>"));
-   public static object printf_primitive =
+   static object printf_primitive =
       PJScheme.make_proc ((object) symbol ("<proc-70>"));
-   public static object vector_prim =
+   static object vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-71>"));
-   public static object vector_set_b_prim =
+   static object vector_set_b_prim =
       PJScheme.make_proc ((object) symbol ("<proc-72>"));
-   public static object vector_ref_prim =
+   static object vector_ref_prim =
       PJScheme.make_proc ((object) symbol ("<proc-73>"));
-   public static object make_vector_prim =
+   static object make_vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-74>"));
-   public static object error_prim =
+   static object error_prim =
       PJScheme.make_proc ((object) symbol ("<proc-75>"));
-   public static object list_ref_prim =
+   static object list_ref_prim =
       PJScheme.make_proc ((object) symbol ("<proc-76>"));
-   public static object toplevel_env = PJScheme.make_toplevel_env ();
+   static object toplevel_env = PJScheme.make_toplevel_env ();
 
 
    static object void_value = null;
@@ -12679,6 +12662,40 @@ public class PJScheme:Scheme
 	 return PJScheme.trampoline ();
       };
    }
+
+   static int _closure_depth = 0;
+
+   public static int get_closure_depth ()
+   {
+      return _closure_depth;
+   }
+
+   public static void increment_closure_depth ()
+   {
+      _closure_depth++;
+
+   }
+
+   public static void decrement_closure_depth ()
+   {
+      _closure_depth--;
+   }
+
+   public static void initialize_closure_depth ()
+   {
+      _closure_depth = 0;
+   }
+
+   public static object repeat (object item, object times)
+   {
+      object retval = EmptyList;
+      for (int i = 0; i < ((int) times); i++)
+	{
+	   retval = cons (item, retval);
+	}
+      return retval;
+   }
+
    public static Proc get_variables_from_frame_proc =
       new Proc ("get-variables-from-frame",
 		(Procedure1) get_variables_from_frame, 1, 1);

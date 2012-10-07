@@ -3491,18 +3491,6 @@
 		    (k v fail)
 		    (read-and-eval-asexps tokens-left src env handler fail k)))))))))))
 
-(define handle-debug-info
-  (lambda (exp result)
-    (let ((info (rac exp)))
-      (if (eq? info 'none)
-	  (printf "~s evaluates to ~a~%" (aunparse exp) result)
-	  (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-		  (aunparse exp)
-		  (get-start-line info)
-		  (get-start-char info)
-		  (get-srcfile info)
-		  result)))))
-
 (define *tracing-on?* #t)
 
 (define make-debugging-k
@@ -3513,8 +3501,25 @@
 	  (handle-debug-info exp v)
 	  (k v fail)))))
 
+(define highlight-expression
+  (lambda (exp)
+    ;; call: (function 1 2 3) 
+    ;;          ["filename.ss" at line 13 column 4]
+    (printf "call: ~s~%" (aunparse exp))
+    (let ((info (rac exp)))
+      (if (not (eq? info 'none))
+	  (printf "['~a' at line ~a column ~a]~%"
+		  (get-srcfile info)
+		  (get-start-line info)
+		  (get-start-char info))))))
+
+(define handle-debug-info
+  (lambda (exp result)
+    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
+
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
+   (if *tracing-on?* (highlight-expression exp))
    (let ((k (make-debugging-k exp k)))   ;; need to reindent
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
@@ -3661,10 +3666,25 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
-(define closure-depth 0)
+(define _closure-depth 0)
 
-;; FIXME: cps or just loop
+(define get-closure-depth
+  (lambda ()
+    _closure-depth
+    ))
+
+(define increment-closure-depth
+  (lambda ()
+    (set! _closure-depth (+ _closure-depth 1))
+    ))
+
+(define decrement-closure-depth
+  (lambda ()
+    (set! _closure-depth (- _closure-depth 1))
+    ))
+
 (define repeat
+  ;; turns a list of char into a string
   (lambda (item times)
     (if (= times 0)
 	'()
@@ -3675,12 +3695,12 @@
     (lambda-proc (args env2 info handler fail k2)
       (if (= (length args) (length formals))
 	  (begin
-	    (printf "~scall: ~s~%" (apply string-append (repeat " |" closure-depth)) (cons name args))
-	    (set! closure-depth (+ closure-depth 1))
+	    (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
+	    (increment-closure-depth)
 	    (eval-sequence bodies (extend env formals args) handler fail
 		 (lambda-cont2 (v fail)
-	            (set! closure-depth (- closure-depth 1))
-	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" closure-depth)) v)
+	            (decrement-closure-depth)
+	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
 		    (k2 v fail))))
 	  (runtime-error "incorrect number of arguments in application" info handler fail)))))
 
@@ -3694,12 +3714,12 @@
 		  (cons (list-tail args (length formals))
 			(list-head args (length formals))))))
 	  (begin
-	    (printf "~scall: ~s~%" (apply string-append (repeat " |" closure-depth)) (cons name args))
-	    (set! closure-depth (+ closure-depth 1))
+	    (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
+	    (increment-closure-depth)
 	    (eval-sequence bodies new-env handler fail
 		 (lambda-cont2 (v fail)
-	            (set! closure-depth (- closure-depth 1))
-	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" closure-depth)) v)
+	            (decrement-closure-depth)
+	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
 		    (k2 v fail))))
 	  (runtime-error "not enough arguments in application" info handler fail))))))
 

@@ -634,10 +634,10 @@
       (<cont2-66> (k) (apply-cont2 k (dlr-func value1) value2))
       (<cont2-67> (e handler) (apply-handler2 handler e value2))
       (<cont2-68> (k2)
-       (set! closure-depth (- closure-depth 1))
+       (decrement-closure-depth)
        (printf
          "~sreturn: ~s~%"
-         (apply string-append (repeat " |" closure-depth))
+         (apply string-append (repeat " |" (get-closure-depth)))
          value1)
        (apply-cont2 k2 value1 value2))
       (<cont2-69> (v1 k) (apply-cont2 k (cons v1 value1) value2))
@@ -901,9 +901,9 @@
            (begin
              (printf
                "~scall: ~s~%"
-               (apply string-append (repeat " |" closure-depth))
+               (apply string-append (repeat " |" (get-closure-depth)))
                (cons name args))
-             (set! closure-depth (+ closure-depth 1))
+             (increment-closure-depth)
              (eval-sequence bodies (extend env formals args) handler fail
                (make-cont2 '<cont2-68> k2)))
            (runtime-error
@@ -922,9 +922,9 @@
              (begin
                (printf
                  "~scall: ~s~%"
-                 (apply string-append (repeat " |" closure-depth))
+                 (apply string-append (repeat " |" (get-closure-depth)))
                  (cons name args))
-               (set! closure-depth (+ closure-depth 1))
+               (increment-closure-depth)
                (eval-sequence bodies new-env handler fail
                  (make-cont2 '<cont2-68> k2)))
              (runtime-error
@@ -3344,22 +3344,29 @@
         (read-asexp tokens src handler fail
           (make-cont4 '<cont4-10> src env handler k)))))
 
-(define handle-debug-info
-  (lambda (exp result)
-    (let ((info (rac exp)))
-      (if (eq? info 'none)
-          (printf "~s evaluates to ~a~%" (aunparse exp) result)
-          (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-            (aunparse exp) (get-start-line info) (get-start-char info)
-            (get-srcfile info) result)))))
-
 (define make-debugging-k
   (lambda (exp k)
     (if (not *tracing-on?*) k (make-cont2 '<cont2-52> exp k))))
 
+(define highlight-expression
+  (lambda (exp)
+    (printf "call: ~s~%" (aunparse exp))
+    (let ((info (rac exp)))
+      (if (not (eq? info 'none))
+          (printf
+            "['~a' at line ~a column ~a]~%"
+            (get-srcfile info)
+            (get-start-line info)
+            (get-start-char info))))))
+
+(define handle-debug-info
+  (lambda (exp result)
+    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
+
 (define*
   m
   (lambda (exp env handler fail k)
+    (if *tracing-on?* (highlight-expression exp))
     (let ((k (make-debugging-k exp k)))
       (cases aexpression exp
        (lit-aexp (datum info) (apply-cont2 k datum fail))
@@ -3484,6 +3491,14 @@
         (let ((new-fail (make-fail '<fail-3> exps env handler fail
                           k)))
           (m (car exps) env handler new-fail k)))))
+
+(define get-closure-depth (lambda () _closure-depth))
+
+(define increment-closure-depth
+  (lambda () (set! _closure-depth (+ _closure-depth 1))))
+
+(define decrement-closure-depth
+  (lambda () (set! _closure-depth (- _closure-depth 1))))
 
 (define repeat
   (lambda (item times)
@@ -4087,7 +4102,7 @@
 
 (define *tracing-on?* #t)
 
-(define closure-depth 0)
+(define _closure-depth 0)
 
 (define void-prim (make-proc '<proc-5>))
 

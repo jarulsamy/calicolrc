@@ -3178,35 +3178,73 @@ public class Vector {
       }
   }
 
+  public static void highlight_expression(object exp) {
+      // This should be made fast, as it happens on each step!
+      Calico.MainWindow calico;
+      object info = PJScheme.rac(exp);
+      if (Equal(info, symbol("none"))) {
+	  return;
+      }
+      int start_line = (int)PJScheme.get_start_line(info);
+      if (_dlr_env != null) {
+	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
+	  if (calico != null) {
+	      if (calico.CurrentDocument == null) {
+		  return;
+	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
+		  // don't return! Fall through and print
+	      } else if (calico.ProgramSpeed.Value == 100) {
+		  return;
+	      }
+	  } else {
+	      return;
+	  }
+      } else {
+	  return;
+      }
+      string filename = PJScheme.get_srcfile(info).ToString();
+      Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
+      int start_col = (int)PJScheme.get_start_char(info);
+      int end_line = (int)PJScheme.get_end_line(info);
+      int end_col = (int)PJScheme.get_end_char(info);
+      calico.playResetEvent.Reset (); 
+      Calico.MainWindow.Invoke ( delegate {
+	      document.GotoLine(start_line);
+	      document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
+          });
+      if (! Equal(car(exp), symbol("lit-aexp"))) {
+	  printf("{0}call: {1}~%", 
+		 string_append(PJScheme.repeat(" |", 
+					       (object)PJScheme.get_closure_depth())),
+		 PJScheme.aunparse(exp));
+	  PJScheme.increment_closure_depth();
+      }
+  }
+
   public static void handle_debug_info(object exp, object result) {
       // This should be made fast, as it happens on each step!
       Calico.MainWindow calico;
       object info = PJScheme.rac(exp);
       if (Equal(info, symbol("none"))) {
-        return;
-	//} else {
-        //System.Console.WriteLine(
-	//	 String.Format("{0} => {1}", 
-	//		       PJScheme.aunparse(exp), result));
+	  return;
       }
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
-        calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
-        if (calico != null) {
+	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
+	  if (calico != null) {
 	      if (calico.CurrentDocument == null) {
-            return;
+		  return;
 	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
-            // don't return! Fall through and wait
+		  // don't return! Fall through and wait
 	      } else if (calico.ProgramSpeed.Value == 100) {
-            return;
+		  return;
 	      }
-        } else {
+	  } else {
 	      return;
-        }
+	  }
       } else {
-        return;
+	  return;
       }
-      //System.Console.WriteLine("stepping!");
       // We have a calico defined and we should trace and/or stop
       string filename = PJScheme.get_srcfile(info).ToString();
       Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
@@ -3215,27 +3253,27 @@ public class Vector {
       int end_col = (int)PJScheme.get_end_char(info);
       calico.playResetEvent.Reset (); 
       Calico.MainWindow.Invoke ( delegate {
-            calico.PlayButton.Sensitive = true;
-            calico.PauseButton.Sensitive = false;
-            document.GotoLine(start_line);
-            document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
+	      calico.PlayButton.Sensitive = true;
+	      calico.PauseButton.Sensitive = false;
+	      document.GotoLine(start_line);
+	      document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
           });
       if (! Equal(car(exp), symbol("lit-aexp"))) {
-	  printf("{0}{1} => {2}~%", 
+	  PJScheme.decrement_closure_depth();
+	  printf("{0}return: {1}~%", 
 		 string_append(PJScheme.repeat(" |", 
-					       ((int)PJScheme.closure_depth) + 1)),
-		 PJScheme.aunparse(exp),
+					       (object)PJScheme.get_closure_depth())),
 		 result);
       }
       if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
-	  printf("{0}Trace: Paused!~%", 
+	  printf("{0}trace: Paused!~%", 
 		 string_append(PJScheme.repeat(" |", 
-					       ((int)PJScheme.closure_depth) + 1)));
+					       (object)PJScheme.get_closure_depth())));
 	  calico.playResetEvent.WaitOne();
       } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
-        double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
-        // Force at least a slight sleep, else no GUI controls
-        wait(pause);
+	  double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
+	  // Force at least a slight sleep, else no GUI controls
+	  wait(pause);
       }
   }
 }

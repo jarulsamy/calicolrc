@@ -1821,10 +1821,10 @@
                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-68>)
                                                                                                                                                                                                                                                                                       (let ((k2 'undefined))
                                                                                                                                                                                                                                                                                         (set! k2 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                        (set! closure-depth (- closure-depth 1))
+                                                                                                                                                                                                                                                                                        (decrement-closure-depth)
                                                                                                                                                                                                                                                                                         (printf
                                                                                                                                                                                                                                                                                           "~sreturn: ~s~%"
-                                                                                                                                                                                                                                                                                          (apply string-append (repeat " |" closure-depth))
+                                                                                                                                                                                                                                                                                          (apply string-append (repeat " |" (get-closure-depth)))
                                                                                                                                                                                                                                                                                           value1_reg)
                                                                                                                                                                                                                                                                                         (set! k_reg k2)
                                                                                                                                                                                                                                                                                         (set! pc apply-cont2))
@@ -2614,9 +2614,9 @@
                 (begin
                   (printf
                     "~scall: ~s~%"
-                    (apply string-append (repeat " |" closure-depth))
+                    (apply string-append (repeat " |" (get-closure-depth)))
                     (cons name args_reg))
-                  (set! closure-depth (+ closure-depth 1))
+                  (increment-closure-depth)
                   (set! k_reg (make-cont2 '<cont2-68> k2_reg))
                   (set! env_reg (extend env formals args_reg))
                   (set! exps_reg bodies)
@@ -2647,9 +2647,9 @@
                             (list-head args_reg (length formals)))))
                       (printf
                         "~scall: ~s~%"
-                        (apply string-append (repeat " |" closure-depth))
+                        (apply string-append (repeat " |" (get-closure-depth)))
                         (cons name args_reg))
-                      (set! closure-depth (+ closure-depth 1))
+                      (increment-closure-depth)
                       (set! k_reg (make-cont2 '<cont2-68> k2_reg))
                       (set! env_reg new-env)
                       (set! exps_reg bodies)
@@ -6006,25 +6006,32 @@
             (make-cont4 '<cont4-10> src_reg env_reg handler_reg k_reg))
           (set! pc read-asexp)))))
 
-(define handle-debug-info
-  (lambda (exp result)
-    (let ((info 'undefined))
-      (set! info (rac exp))
-      (if (eq? info 'none)
-          (printf "~s evaluates to ~a~%" (aunparse exp) result)
-          (printf "~s at line ~a char ~a of ~a evaluates to ~a~%"
-            (aunparse exp) (get-start-line info) (get-start-char info)
-            (get-srcfile info) result)))))
-
 (define make-debugging-k
   (lambda (exp k)
     (if (not *tracing-on?*)
         (return* k)
         (return* (make-cont2 '<cont2-52> exp k)))))
 
+(define highlight-expression
+  (lambda (exp)
+    (printf "call: ~s~%" (aunparse exp))
+    (let ((info 'undefined))
+      (set! info (rac exp))
+      (if (not (eq? info 'none))
+          (printf
+            "['~a' at line ~a column ~a]~%"
+            (get-srcfile info)
+            (get-start-line info)
+            (get-start-char info))))))
+
+(define handle-debug-info
+  (lambda (exp result)
+    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
+
 (define*
   m
   (lambda ()
+    (if *tracing-on?* (highlight-expression exp_reg))
     (let ((k 'undefined))
       (set! k (make-debugging-k exp_reg k_reg))
       (if (eq? (car exp_reg) 'lit-aexp)
@@ -6294,6 +6301,15 @@
           (set! fail_reg new-fail)
           (set! exp_reg (car exps_reg))
           (set! pc m)))))
+
+(define get-closure-depth
+  (lambda () (return* _closure-depth)))
+
+(define increment-closure-depth
+  (lambda () (set! _closure-depth (+ _closure-depth 1))))
+
+(define decrement-closure-depth
+  (lambda () (set! _closure-depth (- _closure-depth 1))))
 
 (define repeat
   (lambda (item times)
@@ -7122,7 +7138,7 @@
 
 (define *tracing-on?* #t)
 
-(define closure-depth 0)
+(define _closure-depth 0)
 
 (define void-prim (make-proc '<proc-5>))
 

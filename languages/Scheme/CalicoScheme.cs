@@ -38,7 +38,7 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text, bool ok) {
-    PJScheme.closure_depth = 0;
+    PJScheme.initialize_closure_depth();
     object result = PJScheme.execute_string_rm(text);
     if (result == null) {
        return true;
@@ -53,7 +53,7 @@ public class CalicoSchemeEngine : Engine
 
 
   public override bool Execute(string text) {
-    PJScheme.closure_depth = 0;
+    PJScheme.initialize_closure_depth();
     object result = PJScheme.execute_string_rm(text);
     if (result == null) {
        return true;
@@ -70,7 +70,7 @@ public class CalicoSchemeEngine : Engine
 
   public override bool ExecuteFile(string filename) {
     System.Console.WriteLine("Run filename '{0}'!", filename);
-    PJScheme.closure_depth = 0;
+    PJScheme.initialize_closure_depth();
     object obj = PJScheme.execute_file_rm(filename);
     if (obj != null) {
       string str = Scheme.repr(obj);
@@ -107,7 +107,6 @@ public class CalicoSchemeEngine : Engine
 			interactive = true;
 		  }
 		} else {
-		  PJScheme.closure_depth = 0;
 		  scheme.engine.ExecuteFile(file);
 		}
 	  } 
@@ -127,7 +126,7 @@ public class CalicoSchemeEngine : Engine
         else
           expr = line;
 	    if (scheme.engine.ReadyToExecute(expr)) {
-		  PJScheme.closure_depth = 0;
+	      PJScheme.initialize_closure_depth();
 		  scheme.engine.Execute(expr);
 		  expr = "";
 		  prompt = "scheme>>> ";

@@ -33,7 +33,9 @@
 	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
 	       dlr-object? dlr-lookup-components set-global-value!
 	       set-global-docstring! printf-prim using-prim iterator? get_type
-	       handle-debug-info
+	       handle-debug-info highlight-expression 
+	       _closure-depth initialize-closure-depth increment-closure-depth
+	       decrement-closure-depth get-closure-depth repeat
 	       ))
 
 (define SIGNATURES (make-hash-table))
@@ -111,6 +113,8 @@
     (get-reserved-keywords "object" ())
     (safe-print "void" ())
     (handle-debug-info "void" ())
+    (highlight-expression "void" ())
+    (get-closure-depth "int" ())
     ))
 
 (define *system-ignore-definitions*
@@ -228,6 +232,38 @@
       return PJScheme.trampoline();
     };
   }
+
+   static int _closure_depth = 0;
+
+   public static int get_closure_depth ()
+   {
+      return _closure_depth;
+   }
+
+   public static void increment_closure_depth ()
+   {
+      _closure_depth++;
+
+   }
+
+   public static void decrement_closure_depth ()
+   {
+      _closure_depth--;
+   }
+
+   public static void initialize_closure_depth ()
+   {
+      _closure_depth = 0;
+   }
+
+   public static object repeat(object item, object times) {
+      object retval = EmptyList;
+      for (int i=0; i < ((int)times); i++) {
+          retval = cons(item, retval);
+      }
+      return retval;
+   }
+
 ")
 
 (define lookup-signature
@@ -379,7 +415,7 @@
 		      (assign-exp (if (null? (cadr types))
 				      (convert-exp (caddr def) name)
 				      (caadr types))))
-		  (format "public static ~a ~a = ~a;\n" ret-type pname assign-exp)))
+		  (format "static ~a ~a = ~a;\n" ret-type pname assign-exp)))
 	      (begin
 		(printf "skipping duplicate variable definition: ~a~%" name)
 		""))))
