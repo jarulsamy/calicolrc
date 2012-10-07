@@ -524,6 +524,7 @@ public class Scheme {
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
   public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
+  public static Proc char_q_proc = new Proc("string?", (Procedure1Bool) char_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
   public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);

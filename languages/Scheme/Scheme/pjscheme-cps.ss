@@ -4032,6 +4032,14 @@
        (runtime-error "incorrect number of arguments to string?" info handler fail))
       (else (k2 (apply string? args) fail)))))
 
+;; char?
+(define char?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char?" info handler fail))
+      (else (k2 (apply char? args) fail)))))
+
 ;; null?
 (define null?-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4397,8 +4405,8 @@
 (define append-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-two? args))
-       (runtime-error "incorrect number of arguments to append" info handler fail))
+;;      ((not (length-two? args))
+;;       (runtime-error "incorrect number of arguments to append" info handler fail))
       ((not (list? (car args)))
        (runtime-error (format "append called on incorrect list structure ~s" (car args)) info handler fail))
       (else (append-all args (lambda-cont (v) (k2 v fail)))))))
@@ -4670,27 +4678,88 @@
 
 (define make-toplevel-env
   (lambda ()
-    (make-initial-env-extended
-     (make-initial-environment
-      (list 'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline
-	    'load 'length 'symbol? 'number? 'boolean? 'string? 'null? 'pair? 'cons 'car 'cdr 'cadr 'caddr
-	    'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
-	    'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
-	    'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-	    'vector 'vector-set! 'vector-ref 'make-vector '<= '>= 'error 'list-ref 'unparse 
-	    'string 'substring 'number->string 'assv 'memv)
-      (list void-prim exit-prim eval-prim parse-prim parse-string-prim read-string-prim apply-prim sqrt-prim
-	    print-prim display-prim newline-prim load-prim length-prim symbol?-prim number?-prim boolean?-prim
-	    string?-prim null?-prim pair?-prim cons-prim car-prim cdr-prim cadr-prim
-	    caddr-prim list-prim plus-prim minus-prim times-prim divide-prim lt-prim gt-prim
-	    equal-sign-prim equal-sign-prim abs-prim equal?-prim eq?-prim memq-prim member-prim range-prim
-	    set-car!-prim set-cdr!-prim
-	    import-prim get-prim call/cc-prim call/cc-prim abort-prim require-prim cut-prim reverse-prim
-	    append-prim list-to-vector-prim dir-prim current-time-prim map-prim for-each-prim env-prim
-	    using-primitive not-prim printf-primitive vector-prim vector-set!-prim vector-ref-prim
-	    make-vector-prim lt-or-eq-prim gt-or-eq-prim error-prim list-ref-prim unparse-prim
-	    string-prim substring-prim number->string-prim assv-prim memv-prim)))))
-
+    (let ((primitives 
+	   (list
+	    (list '* times-prim)
+	    (list '+ plus-prim)
+	    (list '- minus-prim)
+	    (list '/ divide-prim)
+	    (list '< lt-prim)
+	    (list '<= lt-or-eq-prim)
+	    (list '= equal-sign-prim)
+	    (list '=? equal-sign-prim)
+	    (list '> gt-prim)
+	    (list '>= gt-or-eq-prim)
+	    (list 'abort abort-prim)
+	    (list 'abs abs-prim)
+	    (list 'append append-prim)
+	    (list 'apply apply-prim)
+	    (list 'assv assv-prim)
+	    (list 'boolean? boolean?-prim)
+	    (list 'caddr caddr-prim)
+	    (list 'cadr cadr-prim)
+	    (list 'call-with-current-continuation call/cc-prim)
+	    (list 'call/cc call/cc-prim)
+	    (list 'car car-prim)
+	    (list 'cdr cdr-prim)
+	    (list 'char? char?-prim)
+	    (list 'cons cons-prim)
+	    (list 'current-time current-time-prim)
+	    (list 'cut cut-prim)
+	    (list 'dir dir-prim)
+	    (list 'display display-prim)
+	    (list 'env env-prim)
+	    (list 'eq? eq?-prim)
+	    (list 'equal? equal?-prim)
+	    (list 'error error-prim)
+	    (list 'eval eval-prim)
+	    (list 'exit exit-prim)
+	    (list 'for-each for-each-prim)
+	    (list 'get get-prim)
+	    (list 'import import-prim)
+	    (list 'length length-prim)
+	    (list 'list list-prim)
+	    (list 'list->vector list-to-vector-prim)
+	    (list 'list-ref list-ref-prim)
+	    (list 'load load-prim)
+	    (list 'make-vector make-vector-prim)
+	    (list 'map map-prim)
+	    (list 'member member-prim)
+	    (list 'memq memq-prim)
+	    (list 'memv memv-prim)
+	    (list 'newline newline-prim)
+	    (list 'not not-prim)
+	    (list 'null? null?-prim)
+	    (list 'number->string number->string-prim)
+	    (list 'number? number?-prim)
+	    (list 'pair? pair?-prim)
+	    (list 'parse parse-prim)
+	    (list 'parse-string parse-string-prim)
+	    (list 'print print-prim)
+	    (list 'printf printf-primitive)
+	    (list 'range range-prim)
+	    (list 'read-string read-string-prim)
+	    (list 'require require-prim)
+	    (list 'reverse reverse-prim)
+	    (list 'set-car! set-car!-prim)
+	    (list 'set-cdr! set-cdr!-prim)
+	    (list 'sqrt sqrt-prim)
+	    (list 'string string-prim)
+	    (list 'string? string?-prim)
+	    (list 'substring substring-prim)
+	    (list 'symbol? symbol?-prim)
+	    (list 'unparse unparse-prim)
+	    (list 'using using-primitive)
+	    (list 'vector vector-prim)
+	    (list 'vector-ref vector-ref-prim)
+	    (list 'vector-set! vector-set!-prim)
+	    (list 'void void-prim)
+	    )))
+      (make-initial-env-extended
+       (make-initial-environment
+	(map car primitives)
+	(map cadr primitives))))))
+	
 (define toplevel-env (make-toplevel-env))
 
 ;;------------------------------------------------------------------------
