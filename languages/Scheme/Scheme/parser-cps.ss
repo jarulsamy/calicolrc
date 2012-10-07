@@ -607,7 +607,7 @@
 (define reserved-keyword?
   (lambda (x)
     (and (symbol? x)
-	 (memq x (get-reserved-keywords)))))
+	 (not (eq? (memq x (get-reserved-keywords)) #f)))))
 
 ;;------------------------------------------------------------------------
 ;; annotated s-expressions

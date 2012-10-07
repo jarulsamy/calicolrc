@@ -9151,8 +9151,11 @@ public class PJScheme:Scheme
       return ((bool)
 	      (((bool) PJScheme.symbol_q ((object) x))
 	       && ((bool) PJScheme.
-		   memq ((object) x,
-			 (object) PJScheme.get_reserved_keywords ()))));
+		   not ((object) PJScheme.
+			Eq ((object) PJScheme.
+			    memq ((object) x,
+				  (object) PJScheme.get_reserved_keywords ()),
+			    (object) false)))));
    }
 
    new public static void create_letrec_assignments_hat ()

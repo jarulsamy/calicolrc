@@ -4992,7 +4992,8 @@
 (define reserved-keyword?
   (lambda (x)
     (return*
-      (and (symbol? x) (memq x (get-reserved-keywords))))))
+      (and (symbol? x)
+           (not (eq? (memq x (get-reserved-keywords)) #f))))))
 
 (define*
   create-letrec-assignments^

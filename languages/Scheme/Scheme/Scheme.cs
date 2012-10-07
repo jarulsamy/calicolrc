@@ -3041,7 +3041,8 @@ public class Vector {
 }
 
   public static void Main(string [] args) {
-		PJScheme.execute_string_rm("(error 'thing \"message ~s\" 42)");
+	printf ("  (if 'a): {0}\n",
+			PJScheme.execute_string_rm("(if 'a)"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
