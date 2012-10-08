@@ -448,7 +448,7 @@
 	     (else (k (begin-exp v) fail))))))
       ((lambda? datum)
        (parse-all (cddr datum) handler fail
-	 (lambda-cont2 (bodies fail)
+	 (lambda-cont2 (bodies fail)   ;; (lambda x x)
 	   (if (list? (cadr datum))
 	     (k (lambda-exp (cadr datum) bodies) fail)
 	     (k (mu-lambda-exp (head (cadr datum)) (last (cadr datum)) bodies) fail)))))

@@ -465,31 +465,30 @@
 	  (begin
 	    (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
 	    (increment-closure-depth)
-	    (eval-sequence bodies (extend env formals args) handler fail
+	    (eval-sequence bodies (extend env formals args) handler fail 
 		 (lambda-cont2 (v fail)
 	            (decrement-closure-depth)
 	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
-		    (k2 v fail))))
+		    (k2 'ok fail))))
 	  (runtime-error "incorrect number of arguments in application" info handler fail)))))
 
 (define mu-trace-closure
   (lambda (name formals runt bodies env)
     (lambda-proc (args env2 info handler fail k2)
-      (if (>= (length args) (length formals))
-	(let ((new-env
-		(extend env
-		  (cons runt formals)
-		  (cons (list-tail args (length formals))
-			(list-head args (length formals))))))
-	  (begin
-	    (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
-	    (increment-closure-depth)
-	    (eval-sequence bodies new-env handler fail
-		 (lambda-cont2 (v fail)
-	            (decrement-closure-depth)
-	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
+       (if (>= (length args) (length formals))
+	   (let ((new-env
+		  (extend env
+			  (cons runt formals)
+			  (cons (list-tail args (length formals))
+				(list-head args (length formals))))))
+	     (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
+	     (increment-closure-depth)
+	     (eval-sequence bodies new-env handler fail
+		(lambda-cont2 (v fail)
+		    (decrement-closure-depth)
+		    (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
 		    (k2 v fail))))
-	  (runtime-error "not enough arguments in application" info handler fail))))))
+	   (runtime-error "not enough arguments in application" info handler fail)))))
 
 (define closure
   (lambda (formals bodies env)

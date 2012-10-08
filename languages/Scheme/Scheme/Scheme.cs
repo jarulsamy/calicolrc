@@ -2497,7 +2497,7 @@ public class Scheme {
   }
 
   public static object append(params object[] obj) {
-	return Append(obj[0], obj[1]);
+      return Append(obj[0], obj[1]);
   }
 
   public static object append(object obj) {
@@ -2506,8 +2506,8 @@ public class Scheme {
 
   // you have to be kidding - set_cdr???!!!!!
   public static object Append(object obj1, object obj2) {
-    if (! list_q(obj1)) {
-	throw new Exception(string.Format("error in append: {0} is not a proper list", obj1));
+    if (! pair_q(obj1)) {
+	throw new Exception(string.Format("error in append: {0} is not a pair", obj1));
     } else if (! list_q(obj2)) { // special cases
 	if (null_q(obj1)) { // (append '() 'a) => 'a
 	    return obj2;
