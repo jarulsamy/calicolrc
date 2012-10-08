@@ -519,18 +519,26 @@ public class Scheme {
   public static Proc sqrt_proc = new Proc("sqrt", (Procedure1) sqrt, -1, 1);
   public static Proc abs_proc = new Proc("abs", (Procedure1) abs, -1, 1);
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
+  public static Proc string_to_number_proc = new Proc("string->number", (Procedure1) string_to_number, 1, 1);
   public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
   public static Proc symbol_q_proc = new Proc("symbol?", (Procedure1Bool) symbol_q, 1, 2);
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
   public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
-  public static Proc char_q_proc = new Proc("string?", (Procedure1Bool) char_q, 1, 2);
+  public static Proc char_q_proc = new Proc("char?", (Procedure1Bool) char_q, 1, 2);
+  public static Proc char_whitespace_q_proc = new Proc("char-whitespace?", (Procedure1Bool) char_whitespace_q, 1, 2);
+  public static Proc char_alphabetic_q_proc = new Proc("char-alphabetic?", (Procedure1Bool) char_alphabetic_q, 1, 2);
+  public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
+  public static Proc char_is__q_proc = new Proc("char=?", (Procedure2Bool) char_eq_q, 2, 2);
+  public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
   public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
   public static Proc string_append_proc = new Proc("string-append", (Procedure1) string_append, -1, 1);
+  public static Proc string_length_proc = new Proc("string-length", (Procedure1) string_length, 1, 1);
+  public static Proc string_ref_proc = new Proc("string-ref", (Procedure2) string_ref, 2, 1);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
@@ -700,12 +708,14 @@ public class Scheme {
 	set_env_b(env, symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1));
 	set_env_b(env, symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1));
 	set_env_b(env, symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1));
-	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)); 
+	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1));
 	set_env_b(env, symbol("atom?"), atom_q_proc);
 	set_env_b(env, symbol("string-append"), string_append_proc);
 	set_env_b(env, symbol("assq"), assq_proc);
 	set_env_b(env, symbol("safe-print"), safe_print_proc);
 	set_env_b(env, symbol("get-member"), get_member_proc);
+	set_env_b(env, symbol("eqv?"), Eqv_proc);
+	set_env_b(env, symbol("equal?"), Equal_proc);
 	return env;
   }
   
@@ -1206,6 +1216,12 @@ public class Scheme {
 	return retval;
   }
 
+  public static object string_ref(object args) {
+      object s = car(args);
+      object i = cadr(args);
+      return s.ToString()[(int)i];
+  }
+
   public static object string_ref(object s, object i) {
 	return s.ToString()[(int)i];
   }
@@ -1230,6 +1246,10 @@ public class Scheme {
 
   public static bool char_q(object datum) {
 	return (datum is char);
+  }
+
+    public static bool char_eq_q(object c1, object c2) {
+      return Equals(c1, c2);
   }
 
   public static bool string_q(object datum) {
@@ -1294,6 +1314,16 @@ public class Scheme {
 
   public static object string_to_symbol(object s) {
 	return symbol(s.ToString());
+  }
+
+  public static object string_to_number(object s) {
+      string ss = s.ToString();
+      if (ss.Contains("."))
+	  return string_to_decimal(ss);
+      else if (ss.Contains("/"))
+	  return string_to_rational(ss);
+      else
+	  return string_to_integer(ss);
   }
 
   public static object string_to_integer(object str) {
@@ -1701,69 +1731,63 @@ public class Scheme {
   }
 
   public static bool Eq(object obj1, object obj2) {
-	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+      if ((obj1 is Symbol) || (obj2 is Symbol)) { 
 	  if ((obj1 is Symbol) && (obj2 is Symbol))
-		return ((Symbol)obj1).Equals(obj2);
+	      return ((Symbol)obj1).Equals(obj2);
 	  else return false;
-	} else if (pair_q(obj1) && pair_q(obj2)) {
+      } else if (pair_q(obj1) && pair_q(obj2)) {
 	  if (null_q(obj1) && null_q(obj2))
-		return true;
-	  else if (Equal(car(obj1),  car(obj2))) // FIXME: confusion
-                                             // between internal lists
-                                             // and user's
-		return Equal(cdr(obj1), cdr(obj2));
-	  else
-		return false;
-    } if (pair_q(obj1) || pair_q(obj2)) {
-			return false;
-	} else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-        try {
-          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-        } catch {
-          return false;
-        }
+	      return true;
+	  else {
+	      return (((Cons)obj1).id == ((Cons)obj2).id);
+	  }
+      } if (pair_q(obj1) || pair_q(obj2)) {
+	  return false;
       } else {
-        if (obj1 is BigInteger) {
-          return ((BigInteger)obj1).Equals(obj2);
-        } else {
-          return ((BigInteger)obj2).Equals(obj1);
-        }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+	      try {
+		  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+	      } catch {
+		  return false;
+	      }
+	  } else {
+	      if (obj1 is BigInteger) {
+		  return ((BigInteger)obj1).Equals(obj2);
+	      } else {
+		  return ((BigInteger)obj2).Equals(obj1);
+	      }
+	  }
       }
-	}
   }
 
   public static bool Eqv(object obj1, object obj2) {
-	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+      if ((obj1 is Symbol) || (obj2 is Symbol)) { 
 	  if ((obj1 is Symbol) && (obj2 is Symbol))
-		return ((Symbol)obj1).Equals(obj2);
+	      return ((Symbol)obj1).Equals(obj2);
 	  else return false;
-	} else if (pair_q(obj1) && pair_q(obj2)) {
+      } else if (pair_q(obj1) && pair_q(obj2)) {
 	  if (null_q(obj1) && null_q(obj2))
-		return true;
-	  else if (Eqv(car(obj1),  car(obj2))) // FIXME: confusion
-                                             // between internal lists
-                                             // and user's
-		return Eqv(cdr(obj1), cdr(obj2));
-	  else
-		return false;
-    } if (pair_q(obj1) || pair_q(obj2)) {
-			return false;
-	} else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-        try {
-          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-        } catch {
-          return false;
-        }
+	      return true;
+	  else {
+	      return (((Cons)obj1).id == ((Cons)obj2).id);
+	  }
+      } if (pair_q(obj1) || pair_q(obj2)) {
+	  return false;
       } else {
-        if (obj1 is BigInteger) {
-          return ((BigInteger)obj1).Equals(obj2);
-        } else {
-          return ((BigInteger)obj2).Equals(obj1);
-        }
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+	      try {
+		  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+	      } catch {
+		  return false;
+	      }
+	  } else {
+	      if (obj1 is BigInteger) {
+		  return ((BigInteger)obj1).Equals(obj2);
+	      } else {
+		  return ((BigInteger)obj2).Equals(obj1);
+	      }
+	  }
       }
-	}
   }
 
   public static bool Equal(object obj1, object obj2) {
@@ -3249,6 +3273,17 @@ public class Vector {
       // We have a calico defined and we should trace and/or stop
       string filename = PJScheme.get_srcfile(info).ToString();
       Calico.TextDocument document = (Calico.TextDocument)calico.GetDocument(filename);
+      // (lit-aexp (a b c) (stdin 1 1 1 1 8 8))
+      // <sourcefile>    1  1
+      // <startline>     1  8
+      // <startchar>     1  8
+      // <startposition> 1  1 
+      // <endline>       1  8
+      // <endchar>       8  8
+      // <endposition>   8  1
+      //                   17
+      //		   17
+
       int start_col = (int)PJScheme.get_start_char(info);
       int end_line = (int)PJScheme.get_end_line(info);
       int end_col = (int)PJScheme.get_end_char(info);

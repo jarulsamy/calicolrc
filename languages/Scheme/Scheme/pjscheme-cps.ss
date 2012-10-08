@@ -1412,6 +1412,17 @@
 		   (k `(let ((bool ,test-exp)
 			     (else-code (lambda () (cond ,@other-clauses))))
 			 (if bool bool (else-code))))))
+		((eq? (car then-exps) '=>)
+		 (cond
+		   ((null? (cdr then-exps)) (macro-error 'cond-transformer first-clause))
+		   ((null? other-clauses)
+		    (k `(let ((bool ,test-exp)
+			      (th (lambda () ,(cadr then-exps))))
+			  (if bool ((th) bool)))))
+		   (else (k `(let ((bool ,test-exp)
+				   (th (lambda () ,(cadr then-exps)))
+				   (else-code (lambda () (cond ,@other-clauses))))
+			       (if bool ((th) bool) (else-code)))))))
 		((null? other-clauses)
 		 (if (null? (cdr then-exps))
 		   (k `(if ,test-exp ,(car then-exps)))
@@ -1898,6 +1909,17 @@
 		   (k `(let ((bool ,test-exp)
 			     (else-code (lambda () (cond ,@other-clauses))))
 			 (if bool bool (else-code))))))
+		((eq?^ (car then-exps) '=>)
+		 (cond
+		   ((null? (cdr then-exps)) (amacro-error 'cond-transformer^ first-clause))
+		   ((null? other-clauses)
+		    (k `(let ((bool ,test-exp)
+			      (th (lambda () ,(cadr then-exps))))
+			  (if bool ((th) bool)))))
+		   (else (k `(let ((bool ,test-exp)
+				   (th (lambda () ,(cadr then-exps)))
+				   (else-code (lambda () (cond ,@other-clauses))))
+			       (if bool ((th) bool) (else-code)))))))
 		((null? other-clauses)
 		 (if (null? (cdr then-exps))
 		   (k `(if ,test-exp ,(car then-exps)))
@@ -3784,6 +3806,12 @@
 	(and (number? (car ls))
 	     (all-numeric? (cdr ls))))))
 
+(define all-char?
+  (lambda (ls)
+    (or (null? ls)
+	(and (char? (car ls))
+	     (all-char? (cdr ls))))))
+
 ;; void
 (define void-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -3819,6 +3847,28 @@
     (reannotate-cps (car args)
       (lambda-cont (adatum)
 	(aparse adatum handler fail k2)))))
+
+;; string-length
+(define string-length-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string-length" info handler fail))
+      ((not (string? (car args)))
+       (runtime-error "string-length called on non-string argument" info handler fail))
+      (else (k2 (apply string-length args) fail)))))
+
+;; string-ref
+(define string-ref-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to string-ref" info handler fail))
+      ((not (string? (car args)))
+       (runtime-error "string-ref called with non-string first argument" info handler fail))
+      ((not (number? (cadr args)))
+       (runtime-error "string-ref called with non-numberic second argument" info handler fail))
+      (else (k2 (apply string-ref args) fail)))))
 
 ;; unparse
 (define unparse-prim
@@ -4039,6 +4089,38 @@
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to char?" info handler fail))
       (else (k2 (apply char? args) fail)))))
+
+;; char=?
+(define char=?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to char=?" info handler fail))
+      (else (k2 (apply char=? args) fail)))))
+
+;; char-whitespace?
+(define char-whitespace?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char-whitespace?" info handler fail))
+      (else (k2 (apply char-whitespace? args) fail)))))
+
+;; char-alphabetic?
+(define char-alphabetic?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char-alphabetic?" info handler fail))
+      (else (k2 (apply char-alphabetic? args) fail)))))
+
+;; char-numeric?
+(define char-numeric?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char-numeric?" info handler fail))
+      (else (k2 (apply char-numeric? args) fail)))))
 
 ;; null?
 (define null?-prim
@@ -4407,8 +4489,8 @@
     (cond
 ;;      ((not (length-two? args))
 ;;       (runtime-error "incorrect number of arguments to append" info handler fail))
-      ((not (list? (car args)))
-       (runtime-error (format "append called on incorrect list structure ~s" (car args)) info handler fail))
+;;      ((not (list? (car args)))
+;;       (runtime-error (format "append called on incorrect list structure ~s" (car args)) info handler fail))
       (else (append-all args (lambda-cont (v) (k2 v fail)))))))
 ;;      (else (k2 (apply append args) fail)))))
 
@@ -4429,6 +4511,14 @@
 	      (lambda-cont (ls)
 		(append2 (car lists) ls k)))))))
 
+;; string->number
+(define string->number-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string->number" info handler fail))
+      (else (k2 (apply string->number args) fail)))))
+
 ;; list->vector
 (define list-to-vector-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4438,6 +4528,18 @@
       ((not (list? (car args)))
        (runtime-error (format "list->vector called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply list->vector args) fail)))))
+
+;; list->string
+(define list->string-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to list->string" info handler fail))
+      ((not (list? (car args)))
+       (runtime-error (format "list->string called on incorrect list structure ~s" (car args)) info handler fail))
+      ((not (all-char? (car args)))
+       (runtime-error (format "list->string called on non-char list ~s" (car args)) info handler fail))
+      (else (k2 (apply list->string args) fail)))))
 
 ;; dir
 (define dir-prim
@@ -4703,6 +4805,10 @@
 	    (list 'car car-prim)
 	    (list 'cdr cdr-prim)
 	    (list 'char? char?-prim)
+	    (list 'char=? char=?-prim)
+	    (list 'char-whitespace? char-whitespace?-prim)
+	    (list 'char-alphabetic? char-alphabetic?-prim)
+	    (list 'char-numeric? char-numeric?-prim)
 	    (list 'cons cons-prim)
 	    (list 'current-time current-time-prim)
 	    (list 'cut cut-prim)
@@ -4720,6 +4826,7 @@
 	    (list 'length length-prim)
 	    (list 'list list-prim)
 	    (list 'list->vector list-to-vector-prim)
+	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
 	    (list 'make-vector make-vector-prim)
@@ -4745,7 +4852,10 @@
 	    (list 'set-cdr! set-cdr!-prim)
 	    (list 'sqrt sqrt-prim)
 	    (list 'string string-prim)
+	    (list 'string-length string-length-prim)
+	    (list 'string-ref string-ref-prim)
 	    (list 'string? string?-prim)
+	    (list 'string->number string->number-prim)
 	    (list 'substring substring-prim)
 	    (list 'symbol? symbol?-prim)
 	    (list 'unparse unparse-prim)
