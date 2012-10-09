@@ -575,16 +575,11 @@ public class Scheme {
   public static string NEWLINE_STRING = "\n";
 
   public static bool true_q (object v) {
-	if (v is bool) {
+      // only #f is false, everything else is true
+      if (v is bool) {
 	  return ((bool) v);
-	} else {
-	  if (v is int) 
-		return (((int)v) != 0);
-	  else if (v is double) 
-		return (((double)v) != 0.0);
-	  else
-		return true;
-	}
+      } else
+	  return true;
   }
 
   public static object get_current_time() {
@@ -1533,6 +1528,9 @@ public class Scheme {
 	else if (len == 5)
 	  Console.Write(format(car(args), cadr(args), caddr(args), cadddr(args), 
 			  cadddr(cdr(args)), cadddr(cdr(cdr(args)))));
+	else if (len == 6)
+	    Console.Write(format(car(args), cadr(args), caddr(args), cadddr(args), 
+				 cadddr(cdr(args)), cadddr(cdr(cdr(args))), cadddr(cdr(cdr(cdr(args))))));
 	return null;
   }
   
@@ -1703,36 +1701,27 @@ public class Scheme {
   public static string format(object msg, params object[] rest) {
 	string retval = "";
 	string new_msg = "";
-	//MethodInfo mi = get_method(msg, "__repr__");
 	string smsg = msg.ToString();
-	/*
-	if (mi != null) {
-	  smsg = (string)mi.Invoke(msg, null);
-	} else {
-	  smsg = msg.ToString();
-	}
-	*/
 	int count = 0;
 	for (int i = 0; i < smsg.Length; i++) {
-	  if (smsg[i] == TILDE) {
+	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		  new_msg += string.Format("{0}", rest[count]);
-		  count += 1;
-		  i++;
+		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    count += 1;
+		    i++;
 		} else if (smsg[i+1] == 'a') {
-		  new_msg += string.Format("{0}", rest[count]);
-		  count += 1;
-		  i++;
+		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    count += 1;
+		    i++;
 		} else if (smsg[i+1] == '%') {
-		  new_msg += "\n";
-		  count += 1;
-		  i++;
+		    new_msg += "\n";
+		    i++;
 		} else
-		  throw new Exception(string.Format("format needs to handle: \"{0}\"", 
-				  smsg));
-	  } else {
+		    throw new Exception(string.Format("format needs to handle: \"{0}\"", 
+						      smsg));
+	    } else {
 		new_msg += smsg[i];
-	  }
+	    }
 	}
 	retval = String.Format(new_msg, rest);
 	return retval;
@@ -2681,10 +2670,8 @@ public class Scheme {
   public static object cddddr(object x) {	return cdr(cdr(cdr(cdr(x))));   }
 
   public static void pretty_print(object obj) {
-	// FIXME: need to make this safe
-	// Just get representation for now
-	System.Console.Write(repr(obj));
-	newline();
+      // FIXME: repr is safe, just not pretty
+      System.Console.WriteLine(repr(obj));
   }  
 
   public static void safe_print(object arg) {
@@ -2693,7 +2680,7 @@ public class Scheme {
     pretty_print(sarg);
   }
 
-  // need to cps/registerize this to avoid reliance on C-sharp's stack
+  // FIXME: need to cps/registerize this to avoid reliance on C-sharp's stack
   public static object make_safe(object x) {
     if (procedure_object_q(x))
       return (symbol("<procedure>"));
