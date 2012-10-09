@@ -6149,6 +6149,27 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-70>"))))
 	    if (true_q
 		(PJScheme.
+		 not ((object) PJScheme.length_two_q ((object) args_reg))))
+	      {
+		 msg_reg = "incorrect number of arguments to string=?";
+		 pc = (Function) runtime_error;
+
+	      }
+	    else
+	      {
+		 value2_reg = fail_reg;
+		 value1_reg = apply (string_is__q_proc, (object) args_reg);
+		 k_reg = k2_reg;
+		 pc = (Function) apply_cont2;
+
+	      }
+	 else
+	    if (true_q
+		(PJScheme.
+		 Eq ((object) PJScheme.car ((object) temp_1),
+		     (object) symbol ("<proc-71>"))))
+	    if (true_q
+		(PJScheme.
 		 not ((object) PJScheme.length_one_q ((object) args_reg))))
 	      {
 		 msg_reg = "incorrect number of arguments to list->vector";
@@ -6181,7 +6202,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-71>"))))
+		     (object) symbol ("<proc-72>"))))
 	    if (true_q
 		(PJScheme.
 		 not ((object) PJScheme.length_one_q ((object) args_reg))))
@@ -6231,7 +6252,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-72>"))))
+		     (object) symbol ("<proc-73>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg =
@@ -6244,7 +6265,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-73>"))))
+		     (object) symbol ("<proc-74>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg = PJScheme.get_current_time ();
@@ -6256,7 +6277,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-74>"))))
+		     (object) symbol ("<proc-75>"))))
 	   {
 	      k_reg = k2_reg;
 	      env_reg = env2_reg;
@@ -6269,7 +6290,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-75>"))))
+		     (object) symbol ("<proc-76>"))))
 	   {
 	      k_reg = k2_reg;
 	      env_reg = env2_reg;
@@ -6282,7 +6303,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-76>"))))
+		     (object) symbol ("<proc-77>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg = env2_reg;
@@ -6294,7 +6315,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-77>"))))
+		     (object) symbol ("<proc-78>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg =
@@ -6307,7 +6328,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-78>"))))
+		     (object) symbol ("<proc-79>"))))
 	    if (true_q
 		(PJScheme.
 		 not ((object) PJScheme.length_one_q ((object) args_reg))))
@@ -6329,7 +6350,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-79>"))))
+		     (object) symbol ("<proc-80>"))))
 	   {
 	      apply (printf_prim_proc, (object) args_reg);
 	      value2_reg = fail_reg;
@@ -6342,7 +6363,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-80>"))))
+		     (object) symbol ("<proc-81>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg = PJScheme.list_to_vector ((object) args_reg);
@@ -6354,7 +6375,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-81>"))))
+		     (object) symbol ("<proc-82>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg =
@@ -6372,7 +6393,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-82>"))))
+		     (object) symbol ("<proc-83>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg = apply (vector_ref_proc, (object) args_reg);
@@ -6384,7 +6405,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-83>"))))
+		     (object) symbol ("<proc-84>"))))
 	   {
 	      value2_reg = fail_reg;
 	      value1_reg = apply (make_vector_proc, (object) args_reg);
@@ -6396,7 +6417,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-84>"))))
+		     (object) symbol ("<proc-85>"))))
 	   {
 	      object location = null;
 	      object message = null;
@@ -6416,7 +6437,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-85>"))))
+		     (object) symbol ("<proc-86>"))))
 	    if (true_q
 		(PJScheme.
 		 not ((object) PJScheme.length_two_q ((object) args_reg))))
@@ -6437,7 +6458,7 @@ public class PJScheme:Scheme
 	    if (true_q
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
-		     (object) symbol ("<proc-86>"))))
+		     (object) symbol ("<proc-87>"))))
 	   {
 	      object external_function_object = null;
 	      external_function_object =
@@ -12537,6 +12558,9 @@ public class PJScheme:Scheme
 			   list ((object) symbol ("string->number"),
 				 (object) string_to_number_prim),
 			   (object) PJScheme.
+			   list ((object) symbol ("string=?"),
+				 (object) string_is__q_prim),
+			   (object) PJScheme.
 			   list ((object) symbol ("substring"),
 				 (object) substring_prim),
 			   (object) PJScheme.
@@ -12577,7 +12601,7 @@ public class PJScheme:Scheme
 						external_function_object)
    {
       return ((object) PJScheme.
-	      make_proc ((object) symbol ("<proc-86>"),
+	      make_proc ((object) symbol ("<proc-87>"),
 			 (object) external_function_object));
    }
 
@@ -13073,38 +13097,40 @@ public class PJScheme:Scheme
       PJScheme.make_proc ((object) symbol ("<proc-68>"));
    static object string_to_number_prim =
       PJScheme.make_proc ((object) symbol ("<proc-69>"));
-   static object list_to_vector_prim =
+   static object string_is__q_prim =
       PJScheme.make_proc ((object) symbol ("<proc-70>"));
-   static object list_to_string_prim =
+   static object list_to_vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-71>"));
-   static object dir_prim =
+   static object list_to_string_prim =
       PJScheme.make_proc ((object) symbol ("<proc-72>"));
-   static object current_time_prim =
+   static object dir_prim =
       PJScheme.make_proc ((object) symbol ("<proc-73>"));
-   static object map_prim =
+   static object current_time_prim =
       PJScheme.make_proc ((object) symbol ("<proc-74>"));
-   static object for_each_prim =
+   static object map_prim =
       PJScheme.make_proc ((object) symbol ("<proc-75>"));
-   static object env_prim =
+   static object for_each_prim =
       PJScheme.make_proc ((object) symbol ("<proc-76>"));
-   static object using_primitive =
+   static object env_prim =
       PJScheme.make_proc ((object) symbol ("<proc-77>"));
-   static object not_prim =
+   static object using_primitive =
       PJScheme.make_proc ((object) symbol ("<proc-78>"));
-   static object printf_primitive =
+   static object not_prim =
       PJScheme.make_proc ((object) symbol ("<proc-79>"));
-   static object vector_prim =
+   static object printf_primitive =
       PJScheme.make_proc ((object) symbol ("<proc-80>"));
-   static object vector_set_b_prim =
+   static object vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-81>"));
-   static object vector_ref_prim =
+   static object vector_set_b_prim =
       PJScheme.make_proc ((object) symbol ("<proc-82>"));
-   static object make_vector_prim =
+   static object vector_ref_prim =
       PJScheme.make_proc ((object) symbol ("<proc-83>"));
-   static object error_prim =
+   static object make_vector_prim =
       PJScheme.make_proc ((object) symbol ("<proc-84>"));
-   static object list_ref_prim =
+   static object error_prim =
       PJScheme.make_proc ((object) symbol ("<proc-85>"));
+   static object list_ref_prim =
+      PJScheme.make_proc ((object) symbol ("<proc-86>"));
    static object toplevel_env = PJScheme.make_toplevel_env ();
 
 

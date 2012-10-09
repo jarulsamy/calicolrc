@@ -1264,6 +1264,14 @@
        (runtime-error "incorrect number of arguments to string->number" info handler fail))
       (else (k2 (apply string->number args) fail)))))
 
+;; string=?
+(define string=?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-two? args))
+      (runtime-error "incorrect number of arguments to string=?" info handler fail))
+     (else (k2 (apply string=? args) fail)))))
+
 ;; list->vector
 (define list-to-vector-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1601,6 +1609,7 @@
 	    (list 'string-ref string-ref-prim)
 	    (list 'string? string?-prim)
 	    (list 'string->number string->number-prim)
+	    (list 'string=? string=?-prim)
 	    (list 'substring substring-prim)
 	    (list 'symbol? symbol?-prim)
 	    (list 'unparse unparse-prim)

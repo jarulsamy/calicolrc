@@ -1520,6 +1520,15 @@
          (else (apply-cont2 k2 (apply string->number args) fail))))
       (<proc-70> ()
        (cond
+         ((not (length-two? args))
+          (runtime-error
+            "incorrect number of arguments to string=?"
+            info
+            handler
+            fail))
+         (else (apply-cont2 k2 (apply string=? args) fail))))
+      (<proc-71> ()
+       (cond
          ((not (length-one? args))
           (runtime-error
             "incorrect number of arguments to list->vector"
@@ -1535,7 +1544,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list->vector args) fail))))
-      (<proc-71> ()
+      (<proc-72> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1560,16 +1569,16 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list->string args) fail))))
-      (<proc-72> () (apply-cont2 k2 (dir args env2) fail))
-      (<proc-73> () (apply-cont2 k2 (get-current-time) fail))
-      (<proc-74> ()
-       (map-primitive (car args) (cdr args) env2 handler fail k2))
+      (<proc-73> () (apply-cont2 k2 (dir args env2) fail))
+      (<proc-74> () (apply-cont2 k2 (get-current-time) fail))
       (<proc-75> ()
+       (map-primitive (car args) (cdr args) env2 handler fail k2))
+      (<proc-76> ()
        (for-each-primitive (car args) (cdr args) env2 handler fail
          k2))
-      (<proc-76> () (apply-cont2 k2 env2 fail))
-      (<proc-77> () (apply-cont2 k2 (using-prim args env2) fail))
-      (<proc-78> ()
+      (<proc-77> () (apply-cont2 k2 env2 fail))
+      (<proc-78> () (apply-cont2 k2 (using-prim args env2) fail))
+      (<proc-79> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1578,25 +1587,25 @@
             handler
             fail))
          (else (apply-cont2 k2 (not (car args)) fail))))
-      (<proc-79> ()
+      (<proc-80> ()
        (apply printf-prim args)
        (apply-cont2 k2 void-value fail))
-      (<proc-80> () (apply-cont2 k2 (list->vector args) fail))
-      (<proc-81> ()
+      (<proc-81> () (apply-cont2 k2 (list->vector args) fail))
+      (<proc-82> ()
        (apply-cont2
          k2
          (vector-set! (car args) (cadr args) (caddr args))
          fail))
-      (<proc-82> () (apply-cont2 k2 (apply vector-ref args) fail))
-      (<proc-83> ()
-       (apply-cont2 k2 (apply make-vector args) fail))
+      (<proc-83> () (apply-cont2 k2 (apply vector-ref args) fail))
       (<proc-84> ()
+       (apply-cont2 k2 (apply make-vector args) fail))
+      (<proc-85> ()
        (let* ((location (format "Error in ~a: " (car args)))
               (message (string-append
                          location
                          (apply format (cdr args)))))
          (runtime-error message info handler fail)))
-      (<proc-85> ()
+      (<proc-86> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1605,7 +1614,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list-ref args) fail))))
-      (<proc-86> (external-function-object)
+      (<proc-87> (external-function-object)
        (apply-cont2
          k2
          (apply* external-function-object args)
@@ -4024,6 +4033,7 @@
                        (list 'string-ref string-ref-prim)
                        (list 'string? string?-prim)
                        (list 'string->number string->number-prim)
+                       (list 'string=? string=?-prim)
                        (list 'substring substring-prim)
                        (list 'symbol? symbol?-prim)
                        (list 'unparse unparse-prim)
@@ -4039,7 +4049,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc '<proc-86> external-function-object)))
+    (make-proc '<proc-87> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -4378,37 +4388,39 @@
 
 (define string->number-prim (make-proc '<proc-69>))
 
-(define list-to-vector-prim (make-proc '<proc-70>))
+(define string=?-prim (make-proc '<proc-70>))
 
-(define list->string-prim (make-proc '<proc-71>))
+(define list-to-vector-prim (make-proc '<proc-71>))
 
-(define dir-prim (make-proc '<proc-72>))
+(define list->string-prim (make-proc '<proc-72>))
 
-(define current-time-prim (make-proc '<proc-73>))
+(define dir-prim (make-proc '<proc-73>))
 
-(define map-prim (make-proc '<proc-74>))
+(define current-time-prim (make-proc '<proc-74>))
 
-(define for-each-prim (make-proc '<proc-75>))
+(define map-prim (make-proc '<proc-75>))
 
-(define env-prim (make-proc '<proc-76>))
+(define for-each-prim (make-proc '<proc-76>))
 
-(define using-primitive (make-proc '<proc-77>))
+(define env-prim (make-proc '<proc-77>))
 
-(define not-prim (make-proc '<proc-78>))
+(define using-primitive (make-proc '<proc-78>))
 
-(define printf-primitive (make-proc '<proc-79>))
+(define not-prim (make-proc '<proc-79>))
 
-(define vector-prim (make-proc '<proc-80>))
+(define printf-primitive (make-proc '<proc-80>))
 
-(define vector-set!-prim (make-proc '<proc-81>))
+(define vector-prim (make-proc '<proc-81>))
 
-(define vector-ref-prim (make-proc '<proc-82>))
+(define vector-set!-prim (make-proc '<proc-82>))
 
-(define make-vector-prim (make-proc '<proc-83>))
+(define vector-ref-prim (make-proc '<proc-83>))
 
-(define error-prim (make-proc '<proc-84>))
+(define make-vector-prim (make-proc '<proc-84>))
 
-(define list-ref-prim (make-proc '<proc-85>))
+(define error-prim (make-proc '<proc-85>))
+
+(define list-ref-prim (make-proc '<proc-86>))
 
 (define toplevel-env (make-toplevel-env))
 

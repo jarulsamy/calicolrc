@@ -558,6 +558,7 @@ public class Scheme {
   public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
+  public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
     // Add new procedures above here!
     // Then add low-level C# code below
 
@@ -717,6 +718,7 @@ public class Scheme {
 	set_env_b(env, symbol("get-member"), get_member_proc);
 	set_env_b(env, symbol("eqv?"), Eqv_proc);
 	set_env_b(env, symbol("equal?"), Equal_proc);
+	set_env_b(env, symbol("string=?"), string_is__q_proc);
 	return env;
   }
   
@@ -1735,6 +1737,10 @@ public class Scheme {
 	retval = String.Format(new_msg, rest);
 	return retval;
   }
+
+    public static bool string_eq_q(object args) {
+	return (car(args).ToString() == (cadr(args).ToString()));
+    }
 
   public static bool GreaterOrEqual(object args) {
 	return GreaterOrEqual(car(args), cadr(args));
