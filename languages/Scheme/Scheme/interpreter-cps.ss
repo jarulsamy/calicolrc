@@ -469,7 +469,7 @@
 		 (lambda-cont2 (v fail)
 	            (decrement-closure-depth)
 	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
-		    (k2 'ok fail))))
+		    (k2 v fail))))
 	  (runtime-error "incorrect number of arguments in application" info handler fail)))))
 
 (define mu-trace-closure
@@ -665,12 +665,12 @@
     (for-each safe-print args)
     (k2 void-value fail)))
 
-;; string-prim 
+;; string
 (define string-prim 
   ;; turns a list of char into a string
   (lambda-proc (args env2 info handler fail k2)
      ;;(k2 (apply string-append (map (lambda (c) (format "~s" c)) args)) fail)))
-     (k2 (char->string args) fail)))
+     (k2 (apply char->string args) fail)))
 
 ;; substring
 (define substring-prim 
@@ -895,8 +895,8 @@
 (define car-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
-       (runtime-error "incorrect number of arguments to car" info handler fail))
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to car" info handler fail))
       ((not (pair? (car args)))
        (runtime-error (format "car called on non-pair ~s" (car args)) info handler fail))
       (else (k2 (apply car args) fail)))))
@@ -905,8 +905,8 @@
 (define cdr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
-       (runtime-error "incorrect number of arguments to cdr" info handler fail))
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to cdr" info handler fail))
       ((not (pair? (car args)))
        (runtime-error (format "cdr called on non-pair ~s" (car args)) info handler fail))
       (else (k2 (apply cdr args) fail)))))
@@ -915,8 +915,8 @@
 (define cadr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
-       (runtime-error "incorrect number of arguments to cadr" info handler fail))
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to cadr" info handler fail))
       ((not (length-at-least? 2 (car args)))
        (runtime-error (format "cadr called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply cadr args) fail)))))
@@ -925,8 +925,8 @@
 (define caddr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
-       (runtime-error "incorrect number of arguments to caddr" info handler fail))
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to caddr" info handler fail))
       ((not (length-at-least? 3 (car args)))
        (runtime-error (format "caddr called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply caddr args) fail)))))

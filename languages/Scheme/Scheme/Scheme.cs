@@ -526,6 +526,7 @@ public class Scheme {
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
   public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
   public static Proc char_q_proc = new Proc("char?", (Procedure1Bool) char_q, 1, 2);
+  public static Proc char_to_string_proc = new Proc("char->string", (Procedure1) char_to_string, 1, 1);
   public static Proc char_whitespace_q_proc = new Proc("char-whitespace?", (Procedure1Bool) char_whitespace_q, 1, 2);
   public static Proc char_alphabetic_q_proc = new Proc("char-alphabetic?", (Procedure1Bool) char_alphabetic_q, 1, 2);
   public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
@@ -1364,7 +1365,7 @@ public class Scheme {
 
   public static void display(object obj, object port) {
 	// FIXME: add output port type
-	string s = repr(obj);
+	string s = ToString(obj);
 	int len = s.Length;
 	if (s.Substring(len - 1, 1) != "\n") 
 	  config.NEED_NEWLINE = true;
@@ -1535,6 +1536,74 @@ public class Scheme {
   
   public static void printf(object fmt, params object[] objs) {
 	Console.Write(format(fmt, objs));
+  }
+
+  public static string ToString(object obj) {
+	if (obj == null) {
+	  return "<void>"; // FIXME: should give void when forced
+	} else if (obj is System.Boolean) {
+	  return ((bool)obj) ? "#t" : "#f";
+	} else if (obj is IronPython.Runtime.List) {
+	  return ((IronPython.Runtime.List)obj).__repr__(
+		  IronPython.Runtime.DefaultContext.Default);
+	} else if (obj is IronPython.Runtime.PythonDictionary) {
+	  return ((IronPython.Runtime.PythonDictionary)obj).__repr__(
+		  IronPython.Runtime.DefaultContext.Default);
+	} else if (obj is IronPython.Runtime.PythonTuple) {
+	  return obj.ToString();
+	} else if (obj is Array) {
+	    //System.Console.WriteLine("Here 1");
+	  return (string)array_to_string((object[]) obj);
+	} else if (obj is double) {
+	  string s = obj.ToString();
+	  if (s.Contains("."))
+		return s;
+	  else
+		return String.Format("{0}.0", s);
+	} else if (obj is String) {
+	  return String.Format("{0}", obj);
+	} else if (obj is Symbol) {
+	    //System.Console.WriteLine("Here 2");
+	  return obj.ToString();
+	} else if (pair_q(obj)) {
+	    //System.Console.WriteLine("Here 3");
+	  if (procedure_q(obj)) {
+		return "#<procedure>";
+	  } else if (Eq(car(obj), symbol("environment"))) {
+		return "#<environment>"; //, car(obj));
+	  } else {
+	      //System.Console.WriteLine("Here 4");
+	      string retval = "";
+	      object current = (Cons)obj;
+	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
+	      ids[((Cons)current).id] = true;
+	      while (pair_q(current)) {
+		  //System.Console.WriteLine("Here 5");
+		  if (retval != "") {
+		      retval += " ";
+		  } 
+		  object car_current = car(current);
+		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
+		      retval += " ...";
+		      current = null;
+		  } else {
+		      retval += ToString(car_current);
+		      current = cdr(current);
+		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
+			  retval += " ...";
+			  current = null;
+		      } else {
+			  if (!pair_q(current) && !Eq(current, EmptyList)) {
+			      retval += " . " + ToString(current); // ...
+			  }
+		      }
+		  }
+	      }
+	      return "(" + retval + ")";
+	  }
+	} else {
+	    return obj.ToString();
+	}
   }
 
   public static string repr(object obj) {
@@ -2473,11 +2542,11 @@ public class Scheme {
 
   public static object rdc(object lyst) {
 	if (null_q(cdr(lyst)))
-	  return lyst;
+	  return EmptyList;
 	else
-	  return rdc(cdr(lyst));
+	  return cons(car(lyst), rdc(cdr(lyst)));
   }
-
+	
   public static void set_cdr_b(object obj) {
 	set_cdr_b(car(obj), cadr(obj));
   }
@@ -2497,49 +2566,34 @@ public class Scheme {
   }
 
   public static object append(params object[] obj) {
-      return Append(obj[0], obj[1]);
+		object current = obj[0];
+		for (int i = 1; i < obj.Length; i++) {
+			current = append2(current, obj[i]);
+		}
+		return current;
   }
 
-  public static object append(object obj) {
-	return Append(car(obj), cadr(obj));
-  }
-
-  // you have to be kidding - set_cdr???!!!!!
-  public static object Append(object obj1, object obj2) {
-    if (! pair_q(obj1)) {
-	throw new Exception(string.Format("error in append: {0} is not a pair", obj1));
-    } else if (! list_q(obj2)) { // special cases
-	if (null_q(obj1)) { // (append '() 'a) => 'a
-	    return obj2;
-	} else {            // (append '(a b) 'c) => '(a b . c)
-	    Object lyst = (Cons)obj1;
-	    Cons cell = (Cons) rdc(lyst);
-	    set_cdr_b(cell, obj2);
-	    return lyst;
+	public static object append2 (object obj1, object obj2)
+	{
+		if (! list_q (obj1)) {
+			throw new Exception (string.Format ("error in append: {0} is not a list", obj1));
+		} else if (obj1 is object[]) {
+			Object lyst = list(obj1);
+			return copy_of(lyst, obj2);
+		} else  {
+			return copy_of(obj1, obj2);
+		}
 	}
-    } else if (obj1 is object[]) {
-      Object lyst = list(obj1);
-      if (((int) length(lyst)) > 0) {
-	Cons cell = (Cons) rdc(lyst);
-	set_cdr_b(cell, obj2);
-	return lyst;
-      } else {
-	return obj2;
-      }
-    } else if (obj1 is Cons) {
-      if (((int) length(obj1)) > 0) {
-	Cons cell = (Cons) rdc(obj1);
-	set_cdr_b(cell, obj2);
-	return obj1;
-      } else {
-	return obj2;
-      }
-    } else if (obj1 == EmptyList) {
-      return obj2;
-    } else {
-      throw new Exception(string.Format("error in append: need two lists"));
-    }
-  }
+
+	public static object copy_of(object pair, object item) {
+		object retval = item;
+		object current = pair;
+		while (current != EmptyList) {
+			retval = cons(PJScheme.rac(current), retval);
+			current = rdc(current);
+		}
+		return retval;
+	}
 	
   public static string format_prim(object obj) {
 	return format(car(obj), list_to_array(obj, 1));
@@ -3066,8 +3120,12 @@ public class Vector {
 }
 
   public static void Main(string [] args) {
-	printf ("  (if 'a): {0}\n",
-			PJScheme.execute_string_rm("(if 'a)"));
+	//printf(append(list(symbol("a")), list(symbol("b"))));
+	//printf(append(list(symbol("a"), symbol("b")), list(symbol("c"))));
+	//printf(append(list(symbol("a")), list(symbol("b")), list(symbol("c"))));
+			
+	printf ("  (load \"sllgen.ss\"): {0}\n",
+			PJScheme.execute_string_rm("(load \"/home/dblank/Calico/trunk/examples/scheme/sllgen.ss\")"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
@@ -3211,7 +3269,18 @@ public class Vector {
 	  return;
       }
       int start_line = (int)PJScheme.get_start_line(info);
-      if (_dlr_env != null) {
+
+		/* force CLI output
+      string filename = PJScheme.get_srcfile(info).ToString();
+      int start_col = (int)PJScheme.get_start_char(info);
+      int end_line = (int)PJScheme.get_end_line(info);
+      int end_col = (int)PJScheme.get_end_char(info);
+	  printf("[~s] at line ~s, column ~s~%", filename, start_line, start_col);
+      printf("~s~%", PJScheme.aunparse(exp));
+	  return;			
+	}
+		 */
+ 	  if (_dlr_env != null) {
 	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
 	  if (calico != null) {
 	      if (calico.CurrentDocument == null) {
@@ -3238,10 +3307,16 @@ public class Vector {
 	      document.texteditor.SetSelection(start_line, start_col, end_line, end_col + 1);
           });
       if (! Equal(car(exp), symbol("lit-aexp"))) {
-	  printf("{0}call: {1}~%", 
+	  printf("{0}call: ", 
 		 string_append(PJScheme.repeat(" |", 
-					       (object)PJScheme.get_closure_depth())),
-		 PJScheme.aunparse(exp));
+					       (object)PJScheme.get_closure_depth())));
+	  //try {
+	      printf("~s~%", PJScheme.aunparse(exp));
+	  //} catch {
+	  //    printf("{0}return: ERROR in PRINTING AUNPARSE!~%", 
+	//	     string_append(PJScheme.repeat(" |", 
+	//					   (object)PJScheme.get_closure_depth())));
+	  //}
 	  PJScheme.increment_closure_depth();
       }
   }
@@ -3253,6 +3328,10 @@ public class Vector {
       if (Equal(info, symbol("none"))) {
 	  return;
       }
+	  /*
+	  Force CLI output 
+      printf("result: ~s~%", result);
+      */		
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
 	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
@@ -3296,10 +3375,16 @@ public class Vector {
           });
       if (! Equal(car(exp), symbol("lit-aexp"))) {
 	  PJScheme.decrement_closure_depth();
-	  printf("{0}return: {1}~%", 
-		 string_append(PJScheme.repeat(" |", 
-					       (object)PJScheme.get_closure_depth())),
-		 result);
+	  try {
+	      printf("{0}return: ", 
+		     string_append(PJScheme.repeat(" |", 
+						   (object)PJScheme.get_closure_depth())));
+	      printf("~s~%", repr(result));
+	  } catch {
+	      printf("{0}return: ERROR in PRINTING RESULT!~%", 
+		     string_append(PJScheme.repeat(" |", 
+						   (object)PJScheme.get_closure_depth())));
+	  }
       }
       if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
 	  printf("{0}trace: Paused!~%", 

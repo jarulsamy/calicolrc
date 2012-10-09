@@ -56,7 +56,7 @@
       <Package>gtk-sharp-2.0</Package>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Calico, Version=1.0.4660.14486, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="Calico, Version=1.0.4663.22218, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\bin\Calico.exe</HintPath>
     </Reference>

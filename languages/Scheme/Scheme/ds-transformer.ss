@@ -25,8 +25,8 @@
   (lambda (x)
     (and (list? x)
 	 (not (null? x))
-	 (memq (car x) '(define define* define+ define-datatype))
-	 (memq (cadr x) *ignore-definitions*))))
+	 (member (car x) '(define define* define+ define-datatype))
+	 (member (cadr x) *ignore-definitions*))))
 
 ;; these definitions will not be included in the transformed output code
 (define *ignore-definitions*
@@ -175,7 +175,7 @@
 	    (eq? (car code) lambda-name))
 	  (datatype-application? (code)
 	    (or (and (symbol? (car code))
-		     (memq (car code) all-obj-names)
+		     (member (car code) all-obj-names)
 		     (= (length (cdr code)) (length arg-names)))
 		(and (list? (car code))
 		     (not (null? (car code)))
@@ -323,18 +323,18 @@
 	  (let ((type (dt 'get-type))
 		(make-name (dt 'get-make-name))
 		(apply-name (dt 'get-apply-name)))
-	    (if (memq make-name globally-defined-symbols)
+	    (if (member make-name globally-defined-symbols)
 	      (error-in-source #f
 		(format "Cannot create ~a datatype because ~a is already defined in ~a"
 			type make-name source-file)))
-	    (if (memq apply-name globally-defined-symbols)
+	    (if (member apply-name globally-defined-symbols)
 	      (error-in-source #f
 		(format "Cannot create ~a datatype because ~a is already defined in ~a"
 			type apply-name source-file)))
-	    (if (memq make-name default-top-level-symbols)
+	    (if (member make-name default-top-level-symbols)
 	      (printf "~%*** Warning: ~a datatype will redefine top-level symbol ~a~%"
 			type make-name))
-	    (if (memq apply-name default-top-level-symbols)
+	    (if (member apply-name default-top-level-symbols)
 	      (printf "~%*** Warning: ~a datatype will redefine top-level symbol ~a~%"
 			type apply-name))))
 	all-datatypes))
@@ -487,7 +487,7 @@
 		(fields (sort-fields
 			  (filter
 			    ;; remove any vars that are not lexically bound
-			    (lambda (var) (memq var params))
+			    (lambda (var) (member var params))
 			    (free code '()))
 			  record-field-order))
 		(tag (dt 'add-clause formals bodies fields params))
@@ -567,7 +567,7 @@
 	      (if *include-define*-in-ds-code?*
 		`(halt* ,((transform params) value))
 		((transform params) value)))
-	    (else (if (memq (car code) syntactic-keywords)
+	    (else (if (member (car code) syntactic-keywords)
 		    (error-in-source code
 		      "I don't know how to process the above code.")
 		    (map (transform params) code)))))))))
@@ -630,8 +630,8 @@
 		  0
 		  (+ 1 (pos x (cdr ls)))))))
       (sort (lambda (f1 f2)
-	      (let ((f1-mem (memq f1 field-order))
-		    (f2-mem (memq f2 field-order)))
+	      (let ((f1-mem (member f1 field-order))
+		    (f2-mem (member f2 field-order)))
 		(cond
 		  ((and f1-mem f2-mem) (< (pos f1 field-order) (pos f2 field-order)))
 		  ((and (not f1-mem) f2-mem) #t)
@@ -664,7 +664,7 @@
       ((literal? code) '())
       ((vector? code) '())
       ((datatype-lambda? code) (all-free (cddr code) (union (cadr code) params)))
-      ((symbol? code) (if (memq code params) '() (list code)))
+      ((symbol? code) (if (member code params) '() (list code)))
       (else
 	(record-case code
 	  (quote (datum) '())
@@ -701,7 +701,7 @@
 	  (cases (type exp . clauses)
 	    (union (free exp params)
 		   (union-all (map (free-in-record-case-clause params) clauses))))
-	  (else (if (memq (car code) syntactic-keywords)
+	  (else (if (member (car code) syntactic-keywords)
 		  (error 'free "don't know how to process ~a" code)
 		  (all-free code params))))))))
 
@@ -736,8 +736,8 @@
     (cond
       ((symbol? s2) (union s1 (list s2)))
       ((null? s1) s2)
-      ((symbol? s1) (if (memq s1 s2) s2 (cons s1 s2)))
-      ((memq (car s1) s2) (union (cdr s1) s2))
+      ((symbol? s1) (if (member s1 s2) s2 (cons s1 s2)))
+      ((member (car s1) s2) (union (cdr s1) s2))
       (else (cons (car s1) (union (cdr s1) s2))))))
 
 (define union-all
@@ -805,7 +805,7 @@
 	((mem? new-var formals)
 	 (error-in-source lambda-exp
 	   (format "~a is already a parameter in the above lambda expression." new-var)))
-	((memq new-var (all-free bodies '()))
+	((member new-var (all-free bodies '()))
 	 (error-in-source lambda-exp
 	   (format "Cannot safely rename ~a to ~a in the above lambda expression" old-var new-var)
 	   (format "because ~a already occurs free within its body." new-var)))
@@ -872,14 +872,14 @@
 			 (exps (map cadr (caddr exp)))
 			 (bodies (cdddr exp)))
 		     `(let ,name ,(map list vars (map rename exps))
-			,@(if (or (memq old-var vars) (eq? old-var name))
+			,@(if (or (member old-var vars) (eq? old-var name))
 			    bodies
 			    (map rename bodies))))
 		   ;; ordinary let
 		   (let ((vars (map car bindings))
 			 (exps (map cadr bindings)))
 		     `(let ,(map list vars (map rename exps))
-			,@(if (memq old-var vars)
+			,@(if (member old-var vars)
 			    bodies
 			    (map rename bodies))))))
 	       (let* (bindings . bodies)
@@ -896,13 +896,13 @@
 			       (cons new-binding (cdr bindings))
 			       (cons new-binding (rename-binding-exps (cdr bindings)))))))))
 		     `(let* ,(rename-binding-exps bindings)
-			,@(if (memq old-var vars)
+			,@(if (member old-var vars)
 			    bodies
 			    (map rename bodies))))))
 	       (letrec (decls . bodies)
 		 (let ((vars (map car decls))
 		       (procs (map cadr decls)))
-		   (if (memq old-var vars)
+		   (if (member old-var vars)
 		     exp
 		     `(letrec ,(map list vars (map rename procs))
 			,@(map rename bodies)))))
@@ -923,7 +923,7 @@
 	       (cases (type exp . clauses)
 		 `(cases ,type ,(rename exp)
 		    ,@(map rename-record-case-clause clauses)))
-	       (else (if (memq (car exp) syntactic-keywords)
+	       (else (if (member (car exp) syntactic-keywords)
 		       (error 'rename "don't know how to process ~a" exp)
 		       (map rename exp))))))))
        (rename-in-quasiquote
@@ -943,7 +943,7 @@
 	     (cons 'else (map rename (cdr clause)))
 	     (let ((tags (car clause))
 		   (formals (cadr clause)))
-	       (if (memq old-var formals)
+	       (if (member old-var formals)
 		 clause
 		 `(,tags ,formals ,@(map rename (cddr clause)))))))))
       rename)))
@@ -972,7 +972,7 @@
 	       (lambda (formals . bodies)
 		 (cond
 		   ((mem? old-var formals) #f)
-		   ((and (mem? new-var formals) (memq old-var (all-free bodies '()))) #t)
+		   ((and (mem? new-var formals) (member old-var (all-free bodies '()))) #t)
 		   (else (ormap unsafe? bodies))))
 	       (let (bindings . bodies) (unsafe? (let-transformer exp (lambda (v) v))))
 	       (let* (bindings . bodies) (unsafe? (let*-transformer exp (lambda (v) v))))
@@ -992,7 +992,7 @@
 		 (unsafe? (record-case-transformer exp (lambda (v) v))))
 	       (cases (type rexp . clauses)
 		 (unsafe? (record-case-transformer `(record-case ,rexp ,@clauses) (lambda (v) v))))
-	       (else (if (memq (car exp) syntactic-keywords)
+	       (else (if (member (car exp) syntactic-keywords)
 		       (error 'unsafe? "don't know how to process ~a" exp)
 		       (ormap unsafe? exp))))))))
        (unsafe-in-quasiquote?
