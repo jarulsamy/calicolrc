@@ -972,6 +972,18 @@
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
 
+;; modulo
+(define modulo-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to %" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "% called on non-numeric argument(s)" info handler fail))
+      ((= 0 (caddr args))
+       (runtime-error "modulo by zero" info handler fail))
+      (else (k2 (apply modulo args) fail)))))
+
 ;; <
 (define lt-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1587,6 +1599,7 @@
 	    (list 'member member-prim)
 	    (list 'memq memq-prim)
 	    (list 'memv memv-prim)
+	    (list 'modulo modulo-prim)
 	    (list 'newline newline-prim)
 	    (list 'not not-prim)
 	    (list 'null? null?-prim)

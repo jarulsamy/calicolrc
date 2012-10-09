@@ -238,6 +238,63 @@ public class ObjectType
 		}
 	}
 
+	public static object Modulo (System.Object o1, System.Object o2)
+	{
+		checked {
+			//FIXME: Add defense for checking overflow.
+			//FIXME: Add support for Date
+			if ((o1 is Double) || (o2 is Double)) {
+				Double dbl1 = Convert.ToDouble (o1);
+				Double dbl2 = Convert.ToDouble (o2);
+	    
+				return dbl1 % dbl2;
+			} else if ((o1 is Single) || (o2 is Single)) {
+				Single f1 = Convert.ToSingle (o1);
+				Single f2 = Convert.ToSingle (o2);
+	    
+				return f1 % f2;
+
+			} else if ((o1 is Decimal) || (o2 is Decimal)) {
+				Decimal dec1 = Convert.ToDecimal (o1);
+				Decimal dec2 = Convert.ToDecimal (o2);
+	    
+				return dec1 % dec2;
+
+			} else if ((o1 is Int64) || (o2 is Int64)) {
+				Int64 l1 = Convert.ToInt64 (o1);
+				Int64 l2 = Convert.ToInt64 (o2);
+	    
+				return l1 % l2;
+			} else if ((o1 is int) || (o2 is int)) {
+				int i1 = Convert.ToInt32 (o1);
+				int i2 = Convert.ToInt32 (o2);
+	    
+				return i1 % i2;
+	    
+			} else if ((o1 is Int16) || (o2 is Int16)) {
+				Int16 short1 = Convert.ToInt16 (o1);
+				Int16 short2 = Convert.ToInt16 (o2);
+	    
+				return short1 % short2;
+	    
+			} else if ((o1 is Byte) || (o2 is Byte)) {
+				Byte b1 = Convert.ToByte (o1);
+				Byte b2 = Convert.ToByte (o2);
+	    
+				return b1 % b2;
+	    
+			} else if ((o1 is Boolean) || (o2 is Boolean)) {
+				Boolean bool1 = Convert.ToBoolean (o1);
+				Boolean bool2 = Convert.ToBoolean (o2);
+	    
+				return Convert.ToInt16 (bool1) % Convert.ToInt16 (bool2);
+	    
+			} else {// Not implemented case
+				throw new Exception ("Implement me: " + o1.GetType ().Name + " " + o2.GetType ().Name);
+			}
+		}
+	}
+
 	public static object SubObj (System.Object o1, System.Object o2)
 	{
 		checked {

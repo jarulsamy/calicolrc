@@ -1267,6 +1267,23 @@
          (else (apply-cont2 k2 (apply / args) fail))))
       (<proc-47> ()
        (cond
+         ((not (length-two? args))
+          (runtime-error
+            "incorrect number of arguments to %"
+            info
+            handler
+            fail))
+         ((not (all-numeric? args))
+          (runtime-error
+            "% called on non-numeric argument(s)"
+            info
+            handler
+            fail))
+         ((= 0 (caddr args))
+          (runtime-error "modulo by zero" info handler fail))
+         (else (apply-cont2 k2 (apply modulo args) fail))))
+      (<proc-48> ()
+       (cond
          ((not (length-at-least? 2 args))
           (runtime-error
             "incorrect number of arguments to <"
@@ -1280,7 +1297,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply < args) fail))))
-      (<proc-48> ()
+      (<proc-49> ()
        (cond
          ((not (length-at-least? 2 args))
           (runtime-error
@@ -1295,7 +1312,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply > args) fail))))
-      (<proc-49> ()
+      (<proc-50> ()
        (cond
          ((not (length-at-least? 2 args))
           (runtime-error
@@ -1310,7 +1327,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply <= args) fail))))
-      (<proc-50> ()
+      (<proc-51> ()
        (cond
          ((not (length-at-least? 2 args))
           (runtime-error
@@ -1325,7 +1342,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply >= args) fail))))
-      (<proc-51> ()
+      (<proc-52> ()
        (cond
          ((not (length-at-least? 2 args))
           (runtime-error
@@ -1340,7 +1357,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply = args) fail))))
-      (<proc-52> ()
+      (<proc-53> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1355,7 +1372,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply abs args) fail))))
-      (<proc-53> ()
+      (<proc-54> ()
        (if (not (length-two? args))
            (runtime-error
              "incorrect number of arguments to equal?"
@@ -1366,7 +1383,7 @@
              (car args)
              (cadr args)
              (make-cont '<cont-38> fail k2))))
-      (<proc-54> ()
+      (<proc-55> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1375,7 +1392,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply eq? args) fail))))
-      (<proc-55> ()
+      (<proc-56> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1384,7 +1401,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply memq args) fail))))
-      (<proc-56> ()
+      (<proc-57> ()
        (if (not (length-two? args))
            (runtime-error
              "incorrect number of arguments to member"
@@ -1393,7 +1410,7 @@
              fail)
            (member-loop (car args) (cadr args) (cadr args) info handler
              fail k2)))
-      (<proc-57> ()
+      (<proc-58> ()
        (cond
          ((or (null? args) (length-at-least? 4 args))
           (runtime-error
@@ -1408,7 +1425,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply range args) fail))))
-      (<proc-58> ()
+      (<proc-59> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1423,7 +1440,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply set-car! args) fail))))
-      (<proc-59> ()
+      (<proc-60> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1438,17 +1455,17 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply set-cdr! args) fail))))
-      (<proc-60> ()
+      (<proc-61> ()
        (let ((filename (car args)))
          (if (null? (cdr args))
              (load-file filename env2 'none handler fail k2)
              (let ((module-name (cadr args)))
                (lookup-binding-in-first-frame module-name env2 handler fail
                  (make-cont2 '<cont2-78> filename env2 handler k2))))))
-      (<proc-61> ()
+      (<proc-62> ()
        (get-primitive args env2 info handler fail k2))
-      (<proc-62> (k) (apply-cont2 k (car args) fail))
-      (<proc-63> ()
+      (<proc-63> (k) (apply-cont2 k (car args) fail))
+      (<proc-64> ()
        (if (not (length-one? args))
            (runtime-error
              "incorrect number of arguments to call/cc"
@@ -1462,16 +1479,16 @@
                    info
                    handler
                    fail)
-                 (let ((fake-k (make-proc '<proc-62> k2)))
+                 (let ((fake-k (make-proc '<proc-63> k2)))
                    (if (dlr-exp? proc)
                        (apply-cont2 k2 (dlr-apply proc (list fake-k)) fail)
                        (apply-proc proc (list fake-k) env2 info handler
                          fail k2)))))))
-      (<proc-64> ()
+      (<proc-65> ()
        (if (null? args)
            (apply-cont2 REP-k void-value fail)
            (apply-cont2 REP-k (car args) fail)))
-      (<proc-65> ()
+      (<proc-66> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1481,7 +1498,7 @@
             fail))
          ((true? (car args)) (apply-cont2 k2 'ok fail))
          (else (apply-fail fail))))
-      (<proc-66> ()
+      (<proc-67> ()
        (if (not (null? args))
            (runtime-error
              "incorrect number of arguments to cut"
@@ -1489,7 +1506,7 @@
              handler
              fail)
            (apply-cont2 k2 'ok REP-fail)))
-      (<proc-67> ()
+      (<proc-68> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1506,10 +1523,10 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply reverse args) fail))))
-      (<proc-68> ()
+      (<proc-69> ()
        (cond
          (else (append-all args (make-cont '<cont-38> fail k2)))))
-      (<proc-69> ()
+      (<proc-70> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1518,7 +1535,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply string->number args) fail))))
-      (<proc-70> ()
+      (<proc-71> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1527,7 +1544,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply string=? args) fail))))
-      (<proc-71> ()
+      (<proc-72> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1544,7 +1561,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list->vector args) fail))))
-      (<proc-72> ()
+      (<proc-73> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1569,16 +1586,16 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list->string args) fail))))
-      (<proc-73> () (apply-cont2 k2 (dir args env2) fail))
-      (<proc-74> () (apply-cont2 k2 (get-current-time) fail))
-      (<proc-75> ()
-       (map-primitive (car args) (cdr args) env2 handler fail k2))
+      (<proc-74> () (apply-cont2 k2 (dir args env2) fail))
+      (<proc-75> () (apply-cont2 k2 (get-current-time) fail))
       (<proc-76> ()
+       (map-primitive (car args) (cdr args) env2 handler fail k2))
+      (<proc-77> ()
        (for-each-primitive (car args) (cdr args) env2 handler fail
          k2))
-      (<proc-77> () (apply-cont2 k2 env2 fail))
-      (<proc-78> () (apply-cont2 k2 (using-prim args env2) fail))
-      (<proc-79> ()
+      (<proc-78> () (apply-cont2 k2 env2 fail))
+      (<proc-79> () (apply-cont2 k2 (using-prim args env2) fail))
+      (<proc-80> ()
        (cond
          ((not (length-one? args))
           (runtime-error
@@ -1587,25 +1604,25 @@
             handler
             fail))
          (else (apply-cont2 k2 (not (car args)) fail))))
-      (<proc-80> ()
+      (<proc-81> ()
        (apply printf-prim args)
        (apply-cont2 k2 void-value fail))
-      (<proc-81> () (apply-cont2 k2 (list->vector args) fail))
-      (<proc-82> ()
+      (<proc-82> () (apply-cont2 k2 (list->vector args) fail))
+      (<proc-83> ()
        (apply-cont2
          k2
          (vector-set! (car args) (cadr args) (caddr args))
          fail))
-      (<proc-83> () (apply-cont2 k2 (apply vector-ref args) fail))
-      (<proc-84> ()
-       (apply-cont2 k2 (apply make-vector args) fail))
+      (<proc-84> () (apply-cont2 k2 (apply vector-ref args) fail))
       (<proc-85> ()
+       (apply-cont2 k2 (apply make-vector args) fail))
+      (<proc-86> ()
        (let* ((location (format "Error in ~a: " (car args)))
               (message (string-append
                          location
                          (apply format (cdr args)))))
          (runtime-error message info handler fail)))
-      (<proc-86> ()
+      (<proc-87> ()
        (cond
          ((not (length-two? args))
           (runtime-error
@@ -1614,7 +1631,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply list-ref args) fail))))
-      (<proc-87> (external-function-object)
+      (<proc-88> (external-function-object)
        (apply-cont2
          k2
          (apply* external-function-object args)
@@ -4014,6 +4031,7 @@
                        (list 'make-vector make-vector-prim)
                        (list 'map map-prim) (list 'member member-prim)
                        (list 'memq memq-prim) (list 'memv memv-prim)
+                       (list 'modulo modulo-prim)
                        (list 'newline newline-prim) (list 'not not-prim)
                        (list 'null? null?-prim)
                        (list 'number->string number->string-prim)
@@ -4049,7 +4067,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc '<proc-87> external-function-object)))
+    (make-proc '<proc-88> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -4344,83 +4362,85 @@
 
 (define divide-prim (make-proc '<proc-46>))
 
-(define lt-prim (make-proc '<proc-47>))
+(define modulo-prim (make-proc '<proc-47>))
 
-(define gt-prim (make-proc '<proc-48>))
+(define lt-prim (make-proc '<proc-48>))
 
-(define lt-or-eq-prim (make-proc '<proc-49>))
+(define gt-prim (make-proc '<proc-49>))
 
-(define gt-or-eq-prim (make-proc '<proc-50>))
+(define lt-or-eq-prim (make-proc '<proc-50>))
 
-(define equal-sign-prim (make-proc '<proc-51>))
+(define gt-or-eq-prim (make-proc '<proc-51>))
 
-(define abs-prim (make-proc '<proc-52>))
+(define equal-sign-prim (make-proc '<proc-52>))
 
-(define equal?-prim (make-proc '<proc-53>))
+(define abs-prim (make-proc '<proc-53>))
 
-(define eq?-prim (make-proc '<proc-54>))
+(define equal?-prim (make-proc '<proc-54>))
 
-(define memq-prim (make-proc '<proc-55>))
+(define eq?-prim (make-proc '<proc-55>))
 
-(define member-prim (make-proc '<proc-56>))
+(define memq-prim (make-proc '<proc-56>))
 
-(define range-prim (make-proc '<proc-57>))
+(define member-prim (make-proc '<proc-57>))
 
-(define set-car!-prim (make-proc '<proc-58>))
+(define range-prim (make-proc '<proc-58>))
 
-(define set-cdr!-prim (make-proc '<proc-59>))
+(define set-car!-prim (make-proc '<proc-59>))
 
-(define import-prim (make-proc '<proc-60>))
+(define set-cdr!-prim (make-proc '<proc-60>))
 
-(define get-prim (make-proc '<proc-61>))
+(define import-prim (make-proc '<proc-61>))
 
-(define call/cc-prim (make-proc '<proc-63>))
+(define get-prim (make-proc '<proc-62>))
 
-(define abort-prim (make-proc '<proc-64>))
+(define call/cc-prim (make-proc '<proc-64>))
 
-(define require-prim (make-proc '<proc-65>))
+(define abort-prim (make-proc '<proc-65>))
 
-(define cut-prim (make-proc '<proc-66>))
+(define require-prim (make-proc '<proc-66>))
 
-(define reverse-prim (make-proc '<proc-67>))
+(define cut-prim (make-proc '<proc-67>))
 
-(define append-prim (make-proc '<proc-68>))
+(define reverse-prim (make-proc '<proc-68>))
 
-(define string->number-prim (make-proc '<proc-69>))
+(define append-prim (make-proc '<proc-69>))
 
-(define string=?-prim (make-proc '<proc-70>))
+(define string->number-prim (make-proc '<proc-70>))
 
-(define list-to-vector-prim (make-proc '<proc-71>))
+(define string=?-prim (make-proc '<proc-71>))
 
-(define list->string-prim (make-proc '<proc-72>))
+(define list-to-vector-prim (make-proc '<proc-72>))
 
-(define dir-prim (make-proc '<proc-73>))
+(define list->string-prim (make-proc '<proc-73>))
 
-(define current-time-prim (make-proc '<proc-74>))
+(define dir-prim (make-proc '<proc-74>))
 
-(define map-prim (make-proc '<proc-75>))
+(define current-time-prim (make-proc '<proc-75>))
 
-(define for-each-prim (make-proc '<proc-76>))
+(define map-prim (make-proc '<proc-76>))
 
-(define env-prim (make-proc '<proc-77>))
+(define for-each-prim (make-proc '<proc-77>))
 
-(define using-primitive (make-proc '<proc-78>))
+(define env-prim (make-proc '<proc-78>))
 
-(define not-prim (make-proc '<proc-79>))
+(define using-primitive (make-proc '<proc-79>))
 
-(define printf-primitive (make-proc '<proc-80>))
+(define not-prim (make-proc '<proc-80>))
 
-(define vector-prim (make-proc '<proc-81>))
+(define printf-primitive (make-proc '<proc-81>))
 
-(define vector-set!-prim (make-proc '<proc-82>))
+(define vector-prim (make-proc '<proc-82>))
 
-(define vector-ref-prim (make-proc '<proc-83>))
+(define vector-set!-prim (make-proc '<proc-83>))
 
-(define make-vector-prim (make-proc '<proc-84>))
+(define vector-ref-prim (make-proc '<proc-84>))
 
-(define error-prim (make-proc '<proc-85>))
+(define make-vector-prim (make-proc '<proc-85>))
 
-(define list-ref-prim (make-proc '<proc-86>))
+(define error-prim (make-proc '<proc-86>))
+
+(define list-ref-prim (make-proc '<proc-87>))
 
 (define toplevel-env (make-toplevel-env))
 

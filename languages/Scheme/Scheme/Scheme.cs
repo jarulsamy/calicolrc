@@ -499,6 +499,7 @@ public class Scheme {
   public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
   public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
+  public static Proc modulo_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
@@ -2064,6 +2065,10 @@ public class Scheme {
 	}
 	return retval;
   }
+
+    public static object modulo(object obj1, object obj2) {
+	return (ObjectType.Modulo(obj1, obj2));
+    }
 
   public static object Subtract(object obj) {
 	// For subtracting 1 or more numbers in list
