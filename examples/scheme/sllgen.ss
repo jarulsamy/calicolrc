@@ -64,12 +64,13 @@
             (lambda (tree token token-stream)
               (if (null? token)
                 (sllgen:stream-get! token-stream
-                  (lambda (tok1 str1)
-                    (set! token tok1)
-                    (set! token-stream str1))
-                  (lambda ()
-                    (sllgen:error 'sllgen:string-parser
-                      "~%Internal error: shouldn't run off end of stream with sentinels"))))
+           (lambda (tok1 str1)
+         (set! token tok1)
+         (set! token-stream str1))
+           (lambda ()
+         (sllgen:error 'sllgen:string-parser
+                   "~%Internal error: shouldn't run off end of stream with sentinels"))))
+       '(display (sllgen:token->class token))
               (if (eq? (sllgen:token->class token) 'end-marker)
                 tree
                 (sllgen:error 'parsing
@@ -247,7 +248,7 @@
 ;;; need to define sllgen:grammar-check-syntax
 
 (define sllgen:check
-  (trace-lambda sllgen:check (test format . args)
+  (lambda (test format . args)
     (lambda (obj)
       (or (test obj)
         (apply sllgen:error
@@ -819,7 +820,7 @@
            ;; follow(b)
            (closure-rules '())
            (get-nonterminal
-            (lambda (item) 
+            (lambda (item)
               (cond
                 ((member item non-terminals) item)
                 (else #f)))))
@@ -837,7 +838,7 @@
                       (action (sllgen:production->action production)))
                  (rhs-loop
                    lhs
-                   (append rhs ;; add back the goto as a nonterminal 
+                   (append rhs ;; add back the goto as a nonterminal
                      (if (and (pair? action) (eq? (car action) 'goto))
                         (list (cadr action))
                         '())))
@@ -922,7 +923,7 @@
            (table (sllgen:make-initial-table non-terminals)))
       (for-each
         (lambda (production)
-          (let 
+          (let
             ((lhs (sllgen:production->lhs production)))
             (sllgen:add-value-to-table! table lhs production)))
         productions)
@@ -935,7 +936,7 @@
     (let ((non-terminals
             (sllgen:uniq (map sllgen:production->lhs productions)))
           (table (sllgen:group-productions productions)))
-      (map 
+      (map
         (lambda (table-entry)
           (sllgen:make-parse-table-non-terminal-entry
             (car table-entry)
@@ -974,7 +975,7 @@
   (lambda (non-terminals rhs action)
     (let loop ((rhs rhs))
       (cond
-        ((null? rhs) 
+        ((null? rhs)
          ;; at end -- emit reduce action or emit-list action
          (if (symbol? action)
             ;; symbols become "reduce",
@@ -1060,6 +1061,12 @@
 
 ;; top level stream transducer:
 
+;;(sllgen:parse-scanner-spec 
+;; (append
+;;  (sllgen:grammar->string-literal-scanner-spec
+;;   gram2)
+;;  lex2)
+
 (define sllgen:make-scanner
   (lambda (init-states)
     (let ((start-states (sllgen:parse-scanner-spec init-states)))
@@ -1086,8 +1093,8 @@
   (lambda (v)
     (or
       (and
-        (list? v) 
-        (= (length v) 3) 
+        (list? v)
+        (= (length v) 3)
         (symbol? (car v))
         (list? (cadr v))
         (symbol? (caddr v))
@@ -1102,7 +1109,7 @@
       ((symbol? regexp) (sllgen:symbol->regexp regexp))
       ((and (pair? regexp) (symbol? (car regexp)))
        (case (car regexp)
-         ((or)
+         ((or-exp)
           (sllgen:make-or-regexp (map sllgen:parse-regexp (cdr regexp))))
          ((concat)
           (sllgen:make-concat-regexp (map sllgen:parse-regexp (cdr regexp))))
@@ -1146,19 +1153,19 @@
 (define sllgen:make-arbno-regexp (lambda (re) (list 'arbno re)))
 (define sllgen:make-concat-regexp (lambda (rs) (cons 'concat rs)))
 
-(define sllgen:tester-regexp? 
-  (lambda (x) 
+(define sllgen:tester-regexp?
+  (lambda (x)
     (and (sllgen:tester? x) (lambda (f) (f x)))))
 
 (define sllgen:or-regexp?
-  (trace-lambda sslgen:or-regexp? (x)
+  (lambda (x)
     (and (eq? (car x) 'or)
         (lambda (f) (f (cdr x))))))
 
 (define sllgen:arbno-regexp?
-  (trace-lambda sllgen:arbno-regexp? (x)
+  (lambda (x)
     (and (eq? (car x) 'arbno)
-        (trace-lambda lambda1 (f) (f (cadr x))))))
+        (lambda (f) (f (cadr x))))))
 
 (define sllgen:concat-regexp?
   (lambda (x)
@@ -1203,6 +1210,7 @@
 
 (define sllgen:apply-tester
   (lambda (tester ch)
+;;    (printf "tester? ~s ~s ~%" tester ch)
     (cond
       ((char? tester) (char=? tester ch))
       ((symbol? tester)
@@ -1219,8 +1227,8 @@
               "~%Internal error: unknown tester ~s"
               tester)))))
 
-(define sllgen:make-char-tester 
-  (lambda (char) 
+(define sllgen:make-char-tester
+  (lambda (char)
     (and (or (char? char)
             (sllgen:error 'scanner-generation "illegal character ~s" char))
       char)))
@@ -1228,11 +1236,11 @@
 (define sllgen:tester?
   (lambda (v)
     (or (char? v)
-       (member v sllgen:tester-symbol-list)
-       (and (pair? v)
-         (eq? (car v) 'not)
-         (pair? (cdr v))
-         (char? (cadr v))))))
+ (member v sllgen:tester-symbol-list)
+ (and (pair? v)
+      (eq? (car v) 'not)
+      (pair? (cdr v))
+      (char? (cadr v))))))
 
 
 ;;; actions
@@ -1273,6 +1281,7 @@
   (lambda (buffer actions loc)
     (let* ((opcode (sllgen:find-preferred-action (map car actions)))
            (classname (cdr (assq opcode actions))))
+      ;;(printf "opcode: ~s~%" opcode)
       (case opcode
         ((skip) (sllgen:error 'sllgen:cook-token
                   "~%Internal error: skip should have been handled earlier ~s"
@@ -1325,7 +1334,7 @@
     (and
       (pair? action)
       (member (car action) sllgen:action-preference-list)
-      (symbol? (cdr action))))) 
+      (symbol? (cdr action)))))
 
 ;; tokens
 
@@ -1336,31 +1345,31 @@
 
 ; (define-record local-state ((list-of regexp?) sllgen:action?))
 
-(define sllgen:make-local-state 
+(define sllgen:make-local-state
   (lambda (regexps action)
     (append regexps (list action))))
 
 ;; k = (actions * newstates * char * stream) -> val
 (define sllgen:scanner-inner-loop
-  (lambda (local-states stream k)            
+  (lambda (local-states stream k)
     (let ((actions '())
           (newstates '())
           (char '())
           (eos-found? #f))              ; do we need to return this too?
       ;(eopl:printf "initializing sllgen:scanner-inner-loop~%")
       (let loop ((local-states local-states)) ; local-states
-;         '(begin
-;            (eopl:printf "sllgen:scanner-inner-loop char = ~s actions=~s local-states =~%"
-;              char actions)
-;            (for-each
-;              (lambda (local-state)
-;                (sllgen:pretty-print (map sllgen:unparse-regexp local-state)))
-;              local-states)
-;            (eopl:printf "newstates = ~%")
-;            (for-each
-;              (lambda (local-state)
-;                (sllgen:pretty-print (map sllgen:unparse-regexp local-state)))
-;              newstates))
+         '(begin
+            (eopl:printf "sllgen:scanner-inner-loop char = ~s actions=~s local-states =~%"
+              char actions)
+            (for-each
+              (lambda (local-state)
+                (pretty-print (map sllgen:unparse-regexp local-state)))
+              local-states)
+            (eopl:printf "newstates = ~%")
+            (for-each
+              (lambda (local-state)
+                (pretty-print (map sllgen:unparse-regexp local-state)))
+              newstates))
        (if (null? local-states)
           ;; no more states to consider
           (begin
@@ -1418,7 +1427,7 @@
                    ;; (regexp1 (arbno regexp1) regexps action)
                    (loop
                      (append
-                       (list 
+                       (list
                          (cdr state)    ; 0 occurrences
                          (cons regexp1 state) ; >= 1 occurrences
                          )
@@ -1429,7 +1438,7 @@
                  (lambda (sequents)
                    ;; (printf "processing concat: sequents = ~s~%" sequents)
                    (loop
-                     (cons 
+                     (cons
                        (append sequents (cdr state))
                        (cdr local-states)))))))))))))
 
@@ -1437,7 +1446,7 @@
 
 (define sllgen:scanner-outer-loop
   (lambda (start-states input-stream)   ; -> (token stream), same as before
-    (let 
+    (let
       ((states start-states)            ; list of local-states
        (buffer '())                     ; characters accumulated so far
        (success-buffer '())             ; characters for the last
@@ -1540,7 +1549,7 @@
 
 ;;; this is banged, because doing it on some streams may cause a side-effect. 
 (define sllgen:stream-get!
-  (lambda (str fcn eos-fcn) 
+  (lambda (str fcn eos-fcn)
     (str fcn eos-fcn)))
 
 (define sllgen:empty-stream
@@ -1606,10 +1615,10 @@
 (define sllgen:stream-add-sentinel-via-thunk
   (lambda (stream sentinel-fcn)
     (lambda (fn eos)                    ; here's what to do on a get
-      (sllgen:stream-get! stream 
+      (sllgen:stream-get! stream
         (lambda (val str)
           (fn val (sllgen:stream-add-sentinel-via-thunk str sentinel-fcn)))
-        (lambda ()                    
+        (lambda ()
           ;; when the stream runs out, try this
           (let ((sentinel (sentinel-fcn)))
 ;            (eopl:printf "~s~%" sentinel)
@@ -2122,13 +2131,12 @@
 ;;; error handling
 ;;; ****************************************************************
 
-(define sllgen:error 
+(define sllgen:error
   (lambda (who format . data)
     ;; print the message
     (eopl:printf "Error reported by sllgen during ~s:~%" who)
-    (apply eopl:printf (cons format data))
-    (newline)
-    (error who format data)))
+    (print who format data)
+    (newline)))
 
 ;;; ****************************************************************
 ;;; ****************************************************************
@@ -2227,7 +2235,7 @@
 (define lex2
    '((whitespace (whitespace) skip)
      (comment ("%" (arbno (not #\newline))) skip)
-     (identifier (letter (arbno (or letter digit))) make-symbol)
+     (identifier (letter (arbno (or-exp letter digit))) make-symbol)
      (number (digit (arbno digit)) make-number)))
 
 (define gram2
@@ -2296,7 +2304,7 @@
 
 (define gram4
   '((expression
-      ("let" (separated-list (separated-list identifier "," ) "=" expression ";" ) 
+      ("let" (separated-list (separated-list identifier "," ) "=" expression ";" )
         "in" expression)
       let-exp)
     (expression
@@ -2311,6 +2319,40 @@
 (define show4
   (lambda () (sllgen:list-define-datatypes lex2 gram4)))
 
-(gen4)
-(print (parse4 "7"))
-(print (parse4 "let x = 7; in 7"))
+
+;(gen4)
+;(print (parse4 "7"))
+;(print (parse4 "let x = 7; in 7"))
+
+ (define lc-lex
+   '((whitespace (whitespace) skip)
+     (comment ("//" (arbno (not #\newline))) skip)
+     (identifier (letter (arbno (or-exp letter digit))) make-symbol)
+     (number (digit (arbno digit)) make-number)))
+
+(define lc-gram
+  '(
+   (lc-exp
+       ("def" "(" (arbno identifier) ")" ":" lc-exp)
+       lambda-exp)
+    (lc-exp
+       (identifier)
+       var-exp)
+    (lc-exp
+        ("&" identifier "(" (arbno lc-exp) ")")
+        app-exp)
+    (lc-exp
+       (number)
+       lit-exp)
+  ))
+  
+(define zero?
+    (lambda (n)
+        (= n 0)))
+
+(define parse-lc (sllgen:make-string-parser lc-lex lc-gram))
+(print (parse-lc "x"))
+(print (parse-lc "42"))
+(print (parse-lc "def (a b): 42"))
+(print (parse-lc "def (a b): &add(a b)"))
+
