@@ -16,7 +16,6 @@ using Microsoft.Scripting.Math;
 using Microsoft.Scripting.Hosting;
 using System.Collections; // Hashtable
 using System.Collections.Generic; // List
-//using Microsoft.VisualBasic.CompilerServices;
 using IronPython;
 
 public class Method {

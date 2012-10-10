@@ -3821,6 +3821,11 @@
 (define void?
   (lambda (x) (eq? x void-value)))
 
+;; zero?
+(define zero?-prim
+  (lambda-proc (args env2 info handler fail k2)
+      (k2 (= (car args) 0) fail)))
+
 ;; exit
 (define exit-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4885,6 +4890,7 @@
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)
 	    (list 'void void-prim)
+	    (list 'zero? zero?-prim)
 	    )))
       (make-initial-env-extended
        (make-initial-environment
