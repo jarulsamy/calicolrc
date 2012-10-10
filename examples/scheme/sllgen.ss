@@ -2346,52 +2346,48 @@
        lit-exp)
   ))
   
-(define zero?
-    (lambda (n)
-        (= n 0)))
-
-(define parse-lc (sllgen:make-string-parser lc-lex lc-gram))
+;;(define parse-lc (sllgen:make-string-parser lc-lex lc-gram))
 ;;(print (parse-lc "x"))
 ;;(print (parse-lc "42"))
 ;;(print (parse-lc "def (a b): 42"))
-(print (parse-lc "def (a b): &add(a b)"))
-
-(sllgen:make-define-datatypes lc-lex lc-gram)
-
-(define view-lc
-    (lambda (ast)
-        (cases lc-exp ast
-            (lambda-exp (ids body)
-               (printf "ids: ~s body: ~s\n" ids body))
-            (var-exp (name)
-               (printf "name: ~s\n" name))
-            (lit-exp (value)
-               (printf "lit: ~s\n" value))
-            (app-exp (operator operands)
-               (printf "application: ~s ~s\n" operator operands))
-            (else (error 'eval-lc "invalid lc-exp form")))))
-
-(define eval-lc
-    (lambda (ast env)
-        (cases lc-exp ast
-            (lambda-exp (ids body)
-               (list 'closure-exp ids env body))
-            (var-exp (name)
-               (lookup name env))
-            (lit-exp (value)
-               value)
-            (app-exp (operator operands)
-               (applyit (lookup operator env) operands env))
-            (else (error 'eval-lc "invalid lc-exp form")))))
-
-(define lookup
-    (lambda (var env)
-        (cadr (assv var env))))
-
-(define applyit
-    (lambda (f args env)
-        (case f
-            ((add) (+ (eval-lc (car args) env) (eval-lc (cadr args) env)))
-            (else (error 'applit "no such function")))))
-
-;;(eval-lc (parse-lc "&add(1 2)") '((add add)))
+;; (print (parse-lc "def (a b): &add(a b)"))
+;; 
+;; (sllgen:make-define-datatypes lc-lex lc-gram)
+;; 
+;; (define view-lc
+;;     (lambda (ast)
+;;         (cases lc-exp ast
+;;             (lambda-exp (ids body)
+;;                (printf "ids: ~s body: ~s\n" ids body))
+;;             (var-exp (name)
+;;                (printf "name: ~s\n" name))
+;;             (lit-exp (value)
+;;                (printf "lit: ~s\n" value))
+;;             (app-exp (operator operands)
+;;                (printf "application: ~s ~s\n" operator operands))
+;;             (else (error 'eval-lc "invalid lc-exp form")))))
+;; 
+;; (define eval-lc
+;;     (lambda (ast env)
+;;         (cases lc-exp ast
+;;             (lambda-exp (ids body)
+;;                (list 'closure-exp ids env body))
+;;             (var-exp (name)
+;;                (lookup name env))
+;;             (lit-exp (value)
+;;                value)
+;;             (app-exp (operator operands)
+;;                (applyit (lookup operator env) operands env))
+;;             (else (error 'eval-lc "invalid lc-exp form")))))
+;; 
+;; (define lookup
+;;     (lambda (var env)
+;;         (cadr (assv var env))))
+;; 
+;; (define applyit
+;;     (lambda (f args env)
+;;         (case f
+;;             ((add) (+ (eval-lc (car args) env) (eval-lc (cadr args) env)))
+;;             (else (error 'applit "no such function")))))
+;; 
+;; ;;(eval-lc (parse-lc "&add(1 2)") '((add add)))
