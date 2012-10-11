@@ -177,6 +177,9 @@ using System;
 		public override void reinit(string port, int baud) {
 		    bool need_port = true;
 		    SerialPort serial = (((Scribbler)(Myro.robot)).serial as SerialPort);
+			if (port.StartsWith ("COM") || port.StartsWith ("com")) {
+			  port = "\\\\.\\" + port;             
+			}
 		    if (serial.IsOpen) {
 			if (port == null) 
 			    need_port = false;
@@ -197,6 +200,9 @@ using System;
 		    if (need_port) {
 			if (port == null) {
 			    port = (string)Myro.ask ("Port");
+				if (port.StartsWith ("COM") || port.StartsWith ("com")) {
+				  port = "\\\\.\\" + port;             
+				}
 			}
 			if (port != null) {
 			    Myro.robot = new Scribbler (port, baud);
@@ -220,10 +226,9 @@ using System;
     
 		public Scribbler (string port, int baud)
 		{
-			//if (port.StartsWith ("COM") || port.StartsWith ("com")) {
-			//	port = @"\\.\" + port;             // "comment
-			//}
-
+		    if (port.StartsWith ("COM") || port.StartsWith ("com")) {
+			  port = "\\\\.\\" + port;             
+			}
 			serial = new SerialPort (port, baud);
 			lock (serial) {
 				serial.ReadTimeout = 1000; // milliseconds
