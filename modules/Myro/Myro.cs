@@ -140,6 +140,12 @@ public static class Myro
 	public static Simulation simulation;
 	public static int gui_thread_id = -1;
 	static string dialogResponse = null;
+	static string pickAFileResponse = "";
+	static string pickAFolderResponse = "";
+	static bool yesnoResponse = false;
+	static Graphics.Color pickAColorResponse = null;
+	static string pickAFontResponse = null;
+	static object askResponse = null;
 	static string REVISION = "$Revision: $";
 	static string startup_path = null;
 	static string os_name = null;
@@ -149,6 +155,7 @@ public static class Myro
 	public readonly static PythonDictionary frequencies = new PythonDictionary ();
 	public readonly static Gamepads gamepads = new Gamepads ();
 	public readonly static Computer computer = new Computer ();
+        readonly static ManualResetEvent MyManualResetEvent = new ManualResetEvent (false);
 
 	public static void initialize_module (string path, string os)
 	{
@@ -1863,44 +1870,60 @@ public static class Myro
 
 	public static string pickAFile ()
 	{
-		string retval = null;
-		ManualResetEvent ev = new ManualResetEvent (false);
+		//string retval = null;
+		//ManualResetEvent ev = new ManualResetEvent (false);
+		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog ("Select a file",
                                null,
                                Gtk.FileChooserAction.Open,
                                "Cancel", Gtk.ResponseType.Cancel,
-                               "Open", Gtk.ResponseType.Accept);
+                               "Select File", Gtk.ResponseType.Accept);
+			fc.Response += HandlePickAFileResponse;
 			fc.ShowAll ();
-			if (fc.Run () == (int)(Gtk.ResponseType.Accept)) {
-				retval = fc.Filename;
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return pickAFileResponse;
+	}
+
+	static void HandlePickAFileResponse (object o, Gtk.ResponseArgs args)
+	{
+		if (args.ResponseId == Gtk.ResponseType.Accept) {
+			pickAFileResponse = ((Gtk.FileChooserDialog)o).Filename;
+		} else {
+			pickAFileResponse = null;
+		}
+		((Gtk.FileChooserDialog)o).Destroy();
+		MyManualResetEvent.Set ();
 	}
 
 	public static string pickAFolder ()
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
-		string retval = null;
+		//ManualResetEvent ev = new ManualResetEvent (false);
+		//string retval = null;
+		MyManualResetEvent.Reset();
 		Invoke (delegate {
-			Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog ("Select a file",
+			Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog ("Select a folder",
                                null,
                                Gtk.FileChooserAction.SelectFolder,
                                "Cancel", Gtk.ResponseType.Cancel,
-                               "Open", Gtk.ResponseType.Accept);
+                               "Select Folder", Gtk.ResponseType.Accept);
+			fc.Response += HandlePickAFolderResponse;
 			fc.ShowAll ();
-			if (fc.Run () == (int)(Gtk.ResponseType.Accept)) {
-				retval = fc.Filename;
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return pickAFolderResponse;
+	}
+
+	static void HandlePickAFolderResponse (object o, Gtk.ResponseArgs args)
+	{
+		if (args.ResponseId == Gtk.ResponseType.Accept) {
+			pickAFolderResponse = ((Gtk.FileChooserDialog)o).Filename;
+		} else {
+			pickAFolderResponse = null;
+		}
+		((Gtk.FileChooserDialog)o).Destroy();
+		MyManualResetEvent.Set ();		
 	}
 
 	public static List getColorNames ()
@@ -1923,59 +1946,80 @@ public static class Myro
 
 	public static Graphics.Color pickAColor ()
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
-		Graphics.Color retval = null;
+		//ManualResetEvent ev = new ManualResetEvent (false);
+		//Graphics.Color retval = null;
+		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
+			fc.Response += HandlePickAColorResponse;
 			fc.ShowAll ();
-			if (fc.Run () == (int)(Gtk.ResponseType.Ok)) {
-				retval = new Graphics.Color (
-               (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Red)) / Math.Pow (2, 16) * 255.0),
-           (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Green)) / Math.Pow (2, 16) * 255.0),
-           (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Blue)) / Math.Pow (2, 16) * 255.0));
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return pickAColorResponse;
+	}
+
+	static void HandlePickAColorResponse (object o, Gtk.ResponseArgs args)
+	{
+		Gtk.ColorSelectionDialog fc = (Gtk.ColorSelectionDialog)o;
+		if (args.ResponseId == Gtk.ResponseType.Ok) {
+			pickAColorResponse = new Graphics.Color (
+	           (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Red)) / Math.Pow (2, 16) * 255.0),
+    		   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Green)) / Math.Pow (2, 16) * 255.0),
+       		   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Blue)) / Math.Pow (2, 16) * 255.0));
+		}
+		fc.Destroy ();
+		MyManualResetEvent.Set ();
 	}
 
 	public static string pickAFont ()
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
-		string retval = null;
+		MyManualResetEvent.Reset();
+		pickAFontResponse = null;
 		Invoke (delegate {
 			Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog ("Select a font");
+			fc.Response += HandlePickAFontResponse;
 			fc.ShowAll ();
-			if (fc.Run () == (int)(Gtk.ResponseType.Ok)) {
-				retval = fc.FontName;
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return pickAFontResponse;
+	}
+
+	static void HandlePickAFontResponse (object o, Gtk.ResponseArgs args)
+	{
+		Gtk.FontSelectionDialog fc = (Gtk.FontSelectionDialog)o;
+		if (args.ResponseId == Gtk.ResponseType.Ok) {
+			pickAFontResponse = fc.FontName;
+		}
+		fc.Destroy ();
+		MyManualResetEvent.Set ();		
 	}
 
 	public static bool yesno (string question)
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
-		bool retval = false;
+		//ManualResetEvent ev = new ManualResetEvent (false);
+		//bool retval = false;
+		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.MessageDialog fc = new Gtk.MessageDialog (null,
                                0, Gtk.MessageType.Question,
                                Gtk.ButtonsType.YesNo,
                                question);
+			fc.Response += HandleYesNoResponse;
 			fc.ShowAll ();
-			if (fc.Run () == (int)(Gtk.ResponseType.Yes)) {
-				retval = true;
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return yesnoResponse;
+	}
+
+	static void HandleYesNoResponse (object o, Gtk.ResponseArgs args)
+	{
+		if (args.ResponseId == Gtk.ResponseType.Yes) {
+			yesnoResponse = true;
+		} else {
+			yesnoResponse = false;
+		}
+		((Gtk.MessageDialog)o).Destroy ();
+		MyManualResetEvent.Set ();
 	}
 
 	public static string to_s (object obj)
@@ -2101,8 +2145,8 @@ public static class Myro
 
 	public static string askQuestion (string question, IList choices)
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
 		dialogResponse = null;
+		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.Dialog fc = new Gtk.Dialog ("Information Request", null, 0);
 			fc.VBox.PackStart (new Gtk.Label (question));
@@ -2116,18 +2160,17 @@ public static class Myro
 				}
 			}
 			fc.ShowAll ();
-			fc.Run ();
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
+		MyManualResetEvent.WaitOne ();
 		return dialogResponse;
 	}
 
 	public static void DialogHandler (object obj, System.EventArgs args, Gtk.Dialog dialog)
 	{
 		dialogResponse = ((Gtk.Button)obj).Label;
-		dialog.Respond (Gtk.ResponseType.Ok);
+		//dialog.Respond (Gtk.ResponseType.Ok);
+		dialog.Destroy ();
+		MyManualResetEvent.Set();
 	}
 
 	public static string input (object question)
@@ -2171,8 +2214,8 @@ public static class Myro
 
 	public static object ask (object question, string title)
 	{
-		ManualResetEvent ev = new ManualResetEvent (false);
-		object retval = null;
+		MyManualResetEvent.Reset();
+		askResponse = null;
 		Gtk.Entry myentry = null;
 		PythonDictionary responses = new PythonDictionary ();
 		Invoke (delegate {
@@ -2211,28 +2254,37 @@ public static class Myro
 				hbox.PackStart (entry);
 				fc.VBox.PackStart (hbox);
 			}
+			fc.Response += delegate(object o, Gtk.ResponseArgs args) {
+				HandleAskResponse(o, args, question, responses, myentry);
+			}; 
 			fc.ShowAll ();
-			if (fc.Run () == (int)Gtk.ResponseType.Ok) {
-				if (question is List) {
-					foreach (string choice in responses.Keys) {
-						responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-					}
-					retval = responses;
-				} else if (question is IDictionary) {
-					foreach (string choice in responses.Keys) {
-						responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-					}
-					retval = responses;
-
-				} else {
-					retval = myentry.Text;
-				}
-			}
-			fc.Destroy ();
-			ev.Set ();
 		});
-		ev.WaitOne ();
-		return retval;
+		MyManualResetEvent.WaitOne ();
+		return askResponse;
+	}
+
+	static void HandleAskResponse (object o, Gtk.ResponseArgs args, object question, 
+								   PythonDictionary responses, Gtk.Entry myentry)
+	{
+		Gtk.MessageDialog fc = (Gtk.MessageDialog)o;
+		if (args.ResponseId == Gtk.ResponseType.Ok) {
+			if (question is List) {
+				foreach (string choice in responses.Keys) {
+					responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+				}
+				askResponse = responses;
+			} else if (question is IDictionary) {
+				foreach (string choice in responses.Keys) {
+					responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+				}
+				askResponse = responses;
+			} else {
+				askResponse = myentry.Text;
+			}
+		}
+		fc.Destroy ();
+		MyManualResetEvent.Set ();
+		
 	}
 
 	public static object pickOne (params object [] items)

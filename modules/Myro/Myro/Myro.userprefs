@@ -1,14 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\Myro.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../Myro.cs">
     <Files>
-      <File FileName="..\Myro.cs" Line="662" Column="13" />
+      <File FileName="../Myro.cs" Line="3447" Column="16" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Myro" expanded="True">
-            <Node name="References" expanded="True" selected="True" />
+            <Node name="References" expanded="True" />
+            <Node name="Myro.cs" selected="True" />
           </Node>
         </State>
       </Pad>
