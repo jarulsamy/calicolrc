@@ -1870,8 +1870,7 @@ public static class Myro
 
 	public static string pickAFile ()
 	{
-		//string retval = null;
-		//ManualResetEvent ev = new ManualResetEvent (false);
+		pickAFileResponse = null;
 		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog ("Select a file",
@@ -1899,8 +1898,7 @@ public static class Myro
 
 	public static string pickAFolder ()
 	{
-		//ManualResetEvent ev = new ManualResetEvent (false);
-		//string retval = null;
+		pickAFolderResponse = null;
 		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog ("Select a folder",
@@ -1946,8 +1944,7 @@ public static class Myro
 
 	public static Graphics.Color pickAColor ()
 	{
-		//ManualResetEvent ev = new ManualResetEvent (false);
-		//Graphics.Color retval = null;
+		pickAColorResponse = null;
 		MyManualResetEvent.Reset();
 		Invoke (delegate {
 			Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
