@@ -107,18 +107,33 @@
       (lambda-cont2 (binding fail)
 	(k (binding-value binding) fail)))))
 
+;; new version does the dlr-env-contains check first for greater efficiency
 (define* lookup-binding
   (lambda (variable env var-info handler fail k)
-    (let ((binding (search-env env variable)))
-      (if binding
-	(k binding fail)
-	(split-variable variable fail
-	  (lambda-cont2 (components fail)
-	    (if (dlr-env-contains variable)
-	      (k (dlr-env-lookup variable) fail)
+    (if (dlr-env-contains variable)
+      (k (dlr-env-lookup variable) fail)
+      (let ((binding (search-env env variable)))
+	(if binding
+	  (k binding fail)
+	  (split-variable variable fail
+	    (lambda-cont2 (components fail)
 	      (if components
 		(lookup-variable-components components "" env handler fail k)
 		(runtime-error (format "unbound variable ~a" variable) var-info handler fail)))))))))
+
+;;;; previous version:
+;;(define* lookup-binding
+;;  (lambda (variable env var-info handler fail k)
+;;    (let ((binding (search-env env variable)))
+;;      (if binding
+;;	(k binding fail)
+;;	(split-variable variable fail
+;;	  (lambda-cont2 (components fail)
+;;	    (if (dlr-env-contains variable)
+;;	      (k (dlr-env-lookup variable) fail)
+;;	      (if components
+;;		(lookup-variable-components components "" env handler fail k)
+;;		(runtime-error (format "unbound variable ~a" variable) var-info handler fail)))))))))
 ;;                    (handler (format "unbound variable ~a" variable) fail)))))))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist

@@ -11,9 +11,10 @@
 (load "parser-cps.ss")
 
 ;;----------------------------------------------------------------------------
-;; enables interpreter to be run directly in Petite Chez Scheme, independently of C#
+;; these definitions enable the interpreter code to run in Petite Chez
+;; Scheme, independently of C#
 
-;; dummy versions of functions used in C# code
+;; dummy versions of functions defined in C# code
 (define dlr-exp? (lambda (x) #f))
 (define dlr-apply apply)
 (define dlr-func (lambda (x) x))
@@ -74,7 +75,7 @@
 (define* read-eval-print-loop
   (lambda ()
     (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
-      ;; execute gets redefined as execute-rm in the scheme register machine
+      ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
 	    (safe-print result))
@@ -137,7 +138,7 @@
 
 (define execute-next-expression
   (lambda (src)
-    (read-asexp *tokens-left* src REP-handler *last-fail*
+    (read-sexp *tokens-left* src REP-handler *last-fail*
       (lambda-cont4 (datum end tokens-left fail)
 	(set! *tokens-left* tokens-left)
 	(aparse datum REP-handler fail
@@ -249,7 +250,7 @@
   (lambda (tokens src env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
       (k void-value fail)
-      (read-asexp tokens src handler fail
+      (read-sexp tokens src handler fail
 	(lambda-cont4 (datum end tokens-left fail)
 	  (aparse datum handler fail
 	    (lambda-cont2 (exp fail)
@@ -259,7 +260,7 @@
 		    (k v fail)
 		    (read-and-eval-asexps tokens-left src env handler fail k)))))))))))
 
-(define *tracing-on?* #t)
+(define *tracing-on?* #f)
 
 (define make-debugging-k
   (lambda (exp k)
@@ -363,14 +364,6 @@
 	(m exp env handler fail
 	  ;; TODO: pass in more info to handler (k, env) to support resume, etc.
 	  (lambda-cont2 (e fail) (handler e fail))))
-      (dict-aexp (pairs info)
-	(k (list 'dict pairs) fail))
-      (help-aexp (var var-info info)
-	(if (reserved-keyword? var)
-	  (k (format "~a is a keyword" var) fail)
-	  (lookup-binding var env var-info handler fail
-	    (lambda-cont2 (binding fail)
-	      (k (binding-docstring binding) fail)))))
       (choose-aexp (exps info)
 	(eval-choices exps env handler fail k))
       (app-aexp (operator operands info)
@@ -434,61 +427,62 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
-(define _closure-depth 0)
-
-(define get-closure-depth
-  (lambda ()
-    _closure-depth
-    ))
-
-(define increment-closure-depth
-  (lambda ()
-    (set! _closure-depth (+ _closure-depth 1))
-    ))
-
-(define decrement-closure-depth
-  (lambda ()
-    (set! _closure-depth (- _closure-depth 1))
-    ))
-
-(define repeat
-  ;; turns a list of char into a string
-  (lambda (item times)
-    (if (= times 0)
-	'()
-	(cons item (repeat item (- times 1))))))
+(define make-trace-depth-string
+  (lambda (level)
+    (if (= level 0)
+      ""
+      (string-append " |" (make-trace-depth-string (- level 1))))))
 
 (define trace-closure
   (lambda (name formals bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-      (if (= (length args) (length formals))
+    (let ((trace-depth 0))
+      (lambda-proc (args env2 info handler fail k2)
+	(if (= (length args) (length formals))
 	  (begin
-	    (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
-	    (increment-closure-depth)
+	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
+	    ;;(printf "k: ~a\n" (make-safe-continuation k2))
+	    (set! trace-depth (+ trace-depth 1))
 	    (eval-sequence bodies (extend env formals args) handler fail 
-		 (lambda-cont2 (v fail)
-	            (decrement-closure-depth)
-	            (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
-		    (k2 v fail))))
-	  (runtime-error "incorrect number of arguments in application" info handler fail)))))
+	      (lambda-cont2 (v fail)
+		(set! trace-depth (- trace-depth 1))
+		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		(k2 v fail))))
+	  (runtime-error "incorrect number of arguments in application" info handler fail))))))
+
+;; experimental
+(define make-safe-continuation
+  (lambda (k)
+    (cond
+      ((not (pair? k)) '<???>)
+      ((eq? (car k) 'fail-continuation) '<fail>)
+      ((memq (car k) '(handler handler2)) '<handler>)
+      ((memq (car k) '(continuation continuation2 continuation3 continuation4))
+       (cons (cadr k) (map make-safe-continuation (filter continuation-object? (cddr k)))))
+      (else '<???>))))
+
+;; experimental
+(define continuation-object?
+  (lambda (x)
+    (and (pair? x) (memq (car x) '(continuation continuation2 continuation3 continuation4)))))
 
 (define mu-trace-closure
   (lambda (name formals runt bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-       (if (>= (length args) (length formals))
-	   (let ((new-env
+    (let ((trace-depth 0))
+      (lambda-proc (args env2 info handler fail k2)
+	(if (>= (length args) (length formals))
+	  (let ((new-env
 		  (extend env
-			  (cons runt formals)
-			  (cons (list-tail args (length formals))
-				(list-head args (length formals))))))
-	     (printf "~scall: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) (cons name args))
-	     (increment-closure-depth)
-	     (eval-sequence bodies new-env handler fail
-		(lambda-cont2 (v fail)
-		    (decrement-closure-depth)
-		    (printf "~sreturn: ~s~%" (apply string-append (repeat " |" (get-closure-depth))) v)
-		    (k2 v fail))))
-	   (runtime-error "not enough arguments in application" info handler fail)))))
+		    (cons runt formals)
+		    (cons (list-tail args (length formals))
+		      (list-head args (length formals))))))
+	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
+	    (set! trace-depth (+ trace-depth 1))
+	    (eval-sequence bodies new-env handler fail
+	      (lambda-cont2 (v fail)
+		(set! trace-depth (- trace-depth 1))
+		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		(k2 v fail))))
+	  (runtime-error "not enough arguments in application" info handler fail))))))
 
 (define closure
   (lambda (formals bodies env)
@@ -521,11 +515,11 @@
 
 (define* eval-sequence
   (lambda (exps env handler fail k)
-    (m (car exps) env handler fail
-       (lambda-cont2 (result fail)
-	 (if (null? (cdr exps))
-	   (k result fail)
-	   (eval-sequence (cdr exps) env handler fail k))))))
+    (if (null? (cdr exps))
+      (m (car exps) env handler fail k)
+      (m (car exps) env handler fail
+	(lambda-cont2 (result fail)
+	  (eval-sequence (cdr exps) env handler fail k))))))
 
 ;;----------------------------------------------------------------------------
 ;; Primitives
@@ -630,7 +624,7 @@
   (lambda-proc (args env2 info handler fail k2)
     (scan-input (car args) 'stdin handler fail
       (lambda-cont2 (tokens fail)
-	(read-asexp tokens 'stdin handler fail
+	(read-sexp tokens 'stdin handler fail
 	  (lambda-cont4 (adatum end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'end-marker)
 	      (aparse adatum handler fail k2)
@@ -641,7 +635,7 @@
   (lambda-proc (args env2 info handler fail k2)
     (scan-input (car args) 'stdin handler fail
       (lambda-cont2 (tokens fail)
-	(read-asexp tokens 'stdin handler fail
+	(read-sexp tokens 'stdin handler fail
 	  (lambda-cont4 (adatum end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'end-marker)
 	      (k2 adatum fail)
@@ -900,8 +894,8 @@
 (define car-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to car" info handler fail))
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to car" info handler fail))
       ((not (pair? (car args)))
        (runtime-error (format "car called on non-pair ~s" (car args)) info handler fail))
       (else (k2 (apply car args) fail)))))
@@ -910,8 +904,8 @@
 (define cdr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to cdr" info handler fail))
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdr" info handler fail))
       ((not (pair? (car args)))
        (runtime-error (format "cdr called on non-pair ~s" (car args)) info handler fail))
       (else (k2 (apply cdr args) fail)))))
@@ -920,8 +914,8 @@
 (define cadr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to cadr" info handler fail))
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cadr" info handler fail))
       ((not (length-at-least? 2 (car args)))
        (runtime-error (format "cadr called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply cadr args) fail)))))
@@ -930,8 +924,8 @@
 (define caddr-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to caddr" info handler fail))
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caddr" info handler fail))
       ((not (length-at-least? 3 (car args)))
        (runtime-error (format "caddr called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply caddr args) fail)))))
@@ -1248,30 +1242,33 @@
 ;; append
 (define append-prim
   (lambda-proc (args env2 info handler fail k2)
-    (cond
+    (append-all args info handler fail k2)))
+;;    (cond
 ;;      ((not (length-two? args))
 ;;       (runtime-error "incorrect number of arguments to append" info handler fail))
 ;;      ((not (list? (car args)))
 ;;       (runtime-error (format "append called on incorrect list structure ~s" (car args)) info handler fail))
-      (else (append-all args (lambda-cont (v) (k2 v fail)))))))
+;;      (else (append-all args (lambda-cont (v) (k2 v fail)))))))
 ;;      (else (k2 (apply append args) fail)))))
 
 (define* append2
-  (lambda (ls1 ls2 k)
+  (lambda (ls1 ls2 fail k2)
     (if (null? ls1)
-      (k ls2)
-      (append2 (cdr ls1) ls2
-	(lambda-cont (v)
-	  (k (cons (car ls1) v)))))))
+      (k2 ls2 fail)
+      (append2 (cdr ls1) ls2 fail
+	(lambda-cont2 (v fail)
+	  (k2 (cons (car ls1) v) fail))))))
 
 (define* append-all
-  (lambda (lists k)
+  (lambda (lists info handler fail k2)
     (cond
-      ((null? lists) (k '()))
-      ((null? (cdr lists)) (k (car lists)))
-      (else (append-all (cdr lists)
-	      (lambda-cont (ls)
-		(append2 (car lists) ls k)))))))
+      ((null? lists) (k2 '() fail))
+      ((null? (cdr lists)) (k2 (car lists) fail))
+      ((not (list? (car lists)))
+       (runtime-error (format "append called on incorrect list structure ~s" (car lists)) info handler fail))
+      (else (append-all (cdr lists) info handler fail
+	      (lambda-cont2 (ls fail)
+		(append2 (car lists) ls fail k2)))))))
 
 ;; string->number
 (define string->number-prim

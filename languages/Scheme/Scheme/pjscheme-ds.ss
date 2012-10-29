@@ -32,8 +32,8 @@
    (info source-info?))
  (define-syntax-aexp
    (name symbol?)
-   (clauses (list-of (list-of pattern?)))
-   (aclauses list-of-asexp?)
+   (clauses (list-of define-syntax-clause?))
+   (aclauses list-of-define-syntax-clauses?^)
    (info source-info?))
  (begin-aexp
    (exps (list-of aexpression?))
@@ -52,7 +52,8 @@
    (formals (list-of symbol?))
    (bodies (list-of aexpression?))
    (info source-info?))
- (mu-trace-lambda-aexp (name symbol?) (formals (list-of symbol?)) (runt symbol?)
+ (mu-trace-lambda-aexp (name symbol?)
+   (formals (list-of symbol?)) (runt symbol?)
    (bodies (list-of aexpression?)) (info source-info?))
  (app-aexp
    (operator aexpression?)
@@ -67,17 +68,10 @@
    (body aexpression?)
    (finally-exps (list-of aexpression?))
    (info source-info?))
- (try-catch-finally-aexp (body aexpression?) (catch-var symbol?)
-   (catch-exps (list-of aexpression?))
+ (try-catch-finally-aexp (body aexpression?)
+   (catch-var symbol?) (catch-exps (list-of aexpression?))
    (finally-exps (list-of aexpression?)) (info source-info?))
  (raise-aexp (exp aexpression?) (info source-info?))
- (dict-aexp
-   (entries (list-of (list-of aexpression?)))
-   (info source-info?))
- (help-aexp
-   (var symbol?)
-   (var-info source-info?)
-   (info source-info?))
  (choose-aexp
    (exps (list-of aexpression?))
    (info source-info?)))
@@ -92,86 +86,78 @@
   (lambda (k value)
     (record-case (cdr k)
       (<cont-1> (chars fail k) (apply-cont3 k value chars fail))
-      (<cont-2> (k) (apply-cont k (list->vector value)))
-      (<cont-3> (v1 k) (apply-cont k (cons v1 value)))
-      (<cont-4> (x k)
-       (unannotate-cps (cdr x) (make-cont '<cont-3> value k)))
-      (<cont-5> (k)
-       (apply-cont k (retag (list->vector value) 'none)))
-      (<cont-6> (k) (apply-cont k (retag value 'none)))
+      (<cont-2> (v1 info k)
+       (apply-cont k (list pair-tag v1 value info)))
+      (<cont-3> (x info k)
+       (annotate-cps
+         (cdr x)
+         'none
+         (make-cont '<cont-2> value info k)))
+      (<cont-4> (k) (apply-cont k (list->vector value)))
+      (<cont-5> (v1 k) (apply-cont k (cons v1 value)))
+      (<cont-6> (x k)
+       (unannotate-cps (cdr x) (make-cont '<cont-5> value k)))
       (<cont-7> (x k)
-       (reannotate-seq-cps (cdr x) (make-cont '<cont-3> value k)))
-      (<cont-8> () (halt* value))
-      (<cont-9> (bindings k)
-       (apply-cont k `(let ((unquote (car bindings))) ,value)))
-      (<cont-10> (clauses var k)
-       (let ((clause (car clauses)))
-         (cond
-           ((eq?^ (car^ clause) 'else)
-            (apply-cont k (cons clause value)))
-           ((symbol?^ (car^ clause))
-            (apply-cont
-              k
-              (cons
-                `((eq? ,var ',(get-sexp (car^ clause))) ,@(cdr^ clause))
-                value)))
-           (else
-            (apply-cont
-              k
-              (cons
-                `((memq ,var ',(get-sexp (car^ clause))) ,@(cdr^ clause))
-                value))))))
-      (<cont-11> (transformer-name)
-       (error transformer-name "bad concrete syntax: ~a" value))
-      (<cont-12> (adatum bodies info fail k)
-       (if (list? value)
-           (apply-cont2
-             k
-             (trace-lambda-aexp
-               (get-sexp (cadr^ adatum))
-               value
-               bodies
-               info)
-             fail)
-           (apply-cont2
-             k
-             (mu-trace-lambda-aexp (get-sexp (cadr^ adatum)) (head value)
-               (last value) bodies info)
-             fail)))
-      (<cont-13> (bodies info fail k)
+       (unannotate-cps (caddr x) (make-cont '<cont-5> value k)))
+      (<cont-8> (end tokens-left fail k)
+       (apply-cont4 k value end tokens-left fail))
+      (<cont-9> (end tokens fail k)
+       (apply-cont4 k value end (rest-of tokens) fail))
+      (<cont-10> (end tokens fail k)
+       (apply-cont4 k v end (rest-of tokens) fail))
+      (<cont-11> (src start tokens handler fail k)
+       (read-sexp (rest-of tokens) src handler fail
+         (make-cont4 '<cont4-3> src start value k)))
+      (<cont-12> () (halt* value))
+      (<cont-13> (adatum bodies info fail k)
+       (let ((name (untag-atom^ (cadr^ adatum))))
+         (if (list? value)
+             (apply-cont2
+               k
+               (trace-lambda-aexp name value bodies info)
+               fail)
+             (apply-cont2
+               k
+               (mu-trace-lambda-aexp name (head value) (last value) bodies
+                 info)
+               fail))))
+      (<cont-14> (bodies info fail k)
        (if (list? value)
            (apply-cont2 k (lambda-aexp value bodies info) fail)
            (apply-cont2
              k
              (mu-lambda-aexp (head value) (last value) bodies info)
              fail)))
-      (<cont-14> (aclauses name info fail k)
+      (<cont-15> (aclauses name info fail k)
        (apply-cont2
          k
          (define-syntax-aexp name value aclauses info)
          fail))
-      (<cont-15> (info handler fail k)
-       (aparse (replace-info value info) handler fail k))
       (<cont-16> (info handler fail k)
-       (reannotate-cps
+       (aparse (replace-info value info) handler fail k))
+      (<cont-17> (info handler fail k)
+       (annotate-cps
          value
-         (make-cont '<cont-15> info handler fail k)))
-      (<cont-17> (adatum handler fail k)
-       (let ((info (get-source-info adatum)))
-         (if (original-source-info? adatum)
-             (aparse
-               (replace-info value (snoc 'quasiquote info))
-               handler
-               fail
-               k)
-             (aparse (replace-info value info) handler fail k))))
-      (<cont-18> (adatum handler fail k)
-       (reannotate-cps
+         'none
+         (make-cont '<cont-16> info handler fail k)))
+      (<cont-18> (adatum info handler fail k)
+       (if (original-source-info? adatum)
+           (aparse
+             (replace-info value (snoc 'quasiquote info))
+             handler
+             fail
+             k)
+           (aparse (replace-info value info) handler fail k)))
+      (<cont-19> (adatum info handler fail k)
+       (annotate-cps
          value
-         (make-cont '<cont-17> adatum handler fail k)))
-      (<cont-19> (info fail k)
+         'none
+         (make-cont '<cont-18> adatum info handler fail k)))
+      (<cont-20> (info fail k)
+       (apply-cont2 k (lit-aexp (cadr value) info) fail))
+      (<cont-21> (info fail k)
        (apply-cont2 k (lit-aexp value info) fail))
-      (<cont-20> (msg info handler fail)
+      (<cont-22> (msg info handler fail)
        (apply-handler2
          handler
          (format
@@ -183,23 +169,61 @@
              (get-start-char info)
              (get-srcfile info)))
          fail))
-      (<cont-21> (adatum fail k)
+      (<cont-23> (bindings k)
+       (apply-cont k `(let (,(car^ bindings)) ,value)))
+      (<cont-24> (clauses var k)
+       (let ((clause (car^ clauses)))
+         (cond
+           ((eq?^ (car^ clause) 'else)
+            (apply-cont k (cons clause value)))
+           ((symbol?^ (car^ clause))
+            (apply-cont
+              k
+              (cons
+                `((eq? ,var ',(car^ clause)) ,@(at^ (cdr^ clause)))
+                value)))
+           (else
+            (apply-cont
+              k
+              (cons
+                `((memq ,var ',(car^ clause)) ,@(at^ (cdr^ clause)))
+                value))))))
+      (<cont-25> (fields name k2)
+       (let ((constructor-def `(define ,name
+                                 (lambda args
+                                   (if (= (length args) ,(length^ fields))
+                                       ,value
+                                       (error ',name
+                                         "wrong number of arguments"))))))
+         (apply-cont2 k2 name constructor-def)))
+      (<cont-26> (cdrs fields name k)
+       (apply-cont
+         k
+         `(if (,(cadar^ fields) (car ,cdrs))
+              ,value
+              (error ',name
+                "~a is not of type ~a"
+                (car ,cdrs)
+                ',(cadar^ fields)))))
+      (<cont-27> (adatum macro-keyword fail k)
        (if (has-source-info? value)
            (apply-cont2 k value fail)
            (let ((info (get-source-info adatum)))
              (if (original-source-info? adatum)
-                 (let ((macro-keyword (get-sexp (car^ adatum))))
-                   (apply-cont2
-                     k
-                     (replace-info value (snoc macro-keyword info))
-                     fail))
+                 (apply-cont2
+                   k
+                   (replace-info value (snoc macro-keyword info))
+                   fail)
                  (apply-cont2 k (replace-info value info) fail)))))
-      (<cont-22> (adatum fail k)
-       (reannotate-cps value (make-cont '<cont-21> adatum fail k)))
-      (<cont-23> (aclauses
+      (<cont-28> (adatum macro-keyword fail k)
+       (annotate-cps
+         value
+         'none
+         (make-cont '<cont-27> adatum macro-keyword fail k)))
+      (<cont-29> (aclauses
                   adatum
-                  aright-pattern
                   clauses
+                  right-apattern
                   right-pattern
                   handler
                   fail
@@ -208,85 +232,84 @@
            (instantiate^
              right-pattern
              value
-             aright-pattern
-             (make-cont2 '<cont2-40> fail k))
-           (process-macro-clauses^ (cdr clauses) (cdr aclauses) adatum
+             right-apattern
+             (make-cont2 '<cont2-46> fail k))
+           (process-macro-clauses^ (cdr clauses) (cdr^ aclauses) adatum
              handler fail k)))
-      (<cont-24> (aclauses
+      (<cont-30> (aclauses
                   adatum
-                  aleft-pattern
-                  aright-pattern
                   clauses
+                  left-apattern
                   left-pattern
+                  right-apattern
                   right-pattern
                   handler
                   fail
                   k)
-       (unify-patterns^ left-pattern value aleft-pattern adatum
-         (make-cont '<cont-23> aclauses adatum aright-pattern clauses
+       (unify-patterns^ left-pattern value left-apattern adatum
+         (make-cont '<cont-29> aclauses adatum clauses right-apattern
            right-pattern handler fail k)))
-      (<cont-25> (v1 k) (apply-cont k `(append ,v1 ,value)))
-      (<cont-26> (ax depth k)
+      (<cont-31> (v1 k) (apply-cont k `(append ,v1 ,value)))
+      (<cont-32> (ax depth k)
        (qq-expand-cps
-         (^cdr^ ax)
+         (cdr^ ax)
          depth
-         (make-cont '<cont-25> value k)))
-      (<cont-27> (k) (apply-cont k `(list->vector ,value)))
-      (<cont-28> (ax k) (apply-cont k `(cons ',(car^ ax) ,value)))
-      (<cont-29> (k) (apply-cont k `(cons 'quasiquote ,value)))
-      (<cont-30> (v1 k)
+         (make-cont '<cont-31> value k)))
+      (<cont-33> (k) (apply-cont k `(list->vector ,value)))
+      (<cont-34> (depth k)
+       (qq-expand-cps value depth (make-cont '<cont-33> k)))
+      (<cont-35> (ax k) (apply-cont k `(cons ',(car^ ax) ,value)))
+      (<cont-36> (k) (apply-cont k `(cons 'quasiquote ,value)))
+      (<cont-37> (v1 k)
        (apply-cont k `(list (append ,v1 ,value))))
-      (<cont-31> (ax depth k)
+      (<cont-38> (ax depth k)
        (qq-expand-cps
-         (^cdr^ ax)
+         (cdr^ ax)
          depth
-         (make-cont '<cont-30> value k)))
-      (<cont-32> (k) (apply-cont k `(list ,value)))
-      (<cont-33> (ax k)
+         (make-cont '<cont-37> value k)))
+      (<cont-39> (k) (apply-cont k `(list ,value)))
+      (<cont-40> (ax k)
        (apply-cont k `(list (cons ',(car^ ax) ,value))))
-      (<cont-34> (k)
+      (<cont-41> (k)
        (apply-cont k `(list (cons 'quasiquote ,value))))
-      (<cont-35> (v1 fail k) (apply-cont2 k (cons v1 value) fail))
-      (<cont-36> (handler fail k2)
+      (<cont-42> (handler fail k2)
        (aparse
          value
          handler
          fail
-         (make-cont2 '<cont2-72> handler k2)))
-      (<cont-37> (handler fail k2) (aparse value handler fail k2))
-      (<cont-38> (fail k2) (apply-cont2 k2 value fail))
-      (<cont-39> (x y k)
+         (make-cont2 '<cont2-71> handler k2)))
+      (<cont-43> (handler fail k2) (aparse value handler fail k2))
+      (<cont-44> (fail k2) (apply-cont2 k2 value fail))
+      (<cont-45> (x y k)
        (if value
            (equal-objects? (cdr x) (cdr y) k)
            (apply-cont k #f)))
-      (<cont-40> (i v1 v2 k)
+      (<cont-46> (i v1 v2 k)
        (if value
            (equal-vectors? v1 v2 (- i 1) k)
            (apply-cont k #f)))
-      (<cont-41> (ls x y info handler fail k)
+      (<cont-47> (ls x y info handler fail k)
        (if value
            (apply-cont2 k y fail)
            (member-loop x (cdr y) ls info handler fail k)))
-      (<cont-42> (ls1 k) (apply-cont k (cons (car ls1) value)))
-      (<cont-43> (lists k) (append2 (car lists) value k))
-      (<cont-44> (pattern var k)
+      (<cont-48> (pattern var k)
        (if value (apply-cont k #t) (occurs? var (cdr pattern) k)))
-      (<cont-45> (ap2 p1 p2 k)
+      (<cont-49> (ap2 p1 p2 k)
        (if value
            (apply-cont k #f)
            (apply-cont k (make-sub 'unit p1 p2 ap2))))
-      (<cont-46> (s-car k)
+      (<cont-50> (s-car k)
        (if (not value)
            (apply-cont k #f)
            (apply-cont k (make-sub 'composite s-car value))))
-      (<cont-47> (apair1 apair2 pair1 pair2 k)
+      (<cont-51> (apair1 apair2 pair1 pair2 k)
        (if (not value)
            (apply-cont k #f)
            (instantiate^
              (cdr pair1)
              value
-             (^cdr^ apair1)
-             (make-cont2 '<cont2-90> apair2 pair2 value k))))
+             (cdr^ apair1)
+             (make-cont2 '<cont2-91> apair2 pair2 value k))))
       (else (error 'apply-cont "bad continuation: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -304,15 +327,13 @@
       (<cont2-3> (k)
        (apply-cont2 k (binding-value value1) value2))
       (<cont2-4> (var-info variable env handler k)
-       (if (dlr-env-contains variable)
-           (apply-cont2 k (dlr-env-lookup variable) value2)
-           (if value1
-               (lookup-variable-components value1 "" env handler value2 k)
-               (runtime-error
-                 (format "unbound variable ~a" variable)
-                 var-info
-                 handler
-                 value2))))
+       (if value1
+           (lookup-variable-components value1 "" env handler value2 k)
+           (runtime-error
+             (format "unbound variable ~a" variable)
+             var-info
+             handler
+             value2)))
       (<cont2-5> (components path var handler k)
        (if (null? (cdr components))
            (apply-cont2 k value1 value2)
@@ -332,251 +353,255 @@
                        value2))
                  (lookup-variable-components (cdr components) new-path
                    result handler value2 k)))))
-      (<cont2-6> (bodies k)
-       (apply-cont k `(let (unquote value1) ,@value2 ,@bodies)))
-      (<cont2-7> (procs vars k2)
-       (apply-cont2
-         k2
-         (cons `(,(car vars) 'undefined) value1)
-         (cons `(set! ,(car vars) ,(car procs)) value2)))
-      (<cont2-8> (exp k)
-       (apply-cont
-         k
-         `(let ((r ,exp) (unquote-splicing value1))
-            (cond (unquote-splicing value2)))))
-      (<cont2-9> (clauses var k2)
-       (let ((clause (car clauses)))
-         (if (eq?^ (car^ clause) 'else)
-             (apply-cont2
-               k2
-               (cons `(else-code (lambda () ,@(cdr^ clause))) value1)
-               (cons '(else (else-code)) value2))
-             (if (symbol?^ (car^ clause))
-                 (let ((name (get-sexp (car^ clause))))
-                   (apply-cont2
-                     k2
-                     (cons `(,name (lambda () ,@(cdr^ clause))) value1)
-                     (cons `((eq? ,var ',(car^ clause)) (,name)) value2)))
-                 (let ((name (get-sexp (car^ (car^ clause)))))
-                   (apply-cont2
-                     k2
-                     (cons `(,name (lambda () ,@(cdr^ clause))) value1)
-                     (cons
-                       `((memq ,var ',(car^ clause)) (,name))
-                       value2)))))))
-      (<cont2-10> (clauses var k2)
-       (let ((clause (car clauses)))
-         (if (eq?^ (car^ clause) 'else)
-             (apply-cont2
-               k2
-               (cons `(else-code (lambda () ,@(cdr^ clause))) value1)
-               (cons `(else (else-code)) value2))
-             (if (symbol?^ (car^ clause))
-                 (let ((name (get-sexp (car^ clause))))
-                   (apply-cont2
-                     k2
-                     (cons
-                       `(,name
-                          (lambda (unquote (cadr^ clause))
-                            ,@(cddr^ clause)))
-                       value1)
-                     (cons
-                       `((eq? (car ,var) ',(car^ clause))
-                          (apply ,name (cdr ,var)))
-                       value2)))
-                 (let ((name (get-sexp (car^ (car^ clause)))))
-                   (apply-cont2
-                     k2
-                     (cons
-                       `(,name
-                          (lambda (unquote (cadr^ clause))
-                            ,@(cddr^ clause)))
-                       value1)
-                     (cons
-                       `((memq (car ,var) ',(car^ clause))
-                          (apply ,name (cdr ,var)))
-                       value2)))))))
-      (<cont2-11> (exp type-name type-tester-name k)
-       (apply-cont
-         k
-         `(let ((r ,exp) (unquote-splicing value1))
-            (if (not (,type-tester-name r))
-                (error 'cases "~a is not a valid ~a" r ',type-name)
-                (cond (unquote-splicing value2))))))
-      (<cont2-12> (v1 info k)
+      (<cont2-6> (v1 info k)
        (apply-cont2 k (app-aexp v1 value1 info) value2))
-      (<cont2-13> (adatum info handler k)
+      (<cont2-7> (adatum info handler k)
        (aparse-all
          (cdr^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-12> value1 info k)))
-      (<cont2-14> (info k)
+         (make-cont2 '<cont2-6> value1 info k)))
+      (<cont2-8> (info k)
        (apply-cont2 k (choose-aexp value1 info) value2))
-      (<cont2-15> (info k)
-       (apply-cont2 k (dict-aexp value1 info) value2))
-      (<cont2-16> (info k)
+      (<cont2-9> (info k)
        (apply-cont2 k (raise-aexp value1 info) value2))
-      (<cont2-17> (adatum cexps body info k)
-       (let ((cvar (get-sexp (catch-var^ (caddr^ adatum)))))
+      (<cont2-10> (adatum cexps body info k)
+       (let ((cvar (catch-var^ adatum)))
          (apply-cont2
            k
            (try-catch-finally-aexp body cvar cexps value1 info)
            value2)))
-      (<cont2-18> (adatum body info handler k)
+      (<cont2-11> (adatum body info handler k)
        (aparse-all
-         (finally-exps^ (cadddr^ adatum))
+         (try-catch-finally-exps^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-17> adatum value1 body info k)))
-      (<cont2-19> (adatum info handler k)
+         (make-cont2 '<cont2-10> adatum value1 body info k)))
+      (<cont2-12> (adatum info handler k)
        (aparse-all
-         (catch-exps^ (caddr^ adatum))
+         (catch-exps^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-18> adatum value1 info handler k)))
-      (<cont2-20> (body info k)
+         (make-cont2 '<cont2-11> adatum value1 info handler k)))
+      (<cont2-13> (body info k)
        (apply-cont2 k (try-finally-aexp body value1 info) value2))
-      (<cont2-21> (adatum info handler k)
+      (<cont2-14> (adatum info handler k)
        (aparse-all
-         (finally-exps^ (caddr^ adatum))
+         (try-finally-exps^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-20> value1 info k)))
-      (<cont2-22> (adatum body info k)
-       (let ((cvar (get-sexp (catch-var^ (caddr^ adatum)))))
+         (make-cont2 '<cont2-13> value1 info k)))
+      (<cont2-15> (adatum body info k)
+       (let ((cvar (catch-var^ adatum)))
          (apply-cont2
            k
            (try-catch-aexp body cvar value1 info)
            value2)))
-      (<cont2-23> (adatum info handler k)
+      (<cont2-16> (adatum info handler k)
        (aparse-all
-         (catch-exps^ (caddr^ adatum))
+         (catch-exps^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-22> adatum value1 info k)))
-      (<cont2-24> (adatum info k)
+         (make-cont2 '<cont2-15> adatum value1 info k)))
+      (<cont2-17> (adatum info k)
        (unannotate-cps
          (caddr^ adatum)
-         (make-cont '<cont-12> adatum value1 info value2 k)))
-      (<cont2-25> (adatum info k)
+         (make-cont '<cont-13> adatum value1 info value2 k)))
+      (<cont2-18> (adatum info k)
        (unannotate-cps
          (cadr^ adatum)
-         (make-cont '<cont-13> value1 info value2 k)))
-      (<cont2-26> (adatum info handler k)
+         (make-cont '<cont-14> value1 info value2 k)))
+      (<cont2-19> (adatum info handler k)
        (cond
          ((null? value1)
           (aparse-error "bad concrete syntax:" adatum handler value2))
          ((null? (cdr value1)) (apply-cont2 k (car value1) value2))
          (else (apply-cont2 k (begin-aexp value1 info) value2))))
-      (<cont2-27> (adatum info k)
+      (<cont2-20> (adatum info k)
        (apply-cont2
          k
          (define!-aexp
-           (get-sexp (cadr^ adatum))
-           (get-sexp (caddr^ adatum))
+           (define-var^ adatum)
+           (define-docstring^ adatum)
            value1
            info)
          value2))
-      (<cont2-28> (adatum info k)
+      (<cont2-21> (adatum info k)
        (apply-cont2
          k
-         (define!-aexp (get-sexp (cadr^ adatum)) "" value1 info)
+         (define!-aexp (define-var^ adatum) "" value1 info)
          value2))
-      (<cont2-29> (adatum info k)
+      (<cont2-22> (adatum info k)
        (apply-cont2
          k
          (define-aexp
-           (get-sexp (cadr^ adatum))
-           (get-sexp (caddr^ adatum))
+           (define-var^ adatum)
+           (define-docstring^ adatum)
            value1
            info)
          value2))
-      (<cont2-30> (adatum info k)
+      (<cont2-23> (adatum info k)
        (apply-cont2
          k
-         (define-aexp (get-sexp (cadr^ adatum)) "" value1 info)
+         (define-aexp (define-var^ adatum) "" value1 info)
          value2))
-      (<cont2-31> (info k)
+      (<cont2-24> (info k)
        (apply-cont2 k (func-aexp value1 info) value2))
-      (<cont2-32> (adatum info k)
+      (<cont2-25> (adatum info k)
        (let ((var-info (get-source-info (cadr^ adatum))))
          (apply-cont2
            k
-           (assign-aexp (get-sexp (cadr^ adatum)) value1 var-info info)
+           (assign-aexp
+             (untag-atom^ (cadr^ adatum))
+             value1
+             var-info
+             info)
            value2)))
-      (<cont2-33> (v1 v2 info k)
+      (<cont2-26> (v1 v2 info k)
        (apply-cont2 k (if-aexp v1 v2 value1 info) value2))
-      (<cont2-34> (adatum v1 info handler k)
+      (<cont2-27> (adatum v1 info handler k)
        (aparse
          (cadddr^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-33> v1 value1 info k)))
-      (<cont2-35> (adatum info handler k)
+         (make-cont2 '<cont2-26> v1 value1 info k)))
+      (<cont2-28> (adatum info handler k)
        (aparse
          (caddr^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-34> adatum value1 info handler k)))
-      (<cont2-36> (v1 info k)
+         (make-cont2 '<cont2-27> adatum value1 info handler k)))
+      (<cont2-29> (v1 info k)
        (apply-cont2
          k
          (if-aexp v1 value1 (lit-aexp #f 'none) info)
          value2))
-      (<cont2-37> (adatum info handler k)
+      (<cont2-30> (adatum info handler k)
        (aparse
          (caddr^ adatum)
          handler
          value2
-         (make-cont2 '<cont2-36> value1 info k)))
-      (<cont2-38> (handler k) (aparse value1 handler value2 k))
-      (<cont2-39> (adatum handler k)
-       (if (pattern-macro? value1)
-           (process-macro-clauses^ (macro-clauses^ value1)
-             (macro-aclauses^ value1) adatum handler value2 k)
-           (apply-macro
-             value1
-             adatum
-             (make-cont '<cont-22> adatum value2 k))))
-      (<cont2-40> (fail k) (apply-cont2 k value2 fail))
-      (<cont2-41> (a k) (apply-cont2 k (cons a value1) value2))
-      (<cont2-42> (entries handler k)
-       (aparse-entries
-         (cdr entries)
-         handler
-         value2
-         (make-cont2 '<cont2-41> value1 k)))
-      (<cont2-43> (adatum-list handler k)
+         (make-cont2 '<cont2-29> value1 info k)))
+      (<cont2-31> (handler k) (aparse value1 handler value2 k))
+      (<cont2-32> (a k) (apply-cont2 k (cons a value1) value2))
+      (<cont2-33> (adatum-list handler k)
        (aparse-all
-         (cdr adatum-list)
+         (cdr^ adatum-list)
          handler
          value2
-         (make-cont2 '<cont2-41> value1 k)))
-      (<cont2-44> (exp k)
-       (apply-cont2 k (cons exp value1) value2))
-      (<cont2-45> (src tokens-left handler k)
+         (make-cont2 '<cont2-32> value1 k)))
+      (<cont2-34> (v1 k) (apply-cont2 k (cons v1 value1) value2))
+      (<cont2-35> (src tokens-left handler k)
        (aparse-sexps tokens-left src handler value2
-         (make-cont2 '<cont2-44> value1 k)))
-      (<cont2-46> () (set! *last-fail* value2) (halt* value1))
-      (<cont2-47> ()
+         (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-36> (bodies k)
+       (apply-cont k `(let ,value1 ,@value2 ,@(at^ bodies))))
+      (<cont2-37> (procs vars k2)
+       (apply-cont2
+         k2
+         (cons `(,(car^ vars) 'undefined) value1)
+         (cons `(set! ,(car^ vars) ,(car^ procs)) value2)))
+      (<cont2-38> (exp k)
+       (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))
+      (<cont2-39> (clauses var k2)
+       (let ((clause (car^ clauses)))
+         (if (eq?^ (car^ clause) 'else)
+             (apply-cont2
+               k2
+               (cons `(else-code (lambda () ,@(at^ (cdr^ clause)))) value1)
+               (cons '(else (else-code)) value2))
+             (if (symbol?^ (car^ clause))
+                 (let ((name (car^ clause)))
+                   (apply-cont2
+                     k2
+                     (cons
+                       `(,name (lambda () ,@(at^ (cdr^ clause))))
+                       value1)
+                     (cons `((eq? ,var ',(car^ clause)) (,name)) value2)))
+                 (let ((name (caar^ clause)))
+                   (apply-cont2
+                     k2
+                     (cons
+                       `(,name (lambda () ,@(at^ (cdr^ clause))))
+                       value1)
+                     (cons
+                       `((memq ,var ',(car^ clause)) (,name))
+                       value2)))))))
+      (<cont2-40> (clauses var k2)
+       (let ((clause (car^ clauses)))
+         (if (eq?^ (car^ clause) 'else)
+             (apply-cont2
+               k2
+               (cons `(else-code (lambda () ,@(at^ (cdr^ clause)))) value1)
+               (cons `(else (else-code)) value2))
+             (if (symbol?^ (car^ clause))
+                 (let ((name (car^ clause)))
+                   (apply-cont2
+                     k2
+                     (cons
+                       `(,name
+                          (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
+                       value1)
+                     (cons
+                       `((eq? (car ,var) ',(car^ clause))
+                          (apply ,name (cdr ,var)))
+                       value2)))
+                 (let ((name (caar^ clause)))
+                   (apply-cont2
+                     k2
+                     (cons
+                       `(,name
+                          (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
+                       value1)
+                     (cons
+                       `((memq (car ,var) ',(car^ clause))
+                          (apply ,name (cdr ,var)))
+                       value2)))))))
+      (<cont2-41> (type-tester-name k)
+       (let ((tester-def `(define ,type-tester-name
+                            (lambda (x)
+                              (and (pair? x)
+                                   (not (not (memq (car x) ',value1))))))))
+         (apply-cont k `(begin ,tester-def ,@value2))))
+      (<cont2-42> (def name k2)
+       (apply-cont2 k2 (cons name value1) (cons def value2)))
+      (<cont2-43> (variants k2)
+       (make-dd-variant-constructors^
+         (cdr^ variants)
+         (make-cont2 '<cont2-42> value2 value1 k2)))
+      (<cont2-44> (exp type-name type-tester-name k)
+       (apply-cont
+         k
+         `(let ((r ,exp) ,@value1)
+            (if (not (,type-tester-name r))
+                (error 'cases "~a is not a valid ~a" r ',type-name)
+                (cond ,@value2)))))
+      (<cont2-45> (adatum macro-keyword handler k)
+       (if (pattern-macro? value1)
+           (process-macro-clauses^ (macro-clauses value1)
+             (macro-aclauses value1) adatum handler value2 k)
+           (apply-macro value1 adatum handler value2
+             (make-cont '<cont-28> adatum macro-keyword value2 k))))
+      (<cont2-46> (fail k) (apply-cont2 k value2 fail))
+      (<cont2-47> () (set! *last-fail* value2) (halt* value1))
+      (<cont2-48> ()
        (m value1 toplevel-env REP-handler value2 REP-k))
-      (<cont2-48> () (halt* #t))
-      (<cont2-49> ()
+      (<cont2-49> () (halt* #t))
+      (<cont2-50> ()
        (aparse-sexps value1 'stdin try-parse-handler value2
-         (make-cont2 '<cont2-48>)))
-      (<cont2-50> (src tokens-left env handler k)
+         (make-cont2 '<cont2-49>)))
+      (<cont2-51> (src tokens-left env handler k)
        (if (token-type? (first tokens-left) 'end-marker)
            (apply-cont2 k value1 value2)
            (read-and-eval-asexps tokens-left src env handler value2
              k)))
-      (<cont2-51> (src tokens-left env handler k)
+      (<cont2-52> (src tokens-left env handler k)
        (m value1 env handler value2
-          (make-cont2 '<cont2-50> src tokens-left env handler k)))
-      (<cont2-52> (exp k)
+          (make-cont2 '<cont2-51> src tokens-left env handler k)))
+      (<cont2-53> (exp k)
        (handle-debug-info exp value1)
        (apply-cont2 k value1 value2))
-      (<cont2-53> (args env info handler k)
+      (<cont2-54> (args env info handler k)
        (cond
          ((dlr-exp? value1)
           (apply-cont2 k (dlr-apply value1 args) value2))
@@ -588,11 +613,9 @@
             info
             handler
             value2))))
-      (<cont2-54> (operator env info handler k)
+      (<cont2-55> (operator env info handler k)
        (m operator env handler value2
-          (make-cont2 '<cont2-53> value1 env info handler k)))
-      (<cont2-55> (k)
-       (apply-cont2 k (binding-docstring value1) value2))
+          (make-cont2 '<cont2-54> value1 env info handler k)))
       (<cont2-56> (handler)
        (apply-handler2 handler value1 value2))
       (<cont2-57> (v k) (apply-cont2 k v value2))
@@ -633,44 +656,41 @@
            (m else-exp env handler value2 k)))
       (<cont2-66> (k) (apply-cont2 k (dlr-func value1) value2))
       (<cont2-67> (e handler) (apply-handler2 handler e value2))
-      (<cont2-68> (k2)
-       (decrement-closure-depth)
+      (<cont2-68> (trace-depth k2)
+       (set! trace-depth (- trace-depth 1))
        (printf
-         "~sreturn: ~s~%"
-         (apply string-append (repeat " |" (get-closure-depth)))
+         "~areturn: ~s~%"
+         (make-trace-depth-string trace-depth)
          value1)
        (apply-cont2 k2 value1 value2))
-      (<cont2-69> (v1 k) (apply-cont2 k (cons v1 value1) value2))
-      (<cont2-70> (exps env handler k)
+      (<cont2-69> (exps env handler k)
        (m* (cdr exps) env handler value2
-           (make-cont2 '<cont2-69> value1 k)))
-      (<cont2-71> (exps env handler k)
-       (if (null? (cdr exps))
-           (apply-cont2 k value1 value2)
-           (eval-sequence (cdr exps) env handler value2 k)))
-      (<cont2-72> (handler k2)
+           (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-70> (exps env handler k)
+       (eval-sequence (cdr exps) env handler value2 k))
+      (<cont2-71> (handler k2)
        (m value1 toplevel-env handler value2 k2))
-      (<cont2-73> (handler k2)
-       (read-asexp value1 'stdin handler value2
+      (<cont2-72> (handler k2)
+       (read-sexp value1 'stdin handler value2
          (make-cont4 '<cont4-11> handler k2)))
-      (<cont2-74> (handler k2)
-       (read-asexp value1 'stdin handler value2
+      (<cont2-73> (handler k2)
+       (read-sexp value1 'stdin handler value2
          (make-cont4 '<cont4-12> handler k2)))
-      (<cont2-75> (k)
+      (<cont2-74> (k)
        (if (null? load-stack)
            (printf "WARNING: empty load-stack encountered!\n")
            (set! load-stack (cdr load-stack)))
        (apply-cont2 k void-value value2))
-      (<cont2-76> (filename env handler k)
+      (<cont2-75> (filename env handler k)
        (read-and-eval-asexps value1 filename env handler value2
-         (make-cont2 '<cont2-75> k)))
-      (<cont2-77> (filenames env info handler k)
+         (make-cont2 '<cont2-74> k)))
+      (<cont2-76> (filenames env info handler k)
        (load-files (cdr filenames) env info handler value2 k))
-      (<cont2-78> (filename env2 handler k2)
+      (<cont2-77> (filename env2 handler k2)
        (let ((module (extend env2 '() '())))
          (set-binding-value! value1 module)
          (load-file filename module 'none handler value2 k2)))
-      (<cont2-79> (args sym info handler k)
+      (<cont2-78> (args sym info handler k)
        (cond
          ((null? (cdr args)) (apply-cont2 k value1 value2))
          ((not (environment? value1))
@@ -681,61 +701,65 @@
             value2))
          (else
           (get-primitive (cdr args) value1 info handler value2 k))))
-      (<cont2-80> (iterator proc env handler k)
-       (iterate-continue proc iterator env handler value2 k))
+      (<cont2-79> (ls1 k2)
+       (apply-cont2 k2 (cons (car ls1) value1) value2))
+      (<cont2-80> (lists k2)
+       (append2 (car lists) value1 value2 k2))
       (<cont2-81> (iterator proc env handler k)
+       (iterate-continue proc iterator env handler value2 k))
+      (<cont2-82> (iterator proc env handler k)
        (iterate-collect-continue proc iterator env handler value2
-         (make-cont2 '<cont2-69> value1 k)))
-      (<cont2-82> (list1 proc env handler k)
+         (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-83> (list1 proc env handler k)
        (map1 proc (cdr list1) env handler value2
-         (make-cont2 '<cont2-69> value1 k)))
-      (<cont2-83> (list1 proc k)
+         (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-84> (list1 proc k)
        (apply-cont2
          k
          (cons (dlr-apply proc (list (car list1))) value1)
          value2))
-      (<cont2-84> (list1 list2 proc env handler k)
+      (<cont2-85> (list1 list2 proc env handler k)
        (map2 proc (cdr list1) (cdr list2) env handler value2
-         (make-cont2 '<cont2-69> value1 k)))
-      (<cont2-85> (list1 list2 proc k)
+         (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-86> (list1 list2 proc k)
        (apply-cont2
          k
          (cons
            (dlr-apply proc (list (car list1) (car list2)))
            value1)
          value2))
-      (<cont2-86> (lists proc env handler k)
+      (<cont2-87> (lists proc env handler k)
        (mapN proc (map cdr lists) env handler value2
-         (make-cont2 '<cont2-69> value1 k)))
-      (<cont2-87> (lists proc k)
+         (make-cont2 '<cont2-34> value1 k)))
+      (<cont2-88> (lists proc k)
        (apply-cont2
          k
          (cons (dlr-apply proc (map car lists)) value1)
          value2))
-      (<cont2-88> (arg-list proc env handler k)
+      (<cont2-89> (arg-list proc env handler k)
        (for-each-primitive proc (map cdr arg-list) env handler
          value2 k))
-      (<cont2-89> (new-acdr1 new-cdr1 s-car k)
+      (<cont2-90> (new-acdr1 new-cdr1 s-car k)
        (unify-patterns^ new-cdr1 value1 new-acdr1 value2
-         (make-cont '<cont-46> s-car k)))
-      (<cont2-90> (apair2 pair2 s-car k)
+         (make-cont '<cont-50> s-car k)))
+      (<cont2-91> (apair2 pair2 s-car k)
        (instantiate^
          (cdr pair2)
          s-car
-         (^cdr^ apair2)
-         (make-cont2 '<cont2-89> value2 value1 s-car k)))
-      (<cont2-91> (a aa ap k2)
+         (cdr^ apair2)
+         (make-cont2 '<cont2-90> value2 value1 s-car k)))
+      (<cont2-92> (a aa ap k2)
        (apply-cont2
          k2
          (cons a value1)
          (cons^ aa value2 (get-source-info ap))))
-      (<cont2-92> (ap pattern s k2)
+      (<cont2-93> (ap pattern s k2)
        (instantiate^
          (cdr pattern)
          s
-         (^cdr^ ap)
-         (make-cont2 '<cont2-91> value1 value2 ap k2)))
-      (<cont2-93> (s2 k2) (instantiate^ value1 s2 value2 k2))
+         (cdr^ ap)
+         (make-cont2 '<cont2-92> value1 value2 ap k2)))
+      (<cont2-94> (s2 k2) (instantiate^ value1 s2 value2 k2))
       (else (error 'apply-cont2 "bad continuation2: ~a" k)))))
 
 ;;----------------------------------------------------------------------
@@ -765,53 +789,50 @@
   (lambda (k value1 value2 value3 value4)
     (record-case (cdr k)
       (<cont4-1> (src start k)
-       (apply-cont4 k
-         (make-asexp src start value2 (list->vector value1)) value2
-         value3 value4))
+       (annotate-cps
+         (list->vector value1)
+         (make-info src start value2)
+         (make-cont '<cont-8> value2 value3 value4 k)))
       (<cont4-2> (src start k)
-       (apply-cont4 k (make-asexp src start value2 value1) value2
-         value3 value4))
-      (<cont4-3> (keyword keyword-end src start k)
-       (apply-cont4 k
-         (make-asexp
-           src
-           start
-           value2
-           (list (make-asexp src start keyword-end keyword) value1))
-         value2 value3 value4))
-      (<cont4-4> (asexp1 k)
-       (apply-cont4 k (cons asexp1 value1) value2 value3 value4))
+       (annotate-cps
+         value1
+         (make-info src start value2)
+         (make-cont '<cont-8> value2 value3 value4 k)))
+      (<cont4-3> (src start v k)
+       (annotate-cps
+         (list v value1)
+         (make-info src start value2)
+         (make-cont '<cont-8> value2 value3 value4 k)))
+      (<cont4-4> (sexp1 k)
+       (apply-cont4 k (cons sexp1 value1) value2 value3 value4))
       (<cont4-5> (src handler k)
-       (read-avector-sequence value3 src handler value4
+       (read-vector-sequence value3 src handler value4
          (make-cont4 '<cont4-4> value1 k)))
-      (<cont4-6> (asexp1 expected-terminator src handler k)
-       (if (or (null?^ value1) (pair?^ value1))
-           (close-asexp-sequence (cons asexp1 (get-sexp value1)) value3
-             expected-terminator src handler value4 k)
-           (close-asexp-sequence (cons asexp1 value1) value3
-             expected-terminator src handler value4 k)))
+      (<cont4-6> (expected-terminator sexp1 src handler k)
+       (close-sexp-sequence (cons sexp1 value1) value3
+         expected-terminator src handler value4 k))
       (<cont4-7> (expected-terminator src handler k)
        (if (token-type? (first value3) 'dot)
-           (read-asexp (rest-of value3) src handler value4
-             (make-cont4 '<cont4-6> value1 expected-terminator src
+           (read-sexp (rest-of value3) src handler value4
+             (make-cont4 '<cont4-6> expected-terminator value1 src
                handler k))
-           (read-asexp-sequence value3 expected-terminator src handler
+           (read-sexp-sequence value3 expected-terminator src handler
              value4 (make-cont4 '<cont4-4> value1 k))))
       (<cont4-8> (src handler k)
        (aparse
          value1
          handler
          value4
-         (make-cont2 '<cont2-45> src value3 handler k)))
+         (make-cont2 '<cont2-35> src value3 handler k)))
       (<cont4-9> ()
        (set! *tokens-left* value3)
-       (aparse value1 REP-handler value4 (make-cont2 '<cont2-47>)))
+       (aparse value1 REP-handler value4 (make-cont2 '<cont2-48>)))
       (<cont4-10> (src env handler k)
        (aparse
          value1
          handler
          value4
-         (make-cont2 '<cont2-51> src value3 env handler k)))
+         (make-cont2 '<cont2-52> src value3 env handler k)))
       (<cont4-11> (handler k2)
        (if (token-type? (first value3) 'end-marker)
            (aparse value1 handler value4 k2)
@@ -896,22 +917,22 @@
   apply-proc
   (lambda (proc args env2 info handler fail k2)
     (record-case (cdr proc)
-      (<proc-1> (bodies name formals env)
+      (<proc-1> (bodies name trace-depth formals env)
        (if (= (length args) (length formals))
            (begin
              (printf
-               "~scall: ~s~%"
-               (apply string-append (repeat " |" (get-closure-depth)))
+               "~acall: ~s~%"
+               (make-trace-depth-string trace-depth)
                (cons name args))
-             (increment-closure-depth)
+             (set! trace-depth (+ trace-depth 1))
              (eval-sequence bodies (extend env formals args) handler fail
-               (make-cont2 '<cont2-68> k2)))
+               (make-cont2 '<cont2-68> trace-depth k2)))
            (runtime-error
              "incorrect number of arguments in application"
              info
              handler
              fail)))
-      (<proc-2> (bodies name formals runt env)
+      (<proc-2> (bodies name trace-depth formals runt env)
        (if (>= (length args) (length formals))
            (let ((new-env (extend
                             env
@@ -920,12 +941,12 @@
                               (list-tail args (length formals))
                               (list-head args (length formals))))))
              (printf
-               "~scall: ~s~%"
-               (apply string-append (repeat " |" (get-closure-depth)))
+               "~acall: ~s~%"
+               (make-trace-depth-string trace-depth)
                (cons name args))
-             (increment-closure-depth)
+             (set! trace-depth (+ trace-depth 1))
              (eval-sequence bodies new-env handler fail
-               (make-cont2 '<cont2-68> k2)))
+               (make-cont2 '<cont2-68> trace-depth k2)))
            (runtime-error
              "not enough arguments in application"
              info
@@ -960,11 +981,11 @@
       (<proc-8> ()
        (reannotate-cps
          (car args)
-         (make-cont '<cont-36> handler fail k2)))
+         (make-cont '<cont-42> handler fail k2)))
       (<proc-9> ()
        (reannotate-cps
          (car args)
-         (make-cont '<cont-37> handler fail k2)))
+         (make-cont '<cont-43> handler fail k2)))
       (<proc-10> ()
        (cond
          ((not (length-one? args))
@@ -1004,10 +1025,10 @@
       (<proc-12> () (apply-cont2 k2 (aunparse (car args)) fail))
       (<proc-13> ()
        (scan-input (car args) 'stdin handler fail
-         (make-cont2 '<cont2-73> handler k2)))
+         (make-cont2 '<cont2-72> handler k2)))
       (<proc-14> ()
        (scan-input (car args) 'stdin handler fail
-         (make-cont2 '<cont2-74> handler k2)))
+         (make-cont2 '<cont2-73> handler k2)))
       (<proc-15> ()
        (let ((proc (car args)) (proc-args (cadr args)))
          (apply-proc proc proc-args env2 info handler fail k2)))
@@ -1179,6 +1200,12 @@
          (else (apply-cont2 k2 (apply cons args) fail))))
       (<proc-39> ()
        (cond
+         ((not (length-one? args))
+          (runtime-error
+            "incorrect number of arguments to car"
+            info
+            handler
+            fail))
          ((not (pair? (car args)))
           (runtime-error
             (format "car called on non-pair ~s" (car args))
@@ -1188,6 +1215,12 @@
          (else (apply-cont2 k2 (apply car args) fail))))
       (<proc-40> ()
        (cond
+         ((not (length-one? args))
+          (runtime-error
+            "incorrect number of arguments to cdr"
+            info
+            handler
+            fail))
          ((not (pair? (car args)))
           (runtime-error
             (format "cdr called on non-pair ~s" (car args))
@@ -1197,6 +1230,12 @@
          (else (apply-cont2 k2 (apply cdr args) fail))))
       (<proc-41> ()
        (cond
+         ((not (length-one? args))
+          (runtime-error
+            "incorrect number of arguments to cadr"
+            info
+            handler
+            fail))
          ((not (length-at-least? 2 (car args)))
           (runtime-error
             (format
@@ -1208,6 +1247,12 @@
          (else (apply-cont2 k2 (apply cadr args) fail))))
       (<proc-42> ()
        (cond
+         ((not (length-one? args))
+          (runtime-error
+            "incorrect number of arguments to caddr"
+            info
+            handler
+            fail))
          ((not (length-at-least? 3 (car args)))
           (runtime-error
             (format
@@ -1383,7 +1428,7 @@
            (equal-objects?
              (car args)
              (cadr args)
-             (make-cont '<cont-38> fail k2))))
+             (make-cont '<cont-44> fail k2))))
       (<proc-56> ()
        (cond
          ((not (length-two? args))
@@ -1462,7 +1507,7 @@
              (load-file filename env2 'none handler fail k2)
              (let ((module-name (cadr args)))
                (lookup-binding-in-first-frame module-name env2 handler fail
-                 (make-cont2 '<cont2-78> filename env2 handler k2))))))
+                 (make-cont2 '<cont2-77> filename env2 handler k2))))))
       (<proc-63> ()
        (get-primitive args env2 info handler fail k2))
       (<proc-64> (k) (apply-cont2 k (car args) fail))
@@ -1524,9 +1569,7 @@
             handler
             fail))
          (else (apply-cont2 k2 (apply reverse args) fail))))
-      (<proc-70> ()
-       (cond
-         (else (append-all args (make-cont '<cont-38> fail k2)))))
+      (<proc-70> () (append-all args info handler fail k2))
       (<proc-71> ()
        (cond
          ((not (length-one? args))
@@ -1647,7 +1690,7 @@
 
 (define*
   apply-macro
-  (lambda (macro datum k)
+  (lambda (macro datum handler fail k)
     (record-case (cdr macro)
       (<macro-1> ()
        (if (symbol?^ (cadr^ datum))
@@ -1658,13 +1701,15 @@
                   (bodies (cdddr^ datum)))
              (apply-cont
                k
-               `(letrec ((,name (lambda (unquote vars) ,@bodies)))
-                  (,name ,@exps))))
+               `(letrec ((,name (lambda ,vars ,@(at^ bodies))))
+                  (,name ,@(at^ exps)))))
            (let* ((bindings (cadr^ datum))
                   (vars (map^ car^ bindings))
                   (exps (map^ cadr^ bindings))
                   (bodies (cddr^ datum)))
-             (apply-cont k `((lambda (unquote vars) ,@bodies) ,@exps)))))
+             (apply-cont
+               k
+               `((lambda ,vars ,@(at^ bodies)) ,@(at^ exps))))))
       (<macro-2> ()
        (let* ((decls (cadr^ datum))
               (vars (map^ car^ decls))
@@ -1673,53 +1718,63 @@
          (create-letrec-assignments^
            vars
            procs
-           (make-cont2 '<cont2-6> bodies k))))
+           (make-cont2 '<cont2-36> bodies k))))
       (<macro-3> ()
-       (let ((name (car^ (cadr^ datum)))
-             (formals (cdr^ (cadr^ datum)))
+       (let ((name (caadr^ datum))
+             (formals (cdadr^ datum))
              (bodies (cddr^ datum)))
          (apply-cont
            k
-           `(define (unquote name)
-              (lambda (unquote formals) ,@bodies)))))
+           `(define ,name (lambda ,formals ,@(at^ bodies))))))
       (<macro-4> ()
        (let ((exps (cdr^ datum)))
          (cond
-           ((null? exps) (apply-cont k '#t))
-           ((null? (cdr exps)) (apply-cont k (car exps)))
-           (else
-            (apply-cont k `(if ,(car exps) (and ,@(cdr exps)) #f))))))
-      (<macro-5> ()
-       (let ((exps (cdr^ datum)))
-         (cond
-           ((null? exps) (apply-cont k '#f))
-           ((null? (cdr exps)) (apply-cont k (car exps)))
+           ((null?^ exps) (apply-cont k '#t))
+           ((null?^ (cdr^ exps)) (apply-cont k (car^ exps)))
            (else
             (apply-cont
               k
-              `(let ((bool ,(car exps))
-                     (else-code (lambda () (or ,@(cdr exps)))))
+              `(if ,(car^ exps) (and ,@(at^ (cdr^ exps))) #f))))))
+      (<macro-5> ()
+       (let ((exps (cdr^ datum)))
+         (cond
+           ((null?^ exps) (apply-cont k '#f))
+           ((null?^ (cdr^ exps)) (apply-cont k (car^ exps)))
+           (else
+            (apply-cont
+              k
+              `(let ((bool ,(car^ exps))
+                     (else-code (lambda () (or ,@(at^ (cdr^ exps))))))
                  (if bool bool (else-code))))))))
       (<macro-6> ()
        (let ((clauses (cdr^ datum)))
-         (if (null? clauses)
-             (amacro-error 'cond-transformer^ datum)
-             (let ((first-clause (car clauses))
-                   (other-clauses (cdr clauses)))
+         (if (null?^ clauses)
+             (amacro-error "empty (cond) expression" datum handler fail)
+             (let ((first-clause (car^ clauses))
+                   (other-clauses (cdr^ clauses)))
                (if (or (null?^ first-clause) (not (list?^ first-clause)))
-                   (amacro-error 'cond-transformer^ datum)
+                   (amacro-error
+                     "improper cond clause"
+                     first-clause
+                     handler
+                     fail)
                    (let ((test-exp (car^ first-clause))
                          (then-exps (cdr^ first-clause)))
                      (cond
                        ((eq?^ test-exp 'else)
                         (cond
-                          ((null? then-exps)
-                           (amacro-error 'cond-transformer^ '(else)))
-                          ((null? (cdr then-exps))
-                           (apply-cont k (car then-exps)))
-                          (else (apply-cont k `(begin ,@then-exps)))))
-                       ((null? then-exps)
-                        (if (null? other-clauses)
+                          ((null?^ then-exps)
+                           (amacro-error
+                             "improper else clause"
+                             first-clause
+                             handler
+                             fail))
+                          ((null?^ (cdr^ then-exps))
+                           (apply-cont k (car^ then-exps)))
+                          (else
+                           (apply-cont k `(begin ,@(at^ then-exps))))))
+                       ((null?^ then-exps)
+                        (if (null?^ other-clauses)
                             (apply-cont
                               k
                               `(let ((bool ,test-exp)) (if bool bool)))
@@ -1728,103 +1783,96 @@
                               `(let ((bool ,test-exp)
                                      (else-code (lambda ()
                                                   (cond
-                                                    (unquote-splicing
-                                                     other-clauses)))))
+                                                    ,@(at^ other-clauses)))))
                                  (if bool bool (else-code))))))
-                       ((eq?^ (car then-exps) '=>)
+                       ((eq?^ (car^ then-exps) '=>)
                         (cond
-                          ((null? (cdr then-exps))
-                           (amacro-error 'cond-transformer^ first-clause))
-                          ((null? other-clauses)
+                          ((null?^ (cdr^ then-exps))
+                           (amacro-error
+                             "improper => clause"
+                             first-clause
+                             handler
+                             fail))
+                          ((null?^ other-clauses)
                            (apply-cont
                              k
                              `(let ((bool ,test-exp)
-                                    (th (lambda () ,(cadr then-exps))))
+                                    (th (lambda () ,(cadr^ then-exps))))
                                 (if bool ((th) bool)))))
                           (else
                            (apply-cont
                              k
                              `(let ((bool ,test-exp)
-                                    (th (lambda () ,(cadr then-exps)))
+                                    (th (lambda () ,(cadr^ then-exps)))
                                     (else-code (lambda ()
                                                  (cond
-                                                   (unquote-splicing
-                                                    other-clauses)))))
+                                                   ,@(at^ other-clauses)))))
                                 (if bool ((th) bool) (else-code)))))))
-                       ((null? other-clauses)
-                        (if (null? (cdr then-exps))
-                            (apply-cont k `(if ,test-exp ,(car then-exps)))
+                       ((null?^ other-clauses)
+                        (if (null?^ (cdr^ then-exps))
                             (apply-cont
                               k
-                              `(if ,test-exp (begin ,@then-exps)))))
-                       ((null? (cdr then-exps))
+                              `(if ,test-exp ,(car^ then-exps)))
+                            (apply-cont
+                              k
+                              `(if ,test-exp (begin ,@(at^ then-exps))))))
+                       ((null?^ (cdr^ then-exps))
                         (apply-cont
                           k
                           `(if ,test-exp
-                               ,(car then-exps)
-                               (cond (unquote-splicing other-clauses)))))
+                               ,(car^ then-exps)
+                               (cond ,@(at^ other-clauses)))))
                        (else
                         (apply-cont
                           k
                           `(if ,test-exp
-                               (begin ,@then-exps)
-                               (cond
-                                 (unquote-splicing
-                                  other-clauses))))))))))))
+                               (begin ,@(at^ then-exps))
+                               (cond ,@(at^ other-clauses))))))))))))
       (<macro-7> ()
-       (let ((bindings (get-sexp (cadr^ datum)))
-             (bodies (cddr^ datum)))
+       (let ((bindings (cadr^ datum)) (bodies (cddr^ datum)))
          (nest-let*-bindings^ bindings bodies k)))
       (<macro-8> ()
        (let ((exp (cadr^ datum)) (clauses (cddr^ datum)))
          (case-clauses->cond-clauses^
            'r
            clauses
-           (make-cont2 '<cont2-8> exp k))))
+           (make-cont2 '<cont2-38> exp k))))
       (<macro-9> ()
        (let ((exp (cadr^ datum)) (clauses (cddr^ datum)))
          (record-case-clauses->cond-clauses^
            'r
            clauses
-           (make-cont2 '<cont2-8> exp k))))
+           (make-cont2 '<cont2-38> exp k))))
       (<macro-10> ()
-       (let* ((datatype-name (get-sexp (cadr^ datum)))
+       (let* ((datatype-name (cadr^ datum))
               (type-tester-name (string->symbol
                                   (string-append
-                                    (symbol->string datatype-name)
+                                    (symbol->string^ datatype-name)
                                     "?"))))
-         (if (not (eq?^ (cadr (cdr^ datum)) type-tester-name))
-             (amacro-error 'define-datatype-transformer^ datum)
-             (let* ((variants (cddr (cdr^ datum)))
-                    (variant-names (define-datatype-variant-names
-                                     variants))
-                    (variant-tests (define-datatype-variant-tests
-                                     variants))
-                    (tester-def `(define (unquote type-tester-name)
-                                   (lambda (x)
-                                     (and (pair? x)
-                                          (not (not (memq
-                                                      (car x)
-                                                      ',variant-names))))))))
-               (apply-cont
-                 k
-                 `(begin
-                    ,tester-def
-                    ,@(make-define-datatype-defines
-                        variant-names
-                        variant-tests)))))))
+         (if (not (eq?^ (caddr^ datum) type-tester-name))
+             (amacro-error
+               (format
+                 "datatype tester predicate not named ~a"
+                 type-tester-name)
+               (caddr^ datum)
+               handler
+               fail)
+             (let ((variants (cdddr^ datum)))
+               (make-dd-variant-constructors^
+                 variants
+                 (make-cont2 '<cont2-41> type-tester-name k))))))
       (<macro-11> ()
-       (let* ((type-name (get-sexp (cadr^ datum)))
+       (let* ((type-name (cadr^ datum))
               (type-tester-name (string->symbol
                                   (string-append
-                                    (symbol->string type-name)
+                                    (symbol->string^ type-name)
                                     "?")))
               (exp (caddr^ datum))
               (clauses (cdddr^ datum)))
          (record-case-clauses->cond-clauses^
            'r
            clauses
-           (make-cont2 '<cont2-11> exp type-name type-tester-name k))))
+           (make-cont2 '<cont2-44> exp type-name type-tester-name k))))
       (else (error
              'apply-macro
              "bad macro-transformer: ~a"
@@ -1928,62 +1976,56 @@
   (lambda (token-type buffer src handler fail k)
     (let ((buffer (reverse buffer)))
       (case token-type
-        (end-marker (apply-cont k (make-token 'end-marker)))
+        (end-marker (apply-cont k (make-token1 'end-marker)))
         (integer
-         (apply-cont
-           k
-           (make-info-token 'integer (list->string buffer))))
+         (apply-cont k (make-token2 'integer (list->string buffer))))
         (decimal
-         (apply-cont
-           k
-           (make-info-token 'decimal (list->string buffer))))
+         (apply-cont k (make-token2 'decimal (list->string buffer))))
         (rational
          (apply-cont
            k
-           (make-info-token 'rational (list->string buffer))))
+           (make-token2 'rational (list->string buffer))))
         (identifier
          (apply-cont
            k
-           (make-info-token
+           (make-token2
              'identifier
              (string->symbol (list->string buffer)))))
         (boolean
          (apply-cont
            k
-           (make-info-token
+           (make-token2
              'boolean
              (or (char=? (car buffer) #\t) (char=? (car buffer) #\T)))))
         (character
-         (apply-cont k (make-info-token 'character (car buffer))))
+         (apply-cont k (make-token2 'character (car buffer))))
         (named-character
          (let ((name (list->string buffer)))
            (cond
              ((string=? name "nul")
-              (apply-cont k (make-info-token 'character #\nul)))
+              (apply-cont k (make-token2 'character #\nul)))
              ((string=? name "space")
-              (apply-cont k (make-info-token 'character #\space)))
+              (apply-cont k (make-token2 'character #\space)))
              ((string=? name "tab")
-              (apply-cont k (make-info-token 'character #\tab)))
+              (apply-cont k (make-token2 'character #\tab)))
              ((string=? name "newline")
-              (apply-cont k (make-info-token 'character #\newline)))
+              (apply-cont k (make-token2 'character #\newline)))
              ((string=? name "linefeed")
-              (apply-cont k (make-info-token 'character #\newline)))
+              (apply-cont k (make-token2 'character #\newline)))
              ((string=? name "backspace")
-              (apply-cont k (make-info-token 'character #\backspace)))
+              (apply-cont k (make-token2 'character #\backspace)))
              ((string=? name "return")
-              (apply-cont k (make-info-token 'character #\return)))
+              (apply-cont k (make-token2 'character #\return)))
              ((string=? name "page")
-              (apply-cont k (make-info-token 'character #\page)))
+              (apply-cont k (make-token2 'character #\page)))
              (else
               (scan-error (format "invalid character name #\\~a" name)
                 token-start-line token-start-char src handler fail)))))
         (string
-         (apply-cont
-           k
-           (make-info-token 'string (list->string buffer))))
-        (else (apply-cont k (make-token token-type)))))))
+         (apply-cont k (make-token2 'string (list->string buffer))))
+        (else (apply-cont k (make-token1 token-type)))))))
 
-(define make-token
+(define make-token1
   (lambda (token-type)
     (let ((start (list
                    token-start-line
@@ -1997,7 +2039,7 @@
           (list token-type end end)
           (list token-type start end)))))
 
-(define make-info-token
+(define make-token2
   (lambda (token-type token-info)
     (list
       token-type
@@ -2024,23 +2066,21 @@
 (define get-token-start-pos
   (lambda (token) (caddr (get-token-start token))))
 
-(define snoc
-  (lambda (x lyst)
-    (cond
-      ((null? lyst) (list x))
-      (else (cons (car lyst) (snoc x (cdr lyst)))))))
-
 (define rac
-  (lambda (lyst)
-    (cond
-      ((null? (cdr lyst)) (car lyst))
-      (else (rac (cdr lyst))))))
+  (lambda (ls)
+    (cond ((null? (cdr ls)) (car ls)) (else (rac (cdr ls))))))
 
 (define rdc
-  (lambda (lyst)
+  (lambda (ls)
     (cond
-      ((null? (cdr lyst)) '())
-      (else (cons (car lyst) (rdc (cdr lyst)))))))
+      ((null? (cdr ls)) '())
+      (else (cons (car ls) (rdc (cdr ls)))))))
+
+(define snoc
+  (lambda (x ls)
+    (cond
+      ((null? ls) (list x))
+      (else (cons (car ls) (snoc x (cdr ls)))))))
 
 (define char-delimiter?
   (lambda (c)
@@ -2241,6 +2281,169 @@
          (else 'error)))
       (else (error 'apply-state "invalid state: ~a" state)))))
 
+(define aatom?
+  (lambda (x) (and (pair? x) (eq? (car x) atom-tag))))
+
+(define apair?
+  (lambda (x) (and (pair? x) (eq? (car x) pair-tag))))
+
+(define annotated?
+  (lambda (x)
+    (and (pair? x)
+         (or (eq? (car x) atom-tag) (eq? (car x) pair-tag)))))
+
+(define untag-atom^ (lambda (aatom) (cadr aatom)))
+
+(define atom?^ (lambda (asexp) (eq? (car asexp) atom-tag)))
+
+(define pair?^ (lambda (asexp) (eq? (car asexp) pair-tag)))
+
+(define null?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (null? (untag-atom^ asexp)))))
+
+(define symbol?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (symbol? (untag-atom^ asexp)))))
+
+(define string?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (string? (untag-atom^ asexp)))))
+
+(define vector?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (vector? (untag-atom^ asexp)))))
+
+(define car^ (lambda (asexp) (cadr asexp)))
+
+(define cdr^ (lambda (asexp) (caddr asexp)))
+
+(define cadr^ (lambda (asexp) (car^ (cdr^ asexp))))
+
+(define cdar^ (lambda (asexp) (cdr^ (car^ asexp))))
+
+(define caar^ (lambda (asexp) (car^ (car^ asexp))))
+
+(define cddr^ (lambda (asexp) (cdr^ (cdr^ asexp))))
+
+(define cdddr^ (lambda (asexp) (cdr^ (cdr^ (cdr^ asexp)))))
+
+(define caddr^ (lambda (asexp) (car^ (cdr^ (cdr^ asexp)))))
+
+(define cdadr^ (lambda (asexp) (cdr^ (car^ (cdr^ asexp)))))
+
+(define cadar^ (lambda (asexp) (car^ (cdr^ (car^ asexp)))))
+
+(define caadr^ (lambda (asexp) (car^ (car^ (cdr^ asexp)))))
+
+(define cadddr^
+  (lambda (asexp) (car^ (cdr^ (cdr^ (cdr^ asexp))))))
+
+(define eq?^ (lambda (asexp sym) (eq? (cadr asexp) sym)))
+
+(define vector->list^
+  (lambda (asexp) (vector->list (cadr asexp))))
+
+(define symbol->string^
+  (lambda (asexp) (symbol->string (cadr asexp))))
+
+(define list?^
+  (lambda (asexp)
+    (or (null?^ asexp)
+        (and (pair?^ asexp) (list?^ (caddr asexp))))))
+
+(define at^
+  (lambda (alist)
+    (if (null?^ alist)
+        '()
+        (cons (car^ alist) (at^ (cdr^ alist))))))
+
+(define length^
+  (lambda (asexp)
+    (cond
+      ((null?^ asexp) 0)
+      (else (+ 1 (length^ (cdr^ asexp)))))))
+
+(define cons^ (lambda (a b info) (list pair-tag a b info)))
+
+(define map^
+  (lambda (f^ asexp)
+    (cond
+      ((null?^ asexp) (list atom-tag '() 'none))
+      (else
+       (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
+
+(define annotate
+  (lambda (x info)
+    (cond
+      ((not *reader-generates-annotated-sexps?*) x)
+      ((annotated? x) x)
+      ((pair? x)
+       (list
+         pair-tag
+         (annotate (car x) 'none)
+         (annotate (cdr x) 'none)
+         info))
+      (else (list atom-tag x info)))))
+
+(define annotate-cps
+  (lambda (x info k)
+    (cond
+      ((not *reader-generates-annotated-sexps?*) (apply-cont k x))
+      ((annotated? x) (apply-cont k x))
+      ((pair? x)
+       (annotate-cps (car x) 'none (make-cont '<cont-3> x info k)))
+      (else (apply-cont k (list atom-tag x info))))))
+
+(define*
+  unannotate-cps
+  (lambda (x k)
+    (cond
+      ((aatom? x) (unannotate-cps (cadr x) k))
+      ((apair? x)
+       (unannotate-cps (cadr x) (make-cont '<cont-7> x k)))
+      ((pair? x)
+       (unannotate-cps (car x) (make-cont '<cont-6> x k)))
+      ((vector? x)
+       (unannotate-cps (vector->list x) (make-cont '<cont-4> k)))
+      (else (apply-cont k x)))))
+
+(define make-info
+  (lambda (src start end) (cons src (append start end))))
+
+(define replace-info
+  (lambda (asexp new-info)
+    (if (atom?^ asexp)
+        (list atom-tag (cadr asexp) new-info)
+        (list pair-tag (cadr asexp) (caddr asexp) new-info))))
+
+(define get-srcfile (lambda (info) (car info)))
+
+(define get-start-line (lambda (info) (cadr info)))
+
+(define get-start-char (lambda (info) (caddr info)))
+
+(define get-start-pos (lambda (info) (cadddr info)))
+
+(define get-end-line (lambda (info) (car (cddddr info))))
+
+(define get-end-char (lambda (info) (cadr (cddddr info))))
+
+(define get-end-pos (lambda (info) (caddr (cddddr info))))
+
+(define get-source-info (lambda (asexp) (rac asexp)))
+
+(define source-info?
+  (lambda (x) (or (eq? x 'none) (list? x))))
+
+(define has-source-info?
+  (lambda (asexp) (not (eq? (get-source-info asexp) 'none))))
+
+(define original-source-info?
+  (lambda (asexp)
+    (and (has-source-info? asexp)
+         (= (length (get-source-info asexp)) 7))))
+
 (define first (lambda (x) (car x)))
 
 (define rest-of (lambda (x) (cdr x)))
@@ -2297,219 +2500,92 @@
                 '()
                 (cons char (loop (read-char port))))))))))
 
-(define make-asexp
-  (lambda (src start end sexp)
-    (list asexp-tag sexp (cons src (append start end)))))
-
-(define retag
-  (lambda (sexp info) (list asexp-tag sexp info)))
-
-(define asexp?
-  (lambda (x) (and (pair? x) (eq? (car x) asexp-tag))))
-
-(define get-sexp (lambda (asexp) (cadr asexp)))
-
-(define get-source-info (lambda (asexp) (caddr asexp)))
-
-(define get-srcfile (lambda (info) (car info)))
-
-(define get-start-line (lambda (info) (cadr info)))
-
-(define get-start-char (lambda (info) (caddr info)))
-
-(define get-start-pos (lambda (info) (cadddr info)))
-
-(define get-end-line (lambda (info) (car (cddddr info))))
-
-(define get-end-char (lambda (info) (cadr (cddddr info))))
-
-(define get-end-pos (lambda (info) (caddr (cddddr info))))
-
-(define has-source-info?
-  (lambda (asexp) (not (eq? (get-source-info asexp) 'none))))
-
-(define original-source-info?
-  (lambda (asexp)
-    (and (has-source-info? asexp)
-         (= (length (get-source-info asexp)) 7))))
-
-(define source-info?
-  (lambda (x) (or (eq? x 'none) (list? x))))
-
-(define replace-info
-  (lambda (asexp info) (retag (get-sexp asexp) info)))
-
-(define car^ (lambda (asexp) (car (get-sexp asexp))))
-
-(define cdr^ (lambda (asexp) (cdr (get-sexp asexp))))
-
-(define cddr^ (lambda (asexp) (cddr (get-sexp asexp))))
-
-(define cdddr^ (lambda (asexp) (cdddr (get-sexp asexp))))
-
-(define cadr^ (lambda (asexp) (cadr (get-sexp asexp))))
-
-(define caddr^ (lambda (asexp) (caddr (get-sexp asexp))))
-
-(define cadddr^ (lambda (asexp) (cadddr (get-sexp asexp))))
-
-(define map^ (lambda (f asexp) (map f (get-sexp asexp))))
-
-(define symbol?^
-  (lambda (asexp) (symbol? (get-sexp asexp))))
-
-(define string?^
-  (lambda (asexp) (string? (get-sexp asexp))))
-
-(define length^ (lambda (asexp) (length (get-sexp asexp))))
-
-(define eq?^ (lambda (asexp x) (eq? (get-sexp asexp) x)))
-
-(define vector?^
-  (lambda (asexp) (vector? (get-sexp asexp))))
-
-(define vector->list^
-  (lambda (asexp) (vector->list (get-sexp asexp))))
-
-(define cons^
-  (lambda (a b info)
-    (cond
-      ((null?^ b) (retag (list a) info))
-      ((pair?^ b) (retag (cons a (get-sexp b)) info))
-      (else (retag (cons a b) info)))))
-
-(define ^cdr^
-  (lambda (asexp)
-    (if (asexp? (cdr^ asexp))
-        (cdr^ asexp)
-        (retag (cdr^ asexp) 'none))))
-
-(define null?^
-  (lambda (x) (and (asexp? x) (null? (get-sexp x)))))
-
-(define pair?^
-  (lambda (x) (and (asexp? x) (pair? (get-sexp x)))))
-
-(define list?^
-  (lambda (x) (and (asexp? x) (list-of-asexp? (get-sexp x)))))
-
-(define list-of-asexp?
-  (lambda (x)
-    (or (null? x)
-        (and (pair? x)
-             (asexp? (car x))
-             (or (list-of-asexp? (cdr x)) (list?^ (cdr x)))))))
-
 (define*
-  unannotate-cps
-  (lambda (x k)
-    (cond
-      ((asexp? x) (unannotate-cps (get-sexp x) k))
-      ((pair? x)
-       (unannotate-cps (car x) (make-cont '<cont-4> x k)))
-      ((vector? x)
-       (unannotate-cps (vector->list x) (make-cont '<cont-2> k)))
-      (else (apply-cont k x)))))
-
-(define*
-  reannotate-cps
-  (lambda (x k)
-    (cond
-      ((asexp? x) (apply-cont k x))
-      ((pair? x) (reannotate-seq-cps x (make-cont '<cont-6> k)))
-      ((vector? x)
-       (reannotate-seq-cps
-         (vector->list x)
-         (make-cont '<cont-5> k)))
-      (else (apply-cont k (retag x 'none))))))
-
-(define*
-  reannotate-seq-cps
-  (lambda (x k)
-    (cond
-      ((null? x) (apply-cont k '()))
-      ((asexp? x) (apply-cont k x))
-      ((not (pair? x)) (reannotate-cps x k))
-      ((or (null?^ (cdr x)) (pair?^ (cdr x)))
-       (reannotate-seq-cps (cons (car x) (get-sexp (cdr x))) k))
-      (else (reannotate-cps (car x) (make-cont '<cont-7> x k))))))
-
-(define*
-  read-asexp
+  read-sexp
   (lambda (tokens src handler fail k)
     (let ((start (get-token-start (first tokens)))
           (end (get-token-end (first tokens))))
       (record-case (first tokens)
         (integer (str)
-         (apply-cont4 k
-           (make-asexp src start end (string->integer str)) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           (string->integer str)
+           (make-info src start end)
+           (make-cont '<cont-9> end tokens fail k)))
         (decimal (str)
-         (apply-cont4 k
-           (make-asexp src start end (string->decimal str)) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           (string->decimal str)
+           (make-info src start end)
+           (make-cont '<cont-10> end tokens fail k)))
         (rational (str)
          (let ((num (string->rational str)))
            (if (true? num)
-               (apply-cont4 k (make-asexp src start end num) end
-                 (rest-of tokens) fail)
+               (annotate-cps
+                 num
+                 (make-info src start end)
+                 (make-cont '<cont-9> end tokens fail k))
                (read-error (format "cannot represent ~a" str) tokens src
                  handler fail))))
         (boolean (bool)
-         (apply-cont4 k (make-asexp src start end bool) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           bool
+           (make-info src start end)
+           (make-cont '<cont-9> end tokens fail k)))
         (character (char)
-         (apply-cont4 k (make-asexp src start end char) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           char
+           (make-info src start end)
+           (make-cont '<cont-9> end tokens fail k)))
         (string (str)
-         (apply-cont4 k (make-asexp src start end str) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           str
+           (make-info src start end)
+           (make-cont '<cont-9> end tokens fail k)))
         (identifier (id)
-         (apply-cont4 k (make-asexp src start end id) end
-           (rest-of tokens) fail))
+         (annotate-cps
+           id
+           (make-info src start end)
+           (make-cont '<cont-9> end tokens fail k)))
         (apostrophe ()
-         (read-annotated-abbreviation tokens 'quote src handler fail
-           k))
+         (read-abbreviation tokens 'quote src handler fail k))
         (backquote ()
-         (read-annotated-abbreviation tokens 'quasiquote src handler
-           fail k))
+         (read-abbreviation tokens 'quasiquote src handler fail k))
         (comma ()
-         (read-annotated-abbreviation tokens 'unquote src handler
-           fail k))
+         (read-abbreviation tokens 'unquote src handler fail k))
         (comma-at ()
-         (read-annotated-abbreviation tokens 'unquote-splicing src
-           handler fail k))
+         (read-abbreviation tokens 'unquote-splicing src handler fail
+           k))
         (lparen ()
          (let ((tokens (rest-of tokens)))
-           (read-asexp-sequence tokens 'rparen src handler fail
+           (read-sexp-sequence tokens 'rparen src handler fail
              (make-cont4 '<cont4-2> src start k))))
         (lbracket ()
          (let ((tokens (rest-of tokens)))
-           (read-asexp-sequence tokens 'rbracket src handler fail
+           (read-sexp-sequence tokens 'rbracket src handler fail
              (make-cont4 '<cont4-2> src start k))))
         (lvector ()
-         (read-avector-sequence (rest-of tokens) src handler fail
+         (read-vector-sequence (rest-of tokens) src handler fail
            (make-cont4 '<cont4-1> src start k)))
         (else (unexpected-token-error tokens src handler fail))))))
 
 (define*
-  read-annotated-abbreviation
+  read-abbreviation
   (lambda (tokens keyword src handler fail k)
     (let ((start (get-token-start (first tokens)))
           (keyword-end (get-token-end (first tokens))))
-      (read-asexp (rest-of tokens) src handler fail
-        (make-cont4 '<cont4-3> keyword keyword-end src start k)))))
+      (annotate-cps
+        keyword
+        (make-info src start keyword-end)
+        (make-cont '<cont-11> src start tokens handler fail k)))))
 
 (define*
-  read-avector-sequence
+  read-vector-sequence
   (lambda (tokens src handler fail k)
     (record-case (first tokens)
       (rparen ()
-       (close-asexp-sequence '() tokens 'rparen src handler fail
-         k))
+       (close-sexp-sequence '() tokens 'rparen src handler fail k))
       (dot ()
        (read-error "unexpected dot (.)" tokens src handler fail))
-      (else (read-asexp
+      (else (read-sexp
              tokens
              src
              handler
@@ -2517,15 +2593,15 @@
              (make-cont4 '<cont4-5> src handler k))))))
 
 (define*
-  read-asexp-sequence
+  read-sexp-sequence
   (lambda (tokens expected-terminator src handler fail k)
     (record-case (first tokens)
       ((rparen rbracket) ()
-       (close-asexp-sequence '() tokens expected-terminator src
+       (close-sexp-sequence '() tokens expected-terminator src
          handler fail k))
       (dot ()
        (read-error "unexpected dot (.)" tokens src handler fail))
-      (else (read-asexp
+      (else (read-sexp
              tokens
              src
              handler
@@ -2534,15 +2610,15 @@
                k))))))
 
 (define*
-  close-asexp-sequence
-  (lambda (asexps tokens expected-terminator src handler fail
+  close-sexp-sequence
+  (lambda (sexps tokens expected-terminator src handler fail
            k)
     (let ((end (get-token-end (first tokens))))
       (record-case (first tokens)
         ((rparen rbracket) ()
          (cond
            ((token-type? (first tokens) expected-terminator)
-            (apply-cont4 k asexps end (rest-of tokens) fail))
+            (apply-cont4 k sexps end (rest-of tokens) fail))
            ((eq? expected-terminator 'rparen)
             (read-error "parenthesized list terminated by bracket"
               tokens src handler fail))
@@ -2629,13 +2705,16 @@
 (define*
   lookup-binding
   (lambda (variable env var-info handler fail k)
-    (let ((binding (search-env env variable)))
-      (if binding
-          (apply-cont2 k binding fail)
-          (split-variable
-            variable
-            fail
-            (make-cont2 '<cont2-4> var-info variable env handler k))))))
+    (if (dlr-env-contains variable)
+        (apply-cont2 k (dlr-env-lookup variable) fail)
+        (let ((binding (search-env env variable)))
+          (if binding
+              (apply-cont2 k binding fail)
+              (split-variable
+                variable
+                fail
+                (make-cont2 '<cont2-4> var-info variable env handler
+                  k)))))))
 
 (define*
   lookup-binding-in-first-frame
@@ -2703,13 +2782,27 @@
                              (group (cdr (list-tail chars n))))))))))
       (group chars))))
 
-(define pattern-macro?
-  (lambda (x) (and (pair? x) (eq? (car x) 'pattern-macro))))
+(define dlr-exp? (lambda (x) #f))
 
-(define*
-  macro-error
-  (lambda (transformer-name datum)
-    (error transformer-name "bad concrete syntax: ~a" datum)))
+(define dlr-func (lambda (x) x))
+
+(define dlr-env-contains (lambda (x) #f))
+
+(define dlr-env-lookup (lambda (x) #f))
+
+(define dlr-object? (lambda (x) #f))
+
+(define dlr-lookup-components (lambda (x y) #f))
+
+(define set-global-value! (lambda (var x) #f))
+
+(define set-global-docstring! (lambda (var x) #f))
+
+(define using-prim (lambda ignore #f))
+
+(define iterator? (lambda ignore #f))
+
+(define get_type (lambda (x) 'unknown))
 
 (define head
   (lambda (formals)
@@ -2726,115 +2819,362 @@
       ((pair? (cdr formals)) (last (cdr formals)))
       (else (cdr formals)))))
 
-(define literal?
-  (lambda (datum)
-    (or (number? datum)
-        (boolean? datum)
-        (char? datum)
-        (string? datum))))
-
 (define anything? (lambda (datum) #t))
 
-(define get-reserved-keywords
-  (lambda ()
-    '(quote func define! quasiquote lambda if set! define begin
-      cond and or let let* letrec case record-case try catch
-      finally raise dict help choose)))
+(define application?^
+  (lambda (asexp)
+    (and (list?^ asexp)
+         (not (null?^ asexp))
+         (not (reserved-keyword? (untag-atom^ (car^ asexp)))))))
 
 (define reserved-keyword?
   (lambda (x)
     (and (symbol? x)
          (not (eq? (memq x (get-reserved-keywords)) #f)))))
 
+(define get-reserved-keywords
+  (lambda ()
+    '(quote func define! quasiquote lambda if set! define begin
+      cond and or let let* letrec case record-case try catch
+      finally raise define-syntax choose define-datatype cases
+      trace-lambda)))
+
+(define mit-style-define?^
+  (lambda (asexp) (not (symbol?^ (cadr^ asexp)))))
+
+(define literal?
+  (lambda (datum)
+    (or (number? datum)
+        (boolean? datum)
+        (null? datum)
+        (char? datum)
+        (string? datum))))
+
+(define literal?^
+  (lambda (asexp)
+    (and (eq? (car asexp) atom-tag)
+         (or (number? (untag-atom^ asexp))
+             (boolean? (untag-atom^ asexp))
+             (null? (untag-atom^ asexp))
+             (char? (untag-atom^ asexp))
+             (string? (untag-atom^ asexp))))))
+
+(define syntactic-sugar?^
+  (lambda (asexp)
+    (and (pair?^ asexp)
+         (symbol?^ (car^ asexp))
+         (true? (search-env macro-env (untag-atom^ (car^ asexp)))))))
+
+(define tagged-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+           (op (length^ asexp) len)
+           (symbol?^ (car^ asexp))
+           (eq?^ (car^ asexp) keyword)))))
+
+(define define-var^ (lambda (x) (untag-atom^ (cadr^ x))))
+
+(define define-docstring^
+  (lambda (x) (untag-atom^ (caddr^ x))))
+
+(define try-body^ (lambda (x) (cadr^ x)))
+
+(define catch-var^
+  (lambda (x) (untag-atom^ (cadr^ (caddr^ x)))))
+
+(define catch-exps^ (lambda (x) (cddr^ (caddr^ x))))
+
+(define try-finally-exps^ (lambda (x) (cdr^ (caddr^ x))))
+
+(define try-catch-finally-exps^
+  (lambda (x) (cdr^ (cadddr^ x))))
+
+(define*
+  aparse
+  (lambda (adatum handler fail k)
+    (let ((info (get-source-info adatum)))
+      (cond
+        ((literal?^ adatum)
+         (apply-cont2 k (lit-aexp (untag-atom^ adatum) info) fail))
+        ((symbol?^ adatum)
+         (apply-cont2 k (var-aexp (untag-atom^ adatum) info) fail))
+        ((vector?^ adatum)
+         (unannotate-cps adatum (make-cont '<cont-21> info fail k)))
+        ((quote?^ adatum)
+         (unannotate-cps adatum (make-cont '<cont-20> info fail k)))
+        ((quasiquote?^ adatum)
+         (qq-expand-cps
+           (cadr^ adatum)
+           0
+           (make-cont '<cont-19> adatum info handler fail k)))
+        ((unquote?^ adatum)
+         (aparse-error "misplaced" adatum handler fail))
+        ((unquote-splicing?^ adatum)
+         (aparse-error "misplaced" adatum handler fail))
+        ((syntactic-sugar?^ adatum)
+         (expand-once^
+           adatum
+           handler
+           fail
+           (make-cont2 '<cont2-31> handler k)))
+        ((if-then?^ adatum)
+         (aparse
+           (cadr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-30> adatum info handler k)))
+        ((if-else?^ adatum)
+         (aparse
+           (cadr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-28> adatum info handler k)))
+        ((assignment?^ adatum)
+         (aparse
+           (caddr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-25> adatum info k)))
+        ((func?^ adatum)
+         (aparse
+           (cadr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-24> info k)))
+        ((define?^ adatum)
+         (cond
+           ((mit-style-define?^ adatum)
+            (apply-macro mit-define-transformer^ adatum handler fail
+              (make-cont '<cont-17> info handler fail k)))
+           ((= (length^ adatum) 3)
+            (aparse
+              (caddr^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-23> adatum info k)))
+           ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum)))
+            (aparse
+              (cadddr^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-22> adatum info k)))
+           (else
+            (aparse-error "bad concrete syntax:" adatum handler fail))))
+        ((define!?^ adatum)
+         (cond
+           ((mit-style-define?^ adatum)
+            (apply-macro mit-define-transformer^ adatum handler fail
+              (make-cont '<cont-17> info handler fail k)))
+           ((= (length^ adatum) 3)
+            (aparse
+              (caddr^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-21> adatum info k)))
+           ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum)))
+            (aparse
+              (cadddr^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-20> adatum info k)))
+           (else
+            (aparse-error "bad concrete syntax:" adatum handler fail))))
+        ((define-syntax?^ adatum)
+         (let ((name (define-var^ adatum)) (aclauses (cddr^ adatum)))
+           (unannotate-cps
+             aclauses
+             (make-cont '<cont-15> aclauses name info fail k))))
+        ((begin?^ adatum)
+         (aparse-all
+           (cdr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-19> adatum info handler k)))
+        ((lambda?^ adatum)
+         (aparse-all
+           (cddr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-18> adatum info k)))
+        ((trace-lambda?^ adatum)
+         (aparse-all
+           (cdddr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-17> adatum info k)))
+        ((try?^ adatum)
+         (cond
+           ((= (length^ adatum) 2)
+            (aparse (try-body^ adatum) handler fail k))
+           ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
+            (aparse
+              (try-body^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-16> adatum info handler k)))
+           ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
+            (aparse
+              (try-body^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-14> adatum info handler k)))
+           ((and (= (length^ adatum) 4)
+                 (catch?^ (caddr^ adatum))
+                 (finally?^ (cadddr^ adatum)))
+            (aparse
+              (try-body^ adatum)
+              handler
+              fail
+              (make-cont2 '<cont2-12> adatum info handler k)))
+           (else
+            (aparse-error "bad try syntax:" adatum handler fail))))
+        ((raise?^ adatum)
+         (aparse
+           (cadr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-9> info k)))
+        ((choose?^ adatum)
+         (aparse-all
+           (cdr^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-8> info k)))
+        ((application?^ adatum)
+         (aparse
+           (car^ adatum)
+           handler
+           fail
+           (make-cont2 '<cont2-7> adatum info handler k)))
+        (else
+         (aparse-error
+           "bad concrete syntax:"
+           adatum
+           handler
+           fail))))))
+
+(define*
+  aparse-all
+  (lambda (adatum-list handler fail k)
+    (if (null?^ adatum-list)
+        (apply-cont2 k '() fail)
+        (aparse
+          (car^ adatum-list)
+          handler
+          fail
+          (make-cont2 '<cont2-33> adatum-list handler k)))))
+
+(define*
+  aparse-error
+  (lambda (msg adatum handler fail)
+    (let ((info (get-source-info adatum)))
+      (unannotate-cps
+        adatum
+        (make-cont '<cont-22> msg info handler fail)))))
+
+(define*
+  aparse-sexps
+  (lambda (tokens src handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+        (apply-cont2 k '() fail)
+        (read-sexp tokens src handler fail
+          (make-cont4 '<cont4-8> src handler k)))))
+
 (define*
   create-letrec-assignments^
   (lambda (vars procs k2)
-    (if (null? vars)
+    (if (null?^ vars)
         (apply-cont2 k2 '() '())
         (create-letrec-assignments^
-          (cdr vars)
-          (cdr procs)
-          (make-cont2 '<cont2-7> procs vars k2)))))
+          (cdr^ vars)
+          (cdr^ procs)
+          (make-cont2 '<cont2-37> procs vars k2)))))
+
+(define*
+  amacro-error
+  (lambda (msg adatum handler fail)
+    (let ((info (get-source-info adatum)))
+      (apply-handler2
+        handler
+        (format
+          "Error: ~a ~a"
+          msg
+          (where-at
+            (get-start-line info)
+            (get-start-char info)
+            (get-srcfile info)))
+        fail))))
 
 (define*
   nest-let*-bindings^
   (lambda (bindings bodies k)
-    (if (or (null? bindings) (null? (cdr bindings)))
-        (apply-cont k `(let (unquote bindings) ,@bodies))
+    (if (or (null?^ bindings) (null?^ (cdr^ bindings)))
+        (apply-cont k `(let ,bindings ,@(at^ bodies)))
         (nest-let*-bindings^
-          (cdr bindings)
+          (cdr^ bindings)
           bodies
-          (make-cont '<cont-9> bindings k)))))
+          (make-cont '<cont-23> bindings k)))))
 
 (define*
   case-clauses->simple-cond-clauses^
   (lambda (var clauses k)
-    (if (null? clauses)
+    (if (null?^ clauses)
         (apply-cont k '())
         (case-clauses->simple-cond-clauses^
           var
-          (cdr clauses)
-          (make-cont '<cont-10> clauses var k)))))
+          (cdr^ clauses)
+          (make-cont '<cont-24> clauses var k)))))
 
 (define*
   case-clauses->cond-clauses^
   (lambda (var clauses k2)
-    (if (null? clauses)
+    (if (null?^ clauses)
         (apply-cont2 k2 '() '())
         (case-clauses->cond-clauses^
           var
-          (cdr clauses)
-          (make-cont2 '<cont2-9> clauses var k2)))))
+          (cdr^ clauses)
+          (make-cont2 '<cont2-39> clauses var k2)))))
 
 (define*
   record-case-clauses->cond-clauses^
   (lambda (var clauses k2)
-    (if (null? clauses)
+    (if (null?^ clauses)
         (apply-cont2 k2 '() '())
         (record-case-clauses->cond-clauses^
           var
-          (cdr clauses)
-          (make-cont2 '<cont2-10> clauses var k2)))))
+          (cdr^ clauses)
+          (make-cont2 '<cont2-40> clauses var k2)))))
 
-(define define-datatype-variant-names
-  (lambda (variants)
-    (cond
-      ((null? variants) '())
-      (else
-       (cons
-         (get-sexp (car^ (car variants)))
-         (define-datatype-variant-names (cdr variants)))))))
+(define*
+  make-dd-variant-constructors^
+  (lambda (variants k2)
+    (if (null?^ variants)
+        (apply-cont2 k2 '() '())
+        (make-dd-variant-constructor^
+          (car^ variants)
+          (make-cont2 '<cont2-43> variants k2)))))
 
-(define define-datatype-variant-tests
-  (lambda (variants)
-    (cond
-      ((null? variants) '())
-      ((null? (cdr^ (car variants)))
-       (cons '() (define-datatype-variant-tests (cdr variants))))
-      (else
-       (cons
-         (get-sexp (cadr^ (cadr^ (car variants))))
-         (define-datatype-variant-tests (cdr variants)))))))
+(define*
+  make-dd-variant-constructor^
+  (lambda (variant k2)
+    (let ((name (car^ variant)) (fields (cdr^ variant)))
+      (verify-dd-constructor-fields^
+        name
+        fields
+        'args
+        (make-cont '<cont-25> fields name k2)))))
 
-(define make-define-datatype-defines
-  (lambda (names tests)
-    (cond
-      ((null? names) '())
-      ((null? (car tests))
-       (cons
-         `(define (unquote (car names))
-            (lambda args (cons ',(car names) args)))
-         (make-define-datatype-defines (cdr names) (cdr tests))))
-      (else
-       (cons
-         `(define (unquote (car names))
-            (lambda args
-              (if (apply ,(car tests) (list (car args)))
-                  (cons ',(car names) args)
-                  (error ',(car names)
-                    "'~s' not a valid value"
-                    (car args)))))
-         (make-define-datatype-defines (cdr names) (cdr tests)))))))
+(define*
+  verify-dd-constructor-fields^
+  (lambda (name fields cdrs k)
+    (if (null?^ fields)
+        (apply-cont k `(cons ',name args))
+        (verify-dd-constructor-fields^
+          name
+          (cdr^ fields)
+          `(cdr ,cdrs)
+          (make-cont '<cont-26> cdrs fields name k)))))
 
 (define make-macro-env^
   (lambda ()
@@ -2846,255 +3186,50 @@
         case-transformer^ record-case-transformer^
         define-datatype-transformer^ cases-transformer^))))
 
-(define*
-  amacro-error
-  (lambda (transformer-name adatum)
-    (unannotate-cps
-      adatum
-      (make-cont '<cont-11> transformer-name))))
-
 (define make-pattern-macro^
   (lambda (clauses aclauses)
     (list 'pattern-macro clauses aclauses)))
 
-(define macro-clauses^ (lambda (macro) (cadr macro)))
+(define pattern-macro?
+  (lambda (x) (and (pair? x) (eq? (car x) 'pattern-macro))))
 
-(define macro-aclauses^ (lambda (macro) (caddr macro)))
+(define macro-clauses (lambda (macro) (cadr macro)))
 
-(define application?^
-  (lambda (asexp)
-    (and (list?^ asexp)
-         (not (null?^ asexp))
-         (not (reserved-keyword? (get-sexp (car^ asexp)))))))
+(define macro-aclauses (lambda (macro) (caddr macro)))
 
-(define mit-style?^
-  (lambda (asexp) (not (symbol?^ (cadr^ asexp)))))
+(define define-syntax-clause?
+  (lambda (x)
+    (and (list? x)
+         (= (length x) 2)
+         (pattern? (car x))
+         (pattern? (cadr x)))))
 
-(define literal?^
-  (lambda (asexp)
-    (let ((s (get-sexp asexp)))
-      (or (number? s) (boolean? s) (char? s) (string? s)))))
+(define define-syntax-clause?^
+  (lambda (x)
+    (and (list?^ x)
+         (= (length^ x) 2)
+         (apattern? (car^ x))
+         (apattern? (cadr^ x)))))
 
-(define syntactic-sugar?^
-  (lambda (asexp)
-    (and (pair?^ asexp)
-         (symbol?^ (car^ asexp))
-         (true? (search-env macro-env (get-sexp (car^ asexp)))))))
+(define apattern?
+  (lambda (x)
+    (or (aatom? x)
+        (and (apair? x)
+             (apattern? (cadr x))
+             (apattern? (caddr x))))))
 
-(define tagged-list^
-  (lambda (tag op len)
-    (lambda (asexp)
-      (and (list?^ asexp)
-           (op (length^ asexp) len)
-           (symbol?^ (car^ asexp))
-           (eq? (get-sexp (car^ asexp)) tag)))))
-
-(define try-body^ (lambda (x) (cadr^ x)))
-
-(define catch-var^ (lambda (x) (cadr^ x)))
-
-(define catch-exps^ (lambda (x) (cddr^ x)))
-
-(define finally-exps^ (lambda (x) (cdr (get-sexp x))))
-
-(define*
-  aparse
-  (lambda (adatum handler fail k)
-    (let ((info (get-source-info adatum)))
-      (cond
-        ((null?^ adatum)
-         (apply-cont2 k (lit-aexp (get-sexp adatum) info) fail))
-        ((literal?^ adatum)
-         (apply-cont2 k (lit-aexp (get-sexp adatum) info) fail))
-        ((vector?^ adatum)
-         (unannotate-cps adatum (make-cont '<cont-19> info fail k)))
-        ((symbol?^ adatum)
-         (apply-cont2 k (var-aexp (get-sexp adatum) info) fail))
-        ((quote?^ adatum)
-         (unannotate-cps
-           (cadr^ adatum)
-           (make-cont '<cont-19> info fail k)))
-        ((quasiquote?^ adatum)
-         (qq-expand-cps
-           (cadr^ adatum)
-           0
-           (make-cont '<cont-18> adatum handler fail k)))
-        ((unquote?^ adatum)
-         (aparse-error "misplaced" adatum handler fail))
-        ((unquote-splicing?^ adatum)
-         (aparse-error "misplaced" adatum handler fail))
-        ((syntactic-sugar?^ adatum)
-         (expand-once^
-           adatum
-           handler
-           fail
-           (make-cont2 '<cont2-38> handler k)))
-        ((if-then?^ adatum)
-         (aparse
-           (cadr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-37> adatum info handler k)))
-        ((if-else?^ adatum)
-         (aparse
-           (cadr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-35> adatum info handler k)))
-        ((assignment?^ adatum)
-         (aparse
-           (caddr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-32> adatum info k)))
-        ((func?^ adatum)
-         (aparse
-           (cadr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-31> info k)))
-        ((define?^ adatum)
-         (cond
-           ((mit-style?^ adatum)
-            (apply-macro
-              mit-define-transformer^
-              adatum
-              (make-cont '<cont-16> info handler fail k)))
-           ((= (length^ adatum) 3)
-            (aparse
-              (caddr^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-30> adatum info k)))
-           ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum)))
-            (aparse
-              (cadddr^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-29> adatum info k)))
-           (else
-            (aparse-error "bad concrete syntax:" adatum handler fail))))
-        ((define!?^ adatum)
-         (cond
-           ((mit-style?^ adatum)
-            (apply-macro
-              mit-define-transformer^
-              adatum
-              (make-cont '<cont-16> info handler fail k)))
-           ((= (length^ adatum) 3)
-            (aparse
-              (caddr^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-28> adatum info k)))
-           ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum)))
-            (aparse
-              (cadddr^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-27> adatum info k)))
-           (else
-            (aparse-error "bad concrete syntax:" adatum handler fail))))
-        ((define-syntax?^ adatum)
-         (let ((name (get-sexp (cadr^ adatum)))
-               (aclauses (cddr^ adatum)))
-           (unannotate-cps
-             aclauses
-             (make-cont '<cont-14> aclauses name info fail k))))
-        ((begin?^ adatum)
-         (aparse-all
-           (cdr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-26> adatum info handler k)))
-        ((lambda?^ adatum)
-         (aparse-all
-           (cddr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-25> adatum info k)))
-        ((trace-lambda?^ adatum)
-         (aparse-all
-           (cdddr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-24> adatum info k)))
-        ((try?^ adatum)
-         (cond
-           ((= (length^ adatum) 2)
-            (aparse (try-body^ adatum) handler fail k))
-           ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
-            (aparse
-              (try-body^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-23> adatum info handler k)))
-           ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
-            (aparse
-              (try-body^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-21> adatum info handler k)))
-           ((and (= (length^ adatum) 4)
-                 (catch?^ (caddr^ adatum))
-                 (finally?^ (cadddr^ adatum)))
-            (aparse
-              (try-body^ adatum)
-              handler
-              fail
-              (make-cont2 '<cont2-19> adatum info handler k)))
-           (else
-            (aparse-error "bad try syntax:" adatum handler fail))))
-        ((raise?^ adatum)
-         (aparse
-           (cadr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-16> info k)))
-        ((dict?^ adatum)
-         (aparse-entries
-           (cdr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-15> info k)))
-        ((help?^ adatum)
-         (if (symbol?^ (cadr^ adatum))
-             (let ((var (get-sexp (cadr^ adatum)))
-                   (var-info (get-source-info (cadr^ adatum))))
-               (apply-cont2 k (help-aexp var var-info info) fail))
-             (aparse-error "bad concrete syntax:" adatum handler fail)))
-        ((choose?^ adatum)
-         (aparse-all
-           (cdr^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-14> info k)))
-        ((application?^ adatum)
-         (aparse
-           (car^ adatum)
-           handler
-           fail
-           (make-cont2 '<cont2-13> adatum info handler k)))
-        (else
-         (aparse-error
-           "bad concrete syntax:"
-           adatum
-           handler
-           fail))))))
-
-(define*
-  aparse-error
-  (lambda (msg adatum handler fail)
-    (let ((info (get-source-info adatum)))
-      (unannotate-cps
-        adatum
-        (make-cont '<cont-20> msg info handler fail)))))
+(define list-of-define-syntax-clauses?^
+  (lambda (alist)
+    (or (null?^ alist)
+        (and (define-syntax-clause?^ (car^ alist))
+             (list-of-define-syntax-clauses?^ (cdr^ alist))))))
 
 (define*
   expand-once^
   (lambda (adatum handler fail k)
-    (lookup-value (get-sexp (car^ adatum)) macro-env 'none
-      handler fail (make-cont2 '<cont2-39> adatum handler k))))
+    (let ((macro-keyword (untag-atom^ (car^ adatum))))
+      (lookup-value macro-keyword macro-env 'none handler fail
+        (make-cont2 '<cont2-45> adatum macro-keyword handler k)))))
 
 (define*
   process-macro-clauses^
@@ -3107,43 +3242,13 @@
           fail)
         (let ((left-pattern (caar clauses))
               (right-pattern (cadar clauses))
-              (aleft-pattern (car^ (car aclauses)))
-              (aright-pattern (cadr^ (car aclauses))))
+              (left-apattern (caar^ aclauses))
+              (right-apattern (cadar^ aclauses)))
           (unannotate-cps
             adatum
-            (make-cont '<cont-24> aclauses adatum aleft-pattern
-              aright-pattern clauses left-pattern right-pattern handler
-              fail k))))))
-
-(define*
-  aparse-entries
-  (lambda (entries handler fail k)
-    (if (null? entries)
-        (apply-cont2 k '() fail)
-        (aparse-all
-          (get-sexp (car entries))
-          handler
-          fail
-          (make-cont2 '<cont2-42> entries handler k)))))
-
-(define*
-  aparse-all
-  (lambda (adatum-list handler fail k)
-    (if (null? adatum-list)
-        (apply-cont2 k '() fail)
-        (aparse
-          (car adatum-list)
-          handler
-          fail
-          (make-cont2 '<cont2-43> adatum-list handler k)))))
-
-(define*
-  aparse-sexps
-  (lambda (tokens src handler fail k)
-    (if (token-type? (first tokens) 'end-marker)
-        (apply-cont2 k '() fail)
-        (read-asexp tokens src handler fail
-          (make-cont4 '<cont4-8> src handler k)))))
+            (make-cont '<cont-30> aclauses adatum clauses left-apattern
+              left-pattern right-apattern right-pattern handler fail
+              k))))))
 
 (define*
   qq-expand-cps
@@ -3151,33 +3256,33 @@
     (cond
       ((quasiquote?^ ax)
        (qq-expand-cps
-         (^cdr^ ax)
+         (cdr^ ax)
          (+ depth 1)
-         (make-cont '<cont-29> k)))
+         (make-cont '<cont-36> k)))
       ((or (unquote?^ ax) (unquote-splicing?^ ax))
        (cond
          ((> depth 0)
           (qq-expand-cps
-            (^cdr^ ax)
+            (cdr^ ax)
             (- depth 1)
-            (make-cont '<cont-28> ax k)))
+            (make-cont '<cont-35> ax k)))
          ((and (unquote?^ ax)
-               (not (null? (cdr^ ax)))
-               (null? (cddr^ ax)))
+               (not (null?^ (cdr^ ax)))
+               (null?^ (cddr^ ax)))
           (apply-cont k (cadr^ ax)))
          (else (apply-cont k `',ax))))
       ((vector?^ ax)
-       (qq-expand-cps
-         (retag (vector->list^ ax) 'none)
-         depth
-         (make-cont '<cont-27> k)))
+       (annotate-cps
+         (vector->list^ ax)
+         'none
+         (make-cont '<cont-34> depth k)))
       ((not (pair?^ ax)) (apply-cont k `',ax))
-      ((null? (cdr^ ax)) (qq-expand-list-cps (car^ ax) depth k))
+      ((null?^ (cdr^ ax)) (qq-expand-list-cps (car^ ax) depth k))
       (else
        (qq-expand-list-cps
          (car^ ax)
          depth
-         (make-cont '<cont-26> ax depth k))))))
+         (make-cont '<cont-32> ax depth k))))))
 
 (define*
   qq-expand-list-cps
@@ -3185,139 +3290,91 @@
     (cond
       ((quasiquote?^ ax)
        (qq-expand-cps
-         (^cdr^ ax)
+         (cdr^ ax)
          (+ depth 1)
-         (make-cont '<cont-34> k)))
+         (make-cont '<cont-41> k)))
       ((or (unquote?^ ax) (unquote-splicing?^ ax))
        (cond
          ((> depth 0)
           (qq-expand-cps
-            (^cdr^ ax)
+            (cdr^ ax)
             (- depth 1)
-            (make-cont '<cont-33> ax k)))
-         ((unquote?^ ax) (apply-cont k `(list . ,(^cdr^ ax))))
-         ((null? (cddr^ ax)) (apply-cont k (cadr^ ax)))
-         (else (apply-cont k `(append . ,(^cdr^ ax))))))
+            (make-cont '<cont-40> ax k)))
+         ((unquote?^ ax) (apply-cont k `(list . ,(cdr^ ax))))
+         ((null?^ (cddr^ ax)) (apply-cont k (cadr^ ax)))
+         (else (apply-cont k `(append . ,(cdr^ ax))))))
       ((vector?^ ax)
-       (qq-expand-cps ax depth (make-cont '<cont-32> k)))
+       (qq-expand-cps ax depth (make-cont '<cont-39> k)))
       ((not (pair?^ ax)) (apply-cont k `'(,ax)))
-      ((null? (cdr^ ax))
+      ((null?^ (cdr^ ax))
        (qq-expand-list-cps
          (car^ ax)
          depth
-         (make-cont '<cont-32> k)))
+         (make-cont '<cont-39> k)))
       (else
        (qq-expand-list-cps
          (car^ ax)
          depth
-         (make-cont '<cont-31> ax depth k))))))
-
-(define*
-  unparse-exps
-  (lambda (exps handler fail k)
-    (if (null? exps)
-        (apply-cont2 k '() fail)
-        (unparse
-          (car exps)
-          handle
-          fail
-          (lambda (v1)
-            (unparse-exps
-              (cdr exps)
-              handler
-              fail
-              (make-cont '<cont-35> v1 fail k)))))))
+         (make-cont '<cont-38> ax depth k))))))
 
 (define aunparse
   (lambda (aexp)
-    (let ((ae (car aexp)))
-      (cond
-        ((eq? ae 'lit-aexp)
-         (let ((datum (cadr aexp)))
-           (cond
-             ((literal? datum) datum)
-             ((vector? datum) datum)
-             (else `',datum))))
-        ((eq? ae 'var-aexp) (let ((id (cadr aexp))) id))
-        ((eq? ae 'if-aexp)
-         (let ((test-aexp (cadr aexp))
-               (then-aexp (caddr aexp))
-               (else-aexp (cadddr aexp)))
-           `(if ,(aunparse test-aexp)
-                ,(aunparse then-aexp)
-                ,(aunparse else-aexp))))
-        ((eq? ae 'assign-aexp)
-         (let ((var (cadr aexp)) (rhs-exp (caddr aexp)))
-           `(set! ,var ,(aunparse rhs-exp))))
-        ((eq? ae 'func-aexp)
-         (let ((exp (cadr aexp))) `(func ,(aunparse exp))))
-        ((eq? ae 'define-aexp)
-         (let ((id (cadr aexp))
-               (docstring (caddr aexp))
-               (rhs-exp (cadddr aexp)))
-           (if (string=? docstring "")
-               `(define (unquote id) ,(aunparse rhs-exp))
-               `(define (unquote id) ,docstring ,(aunparse rhs-exp)))))
-        ((eq? ae 'define!-aexp)
-         (let ((id (cadr aexp))
-               (docstring (caddr aexp))
-               (rhs-exp (cadddr aexp)))
-           (if (string=? docstring "")
-               `(define! ,id ,(aunparse rhs-exp))
-               `(define! ,id ,docstring ,(aunparse rhs-exp)))))
-        ((eq? ae 'define-syntax-aexp)
-         (let ((name (cadr aexp)) (clauses (caddr aexp)))
-           `(define-syntax (unquote name) ,@clauses)))
-        ((eq? ae 'begin-aexp)
-         (let ((exps (cadr aexp))) `(begin ,@(map aunparse exps))))
-        ((eq? ae 'lambda-aexp)
-         (let ((formals (cadr aexp)) (bodies (caddr aexp)))
-           `(lambda (unquote formals) ,@(map aunparse bodies))))
-        ((eq? ae 'mu-lambda-aexp)
-         (let ((formals (cadr aexp))
-               (runt (caddr aexp))
-               (bodies (cadddr aexp)))
-           `(lambda (,@formals . ,runt) ,@(map aunparse bodies))))
-        ((eq? ae 'trace-lambda-aexp)
-         (let ((name (cadr aexp))
-               (formals (caddr aexp))
-               (bodies (cadddr aexp)))
-           `(trace-lambda ,name (unquote formals)
-              ,@(map aunparse bodies))))
-        ((eq? ae 'mu-trace-lambda-aexp)
-         (let ((name (cadr aexp))
-               (formals (caddr aexp))
-               (runt (cadddr aexp))
-               (bodies (car (cddddr aexp))))
-           `(trace-lambda ,name (,@formals . ,runt)
-              ,@(map aunparse bodies))))
-        ((eq? ae 'app-aexp)
-         (let ((operator (cadr aexp)) (operands (caddr aexp)))
-           `(,(aunparse operator) ,@(map aunparse operands))))
-        ((eq? ae 'try-catch-aexp)
-         (let ((body (cadr aexp))
-               (catch-var (caddr aexp))
-               (catch-exps (cadddr aexp)))
-           `(try ,(aunparse body)
-                 (catch ,catch-var ,@(map aunparse catch-exps)))))
-        ((eq? ae 'try-finally-aexp)
-         (let ((body (cadr aexp)) (finally-exps (caddr aexp)))
-           `(try ,(aunparse body)
-                 (finally ,@(map aunparse finally-exps)))))
-        ((eq? ae 'try-catch-finally-aexp)
-         (let ((body (cadr aexp))
-               (catch-var (caddr aexp))
-               (catch-exps (cadddr aexp))
-               (finally-exps (car (cddddr aexp))))
-           `(try ,(aunparse body)
-                 (catch ,catch-var ,@(map aunparse catch-exps))
-                 (finally ,@(map aunparse finally-exps)))))
-        ((eq? ae 'raise-aexp)
-         (let ((exp (cadr aexp))) `(raise ,(aunparse exp))))
-        ((eq? ae 'help-aexp) (let ((var (cadr aexp))) `(help ,var)))
-        ((eq? ae 'choose-aexp)
-         (let ((exps (cadr aexp))) `(choose ,@(map aunparse exps))))
-        (else (error 'unparse "bad concrete syntax: ~s" aexp))))))
+    (cases aexpression aexp
+     (lit-aexp
+       (datum info)
+       (cond
+         ((literal? datum) datum)
+         ((vector? datum) datum)
+         (else `',datum)))
+     (var-aexp (id info) id)
+     (if-aexp
+       (test-aexp then-aexp else-aexp info)
+       `(if ,(aunparse test-aexp)
+            ,(aunparse then-aexp)
+            ,(aunparse else-aexp)))
+     (assign-aexp
+       (var rhs-exp var-info info)
+       `(set! ,var ,(aunparse rhs-exp)))
+     (func-aexp (exp info) `(func ,(aunparse exp)))
+     (define-aexp
+       (id docstring rhs-exp info)
+       (if (string=? docstring "")
+           `(define ,id ,(aunparse rhs-exp))
+           `(define ,id ,docstring ,(aunparse rhs-exp))))
+     (define!-aexp
+       (id docstring rhs-exp info)
+       (if (string=? docstring "")
+           `(define! ,id ,(aunparse rhs-exp))
+           `(define! ,id ,docstring ,(aunparse rhs-exp))))
+     (define-syntax-aexp
+       (name clauses aclauses info)
+       `(define-syntax ,name ,@clauses))
+     (begin-aexp (exps info) `(begin ,@(map aunparse exps)))
+     (lambda-aexp
+       (formals bodies info)
+       `(lambda ,formals ,@(map aunparse bodies)))
+     (mu-lambda-aexp
+       (formals runt bodies info)
+       `(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
+     (app-aexp
+       (operator operands info)
+       `(,(aunparse operator) ,@(map aunparse operands)))
+     (try-catch-aexp
+       (body catch-var catch-exps info)
+       `(try ,(aunparse body)
+             (catch ,catch-var ,@(map aunparse catch-exps))))
+     (try-finally-aexp
+       (body finally-exps info)
+       `(try ,(aunparse body)
+             (finally ,@(map aunparse finally-exps))))
+     (try-catch-finally-aexp
+       (body catch-var catch-exps finally-exps info)
+       `(try ,(aunparse body)
+             (catch ,catch-var ,@(map aunparse catch-exps))
+             (finally ,@(map aunparse finally-exps))))
+     (raise-aexp (exp info) `(raise ,(aunparse exp)))
+     (choose-aexp (exps info) `(choose ,@(map aunparse exps)))
+     (else (error 'aunparse "bad abstract syntax: ~s" aexp)))))
 
 (define dlr-exp? (lambda (x) #f))
 
@@ -3413,7 +3470,7 @@
 
 (define execute-next-expression
   (lambda (src)
-    (read-asexp *tokens-left* src REP-handler *last-fail*
+    (read-sexp *tokens-left* src REP-handler *last-fail*
       (make-cont4 '<cont4-9>))))
 
 (define initialize-globals
@@ -3457,7 +3514,7 @@
   (lambda (input)
     (set! load-stack '())
     (scan-input input 'stdin try-parse-handler *last-fail*
-      (make-cont2 '<cont2-49>))
+      (make-cont2 '<cont2-50>))
     (trampoline)))
 
 (define*
@@ -3465,12 +3522,12 @@
   (lambda (tokens src env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
         (apply-cont2 k void-value fail)
-        (read-asexp tokens src handler fail
+        (read-sexp tokens src handler fail
           (make-cont4 '<cont4-10> src env handler k)))))
 
 (define make-debugging-k
   (lambda (exp k)
-    (if (not *tracing-on?*) k (make-cont2 '<cont2-52> exp k))))
+    (if (not *tracing-on?*) k (make-cont2 '<cont2-53> exp k))))
 
 (define highlight-expression
   (lambda (exp)
@@ -3560,22 +3617,13 @@
        (raise-aexp
          (exp info)
          (m exp env handler fail (make-cont2 '<cont2-56> handler)))
-       (dict-aexp
-         (pairs info)
-         (apply-cont2 k (list 'dict pairs) fail))
-       (help-aexp
-         (var var-info info)
-         (if (reserved-keyword? var)
-             (apply-cont2 k (format "~a is a keyword" var) fail)
-             (lookup-binding var env var-info handler fail
-               (make-cont2 '<cont2-55> k))))
        (choose-aexp
          (exps info)
          (eval-choices exps env handler fail k))
        (app-aexp
          (operator operands info)
          (m* operands env handler fail
-             (make-cont2 '<cont2-54> operator env info handler k)))
+             (make-cont2 '<cont2-55> operator env info handler k)))
        (else (error 'm "bad abstract syntax: ~s" exp))))))
 
 (define*
@@ -3616,25 +3664,49 @@
                           k)))
           (m (car exps) env handler new-fail k)))))
 
-(define get-closure-depth (lambda () _closure-depth))
-
-(define increment-closure-depth
-  (lambda () (set! _closure-depth (+ _closure-depth 1))))
-
-(define decrement-closure-depth
-  (lambda () (set! _closure-depth (- _closure-depth 1))))
-
-(define repeat
-  (lambda (item times)
-    (if (= times 0) '() (cons item (repeat item (- times 1))))))
+(define make-trace-depth-string
+  (lambda (level)
+    (if (= level 0)
+        ""
+        (string-append
+          " |"
+          (make-trace-depth-string (- level 1))))))
 
 (define trace-closure
   (lambda (name formals bodies env)
-    (make-proc '<proc-1> bodies name formals env)))
+    (let ((trace-depth 0))
+      (make-proc '<proc-1> bodies name trace-depth formals env))))
+
+(define make-safe-continuation
+  (lambda (k)
+    (cond
+      ((not (pair? k)) '<???>)
+      ((eq? (car k) 'fail-continuation) '<fail>)
+      ((memq (car k) '(handler handler2)) '<handler>)
+      ((memq
+         (car k)
+         '(continuation continuation2 continuation3 continuation4))
+       (cons
+         (cadr k)
+         (map make-safe-continuation
+              (filter continuation-object? (cddr k)))))
+      (else '<???>))))
+
+(define continuation-object?
+  (lambda (x)
+    (and (pair? x)
+         (memq
+           (car x)
+           '(continuation
+              continuation2
+              continuation3
+              continuation4)))))
 
 (define mu-trace-closure
   (lambda (name formals runt bodies env)
-    (make-proc '<proc-2> bodies name formals runt env)))
+    (let ((trace-depth 0))
+      (make-proc '<proc-2> bodies name trace-depth formals runt
+        env))))
 
 (define closure
   (lambda (formals bodies env)
@@ -3650,13 +3722,15 @@
     (if (null? exps)
         (apply-cont2 k '() fail)
         (m (car exps) env handler fail
-           (make-cont2 '<cont2-70> exps env handler k)))))
+           (make-cont2 '<cont2-69> exps env handler k)))))
 
 (define*
   eval-sequence
   (lambda (exps env handler fail k)
-    (m (car exps) env handler fail
-       (make-cont2 '<cont2-71> exps env handler k))))
+    (if (null? (cdr exps))
+        (m (car exps) env handler fail k)
+        (m (car exps) env handler fail
+           (make-cont2 '<cont2-70> exps env handler k)))))
 
 (define length-one?
   (lambda (ls) (and (not (null? ls)) (null? (cdr ls)))))
@@ -3737,7 +3811,7 @@
       (else
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
-         (make-cont2 '<cont2-76> filename env handler k))))))
+         (make-cont2 '<cont2-75> filename env handler k))))))
 
 (define*
   load-files
@@ -3745,7 +3819,7 @@
     (if (null? filenames)
         (apply-cont2 k void-value fail)
         (load-file (car filenames) env info handler fail
-          (make-cont2 '<cont2-77> filenames env info handler k)))))
+          (make-cont2 '<cont2-76> filenames env info handler k)))))
 
 (define*
   length-loop
@@ -3778,7 +3852,7 @@
        (equal-objects?
          (car x)
          (car y)
-         (make-cont '<cont-39> x y k)))
+         (make-cont '<cont-45> x y k)))
       ((and (vector? x)
             (vector? y)
             (= (vector-length x) (vector-length y)))
@@ -3793,7 +3867,7 @@
         (equal-objects?
           (vector-ref v1 i)
           (vector-ref v2 i)
-          (make-cont '<cont-40> i v1 v2 k)))))
+          (make-cont '<cont-46> i v1 v2 k)))))
 
 (define*
   member-loop
@@ -3810,7 +3884,7 @@
        (equal-objects?
          x
          (car y)
-         (make-cont '<cont-41> ls x y info handler fail k))))))
+         (make-cont '<cont-47> ls x y info handler fail k))))))
 
 (define range
   (lambda args
@@ -3828,23 +3902,36 @@
   (lambda (args env info handler fail k)
     (let ((sym (car args)))
       (lookup-value sym env 'none handler fail
-        (make-cont2 '<cont2-79> args sym info handler k)))))
+        (make-cont2 '<cont2-78> args sym info handler k)))))
 
 (define*
   append2
-  (lambda (ls1 ls2 k)
+  (lambda (ls1 ls2 fail k2)
     (if (null? ls1)
-        (apply-cont k ls2)
-        (append2 (cdr ls1) ls2 (make-cont '<cont-42> ls1 k)))))
+        (apply-cont2 k2 ls2 fail)
+        (append2
+          (cdr ls1)
+          ls2
+          fail
+          (make-cont2 '<cont2-79> ls1 k2)))))
 
 (define*
   append-all
-  (lambda (lists k)
+  (lambda (lists info handler fail k2)
     (cond
-      ((null? lists) (apply-cont k '()))
-      ((null? (cdr lists)) (apply-cont k (car lists)))
+      ((null? lists) (apply-cont2 k2 '() fail))
+      ((null? (cdr lists)) (apply-cont2 k2 (car lists) fail))
+      ((not (list? (car lists)))
+       (runtime-error
+         (format
+           "append called on incorrect list structure ~s"
+           (car lists))
+         info
+         handler
+         fail))
       (else
-       (append-all (cdr lists) (make-cont '<cont-43> lists k))))))
+       (append-all (cdr lists) info handler fail
+         (make-cont2 '<cont2-80> lists k2))))))
 
 (define dir
   (lambda (args env)
@@ -3926,7 +4013,7 @@
       (if (null? item)
           (apply-cont2 k '() fail)
           (apply-proc proc (list item) env 'none handler fail
-            (make-cont2 '<cont2-80> iterator proc env handler k))))))
+            (make-cont2 '<cont2-81> iterator proc env handler k))))))
 
 (define*
   iterate-collect
@@ -3942,7 +4029,7 @@
       (if (null? item)
           (apply-cont2 k '() fail)
           (apply-proc proc (list item) env 'none handler fail
-            (make-cont2 '<cont2-81> iterator proc env handler k))))))
+            (make-cont2 '<cont2-82> iterator proc env handler k))))))
 
 (define*
   map1
@@ -3951,9 +4038,9 @@
         (apply-cont2 k '() fail)
         (if (dlr-exp? proc)
             (map1 proc (cdr list1) env handler fail
-              (make-cont2 '<cont2-83> list1 proc k))
+              (make-cont2 '<cont2-84> list1 proc k))
             (apply-proc proc (list (car list1)) env 'none handler fail
-              (make-cont2 '<cont2-82> list1 proc env handler k))))))
+              (make-cont2 '<cont2-83> list1 proc env handler k))))))
 
 (define*
   map2
@@ -3962,9 +4049,10 @@
         (apply-cont2 k '() fail)
         (if (dlr-exp? proc)
             (map2 proc (cdr list1) (cdr list2) env handler fail
-              (make-cont2 '<cont2-85> list1 list2 proc k))
-            (apply-proc proc (list (car list1) (car list2)) env 'none handler fail
-              (make-cont2 '<cont2-84> list1 list2 proc env handler k))))))
+              (make-cont2 '<cont2-86> list1 list2 proc k))
+            (apply-proc proc (list (car list1) (car list2)) env 'none
+              handler fail
+              (make-cont2 '<cont2-85> list1 list2 proc env handler k))))))
 
 (define*
   mapN
@@ -3973,9 +4061,9 @@
         (apply-cont2 k '() fail)
         (if (dlr-exp? proc)
             (mapN proc (map cdr lists) env handler fail
-              (make-cont2 '<cont2-87> lists proc k))
+              (make-cont2 '<cont2-88> lists proc k))
             (apply-proc proc (map car lists) env 'none handler fail
-              (make-cont2 '<cont2-86> lists proc env handler k))))))
+              (make-cont2 '<cont2-87> lists proc env handler k))))))
 
 (define*
   for-each-primitive
@@ -3990,22 +4078,23 @@
                     (dlr-apply proc (map car arg-list))
                     (for-each-primitive proc (map cdr arg-list) env handler
                       fail k))
-                  (apply-proc proc (map car arg-list) env 'none handler fail
-                    (make-cont2 '<cont2-88> arg-list proc env handler
+                  (apply-proc proc (map car arg-list) env 'none handler
+                    fail
+                    (make-cont2 '<cont2-89> arg-list proc env handler
                       k))))))))
 
 (define make-initial-env-extended (lambda (env) env))
 
 (define make-toplevel-env
   (lambda ()
-    (let ((primitives (list (list '* times-prim) (list '+ plus-prim)
-                       (list '- minus-prim) (list '/ divide-prim)
-                       (list '< lt-prim) (list '<= lt-or-eq-prim)
-                       (list '= equal-sign-prim) (list '=? equal-sign-prim)
-                       (list '> gt-prim) (list '>= gt-or-eq-prim)
-                       (list 'abort abort-prim) (list 'abs abs-prim)
-                       (list 'append append-prim) (list 'apply apply-prim)
-                       (list 'assv assv-prim)
+    (let ((primitives (list (list '* times-prim)
+                       (list '+ plus-prim) (list '- minus-prim)
+                       (list '/ divide-prim) (list '< lt-prim)
+                       (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
+                       (list '=? equal-sign-prim) (list '> gt-prim)
+                       (list '>= gt-or-eq-prim) (list 'abort abort-prim)
+                       (list 'abs abs-prim) (list 'append append-prim)
+                       (list 'apply apply-prim) (list 'assv assv-prim)
                        (list 'boolean? boolean?-prim)
                        (list 'caddr caddr-prim) (list 'cadr cadr-prim)
                        (list 'call-with-current-continuation call/cc-prim)
@@ -4098,7 +4187,7 @@
        (occurs?
          var
          (car pattern)
-         (make-cont '<cont-44> pattern var k))))))
+         (make-cont '<cont-48> pattern var k))))))
 
 (define*
   unify-patterns^
@@ -4107,7 +4196,7 @@
       ((pattern-variable? p1)
        (if (pattern-variable? p2)
            (apply-cont k (make-sub 'unit p1 p2 ap2))
-           (occurs? p1 p2 (make-cont '<cont-45> ap2 p1 p2 k))))
+           (occurs? p1 p2 (make-cont '<cont-49> ap2 p1 p2 k))))
       ((pattern-variable? p2) (unify-patterns^ p2 p1 ap2 ap1 k))
       ((and (constant? p1) (constant? p2) (equal? p1 p2))
        (apply-cont k (make-sub 'empty)))
@@ -4117,8 +4206,9 @@
 (define*
   unify-pairs^
   (lambda (pair1 pair2 apair1 apair2 k)
-    (unify-patterns^ (car pair1) (car pair2) (car^ apair1) (car^ apair2)
-      (make-cont '<cont-47> apair1 apair2 pair1 pair2 k))))
+    (unify-patterns^ (car pair1) (car pair2) (car^ apair1)
+      (car^ apair2)
+      (make-cont '<cont-51> apair1 apair2 pair1 pair2 k))))
 
 (define*
   instantiate^
@@ -4131,7 +4221,7 @@
          (car pattern)
          s
          (car^ ap)
-         (make-cont2 '<cont2-92> ap pattern s k2)))
+         (make-cont2 '<cont2-93> ap pattern s k2)))
       (else (error 'instantiate^ "bad pattern: ~a" pattern)))))
 
 (define make-sub (lambda args (cons 'substitution args)))
@@ -4146,7 +4236,7 @@
            (apply-cont2 k2 new-pattern new-apattern)
            (apply-cont2 k2 var avar)))
       (composite (s1 s2)
-       (apply-sub^ s1 var avar (make-cont2 '<cont2-93> s2 k2)))
+       (apply-sub^ s1 var avar (make-cont2 '<cont2-94> s2 k2)))
       (else (error 'apply-sub^ "bad substitution: ~a" s)))))
 
 (define chars-to-scan 'undefined)
@@ -4169,9 +4259,13 @@
 
 (define token-start-position 'undefined)
 
-(define asexp-tag (box 'tag))
+(define atom-tag (box 'atom))
 
-(define init-cont (make-cont '<cont-8>))
+(define pair-tag (box 'pair))
+
+(define *reader-generates-annotated-sexps?* #t)
+
+(define init-cont (make-cont '<cont-12>))
 
 (define init-cont2 (make-cont2 '<cont2-2>))
 
@@ -4183,30 +4277,9 @@
 
 (define init-fail (make-fail '<fail-1>))
 
-(define let-transformer^ (make-macro '<macro-1>))
+(define dlr-apply apply)
 
-(define letrec-transformer^ (make-macro '<macro-2>))
-
-(define mit-define-transformer^ (make-macro '<macro-3>))
-
-(define and-transformer^ (make-macro '<macro-4>))
-
-(define or-transformer^ (make-macro '<macro-5>))
-
-(define cond-transformer^ (make-macro '<macro-6>))
-
-(define let*-transformer^ (make-macro '<macro-7>))
-
-(define case-transformer^ (make-macro '<macro-8>))
-
-(define record-case-transformer^ (make-macro '<macro-9>))
-
-(define define-datatype-transformer^
-  (make-macro '<macro-10>))
-
-(define cases-transformer^ (make-macro '<macro-11>))
-
-(define macro-env (make-macro-env^))
+(define printf-prim printf)
 
 (define quote?^ (tagged-list^ 'quote = 2))
 
@@ -4239,10 +4312,6 @@
 
 (define raise?^ (tagged-list^ 'raise = 2))
 
-(define dict?^ (tagged-list^ 'dict >= 1))
-
-(define help?^ (tagged-list^ 'help = 2))
-
 (define choose?^ (tagged-list^ 'choose >= 1))
 
 (define try?^ (tagged-list^ 'try >= 2))
@@ -4251,11 +4320,48 @@
 
 (define finally?^ (tagged-list^ 'finally >= 2))
 
+(define let-transformer^ (make-macro '<macro-1>))
+
+(define letrec-transformer^ (make-macro '<macro-2>))
+
+(define mit-define-transformer^ (make-macro '<macro-3>))
+
+(define and-transformer^ (make-macro '<macro-4>))
+
+(define or-transformer^ (make-macro '<macro-5>))
+
+(define cond-transformer^ (make-macro '<macro-6>))
+
+(define let*-transformer^ (make-macro '<macro-7>))
+
+(define case-transformer^ (make-macro '<macro-8>))
+
+(define record-case-transformer^ (make-macro '<macro-9>))
+
+(define define-datatype-transformer^
+  (make-macro '<macro-10>))
+
+(define cases-transformer^ (make-macro '<macro-11>))
+
+(define dd1
+  "(define-datatype thing thing?\n     (thing0)\n     (thing1\n       (f1 thing1-field1?))\n     (thing2\n       (f1 thing2-field1?)\n       (f2 thing2-field2?))\n     (thing3\n       (f1 thing3-field1?)\n       (f2 (list-of thing3-field2?))\n       (f3 thing3-field3?)))")
+
+(define cases1
+  "(cases thing (cons x y)\n     (thing0 () b1)\n     (thing1 (f1) b1 b2 b3)\n     (thing2 (f1 f2 . f3) b1 b2 b3)\n     (thing3 args b1 b2 b3)\n     (else d1 d2 d3))")
+
+(define dd2
+  "(define-datatype expression expression?\n     (var-exp\n       (id symbol?))\n     (if-exp\n       (test-exp expression?)\n       (then-exp expression?)\n       (else-exp expression?))\n     (lambda-exp\n       (formals (list-of symbol?))\n       (bodies (list-of expression?)))\n     (app-exp\n       (operator expression?)\n       (operands (list-of expression?))))")
+
+(define cases2
+  "(cases expression exp\n     (var-exp (id info)\n       (lookup-value id env info handler fail k))\n     (if-exp (test-exp then-exp else-exp info)\n       (m test-exp env handler fail\n\t  (lambda (bool fail)\n\t    (if bool\n\t      (m then-exp env handler fail k)\n\t      (m else-exp env handler fail k)))))\n      (lambda-exp (formals bodies info)\n\t(k (closure formals bodies env) fail))\n      (app-exp (operator operands info)\n\t(m* operands env handler fail\n\t  (lambda (args fail)\n\t    (m operator env handler fail\n\t      (lambda (proc fail)\n\t\t(proc args env info handler fail k))))))\n      (else (error 'm \"bad abstract syntax: ~s\" exp)))")
+
+(define macro-env (make-macro-env^))
+
 (define dlr-apply apply)
 
 (define printf-prim printf)
 
-(define REP-k (make-cont2 '<cont2-46>))
+(define REP-k (make-cont2 '<cont2-47>))
 
 (define REP-handler (make-handler2 '<handler2-2>))
 
@@ -4267,9 +4373,7 @@
 
 (define try-parse-handler (make-handler2 '<handler2-3>))
 
-(define *tracing-on?* #t)
-
-(define _closure-depth 0)
+(define *tracing-on?* #f)
 
 (define void-prim (make-proc '<proc-5>))
 

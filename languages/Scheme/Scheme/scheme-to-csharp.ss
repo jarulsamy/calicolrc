@@ -27,9 +27,7 @@
 	       unparse unparse-exps qq-expand-cps_ qq-expand-list-cps_
 	       init-cont init-cont2 init-cont3 init-handler init-handler2 init-fail
 	       ;; defined in Scheme.cs:
-	       asexp-tag asexp? length^ list?^ symbol?^ car^ cdr^ cadr^ cddr^ caddr^ cdddr^ cadddr^
-	       tagged-list^ list-of-asexp? map^ safe-print make-safe
-
+	       atom-tag pair-tag annotated? tagged-list^ safe-print make-safe
 	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
 	       dlr-object? dlr-lookup-components set-global-value!
 	       set-global-docstring! printf-prim using-prim iterator? get_type

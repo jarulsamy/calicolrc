@@ -32,20 +32,17 @@
 (define *ignore-definitions*
   '(Main
     ;; unannotated functions and datatypes
-    expression syntactic-sugar? make-pattern-macro macro-clauses expand-once process-macro-clauses
+    expression syntactic-sugar? make-pattern-macro expand-once process-macro-clauses
     mit-define-transformer and-transformer or-transformer cond-transformer let-transformer
     letrec-transformer create-letrec-assignments let*-transformer nest-let*-bindings
     case-transformer case-clauses->simple-cond-clauses case-clauses->cond-clauses
-    record-case-transformer record-case-clauses->cond-clauses
-    parse parse-error parse-entries parse-all mit-style? tagged-list
+    record-case-transformer record-case-clauses->cond-clauses tagged-list
+    parse parse-error parse-entries parse-all mit-style-define? special-form?
     quote? quasiquote? unquote? unquote-splicing? if-then? if-else? assignment? func?
-    define? define!? define-syntax? begin? lambda? raise? dict? help? choose? try?
+    define? define!? define-syntax? begin? lambda? raise? choose? try?
     try-body catch? catch-var catch-exps finally? finally-exps application?
-    unparse expand-macro parse-string parse-file print-parsed-sexps get-parsed-sexps
-    parse-sexps
+    unparse expand-macro parse-string parse-file print-parsed-sexps get-parsed-sexps parse-sexps
     qqtest qq1 qq-expand1 qq-expand1-list qq2 qq-expand2 qq-expand2-list qq-expand-cps_ qq-expand-list-cps_
-    read-sexp read-abbreviation read-sexp-sequence close-sexp-sequence read-vector-sequence
-    read-next-sexp improper-list?^ improper-list-of-asexp?
     unannotate reannotate reannotate-seq scan-string scan-file read-string read-datum read-file
     read-file-loop print-file print-file-loop
     aread-string aread-datum aread-file aread-file-loop aparse-string aparse-file aprint-parsed-sexps
@@ -68,7 +65,7 @@
       (make-datatype 'handler2 'handler2 '((handler) exception fail))
       (make-datatype 'procedure 'proc '((proc) args env2 info handler fail k2))
       (make-datatype 'floopproc 'fproc '((proc) args k-env k2))
-      (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer mit-define-transformer^) datum k))
+      (make-datatype 'macro-transformer 'macro '((macro mit-define-transformer mit-define-transformer^) datum handler fail k))
       )))
 
 ;; determines the order of the free variables in data-structure records
@@ -132,7 +129,7 @@
 	  (cond
 	    ((eof-object? exp) vars)
 	    ((or (define? exp) (define*? exp))
-	     (if (mit-style? exp)
+	     (if (mit-style-define? exp)
 		 (loop (read port) (union (caadr exp) vars))
 		 (loop (read port) (union (cadr exp) vars))))
 	    ((eopl-define-datatype? exp)
@@ -431,12 +428,29 @@
   (lambda (exp)
     (and (or (define? exp)
 	     (define*? exp))
-	 (or (mit-style? exp)
+	 (or (mit-style-define? exp)
 	     (lambda? (caddr exp))))))
 
-(define define*? (tagged-list 'define* >= 3))
+(define special-form?
+  (lambda (keyword op len)
+    (lambda (sexp)
+      (and (list? sexp)
+	   (op (length sexp) len)
+	   (symbol? (car sexp))
+	   (eq? (car sexp) keyword)))))
 
-(define define+? (tagged-list 'define+ >= 3))
+(define mit-style-define?
+  (lambda (sexp)
+    (not (symbol? (cadr sexp)))))
+
+(define define? (special-form? 'define >= 3))
+(define define*? (special-form? 'define* >= 3))
+(define define+? (special-form? 'define+ >= 3))
+(define lambda? (special-form? 'lambda >= 3))
+(define quasiquote? (special-form? 'quasiquote = 2))
+(define unquote? (special-form? 'unquote >= 2))
+(define unquote-splicing? (special-form? 'unquote-splicing >= 2))
+(define begin? (special-form? 'begin >= 2))
 
 (define mit-define->define
   (lambda (def)
@@ -539,7 +553,7 @@
 	      `(begin ,@(map (transform params) exps)))
 	    ((define define*) (name . bodies)
 	     (cond
-	       ((mit-style? code)
+	       ((mit-style-define? code)
 		((transform params) (mit-define->define code)))
 	       (*include-define*-in-ds-code?*
 		`(,(car code) ,name ,((transform params) (car bodies))))
@@ -683,7 +697,7 @@
 	  (set! (var rhs-exp) (union var (free rhs-exp params)))
 	  (begin exps (all-free exps params))
 	  ((define define*) (name . bodies)
-	    (if (mit-style? code)
+	    (if (mit-style-define? code)
 	      (all-free bodies (union name params))
 	      (free (car bodies) (union name params))))
 	  (define-syntax args '())
@@ -1018,7 +1032,7 @@
 	     (newline))
 	    ((or (define? exp) (define*? exp))
 	     (cond
-	       ((mit-style? exp)
+	       ((mit-style-define? exp)
 		(pretty-print (cadr exp))
 		(loop (read port) (cons (cadr exp) sigs)))
 	       ((lambda? (caddr exp))
@@ -1031,3 +1045,129 @@
 
 (define all-datatypes (make-all-datatypes))
 
+;;-------------------------------------------------------------------------------
+;; macro transformers
+
+(define let-transformer
+  (lambda (code k)
+    (if (symbol? (cadr code))
+      ;; named let
+      (let* ((name (cadr code))
+	     (bindings (caddr code))
+	     (vars (map car bindings))
+	     (exps (map cadr bindings))
+	     (bodies (cdddr code)))
+	(k `(letrec ((,name (lambda ,vars ,@bodies))) (,name ,@exps))))
+      ;; ordinary let
+      (let* ((bindings (cadr code))
+	     (vars (map car bindings))
+	     (exps (map cadr bindings))
+	     (bodies (cddr code)))
+	(k `((lambda ,vars ,@bodies) ,@exps))))))
+
+(define letrec-transformer
+  (lambda (code k)
+    (let* ((decls (cadr code))
+	   (vars (map car decls))
+	   (procs (map cadr decls))
+	   (bodies (cddr code)))
+      (create-letrec-assignments vars procs
+	(lambda (bindings assigns)  ;; bindings and assigns are unannotated
+	  (k `(let ,bindings ,@assigns ,@bodies)))))))
+
+(define create-letrec-assignments
+  (lambda (vars procs k2)
+    (if (null? vars)
+      (k2 '() '())
+      (create-letrec-assignments (cdr vars) (cdr procs)
+	(lambda (bindings assigns)
+	  (k2 (cons `(,(car vars) 'undefined) bindings)
+	      (cons `(set! ,(car vars) ,(car procs)) assigns)))))))
+
+;; avoids variable capture
+(define cond-transformer
+  (lambda (code k)
+    (let ((clauses (cdr code)))
+      (if (null? clauses)
+	(amacro-error 'cond-transformer code)
+	(let ((first-clause (car clauses))
+	      (other-clauses (cdr clauses)))
+	  (if (or (null? first-clause) (not (list? first-clause)))
+	    (amacro-error 'cond-transformer code)
+	    (let ((test-exp (car first-clause))
+		  (then-exps (cdr first-clause)))
+	      (cond
+		((eq? test-exp 'else)
+		 (cond
+		   ((null? then-exps) (amacro-error 'cond-transformer '(else)))
+		   ((null? (cdr then-exps)) (k (car then-exps)))
+		   (else (k `(begin ,@then-exps)))))
+		((null? then-exps)
+		 (if (null? other-clauses)
+		   (k `(let ((bool ,test-exp))
+			 (if bool bool)))
+		   (k `(let ((bool ,test-exp)
+			     (else-code (lambda () (cond ,@other-clauses))))
+			 (if bool bool (else-code))))))
+		((eq? (car then-exps) '=>)
+		 (cond
+		   ((null? (cdr then-exps)) (amacro-error 'cond-transformer first-clause))
+		   ((null? other-clauses)
+		    (k `(let ((bool ,test-exp)
+			      (th (lambda () ,(cadr then-exps))))
+			  (if bool ((th) bool)))))
+		   (else (k `(let ((bool ,test-exp)
+				   (th (lambda () ,(cadr then-exps)))
+				   (else-code (lambda () (cond ,@other-clauses))))
+			       (if bool ((th) bool) (else-code)))))))
+		((null? other-clauses)
+		 (if (null? (cdr then-exps))
+		   (k `(if ,test-exp ,(car then-exps)))
+		   (k `(if ,test-exp (begin ,@then-exps)))))
+		((null? (cdr then-exps))
+		 (k `(if ,test-exp ,(car then-exps) (cond ,@other-clauses))))
+		(else (k `(if ,test-exp (begin ,@then-exps) (cond ,@other-clauses))))))))))))
+
+(define let*-transformer
+  (lambda (code k)
+    (let ((bindings (cadr code))
+	  (bodies (cddr code)))
+      (nest-let*-bindings bindings bodies k))))
+
+(define nest-let*-bindings
+  (lambda (bindings bodies k)
+    (if (or (null? bindings)
+	    (null? (cdr bindings)))
+	(k `(let ,bindings ,@bodies))
+	(nest-let*-bindings (cdr bindings) bodies
+	  (lambda (v)
+	    (k `(let (,(car bindings)) ,v)))))))
+
+;; avoids variable capture
+(define record-case-transformer
+  (lambda (code k)
+    (let ((exp (cadr code))
+	  (clauses (cddr code)))
+      (record-case-clauses->cond-clauses 'r clauses
+	(lambda (bindings new-clauses)
+	  (k `(let ((r ,exp) ,@bindings) (cond ,@new-clauses))))))))
+
+(define record-case-clauses->cond-clauses
+  (lambda (var clauses k2)
+    (if (null? clauses)
+      (k2 '() '())
+      (record-case-clauses->cond-clauses var (cdr clauses)
+	(lambda (bindings new-clauses)
+	  (let ((clause (car clauses)))
+	    (if (eq? (car clause) 'else)
+	      (k2 (cons `(else-code (lambda () ,@(cdr clause))) bindings)
+		  (cons `(else (else-code)) new-clauses))
+	      (if (symbol? (car clause))
+		(let ((name (car clause)))
+		  (k2 (cons `(,name (lambda ,(cadr clause) ,@(cddr clause))) bindings)
+		      (cons `((eq? (car ,var) ',(car clause)) (apply ,name (cdr ,var)))
+			    new-clauses)))
+		(let ((name (caar clause)))
+		  (k2 (cons `(,name (lambda ,(cadr clause) ,@(cddr clause))) bindings)
+		      (cons `((memq (car ,var) ',(car clause)) (apply ,name (cdr ,var)))
+			    new-clauses)))))))))))

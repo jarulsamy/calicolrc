@@ -142,36 +142,36 @@
     (let ((buffer (reverse buffer)))
       (case token-type
         (end-marker
-          (k (make-token 'end-marker)))
+          (k (make-token1 'end-marker)))
         (integer
-          (k (make-info-token 'integer (list->string buffer))))
+          (k (make-token2 'integer (list->string buffer))))
         (decimal
-          (k (make-info-token 'decimal (list->string buffer))))
+          (k (make-token2 'decimal (list->string buffer))))
         (rational
-          (k (make-info-token 'rational (list->string buffer))))
+          (k (make-token2 'rational (list->string buffer))))
         (identifier
-          (k (make-info-token 'identifier (string->symbol (list->string buffer)))))
+          (k (make-token2 'identifier (string->symbol (list->string buffer)))))
         (boolean
-          (k (make-info-token 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T)))))
+          (k (make-token2 'boolean (or (char=? (car buffer) #\t) (char=? (car buffer) #\T)))))
         (character
-          (k (make-info-token 'character (car buffer))))
+          (k (make-token2 'character (car buffer))))
         (named-character
           (let ((name (list->string buffer)))
             (cond
-              ((string=? name "nul") (k (make-info-token 'character #\nul)))
-              ((string=? name "space") (k (make-info-token 'character #\space)))
-              ((string=? name "tab") (k (make-info-token 'character #\tab)))
-              ((string=? name "newline") (k (make-info-token 'character #\newline)))
-              ((string=? name "linefeed") (k (make-info-token 'character #\newline)))
-              ((string=? name "backspace") (k (make-info-token 'character #\backspace)))
-              ((string=? name "return") (k (make-info-token 'character #\return)))
-              ((string=? name "page") (k (make-info-token 'character #\page)))
+              ((string=? name "nul") (k (make-token2 'character #\nul)))
+              ((string=? name "space") (k (make-token2 'character #\space)))
+              ((string=? name "tab") (k (make-token2 'character #\tab)))
+              ((string=? name "newline") (k (make-token2 'character #\newline)))
+              ((string=? name "linefeed") (k (make-token2 'character #\newline)))
+              ((string=? name "backspace") (k (make-token2 'character #\backspace)))
+              ((string=? name "return") (k (make-token2 'character #\return)))
+              ((string=? name "page") (k (make-token2 'character #\page)))
 	      (else (scan-error (format "invalid character name #\\~a" name)
 				token-start-line token-start-char src handler fail)))))
         (string
-          (k (make-info-token 'string (list->string buffer))))
+          (k (make-token2 'string (list->string buffer))))
         (else
-          (k (make-token token-type)))))))
+          (k (make-token1 token-type)))))))
 
 ;;------------------------------------------------------------------------
 ;; tokens
@@ -186,7 +186,7 @@
 ;;
 ;; <token-start/end> ::= (<line> <char> <pos>)
 
-(define make-token
+(define make-token1
   (lambda (token-type)
     (let ((start (list token-start-line token-start-char token-start-position))
 	  (end (list last-scan-line last-scan-char last-scan-position)))
@@ -194,7 +194,7 @@
 	(list token-type end end)
 	(list token-type start end)))))
 
-(define make-info-token
+(define make-token2
   (lambda (token-type token-info)
     (list token-type token-info
           (list token-start-line token-start-char token-start-position)
@@ -224,23 +224,23 @@
   (lambda (token)
     (caddr (get-token-start token))))
 
-(define snoc
-  (lambda (x lyst)
-    (cond
-      ((null? lyst) (list x))
-      (else (cons (car lyst) (snoc x (cdr lyst)))))))
-
 (define rac
-  (lambda (lyst)
+  (lambda (ls)
     (cond
-     ((null? (cdr lyst)) (car lyst))
-     (else (rac (cdr lyst))))))
+     ((null? (cdr ls)) (car ls))
+     (else (rac (cdr ls))))))
 
 (define rdc
-  (lambda (lyst)
+  (lambda (ls)
     (cond
-     ((null? (cdr lyst)) '())
-     (else (cons (car lyst) (rdc (cdr lyst)))))))
+     ((null? (cdr ls)) '())
+     (else (cons (car ls) (rdc (cdr ls)))))))
+
+(define snoc
+  (lambda (x ls)
+    (cond
+      ((null? ls) (list x))
+      (else (cons (car ls) (snoc x (cdr ls)))))))
 
 ;;------------------------------------------------------------------------
 ;; character categories
@@ -449,6 +449,221 @@
         (error 'apply-state "invalid state: ~a" state)))))
 
 ;;------------------------------------------------------------------------
+;; annotated s-expressions
+;;
+;; <aexp> ::= (#&atom <number> <info>)
+;;          | (#&atom <boolean> <info>)
+;;          | (#&atom <character> <info>)
+;;          | (#&atom <string> <info>)
+;;          | (#&atom <vector> <info>)
+;;          | (#&atom <symbol> <info>)
+;;          | (#&atom () <info>)
+;;          | (#&pair <aexp> <aexp> <info>)
+;;
+;; <info> ::= (<srcfile> <start_line> <start_char> <start_pos> <end_line> <end_char> <end_pos>)
+;;          | (<srcfile> <start_line> <start_char> <start_pos> <end_line> <end_char> <end_pos> <macro-name>+)
+
+(define atom-tag (box 'atom))
+(define pair-tag (box 'pair))
+
+(define aatom?
+  (lambda (x)
+    (and (pair? x) (eq? (car x) atom-tag))))
+
+(define apair?
+  (lambda (x)
+    (and (pair? x) (eq? (car x) pair-tag))))
+
+(define annotated?
+  (lambda (x)
+    (and (pair? x) (or (eq? (car x) atom-tag) (eq? (car x) pair-tag)))))
+
+(define untag-atom^
+  (lambda (aatom)
+    (cadr aatom)))
+
+(define atom?^
+  (lambda (asexp)
+    (eq? (car asexp) atom-tag)))
+
+(define pair?^
+  (lambda (asexp)
+    (eq? (car asexp) pair-tag)))
+
+(define null?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (null? (untag-atom^ asexp)))))
+
+(define symbol?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (symbol? (untag-atom^ asexp)))))
+
+(define string?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (string? (untag-atom^ asexp)))))
+
+(define vector?^
+  (lambda (asexp)
+    (and (atom?^ asexp) (vector? (untag-atom^ asexp)))))
+
+(define car^ (lambda (asexp) (cadr asexp)))
+(define cdr^ (lambda (asexp) (caddr asexp)))
+(define cadr^ (lambda (asexp) (car^ (cdr^ asexp))))
+(define cdar^ (lambda (asexp) (cdr^ (car^ asexp))))
+(define caar^ (lambda (asexp) (car^ (car^ asexp))))
+(define cddr^ (lambda (asexp) (cdr^ (cdr^ asexp))))
+(define cdddr^ (lambda (asexp) (cdr^ (cdr^ (cdr^ asexp)))))
+(define caddr^ (lambda (asexp) (car^ (cdr^ (cdr^ asexp)))))
+(define cdadr^ (lambda (asexp) (cdr^ (car^ (cdr^ asexp)))))
+(define cadar^ (lambda (asexp) (car^ (cdr^ (car^ asexp)))))
+(define caadr^ (lambda (asexp) (car^ (car^ (cdr^ asexp)))))
+(define cadddr^ (lambda (asexp) (car^ (cdr^ (cdr^ (cdr^ asexp))))))
+(define eq?^ (lambda (asexp sym) (eq? (cadr asexp) sym)))
+(define vector->list^ (lambda (asexp) (vector->list (cadr asexp))))
+(define symbol->string^ (lambda (asexp) (symbol->string (cadr asexp))))
+
+(define list?^
+  (lambda (asexp)
+    (or (null?^ asexp)
+	(and (pair?^ asexp) (list?^ (caddr asexp))))))
+
+;; must wrap annotated lists with this before using ,@
+(define at^
+  (lambda (alist)
+    (if (null?^ alist)
+      '()
+      (cons (car^ alist) (at^ (cdr^ alist))))))
+
+(define length^
+  (lambda (asexp)
+    (cond
+      ((null?^ asexp) 0)
+      (else (+ 1 (length^ (cdr^ asexp)))))))
+
+(define cons^
+  (lambda (a b info)
+    (list pair-tag a b info)))
+
+(define map^
+  (lambda (f^ asexp)
+    (cond
+      ((null?^ asexp) (list atom-tag '() 'none))
+      (else (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
+      
+(define *reader-generates-annotated-sexps?* #t)
+
+;; for manual testing only
+(define annotate
+  (lambda (x info)
+    (cond
+      ((not *reader-generates-annotated-sexps?*) x)
+      ((annotated? x) x)
+      ((pair? x) (list pair-tag (annotate (car x) 'none) (annotate (cdr x) 'none) info))
+      (else (list atom-tag x info)))))
+
+(define annotate-cps
+  (lambda (x info k)   ;; k receives 1 arg: an annotated sexp
+    (cond
+      ((not *reader-generates-annotated-sexps?*) (k x))
+      ((annotated? x) (k x))
+      ((pair? x)
+       (annotate-cps (car x) 'none
+	 (lambda-cont (v1)
+	   (annotate-cps (cdr x) 'none
+	     (lambda-cont (v2)
+	       (k (list pair-tag v1 v2 info)))))))
+      (else (k (list atom-tag x info))))))
+
+;; for manual testing only
+(define unannotate
+  (lambda (x)
+    (cond
+      ((aatom? x) (unannotate (cadr x)))
+      ((apair? x) (cons (unannotate (cadr x)) (unannotate (caddr x))))
+      ((pair? x) (cons (unannotate (car x)) (unannotate (cdr x))))
+      ((vector? x) (list->vector (unannotate (vector->list x))))
+      (else x))))
+
+(define* unannotate-cps
+  (lambda (x k)   ;; k receives 1 arg: an unannotated sexp
+    (cond
+      ((aatom? x)
+       (unannotate-cps (cadr x) k))
+      ((apair? x)
+       (unannotate-cps (cadr x)
+	 (lambda-cont (v1)
+	   (unannotate-cps (caddr x)
+	     (lambda-cont (v2)
+	       (k (cons v1 v2)))))))
+      ((pair? x)
+       (unannotate-cps (car x)
+	 (lambda-cont (v1)
+	   (unannotate-cps (cdr x)
+	     (lambda-cont (v2)
+	       (k (cons v1 v2)))))))
+      ((vector? x)
+       (unannotate-cps (vector->list x)
+	 (lambda-cont (ls)
+	   (k (list->vector ls)))))
+      (else (k x)))))
+
+(define make-info
+  (lambda (src start end)
+    (cons src (append start end))))
+
+(define replace-info
+  (lambda (asexp new-info)
+    (if (atom?^ asexp)
+      (list atom-tag (cadr asexp) new-info)
+      (list pair-tag (cadr asexp) (caddr asexp) new-info))))
+
+(define get-srcfile
+  (lambda (info)
+    (car info)))
+
+(define get-start-line
+  (lambda (info)
+    (cadr info)))
+
+(define get-start-char
+  (lambda (info)
+    (caddr info)))
+
+(define get-start-pos
+  (lambda (info)
+    (cadddr info)))
+
+(define get-end-line
+  (lambda (info)
+    (car (cddddr info))))
+
+(define get-end-char
+  (lambda (info)
+    (cadr (cddddr info))))
+
+(define get-end-pos
+  (lambda (info)
+    (caddr (cddddr info))))
+
+(define get-source-info
+  (lambda (asexp)
+    (rac asexp)))
+
+(define source-info?
+  (lambda (x)
+    (or (eq? x 'none) (list? x))))
+
+(define has-source-info?
+  (lambda (asexp)
+    (not (eq? (get-source-info asexp) 'none))))
+
+;; true if no macro name at end of info list
+(define original-source-info?
+  (lambda (asexp)
+    (and (has-source-info? asexp)
+	 (= (length (get-source-info asexp)) 7))))
+
+;;------------------------------------------------------------------------
 ;; recursive descent parser
 ;;
 ;; <sexp> ::= <number> | <boolean> | <character> | <string> | <identifier>
@@ -481,93 +696,6 @@
   (lambda (v) 
     (if v #t #f)))
 
-(define* read-sexp
-  (lambda (tokens src handler fail k)   ;; k receives 3 args: sexp, tokens-left, fail
-    (record-case (first tokens)
-      (integer (str)
-        (k (string->integer str) (rest-of tokens) fail))
-      (decimal (str)
-        (k (string->decimal str) (rest-of tokens) fail))
-      (rational (str)
-        (let ((num (string->rational str)))
-          (if (true? num)
-            (k num (rest-of tokens) fail)
-	    (read-error (format "cannot represent ~a" str) tokens src handler fail))))
-      (boolean (bool) (k bool (rest-of tokens) fail))
-      (character (char) (k char (rest-of tokens) fail))
-      (string (str) (k str (rest-of tokens) fail))
-      (identifier (id) (k id (rest-of tokens) fail))
-      (apostrophe () (read-abbreviation tokens 'quote src handler fail k))
-      (backquote () (read-abbreviation tokens 'quasiquote src handler fail k))
-      (comma () (read-abbreviation tokens 'unquote src handler fail k))
-      (comma-at () (read-abbreviation tokens 'unquote-splicing src handler fail k))
-      (lparen ()
-        (let ((tokens (rest-of tokens)))
-	  (read-sexp-sequence tokens 'rparen src handler fail
-	    (lambda-cont3 (sexps tokens-left fail)
-	      (k sexps tokens-left fail)))))
-      (lbracket ()
-        (let ((tokens (rest-of tokens)))
-	  (read-sexp-sequence tokens 'rbracket src handler fail
-	    (lambda-cont3 (sexps tokens-left fail)
-	      (k sexps tokens-left fail)))))
-      (lvector ()
-        (read-vector-sequence (rest-of tokens) src handler fail
-          (lambda-cont3 (sexps tokens-left fail)
-            (k (list->vector sexps) tokens-left fail))))
-      (else (unexpected-token-error tokens src handler fail)))))
-
-(define* read-abbreviation
-  (lambda (tokens keyword src handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
-    (read-sexp (rest-of tokens) src handler fail
-      (lambda-cont3 (sexp tokens-left fail)
-        (k (list keyword sexp) tokens-left fail)))))
-
-(define* read-sexp-sequence
-  (lambda (tokens expected-terminator src handler fail k)
-    (record-case (first tokens)
-      ((rparen rbracket) ()
-       (close-sexp-sequence '() tokens expected-terminator src handler fail k))
-      (dot ()
-	(read-error "unexpected dot (.)" tokens src handler fail))
-      (else
-        (read-sexp tokens src handler fail
-          (lambda-cont3 (sexp1 tokens-left fail)
-	    (if (token-type? (first tokens-left) 'dot)
-	      (read-sexp (rest-of tokens-left) src handler fail
-		(lambda-cont3 (sexp2 tokens-left fail)
-		  (close-sexp-sequence (cons sexp1 sexp2) tokens-left expected-terminator src handler fail k)))
-	      (read-sexp-sequence tokens-left expected-terminator src handler fail
-		(lambda-cont3 (sexps tokens-left fail)
-		  (k (cons sexp1 sexps) tokens-left fail))))))))))
-
-(define* close-sexp-sequence
-  (lambda (sexp tokens expected-terminator src handler fail k)
-    (record-case (first tokens)
-      ((rparen rbracket) ()
-       (cond
-         ((token-type? (first tokens) expected-terminator)
-          (k sexp (rest-of tokens) fail))
-         ((eq? expected-terminator 'rparen)
-          (read-error "parenthesized list terminated by bracket" tokens src handler fail))
-         ((eq? expected-terminator 'rbracket)
-	  (read-error "bracketed list terminated by parenthesis" tokens src handler fail))))
-      (else (unexpected-token-error tokens src handler fail)))))
-
-(define* read-vector-sequence
-  (lambda (tokens src handler fail k)  ;; k gets 3 args: sexps, tokens-left, fail
-    (record-case (first tokens)
-      (rparen ()
-	(close-sexp-sequence '() tokens 'rparen src handler fail k))
-      (dot ()
-	(read-error "unexpected dot (.)" tokens src handler fail))
-      (else
-        (read-sexp tokens src handler fail
-          (lambda-cont3 (sexp1 tokens-left fail)
-	    (read-vector-sequence tokens-left src handler fail
-	      (lambda-cont3 (sexps tokens-left fail)
-		(k (cons sexp1 sexps) tokens-left fail)))))))))
-
 (define* unexpected-token-error
   (lambda (tokens src handler fail)
     (let ((token (first tokens)))
@@ -599,314 +727,121 @@
               '()
               (cons char (loop (read-char port))))))))))
 
-;;------------------------------------------------------------------------
-;; annotated s-expressions
-;;
-;; <asexp> ::= (asexp <sexp> <info>)
-;;
-;; <sexp> ::= <number>
-;;          | <boolean>
-;;          | <character>
-;;          | <string>
-;;          | <vector>
-;;          | <symbol>
-;;          | ( <asexp>* )
-;;          | ( <asexp>+ . <asexp> )
-;;
-;; <info> ::= (<srcfile> <start_line> <start_char> <start_pos> <end_line> <end_char> <end_pos>)
-;;          | (<srcfile> <start_line> <start_char> <start_pos> <end_line> <end_char> <end_pos> <macro-name>+)
-
-(define asexp-tag (box 'tag))
-
-(define make-asexp
-  (lambda (src start end sexp)
-    (list asexp-tag sexp (cons src (append start end)))))
-
-(define retag
-  (lambda (sexp info)
-    (list asexp-tag sexp info)))
-
-(define asexp?
-  (lambda (x)
-    (and (pair? x) (eq? (car x) asexp-tag))))
-
-(define get-sexp
-  (lambda (asexp)
-    (cadr asexp)))
-
-(define get-source-info
-  (lambda (asexp)
-    (caddr asexp)))
-
-(define get-srcfile
-  (lambda (info)
-    (car info)))
-
-(define get-start-line
-  (lambda (info)
-    (cadr info)))
-
-(define get-start-char
-  (lambda (info)
-    (caddr info)))
-
-(define get-start-pos
-  (lambda (info)
-    (cadddr info)))
-
-(define get-end-line
-  (lambda (info)
-    (car (cddddr info))))
-
-(define get-end-char
-  (lambda (info)
-    (cadr (cddddr info))))
-
-(define get-end-pos
-  (lambda (info)
-    (caddr (cddddr info))))
-
-(define has-source-info?
-  (lambda (asexp)
-    (not (eq? (get-source-info asexp) 'none))))
-
-;; true if no macro name at end of info list
-(define original-source-info?
-  (lambda (asexp)
-    (and (has-source-info? asexp)
-	 (= (length (get-source-info asexp)) 7))))
-
-(define source-info?
-  (lambda (x)
-    (or (eq? x 'none) (list? x))))
-
-(define replace-info
-  (lambda (asexp info)
-    (retag (get-sexp asexp) info)))
-
-(define car^ (lambda (asexp) (car (get-sexp asexp))))
-(define cdr^ (lambda (asexp) (cdr (get-sexp asexp))))
-(define cddr^ (lambda (asexp) (cddr (get-sexp asexp))))
-(define cdddr^ (lambda (asexp) (cdddr (get-sexp asexp))))
-(define cadr^ (lambda (asexp) (cadr (get-sexp asexp))))
-(define caddr^ (lambda (asexp) (caddr (get-sexp asexp))))
-(define cadddr^ (lambda (asexp) (cadddr (get-sexp asexp))))
-(define map^ (lambda (f asexp) (map f (get-sexp asexp))))
-(define symbol?^ (lambda (asexp) (symbol? (get-sexp asexp))))
-(define string?^ (lambda (asexp) (string? (get-sexp asexp))))
-(define length^ (lambda (asexp) (length (get-sexp asexp))))
-(define eq?^ (lambda (asexp x) (eq? (get-sexp asexp) x)))
-(define vector?^ (lambda (asexp) (vector? (get-sexp asexp))))
-(define vector->list^ (lambda (asexp) (vector->list (get-sexp asexp))))
-
-(define cons^
-  (lambda (a b info)
-    (cond
-      ((null?^ b) (retag (list a) info))
-      ((pair?^ b) (retag (cons a (get-sexp b)) info))
-      (else (retag (cons a b) info)))))
-
-(define ^cdr^
-  (lambda (asexp)
-    (if (asexp? (cdr^ asexp)) ;; asexp could represent an annotated dotted pair
-      (cdr^ asexp)
-      (retag (cdr^ asexp) 'none))))
-
-;; unnecessary:
-(define improper-list?^ (lambda (asexp) (improper-list-of-asexp? (get-sexp asexp))))
-
-(define null?^
-  (lambda (x)
-    (and (asexp? x) (null? (get-sexp x)))))
-
-(define pair?^
-  (lambda (x)
-    (and (asexp? x) (pair? (get-sexp x)))))
-
-(define list?^
-  (lambda (x)
-    (and (asexp? x) (list-of-asexp? (get-sexp x)))))
-
-(define list-of-asexp?
-  (lambda (x)
-    (or (null? x)
-	(and (pair? x)
-	     (asexp? (car x))
-	     ;; example: (aread-string "(a . (b))")
-	     (or (list-of-asexp? (cdr x))
-		 (list?^ (cdr x)))))))
-
-;; unnecessary:
-(define improper-list-of-asexp?
-  (lambda (x)
-    (and (pair? x)
-	 (asexp? (car x))
-	 (or (asexp? (cdr x))
-	     (improper-list-of-asexp? (cdr x))))))
-
-;; for manual testing only
-(define unannotate
-  (lambda (x)
-    (cond
-      ((asexp? x) (unannotate (get-sexp x)))
-      ((pair? x) (cons (unannotate (car x)) (unannotate (cdr x))))
-      ((vector? x) (list->vector (unannotate (vector->list x))))
-      (else x))))
-
-;; for manual testing only
-(define reannotate
-  (lambda (x)
-    (cond
-      ((asexp? x) x)
-      ((pair? x) (retag (reannotate-seq x) 'none))
-      ((vector? x) (retag (list->vector (reannotate-seq (vector->list x))) 'none))
-      (else (retag x 'none)))))
-
-;; for manual testing only
-(define reannotate-seq
-  (lambda (x)
-    (cond
-      ((null? x) '())
-      ((asexp? x) x)
-      ((not (pair? x)) (reannotate x))
-      ((or (null?^ (cdr x)) (pair?^ (cdr x)))  ;; necessary for annotated structures like (a . (b))
-       (reannotate-seq (cons (car x) (get-sexp (cdr x)))))
-      (else (cons (reannotate (car x)) (reannotate-seq (cdr x)))))))
-
-(define* unannotate-cps
-  (lambda (x k)   ;; k takes 1 arg
-    (cond
-      ((asexp? x)
-       (unannotate-cps (get-sexp x) k))
-      ((pair? x)
-       (unannotate-cps (car x)
-	 (lambda-cont (v1)
-	   (unannotate-cps (cdr x)
-	     (lambda-cont (v2)
-	       (k (cons v1 v2)))))))
-      ((vector? x)
-       (unannotate-cps (vector->list x)
-	 (lambda-cont (ls)
-	   (k (list->vector ls)))))
-      (else (k x)))))
-
-(define* reannotate-cps
-  (lambda (x k)    ;; k takes 1 arg
-    (cond
-      ((asexp? x) (k x))
-      ((pair? x)
-       (reannotate-seq-cps x (lambda-cont (v) (k (retag v 'none)))))
-      ((vector? x)
-       (reannotate-seq-cps (vector->list x)
-	 (lambda-cont (v)
-	   (k (retag (list->vector v) 'none)))))
-      (else (k (retag x 'none))))))
-
-(define* reannotate-seq-cps
-  (lambda (x k)   ;; k takes 1 arg
-    (cond
-      ((null? x) (k '()))
-      ((asexp? x) (k x))
-      ((not (pair? x)) (reannotate-cps x k))
-      ((or (null?^ (cdr x)) (pair?^ (cdr x)))  ;; necessary for annotated structures like (a . (b))
-       (reannotate-seq-cps (cons (car x) (get-sexp (cdr x))) k))
-      (else (reannotate-cps (car x)
-	      (lambda-cont (v1)
-		(reannotate-seq-cps (cdr x)
-		  (lambda-cont (v2)
-		    (k (cons v1 v2))))))))))
-
-(define* read-asexp
-  (lambda (tokens src handler fail k)   ;; k receives 4 args: asexp, end, tokens-left, fail
+(define* read-sexp
+  (lambda (tokens src handler fail k)   ;; k receives 4 args: sexp, end, tokens-left, fail
     (let ((start (get-token-start (first tokens)))
 	  (end (get-token-end (first tokens))))
       (record-case (first tokens)
 	(integer (str)
-	  (k (make-asexp src start end (string->integer str)) end (rest-of tokens) fail))
+	  (annotate-cps (string->integer str) (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k sexp end (rest-of tokens) fail))))
 	(decimal (str)
-	  (k (make-asexp src start end (string->decimal str)) end (rest-of tokens) fail))
+	  (annotate-cps (string->decimal str) (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k v end (rest-of tokens) fail))))
 	(rational (str)
 	  (let ((num (string->rational str)))
 	    (if (true? num)
-	      (k (make-asexp src start end num) end (rest-of tokens) fail)
+	      (annotate-cps num (make-info src start end)
+		(lambda-cont (sexp)
+		  (k sexp end (rest-of tokens) fail)))
 	      (read-error (format "cannot represent ~a" str) tokens src handler fail))))
-	(boolean (bool) (k (make-asexp src start end bool) end (rest-of tokens) fail))
-	(character (char) (k (make-asexp src start end char) end (rest-of tokens) fail))
-	(string (str) (k (make-asexp src start end str) end (rest-of tokens) fail))
-	(identifier (id) (k (make-asexp src start end id) end (rest-of tokens) fail))
-	(apostrophe () (read-annotated-abbreviation tokens 'quote src handler fail k))
-	(backquote () (read-annotated-abbreviation tokens 'quasiquote src handler fail k))
-	(comma () (read-annotated-abbreviation tokens 'unquote src handler fail k))
-	(comma-at () (read-annotated-abbreviation tokens 'unquote-splicing src handler fail k))
+	(boolean (bool)
+	  (annotate-cps bool (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k sexp end (rest-of tokens) fail))))
+	(character (char)
+	  (annotate-cps char (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k sexp end (rest-of tokens) fail))))
+	(string (str)
+	  (annotate-cps str (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k sexp end (rest-of tokens) fail))))
+	(identifier (id)
+	  (annotate-cps id (make-info src start end)
+	    (lambda-cont (sexp)
+	      (k sexp end (rest-of tokens) fail))))
+	(apostrophe () (read-abbreviation tokens 'quote src handler fail k))
+	(backquote () (read-abbreviation tokens 'quasiquote src handler fail k))
+	(comma () (read-abbreviation tokens 'unquote src handler fail k))
+	(comma-at () (read-abbreviation tokens 'unquote-splicing src handler fail k))
 	(lparen ()
 	  (let ((tokens (rest-of tokens)))
-	    (read-asexp-sequence tokens 'rparen src handler fail
-	      (lambda-cont4 (asexps end tokens-left fail)
-		(k (make-asexp src start end asexps) end tokens-left fail)))))
+	    (read-sexp-sequence tokens 'rparen src handler fail
+	      (lambda-cont4 (sexps end tokens-left fail)
+		(annotate-cps sexps (make-info src start end)
+		  (lambda-cont (sexp)
+		    (k sexp end tokens-left fail)))))))
 	(lbracket ()
 	  (let ((tokens (rest-of tokens)))
-	    (read-asexp-sequence tokens 'rbracket src handler fail
-	      (lambda-cont4 (asexps end tokens-left fail)
-		(k (make-asexp src start end asexps) end tokens-left fail)))))
+	    (read-sexp-sequence tokens 'rbracket src handler fail
+	      (lambda-cont4 (sexps end tokens-left fail)
+		(annotate-cps sexps (make-info src start end)
+		  (lambda-cont (sexp)
+		    (k sexp end tokens-left fail)))))))
 	(lvector ()
-	  (read-avector-sequence (rest-of tokens) src handler fail
-	    (lambda-cont4 (asexps end tokens-left fail)
-	      (k (make-asexp src start end (list->vector asexps)) end tokens-left fail))))
+	  (read-vector-sequence (rest-of tokens) src handler fail
+	    (lambda-cont4 (sexps end tokens-left fail)
+	      (annotate-cps (list->vector sexps) (make-info src start end)
+		(lambda-cont (sexp)
+		  (k sexp end tokens-left fail))))))
 	(else (unexpected-token-error tokens src handler fail))))))
 
-(define* read-annotated-abbreviation
+(define* read-abbreviation
   (lambda (tokens keyword src handler fail k)
     (let ((start (get-token-start (first tokens)))
 	  (keyword-end (get-token-end (first tokens))))
-      (read-asexp (rest-of tokens) src handler fail
-	(lambda-cont4 (asexp end tokens-left fail)
-	  (k (make-asexp src start end (list (make-asexp src start keyword-end keyword) asexp))
-	     end tokens-left fail))))))
+      (annotate-cps keyword (make-info src start keyword-end)
+	(lambda-cont (v)
+	  (read-sexp (rest-of tokens) src handler fail
+	    (lambda-cont4 (sexp end tokens-left fail)
+	      (annotate-cps (list v sexp) (make-info src start end)
+		(lambda-cont (v2)
+		  (k v2 end tokens-left fail))))))))))
 
-(define* read-avector-sequence
+(define* read-vector-sequence
   (lambda (tokens src handler fail k)  ;; k gets 4 args: sexps, end, tokens-left, fail
     (record-case (first tokens)
       (rparen ()
-	(close-asexp-sequence '() tokens 'rparen src handler fail k))
+	(close-sexp-sequence '() tokens 'rparen src handler fail k))
       (dot ()
 	(read-error "unexpected dot (.)" tokens src handler fail))
       (else
-        (read-asexp tokens src handler fail
-          (lambda-cont4 (asexp1 end tokens-left fail)
-	    (read-avector-sequence tokens-left src handler fail
-	      (lambda-cont4 (asexps end tokens-left fail)
-		(k (cons asexp1 asexps) end tokens-left fail)))))))))
+        (read-sexp tokens src handler fail
+          (lambda-cont4 (sexp1 end tokens-left fail)
+	    (read-vector-sequence tokens-left src handler fail
+	      (lambda-cont4 (sexps end tokens-left fail)
+		(k (cons sexp1 sexps) end tokens-left fail)))))))))
 
-(define* read-asexp-sequence
-  (lambda (tokens expected-terminator src handler fail k)  ;; k gets 4 args: asexps, end, tokens-left, fail
+(define* read-sexp-sequence
+  (lambda (tokens expected-terminator src handler fail k)  ;; k gets 4 args: sexps, end, tokens-left, fail
     (record-case (first tokens)
       ((rparen rbracket) ()
-       (close-asexp-sequence '() tokens expected-terminator src handler fail k))
+       (close-sexp-sequence '() tokens expected-terminator src handler fail k))
       (dot ()
 	(read-error "unexpected dot (.)" tokens src handler fail))
       (else
-        (read-asexp tokens src handler fail
-          (lambda-cont4 (asexp1 end tokens-left fail)
+        (read-sexp tokens src handler fail
+          (lambda-cont4 (sexp1 end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'dot)
-	      (read-asexp (rest-of tokens-left) src handler fail
-		(lambda-cont4 (asexp2 end tokens-left fail)
-		  (if (or (null?^ asexp2) (pair?^ asexp2))
-		    (close-asexp-sequence
-		      (cons asexp1 (get-sexp asexp2)) tokens-left expected-terminator src handler fail k)
-		    (close-asexp-sequence
-		      (cons asexp1 asexp2) tokens-left expected-terminator src handler fail k))))
-	      (read-asexp-sequence tokens-left expected-terminator src handler fail
-		(lambda-cont4 (asexps end tokens-left fail)
-		  (k (cons asexp1 asexps) end tokens-left fail))))))))))
+	      (read-sexp (rest-of tokens-left) src handler fail
+		(lambda-cont4 (sexp2 end tokens-left fail)
+		  (close-sexp-sequence
+		    (cons sexp1 sexp2) tokens-left expected-terminator src handler fail k)))
+	      (read-sexp-sequence tokens-left expected-terminator src handler fail
+		(lambda-cont4 (sexps end tokens-left fail)
+		  (k (cons sexp1 sexps) end tokens-left fail))))))))))
 
-(define* close-asexp-sequence
-  (lambda (asexps tokens expected-terminator src handler fail k)  ;; k gets 4 args: asexps, end, tokens-left, fail
+(define* close-sexp-sequence
+  (lambda (sexps tokens expected-terminator src handler fail k)  ;; k gets 4 args: sexps, end, tokens-left, fail
     (let ((end (get-token-end (first tokens))))
       (record-case (first tokens)
 	((rparen rbracket) ()
 	 (cond
 	   ((token-type? (first tokens) expected-terminator)
-	    (k asexps end (rest-of tokens) fail))
+	    (k sexps end (rest-of tokens) fail))
 	   ((eq? expected-terminator 'rparen)
 	    (read-error "parenthesized list terminated by bracket" tokens src handler fail))
 	   ((eq? expected-terminator 'rbracket)
@@ -931,63 +866,18 @@
   (lambda (filename)
     (scan-input (read-content filename) filename init-handler2 init-fail init-cont2)))
 
-(define read-string
-  (lambda (input)
-    (read-datum input 'stdin init-handler2 init-fail init-cont3)))
-
-(define* read-datum
-  (lambda (input src handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
-    (scan-input input src handler fail
-      (lambda-cont2 (tokens fail)
-        (read-sexp tokens src handler fail
-          (lambda-cont3 (sexp tokens-left fail)
-            (if (token-type? (first tokens-left) 'end-marker)
-              (k sexp tokens-left fail)
-	      (read-error "tokens left over" tokens-left src handler fail))))))))
-
-(define read-file
-  (lambda (filename) 
-   (scan-input (read-content filename) filename init-handler2 init-fail
-      (lambda-cont2 (tokens fail)
-        (read-file-loop tokens filename init-handler2 init-fail init-cont2)))))
-
-(define* read-file-loop
-  (lambda (tokens src handler fail k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k '() fail)
-      (read-sexp tokens src handler fail
-        (lambda-cont3 (sexp tokens-left fail)
-	  (read-file-loop tokens-left src handler fail
-	    (lambda-cont2 (sexps fail)
-	      (k (cons sexp sexps) fail))))))))
-
-(define print-file
-  (lambda (filename)
-    (scan-input (read-content filename) filename init-handler2 init-fail
-      (lambda-cont2 (tokens fail)
-        (print-file-loop tokens filename init-handler2 init-fail init-cont2)))))
-
-(define* print-file-loop
-  (lambda (tokens src handler fail k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k 'done fail)
-      (read-sexp tokens src handler fail
-        (lambda-cont3 (sexp tokens-left fail)
-          (pretty-print sexp)
-          (print-file-loop tokens-left src handler fail k))))))
-
 (define aread-string
   (lambda (input)
     (aread-datum input 'stdin init-handler2 init-fail init-cont3)))
 
 (define* aread-datum
-  (lambda (input src handler fail k)  ;; k receives 3 args: asexp, tokens-left, fail
+  (lambda (input src handler fail k)  ;; k receives 3 args: sexp, tokens-left, fail
     (scan-input input src handler fail
       (lambda-cont2 (tokens fail)
-        (read-asexp tokens src handler fail
-          (lambda-cont4 (asexp end tokens-left fail)
+        (read-sexp tokens src handler fail
+          (lambda-cont4 (sexp end tokens-left fail)
             (if (token-type? (first tokens-left) 'end-marker)
-              (k asexp tokens-left fail)
+              (k sexp tokens-left fail)
 	      (read-error "tokens left over" tokens-left src handler fail))))))))
 
 (define aread-file
@@ -1000,8 +890,9 @@
   (lambda (tokens src handler fail k)
     (if (token-type? (first tokens) 'end-marker)
       (k '() fail)
-      (read-asexp tokens src handler fail
-        (lambda-cont4 (asexp end tokens-left fail)
+      (read-sexp tokens src handler fail
+        (lambda-cont4 (sexp end tokens-left fail)
 	  (aread-file-loop tokens-left src handler fail
-	    (lambda-cont2 (asexps fail)
-	      (k (cons asexp asexps) fail))))))))
+	    (lambda-cont2 (sexps fail)
+	      (k (cons sexp sexps) fail))))))))
+

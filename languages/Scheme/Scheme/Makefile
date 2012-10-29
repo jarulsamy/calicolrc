@@ -27,7 +27,6 @@ run: pjscheme-rm.ss no-csharp-support.ss
 	echo "(case-sensitive #t)" > pjscheme-run.ss
 	echo "(load \"pjscheme-rm.ss\")" >> pjscheme-run.ss
 	echo "(load \"no-csharp-support.ss\")" >> pjscheme-run.ss
-	echo "(define execute execute-rm)" >> pjscheme-run.ss
 	echo "(begin (display (run start)) (newline))" >> pjscheme-run.ss
 	petite pjscheme-run.ss
 

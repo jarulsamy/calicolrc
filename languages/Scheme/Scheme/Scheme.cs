@@ -2,11 +2,11 @@
 /*
   ;; Calico Scheme interpreter with support for choose
   ;;
-  ;; Written by James B. Marshall and Douglas S. Blank
-  ;; jmarshall@slc.edu
-  ;; http://science.slc.edu/~jmarshall
+  ;; Written by Douglas S. Blank and James B. Marshall
   ;; dblank@brynmawr.edu
   ;; http://cs.brynmawr.edu/~dblank
+  ;; jmarshall@slc.edu
+  ;; http://science.slc.edu/~jmarshall
 */
 
 using System;
@@ -2820,16 +2820,23 @@ public class Scheme {
   //--------------------------------------------------------------------------------------------
   // support for annotated s-expressions
 
-  public static object asexp_tag = new Cons(symbol("tag"), EmptyList);
+  public static object atom_tag = new Cons(symbol("atom_tag"), EmptyList);
 
-  public static bool asexp_q(object x) {
-    return (pair_q(x) && Eq(car(x), asexp_tag));
+  public static object pair_tag = new Cons(symbol("pair_tag"), EmptyList);
+
+  public static bool aatom_q(object x) {
+    return (pair_q(x) && Eq(car(x), atom_tag));
   }
 
-  public static object get_sexp(object asexp) {
-    return (cadr(asexp));
+  public static bool apair_q(object x) {
+    return (pair_q(x) && Eq(car(x), pair_tag));
   }
 
+  public static bool annotated_q(object x) {
+    return (pair_q(x) && (Eq(car(x), atom_tag) || Eq(car(x), pair_tag)));
+  }
+
+    /*
   public static int length_hat(object asexp) {
     return ((int)length(get_sexp(asexp)));
   }
@@ -2850,6 +2857,7 @@ public class Scheme {
   public static object map_hat(object proc, object asexp) {
     return (map(proc, get_sexp(asexp)));
    }
+    */
 
   public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
     return (object x) => {

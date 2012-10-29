@@ -14,6 +14,11 @@
 
 (load "ds-transformer.ss")
 
+;; these definitions will not be included in the transformed output code
+(define *ignore-definitions*
+  '(execute execute-string execute-file execute-loop
+     ))
+
 ;; default transformer settings
 (define *include-eopl-define-datatype-in-registerized-code?* #f)
 (define *include-define*-in-registerized-code?* #t)
@@ -155,6 +160,8 @@
 		     ((eopl-define-datatype? exp)
 		      (set! need-eopl-support? #t)
 		      (set! eopl-defs (cons exp eopl-defs)))
+		     ((skip-definition? exp)
+		      (printf "skipping ~a definition\n" (cadr exp)))
 		     ((or (define? exp) (define*? exp))
 		      (set! defs (cons (preprocess-define exp) defs)))
 		     ((define+? exp)
@@ -246,7 +253,7 @@
 (define preprocess-define
   (lambda (def)
     (cond
-      ((mit-style? def) (preprocess-define (mit-define->define def)))
+      ((mit-style-define? def) (preprocess-define (mit-define->define def)))
       ((define*? def)
        (let* ((name (cadr def))
 	      (lambda-exp (caddr def))
