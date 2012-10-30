@@ -92,6 +92,14 @@ public class CalicoSchemeEngine : Engine
     return PJScheme.try_parse(text);
   }
 
+  public override void SetTraceOn(MainWindow calico) {
+      PJScheme.tracing_on(PJScheme.list(true));
+  }
+
+  public override void SetTraceOff() {
+      PJScheme.tracing_on(PJScheme.list(false));
+  }
+
   public static void Main(string[] args) {
       LanguageManager manager = new LanguageManager(new List<string>(){"scheme"}, 
 						    "..", 
