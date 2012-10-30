@@ -544,7 +544,7 @@
   (lambda (a b info)
     (list pair-tag a b info)))
 
-(define map^
+(define-native map^
   (lambda (f^ asexp)
     (cond
       ((null?^ asexp) (list atom-tag '() 'none))
@@ -561,7 +561,7 @@
       ((pair? x) (list pair-tag (annotate (car x) 'none) (annotate (cdr x) 'none) info))
       (else (list atom-tag x info)))))
 
-(define annotate-cps
+(define* annotate-cps
   (lambda (x info k)   ;; k receives 1 arg: an annotated sexp
     (cond
       ((not *reader-generates-annotated-sexps?*) (k x))
@@ -739,7 +739,7 @@
 	(decimal (str)
 	  (annotate-cps (string->decimal str) (make-info src start end)
 	    (lambda-cont (sexp)
-	      (k v end (rest-of tokens) fail))))
+	      (k sexp end (rest-of tokens) fail))))
 	(rational (str)
 	  (let ((num (string->rational str)))
 	    (if (true? num)

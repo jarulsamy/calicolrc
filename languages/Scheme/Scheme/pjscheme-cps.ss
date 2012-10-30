@@ -544,7 +544,7 @@
   (lambda (a b info)
     (list pair-tag a b info)))
 
-(define map^
+(define-native map^
   (lambda (f^ asexp)
     (cond
       ((null?^ asexp) (list atom-tag '() 'none))
@@ -561,7 +561,7 @@
       ((pair? x) (list pair-tag (annotate (car x) 'none) (annotate (cdr x) 'none) info))
       (else (list atom-tag x info)))))
 
-(define annotate-cps
+(define* annotate-cps
   (lambda (x info k)   ;; k receives 1 arg: an annotated sexp
     (cond
       ((not *reader-generates-annotated-sexps?*) (k x))
@@ -739,7 +739,7 @@
 	(decimal (str)
 	  (annotate-cps (string->decimal str) (make-info src start end)
 	    (lambda-cont (sexp)
-	      (k v end (rest-of tokens) fail))))
+	      (k sexp end (rest-of tokens) fail))))
 	(rational (str)
 	  (let ((num (string->rational str)))
 	    (if (true? num)
@@ -1122,6 +1122,8 @@
 (load "reader-cps.ss")
 (load "unifier-cps.ss")
 
+(define *use-lexical-address* #t)
+
 ;; for the macro environment
 (load "environments-cps.ss")
 
@@ -1319,7 +1321,7 @@
 	 (symbol?^ (car^ asexp))
 	 (true? (search-env macro-env (untag-atom^ (car^ asexp)))))))
 
-(define tagged-list^
+(define-native tagged-list^
   (lambda (keyword op len)
     (lambda (asexp)
       (and (list?^ asexp)
@@ -1826,7 +1828,7 @@
 ;;----------------------------------------------------------------------------
 ;; temporary
 
-(define dd1
+(define-native dd1
   "(define-datatype thing thing?
      (thing0)
      (thing1
@@ -1839,7 +1841,7 @@
        (f2 (list-of thing3-field2?))
        (f3 thing3-field3?)))")
 
-(define cases1
+(define-native cases1
   "(cases thing (cons x y)
      (thing0 () b1)
      (thing1 (f1) b1 b2 b3)
@@ -1847,7 +1849,7 @@
      (thing3 args b1 b2 b3)
      (else d1 d2 d3))")
 
-(define dd2
+(define-native dd2
   "(define-datatype expression expression?
      (var-exp
        (id symbol?))
@@ -1862,7 +1864,7 @@
        (operator expression?)
        (operands (list-of expression?))))")
 
-(define cases2
+(define-native cases2
   "(cases expression exp
      (var-exp (id info)
        (lookup-value id env info handler fail k))
@@ -2885,6 +2887,23 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
+(define _closure-depth 0)
+
+(define get-closure-depth
+  (lambda ()
+    _closure-depth
+    ))
+
+(define increment-closure-depth
+  (lambda ()
+    (set! _closure-depth (+ _closure-depth 1))
+    ))
+
+(define decrement-closure-depth
+  (lambda ()
+    (set! _closure-depth (- _closure-depth 1))
+    ))
+
 (define make-trace-depth-string
   (lambda (level)
     (if (= level 0)
@@ -2908,7 +2927,7 @@
 	  (runtime-error "incorrect number of arguments in application" info handler fail))))))
 
 ;; experimental
-(define make-safe-continuation
+(define-native make-safe-continuation
   (lambda (k)
     (cond
       ((not (pair? k)) '<???>)
@@ -3037,18 +3056,18 @@
 ;; eval
 (define eval-prim
   (lambda-proc (args env2 info handler fail k2)
-    (reannotate-cps (car args)
+    (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-	(aparse adatum handler fail
-	  (lambda-cont2 (exp fail)
-	    (m exp toplevel-env handler fail k2)))))))
+        (aparse adatum handler fail
+          (lambda-cont2 (exp fail)
+            (m exp toplevel-env handler fail k2)))))))
 
 ;; parse
 (define parse-prim
   (lambda-proc (args env2 info handler fail k2)
-    (reannotate-cps (car args)
+    (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-	(aparse adatum handler fail k2)))))
+        (aparse adatum handler fail k2)))))
 
 ;; string-length
 (define string-length-prim

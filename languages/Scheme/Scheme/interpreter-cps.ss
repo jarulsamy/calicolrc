@@ -427,6 +427,23 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
+(define _closure-depth 0)
+
+(define get-closure-depth
+  (lambda ()
+    _closure-depth
+    ))
+
+(define increment-closure-depth
+  (lambda ()
+    (set! _closure-depth (+ _closure-depth 1))
+    ))
+
+(define decrement-closure-depth
+  (lambda ()
+    (set! _closure-depth (- _closure-depth 1))
+    ))
+
 (define make-trace-depth-string
   (lambda (level)
     (if (= level 0)
@@ -450,7 +467,7 @@
 	  (runtime-error "incorrect number of arguments in application" info handler fail))))))
 
 ;; experimental
-(define make-safe-continuation
+(define-native make-safe-continuation
   (lambda (k)
     (cond
       ((not (pair? k)) '<???>)
@@ -579,18 +596,18 @@
 ;; eval
 (define eval-prim
   (lambda-proc (args env2 info handler fail k2)
-    (reannotate-cps (car args)
+    (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-	(aparse adatum handler fail
-	  (lambda-cont2 (exp fail)
-	    (m exp toplevel-env handler fail k2)))))))
+        (aparse adatum handler fail
+          (lambda-cont2 (exp fail)
+            (m exp toplevel-env handler fail k2)))))))
 
 ;; parse
 (define parse-prim
   (lambda-proc (args env2 info handler fail k2)
-    (reannotate-cps (car args)
+    (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-	(aparse adatum handler fail k2)))))
+        (aparse adatum handler fail k2)))))
 
 ;; string-length
 (define string-length-prim

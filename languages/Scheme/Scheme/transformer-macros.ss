@@ -48,6 +48,10 @@
   (syntax-rules ()
     [(_ name body ...) (define name body ...)]))
 
+(define-syntax define-native
+  (syntax-rules ()
+    [(_ name body ...) (define name body ...)]))
+
 ;; where the computation should halt
 
 (define-syntax halt*

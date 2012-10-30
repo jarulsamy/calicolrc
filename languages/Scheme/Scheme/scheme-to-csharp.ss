@@ -27,7 +27,7 @@
 	       unparse unparse-exps qq-expand-cps_ qq-expand-list-cps_
 	       init-cont init-cont2 init-cont3 init-handler init-handler2 init-fail
 	       ;; defined in Scheme.cs:
-	       atom-tag pair-tag annotated? tagged-list^ safe-print make-safe
+	       atom-tag pair-tag annotated? safe-print make-safe
 	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
 	       dlr-object? dlr-lookup-components set-global-value!
 	       set-global-docstring! printf-prim using-prim iterator? get_type
@@ -113,6 +113,7 @@
     (handle-debug-info "void" ())
     (highlight-expression "void" ())
     (get-closure-depth "int" ())
+    (*tracing-on?* "bool" ())
     ))
 
 (define *system-ignore-definitions*
@@ -262,6 +263,26 @@
       return retval;
    }
 
+   public static object use_lexical_address(object value) {
+	if (null_q(value)) {
+	    return _staruse_lexical_address_star;
+	} else {
+	    value = car(value);
+	    _staruse_lexical_address_star = (bool)value;
+	    return null;
+	}
+   }
+
+   // *tracing-on?*
+   public static object tracing_on(object value) {
+	if (null_q(value)) {
+	    return _startracing_on_q_star;
+	} else {
+	    value = car(value);
+	    _startracing_on_q_star = (bool)value;
+	    return null;
+	}
+   }
 ")
 
 (define lookup-signature

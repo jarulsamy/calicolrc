@@ -17,6 +17,8 @@
 (load "reader-cps.ss")
 (load "unifier-cps.ss")
 
+(define *use-lexical-address* #t)
+
 ;; for the macro environment
 (load "environments-cps.ss")
 
@@ -214,7 +216,7 @@
 	 (symbol?^ (car^ asexp))
 	 (true? (search-env macro-env (untag-atom^ (car^ asexp)))))))
 
-(define tagged-list^
+(define-native tagged-list^
   (lambda (keyword op len)
     (lambda (asexp)
       (and (list?^ asexp)
@@ -721,7 +723,7 @@
 ;;----------------------------------------------------------------------------
 ;; temporary
 
-(define dd1
+(define-native dd1
   "(define-datatype thing thing?
      (thing0)
      (thing1
@@ -734,7 +736,7 @@
        (f2 (list-of thing3-field2?))
        (f3 thing3-field3?)))")
 
-(define cases1
+(define-native cases1
   "(cases thing (cons x y)
      (thing0 () b1)
      (thing1 (f1) b1 b2 b3)
@@ -742,7 +744,7 @@
      (thing3 args b1 b2 b3)
      (else d1 d2 d3))")
 
-(define dd2
+(define-native dd2
   "(define-datatype expression expression?
      (var-exp
        (id symbol?))
@@ -757,7 +759,7 @@
        (operator expression?)
        (operands (list-of expression?))))")
 
-(define cases2
+(define-native cases2
   "(cases expression exp
      (var-exp (id info)
        (lookup-value id env info handler fail k))

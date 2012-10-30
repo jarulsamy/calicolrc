@@ -548,13 +548,13 @@ public class Scheme {
   public static Proc get_member_proc = new Proc("get-member", (Procedure2)get_external_member_name, 2, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
-  public static Proc car_hat_proc = new Proc("car^",(Procedure1)car_hat, 1, 1);
-  public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)cdr_hat, 1, 1);
-  public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)cadr_hat, 1, 1);
-  public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)cddr_hat, 1, 1);
-  public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)caddr_hat, 1, 1);
-  public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)cdddr_hat, 1, 1);
-  public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)cadddr_hat, 1, 1);
+  public static Proc car_hat_proc = new Proc("car^",(Procedure1)PJScheme.car_hat, 1, 1);
+  public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)PJScheme.cdr_hat, 1, 1);
+  public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
+  public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)PJScheme.cddr_hat, 1, 1);
+  public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
+  public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)PJScheme.cdddr_hat, 1, 1);
+  public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
   public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
@@ -1116,6 +1116,67 @@ public class Scheme {
 	return retval;
   }
 
+	public static object map_hat (object f_hat, object asexp)
+	{
+		// (lambda (f^ asexp)
+		//   (cond
+		//     ((null?^ asexp) (list atom-tag '() 'none))
+		//     (else (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
+		if ((bool)PJScheme.null_q_hat(asexp))
+			return list(PJScheme.atom_tag, EmptyList, symbol("none"));
+		else
+			return PJScheme.cons_hat(apply(f_hat, list(PJScheme.car_hat (asexp))),
+			                         map_hat (f_hat, PJScheme.cdr_hat (asexp)),
+			                         symbol("none"));
+	}
+	
+	/*
+		object retval = EmptyList;
+		object tail = retval;
+		object current = asexp;
+		while (!(bool)PJScheme.null_q_hat(current)) {
+			object result;
+			if ((bool)PJScheme.list_q_hat (PJScheme.car_hat (current)))
+				result = apply (f_hat, list (PJScheme.car_hat (current)));
+			else
+				result = apply (f_hat, PJScheme.car_hat (current));
+			if ((bool)PJScheme.null_q_hat (tail)) {
+				retval = list (PJScheme.atom_tag, result, symbol ("none")); // start of list
+				tail = retval;
+			} else { // pair
+				set_cdr_b (tail, PJScheme.cons_hat (result, EmptyList, symbol ("none")));
+				tail = PJScheme.cdr_hat (tail);
+			}
+			current = PJScheme.cdr_hat (current);
+		}
+		return retval;
+	}
+	*/
+
+  public static object filter(object proc, object args) {
+	object retval = EmptyList;
+	object tail = retval;
+	object current1 = args;
+	while (!Eq(current1, EmptyList)) {
+	  object result;
+	  if (pair_q(car(current1)))
+		result = apply(proc, list(car(current1)));
+	  else
+		result = apply(proc, car(current1));
+	  if (true_q(result)) {
+	      if (Eq(tail, EmptyList)) {
+		  retval = list(result); // start of list
+		  tail = retval;
+	      } else { // pair
+		  set_cdr_b(tail, cons(result, EmptyList));
+		  tail = cdr(tail);
+	      }
+	  }
+	  current1 = cdr(current1);
+	}
+	return retval;
+  }
+
   public static object map(object proc, object args1, object args2) {
 	object retval = EmptyList;
 	object tail = EmptyList;
@@ -1135,21 +1196,36 @@ public class Scheme {
 	}
 	return retval;
   }
-
-  public static Func<object,bool> tagged_list(object test_string, object pred, object value) {
-	return (object lyst) => {
-	  if (pair_q(lyst)) {
-		bool retval = (((bool)Eq(car(lyst), string_to_symbol(test_string))) && 
-			           ((bool)((Predicate2)pred)(length_safe(lyst), value)));
+	
+	/*
+(define-native tagged-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq?^ (car^ asexp) keyword)))))
+	 */
+	public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
+	return (object asexp) => {
+	  return ((bool)pair_q(asexp) &&
+		      ((bool)PJScheme.list_q_hat(asexp)) && 
+		      ((bool)((Predicate2)pred)(PJScheme.length_hat(asexp), value)) &&
+			  ((bool)(PJScheme.symbol_q_hat(PJScheme.car_hat(asexp)))) &&
+			  ((bool)(PJScheme.eq_q_hat(PJScheme.car_hat(asexp), string_to_symbol(test_string))))
+	         );
 		//printf("is this a {0}? ({1} ...) compare {2} => {3}\n", test_string, car(lyst), value, retval);
-		return retval;
-	  } else {
-		//printf("is this a {0}? not a list! => false\n", test_string);
-		return false;
-	  }
 	};
   }
-
+	
+  public static Func<object,bool> tagged_list(object test_string, object pred, object value) {
+		return (object lyst) => {
+	        	return (pair_q(lyst) &&
+		                ((bool)Eq(car(lyst), string_to_symbol(test_string))) && 
+                        ((bool)((Predicate2)pred)(length_safe(lyst), value)));
+			};
+  }
+	
   public static Func<object,bool> procedure_q = tagged_list(symbol("procedure"), (Predicate2)GreaterOrEqual, 1);
 
   public static bool procedure_q_proc(object obj) {
@@ -2837,12 +2913,38 @@ public class Scheme {
   }
 
     /*
-  public static int length_hat(object asexp) {
-    return ((int)length(get_sexp(asexp)));
-  }
+      assignment_q_hat
+      begin_q_hat
+      catch_q_hat
+      choose_q_hat
+      continuation_object_q
+      define_b_q_hat
+      define_q_hat
+      define_syntax_q_hat
+      f_hat
+      f_hat_proc
+      finally_q_hat
+      func_q_hat
+      if_else_q_hat
+      if_then_q_hat
+      lambda_q_hat
+      make_safe_continuation_proc
+      quasiquote_q_hat
+      quote_q_hat
+      raise_q_hat
+      trace_lambda_q_hat
+      try_q_hat
+      unquote_q_hat
+      unquote_splicing_q_hat
+    */
 
+    /*
   public static bool list_q_hat(object x) {
     return (asexp_q(x) && list_of_asexp_q(get_sexp(x)));
+  }
+
+  public static int length_hat(object asexp) {
+    return ((int)length(get_sexp(asexp)));
   }
 
   public static bool symbol_q_hat(object asexp) { return (symbol_q(get_sexp(asexp))); }
@@ -2857,7 +2959,6 @@ public class Scheme {
   public static object map_hat(object proc, object asexp) {
     return (map(proc, get_sexp(asexp)));
    }
-    */
 
   public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
     return (object x) => {
@@ -2920,6 +3021,7 @@ public class Scheme {
       }
     }
   }
+    */
 
   //--------------------------------------------------------------------------------------------
 
@@ -3129,8 +3231,10 @@ public class Vector {
 	//printf(append(list(symbol("a"), symbol("b")), list(symbol("c"))));
 	//printf(append(list(symbol("a")), list(symbol("b")), list(symbol("c"))));
 			
-	printf ("  (load \"sllgen.ss\"): {0}\n",
-			PJScheme.execute_string_rm("(load \"/home/dblank/Calico/trunk/examples/scheme/sllgen.ss\")"));
+	//printf ("  (load \"sllgen.ss\"): {0}\n",
+	//		PJScheme.execute_string_rm("(load \"/home/dblank/Calico/trunk/examples/scheme/sllgen.ss\")"));
+	printf ("  (print (list 1 2 3): {0}\n",
+			PJScheme.execute_string_rm("(print (list 1 2 3))"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------

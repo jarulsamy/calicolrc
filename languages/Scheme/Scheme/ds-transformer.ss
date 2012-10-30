@@ -43,7 +43,7 @@
     try-body catch? catch-var catch-exps finally? finally-exps application?
     unparse expand-macro parse-string parse-file print-parsed-sexps get-parsed-sexps parse-sexps
     qqtest qq1 qq-expand1 qq-expand1-list qq2 qq-expand2 qq-expand2-list qq-expand-cps_ qq-expand-list-cps_
-    unannotate reannotate reannotate-seq scan-string scan-file read-string read-datum read-file
+    unannotate reannotate-cps reannotate-seq scan-string scan-file read-string read-datum read-file
     read-file-loop print-file print-file-loop
     aread-string aread-datum aread-file aread-file-loop aparse-string aparse-file aprint-parsed-sexps
     aget-parsed-sexps
