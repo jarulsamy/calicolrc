@@ -2324,33 +2324,33 @@
 ;(print (parse4 "7"))
 ;(print (parse4 "let x = 7; in 7"))
 
- (define lc-lex
-   '((whitespace (whitespace) skip)
-     (comment ("//" (arbno (not #\newline))) skip)
-     (identifier (letter (arbno (or-exp letter digit))) make-symbol)
-     (number (digit (arbno digit)) make-number)))
-
-(define lc-gram
-  '(
-   (lc-exp
-       ("def" "(" (arbno identifier) ")" ":" lc-exp)
-       lambda-exp)
-    (lc-exp
-       (identifier)
-       var-exp)
-    (lc-exp
-        ("&" identifier "(" (arbno lc-exp) ")")
-        app-exp)
-    (lc-exp
-       (number)
-       lit-exp)
-  ))
-  
+;;  (define lc-lex
+;;    '((whitespace (whitespace) skip)
+;;      (comment ("//" (arbno (not #\newline))) skip)
+;;      (identifier (letter (arbno (or-exp letter digit))) make-symbol)
+;;      (number (digit (arbno digit)) make-number)))
+;; 
+;; (define lc-gram
+;;   '(
+;;    (lc-exp
+;;        ("def" "(" (arbno identifier) ")" ":" lc-exp)
+;;        lambda-exp)
+;;     (lc-exp
+;;        (identifier)
+;;        var-exp)
+;;     (lc-exp
+;;         ("&" identifier "(" (arbno lc-exp) ")")
+;;         app-exp)
+;;     (lc-exp
+;;        (number)
+;;        lit-exp)
+;;   ))
+;;
 ;;(define parse-lc (sllgen:make-string-parser lc-lex lc-gram))
 ;;(print (parse-lc "x"))
 ;;(print (parse-lc "42"))
 ;;(print (parse-lc "def (a b): 42"))
-;; (print (parse-lc "def (a b): &add(a b)"))
+;;(time (parse-lc "def (a b): &add(a b)"))
 ;; 
 ;; (sllgen:make-define-datatypes lc-lex lc-gram)
 ;; 

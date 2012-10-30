@@ -18,11 +18,29 @@
 ;; 
 ;; $Id: $
 
+(define-syntax time
+  [(time ?exp) (let ((start (current-time)))
+      ?exp
+      (printf "~s\n" (- (current-time) start)))])
+
 (define fact1
+    "Factorial for Scheme"
+    (lambda (n accum)
+        (if (= n 1)
+            accum
+            (fact1 (- n 1) (* n accum)))))
+
+(define fact2
     "Factorial for Scheme"
     (lambda (n)
         (if (= n 1)
             1
-            (* n (fact1 (- n 1))))))
+            (* (fact2 (- n 1)) n))))
 
-(fact1 1000)
+(define fact3
+    (lambda (n)
+        (apply * (range 1 (+ n 1)))))
+
+(time (fact1 1000 1))
+(time (fact2 1000))
+(time (fact3 1000))

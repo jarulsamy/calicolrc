@@ -202,7 +202,7 @@
       ((lambda (a b . z) (list a b z)) 1 2))
     (verify "not enough arguments given"
       (try ((lambda (a b . z) (list a b z)) 1)
-	   (catch e e)))
+	       (catch e e "not enough arguments given")))
     ))
 
 (define test-define
