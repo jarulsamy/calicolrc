@@ -141,7 +141,7 @@
     (read-sexp *tokens-left* src REP-handler *last-fail*
       (lambda-cont4 (datum end tokens-left fail)
 	(set! *tokens-left* tokens-left)
-	(aparse datum REP-handler fail
+	(aparse datum toplevel-env REP-handler fail
 	  (lambda-cont2 (exp fail)
 	    (m exp toplevel-env REP-handler fail REP-k)))))))
 
@@ -196,7 +196,7 @@
     (set! load-stack '())
     (scan-input input 'stdin try-parse-handler *last-fail*
       (lambda-cont2 (tokens fail)
-	(aparse-sexps tokens 'stdin try-parse-handler fail
+	(aparse-sexps tokens 'stdin toplevel-env try-parse-handler fail
 	  (lambda-cont2 (result fail)
 	    (halt* #t)))))
     (trampoline)))
@@ -252,7 +252,7 @@
       (k void-value fail)
       (read-sexp tokens src handler fail
 	(lambda-cont4 (datum end tokens-left fail)
-	  (aparse datum handler fail
+	  (aparse datum env handler fail
 	    (lambda-cont2 (exp fail)
 	      (m exp env handler fail
 		(lambda-cont2 (v fail)
@@ -289,10 +289,13 @@
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
    (if *tracing-on?* (highlight-expression exp))
-   (let ((k (make-debugging-k exp k)))   ;; need to reindent
+   (let ((k (if *tracing-on?* (make-debugging-k exp k) k)))
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
       (var-aexp (id info) (lookup-value id env info handler fail k))
+      (lexical-address-aexp (depth offset variable info) 
+	(lookup-value-by-lexical-address 
+	 depth offset env info handler fail k))
       (func-aexp (exp info)
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
@@ -598,16 +601,25 @@
   (lambda-proc (args env2 info handler fail k2)
     (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-        (aparse adatum handler fail
+        (aparse adatum env2 handler fail
           (lambda-cont2 (exp fail)
-            (m exp toplevel-env handler fail k2)))))))
+            (m exp env2 handler fail k2)))))))
+
+;; eval-ast
+(define eval-ast-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (if (list? (car args)) ;; is there a better check for exp?
+	(m (car args) env2 handler fail 
+	   (lambda-cont2 (result fail2)
+		(k2 result fail2)))
+	(runtime-error "eval-ast called on non-abstract syntax tree argument" info handler fail))))
 
 ;; parse
 (define parse-prim
   (lambda-proc (args env2 info handler fail k2)
     (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-        (aparse adatum handler fail k2)))))
+        (aparse adatum env2 handler fail k2)))))
 
 ;; string-length
 (define string-length-prim
@@ -636,6 +648,11 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (aunparse (car args)) fail)))
 
+;; unparse-procedure
+(define unparse-procedure-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (aunparse (car (caddr (car args)))) fail)))
+
 ;; parse-string
 (define parse-string-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -644,7 +661,7 @@
 	(read-sexp tokens 'stdin handler fail
 	  (lambda-cont4 (adatum end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'end-marker)
-	      (aparse adatum handler fail k2)
+	      (aparse adatum env2 handler fail k2)
 	      (read-error "tokens left over" tokens-left 'stdin handler fail))))))))
 
 ;; read-string
@@ -760,7 +777,7 @@
   (lambda-proc (args env2 info handler fail k2)
     (if (not (length-one? args))
        (runtime-error "incorrect number of arguments to load" info handler fail)
-       (load-file (car args) toplevel-env info handler fail k2))))
+       (load-file (car args) env2 info handler fail k2))))
 
 (define load-stack '())
 
@@ -1341,7 +1358,15 @@
 
 (define get-variables-from-frame
   (lambda (frame) 
-    (map binding-variable frame)))
+    (map binding-variable (vector->list frame))))
+
+(define get-variables-from-frames
+  (lambda (frames) 
+    (map get-variables-from-frame frames)))
+
+(define get-variables-from-list
+   (lambda (frame) 
+     (map binding-variable frame)))
 
 (define symbol<?
   (lambda (a b)
@@ -1522,7 +1547,7 @@
 ;; vector
 (define vector-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (list->vector args) fail)))
+    (k2 (apply vector_native args) fail)))
 
 ;; vector-set!
 (define vector-set!-prim
@@ -1556,7 +1581,7 @@
 
 ;; Add new procedures above here!
 ;; Then, add NAME to env
-;; Then, add NAME_proc to Scheme.cs
+;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
 
 ;; this is here as a hook for extending environments in C# etc.
 (define make-initial-env-extended
@@ -1603,6 +1628,7 @@
 	    (list 'equal? equal?-prim)
 	    (list 'error error-prim)
 	    (list 'eval eval-prim)
+	    (list 'eval-ast eval-ast-prim)
 	    (list 'exit exit-prim)
 	    (list 'for-each for-each-prim)
 	    (list 'get get-prim)
@@ -1645,6 +1671,7 @@
 	    (list 'substring substring-prim)
 	    (list 'symbol? symbol?-prim)
 	    (list 'unparse unparse-prim)
+	    (list 'unparse-procedure unparse-procedure-prim)
 	    (list 'using using-primitive)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)

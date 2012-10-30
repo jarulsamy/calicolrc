@@ -76,6 +76,11 @@
   (var-aexp
     (id symbol?)
     (info source-info?))
+  (lexical-address-aexp
+    (depth number?)
+    (offset number?)
+    (variable symbol?)
+    (info source-info?))
   (if-aexp
     (test-aexp aexpression?)
     (then-aexp aexpression?)
@@ -252,11 +257,14 @@
 (define try-catch-finally-exps^ (lambda (x) (cdr^ (cadddr^ x))))
 
 (define* aparse
-  (lambda (adatum handler fail k)
+  (lambda (adatum env handler fail k)
     (let ((info (get-source-info adatum)))
       (cond
 	((literal?^ adatum) (k (lit-aexp (untag-atom^ adatum) info) fail))
-	((symbol?^ adatum) (k (var-aexp (untag-atom^ adatum) info) fail))
+	((symbol?^ adatum) 
+	 (if *use-lexical-address*
+	     (k (get-lexical-address env (untag-atom^ adatum) info) fail)
+	     (k (var-aexp (untag-atom^ adatum) info) fail)))
 	((vector?^ adatum)
 	 (unannotate-cps adatum
 	   (lambda-cont (v)
@@ -271,35 +279,35 @@
 	     (annotate-cps v 'none
 	       (lambda-cont (expansion)
 		 (if (original-source-info? adatum)
-		   (aparse (replace-info expansion (snoc 'quasiquote info)) handler fail k)
-		   (aparse (replace-info expansion info) handler fail k)))))))
+		   (aparse (replace-info expansion (snoc 'quasiquote info)) env handler fail k)
+		   (aparse (replace-info expansion info) env handler fail k)))))))
 	((unquote?^ adatum) (aparse-error "misplaced" adatum handler fail))
 	((unquote-splicing?^ adatum) (aparse-error "misplaced" adatum handler fail))
 	((syntactic-sugar?^ adatum)
 	 (expand-once^ adatum handler fail
 	   (lambda-cont2 (expansion fail)
-	     (aparse expansion handler fail k))))
+	     (aparse expansion env handler fail k))))
 	((if-then?^ adatum)
-	 (aparse (cadr^ adatum) handler fail
+	 (aparse (cadr^ adatum) env handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse (caddr^ adatum) handler fail
+	     (aparse (caddr^ adatum) env handler fail
 	       (lambda-cont2 (v2 fail)
 		 (k (if-aexp v1 v2 (lit-aexp #f 'none) info) fail))))))
 	((if-else?^ adatum)
-	 (aparse (cadr^ adatum) handler fail
+	 (aparse (cadr^ adatum) env handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse (caddr^ adatum) handler fail
+	     (aparse (caddr^ adatum) env handler fail
 	       (lambda-cont2 (v2 fail)
-		 (aparse (cadddr^ adatum) handler fail
+		 (aparse (cadddr^ adatum) env handler fail
 		   (lambda-cont2 (v3 fail)
 		     (k (if-aexp v1 v2 v3 info) fail))))))))
 	((assignment?^ adatum)
-	 (aparse (caddr^ adatum) handler fail
+	 (aparse (caddr^ adatum) env handler fail
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
-	 (aparse (cadr^ adatum) handler fail
+	 (aparse (cadr^ adatum) env handler fail
 	   (lambda-cont2 (e fail)
 	     (k (func-aexp e info) fail))))
 	((define?^ adatum)
@@ -309,13 +317,13 @@
 	      (lambda-cont (v)
 		(annotate-cps v 'none
 		  (lambda-cont (expansion)
-		    (aparse (replace-info expansion info) handler fail k))))))
+		    (aparse (replace-info expansion info) env handler fail k))))))
 	   ((= (length^ adatum) 3) ;; (define <var> <body>)
-	    (aparse (caddr^ adatum) handler fail
+	    (aparse (caddr^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
 		(k (define-aexp (define-var^ adatum) "" body info) fail))))
 	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define <var> <docstring> <body>)
-	    (aparse (cadddr^ adatum) handler fail
+	    (aparse (cadddr^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
 		(k (define-aexp (define-var^ adatum) (define-docstring^ adatum) body info) fail))))
 	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
@@ -326,13 +334,13 @@
 	      (lambda-cont (v)
 		(annotate-cps v 'none
 		  (lambda-cont (expansion)
-		    (aparse (replace-info expansion info) handler fail k))))))
+		    (aparse (replace-info expansion info) env handler fail k))))))
 	   ((= (length^ adatum) 3) ;; (define! <var> <body>)
-	    (aparse (caddr^ adatum) handler fail
+	    (aparse (caddr^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
 		(k (define!-aexp (define-var^ adatum) "" body info) fail))))
 	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define! <var> <docstring> <body>)
-	    (aparse (cadddr^ adatum) handler fail
+	    (aparse (cadddr^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
 		(k (define!-aexp (define-var^ adatum) (define-docstring^ adatum) body info) fail))))
 	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
@@ -343,83 +351,89 @@
 	     (lambda-cont (clauses)
 	       (k (define-syntax-aexp name clauses aclauses info) fail)))))
 	((begin?^ adatum)
-	 (aparse-all (cdr^ adatum) handler fail
+	 (aparse-all (cdr^ adatum) env handler fail
 	   (lambda-cont2 (exps fail)
 	     (cond
 	       ((null? exps) (aparse-error "bad concrete syntax:" adatum handler fail))
 	       ((null? (cdr exps)) (k (car exps) fail))
 	       (else (k (begin-aexp exps info) fail))))))
 	((lambda?^ adatum)
-	 (aparse-all (cddr^ adatum) handler fail
-	   (lambda-cont2 (bodies fail)
-	     (unannotate-cps (cadr^ adatum)
-	       (lambda-cont (formals)
-		 (if (list? formals)
-		   (k (lambda-aexp formals bodies info) fail)
-		   (k (mu-lambda-aexp (head formals) (last formals) bodies info) fail)))))))
+	 (unannotate-cps (cadr^ adatum)
+	    (lambda-cont (formals)
+	        (let ((formals-list (if (list? formals)
+					formals
+					(cons (last formals) (head formals)))))
+		  (aparse-all (cddr^ adatum) (extend env formals-list formals-list) handler fail
+		      (lambda-cont2 (bodies fail)
+			 (if (list? formals)
+			     (k (lambda-aexp formals bodies info) fail)
+			     (k (mu-lambda-aexp (head formals) (last formals) bodies info) fail))))))))
 	((trace-lambda?^ adatum)
-	 (aparse-all (cdddr^ adatum) handler fail
-	   (lambda-cont2 (bodies fail)
-	     (unannotate-cps (caddr^ adatum)
-	       (lambda-cont (formals)
-		 (let ((name (untag-atom^ (cadr^ adatum))))
-		   (if (list? formals)
-		     (k (trace-lambda-aexp name formals bodies info) fail)
-		     (k (mu-trace-lambda-aexp name (head formals) (last formals) bodies info) fail))))))))
+	 (unannotate-cps (caddr^ adatum)
+	      (lambda-cont (formals)
+		(let ((formals-list (if (list? formals)
+					 formals
+					 (cons (last formals) (head formals))))
+		      (name (untag-atom^ (cadr^ adatum))))
+		  (aparse-all (cdddr^ adatum) (extend env formals-list formals-list) handler fail
+		      (lambda-cont2 (bodies fail)
+			 (if (list? formals)
+			     (k (trace-lambda-aexp name formals bodies info) fail)
+			     (k (mu-trace-lambda-aexp name (head formals) (last formals) bodies info) fail))))))))
 	((try?^ adatum)
 	 (cond
 	  ;; (try <body>)
 	   ((= (length^ adatum) 2)
-	    (aparse (try-body^ adatum) handler fail k))
+	    (aparse (try-body^ adatum) env handler fail k))
 	   ;; (try <body> (catch <var> <exp> ...))
 	   ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
-	    (aparse (try-body^ adatum) handler fail
+	    (aparse (try-body^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) handler fail
+		(aparse-all (catch-exps^ adatum) env handler fail
 		  (lambda-cont2 (cexps fail)
 		    (let ((cvar (catch-var^ adatum)))
 		      (k (try-catch-aexp body cvar cexps info) fail)))))))
 	   ;; (try <body> (finally <exp> ...))
 	   ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
-	    (aparse (try-body^ adatum) handler fail
+	    (aparse (try-body^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (try-finally-exps^ adatum) handler fail
+		(aparse-all (try-finally-exps^ adatum) env handler fail
 		  (lambda-cont2 (fexps fail)
 		    (k (try-finally-aexp body fexps info) fail))))))
 	   ;; (try <body> (catch <var> <exp> ...) (finally <exp> ...))
 	   ((and (= (length^ adatum) 4) (catch?^ (caddr^ adatum)) (finally?^ (cadddr^ adatum)))
-	    (aparse (try-body^ adatum) handler fail
+	    (aparse (try-body^ adatum) env handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) handler fail
+		(aparse-all (catch-exps^ adatum) env handler fail
 		  (lambda-cont2 (cexps fail)
-		    (aparse-all (try-catch-finally-exps^ adatum) handler fail
+		    (aparse-all (try-catch-finally-exps^ adatum) env handler fail
 		      (lambda-cont2 (fexps fail)
 			(let ((cvar (catch-var^ adatum)))
 			  (k (try-catch-finally-aexp body cvar cexps fexps info) fail)))))))))
 	   (else (aparse-error "bad try syntax:" adatum handler fail))))
 	((raise?^ adatum)
-	 (aparse (cadr^ adatum) handler fail
+	 (aparse (cadr^ adatum) env handler fail
 	   (lambda-cont2 (v fail)
 	     (k (raise-aexp v info) fail))))
 	((choose?^ adatum)
-	 (aparse-all (cdr^ adatum) handler fail
+	 (aparse-all (cdr^ adatum) env handler fail
 	   (lambda-cont2 (exps fail)
 	     (k (choose-aexp exps info) fail))))
 	((application?^ adatum)
-	 (aparse (car^ adatum) handler fail
+	 (aparse (car^ adatum) env handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse-all (cdr^ adatum) handler fail
+	     (aparse-all (cdr^ adatum) env handler fail
 	       (lambda-cont2 (v2 fail)
 		 (k (app-aexp v1 v2 info) fail))))))
 	(else (aparse-error "bad concrete syntax:" adatum handler fail))))))
 
 (define* aparse-all
-  (lambda (adatum-list handler fail k)
+  (lambda (adatum-list env handler fail k)
     (if (null?^ adatum-list)
       (k '() fail)
-      (aparse (car^ adatum-list) handler fail
+      (aparse (car^ adatum-list) env handler fail
 	(lambda-cont2 (a fail)
-	  (aparse-all (cdr^ adatum-list) handler fail
+	  (aparse-all (cdr^ adatum-list) env handler fail
 	    (lambda-cont2 (b fail)
 	      (k (cons a b) fail))))))))
 
@@ -434,14 +448,14 @@
 
 ;; used once in interpreter-cps.ss
 (define* aparse-sexps
-  (lambda (tokens src handler fail k)
+  (lambda (tokens src env handler fail k)
     (if (token-type? (first tokens) 'end-marker)
       (k '() fail)
       (read-sexp tokens src handler fail
 	(lambda-cont4 (adatum end tokens-left fail)
-	  (aparse adatum handler fail
+	  (aparse adatum env handler fail
 	    (lambda-cont2 (v1 fail)
-	      (aparse-sexps tokens-left src handler fail
+	      (aparse-sexps tokens-left src env handler fail
 		(lambda-cont2 (v2 fail)
 		  (k (cons v1 v2) fail))))))))))
 
@@ -1036,6 +1050,7 @@
 	  ((vector? datum) datum)
 	  (else `(quote ,datum))))
       (var-aexp (id info) id)
+      (lexical-address-aexp (depth offset variable info) variable)
       (if-aexp (test-aexp then-aexp else-aexp info)
 	`(if ,(aunparse test-aexp) ,(aunparse then-aexp) ,(aunparse else-aexp)))
       (assign-aexp (var rhs-exp var-info info)
@@ -1082,7 +1097,7 @@
   (lambda (string)
     (aread-datum string 'stdin init-handler2 init-fail
       (lambda-cont3 (adatum tokens-left fail)
-	(aparse adatum init-handler2 init-fail init-cont2)))))
+	(aparse adatum toplevel-env init-handler2 init-fail init-cont2)))))
 
 (define aparse-file
   (lambda (filename)
@@ -1096,7 +1111,7 @@
   (lambda (filename)
     (scan-input (read-content filename) filename init-handler2 init-fail
       (lambda-cont2 (tokens fail)
-	(aparse-sexps tokens filename init-handler2 init-fail init-cont2)))))
+	(aparse-sexps tokens filename toplevel-env init-handler2 init-fail init-cont2)))))
 
 ;;--------------------------------------------------------------------------------------------
 ;; not used - for possible future reference
@@ -1181,6 +1196,33 @@
       ((not (pair? x)) `'(,x))
       ((null? (cdr x)) `(list ,(qq-expand2-list (car x) depth)))
       (else `(list (append ,(qq-expand2-list (car x) depth) ,(qq-expand2 (cdr x) depth)))))))
+
+(define get-lexical-address
+  ;; given an environment and variable id, return the depth of the
+  ;; frame and offset OR return it as a var-exp signifying it as an
+  ;; unbound variable
+  (lambda (env id info)
+    (get-lexical-address-frames (cdr env) id 0 0 info)))
+
+(define get-lexical-address-frames
+  ;; given a list of frames, get the lexical address of variable
+  (lambda (frames variable depth offset info)
+    (cond 
+     ((null? frames) (var-aexp variable info)) ;; free!
+     (else (let ((result (get-lexical-address-frame (car frames) variable depth offset info)))
+	     (if (not (car result))
+		 (get-lexical-address-frames (cdr frames) variable (+ 1 depth) 0 info)
+		 (cadr result)))))))
+
+(define get-lexical-address-frame
+  ;; returns (#t pos) or (#f) signifying bound or free, respectively
+  (lambda (frame variable depth offset info)
+    (cond
+     ((empty-frame? frame) (list #f)) ;; not in this frame
+     ((>= offset (vector-length frame)) (list #f)) ;; not here
+     ((eq? (binding-variable (vector-ref frame offset)) variable)
+      (list #t (lexical-address-aexp depth offset variable info)))
+     (else (get-lexical-address-frame frame variable depth (+ 1 offset) info)))))
 
 ;;;; walks through unannotated and annotated expressions in parallel, guided by unannotated expression
 ;;(define qq-expand

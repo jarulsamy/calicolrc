@@ -32,27 +32,26 @@
 
 (define make-frame
   (lambda (variables values)
-    (map make-binding variables values)))
-
-(define first-binding
-  (lambda (frame)
-    (car frame)))
-
-(define rest-of-bindings
-  (lambda (frame)
-    (cdr frame)))
+    (list->vector (map make-binding variables values))))
 
 (define empty-frame?
   (lambda (frame)
-    (null? frame)))
+    (= (vector-length frame) 0)))
 
-(define search-frame
+(define-native search-frame
   (lambda (frame variable)
     (cond
       ((empty-frame? frame) #f)
-      ((eq? (binding-variable (first-binding frame)) variable)
-       (first-binding frame))
-      (else (search-frame (rest-of-bindings frame) variable)))))
+      (else (search-frame-position frame variable 0)))))
+
+(define-native search-frame-position
+  (lambda (frame variable position)
+    (cond
+     ((>= position (vector-length frame)) #f)
+     ((eq? (binding-variable (vector-ref frame position)) variable)
+      (vector-ref frame position))
+     (else (search-frame-position frame variable (+ 1 position))))))
+
 
 ;; environments
 
@@ -107,34 +106,36 @@
       (lambda-cont2 (binding fail)
 	(k (binding-value binding) fail)))))
 
-;; new version does the dlr-env-contains check first for greater efficiency
+(define vector-append
+  (lambda (v1 v2)
+    (list->vector (append (vector->list v1) (vector->list v2)))))
+
+(define* lookup-value-by-lexical-address
+  (lambda (depth offset env var-info handler fail k)
+    (lookup-value-in-frames-by-lexical-address depth offset 
+	  (cdr env) var-info handler fail k)))
+
+(define* lookup-value-in-frames-by-lexical-address
+  (lambda (depth offset frames var-info handler fail k)
+    (cond
+     ((= depth 0) (k (binding-value (vector-ref (car frames) offset)) fail))
+     (else (lookup-value-in-frames-by-lexical-address (- depth 1) offset 
+	       (cdr frames) var-info handler fail k)))))
+
 (define* lookup-binding
   (lambda (variable env var-info handler fail k)
-    (if (dlr-env-contains variable)
-      (k (dlr-env-lookup variable) fail)
-      (let ((binding (search-env env variable)))
-	(if binding
-	  (k binding fail)
-	  (split-variable variable fail
-	    (lambda-cont2 (components fail)
-	      (if components
-		(lookup-variable-components components "" env handler fail k)
-		(runtime-error (format "unbound variable ~a" variable) var-info handler fail)))))))))
+    (let ((binding (search-env env variable)))
+      (cond 
+       (binding (k binding fail))
+       ((dlr-env-contains variable) (k (dlr-env-lookup variable) fail))
+       (else (split-variable variable env var-info handler fail k))))))
 
-;;;; previous version:
-;;(define* lookup-binding
-;;  (lambda (variable env var-info handler fail k)
-;;    (let ((binding (search-env env variable)))
-;;      (if binding
-;;	(k binding fail)
-;;	(split-variable variable fail
-;;	  (lambda-cont2 (components fail)
-;;	    (if (dlr-env-contains variable)
-;;	      (k (dlr-env-lookup variable) fail)
-;;	      (if components
-;;		(lookup-variable-components components "" env handler fail k)
-;;		(runtime-error (format "unbound variable ~a" variable) var-info handler fail)))))))))
-;;                    (handler (format "unbound variable ~a" variable) fail)))))))))
+(define* split-variable
+  (lambda (variable env var-info handler fail k)
+    (let ((strings (group (string->list (symbol->string variable)) #\.)))
+      (if (or (member "" strings) (= (length strings) 1))
+	  (runtime-error (format "unbound variable ~a" variable) var-info handler fail)
+	  (lookup-variable-components (map string->symbol strings) "" env handler fail k)))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist
 (define* lookup-binding-in-first-frame
@@ -144,7 +145,7 @@
         (if binding
 	  (k binding fail)
           (let ((new-binding (make-binding var 'undefined)))
-            (let ((new-frame (cons new-binding frame)))
+            (let ((new-frame (vector-append frame (vector new-binding))))
               (set-first-frame! env new-frame)
 	      (k new-binding fail))))))))
 
@@ -180,13 +181,6 @@
         ((dlr-env-contains var) (k (dlr-env-lookup var) fail))
 	((string=? path "") (handler (format "unbound module '~a'" var) fail))
 	(else (handler (format "unbound variable '~a' in module '~a'" var path) fail))))))
-
-(define* split-variable
-  (lambda (variable fail k)
-    (let ((strings (group (string->list (symbol->string variable)) #\.)))
-      (if (or (member "" strings) (= (length strings) 1))
-	(k #f fail)
-	(k (map string->symbol strings) fail)))))
 
 (define group
   (lambda (chars delimiter)

@@ -50,8 +50,10 @@ public class Config {
 
   public Symbol symbol(string ssymbol) {
 	if (!symbol_table.ContainsKey(ssymbol)) {
-	  symbol_table.Add(ssymbol, new Symbol(ssymbol, symbol_count));
+	  var newsym = new Symbol(ssymbol, symbol_count);
+	  symbol_table.Add(ssymbol, newsym);
 	  symbol_count++;
+	  return newsym;
 	}
 	return (Symbol) symbol_table[ssymbol];
   }
@@ -82,17 +84,21 @@ public class Symbol : IList {
 	return this.id;
   }
 
+  public String __repr__() {
+      return id;
+  }
+
   // Items necessary for it to be an IList
-  // FIXME: make EmptyList a real list
+  // (used in other DLR interfaces)
   public bool IsFixedSize {
 	get {
-	  return false;
+	  return true;
 	}
   }
 
   public bool IsReadOnly {
 	get {
-	  return false;
+	  return true;
 	}
   }
 
@@ -106,7 +112,7 @@ public class Symbol : IList {
   }
 
   public int Add(object value) {
-	return 0; // should return count
+	return 0; 
   }
 
   public int Count {
@@ -201,6 +207,10 @@ public class Rational {
 	return d.GetHashCode();
   }
   
+  public String __repr__() {
+      return ToString();
+  }
+
   public override string ToString() {
 	//if (denominator != 1)
 	return string.Format("{0}/{1}", numerator, denominator);
@@ -330,6 +340,8 @@ public class Scheme {
     public delegate object Procedure9(object a0, object a1, object a2, object a3, object a4, object a5, object a6, object a7, object a8);
     public delegate object Procedure10(object a0, object a1, object a2, object a3, object a4, object a5, object a6, object a7, object a8, object a9);
 
+    public delegate object ProcedureN(params object [] args);
+
   public static object symbol(object symbol) {
 	return config.symbol(symbol.ToString());
   }
@@ -458,6 +470,10 @@ public class Scheme {
 	  return retval;
 	}
 
+        public String __repr__() {
+	    return ToString();
+	}
+
 	public override string ToString() {
 	  return String.Format("#<procedure {0}>", repr);
 	}
@@ -504,6 +520,9 @@ public class Scheme {
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
   public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
   public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
+  public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) make_external_proc, 1, 1);
+  public static Proc vector_proc = new Proc("vector", (ProcedureN) vector, -1, 1);
+  public static Proc vector_native_proc = new Proc("vector", (Procedure1) vector_native, -1, 1);
   public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
   public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
   public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
@@ -543,7 +562,8 @@ public class Scheme {
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
-  public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
+  //public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
+  public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)PJScheme.make_binding, 2, 1);
   public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
   public static Proc get_member_proc = new Proc("get-member", (Procedure2)get_external_member_name, 2, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
@@ -559,6 +579,14 @@ public class Scheme {
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
+
+  public static Proc binding_variable_proc = new Proc("binding_variable", 
+							(Procedure1) PJScheme.binding_variable,
+							2, 1);
+  public static Proc get_variables_from_frame_proc = new Proc("get_variables_from_frame", 
+								(Procedure1) PJScheme.get_variables_from_frame,
+								1, 1);
+
     // Add new procedures above here!
     // Then add low-level C# code below
 
@@ -581,6 +609,9 @@ public class Scheme {
       } else
 	  return true;
   }
+
+  public static Func<object,bool> module_q = tagged_list(symbol("module"), (Predicate2)GreaterOrEqual, 1);
+  public static Func<object,bool> environment_q = tagged_list(symbol("environment"), (Predicate2)GreaterOrEqual, 1);
 
   public static object get_current_time() {
 	DateTime baseTime = new DateTime(1970, 1, 1, 8, 0, 0);
@@ -615,108 +646,100 @@ public class Scheme {
 	return cons(symbol("procedure"), list(args));
   }
 
-  public static object make_binding (object variable, object value) {
-	return ((object) list((object) variable, "", (object) value));
-  }
-  
-  public static object first_frame (object env) {
-	return ((object) cadr ((object) env));
-  }
-
-  public static void set_first_frame_b (object env, object new_frame) {
-	set_car_b ((object) cdr ((object) env), (object) new_frame);
-  }
-
   // given a name, return a function that given an array, returns object
   public static Procedure2 make_instance_proc(object tname) {
 	return (path, args) => call_external_proc(tname, path, args);
   }
+
+
   
-  public static void set_env_b(object env, object var, object val) {
-	object frame = first_frame(env);
-	// make_external_proc is defined in generated code
-	set_first_frame_b(env, cons(make_binding(var, PJScheme.make_external_proc(val)), frame));
-  }
-
-  public static void set_env_raw_b(object env, object var, object val) {
-	object frame = first_frame(env);
-	set_first_frame_b(env, cons(make_binding(var, val), frame));
-  }
-
   public static object make_initial_env_extended (object env) {
-    /* The following are already added in interpreter.ss:
-       'void 'exit 'eval 'parse 'parse-string 'read-string 'apply 'sqrt 'print 'display 'newline 'load 'length
-       'null? 'cons 'car 'cdr 'cadr 'caddr 'list '+ '- '* '/ '< '> '= '=? 'abs 'equal? 'eq? 'memq 'member
-       'range 'set-car! 'set-cdr! 'import 'get 'call-with-current-continuation 'call/cc 'abort 'require
-       'cut 'reverse 'append 'list->vector 'dir 'current-time 'map 'for-each 'env 'using 'not 'printf
-       'vector 'vector-set! 'vector-ref 'make-vector '<= '>=
-    */
-  	set_env_b(env, symbol("property"), new Proc("property", (Procedure1)property, -1, 1));
- 	set_env_b(env, symbol("debug"), new Proc("debug", (Procedure1)debug, -1, 1));
- 	set_env_b(env, symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1));
- 	set_env_b(env, symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1));
- 	set_env_b(env, symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1));
- 	set_env_b(env, symbol("rational"), new Proc("int", (Procedure2)ToRational, 2, 1));
- 	set_env_b(env, symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1));
- 	set_env_b(env, symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2));
-// why "list?" and not "iterator?" here ????
- 	set_env_b(env, symbol("iterator?"), new Proc("list?", (Procedure1Bool)iterator_q, 1, 2));
- 	set_env_b(env, symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2));
- 	set_env_b(env, symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1));
-	set_env_b(env, symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1));
- 	set_env_b(env, symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2));
- 	set_env_b(env, symbol("length"), new Proc("length", (Procedure1)length, 1, 1));
- 	set_env_b(env, symbol("procedure?"), new Proc("procedure?", (Procedure1Bool)procedure_q_proc, 1, 2));
- 	set_env_b(env, symbol("string<?"), new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2));
- 	set_env_b(env, symbol("string->symbol"), new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1));
- 	set_env_b(env, symbol("symbol->string"), new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1));
- 	set_env_b(env, symbol("string->list"), new Proc("string->list", (Procedure1) string_to_list, 1, 1));
- 	set_env_b(env, symbol("group"), new Proc("group", (Procedure2) group, 2, 1));
- 	set_env_b(env, symbol("member"), new Proc("member", (Procedure2)member, 2, 1));
- 	set_env_b(env, symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1));
- 	set_env_b(env, symbol("list-head"), new Proc("list-head", (Procedure2)list_head, 2, 1));
- 	set_env_b(env, symbol("list-tail"), new Proc("list-tail", (Procedure2)list_tail, 2, 1));
- 	set_env_b(env, symbol("symbol"), new Proc("symbol", (Procedure1)symbol, 1, 1));
-	set_env_b(env, symbol("caar"), new Proc("caar", (Procedure1)caar, 1, 1));
-	set_env_b(env, symbol("cadr"), new Proc("cadr", (Procedure1)cadr, 1, 1));
-	set_env_b(env, symbol("cdar"), new Proc("cdar", (Procedure1)cdar, 1, 1));
-	set_env_b(env, symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1));
-	set_env_b(env, symbol("caaar"), new Proc("caaar", (Procedure1)caaar, 1, 1));
-	set_env_b(env, symbol("caadr"), new Proc("caadr", (Procedure1)caadr, 1, 1));
-	set_env_b(env, symbol("cadar"), new Proc("cadar", (Procedure1)cadar, 1, 1));
-	set_env_b(env, symbol("caddr"), new Proc("caddr", (Procedure1)caddr, 1, 1));
-	set_env_b(env, symbol("cdaar"), new Proc("cdaar", (Procedure1)cdaar, 1, 1));
-	set_env_b(env, symbol("cdadr"), new Proc("cdadr", (Procedure1)cdadr, 1, 1));
-	set_env_b(env, symbol("cddar"), new Proc("cddar", (Procedure1)cddar, 1, 1));
-	set_env_b(env, symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1));
-	set_env_b(env, symbol("caaaar"), new Proc("caaaar", (Procedure1)caaaar, 1, 1));
-	set_env_b(env, symbol("caaadr"), new Proc("caaadr", (Procedure1)caaadr, 1, 1));
-	set_env_b(env, symbol("caadar"), new Proc("caadar", (Procedure1)caadar, 1, 1));
-	set_env_b(env, symbol("caaddr"), new Proc("caaddr", (Procedure1)caaddr, 1, 1));
-	set_env_b(env, symbol("cadaar"), new Proc("cadaar", (Procedure1)cadaar, 1, 1));
-	set_env_b(env, symbol("cadadr"), new Proc("cadadr", (Procedure1)cadadr, 1, 1));
-	set_env_b(env, symbol("caddar"), new Proc("caddar", (Procedure1)caddar, 1, 1));
-	set_env_b(env, symbol("cadddr"), new Proc("cadddr", (Procedure1)cadddr, 1, 1));
-	set_env_b(env, symbol("cdaaar"), new Proc("cdaaar", (Procedure1)cdaaar, 1, 1));
-	set_env_b(env, symbol("cdaadr"), new Proc("cdaadr", (Procedure1)cdaadr, 1, 1));
-	set_env_b(env, symbol("cdadar"), new Proc("cdadar", (Procedure1)cdadar, 1, 1));
-	set_env_b(env, symbol("cdaddr"), new Proc("cdaddr", (Procedure1)cdaddr, 1, 1));
-	set_env_b(env, symbol("cddaar"), new Proc("cddaar", (Procedure1)cddaar, 1, 1));
-	set_env_b(env, symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1));
-	set_env_b(env, symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1));
-	set_env_b(env, symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1));
-	set_env_b(env, symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1));
-	set_env_b(env, symbol("atom?"), atom_q_proc);
-	set_env_b(env, symbol("string-append"), string_append_proc);
-	set_env_b(env, symbol("assq"), assq_proc);
-	set_env_b(env, symbol("safe-print"), safe_print_proc);
-	set_env_b(env, symbol("get-member"), get_member_proc);
-	set_env_b(env, symbol("eqv?"), Eqv_proc);
-	set_env_b(env, symbol("equal?"), Equal_proc);
-	set_env_b(env, symbol("string=?"), string_is__q_proc);
-	return env;
+      // ProcedureN - N is arg count coming in
+      // -1, 1, 2 - number of pieces to call app with (-1 is all)
+      // 0, 1, 2 - return type 0 = void, 1 = object, 2 = bool
+      object primitives = list(
+	       list(symbol("assq"), assq_proc),
+	       list(symbol("atom?"), atom_q_proc),
+	       list(symbol("caaaar"), new Proc("caaaar", (Procedure1)caaaar, 1, 1)),
+	       list(symbol("caaadr"), new Proc("caaadr", (Procedure1)caaadr, 1, 1)),
+	       list(symbol("caaar"), new Proc("caaar", (Procedure1)caaar, 1, 1)),
+	       list(symbol("caadar"), new Proc("caadar", (Procedure1)caadar, 1, 1)),
+	       list(symbol("caaddr"), new Proc("caaddr", (Procedure1)caaddr, 1, 1)),
+	       list(symbol("caadr"), new Proc("caadr", (Procedure1)caadr, 1, 1)),
+	       list(symbol("caar"), new Proc("caar", (Procedure1)caar, 1, 1)),
+	       list(symbol("cadaar"), new Proc("cadaar", (Procedure1)cadaar, 1, 1)),
+	       list(symbol("cadadr"), new Proc("cadadr", (Procedure1)cadadr, 1, 1)),
+	       list(symbol("cadar"), new Proc("cadar", (Procedure1)cadar, 1, 1)),
+	       list(symbol("caddar"), new Proc("caddar", (Procedure1)caddar, 1, 1)),
+	       list(symbol("cadddr"), new Proc("cadddr", (Procedure1)cadddr, 1, 1)),
+	       list(symbol("caddr"), new Proc("caddr", (Procedure1)caddr, 1, 1)),
+	       list(symbol("cadr"), new Proc("cadr", (Procedure1)cadr, 1, 1)),
+	       list(symbol("cdaaar"), new Proc("cdaaar", (Procedure1)cdaaar, 1, 1)),
+	       list(symbol("cdaadr"), new Proc("cdaadr", (Procedure1)cdaadr, 1, 1)),
+	       list(symbol("cdaar"), new Proc("cdaar", (Procedure1)cdaar, 1, 1)),
+	       list(symbol("cdadar"), new Proc("cdadar", (Procedure1)cdadar, 1, 1)),
+	       list(symbol("cdaddr"), new Proc("cdaddr", (Procedure1)cdaddr, 1, 1)),
+	       list(symbol("cdadr"), new Proc("cdadr", (Procedure1)cdadr, 1, 1)),
+	       list(symbol("cdar"), new Proc("cdar", (Procedure1)cdar, 1, 1)),
+	       list(symbol("cddaar"), new Proc("cddaar", (Procedure1)cddaar, 1, 1)),
+	       list(symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1)),
+	       list(symbol("cddar"), new Proc("cddar", (Procedure1)cddar, 1, 1)),
+	       list(symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1)),
+	       list(symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1)),
+	       list(symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1)),
+	       list(symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1)),
+	       list(symbol("debug"), new Proc("debug", (Procedure1)debug, -1, 1)),
+	       list(symbol("equal?"), Equal_proc),
+	       list(symbol("eqv?"), Eqv_proc),
+	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
+	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
+	       list(symbol("get-member"), get_member_proc),
+	       list(symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)),
+	       list(symbol("group"), new Proc("group", (Procedure2) group, 2, 1)),
+	       list(symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1)),
+	       list(symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2)),
+	       list(symbol("length"), new Proc("length", (Procedure1)length, 1, 1)),
+	       list(symbol("list->vector"), list_to_vector_proc),
+	       list(symbol("list-head"), new Proc("list-head", (Procedure2)list_head, 2, 1)),
+	       list(symbol("list-tail"), new Proc("list-tail", (Procedure2)list_tail, 2, 1)),
+	       list(symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2)),
+	       list(symbol("member"), new Proc("member", (Procedure2)member, 2, 1)),
+	       list(symbol("procedure?"), new Proc("procedure?", (Procedure1Bool)procedure_q_proc, 1, 2)),
+	       list(symbol("property"), new Proc("property", (Procedure1)property, -1, 1)),
+	       list(symbol("rational"), new Proc("int", (Procedure2)ToRational, 2, 1)),
+	       list(symbol("safe-print"), safe_print_proc),
+	       list(symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1)),
+	       list(symbol("string->list"), new Proc("string->list", (Procedure1) string_to_list, 1, 1)),
+	       list(symbol("string->symbol"), new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1)),
+	       list(symbol("string-append"), string_append_proc),
+	       list(symbol("string<?"), new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2)),
+	       list(symbol("string=?"), string_is__q_proc),
+	       list(symbol("symbol"), new Proc("symbol", (Procedure1)symbol, 1, 1)),
+	       list(symbol("symbol->string"), new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1)),
+	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
+	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
+	       list(symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1)),
+	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
+	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
+	       list(symbol("use-tracing"), new Proc("use-tracing", (Procedure1)PJScheme.tracing_on, -1, 1)),
+	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0))
+			       );
+      
+      // object settings = list(
+      // 			     list(symbol("*use-lexical-address*"), ((object)value => PJScheme.use_lexical_address))
+      // 			     );
+      // env = PJScheme.extend(env,  map(car_proc, settings), map(cadr_proc, settings));
+      return PJScheme.extend(env,  map(car_proc, primitives), map(make_external_proc_proc, map(cadr_proc, primitives)));
   }
   
+  public static void reset_toplevel_env() {
+      PJScheme.initialize_globals();
+  }
+    
+  public static object make_external_proc(object val) {
+      return PJScheme.make_external_proc(val);
+  }
+    
   public static object debug(object args) {
 	if (((int) length(args)) == 0)
 	  return config.DEBUG;
@@ -806,15 +829,15 @@ public class Scheme {
       //return IronPython.Runtime.Types.DynamicHelpers.
       //GetPythonTypeFromType(property.GetType());
     }
-    return null;
+    throw new Exception(String.Format("no such member: '{0}'", name));
   }
 
   public static object call_external_proc(object obj, object path, object args) {
-	//string name = obj.ToString();
-	//Type type = null;
-	//type = get_the_type(name.ToString());
-    Type type = obj.GetType();
-	if (type != null) {
+      //string name = obj.ToString();
+      //Type type = null;
+      //type = get_the_type(name.ToString());
+      Type type = obj.GetType();
+      if (type != null) {
 	  //Type[] types = get_arg_types(args);
 	  object[] arguments = list_to_array(args);
 	  object result = get_external_member(obj, car(path).ToString());
@@ -855,49 +878,49 @@ public class Scheme {
   }
 
   public static object using_prim(object args, object env) {
-	// implements "using"
-	Assembly assembly = null;
-	if (list_q(args)) {
+      // implements "using"
+      Assembly assembly = null;
+      if (list_q(args)) {
 	  int len = (int) length(args);
 	  if (len > 0) { // (using "file.dll"), (using "System")
-		String filename = car(args).ToString();
-		try {
-    	  // FAILS without trying/catch when DEBUG in MonoDevelop
+	      String filename = car(args).ToString();
+	      try {
+		  // FAILS without trying/catch when DEBUG in MonoDevelop
 		  assembly = Assembly.Load(filename);
-		} catch {
+	      } catch {
 #pragma warning disable 612
-		  assembly = Assembly.LoadWithPartialName(filename);
+		      assembly = Assembly.LoadWithPartialName(filename);
 #pragma warning restore 612
-		}
-		// add assembly to assemblies
-		if (assembly != null) {
+              }
+	      // add assembly to assemblies
+	      if (assembly != null) {
 		  config.AddAssembly(assembly);
 		  if (_dlr_runtime != null) {
-			_dlr_runtime.LoadAssembly(assembly);
-			// then add each type to environment
-			// FIXME: optionally module name
-			foreach (Type type in assembly.GetTypes()) {
+		      _dlr_runtime.LoadAssembly(assembly);
+		      // then add each type to environment
+		      // FIXME: optionally module name
+		      foreach (Type type in assembly.GetTypes()) {
 			  if (type.IsPublic) {
-				_dlr_env.SetVariable(type.Name, 
-					IronPython.Runtime.Types.DynamicHelpers. 
-					GetPythonTypeFromType(type));
+			      _dlr_env.SetVariable(type.Name, 
+						   IronPython.Runtime.Types.DynamicHelpers. 
+						   GetPythonTypeFromType(type));
 			  }
-			}
+		      }
 		  } else {
-			throw new Exception("DLR Runtime not available");
+		      throw new Exception("DLR Runtime not available");
 		  }
-		} else {
+	      } else {
 		  throw new Exception(String.Format("external library '{0}' could not be loaded", filename));
-		}
+	      }
 	  } else {
-		throw new Exception("using takes a DLL name, and optionally a moduleName");
+	      throw new Exception("using takes a DLL name, and optionally a moduleName");
 	  }
-	} else {
+      } else {
 	  throw new Exception("using takes a DLL name, and optionally a moduleName");
-	}
-	return PJScheme.symbol("<void>");
+      }
+      return PJScheme.symbol("<void>");
   }
-  
+
   public static object ToDouble(object obj) {
 	try {
 	  return Convert.ToDouble(obj);
@@ -924,30 +947,6 @@ public class Scheme {
     return new Rational((int) obj1, (int)obj2);
   }
   
-//   public static object make_macro_env () {
-// 	return ((object)
-// 		list(make_frame(
-// 				list (
-// 					symbol("and"), 
-// 					symbol("or"),
-// 					symbol("cond"), 
-// 					symbol("let"),
-// 					symbol("letrec"),
-// 					symbol("let*"),
-// 					symbol("case"),
-// 					symbol("record-case")
-// 					  ),
-// 				list (
-// 					symbol("and_transformer"),
-// 					symbol("or_transformer"),
-// 					symbol("cond_transformer"),
-// 					symbol("let_transformer"),
-// 					symbol("letrec_transformer"),
-// 					symbol("let_star_transformer"),
-// 					symbol("case_transformer"),
-// 					symbol("record_case_transformer")))));
-//   }
-
   public static object range(object args) { // range(start stop incr)
 	if (list_q(args)) {
 	  int len = (int) length(args);
@@ -1232,6 +1231,34 @@ public class Scheme {
 	return (bool) procedure_q(obj);
   }
 
+  public static object vector_to_list(object obj) {
+    return ((Vector)obj).ToList();
+  }
+
+  public static object list_to_vector(object lyst) {
+      if (list_q(lyst)) {
+	  int len = (int) length(lyst);
+	  object current = lyst;
+	  object[] retval = new object[len];
+	  for (int i = 0; i < len; i++) {
+	      retval[i] = car(current);
+	      current = cdr(current);
+	  }
+	  return new Vector(retval);
+      } else {
+	  throw new Exception("argument is not a proper list");
+      }
+  }
+
+    public static object vector_native(object lyst) {
+	return list_to_vector(lyst);
+    }
+
+  public static object vector(params object [] array) {
+	  object lyst = list (array);
+      return list_to_vector(lyst);
+  }
+
   public static object make_vector(object size) {
     int len = (int) size;
     object[] retval = new object[len];
@@ -1257,17 +1284,6 @@ public class Scheme {
   public static object vector_length(object vector) {
     Vector v = (Vector) vector;
     return v.length();
-  }
-
-  public static object list_to_vector(object lyst) {
-    int len = (int) length(lyst);
-    object current = lyst;
-    object[] retval = new object[len];
-    for (int i = 0; i < len; i++) {
-      retval[i] = car(current);
-      current = cdr(current);
-    }
-    return new Vector(retval);
   }
 
   public static object [] list_to_array(object lyst) {
@@ -1497,31 +1513,25 @@ public class Scheme {
 
   public static bool dlr_env_contains(object variable) {
 	bool retval = true;
-	try {
-	  if (_dlr_env != null) {
+	if (_dlr_env != null) {
+	    try {
 		_dlr_env.GetVariable(variable.ToString());
-	  } else {
-		throw new Exception(String.Format("DLR Environment not available"));
-	  }
-	} catch {
-	  retval = false;
+	    } catch {
+		retval = false;
+	    }
+	} else {
+	    retval = false;
 	}
 	return retval;
   }
 
   public static object dlr_env_lookup(object variable) {
 	object retval = null;
-	try {
-	  //retval =
-	  //_dlr_runtime.Operations.Invoke(_dlr_env.GetVariable(variable.ToString()));
-	  if (_dlr_env != null) 
-		retval = _dlr_env.GetVariable(variable.ToString());
-	  else
-		throw new Exception(String.Format("DLR Environment not available"));
-	} catch {
-	  retval = null;
-	}
-    return make_binding("dlr", retval);
+	if (_dlr_env != null) 
+	    retval = _dlr_env.GetVariable(variable.ToString());
+	else
+	    throw new Exception(String.Format("DLR Environment not available"));
+	return PJScheme.make_binding("dlr", retval);
   }
 
   public static object dlr_env_list() {
@@ -1547,45 +1557,26 @@ public class Scheme {
   }
 
   public static object dlr_lookup_components(object result, object parts_list) {
-    //printf("dlr_lookup_components: {0}, {1}\n", result, parts_list);
-    object retobj = result;
-    while (pair_q(parts_list)) {
-      //printf("...loop: {0}\n", parts_list);
-      // fixme: needs to use args to get method
-      try{
-		if (_dlr_runtime != null) {
+      //printf("dlr_lookup_components: {0}, {1}\n", result, parts_list);
+      object retobj = result;
+      while (pair_q(parts_list)) {
+	  //printf("...loop: {0}\n", parts_list);
+	  // fixme: needs to use args to get method
+	  try{
+	      if (_dlr_runtime != null) {
 		  retobj = _dlr_runtime.Operations.GetMember(retobj, 
-			  car(parts_list).ToString());
-		} else {
+							     car(parts_list).ToString());
+	      } else {
 		  throw new Exception(String.Format("DLR Runtime not available"));
-		}
-      } catch {
-	object binding = make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
-        return binding;
+	      }
+	  } catch {
+	      object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+	      return binding;
+	  }
+	  parts_list = cdr(parts_list);
       }
-      parts_list = cdr(parts_list);
-    }
-    return make_binding("dlr", retobj);
+      return PJScheme.make_binding("dlr", retobj);
   }
-
-  /*
-    bool retval = true;
-    while (current < parts.Length) {
-      object tuple;
-      try {
-        _dlr_runtime.Operations.TryGetMember(retobj, 
-            parts[current].ToString(), false, out tuple); // ignore
-                                                          // case?
-        // tuple is actually lookup?
-      } catch {
-        retval = false;
-        break;
-      }
-      current += 1;
-    }
-    return retval;
-  }
-  */
 
   public static object printf_prim(object args) {
 	int len = ((int) length(args)) - 1;
@@ -2878,10 +2869,6 @@ public class Scheme {
 	return false;
   }
 
-  public static object vector_to_list(object obj) {
-    return ((Vector)obj).ToList();
-  }
-
   public static object read_content(object filename) {
     System.IO.StreamReader fp = File.OpenText(filename.ToString());
 	string text = fp.ReadToEnd();
@@ -3144,11 +3131,11 @@ public class Scheme {
 	  return String.Format("({0} ...)", this.car); //...
 	}
   }
+
+  public String __repr__() {
+      return ToString();
+  }
   
-  public static Func<object,bool> module_q = tagged_list(symbol("module"), (Predicate2)GreaterOrEqual, 1);
-
-  public static Func<object,bool> environment_q = tagged_list(symbol("environment"), (Predicate2)GreaterOrEqual, 1);
-
   public override string ToString() { // Unsafe
 	if (procedure_q(this)) 
 	  return "#<procedure>";
@@ -3189,7 +3176,7 @@ public class Scheme {
   }
 }
 
-public class Vector {
+    public class Vector : IList {
   
   private object[] values;
   
@@ -3223,7 +3210,92 @@ public class Vector {
     }
     return String.Format("#{0}({1})", values.Length, retval);
   }
+
+  public String __repr__() {
+      return ToString();
+  }
   
+  // Items necessary for it to be an IList
+  public bool IsFixedSize {
+	get {
+	  return true;
+	}
+  }
+
+  public bool IsReadOnly {
+	get {
+	  return true;
+	}
+  }
+
+  public bool IsSynchronized {
+	get {
+	  return false;
+	}
+  }
+
+  public void CopyTo(System.Array array, int index) {
+  }
+
+  public int Add(object value) {
+	return 0; // should return count
+  }
+
+  public int Count {
+    get {
+      return values.Length;
+    }
+  }
+
+  public void Remove(object value) {
+  }
+
+  public void RemoveAt(int index) {
+  }
+
+  public void Clear() {
+  }
+
+  public bool Contains(object value) {
+      for (int i = 0; i < values.Length; i++) {
+	  if (Eq(values[i], value)) {
+	      return true;
+	  }
+      }
+      return false;
+  }
+
+  public int IndexOf(object value) {
+      for (int i = 0; i < values.Length; i++) {
+	  if (Eq(values[i], value)) {
+	      return i;
+	  }
+      }
+      return -1;
+  }
+
+  public void Insert(int index, object value) {
+  }
+
+  public object this[int index] {
+	get {
+	    return values[index];
+	}
+	set { // value is the item
+	    values[index] = value;
+	}
+  }
+  public object SyncRoot {
+	get {
+	  return this;
+	}
+  }
+  public IEnumerator GetEnumerator() {
+    // FIXME: return enumerator that returns nothing
+    // Refer to the IEnumerator documentation for an example of
+    // implementing an enumerator.
+    throw new Exception("The method or operation is not implemented.");
+  }
 }
 
   public static void Main(string [] args) {
@@ -3506,4 +3578,38 @@ public class Vector {
 	  wait(pause);
       }
   }
+
+  public static object search_frame(object frame, object variable) {
+      if (PJScheme.empty_frame_q(frame)) {
+	  return false;
+      } else {
+	  if (frame is Vector) {
+	      Vector v = (Vector)frame;
+	      for (int i = 0; i < (int)v.length(); i++) {
+		  if (Eq(PJScheme.binding_variable(v.get(i)), variable)) {
+		      return v.get(i);
+		  }
+	      }
+	  } else {
+	      throw new Exception("frame is not a vector");
+	  }
+      }
+      return false;
+  }
+
+    public static object my_get_lexical_address_frame(object frame, object variable, object depth, object offset, object info) {
+	// returns (#t pos) or (#f) signifying bound or free, respectively
+	if (PJScheme.empty_frame_q(frame)) {
+	    return list(false); // not in this frame
+	} else if ((int)offset >= (int)vector_length(frame)) {
+	    return list(false); // not here
+	} else {
+	    for (int i = (int)offset; i < (int)((Vector)frame).length(); i++) {
+		if (Eq(PJScheme.binding_variable(vector_ref(frame, i)), variable)) {
+		    return list(true, PJScheme.lexical_address_aexp(depth, i, variable, info));
+		}
+	    }
+	    return list(false); // not here
+	}
+    }
 }

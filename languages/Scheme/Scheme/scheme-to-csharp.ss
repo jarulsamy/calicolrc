@@ -7,21 +7,14 @@
 ;; to access various utilities (define*? etc.)
 (load "rm-transformer.ss")
 
-(define *code* 
-"  public static Proc get_variables_from_frame_proc = 
-         new Proc(\"get-variables-from-frame\", (Procedure1) get_variables_from_frame, 1, 1);
-   public static Proc binding_variable_proc = 
-         new Proc(\"binding-variable\", (Procedure1) binding_variable, 1, 1);
-")
-
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
 (define *ignore-definitions*
   '(void-value scheme-REP-k scheme-REP-handler scheme-REP-fail start restart read-line
 	       raw-read-line Main read-content string->integer string->decimal
 	       string->rational tagged-list testall group get-current-time range
-	       true? type? make-initial-env-extended make_binding_proc first-frame
-	       set-first-frame! make-proc make-binding dlr-env-lookup
+	       true? type? make-initial-env-extended 
+	       make-proc dlr-env-lookup
 	       dlr-env-contains
 	       execute execute-loop execute-string execute-file read-eval-print-loop
 	       unparse unparse-exps qq-expand-cps_ qq-expand-list-cps_
@@ -62,7 +55,7 @@
     (scan-string "void" ("object"))
     (scan-file "void" ("object"))
     (apply-state "object" ("object" "object"))
-    (read-string "void" ("object"))
+    (read-string "object" ("object"))
 ;;    (read-file "void" ("object"))
     (pc "Function" ("null"))
     (Main "void" ("string []"))
@@ -113,13 +106,14 @@
     (handle-debug-info "void" ())
     (highlight-expression "void" ())
     (get-closure-depth "int" ())
+    (*use-lexical-address* "bool" ())
     (*tracing-on?* "bool" ())
+    (unparse-prim "object" ())
     ))
 
 (define *system-ignore-definitions*
   ;; use scheme name of functions to not move to csharp
-  '(*function-signatures* *ignore-definitions* run trampoline *need-newline*
-    *code*))
+  '(*function-signatures* *ignore-definitions* run trampoline *need-newline*))
 
 (define proper-name
   (lambda (name)
@@ -192,11 +186,11 @@
 	    (header "using System;\n\n"))
 	(if (equal? *class* 'undefined)
 	    (set! *class* name))
-	(format "#pragma warning disable 109\n~a public class ~a: Scheme {\n~a\n~a ~a}\n"
+	(format "#pragma warning disable 109\n~a public class ~a: Scheme {\n~a\n~a}\n"
 		header *class*
 		(apply string-append (map convert-define defs))
 		cs-trampoline
-		*code*)))))
+		)))))
 
 (define cs-trampoline
   "
