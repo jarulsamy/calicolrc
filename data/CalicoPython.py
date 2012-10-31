@@ -68,7 +68,7 @@ class MyLanguage(Calico.Language):
         self.proper_name = "%(name)s"
         self.extensions = System.Array[str](["%(extension)s"])
         self.mimetype = "%(mime_type)s"
-        self.LineComment = "##"
+        self.LineComment = "%(comment)s"
 
     def MakeEngine(self, manager):
         """
