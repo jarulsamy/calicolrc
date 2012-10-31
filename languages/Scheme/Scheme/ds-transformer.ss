@@ -21,33 +21,21 @@
 ;; - no internal define/define*'s
 
 ;; assumes all definitions are in indiana style, not mit style
-(define skip-definition?
+(define ignore-definition?
   (lambda (x)
     (and (list? x)
 	 (not (null? x))
-	 (member (car x) '(define define* define+ define-datatype))
+	 (member (car x) '(define define* define+ define-native define-datatype))
 	 (member (cadr x) *ignore-definitions*))))
 
 ;; these definitions will not be included in the transformed output code
 (define *ignore-definitions*
   '(Main
     ;; unannotated functions and datatypes
-    expression syntactic-sugar? make-pattern-macro expand-once process-macro-clauses
-    mit-define-transformer and-transformer or-transformer cond-transformer let-transformer
-    letrec-transformer create-letrec-assignments let*-transformer nest-let*-bindings
-    case-transformer case-clauses->simple-cond-clauses case-clauses->cond-clauses
-    record-case-transformer record-case-clauses->cond-clauses tagged-list
-    parse parse-error parse-entries parse-all mit-style-define? special-form?
-    quote? quasiquote? unquote? unquote-splicing? if-then? if-else? assignment? func?
-    define? define!? define-syntax? begin? lambda? raise? choose? try?
-    try-body catch? catch-var catch-exps finally? finally-exps application?
-    unparse expand-macro parse-string parse-file print-parsed-sexps get-parsed-sexps parse-sexps
-    qqtest qq1 qq-expand1 qq-expand1-list qq2 qq-expand2 qq-expand2-list qq-expand-cps_ qq-expand-list-cps_
-    unannotate reannotate-cps reannotate-seq scan-string scan-file read-string read-datum read-file
-    read-file-loop print-file print-file-loop
-    aread-string aread-file aread-file-loop aparse-string aparse-file aprint-parsed-sexps
-    aget-parsed-sexps
-    up aup print-sub unify-patterns unify-pairs instantiate
+    qqtest qq-expand-cps_ qq-expand-list-cps_ qq1 qq-expand1 qq-expand1-list qq2 qq-expand2 qq-expand2-list
+    expand-macro aparse-string aparse-file aprint-parsed-sexps aget-parsed-sexps
+    scan-string scan-file aread-string aread-datum aread-file aread-file-loop
+    annotate unannotate up aup print-sub
     ))
 
 ;;-------------------------------------------------------------------------------
@@ -347,10 +335,10 @@
 		  (set! eopl-defs (reverse eopl-defs))
 		  (set! function-defs (reverse function-defs))
 		  (set! other-defs (reverse other-defs)))
-		 ;; skip top level calls to load
+		 ;; ignore top level calls to load
 		 ((load? exp)
 		  (read-transformed-exps input-port))
-		 ((skip-definition? exp)
+		 ((ignore-definition? exp)
 		  (printf "skipping ~a definition\n" (cadr exp))
 		  (read-transformed-exps input-port))
 		 ;; must transform the expression before calling the recursion
@@ -446,6 +434,7 @@
 (define define? (special-form? 'define >= 3))
 (define define*? (special-form? 'define* >= 3))
 (define define+? (special-form? 'define+ >= 3))
+(define define-native? (special-form? 'define-native >= 3))
 (define lambda? (special-form? 'lambda >= 3))
 (define quasiquote? (special-form? 'quasiquote = 2))
 (define unquote? (special-form? 'unquote >= 2))

@@ -271,7 +271,7 @@
                                                             (if (list? value_reg)
                                                                 value_reg
                                                                 (cons (last value_reg) (head value_reg))))
-                                                          (set! k_reg (make-cont2 '<cont2-17> name value_reg info k))
+                                                          (set! k_reg (make-cont2 '<cont2-16> name value_reg info k))
                                                           (set! fail_reg fail)
                                                           (set! handler_reg handler)
                                                           (set! env_reg (extend env formals-list formals-list))
@@ -295,7 +295,7 @@
                                                                 (if (list? value_reg)
                                                                     value_reg
                                                                     (cons (last value_reg) (head value_reg))))
-                                                              (set! k_reg (make-cont2 '<cont2-18> value_reg info k))
+                                                              (set! k_reg (make-cont2 '<cont2-17> value_reg info k))
                                                               (set! fail_reg fail)
                                                               (set! handler_reg handler)
                                                               (set! env_reg (extend env formals-list formals-list))
@@ -618,7 +618,7 @@
                                                                                                                         (set! aclauses (list-ref temp_1 1))
                                                                                                                         (if value_reg
                                                                                                                             (begin
-                                                                                                                              (set! k2_reg (make-cont2 '<cont2-46> fail k))
+                                                                                                                              (set! k2_reg (make-cont2 '<cont2-45> fail k))
                                                                                                                               (set! ap_reg right-apattern)
                                                                                                                               (set! s_reg value_reg)
                                                                                                                               (set! pattern_reg right-pattern)
@@ -781,7 +781,7 @@
                                                                                                                                                                             (set! fail (list-ref temp_1 3))
                                                                                                                                                                             (set! handler (list-ref temp_1 2))
                                                                                                                                                                             (set! env2 (list-ref temp_1 1))
-                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-71> env2 handler k2))
+                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-70> env2 handler k2))
                                                                                                                                                                             (set! fail_reg fail)
                                                                                                                                                                             (set! handler_reg handler)
                                                                                                                                                                             (set! env_reg env2)
@@ -939,7 +939,7 @@
                                                                                                                                                                                                                       (set! pc apply-cont))
                                                                                                                                                                                                                     (begin
                                                                                                                                                                                                                       (set! k2_reg
-                                                                                                                                                                                                                        (make-cont2 '<cont2-92> apair2 pair2 value_reg k))
+                                                                                                                                                                                                                        (make-cont2 '<cont2-91> apair2 pair2 value_reg k))
                                                                                                                                                                                                                       (set! ap_reg (cdr^ apair1))
                                                                                                                                                                                                                       (set! s_reg value_reg)
                                                                                                                                                                                                                       (set! pattern_reg (cdr pair1))
@@ -966,289 +966,287 @@
           (if (eq? (car temp_1) '<cont2-2>)
               (begin (set! final_reg value1_reg) (set! pc #f))
               (if (eq? (car temp_1) '<cont2-3>)
-                  (let ((src 'undefined) (handler 'undefined) (k 'undefined))
-                    (set! k (list-ref temp_1 3))
-                    (set! handler (list-ref temp_1 2))
-                    (set! src (list-ref temp_1 1))
-                    (set! k_reg (make-cont4 '<cont4-8> src handler k))
-                    (set! fail_reg value2_reg)
-                    (set! handler_reg handler)
-                    (set! src_reg src)
-                    (set! tokens_reg value1_reg)
-                    (set! pc read-sexp))
+                  (let ((k 'undefined))
+                    (set! k (list-ref temp_1 1))
+                    (set! value1_reg (binding-value value1_reg))
+                    (set! k_reg k)
+                    (set! pc apply-cont2))
                   (if (eq? (car temp_1) '<cont2-4>)
-                      (let ((k 'undefined))
-                        (set! k (list-ref temp_1 1))
-                        (set! value1_reg (binding-value value1_reg))
-                        (set! k_reg k)
-                        (set! pc apply-cont2))
-                      (if (eq? (car temp_1) '<cont2-5>)
-                          (let ((components 'undefined)
-                                (path 'undefined)
-                                (var 'undefined)
-                                (handler 'undefined)
-                                (k 'undefined))
-                            (set! k (list-ref temp_1 5))
-                            (set! handler (list-ref temp_1 4))
-                            (set! var (list-ref temp_1 3))
-                            (set! path (list-ref temp_1 2))
-                            (set! components (list-ref temp_1 1))
-                            (if (null? (cdr components))
-                                (begin (set! k_reg k) (set! pc apply-cont2))
-                                (let ((result 'undefined) (new-path 'undefined))
-                                  (set! new-path
-                                    (if (string=? path "")
-                                        (format "~a" var)
-                                        (format "~a.~a" path var)))
-                                  (set! result (binding-value value1_reg))
-                                  (if (not (environment? result))
-                                      (if (dlr-object? result)
-                                          (begin
-                                            (set! value1_reg
-                                              (dlr-lookup-components result (cdr components)))
-                                            (set! k_reg k)
-                                            (set! pc apply-cont2))
-                                          (begin
-                                            (set! fail_reg value2_reg)
-                                            (set! exception_reg (format "~a is not a module" new-path))
-                                            (set! handler_reg handler)
-                                            (set! pc apply-handler2)))
+                      (let ((components 'undefined)
+                            (path 'undefined)
+                            (var 'undefined)
+                            (handler 'undefined)
+                            (k 'undefined))
+                        (set! k (list-ref temp_1 5))
+                        (set! handler (list-ref temp_1 4))
+                        (set! var (list-ref temp_1 3))
+                        (set! path (list-ref temp_1 2))
+                        (set! components (list-ref temp_1 1))
+                        (if (null? (cdr components))
+                            (begin (set! k_reg k) (set! pc apply-cont2))
+                            (let ((result 'undefined) (new-path 'undefined))
+                              (set! new-path
+                                (if (string=? path "")
+                                    (format "~a" var)
+                                    (format "~a.~a" path var)))
+                              (set! result (binding-value value1_reg))
+                              (if (not (environment? result))
+                                  (if (dlr-object? result)
                                       (begin
+                                        (set! value1_reg
+                                          (dlr-lookup-components result (cdr components)))
                                         (set! k_reg k)
+                                        (set! pc apply-cont2))
+                                      (begin
                                         (set! fail_reg value2_reg)
+                                        (set! exception_reg (format "~a is not a module" new-path))
                                         (set! handler_reg handler)
-                                        (set! env_reg result)
-                                        (set! path_reg new-path)
-                                        (set! components_reg (cdr components))
-                                        (set! pc lookup-variable-components))))))
-                          (if (eq? (car temp_1) '<cont2-6>)
-                              (let ((v1 'undefined) (info 'undefined) (k 'undefined))
-                                (set! k (list-ref temp_1 3))
-                                (set! info (list-ref temp_1 2))
-                                (set! v1 (list-ref temp_1 1))
-                                (set! value1_reg (app-aexp v1 value1_reg info))
-                                (set! k_reg k)
-                                (set! pc apply-cont2))
-                              (if (eq? (car temp_1) '<cont2-7>)
-                                  (let ((adatum 'undefined)
-                                        (env 'undefined)
-                                        (info 'undefined)
-                                        (handler 'undefined)
-                                        (k 'undefined))
-                                    (set! k (list-ref temp_1 5))
-                                    (set! handler (list-ref temp_1 4))
-                                    (set! info (list-ref temp_1 3))
-                                    (set! env (list-ref temp_1 2))
-                                    (set! adatum (list-ref temp_1 1))
-                                    (set! k_reg (make-cont2 '<cont2-6> value1_reg info k))
+                                        (set! pc apply-handler2)))
+                                  (begin
+                                    (set! k_reg k)
                                     (set! fail_reg value2_reg)
                                     (set! handler_reg handler)
-                                    (set! env_reg env)
-                                    (set! adatum-list_reg (cdr^ adatum))
-                                    (set! pc aparse-all))
+                                    (set! env_reg result)
+                                    (set! path_reg new-path)
+                                    (set! components_reg (cdr components))
+                                    (set! pc lookup-variable-components))))))
+                      (if (eq? (car temp_1) '<cont2-5>)
+                          (let ((v1 'undefined) (info 'undefined) (k 'undefined))
+                            (set! k (list-ref temp_1 3))
+                            (set! info (list-ref temp_1 2))
+                            (set! v1 (list-ref temp_1 1))
+                            (set! value1_reg (app-aexp v1 value1_reg info))
+                            (set! k_reg k)
+                            (set! pc apply-cont2))
+                          (if (eq? (car temp_1) '<cont2-6>)
+                              (let ((adatum 'undefined)
+                                    (env 'undefined)
+                                    (info 'undefined)
+                                    (handler 'undefined)
+                                    (k 'undefined))
+                                (set! k (list-ref temp_1 5))
+                                (set! handler (list-ref temp_1 4))
+                                (set! info (list-ref temp_1 3))
+                                (set! env (list-ref temp_1 2))
+                                (set! adatum (list-ref temp_1 1))
+                                (set! k_reg (make-cont2 '<cont2-5> value1_reg info k))
+                                (set! fail_reg value2_reg)
+                                (set! handler_reg handler)
+                                (set! env_reg env)
+                                (set! adatum-list_reg (cdr^ adatum))
+                                (set! pc aparse-all))
+                              (if (eq? (car temp_1) '<cont2-7>)
+                                  (let ((info 'undefined) (k 'undefined))
+                                    (set! k (list-ref temp_1 2))
+                                    (set! info (list-ref temp_1 1))
+                                    (set! value1_reg (choose-aexp value1_reg info))
+                                    (set! k_reg k)
+                                    (set! pc apply-cont2))
                                   (if (eq? (car temp_1) '<cont2-8>)
                                       (let ((info 'undefined) (k 'undefined))
                                         (set! k (list-ref temp_1 2))
                                         (set! info (list-ref temp_1 1))
-                                        (set! value1_reg (choose-aexp value1_reg info))
+                                        (set! value1_reg (raise-aexp value1_reg info))
                                         (set! k_reg k)
                                         (set! pc apply-cont2))
                                       (if (eq? (car temp_1) '<cont2-9>)
-                                          (let ((info 'undefined) (k 'undefined))
-                                            (set! k (list-ref temp_1 2))
-                                            (set! info (list-ref temp_1 1))
-                                            (set! value1_reg (raise-aexp value1_reg info))
-                                            (set! k_reg k)
-                                            (set! pc apply-cont2))
+                                          (let ((adatum 'undefined)
+                                                (cexps 'undefined)
+                                                (body 'undefined)
+                                                (info 'undefined)
+                                                (k 'undefined))
+                                            (set! k (list-ref temp_1 5))
+                                            (set! info (list-ref temp_1 4))
+                                            (set! body (list-ref temp_1 3))
+                                            (set! cexps (list-ref temp_1 2))
+                                            (set! adatum (list-ref temp_1 1))
+                                            (let ((cvar 'undefined))
+                                              (set! cvar (catch-var^ adatum))
+                                              (set! value1_reg
+                                                (try-catch-finally-aexp body cvar cexps value1_reg info))
+                                              (set! k_reg k)
+                                              (set! pc apply-cont2)))
                                           (if (eq? (car temp_1) '<cont2-10>)
                                               (let ((adatum 'undefined)
-                                                    (cexps 'undefined)
                                                     (body 'undefined)
+                                                    (env 'undefined)
                                                     (info 'undefined)
+                                                    (handler 'undefined)
                                                     (k 'undefined))
-                                                (set! k (list-ref temp_1 5))
+                                                (set! k (list-ref temp_1 6))
+                                                (set! handler (list-ref temp_1 5))
                                                 (set! info (list-ref temp_1 4))
-                                                (set! body (list-ref temp_1 3))
-                                                (set! cexps (list-ref temp_1 2))
+                                                (set! env (list-ref temp_1 3))
+                                                (set! body (list-ref temp_1 2))
                                                 (set! adatum (list-ref temp_1 1))
-                                                (let ((cvar 'undefined))
-                                                  (set! cvar (catch-var^ adatum))
-                                                  (set! value1_reg
-                                                    (try-catch-finally-aexp body cvar cexps value1_reg info))
-                                                  (set! k_reg k)
-                                                  (set! pc apply-cont2)))
+                                                (set! k_reg
+                                                  (make-cont2 '<cont2-9> adatum value1_reg body info k))
+                                                (set! fail_reg value2_reg)
+                                                (set! handler_reg handler)
+                                                (set! env_reg env)
+                                                (set! adatum-list_reg (try-catch-finally-exps^ adatum))
+                                                (set! pc aparse-all))
                                               (if (eq? (car temp_1) '<cont2-11>)
                                                   (let ((adatum 'undefined)
-                                                        (body 'undefined)
                                                         (env 'undefined)
                                                         (info 'undefined)
                                                         (handler 'undefined)
                                                         (k 'undefined))
-                                                    (set! k (list-ref temp_1 6))
-                                                    (set! handler (list-ref temp_1 5))
-                                                    (set! info (list-ref temp_1 4))
-                                                    (set! env (list-ref temp_1 3))
-                                                    (set! body (list-ref temp_1 2))
+                                                    (set! k (list-ref temp_1 5))
+                                                    (set! handler (list-ref temp_1 4))
+                                                    (set! info (list-ref temp_1 3))
+                                                    (set! env (list-ref temp_1 2))
                                                     (set! adatum (list-ref temp_1 1))
                                                     (set! k_reg
-                                                      (make-cont2 '<cont2-10> adatum value1_reg body info k))
+                                                      (make-cont2 '<cont2-10> adatum value1_reg env info handler
+                                                        k))
                                                     (set! fail_reg value2_reg)
                                                     (set! handler_reg handler)
                                                     (set! env_reg env)
-                                                    (set! adatum-list_reg (try-catch-finally-exps^ adatum))
+                                                    (set! adatum-list_reg (catch-exps^ adatum))
                                                     (set! pc aparse-all))
                                                   (if (eq? (car temp_1) '<cont2-12>)
-                                                      (let ((adatum 'undefined)
-                                                            (env 'undefined)
-                                                            (info 'undefined)
-                                                            (handler 'undefined)
-                                                            (k 'undefined))
-                                                        (set! k (list-ref temp_1 5))
-                                                        (set! handler (list-ref temp_1 4))
-                                                        (set! info (list-ref temp_1 3))
-                                                        (set! env (list-ref temp_1 2))
-                                                        (set! adatum (list-ref temp_1 1))
-                                                        (set! k_reg
-                                                          (make-cont2 '<cont2-11> adatum value1_reg env info handler
-                                                            k))
-                                                        (set! fail_reg value2_reg)
-                                                        (set! handler_reg handler)
-                                                        (set! env_reg env)
-                                                        (set! adatum-list_reg (catch-exps^ adatum))
-                                                        (set! pc aparse-all))
+                                                      (let ((body 'undefined) (info 'undefined) (k 'undefined))
+                                                        (set! k (list-ref temp_1 3))
+                                                        (set! info (list-ref temp_1 2))
+                                                        (set! body (list-ref temp_1 1))
+                                                        (set! value1_reg (try-finally-aexp body value1_reg info))
+                                                        (set! k_reg k)
+                                                        (set! pc apply-cont2))
                                                       (if (eq? (car temp_1) '<cont2-13>)
-                                                          (let ((body 'undefined) (info 'undefined) (k 'undefined))
-                                                            (set! k (list-ref temp_1 3))
-                                                            (set! info (list-ref temp_1 2))
-                                                            (set! body (list-ref temp_1 1))
-                                                            (set! value1_reg (try-finally-aexp body value1_reg info))
-                                                            (set! k_reg k)
-                                                            (set! pc apply-cont2))
+                                                          (let ((adatum 'undefined)
+                                                                (env 'undefined)
+                                                                (info 'undefined)
+                                                                (handler 'undefined)
+                                                                (k 'undefined))
+                                                            (set! k (list-ref temp_1 5))
+                                                            (set! handler (list-ref temp_1 4))
+                                                            (set! info (list-ref temp_1 3))
+                                                            (set! env (list-ref temp_1 2))
+                                                            (set! adatum (list-ref temp_1 1))
+                                                            (set! k_reg (make-cont2 '<cont2-12> value1_reg info k))
+                                                            (set! fail_reg value2_reg)
+                                                            (set! handler_reg handler)
+                                                            (set! env_reg env)
+                                                            (set! adatum-list_reg (try-finally-exps^ adatum))
+                                                            (set! pc aparse-all))
                                                           (if (eq? (car temp_1) '<cont2-14>)
                                                               (let ((adatum 'undefined)
-                                                                    (env 'undefined)
+                                                                    (body 'undefined)
                                                                     (info 'undefined)
-                                                                    (handler 'undefined)
                                                                     (k 'undefined))
-                                                                (set! k (list-ref temp_1 5))
-                                                                (set! handler (list-ref temp_1 4))
+                                                                (set! k (list-ref temp_1 4))
                                                                 (set! info (list-ref temp_1 3))
-                                                                (set! env (list-ref temp_1 2))
+                                                                (set! body (list-ref temp_1 2))
                                                                 (set! adatum (list-ref temp_1 1))
-                                                                (set! k_reg (make-cont2 '<cont2-13> value1_reg info k))
-                                                                (set! fail_reg value2_reg)
-                                                                (set! handler_reg handler)
-                                                                (set! env_reg env)
-                                                                (set! adatum-list_reg (try-finally-exps^ adatum))
-                                                                (set! pc aparse-all))
+                                                                (let ((cvar 'undefined))
+                                                                  (set! cvar (catch-var^ adatum))
+                                                                  (set! value1_reg (try-catch-aexp body cvar value1_reg info))
+                                                                  (set! k_reg k)
+                                                                  (set! pc apply-cont2)))
                                                               (if (eq? (car temp_1) '<cont2-15>)
                                                                   (let ((adatum 'undefined)
-                                                                        (body 'undefined)
+                                                                        (env 'undefined)
                                                                         (info 'undefined)
+                                                                        (handler 'undefined)
                                                                         (k 'undefined))
-                                                                    (set! k (list-ref temp_1 4))
+                                                                    (set! k (list-ref temp_1 5))
+                                                                    (set! handler (list-ref temp_1 4))
                                                                     (set! info (list-ref temp_1 3))
-                                                                    (set! body (list-ref temp_1 2))
+                                                                    (set! env (list-ref temp_1 2))
                                                                     (set! adatum (list-ref temp_1 1))
-                                                                    (let ((cvar 'undefined))
-                                                                      (set! cvar (catch-var^ adatum))
-                                                                      (set! value1_reg (try-catch-aexp body cvar value1_reg info))
-                                                                      (set! k_reg k)
-                                                                      (set! pc apply-cont2)))
+                                                                    (set! k_reg
+                                                                      (make-cont2 '<cont2-14> adatum value1_reg info k))
+                                                                    (set! fail_reg value2_reg)
+                                                                    (set! handler_reg handler)
+                                                                    (set! env_reg env)
+                                                                    (set! adatum-list_reg (catch-exps^ adatum))
+                                                                    (set! pc aparse-all))
                                                                   (if (eq? (car temp_1) '<cont2-16>)
-                                                                      (let ((adatum 'undefined)
-                                                                            (env 'undefined)
+                                                                      (let ((name 'undefined)
+                                                                            (formals 'undefined)
                                                                             (info 'undefined)
-                                                                            (handler 'undefined)
                                                                             (k 'undefined))
-                                                                        (set! k (list-ref temp_1 5))
-                                                                        (set! handler (list-ref temp_1 4))
+                                                                        (set! k (list-ref temp_1 4))
                                                                         (set! info (list-ref temp_1 3))
-                                                                        (set! env (list-ref temp_1 2))
-                                                                        (set! adatum (list-ref temp_1 1))
-                                                                        (set! k_reg
-                                                                          (make-cont2 '<cont2-15> adatum value1_reg info k))
-                                                                        (set! fail_reg value2_reg)
-                                                                        (set! handler_reg handler)
-                                                                        (set! env_reg env)
-                                                                        (set! adatum-list_reg (catch-exps^ adatum))
-                                                                        (set! pc aparse-all))
+                                                                        (set! formals (list-ref temp_1 2))
+                                                                        (set! name (list-ref temp_1 1))
+                                                                        (if (list? formals)
+                                                                            (begin
+                                                                              (set! value1_reg
+                                                                                (trace-lambda-aexp name formals value1_reg info))
+                                                                              (set! k_reg k)
+                                                                              (set! pc apply-cont2))
+                                                                            (begin
+                                                                              (set! value1_reg
+                                                                                (mu-trace-lambda-aexp name (head formals) (last formals)
+                                                                                  value1_reg info))
+                                                                              (set! k_reg k)
+                                                                              (set! pc apply-cont2))))
                                                                       (if (eq? (car temp_1) '<cont2-17>)
-                                                                          (let ((name 'undefined)
-                                                                                (formals 'undefined)
-                                                                                (info 'undefined)
-                                                                                (k 'undefined))
-                                                                            (set! k (list-ref temp_1 4))
-                                                                            (set! info (list-ref temp_1 3))
-                                                                            (set! formals (list-ref temp_1 2))
-                                                                            (set! name (list-ref temp_1 1))
+                                                                          (let ((formals 'undefined) (info 'undefined) (k 'undefined))
+                                                                            (set! k (list-ref temp_1 3))
+                                                                            (set! info (list-ref temp_1 2))
+                                                                            (set! formals (list-ref temp_1 1))
                                                                             (if (list? formals)
                                                                                 (begin
-                                                                                  (set! value1_reg
-                                                                                    (trace-lambda-aexp name formals value1_reg info))
+                                                                                  (set! value1_reg (lambda-aexp formals value1_reg info))
                                                                                   (set! k_reg k)
                                                                                   (set! pc apply-cont2))
                                                                                 (begin
                                                                                   (set! value1_reg
-                                                                                    (mu-trace-lambda-aexp name (head formals) (last formals)
-                                                                                      value1_reg info))
+                                                                                    (mu-lambda-aexp
+                                                                                      (head formals)
+                                                                                      (last formals)
+                                                                                      value1_reg
+                                                                                      info))
                                                                                   (set! k_reg k)
                                                                                   (set! pc apply-cont2))))
                                                                           (if (eq? (car temp_1) '<cont2-18>)
-                                                                              (let ((formals 'undefined) (info 'undefined) (k 'undefined))
-                                                                                (set! k (list-ref temp_1 3))
+                                                                              (let ((adatum 'undefined)
+                                                                                    (info 'undefined)
+                                                                                    (handler 'undefined)
+                                                                                    (k 'undefined))
+                                                                                (set! k (list-ref temp_1 4))
+                                                                                (set! handler (list-ref temp_1 3))
                                                                                 (set! info (list-ref temp_1 2))
-                                                                                (set! formals (list-ref temp_1 1))
-                                                                                (if (list? formals)
+                                                                                (set! adatum (list-ref temp_1 1))
+                                                                                (if (null? value1_reg)
                                                                                     (begin
-                                                                                      (set! value1_reg (lambda-aexp formals value1_reg info))
-                                                                                      (set! k_reg k)
-                                                                                      (set! pc apply-cont2))
-                                                                                    (begin
-                                                                                      (set! value1_reg
-                                                                                        (mu-lambda-aexp
-                                                                                          (head formals)
-                                                                                          (last formals)
-                                                                                          value1_reg
-                                                                                          info))
-                                                                                      (set! k_reg k)
-                                                                                      (set! pc apply-cont2))))
+                                                                                      (set! fail_reg value2_reg)
+                                                                                      (set! handler_reg handler)
+                                                                                      (set! adatum_reg adatum)
+                                                                                      (set! msg_reg "bad concrete syntax:")
+                                                                                      (set! pc aparse-error))
+                                                                                    (if (null? (cdr value1_reg))
+                                                                                        (begin
+                                                                                          (set! value1_reg (car value1_reg))
+                                                                                          (set! k_reg k)
+                                                                                          (set! pc apply-cont2))
+                                                                                        (begin
+                                                                                          (set! value1_reg (begin-aexp value1_reg info))
+                                                                                          (set! k_reg k)
+                                                                                          (set! pc apply-cont2)))))
                                                                               (if (eq? (car temp_1) '<cont2-19>)
-                                                                                  (let ((adatum 'undefined)
-                                                                                        (info 'undefined)
-                                                                                        (handler 'undefined)
-                                                                                        (k 'undefined))
-                                                                                    (set! k (list-ref temp_1 4))
-                                                                                    (set! handler (list-ref temp_1 3))
+                                                                                  (let ((adatum 'undefined) (info 'undefined) (k 'undefined))
+                                                                                    (set! k (list-ref temp_1 3))
                                                                                     (set! info (list-ref temp_1 2))
                                                                                     (set! adatum (list-ref temp_1 1))
-                                                                                    (if (null? value1_reg)
-                                                                                        (begin
-                                                                                          (set! fail_reg value2_reg)
-                                                                                          (set! handler_reg handler)
-                                                                                          (set! adatum_reg adatum)
-                                                                                          (set! msg_reg "bad concrete syntax:")
-                                                                                          (set! pc aparse-error))
-                                                                                        (if (null? (cdr value1_reg))
-                                                                                            (begin
-                                                                                              (set! value1_reg (car value1_reg))
-                                                                                              (set! k_reg k)
-                                                                                              (set! pc apply-cont2))
-                                                                                            (begin
-                                                                                              (set! value1_reg (begin-aexp value1_reg info))
-                                                                                              (set! k_reg k)
-                                                                                              (set! pc apply-cont2)))))
+                                                                                    (set! value1_reg
+                                                                                      (define!-aexp
+                                                                                        (define-var^ adatum)
+                                                                                        (define-docstring^ adatum)
+                                                                                        value1_reg
+                                                                                        info))
+                                                                                    (set! k_reg k)
+                                                                                    (set! pc apply-cont2))
                                                                                   (if (eq? (car temp_1) '<cont2-20>)
                                                                                       (let ((adatum 'undefined) (info 'undefined) (k 'undefined))
                                                                                         (set! k (list-ref temp_1 3))
                                                                                         (set! info (list-ref temp_1 2))
                                                                                         (set! adatum (list-ref temp_1 1))
                                                                                         (set! value1_reg
-                                                                                          (define!-aexp
-                                                                                            (define-var^ adatum)
-                                                                                            (define-docstring^ adatum)
-                                                                                            value1_reg
-                                                                                            info))
+                                                                                          (define!-aexp (define-var^ adatum) "" value1_reg info))
                                                                                         (set! k_reg k)
                                                                                         (set! pc apply-cont2))
                                                                                       (if (eq? (car temp_1) '<cont2-21>)
@@ -1257,7 +1255,11 @@
                                                                                             (set! info (list-ref temp_1 2))
                                                                                             (set! adatum (list-ref temp_1 1))
                                                                                             (set! value1_reg
-                                                                                              (define!-aexp (define-var^ adatum) "" value1_reg info))
+                                                                                              (define-aexp
+                                                                                                (define-var^ adatum)
+                                                                                                (define-docstring^ adatum)
+                                                                                                value1_reg
+                                                                                                info))
                                                                                             (set! k_reg k)
                                                                                             (set! pc apply-cont2))
                                                                                           (if (eq? (car temp_1) '<cont2-22>)
@@ -1266,222 +1268,280 @@
                                                                                                 (set! info (list-ref temp_1 2))
                                                                                                 (set! adatum (list-ref temp_1 1))
                                                                                                 (set! value1_reg
-                                                                                                  (define-aexp
-                                                                                                    (define-var^ adatum)
-                                                                                                    (define-docstring^ adatum)
-                                                                                                    value1_reg
-                                                                                                    info))
+                                                                                                  (define-aexp (define-var^ adatum) "" value1_reg info))
                                                                                                 (set! k_reg k)
                                                                                                 (set! pc apply-cont2))
                                                                                               (if (eq? (car temp_1) '<cont2-23>)
-                                                                                                  (let ((adatum 'undefined) (info 'undefined) (k 'undefined))
-                                                                                                    (set! k (list-ref temp_1 3))
-                                                                                                    (set! info (list-ref temp_1 2))
-                                                                                                    (set! adatum (list-ref temp_1 1))
-                                                                                                    (set! value1_reg
-                                                                                                      (define-aexp (define-var^ adatum) "" value1_reg info))
+                                                                                                  (let ((info 'undefined) (k 'undefined))
+                                                                                                    (set! k (list-ref temp_1 2))
+                                                                                                    (set! info (list-ref temp_1 1))
+                                                                                                    (set! value1_reg (func-aexp value1_reg info))
                                                                                                     (set! k_reg k)
                                                                                                     (set! pc apply-cont2))
                                                                                                   (if (eq? (car temp_1) '<cont2-24>)
-                                                                                                      (let ((info 'undefined) (k 'undefined))
-                                                                                                        (set! k (list-ref temp_1 2))
-                                                                                                        (set! info (list-ref temp_1 1))
-                                                                                                        (set! value1_reg (func-aexp value1_reg info))
-                                                                                                        (set! k_reg k)
-                                                                                                        (set! pc apply-cont2))
+                                                                                                      (let ((adatum 'undefined) (info 'undefined) (k 'undefined))
+                                                                                                        (set! k (list-ref temp_1 3))
+                                                                                                        (set! info (list-ref temp_1 2))
+                                                                                                        (set! adatum (list-ref temp_1 1))
+                                                                                                        (let ((var-info 'undefined))
+                                                                                                          (set! var-info (get-source-info (cadr^ adatum)))
+                                                                                                          (set! value1_reg
+                                                                                                            (assign-aexp
+                                                                                                              (untag-atom^ (cadr^ adatum))
+                                                                                                              value1_reg
+                                                                                                              var-info
+                                                                                                              info))
+                                                                                                          (set! k_reg k)
+                                                                                                          (set! pc apply-cont2)))
                                                                                                       (if (eq? (car temp_1) '<cont2-25>)
-                                                                                                          (let ((adatum 'undefined) (info 'undefined) (k 'undefined))
-                                                                                                            (set! k (list-ref temp_1 3))
-                                                                                                            (set! info (list-ref temp_1 2))
-                                                                                                            (set! adatum (list-ref temp_1 1))
-                                                                                                            (let ((var-info 'undefined))
-                                                                                                              (set! var-info (get-source-info (cadr^ adatum)))
-                                                                                                              (set! value1_reg
-                                                                                                                (assign-aexp
-                                                                                                                  (untag-atom^ (cadr^ adatum))
-                                                                                                                  value1_reg
-                                                                                                                  var-info
-                                                                                                                  info))
-                                                                                                              (set! k_reg k)
-                                                                                                              (set! pc apply-cont2)))
+                                                                                                          (let ((v1 'undefined)
+                                                                                                                (v2 'undefined)
+                                                                                                                (info 'undefined)
+                                                                                                                (k 'undefined))
+                                                                                                            (set! k (list-ref temp_1 4))
+                                                                                                            (set! info (list-ref temp_1 3))
+                                                                                                            (set! v2 (list-ref temp_1 2))
+                                                                                                            (set! v1 (list-ref temp_1 1))
+                                                                                                            (set! value1_reg (if-aexp v1 v2 value1_reg info))
+                                                                                                            (set! k_reg k)
+                                                                                                            (set! pc apply-cont2))
                                                                                                           (if (eq? (car temp_1) '<cont2-26>)
-                                                                                                              (let ((v1 'undefined)
-                                                                                                                    (v2 'undefined)
+                                                                                                              (let ((adatum 'undefined)
+                                                                                                                    (v1 'undefined)
+                                                                                                                    (env 'undefined)
                                                                                                                     (info 'undefined)
+                                                                                                                    (handler 'undefined)
                                                                                                                     (k 'undefined))
-                                                                                                                (set! k (list-ref temp_1 4))
-                                                                                                                (set! info (list-ref temp_1 3))
-                                                                                                                (set! v2 (list-ref temp_1 2))
-                                                                                                                (set! v1 (list-ref temp_1 1))
-                                                                                                                (set! value1_reg (if-aexp v1 v2 value1_reg info))
-                                                                                                                (set! k_reg k)
-                                                                                                                (set! pc apply-cont2))
+                                                                                                                (set! k (list-ref temp_1 6))
+                                                                                                                (set! handler (list-ref temp_1 5))
+                                                                                                                (set! info (list-ref temp_1 4))
+                                                                                                                (set! env (list-ref temp_1 3))
+                                                                                                                (set! v1 (list-ref temp_1 2))
+                                                                                                                (set! adatum (list-ref temp_1 1))
+                                                                                                                (set! k_reg (make-cont2 '<cont2-25> v1 value1_reg info k))
+                                                                                                                (set! fail_reg value2_reg)
+                                                                                                                (set! handler_reg handler)
+                                                                                                                (set! env_reg env)
+                                                                                                                (set! adatum_reg (cadddr^ adatum))
+                                                                                                                (set! pc aparse))
                                                                                                               (if (eq? (car temp_1) '<cont2-27>)
                                                                                                                   (let ((adatum 'undefined)
-                                                                                                                        (v1 'undefined)
                                                                                                                         (env 'undefined)
                                                                                                                         (info 'undefined)
                                                                                                                         (handler 'undefined)
                                                                                                                         (k 'undefined))
-                                                                                                                    (set! k (list-ref temp_1 6))
-                                                                                                                    (set! handler (list-ref temp_1 5))
-                                                                                                                    (set! info (list-ref temp_1 4))
-                                                                                                                    (set! env (list-ref temp_1 3))
-                                                                                                                    (set! v1 (list-ref temp_1 2))
+                                                                                                                    (set! k (list-ref temp_1 5))
+                                                                                                                    (set! handler (list-ref temp_1 4))
+                                                                                                                    (set! info (list-ref temp_1 3))
+                                                                                                                    (set! env (list-ref temp_1 2))
                                                                                                                     (set! adatum (list-ref temp_1 1))
-                                                                                                                    (set! k_reg (make-cont2 '<cont2-26> v1 value1_reg info k))
+                                                                                                                    (set! k_reg
+                                                                                                                      (make-cont2 '<cont2-26> adatum value1_reg env info handler
+                                                                                                                        k))
                                                                                                                     (set! fail_reg value2_reg)
                                                                                                                     (set! handler_reg handler)
                                                                                                                     (set! env_reg env)
-                                                                                                                    (set! adatum_reg (cadddr^ adatum))
+                                                                                                                    (set! adatum_reg (caddr^ adatum))
                                                                                                                     (set! pc aparse))
                                                                                                                   (if (eq? (car temp_1) '<cont2-28>)
-                                                                                                                      (let ((adatum 'undefined)
-                                                                                                                            (env 'undefined)
-                                                                                                                            (info 'undefined)
-                                                                                                                            (handler 'undefined)
-                                                                                                                            (k 'undefined))
-                                                                                                                        (set! k (list-ref temp_1 5))
-                                                                                                                        (set! handler (list-ref temp_1 4))
-                                                                                                                        (set! info (list-ref temp_1 3))
-                                                                                                                        (set! env (list-ref temp_1 2))
-                                                                                                                        (set! adatum (list-ref temp_1 1))
-                                                                                                                        (set! k_reg
-                                                                                                                          (make-cont2 '<cont2-27> adatum value1_reg env info handler
-                                                                                                                            k))
-                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                        (set! handler_reg handler)
-                                                                                                                        (set! env_reg env)
-                                                                                                                        (set! adatum_reg (caddr^ adatum))
-                                                                                                                        (set! pc aparse))
+                                                                                                                      (let ((v1 'undefined) (info 'undefined) (k 'undefined))
+                                                                                                                        (set! k (list-ref temp_1 3))
+                                                                                                                        (set! info (list-ref temp_1 2))
+                                                                                                                        (set! v1 (list-ref temp_1 1))
+                                                                                                                        (set! value1_reg
+                                                                                                                          (if-aexp v1 value1_reg (lit-aexp #f 'none) info))
+                                                                                                                        (set! k_reg k)
+                                                                                                                        (set! pc apply-cont2))
                                                                                                                       (if (eq? (car temp_1) '<cont2-29>)
-                                                                                                                          (let ((v1 'undefined) (info 'undefined) (k 'undefined))
-                                                                                                                            (set! k (list-ref temp_1 3))
-                                                                                                                            (set! info (list-ref temp_1 2))
-                                                                                                                            (set! v1 (list-ref temp_1 1))
-                                                                                                                            (set! value1_reg
-                                                                                                                              (if-aexp v1 value1_reg (lit-aexp #f 'none) info))
-                                                                                                                            (set! k_reg k)
-                                                                                                                            (set! pc apply-cont2))
+                                                                                                                          (let ((adatum 'undefined)
+                                                                                                                                (env 'undefined)
+                                                                                                                                (info 'undefined)
+                                                                                                                                (handler 'undefined)
+                                                                                                                                (k 'undefined))
+                                                                                                                            (set! k (list-ref temp_1 5))
+                                                                                                                            (set! handler (list-ref temp_1 4))
+                                                                                                                            (set! info (list-ref temp_1 3))
+                                                                                                                            (set! env (list-ref temp_1 2))
+                                                                                                                            (set! adatum (list-ref temp_1 1))
+                                                                                                                            (set! k_reg (make-cont2 '<cont2-28> value1_reg info k))
+                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                            (set! handler_reg handler)
+                                                                                                                            (set! env_reg env)
+                                                                                                                            (set! adatum_reg (caddr^ adatum))
+                                                                                                                            (set! pc aparse))
                                                                                                                           (if (eq? (car temp_1) '<cont2-30>)
-                                                                                                                              (let ((adatum 'undefined)
-                                                                                                                                    (env 'undefined)
-                                                                                                                                    (info 'undefined)
-                                                                                                                                    (handler 'undefined)
-                                                                                                                                    (k 'undefined))
-                                                                                                                                (set! k (list-ref temp_1 5))
-                                                                                                                                (set! handler (list-ref temp_1 4))
-                                                                                                                                (set! info (list-ref temp_1 3))
-                                                                                                                                (set! env (list-ref temp_1 2))
-                                                                                                                                (set! adatum (list-ref temp_1 1))
-                                                                                                                                (set! k_reg (make-cont2 '<cont2-29> value1_reg info k))
+                                                                                                                              (let ((env 'undefined) (handler 'undefined) (k 'undefined))
+                                                                                                                                (set! k (list-ref temp_1 3))
+                                                                                                                                (set! handler (list-ref temp_1 2))
+                                                                                                                                (set! env (list-ref temp_1 1))
+                                                                                                                                (set! k_reg k)
                                                                                                                                 (set! fail_reg value2_reg)
                                                                                                                                 (set! handler_reg handler)
                                                                                                                                 (set! env_reg env)
-                                                                                                                                (set! adatum_reg (caddr^ adatum))
+                                                                                                                                (set! adatum_reg value1_reg)
                                                                                                                                 (set! pc aparse))
                                                                                                                               (if (eq? (car temp_1) '<cont2-31>)
-                                                                                                                                  (let ((env 'undefined) (handler 'undefined) (k 'undefined))
-                                                                                                                                    (set! k (list-ref temp_1 3))
-                                                                                                                                    (set! handler (list-ref temp_1 2))
-                                                                                                                                    (set! env (list-ref temp_1 1))
+                                                                                                                                  (let ((a 'undefined) (k 'undefined))
+                                                                                                                                    (set! k (list-ref temp_1 2))
+                                                                                                                                    (set! a (list-ref temp_1 1))
+                                                                                                                                    (set! value1_reg (cons a value1_reg))
                                                                                                                                     (set! k_reg k)
-                                                                                                                                    (set! fail_reg value2_reg)
-                                                                                                                                    (set! handler_reg handler)
-                                                                                                                                    (set! env_reg env)
-                                                                                                                                    (set! adatum_reg value1_reg)
-                                                                                                                                    (set! pc aparse))
+                                                                                                                                    (set! pc apply-cont2))
                                                                                                                                   (if (eq? (car temp_1) '<cont2-32>)
-                                                                                                                                      (let ((a 'undefined) (k 'undefined))
-                                                                                                                                        (set! k (list-ref temp_1 2))
-                                                                                                                                        (set! a (list-ref temp_1 1))
-                                                                                                                                        (set! value1_reg (cons a value1_reg))
-                                                                                                                                        (set! k_reg k)
-                                                                                                                                        (set! pc apply-cont2))
+                                                                                                                                      (let ((adatum-list 'undefined)
+                                                                                                                                            (env 'undefined)
+                                                                                                                                            (handler 'undefined)
+                                                                                                                                            (k 'undefined))
+                                                                                                                                        (set! k (list-ref temp_1 4))
+                                                                                                                                        (set! handler (list-ref temp_1 3))
+                                                                                                                                        (set! env (list-ref temp_1 2))
+                                                                                                                                        (set! adatum-list (list-ref temp_1 1))
+                                                                                                                                        (set! k_reg (make-cont2 '<cont2-31> value1_reg k))
+                                                                                                                                        (set! fail_reg value2_reg)
+                                                                                                                                        (set! handler_reg handler)
+                                                                                                                                        (set! env_reg env)
+                                                                                                                                        (set! adatum-list_reg (cdr^ adatum-list))
+                                                                                                                                        (set! pc aparse-all))
                                                                                                                                       (if (eq? (car temp_1) '<cont2-33>)
-                                                                                                                                          (let ((adatum-list 'undefined)
-                                                                                                                                                (env 'undefined)
-                                                                                                                                                (handler 'undefined)
-                                                                                                                                                (k 'undefined))
-                                                                                                                                            (set! k (list-ref temp_1 4))
-                                                                                                                                            (set! handler (list-ref temp_1 3))
-                                                                                                                                            (set! env (list-ref temp_1 2))
-                                                                                                                                            (set! adatum-list (list-ref temp_1 1))
-                                                                                                                                            (set! k_reg (make-cont2 '<cont2-32> value1_reg k))
-                                                                                                                                            (set! fail_reg value2_reg)
-                                                                                                                                            (set! handler_reg handler)
-                                                                                                                                            (set! env_reg env)
-                                                                                                                                            (set! adatum-list_reg (cdr^ adatum-list))
-                                                                                                                                            (set! pc aparse-all))
+                                                                                                                                          (let ((v1 'undefined) (k 'undefined))
+                                                                                                                                            (set! k (list-ref temp_1 2))
+                                                                                                                                            (set! v1 (list-ref temp_1 1))
+                                                                                                                                            (set! value1_reg (cons v1 value1_reg))
+                                                                                                                                            (set! k_reg k)
+                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                           (if (eq? (car temp_1) '<cont2-34>)
-                                                                                                                                              (let ((v1 'undefined) (k 'undefined))
-                                                                                                                                                (set! k (list-ref temp_1 2))
-                                                                                                                                                (set! v1 (list-ref temp_1 1))
-                                                                                                                                                (set! value1_reg (cons v1 value1_reg))
-                                                                                                                                                (set! k_reg k)
-                                                                                                                                                (set! pc apply-cont2))
+                                                                                                                                              (let ((src 'undefined)
+                                                                                                                                                    (tokens-left 'undefined)
+                                                                                                                                                    (env 'undefined)
+                                                                                                                                                    (handler 'undefined)
+                                                                                                                                                    (k 'undefined))
+                                                                                                                                                (set! k (list-ref temp_1 5))
+                                                                                                                                                (set! handler (list-ref temp_1 4))
+                                                                                                                                                (set! env (list-ref temp_1 3))
+                                                                                                                                                (set! tokens-left (list-ref temp_1 2))
+                                                                                                                                                (set! src (list-ref temp_1 1))
+                                                                                                                                                (set! k_reg (make-cont2 '<cont2-33> value1_reg k))
+                                                                                                                                                (set! fail_reg value2_reg)
+                                                                                                                                                (set! handler_reg handler)
+                                                                                                                                                (set! env_reg env)
+                                                                                                                                                (set! src_reg src)
+                                                                                                                                                (set! tokens_reg tokens-left)
+                                                                                                                                                (set! pc aparse-sexps))
                                                                                                                                               (if (eq? (car temp_1) '<cont2-35>)
-                                                                                                                                                  (let ((src 'undefined)
-                                                                                                                                                        (tokens-left 'undefined)
-                                                                                                                                                        (env 'undefined)
-                                                                                                                                                        (handler 'undefined)
-                                                                                                                                                        (k 'undefined))
-                                                                                                                                                    (set! k (list-ref temp_1 5))
-                                                                                                                                                    (set! handler (list-ref temp_1 4))
-                                                                                                                                                    (set! env (list-ref temp_1 3))
-                                                                                                                                                    (set! tokens-left (list-ref temp_1 2))
-                                                                                                                                                    (set! src (list-ref temp_1 1))
-                                                                                                                                                    (set! k_reg (make-cont2 '<cont2-34> value1_reg k))
-                                                                                                                                                    (set! fail_reg value2_reg)
-                                                                                                                                                    (set! handler_reg handler)
-                                                                                                                                                    (set! env_reg env)
-                                                                                                                                                    (set! src_reg src)
-                                                                                                                                                    (set! tokens_reg tokens-left)
-                                                                                                                                                    (set! pc aparse-sexps))
+                                                                                                                                                  (let ((bodies 'undefined) (k 'undefined))
+                                                                                                                                                    (set! k (list-ref temp_1 2))
+                                                                                                                                                    (set! bodies (list-ref temp_1 1))
+                                                                                                                                                    (set! value_reg
+                                                                                                                                                      (append
+                                                                                                                                                        (list 'let)
+                                                                                                                                                        (append
+                                                                                                                                                          (list value1_reg)
+                                                                                                                                                          (append value2_reg (at^ bodies)))))
+                                                                                                                                                    (set! k_reg k)
+                                                                                                                                                    (set! pc apply-cont))
                                                                                                                                                   (if (eq? (car temp_1) '<cont2-36>)
-                                                                                                                                                      (let ((bodies 'undefined) (k 'undefined))
-                                                                                                                                                        (set! k (list-ref temp_1 2))
-                                                                                                                                                        (set! bodies (list-ref temp_1 1))
-                                                                                                                                                        (set! value_reg
-                                                                                                                                                          (append
-                                                                                                                                                            (list 'let)
+                                                                                                                                                      (let ((procs 'undefined) (vars 'undefined) (k2 'undefined))
+                                                                                                                                                        (set! k2 (list-ref temp_1 3))
+                                                                                                                                                        (set! vars (list-ref temp_1 2))
+                                                                                                                                                        (set! procs (list-ref temp_1 1))
+                                                                                                                                                        (set! value2_reg
+                                                                                                                                                          (cons
                                                                                                                                                             (append
-                                                                                                                                                              (list value1_reg)
-                                                                                                                                                              (append value2_reg (at^ bodies)))))
-                                                                                                                                                        (set! k_reg k)
-                                                                                                                                                        (set! pc apply-cont))
+                                                                                                                                                              (list 'set!)
+                                                                                                                                                              (append (list (car^ vars)) (list (car^ procs))))
+                                                                                                                                                            value2_reg))
+                                                                                                                                                        (set! value1_reg
+                                                                                                                                                          (cons
+                                                                                                                                                            (append
+                                                                                                                                                              (list (car^ vars))
+                                                                                                                                                              (list (append (list 'quote) (list 'undefined))))
+                                                                                                                                                            value1_reg))
+                                                                                                                                                        (set! k_reg k2)
+                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                       (if (eq? (car temp_1) '<cont2-37>)
-                                                                                                                                                          (let ((procs 'undefined) (vars 'undefined) (k2 'undefined))
-                                                                                                                                                            (set! k2 (list-ref temp_1 3))
-                                                                                                                                                            (set! vars (list-ref temp_1 2))
-                                                                                                                                                            (set! procs (list-ref temp_1 1))
-                                                                                                                                                            (set! value2_reg
-                                                                                                                                                              (cons
+                                                                                                                                                          (let ((exp 'undefined) (k 'undefined))
+                                                                                                                                                            (set! k (list-ref temp_1 2))
+                                                                                                                                                            (set! exp (list-ref temp_1 1))
+                                                                                                                                                            (set! value_reg
+                                                                                                                                                              (append
+                                                                                                                                                                (list 'let)
                                                                                                                                                                 (append
-                                                                                                                                                                  (list 'set!)
-                                                                                                                                                                  (append (list (car^ vars)) (list (car^ procs))))
-                                                                                                                                                                value2_reg))
-                                                                                                                                                            (set! value1_reg
-                                                                                                                                                              (cons
-                                                                                                                                                                (append
-                                                                                                                                                                  (list (car^ vars))
-                                                                                                                                                                  (list (append (list 'quote) (list 'undefined))))
-                                                                                                                                                                value1_reg))
-                                                                                                                                                            (set! k_reg k2)
-                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                  (list
+                                                                                                                                                                    (append (list (append (list 'r) (list exp))) value1_reg))
+                                                                                                                                                                  (list (append (list 'cond) value2_reg)))))
+                                                                                                                                                            (set! k_reg k)
+                                                                                                                                                            (set! pc apply-cont))
                                                                                                                                                           (if (eq? (car temp_1) '<cont2-38>)
-                                                                                                                                                              (let ((exp 'undefined) (k 'undefined))
-                                                                                                                                                                (set! k (list-ref temp_1 2))
-                                                                                                                                                                (set! exp (list-ref temp_1 1))
-                                                                                                                                                                (set! value_reg
-                                                                                                                                                                  (append
-                                                                                                                                                                    (list 'let)
-                                                                                                                                                                    (append
-                                                                                                                                                                      (list
-                                                                                                                                                                        (append (list (append (list 'r) (list exp))) value1_reg))
-                                                                                                                                                                      (list (append (list 'cond) value2_reg)))))
-                                                                                                                                                                (set! k_reg k)
-                                                                                                                                                                (set! pc apply-cont))
+                                                                                                                                                              (let ((clauses 'undefined) (var 'undefined) (k2 'undefined))
+                                                                                                                                                                (set! k2 (list-ref temp_1 3))
+                                                                                                                                                                (set! var (list-ref temp_1 2))
+                                                                                                                                                                (set! clauses (list-ref temp_1 1))
+                                                                                                                                                                (let ((clause 'undefined))
+                                                                                                                                                                  (set! clause (car^ clauses))
+                                                                                                                                                                  (if (eq?^ (car^ clause) 'else)
+                                                                                                                                                                      (begin
+                                                                                                                                                                        (set! value2_reg
+                                                                                                                                                                          (cons (list 'else (list 'else-code)) value2_reg))
+                                                                                                                                                                        (set! value1_reg
+                                                                                                                                                                          (cons
+                                                                                                                                                                            (append
+                                                                                                                                                                              (list 'else-code)
+                                                                                                                                                                              (list
+                                                                                                                                                                                (append
+                                                                                                                                                                                  (list 'lambda)
+                                                                                                                                                                                  (append (list '()) (at^ (cdr^ clause))))))
+                                                                                                                                                                            value1_reg))
+                                                                                                                                                                        (set! k_reg k2)
+                                                                                                                                                                        (set! pc apply-cont2))
+                                                                                                                                                                      (if (symbol?^ (car^ clause))
+                                                                                                                                                                          (let ((name 'undefined))
+                                                                                                                                                                            (set! name (car^ clause))
+                                                                                                                                                                            (set! value2_reg
+                                                                                                                                                                              (cons
+                                                                                                                                                                                (append
+                                                                                                                                                                                  (list
+                                                                                                                                                                                    (append
+                                                                                                                                                                                      (list 'eq?)
+                                                                                                                                                                                      (append
+                                                                                                                                                                                        (list var)
+                                                                                                                                                                                        (list (append (list 'quote) (list (car^ clause)))))))
+                                                                                                                                                                                  (list (list name)))
+                                                                                                                                                                                value2_reg))
+                                                                                                                                                                            (set! value1_reg
+                                                                                                                                                                              (cons
+                                                                                                                                                                                (append
+                                                                                                                                                                                  (list name)
+                                                                                                                                                                                  (list
+                                                                                                                                                                                    (append
+                                                                                                                                                                                      (list 'lambda)
+                                                                                                                                                                                      (append (list '()) (at^ (cdr^ clause))))))
+                                                                                                                                                                                value1_reg))
+                                                                                                                                                                            (set! k_reg k2)
+                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                          (let ((name 'undefined))
+                                                                                                                                                                            (set! name (caar^ clause))
+                                                                                                                                                                            (set! value2_reg
+                                                                                                                                                                              (cons
+                                                                                                                                                                                (append
+                                                                                                                                                                                  (list
+                                                                                                                                                                                    (append
+                                                                                                                                                                                      (list 'memq)
+                                                                                                                                                                                      (append
+                                                                                                                                                                                        (list var)
+                                                                                                                                                                                        (list (append (list 'quote) (list (car^ clause)))))))
+                                                                                                                                                                                  (list (list name)))
+                                                                                                                                                                                value2_reg))
+                                                                                                                                                                            (set! value1_reg
+                                                                                                                                                                              (cons
+                                                                                                                                                                                (append
+                                                                                                                                                                                  (list name)
+                                                                                                                                                                                  (list
+                                                                                                                                                                                    (append
+                                                                                                                                                                                      (list 'lambda)
+                                                                                                                                                                                      (append (list '()) (at^ (cdr^ clause))))))
+                                                                                                                                                                                value1_reg))
+                                                                                                                                                                            (set! k_reg k2)
+                                                                                                                                                                            (set! pc apply-cont2))))))
                                                                                                                                                               (if (eq? (car temp_1) '<cont2-39>)
                                                                                                                                                                   (let ((clauses 'undefined) (var 'undefined) (k2 'undefined))
                                                                                                                                                                     (set! k2 (list-ref temp_1 3))
@@ -1492,7 +1552,9 @@
                                                                                                                                                                       (if (eq?^ (car^ clause) 'else)
                                                                                                                                                                           (begin
                                                                                                                                                                             (set! value2_reg
-                                                                                                                                                                              (cons (list 'else (list 'else-code)) value2_reg))
+                                                                                                                                                                              (cons
+                                                                                                                                                                                (append (list 'else) (list (list 'else-code)))
+                                                                                                                                                                                value2_reg))
                                                                                                                                                                             (set! value1_reg
                                                                                                                                                                               (cons
                                                                                                                                                                                 (append
@@ -1514,9 +1576,14 @@
                                                                                                                                                                                         (append
                                                                                                                                                                                           (list 'eq?)
                                                                                                                                                                                           (append
-                                                                                                                                                                                            (list var)
+                                                                                                                                                                                            (list (append (list 'car) (list var)))
                                                                                                                                                                                             (list (append (list 'quote) (list (car^ clause)))))))
-                                                                                                                                                                                      (list (list name)))
+                                                                                                                                                                                      (list
+                                                                                                                                                                                        (append
+                                                                                                                                                                                          (list 'apply)
+                                                                                                                                                                                          (append
+                                                                                                                                                                                            (list name)
+                                                                                                                                                                                            (list (append (list 'cdr) (list var)))))))
                                                                                                                                                                                     value2_reg))
                                                                                                                                                                                 (set! value1_reg
                                                                                                                                                                                   (cons
@@ -1525,7 +1592,7 @@
                                                                                                                                                                                       (list
                                                                                                                                                                                         (append
                                                                                                                                                                                           (list 'lambda)
-                                                                                                                                                                                          (append (list '()) (at^ (cdr^ clause))))))
+                                                                                                                                                                                          (append (list (cadr^ clause)) (at^ (cddr^ clause))))))
                                                                                                                                                                                     value1_reg))
                                                                                                                                                                                 (set! k_reg k2)
                                                                                                                                                                                 (set! pc apply-cont2))
@@ -1538,9 +1605,14 @@
                                                                                                                                                                                         (append
                                                                                                                                                                                           (list 'memq)
                                                                                                                                                                                           (append
-                                                                                                                                                                                            (list var)
+                                                                                                                                                                                            (list (append (list 'car) (list var)))
                                                                                                                                                                                             (list (append (list 'quote) (list (car^ clause)))))))
-                                                                                                                                                                                      (list (list name)))
+                                                                                                                                                                                      (list
+                                                                                                                                                                                        (append
+                                                                                                                                                                                          (list 'apply)
+                                                                                                                                                                                          (append
+                                                                                                                                                                                            (list name)
+                                                                                                                                                                                            (list (append (list 'cdr) (list var)))))))
                                                                                                                                                                                     value2_reg))
                                                                                                                                                                                 (set! value1_reg
                                                                                                                                                                                   (cons
@@ -1549,244 +1621,182 @@
                                                                                                                                                                                       (list
                                                                                                                                                                                         (append
                                                                                                                                                                                           (list 'lambda)
-                                                                                                                                                                                          (append (list '()) (at^ (cdr^ clause))))))
+                                                                                                                                                                                          (append (list (cadr^ clause)) (at^ (cddr^ clause))))))
                                                                                                                                                                                     value1_reg))
                                                                                                                                                                                 (set! k_reg k2)
                                                                                                                                                                                 (set! pc apply-cont2))))))
                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-40>)
-                                                                                                                                                                      (let ((clauses 'undefined) (var 'undefined) (k2 'undefined))
-                                                                                                                                                                        (set! k2 (list-ref temp_1 3))
-                                                                                                                                                                        (set! var (list-ref temp_1 2))
-                                                                                                                                                                        (set! clauses (list-ref temp_1 1))
-                                                                                                                                                                        (let ((clause 'undefined))
-                                                                                                                                                                          (set! clause (car^ clauses))
-                                                                                                                                                                          (if (eq?^ (car^ clause) 'else)
-                                                                                                                                                                              (begin
-                                                                                                                                                                                (set! value2_reg
-                                                                                                                                                                                  (cons
-                                                                                                                                                                                    (append (list 'else) (list (list 'else-code)))
-                                                                                                                                                                                    value2_reg))
-                                                                                                                                                                                (set! value1_reg
-                                                                                                                                                                                  (cons
+                                                                                                                                                                      (let ((type-tester-name 'undefined) (k 'undefined))
+                                                                                                                                                                        (set! k (list-ref temp_1 2))
+                                                                                                                                                                        (set! type-tester-name (list-ref temp_1 1))
+                                                                                                                                                                        (let ((tester-def 'undefined))
+                                                                                                                                                                          (set! tester-def
+                                                                                                                                                                            (append
+                                                                                                                                                                              (list 'define)
+                                                                                                                                                                              (append
+                                                                                                                                                                                (list type-tester-name)
+                                                                                                                                                                                (list
+                                                                                                                                                                                  (append
+                                                                                                                                                                                    (list 'lambda)
                                                                                                                                                                                     (append
-                                                                                                                                                                                      (list 'else-code)
+                                                                                                                                                                                      (list (list 'x))
                                                                                                                                                                                       (list
                                                                                                                                                                                         (append
-                                                                                                                                                                                          (list 'lambda)
-                                                                                                                                                                                          (append (list '()) (at^ (cdr^ clause))))))
-                                                                                                                                                                                    value1_reg))
-                                                                                                                                                                                (set! k_reg k2)
-                                                                                                                                                                                (set! pc apply-cont2))
-                                                                                                                                                                              (if (symbol?^ (car^ clause))
-                                                                                                                                                                                  (let ((name 'undefined))
-                                                                                                                                                                                    (set! name (car^ clause))
-                                                                                                                                                                                    (set! value2_reg
-                                                                                                                                                                                      (cons
-                                                                                                                                                                                        (append
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'eq?)
+                                                                                                                                                                                          (list 'and)
+                                                                                                                                                                                          (append
+                                                                                                                                                                                            (list (append (list 'pair?) (list 'x)))
+                                                                                                                                                                                            (list
                                                                                                                                                                                               (append
-                                                                                                                                                                                                (list (append (list 'car) (list var)))
-                                                                                                                                                                                                (list (append (list 'quote) (list (car^ clause)))))))
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'apply)
-                                                                                                                                                                                              (append
-                                                                                                                                                                                                (list name)
-                                                                                                                                                                                                (list (append (list 'cdr) (list var)))))))
-                                                                                                                                                                                        value2_reg))
-                                                                                                                                                                                    (set! value1_reg
-                                                                                                                                                                                      (cons
-                                                                                                                                                                                        (append
-                                                                                                                                                                                          (list name)
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'lambda)
-                                                                                                                                                                                              (append (list (cadr^ clause)) (at^ (cddr^ clause))))))
-                                                                                                                                                                                        value1_reg))
-                                                                                                                                                                                    (set! k_reg k2)
-                                                                                                                                                                                    (set! pc apply-cont2))
-                                                                                                                                                                                  (let ((name 'undefined))
-                                                                                                                                                                                    (set! name (caar^ clause))
-                                                                                                                                                                                    (set! value2_reg
-                                                                                                                                                                                      (cons
-                                                                                                                                                                                        (append
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'memq)
-                                                                                                                                                                                              (append
-                                                                                                                                                                                                (list (append (list 'car) (list var)))
-                                                                                                                                                                                                (list (append (list 'quote) (list (car^ clause)))))))
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'apply)
-                                                                                                                                                                                              (append
-                                                                                                                                                                                                (list name)
-                                                                                                                                                                                                (list (append (list 'cdr) (list var)))))))
-                                                                                                                                                                                        value2_reg))
-                                                                                                                                                                                    (set! value1_reg
-                                                                                                                                                                                      (cons
-                                                                                                                                                                                        (append
-                                                                                                                                                                                          (list name)
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'lambda)
-                                                                                                                                                                                              (append (list (cadr^ clause)) (at^ (cddr^ clause))))))
-                                                                                                                                                                                        value1_reg))
-                                                                                                                                                                                    (set! k_reg k2)
-                                                                                                                                                                                    (set! pc apply-cont2))))))
-                                                                                                                                                                      (if (eq? (car temp_1) '<cont2-41>)
-                                                                                                                                                                          (let ((type-tester-name 'undefined) (k 'undefined))
-                                                                                                                                                                            (set! k (list-ref temp_1 2))
-                                                                                                                                                                            (set! type-tester-name (list-ref temp_1 1))
-                                                                                                                                                                            (let ((tester-def 'undefined))
-                                                                                                                                                                              (set! tester-def
-                                                                                                                                                                                (append
-                                                                                                                                                                                  (list 'define)
-                                                                                                                                                                                  (append
-                                                                                                                                                                                    (list type-tester-name)
-                                                                                                                                                                                    (list
-                                                                                                                                                                                      (append
-                                                                                                                                                                                        (list 'lambda)
-                                                                                                                                                                                        (append
-                                                                                                                                                                                          (list (list 'x))
-                                                                                                                                                                                          (list
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list 'and)
-                                                                                                                                                                                              (append
-                                                                                                                                                                                                (list (append (list 'pair?) (list 'x)))
+                                                                                                                                                                                                (list 'not)
                                                                                                                                                                                                 (list
                                                                                                                                                                                                   (append
                                                                                                                                                                                                     (list 'not)
                                                                                                                                                                                                     (list
                                                                                                                                                                                                       (append
-                                                                                                                                                                                                        (list 'not)
-                                                                                                                                                                                                        (list
-                                                                                                                                                                                                          (append
-                                                                                                                                                                                                            (list 'memq)
-                                                                                                                                                                                                            (append
-                                                                                                                                                                                                              (list (append (list 'car) (list 'x)))
-                                                                                                                                                                                                              (list
-                                                                                                                                                                                                                (append (list 'quote) (list value1_reg)))))))))))))))))))
-                                                                                                                                                                              (set! value_reg
-                                                                                                                                                                                (append
-                                                                                                                                                                                  (list 'begin)
-                                                                                                                                                                                  (append (list tester-def) value2_reg)))
-                                                                                                                                                                              (set! k_reg k)
-                                                                                                                                                                              (set! pc apply-cont)))
+                                                                                                                                                                                                        (list 'memq)
+                                                                                                                                                                                                        (append
+                                                                                                                                                                                                          (list (append (list 'car) (list 'x)))
+                                                                                                                                                                                                          (list
+                                                                                                                                                                                                            (append (list 'quote) (list value1_reg)))))))))))))))))))
+                                                                                                                                                                          (set! value_reg
+                                                                                                                                                                            (append
+                                                                                                                                                                              (list 'begin)
+                                                                                                                                                                              (append (list tester-def) value2_reg)))
+                                                                                                                                                                          (set! k_reg k)
+                                                                                                                                                                          (set! pc apply-cont)))
+                                                                                                                                                                      (if (eq? (car temp_1) '<cont2-41>)
+                                                                                                                                                                          (let ((def 'undefined) (name 'undefined) (k2 'undefined))
+                                                                                                                                                                            (set! k2 (list-ref temp_1 3))
+                                                                                                                                                                            (set! name (list-ref temp_1 2))
+                                                                                                                                                                            (set! def (list-ref temp_1 1))
+                                                                                                                                                                            (set! value2_reg (cons def value2_reg))
+                                                                                                                                                                            (set! value1_reg (cons name value1_reg))
+                                                                                                                                                                            (set! k_reg k2)
+                                                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-42>)
-                                                                                                                                                                              (let ((def 'undefined) (name 'undefined) (k2 'undefined))
-                                                                                                                                                                                (set! k2 (list-ref temp_1 3))
-                                                                                                                                                                                (set! name (list-ref temp_1 2))
-                                                                                                                                                                                (set! def (list-ref temp_1 1))
-                                                                                                                                                                                (set! value2_reg (cons def value2_reg))
-                                                                                                                                                                                (set! value1_reg (cons name value1_reg))
-                                                                                                                                                                                (set! k_reg k2)
-                                                                                                                                                                                (set! pc apply-cont2))
+                                                                                                                                                                              (let ((variants 'undefined) (k2 'undefined))
+                                                                                                                                                                                (set! k2 (list-ref temp_1 2))
+                                                                                                                                                                                (set! variants (list-ref temp_1 1))
+                                                                                                                                                                                (set! k2_reg
+                                                                                                                                                                                  (make-cont2 '<cont2-41> value2_reg value1_reg k2))
+                                                                                                                                                                                (set! variants_reg (cdr^ variants))
+                                                                                                                                                                                (set! pc make-dd-variant-constructors^))
                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-43>)
-                                                                                                                                                                                  (let ((variants 'undefined) (k2 'undefined))
-                                                                                                                                                                                    (set! k2 (list-ref temp_1 2))
-                                                                                                                                                                                    (set! variants (list-ref temp_1 1))
-                                                                                                                                                                                    (set! k2_reg
-                                                                                                                                                                                      (make-cont2 '<cont2-42> value2_reg value1_reg k2))
-                                                                                                                                                                                    (set! variants_reg (cdr^ variants))
-                                                                                                                                                                                    (set! pc make-dd-variant-constructors^))
+                                                                                                                                                                                  (let ((exp 'undefined)
+                                                                                                                                                                                        (type-name 'undefined)
+                                                                                                                                                                                        (type-tester-name 'undefined)
+                                                                                                                                                                                        (k 'undefined))
+                                                                                                                                                                                    (set! k (list-ref temp_1 4))
+                                                                                                                                                                                    (set! type-tester-name (list-ref temp_1 3))
+                                                                                                                                                                                    (set! type-name (list-ref temp_1 2))
+                                                                                                                                                                                    (set! exp (list-ref temp_1 1))
+                                                                                                                                                                                    (set! value_reg
+                                                                                                                                                                                      (append
+                                                                                                                                                                                        (list 'let)
+                                                                                                                                                                                        (append
+                                                                                                                                                                                          (list
+                                                                                                                                                                                            (append (list (append (list 'r) (list exp))) value1_reg))
+                                                                                                                                                                                          (list
+                                                                                                                                                                                            (append
+                                                                                                                                                                                              (list 'if)
+                                                                                                                                                                                              (append
+                                                                                                                                                                                                (list
+                                                                                                                                                                                                  (append
+                                                                                                                                                                                                    (list 'not)
+                                                                                                                                                                                                    (list (append (list type-tester-name) (list 'r)))))
+                                                                                                                                                                                                (append
+                                                                                                                                                                                                  (list
+                                                                                                                                                                                                    (append
+                                                                                                                                                                                                      (list 'error)
+                                                                                                                                                                                                      (append
+                                                                                                                                                                                                        (list (append (list 'quote) (list 'cases)))
+                                                                                                                                                                                                        (append
+                                                                                                                                                                                                          (list "~a is not a valid ~a")
+                                                                                                                                                                                                          (append
+                                                                                                                                                                                                            (list 'r)
+                                                                                                                                                                                                            (list (append (list 'quote) (list type-name))))))))
+                                                                                                                                                                                                  (list (append (list 'cond) value2_reg)))))))))
+                                                                                                                                                                                    (set! k_reg k)
+                                                                                                                                                                                    (set! pc apply-cont))
                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-44>)
-                                                                                                                                                                                      (let ((exp 'undefined)
-                                                                                                                                                                                            (type-name 'undefined)
-                                                                                                                                                                                            (type-tester-name 'undefined)
+                                                                                                                                                                                      (let ((adatum 'undefined)
+                                                                                                                                                                                            (macro-keyword 'undefined)
+                                                                                                                                                                                            (handler 'undefined)
                                                                                                                                                                                             (k 'undefined))
                                                                                                                                                                                         (set! k (list-ref temp_1 4))
-                                                                                                                                                                                        (set! type-tester-name (list-ref temp_1 3))
-                                                                                                                                                                                        (set! type-name (list-ref temp_1 2))
-                                                                                                                                                                                        (set! exp (list-ref temp_1 1))
-                                                                                                                                                                                        (set! value_reg
-                                                                                                                                                                                          (append
-                                                                                                                                                                                            (list 'let)
-                                                                                                                                                                                            (append
-                                                                                                                                                                                              (list
-                                                                                                                                                                                                (append (list (append (list 'r) (list exp))) value1_reg))
-                                                                                                                                                                                              (list
-                                                                                                                                                                                                (append
-                                                                                                                                                                                                  (list 'if)
-                                                                                                                                                                                                  (append
-                                                                                                                                                                                                    (list
-                                                                                                                                                                                                      (append
-                                                                                                                                                                                                        (list 'not)
-                                                                                                                                                                                                        (list (append (list type-tester-name) (list 'r)))))
-                                                                                                                                                                                                    (append
-                                                                                                                                                                                                      (list
-                                                                                                                                                                                                        (append
-                                                                                                                                                                                                          (list 'error)
-                                                                                                                                                                                                          (append
-                                                                                                                                                                                                            (list (append (list 'quote) (list 'cases)))
-                                                                                                                                                                                                            (append
-                                                                                                                                                                                                              (list "~a is not a valid ~a")
-                                                                                                                                                                                                              (append
-                                                                                                                                                                                                                (list 'r)
-                                                                                                                                                                                                                (list (append (list 'quote) (list type-name))))))))
-                                                                                                                                                                                                      (list (append (list 'cond) value2_reg)))))))))
-                                                                                                                                                                                        (set! k_reg k)
-                                                                                                                                                                                        (set! pc apply-cont))
+                                                                                                                                                                                        (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                        (set! macro-keyword (list-ref temp_1 2))
+                                                                                                                                                                                        (set! adatum (list-ref temp_1 1))
+                                                                                                                                                                                        (if (pattern-macro? value1_reg)
+                                                                                                                                                                                            (begin
+                                                                                                                                                                                              (set! k_reg k)
+                                                                                                                                                                                              (set! fail_reg value2_reg)
+                                                                                                                                                                                              (set! handler_reg handler)
+                                                                                                                                                                                              (set! adatum_reg adatum)
+                                                                                                                                                                                              (set! aclauses_reg (macro-aclauses value1_reg))
+                                                                                                                                                                                              (set! clauses_reg (macro-clauses value1_reg))
+                                                                                                                                                                                              (set! pc process-macro-clauses^))
+                                                                                                                                                                                            (begin
+                                                                                                                                                                                              (set! k_reg
+                                                                                                                                                                                                (make-cont '<cont-27> adatum macro-keyword value2_reg k))
+                                                                                                                                                                                              (set! fail_reg value2_reg)
+                                                                                                                                                                                              (set! handler_reg handler)
+                                                                                                                                                                                              (set! datum_reg adatum)
+                                                                                                                                                                                              (set! macro_reg value1_reg)
+                                                                                                                                                                                              (set! pc apply-macro))))
                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-45>)
-                                                                                                                                                                                          (let ((adatum 'undefined)
-                                                                                                                                                                                                (macro-keyword 'undefined)
-                                                                                                                                                                                                (handler 'undefined)
-                                                                                                                                                                                                (k 'undefined))
-                                                                                                                                                                                            (set! k (list-ref temp_1 4))
-                                                                                                                                                                                            (set! handler (list-ref temp_1 3))
-                                                                                                                                                                                            (set! macro-keyword (list-ref temp_1 2))
-                                                                                                                                                                                            (set! adatum (list-ref temp_1 1))
-                                                                                                                                                                                            (if (pattern-macro? value1_reg)
-                                                                                                                                                                                                (begin
-                                                                                                                                                                                                  (set! k_reg k)
-                                                                                                                                                                                                  (set! fail_reg value2_reg)
-                                                                                                                                                                                                  (set! handler_reg handler)
-                                                                                                                                                                                                  (set! adatum_reg adatum)
-                                                                                                                                                                                                  (set! aclauses_reg (macro-aclauses value1_reg))
-                                                                                                                                                                                                  (set! clauses_reg (macro-clauses value1_reg))
-                                                                                                                                                                                                  (set! pc process-macro-clauses^))
-                                                                                                                                                                                                (begin
-                                                                                                                                                                                                  (set! k_reg
-                                                                                                                                                                                                    (make-cont '<cont-27> adatum macro-keyword value2_reg k))
-                                                                                                                                                                                                  (set! fail_reg value2_reg)
-                                                                                                                                                                                                  (set! handler_reg handler)
-                                                                                                                                                                                                  (set! datum_reg adatum)
-                                                                                                                                                                                                  (set! macro_reg value1_reg)
-                                                                                                                                                                                                  (set! pc apply-macro))))
+                                                                                                                                                                                          (let ((fail 'undefined) (k 'undefined))
+                                                                                                                                                                                            (set! k (list-ref temp_1 2))
+                                                                                                                                                                                            (set! fail (list-ref temp_1 1))
+                                                                                                                                                                                            (set! value1_reg value2_reg)
+                                                                                                                                                                                            (set! value2_reg fail)
+                                                                                                                                                                                            (set! k_reg k)
+                                                                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-46>)
-                                                                                                                                                                                              (let ((fail 'undefined) (k 'undefined))
-                                                                                                                                                                                                (set! k (list-ref temp_1 2))
-                                                                                                                                                                                                (set! fail (list-ref temp_1 1))
-                                                                                                                                                                                                (set! value1_reg value2_reg)
-                                                                                                                                                                                                (set! value2_reg fail)
-                                                                                                                                                                                                (set! k_reg k)
-                                                                                                                                                                                                (set! pc apply-cont2))
+                                                                                                                                                                                              (begin
+                                                                                                                                                                                                (set! *last-fail* value2_reg)
+                                                                                                                                                                                                (set! final_reg value1_reg)
+                                                                                                                                                                                                (set! pc #f))
                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-47>)
                                                                                                                                                                                                   (begin
-                                                                                                                                                                                                    (set! *last-fail* value2_reg)
-                                                                                                                                                                                                    (set! final_reg value1_reg)
-                                                                                                                                                                                                    (set! pc #f))
+                                                                                                                                                                                                    (set! k_reg REP-k)
+                                                                                                                                                                                                    (set! fail_reg value2_reg)
+                                                                                                                                                                                                    (set! handler_reg REP-handler)
+                                                                                                                                                                                                    (set! env_reg toplevel-env)
+                                                                                                                                                                                                    (set! exp_reg value1_reg)
+                                                                                                                                                                                                    (set! pc m))
                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-48>)
-                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                        (set! k_reg REP-k)
-                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                        (set! handler_reg REP-handler)
-                                                                                                                                                                                                        (set! env_reg toplevel-env)
-                                                                                                                                                                                                        (set! exp_reg value1_reg)
-                                                                                                                                                                                                        (set! pc m))
+                                                                                                                                                                                                      (begin (set! final_reg #t) (set! pc #f))
                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-49>)
-                                                                                                                                                                                                          (begin (set! final_reg #t) (set! pc #f))
+                                                                                                                                                                                                          (begin
+                                                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-48>))
+                                                                                                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                                                                                                            (set! handler_reg try-parse-handler)
+                                                                                                                                                                                                            (set! env_reg toplevel-env)
+                                                                                                                                                                                                            (set! src_reg 'stdin)
+                                                                                                                                                                                                            (set! tokens_reg value1_reg)
+                                                                                                                                                                                                            (set! pc aparse-sexps))
                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-50>)
-                                                                                                                                                                                                              (begin
-                                                                                                                                                                                                                (set! k_reg (make-cont2 '<cont2-49>))
-                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                (set! handler_reg try-parse-handler)
-                                                                                                                                                                                                                (set! env_reg toplevel-env)
-                                                                                                                                                                                                                (set! src_reg 'stdin)
-                                                                                                                                                                                                                (set! tokens_reg value1_reg)
-                                                                                                                                                                                                                (set! pc aparse-sexps))
+                                                                                                                                                                                                              (let ((src 'undefined)
+                                                                                                                                                                                                                    (tokens-left 'undefined)
+                                                                                                                                                                                                                    (env 'undefined)
+                                                                                                                                                                                                                    (handler 'undefined)
+                                                                                                                                                                                                                    (k 'undefined))
+                                                                                                                                                                                                                (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                (set! tokens-left (list-ref temp_1 2))
+                                                                                                                                                                                                                (set! src (list-ref temp_1 1))
+                                                                                                                                                                                                                (if (token-type? (first tokens-left) 'end-marker)
+                                                                                                                                                                                                                    (begin (set! k_reg k) (set! pc apply-cont2))
+                                                                                                                                                                                                                    (begin
+                                                                                                                                                                                                                      (set! k_reg k)
+                                                                                                                                                                                                                      (set! fail_reg value2_reg)
+                                                                                                                                                                                                                      (set! handler_reg handler)
+                                                                                                                                                                                                                      (set! env_reg env)
+                                                                                                                                                                                                                      (set! src_reg src)
+                                                                                                                                                                                                                      (set! tokens_reg tokens-left)
+                                                                                                                                                                                                                      (set! pc read-and-eval-asexps))))
                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-51>)
                                                                                                                                                                                                                   (let ((src 'undefined)
                                                                                                                                                                                                                         (tokens-left 'undefined)
@@ -1798,43 +1808,55 @@
                                                                                                                                                                                                                     (set! env (list-ref temp_1 3))
                                                                                                                                                                                                                     (set! tokens-left (list-ref temp_1 2))
                                                                                                                                                                                                                     (set! src (list-ref temp_1 1))
-                                                                                                                                                                                                                    (if (token-type? (first tokens-left) 'end-marker)
-                                                                                                                                                                                                                        (begin (set! k_reg k) (set! pc apply-cont2))
-                                                                                                                                                                                                                        (begin
-                                                                                                                                                                                                                          (set! k_reg k)
-                                                                                                                                                                                                                          (set! fail_reg value2_reg)
-                                                                                                                                                                                                                          (set! handler_reg handler)
-                                                                                                                                                                                                                          (set! env_reg env)
-                                                                                                                                                                                                                          (set! src_reg src)
-                                                                                                                                                                                                                          (set! tokens_reg tokens-left)
-                                                                                                                                                                                                                          (set! pc read-and-eval-asexps))))
+                                                                                                                                                                                                                    (set! k_reg
+                                                                                                                                                                                                                      (make-cont2 '<cont2-50> src tokens-left env handler k))
+                                                                                                                                                                                                                    (set! fail_reg value2_reg)
+                                                                                                                                                                                                                    (set! handler_reg handler)
+                                                                                                                                                                                                                    (set! env_reg env)
+                                                                                                                                                                                                                    (set! exp_reg value1_reg)
+                                                                                                                                                                                                                    (set! pc m))
                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-52>)
-                                                                                                                                                                                                                      (let ((src 'undefined)
-                                                                                                                                                                                                                            (tokens-left 'undefined)
-                                                                                                                                                                                                                            (env 'undefined)
-                                                                                                                                                                                                                            (handler 'undefined)
-                                                                                                                                                                                                                            (k 'undefined))
-                                                                                                                                                                                                                        (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                        (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                        (set! env (list-ref temp_1 3))
-                                                                                                                                                                                                                        (set! tokens-left (list-ref temp_1 2))
-                                                                                                                                                                                                                        (set! src (list-ref temp_1 1))
-                                                                                                                                                                                                                        (set! k_reg
-                                                                                                                                                                                                                          (make-cont2 '<cont2-51> src tokens-left env handler k))
-                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                        (set! handler_reg handler)
-                                                                                                                                                                                                                        (set! env_reg env)
-                                                                                                                                                                                                                        (set! exp_reg value1_reg)
-                                                                                                                                                                                                                        (set! pc m))
+                                                                                                                                                                                                                      (let ((exp 'undefined) (k 'undefined))
+                                                                                                                                                                                                                        (set! k (list-ref temp_1 2))
+                                                                                                                                                                                                                        (set! exp (list-ref temp_1 1))
+                                                                                                                                                                                                                        (handle-debug-info exp value1_reg)
+                                                                                                                                                                                                                        (set! k_reg k)
+                                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-53>)
-                                                                                                                                                                                                                          (let ((exp 'undefined) (k 'undefined))
-                                                                                                                                                                                                                            (set! k (list-ref temp_1 2))
-                                                                                                                                                                                                                            (set! exp (list-ref temp_1 1))
-                                                                                                                                                                                                                            (handle-debug-info exp value1_reg)
-                                                                                                                                                                                                                            (set! k_reg k)
-                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                          (let ((args 'undefined)
+                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                (info 'undefined)
+                                                                                                                                                                                                                                (handler 'undefined)
+                                                                                                                                                                                                                                (k 'undefined))
+                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                            (set! info (list-ref temp_1 3))
+                                                                                                                                                                                                                            (set! env (list-ref temp_1 2))
+                                                                                                                                                                                                                            (set! args (list-ref temp_1 1))
+                                                                                                                                                                                                                            (if (dlr-exp? value1_reg)
+                                                                                                                                                                                                                                (begin
+                                                                                                                                                                                                                                  (set! value1_reg (dlr-apply value1_reg args))
+                                                                                                                                                                                                                                  (set! k_reg k)
+                                                                                                                                                                                                                                  (set! pc apply-cont2))
+                                                                                                                                                                                                                                (if (procedure-object? value1_reg)
+                                                                                                                                                                                                                                    (begin
+                                                                                                                                                                                                                                      (set! k2_reg k)
+                                                                                                                                                                                                                                      (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                      (set! handler_reg handler)
+                                                                                                                                                                                                                                      (set! info_reg info)
+                                                                                                                                                                                                                                      (set! env2_reg env)
+                                                                                                                                                                                                                                      (set! args_reg args)
+                                                                                                                                                                                                                                      (set! proc_reg value1_reg)
+                                                                                                                                                                                                                                      (set! pc apply-proc))
+                                                                                                                                                                                                                                    (begin
+                                                                                                                                                                                                                                      (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                      (set! handler_reg handler)
+                                                                                                                                                                                                                                      (set! info_reg info)
+                                                                                                                                                                                                                                      (set! msg_reg
+                                                                                                                                                                                                                                        (format "attempt to apply non-procedure ~a" value1_reg))
+                                                                                                                                                                                                                                      (set! pc runtime-error)))))
                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-54>)
-                                                                                                                                                                                                                              (let ((args 'undefined)
+                                                                                                                                                                                                                              (let ((operator 'undefined)
                                                                                                                                                                                                                                     (env 'undefined)
                                                                                                                                                                                                                                     (info 'undefined)
                                                                                                                                                                                                                                     (handler 'undefined)
@@ -1843,213 +1865,195 @@
                                                                                                                                                                                                                                 (set! handler (list-ref temp_1 4))
                                                                                                                                                                                                                                 (set! info (list-ref temp_1 3))
                                                                                                                                                                                                                                 (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                (set! args (list-ref temp_1 1))
-                                                                                                                                                                                                                                (if (dlr-exp? value1_reg)
-                                                                                                                                                                                                                                    (begin
-                                                                                                                                                                                                                                      (set! value1_reg (dlr-apply value1_reg args))
-                                                                                                                                                                                                                                      (set! k_reg k)
-                                                                                                                                                                                                                                      (set! pc apply-cont2))
-                                                                                                                                                                                                                                    (if (procedure-object? value1_reg)
-                                                                                                                                                                                                                                        (begin
-                                                                                                                                                                                                                                          (set! k2_reg k)
-                                                                                                                                                                                                                                          (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                          (set! handler_reg handler)
-                                                                                                                                                                                                                                          (set! info_reg info)
-                                                                                                                                                                                                                                          (set! env2_reg env)
-                                                                                                                                                                                                                                          (set! args_reg args)
-                                                                                                                                                                                                                                          (set! proc_reg value1_reg)
-                                                                                                                                                                                                                                          (set! pc apply-proc))
-                                                                                                                                                                                                                                        (begin
-                                                                                                                                                                                                                                          (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                          (set! handler_reg handler)
-                                                                                                                                                                                                                                          (set! info_reg info)
-                                                                                                                                                                                                                                          (set! msg_reg
-                                                                                                                                                                                                                                            (format "attempt to apply non-procedure ~a" value1_reg))
-                                                                                                                                                                                                                                          (set! pc runtime-error)))))
+                                                                                                                                                                                                                                (set! operator (list-ref temp_1 1))
+                                                                                                                                                                                                                                (set! k_reg
+                                                                                                                                                                                                                                  (make-cont2 '<cont2-53> value1_reg env info handler k))
+                                                                                                                                                                                                                                (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                (set! handler_reg handler)
+                                                                                                                                                                                                                                (set! env_reg env)
+                                                                                                                                                                                                                                (set! exp_reg operator)
+                                                                                                                                                                                                                                (set! pc m))
                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-55>)
-                                                                                                                                                                                                                                  (let ((operator 'undefined)
-                                                                                                                                                                                                                                        (env 'undefined)
-                                                                                                                                                                                                                                        (info 'undefined)
-                                                                                                                                                                                                                                        (handler 'undefined)
-                                                                                                                                                                                                                                        (k 'undefined))
-                                                                                                                                                                                                                                    (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                    (set! info (list-ref temp_1 3))
-                                                                                                                                                                                                                                    (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                    (set! operator (list-ref temp_1 1))
-                                                                                                                                                                                                                                    (set! k_reg
-                                                                                                                                                                                                                                      (make-cont2 '<cont2-54> value1_reg env info handler k))
+                                                                                                                                                                                                                                  (let ((handler 'undefined))
+                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 1))
                                                                                                                                                                                                                                     (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                    (set! exception_reg value1_reg)
                                                                                                                                                                                                                                     (set! handler_reg handler)
-                                                                                                                                                                                                                                    (set! env_reg env)
-                                                                                                                                                                                                                                    (set! exp_reg operator)
-                                                                                                                                                                                                                                    (set! pc m))
+                                                                                                                                                                                                                                    (set! pc apply-handler2))
                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-56>)
-                                                                                                                                                                                                                                      (let ((handler 'undefined))
-                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 1))
-                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                        (set! exception_reg value1_reg)
-                                                                                                                                                                                                                                        (set! handler_reg handler)
-                                                                                                                                                                                                                                        (set! pc apply-handler2))
+                                                                                                                                                                                                                                      (let ((v 'undefined) (k 'undefined))
+                                                                                                                                                                                                                                        (set! k (list-ref temp_1 2))
+                                                                                                                                                                                                                                        (set! v (list-ref temp_1 1))
+                                                                                                                                                                                                                                        (set! value1_reg v)
+                                                                                                                                                                                                                                        (set! k_reg k)
+                                                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-57>)
-                                                                                                                                                                                                                                          (let ((v 'undefined) (k 'undefined))
-                                                                                                                                                                                                                                            (set! k (list-ref temp_1 2))
-                                                                                                                                                                                                                                            (set! v (list-ref temp_1 1))
-                                                                                                                                                                                                                                            (set! value1_reg v)
-                                                                                                                                                                                                                                            (set! k_reg k)
-                                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                                          (let ((fexps 'undefined)
+                                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                                (handler 'undefined)
+                                                                                                                                                                                                                                                (k 'undefined))
+                                                                                                                                                                                                                                            (set! k (list-ref temp_1 4))
+                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                                                                            (set! env (list-ref temp_1 2))
+                                                                                                                                                                                                                                            (set! fexps (list-ref temp_1 1))
+                                                                                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-56> value1_reg k))
+                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                            (set! handler_reg handler)
+                                                                                                                                                                                                                                            (set! env_reg env)
+                                                                                                                                                                                                                                            (set! exps_reg fexps)
+                                                                                                                                                                                                                                            (set! pc eval-sequence))
                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-58>)
-                                                                                                                                                                                                                                              (let ((fexps 'undefined)
-                                                                                                                                                                                                                                                    (env 'undefined)
-                                                                                                                                                                                                                                                    (handler 'undefined)
+                                                                                                                                                                                                                                              (let ((aclauses 'undefined)
+                                                                                                                                                                                                                                                    (clauses 'undefined)
                                                                                                                                                                                                                                                     (k 'undefined))
-                                                                                                                                                                                                                                                (set! k (list-ref temp_1 4))
-                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 3))
-                                                                                                                                                                                                                                                (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                                (set! fexps (list-ref temp_1 1))
-                                                                                                                                                                                                                                                (set! k_reg (make-cont2 '<cont2-57> value1_reg k))
-                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                (set! handler_reg handler)
-                                                                                                                                                                                                                                                (set! env_reg env)
-                                                                                                                                                                                                                                                (set! exps_reg fexps)
-                                                                                                                                                                                                                                                (set! pc eval-sequence))
+                                                                                                                                                                                                                                                (set! k (list-ref temp_1 3))
+                                                                                                                                                                                                                                                (set! clauses (list-ref temp_1 2))
+                                                                                                                                                                                                                                                (set! aclauses (list-ref temp_1 1))
+                                                                                                                                                                                                                                                (set-binding-value!
+                                                                                                                                                                                                                                                  value1_reg
+                                                                                                                                                                                                                                                  (make-pattern-macro^ clauses aclauses))
+                                                                                                                                                                                                                                                (set! value1_reg void-value)
+                                                                                                                                                                                                                                                (set! k_reg k)
+                                                                                                                                                                                                                                                (set! pc apply-cont2))
                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-59>)
-                                                                                                                                                                                                                                                  (let ((aclauses 'undefined)
-                                                                                                                                                                                                                                                        (clauses 'undefined)
+                                                                                                                                                                                                                                                  (let ((docstring 'undefined)
+                                                                                                                                                                                                                                                        (var 'undefined)
                                                                                                                                                                                                                                                         (k 'undefined))
                                                                                                                                                                                                                                                     (set! k (list-ref temp_1 3))
-                                                                                                                                                                                                                                                    (set! clauses (list-ref temp_1 2))
-                                                                                                                                                                                                                                                    (set! aclauses (list-ref temp_1 1))
-                                                                                                                                                                                                                                                    (set-binding-value!
-                                                                                                                                                                                                                                                      value1_reg
-                                                                                                                                                                                                                                                      (make-pattern-macro^ clauses aclauses))
+                                                                                                                                                                                                                                                    (set! var (list-ref temp_1 2))
+                                                                                                                                                                                                                                                    (set! docstring (list-ref temp_1 1))
+                                                                                                                                                                                                                                                    (set-global-value! var value1_reg)
+                                                                                                                                                                                                                                                    (set-global-docstring! var docstring)
                                                                                                                                                                                                                                                     (set! value1_reg void-value)
                                                                                                                                                                                                                                                     (set! k_reg k)
                                                                                                                                                                                                                                                     (set! pc apply-cont2))
                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-60>)
                                                                                                                                                                                                                                                       (let ((docstring 'undefined)
-                                                                                                                                                                                                                                                            (var 'undefined)
+                                                                                                                                                                                                                                                            (rhs-value 'undefined)
                                                                                                                                                                                                                                                             (k 'undefined))
                                                                                                                                                                                                                                                         (set! k (list-ref temp_1 3))
-                                                                                                                                                                                                                                                        (set! var (list-ref temp_1 2))
+                                                                                                                                                                                                                                                        (set! rhs-value (list-ref temp_1 2))
                                                                                                                                                                                                                                                         (set! docstring (list-ref temp_1 1))
-                                                                                                                                                                                                                                                        (set-global-value! var value1_reg)
-                                                                                                                                                                                                                                                        (set-global-docstring! var docstring)
+                                                                                                                                                                                                                                                        (set-binding-value! value1_reg rhs-value)
+                                                                                                                                                                                                                                                        (set-binding-docstring! value1_reg docstring)
                                                                                                                                                                                                                                                         (set! value1_reg void-value)
                                                                                                                                                                                                                                                         (set! k_reg k)
                                                                                                                                                                                                                                                         (set! pc apply-cont2))
                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-61>)
                                                                                                                                                                                                                                                           (let ((docstring 'undefined)
-                                                                                                                                                                                                                                                                (rhs-value 'undefined)
+                                                                                                                                                                                                                                                                (var 'undefined)
+                                                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                                                (handler 'undefined)
                                                                                                                                                                                                                                                                 (k 'undefined))
-                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 3))
-                                                                                                                                                                                                                                                            (set! rhs-value (list-ref temp_1 2))
+                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                            (set! var (list-ref temp_1 2))
                                                                                                                                                                                                                                                             (set! docstring (list-ref temp_1 1))
-                                                                                                                                                                                                                                                            (set-binding-value! value1_reg rhs-value)
-                                                                                                                                                                                                                                                            (set-binding-docstring! value1_reg docstring)
-                                                                                                                                                                                                                                                            (set! value1_reg void-value)
-                                                                                                                                                                                                                                                            (set! k_reg k)
-                                                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-60> docstring value1_reg k))
+                                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                            (set! handler_reg handler)
+                                                                                                                                                                                                                                                            (set! env_reg env)
+                                                                                                                                                                                                                                                            (set! var_reg var)
+                                                                                                                                                                                                                                                            (set! pc lookup-binding-in-first-frame))
                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-62>)
-                                                                                                                                                                                                                                                              (let ((docstring 'undefined)
-                                                                                                                                                                                                                                                                    (var 'undefined)
-                                                                                                                                                                                                                                                                    (env 'undefined)
-                                                                                                                                                                                                                                                                    (handler 'undefined)
-                                                                                                                                                                                                                                                                    (k 'undefined))
-                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                (set! env (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                (set! var (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                (set! docstring (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                (set! k_reg (make-cont2 '<cont2-61> docstring value1_reg k))
-                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                (set! handler_reg handler)
-                                                                                                                                                                                                                                                                (set! env_reg env)
-                                                                                                                                                                                                                                                                (set! var_reg var)
-                                                                                                                                                                                                                                                                (set! pc lookup-binding-in-first-frame))
+                                                                                                                                                                                                                                                              (let ((rhs-value 'undefined) (k 'undefined))
+                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                (set! rhs-value (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                (let ((old-value 'undefined))
+                                                                                                                                                                                                                                                                  (set! old-value (binding-value value1_reg))
+                                                                                                                                                                                                                                                                  (set-binding-value! value1_reg rhs-value)
+                                                                                                                                                                                                                                                                  (let ((new-fail 'undefined))
+                                                                                                                                                                                                                                                                    (set! new-fail
+                                                                                                                                                                                                                                                                      (make-fail '<fail-2> value1_reg old-value value2_reg))
+                                                                                                                                                                                                                                                                    (set! value2_reg new-fail)
+                                                                                                                                                                                                                                                                    (set! value1_reg void-value)
+                                                                                                                                                                                                                                                                    (set! k_reg k)
+                                                                                                                                                                                                                                                                    (set! pc apply-cont2))))
                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-63>)
-                                                                                                                                                                                                                                                                  (let ((rhs-value 'undefined) (k 'undefined))
-                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                    (set! rhs-value (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                    (let ((old-value 'undefined))
-                                                                                                                                                                                                                                                                      (set! old-value (binding-value value1_reg))
-                                                                                                                                                                                                                                                                      (set-binding-value! value1_reg rhs-value)
-                                                                                                                                                                                                                                                                      (let ((new-fail 'undefined))
-                                                                                                                                                                                                                                                                        (set! new-fail
-                                                                                                                                                                                                                                                                          (make-fail '<fail-2> value1_reg old-value value2_reg))
-                                                                                                                                                                                                                                                                        (set! value2_reg new-fail)
-                                                                                                                                                                                                                                                                        (set! value1_reg void-value)
-                                                                                                                                                                                                                                                                        (set! k_reg k)
-                                                                                                                                                                                                                                                                        (set! pc apply-cont2))))
+                                                                                                                                                                                                                                                                  (let ((var 'undefined)
+                                                                                                                                                                                                                                                                        (var-info 'undefined)
+                                                                                                                                                                                                                                                                        (env 'undefined)
+                                                                                                                                                                                                                                                                        (handler 'undefined)
+                                                                                                                                                                                                                                                                        (k 'undefined))
+                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                    (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                    (set! var-info (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                    (set! var (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                    (set! k_reg (make-cont2 '<cont2-62> value1_reg k))
+                                                                                                                                                                                                                                                                    (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                    (set! handler_reg handler)
+                                                                                                                                                                                                                                                                    (set! var-info_reg var-info)
+                                                                                                                                                                                                                                                                    (set! env_reg env)
+                                                                                                                                                                                                                                                                    (set! variable_reg var)
+                                                                                                                                                                                                                                                                    (set! pc lookup-binding))
                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-64>)
-                                                                                                                                                                                                                                                                      (let ((var 'undefined)
-                                                                                                                                                                                                                                                                            (var-info 'undefined)
+                                                                                                                                                                                                                                                                      (let ((else-exp 'undefined)
+                                                                                                                                                                                                                                                                            (then-exp 'undefined)
                                                                                                                                                                                                                                                                             (env 'undefined)
                                                                                                                                                                                                                                                                             (handler 'undefined)
                                                                                                                                                                                                                                                                             (k 'undefined))
                                                                                                                                                                                                                                                                         (set! k (list-ref temp_1 5))
                                                                                                                                                                                                                                                                         (set! handler (list-ref temp_1 4))
                                                                                                                                                                                                                                                                         (set! env (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                        (set! var-info (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                        (set! var (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                        (set! k_reg (make-cont2 '<cont2-63> value1_reg k))
-                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                        (set! handler_reg handler)
-                                                                                                                                                                                                                                                                        (set! var-info_reg var-info)
-                                                                                                                                                                                                                                                                        (set! env_reg env)
-                                                                                                                                                                                                                                                                        (set! variable_reg var)
-                                                                                                                                                                                                                                                                        (set! pc lookup-binding))
+                                                                                                                                                                                                                                                                        (set! then-exp (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                        (set! else-exp (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                        (if value1_reg
+                                                                                                                                                                                                                                                                            (begin
+                                                                                                                                                                                                                                                                              (set! k_reg k)
+                                                                                                                                                                                                                                                                              (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                              (set! handler_reg handler)
+                                                                                                                                                                                                                                                                              (set! env_reg env)
+                                                                                                                                                                                                                                                                              (set! exp_reg then-exp)
+                                                                                                                                                                                                                                                                              (set! pc m))
+                                                                                                                                                                                                                                                                            (begin
+                                                                                                                                                                                                                                                                              (set! k_reg k)
+                                                                                                                                                                                                                                                                              (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                              (set! handler_reg handler)
+                                                                                                                                                                                                                                                                              (set! env_reg env)
+                                                                                                                                                                                                                                                                              (set! exp_reg else-exp)
+                                                                                                                                                                                                                                                                              (set! pc m))))
                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-65>)
-                                                                                                                                                                                                                                                                          (let ((else-exp 'undefined)
-                                                                                                                                                                                                                                                                                (then-exp 'undefined)
-                                                                                                                                                                                                                                                                                (env 'undefined)
-                                                                                                                                                                                                                                                                                (handler 'undefined)
-                                                                                                                                                                                                                                                                                (k 'undefined))
-                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                            (set! then-exp (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                            (set! else-exp (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                            (if value1_reg
-                                                                                                                                                                                                                                                                                (begin
-                                                                                                                                                                                                                                                                                  (set! k_reg k)
-                                                                                                                                                                                                                                                                                  (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                  (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                  (set! env_reg env)
-                                                                                                                                                                                                                                                                                  (set! exp_reg then-exp)
-                                                                                                                                                                                                                                                                                  (set! pc m))
-                                                                                                                                                                                                                                                                                (begin
-                                                                                                                                                                                                                                                                                  (set! k_reg k)
-                                                                                                                                                                                                                                                                                  (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                  (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                  (set! env_reg env)
-                                                                                                                                                                                                                                                                                  (set! exp_reg else-exp)
-                                                                                                                                                                                                                                                                                  (set! pc m))))
+                                                                                                                                                                                                                                                                          (let ((k 'undefined))
+                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                            (set! value1_reg (dlr-func value1_reg))
+                                                                                                                                                                                                                                                                            (set! k_reg k)
+                                                                                                                                                                                                                                                                            (set! pc apply-cont2))
                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-66>)
-                                                                                                                                                                                                                                                                              (let ((k 'undefined))
-                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                (set! value1_reg (dlr-func value1_reg))
-                                                                                                                                                                                                                                                                                (set! k_reg k)
-                                                                                                                                                                                                                                                                                (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                              (let ((e 'undefined) (handler 'undefined))
+                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                (set! e (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                (set! exception_reg e)
+                                                                                                                                                                                                                                                                                (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                (set! pc apply-handler2))
                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-67>)
-                                                                                                                                                                                                                                                                                  (let ((e 'undefined) (handler 'undefined))
-                                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                    (set! e (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                    (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                    (set! exception_reg e)
-                                                                                                                                                                                                                                                                                    (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                    (set! pc apply-handler2))
+                                                                                                                                                                                                                                                                                  (let ((trace-depth 'undefined) (k2 'undefined))
+                                                                                                                                                                                                                                                                                    (set! k2 (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                    (set! trace-depth (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                    (set! trace-depth (- trace-depth 1))
+                                                                                                                                                                                                                                                                                    (printf
+                                                                                                                                                                                                                                                                                      "~areturn: ~s~%"
+                                                                                                                                                                                                                                                                                      (make-trace-depth-string trace-depth)
+                                                                                                                                                                                                                                                                                      value1_reg)
+                                                                                                                                                                                                                                                                                    (set! k_reg k2)
+                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-68>)
-                                                                                                                                                                                                                                                                                      (let ((trace-depth 'undefined) (k2 'undefined))
-                                                                                                                                                                                                                                                                                        (set! k2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                        (set! trace-depth (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                        (set! trace-depth (- trace-depth 1))
-                                                                                                                                                                                                                                                                                        (printf
-                                                                                                                                                                                                                                                                                          "~areturn: ~s~%"
-                                                                                                                                                                                                                                                                                          (make-trace-depth-string trace-depth)
-                                                                                                                                                                                                                                                                                          value1_reg)
-                                                                                                                                                                                                                                                                                        (set! k_reg k2)
-                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                      (let ((exps 'undefined)
+                                                                                                                                                                                                                                                                                            (env 'undefined)
+                                                                                                                                                                                                                                                                                            (handler 'undefined)
+                                                                                                                                                                                                                                                                                            (k 'undefined))
+                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                        (set! env (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                        (set! exps (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                        (set! k_reg (make-cont2 '<cont2-33> value1_reg k))
+                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                        (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                        (set! env_reg env)
+                                                                                                                                                                                                                                                                                        (set! exps_reg (cdr exps))
+                                                                                                                                                                                                                                                                                        (set! pc m*))
                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-69>)
                                                                                                                                                                                                                                                                                           (let ((exps 'undefined)
                                                                                                                                                                                                                                                                                                 (env 'undefined)
@@ -2059,174 +2063,177 @@
                                                                                                                                                                                                                                                                                             (set! handler (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                             (set! env (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                             (set! exps (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-34> value1_reg k))
+                                                                                                                                                                                                                                                                                            (set! k_reg k)
                                                                                                                                                                                                                                                                                             (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                             (set! handler_reg handler)
                                                                                                                                                                                                                                                                                             (set! env_reg env)
                                                                                                                                                                                                                                                                                             (set! exps_reg (cdr exps))
-                                                                                                                                                                                                                                                                                            (set! pc m*))
+                                                                                                                                                                                                                                                                                            (set! pc eval-sequence))
                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-70>)
-                                                                                                                                                                                                                                                                                              (let ((exps 'undefined)
-                                                                                                                                                                                                                                                                                                    (env 'undefined)
+                                                                                                                                                                                                                                                                                              (let ((env2 'undefined)
                                                                                                                                                                                                                                                                                                     (handler 'undefined)
-                                                                                                                                                                                                                                                                                                    (k 'undefined))
-                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                (set! exps (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                (set! k_reg k)
+                                                                                                                                                                                                                                                                                                    (k2 'undefined))
+                                                                                                                                                                                                                                                                                                (set! k2 (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                (set! env2 (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                (set! k_reg k2)
                                                                                                                                                                                                                                                                                                 (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                 (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                (set! env_reg env)
-                                                                                                                                                                                                                                                                                                (set! exps_reg (cdr exps))
-                                                                                                                                                                                                                                                                                                (set! pc eval-sequence))
+                                                                                                                                                                                                                                                                                                (set! env_reg env2)
+                                                                                                                                                                                                                                                                                                (set! exp_reg value1_reg)
+                                                                                                                                                                                                                                                                                                (set! pc m))
                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-71>)
-                                                                                                                                                                                                                                                                                                  (let ((env2 'undefined)
-                                                                                                                                                                                                                                                                                                        (handler 'undefined)
-                                                                                                                                                                                                                                                                                                        (k2 'undefined))
-                                                                                                                                                                                                                                                                                                    (set! k2 (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                    (set! env2 (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                  (let ((k2 'undefined))
+                                                                                                                                                                                                                                                                                                    (set! k2 (list-ref temp_1 1))
                                                                                                                                                                                                                                                                                                     (set! k_reg k2)
-                                                                                                                                                                                                                                                                                                    (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                    (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                    (set! env_reg env2)
-                                                                                                                                                                                                                                                                                                    (set! exp_reg value1_reg)
-                                                                                                                                                                                                                                                                                                    (set! pc m))
+                                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-72>)
-                                                                                                                                                                                                                                                                                                      (let ((k2 'undefined))
-                                                                                                                                                                                                                                                                                                        (set! k2 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                        (set! k_reg k2)
-                                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                      (let ((env2 'undefined)
+                                                                                                                                                                                                                                                                                                            (handler 'undefined)
+                                                                                                                                                                                                                                                                                                            (k2 'undefined))
+                                                                                                                                                                                                                                                                                                        (set! k2 (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                        (set! env2 (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                        (set! k_reg (make-cont4 '<cont4-11> env2 handler k2))
+                                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                        (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                        (set! src_reg 'stdin)
+                                                                                                                                                                                                                                                                                                        (set! tokens_reg value1_reg)
+                                                                                                                                                                                                                                                                                                        (set! pc read-sexp))
                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-73>)
-                                                                                                                                                                                                                                                                                                          (let ((env2 'undefined)
-                                                                                                                                                                                                                                                                                                                (handler 'undefined)
-                                                                                                                                                                                                                                                                                                                (k2 'undefined))
-                                                                                                                                                                                                                                                                                                            (set! k2 (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                            (set! env2 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                            (set! k_reg (make-cont4 '<cont4-12> env2 handler k2))
+                                                                                                                                                                                                                                                                                                          (let ((handler 'undefined) (k2 'undefined))
+                                                                                                                                                                                                                                                                                                            (set! k2 (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                            (set! k_reg (make-cont4 '<cont4-12> handler k2))
                                                                                                                                                                                                                                                                                                             (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                             (set! handler_reg handler)
                                                                                                                                                                                                                                                                                                             (set! src_reg 'stdin)
                                                                                                                                                                                                                                                                                                             (set! tokens_reg value1_reg)
                                                                                                                                                                                                                                                                                                             (set! pc read-sexp))
                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-74>)
-                                                                                                                                                                                                                                                                                                              (let ((handler 'undefined) (k2 'undefined))
-                                                                                                                                                                                                                                                                                                                (set! k2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                (set! k_reg (make-cont4 '<cont4-13> handler k2))
-                                                                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                (set! src_reg 'stdin)
-                                                                                                                                                                                                                                                                                                                (set! tokens_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                (set! pc read-sexp))
+                                                                                                                                                                                                                                                                                                              (let ((k 'undefined))
+                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                (if (null? load-stack)
+                                                                                                                                                                                                                                                                                                                    (printf "WARNING: empty load-stack encountered!\n")
+                                                                                                                                                                                                                                                                                                                    (set! load-stack (cdr load-stack)))
+                                                                                                                                                                                                                                                                                                                (set! value1_reg void-value)
+                                                                                                                                                                                                                                                                                                                (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-75>)
-                                                                                                                                                                                                                                                                                                                  (let ((k 'undefined))
-                                                                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                    (if (null? load-stack)
-                                                                                                                                                                                                                                                                                                                        (printf "WARNING: empty load-stack encountered!\n")
-                                                                                                                                                                                                                                                                                                                        (set! load-stack (cdr load-stack)))
-                                                                                                                                                                                                                                                                                                                    (set! value1_reg void-value)
-                                                                                                                                                                                                                                                                                                                    (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                  (let ((filename 'undefined)
+                                                                                                                                                                                                                                                                                                                        (env 'undefined)
+                                                                                                                                                                                                                                                                                                                        (handler 'undefined)
+                                                                                                                                                                                                                                                                                                                        (k 'undefined))
+                                                                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                    (set! env (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                    (set! filename (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                    (set! k_reg (make-cont2 '<cont2-74> k))
+                                                                                                                                                                                                                                                                                                                    (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                    (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                    (set! env_reg env)
+                                                                                                                                                                                                                                                                                                                    (set! src_reg filename)
+                                                                                                                                                                                                                                                                                                                    (set! tokens_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                    (set! pc read-and-eval-asexps))
                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-76>)
-                                                                                                                                                                                                                                                                                                                      (let ((filename 'undefined)
+                                                                                                                                                                                                                                                                                                                      (let ((filenames 'undefined)
                                                                                                                                                                                                                                                                                                                             (env 'undefined)
+                                                                                                                                                                                                                                                                                                                            (info 'undefined)
                                                                                                                                                                                                                                                                                                                             (handler 'undefined)
                                                                                                                                                                                                                                                                                                                             (k 'undefined))
-                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                        (set! info (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                         (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                        (set! filename (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                        (set! k_reg (make-cont2 '<cont2-75> k))
+                                                                                                                                                                                                                                                                                                                        (set! filenames (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                        (set! k_reg k)
                                                                                                                                                                                                                                                                                                                         (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                                         (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                        (set! info_reg info)
                                                                                                                                                                                                                                                                                                                         (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                        (set! src_reg filename)
-                                                                                                                                                                                                                                                                                                                        (set! tokens_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                        (set! pc read-and-eval-asexps))
+                                                                                                                                                                                                                                                                                                                        (set! filenames_reg (cdr filenames))
+                                                                                                                                                                                                                                                                                                                        (set! pc load-files))
                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-77>)
-                                                                                                                                                                                                                                                                                                                          (let ((filenames 'undefined)
-                                                                                                                                                                                                                                                                                                                                (env 'undefined)
-                                                                                                                                                                                                                                                                                                                                (info 'undefined)
+                                                                                                                                                                                                                                                                                                                          (let ((filename 'undefined)
+                                                                                                                                                                                                                                                                                                                                (env2 'undefined)
                                                                                                                                                                                                                                                                                                                                 (handler 'undefined)
-                                                                                                                                                                                                                                                                                                                                (k 'undefined))
-                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                            (set! info (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                            (set! filenames (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                            (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                            (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                            (set! info_reg info)
-                                                                                                                                                                                                                                                                                                                            (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                            (set! filenames_reg (cdr filenames))
-                                                                                                                                                                                                                                                                                                                            (set! pc load-files))
+                                                                                                                                                                                                                                                                                                                                (k2 'undefined))
+                                                                                                                                                                                                                                                                                                                            (set! k2 (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                            (set! env2 (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                            (set! filename (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                            (let ((module 'undefined))
+                                                                                                                                                                                                                                                                                                                              (set! module (extend env2 '() '()))
+                                                                                                                                                                                                                                                                                                                              (set-binding-value! value1_reg module)
+                                                                                                                                                                                                                                                                                                                              (set! k_reg k2)
+                                                                                                                                                                                                                                                                                                                              (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                              (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                              (set! info_reg 'none)
+                                                                                                                                                                                                                                                                                                                              (set! env_reg module)
+                                                                                                                                                                                                                                                                                                                              (set! filename_reg filename)
+                                                                                                                                                                                                                                                                                                                              (set! pc load-file)))
                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-78>)
-                                                                                                                                                                                                                                                                                                                              (let ((filename 'undefined)
-                                                                                                                                                                                                                                                                                                                                    (env2 'undefined)
+                                                                                                                                                                                                                                                                                                                              (let ((args 'undefined)
+                                                                                                                                                                                                                                                                                                                                    (sym 'undefined)
+                                                                                                                                                                                                                                                                                                                                    (info 'undefined)
                                                                                                                                                                                                                                                                                                                                     (handler 'undefined)
-                                                                                                                                                                                                                                                                                                                                    (k2 'undefined))
-                                                                                                                                                                                                                                                                                                                                (set! k2 (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                (set! env2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                (set! filename (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                (let ((module 'undefined))
-                                                                                                                                                                                                                                                                                                                                  (set! module (extend env2 '() '()))
-                                                                                                                                                                                                                                                                                                                                  (set-binding-value! value1_reg module)
-                                                                                                                                                                                                                                                                                                                                  (set! k_reg k2)
-                                                                                                                                                                                                                                                                                                                                  (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                  (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                  (set! info_reg 'none)
-                                                                                                                                                                                                                                                                                                                                  (set! env_reg module)
-                                                                                                                                                                                                                                                                                                                                  (set! filename_reg filename)
-                                                                                                                                                                                                                                                                                                                                  (set! pc load-file)))
+                                                                                                                                                                                                                                                                                                                                    (k 'undefined))
+                                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                (set! info (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                (set! sym (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                (set! args (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                (if (null? (cdr args))
+                                                                                                                                                                                                                                                                                                                                    (begin (set! k_reg k) (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                                    (if (not (environment? value1_reg))
+                                                                                                                                                                                                                                                                                                                                        (begin
+                                                                                                                                                                                                                                                                                                                                          (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                          (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                          (set! info_reg info)
+                                                                                                                                                                                                                                                                                                                                          (set! msg_reg (format "invalid module ~a" sym))
+                                                                                                                                                                                                                                                                                                                                          (set! pc runtime-error))
+                                                                                                                                                                                                                                                                                                                                        (begin
+                                                                                                                                                                                                                                                                                                                                          (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                                          (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                          (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                          (set! info_reg info)
+                                                                                                                                                                                                                                                                                                                                          (set! env_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                                          (set! args_reg (cdr args))
+                                                                                                                                                                                                                                                                                                                                          (set! pc get-primitive)))))
                                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-79>)
-                                                                                                                                                                                                                                                                                                                                  (let ((args 'undefined)
-                                                                                                                                                                                                                                                                                                                                        (sym 'undefined)
-                                                                                                                                                                                                                                                                                                                                        (info 'undefined)
-                                                                                                                                                                                                                                                                                                                                        (handler 'undefined)
-                                                                                                                                                                                                                                                                                                                                        (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                    (set! info (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                    (set! sym (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                    (set! args (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                    (if (null? (cdr args))
-                                                                                                                                                                                                                                                                                                                                        (begin (set! k_reg k) (set! pc apply-cont2))
-                                                                                                                                                                                                                                                                                                                                        (if (not (environment? value1_reg))
-                                                                                                                                                                                                                                                                                                                                            (begin
-                                                                                                                                                                                                                                                                                                                                              (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                              (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                              (set! info_reg info)
-                                                                                                                                                                                                                                                                                                                                              (set! msg_reg (format "invalid module ~a" sym))
-                                                                                                                                                                                                                                                                                                                                              (set! pc runtime-error))
-                                                                                                                                                                                                                                                                                                                                            (begin
-                                                                                                                                                                                                                                                                                                                                              (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                                              (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                              (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                              (set! info_reg info)
-                                                                                                                                                                                                                                                                                                                                              (set! env_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                                              (set! args_reg (cdr args))
-                                                                                                                                                                                                                                                                                                                                              (set! pc get-primitive)))))
+                                                                                                                                                                                                                                                                                                                                  (let ((ls1 'undefined) (k2 'undefined))
+                                                                                                                                                                                                                                                                                                                                    (set! k2 (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                    (set! ls1 (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                    (set! value1_reg (cons (car ls1) value1_reg))
+                                                                                                                                                                                                                                                                                                                                    (set! k_reg k2)
+                                                                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-80>)
-                                                                                                                                                                                                                                                                                                                                      (let ((ls1 'undefined) (k2 'undefined))
+                                                                                                                                                                                                                                                                                                                                      (let ((lists 'undefined) (k2 'undefined))
                                                                                                                                                                                                                                                                                                                                         (set! k2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                        (set! ls1 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                        (set! value1_reg (cons (car ls1) value1_reg))
-                                                                                                                                                                                                                                                                                                                                        (set! k_reg k2)
-                                                                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                                        (set! lists (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                        (set! k2_reg k2)
+                                                                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                        (set! ls2_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                                        (set! ls1_reg (car lists))
+                                                                                                                                                                                                                                                                                                                                        (set! pc append2))
                                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-81>)
-                                                                                                                                                                                                                                                                                                                                          (let ((lists 'undefined) (k2 'undefined))
-                                                                                                                                                                                                                                                                                                                                            (set! k2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                            (set! lists (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                            (set! k2_reg k2)
+                                                                                                                                                                                                                                                                                                                                          (let ((iterator 'undefined)
+                                                                                                                                                                                                                                                                                                                                                (proc 'undefined)
+                                                                                                                                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                                                                                                                                (handler 'undefined)
+                                                                                                                                                                                                                                                                                                                                                (k 'undefined))
+                                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                            (set! proc (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                            (set! iterator (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                            (set! k_reg k)
                                                                                                                                                                                                                                                                                                                                             (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                            (set! ls2_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                                            (set! ls1_reg (car lists))
-                                                                                                                                                                                                                                                                                                                                            (set! pc append2))
+                                                                                                                                                                                                                                                                                                                                            (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                            (set! env_reg env)
+                                                                                                                                                                                                                                                                                                                                            (set! iterator_reg iterator)
+                                                                                                                                                                                                                                                                                                                                            (set! proc_reg proc)
+                                                                                                                                                                                                                                                                                                                                            (set! pc iterate-continue))
                                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-82>)
                                                                                                                                                                                                                                                                                                                                               (let ((iterator 'undefined)
                                                                                                                                                                                                                                                                                                                                                     (proc 'undefined)
@@ -2238,15 +2245,15 @@
                                                                                                                                                                                                                                                                                                                                                 (set! env (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                 (set! proc (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                                                                                 (set! iterator (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                                                (set! k_reg (make-cont2 '<cont2-33> value1_reg k))
                                                                                                                                                                                                                                                                                                                                                 (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                                                                 (set! handler_reg handler)
                                                                                                                                                                                                                                                                                                                                                 (set! env_reg env)
                                                                                                                                                                                                                                                                                                                                                 (set! iterator_reg iterator)
                                                                                                                                                                                                                                                                                                                                                 (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                (set! pc iterate-continue))
+                                                                                                                                                                                                                                                                                                                                                (set! pc iterate-collect-continue))
                                                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-83>)
-                                                                                                                                                                                                                                                                                                                                                  (let ((iterator 'undefined)
+                                                                                                                                                                                                                                                                                                                                                  (let ((list1 'undefined)
                                                                                                                                                                                                                                                                                                                                                         (proc 'undefined)
                                                                                                                                                                                                                                                                                                                                                         (env 'undefined)
                                                                                                                                                                                                                                                                                                                                                         (handler 'undefined)
@@ -2255,277 +2262,235 @@
                                                                                                                                                                                                                                                                                                                                                     (set! handler (list-ref temp_1 4))
                                                                                                                                                                                                                                                                                                                                                     (set! env (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                     (set! proc (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                    (set! iterator (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                    (set! k_reg (make-cont2 '<cont2-34> value1_reg k))
+                                                                                                                                                                                                                                                                                                                                                    (set! list1 (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                                    (set! k_reg (make-cont2 '<cont2-33> value1_reg k))
                                                                                                                                                                                                                                                                                                                                                     (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                                                                     (set! handler_reg handler)
                                                                                                                                                                                                                                                                                                                                                     (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                                                    (set! iterator_reg iterator)
+                                                                                                                                                                                                                                                                                                                                                    (set! list1_reg (cdr list1))
                                                                                                                                                                                                                                                                                                                                                     (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                    (set! pc iterate-collect-continue))
+                                                                                                                                                                                                                                                                                                                                                    (set! pc map1))
                                                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-84>)
-                                                                                                                                                                                                                                                                                                                                                      (let ((list1 'undefined)
-                                                                                                                                                                                                                                                                                                                                                            (proc 'undefined)
-                                                                                                                                                                                                                                                                                                                                                            (env 'undefined)
-                                                                                                                                                                                                                                                                                                                                                            (handler 'undefined)
-                                                                                                                                                                                                                                                                                                                                                            (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                                        (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                      (let ((list1 'undefined) (proc 'undefined) (k 'undefined))
+                                                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                         (set! proc (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                                                                                         (set! list1 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                        (set! k_reg (make-cont2 '<cont2-34> value1_reg k))
-                                                                                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                        (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                                        (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                                                        (set! list1_reg (cdr list1))
-                                                                                                                                                                                                                                                                                                                                                        (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                        (set! pc map1))
+                                                                                                                                                                                                                                                                                                                                                        (set! value1_reg
+                                                                                                                                                                                                                                                                                                                                                          (cons (dlr-apply proc (list (car list1))) value1_reg))
+                                                                                                                                                                                                                                                                                                                                                        (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-85>)
                                                                                                                                                                                                                                                                                                                                                           (let ((list1 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                (list2 'undefined)
                                                                                                                                                                                                                                                                                                                                                                 (proc 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                (handler 'undefined)
                                                                                                                                                                                                                                                                                                                                                                 (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                                            (set! proc (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 6))
+                                                                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                                            (set! proc (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                            (set! list2 (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                                                                                             (set! list1 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                            (set! value1_reg
-                                                                                                                                                                                                                                                                                                                                                              (cons
-                                                                                                                                                                                                                                                                                                                                                                (dlr-apply proc (list (car list1)))
-                                                                                                                                                                                                                                                                                                                                                                value1_reg))
-                                                                                                                                                                                                                                                                                                                                                            (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                                                            (set! k_reg (make-cont2 '<cont2-33> value1_reg k))
+                                                                                                                                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                                            (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                                            (set! env_reg env)
+                                                                                                                                                                                                                                                                                                                                                            (set! list2_reg (cdr list2))
+                                                                                                                                                                                                                                                                                                                                                            (set! list1_reg (cdr list1))
+                                                                                                                                                                                                                                                                                                                                                            (set! proc_reg proc)
+                                                                                                                                                                                                                                                                                                                                                            (set! pc map2))
                                                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-86>)
                                                                                                                                                                                                                                                                                                                                                               (let ((list1 'undefined)
                                                                                                                                                                                                                                                                                                                                                                     (list2 'undefined)
                                                                                                                                                                                                                                                                                                                                                                     (proc 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                    (env 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                    (handler 'undefined)
                                                                                                                                                                                                                                                                                                                                                                     (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 6))
-                                                                                                                                                                                                                                                                                                                                                                (set! handler (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                                                                (set! env (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 4))
                                                                                                                                                                                                                                                                                                                                                                 (set! proc (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                                 (set! list2 (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                                                                                                 (set! list1 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                (set! k_reg
-                                                                                                                                                                                                                                                                                                                                                                  (make-cont2 '<cont2-34> value1_reg k))
-                                                                                                                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                                                (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                                                                (set! list2_reg (cdr list2))
-                                                                                                                                                                                                                                                                                                                                                                (set! list1_reg (cdr list1))
-                                                                                                                                                                                                                                                                                                                                                                (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                                (set! pc map2))
+                                                                                                                                                                                                                                                                                                                                                                (set! value1_reg
+                                                                                                                                                                                                                                                                                                                                                                  (cons
+                                                                                                                                                                                                                                                                                                                                                                    (dlr-apply
+                                                                                                                                                                                                                                                                                                                                                                      proc
+                                                                                                                                                                                                                                                                                                                                                                      (list (car list1) (car list2)))
+                                                                                                                                                                                                                                                                                                                                                                    value1_reg))
+                                                                                                                                                                                                                                                                                                                                                                (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                                                                (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-87>)
-                                                                                                                                                                                                                                                                                                                                                                  (let ((list1 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                        (list2 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                  (let ((lists 'undefined)
                                                                                                                                                                                                                                                                                                                                                                         (proc 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                        (env 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                        (handler 'undefined)
                                                                                                                                                                                                                                                                                                                                                                         (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                                                    (set! proc (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                                                    (set! list2 (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                                    (set! list1 (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                    (set! value1_reg
-                                                                                                                                                                                                                                                                                                                                                                      (cons
-                                                                                                                                                                                                                                                                                                                                                                        (dlr-apply
-                                                                                                                                                                                                                                                                                                                                                                          proc
-                                                                                                                                                                                                                                                                                                                                                                          (list (car list1) (car list2)))
-                                                                                                                                                                                                                                                                                                                                                                        value1_reg))
-                                                                                                                                                                                                                                                                                                                                                                    (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                                                                    (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                                                                    (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                                                                    (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                                                    (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                                    (set! proc (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                                                    (set! lists (list-ref temp_1 1))
+                                                                                                                                                                                                                                                                                                                                                                    (set! k_reg
+                                                                                                                                                                                                                                                                                                                                                                      (make-cont2 '<cont2-33> value1_reg k))
+                                                                                                                                                                                                                                                                                                                                                                    (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                    (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                                                    (set! env_reg env)
+                                                                                                                                                                                                                                                                                                                                                                    (set! lists_reg (map cdr lists))
+                                                                                                                                                                                                                                                                                                                                                                    (set! proc_reg proc)
+                                                                                                                                                                                                                                                                                                                                                                    (set! pc mapN))
                                                                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1) '<cont2-88>)
                                                                                                                                                                                                                                                                                                                                                                       (let ((lists 'undefined)
                                                                                                                                                                                                                                                                                                                                                                             (proc 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                            (env 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                            (handler 'undefined)
                                                                                                                                                                                                                                                                                                                                                                             (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                                                                        (set! handler (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                                                        (set! env (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                                        (set! k (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                                         (set! proc (list-ref temp_1 2))
                                                                                                                                                                                                                                                                                                                                                                         (set! lists (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                        (set! k_reg
-                                                                                                                                                                                                                                                                                                                                                                          (make-cont2 '<cont2-34> value1_reg k))
-                                                                                                                                                                                                                                                                                                                                                                        (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                        (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                                                        (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                                                                        (set! lists_reg (map cdr lists))
-                                                                                                                                                                                                                                                                                                                                                                        (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                                        (set! pc mapN))
+                                                                                                                                                                                                                                                                                                                                                                        (set! value1_reg
+                                                                                                                                                                                                                                                                                                                                                                          (cons
+                                                                                                                                                                                                                                                                                                                                                                            (dlr-apply proc (map car lists))
+                                                                                                                                                                                                                                                                                                                                                                            value1_reg))
+                                                                                                                                                                                                                                                                                                                                                                        (set! k_reg k)
+                                                                                                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1) '<cont2-89>)
-                                                                                                                                                                                                                                                                                                                                                                          (let ((lists 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                          (let ((arg-list 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                 (proc 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                (env 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                (handler 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                 (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                                            (set! k (list-ref temp_1 5))
+                                                                                                                                                                                                                                                                                                                                                                            (set! handler (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                                                            (set! env (list-ref temp_1 3))
                                                                                                                                                                                                                                                                                                                                                                             (set! proc (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                                            (set! lists (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                            (set! value1_reg
-                                                                                                                                                                                                                                                                                                                                                                              (cons
-                                                                                                                                                                                                                                                                                                                                                                                (dlr-apply proc (map car lists))
-                                                                                                                                                                                                                                                                                                                                                                                value1_reg))
+                                                                                                                                                                                                                                                                                                                                                                            (set! arg-list (list-ref temp_1 1))
                                                                                                                                                                                                                                                                                                                                                                             (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                                                                            (set! pc apply-cont2))
+                                                                                                                                                                                                                                                                                                                                                                            (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                            (set! handler_reg handler)
+                                                                                                                                                                                                                                                                                                                                                                            (set! env_reg env)
+                                                                                                                                                                                                                                                                                                                                                                            (set! lists_reg (map cdr arg-list))
+                                                                                                                                                                                                                                                                                                                                                                            (set! proc_reg proc)
+                                                                                                                                                                                                                                                                                                                                                                            (set! pc for-each-primitive))
                                                                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1) '<cont2-90>)
-                                                                                                                                                                                                                                                                                                                                                                              (let ((arg-list 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                    (proc 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                    (env 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                    (handler 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                              (let ((new-acdr1 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                    (new-cdr1 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                    (s-car 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                     (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 5))
-                                                                                                                                                                                                                                                                                                                                                                                (set! handler
-                                                                                                                                                                                                                                                                                                                                                                                  (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                                                                (set! env (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                                                                (set! proc (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                                                (set! arg-list
+                                                                                                                                                                                                                                                                                                                                                                                (set! k (list-ref temp_1 4))
+                                                                                                                                                                                                                                                                                                                                                                                (set! s-car (list-ref temp_1 3))
+                                                                                                                                                                                                                                                                                                                                                                                (set! new-cdr1
+                                                                                                                                                                                                                                                                                                                                                                                  (list-ref temp_1 2))
+                                                                                                                                                                                                                                                                                                                                                                                (set! new-acdr1
                                                                                                                                                                                                                                                                                                                                                                                   (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                                (set! k_reg k)
-                                                                                                                                                                                                                                                                                                                                                                                (set! fail_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                                (set! handler_reg handler)
-                                                                                                                                                                                                                                                                                                                                                                                (set! env_reg env)
-                                                                                                                                                                                                                                                                                                                                                                                (set! lists_reg
-                                                                                                                                                                                                                                                                                                                                                                                  (map cdr arg-list))
-                                                                                                                                                                                                                                                                                                                                                                                (set! proc_reg proc)
-                                                                                                                                                                                                                                                                                                                                                                                (set! pc for-each-primitive))
+                                                                                                                                                                                                                                                                                                                                                                                (set! k_reg
+                                                                                                                                                                                                                                                                                                                                                                                  (make-cont
+                                                                                                                                                                                                                                                                                                                                                                                    '<cont-49>
+                                                                                                                                                                                                                                                                                                                                                                                    s-car
+                                                                                                                                                                                                                                                                                                                                                                                    k))
+                                                                                                                                                                                                                                                                                                                                                                                (set! ap2_reg value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                                (set! ap1_reg new-acdr1)
+                                                                                                                                                                                                                                                                                                                                                                                (set! p2_reg value1_reg)
+                                                                                                                                                                                                                                                                                                                                                                                (set! p1_reg new-cdr1)
+                                                                                                                                                                                                                                                                                                                                                                                (set! pc unify-patterns^))
                                                                                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-91>)
-                                                                                                                                                                                                                                                                                                                                                                                  (let ((new-acdr1 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                        (new-cdr1 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                  (let ((apair2 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                        (pair2 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                         (s-car 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                         (k 'undefined))
                                                                                                                                                                                                                                                                                                                                                                                     (set! k (list-ref temp_1 4))
                                                                                                                                                                                                                                                                                                                                                                                     (set! s-car
                                                                                                                                                                                                                                                                                                                                                                                       (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                                                                    (set! new-cdr1
+                                                                                                                                                                                                                                                                                                                                                                                    (set! pair2
                                                                                                                                                                                                                                                                                                                                                                                       (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                                                    (set! new-acdr1
+                                                                                                                                                                                                                                                                                                                                                                                    (set! apair2
                                                                                                                                                                                                                                                                                                                                                                                       (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                                    (set! k_reg
-                                                                                                                                                                                                                                                                                                                                                                                      (make-cont
-                                                                                                                                                                                                                                                                                                                                                                                        '<cont-49>
-                                                                                                                                                                                                                                                                                                                                                                                        s-car
-                                                                                                                                                                                                                                                                                                                                                                                        k))
-                                                                                                                                                                                                                                                                                                                                                                                    (set! ap2_reg value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                                    (set! ap1_reg new-acdr1)
-                                                                                                                                                                                                                                                                                                                                                                                    (set! p2_reg value1_reg)
-                                                                                                                                                                                                                                                                                                                                                                                    (set! p1_reg new-cdr1)
-                                                                                                                                                                                                                                                                                                                                                                                    (set! pc unify-patterns^))
+                                                                                                                                                                                                                                                                                                                                                                                    (set! k2_reg
+                                                                                                                                                                                                                                                                                                                                                                                      (make-cont2 '<cont2-90>
+                                                                                                                                                                                                                                                                                                                                                                                        value2_reg value1_reg
+                                                                                                                                                                                                                                                                                                                                                                                        s-car k))
+                                                                                                                                                                                                                                                                                                                                                                                    (set! ap_reg (cdr^ apair2))
+                                                                                                                                                                                                                                                                                                                                                                                    (set! s_reg s-car)
+                                                                                                                                                                                                                                                                                                                                                                                    (set! pattern_reg
+                                                                                                                                                                                                                                                                                                                                                                                      (cdr pair2))
+                                                                                                                                                                                                                                                                                                                                                                                    (set! pc instantiate^))
                                                                                                                                                                                                                                                                                                                                                                                   (if (eq? (car temp_1)
                                                                                                                                                                                                                                                                                                                                                                                            '<cont2-92>)
-                                                                                                                                                                                                                                                                                                                                                                                      (let ((apair2 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                            (pair2 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                            (s-car 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                            (k 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! k
+                                                                                                                                                                                                                                                                                                                                                                                      (let ((a 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                            (aa 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                            (ap 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                            (k2 'undefined))
+                                                                                                                                                                                                                                                                                                                                                                                        (set! k2
                                                                                                                                                                                                                                                                                                                                                                                           (list-ref temp_1 4))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! s-car
+                                                                                                                                                                                                                                                                                                                                                                                        (set! ap
                                                                                                                                                                                                                                                                                                                                                                                           (list-ref temp_1 3))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! pair2
+                                                                                                                                                                                                                                                                                                                                                                                        (set! aa
                                                                                                                                                                                                                                                                                                                                                                                           (list-ref temp_1 2))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! apair2
+                                                                                                                                                                                                                                                                                                                                                                                        (set! a
                                                                                                                                                                                                                                                                                                                                                                                           (list-ref temp_1 1))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! k2_reg
-                                                                                                                                                                                                                                                                                                                                                                                          (make-cont2 '<cont2-91>
+                                                                                                                                                                                                                                                                                                                                                                                        (set! value2_reg
+                                                                                                                                                                                                                                                                                                                                                                                          (cons^
+                                                                                                                                                                                                                                                                                                                                                                                            aa
                                                                                                                                                                                                                                                                                                                                                                                             value2_reg
-                                                                                                                                                                                                                                                                                                                                                                                            value1_reg s-car k))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! ap_reg
-                                                                                                                                                                                                                                                                                                                                                                                          (cdr^ apair2))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! s_reg s-car)
-                                                                                                                                                                                                                                                                                                                                                                                        (set! pattern_reg
-                                                                                                                                                                                                                                                                                                                                                                                          (cdr pair2))
-                                                                                                                                                                                                                                                                                                                                                                                        (set! pc instantiate^))
+                                                                                                                                                                                                                                                                                                                                                                                            (get-source-info
+                                                                                                                                                                                                                                                                                                                                                                                              ap)))
+                                                                                                                                                                                                                                                                                                                                                                                        (set! value1_reg
+                                                                                                                                                                                                                                                                                                                                                                                          (cons a value1_reg))
+                                                                                                                                                                                                                                                                                                                                                                                        (set! k_reg k2)
+                                                                                                                                                                                                                                                                                                                                                                                        (set! pc apply-cont2))
                                                                                                                                                                                                                                                                                                                                                                                       (if (eq? (car temp_1)
                                                                                                                                                                                                                                                                                                                                                                                                '<cont2-93>)
-                                                                                                                                                                                                                                                                                                                                                                                          (let ((a 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                (aa 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                (ap 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                          (let ((ap 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                                (pattern 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                                (s 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                                 (k2 'undefined))
                                                                                                                                                                                                                                                                                                                                                                                             (set! k2
                                                                                                                                                                                                                                                                                                                                                                                               (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                 temp_1
                                                                                                                                                                                                                                                                                                                                                                                                 4))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! ap
+                                                                                                                                                                                                                                                                                                                                                                                            (set! s
                                                                                                                                                                                                                                                                                                                                                                                               (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                 temp_1
                                                                                                                                                                                                                                                                                                                                                                                                 3))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! aa
+                                                                                                                                                                                                                                                                                                                                                                                            (set! pattern
                                                                                                                                                                                                                                                                                                                                                                                               (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                 temp_1
                                                                                                                                                                                                                                                                                                                                                                                                 2))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! a
+                                                                                                                                                                                                                                                                                                                                                                                            (set! ap
                                                                                                                                                                                                                                                                                                                                                                                               (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                 temp_1
                                                                                                                                                                                                                                                                                                                                                                                                 1))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! value2_reg
-                                                                                                                                                                                                                                                                                                                                                                                              (cons^
-                                                                                                                                                                                                                                                                                                                                                                                                aa
-                                                                                                                                                                                                                                                                                                                                                                                                value2_reg
-                                                                                                                                                                                                                                                                                                                                                                                                (get-source-info
-                                                                                                                                                                                                                                                                                                                                                                                                  ap)))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! value1_reg
-                                                                                                                                                                                                                                                                                                                                                                                              (cons
-                                                                                                                                                                                                                                                                                                                                                                                                a
-                                                                                                                                                                                                                                                                                                                                                                                                value1_reg))
-                                                                                                                                                                                                                                                                                                                                                                                            (set! k_reg k2)
+                                                                                                                                                                                                                                                                                                                                                                                            (set! k2_reg
+                                                                                                                                                                                                                                                                                                                                                                                              (make-cont2
+                                                                                                                                                                                                                                                                                                                                                                                                '<cont2-92>
+                                                                                                                                                                                                                                                                                                                                                                                                value1_reg
+                                                                                                                                                                                                                                                                                                                                                                                                value2_reg ap
+                                                                                                                                                                                                                                                                                                                                                                                                k2))
+                                                                                                                                                                                                                                                                                                                                                                                            (set! ap_reg
+                                                                                                                                                                                                                                                                                                                                                                                              (cdr^ ap))
+                                                                                                                                                                                                                                                                                                                                                                                            (set! s_reg s)
+                                                                                                                                                                                                                                                                                                                                                                                            (set! pattern_reg
+                                                                                                                                                                                                                                                                                                                                                                                              (cdr pattern))
                                                                                                                                                                                                                                                                                                                                                                                             (set! pc
-                                                                                                                                                                                                                                                                                                                                                                                              apply-cont2))
+                                                                                                                                                                                                                                                                                                                                                                                              instantiate^))
                                                                                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1)
                                                                                                                                                                                                                                                                                                                                                                                                    '<cont2-94>)
-                                                                                                                                                                                                                                                                                                                                                                                              (let ((ap 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                    (pattern 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                    (s 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                              (let ((s2 'undefined)
                                                                                                                                                                                                                                                                                                                                                                                                     (k2 'undefined))
                                                                                                                                                                                                                                                                                                                                                                                                 (set! k2
                                                                                                                                                                                                                                                                                                                                                                                                   (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                     temp_1
-                                                                                                                                                                                                                                                                                                                                                                                                    4))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! s
-                                                                                                                                                                                                                                                                                                                                                                                                  (list-ref
-                                                                                                                                                                                                                                                                                                                                                                                                    temp_1
-                                                                                                                                                                                                                                                                                                                                                                                                    3))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! pattern
-                                                                                                                                                                                                                                                                                                                                                                                                  (list-ref
-                                                                                                                                                                                                                                                                                                                                                                                                    temp_1
                                                                                                                                                                                                                                                                                                                                                                                                     2))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! ap
+                                                                                                                                                                                                                                                                                                                                                                                                (set! s2
                                                                                                                                                                                                                                                                                                                                                                                                   (list-ref
                                                                                                                                                                                                                                                                                                                                                                                                     temp_1
                                                                                                                                                                                                                                                                                                                                                                                                     1))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! k2_reg
-                                                                                                                                                                                                                                                                                                                                                                                                  (make-cont2 '<cont2-93>
-                                                                                                                                                                                                                                                                                                                                                                                                    value1_reg
-                                                                                                                                                                                                                                                                                                                                                                                                    value2_reg
-                                                                                                                                                                                                                                                                                                                                                                                                    ap k2))
+                                                                                                                                                                                                                                                                                                                                                                                                (set! k2_reg k2)
                                                                                                                                                                                                                                                                                                                                                                                                 (set! ap_reg
-                                                                                                                                                                                                                                                                                                                                                                                                  (cdr^ ap))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! s_reg s)
+                                                                                                                                                                                                                                                                                                                                                                                                  value2_reg)
+                                                                                                                                                                                                                                                                                                                                                                                                (set! s_reg s2)
                                                                                                                                                                                                                                                                                                                                                                                                 (set! pattern_reg
-                                                                                                                                                                                                                                                                                                                                                                                                  (cdr pattern))
+                                                                                                                                                                                                                                                                                                                                                                                                  value1_reg)
                                                                                                                                                                                                                                                                                                                                                                                                 (set! pc
                                                                                                                                                                                                                                                                                                                                                                                                   instantiate^))
-                                                                                                                                                                                                                                                                                                                                                                                              (if (eq? (car temp_1)
-                                                                                                                                                                                                                                                                                                                                                                                                       '<cont2-95>)
-                                                                                                                                                                                                                                                                                                                                                                                                  (let ((s2 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                        (k2 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! k2
-                                                                                                                                                                                                                                                                                                                                                                                                      (list-ref
-                                                                                                                                                                                                                                                                                                                                                                                                        temp_1
-                                                                                                                                                                                                                                                                                                                                                                                                        2))
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! s2
-                                                                                                                                                                                                                                                                                                                                                                                                      (list-ref
-                                                                                                                                                                                                                                                                                                                                                                                                        temp_1
-                                                                                                                                                                                                                                                                                                                                                                                                        1))
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! k2_reg
-                                                                                                                                                                                                                                                                                                                                                                                                      k2)
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! ap_reg
-                                                                                                                                                                                                                                                                                                                                                                                                      value2_reg)
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! s_reg
-                                                                                                                                                                                                                                                                                                                                                                                                      s2)
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! pattern_reg
-                                                                                                                                                                                                                                                                                                                                                                                                      value1_reg)
-                                                                                                                                                                                                                                                                                                                                                                                                    (set! pc
-                                                                                                                                                                                                                                                                                                                                                                                                      instantiate^))
-                                                                                                                                                                                                                                                                                                                                                                                                  (error 'apply-cont2
-                                                                                                                                                                                                                                                                                                                                                                                                    "bad continuation2: ~a"
-                                                                                                                                                                                                                                                                                                                                                                                                    k_reg)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                                                                                                                                                                                                                                                                                                                                                                                              (error 'apply-cont2
+                                                                                                                                                                                                                                                                                                                                                                                                "bad continuation2: ~a"
+                                                                                                                                                                                                                                                                                                                                                                                                k_reg))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 
 (define make-cont3
   (lambda args (return* (cons 'continuation3 args))))
@@ -2664,79 +2629,77 @@
                                           (set! tokens_reg value3_reg)
                                           (set! pc read-sexp-sequence))))
                                   (if (eq? (car temp_1) '<cont4-8>)
-                                      (let ((src 'undefined) (handler 'undefined) (k 'undefined))
-                                        (set! k (list-ref temp_1 3))
-                                        (set! handler (list-ref temp_1 2))
+                                      (let ((src 'undefined)
+                                            (env 'undefined)
+                                            (handler 'undefined)
+                                            (k 'undefined))
+                                        (set! k (list-ref temp_1 4))
+                                        (set! handler (list-ref temp_1 3))
+                                        (set! env (list-ref temp_1 2))
                                         (set! src (list-ref temp_1 1))
-                                        (if (token-type? (first value3_reg) 'end-marker)
-                                            (begin
-                                              (set! value2_reg value3_reg)
-                                              (set! value3_reg value4_reg)
-                                              (set! k_reg k)
-                                              (set! pc apply-cont3))
-                                            (begin
-                                              (set! fail_reg value4_reg)
-                                              (set! handler_reg handler)
-                                              (set! src_reg src)
-                                              (set! tokens_reg value3_reg)
-                                              (set! msg_reg "tokens left over")
-                                              (set! pc read-error))))
+                                        (set! k_reg
+                                          (make-cont2 '<cont2-34> src value3_reg env handler k))
+                                        (set! fail_reg value4_reg)
+                                        (set! handler_reg handler)
+                                        (set! env_reg env)
+                                        (set! adatum_reg value1_reg)
+                                        (set! pc aparse))
                                       (if (eq? (car temp_1) '<cont4-9>)
-                                          (let ((src 'undefined)
-                                                (env 'undefined)
-                                                (handler 'undefined)
-                                                (k 'undefined))
-                                            (set! k (list-ref temp_1 4))
-                                            (set! handler (list-ref temp_1 3))
-                                            (set! env (list-ref temp_1 2))
-                                            (set! src (list-ref temp_1 1))
-                                            (set! k_reg
-                                              (make-cont2 '<cont2-35> src value3_reg env handler k))
+                                          (begin
+                                            (set! *tokens-left* value3_reg)
+                                            (set! k_reg (make-cont2 '<cont2-47>))
                                             (set! fail_reg value4_reg)
-                                            (set! handler_reg handler)
-                                            (set! env_reg env)
+                                            (set! handler_reg REP-handler)
+                                            (set! env_reg toplevel-env)
                                             (set! adatum_reg value1_reg)
                                             (set! pc aparse))
                                           (if (eq? (car temp_1) '<cont4-10>)
-                                              (begin
-                                                (set! *tokens-left* value3_reg)
-                                                (set! k_reg (make-cont2 '<cont2-48>))
+                                              (let ((src 'undefined)
+                                                    (env 'undefined)
+                                                    (handler 'undefined)
+                                                    (k 'undefined))
+                                                (set! k (list-ref temp_1 4))
+                                                (set! handler (list-ref temp_1 3))
+                                                (set! env (list-ref temp_1 2))
+                                                (set! src (list-ref temp_1 1))
+                                                (set! k_reg
+                                                  (make-cont2 '<cont2-51> src value3_reg env handler k))
                                                 (set! fail_reg value4_reg)
-                                                (set! handler_reg REP-handler)
-                                                (set! env_reg toplevel-env)
+                                                (set! handler_reg handler)
+                                                (set! env_reg env)
                                                 (set! adatum_reg value1_reg)
                                                 (set! pc aparse))
                                               (if (eq? (car temp_1) '<cont4-11>)
-                                                  (let ((src 'undefined)
-                                                        (env 'undefined)
+                                                  (let ((env2 'undefined)
                                                         (handler 'undefined)
-                                                        (k 'undefined))
-                                                    (set! k (list-ref temp_1 4))
-                                                    (set! handler (list-ref temp_1 3))
-                                                    (set! env (list-ref temp_1 2))
-                                                    (set! src (list-ref temp_1 1))
-                                                    (set! k_reg
-                                                      (make-cont2 '<cont2-52> src value3_reg env handler k))
-                                                    (set! fail_reg value4_reg)
-                                                    (set! handler_reg handler)
-                                                    (set! env_reg env)
-                                                    (set! adatum_reg value1_reg)
-                                                    (set! pc aparse))
+                                                        (k2 'undefined))
+                                                    (set! k2 (list-ref temp_1 3))
+                                                    (set! handler (list-ref temp_1 2))
+                                                    (set! env2 (list-ref temp_1 1))
+                                                    (if (token-type? (first value3_reg) 'end-marker)
+                                                        (begin
+                                                          (set! k_reg k2)
+                                                          (set! fail_reg value4_reg)
+                                                          (set! handler_reg handler)
+                                                          (set! env_reg env2)
+                                                          (set! adatum_reg value1_reg)
+                                                          (set! pc aparse))
+                                                        (begin
+                                                          (set! fail_reg value4_reg)
+                                                          (set! handler_reg handler)
+                                                          (set! src_reg 'stdin)
+                                                          (set! tokens_reg value3_reg)
+                                                          (set! msg_reg "tokens left over")
+                                                          (set! pc read-error))))
                                                   (if (eq? (car temp_1) '<cont4-12>)
-                                                      (let ((env2 'undefined)
-                                                            (handler 'undefined)
-                                                            (k2 'undefined))
-                                                        (set! k2 (list-ref temp_1 3))
-                                                        (set! handler (list-ref temp_1 2))
-                                                        (set! env2 (list-ref temp_1 1))
+                                                      (let ((handler 'undefined) (k2 'undefined))
+                                                        (set! k2 (list-ref temp_1 2))
+                                                        (set! handler (list-ref temp_1 1))
                                                         (if (token-type? (first value3_reg) 'end-marker)
                                                             (begin
+                                                              (set! value2_reg value4_reg)
                                                               (set! k_reg k2)
-                                                              (set! fail_reg value4_reg)
-                                                              (set! handler_reg handler)
-                                                              (set! env_reg env2)
-                                                              (set! adatum_reg value1_reg)
-                                                              (set! pc aparse))
+                                                              (set! pc apply-cont2))
                                                             (begin
                                                               (set! fail_reg value4_reg)
                                                               (set! handler_reg handler)
@@ -2744,25 +2707,9 @@
                                                               (set! tokens_reg value3_reg)
                                                               (set! msg_reg "tokens left over")
                                                               (set! pc read-error))))
-                                                      (if (eq? (car temp_1) '<cont4-13>)
-                                                          (let ((handler 'undefined) (k2 'undefined))
-                                                            (set! k2 (list-ref temp_1 2))
-                                                            (set! handler (list-ref temp_1 1))
-                                                            (if (token-type? (first value3_reg) 'end-marker)
-                                                                (begin
-                                                                  (set! value2_reg value4_reg)
-                                                                  (set! k_reg k2)
-                                                                  (set! pc apply-cont2))
-                                                                (begin
-                                                                  (set! fail_reg value4_reg)
-                                                                  (set! handler_reg handler)
-                                                                  (set! src_reg 'stdin)
-                                                                  (set! tokens_reg value3_reg)
-                                                                  (set! msg_reg "tokens left over")
-                                                                  (set! pc read-error))))
-                                                          (error 'apply-cont4
-                                                            "bad continuation4: ~a"
-                                                            k_reg)))))))))))))))))
+                                                      (error 'apply-cont4
+                                                        "bad continuation4: ~a"
+                                                        k_reg))))))))))))))))
 
 (define make-fail
   (lambda args (return* (cons 'fail-continuation args))))
@@ -2863,7 +2810,7 @@
                             (set! handler (list-ref temp_1 3))
                             (set! env (list-ref temp_1 2))
                             (set! fexps (list-ref temp_1 1))
-                            (set! k_reg (make-cont2 '<cont2-67> exception_reg handler))
+                            (set! k_reg (make-cont2 '<cont2-66> exception_reg handler))
                             (set! handler_reg handler)
                             (set! env_reg env)
                             (set! exps_reg fexps)
@@ -2885,7 +2832,7 @@
                                   (set! new-env (extend env (list cvar) (list exception_reg)))
                                   (let ((catch-handler 'undefined))
                                     (set! catch-handler (try-finally-handler fexps env handler))
-                                    (set! k_reg (make-cont2 '<cont2-58> fexps env handler k))
+                                    (set! k_reg (make-cont2 '<cont2-57> fexps env handler k))
                                     (set! handler_reg catch-handler)
                                     (set! env_reg new-env)
                                     (set! exps_reg cexps)
@@ -2920,7 +2867,7 @@
                     (make-trace-depth-string trace-depth)
                     (cons name args_reg))
                   (set! trace-depth (+ trace-depth 1))
-                  (set! k_reg (make-cont2 '<cont2-68> trace-depth k2_reg))
+                  (set! k_reg (make-cont2 '<cont2-67> trace-depth k2_reg))
                   (set! env_reg (extend env formals args_reg))
                   (set! exps_reg bodies)
                   (set! pc eval-sequence))
@@ -2955,7 +2902,7 @@
                         (make-trace-depth-string trace-depth)
                         (cons name args_reg))
                       (set! trace-depth (+ trace-depth 1))
-                      (set! k_reg (make-cont2 '<cont2-68> trace-depth k2_reg))
+                      (set! k_reg (make-cont2 '<cont2-67> trace-depth k2_reg))
                       (set! env_reg new-env)
                       (set! exps_reg bodies)
                       (set! pc eval-sequence))
@@ -3028,7 +2975,7 @@
                                       (if (eq? (car temp_1) '<proc-9>)
                                           (if (list? (car args_reg))
                                               (begin
-                                                (set! k_reg (make-cont2 '<cont2-72> k2_reg))
+                                                (set! k_reg (make-cont2 '<cont2-71> k2_reg))
                                                 (set! env_reg env2_reg)
                                                 (set! exp_reg (car args_reg))
                                                 (set! pc m))
@@ -3093,13 +3040,13 @@
                                                               (if (eq? (car temp_1) '<proc-15>)
                                                                   (begin
                                                                     (set! k_reg
-                                                                      (make-cont2 '<cont2-73> env2_reg handler_reg k2_reg))
+                                                                      (make-cont2 '<cont2-72> env2_reg handler_reg k2_reg))
                                                                     (set! src_reg 'stdin)
                                                                     (set! input_reg (car args_reg))
                                                                     (set! pc scan-input))
                                                                   (if (eq? (car temp_1) '<proc-16>)
                                                                       (begin
-                                                                        (set! k_reg (make-cont2 '<cont2-74> handler_reg k2_reg))
+                                                                        (set! k_reg (make-cont2 '<cont2-73> handler_reg k2_reg))
                                                                         (set! src_reg 'stdin)
                                                                         (set! input_reg (car args_reg))
                                                                         (set! pc scan-input))
@@ -3647,7 +3594,7 @@
                                                                                                                                                                                                                                                                             (let ((module-name 'undefined))
                                                                                                                                                                                                                                                                               (set! module-name (cadr args_reg))
                                                                                                                                                                                                                                                                               (set! k_reg
-                                                                                                                                                                                                                                                                                (make-cont2 '<cont2-78> filename env2_reg handler_reg
+                                                                                                                                                                                                                                                                                (make-cont2 '<cont2-77> filename env2_reg handler_reg
                                                                                                                                                                                                                                                                                   k2_reg))
                                                                                                                                                                                                                                                                               (set! env_reg env2_reg)
                                                                                                                                                                                                                                                                               (set! var_reg module-name)
@@ -3986,7 +3933,7 @@
                 (set! vars (map^ car^ decls))
                 (set! procs (map^ cadr^ decls))
                 (set! bodies (cddr^ datum_reg))
-                (set! k2_reg (make-cont2 '<cont2-36> bodies k_reg))
+                (set! k2_reg (make-cont2 '<cont2-35> bodies k_reg))
                 (set! procs_reg procs)
                 (set! vars_reg vars)
                 (set! pc create-letrec-assignments^))
@@ -4233,7 +4180,7 @@
                                       (let ((exp 'undefined) (clauses 'undefined))
                                         (set! clauses (cddr^ datum_reg))
                                         (set! exp (cadr^ datum_reg))
-                                        (set! k2_reg (make-cont2 '<cont2-38> exp k_reg))
+                                        (set! k2_reg (make-cont2 '<cont2-37> exp k_reg))
                                         (set! clauses_reg clauses)
                                         (set! var_reg 'r)
                                         (set! pc case-clauses->cond-clauses^))
@@ -4241,7 +4188,7 @@
                                           (let ((exp 'undefined) (clauses 'undefined))
                                             (set! clauses (cddr^ datum_reg))
                                             (set! exp (cadr^ datum_reg))
-                                            (set! k2_reg (make-cont2 '<cont2-38> exp k_reg))
+                                            (set! k2_reg (make-cont2 '<cont2-37> exp k_reg))
                                             (set! clauses_reg clauses)
                                             (set! var_reg 'r)
                                             (set! pc record-case-clauses->cond-clauses^))
@@ -4263,7 +4210,7 @@
                                                     (let ((variants 'undefined))
                                                       (set! variants (cdddr^ datum_reg))
                                                       (set! k2_reg
-                                                        (make-cont2 '<cont2-41> type-tester-name k_reg))
+                                                        (make-cont2 '<cont2-40> type-tester-name k_reg))
                                                       (set! variants_reg variants)
                                                       (set! pc make-dd-variant-constructors^))))
                                               (if (eq? (car temp_1) '<macro-11>)
@@ -4278,7 +4225,7 @@
                                                     (set! exp (caddr^ datum_reg))
                                                     (set! clauses (cdddr^ datum_reg))
                                                     (set! k2_reg
-                                                      (make-cont2 '<cont2-44> exp type-name type-tester-name
+                                                      (make-cont2 '<cont2-43> exp type-name type-tester-name
                                                         k_reg))
                                                     (set! clauses_reg clauses)
                                                     (set! var_reg 'r)
@@ -4929,21 +4876,6 @@
 (define cons^
   (lambda (a b info) (return* (list pair-tag a b info))))
 
-(define annotate
-  (lambda (x info)
-    (if (not *reader-generates-annotated-sexps?*)
-        (return* x)
-        (if (annotated? x)
-            (return* x)
-            (if (pair? x)
-                (return*
-                  (list
-                    pair-tag
-                    (annotate (car x) 'none)
-                    (annotate (cdr x) 'none)
-                    info))
-                (return* (list atom-tag x info)))))))
-
 (define*
   annotate-cps
   (lambda ()
@@ -5279,13 +5211,6 @@
                           (set! pc read-error)))))
             (set! pc unexpected-token-error))))))
 
-(define*
-  aread-datum
-  (lambda ()
-    (set! k_reg
-      (make-cont2 '<cont2-3> src_reg handler_reg k_reg))
-    (set! pc scan-input)))
-
 (define make-binding
   (lambda (variable value)
     (return* (list variable "" value))))
@@ -5359,7 +5284,7 @@
 (define*
   lookup-value
   (lambda ()
-    (set! k_reg (make-cont2 '<cont2-4> k_reg))
+    (set! k_reg (make-cont2 '<cont2-3> k_reg))
     (set! pc lookup-binding)))
 
 (define vector-append
@@ -5448,7 +5373,7 @@
     (let ((var 'undefined))
       (set! var (car components_reg))
       (set! k_reg
-        (make-cont2 '<cont2-5> components_reg path_reg var
+        (make-cont2 '<cont2-4> components_reg path_reg var
           handler_reg k_reg))
       (set! var_reg var)
       (set! pc lookup-module-binding))))
@@ -5658,30 +5583,30 @@
                                   (if (syntactic-sugar?^ adatum_reg)
                                       (begin
                                         (set! k_reg
-                                          (make-cont2 '<cont2-31> env_reg handler_reg k_reg))
+                                          (make-cont2 '<cont2-30> env_reg handler_reg k_reg))
                                         (set! pc expand-once^))
                                       (if (if-then?^ adatum_reg)
                                           (begin
                                             (set! k_reg
-                                              (make-cont2 '<cont2-30> adatum_reg env_reg info handler_reg
+                                              (make-cont2 '<cont2-29> adatum_reg env_reg info handler_reg
                                                 k_reg))
                                             (set! adatum_reg (cadr^ adatum_reg))
                                             (set! pc aparse))
                                           (if (if-else?^ adatum_reg)
                                               (begin
                                                 (set! k_reg
-                                                  (make-cont2 '<cont2-28> adatum_reg env_reg info handler_reg
+                                                  (make-cont2 '<cont2-27> adatum_reg env_reg info handler_reg
                                                     k_reg))
                                                 (set! adatum_reg (cadr^ adatum_reg))
                                                 (set! pc aparse))
                                               (if (assignment?^ adatum_reg)
                                                   (begin
-                                                    (set! k_reg (make-cont2 '<cont2-25> adatum_reg info k_reg))
+                                                    (set! k_reg (make-cont2 '<cont2-24> adatum_reg info k_reg))
                                                     (set! adatum_reg (caddr^ adatum_reg))
                                                     (set! pc aparse))
                                                   (if (func?^ adatum_reg)
                                                       (begin
-                                                        (set! k_reg (make-cont2 '<cont2-24> info k_reg))
+                                                        (set! k_reg (make-cont2 '<cont2-23> info k_reg))
                                                         (set! adatum_reg (cadr^ adatum_reg))
                                                         (set! pc aparse))
                                                       (if (define?^ adatum_reg)
@@ -5695,13 +5620,13 @@
                                                                 (set! pc apply-macro))
                                                               (if (= (length^ adatum_reg) 3)
                                                                   (begin
-                                                                    (set! k_reg (make-cont2 '<cont2-23> adatum_reg info k_reg))
+                                                                    (set! k_reg (make-cont2 '<cont2-22> adatum_reg info k_reg))
                                                                     (set! adatum_reg (caddr^ adatum_reg))
                                                                     (set! pc aparse))
                                                                   (if (and (= (length^ adatum_reg) 4)
                                                                            (string?^ (caddr^ adatum_reg)))
                                                                       (begin
-                                                                        (set! k_reg (make-cont2 '<cont2-22> adatum_reg info k_reg))
+                                                                        (set! k_reg (make-cont2 '<cont2-21> adatum_reg info k_reg))
                                                                         (set! adatum_reg (cadddr^ adatum_reg))
                                                                         (set! pc aparse))
                                                                       (begin
@@ -5718,13 +5643,13 @@
                                                                     (set! pc apply-macro))
                                                                   (if (= (length^ adatum_reg) 3)
                                                                       (begin
-                                                                        (set! k_reg (make-cont2 '<cont2-21> adatum_reg info k_reg))
+                                                                        (set! k_reg (make-cont2 '<cont2-20> adatum_reg info k_reg))
                                                                         (set! adatum_reg (caddr^ adatum_reg))
                                                                         (set! pc aparse))
                                                                       (if (and (= (length^ adatum_reg) 4)
                                                                                (string?^ (caddr^ adatum_reg)))
                                                                           (begin
-                                                                            (set! k_reg (make-cont2 '<cont2-20> adatum_reg info k_reg))
+                                                                            (set! k_reg (make-cont2 '<cont2-19> adatum_reg info k_reg))
                                                                             (set! adatum_reg (cadddr^ adatum_reg))
                                                                             (set! pc aparse))
                                                                           (begin
@@ -5741,7 +5666,7 @@
                                                                   (if (begin?^ adatum_reg)
                                                                       (begin
                                                                         (set! k_reg
-                                                                          (make-cont2 '<cont2-19> adatum_reg info handler_reg k_reg))
+                                                                          (make-cont2 '<cont2-18> adatum_reg info handler_reg k_reg))
                                                                         (set! adatum-list_reg (cdr^ adatum_reg))
                                                                         (set! pc aparse-all))
                                                                       (if (lambda?^ adatum_reg)
@@ -5767,7 +5692,7 @@
                                                                                                (catch?^ (caddr^ adatum_reg)))
                                                                                           (begin
                                                                                             (set! k_reg
-                                                                                              (make-cont2 '<cont2-16> adatum_reg env_reg info handler_reg
+                                                                                              (make-cont2 '<cont2-15> adatum_reg env_reg info handler_reg
                                                                                                 k_reg))
                                                                                             (set! adatum_reg (try-body^ adatum_reg))
                                                                                             (set! pc aparse))
@@ -5775,7 +5700,7 @@
                                                                                                    (finally?^ (caddr^ adatum_reg)))
                                                                                               (begin
                                                                                                 (set! k_reg
-                                                                                                  (make-cont2 '<cont2-14> adatum_reg env_reg info handler_reg
+                                                                                                  (make-cont2 '<cont2-13> adatum_reg env_reg info handler_reg
                                                                                                     k_reg))
                                                                                                 (set! adatum_reg (try-body^ adatum_reg))
                                                                                                 (set! pc aparse))
@@ -5784,7 +5709,7 @@
                                                                                                        (finally?^ (cadddr^ adatum_reg)))
                                                                                                   (begin
                                                                                                     (set! k_reg
-                                                                                                      (make-cont2 '<cont2-12> adatum_reg env_reg info handler_reg
+                                                                                                      (make-cont2 '<cont2-11> adatum_reg env_reg info handler_reg
                                                                                                         k_reg))
                                                                                                     (set! adatum_reg (try-body^ adatum_reg))
                                                                                                     (set! pc aparse))
@@ -5793,18 +5718,18 @@
                                                                                                     (set! pc aparse-error))))))
                                                                                   (if (raise?^ adatum_reg)
                                                                                       (begin
-                                                                                        (set! k_reg (make-cont2 '<cont2-9> info k_reg))
+                                                                                        (set! k_reg (make-cont2 '<cont2-8> info k_reg))
                                                                                         (set! adatum_reg (cadr^ adatum_reg))
                                                                                         (set! pc aparse))
                                                                                       (if (choose?^ adatum_reg)
                                                                                           (begin
-                                                                                            (set! k_reg (make-cont2 '<cont2-8> info k_reg))
+                                                                                            (set! k_reg (make-cont2 '<cont2-7> info k_reg))
                                                                                             (set! adatum-list_reg (cdr^ adatum_reg))
                                                                                             (set! pc aparse-all))
                                                                                           (if (application?^ adatum_reg)
                                                                                               (begin
                                                                                                 (set! k_reg
-                                                                                                  (make-cont2 '<cont2-7> adatum_reg env_reg info handler_reg
+                                                                                                  (make-cont2 '<cont2-6> adatum_reg env_reg info handler_reg
                                                                                                     k_reg))
                                                                                                 (set! adatum_reg (car^ adatum_reg))
                                                                                                 (set! pc aparse))
@@ -5822,7 +5747,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 '<cont2-33> adatum-list_reg env_reg handler_reg
+            (make-cont2 '<cont2-32> adatum-list_reg env_reg handler_reg
               k_reg))
           (set! adatum_reg (car^ adatum-list_reg))
           (set! pc aparse)))))
@@ -5847,7 +5772,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont4 '<cont4-9> src_reg env_reg handler_reg k_reg))
+            (make-cont4 '<cont4-8> src_reg env_reg handler_reg k_reg))
           (set! pc read-sexp)))))
 
 (define*
@@ -5861,7 +5786,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 '<cont2-37> procs_reg vars_reg k2_reg))
+            (make-cont2 '<cont2-36> procs_reg vars_reg k2_reg))
           (set! procs_reg (cdr^ procs_reg))
           (set! vars_reg (cdr^ vars_reg))
           (set! pc create-letrec-assignments^)))))
@@ -5918,7 +5843,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 '<cont2-39> clauses_reg var_reg k2_reg))
+            (make-cont2 '<cont2-38> clauses_reg var_reg k2_reg))
           (set! clauses_reg (cdr^ clauses_reg))
           (set! pc case-clauses->cond-clauses^)))))
 
@@ -5933,7 +5858,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 '<cont2-40> clauses_reg var_reg k2_reg))
+            (make-cont2 '<cont2-39> clauses_reg var_reg k2_reg))
           (set! clauses_reg (cdr^ clauses_reg))
           (set! pc record-case-clauses->cond-clauses^)))))
 
@@ -5947,7 +5872,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
-          (set! k2_reg (make-cont2 '<cont2-43> variants_reg k2_reg))
+          (set! k2_reg (make-cont2 '<cont2-42> variants_reg k2_reg))
           (set! variant_reg (car^ variants_reg))
           (set! pc make-dd-variant-constructor^)))))
 
@@ -6044,7 +5969,7 @@
     (let ((macro-keyword 'undefined))
       (set! macro-keyword (untag-atom^ (car^ adatum_reg)))
       (set! k_reg
-        (make-cont2 '<cont2-45> adatum_reg macro-keyword handler_reg
+        (make-cont2 '<cont2-44> adatum_reg macro-keyword handler_reg
           k_reg))
       (set! var-info_reg 'none)
       (set! env_reg macro-env)
@@ -6446,7 +6371,7 @@
 
 (define execute-next-expression
   (lambda (src)
-    (set! k_reg (make-cont4 '<cont4-10>))
+    (set! k_reg (make-cont4 '<cont4-9>))
     (set! fail_reg *last-fail*)
     (set! handler_reg REP-handler)
     (set! src_reg src)
@@ -6500,7 +6425,7 @@
 (define try-parse
   (lambda (input)
     (set! load-stack '())
-    (set! k_reg (make-cont2 '<cont2-50>))
+    (set! k_reg (make-cont2 '<cont2-49>))
     (set! fail_reg *last-fail*)
     (set! handler_reg try-parse-handler)
     (set! src_reg 'stdin)
@@ -6518,14 +6443,14 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont4 '<cont4-11> src_reg env_reg handler_reg k_reg))
+            (make-cont4 '<cont4-10> src_reg env_reg handler_reg k_reg))
           (set! pc read-sexp)))))
 
 (define make-debugging-k
   (lambda (exp k)
     (if (not *tracing-on?*)
         (return* k)
-        (return* (make-cont2 '<cont2-53> exp k)))))
+        (return* (make-cont2 '<cont2-52> exp k)))))
 
 (define highlight-expression
   (lambda (exp)
@@ -6580,7 +6505,7 @@
                   (if (eq? (car exp_reg) 'func-aexp)
                       (let ((exp 'undefined))
                         (set! exp (list-ref exp_reg 1))
-                        (set! k_reg (make-cont2 '<cont2-66> k))
+                        (set! k_reg (make-cont2 '<cont2-65> k))
                         (set! exp_reg exp)
                         (set! pc m))
                       (if (eq? (car exp_reg) 'if-aexp)
@@ -6591,7 +6516,7 @@
                             (set! then-exp (list-ref exp_reg 2))
                             (set! test-exp (list-ref exp_reg 1))
                             (set! k_reg
-                              (make-cont2 '<cont2-65> else-exp then-exp env_reg
+                              (make-cont2 '<cont2-64> else-exp then-exp env_reg
                                 handler_reg k))
                             (set! exp_reg test-exp)
                             (set! pc m))
@@ -6603,7 +6528,7 @@
                                 (set! rhs-exp (list-ref exp_reg 2))
                                 (set! var (list-ref exp_reg 1))
                                 (set! k_reg
-                                  (make-cont2 '<cont2-64> var var-info env_reg handler_reg k))
+                                  (make-cont2 '<cont2-63> var var-info env_reg handler_reg k))
                                 (set! exp_reg rhs-exp)
                                 (set! pc m))
                               (if (eq? (car exp_reg) 'define-aexp)
@@ -6614,7 +6539,7 @@
                                     (set! docstring (list-ref exp_reg 2))
                                     (set! var (list-ref exp_reg 1))
                                     (set! k_reg
-                                      (make-cont2 '<cont2-62> docstring var env_reg handler_reg
+                                      (make-cont2 '<cont2-61> docstring var env_reg handler_reg
                                         k))
                                     (set! exp_reg rhs-exp)
                                     (set! pc m))
@@ -6625,7 +6550,7 @@
                                         (set! rhs-exp (list-ref exp_reg 3))
                                         (set! docstring (list-ref exp_reg 2))
                                         (set! var (list-ref exp_reg 1))
-                                        (set! k_reg (make-cont2 '<cont2-60> docstring var k))
+                                        (set! k_reg (make-cont2 '<cont2-59> docstring var k))
                                         (set! exp_reg rhs-exp)
                                         (set! pc m))
                                       (if (eq? (car exp_reg) 'define-syntax-aexp)
@@ -6635,7 +6560,7 @@
                                             (set! aclauses (list-ref exp_reg 3))
                                             (set! clauses (list-ref exp_reg 2))
                                             (set! name (list-ref exp_reg 1))
-                                            (set! k_reg (make-cont2 '<cont2-59> aclauses clauses k))
+                                            (set! k_reg (make-cont2 '<cont2-58> aclauses clauses k))
                                             (set! env_reg macro-env)
                                             (set! var_reg name)
                                             (set! pc lookup-binding-in-first-frame))
@@ -6712,7 +6637,7 @@
                                                                           (set! new-handler
                                                                             (try-finally-handler fexps env_reg handler_reg))
                                                                           (set! k_reg
-                                                                            (make-cont2 '<cont2-58> fexps env_reg handler_reg k))
+                                                                            (make-cont2 '<cont2-57> fexps env_reg handler_reg k))
                                                                           (set! handler_reg new-handler)
                                                                           (set! exp_reg body)
                                                                           (set! pc m)))
@@ -6730,14 +6655,14 @@
                                                                                 (try-catch-finally-handler cvar cexps fexps env_reg
                                                                                   handler_reg k))
                                                                               (set! k_reg
-                                                                                (make-cont2 '<cont2-58> fexps env_reg handler_reg k))
+                                                                                (make-cont2 '<cont2-57> fexps env_reg handler_reg k))
                                                                               (set! handler_reg new-handler)
                                                                               (set! exp_reg body)
                                                                               (set! pc m)))
                                                                           (if (eq? (car exp_reg) 'raise-aexp)
                                                                               (let ((exp 'undefined))
                                                                                 (set! exp (list-ref exp_reg 1))
-                                                                                (set! k_reg (make-cont2 '<cont2-56> handler_reg))
+                                                                                (set! k_reg (make-cont2 '<cont2-55> handler_reg))
                                                                                 (set! exp_reg exp)
                                                                                 (set! pc m))
                                                                               (if (eq? (car exp_reg) 'choose-aexp)
@@ -6754,7 +6679,7 @@
                                                                                         (set! operands (list-ref exp_reg 2))
                                                                                         (set! operator (list-ref exp_reg 1))
                                                                                         (set! k_reg
-                                                                                          (make-cont2 '<cont2-55> operator env_reg info handler_reg
+                                                                                          (make-cont2 '<cont2-54> operator env_reg info handler_reg
                                                                                             k))
                                                                                         (set! exps_reg operands)
                                                                                         (set! pc m*))
@@ -6872,7 +6797,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 '<cont2-69> exps_reg env_reg handler_reg k_reg))
+            (make-cont2 '<cont2-68> exps_reg env_reg handler_reg k_reg))
           (set! exp_reg (car exps_reg))
           (set! pc m)))))
 
@@ -6883,7 +6808,7 @@
         (begin (set! exp_reg (car exps_reg)) (set! pc m))
         (begin
           (set! k_reg
-            (make-cont2 '<cont2-70> exps_reg env_reg handler_reg k_reg))
+            (make-cont2 '<cont2-69> exps_reg env_reg handler_reg k_reg))
           (set! exp_reg (car exps_reg))
           (set! pc m)))))
 
@@ -6980,7 +6905,7 @@
                 (begin
                   (set! load-stack (cons filename_reg load-stack))
                   (set! k_reg
-                    (make-cont2 '<cont2-76> filename_reg env_reg handler_reg
+                    (make-cont2 '<cont2-75> filename_reg env_reg handler_reg
                       k_reg))
                   (set! src_reg filename_reg)
                   (set! input_reg (read-content filename_reg))
@@ -6996,7 +6921,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 '<cont2-77> filenames_reg env_reg info_reg
+            (make-cont2 '<cont2-76> filenames_reg env_reg info_reg
               handler_reg k_reg))
           (set! filename_reg (car filenames_reg))
           (set! pc load-file)))))
@@ -7103,7 +7028,7 @@
     (let ((sym 'undefined))
       (set! sym (car args_reg))
       (set! k_reg
-        (make-cont2 '<cont2-79> args_reg sym info_reg handler_reg
+        (make-cont2 '<cont2-78> args_reg sym info_reg handler_reg
           k_reg))
       (set! var-info_reg 'none)
       (set! variable_reg sym)
@@ -7119,7 +7044,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
-          (set! k2_reg (make-cont2 '<cont2-80> ls1_reg k2_reg))
+          (set! k2_reg (make-cont2 '<cont2-79> ls1_reg k2_reg))
           (set! ls1_reg (cdr ls1_reg))
           (set! pc append2)))))
 
@@ -7146,7 +7071,7 @@
                       (car lists_reg)))
                   (set! pc runtime-error))
                 (begin
-                  (set! k2_reg (make-cont2 '<cont2-81> lists_reg k2_reg))
+                  (set! k2_reg (make-cont2 '<cont2-80> lists_reg k2_reg))
                   (set! lists_reg (cdr lists_reg))
                   (set! pc append-all)))))))
 
@@ -7257,7 +7182,7 @@
             (set! pc apply-cont2))
           (begin
             (set! k2_reg
-              (make-cont2 '<cont2-82> iterator_reg proc_reg env_reg
+              (make-cont2 '<cont2-81> iterator_reg proc_reg env_reg
                 handler_reg k_reg))
             (set! info_reg 'none)
             (set! env2_reg env_reg)
@@ -7284,7 +7209,7 @@
             (set! pc apply-cont2))
           (begin
             (set! k2_reg
-              (make-cont2 '<cont2-83> iterator_reg proc_reg env_reg
+              (make-cont2 '<cont2-82> iterator_reg proc_reg env_reg
                 handler_reg k_reg))
             (set! info_reg 'none)
             (set! env2_reg env_reg)
@@ -7302,12 +7227,12 @@
         (if (dlr-exp? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 '<cont2-85> list1_reg proc_reg k_reg))
+                (make-cont2 '<cont2-84> list1_reg proc_reg k_reg))
               (set! list1_reg (cdr list1_reg))
               (set! pc map1))
             (begin
               (set! k2_reg
-                (make-cont2 '<cont2-84> list1_reg proc_reg env_reg
+                (make-cont2 '<cont2-83> list1_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -7325,13 +7250,13 @@
         (if (dlr-exp? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 '<cont2-87> list1_reg list2_reg proc_reg k_reg))
+                (make-cont2 '<cont2-86> list1_reg list2_reg proc_reg k_reg))
               (set! list2_reg (cdr list2_reg))
               (set! list1_reg (cdr list1_reg))
               (set! pc map2))
             (begin
               (set! k2_reg
-                (make-cont2 '<cont2-86> list1_reg list2_reg proc_reg env_reg
+                (make-cont2 '<cont2-85> list1_reg list2_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -7349,12 +7274,12 @@
         (if (dlr-exp? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 '<cont2-89> lists_reg proc_reg k_reg))
+                (make-cont2 '<cont2-88> lists_reg proc_reg k_reg))
               (set! lists_reg (map cdr lists_reg))
               (set! pc mapN))
             (begin
               (set! k2_reg
-                (make-cont2 '<cont2-88> lists_reg proc_reg env_reg
+                (make-cont2 '<cont2-87> lists_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -7382,7 +7307,7 @@
                     (set! pc for-each-primitive))
                   (begin
                     (set! k2_reg
-                      (make-cont2 '<cont2-90> arg-list proc_reg env_reg
+                      (make-cont2 '<cont2-89> arg-list proc_reg env_reg
                         handler_reg k_reg))
                     (set! info_reg 'none)
                     (set! env2_reg env_reg)
@@ -7566,7 +7491,7 @@
             (if (pair? pattern_reg)
                 (begin
                   (set! k2_reg
-                    (make-cont2 '<cont2-94> ap_reg pattern_reg s_reg k2_reg))
+                    (make-cont2 '<cont2-93> ap_reg pattern_reg s_reg k2_reg))
                   (set! ap_reg (car^ ap_reg))
                   (set! pattern_reg (car pattern_reg))
                   (set! pc instantiate^))
@@ -7608,7 +7533,7 @@
                   (let ((s1 'undefined) (s2 'undefined))
                     (set! s2 (list-ref temp_1 2))
                     (set! s1 (list-ref temp_1 1))
-                    (set! k2_reg (make-cont2 '<cont2-95> s2 k2_reg))
+                    (set! k2_reg (make-cont2 '<cont2-94> s2 k2_reg))
                     (set! s_reg s1)
                     (set! pc apply-sub^))
                   (error 'apply-sub^ "bad substitution: ~a" s_reg)))))))
@@ -7637,6 +7562,14 @@
 
 (define pair-tag (box 'pair))
 
+(define-native
+  map^
+  (lambda (f^ asexp)
+    (if (null?^ asexp)
+        (return* (list atom-tag '() 'none))
+        (return*
+          (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
+
 (define *reader-generates-annotated-sexps?* #t)
 
 (define init-cont (make-cont '<cont-11>))
@@ -7651,11 +7584,39 @@
 
 (define init-fail (make-fail '<fail-1>))
 
+(define-native
+  search-frame
+  (lambda (frame variable)
+    (if (empty-frame? frame)
+        (return* #f)
+        (return* (search-frame-position frame variable 0)))))
+
+(define-native
+  search-frame-position
+  (lambda (frame variable position)
+    (if (>= position (vector-length frame))
+        (return* #f)
+        (if (eq? (binding-variable (vector-ref frame position))
+                 variable)
+            (return* (vector-ref frame position))
+            (return*
+              (search-frame-position frame variable (+ 1 position)))))))
+
 (define *use-lexical-address* #t)
 
 (define dlr-apply apply)
 
 (define printf-prim printf)
+
+(define-native
+  tagged-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (return*
+        (and (list?^ asexp)
+             (op (length^ asexp) len)
+             (symbol?^ (car^ asexp))
+             (eq?^ (car^ asexp) keyword))))))
 
 (define quote?^ (tagged-list^ 'quote = 2))
 
@@ -7719,13 +7680,29 @@
 
 (define cases-transformer^ (make-macro '<macro-11>))
 
+(define-native
+  dd1
+  "(define-datatype thing thing?\n     (thing0)\n     (thing1\n       (f1 thing1-field1?))\n     (thing2\n       (f1 thing2-field1?)\n       (f2 thing2-field2?))\n     (thing3\n       (f1 thing3-field1?)\n       (f2 (list-of thing3-field2?))\n       (f3 thing3-field3?)))")
+
+(define-native
+  cases1
+  "(cases thing (cons x y)\n     (thing0 () b1)\n     (thing1 (f1) b1 b2 b3)\n     (thing2 (f1 f2 . f3) b1 b2 b3)\n     (thing3 args b1 b2 b3)\n     (else d1 d2 d3))")
+
+(define-native
+  dd2
+  "(define-datatype expression expression?\n     (var-exp\n       (id symbol?))\n     (if-exp\n       (test-exp expression?)\n       (then-exp expression?)\n       (else-exp expression?))\n     (lambda-exp\n       (formals (list-of symbol?))\n       (bodies (list-of expression?)))\n     (app-exp\n       (operator expression?)\n       (operands (list-of expression?))))")
+
+(define-native
+  cases2
+  "(cases expression exp\n     (var-exp (id info)\n       (lookup-value id env info handler fail k))\n     (if-exp (test-exp then-exp else-exp info)\n       (m test-exp env handler fail\n\t  (lambda (bool fail)\n\t    (if bool\n\t      (m then-exp env handler fail k)\n\t      (m else-exp env handler fail k)))))\n      (lambda-exp (formals bodies info)\n\t(k (closure formals bodies env) fail))\n      (app-exp (operator operands info)\n\t(m* operands env handler fail\n\t  (lambda (args fail)\n\t    (m operator env handler fail\n\t      (lambda (proc fail)\n\t\t(proc args env info handler fail k))))))\n      (else (error 'm \"bad abstract syntax: ~s\" exp)))")
+
 (define macro-env (make-macro-env^))
 
 (define dlr-apply apply)
 
 (define printf-prim printf)
 
-(define REP-k (make-cont2 '<cont2-47>))
+(define REP-k (make-cont2 '<cont2-46>))
 
 (define REP-handler (make-handler2 '<handler2-2>))
 
@@ -7740,6 +7717,29 @@
 (define *tracing-on?* #f)
 
 (define _closure-depth 0)
+
+(define-native
+  make-safe-continuation
+  (lambda (k)
+    (if (not (pair? k))
+        (return* '<???>)
+        (if (eq? (car k) 'fail-continuation)
+            (return* '<fail>)
+            (if (memq (car k) (list 'handler 'handler2))
+                (return* '<handler>)
+                (if (memq
+                      (car k)
+                      (list
+                        'continuation
+                        'continuation2
+                        'continuation3
+                        'continuation4))
+                    (return*
+                      (cons
+                        (cadr k)
+                        (map make-safe-continuation
+                             (filter continuation-object? (cddr k)))))
+                    (return* '<???>)))))))
 
 (define void-prim (make-proc '<proc-5>))
 
@@ -7908,6 +7908,10 @@
 (define printf-primitive (make-proc '<proc-84>))
 
 (define vector-prim (make-proc '<proc-85>))
+
+(define-native
+  vector_native
+  (lambda args (return* (apply vector args))))
 
 (define vector-set!-prim (make-proc '<proc-86>))
 

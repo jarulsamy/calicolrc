@@ -53,6 +53,22 @@
 	    s
 	    (print-sub s)))))))
 
+(define print-sub
+  (lambda (s)
+    (record-case (cdr s)
+      (empty () (void))
+      (unit (new-var new-pattern new-apattern)
+	(display new-var)
+	(display " = ")
+	(newline)
+	(pretty-print new-pattern)
+	(pretty-print new-apattern)
+	(newline))
+      (composite (s1 s2)
+	(print-sub s1)
+	(print-sub s2))
+      (else (error 'print-sub "bad substitution: ~s" s)))))
+
 ;;-----------------------------------------------------------------------------------------------
 ;; annotated version
 
@@ -121,22 +137,6 @@
 	  (lambda-cont2 (pattern apattern)
 	    (instantiate^ pattern s2 apattern k2))))
       (else (error 'apply-sub^ "bad substitution: ~a" s)))))
-
-(define print-sub
-  (lambda (s)
-    (record-case (cdr s)
-      (empty () (void))
-      (unit (new-var new-pattern new-apattern)
-	(display new-var)
-	(display " = ")
-	(newline)
-	(pretty-print new-pattern)
-	(pretty-print new-apattern)
-	(newline))
-      (composite (s1 s2)
-	(print-sub s1)
-	(print-sub s2))
-      (else (error 'print-sub "bad substitution: ~s" s)))))
 
 ;;-----------------------------------------------------------------------------------------------
 ;; unannotated version

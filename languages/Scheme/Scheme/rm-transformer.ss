@@ -9,6 +9,7 @@
 ;; - code in first-order tail form
 ;; - define* functions will be converted to 0 arguments
 ;; - no internal define/define*'s
+;; - define-native functions will be included as-is
 
 (case-sensitive #t)
 
@@ -160,11 +161,11 @@
 		     ((eopl-define-datatype? exp)
 		      (set! need-eopl-support? #t)
 		      (set! eopl-defs (cons exp eopl-defs)))
-		     ((skip-definition? exp)
+		     ((ignore-definition? exp)
 		      (printf "skipping ~a definition\n" (cadr exp)))
 		     ((or (define? exp) (define*? exp))
 		      (set! defs (cons (preprocess-define exp) defs)))
-		     ((define+? exp)
+		     ((or (define+? exp) (define-native? exp))
 		      (set! defs (cons exp defs)))
 		     ;; skip top level calls to load
 		     (else 'skip))
@@ -362,7 +363,7 @@
 		(if (null? (cdr new-exps))
 		  (car new-exps)
 		  `(begin ,@new-exps))))
-	    ((define define*) (name body)
+	    ((define define* define-native) (name body)
 	      `(,(car code) ,name ,(transform body)))
 	    (define+ (name body)
 	      (let* ((formals (cadr body))
@@ -690,7 +691,7 @@
 	      `(set! ,var ,(returnize rhs-exp))
 	      code))
 	  (begin exps (returnize-last code))
-	  ((define define*) (name body)
+	  ((define define* define-native) (name body)
 	   (if (lambda? body)
 	     `(,(car code) ,name ,(returnize body))
 	     `(,(car code) ,name ,body)))

@@ -3188,6 +3188,38 @@
        (runtime-error "sqrt called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply sqrt args) fail)))))
 
+;; odd?
+;;(define odd?-prim
+;;  (lambda-proc (args env2 info handler fail k2)
+;;    (cond
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to odd?" info handler fail))
+;;      (else (k2 (odd? (car args)) fail)))))
+
+;; even?
+;;(define even?-prim
+;;  (lambda-proc (args env2 info handler fail k2)
+;;    (cond
+;;      ((not (length-one? args))
+;;       (runtime-error "incorrect number of arguments to even?" info handler fail))
+;;      (else (k2 (even? (car args)) fail)))))
+
+;; quotient
+;;(define quotient-prim
+;;  (lambda-proc (args env2 info handler fail k2)
+;;    (cond
+;;      ((not (length-two? args))
+;;       (runtime-error "incorrect number of arguments to quotient" info handler fail))
+;;      (else (k2 (apply quotient args) fail)))))
+
+;; remainder
+;;(define remainder-prim
+;;  (lambda-proc (args env2 info handler fail k2)
+;;    (cond
+;;      ((not (length-two? args))
+;;       (runtime-error "incorrect number of arguments to remainder" info handler fail))
+;;      (else (k2 (apply remainder args) fail)))))
+
 ;; print
 (define print-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4045,6 +4077,10 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (apply vector_native args) fail)))
 
+(define-native vector_native
+  (lambda args
+    (apply vector args)))
+
 ;; vector-set!
 (define vector-set!-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4158,6 +4194,10 @@
 	    (list 'set-car! set-car!-prim)
 	    (list 'set-cdr! set-cdr!-prim)
 	    (list 'sqrt sqrt-prim)
+;;	    (list 'odd? odd?-prim)
+;;	    (list 'even? even?-prim)
+;;	    (list 'quotient quotient-prim)
+;;	    (list 'remainder remainder-prim)
 	    (list 'string string-prim)
 	    (list 'string-length string-length-prim)
 	    (list 'string-ref string-ref-prim)
@@ -4260,6 +4300,22 @@
 	    s
 	    (print-sub s)))))))
 
+(define print-sub
+  (lambda (s)
+    (record-case (cdr s)
+      (empty () (void))
+      (unit (new-var new-pattern new-apattern)
+	(display new-var)
+	(display " = ")
+	(newline)
+	(pretty-print new-pattern)
+	(pretty-print new-apattern)
+	(newline))
+      (composite (s1 s2)
+	(print-sub s1)
+	(print-sub s2))
+      (else (error 'print-sub "bad substitution: ~s" s)))))
+
 ;;-----------------------------------------------------------------------------------------------
 ;; annotated version
 
@@ -4328,22 +4384,6 @@
 	  (lambda-cont2 (pattern apattern)
 	    (instantiate^ pattern s2 apattern k2))))
       (else (error 'apply-sub^ "bad substitution: ~a" s)))))
-
-(define print-sub
-  (lambda (s)
-    (record-case (cdr s)
-      (empty () (void))
-      (unit (new-var new-pattern new-apattern)
-	(display new-var)
-	(display " = ")
-	(newline)
-	(pretty-print new-pattern)
-	(pretty-print new-apattern)
-	(newline))
-      (composite (s1 s2)
-	(print-sub s1)
-	(print-sub s2))
-      (else (error 'print-sub "bad substitution: ~s" s)))))
 
 ;;-----------------------------------------------------------------------------------------------
 ;; unannotated version
