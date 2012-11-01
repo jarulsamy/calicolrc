@@ -2669,9 +2669,13 @@ public class Scheme {
 	if (pair_q(obj)) {
 	  obj = car(obj);
 	  if (obj is int)
-		return Math.Sqrt((int)obj);
+	      return Math.Sqrt((int)obj);
+	  else if (obj is float || obj is double)
+	      return Math.Sqrt((double)obj);
+	  else if (obj is Rational || obj is BigInteger)
+	      return Math.Sqrt((double)ToDouble(obj));
 	  else
-		throw new Exception(String.Format("can't take sqrt of this type of number: {0}", obj));
+	      throw new Exception(String.Format("can't take sqrt of this type of number: {0}", obj));
 	}
 	throw new Exception("need to apply procedure to list");
   }
@@ -2680,9 +2684,15 @@ public class Scheme {
 	if (pair_q(obj)) {
 	  obj = car(obj);
 	  if (obj is int)
-		return Math.Abs((int)obj);
+	      return Math.Abs((int)obj);
+	  else if (obj is float || obj is double)
+	      return Math.Abs((double)obj);
+	  else if (obj is BigInteger)
+	      return ((BigInteger)obj).Abs();
+	  else if (obj is Rational)
+	      return Math.Abs((double)ToDouble(obj));
 	  else
-		throw new Exception(String.Format("can't take absolute value of this type of number: {0}", obj));
+	      throw new Exception(String.Format("can't take absolute value of this type of number: {0}", obj));
 	}
 	throw new Exception("need to apply procedure to list");
   }
