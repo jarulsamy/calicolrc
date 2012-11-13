@@ -1674,6 +1674,11 @@ public class Scheme {
   }
 
   public static string repr(object obj) {
+      Dictionary<int,bool> ids = new Dictionary<int,bool>();
+      return repr(obj, ids);
+  }
+
+    public static string repr(object obj, Dictionary<int,bool> ids) {
 	if (obj == null) {
 	  return "<void>"; // FIXME: should give void when forced
 	} else if (obj is System.Boolean) {
@@ -1710,7 +1715,6 @@ public class Scheme {
 	      //System.Console.WriteLine("Here 4");
 	      string retval = "";
 	      object current = (Cons)obj;
-	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
@@ -1722,14 +1726,14 @@ public class Scheme {
 		      retval += " ...";
 		      current = null;
 		  } else {
-		      retval += repr(car_current);
+		      retval += repr(car_current, ids);
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
 			  retval += " ...";
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + repr(current); // ...
+			      retval += " . " + repr(current, ids); // ...
 			  }
 		      }
 		  }
