@@ -133,7 +133,11 @@ namespace Calico {
 
         public override void Setup(string path) {
             if (manager != null) {
-                manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
+                try {
+                    manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
+                } catch {
+				  Console.Error.WriteLine("WARNING: Please restart Calico to use this language");
+                }
             } else {
                 scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
                 scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
