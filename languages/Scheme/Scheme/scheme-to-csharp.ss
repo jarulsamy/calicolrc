@@ -133,6 +133,7 @@
      ((eq? name '-) 'Subtract)
      ((eq? name '*) 'Multiply)
      ((eq? name '/) 'Divide)
+     ((eq? name '%) 'Modulo)
      ((eq? name 'string) 'make_string)
      ((eq? name 'operator) 'rator)
 ;;     ((eq? name '1st) 'First)

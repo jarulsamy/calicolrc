@@ -5803,7 +5803,7 @@ public class PJScheme:Scheme
 	       if (true_q
 		   (PJScheme.
 		    EqualSign ((object) 0,
-			       (object) PJScheme.caddr ((object) args_reg))))
+			       (object) PJScheme.cadr ((object) args_reg))))
 	      {
 		 msg_reg = "modulo by zero";
 		 pc = (Function) runtime_error;
@@ -5812,7 +5812,7 @@ public class PJScheme:Scheme
 	    else
 	      {
 		 value2_reg = fail_reg;
-		 value1_reg = apply (modulo_proc, (object) args_reg);
+		 value1_reg = apply (Modulo_proc, (object) args_reg);
 		 k_reg = k2_reg;
 		 pc = (Function) apply_cont2;
 
@@ -12984,6 +12984,8 @@ public class PJScheme:Scheme
 						   (object) minus_prim),
 			   (object) PJScheme.list ((object) symbol ("/"),
 						   (object) divide_prim),
+			   (object) PJScheme.list ((object) symbol ("%"),
+						   (object) modulo_prim),
 			   (object) PJScheme.list ((object) symbol ("<"),
 						   (object) lt_prim),
 			   (object) PJScheme.list ((object) symbol ("<="),
@@ -13097,8 +13099,6 @@ public class PJScheme:Scheme
 						   (object) memq_prim),
 			   (object) PJScheme.list ((object) symbol ("memv"),
 						   (object) memv_prim),
-			   (object) PJScheme.list ((object) symbol ("modulo"),
-						   (object) modulo_prim),
 			   (object) PJScheme.
 			   list ((object) symbol ("newline"),
 				 (object) newline_prim),

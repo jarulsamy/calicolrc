@@ -3401,13 +3401,13 @@
                                                                                                                                                                                                                       (begin
                                                                                                                                                                                                                         (set! msg_reg "% called on non-numeric argument(s)")
                                                                                                                                                                                                                         (set! pc runtime-error))
-                                                                                                                                                                                                                      (if (= 0 (caddr args_reg))
+                                                                                                                                                                                                                      (if (= 0 (cadr args_reg))
                                                                                                                                                                                                                           (begin
                                                                                                                                                                                                                             (set! msg_reg "modulo by zero")
                                                                                                                                                                                                                             (set! pc runtime-error))
                                                                                                                                                                                                                           (begin
                                                                                                                                                                                                                             (set! value2_reg fail_reg)
-                                                                                                                                                                                                                            (set! value1_reg (apply modulo args_reg))
+                                                                                                                                                                                                                            (set! value1_reg (apply % args_reg))
                                                                                                                                                                                                                             (set! k_reg k2_reg)
                                                                                                                                                                                                                             (set! pc apply-cont2)))))
                                                                                                                                                                                                               (if (eq? (car temp_1) '<proc-51>)
@@ -7320,7 +7320,8 @@
     (let ((primitives 'undefined))
       (set! primitives
         (list (list '* times-prim) (list '+ plus-prim)
-         (list '- minus-prim) (list '/ divide-prim) (list '< lt-prim)
+         (list '- minus-prim) (list '/ divide-prim)
+         (list '% modulo-prim) (list '< lt-prim)
          (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
          (list '=? equal-sign-prim) (list '> gt-prim)
          (list '>= gt-or-eq-prim) (list 'abort abort-prim)
@@ -7349,9 +7350,8 @@
          (list 'list-ref list-ref-prim) (list 'load load-prim)
          (list 'make-vector make-vector-prim) (list 'map map-prim)
          (list 'member member-prim) (list 'memq memq-prim)
-         (list 'memv memv-prim) (list 'modulo modulo-prim)
-         (list 'newline newline-prim) (list 'not not-prim)
-         (list 'null? null?-prim)
+         (list 'memv memv-prim) (list 'newline newline-prim)
+         (list 'not not-prim) (list 'null? null?-prim)
          (list 'number->string number->string-prim)
          (list 'number? number?-prim) (list 'pair? pair?-prim)
          (list 'parse parse-prim)

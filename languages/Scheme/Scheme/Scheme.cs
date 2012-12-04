@@ -514,7 +514,7 @@ public class Scheme {
   public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
   public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
-  public static Proc modulo_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
+  public static Proc Modulo_proc = new Proc("%", (Procedure1) Modulo, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
@@ -1731,6 +1731,9 @@ public class Scheme {
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
 			  retval += " ...";
 			  current = null;
+		      } else if (pair_q(current) && car(current) == symbol("procedure")) { //FIXME: hack!
+			  retval += " . #<procedure>";
+			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
 			      retval += " . " + repr(current, ids); // ...
@@ -2136,10 +2139,6 @@ public class Scheme {
 	return retval;
   }
 
-    public static object modulo(object obj1, object obj2) {
-	return (ObjectType.Modulo(obj1, obj2));
-    }
-
   public static object Subtract(object obj) {
 	// For subtracting 1 or more numbers in list
 	object retval = car(obj);
@@ -2169,7 +2168,58 @@ public class Scheme {
 	}
 	return retval;
   }
-	
+
+    public static object Modulo(object obj) {
+	object obj1 = car(obj);
+	object obj2 = cadr(obj);
+	return Modulo(obj1, obj2);
+    }
+    
+    public static object Modulo(object obj1, object obj2) {
+	if (obj1 is Rational) {
+	  if (obj2 is Rational) {
+		return (((Rational)obj1) % ((Rational)obj2));
+	  } else if (obj2 is int) {
+		return (((Rational)obj1) % ((int)obj2));
+	  } else if (obj2 is double) {
+		return (((double)((Rational)obj1)) % ((double)obj2));
+	  }
+	} else if (obj2 is Rational) {
+	  if (obj1 is Rational) {
+		return (((Rational)obj1) % ((Rational)obj2));
+	  } else if (obj1 is int) {
+		return (((Rational)obj2) % ((int)obj1));
+	  } else if (obj1 is double) {
+		return (((double)((Rational)obj2)) % ((double)obj1));
+	  }
+	} else {
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+		try {
+		  return (ObjectType.Modulo(obj1, obj2));
+		} catch {
+		  // pass
+		}
+	  }
+	  BigInteger b1 = null;
+	  BigInteger b2 = null;
+	  if (obj1 is int) {
+		b1 = makeBigInteger((int) obj1);
+	  } else if (obj1 is BigInteger) {
+		b1 = (BigInteger)obj1;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+	  if (obj2 is int) {
+		b2 = makeBigInteger((int) obj2);
+	  } else if (obj2 is BigInteger) {
+		b2 = (BigInteger)obj2;
+	  } else
+		throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+	  return b1 % b2;
+	}
+	throw new Exception(String.Format("unable to add {0} and {1}", 
+			obj1.GetType().ToString(), obj2.GetType().ToString()));
+  }
+
   public static object Add(object obj1, object obj2) {
 	if (obj1 is Rational) {
 	  if (obj2 is Rational) {

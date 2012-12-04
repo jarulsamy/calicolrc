@@ -3541,9 +3541,9 @@
        (runtime-error "incorrect number of arguments to %" info handler fail))
       ((not (all-numeric? args))
        (runtime-error "% called on non-numeric argument(s)" info handler fail))
-      ((= 0 (caddr args))
+      ((= 0 (cadr args))
        (runtime-error "modulo by zero" info handler fail))
-      (else (k2 (apply modulo args) fail)))))
+      (else (k2 (apply % args) fail)))))
 
 ;; <
 (define lt-prim
@@ -4127,6 +4127,7 @@
 	    (list '+ plus-prim)
 	    (list '- minus-prim)
 	    (list '/ divide-prim)
+	    (list '% modulo-prim)
 	    (list '< lt-prim)
 	    (list '<= lt-or-eq-prim)
 	    (list '= equal-sign-prim)
@@ -4176,7 +4177,6 @@
 	    (list 'member member-prim)
 	    (list 'memq memq-prim)
 	    (list 'memv memv-prim)
-	    (list 'modulo modulo-prim)
 	    (list 'newline newline-prim)
 	    (list 'not not-prim)
 	    (list 'null? null?-prim)
