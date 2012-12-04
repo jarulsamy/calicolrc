@@ -3060,11 +3060,15 @@ public static class Graphics
 				count++;
 			}
 			set_points (temp);
+            close_path = false;
+            fill = null;
 		}
 
 		public Line (IList iterable1, IList iterable2) :
        this(true, iterable1, iterable2)
 		{
+            close_path = false;
+            fill = null;
 		}
 
 		public Line (bool has_pen, IList iterable1, IList iterable2)
@@ -4260,7 +4264,80 @@ public static class Graphics
 		}
 	}
 
-	public class HSlider : Gtk.HScale
+ public class Entry : Gtk.Entry
+ {
+     public double _x, _y;
+     public WindowClass window;
+
+     public Entry (IList iterable, int size) : base()
+     {
+         _x = System.Convert.ToDouble (iterable [0]);
+         _y = System.Convert.ToDouble (iterable [1]);
+         WidthChars = size;
+         Text = "";
+     }
+
+     public string text {
+        get {return Text;}
+        set {Text = value;}
+     }
+
+     public double x {
+         get {
+             return _x;
+         }
+         set {
+             moveTo (value, _y);
+             window.QueueDraw ();
+         }
+     }
+
+     public double y {
+         get {
+             return _y;
+         }
+         set {
+             moveTo (_x, value);
+             window.QueueDraw ();
+         }
+     }
+
+     public void moveTo (object x, object y)
+     {
+         _x = System.Convert.ToDouble (x);
+         _y = System.Convert.ToDouble (y);
+         // FIXME: actually move it
+     }
+
+     public void draw (WindowClass win)
+     { // button
+         window = win;
+         Invoke (delegate {
+             Show ();
+             window.getCanvas ().Put (this, (int)_x, (int)_y);
+             window.QueueDraw ();
+         });
+     }
+
+/*
+     public void connect (string signal, Func<object,Event,object> function)
+     {
+         Clicked += delegate(object obj, System.EventArgs args) {
+             Event evt = new Event ("click", Graphics.currentTime ());
+             try {
+                 Invoke (delegate {
+                     function (obj, evt);
+                 });
+             } catch (Exception e) {
+                 Console.Error.WriteLine ("Error in connected function");
+                 Console.Error.WriteLine (e.Message);
+             }
+         };
+     }
+     */
+ }
+
+ 	public class HSlider : Gtk.HScale
 	{
 		public WindowClass window;
 		public double _width;
