@@ -26,7 +26,7 @@ import Gtk
 import Gdk
 import Cairo
 
-filename = "../images/blankenship.jpg"
+filename = "../../images/blankenship.jpg"
 _pixbuf = Gdk.Pixbuf(filename)
 _pixbuf.HasAlpha
 format = Cairo.Format.Rgb24
