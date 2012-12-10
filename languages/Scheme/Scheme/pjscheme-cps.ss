@@ -854,6 +854,7 @@
 (define init-cont (lambda-cont (v) (halt* v)))
 (define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
 (define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
+(define init-cont4 (lambda-cont4 (v1 v2 v3 v4) (halt* v1)))
 (define init-handler (lambda-handler (e) (halt* (list 'exception e))))
 (define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
 (define init-fail (lambda-fail () (halt* "no more choices")))
@@ -900,60 +901,49 @@
 
 ;; Environments represented as data structures
 
+;; <env> ::= (environment <frame> ...)
+;; <frame> ::= (<vector-of-bindings> <list-of-vars>)
+;; <binding> ::= (<value> . <docstring>)
+
 ;; bindings
 
 (define make-binding
-  (lambda (variable value)
-    (list variable "" value)))
+  (lambda (value)
+    (cons value "")))
 
-(define binding-variable
+(define binding-value
   (lambda (binding)
     (car binding)))
 
 (define binding-docstring
   (lambda (binding)
-    (cadr binding)))
-
-(define binding-value
-  (lambda (binding)
-    (caddr binding)))
-
-(define set-binding-docstring!
-  (lambda (binding docstring)
-    (set-car! (cdr binding) docstring)))
+    (cdr binding)))
 
 (define set-binding-value!
   (lambda (binding value)
-    (set-car! (cddr binding) value)))
+    (set-car! binding value)))
+
+(define set-binding-docstring!
+  (lambda (binding docstring)
+    (set-cdr! binding docstring)))
 
 ;; frames
 
 (define make-frame
   (lambda (variables values)
-    (list->vector (map make-binding variables values))))
+    (list (list->vector (map make-binding values)) variables)))
 
 (define empty-frame?
   (lambda (frame)
-    (= (vector-length frame) 0)))
+    (null? (cadr frame))))
 
-(define-native search-frame
-  (lambda (frame variable)
-    (cond
-      ((empty-frame? frame) #f)
-      (else (search-frame-position frame variable 0)))))
-
-(define-native search-frame-position
-  (lambda (frame variable position)
-    (cond
-     ((>= position (vector-length frame)) #f)
-     ((eq? (binding-variable (vector-ref frame position)) variable)
-      (vector-ref frame position))
-     (else (search-frame-position frame variable (+ 1 position))))))
-
+(define frame-bindings
+  (lambda (frame)
+    (car frame)))
 
 ;; environments
 
-;; <environment> = (environment . (<frame> ...))
+;; <environment> ::= (environment <frame> <frame>*)
 
 (define environment?
   (lambda (x)
@@ -961,19 +951,36 @@
 
 (define make-empty-environment
   (lambda ()
-    (cons 'environment '(()))))
+    (list 'environment (make-frame '() '()))))
 
 (define make-initial-environment
   (lambda (vars vals)
-    (cons 'environment (list (make-frame vars vals)))))
+    (list 'environment (make-frame vars vals))))
 
 (define first-frame
   (lambda (env)
     (cadr env)))
 
+(define first-frame-vars
+  (lambda (env)
+    (cadr (first-frame env))))
+
+(define initial-contours
+  (lambda (env)
+    (cdr (first-frame env))))
+
 (define frames
   (lambda (env)
     (cdr env)))
+
+(define add-binding
+  (lambda (new-var new-binding frame)
+    (let ((bindings (vector->list (car frame)))
+	  (vars (cadr frame)))
+      ;; must add new binding to the end of the frame, not the front, to
+      ;; preserve correct lexical addresses of other variables in frame
+      (list (list->vector (append bindings (list new-binding)))
+	    (append vars (list new-var))))))
 
 (define set-first-frame!
   (lambda (env new-frame)
@@ -998,42 +1005,88 @@
           binding
           (search-frames (cdr frames) variable))))))
 
+(define-native search-frame
+  (lambda (frame var)
+    (search-for-binding var (car frame) (cadr frame) 0)))
+
+(define-native search-for-binding
+  (lambda (var bindings variables i)
+    (cond
+     ((null? variables) #f)
+     ((eq? (car variables) var) (vector-ref bindings i))
+     (else (search-for-binding var bindings (cdr variables) (+ i 1))))))
+
+;; for macro environments
+(define in-first-frame?
+  (lambda (var env)
+    (true? (memq var (first-frame-vars env)))))
+
+;; for macro environments
+(define get-first-frame-value
+  (lambda (var env)
+    (binding-value (search-frame (first-frame env) var))))
+
+(define* lookup-value-by-lexical-address
+  (lambda (depth offset frames fail k)
+    (let ((bindings (frame-bindings (list-ref frames depth))))
+      (k (binding-value (vector-ref bindings offset)) fail))))
+
+(define* lookup-binding-by-lexical-address
+  (lambda (depth offset frames fail k)
+    (let ((bindings (frame-bindings (list-ref frames depth))))
+      (k (vector-ref bindings offset) fail))))
+
 (define* lookup-value
-  (lambda (variable env var-info handler fail k)
-    (lookup-binding variable env var-info handler fail
+  (lambda (var env var-info handler fail k)
+    (lookup-variable var env var-info handler fail
+      (lambda-cont2 (var fail)
+	(k (dlr-env-lookup var) fail))
+      (lambda-cont3 (dlr-obj components fail)
+	(k (get-external-member dlr-obj components) fail))
       (lambda-cont2 (binding fail)
 	(k (binding-value binding) fail)))))
 
-(define vector-append
-  (lambda (v1 v2)
-    (list->vector (append (vector->list v1) (vector->list v2)))))
+(define* lookup-variable
+  (lambda (var env var-info handler fail gk dk sk) ;; gk: global dlr, dk: dlr obj, sk: scheme module
+    (let ((binding (search-env env var)))  ;; look in scheme env for variable as a whole
+      (if binding
+	(sk binding fail)  ;; found it in the scheme env
+	(let ((components (split-variable var)))  ;; split into components, if any
+	  (cond
+	    ((null? components)  ;; (set! a.b..c val)
+	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
+	    ((and (null? (cdr components)) (dlr-env-contains (car components)))
+	     (gk (car components) fail))  ;; (set! Myro 42)
+	    ((and (not (null? (cdr components)))  ;; (set! Myro.robot 42)
+		  (dlr-env-contains (car components))
+		  (dlr-object? (dlr-env-lookup (car components))))
+	     (dk (dlr-env-lookup (car components)) components fail))
+	    (else (lookup-variable-components components "" env var-info handler fail dk sk))))))))
 
-(define* lookup-value-by-lexical-address
-  (lambda (depth offset env var-info handler fail k)
-    (lookup-value-in-frames-by-lexical-address depth offset 
-	  (cdr env) var-info handler fail k)))
-
-(define* lookup-value-in-frames-by-lexical-address
-  (lambda (depth offset frames var-info handler fail k)
-    (cond
-     ((= depth 0) (k (binding-value (vector-ref (car frames) offset)) fail))
-     (else (lookup-value-in-frames-by-lexical-address (- depth 1) offset 
-	       (cdr frames) var-info handler fail k)))))
-
-(define* lookup-binding
-  (lambda (variable env var-info handler fail k)
-    (let ((binding (search-env env variable)))
-      (cond 
-       (binding (k binding fail))
-       ((dlr-env-contains variable) (k (dlr-env-lookup variable) fail))
-       (else (split-variable variable env var-info handler fail k))))))
-
-(define* split-variable
-  (lambda (variable env var-info handler fail k)
-    (let ((strings (group (string->list (symbol->string variable)) #\.)))
-      (if (or (member "" strings) (= (length strings) 1))
-	  (runtime-error (format "unbound variable ~a" variable) var-info handler fail)
-	  (lookup-variable-components (map string->symbol strings) "" env handler fail k)))))
+;; math.x.y.z where math is a module or a DLR module/item
+;; components: '(math x y z) "" ...
+;; components: '(x y z) "math" ...
+;; components: '(y z) "math.x" ...
+;; components: '(z) "math.x.y" ...
+(define* lookup-variable-components
+  (lambda (components path module var-info handler fail dk sk)
+    ;;(printf "in lookup-variable-components. components: ~s path: ~s\n" components path)
+    (let* ((var (car components))
+	   (binding (search-env module var)))
+      (cond
+	(binding  ;; (set! c val)
+	  (if (null? (cdr components))
+	    (sk binding fail)
+	    (let ((value (binding-value binding))
+		  (new-path (if (string=? path "") (format "~a" var) (format "~a.~a" path var))))
+	      (cond
+	        ((environment? value)
+		 (lookup-variable-components (cdr components) new-path value var-info handler fail dk sk))
+		((dlr-object? value)
+		 (dk value components fail))
+		(else (runtime-error (format "~a is not a module" new-path) var-info handler fail))))))
+	((string=? path "") (runtime-error (format "unbound module '~a'" var) var-info handler fail))
+	(else (runtime-error (format "unbound variable '~a' in module '~a'" var path) var-info handler fail))))))
 
 ;; adds a new binding for var to the first frame if one doesn't exist
 (define* lookup-binding-in-first-frame
@@ -1042,61 +1095,39 @@
       (let ((binding (search-frame frame var)))
         (if binding
 	  (k binding fail)
-          (let ((new-binding (make-binding var 'undefined)))
-            (let ((new-frame (vector-append frame (vector new-binding))))
-              (set-first-frame! env new-frame)
+	  (let ((new-binding (make-binding 'undefined)))
+	    (let ((new-frame (add-binding var new-binding frame)))
+	      (set-first-frame! env new-frame)
 	      (k new-binding fail))))))))
 
-(define* lookup-variable-components
-  ;; math.x.y.z where math is a module or a DLR module/item
-  ;; components: '(test x y z) "" ...
-  ;; components: '(x y z) "test" ...
-  ;; components: '(y z) "test.x" ...
-  ;; components: '(z) "test.x.z" ...
-  (lambda (components path env handler fail k)
-    ;;(printf "components: ~s path: ~s\n" components path)
-    (let ((var (car components)))
-      (lookup-module-binding var env path handler fail
-	(lambda-cont2 (binding fail)
-	  (if (null? (cdr components))
-	    (k binding fail)
-	    (let ((result (binding-value binding))
-		  (new-path (if (string=? path "")
-			      (format "~a" var)
-			      (format "~a.~a" path var))))
-	      (if (not (environment? result))
-                  (if (dlr-object? result)
-                      (k (dlr-lookup-components result (cdr components)) fail)
-                      (handler (format "~a is not a module" new-path) fail))
-                  (lookup-variable-components
-		    (cdr components) new-path result handler fail k)))))))))
+;; (split-variable 'a) => (a)
+;; (split-variable 'a.b.c.d) => (a b c d)
+;; (split-variable 'a.b..c) => ()
+(define split-variable
+  (lambda (var)
+    (let ((strings (string-split (symbol->string var) #\.)))
+      (if (member "" strings)
+	'()
+	(map string->symbol strings)))))
 
-(define* lookup-module-binding
-  (lambda (var env path handler fail k)
-    (let ((binding (search-env env var)))
-      (cond
-	(binding (k binding fail))
-        ((dlr-env-contains var) (k (dlr-env-lookup var) fail))
-	((string=? path "") (handler (format "unbound module '~a'" var) fail))
-	(else (handler (format "unbound variable '~a' in module '~a'" var path) fail))))))
-
-(define group
-  (lambda (chars delimiter)
+(define string-split
+  (lambda (s delimiter-char)
     (letrec
       ((position
 	(lambda (chars)
-	  (if (char=? (car chars) delimiter)
+	  (if (char=? (car chars) delimiter-char)
 	      0
 	      (+ 1 (position (cdr chars))))))
-       (group
+       (split
 	 (lambda (chars)
 	   (cond
 	     ((null? chars) '())
-	     ((not (member delimiter chars)) (list (apply string chars)))
+	     ((not (member delimiter-char chars)) (list (apply string chars)))
 	     (else (let ((n (position chars)))
 		     (cons (apply string (list-head chars n))
-			   (group (cdr (list-tail chars n))))))))))
-      (group chars))))
+			   (split (cdr (list-tail chars n))))))))))
+      (split (string->list s)))))
+
 ;; Calico Scheme parser
 ;;
 ;; Written by James B. Marshall and Douglas S. Blank
@@ -1126,19 +1157,19 @@
 ;; Chez Scheme, because parser-cps.ss uses environments-cps.ss, which
 ;; relies on these functions being defined.
 
-(define dlr-exp? (lambda (x) #f))
-(define dlr-apply apply)
-(define dlr-func (lambda (x) x))
-(define dlr-env-contains (lambda (x) #f))
-(define dlr-env-lookup (lambda (x) #f))
-(define dlr-object? (lambda (x) #f))
-(define dlr-lookup-components (lambda (x y) #f))
-(define set-global-value! (lambda (var x) #f))
-(define set-global-docstring! (lambda (var x) #f))
-(define printf-prim printf)
-(define using-prim (lambda ignore #f))
-(define iterator? (lambda ignore #f))
-(define get_type (lambda (x) 'unknown))
+(define-native dlr-proc? (lambda (x) #f))
+(define-native dlr-apply apply)
+(define-native dlr-func (lambda (x) x))
+(define-native dlr-env-contains (lambda (x) #f))
+(define-native dlr-env-lookup (lambda (x) #f))
+(define-native dlr-object? (lambda (x) #f))
+(define-native dlr-lookup-components (lambda (x y) #f))
+(define-native set-global-value! (lambda (var x) #f))
+(define-native set-global-docstring! (lambda (var x) #f))
+(define-native printf-prim printf)
+(define-native using-prim (lambda ignore #f))
+(define-native iterator? (lambda ignore #f))
+(define-native get_type (lambda (x) 'unknown))
 
 ;;--------------------------------------------------------------------------
 ;; The core grammar
@@ -1178,7 +1209,7 @@
   (lexical-address-aexp
     (depth number?)
     (offset number?)
-    (variable symbol?)
+    (id symbol?)
     (info source-info?))
   (if-aexp
     (test-aexp aexpression?)
@@ -1318,7 +1349,8 @@
   (lambda (asexp)
     (and (pair?^ asexp)
 	 (symbol?^ (car^ asexp))
-	 (true? (search-env macro-env (untag-atom^ (car^ asexp)))))))
+	 (in-first-frame? (untag-atom^ (car^ asexp)) macro-env))))
+;;	 (true? (search-env macro-env (untag-atom^ (car^ asexp)))))))
 
 (define-native tagged-list^
   (lambda (keyword op len)
@@ -1356,13 +1388,13 @@
 (define try-catch-finally-exps^ (lambda (x) (cdr^ (cadddr^ x))))
 
 (define* aparse
-  (lambda (adatum env handler fail k)
+  (lambda (adatum senv handler fail k)   ;; k receives 2 args: aexp, fail
     (let ((info (get-source-info adatum)))
       (cond
 	((literal?^ adatum) (k (lit-aexp (untag-atom^ adatum) info) fail))
-	((symbol?^ adatum) 
+	((symbol?^ adatum)
 	 (if *use-lexical-address*
-	     (k (get-lexical-address env (untag-atom^ adatum) info) fail)
+	     (get-lexical-address (untag-atom^ adatum) senv 0 info fail k)
 	     (k (var-aexp (untag-atom^ adatum) info) fail)))
 	((vector?^ adatum)
 	 (unannotate-cps adatum
@@ -1378,35 +1410,35 @@
 	     (annotate-cps v 'none
 	       (lambda-cont (expansion)
 		 (if (original-source-info? adatum)
-		   (aparse (replace-info expansion (snoc 'quasiquote info)) env handler fail k)
-		   (aparse (replace-info expansion info) env handler fail k)))))))
+		   (aparse (replace-info expansion (snoc 'quasiquote info)) senv handler fail k)
+		   (aparse (replace-info expansion info) senv handler fail k)))))))
 	((unquote?^ adatum) (aparse-error "misplaced" adatum handler fail))
 	((unquote-splicing?^ adatum) (aparse-error "misplaced" adatum handler fail))
 	((syntactic-sugar?^ adatum)
 	 (expand-once^ adatum handler fail
 	   (lambda-cont2 (expansion fail)
-	     (aparse expansion env handler fail k))))
+	     (aparse expansion senv handler fail k))))
 	((if-then?^ adatum)
-	 (aparse (cadr^ adatum) env handler fail
+	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse (caddr^ adatum) env handler fail
+	     (aparse (caddr^ adatum) senv handler fail
 	       (lambda-cont2 (v2 fail)
 		 (k (if-aexp v1 v2 (lit-aexp #f 'none) info) fail))))))
 	((if-else?^ adatum)
-	 (aparse (cadr^ adatum) env handler fail
+	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse (caddr^ adatum) env handler fail
+	     (aparse (caddr^ adatum) senv handler fail
 	       (lambda-cont2 (v2 fail)
-		 (aparse (cadddr^ adatum) env handler fail
+		 (aparse (cadddr^ adatum) senv handler fail
 		   (lambda-cont2 (v3 fail)
 		     (k (if-aexp v1 v2 v3 info) fail))))))))
 	((assignment?^ adatum)
-	 (aparse (caddr^ adatum) env handler fail
+	 (aparse (caddr^ adatum) senv handler fail
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
-	 (aparse (cadr^ adatum) env handler fail
+	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
 	     (k (func-aexp e info) fail))))
 	((define?^ adatum)
@@ -1416,13 +1448,13 @@
 	      (lambda-cont (v)
 		(annotate-cps v 'none
 		  (lambda-cont (expansion)
-		    (aparse (replace-info expansion info) env handler fail k))))))
+		    (aparse (replace-info expansion info) senv handler fail k))))))
 	   ((= (length^ adatum) 3) ;; (define <var> <body>)
-	    (aparse (caddr^ adatum) env handler fail
+	    (aparse (caddr^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
 		(k (define-aexp (define-var^ adatum) "" body info) fail))))
 	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define <var> <docstring> <body>)
-	    (aparse (cadddr^ adatum) env handler fail
+	    (aparse (cadddr^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
 		(k (define-aexp (define-var^ adatum) (define-docstring^ adatum) body info) fail))))
 	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
@@ -1433,13 +1465,13 @@
 	      (lambda-cont (v)
 		(annotate-cps v 'none
 		  (lambda-cont (expansion)
-		    (aparse (replace-info expansion info) env handler fail k))))))
+		    (aparse (replace-info expansion info) senv handler fail k))))))
 	   ((= (length^ adatum) 3) ;; (define! <var> <body>)
-	    (aparse (caddr^ adatum) env handler fail
+	    (aparse (caddr^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
 		(k (define!-aexp (define-var^ adatum) "" body info) fail))))
 	   ((and (= (length^ adatum) 4) (string?^ (caddr^ adatum))) ;; (define! <var> <docstring> <body>)
-	    (aparse (cadddr^ adatum) env handler fail
+	    (aparse (cadddr^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
 		(k (define!-aexp (define-var^ adatum) (define-docstring^ adatum) body info) fail))))
 	   (else (aparse-error "bad concrete syntax:" adatum handler fail))))
@@ -1450,19 +1482,20 @@
 	     (lambda-cont (clauses)
 	       (k (define-syntax-aexp name clauses aclauses info) fail)))))
 	((begin?^ adatum)
-	 (aparse-all (cdr^ adatum) env handler fail
-	   (lambda-cont2 (exps fail)
-	     (cond
-	       ((null? exps) (aparse-error "bad concrete syntax:" adatum handler fail))
-	       ((null? (cdr exps)) (k (car exps) fail))
-	       (else (k (begin-aexp exps info) fail))))))
+	 (cond
+	   ((null?^ (cdr^ adatum)) (aparse-error "bad concrete syntax:" adatum handler fail))
+	   ((null?^ (cddr^ adatum)) (aparse (cadr^ adatum) senv handler fail k))
+	   (else (aparse-all (cdr^ adatum) senv handler fail
+		   (lambda-cont2 (exps fail)
+		     (k (begin-aexp exps info) fail))))))
 	((lambda?^ adatum)
 	 (unannotate-cps (cadr^ adatum)
 	    (lambda-cont (formals)
-	        (let ((formals-list (if (list? formals)
-					formals
-					(cons (last formals) (head formals)))))
-		  (aparse-all (cddr^ adatum) (extend env formals-list formals-list) handler fail
+	        (let ((formals-list
+			(if (list? formals)
+			    formals
+			    (cons (last formals) (head formals)))))
+		  (aparse-all (cddr^ adatum) (cons formals-list senv) handler fail
 		      (lambda-cont2 (bodies fail)
 			 (if (list? formals)
 			     (k (lambda-aexp formals bodies info) fail)
@@ -1470,11 +1503,12 @@
 	((trace-lambda?^ adatum)
 	 (unannotate-cps (caddr^ adatum)
 	      (lambda-cont (formals)
-		(let ((formals-list (if (list? formals)
-					 formals
-					 (cons (last formals) (head formals))))
+		(let ((formals-list
+			(if (list? formals)
+			    formals
+			    (cons (last formals) (head formals))))
 		      (name (untag-atom^ (cadr^ adatum))))
-		  (aparse-all (cdddr^ adatum) (extend env formals-list formals-list) handler fail
+		  (aparse-all (cdddr^ adatum) (cons formals-list senv) handler fail
 		      (lambda-cont2 (bodies fail)
 			 (if (list? formals)
 			     (k (trace-lambda-aexp name formals bodies info) fail)
@@ -1483,56 +1517,56 @@
 	 (cond
 	  ;; (try <body>)
 	   ((= (length^ adatum) 2)
-	    (aparse (try-body^ adatum) env handler fail k))
+	    (aparse (try-body^ adatum) senv handler fail k))
 	   ;; (try <body> (catch <var> <exp> ...))
 	   ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
-	    (aparse (try-body^ adatum) env handler fail
+	    (aparse (try-body^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) env handler fail
+		(aparse-all (catch-exps^ adatum) senv handler fail
 		  (lambda-cont2 (cexps fail)
 		    (let ((cvar (catch-var^ adatum)))
 		      (k (try-catch-aexp body cvar cexps info) fail)))))))
 	   ;; (try <body> (finally <exp> ...))
 	   ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
-	    (aparse (try-body^ adatum) env handler fail
+	    (aparse (try-body^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (try-finally-exps^ adatum) env handler fail
+		(aparse-all (try-finally-exps^ adatum) senv handler fail
 		  (lambda-cont2 (fexps fail)
 		    (k (try-finally-aexp body fexps info) fail))))))
 	   ;; (try <body> (catch <var> <exp> ...) (finally <exp> ...))
 	   ((and (= (length^ adatum) 4) (catch?^ (caddr^ adatum)) (finally?^ (cadddr^ adatum)))
-	    (aparse (try-body^ adatum) env handler fail
+	    (aparse (try-body^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) env handler fail
+		(aparse-all (catch-exps^ adatum) senv handler fail
 		  (lambda-cont2 (cexps fail)
-		    (aparse-all (try-catch-finally-exps^ adatum) env handler fail
+		    (aparse-all (try-catch-finally-exps^ adatum) senv handler fail
 		      (lambda-cont2 (fexps fail)
 			(let ((cvar (catch-var^ adatum)))
 			  (k (try-catch-finally-aexp body cvar cexps fexps info) fail)))))))))
 	   (else (aparse-error "bad try syntax:" adatum handler fail))))
 	((raise?^ adatum)
-	 (aparse (cadr^ adatum) env handler fail
+	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (v fail)
 	     (k (raise-aexp v info) fail))))
 	((choose?^ adatum)
-	 (aparse-all (cdr^ adatum) env handler fail
+	 (aparse-all (cdr^ adatum) senv handler fail
 	   (lambda-cont2 (exps fail)
 	     (k (choose-aexp exps info) fail))))
 	((application?^ adatum)
-	 (aparse (car^ adatum) env handler fail
+	 (aparse (car^ adatum) senv handler fail
 	   (lambda-cont2 (v1 fail)
-	     (aparse-all (cdr^ adatum) env handler fail
+	     (aparse-all (cdr^ adatum) senv handler fail
 	       (lambda-cont2 (v2 fail)
 		 (k (app-aexp v1 v2 info) fail))))))
 	(else (aparse-error "bad concrete syntax:" adatum handler fail))))))
 
 (define* aparse-all
-  (lambda (adatum-list env handler fail k)
+  (lambda (adatum-list senv handler fail k)
     (if (null?^ adatum-list)
       (k '() fail)
-      (aparse (car^ adatum-list) env handler fail
+      (aparse (car^ adatum-list) senv handler fail
 	(lambda-cont2 (a fail)
-	  (aparse-all (cdr^ adatum-list) env handler fail
+	  (aparse-all (cdr^ adatum-list) senv handler fail
 	    (lambda-cont2 (b fail)
 	      (k (cons a b) fail))))))))
 
@@ -1547,16 +1581,57 @@
 
 ;; used once in interpreter-cps.ss
 (define* aparse-sexps
-  (lambda (tokens src env handler fail k)
+  (lambda (tokens src senv handler fail k)
     (if (token-type? (first tokens) 'end-marker)
       (k '() fail)
       (read-sexp tokens src handler fail
 	(lambda-cont4 (adatum end tokens-left fail)
-	  (aparse adatum env handler fail
+	  (aparse adatum senv handler fail
 	    (lambda-cont2 (v1 fail)
-	      (aparse-sexps tokens-left src env handler fail
+	      (aparse-sexps tokens-left src senv handler fail
 		(lambda-cont2 (v2 fail)
 		  (k (cons v1 v2) fail))))))))))
+
+(define* get-lexical-address
+  (lambda (id senv depth info fail k)
+    (cond
+      ((null? senv) (k (var-aexp id info) fail))   ;; free!
+      ((memq id (car senv))
+       (get-lexical-address-offset id (car senv) depth 0 info fail k))
+      (else (get-lexical-address id (cdr senv) (+ depth 1) info fail k)))))
+
+(define* get-lexical-address-offset
+  (lambda (id contours depth offset info fail k)
+    (if (eq? (car contours) id)
+      (k (lexical-address-aexp depth offset id info) fail)
+      (get-lexical-address-offset id (cdr contours) depth (+ offset 1) info fail k))))
+
+;;(define get-lexical-address
+;;  ;; given an environment and variable id, return the depth of the
+;;  ;; frame and offset OR return it as a var-exp signifying it as an
+;;  ;; unbound variable
+;;  (lambda (senv id info)
+;;    (get-lexical-address-frames (frames senv) id 0 0 info)))
+
+;;(define get-lexical-address-frames
+;;  ;; given a list of frames, get the lexical address of variable
+;;  (lambda (frames variable depth offset info)
+;;    (cond 
+;;     ((null? frames) (var-aexp variable info)) ;; free!
+;;     (else (let ((result (get-lexical-address-frame (car frames) variable depth offset info)))
+;;	     (if (not (car result))
+;;		 (get-lexical-address-frames (cdr frames) variable (+ 1 depth) 0 info)
+;;		 (cadr result)))))))
+
+;;(define get-lexical-address-frame
+;;  ;; returns (#t pos) or (#f) signifying bound or free, respectively
+;;  (lambda (frame variable depth offset info)
+;;    (cond
+;;     ((empty-frame? frame) (list #f)) ;; not in this frame
+;;     ((>= offset (vector-length frame)) (list #f)) ;; not here
+;;     ((eq? (binding-variable (vector-ref frame offset)) variable)
+;;      (list #t (lexical-address-aexp depth offset variable info)))
+;;     (else (get-lexical-address-frame frame variable depth (+ 1 offset) info)))))
 
 ;;--------------------------------------------------------------------------
 ;; Macro support
@@ -1961,9 +2036,8 @@
 (define* expand-once^
   (lambda (adatum handler fail k)  ;; k receives 2 args: asexp, fail
     (let ((macro-keyword (untag-atom^ (car^ adatum))))
-      (lookup-value macro-keyword macro-env 'none handler fail
-	(lambda-cont2 (macro fail)
-	  (if (pattern-macro? macro)
+      (let ((macro (get-first-frame-value macro-keyword macro-env)))
+	(if (pattern-macro? macro)
 	    (process-macro-clauses^
 	      (macro-clauses macro) (macro-aclauses macro) adatum handler fail k)
 	    ;; macro transformer functions take 1-arg continuations:
@@ -1976,7 +2050,7 @@
 		      (let ((info (get-source-info adatum)))
 			(if (original-source-info? adatum)
 			  (k (replace-info expansion (snoc macro-keyword info)) fail)
-			  (k (replace-info expansion info) fail))))))))))))))
+			  (k (replace-info expansion info) fail)))))))))))))
 
 (define* process-macro-clauses^
   (lambda (clauses aclauses adatum handler fail k)  ;; k receives 2 args: asexp, fail
@@ -2149,7 +2223,7 @@
 	  ((vector? datum) datum)
 	  (else `(quote ,datum))))
       (var-aexp (id info) id)
-      (lexical-address-aexp (depth offset variable info) variable)
+      (lexical-address-aexp (depth offset id info) id)
       (if-aexp (test-aexp then-aexp else-aexp info)
 	`(if ,(aunparse test-aexp) ,(aunparse then-aexp) ,(aunparse else-aexp)))
       (assign-aexp (var rhs-exp var-info info)
@@ -2190,13 +2264,16 @@
 
 (define expand-macro
   (lambda (transformer sexp)
-    (transformer sexp init-cont)))
+    (transformer sexp init-handler2 init-fail init-cont)))
+
+;; will be overridden by toplevel-env definition in interpreter-cps.ss
+;;(define toplevel-env (make-empty-environment))
 
 (define aparse-string
   (lambda (string)
     (aread-datum string 'stdin init-handler2 init-fail
       (lambda-cont3 (adatum tokens-left fail)
-	(aparse adatum toplevel-env init-handler2 init-fail init-cont2)))))
+	(aparse adatum (initial-contours toplevel-env) init-handler2 init-fail init-cont2)))))
 
 (define aparse-file
   (lambda (filename)
@@ -2210,7 +2287,7 @@
   (lambda (filename)
     (scan-input (read-content filename) filename init-handler2 init-fail
       (lambda-cont2 (tokens fail)
-	(aparse-sexps tokens filename toplevel-env init-handler2 init-fail init-cont2)))))
+	(aparse-sexps tokens filename (initial-contours toplevel-env) init-handler2 init-fail init-cont2)))))
 
 ;;--------------------------------------------------------------------------------------------
 ;; not used - for possible future reference
@@ -2295,33 +2372,6 @@
       ((not (pair? x)) `'(,x))
       ((null? (cdr x)) `(list ,(qq-expand2-list (car x) depth)))
       (else `(list (append ,(qq-expand2-list (car x) depth) ,(qq-expand2 (cdr x) depth)))))))
-
-(define get-lexical-address
-  ;; given an environment and variable id, return the depth of the
-  ;; frame and offset OR return it as a var-exp signifying it as an
-  ;; unbound variable
-  (lambda (env id info)
-    (get-lexical-address-frames (cdr env) id 0 0 info)))
-
-(define get-lexical-address-frames
-  ;; given a list of frames, get the lexical address of variable
-  (lambda (frames variable depth offset info)
-    (cond 
-     ((null? frames) (var-aexp variable info)) ;; free!
-     (else (let ((result (get-lexical-address-frame (car frames) variable depth offset info)))
-	     (if (not (car result))
-		 (get-lexical-address-frames (cdr frames) variable (+ 1 depth) 0 info)
-		 (cadr result)))))))
-
-(define get-lexical-address-frame
-  ;; returns (#t pos) or (#f) signifying bound or free, respectively
-  (lambda (frame variable depth offset info)
-    (cond
-     ((empty-frame? frame) (list #f)) ;; not in this frame
-     ((>= offset (vector-length frame)) (list #f)) ;; not here
-     ((eq? (binding-variable (vector-ref frame offset)) variable)
-      (list #t (lexical-address-aexp depth offset variable info)))
-     (else (get-lexical-address-frame frame variable depth (+ 1 offset) info)))))
 
 ;;;; walks through unannotated and annotated expressions in parallel, guided by unannotated expression
 ;;(define qq-expand
@@ -2511,19 +2561,19 @@
 ;; Scheme, independently of C#
 
 ;; dummy versions of functions defined in C# code
-(define dlr-exp? (lambda (x) #f))
-(define dlr-apply apply)
-(define dlr-func (lambda (x) x))
-(define dlr-env-contains (lambda (x) #f))
-(define dlr-env-lookup (lambda (x) #f))
-(define dlr-object? (lambda (x) #f))
-(define dlr-lookup-components (lambda (x y) #f))
-(define set-global-value! (lambda (var x) #f))
-(define set-global-docstring! (lambda (var x) #f))
-(define printf-prim printf)
-(define using-prim (lambda ignore #f))
-(define iterator? (lambda ignore #f))
-(define get_type (lambda (x) 'unknown))
+(define-native dlr-proc? (lambda (x) #f))
+(define-native dlr-apply apply)
+(define-native dlr-func (lambda (x) x))
+(define-native dlr-env-contains (lambda (x) #f))
+(define-native dlr-env-lookup (lambda (x) #f))
+(define-native dlr-object? (lambda (x) #f))
+(define-native dlr-lookup-components (lambda (x y) #f))
+(define-native set-global-value! (lambda (var x) #f))
+(define-native set-global-docstring! (lambda (var x) #f))
+(define-native printf-prim printf)
+(define-native using-prim (lambda ignore #f))
+(define-native iterator? (lambda ignore #f))
+(define-native get_type (lambda (x) 'unknown))
 
 ;;----------------------------------------------------------------------------
 
@@ -2637,7 +2687,7 @@
     (read-sexp *tokens-left* src REP-handler *last-fail*
       (lambda-cont4 (datum end tokens-left fail)
 	(set! *tokens-left* tokens-left)
-	(aparse datum toplevel-env REP-handler fail
+	(aparse datum (initial-contours toplevel-env) REP-handler fail
 	  (lambda-cont2 (exp fail)
 	    (m exp toplevel-env REP-handler fail REP-k)))))))
 
@@ -2692,7 +2742,7 @@
     (set! load-stack '())
     (scan-input input 'stdin try-parse-handler *last-fail*
       (lambda-cont2 (tokens fail)
-	(aparse-sexps tokens 'stdin toplevel-env try-parse-handler fail
+	(aparse-sexps tokens 'stdin (initial-contours toplevel-env) try-parse-handler fail
 	  (lambda-cont2 (result fail)
 	    (halt* #t)))))
     (trampoline)))
@@ -2742,20 +2792,6 @@
 
 ;;----------------------------------------------------------------------------
 
-(define* read-and-eval-asexps
-  (lambda (tokens src env handler fail k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k void-value fail)
-      (read-sexp tokens src handler fail
-	(lambda-cont4 (datum end tokens-left fail)
-	  (aparse datum env handler fail
-	    (lambda-cont2 (exp fail)
-	      (m exp env handler fail
-		(lambda-cont2 (v fail)
-		  (if (token-type? (first tokens-left) 'end-marker)
-		    (k v fail)
-		    (read-and-eval-asexps tokens-left src env handler fail k)))))))))))
-
 (define *tracing-on?* #f)
 
 (define make-debugging-k
@@ -2788,10 +2824,10 @@
    (let ((k (if *tracing-on?* (make-debugging-k exp k) k)))
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
-      (var-aexp (id info) (lookup-value id env info handler fail k))
-      (lexical-address-aexp (depth offset variable info) 
-	(lookup-value-by-lexical-address 
-	 depth offset env info handler fail k))
+      (var-aexp (id info)
+	(lookup-value id env info handler fail k))
+      (lexical-address-aexp (depth offset id info)
+	(lookup-value-by-lexical-address depth offset (frames env) fail k))
       (func-aexp (exp info)
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
@@ -2805,7 +2841,19 @@
       (assign-aexp (var rhs-exp var-info info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
-	    (lookup-binding var env var-info handler fail
+	    (lookup-variable var env var-info handler fail
+	      (lambda-cont2 (var fail)
+		(let ((old-value (dlr-env-lookup var)))
+		  ;; need to undo the assignment if we back up
+		  (set-global-value! var rhs-value)
+		  (let ((new-fail (lambda-fail () (set-global-value! var old-value) (fail))))
+		    (k void-value new-fail))))
+	      (lambda-cont3 (dlr-obj components fail) ;; dlr-obj is Myro, components is (Myro robot)
+		(let ((old-value (get-external-member dlr-obj components)))
+		  (set-external-member! dlr-obj components rhs-value)
+		  ;; need to undo the assignment if we back up
+		  (let ((new-fail (lambda-fail () (set-external-member! dlr-obj components old-value) (fail))))
+		    (k void-value new-fail))))
 	      (lambda-cont2 (binding fail)
 		(let ((old-value (binding-value binding)))
 		  (set-binding-value! binding rhs-value)
@@ -2871,7 +2919,7 @@
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
 		(cond
-		  ((dlr-exp? proc) (k (dlr-apply proc args) fail))
+		  ((dlr-proc? proc) (k (dlr-apply proc args) fail))
 		  ((procedure-object? proc) (proc args env info handler fail k))
 		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
 				       info handler fail))))))))
@@ -2886,6 +2934,24 @@
 	    (line (get-start-line info))
 	    (char (get-start-char info)))
 	(handler (format "runtime error: ~a ~a" msg (where-at line char src)) fail)))))
+
+(define* m*
+  (lambda (exps env handler fail k)
+    (if (null? exps)
+      (k '() fail)
+      (m (car exps) env handler fail
+	(lambda-cont2 (v1 fail)
+	  (m* (cdr exps) env handler fail
+	    (lambda-cont2 (v2 fail)
+	      (k (cons v1 v2) fail))))))))
+
+(define* eval-sequence
+  (lambda (exps env handler fail k)
+    (if (null? (cdr exps))
+      (m (car exps) env handler fail k)
+      (m (car exps) env handler fail
+	(lambda-cont2 (result fail)
+	  (eval-sequence (cdr exps) env handler fail k))))))
 
 (define try-catch-handler
   (lambda (cvar cexps env handler k)
@@ -2926,22 +2992,24 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
-(define _closure-depth 0)
+(define closure
+  (lambda (formals bodies env)
+    (lambda-proc (args env2 info handler fail k2)
+      (if (= (length args) (length formals))
+	(eval-sequence bodies (extend env formals args) handler fail k2)
+	(runtime-error "incorrect number of arguments in application" info handler fail)))))
 
-(define get-closure-depth
-  (lambda ()
-    _closure-depth
-    ))
-
-(define increment-closure-depth
-  (lambda ()
-    (set! _closure-depth (+ _closure-depth 1))
-    ))
-
-(define decrement-closure-depth
-  (lambda ()
-    (set! _closure-depth (- _closure-depth 1))
-    ))
+(define mu-closure
+  (lambda (formals runt bodies env)
+    (lambda-proc (args env2 info handler fail k2)
+      (if (>= (length args) (length formals))
+	(let ((new-env
+		(extend env
+		  (cons runt formals)
+		  (cons (list-tail args (length formals))
+			(list-head args (length formals))))))
+	  (eval-sequence bodies new-env handler fail k2))
+	(runtime-error "not enough arguments in application" info handler fail)))))
 
 (define make-trace-depth-string
   (lambda (level)
@@ -2990,7 +3058,7 @@
 		  (extend env
 		    (cons runt formals)
 		    (cons (list-tail args (length formals))
-		      (list-head args (length formals))))))
+			  (list-head args (length formals))))))
 	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
 	    (set! trace-depth (+ trace-depth 1))
 	    (eval-sequence bodies new-env handler fail
@@ -2999,43 +3067,6 @@
 		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
 		(k2 v fail))))
 	  (runtime-error "not enough arguments in application" info handler fail))))))
-
-(define closure
-  (lambda (formals bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-      (if (= (length args) (length formals))
-	(eval-sequence bodies (extend env formals args) handler fail k2)
-	(runtime-error "incorrect number of arguments in application" info handler fail)))))
-
-(define mu-closure
-  (lambda (formals runt bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-      (if (>= (length args) (length formals))
-	(let ((new-env
-		(extend env
-		  (cons runt formals)
-		  (cons (list-tail args (length formals))
-			(list-head args (length formals))))))
-	  (eval-sequence bodies new-env handler fail k2))
-	(runtime-error "not enough arguments in application" info handler fail)))))
-
-(define* m*
-  (lambda (exps env handler fail k)
-    (if (null? exps)
-      (k '() fail)
-      (m (car exps) env handler fail
-	(lambda-cont2 (v1 fail)
-	  (m* (cdr exps) env handler fail
-	    (lambda-cont2 (v2 fail)
-	      (k (cons v1 v2) fail))))))))
-
-(define* eval-sequence
-  (lambda (exps env handler fail k)
-    (if (null? (cdr exps))
-      (m (car exps) env handler fail k)
-      (m (car exps) env handler fail
-	(lambda-cont2 (result fail)
-	  (eval-sequence (cdr exps) env handler fail k))))))
 
 ;;----------------------------------------------------------------------------
 ;; Primitives
@@ -3095,27 +3126,37 @@
 ;; eval
 (define eval-prim
   (lambda-proc (args env2 info handler fail k2)
-    (annotate-cps (car args) 'none
-      (lambda-cont (adatum)
-        (aparse adatum env2 handler fail
-          (lambda-cont2 (exp fail)
-            (m exp env2 handler fail k2)))))))
-
+    (cond
+      ((length-one? args)  ;; petite uses toplevel env
+       (annotate-cps (car args) 'none
+	 (lambda-cont (adatum)
+	   (aparse adatum (initial-contours toplevel-env) handler fail
+	     (lambda-cont2 (exp fail)
+	       (m exp toplevel-env handler fail k2))))))
+      ((length-two? args)
+       (annotate-cps (car args) 'none
+	 (lambda-cont (adatum)
+	   (aparse adatum (initial-contours (cadr args)) handler fail
+	     (lambda-cont2 (exp fail)
+	       (m exp (cadr args) handler fail k2))))))
+      (else (runtime-error "incorrect number of arguments to eval" info handler fail)))))
+	       
 ;; eval-ast
 (define eval-ast-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (list? (car args)) ;; is there a better check for exp?
-	(m (car args) env2 handler fail 
-	   (lambda-cont2 (result fail2)
-		(k2 result fail2)))
-	(runtime-error "eval-ast called on non-abstract syntax tree argument" info handler fail))))
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to eval-ast" info handler fail))
+      ((not (list? (car args)))  ;; is there a better test for exp?  aexpression?
+       (runtime-error "eval-ast called on non-abstract syntax tree argument" info handler fail))
+      (else (m (car args) toplevel-env handler fail k2)))))  ;; petite uses toplevel env
 
 ;; parse
 (define parse-prim
   (lambda-proc (args env2 info handler fail k2)
     (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-        (aparse adatum env2 handler fail k2)))))
+        (aparse adatum (initial-contours toplevel-env) handler fail k2)))))  ;; was env2
 
 ;; string-length
 (define string-length-prim
@@ -3142,12 +3183,12 @@
 ;; unparse
 (define unparse-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (aunparse (car args)) fail)))
+    (k2 (aunparse (car args)) fail)))   ;; aunparse should be in CPS
 
 ;; unparse-procedure
 (define unparse-procedure-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (aunparse (car (caddr (car args)))) fail)))
+    (k2 (aunparse (car (caddr (car args)))) fail)))  ;; aunparse should be in CPS
 
 ;; parse-string
 (define parse-string-prim
@@ -3157,7 +3198,7 @@
 	(read-sexp tokens 'stdin handler fail
 	  (lambda-cont4 (adatum end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'end-marker)
-	      (aparse adatum env2 handler fail k2)
+	      (aparse adatum (initial-contours toplevel-env) handler fail k2)  ;; was env2
 	      (read-error "tokens left over" tokens-left 'stdin handler fail))))))))
 
 ;; read-string
@@ -3189,36 +3230,36 @@
       (else (k2 (apply sqrt args) fail)))))
 
 ;; odd?
-;;(define odd?-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to odd?" info handler fail))
-;;      (else (k2 (odd? (car args)) fail)))))
+(define odd?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to odd?" info handler fail))
+      (else (k2 (odd? (car args)) fail)))))
 
 ;; even?
-;;(define even?-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to even?" info handler fail))
-;;      (else (k2 (even? (car args)) fail)))))
+(define even?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to even?" info handler fail))
+      (else (k2 (even? (car args)) fail)))))
 
 ;; quotient
-;;(define quotient-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-two? args))
-;;       (runtime-error "incorrect number of arguments to quotient" info handler fail))
-;;      (else (k2 (apply quotient args) fail)))))
+(define quotient-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to quotient" info handler fail))
+      (else (k2 (apply quotient args) fail)))))
 
 ;; remainder
-;;(define remainder-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-two? args))
-;;       (runtime-error "incorrect number of arguments to remainder" info handler fail))
-;;      (else (k2 (apply remainder args) fail)))))
+(define remainder-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to remainder" info handler fail))
+      (else (k2 (apply remainder args) fail)))))
 
 ;; print
 (define print-prim
@@ -3305,12 +3346,12 @@
   (lambda-proc (args env2 info handler fail k2)
     (if (not (length-one? args))
        (runtime-error "incorrect number of arguments to load" info handler fail)
-       (load-file (car args) env2 info handler fail k2))))
+       (load-file (car args) toplevel-env info handler fail k2))))  ;; petite uses toplevel env
 
 (define load-stack '())
 
 (define* load-file
-  (lambda (filename env info handler fail k)
+  (lambda (filename env2 info handler fail k)
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
@@ -3323,7 +3364,7 @@
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
 	 (lambda-cont2 (tokens fail)
-	   (read-and-eval-asexps tokens filename env handler fail
+	   (read-and-eval-asexps tokens filename env2 handler fail
 	     (lambda-cont2 (v fail)
 	       ;; pop load-stack
 	       (if (null? load-stack)
@@ -3331,20 +3372,34 @@
 		 (set! load-stack (cdr load-stack)))
 	       (k void-value fail)))))))))
 
+(define* read-and-eval-asexps
+  (lambda (tokens src env2 handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k void-value fail)
+      (read-sexp tokens src handler fail
+	(lambda-cont4 (datum end tokens-left fail)
+	  (aparse datum (initial-contours env2) handler fail  ;; was env2
+	    (lambda-cont2 (exp fail)
+	      (m exp env2 handler fail
+		(lambda-cont2 (v fail)
+		  (if (token-type? (first tokens-left) 'end-marker)
+		    (k v fail)
+		    (read-and-eval-asexps tokens-left src env2 handler fail k)))))))))))
+
 (define* load-files
-  (lambda (filenames env info handler fail k)
+  (lambda (filenames env2 info handler fail k)
     (if (null? filenames)
       (k void-value fail)
-      (load-file (car filenames) env info handler fail
+      (load-file (car filenames) env2 info handler fail
 	(lambda-cont2 (v fail)
-	  (load-files (cdr filenames) env info handler fail k))))))
+	  (load-files (cdr filenames) env2 info handler fail k))))))
 
 ;; length
 (define length-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (length-one? args))
-      (runtime-error "incorrect number of arguments to length" info handler fail)
-      (length-loop (car args) 0 (car args) info handler fail k2))))
+    (if (length-one? args)
+      (length-loop (car args) 0 (car args) info handler fail k2)
+      (runtime-error "incorrect number of arguments to length" info handler fail))))
 
 (define* length-loop
   (lambda (x sum ls info handler fail k2)
@@ -3497,6 +3552,24 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 args fail)))
 
+;; make-set
+(define make-set-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to set" info handler fail))
+      (else (make-set (car args) env2 info handler fail k2)))))
+    
+(define* make-set
+  (lambda (lst env2 info handler fail k2)
+    (if (null? lst)
+      (k2 lst fail)
+      (make-set (cdr lst) env2 info handler fail
+	(lambda-cont2 (v fail)
+	  (if (member (car lst) v)
+	    (k2 v fail)
+	    (k2 (cons (car lst) v) fail)))))))
+
 ;; +
 (define plus-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -3541,9 +3614,9 @@
        (runtime-error "incorrect number of arguments to %" info handler fail))
       ((not (all-numeric? args))
        (runtime-error "% called on non-numeric argument(s)" info handler fail))
-      ((= 0 (cadr args))
+      ((= (cadr args) 0)
        (runtime-error "modulo by zero" info handler fail))
-      (else (k2 (apply % args) fail)))))
+      (else (k2 (apply modulo args) fail)))))
 
 ;; <
 (define lt-prim
@@ -3689,7 +3762,7 @@
        (runtime-error "range called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply range args) fail)))))
 
-(define range
+(define-native range
   (lambda args
     (letrec
 	((range
@@ -3723,10 +3796,6 @@
       (else (k2 (apply set-cdr! args) fail)))))
 
 ;; import
-;; bug fix needed:
-;; (import "my-fact.ss" 'm)
-;; (m.m.m.m.m.fib 10) =>  89
-
 (define import-prim
   (lambda-proc (args env2 info handler fail k2)
     (let ((filename (car args)))
@@ -3735,7 +3804,7 @@
 	(let ((module-name (cadr args)))
 	  (lookup-binding-in-first-frame module-name env2 handler fail
 	    (lambda-cont2 (binding fail)
-	      (let ((module (extend env2 '() '())))
+	      (let ((module (make-toplevel-env)))
 		(set-binding-value! binding module)
 		(load-file filename module 'none handler fail k2)))))))))
 
@@ -3764,7 +3833,7 @@
 	(if (not (procedure-object? proc))
 	  (runtime-error "call/cc called with non-procedure" info handler fail)
 	  (let ((fake-k (lambda-proc (args env2 info handler fail k2) (k (car args) fail))))
-	    (if (dlr-exp? proc)
+	    (if (dlr-proc? proc)
 	      (k (dlr-apply proc (list fake-k)) fail)
 	      (proc (list fake-k) env info handler fail k))))))))
 
@@ -3873,28 +3942,22 @@
 ;; dir
 (define dir-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (dir args env2) fail)))
+    (make-set (dir args env2) env2 info handler fail k2)))
 
 (define dir
   (lambda (args env)
     (sort symbol<? (if (null? args)
-		       (flatten
-			 (append (get-reserved-keywords)
-				 (map get-variables-from-frame (frames macro-env))
-				 (map get-variables-from-frame (frames env))))
-		       (get-variables-from-frame (car (frames (car args))))))))
+		       (append (get-variables-from-frames (frames macro-env))
+			       (get-variables-from-frames (frames env)))
+		       (get-variables-from-frames (frames (car args)))))))
 
 (define get-variables-from-frame
-  (lambda (frame) 
-    (map binding-variable (vector->list frame))))
+  (lambda (frame)
+    (cadr frame)))
 
 (define get-variables-from-frames
   (lambda (frames) 
-    (map get-variables-from-frame frames)))
-
-(define get-variables-from-list
-   (lambda (frame) 
-     (map binding-variable frame)))
+    (flatten (map get-variables-from-frame frames))))
 
 (define symbol<?
   (lambda (a b)
@@ -3986,7 +4049,7 @@
   (lambda (proc list1 env handler fail k)
     (if (null? list1)
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(map1 proc (cdr list1) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (list (car list1))) v2)
@@ -4002,7 +4065,7 @@
   (lambda (proc list1 list2 env handler fail k)
     (if (null? list1)
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(map2 proc (cdr list1) (cdr list2) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (list (car list1) (car list2))) v2)
@@ -4017,7 +4080,7 @@
   (lambda (proc lists env handler fail k)
     (if (null? (car lists))
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(mapN proc (map cdr lists) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (map car lists)) v2)
@@ -4040,7 +4103,7 @@
       (let ((arg-list (listify lists)))
 	(if (null? (car arg-list))
 	  (k void-value fail)
-	  (if (dlr-exp? proc) 
+	  (if (dlr-proc? proc) 
 	    (begin
 	      (dlr-apply proc (map car arg-list))
 	      (for-each-primitive proc (map cdr arg-list) env handler fail k))
@@ -4048,8 +4111,8 @@
 	      (lambda-cont2 (v1 fail)
 		(for-each-primitive proc (map cdr arg-list) env handler fail k)))))))))
 
-;; end
-(define env-prim
+;; env
+(define current-environment-prim
   (lambda-proc (args env2 info handler fail k2)
     (k2 env2 fail)))
 
@@ -4111,6 +4174,17 @@
        (runtime-error "incorrect number of arguments to list-ref" info handler fail))
       (else (k2 (apply list-ref args) fail)))))
 
+;; current-directory
+(define current-directory-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((null? args) (k2 (current-directory) fail))
+      ((length-one? args)
+       (if (string? (car args))
+	   (k2 (current-directory (car args)) fail)
+	   (runtime-error "directory must be a string" info handler fail)))
+      (else (runtime-error "incorrect number of arguments to current-directory" info handler fail)))))
+
 ;; Add new procedures above here!
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
@@ -4156,7 +4230,7 @@
 	    (list 'cut cut-prim)
 	    (list 'dir dir-prim)
 	    (list 'display display-prim)
-	    (list 'env env-prim)
+	    (list 'current-environment current-environment-prim)
 	    (list 'eq? eq?-prim)
 	    (list 'equal? equal?-prim)
 	    (list 'error error-prim)
@@ -4172,6 +4246,7 @@
 	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
+	    (list 'make-set make-set-prim)
 	    (list 'make-vector make-vector-prim)
 	    (list 'map map-prim)
 	    (list 'member member-prim)
@@ -4194,10 +4269,10 @@
 	    (list 'set-car! set-car!-prim)
 	    (list 'set-cdr! set-cdr!-prim)
 	    (list 'sqrt sqrt-prim)
-;;	    (list 'odd? odd?-prim)
-;;	    (list 'even? even?-prim)
-;;	    (list 'quotient quotient-prim)
-;;	    (list 'remainder remainder-prim)
+	    (list 'odd? odd?-prim)
+	    (list 'even? even?-prim)
+	    (list 'quotient quotient-prim)
+	    (list 'remainder remainder-prim)
 	    (list 'string string-prim)
 	    (list 'string-length string-length-prim)
 	    (list 'string-ref string-ref-prim)
@@ -4206,19 +4281,19 @@
 	    (list 'string=? string=?-prim)
 	    (list 'substring substring-prim)
 	    (list 'symbol? symbol?-prim)
-	    (list 'unparse unparse-prim)
-	    (list 'unparse-procedure unparse-procedure-prim)
+	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
+	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
 	    (list 'using using-primitive)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)
 	    (list 'void void-prim)
 	    (list 'zero? zero?-prim)
+	    (list 'current-directory current-directory-prim)
+	    (list 'cd current-directory-prim)
 	    )))
       (make-initial-env-extended
-       (make-initial-environment
-	(map car primitives)
-	(map cadr primitives))))))
+        (make-initial-environment (map car primitives) (map cadr primitives))))))
 	
 (define toplevel-env (make-toplevel-env))
 

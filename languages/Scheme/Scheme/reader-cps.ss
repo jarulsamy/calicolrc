@@ -854,6 +854,7 @@
 (define init-cont (lambda-cont (v) (halt* v)))
 (define init-cont2 (lambda-cont2 (v1 v2) (halt* v1)))
 (define init-cont3 (lambda-cont3 (v1 v2 v3) (halt* v1)))
+(define init-cont4 (lambda-cont4 (v1 v2 v3 v4) (halt* v1)))
 (define init-handler (lambda-handler (e) (halt* (list 'exception e))))
 (define init-handler2 (lambda-handler2 (e fail) (halt* (list 'exception e))))
 (define init-fail (lambda-fail () (halt* "no more choices")))

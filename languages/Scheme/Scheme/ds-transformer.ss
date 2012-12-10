@@ -45,8 +45,8 @@
   (lambda ()
     (list
       (make-datatype 'continuation 'cont '((k k2 REP-k) value))
-      (make-datatype 'continuation2 'cont2 '((k k2 REP-k) value1 value2))
-      (make-datatype 'continuation3 'cont3 '((k k2) value1 value2 value3))
+      (make-datatype 'continuation2 'cont2 '((k k2 REP-k gk sk) value1 value2))
+      (make-datatype 'continuation3 'cont3 '((k k2 dk) value1 value2 value3))
       (make-datatype 'continuation4 'cont4 '((k k2) value1 value2 value3 value4))
       (make-datatype 'fail-continuation 'fail '((fail)))
       (make-datatype 'handler 'handler '((handler) exception))

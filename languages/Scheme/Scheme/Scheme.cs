@@ -514,7 +514,7 @@ public class Scheme {
   public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
   public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
-  public static Proc Modulo_proc = new Proc("%", (Procedure1) Modulo, -1, 1);
+  public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
@@ -563,11 +563,13 @@ public class Scheme {
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
   //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
   //public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
-  public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)PJScheme.make_binding, 2, 1);
+  public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
   public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
   public static Proc get_member_proc = new Proc("get-member", (Procedure2)get_external_member_name, 2, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
+  public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
+  public static Proc remainder_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
   public static Proc car_hat_proc = new Proc("car^",(Procedure1)PJScheme.car_hat, 1, 1);
   public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)PJScheme.cdr_hat, 1, 1);
   public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
@@ -580,9 +582,9 @@ public class Scheme {
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
 
-  public static Proc binding_variable_proc = new Proc("binding_variable", 
-							(Procedure1) PJScheme.binding_variable,
-							2, 1);
+    //  public static Proc binding_variable_proc = new Proc("binding_variable", 
+    //							(Procedure1) PJScheme.binding_variable,
+    //							2, 1);
   public static Proc get_variables_from_frame_proc = new Proc("get_variables_from_frame", 
 								(Procedure1) PJScheme.get_variables_from_frame,
 								1, 1);
@@ -623,7 +625,10 @@ public class Scheme {
 	return x.ToString();
   }
 
-  public static object group(object chars, object delimiter) {
+  public static object string_split(object str, object delimiter) {
+        return list(((String)str).Split((char) delimiter));
+
+       /*
 	// given list of chars and a delim char, return a list of strings
 	object retval = EmptyList;
 	object buffer = EmptyList;
@@ -640,6 +645,7 @@ public class Scheme {
 	if (!Eq(buffer, EmptyList))
 	  retval = cons(list_to_string(reverse(buffer)), retval);
 	return reverse(retval);
+      */
   }
 
   public static object make_proc(params object[] args) {
@@ -695,10 +701,9 @@ public class Scheme {
 	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
 	       list(symbol("get-member"), get_member_proc),
 	       list(symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)),
-	       list(symbol("group"), new Proc("group", (Procedure2) group, 2, 1)),
+	       list(symbol("string-split"), new Proc("string-split", (Procedure2) string_split, 2, 1)),
 	       list(symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1)),
 	       list(symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2)),
-	       list(symbol("length"), new Proc("length", (Procedure1)length, 1, 1)),
 	       list(symbol("list->vector"), list_to_vector_proc),
 	       list(symbol("list-head"), new Proc("list-head", (Procedure2)list_head, 2, 1)),
 	       list(symbol("list-tail"), new Proc("list-tail", (Procedure2)list_tail, 2, 1)),
@@ -799,8 +804,24 @@ public class Scheme {
 	return call_external_proc(the_obj, property_list, null);
   }
 
+    public static bool odd_q(object obj) {
+        return !Eq(modulo(obj, 2), 0);
+    }
+
+    public static object even_q(object obj) {
+        return Eq(modulo(obj, 2), 0);
+    }
+
   public static object get_external_member_name(object obj, object name) {
       return get_external_member(obj, name.ToString());
+  }
+
+  public static object set_external_member_b(object obj, object components, object value) {
+      return null;
+  }
+
+  public static object get_external_member(object obj, object components) {
+      return get_external_member_name(obj, car(components));
   }
 
   public static object get_external_member(object obj, string name) {
@@ -1461,11 +1482,12 @@ public class Scheme {
 	Console.Write(s);
   }
 
-  public static object dlr_exp_q(object rator) {
-      //Console.WriteLine("dlr-exp? {0}");
+  public static object dlr_proc_q(object rator) {
+      //Console.WriteLine("dlr-proc? {0}");
       //return (! pair_q(rator));
       return ((rator is IronPython.Runtime.Types.BuiltinFunction) ||
 	      (rator is IronPython.Runtime.PythonFunction) ||
+	      (rator is IronPython.Runtime.Method) ||
 	      (rator is MethodNeedsArgs) ||
 	      (rator is Method) ||
 	      (rator is IronPython.Runtime.Types.PythonType) ||
@@ -1527,11 +1549,12 @@ public class Scheme {
 
   public static object dlr_env_lookup(object variable) {
 	object retval = null;
-	if (_dlr_env != null) 
+	if (_dlr_env != null)  {
 	    retval = _dlr_env.GetVariable(variable.ToString());
-	else
+	    return retval;
+	} else {
 	    throw new Exception(String.Format("DLR Environment not available"));
-	return PJScheme.make_binding("dlr", retval);
+        }
   }
 
   public static object dlr_env_list() {
@@ -1549,12 +1572,22 @@ public class Scheme {
     return retval;
   }
 
-  public static bool dlr_object_q(object result) {
-	// FIXME: can we see if it is a dlr object?
-    //printf("dlr_object_q: {0}\n", result);
-    return true;
-    //return (result is IronPython.Runtime.Types.PythonType);
+  public static object dlr_object_q(object x) {
+      return ((x is IronPython.Runtime.Types.BuiltinFunction) ||
+	      (x is IronPython.Runtime.PythonFunction) ||
+	      (x is IronPython.Runtime.Method) ||
+	      (x is MethodNeedsArgs) ||
+	      (x is Method) ||
+	      (x is IronPython.Runtime.Types.PythonType) ||
+	      (x is Closure));
   }
+  
+//   public static bool dlr_object_q(object result) {
+// 	// FIXME: can we see if it is a dlr object?
+//     //printf("dlr_object_q: {0}\n", result);
+//     return true;
+//     //return (result is IronPython.Runtime.Types.PythonType);
+//   }
 
   public static object dlr_lookup_components(object result, object parts_list) {
       //printf("dlr_lookup_components: {0}, {1}\n", result, parts_list);
@@ -1570,12 +1603,14 @@ public class Scheme {
 		  throw new Exception(String.Format("DLR Runtime not available"));
 	      }
 	  } catch {
-	      object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+	      //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+              object binding = PJScheme.make_binding(get_external_member(result, car(parts_list).ToString()));
 	      return binding;
 	  }
 	  parts_list = cdr(parts_list);
       }
-      return PJScheme.make_binding("dlr", retobj);
+      //return PJScheme.make_binding("dlr", retobj);
+      return PJScheme.make_binding(retobj);
   }
 
   public static object printf_prim(object args) {
@@ -2154,6 +2189,10 @@ public class Scheme {
 	return retval;
   }
 	
+  public static object quotient(object num1, object num2) {
+      return ToInt(Divide(num1, num2));
+  }
+
   public static object Divide(object obj) {
 	// For dividing 1 or more numbers in list
 	object retval = car(obj);
@@ -2169,13 +2208,13 @@ public class Scheme {
 	return retval;
   }
 
-    public static object Modulo(object obj) {
+    public static object modulo(object obj) {
 	object obj1 = car(obj);
 	object obj2 = cadr(obj);
-	return Modulo(obj1, obj2);
+	return modulo(obj1, obj2);
     }
     
-    public static object Modulo(object obj1, object obj2) {
+    public static object modulo(object obj1, object obj2) {
 	if (obj1 is Rational) {
 	  if (obj2 is Rational) {
 		return (((Rational)obj1) % ((Rational)obj2));
@@ -2450,6 +2489,15 @@ public class Scheme {
   }
 
     // Add new low-level procedures here!
+
+    public static object current_directory() {
+        return System.IO.Directory.GetCurrentDirectory();
+    }
+
+    public static object current_directory(object path) {
+        System.IO.Directory.SetCurrentDirectory(path.ToString());
+        return null;
+    }
 
     public static object number_to_string(object number) {
 	return ((number != null) ? number.ToString() : "");
@@ -2905,7 +2953,7 @@ public class Scheme {
 	if (list is Cons) {
 	  object current = list;
 	  while (! Eq(current, EmptyList)) {
-		if (Equal(item1, car(current))) {
+		if (Eq(item1, car(current))) {
 		    return current;
 		}
 		current = cdr(current);
@@ -3643,37 +3691,43 @@ public class Scheme {
       }
   }
 
+    //  public static object search_frame(object frame, object variable) {
+    //      if (PJScheme.empty_frame_q(frame)) {
+    //	  return false;
+    //      } else {
+    //	  if (frame is Vector) {
+    //	      Vector v = (Vector)frame;
+    //	      for (int i = 0; i < (int)v.length(); i++) {
+    //		  if (Eq(PJScheme.binding_variable(v.get(i)), variable)) {
+    //		      return v.get(i);
+    //		  }
+    //	      }
+    //	  } else {
+    //	      throw new Exception("frame is not a vector");
+    //	  }
+    //      }
+    //      return false;
+    //  }
+
+
+  // is this correct?
   public static object search_frame(object frame, object variable) {
-      if (PJScheme.empty_frame_q(frame)) {
-	  return false;
+      if (frame is Cons) {
+          Vector bindings = (Vector) car(frame);
+          object variables = cadr(frame);
+          int i = 0;
+          while (!null_q(variables) && !Eq(car(variables), variable)) {
+              variables = cdr(variables);
+              i++;
+          }
+          if (null_q(variables)) {
+              return false;
+          } else {
+              return bindings.get(i);
+          }
       } else {
-	  if (frame is Vector) {
-	      Vector v = (Vector)frame;
-	      for (int i = 0; i < (int)v.length(); i++) {
-		  if (Eq(PJScheme.binding_variable(v.get(i)), variable)) {
-		      return v.get(i);
-		  }
-	      }
-	  } else {
-	      throw new Exception("frame is not a vector");
-	  }
+          throw new Exception("invalid frame");
       }
-      return false;
   }
 
-    public static object my_get_lexical_address_frame(object frame, object variable, object depth, object offset, object info) {
-	// returns (#t pos) or (#f) signifying bound or free, respectively
-	if (PJScheme.empty_frame_q(frame)) {
-	    return list(false); // not in this frame
-	} else if ((int)offset >= (int)vector_length(frame)) {
-	    return list(false); // not here
-	} else {
-	    for (int i = (int)offset; i < (int)((Vector)frame).length(); i++) {
-		if (Eq(PJScheme.binding_variable(vector_ref(frame, i)), variable)) {
-		    return list(true, PJScheme.lexical_address_aexp(depth, i, variable, info));
-		}
-	    }
-	    return list(false); // not here
-	}
-    }
 }

@@ -15,19 +15,19 @@
 ;; Scheme, independently of C#
 
 ;; dummy versions of functions defined in C# code
-(define dlr-exp? (lambda (x) #f))
-(define dlr-apply apply)
-(define dlr-func (lambda (x) x))
-(define dlr-env-contains (lambda (x) #f))
-(define dlr-env-lookup (lambda (x) #f))
-(define dlr-object? (lambda (x) #f))
-(define dlr-lookup-components (lambda (x y) #f))
-(define set-global-value! (lambda (var x) #f))
-(define set-global-docstring! (lambda (var x) #f))
-(define printf-prim printf)
-(define using-prim (lambda ignore #f))
-(define iterator? (lambda ignore #f))
-(define get_type (lambda (x) 'unknown))
+(define-native dlr-proc? (lambda (x) #f))
+(define-native dlr-apply apply)
+(define-native dlr-func (lambda (x) x))
+(define-native dlr-env-contains (lambda (x) #f))
+(define-native dlr-env-lookup (lambda (x) #f))
+(define-native dlr-object? (lambda (x) #f))
+(define-native dlr-lookup-components (lambda (x y) #f))
+(define-native set-global-value! (lambda (var x) #f))
+(define-native set-global-docstring! (lambda (var x) #f))
+(define-native printf-prim printf)
+(define-native using-prim (lambda ignore #f))
+(define-native iterator? (lambda ignore #f))
+(define-native get_type (lambda (x) 'unknown))
 
 ;;----------------------------------------------------------------------------
 
@@ -141,7 +141,7 @@
     (read-sexp *tokens-left* src REP-handler *last-fail*
       (lambda-cont4 (datum end tokens-left fail)
 	(set! *tokens-left* tokens-left)
-	(aparse datum toplevel-env REP-handler fail
+	(aparse datum (initial-contours toplevel-env) REP-handler fail
 	  (lambda-cont2 (exp fail)
 	    (m exp toplevel-env REP-handler fail REP-k)))))))
 
@@ -196,7 +196,7 @@
     (set! load-stack '())
     (scan-input input 'stdin try-parse-handler *last-fail*
       (lambda-cont2 (tokens fail)
-	(aparse-sexps tokens 'stdin toplevel-env try-parse-handler fail
+	(aparse-sexps tokens 'stdin (initial-contours toplevel-env) try-parse-handler fail
 	  (lambda-cont2 (result fail)
 	    (halt* #t)))))
     (trampoline)))
@@ -246,20 +246,6 @@
 
 ;;----------------------------------------------------------------------------
 
-(define* read-and-eval-asexps
-  (lambda (tokens src env handler fail k)
-    (if (token-type? (first tokens) 'end-marker)
-      (k void-value fail)
-      (read-sexp tokens src handler fail
-	(lambda-cont4 (datum end tokens-left fail)
-	  (aparse datum env handler fail
-	    (lambda-cont2 (exp fail)
-	      (m exp env handler fail
-		(lambda-cont2 (v fail)
-		  (if (token-type? (first tokens-left) 'end-marker)
-		    (k v fail)
-		    (read-and-eval-asexps tokens-left src env handler fail k)))))))))))
-
 (define *tracing-on?* #f)
 
 (define make-debugging-k
@@ -292,10 +278,10 @@
    (let ((k (if *tracing-on?* (make-debugging-k exp k) k)))
     (cases aexpression exp
       (lit-aexp (datum info) (k datum fail))
-      (var-aexp (id info) (lookup-value id env info handler fail k))
-      (lexical-address-aexp (depth offset variable info) 
-	(lookup-value-by-lexical-address 
-	 depth offset env info handler fail k))
+      (var-aexp (id info)
+	(lookup-value id env info handler fail k))
+      (lexical-address-aexp (depth offset id info)
+	(lookup-value-by-lexical-address depth offset (frames env) fail k))
       (func-aexp (exp info)
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
@@ -309,7 +295,19 @@
       (assign-aexp (var rhs-exp var-info info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
-	    (lookup-binding var env var-info handler fail
+	    (lookup-variable var env var-info handler fail
+	      (lambda-cont2 (var fail)
+		(let ((old-value (dlr-env-lookup var)))
+		  ;; need to undo the assignment if we back up
+		  (set-global-value! var rhs-value)
+		  (let ((new-fail (lambda-fail () (set-global-value! var old-value) (fail))))
+		    (k void-value new-fail))))
+	      (lambda-cont3 (dlr-obj components fail) ;; dlr-obj is Myro, components is (Myro robot)
+		(let ((old-value (get-external-member dlr-obj components)))
+		  (set-external-member! dlr-obj components rhs-value)
+		  ;; need to undo the assignment if we back up
+		  (let ((new-fail (lambda-fail () (set-external-member! dlr-obj components old-value) (fail))))
+		    (k void-value new-fail))))
 	      (lambda-cont2 (binding fail)
 		(let ((old-value (binding-value binding)))
 		  (set-binding-value! binding rhs-value)
@@ -375,7 +373,7 @@
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
 		(cond
-		  ((dlr-exp? proc) (k (dlr-apply proc args) fail))
+		  ((dlr-proc? proc) (k (dlr-apply proc args) fail))
 		  ((procedure-object? proc) (proc args env info handler fail k))
 		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
 				       info handler fail))))))))
@@ -390,6 +388,24 @@
 	    (line (get-start-line info))
 	    (char (get-start-char info)))
 	(handler (format "runtime error: ~a ~a" msg (where-at line char src)) fail)))))
+
+(define* m*
+  (lambda (exps env handler fail k)
+    (if (null? exps)
+      (k '() fail)
+      (m (car exps) env handler fail
+	(lambda-cont2 (v1 fail)
+	  (m* (cdr exps) env handler fail
+	    (lambda-cont2 (v2 fail)
+	      (k (cons v1 v2) fail))))))))
+
+(define* eval-sequence
+  (lambda (exps env handler fail k)
+    (if (null? (cdr exps))
+      (m (car exps) env handler fail k)
+      (m (car exps) env handler fail
+	(lambda-cont2 (result fail)
+	  (eval-sequence (cdr exps) env handler fail k))))))
 
 (define try-catch-handler
   (lambda (cvar cexps env handler k)
@@ -430,22 +446,24 @@
 	;; if new-fail is invoked, it will try the next choice
 	(m (car exps) env handler new-fail k)))))
 
-(define _closure-depth 0)
+(define closure
+  (lambda (formals bodies env)
+    (lambda-proc (args env2 info handler fail k2)
+      (if (= (length args) (length formals))
+	(eval-sequence bodies (extend env formals args) handler fail k2)
+	(runtime-error "incorrect number of arguments in application" info handler fail)))))
 
-(define get-closure-depth
-  (lambda ()
-    _closure-depth
-    ))
-
-(define increment-closure-depth
-  (lambda ()
-    (set! _closure-depth (+ _closure-depth 1))
-    ))
-
-(define decrement-closure-depth
-  (lambda ()
-    (set! _closure-depth (- _closure-depth 1))
-    ))
+(define mu-closure
+  (lambda (formals runt bodies env)
+    (lambda-proc (args env2 info handler fail k2)
+      (if (>= (length args) (length formals))
+	(let ((new-env
+		(extend env
+		  (cons runt formals)
+		  (cons (list-tail args (length formals))
+			(list-head args (length formals))))))
+	  (eval-sequence bodies new-env handler fail k2))
+	(runtime-error "not enough arguments in application" info handler fail)))))
 
 (define make-trace-depth-string
   (lambda (level)
@@ -494,7 +512,7 @@
 		  (extend env
 		    (cons runt formals)
 		    (cons (list-tail args (length formals))
-		      (list-head args (length formals))))))
+			  (list-head args (length formals))))))
 	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
 	    (set! trace-depth (+ trace-depth 1))
 	    (eval-sequence bodies new-env handler fail
@@ -503,43 +521,6 @@
 		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
 		(k2 v fail))))
 	  (runtime-error "not enough arguments in application" info handler fail))))))
-
-(define closure
-  (lambda (formals bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-      (if (= (length args) (length formals))
-	(eval-sequence bodies (extend env formals args) handler fail k2)
-	(runtime-error "incorrect number of arguments in application" info handler fail)))))
-
-(define mu-closure
-  (lambda (formals runt bodies env)
-    (lambda-proc (args env2 info handler fail k2)
-      (if (>= (length args) (length formals))
-	(let ((new-env
-		(extend env
-		  (cons runt formals)
-		  (cons (list-tail args (length formals))
-			(list-head args (length formals))))))
-	  (eval-sequence bodies new-env handler fail k2))
-	(runtime-error "not enough arguments in application" info handler fail)))))
-
-(define* m*
-  (lambda (exps env handler fail k)
-    (if (null? exps)
-      (k '() fail)
-      (m (car exps) env handler fail
-	(lambda-cont2 (v1 fail)
-	  (m* (cdr exps) env handler fail
-	    (lambda-cont2 (v2 fail)
-	      (k (cons v1 v2) fail))))))))
-
-(define* eval-sequence
-  (lambda (exps env handler fail k)
-    (if (null? (cdr exps))
-      (m (car exps) env handler fail k)
-      (m (car exps) env handler fail
-	(lambda-cont2 (result fail)
-	  (eval-sequence (cdr exps) env handler fail k))))))
 
 ;;----------------------------------------------------------------------------
 ;; Primitives
@@ -599,27 +580,37 @@
 ;; eval
 (define eval-prim
   (lambda-proc (args env2 info handler fail k2)
-    (annotate-cps (car args) 'none
-      (lambda-cont (adatum)
-        (aparse adatum env2 handler fail
-          (lambda-cont2 (exp fail)
-            (m exp env2 handler fail k2)))))))
-
+    (cond
+      ((length-one? args)  ;; petite uses toplevel env
+       (annotate-cps (car args) 'none
+	 (lambda-cont (adatum)
+	   (aparse adatum (initial-contours toplevel-env) handler fail
+	     (lambda-cont2 (exp fail)
+	       (m exp toplevel-env handler fail k2))))))
+      ((length-two? args)
+       (annotate-cps (car args) 'none
+	 (lambda-cont (adatum)
+	   (aparse adatum (initial-contours (cadr args)) handler fail
+	     (lambda-cont2 (exp fail)
+	       (m exp (cadr args) handler fail k2))))))
+      (else (runtime-error "incorrect number of arguments to eval" info handler fail)))))
+	       
 ;; eval-ast
 (define eval-ast-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (list? (car args)) ;; is there a better check for exp?
-	(m (car args) env2 handler fail 
-	   (lambda-cont2 (result fail2)
-		(k2 result fail2)))
-	(runtime-error "eval-ast called on non-abstract syntax tree argument" info handler fail))))
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to eval-ast" info handler fail))
+      ((not (list? (car args)))  ;; is there a better test for exp?  aexpression?
+       (runtime-error "eval-ast called on non-abstract syntax tree argument" info handler fail))
+      (else (m (car args) toplevel-env handler fail k2)))))  ;; petite uses toplevel env
 
 ;; parse
 (define parse-prim
   (lambda-proc (args env2 info handler fail k2)
     (annotate-cps (car args) 'none
       (lambda-cont (adatum)
-        (aparse adatum env2 handler fail k2)))))
+        (aparse adatum (initial-contours toplevel-env) handler fail k2)))))  ;; was env2
 
 ;; string-length
 (define string-length-prim
@@ -646,12 +637,12 @@
 ;; unparse
 (define unparse-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (aunparse (car args)) fail)))
+    (k2 (aunparse (car args)) fail)))   ;; aunparse should be in CPS
 
 ;; unparse-procedure
 (define unparse-procedure-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (aunparse (car (caddr (car args)))) fail)))
+    (k2 (aunparse (car (caddr (car args)))) fail)))  ;; aunparse should be in CPS
 
 ;; parse-string
 (define parse-string-prim
@@ -661,7 +652,7 @@
 	(read-sexp tokens 'stdin handler fail
 	  (lambda-cont4 (adatum end tokens-left fail)
 	    (if (token-type? (first tokens-left) 'end-marker)
-	      (aparse adatum env2 handler fail k2)
+	      (aparse adatum (initial-contours toplevel-env) handler fail k2)  ;; was env2
 	      (read-error "tokens left over" tokens-left 'stdin handler fail))))))))
 
 ;; read-string
@@ -693,36 +684,36 @@
       (else (k2 (apply sqrt args) fail)))))
 
 ;; odd?
-;;(define odd?-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to odd?" info handler fail))
-;;      (else (k2 (odd? (car args)) fail)))))
+(define odd?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to odd?" info handler fail))
+      (else (k2 (odd? (car args)) fail)))))
 
 ;; even?
-;;(define even?-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-one? args))
-;;       (runtime-error "incorrect number of arguments to even?" info handler fail))
-;;      (else (k2 (even? (car args)) fail)))))
+(define even?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to even?" info handler fail))
+      (else (k2 (even? (car args)) fail)))))
 
 ;; quotient
-;;(define quotient-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-two? args))
-;;       (runtime-error "incorrect number of arguments to quotient" info handler fail))
-;;      (else (k2 (apply quotient args) fail)))))
+(define quotient-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to quotient" info handler fail))
+      (else (k2 (apply quotient args) fail)))))
 
 ;; remainder
-;;(define remainder-prim
-;;  (lambda-proc (args env2 info handler fail k2)
-;;    (cond
-;;      ((not (length-two? args))
-;;       (runtime-error "incorrect number of arguments to remainder" info handler fail))
-;;      (else (k2 (apply remainder args) fail)))))
+(define remainder-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to remainder" info handler fail))
+      (else (k2 (apply remainder args) fail)))))
 
 ;; print
 (define print-prim
@@ -809,12 +800,12 @@
   (lambda-proc (args env2 info handler fail k2)
     (if (not (length-one? args))
        (runtime-error "incorrect number of arguments to load" info handler fail)
-       (load-file (car args) env2 info handler fail k2))))
+       (load-file (car args) toplevel-env info handler fail k2))))  ;; petite uses toplevel env
 
 (define load-stack '())
 
 (define* load-file
-  (lambda (filename env info handler fail k)
+  (lambda (filename env2 info handler fail k)
     (cond
       ((member filename load-stack)
        (printf "skipping recursive load of ~a~%" filename)
@@ -827,7 +818,7 @@
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
 	 (lambda-cont2 (tokens fail)
-	   (read-and-eval-asexps tokens filename env handler fail
+	   (read-and-eval-asexps tokens filename env2 handler fail
 	     (lambda-cont2 (v fail)
 	       ;; pop load-stack
 	       (if (null? load-stack)
@@ -835,20 +826,34 @@
 		 (set! load-stack (cdr load-stack)))
 	       (k void-value fail)))))))))
 
+(define* read-and-eval-asexps
+  (lambda (tokens src env2 handler fail k)
+    (if (token-type? (first tokens) 'end-marker)
+      (k void-value fail)
+      (read-sexp tokens src handler fail
+	(lambda-cont4 (datum end tokens-left fail)
+	  (aparse datum (initial-contours env2) handler fail  ;; was env2
+	    (lambda-cont2 (exp fail)
+	      (m exp env2 handler fail
+		(lambda-cont2 (v fail)
+		  (if (token-type? (first tokens-left) 'end-marker)
+		    (k v fail)
+		    (read-and-eval-asexps tokens-left src env2 handler fail k)))))))))))
+
 (define* load-files
-  (lambda (filenames env info handler fail k)
+  (lambda (filenames env2 info handler fail k)
     (if (null? filenames)
       (k void-value fail)
-      (load-file (car filenames) env info handler fail
+      (load-file (car filenames) env2 info handler fail
 	(lambda-cont2 (v fail)
-	  (load-files (cdr filenames) env info handler fail k))))))
+	  (load-files (cdr filenames) env2 info handler fail k))))))
 
 ;; length
 (define length-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (length-one? args))
-      (runtime-error "incorrect number of arguments to length" info handler fail)
-      (length-loop (car args) 0 (car args) info handler fail k2))))
+    (if (length-one? args)
+      (length-loop (car args) 0 (car args) info handler fail k2)
+      (runtime-error "incorrect number of arguments to length" info handler fail))))
 
 (define* length-loop
   (lambda (x sum ls info handler fail k2)
@@ -1001,6 +1006,24 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 args fail)))
 
+;; make-set
+(define make-set-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to set" info handler fail))
+      (else (make-set (car args) env2 info handler fail k2)))))
+    
+(define* make-set
+  (lambda (lst env2 info handler fail k2)
+    (if (null? lst)
+      (k2 lst fail)
+      (make-set (cdr lst) env2 info handler fail
+	(lambda-cont2 (v fail)
+	  (if (member (car lst) v)
+	    (k2 v fail)
+	    (k2 (cons (car lst) v) fail)))))))
+
 ;; +
 (define plus-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1045,9 +1068,9 @@
        (runtime-error "incorrect number of arguments to %" info handler fail))
       ((not (all-numeric? args))
        (runtime-error "% called on non-numeric argument(s)" info handler fail))
-      ((= 0 (cadr args))
+      ((= (cadr args) 0)
        (runtime-error "modulo by zero" info handler fail))
-      (else (k2 (apply % args) fail)))))
+      (else (k2 (apply modulo args) fail)))))
 
 ;; <
 (define lt-prim
@@ -1193,7 +1216,7 @@
        (runtime-error "range called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply range args) fail)))))
 
-(define range
+(define-native range
   (lambda args
     (letrec
 	((range
@@ -1227,10 +1250,6 @@
       (else (k2 (apply set-cdr! args) fail)))))
 
 ;; import
-;; bug fix needed:
-;; (import "my-fact.ss" 'm)
-;; (m.m.m.m.m.fib 10) =>  89
-
 (define import-prim
   (lambda-proc (args env2 info handler fail k2)
     (let ((filename (car args)))
@@ -1239,7 +1258,7 @@
 	(let ((module-name (cadr args)))
 	  (lookup-binding-in-first-frame module-name env2 handler fail
 	    (lambda-cont2 (binding fail)
-	      (let ((module (extend env2 '() '())))
+	      (let ((module (make-toplevel-env)))
 		(set-binding-value! binding module)
 		(load-file filename module 'none handler fail k2)))))))))
 
@@ -1268,7 +1287,7 @@
 	(if (not (procedure-object? proc))
 	  (runtime-error "call/cc called with non-procedure" info handler fail)
 	  (let ((fake-k (lambda-proc (args env2 info handler fail k2) (k (car args) fail))))
-	    (if (dlr-exp? proc)
+	    (if (dlr-proc? proc)
 	      (k (dlr-apply proc (list fake-k)) fail)
 	      (proc (list fake-k) env info handler fail k))))))))
 
@@ -1377,28 +1396,22 @@
 ;; dir
 (define dir-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (dir args env2) fail)))
+    (make-set (dir args env2) env2 info handler fail k2)))
 
 (define dir
   (lambda (args env)
     (sort symbol<? (if (null? args)
-		       (flatten
-			 (append (get-reserved-keywords)
-				 (map get-variables-from-frame (frames macro-env))
-				 (map get-variables-from-frame (frames env))))
-		       (get-variables-from-frame (car (frames (car args))))))))
+		       (append (get-variables-from-frames (frames macro-env))
+			       (get-variables-from-frames (frames env)))
+		       (get-variables-from-frames (frames (car args)))))))
 
 (define get-variables-from-frame
-  (lambda (frame) 
-    (map binding-variable (vector->list frame))))
+  (lambda (frame)
+    (cadr frame)))
 
 (define get-variables-from-frames
   (lambda (frames) 
-    (map get-variables-from-frame frames)))
-
-(define get-variables-from-list
-   (lambda (frame) 
-     (map binding-variable frame)))
+    (flatten (map get-variables-from-frame frames))))
 
 (define symbol<?
   (lambda (a b)
@@ -1490,7 +1503,7 @@
   (lambda (proc list1 env handler fail k)
     (if (null? list1)
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(map1 proc (cdr list1) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (list (car list1))) v2)
@@ -1506,7 +1519,7 @@
   (lambda (proc list1 list2 env handler fail k)
     (if (null? list1)
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(map2 proc (cdr list1) (cdr list2) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (list (car list1) (car list2))) v2)
@@ -1521,7 +1534,7 @@
   (lambda (proc lists env handler fail k)
     (if (null? (car lists))
       (k '() fail)
-      (if (dlr-exp? proc)
+      (if (dlr-proc? proc)
 	(mapN proc (map cdr lists) env handler fail
 	  (lambda-cont2 (v2 fail)
 	    (k (cons (dlr-apply proc (map car lists)) v2)
@@ -1544,7 +1557,7 @@
       (let ((arg-list (listify lists)))
 	(if (null? (car arg-list))
 	  (k void-value fail)
-	  (if (dlr-exp? proc) 
+	  (if (dlr-proc? proc) 
 	    (begin
 	      (dlr-apply proc (map car arg-list))
 	      (for-each-primitive proc (map cdr arg-list) env handler fail k))
@@ -1552,8 +1565,8 @@
 	      (lambda-cont2 (v1 fail)
 		(for-each-primitive proc (map cdr arg-list) env handler fail k)))))))))
 
-;; end
-(define env-prim
+;; env
+(define current-environment-prim
   (lambda-proc (args env2 info handler fail k2)
     (k2 env2 fail)))
 
@@ -1615,6 +1628,17 @@
        (runtime-error "incorrect number of arguments to list-ref" info handler fail))
       (else (k2 (apply list-ref args) fail)))))
 
+;; current-directory
+(define current-directory-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((null? args) (k2 (current-directory) fail))
+      ((length-one? args)
+       (if (string? (car args))
+	   (k2 (current-directory (car args)) fail)
+	   (runtime-error "directory must be a string" info handler fail)))
+      (else (runtime-error "incorrect number of arguments to current-directory" info handler fail)))))
+
 ;; Add new procedures above here!
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
@@ -1660,7 +1684,7 @@
 	    (list 'cut cut-prim)
 	    (list 'dir dir-prim)
 	    (list 'display display-prim)
-	    (list 'env env-prim)
+	    (list 'current-environment current-environment-prim)
 	    (list 'eq? eq?-prim)
 	    (list 'equal? equal?-prim)
 	    (list 'error error-prim)
@@ -1676,6 +1700,7 @@
 	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
+	    (list 'make-set make-set-prim)
 	    (list 'make-vector make-vector-prim)
 	    (list 'map map-prim)
 	    (list 'member member-prim)
@@ -1698,10 +1723,10 @@
 	    (list 'set-car! set-car!-prim)
 	    (list 'set-cdr! set-cdr!-prim)
 	    (list 'sqrt sqrt-prim)
-;;	    (list 'odd? odd?-prim)
-;;	    (list 'even? even?-prim)
-;;	    (list 'quotient quotient-prim)
-;;	    (list 'remainder remainder-prim)
+	    (list 'odd? odd?-prim)
+	    (list 'even? even?-prim)
+	    (list 'quotient quotient-prim)
+	    (list 'remainder remainder-prim)
 	    (list 'string string-prim)
 	    (list 'string-length string-length-prim)
 	    (list 'string-ref string-ref-prim)
@@ -1710,19 +1735,19 @@
 	    (list 'string=? string=?-prim)
 	    (list 'substring substring-prim)
 	    (list 'symbol? symbol?-prim)
-	    (list 'unparse unparse-prim)
-	    (list 'unparse-procedure unparse-procedure-prim)
+	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
+	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
 	    (list 'using using-primitive)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)
 	    (list 'void void-prim)
 	    (list 'zero? zero?-prim)
+	    (list 'current-directory current-directory-prim)
+	    (list 'cd current-directory-prim)
 	    )))
       (make-initial-env-extended
-       (make-initial-environment
-	(map car primitives)
-	(map cadr primitives))))))
+        (make-initial-environment (map car primitives) (map cadr primitives))))))
 	
 (define toplevel-env (make-toplevel-env))
 

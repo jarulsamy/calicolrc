@@ -12,18 +12,15 @@
 (define *ignore-definitions*
   '(void-value scheme-REP-k scheme-REP-handler scheme-REP-fail start restart read-line
 	       raw-read-line Main read-content string->integer string->decimal
-	       string->rational tagged-list testall group get-current-time range
-	       true? type? make-initial-env-extended 
+	       string->rational tagged-list testall string-split get-current-time
+	       type? make-initial-env-extended 
 	       make-proc dlr-env-lookup
 	       dlr-env-contains
 	       execute execute-loop execute-string execute-file read-eval-print-loop
 	       unparse unparse-exps qq-expand-cps_ qq-expand-list-cps_
-	       init-cont init-cont2 init-cont3 init-handler init-handler2 init-fail
+	       init-cont init-cont2 init-cont3 init-cont4 init-handler init-handler2 init-fail
 	       ;; defined in Scheme.cs:
-	       atom-tag pair-tag annotated? safe-print make-safe
-	       dlr-exp? dlr-apply dlr-func dlr-env-contains dlr-env-lookup
-	       dlr-object? dlr-lookup-components set-global-value!
-	       set-global-docstring! printf-prim using-prim iterator? get_type
+	       true? atom-tag pair-tag annotated? safe-print make-safe
 	       handle-debug-info highlight-expression 
 	       _closure-depth initialize-closure-depth increment-closure-depth
 	       decrement-closure-depth get-closure-depth repeat
