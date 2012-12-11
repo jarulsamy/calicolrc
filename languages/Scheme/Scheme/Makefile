@@ -1,7 +1,10 @@
 MCS=MONO_PATH=../../../bin:../../../modules mcs -sdk:2
 
-../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs
-	$(MCS) -debug Scheme.cs pjscheme.cs ObjectType.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.Scripting.Core -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -out:../PJScheme.dll
+#../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs 
+#	$(MCS) -debug Scheme.cs pjscheme.cs ObjectType.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.Scripting.Core -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -out:../PJScheme.dll
+
+../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs Rational.cs
+	$(MCS) -debug Scheme.cs pjscheme.cs ObjectType.cs Rational.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.Scripting.Core -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -out:../PJScheme.dll
 
 #Scheme.dll: Scheme.cs Makefile
 #	$(MCS) -debug Scheme.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.Core -out:Scheme.dll

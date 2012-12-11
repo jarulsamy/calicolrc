@@ -2379,8 +2379,7 @@
                                                                                                                                                                                                                                                                                                                                                                                         (set! apair2
                                                                                                                                                                                                                                                                                                                                                                                           (list-ref temp_1 1))
                                                                                                                                                                                                                                                                                                                                                                                         (set! k2_reg
-                                                                                                                                                                                                                                                                                                                                                                                          (make-cont2
-                                                                                                                                                                                                                                                                                                                                                                                            '<cont2-91>
+                                                                                                                                                                                                                                                                                                                                                                                          (make-cont2 '<cont2-91>
                                                                                                                                                                                                                                                                                                                                                                                             value2_reg
                                                                                                                                                                                                                                                                                                                                                                                             value1_reg s-car k))
                                                                                                                                                                                                                                                                                                                                                                                         (set! ap_reg
@@ -2447,8 +2446,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                     temp_1
                                                                                                                                                                                                                                                                                                                                                                                                     1))
                                                                                                                                                                                                                                                                                                                                                                                                 (set! k2_reg
-                                                                                                                                                                                                                                                                                                                                                                                                  (make-cont2
-                                                                                                                                                                                                                                                                                                                                                                                                    '<cont2-93>
+                                                                                                                                                                                                                                                                                                                                                                                                  (make-cont2 '<cont2-93>
                                                                                                                                                                                                                                                                                                                                                                                                     value1_reg
                                                                                                                                                                                                                                                                                                                                                                                                     value2_reg
                                                                                                                                                                                                                                                                                                                                                                                                     ap k2))
@@ -5524,7 +5522,9 @@
                       (set! pc apply-cont2))
                     (if (and (not (null? (cdr components)))
                              (dlr-env-contains (car components))
-                             (dlr-object? (dlr-env-lookup (car components))))
+                             (dlr-object-contains
+                               (dlr-env-lookup (car components))
+                               components))
                         (begin
                           (set! value3_reg fail_reg)
                           (set! value2_reg components)
@@ -5562,7 +5562,7 @@
                       (set! path_reg new-path)
                       (set! components_reg (cdr components_reg))
                       (set! pc lookup-variable-components))
-                    (if (dlr-object? value)
+                    (if (dlr-object-contains value components_reg)
                         (begin
                           (set! value3_reg fail_reg)
                           (set! value2_reg components_reg)
@@ -7243,14 +7243,16 @@
 
 (define dir
   (lambda (args env)
-    (return*
-      (sort
-        symbol<?
-        (if (null? args)
-            (append
-              (get-variables-from-frames (frames macro-env))
-              (get-variables-from-frames (frames env)))
-            (get-variables-from-frames (frames (car args))))))))
+    (if (or (null? args) (environment? (car args)))
+        (return*
+          (sort
+            symbol<?
+            (if (null? args)
+                (append
+                  (get-variables-from-frames (frames macro-env))
+                  (get-variables-from-frames (frames env)))
+                (get-variables-from-frames (frames (car args))))))
+        (return* (get-external-members (car args))))))
 
 (define get-variables-from-frame
   (lambda (frame) (return* (cadr frame))))

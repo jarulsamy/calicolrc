@@ -57,8 +57,7 @@
    (formals (list-of symbol?))
    (bodies (list-of aexpression?))
    (info source-info?))
- (mu-trace-lambda-aexp (name symbol?)
-   (formals (list-of symbol?)) (runt symbol?)
+ (mu-trace-lambda-aexp (name symbol?) (formals (list-of symbol?)) (runt symbol?)
    (bodies (list-of aexpression?)) (info source-info?))
  (app-aexp
    (operator aexpression?)
@@ -73,8 +72,8 @@
    (body aexpression?)
    (finally-exps (list-of aexpression?))
    (info source-info?))
- (try-catch-finally-aexp (body aexpression?)
-   (catch-var symbol?) (catch-exps (list-of aexpression?))
+ (try-catch-finally-aexp (body aexpression?) (catch-var symbol?)
+   (catch-exps (list-of aexpression?))
    (finally-exps (list-of aexpression?)) (info source-info?))
  (raise-aexp (exp aexpression?) (info source-info?))
  (choose-aexp
@@ -164,7 +163,7 @@
              (get-srcfile info)))
          fail))
       (<cont-22> (bindings k)
-       (apply-cont k `(let (,(car^ bindings)) ,value)))
+       (apply-cont k `(let ((unquote (car^ bindings))) ,value)))
       (<cont-23> (clauses var k)
        (let ((clause (car^ clauses)))
          (cond
@@ -183,7 +182,7 @@
                 `((memq ,var ',(car^ clause)) ,@(at^ (cdr^ clause)))
                 value))))))
       (<cont-24> (fields name k2)
-       (let ((constructor-def `(define ,name
+       (let ((constructor-def `(define (unquote name)
                                  (lambda args
                                    (if (= (length args) ,(length^ fields))
                                        ,value
@@ -446,14 +445,19 @@
        (aparse-sexps tokens-left src senv handler value2
          (make-cont2 '<cont2-33> value1 k)))
       (<cont2-35> (bodies k)
-       (apply-cont k `(let ,value1 ,@value2 ,@(at^ bodies))))
+       (apply-cont
+         k
+         `(let (unquote value1) ,@value2 ,@(at^ bodies))))
       (<cont2-36> (procs vars k2)
        (apply-cont2
          k2
          (cons `(,(car^ vars) 'undefined) value1)
          (cons `(set! ,(car^ vars) ,(car^ procs)) value2)))
       (<cont2-37> (exp k)
-       (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))
+       (apply-cont
+         k
+         `(let ((r ,exp) (unquote-splicing value1))
+            (cond (unquote-splicing value2)))))
       (<cont2-38> (clauses var k2)
        (let ((clause (car^ clauses)))
          (if (eq?^ (car^ clause) 'else)
@@ -491,7 +495,8 @@
                      k2
                      (cons
                        `(,name
-                          (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
+                          (lambda (unquote (cadr^ clause))
+                            ,@(at^ (cddr^ clause))))
                        value1)
                      (cons
                        `((eq? (car ,var) ',(car^ clause))
@@ -502,14 +507,15 @@
                      k2
                      (cons
                        `(,name
-                          (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
+                          (lambda (unquote (cadr^ clause))
+                            ,@(at^ (cddr^ clause))))
                        value1)
                      (cons
                        `((memq (car ,var) ',(car^ clause))
                           (apply ,name (cdr ,var)))
                        value2)))))))
       (<cont2-40> (type-tester-name k)
-       (let ((tester-def `(define ,type-tester-name
+       (let ((tester-def `(define (unquote type-tester-name)
                             (lambda (x)
                               (and (pair? x)
                                    (not (not (memq (car x) ',value1))))))))
@@ -523,10 +529,10 @@
       (<cont2-43> (exp type-name type-tester-name k)
        (apply-cont
          k
-         `(let ((r ,exp) ,@value1)
+         `(let ((r ,exp) (unquote-splicing value1))
             (if (not (,type-tester-name r))
                 (error 'cases "~a is not a valid ~a" r ',type-name)
-                (cond ,@value2)))))
+                (cond (unquote-splicing value2))))))
       (<cont2-44> (fail k) (apply-cont2 k value2 fail))
       (<cont2-45> () (set! *last-fail* value2) (halt* value1))
       (<cont2-46> ()
@@ -1770,7 +1776,7 @@
                   (bodies (cdddr^ datum)))
              (apply-cont
                k
-               `(letrec ((,name (lambda ,vars ,@(at^ bodies))))
+               `(letrec ((,name (lambda (unquote vars) ,@(at^ bodies))))
                   (,name ,@(at^ exps)))))
            (let* ((bindings (cadr^ datum))
                   (vars (map^ car^ bindings))
@@ -1778,7 +1784,7 @@
                   (bodies (cddr^ datum)))
              (apply-cont
                k
-               `((lambda ,vars ,@(at^ bodies)) ,@(at^ exps))))))
+               `((lambda (unquote vars) ,@(at^ bodies)) ,@(at^ exps))))))
       (<macro-2> ()
        (let* ((decls (cadr^ datum))
               (vars (map^ car^ decls))
@@ -1794,7 +1800,8 @@
              (bodies (cddr^ datum)))
          (apply-cont
            k
-           `(define ,name (lambda ,formals ,@(at^ bodies))))))
+           `(define (unquote name)
+              (lambda (unquote formals) ,@(at^ bodies))))))
       (<macro-4> ()
        (let ((exps (cdr^ datum)))
          (cond
@@ -1852,7 +1859,8 @@
                               `(let ((bool ,test-exp)
                                      (else-code (lambda ()
                                                   (cond
-                                                    ,@(at^ other-clauses)))))
+                                                    (unquote-splicing
+                                                     (at^ other-clauses))))))
                                  (if bool bool (else-code))))))
                        ((eq?^ (car^ then-exps) '=>)
                         (cond
@@ -1875,7 +1883,8 @@
                                     (th (lambda () ,(cadr^ then-exps)))
                                     (else-code (lambda ()
                                                  (cond
-                                                   ,@(at^ other-clauses)))))
+                                                   (unquote-splicing
+                                                    (at^ other-clauses))))))
                                 (if bool ((th) bool) (else-code)))))))
                        ((null?^ other-clauses)
                         (if (null?^ (cdr^ then-exps))
@@ -1890,13 +1899,16 @@
                           k
                           `(if ,test-exp
                                ,(car^ then-exps)
-                               (cond ,@(at^ other-clauses)))))
+                               (cond
+                                 (unquote-splicing (at^ other-clauses))))))
                        (else
                         (apply-cont
                           k
                           `(if ,test-exp
                                (begin ,@(at^ then-exps))
-                               (cond ,@(at^ other-clauses))))))))))))
+                               (cond
+                                 (unquote-splicing
+                                  (at^ other-clauses)))))))))))))
       (<macro-7> ()
        (let ((bindings (cadr^ datum)) (bodies (cddr^ datum)))
          (nest-let*-bindings^ bindings bodies k)))
@@ -2772,9 +2784,8 @@
 (define*
   lookup-value
   (lambda (var env var-info handler fail k)
-    (lookup-variable var env var-info handler fail
-      (make-cont2 '<cont2-4> k) (make-cont3 '<cont3-3> k)
-      (make-cont2 '<cont2-3> k))))
+    (lookup-variable var env var-info handler fail (make-cont2 '<cont2-4> k)
+      (make-cont3 '<cont3-3> k) (make-cont2 '<cont2-3> k))))
 
 (define*
   lookup-variable
@@ -2795,7 +2806,9 @@
                (apply-cont2 gk (car components) fail))
               ((and (not (null? (cdr components)))
                     (dlr-env-contains (car components))
-                    (dlr-object? (dlr-env-lookup (car components))))
+                    (dlr-object-contains
+                      (dlr-env-lookup (car components))
+                      components))
                (apply-cont3
                  dk
                  (dlr-env-lookup (car components))
@@ -2822,7 +2835,7 @@
                  ((environment? value)
                   (lookup-variable-components (cdr components) new-path
                     value var-info handler fail dk sk))
-                 ((dlr-object? value)
+                 ((dlr-object-contains value components)
                   (apply-cont3 dk value components fail))
                  (else
                   (runtime-error
@@ -3156,7 +3169,7 @@
   nest-let*-bindings^
   (lambda (bindings bodies k)
     (if (or (null?^ bindings) (null?^ (cdr^ bindings)))
-        (apply-cont k `(let ,bindings ,@(at^ bodies)))
+        (apply-cont k `(let (unquote bindings) ,@(at^ bodies)))
         (nest-let*-bindings^
           (cdr^ bindings)
           bodies
@@ -3392,8 +3405,8 @@
      (define-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
-           `(define ,id ,(aunparse rhs-exp))
-           `(define ,id ,docstring ,(aunparse rhs-exp))))
+           `(define (unquote id) ,(aunparse rhs-exp))
+           `(define (unquote id) ,docstring ,(aunparse rhs-exp))))
      (define!-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
@@ -3401,11 +3414,11 @@
            `(define! ,id ,docstring ,(aunparse rhs-exp))))
      (define-syntax-aexp
        (name clauses aclauses info)
-       `(define-syntax ,name ,@clauses))
+       `(define-syntax (unquote name) ,@clauses))
      (begin-aexp (exps info) `(begin ,@(map aunparse exps)))
      (lambda-aexp
        (formals bodies info)
-       `(lambda ,formals ,@(map aunparse bodies)))
+       `(lambda (unquote formals) ,@(map aunparse bodies)))
      (mu-lambda-aexp
        (formals runt bodies info)
        `(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
@@ -3952,13 +3965,15 @@
 
 (define dir
   (lambda (args env)
-    (sort
-      symbol<?
-      (if (null? args)
-          (append
-            (get-variables-from-frames (frames macro-env))
-            (get-variables-from-frames (frames env)))
-          (get-variables-from-frames (frames (car args)))))))
+    (if (or (null? args) (environment? (car args)))
+        (sort
+          symbol<?
+          (if (null? args)
+              (append
+                (get-variables-from-frames (frames macro-env))
+                (get-variables-from-frames (frames env)))
+              (get-variables-from-frames (frames (car args)))))
+        (get-external-members (car args)))))
 
 (define get-variables-from-frame
   (lambda (frame) (cadr frame)))
@@ -4069,8 +4084,7 @@
         (if (dlr-proc? proc)
             (map2 proc (cdr list1) (cdr list2) env handler fail
               (make-cont2 '<cont2-87> list1 list2 proc k))
-            (apply-proc proc (list (car list1) (car list2)) env 'none
-              handler fail
+            (apply-proc proc (list (car list1) (car list2)) env 'none handler fail
               (make-cont2 '<cont2-86> list1 list2 proc env handler k))))))
 
 (define*
@@ -4097,8 +4111,7 @@
                     (dlr-apply proc (map car arg-list))
                     (for-each-primitive proc (map cdr arg-list) env handler
                       fail k))
-                  (apply-proc proc (map car arg-list) env 'none handler
-                    fail
+                  (apply-proc proc (map car arg-list) env 'none handler fail
                     (make-cont2 '<cont2-90> arg-list proc env handler
                       k))))))))
 
@@ -4106,15 +4119,14 @@
 
 (define make-toplevel-env
   (lambda ()
-    (let ((primitives (list (list '* times-prim)
-                       (list '+ plus-prim) (list '- minus-prim)
-                       (list '/ divide-prim) (list '% modulo-prim)
-                       (list '< lt-prim) (list '<= lt-or-eq-prim)
-                       (list '= equal-sign-prim) (list '=? equal-sign-prim)
-                       (list '> gt-prim) (list '>= gt-or-eq-prim)
-                       (list 'abort abort-prim) (list 'abs abs-prim)
-                       (list 'append append-prim) (list 'apply apply-prim)
-                       (list 'assv assv-prim)
+    (let ((primitives (list (list '* times-prim) (list '+ plus-prim)
+                       (list '- minus-prim) (list '/ divide-prim)
+                       (list '% modulo-prim) (list '< lt-prim)
+                       (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
+                       (list '=? equal-sign-prim) (list '> gt-prim)
+                       (list '>= gt-or-eq-prim) (list 'abort abort-prim)
+                       (list 'abs abs-prim) (list 'append append-prim)
+                       (list 'apply apply-prim) (list 'assv assv-prim)
                        (list 'boolean? boolean?-prim)
                        (list 'caddr caddr-prim) (list 'cadr cadr-prim)
                        (list 'call-with-current-continuation call/cc-prim)
@@ -4235,8 +4247,7 @@
 (define*
   unify-pairs^
   (lambda (pair1 pair2 apair1 apair2 k)
-    (unify-patterns^ (car pair1) (car pair2) (car^ apair1)
-      (car^ apair2)
+    (unify-patterns^ (car pair1) (car pair2) (car^ apair1) (car^ apair2)
       (make-cont '<cont-51> apair1 apair2 pair1 pair2 k))))
 
 (define*

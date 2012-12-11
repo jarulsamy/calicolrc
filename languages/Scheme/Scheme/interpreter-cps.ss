@@ -1400,10 +1400,12 @@
 
 (define dir
   (lambda (args env)
-    (sort symbol<? (if (null? args)
-		       (append (get-variables-from-frames (frames macro-env))
-			       (get-variables-from-frames (frames env)))
-		       (get-variables-from-frames (frames (car args)))))))
+    (if (or (null? args) (environment? (car args)))
+	(sort symbol<? (if (null? args)
+			   (append (get-variables-from-frames (frames macro-env))
+				   (get-variables-from-frames (frames env)))
+			   (get-variables-from-frames (frames (car args)))))
+	(get-external-members (car args)))))
 
 (define get-variables-from-frame
   (lambda (frame)

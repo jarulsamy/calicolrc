@@ -161,144 +161,6 @@ public class Symbol : IList {
   }
 }
 
-public class Rational {
-  public int numerator;
-  public int denominator;
-  
-  public Rational(int num) {
-	this.numerator = num;
-	this.denominator = 1;
-  }
-  
-  public Rational(int numerator, int denominator) {
-	if (denominator == 0)
-	  throw new Exception("cannot represent rationals with a zero denominator");
-	int gcd = GCD(numerator, denominator);
-	this.numerator = numerator/gcd;
-	this.denominator = denominator/gcd;
-  }
-  
-  public static int GCD(int n1, int n2) {
-	// Greatest Common Denominator
-	n1 = Math.Abs(n1);
-	n2 = Math.Abs(n2);
-	if (n1 == 0) return n2;
-	if (n2 == 0) return n1;
-	if (n1 > n2) return GCD(n2, n1 % n2);
-	else         return GCD(n1, n2 % n1);
-  }
-  
-  public static int LCM(int n1, int n2) {
-	// Least Common Multiple
-	n1 = Math.Abs(n1);
-	n2 = Math.Abs(n2);
-	if (n1 > n2) return checked((n2 / GCD(n1, n2)) * n1);
-	else         return checked((n1 / GCD(n1, n2)) * n2);
-  }
-  
-  public override bool Equals(object other) {
-	return (other is Rational &&
-		(this.numerator == ((Rational)other).numerator &&
-			this.denominator == ((Rational)other).denominator));
-  }
-  
-  public override int GetHashCode() {
-	double d = ((double) numerator) / denominator;
-	return d.GetHashCode();
-  }
-  
-  public String __repr__() {
-      return ToString();
-  }
-
-  public override string ToString() {
-	//if (denominator != 1)
-	return string.Format("{0}/{1}", numerator, denominator);
-	//else
-	//return numerator.ToString();
-  }
-  
-  public static implicit operator double(Rational f) {
-	return (((double) f.numerator) / ((double) f.denominator));
-  }
-  
-  public static implicit operator int(Rational f) {
-	return f.numerator / f.denominator;
-  }
-  
-  public static implicit operator float(Rational f) {
-	return (((float) f.numerator) / ((float) f.denominator));
-  }
-  
-  public static Rational operator +(Rational f1, Rational f2) {
-	int lcm = LCM(f1.denominator, f2.denominator);
-	return new Rational((f1.numerator * lcm/f1.denominator +
-			f2.numerator * lcm/f2.denominator),
-		lcm);
-  }
-  
-  public static Rational operator +(Rational f1, int i) {
-	int lcm = LCM(f1.denominator, 1);
-	return new Rational((f1.numerator * lcm/f1.denominator +
-			i * lcm/1),
-		lcm);
-  }
-  
-  public static Rational operator +(int i, Rational f1) {
-	int lcm = LCM(f1.denominator, 1);
-	return new Rational((f1.numerator * lcm/f1.denominator +
-			i * lcm/1),
-		lcm);
-  }
-
-  public static Rational operator -(Rational f1, Rational f2) {
-	int lcm = LCM(f1.denominator, f2.denominator);
-	return new Rational((f1.numerator * lcm/f1.denominator -
-			f2.numerator * lcm/f2.denominator),
-		lcm);
-  }
-  
-  public static Rational operator -(Rational f1, int i) {
-	int lcm = LCM(f1.denominator, 1);
-	return new Rational((f1.numerator * lcm/f1.denominator -
-			i * lcm/1),
-		lcm);
-  }
-  
-  public static Rational operator -(int i, Rational f1) {
-	int lcm = LCM(f1.denominator, 1);
-	return new Rational((i * lcm/1) - (f1.numerator * lcm/f1.denominator),
-		lcm);
-  }
-
-  public static Rational operator *(Rational f1, Rational f2) {
-	return new Rational((f1.numerator * f2.numerator),
-		(f1.denominator * f2.denominator));
-  }
-  
-  public static Rational operator *(Rational f1, int i) {
-	return new Rational((f1.numerator * i), f1.denominator);
-  }
-  
-  public static Rational operator *(int i, Rational f1) {
-	return new Rational((f1.numerator * i), f1.denominator);
-  }
-
-  public static Rational operator /(Rational f1, Rational f2) {
-	return new Rational((f1.numerator * f2.denominator),
-		                (f1.denominator * f2.numerator));
-  }
-  
-  public static Rational operator /(Rational f1, int i) {
-	return new Rational(f1.numerator, f1.denominator * i);
-  }
-  
-  public static Rational operator /(int i, Rational f1) {
-	return new Rational(f1.denominator * i, f1.numerator);
-  }
-
-}
-
 public class Scheme {
 
   public static int CONS_ID = 0;
@@ -565,7 +427,6 @@ public class Scheme {
   //public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
   public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
-  public static Proc get_member_proc = new Proc("get-member", (Procedure2)get_external_member_name, 2, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
   public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
@@ -656,8 +517,6 @@ public class Scheme {
   public static Procedure2 make_instance_proc(object tname) {
 	return (path, args) => call_external_proc(tname, path, args);
   }
-
-
   
   public static object make_initial_env_extended (object env) {
       // ProcedureN - N is arg count coming in
@@ -678,8 +537,8 @@ public class Scheme {
 	       list(symbol("cadar"), new Proc("cadar", (Procedure1)cadar, 1, 1)),
 	       list(symbol("caddar"), new Proc("caddar", (Procedure1)caddar, 1, 1)),
 	       list(symbol("cadddr"), new Proc("cadddr", (Procedure1)cadddr, 1, 1)),
-	       list(symbol("caddr"), new Proc("caddr", (Procedure1)caddr, 1, 1)),
-	       list(symbol("cadr"), new Proc("cadr", (Procedure1)cadr, 1, 1)),
+	       //list(symbol("caddr"), new Proc("caddr", (Procedure1)caddr, 1, 1)),
+	       //list(symbol("cadr"), new Proc("cadr", (Procedure1)cadr, 1, 1)),
 	       list(symbol("cdaaar"), new Proc("cdaaar", (Procedure1)cdaaar, 1, 1)),
 	       list(symbol("cdaadr"), new Proc("cdaadr", (Procedure1)cdaadr, 1, 1)),
 	       list(symbol("cdaar"), new Proc("cdaar", (Procedure1)cdaar, 1, 1)),
@@ -695,20 +554,19 @@ public class Scheme {
 	       list(symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1)),
 	       list(symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1)),
 	       list(symbol("debug"), new Proc("debug", (Procedure1)debug, -1, 1)),
-	       list(symbol("equal?"), Equal_proc),
+	       //list(symbol("equal?"), Equal_proc),
 	       list(symbol("eqv?"), Eqv_proc),
 	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
 	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
-	       list(symbol("get-member"), get_member_proc),
 	       list(symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)),
 	       list(symbol("string-split"), new Proc("string-split", (Procedure2) string_split, 2, 1)),
 	       list(symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1)),
 	       list(symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2)),
-	       list(symbol("list->vector"), list_to_vector_proc),
+	       //list(symbol("list->vector"), list_to_vector_proc),
 	       list(symbol("list-head"), new Proc("list-head", (Procedure2)list_head, 2, 1)),
 	       list(symbol("list-tail"), new Proc("list-tail", (Procedure2)list_tail, 2, 1)),
 	       list(symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2)),
-	       list(symbol("member"), new Proc("member", (Procedure2)member, 2, 1)),
+	       //list(symbol("member"), new Proc("member", (Procedure2)member, 2, 1)),
 	       list(symbol("procedure?"), new Proc("procedure?", (Procedure1Bool)procedure_q_proc, 1, 2)),
 	       list(symbol("property"), new Proc("property", (Procedure1)property, -1, 1)),
 	       list(symbol("rational"), new Proc("int", (Procedure2)ToRational, 2, 1)),
@@ -718,22 +576,30 @@ public class Scheme {
 	       list(symbol("string->symbol"), new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1)),
 	       list(symbol("string-append"), string_append_proc),
 	       list(symbol("string<?"), new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2)),
-	       list(symbol("string=?"), string_is__q_proc),
+	       //list(symbol("string=?"), string_is__q_proc),
 	       list(symbol("symbol"), new Proc("symbol", (Procedure1)symbol, 1, 1)),
 	       list(symbol("symbol->string"), new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1)),
 	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
 	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
-	       list(symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1)),
+	       //list(symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1)),
 	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
 	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
 	       list(symbol("use-tracing"), new Proc("use-tracing", (Procedure1)PJScheme.tracing_on, -1, 1)),
 	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0))
 			       );
-      
-      // object settings = list(
-      // 			     list(symbol("*use-lexical-address*"), ((object)value => PJScheme.use_lexical_address))
-      // 			     );
-      // env = PJScheme.extend(env,  map(car_proc, settings), map(cadr_proc, settings));
+      /// -------------------
+      // FIXME: remove check when done
+      // Check to see if overwriting a previously defined primitive:
+      object scheme_primitives = PJScheme.dir(EmptyList, env);
+      object current = primitives;
+      while (current != EmptyList) {
+      	  object sym = caar(current);
+	  if (true_q(member(sym, scheme_primitives))) {
+	      printf("WARNING: C# overwrites Scheme function '{0}'\n", sym);
+	  }
+	  current = cdr(current);
+      }
+      /// -------------------
       return PJScheme.extend(env,  map(car_proc, primitives), map(make_external_proc_proc, map(cadr_proc, primitives)));
   }
   
@@ -811,136 +677,6 @@ public class Scheme {
     public static object even_q(object obj) {
         return Eq(modulo(obj, 2), 0);
     }
-
-  public static object get_external_member_name(object obj, object name) {
-      return get_external_member(obj, name.ToString());
-  }
-
-  public static object set_external_member_b(object obj, object components, object value) {
-      return null;
-  }
-
-  public static object get_external_member(object obj, object components) {
-      return get_external_member_name(obj, car(components));
-  }
-
-  public static object get_external_member(object obj, string name) {
-    //printf("get_external_member: {0}, {1}\n", obj, name);
-    Type type = obj.GetType();
-    MethodInfo method;
-    try {
-      method = type.GetMethod(name);
-    } catch (System.Reflection.AmbiguousMatchException) {
-      // wait till you have more info from args
-      return (object)new MethodNeedsArgs(obj, name);
-    }
-    if (method != null) {
-      //printf("GetMethod: {0}\n", method);
-      return new Method(obj, method);
-    }
-    FieldInfo field = type.GetField(name);
-    if (field != null) {
-      //printf("GetField: {0}\n", field.GetValue(obj));
-      return field.GetValue(obj);
-    }
-    PropertyInfo property = type.GetProperty(name);
-    if (property != null) {
-      //printf("GetProperty: {0}\n", property);
-      return property;
-      //return IronPython.Runtime.Types.DynamicHelpers.
-      //GetPythonTypeFromType(property.GetType());
-    }
-    throw new Exception(String.Format("no such member: '{0}'", name));
-  }
-
-  public static object call_external_proc(object obj, object path, object args) {
-      //string name = obj.ToString();
-      //Type type = null;
-      //type = get_the_type(name.ToString());
-      Type type = obj.GetType();
-      if (type != null) {
-	  //Type[] types = get_arg_types(args);
-	  object[] arguments = list_to_array(args);
-	  object result = get_external_member(obj, car(path).ToString());
-	  if (!null_q(result)) {
-		if (Eq(car(result), symbol("method"))) {
-		  string method_name = cadr(result).ToString();
-		  MethodInfo method = (MethodInfo) caddr(result);
-		  object retval = method.Invoke(method_name, arguments);
-		  return retval;
-		} else if (Eq(car(result), symbol("field"))) {
-		  //string field_name = (string) cadr(result);
-		  FieldInfo field = (FieldInfo) caddr(result);
-		  try {
-			return field.GetValue(null); // null for static
-		  } catch {
-			return field.GetValue(obj); // use obj for instance
-		  }
-		} else if (Eq(car(result), symbol("constructor"))) {
-		  //string ctor_name = (string) cadr(result);
-		  ConstructorInfo constructor = (ConstructorInfo) caddr(result);
-		  object retval = constructor.Invoke(arguments);
-		  return retval;
-		} else if (Eq(car(result), symbol("property"))) {
-		  string property_name = cadr(result).ToString();
-		  PropertyInfo property = (PropertyInfo) caddr(result);
-		  // ParameterInfo[] indexes = property.GetIndexParameters();
-		  // to use interface, OR
-		  // PropertyType.IsArray; to just get object then access
-		  return property.GetValue(property_name, null); // non-indexed
-		  //property.GetValue(property_name, index); // indexed
-		} else {
-		  throw new Exception(String.Format("don't know how to handle '{0}'?", result));
-		}
-	  }
-	  return result;
-	}
-	throw new Exception(String.Format("no such external type '{0}'", type));
-  }
-
-  public static object using_prim(object args, object env) {
-      // implements "using"
-      Assembly assembly = null;
-      if (list_q(args)) {
-	  int len = (int) length(args);
-	  if (len > 0) { // (using "file.dll"), (using "System")
-	      String filename = car(args).ToString();
-	      try {
-		  // FAILS without trying/catch when DEBUG in MonoDevelop
-		  assembly = Assembly.Load(filename);
-	      } catch {
-#pragma warning disable 612
-		      assembly = Assembly.LoadWithPartialName(filename);
-#pragma warning restore 612
-              }
-	      // add assembly to assemblies
-	      if (assembly != null) {
-		  config.AddAssembly(assembly);
-		  if (_dlr_runtime != null) {
-		      _dlr_runtime.LoadAssembly(assembly);
-		      // then add each type to environment
-		      // FIXME: optionally module name
-		      foreach (Type type in assembly.GetTypes()) {
-			  if (type.IsPublic) {
-			      _dlr_env.SetVariable(type.Name, 
-						   IronPython.Runtime.Types.DynamicHelpers. 
-						   GetPythonTypeFromType(type));
-			  }
-		      }
-		  } else {
-		      throw new Exception("DLR Runtime not available");
-		  }
-	      } else {
-		  throw new Exception(String.Format("external library '{0}' could not be loaded", filename));
-	      }
-	  } else {
-	      throw new Exception("using takes a DLL name, and optionally a moduleName");
-	  }
-      } else {
-	  throw new Exception("using takes a DLL name, and optionally a moduleName");
-      }
-      return PJScheme.symbol("<void>");
-  }
 
   public static object ToDouble(object obj) {
 	try {
@@ -1451,11 +1187,11 @@ public class Scheme {
 
   public static object string_to_rational(object str) {
 	string[] part = (str.ToString()).Split(SPLITSLASH);
-	Rational retval = new Rational(int.Parse(part[0]), int.Parse(part[1]));
+	Rational retval = new Rational(part[0], part[1]);
 	if (retval.denominator == 1)
-	  return retval.numerator;
+	    return retval.numerator;
 	else
-	  return retval;
+	    return retval;
   }
 
   public static void error(object code, object msg, params object[] rest) {
@@ -1482,7 +1218,170 @@ public class Scheme {
 	Console.Write(s);
   }
 
+  public static Type[] get_types(object [] objects) {
+    Type [] retval = new Type[objects.Length];
+    int count = 0;
+    foreach (object obj in objects) {
+      retval[count] = obj.GetType();
+      count++;
+    }
+    return retval;
+  }
+
+  public static object set_external_member_b(object obj, object components, object value) {
+      return null;
+  }
+
+  public static object get_external_member(object obj, object parts_list) {
+      return dlr_lookup_components(obj, cdr(parts_list));
+  }
+
+  public static object get_external_members(object obj) {
+      Type type = obj.GetType();
+      object retval = EmptyList;
+      foreach (MemberInfo m in type.GetMembers()) {
+	  retval = new Cons(m.Name, retval);
+      }
+      return retval;
+  }
+
+    // FIXME: can't get Myro.robot.name after (Myro.init "sim")
+    // Why not? I don't know
+
+  public static object get_external_member(object obj, string name) {
+      //printf("get_external_member(object={0}, string={1})\n", obj, name);
+      //printf("get_external_member: {0}\n", get_external_members(obj));
+      Type type = obj.GetType();
+      MethodInfo method;
+      try {
+	  method = type.GetMethod(name);
+      } catch (System.Reflection.AmbiguousMatchException) {
+	  // wait till you have more info from args
+	  return (object)new MethodNeedsArgs(obj, name);
+      }
+      if (method != null) {
+	  //printf("GetMethod: {0}\n", method);
+	  return new Method(obj, method);
+      }
+      FieldInfo field = type.GetField(name);
+      if (field != null) {
+	  //printf("GetField: {0}\n", field.GetValue(obj));
+	  return field.GetValue(obj);
+      }
+      PropertyInfo property = type.GetProperty(name);
+      if (property != null) {
+	  //printf("GetProperty: {0}\n", property);
+	  return property;
+	  //return IronPython.Runtime.Types.DynamicHelpers.
+	  //GetPythonTypeFromType(property.GetType());
+      }
+      try {
+	  return _dlr_runtime.Operations.GetMember(obj, name);
+      } catch {
+	  //pass
+      }
+      try {
+	  return _dlr_runtime.Operations.GetMember(obj, "get_Item");
+      } catch {
+	  //pass
+      }
+      throw new Exception(String.Format("no such member: '{0}'", name));
+  }
+
+  public static object call_external_proc(object obj, object path, object args) {
+      //string name = obj.ToString();
+      //Type type = null;
+      //type = get_the_type(name.ToString());
+      Type type = obj.GetType();
+      if (type != null) {
+	  //Type[] types = get_arg_types(args);
+	  object[] arguments = list_to_array(args);
+	  object result = get_external_member(obj, car(path).ToString());
+	  if (!null_q(result)) {
+		if (Eq(car(result), symbol("method"))) {
+		  string method_name = cadr(result).ToString();
+		  MethodInfo method = (MethodInfo) caddr(result);
+		  object retval = method.Invoke(method_name, arguments);
+		  return retval;
+		} else if (Eq(car(result), symbol("field"))) {
+		  //string field_name = (string) cadr(result);
+		  FieldInfo field = (FieldInfo) caddr(result);
+		  try {
+			return field.GetValue(null); // null for static
+		  } catch {
+			return field.GetValue(obj); // use obj for instance
+		  }
+		} else if (Eq(car(result), symbol("constructor"))) {
+		  //string ctor_name = (string) cadr(result);
+		  ConstructorInfo constructor = (ConstructorInfo) caddr(result);
+		  object retval = constructor.Invoke(arguments);
+		  return retval;
+		} else if (Eq(car(result), symbol("property"))) {
+		  string property_name = cadr(result).ToString();
+		  PropertyInfo property = (PropertyInfo) caddr(result);
+		  // ParameterInfo[] indexes = property.GetIndexParameters();
+		  // to use interface, OR
+		  // PropertyType.IsArray; to just get object then access
+		  return property.GetValue(property_name, null); // non-indexed
+		  //property.GetValue(property_name, index); // indexed
+		} else {
+		  throw new Exception(String.Format("don't know how to handle '{0}'?", result));
+		}
+	  }
+	  return result;
+	}
+	throw new Exception(String.Format("no such external type '{0}'", type));
+  }
+
+  public static object using_prim(object args, object env) {
+      // Works with Python Types
+      // implements "using"
+      Assembly assembly = null;
+      object retval = list();
+      if (list_q(args)) {
+	  int len = (int) length(args);
+	  if (len > 0) { // (using "file.dll"), (using "System")
+	      String filename = car(args).ToString();
+	      try {
+		  // FAILS without trying/catch when DEBUG in MonoDevelop
+		  assembly = Assembly.Load(filename);
+	      } catch {
+#pragma warning disable 612
+		      assembly = Assembly.LoadWithPartialName(filename);
+#pragma warning restore 612
+              }
+	      // add assembly to assemblies
+	      if (assembly != null) {
+		  config.AddAssembly(assembly);
+		  if (_dlr_runtime != null) {
+		      _dlr_runtime.LoadAssembly(assembly);
+		      // then add each type to environment
+		      // FIXME: optionally module name
+		      foreach (Type type in assembly.GetTypes()) {
+			  if (type.IsPublic) {
+			      _dlr_env.SetVariable(type.Name, 
+						   // Wrap with Python methods to make easy to use:
+						   IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(type));
+			      retval = new Cons(type.Name, retval);
+			  }
+		      }
+		  } else {
+		      throw new Exception("DLR Runtime not available");
+		  }
+	      } else {
+		  throw new Exception(String.Format("external library '{0}' could not be loaded", filename));
+	      }
+	  } else {
+	      throw new Exception("using takes a DLL name, and optionally a moduleName");
+	  }
+      } else {
+	  throw new Exception("using takes a DLL name, and optionally a moduleName");
+      }
+      return retval;
+  }
+
   public static object dlr_proc_q(object rator) {
+      // Works with Python Types
       //Console.WriteLine("dlr-proc? {0}");
       //return (! pair_q(rator));
       return ((rator is IronPython.Runtime.Types.BuiltinFunction) ||
@@ -1494,17 +1393,8 @@ public class Scheme {
 	      (rator is Closure));
   }
   
-  public static Type[] get_types(object [] objects) {
-    Type [] retval = new Type[objects.Length];
-    int count = 0;
-    foreach (object obj in objects) {
-      retval[count] = obj.GetType();
-      count++;
-    }
-    return retval;
-  }
-
   public static object dlr_apply(object proc, object args) {
+      // Works with Python Types
 	//printf("dlr_apply({0}, {1})\n", proc, args);
 	object retval;
 	if (proc is Method) {
@@ -1548,10 +1438,8 @@ public class Scheme {
   }
 
   public static object dlr_env_lookup(object variable) {
-	object retval = null;
 	if (_dlr_env != null)  {
-	    retval = _dlr_env.GetVariable(variable.ToString());
-	    return retval;
+	    return _dlr_env.GetVariable(variable.ToString());
 	} else {
 	    throw new Exception(String.Format("DLR Environment not available"));
         }
@@ -1572,45 +1460,65 @@ public class Scheme {
     return retval;
   }
 
-  public static object dlr_object_q(object x) {
-      return ((x is IronPython.Runtime.Types.BuiltinFunction) ||
-	      (x is IronPython.Runtime.PythonFunction) ||
-	      (x is IronPython.Runtime.Method) ||
-	      (x is MethodNeedsArgs) ||
-	      (x is Method) ||
-	      (x is IronPython.Runtime.Types.PythonType) ||
-	      (x is Closure));
+  public static object dlr_object_contains(object result, object components) {
+      // checks to see if a dlr_object contains the parts_list
+      //printf("dlr_object_contains: {0}, {1}\n", result, components);
+      object parts_list = cdr(components); // skip the first component, the object
+      object retobj = result;
+      if (_dlr_runtime != null) {
+	  while (pair_q(parts_list)) {
+	      //printf("   dlr_object_contains: part: {0}, '{1}'\n", retobj, car(parts_list));
+	      //printf("members: {0}", get_external_members(retobj));
+	      try{
+		  retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
+		  //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj);
+	      } catch {
+		  //printf("contains, trying : message is {0}\n", e.Message);
+		  try {
+		      //printf("members: {0}", get_external_members(retobj));
+		      if (true_q(member(car(parts_list).ToString(), get_external_members(retobj)))) {
+			  //printf("return true (member)\n");
+			  return true;
+		      }
+		      //retobj = _dlr_runtime.Operations.GetMember(retobj, 
+		      //					 format("Get__{0}__", car(parts_list).ToString()));
+		      //retobj = retobj.Invoke();
+		  } catch {
+		      //printf("contains: false {0}(catch catch)\n", e.Message);
+		      return false;
+		  }
+	      }
+	      parts_list = cdr(parts_list);
+	  }
+      } else {
+	  //printf("contains: false (no dlr)\n");
+	  return false;
+      }
+      //printf("contains: true\n");
+      return true;
   }
-  
-//   public static bool dlr_object_q(object result) {
-// 	// FIXME: can we see if it is a dlr object?
-//     //printf("dlr_object_q: {0}\n", result);
-//     return true;
-//     //return (result is IronPython.Runtime.Types.PythonType);
-//   }
 
   public static object dlr_lookup_components(object result, object parts_list) {
       //printf("dlr_lookup_components: {0}, {1}\n", result, parts_list);
       object retobj = result;
-      while (pair_q(parts_list)) {
-	  //printf("...loop: {0}\n", parts_list);
-	  // fixme: needs to use args to get method
-	  try{
-	      if (_dlr_runtime != null) {
-		  retobj = _dlr_runtime.Operations.GetMember(retobj, 
-							     car(parts_list).ToString());
-	      } else {
-		  throw new Exception(String.Format("DLR Runtime not available"));
+      if (_dlr_runtime != null) {
+	  while (pair_q(parts_list)) {
+	      //printf("   dlr_object_contains: part: {0}, '{1}'\n", retobj, car(parts_list));
+	      //printf("members: {0}", get_external_members(retobj));
+	      // fixme: needs to use args to get method
+	      try{
+		  retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
+		  //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj);
+	      } catch {
+		  //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+		  return get_external_member(result, car(parts_list).ToString());
 	      }
-	  } catch {
-	      //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
-              object binding = PJScheme.make_binding(get_external_member(result, car(parts_list).ToString()));
-	      return binding;
+	      parts_list = cdr(parts_list);
 	  }
-	  parts_list = cdr(parts_list);
+      } else {
+	  throw new Exception(String.Format("DLR Runtime not available"));
       }
-      //return PJScheme.make_binding("dlr", retobj);
-      return PJScheme.make_binding(retobj);
+      return retobj;
   }
 
   public static object printf_prim(object args) {
@@ -1689,14 +1597,14 @@ public class Scheme {
 		      retval += " ...";
 		      current = null;
 		  } else {
-		      retval += ToString(car_current);
+		      retval += repr(car_current);
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
 			  retval += " ...";
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + ToString(current); // ...
+			      retval += " . " + repr(current); // ...
 			  }
 		      }
 		  }
@@ -2796,7 +2704,7 @@ public class Scheme {
 	  else
 	      throw new Exception(String.Format("can't take absolute value of this type of number: {0}", obj));
 	}
-	throw new Exception("need to apply procedure to list");
+	throw new Exception("abs() needs a list");
   }
 
   public static object cons(object obj) {
@@ -2854,7 +2762,7 @@ public class Scheme {
 
   public static void pretty_print(object obj) {
       // FIXME: repr is safe, just not pretty
-      System.Console.WriteLine(repr(obj));
+      System.Console.WriteLine(ToString(obj));
   }  
 
   public static void safe_print(object arg) {
@@ -3184,7 +3092,7 @@ public class Scheme {
   }
 
   public bool Contains(object value) {
-	return false;
+      return (bool)member(value, this);
   }
 
   public int IndexOf(object value) {
@@ -3369,12 +3277,7 @@ public class Scheme {
   }
 
   public bool Contains(object value) {
-      for (int i = 0; i < values.Length; i++) {
-	  if (Eq(values[i], value)) {
-	      return true;
-	  }
-      }
-      return false;
+      return (bool)member(value, this);
   }
 
   public int IndexOf(object value) {
@@ -3417,8 +3320,8 @@ public class Scheme {
 			
 	//printf ("  (load \"sllgen.ss\"): {0}\n",
 	//		PJScheme.execute_string_rm("(load \"/home/dblank/Calico/trunk/examples/scheme/sllgen.ss\")"));
-	printf ("  (print (list 1 2 3): {0}\n",
-			PJScheme.execute_string_rm("(print (list 1 2 3))"));
+	printf ("  1/2: {0}\n",
+			PJScheme.execute_string_rm("1/2"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
@@ -3603,13 +3506,7 @@ public class Scheme {
 	  printf("{0}call: ", 
 		 string_append(PJScheme.repeat(" |", 
 					       (object)PJScheme.get_closure_depth())));
-	  //try {
-	      printf("~s~%", PJScheme.aunparse(exp));
-	  //} catch {
-	  //    printf("{0}return: ERROR in PRINTING AUNPARSE!~%", 
-	//	     string_append(PJScheme.repeat(" |", 
-	//					   (object)PJScheme.get_closure_depth())));
-	  //}
+	  printf("~s~%", PJScheme.aunparse(exp));
 	  PJScheme.increment_closure_depth();
       }
   }
@@ -3621,10 +3518,6 @@ public class Scheme {
       if (Equal(info, symbol("none"))) {
 	  return;
       }
-	  /*
-	  Force CLI output 
-      printf("result: ~s~%", result);
-      */		
       int start_line = (int)PJScheme.get_start_line(info);
       if (_dlr_env != null) {
 	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");

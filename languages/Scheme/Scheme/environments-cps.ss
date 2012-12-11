@@ -149,6 +149,7 @@
 
 (define* lookup-variable
   (lambda (var env var-info handler fail gk dk sk) ;; gk: global dlr, dk: dlr obj, sk: scheme module
+    ;;(printf "in lookup-variable var: ~s env: ~s\n" var env)
     (let ((binding (search-env env var)))  ;; look in scheme env for variable as a whole
       (if binding
 	(sk binding fail)  ;; found it in the scheme env
@@ -160,7 +161,7 @@
 	     (gk (car components) fail))  ;; (set! Myro 42)
 	    ((and (not (null? (cdr components)))  ;; (set! Myro.robot 42)
 		  (dlr-env-contains (car components))
-		  (dlr-object? (dlr-env-lookup (car components))))
+		  (dlr-object-contains (dlr-env-lookup (car components)) components))
 	     (dk (dlr-env-lookup (car components)) components fail))
 	    (else (lookup-variable-components components "" env var-info handler fail dk sk))))))))
 
@@ -183,7 +184,7 @@
 	      (cond
 	        ((environment? value)
 		 (lookup-variable-components (cdr components) new-path value var-info handler fail dk sk))
-		((dlr-object? value)
+		((dlr-object-contains value components)
 		 (dk value components fail))
 		(else (runtime-error (format "~a is not a module" new-path) var-info handler fail))))))
 	((string=? path "") (runtime-error (format "unbound module '~a'" var) var-info handler fail))
