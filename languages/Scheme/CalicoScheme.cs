@@ -34,24 +34,18 @@ public class CalicoSchemeEngine : Engine
 
   public override void PostSetup(MainWindow calico) {
     base.PostSetup(calico);
+    this.calico = calico;
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
+    Scheme.reset_toplevel_env();
   }
 
   public override bool Execute(string text, bool ok) {
     PJScheme.initialize_closure_depth();
     object result = PJScheme.execute_string_rm(text);
-    if (result == null) {
-       return true;
-    }
-    string resultString = Scheme.repr(result);
-    // FIXME: when exceptions have a better format in Scheme:
-    if (resultString.StartsWith("(exception ")) {
-      return false;
-    }
-    return true;
+    return HandleOutput(result, ok);
   }
 
-  public bool HandleOutput(object result) {
+  public bool HandleOutput(object result, bool ok) {
     string resultString = Scheme.repr(result);
     if (resultString.StartsWith("(exception ")) {
 	System.Console.Error.WriteLine("Traceback (most recent call last):");
@@ -69,7 +63,7 @@ public class CalicoSchemeEngine : Engine
 		}
 		System.Console.Error.WriteLine(String.Format("{0}: {1}", error, message));
 	    } else {
-		System.Console.Error.WriteLine(resultString);
+		System.Console.Error.WriteLine(list);
 	    }
 	} else {
 	    System.Console.Error.WriteLine(resultString);
@@ -79,19 +73,22 @@ public class CalicoSchemeEngine : Engine
     if (result != null) {
 	System.Console.WriteLine(resultString);
     }
+    if (ok) {
+	calico.manager.stderr.PrintLine(Calico.Tag.Info, "Done");
+    }
     return true;
   }
 
   public override bool Execute(string text) {
     PJScheme.initialize_closure_depth();
     object result = PJScheme.execute_string_rm(text);
-    return HandleOutput(result);
+    return HandleOutput(result, false);
   }
 
   public override bool ExecuteFile(string filename) {
     PJScheme.initialize_closure_depth();
     object obj = PJScheme.execute_file_rm(filename);
-    return HandleOutput(obj);
+    return HandleOutput(obj, true);
   }
 
   public override bool ReadyToExecute(string text) {
