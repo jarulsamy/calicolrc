@@ -128,14 +128,14 @@
 
 (define* scan-error
   (lambda (msg line char src handler fail)
-    (handler (format "scan error: ~a ~a" msg (where-at line char src)) fail)))
+    (handler (list "ScanError" msg src line char) fail)))
 
 (define* unexpected-char-error
   (lambda (chars src handler fail)
     (let ((c (next-avail chars)))
       (if (char=? c #\nul)
 	(scan-error "unexpected end of input" scan-line scan-char src handler fail)
-	(scan-error (format "unexpected character ~a encountered" c) scan-line scan-char src handler fail)))))
+	(scan-error (format "unexpected character '~a' encountered" c) scan-line scan-char src handler fail)))))
 
 (define* convert-buffer-to-token
   (lambda (token-type buffer src handler fail k)  ;; k receives 1 argument: token
@@ -701,20 +701,15 @@
     (let ((token (first tokens)))
       (if (token-type? token 'end-marker)
 	(read-error "unexpected end of input" tokens src handler fail)
-	(read-error (format "unexpected ~a encountered" (car token)) tokens src handler fail)))))
+	(read-error (format "unexpected '~a' encountered" (car token)) tokens src handler fail)))))
 
 (define* read-error
   (lambda (msg tokens src handler fail)
     (let ((token (first tokens)))
-      (handler (format "read error: ~a ~a" msg
-		       (where-at (get-token-start-line token) (get-token-start-char token) src))
+      (handler (list "ReadError" msg src 
+		     (get-token-start-line token) 
+		     (get-token-start-char token))
 	       fail))))
-
-(define where-at
-  (lambda (line char src)
-    (if (eq? src 'stdin)
-      (format "at line ~a, char ~a" line char)
-      (format "at line ~a, char ~a of ~a" line char src))))
 
 ;; returns the entire file contents as a single string
 (define read-content

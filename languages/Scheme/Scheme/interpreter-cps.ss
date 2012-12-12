@@ -375,7 +375,7 @@
 		(cond
 		  ((dlr-proc? proc) (k (dlr-apply proc args) fail))
 		  ((procedure-object? proc) (proc args env info handler fail k))
-		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
+		  (else (runtime-error (format "attempt to apply non-procedure '~a'" proc)
 				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: ~s" exp)))))
 )
@@ -383,11 +383,13 @@
 (define* runtime-error
   (lambda (msg info handler fail)
     (if (eq? info 'none)
-      (handler (format "runtime error: ~a" msg) fail)
+      (handler (list "RunTimeError" msg 'none 'none 'none) fail)
       (let ((src (get-srcfile info))
 	    (line (get-start-line info))
 	    (char (get-start-char info)))
-	(handler (format "runtime error: ~a ~a" msg (where-at line char src)) fail)))))
+	(handler (list "RunTimeError" msg src line char) fail)))))
+
+;; exceptions: (msg src-file line col)
 
 (define* m*
   (lambda (exps env handler fail k)
@@ -811,9 +813,9 @@
        (printf "skipping recursive load of ~a~%" filename)
        (k void-value fail))
       ((not (string? filename))
-       (runtime-error (format "filename ~a is not a string" filename) info handler fail))
+       (runtime-error (format "filename '~a' is not a string" filename) info handler fail))
       ((not (file-exists? filename))
-       (runtime-error (format "attempted to load nonexistent file ~a" filename) info handler fail))
+       (runtime-error (format "attempted to load nonexistent file '~a'" filename) info handler fail))
       (else
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
@@ -1275,7 +1277,7 @@
 	  (cond
 	    ((null? (cdr args)) (k v fail))
 	    ((not (environment? v))
-	     (runtime-error (format "invalid module ~a" sym) info handler fail))
+	     (runtime-error (format "invalid module '~a'" sym) info handler fail))
 	    (else (get-primitive (cdr args) v info handler fail k))))))))
 
 ;; call/cc
@@ -1618,9 +1620,13 @@
 ;; error
 (define error-prim
   (lambda-proc (args env2 info handler fail k2)
-    (let* ((location (format "Error in ~a: " (car args)))
-	   (message (string-append location (apply format (cdr args)))))
-      (runtime-error message info handler fail))))
+    (cond 
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to 'error' (should be 2)" info handler fail))
+      (else
+       (let* ((location (format "Error in '~a': " (car args)))
+	      (message (string-append location (apply format (cdr args)))))
+	 (runtime-error message info handler fail))))))
 
 ;; list-ref
 (define list-ref-prim

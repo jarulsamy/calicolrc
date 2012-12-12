@@ -128,14 +128,14 @@
 
 (define* scan-error
   (lambda (msg line char src handler fail)
-    (handler (format "scan error: ~a ~a" msg (where-at line char src)) fail)))
+    (handler (list "ScanError" msg src line char) fail)))
 
 (define* unexpected-char-error
   (lambda (chars src handler fail)
     (let ((c (next-avail chars)))
       (if (char=? c #\nul)
 	(scan-error "unexpected end of input" scan-line scan-char src handler fail)
-	(scan-error (format "unexpected character ~a encountered" c) scan-line scan-char src handler fail)))))
+	(scan-error (format "unexpected character '~a' encountered" c) scan-line scan-char src handler fail)))))
 
 (define* convert-buffer-to-token
   (lambda (token-type buffer src handler fail k)  ;; k receives 1 argument: token
@@ -701,20 +701,15 @@
     (let ((token (first tokens)))
       (if (token-type? token 'end-marker)
 	(read-error "unexpected end of input" tokens src handler fail)
-	(read-error (format "unexpected ~a encountered" (car token)) tokens src handler fail)))))
+	(read-error (format "unexpected '~a' encountered" (car token)) tokens src handler fail)))))
 
 (define* read-error
   (lambda (msg tokens src handler fail)
     (let ((token (first tokens)))
-      (handler (format "read error: ~a ~a" msg
-		       (where-at (get-token-start-line token) (get-token-start-char token) src))
+      (handler (list "ReadError" msg src 
+		     (get-token-start-line token) 
+		     (get-token-start-char token))
 	       fail))))
-
-(define where-at
-  (lambda (line char src)
-    (if (eq? src 'stdin)
-      (format "at line ~a, char ~a" line char)
-      (format "at line ~a, char ~a of ~a" line char src))))
 
 ;; returns the entire file contents as a single string
 (define read-content
@@ -1054,14 +1049,14 @@
 	(sk binding fail)  ;; found it in the scheme env
 	(let ((components (split-variable var)))  ;; split into components, if any
 	  (cond
-	    ((null? components)  ;; (set! a.b..c val)
-	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
 	    ((and (null? (cdr components)) (dlr-env-contains (car components)))
 	     (gk (car components) fail))  ;; (set! Myro 42)
 	    ((and (not (null? (cdr components)))  ;; (set! Myro.robot 42)
 		  (dlr-env-contains (car components))
 		  (dlr-object-contains (dlr-env-lookup (car components)) components))
 	     (dk (dlr-env-lookup (car components)) components fail))
+	    ((null? (cdr components))  ;; (set! a.b..c val)
+	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
 	    (else (lookup-variable-components components "" env var-info handler fail dk sk))))))))
 
 ;; math.x.y.z where math is a module or a DLR module/item
@@ -1576,8 +1571,10 @@
     (let ((info (get-source-info adatum)))
       (unannotate-cps adatum
 	(lambda-cont (datum)
-	  (handler (format "parse error: ~a ~s ~a" msg datum
-			   (where-at (get-start-line info) (get-start-char info) (get-srcfile info)))
+	  (handler (list "ParseError" (format "~s ~a" msg datum)
+			 (get-srcfile info)
+			 (get-start-line info) 
+			 (get-start-char info))
 		   fail))))))
 
 ;; used once in interpreter-cps.ss
@@ -1704,9 +1701,9 @@
 (define* amacro-error
   (lambda (msg adatum handler fail)
     (let ((info (get-source-info adatum)))
-      (handler (format "Error: ~a ~a" msg (where-at (get-start-line info)
-						    (get-start-char info)
-						    (get-srcfile info)))
+      (handler (list "MacroError" msg (get-start-line info)
+		     (get-srcfile info)
+		     (get-start-char info))
 	       fail))))
 
 ;; correctly handles single-expression clauses and avoids variable capture
@@ -2922,7 +2919,7 @@
 		(cond
 		  ((dlr-proc? proc) (k (dlr-apply proc args) fail))
 		  ((procedure-object? proc) (proc args env info handler fail k))
-		  (else (runtime-error (format "attempt to apply non-procedure ~a" proc)
+		  (else (runtime-error (format "attempt to apply non-procedure '~a'" proc)
 				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: ~s" exp)))))
 )
@@ -2930,11 +2927,13 @@
 (define* runtime-error
   (lambda (msg info handler fail)
     (if (eq? info 'none)
-      (handler (format "runtime error: ~a" msg) fail)
+      (handler (list "RunTimeError" msg 'none 'none 'none) fail)
       (let ((src (get-srcfile info))
 	    (line (get-start-line info))
 	    (char (get-start-char info)))
-	(handler (format "runtime error: ~a ~a" msg (where-at line char src)) fail)))))
+	(handler (list "RunTimeError" msg src line char) fail)))))
+
+;; exceptions: (msg src-file line col)
 
 (define* m*
   (lambda (exps env handler fail k)
@@ -3358,9 +3357,9 @@
        (printf "skipping recursive load of ~a~%" filename)
        (k void-value fail))
       ((not (string? filename))
-       (runtime-error (format "filename ~a is not a string" filename) info handler fail))
+       (runtime-error (format "filename '~a' is not a string" filename) info handler fail))
       ((not (file-exists? filename))
-       (runtime-error (format "attempted to load nonexistent file ~a" filename) info handler fail))
+       (runtime-error (format "attempted to load nonexistent file '~a'" filename) info handler fail))
       (else
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
@@ -3822,7 +3821,7 @@
 	  (cond
 	    ((null? (cdr args)) (k v fail))
 	    ((not (environment? v))
-	     (runtime-error (format "invalid module ~a" sym) info handler fail))
+	     (runtime-error (format "invalid module '~a'" sym) info handler fail))
 	    (else (get-primitive (cdr args) v info handler fail k))))))))
 
 ;; call/cc
@@ -4165,9 +4164,13 @@
 ;; error
 (define error-prim
   (lambda-proc (args env2 info handler fail k2)
-    (let* ((location (format "Error in ~a: " (car args)))
-	   (message (string-append location (apply format (cdr args)))))
-      (runtime-error message info handler fail))))
+    (cond 
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to 'error' (should be 2)" info handler fail))
+      (else
+       (let* ((location (format "Error in '~a': " (car args)))
+	      (message (string-append location (apply format (cdr args)))))
+	 (runtime-error message info handler fail))))))
 
 ;; list-ref
 (define list-ref-prim

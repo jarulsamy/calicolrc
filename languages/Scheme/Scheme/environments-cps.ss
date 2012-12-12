@@ -155,14 +155,14 @@
 	(sk binding fail)  ;; found it in the scheme env
 	(let ((components (split-variable var)))  ;; split into components, if any
 	  (cond
-	    ((null? components)  ;; (set! a.b..c val)
-	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
 	    ((and (null? (cdr components)) (dlr-env-contains (car components)))
 	     (gk (car components) fail))  ;; (set! Myro 42)
 	    ((and (not (null? (cdr components)))  ;; (set! Myro.robot 42)
 		  (dlr-env-contains (car components))
 		  (dlr-object-contains (dlr-env-lookup (car components)) components))
 	     (dk (dlr-env-lookup (car components)) components fail))
+	    ((null? (cdr components))  ;; (set! a.b..c val)
+	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
 	    (else (lookup-variable-components components "" env var-info handler fail dk sk))))))))
 
 ;; math.x.y.z where math is a module or a DLR module/item

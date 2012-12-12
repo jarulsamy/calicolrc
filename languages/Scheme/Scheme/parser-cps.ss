@@ -445,8 +445,10 @@
     (let ((info (get-source-info adatum)))
       (unannotate-cps adatum
 	(lambda-cont (datum)
-	  (handler (format "parse error: ~a ~s ~a" msg datum
-			   (where-at (get-start-line info) (get-start-char info) (get-srcfile info)))
+	  (handler (list "ParseError" (format "~s ~a" msg datum)
+			 (get-srcfile info)
+			 (get-start-line info) 
+			 (get-start-char info))
 		   fail))))))
 
 ;; used once in interpreter-cps.ss
@@ -573,9 +575,9 @@
 (define* amacro-error
   (lambda (msg adatum handler fail)
     (let ((info (get-source-info adatum)))
-      (handler (format "Error: ~a ~a" msg (where-at (get-start-line info)
-						    (get-start-char info)
-						    (get-srcfile info)))
+      (handler (list "MacroError" msg (get-start-line info)
+		     (get-srcfile info)
+		     (get-start-char info))
 	       fail))))
 
 ;; correctly handles single-expression clauses and avoids variable capture

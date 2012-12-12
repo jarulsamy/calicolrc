@@ -699,15 +699,15 @@ public class PJScheme:Scheme
 	      msg = PJScheme.list_ref ((object) temp_1, (object) 1);
 	      fail_reg = fail;
 	      exception_reg =
-		 PJScheme.format ((object) "parse error: ~a ~s ~a",
-				  (object) msg, (object) value_reg,
-				  (object) PJScheme.
-				  where_at ((object) PJScheme.
-					    get_start_line ((object) info),
-					    (object) PJScheme.
-					    get_start_char ((object) info),
-					    (object) PJScheme.
-					    get_srcfile ((object) info)));
+		 PJScheme.list ((object) "ParseError",
+				(object) PJScheme.format ((object) "~s ~a",
+							  (object) msg,
+							  (object) value_reg),
+				(object) PJScheme.get_srcfile ((object) info),
+				(object) PJScheme.
+				get_start_line ((object) info),
+				(object) PJScheme.
+				get_start_char ((object) info));
 	      handler_reg = handler;
 	      pc = (Function) apply_handler2;
 	   }
@@ -2865,7 +2865,7 @@ public class PJScheme:Scheme
 		   info_reg = info;
 		   msg_reg =
 		      PJScheme.
-		      format ((object) "attempt to apply non-procedure ~a",
+		      format ((object) "attempt to apply non-procedure '~a'",
 			      (object) value1_reg);
 		   pc = (Function) runtime_error;
 
@@ -3545,7 +3545,7 @@ public class PJScheme:Scheme
 		   handler_reg = handler;
 		   info_reg = info;
 		   msg_reg =
-		      PJScheme.format ((object) "invalid module ~a",
+		      PJScheme.format ((object) "invalid module '~a'",
 				       (object) sym);
 		   pc = (Function) runtime_error;
 
@@ -6889,21 +6889,32 @@ public class PJScheme:Scheme
 		(PJScheme.
 		 Eq ((object) PJScheme.car ((object) temp_1),
 		     (object) symbol ("<proc-94>"))))
-	   {
-	      object location = null;
-	      object message = null;
-	      location =
-		 PJScheme.format ((object) "Error in ~a: ",
-				  (object) PJScheme.car ((object) args_reg));
-	      message =
-		 PJScheme.string_append ((object) location,
-					 (object) apply (format_proc,
-							 (object) PJScheme.
-							 cdr ((object)
-							      args_reg)));
-	      msg_reg = message;
-	      pc = (Function) runtime_error;
-	   }
+	    if (true_q
+		(PJScheme.
+		 not ((object) PJScheme.length_two_q ((object) args_reg))))
+	      {
+		 msg_reg =
+		    "incorrect number of arguments to 'error' (should be 2)";
+		 pc = (Function) runtime_error;
+
+	      }
+	    else
+	      {
+		 object location = null;
+		 object message = null;
+		 location =
+		    PJScheme.format ((object) "Error in '~a': ",
+				     (object) PJScheme.
+				     car ((object) args_reg));
+		 message =
+		    PJScheme.string_append ((object) location,
+					    (object) apply (format_proc,
+							    (object) PJScheme.
+							    cdr ((object)
+								 args_reg)));
+		 msg_reg = message;
+		 pc = (Function) runtime_error;
+	      }
 	 else
 	    if (true_q
 		(PJScheme.
@@ -7725,10 +7736,9 @@ public class PJScheme:Scheme
    new public static void scan_error ()
    {
       exception_reg =
-	 PJScheme.format ((object) "scan error: ~a ~a", (object) msg_reg,
-			  (object) PJScheme.where_at ((object) line_reg,
-						      (object) char_reg,
-						      (object) src_reg));
+	 PJScheme.list ((object) "ScanError", (object) msg_reg,
+			(object) src_reg, (object) line_reg,
+			(object) char_reg);
       pc = (Function) apply_handler2;
 
    }
@@ -7752,7 +7762,7 @@ public class PJScheme:Scheme
 	      line_reg = scan_line;
 	      msg_reg =
 		 PJScheme.
-		 format ((object) "unexpected character ~a encountered",
+		 format ((object) "unexpected character '~a' encountered",
 			 (object) c);
 	      pc = (Function) scan_error;
 
@@ -9190,7 +9200,7 @@ public class PJScheme:Scheme
 	 else
 	   {
 	      msg_reg =
-		 PJScheme.format ((object) "unexpected ~a encountered",
+		 PJScheme.format ((object) "unexpected '~a' encountered",
 				  (object) PJScheme.car ((object) token));
 	      pc = (Function) read_error;
 
@@ -9205,29 +9215,15 @@ public class PJScheme:Scheme
 	 object token = null;
 	 token = PJScheme.first ((object) tokens_reg);
 	 exception_reg =
-	    PJScheme.format ((object) "read error: ~a ~a", (object) msg_reg,
-			     (object) PJScheme.where_at ((object) PJScheme.
-							 get_token_start_line
-							 ((object) token),
-							 (object) PJScheme.
-							 get_token_start_char
-							 ((object) token),
-							 (object) src_reg));
+	    PJScheme.list ((object) "ReadError", (object) msg_reg,
+			   (object) src_reg,
+			   (object) PJScheme.
+			   get_token_start_line ((object) token),
+			   (object) PJScheme.
+			   get_token_start_char ((object) token));
 	 pc = (Function) apply_handler2;
       }
 
-   }
-
-   new public static object where_at (object line, object chr, object src)
-   {
-      if (true_q (PJScheme.Eq ((object) src, (object) symbol ("stdin"))))
-	 return ((object) PJScheme.
-		 format ((object) "at line ~a, char ~a", (object) line,
-			 (object) chr));
-      else
-	 return ((object) PJScheme.
-		 format ((object) "at line ~a, char ~a of ~a", (object) line,
-			 (object) chr, (object) src));
    }
 
    new public static void read_sexp ()
@@ -9880,22 +9876,12 @@ public class PJScheme:Scheme
 	   {
 	      object components = null;
 	      components = PJScheme.split_variable ((object) var_reg);
-	      if (true_q (PJScheme.null_q ((object) components)))
-		{
-		   info_reg = var_info_reg;
-		   msg_reg =
-		      PJScheme.format ((object) "unbound variable ~a",
-				       (object) var_reg);
-		   pc = (Function) runtime_error;
-
-		}
-	      else
-		 if (true_q
-		     ((((bool) PJScheme.
-			null_q ((object) PJScheme.cdr ((object) components)))
-		       && ((bool) PJScheme.
-			   dlr_env_contains ((object) PJScheme.
-					     car ((object) components))))))
+	      if (true_q
+		  ((((bool) PJScheme.
+		     null_q ((object) PJScheme.cdr ((object) components)))
+		    && ((bool) PJScheme.
+			dlr_env_contains ((object) PJScheme.
+					  car ((object) components))))))
 		{
 		   value2_reg = fail_reg;
 		   value1_reg = PJScheme.car ((object) components);
@@ -9927,6 +9913,18 @@ public class PJScheme:Scheme
 					       car ((object) components));
 		   k_reg = dk_reg;
 		   pc = (Function) apply_cont3;
+
+		}
+	      else
+		 if (true_q
+		     (PJScheme.
+		      null_q ((object) PJScheme.cdr ((object) components))))
+		{
+		   info_reg = var_info_reg;
+		   msg_reg =
+		      PJScheme.format ((object) "unbound variable ~a",
+				       (object) var_reg);
+		   pc = (Function) runtime_error;
 
 		}
 	      else
@@ -10834,9 +10832,10 @@ public class PJScheme:Scheme
 	 object info = null;
 	 info = PJScheme.get_source_info ((object) adatum_reg);
 	 exception_reg =
-	    PJScheme.format ((object) "Error: ~a ~a", (object) msg_reg,
-			     (object) PJScheme.where_at ((object) PJScheme.
-							 get_start_line ((object) info), (object) PJScheme.get_start_char ((object) info), (object) PJScheme.get_srcfile ((object) info)));
+	    PJScheme.list ((object) "MacroError", (object) msg_reg,
+			   (object) PJScheme.get_start_line ((object) info),
+			   (object) PJScheme.get_srcfile ((object) info),
+			   (object) PJScheme.get_start_char ((object) info));
 	 pc = (Function) apply_handler2;
       }
 
@@ -12275,8 +12274,10 @@ public class PJScheme:Scheme
       if (true_q (PJScheme.Eq ((object) info_reg, (object) symbol ("none"))))
 	{
 	   exception_reg =
-	      PJScheme.format ((object) "runtime error: ~a",
-			       (object) msg_reg);
+	      PJScheme.list ((object) "RunTimeError", (object) msg_reg,
+			     (object) symbol ("none"),
+			     (object) symbol ("none"),
+			     (object) symbol ("none"));
 	   pc = (Function) apply_handler2;
 
 	}
@@ -12289,11 +12290,8 @@ public class PJScheme:Scheme
 	   line = PJScheme.get_start_line ((object) info_reg);
 	   src = PJScheme.get_srcfile ((object) info_reg);
 	   exception_reg =
-	      PJScheme.format ((object) "runtime error: ~a ~a",
-			       (object) msg_reg,
-			       (object) PJScheme.where_at ((object) line,
-							   (object) chr,
-							   (object) src));
+	      PJScheme.list ((object) "RunTimeError", (object) msg_reg,
+			     (object) src, (object) line, (object) chr);
 	   pc = (Function) apply_handler2;
 	}
 
@@ -12590,7 +12588,7 @@ public class PJScheme:Scheme
 	      not ((object) PJScheme.string_q ((object) filename_reg))))
 	{
 	   msg_reg =
-	      PJScheme.format ((object) "filename ~a is not a string",
+	      PJScheme.format ((object) "filename '~a' is not a string",
 			       (object) filename_reg);
 	   pc = (Function) runtime_error;
 
@@ -12602,7 +12600,7 @@ public class PJScheme:Scheme
 	{
 	   msg_reg =
 	      PJScheme.
-	      format ((object) "attempted to load nonexistent file ~a",
+	      format ((object) "attempted to load nonexistent file '~a'",
 		      (object) filename_reg);
 	   pc = (Function) runtime_error;
 

@@ -432,14 +432,9 @@
                                                                                             (set! msg (list-ref temp_1 1))
                                                                                             (set! fail_reg fail)
                                                                                             (set! exception_reg
-                                                                                              (format
-                                                                                                "parse error: ~a ~s ~a"
-                                                                                                msg
-                                                                                                value_reg
-                                                                                                (where-at
-                                                                                                  (get-start-line info)
-                                                                                                  (get-start-char info)
-                                                                                                  (get-srcfile info))))
+                                                                                              (list "ParseError" (format "~s ~a" msg value_reg)
+                                                                                                (get-srcfile info) (get-start-line info)
+                                                                                                (get-start-char info)))
                                                                                             (set! handler_reg handler)
                                                                                             (set! pc apply-handler2))
                                                                                           (if (eq? (car temp_1) '<cont-22>)
@@ -1755,7 +1750,7 @@
                                                                                                                                                                                                                           (set! handler_reg handler)
                                                                                                                                                                                                                           (set! info_reg info)
                                                                                                                                                                                                                           (set! msg_reg
-                                                                                                                                                                                                                            (format "attempt to apply non-procedure ~a" value1_reg))
+                                                                                                                                                                                                                            (format "attempt to apply non-procedure '~a'" value1_reg))
                                                                                                                                                                                                                           (set! pc runtime-error)))))
                                                                                                                                                                                                               (if (eq? (car temp_1) '<cont2-51>)
                                                                                                                                                                                                                   (let ((operator 'undefined)
@@ -2157,7 +2152,7 @@
                                                                                                                                                                                                                                                                                                                                               (set! fail_reg value2_reg)
                                                                                                                                                                                                                                                                                                                                               (set! handler_reg handler)
                                                                                                                                                                                                                                                                                                                                               (set! info_reg info)
-                                                                                                                                                                                                                                                                                                                                              (set! msg_reg (format "invalid module ~a" sym))
+                                                                                                                                                                                                                                                                                                                                              (set! msg_reg (format "invalid module '~a'" sym))
                                                                                                                                                                                                                                                                                                                                               (set! pc runtime-error))
                                                                                                                                                                                                                                                                                                                                             (begin
                                                                                                                                                                                                                                                                                                                                               (set! k_reg k)
@@ -3944,22 +3939,29 @@
                                                                                                                                                                                                                                                                                                                                                                                               apply-cont2))
                                                                                                                                                                                                                                                                                                                                                                                           (if (eq? (car temp_1)
                                                                                                                                                                                                                                                                                                                                                                                                    '<proc-94>)
-                                                                                                                                                                                                                                                                                                                                                                                              (let ((location 'undefined)
-                                                                                                                                                                                                                                                                                                                                                                                                    (message 'undefined))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! location
-                                                                                                                                                                                                                                                                                                                                                                                                  (format
-                                                                                                                                                                                                                                                                                                                                                                                                    "Error in ~a: "
-                                                                                                                                                                                                                                                                                                                                                                                                    (car args_reg)))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! message
-                                                                                                                                                                                                                                                                                                                                                                                                  (string-append
-                                                                                                                                                                                                                                                                                                                                                                                                    location
-                                                                                                                                                                                                                                                                                                                                                                                                    (apply
-                                                                                                                                                                                                                                                                                                                                                                                                      format
-                                                                                                                                                                                                                                                                                                                                                                                                      (cdr args_reg))))
-                                                                                                                                                                                                                                                                                                                                                                                                (set! msg_reg
-                                                                                                                                                                                                                                                                                                                                                                                                  message)
-                                                                                                                                                                                                                                                                                                                                                                                                (set! pc
-                                                                                                                                                                                                                                                                                                                                                                                                  runtime-error))
+                                                                                                                                                                                                                                                                                                                                                                                              (if (not (length-two?
+                                                                                                                                                                                                                                                                                                                                                                                                         args_reg))
+                                                                                                                                                                                                                                                                                                                                                                                                  (begin
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! msg_reg
+                                                                                                                                                                                                                                                                                                                                                                                                      "incorrect number of arguments to 'error' (should be 2)")
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! pc
+                                                                                                                                                                                                                                                                                                                                                                                                      runtime-error))
+                                                                                                                                                                                                                                                                                                                                                                                                  (let ((location 'undefined)
+                                                                                                                                                                                                                                                                                                                                                                                                        (message 'undefined))
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! location
+                                                                                                                                                                                                                                                                                                                                                                                                      (format
+                                                                                                                                                                                                                                                                                                                                                                                                        "Error in '~a': "
+                                                                                                                                                                                                                                                                                                                                                                                                        (car args_reg)))
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! message
+                                                                                                                                                                                                                                                                                                                                                                                                      (string-append
+                                                                                                                                                                                                                                                                                                                                                                                                        location
+                                                                                                                                                                                                                                                                                                                                                                                                        (apply
+                                                                                                                                                                                                                                                                                                                                                                                                          format
+                                                                                                                                                                                                                                                                                                                                                                                                          (cdr args_reg))))
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! msg_reg
+                                                                                                                                                                                                                                                                                                                                                                                                      message)
+                                                                                                                                                                                                                                                                                                                                                                                                    (set! pc
+                                                                                                                                                                                                                                                                                                                                                                                                      runtime-error)))
                                                                                                                                                                                                                                                                                                                                                                                               (if (eq? (car temp_1)
                                                                                                                                                                                                                                                                                                                                                                                                        '<proc-95>)
                                                                                                                                                                                                                                                                                                                                                                                                   (if (not (length-two?
@@ -4492,10 +4494,7 @@
   scan-error
   (lambda ()
     (set! exception_reg
-      (format
-        "scan error: ~a ~a"
-        msg_reg
-        (where-at line_reg char_reg src_reg)))
+      (list "ScanError" msg_reg src_reg line_reg char_reg))
     (set! pc apply-handler2)))
 
 (define*
@@ -4513,7 +4512,7 @@
             (set! char_reg scan-char)
             (set! line_reg scan-line)
             (set! msg_reg
-              (format "unexpected character ~a encountered" c))
+              (format "unexpected character '~a' encountered" c))
             (set! pc scan-error))))))
 
 (define*
@@ -5150,7 +5149,7 @@
             (set! pc read-error))
           (begin
             (set! msg_reg
-              (format "unexpected ~a encountered" (car token)))
+              (format "unexpected '~a' encountered" (car token)))
             (set! pc read-error))))))
 
 (define*
@@ -5159,21 +5158,9 @@
     (let ((token 'undefined))
       (set! token (first tokens_reg))
       (set! exception_reg
-        (format
-          "read error: ~a ~a"
-          msg_reg
-          (where-at
-            (get-token-start-line token)
-            (get-token-start-char token)
-            src_reg)))
+        (list "ReadError" msg_reg src_reg
+          (get-token-start-line token) (get-token-start-char token)))
       (set! pc apply-handler2))))
-
-(define where-at
-  (lambda (line char src)
-    (if (eq? src 'stdin)
-        (return* (format "at line ~a, char ~a" line char))
-        (return*
-          (format "at line ~a, char ~a of ~a" line char src)))))
 
 (define read-content
   (lambda (filename)
@@ -5508,29 +5495,29 @@
             (set! pc apply-cont2))
           (let ((components 'undefined))
             (set! components (split-variable var_reg))
-            (if (null? components)
+            (if (and (null? (cdr components))
+                     (dlr-env-contains (car components)))
                 (begin
-                  (set! info_reg var-info_reg)
-                  (set! msg_reg (format "unbound variable ~a" var_reg))
-                  (set! pc runtime-error))
-                (if (and (null? (cdr components))
-                         (dlr-env-contains (car components)))
+                  (set! value2_reg fail_reg)
+                  (set! value1_reg (car components))
+                  (set! k_reg gk_reg)
+                  (set! pc apply-cont2))
+                (if (and (not (null? (cdr components)))
+                         (dlr-env-contains (car components))
+                         (dlr-object-contains
+                           (dlr-env-lookup (car components))
+                           components))
                     (begin
-                      (set! value2_reg fail_reg)
-                      (set! value1_reg (car components))
-                      (set! k_reg gk_reg)
-                      (set! pc apply-cont2))
-                    (if (and (not (null? (cdr components)))
-                             (dlr-env-contains (car components))
-                             (dlr-object-contains
-                               (dlr-env-lookup (car components))
-                               components))
+                      (set! value3_reg fail_reg)
+                      (set! value2_reg components)
+                      (set! value1_reg (dlr-env-lookup (car components)))
+                      (set! k_reg dk_reg)
+                      (set! pc apply-cont3))
+                    (if (null? (cdr components))
                         (begin
-                          (set! value3_reg fail_reg)
-                          (set! value2_reg components)
-                          (set! value1_reg (dlr-env-lookup (car components)))
-                          (set! k_reg dk_reg)
-                          (set! pc apply-cont3))
+                          (set! info_reg var-info_reg)
+                          (set! msg_reg (format "unbound variable ~a" var_reg))
+                          (set! pc runtime-error))
                         (begin
                           (set! module_reg env_reg)
                           (set! path_reg "")
@@ -6024,13 +6011,8 @@
     (let ((info 'undefined))
       (set! info (get-source-info adatum_reg))
       (set! exception_reg
-        (format
-          "Error: ~a ~a"
-          msg_reg
-          (where-at
-            (get-start-line info)
-            (get-start-char info)
-            (get-srcfile info))))
+        (list "MacroError" msg_reg (get-start-line info)
+          (get-srcfile info) (get-start-char info)))
       (set! pc apply-handler2))))
 
 (define*
@@ -6855,17 +6837,15 @@
   (lambda ()
     (if (eq? info_reg 'none)
         (begin
-          (set! exception_reg (format "runtime error: ~a" msg_reg))
+          (set! exception_reg
+            (list "RunTimeError" msg_reg 'none 'none 'none))
           (set! pc apply-handler2))
         (let ((src 'undefined) (line 'undefined) (char 'undefined))
           (set! char (get-start-char info_reg))
           (set! line (get-start-line info_reg))
           (set! src (get-srcfile info_reg))
           (set! exception_reg
-            (format
-              "runtime error: ~a ~a"
-              msg_reg
-              (where-at line char src)))
+            (list "RunTimeError" msg_reg src line char))
           (set! pc apply-handler2)))))
 
 (define*
@@ -7047,13 +7027,13 @@
         (if (not (string? filename_reg))
             (begin
               (set! msg_reg
-                (format "filename ~a is not a string" filename_reg))
+                (format "filename '~a' is not a string" filename_reg))
               (set! pc runtime-error))
             (if (not (file-exists? filename_reg))
                 (begin
                   (set! msg_reg
                     (format
-                      "attempted to load nonexistent file ~a"
+                      "attempted to load nonexistent file '~a'"
                       filename_reg))
                   (set! pc runtime-error))
                 (begin

@@ -153,14 +153,9 @@
       (<cont-21> (msg info handler fail)
        (apply-handler2
          handler
-         (format
-           "parse error: ~a ~s ~a"
-           msg
-           value
-           (where-at
-             (get-start-line info)
-             (get-start-char info)
-             (get-srcfile info)))
+         (list "ParseError" (format "~s ~a" msg value)
+           (get-srcfile info) (get-start-line info)
+           (get-start-char info))
          fail))
       (<cont-22> (bindings k)
        (apply-cont k `(let ((unquote (car^ bindings))) ,value)))
@@ -552,7 +547,7 @@
           (apply-proc value1 args env info handler value2 k))
          (else
           (runtime-error
-            (format "attempt to apply non-procedure ~a" value1)
+            (format "attempt to apply non-procedure '~a'" value1)
             info
             handler
             value2))))
@@ -663,7 +658,7 @@
          ((null? (cdr args)) (apply-cont2 k value1 value2))
          ((not (environment? value1))
           (runtime-error
-            (format "invalid module ~a" sym)
+            (format "invalid module '~a'" sym)
             info
             handler
             value2))
@@ -1719,11 +1714,19 @@
       (<proc-93> ()
        (apply-cont2 k2 (apply make-vector args) fail))
       (<proc-94> ()
-       (let* ((location (format "Error in ~a: " (car args)))
-              (message (string-append
-                         location
-                         (apply format (cdr args)))))
-         (runtime-error message info handler fail)))
+       (cond
+         ((not (length-two? args))
+          (runtime-error
+            "incorrect number of arguments to 'error' (should be 2)"
+            info
+            handler
+            fail))
+         (else
+          (let* ((location (format "Error in '~a': " (car args)))
+                 (message (string-append
+                            location
+                            (apply format (cdr args)))))
+            (runtime-error message info handler fail)))))
       (<proc-95> ()
        (cond
          ((not (length-two? args))
@@ -2039,7 +2042,7 @@
   (lambda (msg line char src handler fail)
     (apply-handler2
       handler
-      (format "scan error: ~a ~a" msg (where-at line char src))
+      (list "ScanError" msg src line char)
       fail)))
 
 (define*
@@ -2049,8 +2052,9 @@
       (if (char=? c #\nul)
           (scan-error "unexpected end of input" scan-line scan-char
             src handler fail)
-          (scan-error (format "unexpected character ~a encountered" c)
-            scan-line scan-char src handler fail)))))
+          (scan-error
+            (format "unexpected character '~a' encountered" c) scan-line
+            scan-char src handler fail)))))
 
 (define*
   convert-buffer-to-token
@@ -2526,8 +2530,9 @@
       (if (token-type? token 'end-marker)
           (read-error "unexpected end of input" tokens src handler
             fail)
-          (read-error (format "unexpected ~a encountered" (car token))
-            tokens src handler fail)))))
+          (read-error
+            (format "unexpected '~a' encountered" (car token)) tokens
+            src handler fail)))))
 
 (define*
   read-error
@@ -2535,20 +2540,9 @@
     (let ((token (first tokens)))
       (apply-handler2
         handler
-        (format
-          "read error: ~a ~a"
-          msg
-          (where-at
-            (get-token-start-line token)
-            (get-token-start-char token)
-            src))
+        (list "ReadError" msg src (get-token-start-line token)
+          (get-token-start-char token))
         fail))))
-
-(define where-at
-  (lambda (line char src)
-    (if (eq? src 'stdin)
-        (format "at line ~a, char ~a" line char)
-        (format "at line ~a, char ~a of ~a" line char src))))
 
 (define read-content
   (lambda (filename)
@@ -2795,12 +2789,6 @@
           (apply-cont2 sk binding fail)
           (let ((components (split-variable var)))
             (cond
-              ((null? components)
-               (runtime-error
-                 (format "unbound variable ~a" var)
-                 var-info
-                 handler
-                 fail))
               ((and (null? (cdr components))
                     (dlr-env-contains (car components)))
                (apply-cont2 gk (car components) fail))
@@ -2813,6 +2801,12 @@
                  dk
                  (dlr-env-lookup (car components))
                  components
+                 fail))
+              ((null? (cdr components))
+               (runtime-error
+                 (format "unbound variable ~a" var)
+                 var-info
+                 handler
                  fail))
               (else
                (lookup-variable-components components "" env var-info
@@ -3156,13 +3150,8 @@
     (let ((info (get-source-info adatum)))
       (apply-handler2
         handler
-        (format
-          "Error: ~a ~a"
-          msg
-          (where-at
-            (get-start-line info)
-            (get-start-char info)
-            (get-srcfile info)))
+        (list "MacroError" msg (get-start-line info)
+          (get-srcfile info) (get-start-char info))
         fail))))
 
 (define*
@@ -3672,14 +3661,14 @@
     (if (eq? info 'none)
         (apply-handler2
           handler
-          (format "runtime error: ~a" msg)
+          (list "RunTimeError" msg 'none 'none 'none)
           fail)
         (let ((src (get-srcfile info))
               (line (get-start-line info))
               (char (get-start-char info)))
           (apply-handler2
             handler
-            (format "runtime error: ~a ~a" msg (where-at line char src))
+            (list "RunTimeError" msg src line char)
             fail)))))
 
 (define*
@@ -3823,13 +3812,13 @@
        (apply-cont2 k void-value fail))
       ((not (string? filename))
        (runtime-error
-         (format "filename ~a is not a string" filename)
+         (format "filename '~a' is not a string" filename)
          info
          handler
          fail))
       ((not (file-exists? filename))
        (runtime-error
-         (format "attempted to load nonexistent file ~a" filename)
+         (format "attempted to load nonexistent file '~a'" filename)
          info
          handler
          fail))

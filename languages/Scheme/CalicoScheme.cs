@@ -51,35 +51,47 @@ public class CalicoSchemeEngine : Engine
     return true;
   }
 
+  public bool HandleOutput(object result) {
+    string resultString = Scheme.repr(result);
+    if (resultString.StartsWith("(exception ")) {
+	System.Console.Error.WriteLine("Traceback (most recent call last):");
+	if (Scheme.list_q(result) && ((int)Scheme.length(result)) == 2) {
+	    object list = Scheme.cadr(result);
+	    if (Scheme.list_q(list) && ((int)Scheme.length(list)) == 5) {
+		object error = ((Scheme.Cons)list)[0];
+		object message = ((Scheme.Cons)list)[1];
+		object src_file = ((Scheme.Cons)list)[2];
+		object src_line = ((Scheme.Cons)list)[3];
+		object src_col = ((Scheme.Cons)list)[4];
+		if (src_file.ToString() != "none") {
+		    System.Console.Error.WriteLine(String.Format("  File: \"{0}\", line {1}, col {2}", 
+								 src_file, src_line, src_col));
+		}
+		System.Console.Error.WriteLine(String.Format("{0}: {1}", error, message));
+	    } else {
+		System.Console.Error.WriteLine(resultString);
+	    }
+	} else {
+	    System.Console.Error.WriteLine(resultString);
+	}
+	return false;
+    }
+    if (result != null) {
+	System.Console.WriteLine(resultString);
+    }
+    return true;
+  }
 
   public override bool Execute(string text) {
     PJScheme.initialize_closure_depth();
     object result = PJScheme.execute_string_rm(text);
-    if (result == null) {
-       return true;
-    }
-    string resultString = Scheme.repr(result);
-    // FIXME: when exceptions have a better format in Scheme:
-    if (resultString.StartsWith("(exception ")) {
-      System.Console.Error.WriteLine(resultString);
-      return false;
-    }
-    System.Console.WriteLine(resultString);
-    return true;
+    return HandleOutput(result);
   }
 
   public override bool ExecuteFile(string filename) {
-    System.Console.WriteLine("Run filename '{0}'!", filename);
     PJScheme.initialize_closure_depth();
     object obj = PJScheme.execute_file_rm(filename);
-    if (obj != null) {
-      string str = Scheme.repr(obj);
-      if (str != "") {
-	Console.Error.WriteLine(str);
-	return false;
-      }
-    }
-    return true;
+    return HandleOutput(obj);
   }
 
   public override bool ReadyToExecute(string text) {
