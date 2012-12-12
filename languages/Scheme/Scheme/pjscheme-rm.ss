@@ -5516,7 +5516,7 @@
                     (if (null? (cdr components))
                         (begin
                           (set! info_reg var-info_reg)
-                          (set! msg_reg (format "unbound variable ~a" var_reg))
+                          (set! msg_reg (format "unbound variable '~a'" var_reg))
                           (set! pc runtime-error))
                         (begin
                           (set! module_reg env_reg)
@@ -5558,7 +5558,7 @@
                           (set! pc apply-cont3))
                         (begin
                           (set! info_reg var-info_reg)
-                          (set! msg_reg (format "~a is not a module" new-path))
+                          (set! msg_reg (format "'~a' is not a module" new-path))
                           (set! pc runtime-error))))))
           (if (string=? path_reg "")
               (begin

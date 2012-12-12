@@ -9922,7 +9922,7 @@ public class PJScheme:Scheme
 		{
 		   info_reg = var_info_reg;
 		   msg_reg =
-		      PJScheme.format ((object) "unbound variable ~a",
+		      PJScheme.format ((object) "unbound variable '~a'",
 				       (object) var_reg);
 		   pc = (Function) runtime_error;
 
@@ -9997,7 +9997,7 @@ public class PJScheme:Scheme
 		   {
 		      info_reg = var_info_reg;
 		      msg_reg =
-			 PJScheme.format ((object) "~a is not a module",
+			 PJScheme.format ((object) "'~a' is not a module",
 					  (object) new_path);
 		      pc = (Function) runtime_error;
 

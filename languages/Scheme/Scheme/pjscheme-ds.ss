@@ -2804,7 +2804,7 @@
                  fail))
               ((null? (cdr components))
                (runtime-error
-                 (format "unbound variable ~a" var)
+                 (format "unbound variable '~a'" var)
                  var-info
                  handler
                  fail))
@@ -2833,7 +2833,7 @@
                   (apply-cont3 dk value components fail))
                  (else
                   (runtime-error
-                    (format "~a is not a module" new-path)
+                    (format "'~a' is not a module" new-path)
                     var-info
                     handler
                     fail))))))

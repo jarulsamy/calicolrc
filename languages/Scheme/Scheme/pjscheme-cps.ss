@@ -1056,7 +1056,7 @@
 		  (dlr-object-contains (dlr-env-lookup (car components)) components))
 	     (dk (dlr-env-lookup (car components)) components fail))
 	    ((null? (cdr components))  ;; (set! a.b..c val)
-	     (runtime-error (format "unbound variable ~a" var) var-info handler fail))
+	     (runtime-error (format "unbound variable '~a'" var) var-info handler fail))
 	    (else (lookup-variable-components components "" env var-info handler fail dk sk))))))))
 
 ;; math.x.y.z where math is a module or a DLR module/item
@@ -1080,7 +1080,7 @@
 		 (lookup-variable-components (cdr components) new-path value var-info handler fail dk sk))
 		((dlr-object-contains value components)
 		 (dk value components fail))
-		(else (runtime-error (format "~a is not a module" new-path) var-info handler fail))))))
+		(else (runtime-error (format "'~a' is not a module" new-path) var-info handler fail))))))
 	((string=? path "") (runtime-error (format "unbound module '~a'" var) var-info handler fail))
 	(else (runtime-error (format "unbound variable '~a' in module '~a'" var path) var-info handler fail))))))
 
