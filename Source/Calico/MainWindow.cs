@@ -139,6 +139,8 @@ namespace Calico {
                 // TextView
             }
             Output.WrapMode = Gtk.WrapMode.Char; // FIXME: config
+            //Output.ButtonPressEvent += HandleOutputButtonPressEvent;
+            Output.PopulatePopup += HandlePopulatePopup;
             //Output.CopyClipboard += OutputCopiedText;
             // Setup clipboard, and Gui:
             clipboard = Gtk.Clipboard.Get(Gdk.Atom.Intern("CLIPBOARD", false));
@@ -321,6 +323,47 @@ namespace Calico {
             butterfly.Image = animationImages [0];
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        void HandlePopulatePopup (object o, Gtk.PopulatePopupArgs args)
+        {
+            // First, see what kind of line this is:
+            int position = Output.Buffer.CursorPosition;
+            Gtk.TextIter currentiter = Output.Buffer.GetIterAtOffset(position);
+            int char_offset = currentiter.CharsInLine;
+            int line = currentiter.Line;
+            Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
+            Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
+            String text = textiter.GetVisibleText(enditer);
+
+            // Look for appropriate text:
+            System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(
+            text, "^.*File \"(.*)\", line ([0-9]*), .*$");
+            string filename;
+            int lineno;
+            if (match.Success) {
+                // Groups[0] is entire string
+                try {
+                    filename = match.Groups[1].Captures[0].Value;
+                    lineno = Convert.ToInt32(match.Groups[2].Captures[0].Value);
+                } catch {
+                    return;
+                }
+            } else {
+                // Nothing to do
+                return;
+            }
+
+            // If needed, add options to menu:
+            string [] parts = filename.Split(System.IO.Path.DirectorySeparatorChar);
+            Gtk.MenuItem menuitem = new Gtk.MenuItem(
+                String.Format("Go to \"{0}\" line {1}", parts[parts.Length - 1], lineno));
+            menuitem.Activated += delegate(object sender, EventArgs e) {
+                Open(String.Format("{0}:{1}", filename, lineno));
+            };
+            menuitem.Show();
+            // Add item to menu
+            args.Menu.Insert(menuitem, 0);
         }
 
         public void initialize_switch_menu(Gtk.MenuItem switch_menu) {
@@ -1864,6 +1907,8 @@ namespace Calico {
                     ((bool)config.GetValue(String.Format("{0}-language", language), "reset-shell-on-run"))) {
                     ResetShell();
                 }
+                string dir = System.IO.Path.GetDirectoryName(filename);
+                System.IO.Directory.SetCurrentDirectory(dir);
                 manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
             }));

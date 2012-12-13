@@ -54,7 +54,7 @@ public class CalicoSchemeEngine : Engine
 	  object column = Scheme.caddr(info);
 	  object proc_name = Scheme.cadddr(info);
 	  System.Console.Error.WriteLine(
-	       String.Format("  File: \"{0}\", line {1}, col {2}, calling '{3}'", 
+	       String.Format("  File \"{0}\", line {1}, col {2}, calling '{3}'", 
 			     message, line, column, proc_name));
 	  current = Scheme.cdr(current);
       }
@@ -75,7 +75,7 @@ public class CalicoSchemeEngine : Engine
 		object stack = ((Scheme.Cons)list)[5];
 		format_trace_back(stack);
 		if (src_file.ToString() != "none") {
-		    System.Console.Error.WriteLine(String.Format("  File: \"{0}\", line {1}, col {2}", 
+		    System.Console.Error.WriteLine(String.Format("  File \"{0}\", line {1}, col {2}", 
 								 src_file, src_line, src_col));
 		}
 		System.Console.Error.WriteLine(String.Format("{0}: {1}", error, message));
