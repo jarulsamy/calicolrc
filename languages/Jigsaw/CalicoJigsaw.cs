@@ -284,30 +284,30 @@ public class CalicoJigsawDocument : Document
 
 	public override string [] GetAuthors() 
 	{
-        return new string[] {
-			"Mark Russo <russomf@gmail.com>",
-			"Doug Blank <dblank@cs.brynmawr.edu>"
-		};
-    }
+	    return new string[] {
+		"Mark Russo <russomf@gmail.com>",
+		"Doug Blank <dblank@cs.brynmawr.edu>"
+	    };
+	}
 
 	public override void SetOptionsMenu(Gtk.MenuItem options_menu) {
-        options_menu.Submenu = new Gtk.Menu();
-		// Toggle inset:
-		Gtk.MenuItem menu = new Gtk.MenuItem("Toggle Inset");
-		menu.Activated += new EventHandler(cvs.OnViewToggleInset);
-		((Gtk.Menu)options_menu.Submenu).Add(menu);
-		menu.Show();
-		// Show properties:
-		menu = new Gtk.MenuItem("View Properties");
-		menu.Activated += delegate { cvs.ShowPropertiesWindow(); };
-		((Gtk.Menu)options_menu.Submenu).Add(menu);
-		menu.Show();
-		// Auto-view properties:
-		Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
-		miViewAutoProps.Active = true;
-		miViewAutoProps.Activated += (sender, a) => { cvs.AutoProperties = (sender as Gtk.CheckMenuItem).Active; };
-		((Gtk.Menu)options_menu.Submenu).Add(miViewAutoProps);
-		miViewAutoProps.Show();
+	    options_menu.Submenu = new Gtk.Menu();
+	    // Toggle inset:
+	    Gtk.MenuItem menu = new Gtk.MenuItem("Toggle Inset");
+	    menu.Activated += new EventHandler(cvs.OnViewToggleInset);
+	    ((Gtk.Menu)options_menu.Submenu).Add(menu);
+	    menu.Show();
+	    // // Show properties:
+	    // menu = new Gtk.MenuItem("View Properties");
+	    // menu.Activated += delegate { cvs.ShowPropertiesWindow(); };
+	    // ((Gtk.Menu)options_menu.Submenu).Add(menu);
+	    // menu.Show();
+	    // // Auto-view properties:
+	    // Gtk.CheckMenuItem miViewAutoProps = new Gtk.CheckMenuItem("Auto-view Properties");
+	    // miViewAutoProps.Active = true;
+	    // miViewAutoProps.Activated += (sender, a) => { cvs.AutoProperties = (sender as Gtk.CheckMenuItem).Active; };
+	    // ((Gtk.Menu)options_menu.Submenu).Add(miViewAutoProps);
+	    // miViewAutoProps.Show();
     }
 }
 
@@ -333,4 +333,6 @@ public class CalicoJigsawLanguage : Language
 	{
 		return new CalicoJigsawLanguage ();
 	}
+
 }
+

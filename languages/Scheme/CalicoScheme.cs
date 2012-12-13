@@ -41,10 +41,6 @@ public class CalicoSchemeEngine : Engine
   }
 
   public void initialize_execute() {
-      if (!calico.config.HasValue("scheme-language", "use-stack-trace")) {
-	  // add it! 
-	  calico.config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
-      }
       bool use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
       PJScheme.set_use_stack_trace(use_stack_trace);
       PJScheme.initialize_execute();
@@ -201,22 +197,6 @@ public class CalicoSchemeDocument : TextDocument {
             	   base(calico, filename, language, mimetype) {
     }
 
-    public override void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
-        // Put language specific stuff in overloaded version
-        if (!calico.config.HasValue("scheme-language", "use-stack-trace")) {
-	    // add it! 
-	    calico.config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
-	}
-        bool use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
-        Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem("Use Stack Trace");
-        menu_item.Active = use_stack_trace;
-        menu_item.Activated += delegate(object sender, EventArgs e) {
-	    bool value = ((Gtk.CheckMenuItem)sender).Active;
-	    calico.config.SetValue("scheme-language", "use-stack-trace", value);
-	    PJScheme.set_use_stack_trace(value);
-           };
-        ((Gtk.Menu)submenu).Add(menu_item);
-    }
 }
 	
 public class CalicoSchemeLanguage : Language
@@ -244,5 +224,26 @@ public class CalicoSchemeLanguage : Language
         public override string GetUseLibraryString(string fullname) {
 		string bname = System.IO.Path.GetFileNameWithoutExtension(fullname);
                 return String.Format("(using \"{0}\")\n", bname);
-     }
+        }
+
+	public override void InitializeConfig() {
+	    base.InitializeConfig();
+	    if (config != null && !config.HasValue("scheme-language", "use-stack-trace")) {
+		// add it! 
+		config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
+	    }
+	}
+
+	public override void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+	    // Put language specific stuff in overloaded version
+	    bool use_stack_trace = (bool)config.GetValue("scheme-language", "use-stack-trace");
+	    Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem("Use Stack Trace");
+	    menu_item.Active = use_stack_trace;
+	    menu_item.Activated += delegate(object sender, EventArgs e) {
+		bool value = ((Gtk.CheckMenuItem)sender).Active;
+		config.SetValue("scheme-language", "use-stack-trace", value);
+		PJScheme.set_use_stack_trace(value);
+	    };
+	    ((Gtk.Menu)submenu).Add(menu_item);
+	}
 }

@@ -883,6 +883,8 @@ namespace Calico {
         public void SetLanguage(string language) {
             CurrentLanguage = language;
             if (CurrentLanguage != null) {
+                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
+                manager[language].SetOptionsMenu(options_menu);
                 if (Shell.Document.MimeType != String.Format("text/x-{0}", CurrentLanguage)) {
                     try {
                         Shell.Document.MimeType = String.Format("text/x-{0}", CurrentLanguage);
@@ -1050,7 +1052,7 @@ namespace Calico {
             } else {
                 document = manager.languages [language].MakeDocument(this, filename);
             }
-            document.Configure();
+            document.Configure(this.config);
             addToRecentsMenu(filename);
             return document;
         }
@@ -2024,8 +2026,6 @@ namespace Calico {
                 ProgramSpeed.Sensitive = true;
                 ProgramSpeed.Value = CurrentDocument.SpeedValue;
                 // Set options menu:
-                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
-                CurrentDocument.SetOptionsMenu(options_menu);
                 if (! ProgramRunning) {
                     if (CurrentDocument.HasContent) {
                         StartButton.Sensitive = true;
@@ -2036,6 +2036,8 @@ namespace Calico {
                     }
                 }
                 SetLanguage(CurrentDocument.language);
+                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
+                CurrentDocument.SetOptionsMenu(options_menu);
                 CurrentDocument.widget.Child.GrabFocus();
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);

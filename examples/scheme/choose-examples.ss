@@ -419,4 +419,19 @@
                                      (sum c3 c5 c7))))
                             (list c1 c2 c3 c4 c5 c6 c7 c8 c9)))))))))))
 
+(define rolls
+  (lambda ()
+    (let ((a (choose 1 2 3 4 5 6))
+          (b (choose 1 2 3 4 5 6))
+          (c (choose 1 2 3 4 5 6))
+          (d (choose 1 2 3 4 5 6)))
+      (require (<= a b))
+      (require (<= b c))
+      (require (<= c d))
+      (list
+         (list 'a a)
+         (list 'b b)
+         (list 'c c)
+         (list 'd d)))))
+
 (floors2)

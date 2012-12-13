@@ -19,6 +19,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
+
 namespace Calico {
 
     public class Language {
@@ -29,7 +31,8 @@ namespace Calico {
         public string mimetype;
         public bool IsTextLanguage = true;
         public string LineComment = "";
-        public Config config;
+        public Config local_config; // temp, for loading
+        public Config config; // pointer to Calico.config
 
         public Language() {
         }
@@ -44,24 +47,56 @@ namespace Calico {
         
         public virtual void InitializeConfig() {
             // Just used for init and load
-            config = new Config();
-            config.SetValue(System.String.Format("{0}-language", name), "reset-shell-on-run", "bool", true);
+            local_config = new Config();
+            local_config.SetValue(System.String.Format("{0}-language", name), "reset-shell-on-run", "bool", true);
+        }
+
+        public void OnChangeResetShellOnRun (object sender, EventArgs e)
+        {
+            string section = String.Format("{0}-language", name);
+            config.SetValue(section, "reset-shell-on-run", ((Gtk.CheckMenuItem)sender).Active);
+        }
+     
+        public virtual void SetOptionsMenu(Gtk.MenuItem options_menu) {
+            //Gtk.Menu menu = (Gtk.Menu)options_menu.Submenu;
+            //menu.Detach();
+            //options_menu.Submenu = null;
+            options_menu.Submenu = new Gtk.Menu();
+            string section = String.Format("{0}-language", name);
+            if (config.HasValue(section, "reset-shell-on-run")) {
+                bool reset_shell_on_run = (bool)config.GetValue(section, "reset-shell-on-run");
+                Gtk.CheckMenuItem reset_shell_on_run_menu_item = new Gtk.CheckMenuItem("Reset Shell on Run");
+                reset_shell_on_run_menu_item.Active = reset_shell_on_run;
+                reset_shell_on_run_menu_item.Activated += OnChangeResetShellOnRun;
+                ((Gtk.Menu)options_menu.Submenu).Add(reset_shell_on_run_menu_item);
+            } else {
+                Gtk.MenuItem submenu = new Gtk.MenuItem("Reset Shell on Run"); // not available
+                submenu.Sensitive = false;
+                ((Gtk.Menu)options_menu.Submenu).Add(submenu);
+            }
+            SetAdditionalOptionsMenu((Gtk.Menu)options_menu.Submenu);
+            options_menu.ShowAll();
+        }
+
+        public virtual void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+            // Put language specific stuff in overloaded version
         }
 
         public virtual void LoadConfig(Config global_config) {
             // Load the Config into the Global Config
             string section = System.String.Format("{0}-language", name);
-            if (config != null && config.HasValue(section)) {
-                foreach(string setting in config.GetValue(section)) {
+            if (local_config != null && local_config.HasValue(section)) {
+                foreach(string setting in local_config.GetValue(section)) {
                     if (! global_config.HasValue(section, setting)) {
                         global_config.SetValue(
                             section, 
                             setting, 
-                            config.types[section][setting], 
-                            config.values[section][setting]);
+                            local_config.types[section][setting], 
+                            local_config.values[section][setting]);
                     } // else already been defined
                 }
             }
+            config = global_config;
         }
         
         public virtual void MakeEngine(LanguageManager manager) {
