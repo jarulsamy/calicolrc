@@ -128,7 +128,7 @@
 
 (define* scan-error
   (lambda (msg line char src handler fail)
-    (handler (list "ScanError" msg src line char) fail)))
+    (handler (make-exception "ScanError" msg src line char) fail)))
 
 (define* unexpected-char-error
   (lambda (chars src handler fail)
@@ -706,7 +706,7 @@
 (define* read-error
   (lambda (msg tokens src handler fail)
     (let ((token (first tokens)))
-      (handler (list "ReadError" msg src 
+      (handler (make-exception "ReadError" msg src 
 		     (get-token-start-line token) 
 		     (get-token-start-char token))
 	       fail))))

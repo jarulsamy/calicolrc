@@ -40,9 +40,24 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text, bool ok) {
-    PJScheme.initialize_closure_depth();
+    PJScheme.initialize_execute();
     object result = PJScheme.execute_string_rm(text);
     return HandleOutput(result, ok);
+  }
+
+  public void format_trace_back(object list) {
+      object current = list;
+      while (current != Scheme.EmptyList) {
+	  Scheme.Cons info = (Scheme.Cons)Scheme.car(current);
+	  object message = Scheme.car(info);
+	  object line = Scheme.cadr(info);
+	  object column = Scheme.caddr(info);
+	  object proc_name = Scheme.cadddr(info);
+	  System.Console.Error.WriteLine(
+	       String.Format("  File: \"{0}\", line {1}, col {2}, calling '{3}'", 
+			     message, line, column, proc_name));
+	  current = Scheme.cdr(current);
+      }
   }
 
   public bool HandleOutput(object result, bool ok) {
@@ -51,12 +66,14 @@ public class CalicoSchemeEngine : Engine
 	System.Console.Error.WriteLine("Traceback (most recent call last):");
 	if (Scheme.list_q(result) && ((int)Scheme.length(result)) == 2) {
 	    object list = Scheme.cadr(result);
-	    if (Scheme.list_q(list) && ((int)Scheme.length(list)) == 5) {
+	    if (Scheme.list_q(list) && ((int)Scheme.length(list)) == 6) {
 		object error = ((Scheme.Cons)list)[0];
 		object message = ((Scheme.Cons)list)[1];
 		object src_file = ((Scheme.Cons)list)[2];
 		object src_line = ((Scheme.Cons)list)[3];
 		object src_col = ((Scheme.Cons)list)[4];
+		object stack = ((Scheme.Cons)list)[5];
+		format_trace_back(stack);
 		if (src_file.ToString() != "none") {
 		    System.Console.Error.WriteLine(String.Format("  File: \"{0}\", line {1}, col {2}", 
 								 src_file, src_line, src_col));
@@ -80,13 +97,13 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text) {
-    PJScheme.initialize_closure_depth();
+    PJScheme.initialize_execute();
     object result = PJScheme.execute_string_rm(text);
     return HandleOutput(result, false);
   }
 
   public override bool ExecuteFile(string filename) {
-    PJScheme.initialize_closure_depth();
+    PJScheme.initialize_execute();
     object obj = PJScheme.execute_file_rm(filename);
     return HandleOutput(obj, true);
   }
@@ -143,7 +160,7 @@ public class CalicoSchemeEngine : Engine
         else
           expr = line;
 	    if (scheme.engine.ReadyToExecute(expr)) {
-	      PJScheme.initialize_closure_depth();
+  	          PJScheme.initialize_execute();
 		  scheme.engine.Execute(expr);
 		  expr = "";
 		  prompt = "scheme>>> ";

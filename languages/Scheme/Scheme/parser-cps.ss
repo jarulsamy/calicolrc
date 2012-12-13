@@ -445,7 +445,7 @@
     (let ((info (get-source-info adatum)))
       (unannotate-cps adatum
 	(lambda-cont (datum)
-	  (handler (list "ParseError" (format "~s ~a" msg datum)
+	  (handler (make-exception "ParseError" (format "~s ~a" msg datum)
 			 (get-srcfile info)
 			 (get-start-line info) 
 			 (get-start-char info))
@@ -575,7 +575,7 @@
 (define* amacro-error
   (lambda (msg adatum handler fail)
     (let ((info (get-source-info adatum)))
-      (handler (list "MacroError" msg (get-start-line info)
+      (handler (make-exception "MacroError" msg (get-start-line info)
 		     (get-srcfile info)
 		     (get-start-char info))
 	       fail))))

@@ -106,6 +106,13 @@
     (*use-lexical-address* "bool" ())
     (*tracing-on?* "bool" ())
     (unparse-prim "object" ())
+    (initialize-stack-trace "void" ())
+    (push-stack-trace "void" ())
+    (pop-stack-trace "void" ())
+    (m "void" ())
+    (m* "void" ())
+    (make-stack-trace "object" ())
+    (format-stack-trace "object" ())
     ))
 
 (define *system-ignore-definitions*
@@ -242,9 +249,10 @@
       _closure_depth--;
    }
 
-   public static void initialize_closure_depth ()
+   public static void initialize_execute ()
    {
       _closure_depth = 0;
+      initialize_stack_trace();
    }
 
    public static object repeat(object item, object times) {

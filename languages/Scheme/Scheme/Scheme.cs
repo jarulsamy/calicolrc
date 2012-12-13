@@ -442,6 +442,7 @@ public class Scheme {
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
+  public static Proc format_stack_trace_proc = new Proc("format-stack-trace", (Procedure1) PJScheme.format_stack_trace, 1, 1);
 
     //  public static Proc binding_variable_proc = new Proc("binding_variable", 
     //							(Procedure1) PJScheme.binding_variable,
@@ -3320,8 +3321,11 @@ public class Scheme {
 			
 	//printf ("  (load \"sllgen.ss\"): {0}\n",
 	//		PJScheme.execute_string_rm("(load \"/home/dblank/Calico/trunk/examples/scheme/sllgen.ss\")"));
-	printf ("  1/2: {0}\n",
-			PJScheme.execute_string_rm("1/2"));
+	//PJScheme.execute_string_rm("(define fact2 (lambda fact2 (n) (if (= n 1) 1 (* (fact2 (- n 1)) n))))");
+	//printf ("  (fact2 5): {0}\n",
+	//		PJScheme.execute_string_rm("(fact2 5)"));
+	printf ("  (get-stack-trace): {0}\n",
+			PJScheme.execute_string_rm("(get-stack-trace)"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------

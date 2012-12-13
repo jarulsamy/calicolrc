@@ -128,7 +128,7 @@
 
 (define* scan-error
   (lambda (msg line char src handler fail)
-    (handler (list "ScanError" msg src line char) fail)))
+    (handler (make-exception "ScanError" msg src line char) fail)))
 
 (define* unexpected-char-error
   (lambda (chars src handler fail)
@@ -706,7 +706,7 @@
 (define* read-error
   (lambda (msg tokens src handler fail)
     (let ((token (first tokens)))
-      (handler (list "ReadError" msg src 
+      (handler (make-exception "ReadError" msg src 
 		     (get-token-start-line token) 
 		     (get-token-start-char token))
 	       fail))))
@@ -1571,7 +1571,7 @@
     (let ((info (get-source-info adatum)))
       (unannotate-cps adatum
 	(lambda-cont (datum)
-	  (handler (list "ParseError" (format "~s ~a" msg datum)
+	  (handler (make-exception "ParseError" (format "~s ~a" msg datum)
 			 (get-srcfile info)
 			 (get-start-line info) 
 			 (get-start-char info))
@@ -1701,7 +1701,7 @@
 (define* amacro-error
   (lambda (msg adatum handler fail)
     (let ((info (get-source-info adatum)))
-      (handler (list "MacroError" msg (get-start-line info)
+      (handler (make-exception "MacroError" msg (get-start-line info)
 		     (get-srcfile info)
 		     (get-start-char info))
 	       fail))))
@@ -2695,6 +2695,7 @@
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
     (set! load-stack '())
+    (initialize-execute)
     (set! *last-fail* REP-fail)))
 
 ;;----------------------------------------------------------------------------
@@ -2816,6 +2817,33 @@
   (lambda (exp result)
     (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
+(define *stack-trace* '(()))
+
+(define initialize-stack-trace
+  (lambda ()
+    (set-car! *stack-trace* '())))
+
+(define-native initialize-execute
+  (lambda () 'Ok))
+
+(define push-stack-trace
+  (lambda (exp)
+    ;;(printf "~a: ~a\n" 'push exp)
+    ;; FIXME: limit size of stack!
+    (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
+
+(define pop-stack-trace
+  (lambda (exp)
+    ;;(printf "~a: ~a\n" 'pop exp)
+    (if (not (null? (car *stack-trace*)))
+	(set-car! *stack-trace* (cdr (car *stack-trace*))))))
+
+;; (define make-pop-stack-trace-k
+;;   (lambda (exp k2)
+;;     (lambda-cont2 (v fail)
+;;        (pop-stack-trace exp)
+;;        (k2 v fail))))
+
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
    (if *tracing-on?* (highlight-expression exp))
@@ -2916,24 +2944,56 @@
 	  (lambda-cont2 (args fail)
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
+		(push-stack-trace exp)
 		(cond
-		  ((dlr-proc? proc) (k (dlr-apply proc args) fail))
-		  ((procedure-object? proc) (proc args env info handler fail k))
+		  ((dlr-proc? proc) 
+		   (let ((result (dlr-apply proc args)))
+		     (pop-stack-trace exp)
+		     (k result fail)))
+		  ((procedure-object? proc) 
+		   (proc args env info handler fail 
+		      ;; FIXME: don't do this for infinite loops:
+		      (lambda-cont2 (v2 fail)
+			 (pop-stack-trace exp)
+			 (k v2 fail))))
 		  (else (runtime-error (format "attempt to apply non-procedure '~a'" proc)
 				       info handler fail))))))))
-      (else (error 'm "bad abstract syntax: ~s" exp)))))
-)
+      (else (error 'm "bad abstract syntax: '~s'" exp))))))
+
+(define make-exception
+  (lambda (exception message source line column)
+    (list exception message source line column (make-stack-trace))))
+
+(define make-stack-trace
+  (lambda ()
+    (let ((trace (car *stack-trace*)))
+      (reverse (map format-stack-trace trace)))))
+
+(define get-procedure-name
+  (lambda (exp)
+    (cases aexpression exp
+      (lexical-address-aexp (depth offset id info) id)
+      (var-aexp (id info) id)
+      (app-aexp (operator operands info)
+	  (get-procedure-name operator))
+      (else 'unknown))))
+
+(define format-stack-trace
+  (lambda (exp)
+    (let ((info (rac exp)))
+      (list (get-srcfile info)
+	    (get-start-line info)
+	    (get-start-char info)
+	    (get-procedure-name exp)))))
 
 (define* runtime-error
   (lambda (msg info handler fail)
     (if (eq? info 'none)
-      (handler (list "RunTimeError" msg 'none 'none 'none) fail)
+      (handler (make-exception "RunTimeError" msg 'none 'none 'none) fail)
       (let ((src (get-srcfile info))
 	    (line (get-start-line info))
 	    (char (get-start-char info)))
-	(handler (list "RunTimeError" msg src line char) fail)))))
-
-;; exceptions: (msg src-file line col)
+	(handler (make-exception "RunTimeError" msg src line char) fail)))))
 
 (define* m*
   (lambda (exps env handler fail k)
@@ -3808,6 +3868,11 @@
 		(set-binding-value! binding module)
 		(load-file filename module 'none handler fail k2)))))))))
 
+;; get-stack-trace-prim
+(define get-stack-trace-prim
+  (lambda-proc (args env2 info handler fail k)
+    (k (car *stack-trace*) fail)))
+
 ;; get
 (define get-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4245,6 +4310,7 @@
 	    (list 'exit exit-prim)
 	    (list 'for-each for-each-prim)
 	    (list 'get get-prim)
+	    (list 'get-stack-trace get-stack-trace-prim)
 	    (list 'import import-prim)
 	    (list 'length length-prim)
 	    (list 'list list-prim)
