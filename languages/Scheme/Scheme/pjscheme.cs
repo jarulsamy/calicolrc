@@ -2854,13 +2854,15 @@ public class PJScheme:Scheme
 	      env = PJScheme.list_ref ((object) temp_1, (object) 3);
 	      exp = PJScheme.list_ref ((object) temp_1, (object) 2);
 	      args = PJScheme.list_ref ((object) temp_1, (object) 1);
-	      PJScheme.push_stack_trace ((object) exp);
+	      if (true_q (_staruse_stack_trace_star))
+		 PJScheme.push_stack_trace ((object) exp);
 	      if (true_q (PJScheme.dlr_proc_q ((object) value1_reg)))
 		{
 		   object result = null;
 		   result =
 		      PJScheme.dlr_apply ((object) value1_reg, (object) args);
-		   PJScheme.pop_stack_trace ((object) exp);
+		   if (true_q (_staruse_stack_trace_star))
+		      PJScheme.pop_stack_trace ((object) exp);
 		   value1_reg = result;
 		   k_reg = k;
 		   pc = (Function) apply_cont2;
@@ -2868,19 +2870,32 @@ public class PJScheme:Scheme
 	      else
 		 if (true_q
 		     (PJScheme.procedure_object_q ((object) value1_reg)))
-		{
-		   k2_reg =
-		      PJScheme.make_cont2 ((object) symbol ("<cont2-50>"),
-					   (object) exp, (object) k);
-		   fail_reg = value2_reg;
-		   handler_reg = handler;
-		   info_reg = info;
-		   env2_reg = env;
-		   args_reg = args;
-		   proc_reg = value1_reg;
-		   pc = (Function) apply_proc;
+		 if (true_q (_staruse_stack_trace_star))
+		   {
+		      k2_reg =
+			 PJScheme.make_cont2 ((object) symbol ("<cont2-50>"),
+					      (object) exp, (object) k);
+		      fail_reg = value2_reg;
+		      handler_reg = handler;
+		      info_reg = info;
+		      env2_reg = env;
+		      args_reg = args;
+		      proc_reg = value1_reg;
+		      pc = (Function) apply_proc;
 
-		}
+		   }
+		 else
+		   {
+		      k2_reg = k;
+		      fail_reg = value2_reg;
+		      handler_reg = handler;
+		      info_reg = info;
+		      env2_reg = env;
+		      args_reg = args;
+		      proc_reg = value1_reg;
+		      pc = (Function) apply_proc;
+
+		   }
 	      else
 		{
 		   fail_reg = value2_reg;
@@ -11918,6 +11933,17 @@ public class PJScheme:Scheme
 			     (object) k));
    }
 
+   new public static object get_use_stack_trace ()
+   {
+      return ((object) _staruse_stack_trace_star);
+   }
+
+   new public static void set_use_stack_trace (object value)
+   {
+      _staruse_stack_trace_star = value;
+
+   }
+
    new public static void initialize_stack_trace ()
    {
       PJScheme.set_car_b ((object) _starstack_trace_star, (object) EmptyList);
@@ -14086,6 +14112,7 @@ public class PJScheme:Scheme
       PJScheme.make_handler2 ((object) symbol ("<handler2-3>"));
    static bool _startracing_on_q_star = false;
    static object _starstack_trace_star = PJScheme.list ((object) EmptyList);
+   static object _staruse_stack_trace_star = true;
    static object void_prim =
       PJScheme.make_proc ((object) symbol ("<proc-5>"));
    static object zero_q_prim =

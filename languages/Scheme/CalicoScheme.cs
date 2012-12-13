@@ -37,10 +37,21 @@ public class CalicoSchemeEngine : Engine
     this.calico = calico;
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
     Scheme.reset_toplevel_env();
+    initialize_execute();
+  }
+
+  public void initialize_execute() {
+      if (!calico.config.HasValue("scheme-language", "use-stack-trace")) {
+	  // add it! 
+	  calico.config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
+      }
+      bool use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
+      PJScheme.set_use_stack_trace(use_stack_trace);
+      PJScheme.initialize_execute();
   }
 
   public override bool Execute(string text, bool ok) {
-    PJScheme.initialize_execute();
+    initialize_execute();
     object result = PJScheme.execute_string_rm(text);
     return HandleOutput(result, ok);
   }
@@ -97,13 +108,13 @@ public class CalicoSchemeEngine : Engine
   }
 
   public override bool Execute(string text) {
-    PJScheme.initialize_execute();
+    initialize_execute();
     object result = PJScheme.execute_string_rm(text);
     return HandleOutput(result, false);
   }
 
   public override bool ExecuteFile(string filename) {
-    PJScheme.initialize_execute();
+    initialize_execute();
     object obj = PJScheme.execute_file_rm(filename);
     return HandleOutput(obj, true);
   }
@@ -160,7 +171,7 @@ public class CalicoSchemeEngine : Engine
         else
           expr = line;
 	    if (scheme.engine.ReadyToExecute(expr)) {
-  	          PJScheme.initialize_execute();
+		  PJScheme.initialize_execute();
 		  scheme.engine.Execute(expr);
 		  expr = "";
 		  prompt = "scheme>>> ";
@@ -190,6 +201,22 @@ public class CalicoSchemeDocument : TextDocument {
             	   base(calico, filename, language, mimetype) {
     }
 
+    public override void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+        // Put language specific stuff in overloaded version
+        if (!calico.config.HasValue("scheme-language", "use-stack-trace")) {
+	    // add it! 
+	    calico.config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
+	}
+        bool use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
+        Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem("Use Stack Trace");
+        menu_item.Active = use_stack_trace;
+        menu_item.Activated += delegate(object sender, EventArgs e) {
+	    bool value = ((Gtk.CheckMenuItem)sender).Active;
+	    calico.config.SetValue("scheme-language", "use-stack-trace", value);
+	    PJScheme.set_use_stack_trace(value);
+           };
+        ((Gtk.Menu)submenu).Add(menu_item);
+    }
 }
 	
 public class CalicoSchemeLanguage : Language

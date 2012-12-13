@@ -344,11 +344,16 @@ namespace Calico {
                 reset_shell_on_run_menu_item.Activated += OnChangeResetShellOnRun;
                 ((Gtk.Menu)options_menu.Submenu).Add(reset_shell_on_run_menu_item);
             } else {
-                Gtk.MenuItem submenu = new Gtk.MenuItem("Empty");
+                Gtk.MenuItem submenu = new Gtk.MenuItem("Reset Shell on Run"); // not available
                 submenu.Sensitive = false;
                 ((Gtk.Menu)options_menu.Submenu).Add(submenu);
             }
+            SetAdditionalOptionsMenu((Gtk.Menu)options_menu.Submenu);
             options_menu.ShowAll();
+        }
+
+        public virtual void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+            // Put language specific stuff in overloaded version
         }
 
         public void OnChangeResetShellOnRun (object sender, EventArgs e)

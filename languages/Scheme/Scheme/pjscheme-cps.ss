@@ -2819,6 +2819,16 @@
 
 (define *stack-trace* '(()))
 
+(define *use-stack-trace* #t)
+
+(define get-use-stack-trace
+  (lambda ()
+    *use-stack-trace*))
+
+(define set-use-stack-trace
+  (lambda (value)
+    (set! *use-stack-trace* value)))
+
 (define initialize-stack-trace
   (lambda ()
     (set-car! *stack-trace* '())))
@@ -2944,18 +2954,19 @@
 	  (lambda-cont2 (args fail)
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
-		(push-stack-trace exp)
+		(if *use-stack-trace* (push-stack-trace exp))
 		(cond
 		  ((dlr-proc? proc) 
 		   (let ((result (dlr-apply proc args)))
-		     (pop-stack-trace exp)
+		     (if *use-stack-trace* (pop-stack-trace exp))
 		     (k result fail)))
 		  ((procedure-object? proc) 
-		   (proc args env info handler fail 
-		      ;; FIXME: don't do this for infinite loops:
-		      (lambda-cont2 (v2 fail)
-			 (pop-stack-trace exp)
-			 (k v2 fail))))
+		   (if *use-stack-trace*
+		       (proc args env info handler fail 
+			  (lambda-cont2 (v2 fail)
+			     (pop-stack-trace exp)
+			     (k v2 fail)))
+		       (proc args env info handler fail k)))
 		  (else (runtime-error (format "attempt to apply non-procedure '~a'" proc)
 				       info handler fail))))))))
       (else (error 'm "bad abstract syntax: '~s'" exp))))))

@@ -113,6 +113,8 @@
     (m* "void" ())
     (make-stack-trace "object" ())
     (format-stack-trace "object" ())
+    (set-use-stack-trace "void" ())
+    (get-use-stack-trace "object" ())
     ))
 
 (define *system-ignore-definitions*

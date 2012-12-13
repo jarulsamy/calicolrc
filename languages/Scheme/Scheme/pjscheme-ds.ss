@@ -542,15 +542,17 @@
        (pop-stack-trace exp)
        (apply-cont2 k value1 value2))
       (<cont2-51> (args exp env info handler k)
-       (push-stack-trace exp)
+       (if *use-stack-trace* (push-stack-trace exp))
        (cond
          ((dlr-proc? value1)
           (let ((result (dlr-apply value1 args)))
-            (pop-stack-trace exp)
+            (if *use-stack-trace* (pop-stack-trace exp))
             (apply-cont2 k result value2)))
          ((procedure-object? value1)
-          (apply-proc value1 args env info handler value2
-            (make-cont2 '<cont2-50> exp k)))
+          (if *use-stack-trace*
+              (apply-proc value1 args env info handler value2
+                (make-cont2 '<cont2-50> exp k))
+              (apply-proc value1 args env info handler value2 k)))
          (else
           (runtime-error
             (format "attempt to apply non-procedure '~a'" value1)
@@ -3577,6 +3579,11 @@
   (lambda (exp result)
     (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
+(define get-use-stack-trace (lambda () *use-stack-trace*))
+
+(define set-use-stack-trace
+  (lambda (value) (set! *use-stack-trace* value)))
+
 (define initialize-stack-trace
   (lambda () (set-car! *stack-trace* '())))
 
@@ -4542,6 +4549,8 @@
 (define *tracing-on?* #f)
 
 (define *stack-trace* '(()))
+
+(define *use-stack-trace* #t)
 
 (define-native initialize-execute (lambda () 'Ok))
 

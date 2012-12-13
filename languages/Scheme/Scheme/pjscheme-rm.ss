@@ -1739,24 +1739,34 @@
                                                                                                                                                                                                                     (set! env (list-ref temp_1 3))
                                                                                                                                                                                                                     (set! exp (list-ref temp_1 2))
                                                                                                                                                                                                                     (set! args (list-ref temp_1 1))
-                                                                                                                                                                                                                    (push-stack-trace exp)
+                                                                                                                                                                                                                    (if *use-stack-trace* (push-stack-trace exp))
                                                                                                                                                                                                                     (if (dlr-proc? value1_reg)
                                                                                                                                                                                                                         (let ((result 'undefined))
                                                                                                                                                                                                                           (set! result (dlr-apply value1_reg args))
-                                                                                                                                                                                                                          (pop-stack-trace exp)
+                                                                                                                                                                                                                          (if *use-stack-trace* (pop-stack-trace exp))
                                                                                                                                                                                                                           (set! value1_reg result)
                                                                                                                                                                                                                           (set! k_reg k)
                                                                                                                                                                                                                           (set! pc apply-cont2))
                                                                                                                                                                                                                         (if (procedure-object? value1_reg)
-                                                                                                                                                                                                                            (begin
-                                                                                                                                                                                                                              (set! k2_reg (make-cont2 '<cont2-50> exp k))
-                                                                                                                                                                                                                              (set! fail_reg value2_reg)
-                                                                                                                                                                                                                              (set! handler_reg handler)
-                                                                                                                                                                                                                              (set! info_reg info)
-                                                                                                                                                                                                                              (set! env2_reg env)
-                                                                                                                                                                                                                              (set! args_reg args)
-                                                                                                                                                                                                                              (set! proc_reg value1_reg)
-                                                                                                                                                                                                                              (set! pc apply-proc))
+                                                                                                                                                                                                                            (if *use-stack-trace*
+                                                                                                                                                                                                                                (begin
+                                                                                                                                                                                                                                  (set! k2_reg (make-cont2 '<cont2-50> exp k))
+                                                                                                                                                                                                                                  (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                  (set! handler_reg handler)
+                                                                                                                                                                                                                                  (set! info_reg info)
+                                                                                                                                                                                                                                  (set! env2_reg env)
+                                                                                                                                                                                                                                  (set! args_reg args)
+                                                                                                                                                                                                                                  (set! proc_reg value1_reg)
+                                                                                                                                                                                                                                  (set! pc apply-proc))
+                                                                                                                                                                                                                                (begin
+                                                                                                                                                                                                                                  (set! k2_reg k)
+                                                                                                                                                                                                                                  (set! fail_reg value2_reg)
+                                                                                                                                                                                                                                  (set! handler_reg handler)
+                                                                                                                                                                                                                                  (set! info_reg info)
+                                                                                                                                                                                                                                  (set! env2_reg env)
+                                                                                                                                                                                                                                  (set! args_reg args)
+                                                                                                                                                                                                                                  (set! proc_reg value1_reg)
+                                                                                                                                                                                                                                  (set! pc apply-proc)))
                                                                                                                                                                                                                             (begin
                                                                                                                                                                                                                               (set! fail_reg value2_reg)
                                                                                                                                                                                                                               (set! handler_reg handler)
@@ -6666,6 +6676,12 @@
   (lambda (exp result)
     (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
+(define get-use-stack-trace
+  (lambda () (return* *use-stack-trace*)))
+
+(define set-use-stack-trace
+  (lambda (value) (set! *use-stack-trace* value)))
+
 (define initialize-stack-trace
   (lambda () (return* (set-car! *stack-trace* '()))))
 
@@ -8013,6 +8029,8 @@
 (define *tracing-on?* #f)
 
 (define *stack-trace* (list '()))
+
+(define *use-stack-trace* #t)
 
 (define-native initialize-execute (lambda () 'Ok))
 
