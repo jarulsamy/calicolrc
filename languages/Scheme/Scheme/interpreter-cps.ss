@@ -1743,7 +1743,6 @@
 	    (list '< lt-prim)
 	    (list '<= lt-or-eq-prim)
 	    (list '= equal-sign-prim)
-	    (list '=? equal-sign-prim)
 	    (list '> gt-prim)
 	    (list '>= gt-or-eq-prim)
 	    (list 'abort abort-prim)
