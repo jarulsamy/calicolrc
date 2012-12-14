@@ -1,3 +1,5 @@
+;; Calico Scheme Tests
+
 (define odd? 'undefined)
 (define even? 'undefined)
 
@@ -123,73 +125,48 @@
 
 (define ! (lambda (n) (nth n facts)))
 
-;;---------------------------------------------------------------------
-;; example interaction:
-
-;; ==> (load "examples.ss")
-;; ok
-;; ==> (odd? 43)
-;; #t
-
-;; other examples:
-
-;; ==> (list (odd? 42) (even? 42) (odd? 43) (even? 43))
-
-;; ==> (collect (* n n) for n in (range 10))
-;; ==> (collect (* n n) for n in (range 5 20 3))
-;; ==> (collect (* n n) for n in (range 10) if (> n 5))
-
-;; ==> (for 5 times do (print 'hello))
-;; ==> (for sym in '(a b c d) do (print sym) (newline))
-;; ==> (for n in (range 10 20 2) do
-;;            (print n))
-
-;; ==> (for n at (i j) in matrix2d do
-;;            (print (list n 'coords: i j)))
-;; ==> (for n at (i j k) in matrix3d do
-;;            (print (list n 'coords: i j k)))
-
-;; ==> (! 5)"
-;; ==> (nth 10 facts)
-;; ==> (nth 20 fibs)
-;; ==> (first 30 fibs)
-
 (define test-all
   (lambda ()
-    (print (list (odd? 42) (even? 42) (odd? 43) (even? 43)))
-    (print (collect (* n n) for n in (range 10)))
-    (print (collect (* n n) for n in (range 5 20 3)))
-    (print (collect (* n n) for n in (range 10) if (> n 5)))
-    (print (for 5 times do (print 'hello)))
-    (print (for sym in '(a b c d) do (print sym) (newline)))
-    (print (for n in (range 10 20 2) do (print n)))
-    (print (for n at (i j) in matrix2d do (print (list n 'coords: i j))))
-    (print (for n at (i j k) in matrix3d do (print (list n 'coords: i j k))))
-    (print (! 5))
-    (print (nth 10 facts))
-    (print (nth 20 fibs))
-    (print (first 30 fibs))
+    (display "Testing letrec, macros, and streams: ")
+    (verify #f (odd? 42))
+    (verify #t (even? 42))
+    (verify #t (odd? 43))
+    (verify #f (even? 43))
+    (verify '(0 1 4 9 16 25 36 49 64 81) (collect (* n n) for n in (range 10)))
+    (verify '(25 64 121 196 289) (collect (* n n) for n in (range 5 20 3)))
+    (verify '(36 49 64 81) (collect (* n n) for n in (range 10) if (> n 5)))
+    (verify 5 (begin (define hello 0)
+                   (for 5 times do (set! hello (+ hello 1)))
+                   hello))
+    (verify 'done (for sym in '(a b c d) do (define x 1) (set! x sym) x))
+    (verify 'done (for n in (range 10 20 2) do n))
+    (verify 'done (for n at (i j) in matrix2d do (list n 'coords: i j)))
+    (verify 'done (for n at (i j k) in matrix3d do (list n 'coords: i j k)))
+    (verify 120 (! 5))
+    (verify 3628800 (nth 10 facts))
+    (verify 10946 (nth 20 fibs))
+    (verify '(1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181
+              6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040)
+        (first 30 fibs))
     (test-mu-lambda)
     (test-define)
     (test-call/cc)
     (test-loop)
     (test-macros)
-    ))
+    (newline)))
 
 (define verify
   (lambda (answer exp)
-    (print "Testing ")
-    (print exp)
+    ;;(display "   ")
+    ;;(display exp)
+    ;;(display " ")
     (if (equal? exp answer)
-      (print 'passed)
-      (begin
-	(display "failed: ")
-	(display answer)
-	(newline)))))
+      (display ".")
+	  (printf "failed; was ~a, should be ~a" exp answer))))
 
 (define test-mu-lambda
   (lambda ()
-    (print "testing mu lambda")
+    (display "\nTesting mu lambda: ")
     (verify '(1 2 3 4 5)
       ((lambda x x) 1 2 3 4 5))
     (verify '(1 (2 3 4 5))
@@ -207,7 +184,7 @@
 
 (define test-define
   (lambda ()
-    (print "testing define")
+    (display "\nTesting define: ")
     (define f1 (lambda (a b c) (list a b c)))
     (define (f2) (list 42))
     (define (f3 . x) (list x))
@@ -218,7 +195,7 @@
 
 (define test-call/cc
   (lambda ()
-    (print "testing call/cc")
+    (display "\nTesting call/cc: ")
     (verify 40
       (* 10 (call/cc (lambda (k) 4))))
     (verify 40
@@ -230,39 +207,40 @@
 
 (define test-try
   (lambda ()
-    (print "testing try")
+    (print "\nTesting try")
+    (newline)
     (verify 3
       (try 3))
     (verify 3
-      (try 3 (finally (print 'yes) 4)))
+      (try 3 (finally 'yes 4)))
     (verify 'yes
       (try (raise 'yes) (catch e e)))
     (verify 'yes
       (try (try (raise 'yes)) (catch e e)))
     (verify 'oops
-      (try (try (begin (print 'one) (raise 'oops) (print 'two))) (catch e e)))
+      (try (try (begin 'one (raise 'oops) 'two)) (catch e e)))
     (verify 40
-      (* 10 (try (begin (print 'one) (raise 'oops) (print 'two))
-            (catch ex (print 3) 4))))
+      (* 10 (try (begin 'one (raise 'oops) 'two)
+            (catch ex 3 4))))
     (verify 50
-      (* 10 (try (begin (print 'one) (print 'two) 5)
-            (catch ex (print 3) 4))))
+      (* 10 (try (begin 'one 'two 5)
+            (catch ex 3 4))))
     (verify 40
-      (* 10 (try (begin (print 'one) (raise 'oops) 5)
-            (catch ex (print (list 'ex: ex)) 4))))
+      (* 10 (try (begin 'one (raise 'oops) 5)
+            (catch ex (list 'ex: ex) 4))))
     (verify 'oops
-      (try (* 10 (try (begin (print 'one) (raise 'oops) 5)
-            (catch ex (print (list 'ex: ex)) (raise ex) 4))) (catch e e)))
+      (try (* 10 (try (begin 'one (raise 'oops) 5)
+            (catch ex (list 'ex: ex) (raise ex) 4))) (catch e e)))
     (verify 'oops
-      (try (* 10 (try (begin (print 'one) (raise 'oops) 5)
-              (catch ex (print (list 'ex: ex)) (raise ex) 4)
-              (finally (print 'two) 7))) (catch e e)))
+      (try (* 10 (try (begin 'one (raise 'oops) 5)
+              (catch ex (list 'ex: ex) (raise ex) 4)
+              (finally 'two 7))) (catch e e)))
     (verify 77
-      (try (* 10 (try (begin (print 'one) (raise 'oops) 5)
-		      (catch ex (print (list 'ex: ex)) (raise 'bar) 4)))
-	   (catch x (print 'hello) 77)))
+      (try (* 10 (try (begin 'one (raise 'oops) 5)
+		      (catch ex (list 'ex: ex) (raise 'bar) 4)))
+	   (catch x 'hello 77)))
     (verify 3
-      (try 3 (finally (print 'hi) 4)))
+      (try 3 (finally 'hi 4)))
     (verify 'ok
       (define div (lambda (x y) (if (= y 0) (raise "division by zero") (/ x y)))))
     (verify 5
@@ -276,46 +254,46 @@
     (verify -1
       (let ((x (try (div 10 0) (catch e -1)))) x))
     (verify 5
-      (let ((x (try (div 10 2) (catch e -1) (finally (print 'closing-files) 42))))  x))
+      (let ((x (try (div 10 2) (catch e -1) (finally 'closing-files 42))))  x))
     (verify -1
-      (let ((x (try (div 10 0) (catch e -1) (finally (print 'closing-files) 42))))  x))
+      (let ((x (try (div 10 0) (catch e -1) (finally 'closing-files 42))))  x))
     (verify 5
-      (let ((x (try (div 10 2) (finally (print 'closing-files) 42))))  x))
+      (let ((x (try (div 10 2) (finally 'closing-files 42))))  x))
     (verify 'foo
-      (try (let ((x (try (div 10 0) (catch e -1 (raise 'foo)) (finally (print 'closing-files) 42))))  x) (catch e e)))
+      (try (let ((x (try (div 10 0) (catch e -1 (raise 'foo)) (finally 'closing-files 42))))  x) (catch e e)))
     (verify 'ack
       (try (let ((x (try (div 10 0)
                 (catch e -1 (raise 'foo))
-                (finally (print 'closing-files) (raise 'ack) 42))))
+                (finally 'closing-files (raise 'ack) 42))))
        x) (catch e e)))
     (verify 99
       (try (let ((x (try (div 10 0)
                      (catch e -1 (raise 'foo))
-                     (finally (print 'closing-files) (raise 'ack) 42))))
+                     (finally 'closing-files (raise 'ack) 42))))
             x)
        (catch e (if (equal? e 'ack) 99 (raise 'doug)))
-       (finally (print 'closing-outer-files))))
+       (finally 'closing-outer-files)))
     (verify 'doug
       (try (try (let ((x (try (div 10 0)
                      (catch e -1 (raise 'foo))
-                     (finally (print 'closing-files) (raise 'ack) 42))))
+                     (finally 'closing-files (raise 'ack) 42))))
             x)
        (catch e (if (equal? e 'foo) 99 (raise 'doug)))
-       (finally (print 'closing-outer-files))) (catch e e)))
+       (finally 'closing-outer-files)) (catch e e)))
     ))
 
 (define test-loop
   (lambda ()
-    (print "testing loop")
-    (try (let loop ((n 5))
-            (print n)
-            (if (= n 0)
-                (raise 'blastoff!))
-            (loop (- n 1)))
-       (catch e e))))
+    (display "\nTesting loop: ")
+    (verify 'blastoff! (try (let loop ((n 5))
+                            n
+                            (if (= n 0)
+                                (raise 'blastoff!))
+                            (loop (- n 1)))
+                (catch e e)))))
 
 (define (test-macros)
-  (print "testing macros")
+  (display "\nTesting macros: ")
   (verify #t
     (let ((bool 5))
       (or (= bool 4) (= bool 5))))
@@ -339,4 +317,4 @@
 	((orange) () 'no)
 	(else 2 3 4)))))
 
-(test-all)
+(printf "Total test time: ~a\n" (time (test-all)))

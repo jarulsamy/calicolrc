@@ -1945,6 +1945,7 @@ namespace Calico {
                             ToolNotebook.Page = 0;
                         } // show output page
                         Gtk.TextIter end = Output.Buffer.EndIter;
+                        Output.Buffer.PlaceCursor(end);
                         string colorname = MainWindow.tagnames [tag];
                         Output.Buffer.InsertWithTagsByName(ref end, format, colorname);
                         end = Output.Buffer.EndIter;
@@ -1984,6 +1985,7 @@ namespace Calico {
                     Invoke(delegate {
                         lock (ChatOutput) {
                             Gtk.TextIter end = ChatOutput.Buffer.EndIter;
+                            ChatOutput.Buffer.PlaceCursor(end);
                             string colorname = MainWindow.tagnames [tag];
                             ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
                             end = ChatOutput.Buffer.EndIter;
