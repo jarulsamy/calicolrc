@@ -554,7 +554,6 @@ public class Scheme {
 	       list(symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1)),
 	       list(symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1)),
 	       list(symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1)),
-	       list(symbol("debug"), new Proc("debug", (Procedure1)debug, -1, 1)),
 	       //list(symbol("equal?"), Equal_proc),
 	       list(symbol("eqv?"), Eqv_proc),
 	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
