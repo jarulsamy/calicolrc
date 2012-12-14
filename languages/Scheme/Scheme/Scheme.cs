@@ -584,7 +584,6 @@ public class Scheme {
 	       //list(symbol("vector-set!"), new Proc("vector-set!", (Procedure3)vector_set_b, 3, 1)),
 	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
 	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
-	       list(symbol("use-tracing"), new Proc("use-tracing", (Procedure1)PJScheme.tracing_on, -1, 1)),
 	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0))
 			       );
       /// -------------------
