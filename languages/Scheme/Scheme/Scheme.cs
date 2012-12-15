@@ -41,124 +41,41 @@ public class MethodNeedsArgs {
 public class Config {
   public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
-  Hashtable symbol_table = new Hashtable(); //Default one
   public List<Assembly> assemblies = new List<Assembly>();
-  int symbol_count = 1;
 
   public Config() {
   }
 
-  public Symbol symbol(string ssymbol) {
-	if (!symbol_table.ContainsKey(ssymbol)) {
-	  var newsym = new Symbol(ssymbol, symbol_count);
-	  symbol_table.Add(ssymbol, newsym);
-	  symbol_count++;
-	  return newsym;
+  	public Symbol symbol(string ssymbol) {
+		return new Symbol(ssymbol);
 	}
-	return (Symbol) symbol_table[ssymbol];
-  }
 
   public void AddAssembly(Assembly assembly) {
 	assemblies.Add(assembly);
   }
 }
 
-public class Symbol : IList {
-  string id;
-  int val;
-  
-  public Symbol(string id, int val) {
-	this.id = id;
-	this.val = val;
-  }
-  
-  public override bool Equals(object other) {
-	return ((other is Symbol) && (this.val == ((Symbol)other).val));
-  }
-  
-  public override int GetHashCode() {
-	return id.GetHashCode();
-  }
-  
-  public override string ToString() {
-	return this.id;
-  }
-
-  public String __repr__() {
-      return id;
-  }
-
-  // Items necessary for it to be an IList
-  // (used in other DLR interfaces)
-  public bool IsFixedSize {
-	get {
-	  return true;
-	}
-  }
-
-  public bool IsReadOnly {
-	get {
-	  return true;
-	}
-  }
-
-  public bool IsSynchronized {
-	get {
-	  return false;
-	}
-  }
-
-  public void CopyTo(System.Array array, int index) {
-  }
-
-  public int Add(object value) {
-	return 0; 
-  }
-
-  public int Count {
-    get {
-      return 0;
+public class Symbol {
+    public string symbol;
+    public Symbol(String ssymbol) {
+	symbol = ssymbol;
     }
-  }
-
-  public void Remove(object value) {
-  }
-
-  public void RemoveAt(int index) {
-  }
-
-  public void Clear() {
-  }
-
-  public bool Contains(object value) {
-	return false;
-  }
-
-  public int IndexOf(object value) {
-	return -1;
-  }
-
-  public void Insert(int index, object value) {
-  }
-
-  public object this[int index] {
-	get {
-	  throw new Exception("EmptyList does not contain any elements.");
-	}
-	set { // value is the item
-	}
-  }
-  public object SyncRoot {
-	get {
-	  return this;
-	}
-  }
-  public IEnumerator GetEnumerator() {
-    // FIXME: return enumerator that returns nothing
-    // Refer to the IEnumerator documentation for an example of
-    // implementing an enumerator.
-    throw new Exception("The method or operation is not implemented.");
-  }
+    
+    public override bool Equals(object other) {
+	return ((other is Symbol) && (this.symbol == ((Symbol)other).symbol));
+    }
+    
+    public override int GetHashCode() {
+	return symbol.GetHashCode();
+    }
+    
+    public override string ToString() {
+	return symbol;
+    }
+    
+    public String __repr__() {
+	return symbol;
+    }
 }
 
 public class Scheme {
@@ -3312,8 +3229,9 @@ public class Scheme {
 	//PJScheme.execute_string_rm("(define fact2 (lambda fact2 (n) (if (= n 1) 1 (* (fact2 (- n 1)) n))))");
 	//printf ("  (fact2 5): {0}\n",
 	//		PJScheme.execute_string_rm("(fact2 5)"));
-	printf ("  (get-stack-trace): {0}\n",
-			PJScheme.execute_string_rm("(get-stack-trace)"));
+	PJScheme.execute_string_rm("(define fact (lambda (n) (if (= n 1) 1 (* n (fact (- n 1))))))");
+	printf ("  (fact 1000): {0}\n",
+			PJScheme.execute_string_rm("(fact 1000)"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------
