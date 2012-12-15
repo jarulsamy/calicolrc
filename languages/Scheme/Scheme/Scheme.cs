@@ -1706,9 +1706,7 @@ public class Scheme {
   }
 
   public static bool Eq(object obj) {
-	object item = car(obj);
-	object current = cadr(obj);
-    return Eq(item, current);
+    return Eq(car(obj), cadr(obj));
   }
 
   public static bool Eqv(object obj) {
@@ -1718,17 +1716,20 @@ public class Scheme {
   }
 
   public static bool Eq(object obj1, object obj2) {
-      if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
+      if (obj1 is Symbol) {
+	  if (obj2 is Symbol) { 
 	      return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-      } else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-	      return true;
-	  else {
+	  } else 
+	      return false;
+      } if (obj2 is Symbol) {
+	  return false;
+      } else if (pair_q(obj1)) {
+	  if (pair_q(obj2)) {
 	      return (((Cons)obj1).id == ((Cons)obj2).id);
+	  } else {
+	      return false;
 	  }
-      } if (pair_q(obj1) || pair_q(obj2)) {
+      } else if (pair_q(obj2)) {
 	  return false;
       } else {
 	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
@@ -2323,7 +2324,7 @@ public class Scheme {
 
   public static object list_ref(object obj, object pos) {
 	//printf("calling list-ref({0}, {1})\n", obj, pos);
-	if (pair_q(obj)) {
+	if (obj is Cons) {
 	  Cons result = ((Cons)obj);
 	  for (int i = 0; i < ((int)pos); i++) {
 		try {
@@ -2412,17 +2413,10 @@ public class Scheme {
   }
 
   public static bool list_q(object obj) {
-	if (null_q(obj)) {
-	  return true;
-	} else if (pair_q(obj)) {
-	  object current = obj;
-	  while (pair_q(current)) {
-		current = cdr(current);
-	  }
-	  return Eq(current, EmptyList);
-	}
-	//printf("false\n");
-	return false;
+	  	while (obj is Cons) {
+			obj = cdr(obj);
+	  	}
+		return Eq(obj, EmptyList);
   }
 
   public static object list_to_string(object lyst) {
@@ -2547,36 +2541,74 @@ public class Scheme {
 	cell.car = item;
   }
 
-  public static object append(params object[] obj) {
-		object current = obj[0];
-		for (int i = 1; i < obj.Length; i++) {
-			current = append2(current, obj[i]);
-		}
-		return current;
-  }
-
-	public static object append2 (object obj1, object obj2)
+    public static object append (params object[] obj)
 	{
-		if (! list_q (obj1)) {
-			throw new Exception (string.Format ("error in append: {0} is not a list", obj1));
-		} else if (obj1 is object[]) {
-			Object lyst = list(obj1);
-			return copy_of(lyst, obj2);
-		} else  {
-			return copy_of(obj1, obj2);
+		// proper-list, proper-list, ..., thing
+		// (a) (b)
+		object retval = EmptyList;
+		object last_cell = null;
+		object lyst;
+		// put all items from all but last into retval
+		for (int i = 0; i < obj.Length - 1; i++) {
+			lyst = obj[i];
+			if (list_q (lyst)) {
+				if (null_q (lyst)) {
+					// done!
+				} else { // proper list for all but last
+					object current = lyst;
+					while (current != EmptyList) {
+						if (last_cell == null) {
+							retval = new Cons(((Cons)current).car, EmptyList);
+							last_cell = retval;
+						} else {
+							((Cons)last_cell).cdr = new Cons(((Cons)current).car, EmptyList);
+							last_cell = ((Cons)last_cell).cdr;
+						}
+						// advance current
+						current = cdr(current);
+					}
+				}
+			} else { // not a list!
+				throw new Exception (string.Format ("error in append: {0} is not a list", lyst));
+			}
 		}
-	}
-
-	public static object copy_of(object pair, object item) {
-		object retval = item;
-		object current = pair;
-		while (current != EmptyList) {
-			retval = cons(PJScheme.rac(current), retval);
-			current = rdc(current);
+		// last element can be anything
+		lyst = obj[obj.Length - 1];
+		if (null_q (lyst)) {
+			// done!
+		} else { // last one is any kind of list or thing
+			object current = lyst;
+			if (pair_q(lyst)) {
+				while (current != null) {
+					if (last_cell == null) {
+						retval = new Cons(((Cons)current).car, EmptyList);
+						last_cell = retval;
+					} else {
+						((Cons)last_cell).cdr = new Cons(((Cons)current).car, EmptyList);
+						last_cell = ((Cons)last_cell).cdr;
+					}
+					// advance current
+					if (((Cons)current).cdr is Cons) {
+						current = ((Cons)current).cdr;
+					} else if (((Cons)current).cdr == EmptyList) {
+						current = null;
+					} else { // improper list
+						((Cons)last_cell).cdr = ((Cons)current).cdr;
+						current = null;
+					}
+				}
+			} else {
+				if (last_cell == null) {
+					retval = current;
+					last_cell = retval;
+				} else {
+					((Cons)last_cell).cdr = current;
+				}
+			}
 		}
 		return retval;
 	}
-	
+
   public static string format_prim(object obj) {
 	return format(car(obj), list_to_array(obj, 1));
   }
@@ -3220,7 +3252,7 @@ public class Scheme {
 }
 
   public static void Main(string [] args) {
-	//printf(append(list(symbol("a")), list(symbol("b"))));
+	//printf(append(list(symbol("a")), symbol("b")));
 	//printf(append(list(symbol("a"), symbol("b")), list(symbol("c"))));
 	//printf(append(list(symbol("a")), list(symbol("b")), list(symbol("c"))));
 			

@@ -137,7 +137,8 @@ public class ObjectType
 				return bool1.CompareTo (bool2);
 	    
 			} else { // Not implemented case
-				throw new Exception ("Case Not Implemented");
+				throw new Exception (
+					String.Format ("ObjTest Case Not Implemented: {0} and {1}", o1, o2));
 			}
 		}
 	}
