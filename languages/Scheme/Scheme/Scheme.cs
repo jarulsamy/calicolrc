@@ -42,13 +42,21 @@ public class Config {
   public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
+  //Hashtable symbol_table = new Hashtable(); //Default one
 
   public Config() {
   }
 
-  	public Symbol symbol(string ssymbol) {
-		return new Symbol(ssymbol);
-	}
+  public Symbol symbol(string ssymbol) {	         
+      //if (!symbol_table.ContainsKey(ssymbol)) {	                 
+      //	  var newsym = new Symbol(ssymbol);	 
+      //	  symbol_table.Add(ssymbol, newsym);	 
+      //	  return newsym;	 
+      //      }	         
+      //return (Symbol) symbol_table[ssymbol];	 
+      // much faster to just return a new object:
+      return new Symbol(ssymbol);	 
+  }	
 
   public void AddAssembly(Assembly assembly) {
 	assemblies.Add(assembly);
