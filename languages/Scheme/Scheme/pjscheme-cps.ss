@@ -2801,7 +2801,7 @@
 	  (handle-debug-info exp v)
 	  (k v fail)))))
 
-(define highlight-expression
+(define-native highlight-expression
   (lambda (exp)
     ;; call: (function 1 2 3) 
     ;;          ["filename.ss" at line 13 column 4]
@@ -2813,7 +2813,7 @@
 		  (get-start-line info)
 		  (get-start-char info))))))
 
-(define handle-debug-info
+(define-native handle-debug-info
   (lambda (exp result)
     (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
@@ -3528,6 +3528,8 @@
     (cond
       ((not (length-two? args))
        (runtime-error "incorrect number of arguments to char=?" info handler fail))
+      ((or (not (char? (car args))) (not (char? (cadr args))))
+       (runtime-error "char=? requires arguments of type char" info handler fail))
       (else (k2 (apply char=? args) fail)))))
 
 ;; char-whitespace?
@@ -4287,7 +4289,6 @@
 	    (list '< lt-prim)
 	    (list '<= lt-or-eq-prim)
 	    (list '= equal-sign-prim)
-	    (list '=? equal-sign-prim)
 	    (list '> gt-prim)
 	    (list '>= gt-or-eq-prim)
 	    (list 'abort abort-prim)

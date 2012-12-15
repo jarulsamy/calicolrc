@@ -3336,11 +3336,16 @@
                                                                                                                                                                   (begin
                                                                                                                                                                     (set! msg_reg "incorrect number of arguments to char=?")
                                                                                                                                                                     (set! pc runtime-error))
-                                                                                                                                                                  (begin
-                                                                                                                                                                    (set! value2_reg fail_reg)
-                                                                                                                                                                    (set! value1_reg (apply char=? args_reg))
-                                                                                                                                                                    (set! k_reg k2_reg)
-                                                                                                                                                                    (set! pc apply-cont2)))
+                                                                                                                                                                  (if (or (not (char? (car args_reg)))
+                                                                                                                                                                          (not (char? (cadr args_reg))))
+                                                                                                                                                                      (begin
+                                                                                                                                                                        (set! msg_reg "char=? requires arguments of type char")
+                                                                                                                                                                        (set! pc runtime-error))
+                                                                                                                                                                      (begin
+                                                                                                                                                                        (set! value2_reg fail_reg)
+                                                                                                                                                                        (set! value1_reg (apply char=? args_reg))
+                                                                                                                                                                        (set! k_reg k2_reg)
+                                                                                                                                                                        (set! pc apply-cont2))))
                                                                                                                                                               (if (eq? (car temp_1) '<proc-39>)
                                                                                                                                                                   (if (not (length-one? args_reg))
                                                                                                                                                                       (begin
@@ -6660,22 +6665,6 @@
         (return* k)
         (return* (make-cont2 '<cont2-49> exp k)))))
 
-(define highlight-expression
-  (lambda (exp)
-    (printf "call: ~s~%" (aunparse exp))
-    (let ((info 'undefined))
-      (set! info (rac exp))
-      (if (not (eq? info 'none))
-          (printf
-            "['~a' at line ~a column ~a]~%"
-            (get-srcfile info)
-            (get-start-line info)
-            (get-start-char info))))))
-
-(define handle-debug-info
-  (lambda (exp result)
-    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
-
 (define get-use-stack-trace
   (lambda () (return* *use-stack-trace*)))
 
@@ -7586,12 +7575,11 @@
          (list '- minus-prim) (list '/ divide-prim)
          (list '% modulo-prim) (list '< lt-prim)
          (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
-         (list '=? equal-sign-prim) (list '> gt-prim)
-         (list '>= gt-or-eq-prim) (list 'abort abort-prim)
-         (list 'abs abs-prim) (list 'append append-prim)
-         (list 'apply apply-prim) (list 'assv assv-prim)
-         (list 'boolean? boolean?-prim) (list 'caddr caddr-prim)
-         (list 'cadr cadr-prim)
+         (list '> gt-prim) (list '>= gt-or-eq-prim)
+         (list 'abort abort-prim) (list 'abs abs-prim)
+         (list 'append append-prim) (list 'apply apply-prim)
+         (list 'assv assv-prim) (list 'boolean? boolean?-prim)
+         (list 'caddr caddr-prim) (list 'cadr cadr-prim)
          (list 'call-with-current-continuation call/cc-prim)
          (list 'call/cc call/cc-prim) (list 'car car-prim)
          (list 'cdr cdr-prim) (list 'char? char?-prim)
@@ -8027,6 +8015,24 @@
 (define try-parse-handler (make-handler2 '<handler2-3>))
 
 (define *tracing-on?* #f)
+
+(define-native
+  highlight-expression
+  (lambda (exp)
+    (printf "call: ~s~%" (aunparse exp))
+    (let ((info 'undefined))
+      (set! info (rac exp))
+      (if (not (eq? info 'none))
+          (printf
+            "['~a' at line ~a column ~a]~%"
+            (get-srcfile info)
+            (get-start-line info)
+            (get-start-char info))))))
+
+(define-native
+  handle-debug-info
+  (lambda (exp result)
+    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
 (define *stack-trace* (list '()))
 

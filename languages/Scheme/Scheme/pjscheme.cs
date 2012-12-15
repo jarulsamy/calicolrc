@@ -5576,6 +5576,21 @@ public class PJScheme:Scheme
 
 	      }
 	    else
+	       if (true_q
+		   ((((bool) PJScheme.
+		      not ((object) PJScheme.
+			   char_q ((object) PJScheme.
+				   car ((object) args_reg))))
+		     || ((bool) PJScheme.
+			 not ((object) PJScheme.
+			      char_q ((object) PJScheme.
+				      cadr ((object) args_reg)))))))
+	      {
+		 msg_reg = "char=? requires arguments of type char";
+		 pc = (Function) runtime_error;
+
+	      }
+	    else
 	      {
 		 value2_reg = fail_reg;
 		 value1_reg = apply (char_is__q_proc, (object) args_reg);
@@ -13512,8 +13527,6 @@ public class PJScheme:Scheme
 			   (object) PJScheme.list ((object) symbol ("<="),
 						   (object) lt_or_eq_prim),
 			   (object) PJScheme.list ((object) symbol ("="),
-						   (object) equal_sign_prim),
-			   (object) PJScheme.list ((object) symbol ("=?"),
 						   (object) equal_sign_prim),
 			   (object) PJScheme.list ((object) symbol (">"),
 						   (object) gt_prim),
