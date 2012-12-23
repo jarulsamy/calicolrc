@@ -1896,13 +1896,15 @@ public static class Processing
 	{	// Set an individual pixel in the pixbuf
 		if (_p == null) return;
 		if (_pixbuf == null) return;
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
+		
+		int offsetr = (y % _pixbuf.Height) * _pixbuf.Rowstride + (x % _pixbuf.Width) * _pixbuf.NChannels;
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, offsetr, r);
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, offsetr + 1, g);
+		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, offsetr + 2, b);
+		if (_pixbuf.NChannels > 3) System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, offsetr + 3, a);
 	}
 	[JigsawTab("P/Images")]
-	public static void setPixel(int x, int y, byte r, byte g, byte b) { setPixel(x, y, r, g, b, 255); }
+	public static void setPixel(int x, int y, byte r, byte g, byte b){ setPixel(x, y, r, g, b, 255); }
 	[JigsawTab("P/Images")]
 	public static void setPixel(int x, int y, byte gray, byte a) { setPixel(x, y, gray, gray, gray, a); }
 	[JigsawTab("P/Images")]
@@ -1914,10 +1916,17 @@ public static class Processing
 	{	// Set an individual pixel in the pixbuf
 		if (_p == null) return;
 		if (_pixbuf == null) return;
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, red (c));
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, green (c));
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, blue (c));
-		System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, alpha (c));
+		byte r = red (c);
+		byte g = green (c);
+		byte b = blue (c);
+		byte a = 255;
+		if ( _pixbuf.NChannels > 3) a = alpha (c);
+		setPixel(x, y, r, g, b, a);
+
+		//System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, red (c));
+		//System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, green (c));
+		//System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, blue (c));
+		//System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, alpha (c));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1929,7 +1938,9 @@ public static class Processing
 		byte r = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0);
 		byte g = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1);
 		byte b = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2);
-		byte a = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3);
+		byte a = 255;
+		if ( _pixbuf.NChannels > 3)
+			a = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3);
 		return color (r, g, b, a);
 	}
 
