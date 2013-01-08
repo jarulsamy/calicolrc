@@ -1094,21 +1094,23 @@ public static class Myro
 	{
 	    // assumes a single robot will be used
 	    if (port.StartsWith ("sim")) {
-		if (simulation == null || ! simulation.window.Visible) {
-		    simulation = new Simulation ();
-		    //Thread.Sleep ((int)(5 * 1000));
-		} else {
-		    simulation.setup ();
-		}
-		// defaults to SimScribbler in this interface
-		robot = makeRobot ("SimScribbler", simulation); 
-	    } else {
-		if (Myro.robot != null) 
-		    Myro.robot.reinit (port, baud);
-		else {
-		    // defaults to Scribbler in this interface
-		    Myro.robot = makeRobot ("Scribbler", port, baud);
-		}
+            if (simulation == null || ! simulation.window.Visible) {
+                simulation = new Simulation ();
+                //Thread.Sleep ((int)(5 * 1000));
+            } 
+            else {
+                simulation.setup ();
+            }
+            // defaults to SimScribbler in this interface
+            robot = makeRobot ("SimScribbler", simulation); 
+	    } 
+        else {
+            if (Myro.robot != null)
+                Myro.robot.reinit (port, baud);
+            else {
+                // defaults to Scribbler in this interface
+                Myro.robot = makeRobot ("Scribbler", port, baud);
+            }
 	    }
 	}
 
@@ -1730,8 +1732,43 @@ public static class Myro
 	{
 		robot.setPassword (password);
 	}
+
+    public static void darkenCamera(int level)
+    {
+        robot.darkenCamera(level);
+    }
+    
+    public static void manualCamera(int gain=0x00, int brightness=0x80, int exposure=0x41)
+    {
+        robot.manualCamera(gain, brightness, exposure);
+    }
+
+    public static void autoCamera()
+    {
+        robot.autoCamera();
+    }
 	
-  
+    // fluke2
+    public static void setPicSize(string size)
+    {
+        robot.setPicSize(size);
+    }
+
+    public static void servo(int id, int value)
+    {
+        robot.servo(id, value);
+    }
+    
+    public static void enablePanNetworking()
+    {
+        robot.enablePanNetworking();
+    }
+    
+    public static string getFlukeLog()
+    {
+        return robot.getFlukeLog();
+    }
+
 	// s2
 	public static object getEncoders (bool zero = false)
 	{
@@ -2536,6 +2573,36 @@ public static class Myro
 		{
 			return 0; 
 		}
+
+        public virtual void darkenCamera(int level)
+        {
+        }
+        
+        public virtual void manualCamera(int gain=0x00, int brightness=0x80, int exposure=0x41)
+        {
+        }
+
+        public virtual void autoCamera()
+        {
+        }        
+        
+        // fluke2
+        public virtual void setPicSize(string size)
+        {
+        }
+        
+        public virtual void servo(int id, int value)
+        {
+        }
+        
+        public virtual void enablePanNetworking()
+        {
+        }
+        
+        public virtual string getFlukeLog()
+        {
+            return "";
+        }
 		
 		// s2
 		public virtual object getEncoders (bool zero = false)
