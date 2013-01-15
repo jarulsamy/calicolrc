@@ -202,9 +202,9 @@ public class CalicoSchemeDocument : TextDocument {
 public class CalicoSchemeLanguage : Language
 {
 	public CalicoSchemeLanguage () : 
-        base("scheme",  "Scheme", new string[] { "ss", "scm", "s" }, "text/x-scheme")
+	    base("scheme",  "Scheme", new string[] { "ss", "scm", "s" }, "text/x-scheme")
 	{
-	  LineComment = ";;";
+	    LineComment = ";;";
 	}
     
 	public override void MakeEngine (LanguageManager manager)
@@ -228,9 +228,9 @@ public class CalicoSchemeLanguage : Language
 
 	public override void InitializeConfig() {
 	    base.InitializeConfig();
-	    if (config != null && !config.HasValue("scheme-language", "use-stack-trace")) {
+	    if (local_config != null && !local_config.HasValue("scheme-language", "use-stack-trace")) {
 		// add it! 
-		config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
+		local_config.SetValue("scheme-language", "use-stack-trace", "bool", (bool)PJScheme.get_use_stack_trace());
 	    }
 	}
 
