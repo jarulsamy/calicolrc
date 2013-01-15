@@ -18,7 +18,7 @@ for i in range(50):
 	#a bunch of random gliders
     x =int(random(5, width()/sz-5))
     y =int(random(5, height()/sz-5))
-    print (x,y)
+    #print (x,y)
     world[x + 0][y][0] = 1
     world[x + 2][y+1][0] = 1
     world[x + 0][y+2][0] = 1
