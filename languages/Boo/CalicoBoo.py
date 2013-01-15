@@ -79,7 +79,10 @@ class BooEngine(Calico.Engine):
         This is the code that will interprete a file.
         """
         System.Console.WriteLine("Run filename '%s'!" % filename)
-        self.interpreter.EvalCompilerInput(Boo.Lang.Compiler.IO.FileInput(filename))
+        compiler_context = self.interpreter.EvalCompilerInput(Boo.Lang.Compiler.IO.FileInput(filename))
+        for e in compiler_context.Errors:
+            if e.Code != 'BCE0034': # side-effects, don't report
+                System.Console.Error.WriteLine(e)
         return True
 
     def ReadyToExecute(self, text):
