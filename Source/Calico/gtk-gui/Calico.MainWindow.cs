@@ -1526,7 +1526,7 @@ namespace Calico {
 			this.hpaned3 = new global::Gtk.HPaned();
 			this.hpaned3.CanFocus = true;
 			this.hpaned3.Name = "hpaned3";
-			this.hpaned3.Position = 449;
+			this.hpaned3.Position = 447;
 			// Container child hpaned3.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook();
 			this.notebook_tools.CanFocus = true;

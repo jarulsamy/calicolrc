@@ -99,6 +99,8 @@
     <Compile Include="Printing.cs" />
     <Compile Include="DebugTextMarker.cs" />
     <Compile Include="Chat.cs" />
+    <Compile Include="Runtime.cs" />
+    <Compile Include="getline.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

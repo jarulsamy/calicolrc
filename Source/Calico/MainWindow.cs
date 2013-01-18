@@ -94,6 +94,9 @@ namespace Calico {
         //new Gtk.TargetEntry ("application/x-rootwindow-drop", 0, (uint) TargetType.RootWindow)
          };
 
+        public MainWindow(): base(Gtk.WindowType.Toplevel) {
+        }
+
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));

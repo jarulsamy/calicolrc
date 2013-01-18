@@ -1434,7 +1434,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">449</property>
+                        <property name="Position">447</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />
