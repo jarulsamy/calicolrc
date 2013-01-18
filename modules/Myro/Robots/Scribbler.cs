@@ -253,6 +253,32 @@ public class Scribbler: Myro.Robot
             setup ();
     }
 	  
+    public Boolean flukeIsAtLeast(String version)
+    {
+        string[] lookFor = version.Split('.');
+        string[] dversion = dongle.Split('.');
+        if (lookFor.Length != dversion.Length) return false;
+        try
+        {
+            
+            for (int i = 0; i < lookFor.Length; i++)
+            {         
+                if (Int32.Parse(dversion[i]) > Int32.Parse(lookFor[i]))
+                {
+                    return true;            
+                }
+                else if (Int32.Parse(dversion[i]) > Int32.Parse(lookFor[i]))
+                {
+                    return false;           
+                }   
+            }
+        }
+        catch
+        {
+        }
+        return false;
+    }
+
     public Boolean isFluke2(){
         string[] version = dongle.Split('.');
         return (version[0].Equals("3"));
@@ -1855,7 +1881,7 @@ public class Scribbler: Myro.Robot
 
     public override void setPicSize(string size)
     {
-        if (!isFluke2()) return;
+        if (!flukeIsAtLeast("3.0.9")) return;
         byte sizecode = 213;
         if (size == "small")
         {
@@ -1880,7 +1906,7 @@ public class Scribbler: Myro.Robot
 
      public override void servo(int id, int value)
     {
-        if (!isFluke2()) return;
+        if (!flukeIsAtLeast("3.0.9"))
         write(Scribbler.SET_SERVO);
         write((byte)id);
         write((byte)value);
@@ -1888,14 +1914,14 @@ public class Scribbler: Myro.Robot
     
     public override void enablePanNetworking()
     {
-        if (!isFluke2()) return;
+        if (!flukeIsAtLeast("3.0.9"))
         write(Scribbler.ENABLE_PAN);
         write_2byte(0x123);
     }
     
     public override string getFlukeLog()
     {
-        if (!isFluke2()) return "";
+        if (!flukeIsAtLeast("3.0.9")) return "";
         write(Scribbler.GET_ERRORS);
         int size = read_2byte();
         String line = "";
