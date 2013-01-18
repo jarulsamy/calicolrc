@@ -67,7 +67,7 @@ namespace CalicoPython
 			// Set paths:
 			ICollection<string > paths = engine.GetSearchPaths ();
 			// Let users find Calico modules:
-			foreach (string folder in new string[] { "modules", "src" }) {
+			foreach (string folder in new string[] { "modules", "src", "languages/Python/modules" }) {
 				paths.Add (Path.GetFullPath(String.Format("{0}/{1}/{2}", path, "..", folder)));
 			}
 			engine.SetSearchPaths (paths);
