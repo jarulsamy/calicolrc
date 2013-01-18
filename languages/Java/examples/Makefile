@@ -1,0 +1,1 @@
+ikvmstub -lib:../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ Graphics.dll 
