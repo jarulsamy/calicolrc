@@ -41,7 +41,12 @@ public class CalicoSchemeEngine : Engine
   }
 
   public void initialize_execute() {
-      bool use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
+      bool use_stack_trace;
+      try {
+	  use_stack_trace = (bool)calico.config.GetValue("scheme-language", "use-stack-trace");
+      } catch {
+	  use_stack_trace = true;
+      }
       PJScheme.set_use_stack_trace(use_stack_trace);
       PJScheme.initialize_execute();
   }
@@ -98,7 +103,11 @@ public class CalicoSchemeEngine : Engine
 	System.Console.WriteLine(resultString);
     }
     if (ok) {
-	calico.manager.stderr.PrintLine(Calico.Tag.Info, "Done");
+	try {
+	    calico.manager.stderr.PrintLine(Calico.Tag.Info, "Done");
+	} catch {
+	    System.Console.WriteLine("Done");
+	}
     }
     return true;
   }
