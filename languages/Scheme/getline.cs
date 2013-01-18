@@ -46,6 +46,14 @@ namespace Mono.Terminal {
 		}
 		
 		public delegate Completion AutoCompleteHandler (string text, int pos);
+
+	    public int WindowWidth() {
+		if (Console.WindowWidth > 0) {
+		    return Console.WindowWidth;
+		} else {
+		    return 72;
+		}
+	    }
 		
 		//static StreamWriter log;
 		
@@ -225,11 +233,11 @@ namespace Mono.Terminal {
 
 		void UpdateHomeRow (int screenpos)
 		{
-			int lines = 1 + (screenpos / Console.WindowWidth);
-
-			home_row = Console.CursorTop - (lines - 1);
-			if (home_row < 0)
-				home_row = 0;
+		    int lines;
+		    lines = 1 + (screenpos / WindowWidth());
+		    home_row = Console.CursorTop - (lines - 1);
+		    if (home_row < 0)
+			home_row = 0;
 		}
 		
 
@@ -301,7 +309,7 @@ namespace Mono.Terminal {
 
 		int LineCount {
 			get {
-				return (shown_prompt.Length + rendered_text.Length)/Console.WindowWidth;
+			    return (shown_prompt.Length + rendered_text.Length)/WindowWidth();
 			}
 		}
 		
@@ -310,8 +318,8 @@ namespace Mono.Terminal {
 			cursor = newpos;
 
 			int actual_pos = shown_prompt.Length + TextToRenderPos (cursor);
-			int row = home_row + (actual_pos/Console.WindowWidth);
-			int col = actual_pos % Console.WindowWidth;
+			int row = home_row + (actual_pos/WindowWidth());
+			int col = actual_pos % WindowWidth();
 
 			if (row >= Console.BufferHeight)
 				row = Console.BufferHeight-1;
