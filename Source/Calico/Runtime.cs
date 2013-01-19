@@ -23,6 +23,7 @@ using System.IO;
 // Path
 using System.Threading;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Calico;
 using Mono.Terminal;
@@ -85,33 +86,79 @@ namespace Calico {
             executeThread.Start();
         }
 
-
-
         public void REPL() {
-            LineEditor le = new LineEditor("foo");
-            string s;
+	  LineEditor le = new LineEditor ("Calico", 1000);
+	  le.TabAtStartCompletes = false;
+	  string line, expr = "";
+	  string prompt = CurrentLanguage + "> ";
+	  string indent = "";
+	  bool is_unix, isatty, dumb;
 
-            while ((s = le.Edit (CurrentLanguage + "> ", "")) != null) {
-                if (s.StartsWith(":")){
-                    string[] t = s.Split();
-                    Console.WriteLine(t[0] + " " + t[0].Contains("exit"));
-                    if (t[0] == ":lang"){
-                       if(Array.Find(manager.getLanguages(), delegate(string lang) { return lang == t[1]; }) != null){
-                            CurrentLanguage = t[1];
-                        }
-                    }
-                    else if (t[0].Contains("exit") || t[0].Contains("quit"))
-                    {
-                        Console.WriteLine("Bye Bye");
-                       // Gtk.Application.Quit();
-                        Environment.Exit(0);
-                    }
-                }
-                else {
-                    manager [CurrentLanguage].engine.Execute(s);
-                }
-            }
-        }
+	  int p = (int) Environment.OSVersion.Platform;
+	  is_unix = (p == 4) || (p == 128);
+#if NET_4_5
+          isatty = !Console.IsInputRedirected && !Console.IsOutputRedirected;
+#else
+          isatty = true;
+#endif
+	  if (is_unix){
+	      string term = Environment.GetEnvironmentVariable ("TERM");
+	      dumb = term == "dumb" || term == null || isatty == false;
+	  } else
+	      dumb = false;
+
+          while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
+	      if (line.StartsWith(":")){
+		  string[] t = line.Split();
+		  if (t[0] == ":lang") {
+		      if(Array.Find(manager.getLanguages(), delegate(string lang) { return lang == t[1]; }) != null) {
+			  CurrentLanguage = t[1];
+		      }
+		      expr = "";
+		      prompt = CurrentLanguage + "> ";
+		      indent = "";
+		  } else if (t[0].Contains("exit") || t[0].Contains("quit")) {
+		      Console.WriteLine("Bye Bye");
+		      // Gtk.Application.Quit();
+		      Environment.Exit(0);
+		  }
+	      } else {
+		  if (expr != "")
+		      expr = expr + "\n" + line;
+		  else
+		      expr = line;
+		  if (manager[CurrentLanguage].engine.ReadyToExecute(expr)) {
+		      manager[CurrentLanguage].engine.Execute(expr);
+		      expr = "";
+		      prompt = CurrentLanguage + "> ";
+		      indent = "";
+		  } else {
+		      prompt = repeat(".", CurrentLanguage.Length) + "> ";
+		      Match match = Regex.Match(line, "^\t*");
+		      if (match.Success)
+			  indent = match.Value;
+		  }
+	      }
+	  }
+	}
+
+	public static string getline(LineEditor le, string prompt, string indent, bool dumb, bool isatty) {
+	    if (dumb){
+		if (isatty)
+		    Console.Write (prompt);
+		return Console.ReadLine ();
+	    } else {
+		return le.Edit(prompt, indent);
+	    }
+	}
+
+	public static string repeat(string s, int times) {
+	    string retval = "";
+	    for (int i=0; i < times; i++) {
+		retval += s;
+	    }
+	    return retval;
+	}
 
         public void ExecuteFileInBackground(string filename, string language) {
             // This is run from text documents that don't run themselves:
