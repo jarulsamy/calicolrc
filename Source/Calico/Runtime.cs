@@ -134,14 +134,12 @@ namespace Calico {
 		  else
 		      expr = line;
 		  if (manager[CurrentLanguage].engine.ReadyToExecute(expr)) {
-		    try
-		      {	
-			manager[CurrentLanguage].engine.Execute(expr);		
-		      }
-		    catch (Exception e)
-		      {
-			Console.WriteLine(e);
-		      }
+		    try {	
+		      manager[CurrentLanguage].engine.Execute(expr);		
+		    }
+		    catch (Exception e) {
+		      Console.WriteLine(e);
+		    }
 		      expr = "";
 		      prompt = CurrentLanguage + "> ";
 		      indent = "";
