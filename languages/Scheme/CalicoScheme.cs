@@ -171,11 +171,11 @@ public class CalicoSchemeEngine : Engine
 	  string prompt = "scheme>>> ";
 	  string indent = "";
 	  while ((line = le.Edit(prompt, indent)) != null) {
-        if (expr != "")
-          expr = expr + "\n" + line;
-        else
-          expr = line;
-	    if (scheme.engine.ReadyToExecute(expr)) {
+	      if (expr != "")
+		  expr = expr + "\n" + line;
+	      else
+		  expr = line;
+	      if (scheme.engine.ReadyToExecute(expr)) {
 		  PJScheme.initialize_execute();
 		  scheme.engine.Execute(expr);
 		  expr = "";
