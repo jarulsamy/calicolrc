@@ -47,6 +47,8 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
+
+	    GLib.ExceptionManager.UnhandledException += HandleException;
             
             //manager.SetCalico(this);
             // FIXME: move to Python language
@@ -84,6 +86,10 @@ namespace Calico {
             }));
             executeThread.IsBackground = true;
             executeThread.Start();
+        }
+
+        public void HandleException(GLib.UnhandledExceptionArgs args) {
+	  Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
         }
 
         public void REPL() {
@@ -128,7 +134,14 @@ namespace Calico {
 		  else
 		      expr = line;
 		  if (manager[CurrentLanguage].engine.ReadyToExecute(expr)) {
-		      manager[CurrentLanguage].engine.Execute(expr);
+		    try
+		      {	
+			manager[CurrentLanguage].engine.Execute(expr);		
+		      }
+		    catch (Exception e)
+		      {
+			Console.WriteLine(e);
+		      }
 		      expr = "";
 		      prompt = CurrentLanguage + "> ";
 		      indent = "";
