@@ -416,7 +416,7 @@ namespace Mono.Terminal {
 				} else
 					HandleChar ('\t');
 			} else
-				HandleChar ('t');
+				HandleChar ('\t');
 		}
 		
 		void CmdHome ()
