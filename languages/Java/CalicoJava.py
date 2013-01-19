@@ -15,6 +15,7 @@ for filename in glob.glob(os.path.join(libpath, "*.dll")):
     filename = os.path.abspath(filename)
     #print(filename)
     clr.AddReference(filename)
+
 import edu
 import java
 import System
@@ -49,10 +50,19 @@ class MyLanguageEngine(Calico.Engine):
         self.calico = calico
         try:
             self.options = edu.rice.cs.dynamicjava.Options.DEFAULT
-            self.classPathManager = edu.rice.cs.drjava.model.repl.newjvm.ClassPathManager(
-                edu.rice.cs.plt.reflect.ReflectUtil.SYSTEM_CLASS_PATH)
-            self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options)
-                #self.classPathManager.makeClassLoader(None))
+            #self.cp = edu.rice.cs.plt.io.IOUtil.parsePath("/home/dblank/Calico/trunk/languages/Java")
+            #print(self.cp)
+            #loader = edu.rice.cs.plt.reflect.PathClassLoader(self.cp.GetEnumerator())
+            #list = java.util.ArrayList()
+            #list.Add(java.io.File("/home/dblank/Calico/trunk/languages/Java"))
+            #loader = edu.rice.cs.plt.reflect.PathClassLoader(list)
+            try:
+                # This doesn't work on startup, but does after Calico is loaded
+                loader = edu.rice.cs.plt.reflect.PathClassLoader(java.io.File("/home/dblank/Calico/trunk/languages/Java"))
+                self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options, loader)
+            except:
+                print("Java fallback; no classpath")
+                self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options)
         except:
             traceback.print_exc()
 
@@ -154,7 +164,9 @@ def MakeLanguage():
     """
     return MyLanguage()
 
-
-## engine = MyLanguageEngine(calico.manager)
-## engine.PostSetup(calico)
-## engine.Execute("1 + 1;", True)
+try:
+    engine = MyLanguageEngine(calico.manager)
+    engine.PostSetup(calico)
+    ## engine.Execute("1 + 1;", True)\
+except:
+    pass
