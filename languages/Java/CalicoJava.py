@@ -1,5 +1,6 @@
 # This file was constructed automatically by the Calico Project
 # See http://calicoproject.org/ for more details.
+from __future__ import print_function
 
 import sys
 import os
@@ -15,9 +16,26 @@ for filename in glob.glob(os.path.join(libpath, "*.dll")):
     #print(filename)
     clr.AddReference(filename)
 import edu
+import java
 import System
 import Calico
 import traceback
+
+class OutputStream(java.io.ByteArrayOutputStream):
+    def write(self, *args):
+        if len(args) == 1:
+            # byte
+            retval = chr(args)
+        else:
+            # byte[], offset, length
+            byte, offset, length = args
+            retval = ""
+            for i in range(offset, length):
+                retval += chr(byte[i])
+        if self.out_type == "output":
+            print(retval, end="")
+        elif self.out_type == "error":
+            self.calico.Error(retval)
 
 def isNone(v):
     return hasattr(v, "isNone") and v.isNone()
@@ -28,6 +46,7 @@ class MyLanguageEngine(Calico.Engine):
         """
         Do things here that you want to do once (initializations).
         """
+        self.calico = calico
         try:
             self.options = edu.rice.cs.dynamicjava.Options.DEFAULT
             self.classPathManager = edu.rice.cs.drjava.model.repl.newjvm.ClassPathManager(
@@ -36,12 +55,24 @@ class MyLanguageEngine(Calico.Engine):
                 #self.classPathManager.makeClassLoader(None))
         except:
             traceback.print_exc()
+
+    def SetRedirects(self, stdout, stderr):
+        pass
+        #System.setErr()
             
     def Execute(self, text, feedback=True):
         """
         This is where you do something for the text (code). This is
         the interpreter.
         """
+        out = OutputStream()
+        out.out_type = "output"
+        out.calico = self.calico
+        err = OutputStream()
+        err.out_type = "error"
+        err.calico = self.calico
+        edu.rice.cs.plt.io.IOUtil.replaceSystemOut(out)
+        edu.rice.cs.plt.io.IOUtil.replaceSystemErr(err)
         try:
             retval = self.interpreter.interpret(text)
             try:
@@ -49,9 +80,13 @@ class MyLanguageEngine(Calico.Engine):
             except:
                 pass
             if not isNone(retval) and feedback:
-                print(retval.toString())
+                if retval:
+                    if hasattr(retval, "toString"):
+                        print(retval.toString())
+                    else:
+                        print(retval)
         except Exception, error:
-            print(error.message.replace("koala.dynamicjava.interpreter.error.", ""))
+            self.calico.Error(error.message.replace("koala.dynamicjava.interpreter.error.", "") + "\n")
         return True
 
     def ExecuteFile(self, filename):
@@ -74,7 +109,9 @@ class MyLanguageEngine(Calico.Engine):
         to execute. If you return False, then the user can still
         interactively type text into the Calico Shell.
         """
-        return text.split("\n")[-1].strip() == ""
+        lines = text.split("\n")
+        return (lines[-1].strip() == "" or # empty line
+                (not lines[-1].startswith(" ") and lines[-1].endswith(";"))) # statement
 
 class MyLanguage(Calico.Language):
     """
