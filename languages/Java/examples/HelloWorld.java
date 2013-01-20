@@ -3,3 +3,5 @@ public class HelloWorld {
         System.out.println("Hello World!"); // Display the string.
     }
 }
+
+HelloWorld.main(new String[0]);

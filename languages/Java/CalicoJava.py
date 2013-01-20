@@ -59,22 +59,10 @@ class MyLanguageEngine(Calico.Engine):
         Do things here that you want to do once (initializations).
         """
         self.calico = calico
-        try:
-            self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(
-                options, loader)
-        except:
-            print("Java fallback; no classpath")
-            self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options)
+        self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(
+            options, loader)
 
     def SetRedirects(self, stdout, stderr):
-        pass
-        #System.setErr()
-            
-    def Execute(self, text, feedback=True):
-        """
-        This is where you do something for the text (code). This is
-        the interpreter.
-        """
         out = OutputStream()
         out.out_type = "output"
         out.calico = self.calico
@@ -83,6 +71,12 @@ class MyLanguageEngine(Calico.Engine):
         err.calico = self.calico
         edu.rice.cs.plt.io.IOUtil.replaceSystemOut(out)
         edu.rice.cs.plt.io.IOUtil.replaceSystemErr(err)
+            
+    def Execute(self, text, feedback=True):
+        """
+        This is where you do something for the text (code). This is
+        the interpreter.
+        """
         try:
             retval = self.interpreter.interpret(text)
             try:
@@ -110,7 +104,7 @@ class MyLanguageEngine(Calico.Engine):
             traceback.print_exc()
             return
 
-        self.Execute(text, false)
+        self.Execute(text, False)
         return True
 
     def ReadyToExecute(self, text):
