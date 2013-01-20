@@ -22,6 +22,17 @@ import System
 import Calico
 import traceback
 
+# This is done here, because of problem loading if in PostSetup:
+classpath = java.util.ArrayList()
+jarpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "jar"))
+for filename in glob.glob(os.path.join(jarpath, "*.jar")):
+    fileobj = java.io.File(os.path.abspath(filename))
+    #print(filename)
+    classpath.Add(fileobj)
+
+options = edu.rice.cs.dynamicjava.Options.DEFAULT
+loader = edu.rice.cs.plt.reflect.PathClassLoader(classpath)
+
 class OutputStream(java.io.ByteArrayOutputStream):
     def write(self, *args):
         if len(args) == 1:
@@ -49,22 +60,11 @@ class MyLanguageEngine(Calico.Engine):
         """
         self.calico = calico
         try:
-            self.options = edu.rice.cs.dynamicjava.Options.DEFAULT
-            #self.cp = edu.rice.cs.plt.io.IOUtil.parsePath("/home/dblank/Calico/trunk/languages/Java")
-            #print(self.cp)
-            #loader = edu.rice.cs.plt.reflect.PathClassLoader(self.cp.GetEnumerator())
-            #list = java.util.ArrayList()
-            #list.Add(java.io.File("/home/dblank/Calico/trunk/languages/Java"))
-            #loader = edu.rice.cs.plt.reflect.PathClassLoader(list)
-            try:
-                # This doesn't work on startup, but does after Calico is loaded
-                loader = edu.rice.cs.plt.reflect.PathClassLoader(java.io.File("/home/dblank/Calico/trunk/languages/Java"))
-                self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options, loader)
-            except:
-                print("Java fallback; no classpath")
-                self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options)
+            self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(
+                options, loader)
         except:
-            traceback.print_exc()
+            print("Java fallback; no classpath")
+            self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(self.options)
 
     def SetRedirects(self, stdout, stderr):
         pass
