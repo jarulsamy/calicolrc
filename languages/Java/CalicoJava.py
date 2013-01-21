@@ -91,7 +91,10 @@ class MyLanguageEngine(Calico.Engine):
                     else:
                         print(retval)
         except Exception, error:
-            self.calico.Error(error.message.replace("koala.dynamicjava.interpreter.error.", "") + "\n")
+            message = error.message
+            message = message.replace("koala.dynamicjava.interpreter.error.", "")
+            message = message.replace("koala.dynamicjava.parser.wrapper.", "")
+            self.calico.Error(message + "\n")
         return True
 
     def ExecuteFile(self, filename):
