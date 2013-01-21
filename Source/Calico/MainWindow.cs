@@ -1358,13 +1358,12 @@ namespace Calico {
                 "Jim Marshall <jmarshall@sarahlawrence.edu>",
                 "Mark Russo <russomf@gmail.com>",
                 "Jennifer Kay <kay@rowan.edu>",
-                "Deepak Kumar <dkumar@cs.brynmawr.edu>"
             };
             aboutDialog.Comments = (_("Scripting Environment") + "\n\n"
                    + String.Format(_("Running on {0}"), System.Environment.OSVersion.VersionString)
             //+ String.Format("\nMono {0}\n", Mono.Runtime.GetDisplayName())
                       );
-            aboutDialog.Copyright = _("(c) 2011-2012, Institute for Personal Robots in Education");
+            aboutDialog.Copyright = _("(c) 2011-2013, Institute for Personal Robots in Education");
             //aboutDialog.Documenters
             //aboutDialog.License
             //aboutDialog.Logo
