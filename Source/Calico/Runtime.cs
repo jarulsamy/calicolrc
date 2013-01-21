@@ -33,7 +33,6 @@ namespace Calico {
        
         public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config):
         base(){
-
             this.config = config;
             this.Debug = Debug;
             this.manager = manager;
@@ -82,7 +81,8 @@ namespace Calico {
             GLib.Timeout.Add(500, UpdateGUI);
 
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
-                REPL();
+			REPL();
+			Environment.Exit(0);
             }));
             executeThread.IsBackground = true;
             executeThread.Start();
@@ -180,6 +180,13 @@ namespace Calico {
             executeThread.Start();
         }
 
+        public new void Print(Tag tag, string format) {
+	    System.Console.Write(format);
+	}
+
+        public new void Print(string format) {
+	    Print(Tag.Normal, format);
+	}
 
         private bool UpdateGUI() {
             // update any pending requests
