@@ -140,7 +140,7 @@ namespace Calico {
 
         public string GetLanguageFromExtension(string filename) {
             string file_ext = System.IO.Path.GetExtension(filename);
-            if (file_ext != string.Empty) {
+            if (file_ext != string.Empty && file_ext != "") {
                 file_ext = file_ext.Substring(1);
                 foreach (string language in languages.Keys) {
                     foreach (string ext in languages[language].extensions) {

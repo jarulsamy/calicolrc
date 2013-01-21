@@ -1896,10 +1896,13 @@ namespace Calico {
 
         public void ExecuteFileInBackground(string filename) {
             string language = manager.GetLanguageFromExtension(filename);
-            ExecuteFileInBackground(filename, language);
+	    if (language != null)
+               ExecuteFileInBackground(filename, language);
         }
 
         public void ExecuteFileInBackground(string filename, string language) {
+	    if (language == null)
+	       return;
             // This is run from text documents that don't run themselves:
             Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
