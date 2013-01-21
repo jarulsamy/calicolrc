@@ -88,7 +88,7 @@ namespace Calico {
             executeThread.Start();
         }
 
-        public void HandleException(GLib.UnhandledExceptionArgs args) {
+        public new void HandleException(GLib.UnhandledExceptionArgs args) {
 	  Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
         }
 
@@ -171,7 +171,7 @@ namespace Calico {
 	    return retval;
 	}
 
-        public void ExecuteFileInBackground(string filename, string language) {
+        public new void ExecuteFileInBackground(string filename, string language) {
             // This is run from text documents that don't run themselves:
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
