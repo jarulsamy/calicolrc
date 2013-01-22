@@ -248,7 +248,8 @@ namespace Calico {
             } else if (((IList<string>)args).Contains("--repl")) {
                 if (withGraphics) {
                     Application.Init();
-                    new CalicoConsole(args, manager, Debug, config, true);  
+                    MainWindow win = new CalicoConsole(args, manager, Debug, config, true);  
+                    //win.Show();
                     Application.Run();
 
                 } else {

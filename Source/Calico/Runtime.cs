@@ -62,7 +62,12 @@ namespace Calico {
 
             //Build();
             // Run this in in the GUI thread, after we start:
-            manager.PostSetup(this); 
+            //manager.PostSetup(this); 
+
+            // Run this in in the GUI thread, after we start:
+            Gtk.Application.Invoke(delegate {
+                manager.PostSetup(this); });
+
 
             // All done, show if minimized:
             //this.Present();
