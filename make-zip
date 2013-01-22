@@ -1,4 +1,4 @@
-#rm -rf Calico-2.2.0-linux.zip
-zip -v -r Calico-2.2.0-linux.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/StartCalico.bat" "Calico/StartCalico.app/*" "Calico/modules/*/" "Calico/modules/*" "Calico/server/*" "Calico/plugins/*" "Calico/README.txt" "Calico/NOTES" "Calico/make-zip.bat" "Calico/make-zip-mac" "Calico/Makefile" "Calico/make-zip" "Calico/bin/windows/*/" "Calico/bin/windows/*" "Calico/bin/mac/*/" "Calico/bin/mac/*" "Calico/languages/*" 
-zip -v -g -r Calico-2.2.0-linux.zip Calico/modules/*.dll Calico/modules/Myro/Robots/*.dll
-zip -v -g -r Calico-2.2.0-linux.zip Calico/languages/*/*.dll Calico/languages/*/*.exe Calico/languages/*/*.py Calico/languages/Java/lib/* Calico/languages/Java/jar/* Calico/languages/Logo/*/*.py Calico/languages/*/*.dll Calico/languages/*/examples/*
+rm -rf Calico-2.2.1-linux.zip
+zip -v -r Calico-2.2.1-linux.zip Calico -x "*/.svn/*" "Calico/src/*" "Calico/Source/*" "Calico/StartCalico.bat" "Calico/StartCalico.app/*" "Calico/modules/*/" "Calico/modules/*" "Calico/server/*" "Calico/plugins/*" "Calico/README.txt" "Calico/NOTES" "Calico/make-zip.bat" "Calico/make-zip-mac" "Calico/Makefile" "Calico/make-zip" "Calico/bin/windows/*/" "Calico/bin/windows/*" "Calico/bin/mac/*/" "Calico/bin/mac/*" "Calico/languages/*" 
+zip -v -g -r Calico-2.2.1-linux.zip Calico/modules/*.dll Calico/modules/Myro/Robots/*.dll
+zip -v -g -r Calico-2.2.1-linux.zip Calico/languages/*/*.dll Calico/languages/*/*.exe Calico/languages/*/*.py Calico/languages/Java/lib/* Calico/languages/Java/jar/* Calico/languages/Logo/*/*.py Calico/languages/*/*.dll Calico/languages/*/examples/* Calico/languages/*/SyntaxModes/*
