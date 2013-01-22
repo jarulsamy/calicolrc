@@ -145,7 +145,8 @@ class MyLanguage(Calico.Language):
         script.
         """
         path, filename = os.path.split(fullname)
-        return "import " + filename
+        basename, ext = filename.split(".")
+        return "import " + basename + ";\n"
 
     def getExamplesPath(self, root_path):
         """
