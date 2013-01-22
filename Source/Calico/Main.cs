@@ -69,7 +69,9 @@ namespace Calico {
             }
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-            if (verbose) System.Console.WriteLine("    looking for config in \"{0}\"...", config_path);
+            if (verbose) {
+                System.Console.WriteLine("    looking for config in \"{0}\"...", config_path);
+            }
             config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
             Config config;
             if (((IList<string>)args).Contains("--reset")) {
@@ -86,8 +88,10 @@ namespace Calico {
             
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
-            if (verbose)  System.Console.WriteLine("    looking for languages in \"{0}\"...", 
+            if (verbose) {
+                System.Console.WriteLine("    looking for languages in \"{0}\"...", 
                                      System.IO.Path.Combine(path, "..", "languages"));
+            }
 
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
             if (IsLoadLanguages) {
@@ -162,7 +166,9 @@ namespace Calico {
             }
             string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
-            if (verbose)  System.Console.WriteLine("    looking for local languages in \"{0}\"...", local_lang_path);
+            if (verbose) {
+                System.Console.WriteLine("    looking for local languages in \"{0}\"...", local_lang_path);
+            }
             dir = new DirectoryInfo(local_lang_path);
             if (dir.Exists) {
                 foreach (DirectoryInfo d in dir.GetDirectories("*")) {
@@ -217,19 +223,41 @@ namespace Calico {
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;
             }
+            bool withGraphics = true;
+            if (((IList<string>)args).Contains("--nographics")) {
+                withGraphics = false;
+            }
             // Process some commands here:
             if (((IList<string>)args).Contains("--help")) {
                 Usage();
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
-            } else if (((IList<string>)args).Contains("--nogui")){
-                Application.Init();
-                CalicoConsole rs = new CalicoConsole(args, manager, Debug, config);
-                //rs.Show();
-                Application.Run();
+            } else if (((IList<string>)args).Contains("--exec")) {
+                if (withGraphics) {
+                    Application.Init();
+                    new CalicoConsole(args, manager, Debug, config, false);
+                    Application.Run();
 
-            } else {
+                } else {
+                    Application.Init();
+                    new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
+
+                }
+                //rs.Show();
+            } else if (((IList<string>)args).Contains("--repl")) {
+                if (withGraphics) {
+                    Application.Init();
+                    new CalicoConsole(args, manager, Debug, config, true);  
+                    Application.Run();
+
+                } else {
+                    Application.Init();
+                    new CalicoConsoleNoGUI(args, manager, Debug, config, true);
+                }
+                //rs.Show();
+            }
+            else {
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
@@ -261,15 +289,17 @@ namespace Calico {
             Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
             Print("----------------------------------------------------------------------------");
             Print(_("Start calico with the following options:"));
-            Print(_("  StartCalico                            Defaults to shell"));
-            Print(_("  StartCalico FILENAME:LINE ...          Edits FILENAMEs, positioned on LINEs"));
-            Print(_("  StartCalico --lang=LANGUAGE            Sets default language (python, etc.)"));
-            Print(_("  StartCalico --chat                     Brings up chat window"));
-            Print(_("  StartCalico --exec FILENAMEs           Run FILENAMEs standalone with graphics"));
-            Print(_("  StartCalico --exec --nogui FILENAMEs   Run FILENAMEs standalone no graphics"));
-            Print(_("  StartCalico --version                  Displays the version number ({0})"), Version);
-            Print(_("  StartCalico --reset                    Resets config settings to factory defaults"));
-            Print(_("  StartCalico --help                     Displays this message"));
+            Print(_("  StartCalico                               Defaults to shell"));
+            Print(_("  StartCalico FILENAME:LINE ...             Edits FILENAMEs, positioned on LINEs"));
+            Print(_("  StartCalico --lang=LANGUAGE               Sets default language (python, etc.)"));
+            Print(_("  StartCalico --chat                        Brings up chat window"));
+            Print(_("  StartCalico --exec FILENAMEs              Run FILENAMEs standalone with graphics"));
+            Print(_("  StartCalico --repl FILENAMEs              Run FILENAMEs standalone with graphics and then start read-eval loop"));
+            Print(_("  StartCalico --exec --nographics FILENAMEs Run FILENAMEs standalone without graphics"));
+            Print(_("  StartCalico --repl --nographics FILENAMEs Run FILENAMEs standalone without graphics and then start read-eval loop"));
+            Print(_("  StartCalico --version                     Displays the version number ({0})"), Version);
+            Print(_("  StartCalico --reset                       Resets config settings to factory defaults"));
+            Print(_("  StartCalico --help                        Displays this message"));
             Print("");
         }
     }

@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.IO;
+
 // Path
 using System.Threading;
 using System.Text;
@@ -29,10 +30,12 @@ using Calico;
 using Mono.Terminal;
 
 namespace Calico {
-    public partial class CalicoConsole: MainWindow  {
+    public partial class CalicoConsole: MainWindow {
        
-        public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config):
-        base(){
+        public CalicoConsole(): base(){}
+
+        public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL):
+        base() {
             this.config = config;
             this.Debug = Debug;
             this.manager = manager;
@@ -40,25 +43,26 @@ namespace Calico {
             CurrentLanguage = "python";
 
             Gtk.Application.Invoke(delegate {
-                gui_thread_id = Thread.CurrentThread.ManagedThreadId; });
+                gui_thread_id = Thread.CurrentThread.ManagedThreadId;
+            });
 
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
 
-	    GLib.ExceptionManager.UnhandledException += HandleException;
+            GLib.ExceptionManager.UnhandledException += HandleException;
             
             //manager.SetCalico(this);
             // FIXME: move to Python language
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                                             "import sys as _sys; _sys.setrecursionlimit(1000);" +
+                "import sys as _sys; _sys.setrecursionlimit(1000);" +
                 "del division, with_statement, print_function, _sys", false);
             bool debug_handler = true;
 
             //Build();
             // Run this in in the GUI thread, after we start:
-             manager.PostSetup(this); 
+            manager.PostSetup(this); 
 
             // All done, show if minimized:
             //this.Present();
@@ -72,7 +76,7 @@ namespace Calico {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
                     //Console.WriteLine("NO GUI MODE" + CurrentLanguage + " "  + arg);
                     ExecuteFileInBackground(arg, CurrentLanguage);
-                    ///manager [CurrentLanguage].engine.ExecuteFile(arg);
+                    //manager [CurrentLanguage].engine.ExecuteFile(arg);
                 }
             }
 
@@ -80,96 +84,103 @@ namespace Calico {
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
 
-            executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
-			REPL();
-			Environment.Exit(0);
-            }));
-            executeThread.IsBackground = true;
-            executeThread.Start();
+            if (startREPL) {
+                executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
+                    REPL();
+                    Environment.Exit(0);
+                }));
+                executeThread.IsBackground = true;
+                executeThread.Start();
+            } 
         }
 
         public new void HandleException(GLib.UnhandledExceptionArgs args) {
-	  Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
+            Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
         }
 
         public void REPL() {
-	  LineEditor le = new LineEditor ("Calico", 1000);
-	  le.TabAtStartCompletes = false;
-	  string line, expr = "";
-	  string prompt = CurrentLanguage + "> ";
-	  string indent = "";
-	  bool is_unix, isatty, dumb;
+            LineEditor le = new LineEditor("Calico", 1000);
+            le.TabAtStartCompletes = false;
+            string line, expr = "";
+            string prompt = CurrentLanguage + "> ";
+            string indent = "";
+            bool is_unix, isatty, dumb;
 
-	  int p = (int) Environment.OSVersion.Platform;
-	  is_unix = (p == 4) || (p == 128);
+            int p = (int)Environment.OSVersion.Platform;
+            is_unix = (p == 4) || (p == 128);
 #if NET_4_5
           isatty = !Console.IsInputRedirected && !Console.IsOutputRedirected;
 #else
-          isatty = true;
+            isatty = true;
 #endif
-	  if (is_unix){
-	      string term = Environment.GetEnvironmentVariable ("TERM");
-	      dumb = term == "dumb" || term == null || isatty == false;
-	  } else
-	      dumb = false;
+            if (is_unix) {
+                string term = Environment.GetEnvironmentVariable("TERM");
+                dumb = term == "dumb" || term == null || isatty == false;
+            } else {
+                dumb = false;
+            }
 
-          while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
-	      if (line.StartsWith(":")){
-		  string[] t = line.Split();
-		  if (t[0] == ":lang") {
-		      if(Array.Find(manager.getLanguages(), delegate(string lang) { return lang == t[1]; }) != null) {
-			  CurrentLanguage = t[1];
-		      }
-		      expr = "";
-		      prompt = CurrentLanguage + "> ";
-		      indent = "";
-		  } else if (t[0].Contains("exit") || t[0].Contains("quit")) {
-		      Console.WriteLine("Bye Bye");
-		      // Gtk.Application.Quit();
-		      Environment.Exit(0);
-		  }
-	      } else {
-		  if (expr != "")
-		      expr = expr + "\n" + line;
-		  else
-		      expr = line;
-		  if (manager[CurrentLanguage].engine.ReadyToExecute(expr)) {
-		    try {	
-		      manager[CurrentLanguage].engine.Execute(expr);		
-		    }
-		    catch (Exception e) {
-		      Console.WriteLine(e);
-		    }
-		      expr = "";
-		      prompt = CurrentLanguage + "> ";
-		      indent = "";
-		  } else {
-		      prompt = repeat(".", CurrentLanguage.Length) + "> ";
-		      Match match = Regex.Match(line, "^\t*");
-		      if (match.Success)
-			  indent = match.Value;
-		  }
-	      }
-	  }
-	}
+            while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
+                if (line.StartsWith(":")) {
+                    string[] t = line.Split();
+                    if (t [0] == ":lang") {
+                        if (Array.Find(manager.getLanguages(), delegate(string lang) {
+                            return lang == t [1];
+                        }) != null) {
+                            CurrentLanguage = t [1];
+                        }
+                        expr = "";
+                        prompt = CurrentLanguage + "> ";
+                        indent = "";
+                    } else if (t [0].Contains("exit") || t [0].Contains("quit")) {
+                        Console.WriteLine("Bye Bye");
+                        // Gtk.Application.Quit();
+                        Environment.Exit(0);
+                    }
+                } else {
+                    if (expr != "") {
+                        expr = expr + "\n" + line;
+                    } else {
+                        expr = line;
+                    }
+                    if (manager [CurrentLanguage].engine.ReadyToExecute(expr)) {
+                        try {   
+                            manager [CurrentLanguage].engine.Execute(expr);     
+                        } catch (Exception e) {
+                            Console.WriteLine(e);
+                        }
+                        expr = "";
+                        prompt = CurrentLanguage + "> ";
+                        indent = "";
+                    } else {
+                        prompt = repeat(".", CurrentLanguage.Length) + "> ";
+                        Match match = Regex.Match(line, "^\t*");
+                        if (match.Success) {
+                            indent = match.Value;
+                        }
+                    }
+                }
+            }
+        }
 
-	public static string getline(LineEditor le, string prompt, string indent, bool dumb, bool isatty) {
-	    if (dumb){
-		if (isatty)
-		    Console.Write (prompt);
-		return Console.ReadLine ();
-	    } else {
-		return le.Edit(prompt, indent);
-	    }
-	}
+        public static string getline(LineEditor le, string prompt, string indent, bool dumb, bool isatty) {
+            if (dumb) {
+                if (isatty) {
+                    Console.Write(prompt);
+                }
+                return Console.ReadLine();
+            } else {
+                return le.Edit(prompt, indent);
+            }
+        }
 
-	public static string repeat(string s, int times) {
-	    string retval = "";
-	    for (int i=0; i < times; i++) {
-		retval += s;
-	    }
-	    return retval;
-	}
+        public static string repeat(string s, int times) {
+            string retval = "";
+            for (int i=0; i < times; i++) {
+                retval += s;
+            }
+            return retval;
+        }
 
         public new void ExecuteFileInBackground(string filename, string language) {
             // This is run from text documents that don't run themselves:
@@ -181,12 +192,12 @@ namespace Calico {
         }
 
         public new void Print(Tag tag, string format) {
-	    System.Console.Write(format);
-	}
+            System.Console.Write(format);
+        }
 
         public new void Print(string format) {
-	    Print(Tag.Normal, format);
-	}
+            Print(Tag.Normal, format);
+        }
 
         private bool UpdateGUI() {
             // update any pending requests
@@ -546,6 +557,41 @@ namespace Calico {
         */
     }
 
+
+
+    public partial class CalicoConsoleNoGUI: CalicoConsole{
+        public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL){
+            this.config = config;
+            this.Debug = Debug;
+            this.manager = manager;
+            manager.SetCalico(this);
+            CurrentLanguage = "python";
+
+            path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+            if (path.StartsWith("\\")) {
+                path = path.Substring(1);
+            }
+
+            // FIXME: move to Python language
+            manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
+                "import sys as _sys; _sys.setrecursionlimit(1000);" +
+                "del division, with_statement, print_function, _sys", false);
+            manager.PostSetup(this); 
+
+            foreach (string arg in args) {
+                if (!arg.StartsWith("--")) {
+                    CurrentLanguage = manager.GetLanguageFromExtension(arg);
+                    manager [CurrentLanguage].engine.ExecuteFile(arg);
+                }
+            }
+
+            if (startREPL) {
+                REPL();
+            } else {
+                Environment.Exit(0);
+            }
+        }
+    }
 }
 
 // enter not on bottom row inserts, not executes
