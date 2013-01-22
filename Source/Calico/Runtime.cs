@@ -68,6 +68,7 @@ namespace Calico {
             Gtk.Application.Invoke(delegate {
                 manager.PostSetup(this); });
 
+            manager ["python"].engine.Execute("from __builtin__ import raw_input, input", false);
 
             // All done, show if minimized:
             //this.Present();
