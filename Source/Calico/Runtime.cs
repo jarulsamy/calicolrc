@@ -134,6 +134,10 @@ namespace Calico {
                             return lang == t [1];
                         }) != null) {
                             CurrentLanguage = t [1];
+                            manager.Register(manager[CurrentLanguage], true);
+                            manager[CurrentLanguage].engine.Setup(path);
+                            manager[CurrentLanguage].engine.Start(path);
+                            manager[CurrentLanguage].engine.PostSetup(this);
                         }
                         expr = "";
                         prompt = CurrentLanguage + "> ";
