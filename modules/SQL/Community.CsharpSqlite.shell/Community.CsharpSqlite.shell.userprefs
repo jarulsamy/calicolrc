@@ -9,7 +9,6 @@
         <State expanded="True">
           <Node name="SQL" expanded="True">
             <Node name="References" expanded="True" />
-            <Node name="Community.CsharpSqlite" expanded="True" />
             <Node name="src" expanded="True">
               <Node name="shell.cs" selected="True" />
             </Node>
