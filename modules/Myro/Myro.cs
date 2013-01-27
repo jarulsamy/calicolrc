@@ -1090,27 +1090,34 @@ public static class Myro
 		initialize (port, baud);
 	}
 
-	public static void initialize (string port, int baud=38400)
+        public static void initialize (string port, int baud=38400)
 	{
 	    // assumes a single robot will be used
+	    if (port == null) {
+		object retval = ask("Please enter port");
+		if (retval == null)
+		    return;
+		else
+		    port = retval.ToString();
+	    }
 	    if (port.StartsWith ("sim")) {
-            if (simulation == null || ! simulation.window.Visible) {
-                simulation = new Simulation ();
-                //Thread.Sleep ((int)(5 * 1000));
-            } 
-            else {
-                simulation.setup ();
-            }
-            // defaults to SimScribbler in this interface
-            robot = makeRobot ("SimScribbler", simulation); 
+		if (simulation == null || ! simulation.window.Visible) {
+		    simulation = new Simulation ();
+		    //Thread.Sleep ((int)(5 * 1000));
+		} 
+		else {
+		    simulation.setup ();
+		}
+		// defaults to SimScribbler in this interface
+		robot = makeRobot ("SimScribbler", simulation); 
 	    } 
-        else {
-            if (Myro.robot != null)
-                Myro.robot.reinit (port, baud);
-            else {
-                // defaults to Scribbler in this interface
-                Myro.robot = makeRobot ("Scribbler", port, baud);
-            }
+	    else {
+		if (Myro.robot != null)
+		    Myro.robot.reinit (port, baud);
+		else {
+		    // defaults to Scribbler in this interface
+		    Myro.robot = makeRobot ("Scribbler", port, baud);
+		}
 	    }
 	}
 
