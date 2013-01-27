@@ -12,7 +12,9 @@ using sqlite3_int64 = System.Int64;
 using u32 = System.UInt32;
 using va_list = System.Object;
 
-namespace Community.CsharpSqlite
+using Community.CsharpSqlite;
+
+namespace SQL
 {
     using dxCallback = Sqlite3.dxCallback;
     using FILETIME = Sqlite3.FILETIME;
@@ -21,7 +23,7 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Sqlite3.Mem;
 
 
-    class Shell
+    public class Shell
     {
 
         /*
@@ -520,7 +522,7 @@ if( zResult && *zResult ) add_history(zResult);
             return zResult;
         }
 
-        class previous_mode_data
+        public class previous_mode_data
         {
             public bool valid;        /* Is there legit data in here? */
             public int mode;
@@ -533,7 +535,7 @@ if( zResult && *zResult ) add_history(zResult);
         ** the main program to the callback.  This is used to communicate
         ** state and mode information.
         */
-        class callback_data
+        public class callback_data
         {
             public sqlite3 db;            /* The database */
             public bool echoOn;           /* True to echo input commands */
@@ -3757,7 +3759,373 @@ if( zHistory ) read_history(zHistory);
             }
             return rc;
         }
-        // C# DllImports
+
+		public static callback_data initialize() {
+			return initialize (0, new string[0]);
+		}
+
+		public static callback_data initialize(int argc, string[] argv)
+		{
+            string zErrMsg = null;
+            callback_data data = null;
+            string zInitFile = null;
+            StringBuilder zFirstCmd = null;
+            int i;
+            int rc = 0;
+
+            if (!Sqlite3.sqlite3_sourceid().Equals(Sqlite3.SQLITE_SOURCE_ID, StringComparison.InvariantCultureIgnoreCase))
+            {
+                fprintf(stderr, "SQLite header and source version mismatch\n%s\n%s\n",
+                Sqlite3.sqlite3_sourceid(), Sqlite3.SQLITE_SOURCE_ID);
+                exit(1);
+            }
+            Argv0 = argv.Length == 0 ? null : argv[0];
+            main_init(ref data);
+            stdin_is_interactive = isatty(0);
+
+            /* Make sure we have a valid signal handler early, before anything
+            ** else is done.
+            */
+#if SIGINT
+signal(SIGINT, Interrupt_handler);
+#endif
+
+            /* Do an initial pass through the command-line argument to locate
+** the name of the database file, the name of the initialization file,
+** the size of the alternative malloc heap,
+** and the first command to execute.
+*/
+            for (i = 0; i < argc - 1; i++)
+            {
+                string z;
+                if (argv[i][0] != '-')
+                    break;
+                z = argv[i];
+                if (z[0] == '-' && z[1] == '-')
+                    z = z.Remove(0, 1);//z++;
+                if (argv[i].Equals("-separator", StringComparison.InvariantCultureIgnoreCase) || argv[i].Equals("-nullvalue", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                }
+                else if (argv[i].Equals("-init", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                    zInitFile = argv[i];
+                    /* Need to check for batch mode here to so we can avoid printing
+                    ** informational messages (like from process_sqliterc) before 
+                    ** we do the actual processing of arguments later in a second pass.
+                    */
+                }
+                else if (argv[i].Equals("-batch", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    stdin_is_interactive = false;
+                }
+                else if (argv[i].Equals("-heap", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    int j, c;
+                    string zSize;
+                    sqlite3_int64 szHeap;
+
+                    zSize = argv[++i];
+                    szHeap = Convert.ToInt32(zSize);//atoi
+                    for (j = 0; (c = zSize[j]) != null; j++)
+                    {
+                        if (c == 'M') { szHeap *= 1000000; break; }
+                        if (c == 'K') { szHeap *= 1000; break; }
+                        if (c == 'G') { szHeap *= 1000000000; break; }
+                    }
+                    if (szHeap > 0x7fff0000)
+                        szHeap = 0x7fff0000;
+#if (SQLITE_ENABLE_MEMSYS3) || (SQLITE_ENABLE_MEMSYS5)
+Sqlite3.SQLITE_config(Sqlite3.SQLITE_CONFIG_HEAP, malloc((int)szHeap), (int)szHeap, 64);
+#endif
+#if SQLITE_ENABLE_VFSTRACE
+}else if( argv[i].Equals("-vfstrace", StringComparison.InvariantCultureIgnoreCase) ){
+extern int vfstrace_register(
+string zTraceName,
+string zOldVfsName,
+int (*xOut)(const char*,void*),
+void pOutArg,
+int makeDefault
+);
+vfstrace_register("trace",0,(int(*)(const char*,void*))fputs,stderr,1);
+#endif
+                }
+                else if (argv[i].Equals("-vfs", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Sqlite3.sqlite3_vfs pVfs = Sqlite3.sqlite3_vfs_find(argv[++i]);
+                    if (pVfs != null)
+                    {
+                        Sqlite3.sqlite3_vfs_register(pVfs, 1);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "no such VFS: \"%s\"\n", argv[i]);
+                        exit(1);
+                    }
+                }
+            }
+            if (i < argc)
+            {
+#if (SQLITE_OS_OS2) && SQLITE_OS_OS2
+data.zDbFilename = (string )convertCpPathToUtf8( argv[i++] );
+#else
+                data.zDbFilename = argv[i++];
+#endif
+            }
+            else
+            {
+#if !SQLITE_OMIT_MEMORYDB
+                data.zDbFilename = ":memory:";
+#else
+data.zDbFilename = 0;
+#endif
+            }
+            if (i < argc)
+            {
+                zFirstCmd.Append(argv[i++]);
+            }
+            if (i < argc)
+            {
+                fprintf(stderr, "%s: Error: too many options: \"%s\"\n", Argv0, argv[i]);
+                fprintf(stderr, "Use -help for a list of options.\n");
+                return null;
+            }
+            data.Out = stdout;
+
+#if SQLITE_OMIT_MEMORYDB
+if( data.zDbFilename== null ){
+fprintf(stderr,"%s: Error: no database filename specified\n", Argv0);
+return 1;
+}
+#endif
+
+            /* Go ahead and open the database file if it already exists.  If the
+** file does not exist, delay opening it.  This prevents empty database
+** files from being created if a user mistypes the database name argument
+** to the sqlite command-line tool.
+*/
+            if (File.Exists(data.zDbFilename)) //(access(data.zDbFilename, 0) == 0)
+            {
+                open_db(data);
+            }
+
+            /* Process the initialization file if there is one.  If no -init option
+            ** is given on the command line, look for a file named ~/.sqliterc and
+            ** try to process it.
+            */
+            rc = process_sqliterc(data, zInitFile);
+            if (rc > 0)
+            {
+                return null;
+            }
+
+            /* Make a second pass through the command-line argument and set
+            ** options.  This second pass is delayed until after the initialization
+            ** file is processed so that the command-line arguments will override
+            ** settings in the initialization file.
+            */
+            for (i = 0; i < argc && argv[i][0] == '-'; i++)
+            {
+                string z = argv[i];
+                if (z[1] == '-') { z = z.Remove(0, 1); } //z++;
+                if (z.Equals("-init", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                }
+                else if (z.Equals("-html", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.mode = MODE_Html;
+                }
+                else if (z.Equals("-list", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.mode = MODE_List;
+                }
+                else if (z.Equals("-line", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.mode = MODE_Line;
+                }
+                else if (z.Equals("-column", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.mode = MODE_Column;
+                }
+                else if (z.Equals("-csv", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.mode = MODE_Csv;
+                    data.separator = ",";//memcpy(data.separator, ",", 2);
+                }
+                else if (z.Equals("-separator", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                    if (i >= argc)
+                    {
+                        fprintf(stderr, "%s: Error: missing argument for option: %s\n", Argv0, z);
+                        fprintf(stderr, "Use -help for a list of options.\n");
+                        return null;
+                    }
+                    snprintf(data.separator.Length, ref data.separator,
+                    "%.*s", data.separator.Length - 1, argv[i]);
+                }
+                else if (z.Equals("-nullvalue", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                    if (i >= argc)
+                    {
+                        fprintf(stderr, "%s: Error: missing argument for option: %s\n", Argv0, z);
+                        fprintf(stderr, "Use -help for a list of options.\n");
+                        return null;
+                    }
+                    snprintf(99, ref data.nullvalue,
+                    "%.*s", 99 - 1, argv[i]);
+                }
+                else if (z.Equals("-header", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.showHeader = true;
+                }
+                else if (z.Equals("-noheader", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.showHeader = false;
+                }
+                else if (z.Equals("-echo", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.echoOn = true;
+                }
+                else if (z.Equals("-stats", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    data.statsOn = true;
+                }
+                else if (z.Equals("-bail", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    bail_on_error = true;
+                }
+                else if (z.Equals("-version", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    printf("%s %s\n", Sqlite3.sqlite3_libversion(), Sqlite3.sqlite3_sourceid());
+                    return null;
+                }
+                else if (z.Equals("-interactive", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    stdin_is_interactive = true;
+                }
+                else if (z.Equals("-batch", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    stdin_is_interactive = false;
+                }
+                else if (z.Equals("-heap", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                }
+                else if (z.Equals("-vfs", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                }
+                else if (z.Equals("-vfstrace", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    i++;
+                }
+                else if (z.Equals("-help", StringComparison.InvariantCultureIgnoreCase) || z.Equals("--help", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    usage(true);
+                }
+                else
+                {
+                    fprintf(stderr, "%s: Error: unknown option: %s\n", Argv0, z);
+                    fprintf(stderr, "Use -help for a list of options.\n");
+                    return null;
+                }
+            }
+
+            if (zFirstCmd != null && zFirstCmd.Length > 0)
+            {
+                /* Run just the command that follows the database name
+                */
+                if (zFirstCmd[0] == '.')
+                {
+                    rc = do_meta_command(zFirstCmd, data);
+                }
+                else
+                {
+                    open_db(data);
+                    rc = shell_exec(data.db, zFirstCmd.ToString(), shell_callback, data, ref zErrMsg);
+                    if (zErrMsg != null)
+                    {
+                        fprintf(stderr, "Error: %s\n", zErrMsg);
+                        return null;
+                    }
+                    else if (rc != 0)
+                    {
+                        fprintf(stderr, "Error: unable to process SQL \"%s\"\n", zFirstCmd);
+                        return null;
+                    }
+                }
+            }
+            else
+            {
+                /* Run commands received from standard input
+                */
+                if (stdin_is_interactive)
+                {
+                    string zHome;
+                    string zHistory = null;
+                    int nHistory;
+                    printf(
+#if (SQLITE_HAS_CODEC) && (SQLITE_ENABLE_CEROD)
+                    "SQLite version %s with the CEROD Extension\n" + 
+                    "Copyright 2006 Hipp, Wyrick & Company, Inc.\n" +
+#else
+                    "SQLite version %s\n" +
+#endif
+                    "(source %.19s)\n" +
+                    "Enter \".help\" for instructions\n" +
+                    "Enter SQL statements terminated with a \";\"\n",
+                    Sqlite3.sqlite3_libversion(), Sqlite3.sqlite3_sourceid()
+                    );
+                    zHome = find_home_dir();
+                    if (zHome != null)
+                    {
+                        nHistory = strlen30(zHome) + 20;
+                        //if ((zHistory = malloc(nHistory)) != null)
+                        {
+                            snprintf(nHistory, ref zHistory, "%s/.Sqlite3.SQLITE_history", zHome);
+                        }
+                    }
+#if (HAVE_READLINE)// && HAVE_READLINE==1
+if( zHistory ) read_history(zHistory);
+#endif
+					/*
+                    rc = process_input(data, null);
+                    if (zHistory != null)
+                    {
+                        stifle_history(100);
+                        write_history(zHistory);
+                        zHistory = null;//free(zHistory);
+                    }
+                    zHome = null;//free(zHome);
+					*/
+				}
+            }
+            return data;
+        }
+
+		public static string interpret(callback_data data, string s) {
+			string error = "";
+			if (s.StartsWith(".")) {
+				do_meta_command(new StringBuilder(s), data);
+			} else {
+				shell_exec(data.db, s, null, data, ref error);
+			}
+			return error;
+		}
+
+		public static void close(callback_data data) {
+            set_table_name(data, null);
+            if (data.db != null)
+            {
+                Sqlite3.sqlite3_close(data.db);
+            }
+		}
+
+		// C# DllImports
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern void FreeLibrary(IntPtr hModule);
 
