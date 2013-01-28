@@ -1730,6 +1730,11 @@ public static class Myro
 		robot.setForwardness (value);
 	}
 
+	public static object getForwardness ()
+	{
+		return robot.getForwardness ();
+	}
+
 	public static void setVolume (object volume)
 	{
 		robot.setVolume (volume);
@@ -2714,6 +2719,11 @@ public static class Myro
     
 		public virtual void setForwardness (object value)
 		{
+		}
+    
+		public virtual object getForwardness ()
+		{
+		  return null;
 		}
     
 		public virtual void setVolume (object volume)

@@ -827,6 +827,11 @@ public class Scribbler: Myro.Robot
         set (Scribbler.SET_PASS2, pass2);
     }
 
+    public override object getForwardness ()
+    {
+	  return get("forwardness");
+	}
+
     public override void setForwardness (object direction)
     {
         byte val = 0;

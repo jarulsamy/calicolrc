@@ -698,6 +698,11 @@ using System;
 		{
 		}
     
+		public override object getForwardness ()
+		{
+		  return "fluke-forward";
+		}
+
 		public override void setVolume (object volume)
 		{
 		}
