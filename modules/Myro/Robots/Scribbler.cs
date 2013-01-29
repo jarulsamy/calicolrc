@@ -147,7 +147,8 @@ public class Scribbler: Myro.Robot
     static byte TO             = 2;  //Used in movement commands, to means the heading you want to turn to
     static byte DEG            = 1;  //Used in movement commands, specifies using degress instead of S2 angle units
     static byte MM             = 1;  //Used in movement commands, specifies using degress instead of S2 angle units
-	
+    static byte REL            = 8; // Used in arc and movement to indicate relative movement
+
     static byte GET_ERRORS     = 10;  // Fluke2 only
     static byte SET_PIC_SIZE   = 11;  // Fluke2 only
     static byte SET_SERVO      = 12;  // Fluke2 only
@@ -1418,21 +1419,18 @@ public class Scribbler: Myro.Robot
 
         }
     }
-
-    public void setArc (int x, int y, int radius, string arcType = "to", string arcUnits = "mm")
+    
+    public void setArc (int x, int y, int radius, string arcType = "to", string arcUnits = "mm", bool relative = false)
     {
-        byte units = Scribbler.MM;
-        if (arcUnits == "s2") units = 0;
-        byte relative = Scribbler.TO;
-        if (arcType == "by") relative = Scribbler.BY;
-
         byte [] buffer = {Scribbler.SET_ARC, 
-                          (byte)(relative + units),
+                          (byte)(((arcType == "by") ? Scribbler.BY : Scribbler.TO) + 
+                                 ((arcUnits == "s2") ? (byte)0 : Scribbler.MM) + 
+                                 (relative ? Scribbler.REL: (byte)0 )),
                           (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
                           (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
                           (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
         set (buffer);
-
+        
         bool scribblerBusy = true;
         while (scribblerBusy) {	  
             scribblerBusy = _IsInTransit ();
@@ -1442,7 +1440,12 @@ public class Scribbler: Myro.Robot
         }
     }
 
-	public override void arcTo (int x, int y, int r, string units = "mm")
+	public override void arc(int deg, int r)
+    {
+        setArc(deg, 0, r, "by", "mm", true);
+    }
+
+	public override void arcTo(int x, int y, int r, string units = "mm")
 	{
 		setArc(x, y, r, "to", units);
 	}

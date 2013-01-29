@@ -1837,6 +1837,11 @@ public static class Myro
 		robot.moveBy (x, y, units);
 	}
 
+	public static void arc (int degrees, int radius)
+	{
+		robot.arc (degrees, radius);
+	}
+
 	public static void arcTo (int x, int y, int radius, string units = "mm")
 	{
 		robot.arcTo (x, y, radius, units);
@@ -2668,6 +2673,11 @@ public static class Myro
 		}
 
 		public virtual void moveTo (int x, int y, string units = "mm")
+		{
+      
+		}
+
+		public virtual void  arc (int degrees, int radius)
 		{
       
 		}
