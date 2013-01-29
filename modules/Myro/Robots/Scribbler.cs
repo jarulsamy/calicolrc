@@ -146,6 +146,7 @@ public class Scribbler: Myro.Robot
     static byte BY             = 4;  //Used in movement commands, by means how much you wish to move by
     static byte TO             = 2;  //Used in movement commands, to means the heading you want to turn to
     static byte DEG            = 1;  //Used in movement commands, specifies using degress instead of S2 angle units
+    static byte MM             = 1;  //Used in movement commands, specifies using degress instead of S2 angle units
 	
     static byte GET_ERRORS     = 10;  // Fluke2 only
     static byte SET_PIC_SIZE   = 11;  // Fluke2 only
@@ -259,15 +260,14 @@ public class Scribbler: Myro.Robot
         string[] dversion = dongle.Split('.');
         if (lookFor.Length != dversion.Length) return false;
         try
-        {
-            
+		{
             for (int i = 0; i < lookFor.Length; i++)
             {         
                 if (Int32.Parse(dversion[i]) > Int32.Parse(lookFor[i]))
                 {
                     return true;            
                 }
-                else if (Int32.Parse(dversion[i]) > Int32.Parse(lookFor[i]))
+                else if (Int32.Parse(dversion[i]) < Int32.Parse(lookFor[i]))
                 {
                     return false;           
                 }   
@@ -276,7 +276,7 @@ public class Scribbler: Myro.Robot
         catch
         {
         }
-        return false;
+        return true;
     }
 
     public Boolean isFluke2(){
@@ -1345,61 +1345,27 @@ public class Scribbler: Myro.Robot
             return false;
     }
 
-    public override void turnTo (int angle, string radOrDeg = "rad")
+    public override void turnTo (int angle, string units = "deg")
     {
-        setTurn(angle, "to", radOrDeg);
+        setTurn(angle, "to", units);
     }
 
-    public override void turnBy (int angle, string radOrDeg = "rad")
+    public override void turnBy (int angle, string units = "deg")
     {
-        setTurn(angle, "by", radOrDeg);
+        setTurn(angle, "by", units);
     }
 
-    public void setTurn (int angle, string turnType = "to", string radOrDeg = "rad")
+    public void setTurn (int angle, string turnType = "to", string turnUnits = "deg")
     {
-        if (turnType == "to" && radOrDeg == "rad") {
-            byte [] buffer = {Scribbler.SET_TURN, Scribbler.TO, (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
-            set (buffer);
-        } else if (turnType == "by" && radOrDeg == "rad") {
-            byte [] buffer = {Scribbler.SET_TURN, Scribbler.BY, (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};  
-            set (buffer);
-        } else if (turnType == "to" && radOrDeg == "deg") {
-            byte [] buffer = {Scribbler.SET_TURN, (byte)(Scribbler.TO + Scribbler.DEG), (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
-            set (buffer);
-        } else if (turnType == "by" && radOrDeg == "deg") {	  
-            byte [] buffer = {Scribbler.SET_TURN, (byte)(Scribbler.BY + Scribbler.DEG), (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
-            set (buffer);
-        }
-        bool scribblerBusy = true;
-        while (scribblerBusy) {	  
-            scribblerBusy = _IsInTransit ();
-            if (scribblerBusy)
-                Thread.Sleep ((int)(1));
-
-        }
-    }
-
-
-    public override void moveTo (int x, int y)
-    {
-        setMove(x, y, "to");
-    }
-
-    public override void moveBy (int x, int y)
-    {
-        setMove(x, y, "by");
-    }
-
-    public void setMove (int x, int y, string moveType = "to")
-    {
-        if (moveType == "to") {
-            byte [] buffer = {Scribbler.SET_MOVE, Scribbler.TO, (byte)((x >> 8) & 0xff), (byte)(x & 0xff),				 				  				  (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
-            set (buffer);
-        } else {
-            byte [] buffer = {Scribbler.SET_MOVE, Scribbler.BY, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
-                              (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
-            set (buffer);
-        }
+        byte units = Scribbler.DEG;
+        if (turnUnits == "s2") units = 0;
+        byte relative = Scribbler.TO;
+        if (turnType == "by") relative = Scribbler.BY;
+        
+        byte [] buffer = {Scribbler.SET_TURN, 
+                          (byte)(relative + units), 
+                          (byte)((angle >> 8) & 0xff), (byte)(angle & 0xff)};
+        set (buffer);
 
         bool scribblerBusy = true;
         while (scribblerBusy) {	  
@@ -1410,19 +1376,28 @@ public class Scribbler: Myro.Robot
         }
     }
 
-    public override void setArc (int x, int y, int radius, string arcType = "to")
+    public override void moveTo (int x, int y, string units = "mm")
     {
-        if (arcType == "to") {
-            byte [] buffer = {Scribbler.SET_ARC, Scribbler.TO, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
-                              (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
-                              (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
-            set (buffer);
-        } else {
-            byte [] buffer = {Scribbler.SET_ARC, Scribbler.BY, (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
-                              (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
-                              (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
-            set (buffer);
-        }
+        setMove(x, y, "to", units);
+    }
+
+    public override void moveBy (int x, int y, string units = "mm")
+    {
+        setMove(x, y, "by", units);
+    }
+
+    public void setMove (int x, int y, string moveType = "to", string moveUnits = "mm")
+    {
+        byte units = Scribbler.MM;
+        if (moveUnits == "s2") units = 0;
+        byte relative = Scribbler.TO;
+        if (moveType == "by") relative = Scribbler.BY;
+
+        byte [] buffer = {Scribbler.SET_MOVE, 
+                          (byte)(relative + units),
+                          (byte)((x >> 8) & 0xff), (byte)(x & 0xff),
+                          (byte)((y >> 8) & 0xff), (byte)(y & 0xff)};
+        set (buffer);
 
         bool scribblerBusy = true;
         while (scribblerBusy) {	  
@@ -1432,6 +1407,40 @@ public class Scribbler: Myro.Robot
 
         }
     }
+
+    public void setArc (int x, int y, int radius, string arcType = "to", string arcUnits = "mm")
+    {
+        byte units = Scribbler.MM;
+        if (arcUnits == "s2") units = 0;
+        byte relative = Scribbler.TO;
+        if (arcType == "by") relative = Scribbler.BY;
+
+        byte [] buffer = {Scribbler.SET_ARC, 
+                          (byte)(relative + units),
+                          (byte)((x >> 8) & 0xff), (byte)(x & 0xff), 
+                          (byte)((y >> 8) & 0xff), (byte)(y & 0xff),
+                          (byte)((radius >> 8) & 0xff), (byte)(radius & 0xff)};
+        set (buffer);
+
+        bool scribblerBusy = true;
+        while (scribblerBusy) {	  
+            scribblerBusy = _IsInTransit ();
+            if (scribblerBusy)
+                Thread.Sleep ((int)(1));
+
+        }
+    }
+
+	public override void arcTo (int x, int y, int r, string units = "mm")
+	{
+		setArc(x, y, r, "to", units);
+	}
+	
+	public override void arcBy (int x, int y, int r, string units = "mm")
+	{
+		setArc(x, y, r, "by", units);
+	}
+
 
     public override void setEndPath ()
     {

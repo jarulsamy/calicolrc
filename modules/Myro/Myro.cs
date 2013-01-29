@@ -1802,14 +1802,14 @@ public static class Myro
 		return robot.getAngle ();
 	}
   
-	public static void turnTo (int angle, string radOrDeg = "rad")
+	public static void turnTo (int angle, string units = "deg")
 	{
-		robot.turnTo (angle, radOrDeg);
+		robot.turnTo (angle, units);
 	}
 
-	public static void turnBy (int angle, string radOrDeg = "rad")
+	public static void turnBy (int angle, string units = "deg")
 	{
-		robot.turnBy (angle, radOrDeg);
+		robot.turnBy (angle, units);
 	}
 
 	public static void setPosition (uint x, uint y)
@@ -1827,19 +1827,24 @@ public static class Myro
 		robot.setBeginPath (speed);
 	}
 
-	public static void moveTo (int x, int y)
+	public static void moveTo (int x, int y, string units = "mm")
 	{
-		robot.moveTo (x, y);
+		robot.moveTo (x, y, units);
 	}
 
-	public static void moveBy (int x, int y)
+	public static void moveBy (int x, int y, string units = "mm")
 	{
-		robot.moveBy (x, y);
+		robot.moveBy (x, y, units);
 	}
 
-	public static void setArc (int x, int y, int radius, string arcType = "to")
+	public static void arcTo (int x, int y, int radius, string units = "mm")
 	{
-		robot.setArc (x, y, radius, arcType);
+		robot.arcTo (x, y, radius, units);
+	}
+
+	public static void arcBy (int x, int y, int radius, string units = "mm")
+	{
+		robot.arcBy (x, y, radius, units);
 	}
   
 	public static void setEndPath ()
@@ -2647,31 +2652,35 @@ public static class Myro
       
 		}
 
-		public virtual void turnTo (int angle, string radOrDeg = "rad")
+		public virtual void turnTo (int angle, string units = "deg")
 		{
       
 		}
 
-		public virtual void turnBy (int angle, string radOrDeg = "rad")
+		public virtual void turnBy (int angle, string units = "deg")
 		{
       
 		}
 
-		public virtual void moveBy (int x, int y)
+		public virtual void moveBy (int x, int y, string units = "mm")
 		{
       
 		}
 
-		public virtual void moveTo (int x, int y)
+		public virtual void moveTo (int x, int y, string units = "mm")
 		{
       
 		}
 
-		public virtual void setArc (int x, int y, int radius, string arcType = "to")
+		public virtual void  arcTo (int x, int y, int radius, string units = "mm")
 		{
       
 		}
 
+		public virtual void  arcBy (int x, int y, int radius, string units = "mm")
+		{
+			
+		}
 		public virtual void setEndPath ()
 		{
 		}
