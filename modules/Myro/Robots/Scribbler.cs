@@ -142,7 +142,7 @@ public class Scribbler: Myro.Robot
 
 	
     static byte BEGIN_PATH     = 0;  //Used with SET_PATH to say beginning of a path
-    static byte  END_PATH      = 1;  //Used with SET_PATH to say end of a path
+    static byte END_PATH      = 1;  //Used with SET_PATH to say end of a path
     static byte BY             = 4;  //Used in movement commands, by means how much you wish to move by
     static byte TO             = 2;  //Used in movement commands, to means the heading you want to turn to
     static byte DEG            = 1;  //Used in movement commands, specifies using degress instead of S2 angle units
@@ -1304,7 +1304,7 @@ public class Scribbler: Myro.Robot
         return (int)GetInt (buffer, 4) [0];
     }
 
-    public override void setPosition (uint x, uint y)
+    public override void setPosition (int x, int y)
     {
         byte [] buffer = { Scribbler.SET_POSN, 
                            (byte)((x >> 24) & 0xff), 
@@ -1330,11 +1330,22 @@ public class Scribbler: Myro.Robot
 
     public override void setBeginPath (int speed=7)
     {
-        write_packet (Scribbler.SET_PATH, 
-                      Scribbler.BEGIN_PATH, 
-                      0,
-                      (byte)speed);
+        byte [] buffer = {Scribbler.SET_PATH, 
+                          Scribbler.BEGIN_PATH, 
+                          0,
+                          (byte)speed};
+        set(buffer);
     }
+
+    public override void setEndPath ()
+    {
+        byte [] buffer = {Scribbler.SET_PATH, 
+                          Scribbler.END_PATH, 
+                          0,
+                          7};
+        set(buffer);
+    }
+
 
     public bool _IsInTransit ()
     {    
@@ -1440,15 +1451,6 @@ public class Scribbler: Myro.Robot
 	{
 		setArc(x, y, r, "by", units);
 	}
-
-
-    public override void setEndPath ()
-    {
-        write_packet (Scribbler.SET_PATH, 
-                      Scribbler.END_PATH, 
-                      0,
-                      7);
-    }
 
     public override void setS2Volume (int level)
     {

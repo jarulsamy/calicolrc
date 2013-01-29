@@ -1812,7 +1812,7 @@ public static class Myro
 		robot.turnBy (angle, units);
 	}
 
-	public static void setPosition (uint x, uint y)
+	public static void setPosition (int x, int y)
 	{
 		robot.setPosition (x, y);
 	}
@@ -2689,7 +2689,7 @@ public static class Myro
 		{
 		}
 
-		public virtual void setPosition (uint x, uint y)
+		public virtual void setPosition (int x, int y)
 		{
 		}
 		
