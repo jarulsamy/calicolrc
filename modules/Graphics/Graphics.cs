@@ -864,7 +864,7 @@ public static class Graphics
 				double interval_value = (max - min) / 10;
 				double sum = min;
 				for (int y = window.height - border; y >= border; y -= interval) {
-					text = new Text (new Point (border - 20, y), sum.ToString ());
+					text = new Text (new Point (border - 20, y), String.Format("{0:0.###}", sum));
 					text.outline = new Color ("black");
 					text.fontSize = 9;
 					text.tag = "tick";
