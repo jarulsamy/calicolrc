@@ -136,7 +136,8 @@ namespace Calico {
                 try {
                     manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
                 } catch {
-				  Console.Error.WriteLine("WARNING: Please restart Calico to use this language");
+		            Console.Error.WriteLine("WARNING: Please restart Calico to use this language");
+                    engine = null;
                 }
             } else {
                 scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
@@ -154,6 +155,10 @@ namespace Calico {
         }
 
         public override void PostSetup(MainWindow calico) {
+            if (engine == null) {
+                PrintLine("Please restart Calico to use this language.");
+                return;
+            }
 		  System.Reflection.Assembly assembly;
 		  // ---------------------------------------
 		  foreach (System.Reflection.AssemblyName aname in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
@@ -216,6 +221,10 @@ namespace Calico {
         }
 
         public override bool ReadyToExecute(string text) {
+            if (engine == null) {
+                PrintLine("Please restart Calico to use this language.");
+                return false;
+            }
             // If more than one line in DLR, wait for a blank line
             string [] lines = text.Split('\n');
             int line_count = lines.Length;
@@ -257,6 +266,10 @@ namespace Calico {
         public override bool Execute(string text, bool ok) {
             // This is called by RunInBackground() in the MainWindow
             //manager.calico.last_error = ""
+            if (engine == null) {
+                PrintLine("Please restart Calico to use this language.");
+                return false;
+            }
             Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
             Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
             try {

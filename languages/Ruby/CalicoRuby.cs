@@ -44,6 +44,7 @@ public class CalicoRubyEngine : DLREngine {
 		engine = manager.scriptRuntime.GetEngine(dlr_name);
 	  } catch {
 		System.Console.Error.WriteLine("ERROR: Ruby failed to start");
+		engine = null;
 	  }
 	  // Set the compiler options here:
 	  if (engine != null)
@@ -51,6 +52,14 @@ public class CalicoRubyEngine : DLREngine {
 	  //IronRuby.Compiler.RubyCompilerOptions options = (IronRuby.Compiler.RubyCompilerOptions)compiler_options;
 	  // set some ruby options
     }
+
+        public override void PostSetup(MainWindow calico) {
+			base.PostSetup(calico);
+            // Set up input
+	    // "require 'stringio'; ostdout = $stdout; $stdout = fake = StringIO.new; $stdout = ostdout", 
+            Execute("$:.unshift File.join('/home/dblank/Calico/trunk/modules/'); 'Ruby Loaded'",
+		    false);
+	}
 }
 
 public class CalicoRubyDocument : TextDocument {
