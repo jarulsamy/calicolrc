@@ -156,10 +156,8 @@ namespace Calico {
                 "del division, with_statement, print_function, _sys", false);
 
 
+            configureIO();
 
-            if (! Debug) {
-                manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
-            }
             // Run this in in the GUI thread, after we start:
             Gtk.Application.Invoke(delegate {
                 manager.PostSetup(this); });
@@ -329,6 +327,24 @@ namespace Calico {
             butterfly.Image = animationImages [0];
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        void configureIO()
+        {
+            if (! Debug) {
+                CustomStream nout = new CustomStream(this, Tag.Normal);
+                CustomStream nerr = new CustomStream(this, Tag.Error);
+                manager.SetRedirects(nout, nerr);
+
+                StreamWriter swout = new StreamWriter(nout);
+                swout.AutoFlush = true;
+                Console.SetOut(swout);
+                
+                StreamWriter swerr = new StreamWriter(nerr);
+                swerr.AutoFlush = true;
+                Console.SetError(swerr);
+            }
+
         }
 
         void HandlePopulatePopup (object o, Gtk.PopulatePopupArgs args)
@@ -2464,9 +2480,8 @@ namespace Calico {
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
                                              "import sys as _sys; _sys.setrecursionlimit(1000);" +
                                              "del division, with_statement, print_function, _sys", false);
-	    if (! Debug) {
-		manager.SetRedirects(new CustomStream(this, Tag.Normal), new CustomStream(this, Tag.Error));
-	    }
+            configureIO();
+
             manager.PostSetup(this);
             Print(Tag.Info, "Shell reset!\n");
         }

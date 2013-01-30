@@ -41,6 +41,10 @@ namespace Calico {
 	    window.Print(tag, text);
         }
 
+        public override void WriteByte(Byte b){
+            Write(new byte[] {b}, 0, 1);
+        }
+
         public void PrintLine(string text) {
             window.Print(tag, text + "\n");
         }
