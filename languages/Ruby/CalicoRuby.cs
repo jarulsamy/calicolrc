@@ -60,7 +60,7 @@ public class CalicoRubyEngine : DLREngine {
 	    DirectoryInfo dir = new System.IO.DirectoryInfo(
 				    System.IO.Path.Combine(calico.path, 
 							   System.IO.Path.Combine("..", "modules")));
-            Execute(String.Format("$:.unshift File.join({0}); 'Ruby Loaded'", dir),
+            Execute(String.Format("$:.unshift File.join('{0}'); 'Ruby Loaded'", dir),
 		    false);
 	}
 }
