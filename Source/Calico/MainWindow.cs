@@ -29,21 +29,45 @@ using Calico;
 namespace Calico {
     public class ToolWindow : Gtk.Window {
         MainWindow calico;
-
+        Gtk.Notebook nb;
         public ToolWindow(string title, MainWindow calico) :
                 base(title) {
             this.calico = calico;
-        }
             
-        protected override bool OnDeleteEvent(Gdk.Event e) {
-            calico.NotebookPane.Unparent();
+            Gtk.VBox box = new Gtk.VBox (false, 4);
+            nb = new Gtk.Notebook();
+            nb.GroupId = 0;
+
+            box.PackStart(nb);
+            Add(box);
+            ShowAll();
+        }
+
+        public void Close()            
+        {
+            int numPages = nb.NPages;
+            for (int i = 0; i < numPages; i++){ 
+                Gtk.Widget page = nb.GetNthPage(0);
+                Gtk.Widget l = nb.GetTabLabel(page);
+                nb.RemovePage(0);
+                calico.ToolNotebook.AppendPage(page, l);
+                calico.ToolNotebook.SetTabReorderable(page, true);
+                calico.ToolNotebook.SetTabDetachable(page, true);
+            }
+
+            this.Hide();
+            calico.tool_window = null;
+          
+            /*calico.NotebookPane.Unparent();
             if (calico.VPaned2.Child2 == null) {
                 calico.VPaned2.Add2(calico.NotebookPane);
             } else {
                 calico.VPaned2.Add1(calico.NotebookPane);
-            }
-            this.Hide();
-            calico.tool_window = null;
+            } */           
+        }
+            
+        protected override bool OnDeleteEvent(Gdk.Event e) {
+            Close();
             return true;
         }   
         
@@ -79,7 +103,7 @@ namespace Calico {
         public Chat connection;
         int animationSequence = 0;
         Gtk.Image[] animationImages = new Gtk.Image [2];
-        public Gtk.Window tool_window = null;
+        public ToolWindow tool_window = null;
 
 
         public static MainWindow _mainWindow = null;
@@ -324,10 +348,11 @@ namespace Calico {
             // All done, show if minimized:
             ToolNotebook.GroupId = 0;
             DocumentNotebook.GroupId=0 ;
-            DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(0), true);
-            DocumentNotebook.SetTabDetachable(DocumentNotebook.GetNthPage(0), true);  // main window
-            DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(1), true);
-            DocumentNotebook.SetTabDetachable(DocumentNotebook.GetNthPage(1), true);  // shell window
+            // main & shell window
+            for (int i = 0; i < DocumentNotebook.NPages; i++){
+                DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(i), true);
+                DocumentNotebook.SetTabDetachable(DocumentNotebook.GetNthPage(i), true);  
+            }
             // output window
             for (int i = 0; i < ToolNotebook.NPages; i++){
                 ToolNotebook.SetTabReorderable(ToolNotebook.GetNthPage(i), true);
@@ -3086,21 +3111,22 @@ namespace Calico {
             Gtk.Application.Invoke(delegate {
                 if (tool_window == null) {
                     tool_window = new ToolWindow("Calico Tools", this);
-                    NotebookPane.Reparent(tool_window);
+                    //NotebookPane.Reparent(tool_window);
                     int width, height;
                     this.GetSize(out width, out height);
-                    //tool_window.SetSizeRequest(width, height);
-                    tool_window.SetDefaultSize(width, height);
+                    tool_window.SetSizeRequest(width, height);
+                    /*tool_window.SetDefaultSize(width, height);*/
                     tool_window.Show();
                 } else {
-                    NotebookPane.Unparent();
+                    tool_window.Close();
+                    /*                    NotebookPane.Unparent();
                     if (vpaned2.Child2 == null) {
                         vpaned2.Add2(NotebookPane);
                     } else {
                         vpaned2.Add1(NotebookPane);
                     }
                     tool_window.Hide();
-                    tool_window = null;
+                    tool_window = null;*/
                 }
             });
             // else put back
