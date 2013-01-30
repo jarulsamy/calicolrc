@@ -330,6 +330,8 @@ namespace Calico {
                 animationImages [c++] = new Gtk.Image(file);
             }
             butterfly.Image = animationImages [0];
+            this.KeepAbove = false;
+
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
         }
