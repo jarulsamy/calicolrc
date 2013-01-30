@@ -81,6 +81,9 @@ namespace Calico {
         Gtk.Image[] animationImages = new Gtk.Image [2];
         public Gtk.Window tool_window = null;
 
+
+        public static MainWindow _mainWindow = null;
+
         enum TargetType {
             String,
             RootWindow,
@@ -99,6 +102,7 @@ namespace Calico {
 
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
                 base(Gtk.WindowType.Toplevel) {
+            _mainWindow = this;
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));
             this.config = config;
             this.Debug = Debug;
@@ -318,6 +322,18 @@ namespace Calico {
             //     target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
             //StartButton.DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
             // All done, show if minimized:
+            ToolNotebook.GroupId = 0;
+            DocumentNotebook.GroupId=0 ;
+            DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(0), true);
+            DocumentNotebook.SetTabDetachable(DocumentNotebook.GetNthPage(0), true);  // main window
+            DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(1), true);
+            DocumentNotebook.SetTabDetachable(DocumentNotebook.GetNthPage(1), true);  // shell window
+            // output window
+            for (int i = 0; i < ToolNotebook.NPages; i++){
+                ToolNotebook.SetTabReorderable(ToolNotebook.GetNthPage(i), true);
+                ToolNotebook.SetTabDetachable(ToolNotebook.GetNthPage(i), true);  
+            }
+
             this.Present();
             // End of GUI setup
             // Load images for animation:
@@ -1045,6 +1061,7 @@ namespace Calico {
                 int page_num = DocumentNotebook.AppendPage(page.widget, page.tab_widget);
                 documents [page.widget] = page;
                 DocumentNotebook.SetTabReorderable(page.widget, true);
+                DocumentNotebook.SetTabDetachable(page.widget, true);                
                 DocumentNotebook.CurrentPage = page_num;
                 page.close_button.Clicked += delegate {
                     TryToClose(page); };
@@ -2950,7 +2967,7 @@ namespace Calico {
             Dictionary<string,Gtk.Entry> entries = new Dictionary<string,Gtk.Entry>();
             Dictionary<string,string > responses = null;
             Invoke(delegate {
-                Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                Gtk.MessageDialog fc = new Gtk.MessageDialog(_mainWindow,
                                        0, Gtk.MessageType.Question,
                                        Gtk.ButtonsType.OkCancel,
                                        title);
