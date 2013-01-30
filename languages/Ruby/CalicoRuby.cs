@@ -57,7 +57,10 @@ public class CalicoRubyEngine : DLREngine {
 			base.PostSetup(calico);
             // Set up input
 	    // "require 'stringio'; ostdout = $stdout; $stdout = fake = StringIO.new; $stdout = ostdout", 
-            Execute("$:.unshift File.join('/home/dblank/Calico/trunk/modules/'); 'Ruby Loaded'",
+	    DirectoryInfo dir = new System.IO.DirectoryInfo(
+				    System.IO.Path.Combine(calico.path, 
+							   System.IO.Path.Combine("..", "modules")));
+            Execute(String.Format("$:.unshift File.join({0}); 'Ruby Loaded'", dir),
 		    false);
 	}
 }
