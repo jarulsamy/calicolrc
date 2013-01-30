@@ -242,7 +242,6 @@ namespace Calico {
                 } else {
                     Application.Init();
                     new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
-
                 }
                 //rs.Show();
             } else if (((IList<string>)args).Contains("--repl")) {

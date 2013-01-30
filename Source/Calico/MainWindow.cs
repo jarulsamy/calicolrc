@@ -93,7 +93,7 @@ namespace Calico {
              new Gtk.TargetEntry ("text/uri-list", 0, (uint) TargetType.Filename),
         //new Gtk.TargetEntry ("application/x-rootwindow-drop", 0, (uint) TargetType.RootWindow)
          };
-
+        
         public MainWindow(): base(Gtk.WindowType.Toplevel) {
         }
 
@@ -131,8 +131,13 @@ namespace Calico {
             tagnames [Tag.Normal] = "normal";
             tags [Tag.Normal] = new Gtk.TextTag("normal");
             tags [Tag.Normal].Foreground = "black";
+
+            
+            //this.TypeHint = Gdk.WindowTypeHint.Normal;
             // Build the GUI:
             Build();
+            this.KeepAbove = true;
+
             Gtk.Application.Invoke(delegate {
                 gui_thread_id = Thread.CurrentThread.ManagedThreadId; });
             PostBuild();
