@@ -1276,43 +1276,71 @@ def play(player1, player2):
 def makeWindow(size):
     window = Graphics.Window("Chess", size, size)
     for x in range(8):
+        for y in range(8):
+            r = Graphics.Rectangle((x * size/8, y * size/8),
+                                   ((x + 1) * size/8, (y + 1) * size/8))
+            if ((x % 2 == 0 and y % 2 == 0) or
+                (x % 2 == 1 and y % 2 == 1)):
+                r.color = Graphics.Color("white")
+            else:
+                r.color = Graphics.Color("gray")
+            r.draw(window)
+    for x in range(8):
         line = Graphics.Line((x * size/8, 0), (x * size/8, size))
         line.draw(window)
     for y in range(8):
         line = Graphics.Line((0, y * size/8), (size, y * size/8))
         line.draw(window)
-    chess_set = Graphics.Picture("../../images/chess_set.png")
-    row = 0
-    col = 0
     images = {}
     for x,w,piece in ((0,70,"king"), (140,80,"queen"), (300,60,"rook"),
                       (440,514-440,"bishop"), (590,662-590,"knight"), (750,50,"pawn")):
-        col = 0
         for y,color in ((0, "black"), (125, "white")):
-            image = chess_set.getRegion((x, y), w, 80)
-            images[(piece, color)] = image
-            col += 1
-        row += 1
-    for piece in ("rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"):
-        col = 0
-        for color,y in (("white", (size/8)/2), ("black", size - (size/8)/2)):
-            image = images[(piece, color)]
-            image.x = (col * size/8) + (size/8)/2
-            image.y = y
-            image.draw(window)
-            col += 1
-    return window
+            images[(piece, color)] = (x, y, w, 80)
+    return window, images
 
-def display(window, board):
+def displayBoard(window, board, images, count):
     size = window.width
+    chess_set = Graphics.Picture("../../images/chess_set.png")
+    map = {"r": ("rook", "black"),
+           "n": ("knight", "black"),
+           "b": ("bishop", "black"),
+           "q": ("queen", "black"),
+           "k": ("king", "black"),
+           "p": ("pawn", "black"),
+           "R": ("rook", "white"),
+           "N": ("knight", "white"),
+           "B": ("bishop", "white"),
+           "Q": ("queen", "white"),
+           "K": ("king", "white"),
+           "P": ("pawn", "white")}
+    even = (count % 2) == 0
+    for col in range(8):
+        for row in range(8):
+            if board.board[row][col] != ' ':
+                x, y, w, h = images[map[board.board[row][col]]]
+                image = chess_set.getRegion((x, y), w, h)
+                if even:
+                    image.tag = "piece-even"
+                else:
+                    image.tag = "piece-odd"
+                image.border = 0
+                image.x = (col * size/8) + (size/8)/2
+                image.y = (row * size/8) + (size/8)/2
+                image.draw(window)
+    if even:
+        window.removeTagged("piece-odd")
+    else:
+        window.removeTagged("piece-even")
 
 def gplay(player1, player2):
     state = State('w')
     board = ChessBoard()
     size = 600
-    window = makeWindow(size)
+    window, images = makeWindow(size)
+    count = 0
+    displayBoard(window, board, images, count)
     while state.game_result == 0:
-        display(window, board)
+        count += 1
         moves = board.getMoves(state)
         if moves:
             if state.player == 'w':
@@ -1324,12 +1352,12 @@ def gplay(player1, player2):
                   (state.player, board.board[fromPos[1]][fromPos[0]],
                    fromPos, toPos))
             board.makeMove(state, fromPos, toPos)
+            displayBoard(window, board, images, count)
             if state.game_result == 0:
                 state.player = board.getOtherPlayer(state)
                 board.checkStatus(state)
         else:
             print("No moves!")
             break
-
 
 gplay(randomPlayer, randomPlayer)

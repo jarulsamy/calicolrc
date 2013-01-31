@@ -1184,6 +1184,19 @@ public static class Graphics
 			ShowAll ();
 		}
 		
+		public void removeTagged(String tag) {
+		    List to_remove = new List ();
+		    lock (_canvas.shapes) {
+			foreach (Shape shape in _canvas.shapes) {
+			    if (shape.tag == tag)
+				to_remove.Add (shape);
+			}
+			foreach (Shape shape in to_remove) {
+			    _canvas.shapes.Remove (shape);
+			}
+		    }
+		}
+		
 		public void addScrollbars(int width, int height) {
 			if (Child == _canvas) {
 				Invoke( delegate {
