@@ -25,6 +25,7 @@
 
 from copy import deepcopy
 import random
+import Graphics
 
 def printReason(game_result):
     # Reason values
@@ -1272,4 +1273,63 @@ def play(player1, player2):
             print("No moves!")
             break
 
-play(randomPlayer, randomPlayer)
+def makeWindow(size):
+    window = Graphics.Window("Chess", size, size)
+    for x in range(8):
+        line = Graphics.Line((x * size/8, 0), (x * size/8, size))
+        line.draw(window)
+    for y in range(8):
+        line = Graphics.Line((0, y * size/8), (size, y * size/8))
+        line.draw(window)
+    chess_set = Graphics.Picture("../../images/chess_set.png")
+    row = 0
+    col = 0
+    images = {}
+    for x,w,piece in ((0,70,"king"), (140,80,"queen"), (300,60,"rook"),
+                      (440,514-440,"bishop"), (590,662-590,"knight"), (750,50,"pawn")):
+        col = 0
+        for y,color in ((0, "black"), (125, "white")):
+            image = chess_set.getRegion((x, y), w, 80)
+            images[(piece, color)] = image
+            col += 1
+        row += 1
+    for piece in ("rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"):
+        col = 0
+        for color,y in (("white", (size/8)/2), ("black", size - (size/8)/2)):
+            image = images[(piece, color)]
+            image.x = (col * size/8) + (size/8)/2
+            image.y = y
+            image.draw(window)
+            col += 1
+    return window
+
+def display(window, board):
+    size = window.width
+
+def gplay(player1, player2):
+    state = State('w')
+    board = ChessBoard()
+    size = 600
+    window = makeWindow(size)
+    while state.game_result == 0:
+        display(window, board)
+        moves = board.getMoves(state)
+        if moves:
+            if state.player == 'w':
+                fromPos, toPos = player2(board, state, moves)
+            else:
+                fromPos, toPos = player1(board, state, moves)
+
+            print("%s moves %s from %s to %s" %
+                  (state.player, board.board[fromPos[1]][fromPos[0]],
+                   fromPos, toPos))
+            board.makeMove(state, fromPos, toPos)
+            if state.game_result == 0:
+                state.player = board.getOtherPlayer(state)
+                board.checkStatus(state)
+        else:
+            print("No moves!")
+            break
+
+
+gplay(randomPlayer, randomPlayer)
