@@ -27,36 +27,35 @@ using System.Collections.Generic;
 using Calico;
 
 namespace Calico {
-    public class ToolWindow : Gtk.Window {
+    public class AuxWindow : Gtk.Window {
         MainWindow calico;
-        Gtk.Notebook nb;
-        public ToolWindow(string title, MainWindow calico) :
-                base(title) {
+        public Gtk.Notebook AuxNotebook;
+        public AuxWindow(string title, MainWindow calico) : base(title) {
             this.calico = calico;
             
             Gtk.VBox box = new Gtk.VBox (false, 4);
-            nb = new Gtk.Notebook();
-            nb.GroupId = 0;
+            AuxNotebook = new Gtk.Notebook();
+            AuxNotebook.GroupId = 0;
 
-            box.PackStart(nb);
+            box.PackStart(AuxNotebook);
             Add(box);
             ShowAll();
         }
 
         public void Close()            
         {
-            int numPages = nb.NPages;
+            int numPages = AuxNotebook.NPages;
             for (int i = 0; i < numPages; i++){ 
-                Gtk.Widget page = nb.GetNthPage(0);
-                Gtk.Widget l = nb.GetTabLabel(page);
-                nb.RemovePage(0);
+                Gtk.Widget page = AuxNotebook.GetNthPage(0);
+                Gtk.Widget l = AuxNotebook.GetTabLabel(page);
+                AuxNotebook.RemovePage(0);
                 calico.ToolNotebook.AppendPage(page, l);
                 calico.ToolNotebook.SetTabReorderable(page, true);
                 calico.ToolNotebook.SetTabDetachable(page, true);
             }
 
             this.Hide();
-            calico.tool_window = null;
+            calico.aux_window = null;
           
             /*calico.NotebookPane.Unparent();
             if (calico.VPaned2.Child2 == null) {
@@ -101,7 +100,7 @@ namespace Calico {
         public Chat connection;
         int animationSequence = 0;
         Gtk.Image[] animationImages = new Gtk.Image [2];
-        public ToolWindow tool_window = null;
+        public AuxWindow aux_window = null;
 
 
         public static MainWindow _mainWindow = null;
@@ -2163,24 +2162,62 @@ namespace Calico {
             }
         }
 
-        private int findTab(Gtk.Notebook nb, string name)
+        public void movePage(Gtk.Notebook src, int idx, Gtk.Notebook dst) {
+            if (idx < 0) return;
+            Gtk.Widget page = src.GetNthPage(idx);
+            Gtk.Widget l = src.GetTabLabel(page);
+            src.RemovePage(idx);
+            dst.AppendPage(page, l);
+            dst.SetTabReorderable(page, true);
+            dst.SetTabDetachable(page, true);            
+        }
+
+
+        public void movePage(string name, Gtk.Notebook dst) {
+            int idx = findTab(name);
+            if (idx != -1)
+            {                
+                Gtk.Notebook nb = findNotebook(name);
+                movePage(nb, idx, dst);
+            }
+        }          
+
+        private int findTab(string name)
         {
-            for (int page_num = 0; page_num < nb.NPages; page_num++) {
+            int idx = -1;
+            idx = findTab(DocumentNotebook, name);
+            if (idx != -1) return idx;
+
+            idx = findTab(ToolNotebook, name);
+            if (idx != -1) return idx;
+
+            if (aux_window != null)  idx = findTab(aux_window.AuxNotebook, name);
+            return idx;
+        }
+
+        private int findTab(Gtk.Notebook nb, string name)
+        {            
+            for (int page_num = 0; page_num < nb.NPages; page_num++)
+            {          
                 Gtk.Widget page = nb.GetNthPage(page_num);
                 if (nb.GetTabLabelText(page) == name) return page_num;
             }
             return -1;
         }
+
+        private Gtk.Notebook findNotebook(string name)
+        {            
+            if (findTab(DocumentNotebook, name) != -1) return DocumentNotebook;
+            if (findTab(ToolNotebook, name) != -1) return ToolNotebook;
+            if (aux_window != null && findTab(aux_window.AuxNotebook, name) != -1) return aux_window.AuxNotebook;
+            return null;
+        }
+        
         public void switchToShell()
         {
-            int idx = findTab(DocumentNotebook, "Shell");
-            if (idx != -1) 
-                DocumentNotebook.Page = idx;
-            else
-            {
-                idx = findTab(ToolNotebook, "Shell");
-                if (idx != -1) ToolNotebook.Page = idx;
-            }            
+            Gtk.Notebook nb = findNotebook("Shell");
+            int idx = findTab("Shell");
+            nb.Page = idx;
         }
         
         protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
@@ -3126,24 +3163,28 @@ namespace Calico {
             // If output tabs are in pane:
             // Create new window, unparent output tabs etc, and show
             Gtk.Application.Invoke(delegate {
-                if (tool_window == null) {
-                    tool_window = new ToolWindow("Calico Tools", this);
-                    //NotebookPane.Reparent(tool_window);
-                    int width, height;
+                if (aux_window == null) {
+                    aux_window = new AuxWindow("Calico Tools", this);
+
+                    movePage("Output", aux_window.AuxNotebook);
+                    movePage("Shell", ToolNotebook);
+                    
+                    //NotebookPane.Reparent(aux_window);
+                                 int width, height;
                     this.GetSize(out width, out height);
-                    tool_window.SetSizeRequest(width, height);
-                    /*tool_window.SetDefaultSize(width, height);*/
-                    tool_window.Show();
+                    aux_window.SetSizeRequest(width, height);
+                    /*aux_window.SetDefaultSize(width, height);*/
+                    aux_window.Show();
                 } else {
-                    tool_window.Close();
+                    aux_window.Close();
                     /*                    NotebookPane.Unparent();
                     if (vpaned2.Child2 == null) {
                         vpaned2.Add2(NotebookPane);
                     } else {
                         vpaned2.Add1(NotebookPane);
                     }
-                    tool_window.Hide();
-                    tool_window = null;*/
+                    aux_window.Hide();
+                    aux_window = null;*/
                 }
             });
             // else put back
@@ -3151,7 +3192,7 @@ namespace Calico {
 
         protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
             Gtk.Application.Invoke(delegate {
-                if (tool_window == null) { // Good, only do swap if in window
+                if (aux_window == null) { // Good, only do swap if in window
                     if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
                         vpaned2.Remove(NotebookPane);
                         vpaned2.Remove(notebook_docs);
@@ -3183,7 +3224,7 @@ namespace Calico {
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
             Gtk.Application.Invoke(delegate {
-                if (tool_window == null) { // Good, only do swap if in window
+                if (aux_window == null) { // Good, only do swap if in window
                     if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
                         // swap:
                         hpaned1.Remove(NotebookPane);
