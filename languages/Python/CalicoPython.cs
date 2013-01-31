@@ -148,7 +148,8 @@ namespace CalicoPython
                 //"clr.AddReference('Myro');" +
                 "from Myro import ask;" +
                 "__builtins__['input'] = ask;" +
-				"del __builtins__['raw_input'];" +
+                "__builtins__['raw_input'] = ask;" +
+				//"del __builtins__['raw_input'];" +
                 "del ask;", false);
 		}
 	}
