@@ -570,20 +570,27 @@ namespace Calico {
         public Gtk.VPaned VPaned2 {
             get { return vpaned2; }
         }
-        
+
         public Document CurrentDocument {
             get {
-                int page_num = DocumentNotebook.Page;
-                if (page_num > 1) {
-                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget)) {
-                        return documents [widget];
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
+                Document d = null;
+                int page_num = DocumentNotebook.Page;                
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))
+                {
+                    return documents [widget];
                 }
+
+                page_num = ToolNotebook.Page;
+                widget = ToolNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))  return documents [widget];
+                if (aux_window != null)
+                {
+                    page_num = aux_window.AuxNotebook.Page;
+                    widget = aux_window.AuxNotebook.GetNthPage(page_num);
+                    if (widget != null && documents.ContainsKey(widget)) return documents [widget];
+                }
+                return null;
             }
         }
 
@@ -621,16 +628,19 @@ namespace Calico {
 
         public Document this [int page_num] {
             get {
-                if (page_num > 1) {
-                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget)) {
-                        return documents [widget];
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
+                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))  return documents [widget];
+               
+                page_num = ToolNotebook.Page;
+                widget = ToolNotebook.GetNthPage(page_num);
+                if (documents.ContainsKey(widget))  return documents [widget];
+                if (aux_window != null)
+                {
+                    page_num = aux_window.AuxNotebook.Page;
+                    widget = aux_window.AuxNotebook.GetNthPage(page_num);
+                    if (documents.ContainsKey(widget)) return documents [widget];
                 }
+                return null;
             }
         }
 
@@ -1046,18 +1056,17 @@ namespace Calico {
             // if already open, select it
             bool add_it = true;
             if (filename != null) {
-                // Page 0 is the Help page; Page 1 is Shell
-                for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
-                    Gtk.Widget npage = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(npage)) {
-                        Document npage_document = documents [npage];
-                        if (npage_document.filename == filename) {
-                            DocumentNotebook.CurrentPage = page_num;
-                            add_it = false;
-                            break;
+                foreach (KeyValuePair<Gtk.Widget, Document> d in documents) {
+                        Document npage_document = d.Value;
+                        if (npage_document.filename == filename)
+                        {                                       
+                            int i = findTabByWidget(d.Key);
+                            Gtk.Notebook nb = findNotebookByWidget(d.Key);
+                            nb.CurrentPage = i;
+                            return false;
                         }
-                    }
                 }
+           
                 if (page == null) {
                     if (language == null) {
                         language = manager.GetLanguageFromExtension(filename);
@@ -1365,7 +1374,7 @@ namespace Calico {
         }
 
         public bool FileSavedAs(Document doc, string filename) {
-            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
+            for (int page_num = 0; page_num < DocumentNotebook.NPages; page_num++) {
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                 if (documents.ContainsKey(widget)) {
                     if (documents [widget].filename == filename && documents [widget] != doc) {
@@ -1573,7 +1582,8 @@ namespace Calico {
                 // Shell or Text Editor
                 string language = "python";
                 string line_comment = "##";
-                if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+                if (Focus == Shell) {
+                //if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                     language = ShellLanguage;
                 } else {
                     language = CurrentLanguage;
@@ -1612,7 +1622,8 @@ namespace Calico {
             if (Focus is Mono.TextEditor.TextEditor) {
                 string language = "python";
                 string line_comment = "##";
-                if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+                //if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+                if (Focus == Shell){
                     language = ShellLanguage;
                 } else {
                     language = CurrentLanguage;
@@ -1659,7 +1670,8 @@ namespace Calico {
                                                      searchEntry.Entry.Text.Length);
                         CurrentDocument.SearchMore(searchEntry.Entry.Text);
                         args.RetVal = true;
-                    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+                    } else if (Focus == Shell){
+                      //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                         if (history.SearchMore(searchEntry.ActiveText)) {
                             Shell.Text = history.update();
                             UpdateUpDownArrows();
@@ -1669,7 +1681,9 @@ namespace Calico {
                     if (CurrentDocument != null) {
                         CurrentDocument.SearchNext(searchEntry.ActiveText);
                         args.RetVal = true;
-                    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+                    } else if (Focus == Shell){
+                      //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+
                         if (history.SearchPrevious(searchEntry.ActiveText)) {
                             Shell.Text = history.update();
                             UpdateUpDownArrows();
@@ -2131,7 +2145,8 @@ namespace Calico {
                     StartAction.Sensitive = false;
                 }
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            } //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            else if (Focus == Shell){
                 ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
@@ -2182,6 +2197,20 @@ namespace Calico {
             }
         }          
 
+        private int findTabByWidget(Gtk.Widget w) {
+            string s = DocumentNotebook.GetTabLabelText (w);
+            if (s == null) return -1;
+            else return findTab(s);
+        }
+
+        private Gtk.Notebook findNotebookByWidget(Gtk.Widget w) {
+            if (DocumentNotebook.GetTabLabelText (w) == null) return DocumentNotebook;
+            if (ToolNotebook.GetTabLabelText (w) == null) return ToolNotebook;
+            if (aux_window != null  && 
+                aux_window.AuxNotebook.GetTabLabelText (w) == null) return aux_window.AuxNotebook;
+            return null;
+        }
+        
         private int findTab(string name)
         {
             int idx = -1;
@@ -2273,7 +2302,8 @@ namespace Calico {
                     ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Run file]\n");
                     //}
                 }
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            } else if (Focus == Shell){
+                //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 string text = Shell.Document.Text;
                 history.last(text.TrimEnd());
                 ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
@@ -2479,11 +2509,8 @@ namespace Calico {
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
-            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
-                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                if (documents.ContainsKey(widget)) {
-                    documents [widget].UpdateZoom();
-                }
+            foreach (KeyValuePair<Gtk.Widget, Document> d in documents) {
+                d.Value.UpdateZoom();
             }
         }
 
@@ -2492,12 +2519,9 @@ namespace Calico {
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
-            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
-                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                if (documents.ContainsKey(widget)) {
-                    documents [widget].DefaultZoom();
-                    documents [widget].UpdateZoom();
-                }
+            foreach (KeyValuePair<Gtk.Widget, Document> d in documents) {                
+                d.Value.DefaultZoom();
+                d.Value.UpdateZoom();
             }
         }
 
@@ -2508,29 +2532,23 @@ namespace Calico {
             Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
             ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
-            for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
-                Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                if (documents.ContainsKey(widget)) {
-                    documents [widget].ZoomIn();
-                    documents [widget].UpdateZoom();
-                }
-            }
+            foreach (KeyValuePair<Gtk.Widget, Document> d in documents) {                
+                d.Value.ZoomIn();
+                d.Value.UpdateZoom();
+            }            
         }
 
         protected void OnZoomOutActionActivated(object sender, System.EventArgs e) {
             if (((int)config.GetValue("config", "font-size")) > 5 * 1024) {
                 config.SetValue("config", "font-size",
-                    ((int)config.GetValue("config", "font-size")) - 1024);
+                                ((int)config.GetValue("config", "font-size")) - 1024);
                 Shell.Options.FontName = GetFont().ToString();
                 Output.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
                 ChatOutput.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
                 ChatCommand.ModifyFont(Pango.FontDescription.FromString(Shell.Options.FontName));
-                for (int page_num = 2; page_num < DocumentNotebook.NPages; page_num++) {
-                    Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
-                    if (documents.ContainsKey(widget)) {
-                        documents [widget].ZoomOut();
-                        documents [widget].UpdateZoom();
-                    }
+                foreach (KeyValuePair<Gtk.Widget, Document> d in documents) {                
+                    d.Value.ZoomOut();
+                    d.Value.UpdateZoom();
                 }
             }
         }
@@ -2801,7 +2819,8 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchStop();
                 CurrentDocument.widget.Child.GrabFocus();
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            } else if (Focus == Shell) {
+              //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 Shell.GrabFocus();
             }
         }
@@ -2910,7 +2929,8 @@ namespace Calico {
         protected void OnSearchEntryChanged(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchMore(searchEntry.ActiveText);
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            } //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            else if (Focus == Shell){
                 if (history.SearchMore(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
@@ -2921,7 +2941,8 @@ namespace Calico {
         protected void OnSearchNextButtonClicked(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchNext(searchEntry.ActiveText);
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            }else if (Focus == Shell){
+            //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
@@ -2933,7 +2954,8 @@ namespace Calico {
         protected void OnSearchPrevButtonClicked(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchPrevious(searchEntry.ActiveText);
-            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            } else if (Focus == Shell){
+                //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
