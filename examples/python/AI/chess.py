@@ -1167,14 +1167,6 @@ class ChessBoard(object):
                 state.endGame(self.THREE_REPETITION_RULE)
         printReason(state.game_result)
 
-def randomPlayer(board, state, moves):
-    # moves is a list of [(from, piece, moves), ...]
-    # [((0, 1), 'P', [(0, 2), (0, 3)]), ...]
-    selection = random.choice(moves)
-    fromPos = selection[0]
-    toPos = random.choice(selection[2])
-    return fromPos, toPos
-
 def makeWindow(size):
     window = Graphics.Window("Chess", size, size)
     for x in range(8):
@@ -1202,6 +1194,7 @@ def makeWindow(size):
 
 def displayBoard(window, board, images, count):
     size = window.width
+    #chess_set = Graphics.Picture("/usr/local/lib/Calico/examples/images/chess_set.png")
     chess_set = Graphics.Picture("../../images/chess_set.png")
     map = {"r": ("rook", "black"),
            "n": ("knight", "black"),
@@ -1235,6 +1228,8 @@ def displayBoard(window, board, images, count):
         window.removeTagged("piece-even")
 
 def gplay(player1, player2):
+    # player1 is black
+    # player2 is white
     state = State('w')
     board = ChessBoard()
     size = 600
@@ -1263,6 +1258,8 @@ def gplay(player1, player2):
             break
 
 def play(player1, player2):
+    # player1 is black
+    # player2 is white
     state = State('w')
     board = ChessBoard()
     print(board)
@@ -1285,8 +1282,88 @@ def play(player1, player2):
             print("No moves!")
             break
 
+def randomPlayer1(board, state, moves):
+    """
+    This is a bad random player... first it picks a
+    piece, then selects from one of its moves. This
+    does not give ever move an equal chance of being
+    picked.
+    """
+    # moves is a list of [(from, piece, moves), ...]
+    # [((0, 1), 'P', [(0, 2), (0, 3)]), ...]
+    selection = random.choice(moves)
+    fromPos = selection[0]
+    toPos = random.choice(selection[2])
+    return fromPos, toPos
+
+def randomPlayer2(board, state, moves):
+    """
+    This is a better random player, in that at least
+    every move has an equal chance of being made.
+    """
+    # moves is a list of [(from, piece, moves), ...]
+    # [((0, 1), 'P', [(0, 2), (0, 3)]), ...]
+    tofrom = []
+    for move in moves:
+        fromPos = move[0]
+        for toPos  in move[2]:
+            tofrom.append((fromPos, toPos))
+    selection = random.choice(tofrom)
+    fromPos = selection[0]
+    toPos = selection[1]
+    return fromPos, toPos
+
+def player1(board, state, moves):
+    """
+    This player uses a static analysis of the board
+    to pick a winning move.
+    """
+    # moves is a list of [(from, piece, moves), ...]
+    # [((0, 1), 'P', [(0, 2), (0, 3)]), ...]
+    # Firs, get a list of all moves:
+    tofrom = []
+    for move in moves:
+        fromPos = move[0]
+        for toPos  in move[2]:
+            tofrom.append([fromPos, toPos, 0]) # place for score
+    # Now, we go through and try each one on the board
+    # and see what the results are:
+    for move in tofrom:
+        fromPos, toPos, score = move
+        newboard = deepcopy(board)
+        newstate = deepcopy(state)
+        newboard.makeMove(newstate, fromPos, toPos)
+        # go through board and return a score
+        move[2] = staticAnalysis(newboard, newstate)
+    tofrom.sort(key=lambda move: move[2]) # sort on score
+    # return the highest from, to:
+    return tofrom[-1][0], tofrom[-1][1]
+
+def staticAnalysis(board, state):
+    """
+    This is given a board and state of what would happen
+    if you made a particular move.
+    """
+    print("Static analysis")
+    print("State.player:", state.player)
+    print(board)
+    score = random.random() # small random value
+    for x in range(8):
+        for y in range(8):
+            color = board.getColor(x, y)
+            piece = board.board[y][x].upper()
+            if color == state.player:
+                score += 1 # one of my pieces
+            elif color == ' ':
+                pass       # an empty place
+            else:
+                score -= 1 # the other player
+    print(score)
+    return score
+
 # Play a game:
-gplay(randomPlayer, randomPlayer)
+# black, white:
+gplay(randomPlayer1, player1)
 #play(randomPlayer, randomPlayer)
 
 ## or interactively test:
