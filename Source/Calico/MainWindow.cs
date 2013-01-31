@@ -32,8 +32,8 @@ namespace Calico {
         public Gtk.Notebook AuxNotebook;
         public AuxWindow(string title, MainWindow calico) : base(title) {
             this.calico = calico;
-            
-            Gtk.VBox box = new Gtk.VBox (false, 4);
+            Resizable = true;
+            Gtk.HBox box = new Gtk.HBox (false, 0);
             AuxNotebook = new Gtk.Notebook();
             AuxNotebook.GroupId = 0;
 
@@ -3187,15 +3187,14 @@ namespace Calico {
             Gtk.Application.Invoke(delegate {
                 if (aux_window == null) {
                     aux_window = new AuxWindow("Calico Tools", this);
-
                     movePage("Output", aux_window.AuxNotebook);
                     movePage("Shell", ToolNotebook);
                     
                     //NotebookPane.Reparent(aux_window);
-                                 int width, height;
+                    int width, height;
                     this.GetSize(out width, out height);
-                    aux_window.SetSizeRequest(width, height);
-                    /*aux_window.SetDefaultSize(width, height);*/
+                    aux_window.SetSizeRequest(width/2, height/2);
+                    //aux_window.SetDefaultSize(width, height);
                     aux_window.Show();
                 } else {
                     aux_window.Close();
