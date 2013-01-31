@@ -4,7 +4,7 @@
 # ChessBoard - a Python program to find the next move in chess
 #
 # Copyright (c)            John Eriksson - http://arainyday.se
-# Copyright (c) 2010       Doug Blank <doug.blank@gmail.com>
+# Copyright (c) 2010-2013  Doug Blank <doug.blank@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,19 @@
 #
 
 # $Id: $
+
+"""
+Plays a random game of chess. Some abbreviations and terms:
+  Uppercase: white, Lowercase: black
+  r,R - rook
+  b,B - bishop
+  n,N - Knight
+  k,K - King
+  q,Q - queen
+  p,P - pawn
+
+  ep - "en passant", special pawn move
+"""
 
 from copy import deepcopy
 import random
@@ -57,22 +70,20 @@ def printReason(game_result):
     elif game_result == 12:
         print("THREE_REPETITION_RULE")
 
-
 def makeRepr(state, board):
     b = ""
     for l in board:
         b += "%s%s%s%s%s%s%s%s" % (l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7])
-
     d = (b,
-    state.player,
-    state.white_king_castle,
-    state.white_queen_castle, 
-    state.black_king_castle,
-    state.black_queen_castle,
-    state.ep[0],
-    state.ep[1],
-    state.game_result,
-    state.stasis_count)
+         state.player,
+         state.white_king_castle,
+         state.white_queen_castle,
+         state.black_king_castle,
+         state.black_queen_castle,
+         state.ep[0],
+         state.ep[1],
+         state.game_result,
+         state.stasis_count)
     #turn,wkc,wqc,bkc,bqc,epx,epy,game_result,stasis_count
     s = "%s%s%d%d%d%d%d%d%d:%d" % d
     return s
@@ -84,34 +95,28 @@ class State(object):
     def __init__(self, player):
         self.game_result = 0 
         self.reason = 0
-        
         # States
         self.player = player
         self.white_king_castle = True
         self.white_queen_castle = True
         self.black_king_castle = True
         self.black_queen_castle = True
-        #none or the location of the current en pessant pawn:
+        #none or the location of the current en passant pawn:
         self.ep = [0, 0]      
         self.stasis_count = 0
         self.move_count = 0
-        
         self.black_king_location = (0, 0)
-        self.white_king_location = (0, 0)    
-        
+        self.white_king_location = (0, 0)
         # three rep stack
         self.three_rep_stack = []
-        
         # full state stack
         self.state_stack = []
         self.state_stack_pointer = 0
-        
         # all moves, stored to make it easier to build textmoves
         #[piece,from,to,takes,promotion,check/checkmate,specialmove]
         #["KQRNBP",(fx,fy),(tx,ty),True/False,"QRNB"/None,"+#"/None,0-5]
         self.cur_move = [None,None,None,False,None,None,0]
         self.moves = []
-        
         self.promotion_value = 1
 
     def setEP(self,epPos):
@@ -122,12 +127,9 @@ class State(object):
         self.ep[1] = 0
 
     def threeRepetitions(self):
-            
         ts = self.three_rep_stack[:self.state_stack_pointer]
-
         if not len(ts):
             return False
-            
         last = ts[len(ts)-1]
         if(ts.count(last) == 3):
             return True
@@ -137,26 +139,25 @@ class State(object):
         self.game_result = reason
 
     def pushState(self, board):
-
         if self.state_stack_pointer != len(self.state_stack):
             self.state_stack = self.state_stack[:self.state_stack_pointer]    
             self.three_rep_stack =  self.three_rep_stack[:self.state_stack_pointer]
-            self.moves = self.moves[:self.state_stack_pointer-1]    
-
+            self.moves = self.moves[:self.state_stack_pointer-1]
         three_state = [self.white_king_castle,
-            self.white_queen_castle,
-            self.black_king_castle,
-            self.black_queen_castle,
-            deepcopy(board),
-            deepcopy(self.ep)]                 
+                       self.white_queen_castle,
+                       self.black_king_castle,
+                       self.black_queen_castle,
+                       deepcopy(board),
+                       deepcopy(self.ep)]
         self.three_rep_stack.append(three_state)
-              
         state_str = makeRepr(self, board)
         self.state_stack.append(state_str)
-
         self.state_stack_pointer = len(self.state_stack)            
 
     def pushMove(self):
+        """
+        Push the current move onto the moves stack.
+        """
         self.moves.append(deepcopy(self.cur_move))
                
     def getMoveCount(self):
@@ -202,12 +203,10 @@ class State(object):
         """
         if self.state_stack_pointer<=1: # No move has been done at thos pointer
             return -1
-        
         self.undo(board)
         move = self.moves[self.state_stack_pointer-1]        
         res = move[6]
         self.redo(board)
-        
         return res
 
     def getLastMove(self):
@@ -221,12 +220,10 @@ class State(object):
         """
         if self.state_stack_pointer<=1: # No move has been done at thos pointer
             return None
-        
         self.undo(board)
         move = self.moves[self.state_stack_pointer-1]        
         res = (move[1], move[2])
         self.redo(board)
-        
         return res
 
     def getAllMoves(self, board, format=1):
@@ -236,11 +233,8 @@ class State(object):
         """
         if self.state_stack_pointer<=1: # No move has been done at this pointer
             return None
-
         res = []
-
         point = self.state_stack_pointer
-
         self.gotoFirst(board)
         while True:
             move = self.moves[self.state_stack_pointer-1]  
@@ -248,10 +242,8 @@ class State(object):
             if self.state_stack_pointer >= len(self.state_stack)-1:
                 break
             self.redo(board)
-
         self.state_stack_pointer = point
-        self.loadCurState(board)        
-
+        self.loadCurState(board)
         return res
 
     def getLastMove(self, board, format=1):
@@ -261,7 +253,6 @@ class State(object):
         """
         if self.state_stack_pointer<=1: # No move has been done at that pointer
             return None
-        
         self.undo(board)
         move = self.moves[self.state_stack_pointer-1]        
         res = self.formatTextMove(move, format)
@@ -278,7 +269,6 @@ class State(object):
             return False
         if move < 1:
             return False
-            
         self.state_stack_pointer = move
         self.loadCurState(board)
                           
@@ -287,13 +277,11 @@ class State(object):
         b= s[:64]
         v = s[64:72]
         f =  int(s[73:])
-
         idx = 0
         for r in range(8):
             for c in range(8):
                 board[r][c]=b[idx]
                 idx+=1
-        
         self.player                = v[0]
         self.white_king_castle     = int(v[1])
         self.white_queen_castle    = int(v[2]) 
@@ -302,7 +290,6 @@ class State(object):
         self.ep[0]                 = int(v[5])
         self.ep[1]                 = int(v[6])
         self.game_result           = int(v[7])
-        
         self.stasis_count = f
                         
     def gotoFirst(self, board):
@@ -344,13 +331,13 @@ class State(object):
 
 class ChessBoard(object):
     """
+    The class that holds the board and values.
     """
     # Promotion values
     QUEEN = 1
     ROOK = 2
     KNIGHT = 3
     BISHOP = 4
-
     # Reason values
     INVALID_MOVE = 1
     INVALID_COLOR = 2
@@ -359,14 +346,12 @@ class ChessBoard(object):
     MUST_SET_PROMOTION = 5
     GAME_IS_OVER = 6
     AMBIGUOUS_MOVE = 7
-
     # Result values
     WHITE_WIN = 8
     BLACK_WIN = 9
     STALEMATE = 10
     STASIS_COUNT_LIMIT_RULE = 11
     THREE_REPETITION_RULE = 12
-
     # Special moves
     NORMAL_MOVE = 0
     EP_MOVE = 1
@@ -374,7 +359,6 @@ class ChessBoard(object):
     PROMOTION_MOVE = 3
     KING_CASTLE_MOVE = 4
     QUEEN_CASTLE_MOVE = 5
-
     # Text move output type
     AN = 0      # g4-e3
     SAN = 1     # Bxe3
@@ -401,7 +385,6 @@ class ChessBoard(object):
         s += "    A B C D E F G H\n"  
         s += "    0 1 2 3 4 5 6 7\n"  
         return s
-    
 
     def getOtherPlayer(self, state):
         if state.player == 'w':
@@ -413,49 +396,46 @@ class ChessBoard(object):
 
     def checkKingGuard(self, state, fromPos, moves, specialMoves={}):
         result = []
-        
         kx, ky = self.getKingLocation(state)
         fx, fy = fromPos
-                
         done = False
         fp = self.board[fy][fx]
         self.board[fy][fx] = " "
         if not self.isThreatened(state, kx, ky):
             done = True
         self.board[fy][fx] = fp
-        
         if done:
             return moves
-        
         for m in moves:
             tx, ty = m
             sp = None
             fp = self.board[fy][fx]
-            tp = self.board[ty][tx]            
-            
+            tp = self.board[ty][tx]
             self.board[fy][fx] = " "
             self.board[ty][tx] = fp
-
             if ((m in specialMoves) and 
                 specialMoves[m] == self.EP_CAPTURE_MOVE):
                 sp = self.board[state.ep[1]][state.ep[0]]
                 self.board[state.ep[1]][state.ep[0]] = " "
-                            
             if not self.isThreatened(state, kx, ky):
                 result.append(m)
-
             if sp:
                 self.board[state.ep[1]][state.ep[0]] = sp
-            
             self.board[fy][fx] = fp
             self.board[ty][tx] = tp
-
         return result    
        
     def isFree(self, x, y):
+        """
+        Is this spot on the board open?
+        """
         return self.board[y][x] == ' ' 
 
     def getColor(self, x, y):
+        """
+        Get the color of the spot on the board.
+        Returns ' ', 'w', or 'b'.
+        """
         if self.board[y][x] == ' ':
             return ' '
         elif self.board[y][x].isupper():
@@ -464,7 +444,6 @@ class ChessBoard(object):
             return 'b'
                 
     def isThreatened(self, state, lx, ly):
-
         if state.player == 'w':
             if lx<7 and ly>0 and self.board[ly-1][lx+1] == 'p':
                 return True
@@ -475,7 +454,6 @@ class ChessBoard(object):
                 return True
             elif lx>0 and ly<7 and self.board[ly+1][lx-1] == 'P':
                 return True
-                
         m =[(lx+1, ly+2), (lx+2, ly+1), (lx+2, ly-1), (lx+1, ly-2), 
             (lx-1, ly+2), (lx-2, ly+1), (lx-1, ly-2), (lx-2, ly-1)]
         for p in m:
@@ -483,8 +461,7 @@ class ChessBoard(object):
                 if self.board[p[1]][p[0]] == "n" and state.player=='w':
                     return True                
                 elif self.board[p[1]][p[0]] == "N" and state.player=='b':
-                    return True                
-                
+                    return True
         dirs = [(1, 0), (-1, 0), (0, 1), (0, -1), 
                 (1, 1), (-1, 1), (1, -1), (-1, -1)]        
         for d in dirs:
@@ -515,8 +492,10 @@ class ChessBoard(object):
                     break
         return False
 
-
     def hasAnyValidMoves(self, state):
+        """
+        Does the state.player have any valid moves?
+        """
         for y in range(0, 8):
             for x in range(0, 8):
                 if self.getColor(x, y) == state.player:
@@ -526,6 +505,10 @@ class ChessBoard(object):
 
     #-----------------------------------------------------------------
     def traceValidMoves(self, state, fromPos, dirs, maxSteps=8):
+        """
+        How far can a piece move fromPos in the directions in dirs
+        before running off the board, or running into another piece?
+        """
         moves = []
         for d in dirs:
             x, y = fromPos
@@ -538,17 +521,20 @@ class ChessBoard(object):
                     break
                 if self.isFree(x, y):
                     moves.append((x, y))
-                elif self.getColor(x, y)!=state.player:
+                elif self.getColor(x, y) != state.player:
                     moves.append((x, y))
                     break
                 else:
                     break
-                steps+=1
+                steps += 1
                 if steps == maxSteps:
                     break
         return moves
     
     def getValidQueenMoves(self, state, fromPos):
+        """
+        Return all of the valid moves that the queen can make.
+        """
         moves = []        
         dirs = [(1, 0), (-1, 0), (0, 1), (0, -1), 
                 (1, 1), (-1, 1), (1, -1), (-1, -1)]
@@ -557,6 +543,9 @@ class ChessBoard(object):
         return moves        
 
     def getValidRookMoves(self, state, fromPos):
+        """
+        Return all of the valid moves that the rook can make.
+        """
         moves = []        
         dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         moves = self.traceValidMoves(state, fromPos, dirs)
@@ -564,13 +553,20 @@ class ChessBoard(object):
         return moves        
 
     def getValidBishopMoves(self, state, fromPos):
-        moves = []        
+        """
+        Return all of the valid moves that the bishop can make.
+        """
+        moves = []
         dirs = [(1, 1), (-1, 1), (1, -1), (-1, -1) ]
         moves = self.traceValidMoves(state, fromPos, dirs)
         moves = self.checkKingGuard(state, fromPos, moves)
         return moves        
                     
     def getValidPawnMoves(self, state, fromPos):
+        """
+        Return all of the valid moves that the pawn can make.
+        Handles special moves, such en passant.
+        """
         moves = []
         specialMoves = {}
         fx, fy = fromPos
@@ -584,10 +580,8 @@ class ChessBoard(object):
             startrow = 1
             ocol = 'w'
             eprow = 4
-        
         if self.isFree(fx, fy+movedir):
             moves.append((fx, fy+movedir))
-            
         if fy == startrow:
             if self.isFree(fx, fy+movedir) and self.isFree(fx, fy+(movedir*2)):
                 moves.append((fx, fy+(movedir*2)))
@@ -596,7 +590,6 @@ class ChessBoard(object):
             moves.append((fx+1, fy+movedir))
         if fx > 0 and self.getColor(fx-1, fy+movedir) == ocol:
             moves.append((fx-1, fy+movedir))
-            
         if fy == eprow and state.ep[1] != 0:
             if state.ep[0] == fx+1:
                moves.append((fx+1, fy+movedir))
@@ -604,12 +597,13 @@ class ChessBoard(object):
             if state.ep[0] == fx-1:
                moves.append((fx-1, fy+movedir))
                specialMoves[(fx-1, fy+movedir)] = self.EP_CAPTURE_MOVE
-
         moves = self.checkKingGuard(state, fromPos, moves, specialMoves)
-         
         return (moves, specialMoves)
 
     def getValidKnightMoves(self, state, fromPos):
+        """
+        Return all of the valid moves that the knight can make.
+        """
         moves = []
         fx, fy = fromPos
         m =[(fx+1, fy+2), (fx+2, fy+1), (fx+2, fy-1), (fx+1, fy-2), 
@@ -618,15 +612,15 @@ class ChessBoard(object):
             if p[0] >= 0 and p[0] <= 7 and p[1] >= 0 and p[1] <= 7: 
                 if self.getColor(p[0], p[1])!=state.player:
                     moves.append(p)
-                
         moves = self.checkKingGuard(state, fromPos, moves)
-        
         return moves    
             
     def getValidKingMoves(self, state, fromPos):
-        moves = [] 
+        """
+        Return all of the valid moves that the king can make.
+        """
+        moves = []
         specialMoves={}
-        
         if state.player == 'w':
             c_row = 7
             c_king = state.white_king_castle
@@ -637,19 +631,14 @@ class ChessBoard(object):
             c_king = state.black_king_castle
             c_queen = state.black_queen_castle
             k = "k"
-               
         dirs = [(1, 0), (-1, 0), (0, 1), (0, -1), 
                 (1, 1), (-1, 1), (1, -1), (-1, -1) ]
-        
         t_moves = self.traceValidMoves(state, fromPos, dirs, 1)
         moves = []
-        
         self.board[fromPos[1]][fromPos[0]] = ' '
-        
         for m in t_moves:
             if not self.isThreatened(state, m[0], m[1]):
                 moves.append(m)
-        
         if c_king: 
             if (self.isFree(5, c_row) and self.isFree(6, c_row) and 
                 self.board[c_row][7].upper() == 'R'):   
@@ -666,28 +655,22 @@ class ChessBoard(object):
                     not self.isThreatened(state, 2, c_row)): 
                     moves.append((2, c_row))
                     specialMoves[(2, c_row)] = self.QUEEN_CASTLE_MOVE
-        
         self.board[fromPos[1]][fromPos[0]] = k
-        
         return (moves, specialMoves)        
 
     # -----------------------------------------------------
     def movePawn(self, state, fromPos, toPos):
         moves, specialMoves = self.getValidPawnMoves(state, fromPos)
-        
         if not toPos in moves:
             return False
-        
         if toPos in specialMoves:
             t = specialMoves[toPos]
         else:
             t = 0
-            
         if t == self.EP_CAPTURE_MOVE:
             self.board[state.ep[1]][state.ep[0]] = ' '
             state.cur_move[3]=True
             state.cur_move[6]=self.EP_CAPTURE_MOVE
-               
         pv = state.promotion_value
         if state.player == 'w' and toPos[1] == 0:
             if pv == 0:
@@ -709,41 +692,31 @@ class ChessBoard(object):
             #state.promotion_value = 0
         else:
             p = self.board[fromPos[1]][fromPos[0]]
-               
         if t == self.EP_MOVE:
             state.setEP(toPos)
             state.cur_move[6]=self.EP_MOVE
         else:
             state.clearEP()
-
         if self.board[toPos[1]][toPos[0]] != ' ':
             state.cur_move[3]=True
-
         self.board[toPos[1]][toPos[0]] = p
-        self.board[fromPos[1]][fromPos[0]] = " "     
-        
+        self.board[fromPos[1]][fromPos[0]] = " "
         state.stasis_count = 0
         return True
 
-
     def moveKnight(self, state, fromPos, toPos):
         moves = self.getValidKnightMoves(state, fromPos)
-        
         if not toPos in moves:
             return False
-        
         state.clearEP()
- 
         if self.board[toPos[1]][toPos[0]] == " ":   
             state.stasis_count+=1
         else:
             state.stasis_count=0
             state.cur_move[3]=True
-                      
         self.board[toPos[1]][toPos[0]] = self.board[fromPos[1]][fromPos[0]]
         self.board[fromPos[1]][fromPos[0]] = " "     
         return True
-
 
     def moveKing(self, state, fromPos, toPos):
         if state.player == 'w':
@@ -754,26 +727,20 @@ class ChessBoard(object):
             c_row = 0
             k = "k"
             r = "r"
-            
         moves, specialMoves = self.getValidKingMoves(state, fromPos)
-
         if toPos in specialMoves:
             t = specialMoves[toPos]
         else:
             t = 0
-        
         if not toPos in moves:
             return False
-        
         state.clearEP()
-
         if state.player == 'w':
             state.white_king_castle = False
             state.white_queen_castle = False
         else:
             state.black_king_castle = False
             state.black_queen_castle = False
-
         if t == self.KING_CASTLE_MOVE:
             state.stasis_count+=1
             self.board[c_row][4] = " "
@@ -794,56 +761,42 @@ class ChessBoard(object):
             else:
                 state.stasis_count=0
                 state.cur_move[3]=True
-                
             self.board[toPos[1]][toPos[0]] = self.board[fromPos[1]][fromPos[0]]
-            self.board[fromPos[1]][fromPos[0]] = " "     
-            
+            self.board[fromPos[1]][fromPos[0]] = " "
         return True
 
     def moveQueen(self, state, fromPos, toPos):
-
         moves = self.getValidQueenMoves(state, fromPos)
-        
         if not toPos in moves:
             return False
-        
         state.clearEP()
-
         if self.board[toPos[1]][toPos[0]] == " ":    
             state.stasis_count+=1
         else:
             state.stasis_count=0
             state.cur_move[3]=True
-                       
         self.board[toPos[1]][toPos[0]] = self.board[fromPos[1]][fromPos[0]]
         self.board[fromPos[1]][fromPos[0]] = " "     
         return True
 
     def moveBishop(self, state, fromPos, toPos):
         moves = self.getValidBishopMoves(state, fromPos)
-        
         if not toPos in moves:
             return False
-        
         state.clearEP()
-
         if self.board[toPos[1]][toPos[0]] == " ":
             state.stasis_count+=1
         else:
             state.stasis_count=0
             state.cur_move[3]=True
-                       
         self.board[toPos[1]][toPos[0]] = self.board[fromPos[1]][fromPos[0]]
         self.board[fromPos[1]][fromPos[0]] = " "     
         return True
 
     def moveRook(self, state, fromPos, toPos):
-        
         moves = self.getValidRookMoves(state, fromPos)
-        
         if not toPos in moves:
             return False
-                
         fx, fy = fromPos
         if state.player == 'w':
             if fx == 0:
@@ -855,21 +808,20 @@ class ChessBoard(object):
                 state.black_queen_castle = False
             if fx == 7:
                 state.black_king_castle = False
-        
-        state.clearEP()                       
-
+        state.clearEP()
         if self.board[toPos[1]][toPos[0]] == " ":    
             state.stasis_count+=1
         else:
             state.stasis_count=0
             state.cur_move[3]=True
-
         self.board[toPos[1]][toPos[0]] = self.board[fromPos[1]][fromPos[0]]
         self.board[fromPos[1]][fromPos[0]] = " "     
         return True
 
     def parseTextMove(self, state, txt):
-    
+        """
+        Makes a move from a standard chess text format.
+        """
         txt = txt.strip()
         promotion = None
         dest_x = 0
@@ -877,7 +829,6 @@ class ChessBoard(object):
         h_piece = "P"
         h_rank = -1
         h_file = -1
-
         # handle the special 
         if txt == "O-O":
             if state.player == 'w':
@@ -889,10 +840,8 @@ class ChessBoard(object):
                 return (None, 4, 7, 2, 7, None)
             if state.player == 'b':
                 return (None, 4, 0, 2, 0, None)
-    
         files = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7}
         ranks = {"8":0, "7":1, "6":2, "5":3, "4":4, "3":5, "2":6, "1":7}
-    
         # Clean up the textmove
         "".join(txt.split("e.p."))
         t = []
@@ -900,24 +849,18 @@ class ChessBoard(object):
             if ch not in "KQRNBabcdefgh12345678":
                 continue    
             t.append(ch)
-
         if len(t)<2:
             return None
-                     
         # Get promotion if any
         if t[-1] in ('Q', 'R', 'N', 'B'):
             promotion = {'Q':1, 'R':2, 'N':3, 'B':4}[t.pop()]
-            
         if len(t)<2:
             return None
-
         # Get the destination
         if not (t[-2] in files) or not (t[-1] in ranks):
             return None
-            
         dest_x = files[t[-2]]
         dest_y = ranks[t[-1]]
-                 
         # Pick out the hints    
         t = t[:-2]  
         for h in t:
@@ -927,17 +870,19 @@ class ChessBoard(object):
                 h_file = files[h]
             elif h in ('1', '2', '3', '4', '5', '6', '7', '8'):
                 h_rank = ranks[h]
-        
         # If we have both a source and destination we don't need the piece hint.
         # This will make us make the move directly.
         if h_rank > -1 and h_file > -1:
             h_piece = None
-                                        
         return (h_piece, h_file, h_rank, dest_x, dest_y, promotion)
 
     def formatTextMove(self, move, format):
-        #piece, from, to, take, promotion, check        
-                
+        """
+        Creates standard chess text format from a move.
+        A move is (piece, fromPos, toPos, take, promotion, check, special)
+        Format can be in AN, LAN, or SAN.
+        """
+        #piece, from, to, take, promotion, check, special
         piece = move[0]
         fpos = tuple(move[1])
         tpos = tuple(move[2])
@@ -945,19 +890,16 @@ class ChessBoard(object):
         promo = move[4]
         check = move[5]
         special = move[6]
-        
         files = "abcdefgh"
         ranks = "87654321"
         if format == self.AN:
             res = "%s%s%s%s" % (files[fpos[0]], ranks[fpos[1]], 
                                 files[tpos[0]], ranks[tpos[1]])
         elif format == self.LAN:
-
             if special == self.KING_CASTLE_MOVE:
                 return "O-O"
             elif special == self.QUEEN_CASTLE_MOVE:
                 return "O-O-O"
-
             tc = "-"
             if take:
                 tc = "x"
@@ -971,13 +913,11 @@ class ChessBoard(object):
             res = "%s%s%s%s%s%s%s%s" % (piece, files[fpos[0]], ranks[fpos[1]], 
                                         tc,    files[tpos[0]], ranks[tpos[1]], 
                                         pt, check)
-        elif format == self.SAN:            
-
+        elif format == self.SAN:
             if special == self.KING_CASTLE_MOVE:
                 return "O-O"
             elif special == self.QUEEN_CASTLE_MOVE:
                 return "O-O-O"
-                            
             tc = ""
             if take:
                 tc = "x"
@@ -1022,15 +962,11 @@ class ChessBoard(object):
         """
         if state.game_result:
             return []
-            
         x, y = location
-        
         if x < 0 or x > 7 or y < 0 or y > 7:
             return False
-                
         if self.getColor(x, y) != state.player:
             return []
-        
         p = self.board[y][x].upper()
         if p == 'P':
             m, s = self.getValidPawnMoves(state, location)
@@ -1048,7 +984,6 @@ class ChessBoard(object):
             return self.getValidKnightMoves(state, location)
         else:
             return []
-        
 
     #-----------------------------------------------------------------------    
     # PUBLIC METHODS
@@ -1145,35 +1080,28 @@ class ChessBoard(object):
         """        
         fx, fy = fromPos
         tx, ty = toPos
-
         state.cur_move[1]=fromPos        
-        state.cur_move[2]=toPos        
-        
+        state.cur_move[2]=toPos
         #check invalid coordinates
         if fx < 0 or fx > 7 or fy < 0 or fy > 7:
             state.reason = self.INVALID_FROM_LOCATION
             return False
-
         #check invalid coordinates
         if tx < 0 or tx > 7 or ty < 0 or ty > 7:    
             state.reason = self.INVALID_TO_LOCATION
             return False
-                
         #check if any move at all
         if fx==tx and fy==ty:
             state.reason = self.INVALID_TO_LOCATION
             return False
-                
         #check if piece on location
         if self.isFree(fx, fy):
             state.reason = self.INVALID_FROM_LOCATION
             return False
-
         #check color of piece
         if self.getColor(fx, fy) != state.player:
             state.reason = self.INVALID_COLOR
             return False
-     
         # Call the correct handler
         p = self.board[fy][fx].upper()
         state.cur_move[0]=p        
@@ -1203,8 +1131,7 @@ class ChessBoard(object):
                 state.reason = self.INVALID_MOVE
                 return False
         else:
-            return False        
-        
+            return False
         state.pushState(self.board)
         state.pushMove()
         other = self.getOtherPlayerState(state)
@@ -1224,7 +1151,6 @@ class ChessBoard(object):
         print(self)
         if self.isCheck(state):
             state.cur_move[5]="+"
-                    
         if not self.hasAnyValidMoves(state):
             if self.isCheck(state):
                 state.cur_move[5]="#"
@@ -1239,7 +1165,6 @@ class ChessBoard(object):
                 state.endGame(self.STASIS_COUNT_LIMIT_RULE)
             elif state.threeRepetitions():
                 state.endGame(self.THREE_REPETITION_RULE)
-
         printReason(state.game_result)
 
 def randomPlayer(board, state, moves):
@@ -1249,29 +1174,6 @@ def randomPlayer(board, state, moves):
     fromPos = selection[0]
     toPos = random.choice(selection[2])
     return fromPos, toPos
-
-def play(player1, player2):
-    state = State('w')
-    board = ChessBoard()
-    print(board)
-    while state.game_result == 0:
-        moves = board.getMoves(state)
-        if moves:
-            if state.player == 'w':
-                fromPos, toPos = player2(board, state, moves)
-            else:
-                fromPos, toPos = player1(board, state, moves)
-                
-            print("%s moves %s from %s to %s" % 
-                  (state.player, board.board[fromPos[1]][fromPos[0]], 
-                   fromPos, toPos))
-            board.makeMove(state, fromPos, toPos)
-            if state.game_result == 0:
-                state.player = board.getOtherPlayer(state)
-                board.checkStatus(state)
-        else:
-            print("No moves!")
-            break
 
 def makeWindow(size):
     window = Graphics.Window("Chess", size, size)
@@ -1360,4 +1262,45 @@ def gplay(player1, player2):
             print("No moves!")
             break
 
+def play(player1, player2):
+    state = State('w')
+    board = ChessBoard()
+    print(board)
+    while state.game_result == 0:
+        moves = board.getMoves(state)
+        if moves:
+            if state.player == 'w':
+                fromPos, toPos = player2(board, state, moves)
+            else:
+                fromPos, toPos = player1(board, state, moves)
+
+            print("%s moves %s from %s to %s" %
+                  (state.player, board.board[fromPos[1]][fromPos[0]],
+                   fromPos, toPos))
+            board.makeMove(state, fromPos, toPos)
+            if state.game_result == 0:
+                state.player = board.getOtherPlayer(state)
+                board.checkStatus(state)
+        else:
+            print("No moves!")
+            break
+
+# Play a game:
 gplay(randomPlayer, randomPlayer)
+#play(randomPlayer, randomPlayer)
+
+## or interactively test:
+## White goes first:
+# state = State('w')
+# board = ChessBoard()
+# print(board)
+## Get possible moves:
+# moves = board.getMoves(state)
+## Pick one
+## Then, apply the move to the board:
+# board.makeMove(state, fromPos, toPos)
+## Switch players:
+# state.player = board.getOtherPlayer(state)
+# board.checkStatus(state)
+## Anything but zero ends the game:
+# print(state.game_result)
