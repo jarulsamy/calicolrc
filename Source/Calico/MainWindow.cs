@@ -30,16 +30,31 @@ namespace Calico {
     public class AuxWindow : Gtk.Window {
         MainWindow calico;
         public Gtk.Notebook AuxNotebook;
-        public AuxWindow(string title, MainWindow calico) : base(title) {
+        public AuxWindow(string title, MainWindow calico) : base(title) 
+        {
             this.calico = calico;
             Resizable = true;
             Gtk.HBox box = new Gtk.HBox (false, 0);
             AuxNotebook = new Gtk.Notebook();
             AuxNotebook.GroupId = 0;
 
+            KeyPressEvent += new Gtk.KeyPressEventHandler (OnKeyPressEvent);
+
             box.PackStart(AuxNotebook);
             Add(box);
             ShowAll();
+        }
+
+        [GLib.ConnectBefore ()] 
+        protected void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) 
+        {
+            // forward even to main window if shell is showing here
+            if (calico.findTab(AuxNotebook, "Shell") == AuxNotebook.Page)  calico.handleShellKey(o, args);
+            else {
+                // forward F5 to main window
+                if(args.Event.Key == Gdk.Key.F5) calico.OnYesAction1Activated(o, args);                
+                // there has to be a less hacky way to do this ....
+            }
         }
 
         public void Close()            
@@ -56,13 +71,6 @@ namespace Calico {
 
             this.Hide();
             calico.aux_window = null;
-          
-            /*calico.NotebookPane.Unparent();
-            if (calico.VPaned2.Child2 == null) {
-                calico.VPaned2.Add2(calico.NotebookPane);
-            } else {
-                calico.VPaned2.Add1(calico.NotebookPane);
-            } */           
         }
             
         protected override bool OnDeleteEvent(Gdk.Event e) {
@@ -1659,7 +1667,7 @@ namespace Calico {
         }
 
         [GLib.ConnectBeforeAttribute]
-        protected virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
+        public virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
             if (Focus == searchEntry.Entry) {
                 if (args.Event.Key == Gdk.Key.Escape) {
                     HandleSearchboxHidden(null, null);
@@ -1691,83 +1699,7 @@ namespace Calico {
                     }
                 } // else, don't handle
             } else if (Focus == Shell) {
-                // Shell handler
-                // FIXME: control+c, if nothing is selected, else it is a copy
-                if (args.Event.Key == Gdk.Key.c && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
-                    string text = Shell.SelectedText;
-                    if (text == null) {
-                        Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
-                        Shell.DeleteSelectedText();
-                        args.RetVal = true;
-                    }
-                } else if (args.Event.Key == Gdk.Key.Escape) {
-                    // FIXME: escape with selected, delete; else delete all
-                    string text = Shell.SelectedText;
-                    if (text == null) {
-                        Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
-                    }
-                    Shell.DeleteSelectedText();
-                    args.RetVal = true;
-                } else if (args.Event.Key == Gdk.Key.Return) {
-                    // if control key is down, too, just insert a return
-                    if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
-                        Shell.InsertAtCaret("\n");
-                        args.RetVal = true;
-                        return;
-                    }
-                    // if cursor in middle, insert a Return
-                    //Mono.TextEditor.Caret caret = Shell.Caret;
-                    //int line = caret.Line;
-                    //int line_count = Shell.Document.LineCount;
-                    // This needs to be better written, and maybe dealt with 
-                    // in each of the languages. Remove from here.
-                    //if (line != line_count) { // caret.line not at bottom
-                    //    completion = null;
-                    //    args.RetVal = false;
-                    //    return;
-                    //}
-                    // else, execute text
-                    // extra line at end signals ready_to_execute:
-                    string text = Shell.Document.Text;
-                    if (text == "") {
-                        completion = null;
-                        args.RetVal = true;
-                        // nothing to do, but handled
-                    } else if (manager[CurrentLanguage].engine != null && manager [CurrentLanguage].engine.ReadyToExecute(text)) {
-                        history.last(text.TrimEnd());
-                        ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
-                        history.add("");
-                        ExecuteShell();
-                        completion = null;
-                        args.RetVal = true;
-                    }
-                    UpdateUpDownArrows();
-                } else if (args.Event.Key == Gdk.Key.Up) {
-                    KeyUp(false); // look at cursor (don't force)
-                } else if (args.Event.Key == Gdk.Key.Down) {
-                    KeyDown(false); // look at cursor (don't force)
-                } else if (args.Event.Key == Gdk.Key.Tab) {
-                    // where are we?
-                    int lineNo = Shell.Caret.Line;
-                    string [] lines = Shell.Document.Text.Split('\n');
-                    string line = lines [lineNo - 1];
-                    string text = line.Substring(0, Shell.Caret.Column - 1);
-                    if (text.Trim() != "") { // something there!
-                        if (completion == null) {
-                            completion = new TabCompletion(this, Shell, text);
-                            if (completion.items != null) { // first time:
-                                Print(completion.format());
-                            }
-                        }
-                        if (completion.items != null && completion.items.Count > 0) {
-                            completion.insertText();
-                        }
-                        args.RetVal = true; // don't put in tab
-                    }
-                    completion = null;
-                } else {
-                    completion = null;
-                }
+                handleShellKey(o, args);
             } else if (Focus == ChatCommand) { // This is a TextView
                 if (args.Event.Key == Gdk.Key.Return) {
                     // if control key is down, too, just insert a return
@@ -1788,6 +1720,87 @@ namespace Calico {
             }
         }
 
+        public void handleShellKey(object o, Gtk.KeyPressEventArgs args) 
+        {
+            // Shell handler
+            // FIXME: control+c, if nothing is selected, else it is a copy
+            if (args.Event.Key == Gdk.Key.c && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                string text = Shell.SelectedText;
+                if (text == null) {
+                    Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+                    Shell.DeleteSelectedText();
+                    args.RetVal = true;
+                }
+            } else if (args.Event.Key == Gdk.Key.Escape) {
+                // FIXME: escape with selected, delete; else delete all
+                string text = Shell.SelectedText;
+                if (text == null) {
+                    Mono.TextEditor.SelectionActions.SelectAll(Shell.GetTextEditorData());
+                }
+                Shell.DeleteSelectedText();
+                args.RetVal = true;
+            } else if (args.Event.Key == Gdk.Key.Return) {
+                // if control key is down, too, just insert a return
+                if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                    Shell.InsertAtCaret("\n");
+                    args.RetVal = true;
+                    return;
+                }
+                // if cursor in middle, insert a Return
+                //Mono.TextEditor.Caret caret = Shell.Caret;
+                //int line = caret.Line;
+                //int line_count = Shell.Document.LineCount;
+                // This needs to be better written, and maybe dealt with 
+                // in each of the languages. Remove from here.
+                //if (line != line_count) { // caret.line not at bottom
+                //    completion = null;
+                //    args.RetVal = false;
+                //    return;
+                //}
+                // else, execute text
+                // extra line at end signals ready_to_execute:
+                string text = Shell.Document.Text;
+                if (text == "") {
+                    completion = null;
+                    args.RetVal = true;
+                    // nothing to do, but handled
+                } else if (manager[CurrentLanguage].engine != null && manager [CurrentLanguage].engine.ReadyToExecute(text)) {
+                    history.last(text.TrimEnd());
+                    ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
+                    history.add("");
+                    ExecuteShell();
+                    completion = null;
+                    args.RetVal = true;
+                }
+                UpdateUpDownArrows();
+            } else if (args.Event.Key == Gdk.Key.Up) {
+                KeyUp(false); // look at cursor (don't force)
+            } else if (args.Event.Key == Gdk.Key.Down) {
+                KeyDown(false); // look at cursor (don't force)
+            } else if (args.Event.Key == Gdk.Key.Tab) {
+                // where are we?
+                int lineNo = Shell.Caret.Line;
+                string [] lines = Shell.Document.Text.Split('\n');
+                string line = lines [lineNo - 1];
+                string text = line.Substring(0, Shell.Caret.Column - 1);
+                if (text.Trim() != "") { // something there!
+                    if (completion == null) {
+                        completion = new TabCompletion(this, Shell, text);
+                        if (completion.items != null) { // first time:
+                            Print(completion.format());
+                        }
+                    }
+                    if (completion.items != null && completion.items.Count > 0) {
+                        completion.insertText();
+                    }
+                    args.RetVal = true; // don't put in tab
+                }
+                completion = null;
+            } else {
+                completion = null;
+            }            
+        }
+ 
         public void KeyDown(bool force) {
             string text = Shell.Document.Text;
             var caret = Shell.Caret;
@@ -2197,6 +2210,16 @@ namespace Calico {
             }
         }          
 
+        private bool tabShowing(string name)
+        {
+            return(findTab(DocumentNotebook, name) == DocumentNotebook.Page 
+                   ||
+                   findTab(ToolNotebook, name) == ToolNotebook.Page 
+                   ||
+                   (aux_window != null && 
+                    findTab(aux_window.AuxNotebook, name) == aux_window.AuxNotebook.Page ));
+        }
+
         private int findTabByWidget(Gtk.Widget w) {
             string s = DocumentNotebook.GetTabLabelText (w);
             if (s == null) return -1;
@@ -2224,7 +2247,7 @@ namespace Calico {
             return idx;
         }
 
-        private int findTab(Gtk.Notebook nb, string name)
+        public int findTab(Gtk.Notebook nb, string name)
         {            
             for (int page_num = 0; page_num < nb.NPages; page_num++)
             {          
@@ -2267,7 +2290,7 @@ namespace Calico {
             manager [CurrentLanguage].engine.SetTraceOff();
         }
 
-        protected virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
+        public virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(CurrentLanguage)) {
                     Error(String.Format("Error: '{0}' is not an active language\n", CurrentLanguage));
@@ -2302,7 +2325,8 @@ namespace Calico {
                     ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Run file]\n");
                     //}
                 }
-            } else if (Focus == Shell){
+            } else if (tabShowing("Shell"))
+              {
                 //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 string text = Shell.Document.Text;
                 history.last(text.TrimEnd());
@@ -3189,8 +3213,6 @@ namespace Calico {
                     aux_window = new AuxWindow("Calico Tools", this);
                     movePage("Output", aux_window.AuxNotebook);
                     movePage("Shell", ToolNotebook);
-                    
-                    //NotebookPane.Reparent(aux_window);
                     int width, height;
                     this.GetSize(out width, out height);
                     aux_window.SetSizeRequest(width/2, height/2);
@@ -3198,14 +3220,6 @@ namespace Calico {
                     aux_window.Show();
                 } else {
                     aux_window.Close();
-                    /*                    NotebookPane.Unparent();
-                    if (vpaned2.Child2 == null) {
-                        vpaned2.Add2(NotebookPane);
-                    } else {
-                        vpaned2.Add1(NotebookPane);
-                    }
-                    aux_window.Hide();
-                    aux_window = null;*/
                 }
             });
             // else put back
