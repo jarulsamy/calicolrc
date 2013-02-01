@@ -308,7 +308,8 @@ class State(object):
         
     def undo(self, board):
         """
-        Undo the last move. Can be used to step back until the initial board setup.
+        Undo the last move. Can be used to step back until the initial
+        board setup.
         Returns True or False if no more moves can be undone.
         """
         if self.state_stack_pointer <= 1:
@@ -820,7 +821,9 @@ class ChessBoard(object):
 
     def parseTextMove(self, state, txt):
         """
-        Makes a move from a standard chess text format.
+        Makes a move from a state, and a standard chess text format.
+        Examples: "O-O", "g4-e3", "Bxe3", "Bg4xe3", etc.
+        Returns (h_piece, h_file, h_rank, dest_x, dest_y, promotion)
         """
         txt = txt.strip()
         promotion = None
@@ -878,18 +881,19 @@ class ChessBoard(object):
 
     def formatTextMove(self, move, format):
         """
-        Creates standard chess text format from a move.
-        A move is (piece, fromPos, toPos, take, promotion, check, special)
+        Creates standard chess text format from a move, and a format code
+        (AN, LAN, or SAN).
+        A move is "piece fromPos toPos take promotion check special"
         Format can be in AN, LAN, or SAN.
         """
         #piece, from, to, take, promotion, check, special
-        piece = move[0]
-        fpos = tuple(move[1])
-        tpos = tuple(move[2])
-        take = move[3]
-        promo = move[4]
-        check = move[5]
-        special = move[6]
+        piece = move[0]       # char code
+        fpos = tuple(move[1]) # 2 ints, 0-7
+        tpos = tuple(move[2]) # 2 ints, 0-7
+        take = move[3]        # 0,1, true/false
+        promo = move[4]       # 0/1, true/false
+        check = move[5]       # 0/1, true/false
+        special = move[6]     # code, 0 or KING_CASTLE_MOVE, etc
         files = "abcdefgh"
         ranks = "87654321"
         if format == self.AN:
@@ -1344,9 +1348,9 @@ def staticAnalysis(board, state):
     This is given a board and state of what would happen
     if you made a particular move.
     """
-    print("Static analysis")
-    print("State.player:", state.player)
-    print(board)
+    #print("Static analysis")
+    #print("State.player:", state.player)
+    #print(board)
     score = random.random() # small random value
     for x in range(8):
         for y in range(8):
@@ -1358,7 +1362,7 @@ def staticAnalysis(board, state):
                 pass       # an empty place
             else:
                 score -= 1 # the other player
-    print(score)
+    #print(score)
     return score
 
 # Play a game:
