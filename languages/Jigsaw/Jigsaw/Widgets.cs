@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace Widgets
 {
-	
 	public class Colors {
 	
 		public static readonly Dictionary<string,Color> colors = 
@@ -225,13 +224,16 @@ namespace Widgets
 		
 		// Keep track of previous mouse Y position to enable scrolling of factories
 		private double? _prevMouseY = null;
-		
+
 		//private CSlider slider;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
 		{
 			this.LineWidth = 1;
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
 			this.LineColor = Diagram.Colors.Honeydew;
 			this.FillColor = Diagram.Colors.Honeydew;
 			this.TextColor = Diagram.Colors.Transparent;
@@ -245,7 +247,11 @@ namespace Widgets
 			//this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
 		}
 		
-		public CBlockPalette(double x, double y) : base(x, y) {}
+		public CBlockPalette(double x, double y) : base(x, y) {
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
+		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override Diagram.CShape Clone(double x, double y) {
@@ -443,6 +449,7 @@ namespace Widgets
 					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 					if (shp != null) {
 						shp.Top += dY;
+						shp.absoluteY = shp.Top;
 					}
 				}
 				cvs.Invalidate();
@@ -468,6 +475,7 @@ namespace Widgets
 					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 					if (shp != null) {
 						shp.Top += dY;
+						shp.absoluteY += dY;
 					}
 				}
 				_prevMouseY = e.Y;
@@ -545,13 +553,16 @@ namespace Widgets
 
 		// Save a reference to the block palette
 		internal CBlockPalette _palette = null;
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette,
 							Cairo.Color fillColor, Cairo.Color lineColor)
 			: base(x, y, w, h)
 		{
 			_palette = palette;
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
 			this.Text = label;
 			this.Radius = 5;
 			this.LineWidth = 0;

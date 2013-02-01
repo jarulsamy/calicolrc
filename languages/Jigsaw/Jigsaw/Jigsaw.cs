@@ -17,7 +17,7 @@ using Microsoft.Scripting.Hosting;
 // When a block is dropped, if an edge is activated, a connection is made.
 
 namespace Jigsaw
-{	
+{
 	// -----------------------------------------------------------------------
 	public static class Constant {
 		public const int SPACES = 4; // used in ToPython indent level
@@ -137,7 +137,7 @@ namespace Jigsaw
 			// Build tabbed panel for blocks
 			int tabY = 0; //33;
 			int os = 34;
-						
+
 			// ----- Control tab and factory blocks
 			tabY += tabHeight;
 			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Control", pnlBlock,
@@ -1397,10 +1397,11 @@ namespace Jigsaw
 					this.EditMode = Diagram.EMode.Translating;
 					
 					// Clip offsets
-					this.ClipOffsets();
+					//this.ClipOffsets();
 					
 					// Find all docked shapes and redock them
 					//this.ReDockShapes(dx, dy);
+					this.FixAbsolutePositionedShapes();
 					
 					this.Invalidate();
 				}
@@ -1416,7 +1417,28 @@ namespace Jigsaw
 				this.Invalidate();
 			}
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll scl)
+		{	// Handle DrawingArea wheel scroll events
+			double deltaX = 0.0;
+			double deltaY = 0.0;
+
+			if (scl.Direction == Gdk.ScrollDirection.Up) {
+				deltaY = 20.0;
+			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
+				deltaY = -20.0;
+			} else if (scl.Direction == Gdk.ScrollDirection.Left) {
+				deltaX = -20.0;
+			} else if (scl.Direction == Gdk.ScrollDirection.Right) {
+				deltaX = 20.0;
+			}
+			this.offsetX += deltaX;
+			this.offsetY += deltaY;
+			this.FixAbsolutePositionedShapes();
+			this.Invalidate();
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		protected void OnInspectorShow(object sender, EventArgs e)
 //		{
@@ -1685,6 +1707,10 @@ namespace Jigsaw
 			
 			// If file selected, read it
 			if (response == (int)Gtk.ResponseType.Accept) {
+
+				// Reset the offsets and reposition absolute shapes.
+				this.ResetOffsets ();
+
 				ReadFile(fc.Filename);
 				CurrentPath = fc.Filename;
 				Directory.SetCurrentDirectory(System.IO.Path.GetDirectoryName(CurrentPath));
@@ -2237,7 +2263,7 @@ namespace Jigsaw
 		protected Gtk.Window _contextMenu = null;
 
 		protected Dictionary<String, CProperty> _properties;
-		
+
 		private Widgets.CBlockPalette _palette = null;	// Reference to block palette, if a factory
 		public static int BlockWidth = 275;             // default block size
 
@@ -2252,7 +2278,8 @@ namespace Jigsaw
 			this._palette = palette;
 			if (palette != null) {
 				this._isFactory = true;
-				this.Dock = Diagram.DockSide.Left;
+				this.positionAbsolute = true;
+				//this.Dock = Diagram.DockSide.Left;
 			}
 			
 			// Default edges

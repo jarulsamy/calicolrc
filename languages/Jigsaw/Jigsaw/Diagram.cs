@@ -175,7 +175,7 @@ namespace Diagram
 		
 		internal double worldWidth = 3000.0;					// Size of underlying canvas world
 		internal double worldHeight = 2000.0;
-        internal double scale = 1.01;                            // Drawing scale (zoom) factor
+        internal double scale = 1.0001;                            // Drawing scale (zoom) factor
 		internal double scaleCenterX = 0.0;						// The point about which scaling is performed (screen coordinates)
 		internal double scaleCenterY = 0.0;
 		internal double offsetX = 0.0;							// The current translation amount
@@ -333,7 +333,7 @@ namespace Diagram
 			g.Scale(     this.scale,         this.scale);
 			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
 			g.Translate( this.offsetX,       this.offsetY);
-			
+
 			// Clear background
 			g.Color = this.BackColor;
 			g.Paint();
@@ -486,6 +486,14 @@ namespace Diagram
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		internal void ResetOffsets()
+		{	// Reset all offsets modified due to dragging the programming area around.
+			this.offsetX = 0.0;
+			this.offsetY = 0.0;
+			this.FixAbsolutePositionedShapes();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoTranslate(double deltaX, double deltaY)
 		{
 			this.offsetX += deltaX;
@@ -520,18 +528,20 @@ namespace Diagram
 			// Update and clip offsets
 			this.UpdateOffsetLimits();
 			this.ClipOffsets();
+			this.FixAbsolutePositionedShapes();
 			this.Invalidate();	
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoResetZoom() {
-			Zoom = 1.01;
-			this.offsetX = 0.0;
-			this.offsetY = 0.0;
+			this.scale = 1.0001;
+			//this.offsetX = 0.0;
+			//this.offsetY = 0.0;
 			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
 			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
 			this.UpdateOffsetLimits();
 			this.ClipOffsets ();
+			this.FixAbsolutePositionedShapes();
 			this.Invalidate();	
 		}
 		
@@ -590,6 +600,7 @@ namespace Diagram
 				}
 				e.RetVal = true;
 			}
+			this.FixAbsolutePositionedShapes();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -722,6 +733,7 @@ namespace Diagram
 			} else if (scl.Direction == Gdk.ScrollDirection.Right) {
 				this.DoTranslate(20.0, 0.0);
 			}
+			this.FixAbsolutePositionedShapes();
 		}
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1217,6 +1229,17 @@ namespace Diagram
             return new CPoint((double)Math.Floor((pnt.X / gs) + 0.5) * gs,
                               (double)Math.Floor((pnt.Y / gs) + 0.5) * gs);
         }
+
+		// - - - Fix positioning of absolute-positioned shapes
+		internal void FixAbsolutePositionedShapes() {
+			foreach (CShape shp in this.shapes)
+			{
+				if (shp.positionAbsolute) {
+					shp.Top = shp.absoluteY - this.offsetY;
+					shp.Left = shp.absoluteX - this.offsetX;
+				}
+			}
+		}
 
         // - - - Return a List<CShape> of selected shapes and connectors - - - - - - -
         public List<CShape> SelectedShapesAndConnectors()
@@ -1941,8 +1964,12 @@ namespace Diagram
         internal double top;
         internal double width;
         internal double height;
-		
-		internal DockSide Dock = DockSide.None;					// Default to no docking
+
+		internal bool positionAbsolute = false;				// Set to true if the shape is to maintain its absolute position wrt to the window
+		internal double absoluteX = 0.0;					// Absolute position, if set.
+		internal double absoluteY = 0.0;
+
+		internal DockSide Dock = DockSide.None;				// Default to no docking
 		
         // Maintain a center point
         internal CPoint center = null;
@@ -1989,6 +2016,9 @@ namespace Diagram
 			
             this.center = new CPoint(0.0, 0.0);
             this.UpdateBoundingBox();
+
+			this.absoluteX = this.Left;
+			this.absoluteY = this.Top;
         }
 
         public CShape(List<CPoint> points):
