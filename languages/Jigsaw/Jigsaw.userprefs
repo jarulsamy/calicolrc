@@ -2,9 +2,10 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Widgets.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="32" Column="83" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="2887" Column="12" />
-      <File FileName="Jigsaw\Widgets.cs" Line="441" Column="49" />
+      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="178" Column="25" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="59" Column="15" />
+      <File FileName="Jigsaw\Widgets.cs" Line="290" Column="18" />
+      <File FileName="Jigsaw\MainWindow.cs" Line="14" Column="2" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">

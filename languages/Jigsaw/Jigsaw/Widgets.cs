@@ -258,51 +258,171 @@ namespace Widgets
 			CBlockPalette clone = new CBlockPalette(x, y, this.Width, this.Height);
 			return (Diagram.CShape)clone;
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void MoveBlocksToTop(Diagram.Canvas cvs) {
-			double move = 0;
+		public void DoScroll(Diagram.Canvas cvs, double dY)
+		{	// Test if a scroll is acceptible based on window bounds and block positions
+			// and perform is acceptible.
+			
+			// The top of at least one shape must be positive
+			// If not, prevent scroll
+			
+			//Console.WriteLine ("{0}, {1}, {2}", cvs.Allocation.Height, cvs.scale, Math.Round(cvs.Allocation.Height/cvs.scale));
+			
+			int cvsHeight = Convert.ToInt32(cvs.Allocation.Height/cvs.scale);
+			int countShps = 0;
+			int countAbove = 0;
+			int countBelow = 0;
+			double maxTop = 0.0;
+			double minBottom = 0.0;
+			
+			// Init minTop and maxBottom
+			if (_currTab._shapes.Count > 0) {
+				Diagram.CShape shp = _currTab._shapes[0].Target as Diagram.CShape;
+				maxTop = shp.Top;
+				minBottom = shp.Top + shp.Height;
+			}
+
 			foreach (WeakReference wrshp in _currTab._shapes)
 			{
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 				if (shp != null) {
-					move = shp.Top;
-					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
-					shp.Select(cvs);		// Select this shape
-					break;
+					countShps++;
+					if (shp.Top + shp.Height < 0.0) {
+						countAbove++;
+					} else if (shp.Top > cvsHeight) {
+						countBelow++;
+					}
+
+					if (shp.Top > maxTop) maxTop = shp.Top;
+					double bottom = shp.Top + shp.Height;
+					if (bottom < minBottom) minBottom = bottom;
 				}
 			}
+			
+			// Perform the scroll if conditions permit
+
+			// Scroll down
+			if (dY < 0.0) {
+				if (countAbove == countShps) {
+					dY = maxTop;
+				} else if (countAbove == countShps - 1) {
+					dY = 0.0;
+				} else if (countBelow == countShps) {
+					dY = cvsHeight-minBottom;
+				}
+
+			// Scroll down
+			} else if (dY > 0.0) {
+				if (countBelow == countShps) {
+					dY = cvsHeight-minBottom;
+				} else if (countBelow == countShps - 1) {
+					dY = 0.0;
+				}
+			}
+			
+			// If movement is in order, perform it
 			foreach (WeakReference wrshp in _currTab._shapes)
 			{
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 				if (shp != null) {
-					shp.Top -= move - 5;
+					shp.Top += dY;
+					shp.absoluteY += dY;
 				}
 			}
-			cvs.Invalidate();
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void MoveBlocksToBottom(Diagram.Canvas cvs) {
-			double move = 0;
-			foreach (WeakReference wrshp in _currTab._shapes)
+		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e)
+		{
+			if (this.ContainsPoint(e.X, e.Y, cvs) )
 			{
-				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-				if (shp != null) {
-					move = shp.Top;
-					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
-					shp.Select(cvs);		// Select this shape
+				double dY = 0.0;
+				if (e.Direction == Gdk.ScrollDirection.Up) {
+					dY = 20.0;
+				} else if (e.Direction == Gdk.ScrollDirection.Down) {
+					dY = -20.0;
 				}
+				
+				DoScroll(cvs, dY);
+				
+				cvs.Invalidate();
+			} else {
+				base.OnScroll(cvs, e);
 			}
-			foreach (WeakReference wrshp in _currTab._shapes)
-			{
-				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-				if (shp != null) {
-					shp.Top -= move - 5;
-				}
-			}
-			cvs.Invalidate();
 		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (this.ContainsPoint(e.X, e.Y, cvs) ) 
+			{
+				_prevMouseY = e.Y;
+			}
+			//base.OnMouseDown(cvs, e);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (_prevMouseY != null && _currTab != null) 
+			{
+				double dY = e.Y - (double)_prevMouseY;
+				
+				DoScroll (cvs, dY);
+				_prevMouseY = e.Y;
+				cvs.Invalidate();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			_prevMouseY = null;
+			base.OnMouseUp (cvs, e);
+		}
+
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void MoveBlocksToTop(Diagram.Canvas cvs) {
+//			double move = 0;
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					move = shp.Top;
+//					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+//					shp.Select(cvs);		// Select this shape
+//					break;
+//				}
+//			}
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					shp.Top -= move - 5;
+//				}
+//			}
+//			cvs.Invalidate();
+//		}
+
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//		public void MoveBlocksToBottom(Diagram.Canvas cvs) {
+//			double move = 0;
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					move = shp.Top;
+//					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+//					shp.Select(cvs);		// Select this shape
+//				}
+//			}
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					shp.Top -= move - 5;
+//				}
+//			}
+//			cvs.Invalidate();
+//		}
 
 //		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		public bool SearchMore(Diagram.Canvas cvs, string s) {
@@ -433,80 +553,26 @@ namespace Widgets
 //			return found;
 //		}
 		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e){
-			if (this.ContainsPoint(e.X, e.Y, cvs) )
-			{
-				double dY = 0.0;
-				if (e.Direction == Gdk.ScrollDirection.Up) {
-					dY = 20.0;
-				} else if (e.Direction == Gdk.ScrollDirection.Down) {
-					dY = -20.0;
-				}
-				
-				foreach (WeakReference wrshp in _currTab._shapes)
-				{
-					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-					if (shp != null) {
-						shp.Top += dY;
-						shp.absoluteY += dY; //= shp.Top;
-					}
-				}
-				cvs.Invalidate();
-			} else {
-				base.OnScroll(cvs, e);
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
-			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
-				_prevMouseY = e.Y;
-			}
-			//base.OnMouseDown(cvs, e);
-		}
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
-			if (_prevMouseY != null && _currTab != null) {
-				double dY = e.Y - (double)_prevMouseY;
-				foreach (WeakReference wrshp in _currTab._shapes)
-				{
-					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
-					if (shp != null) {
-						shp.Top += dY;
-						shp.absoluteY += dY;
-					}
-				}
-				_prevMouseY = e.Y;
-				cvs.Invalidate();
-			}
-		}
-		
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
-			_prevMouseY = null;
-			base.OnMouseUp (cvs, e);
-		}
 
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override void Draw(Cairo.Context g)
-        {
-//			// @@@
-//			// Get current x and y offset from the current transformation matrix
-//			Matrix m = g.Matrix;
-//			double x = m.X0;
-//			double y = m.Y0;
-//			g.InverseTransformDistance(ref x, ref y);
+//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//        public override void Draw(Cairo.Context g)
+//        {
+////			// @@@
+////			// Get current x and y offset from the current transformation matrix
+////			Matrix m = g.Matrix;
+////			double x = m.X0;
+////			double y = m.Y0;
+////			g.InverseTransformDistance(ref x, ref y);
+////
+////			g.Save ();
+////			g.Translate(-x, -y);
 //
-//			g.Save ();
-//			g.Translate(-x, -y);
-
-			// Start with the base rounded rectangle
-			base.Draw(g);
-
-//			g.Restore ();
-		}
+//			// Start with the base rounded rectangle
+//			base.Draw(g);
+//
+////			g.Restore ();
+//		}
 	}
 
 	// -----------------------------------------------------------------------
@@ -551,6 +617,70 @@ namespace Widgets
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DoScroll(Diagram.Canvas cvs, double dY)
+		{	// Test if a scroll is acceptible based on window bounds and block positions
+			// and perform is acceptible.
+			
+			// The top of at least one shape must be positive
+			// If not, prevent scroll
+			
+			int cvsHeight = Convert.ToInt32(cvs.Allocation.Height/cvs.scale);
+			int countShps = 0;
+			int countAbove = 0;
+			int countBelow = 0;
+			double maxTop = 0.0;
+			double minBottom = 0.0;
+
+			// Init minTop and maxBottom
+			if (allTabs.Count > 0) {
+				maxTop = allTabs[0].Top;
+				minBottom = allTabs[0].Top + allTabs[0].Height;
+			}
+
+			foreach (CRoundedTab tab in allTabs)
+			{
+				countShps++;
+				if (tab.Top + tab.Height < 0.0) {
+					countAbove++;
+				} else if (tab.Top > cvsHeight) {
+					countBelow++;
+				}
+
+				if (tab.Top > maxTop) maxTop = tab.Top;
+				double bottom = tab.Top + tab.Height;
+				if (bottom < minBottom) minBottom = bottom;
+			}
+			
+			// Perform the scroll if conditions permit
+
+			// Scroll up
+			if (dY < 0.0) {
+				if (countAbove == countShps) {
+					dY = maxTop;
+				} else if (countAbove == countShps - 1) {
+					dY = 0.0;
+				} else if (countBelow == countShps) {
+					dY = cvsHeight-minBottom;
+				}
+
+			// Scroll down
+			} else if (dY > 0.0) {
+				if (countBelow == countShps) {
+					dY = cvsHeight-minBottom;
+				} else if (countBelow == countShps - 1) {
+					dY = 0.0;
+				}
+			}
+			
+			// If movement is in order, perform it
+			foreach (CRoundedTab tab in allTabs)
+			{
+				tab.Top += dY;
+				tab.absoluteY += dY;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e){
 			if (this.ContainsPoint(e.X, e.Y, cvs) )
 			{
@@ -560,12 +690,8 @@ namespace Widgets
 				} else if (e.Direction == Gdk.ScrollDirection.Down) {
 					dY = -20.0;
 				}
-				
-				foreach (CRoundedTab tab in allTabs)
-				{
-					tab.Top += dY;
-					tab.absoluteY += dY;
-				}
+				DoScroll (cvs, dY);
+
 				cvs.Invalidate();
 			} else {
 				base.OnScroll(cvs, e);
@@ -584,11 +710,8 @@ namespace Widgets
 		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
 			if (_prevMouseY != null) {
 				double dY = e.Y - (double)_prevMouseY;
-				foreach (CRoundedTab tab in allTabs)
-				{
-					tab.Top += dY;
-					tab.absoluteY += dY;
-				}
+
+				DoScroll (cvs, dY);
 				_prevMouseY = e.Y;
 				cvs.Invalidate();
 			}
@@ -599,7 +722,7 @@ namespace Widgets
 			_prevMouseY = null;
 			base.OnMouseUp (cvs, e);
 		}
-
+		
 		//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		//		public void MoveBlocksToTop(Diagram.Canvas cvs) {
 		//			double move = 0;
