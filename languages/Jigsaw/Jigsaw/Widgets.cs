@@ -224,8 +224,6 @@ namespace Widgets
 		
 		// Keep track of previous mouse Y position to enable scrolling of factories
 		private double? _prevMouseY = null;
-
-		//private CSlider slider;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
@@ -242,6 +240,7 @@ namespace Widgets
 			this.Selectable = false;
 			this.Draggable = false;
 			this.Connectable = false;
+			this.TopMost = true;
 			
 			// Add slider to widget - 20 pixels wide
 			//this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
@@ -251,6 +250,7 @@ namespace Widgets
 			this.positionAbsolute = true;
 			this.absoluteX = x;
 			this.absoluteY = y;
+			this.TopMost = true;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -449,7 +449,7 @@ namespace Widgets
 					Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 					if (shp != null) {
 						shp.Top += dY;
-						shp.absoluteY = shp.Top;
+						shp.absoluteY += dY; //= shp.Top;
 					}
 				}
 				cvs.Invalidate();
@@ -508,7 +508,144 @@ namespace Widgets
 //			g.Restore ();
 		}
 	}
-	
+
+	// -----------------------------------------------------------------------
+	public class CTabPalette : Diagram.CRectangle
+	{	// The background palette for currently loaded tabs
+		
+		// Keep a reference to the list of all tabs
+		public List<Widgets.CRoundedTab> allTabs = null;
+		
+		// Keep track of previous mouse Y position to enable scrolling of factories
+		private double? _prevMouseY = null;
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CTabPalette(double x, double y, double w, double h) : base(x, y, w, h)
+		{
+			this.LineWidth = 1;
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
+			this.TopMost = true;
+			this.LineColor = Diagram.Colors.Honeydew;
+			this.FillColor = Diagram.Colors.DarkSlateGray; //LightSlateGray;
+			this.TextColor = Diagram.Colors.Transparent;
+			this.Visible = true;
+			this.Sizable = false;
+			this.Selectable = false;
+			this.Draggable = false;
+			this.Connectable = false;
+		}
+		
+		public CTabPalette(double x, double y) : base(x, y) {
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
+			this.TopMost = true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override Diagram.CShape Clone(double x, double y) {
+			CTabPalette clone = new CTabPalette(x, y, this.Width, this.Height);
+			return (Diagram.CShape)clone;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnScroll( Diagram.Canvas cvs, Gdk.EventScroll e){
+			if (this.ContainsPoint(e.X, e.Y, cvs) )
+			{
+				double dY = 0.0;
+				if (e.Direction == Gdk.ScrollDirection.Up) {
+					dY = 20.0;
+				} else if (e.Direction == Gdk.ScrollDirection.Down) {
+					dY = -20.0;
+				}
+				
+				foreach (CRoundedTab tab in allTabs)
+				{
+					tab.Top += dY;
+					tab.absoluteY += dY;
+				}
+				cvs.Invalidate();
+			} else {
+				base.OnScroll(cvs, e);
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
+				_prevMouseY = e.Y;
+			}
+			//base.OnMouseDown(cvs, e);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (_prevMouseY != null) {
+				double dY = e.Y - (double)_prevMouseY;
+				foreach (CRoundedTab tab in allTabs)
+				{
+					tab.Top += dY;
+					tab.absoluteY += dY;
+				}
+				_prevMouseY = e.Y;
+				cvs.Invalidate();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			_prevMouseY = null;
+			base.OnMouseUp (cvs, e);
+		}
+
+		//		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		//		public void MoveBlocksToTop(Diagram.Canvas cvs) {
+		//			double move = 0;
+		//			foreach (WeakReference wrshp in _currTab._shapes)
+		//			{
+		//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+		//				if (shp != null) {
+		//					move = shp.Top;
+		//					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+		//					shp.Select(cvs);		// Select this shape
+		//					break;
+		//				}
+		//			}
+		//			foreach (WeakReference wrshp in _currTab._shapes)
+		//			{
+		//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+		//				if (shp != null) {
+		//					shp.Top -= move - 5;
+		//				}
+		//			}
+		//			cvs.Invalidate();
+		//		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		//		public void MoveBlocksToBottom(Diagram.Canvas cvs) {
+		//			double move = 0;
+		//			foreach (WeakReference wrshp in _currTab._shapes)
+		//			{
+		//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+		//				if (shp != null) {
+		//					move = shp.Top;
+		//					cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
+		//					shp.Select(cvs);		// Select this shape
+		//				}
+		//			}
+		//			foreach (WeakReference wrshp in _currTab._shapes)
+		//			{
+		//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+		//				if (shp != null) {
+		//					shp.Top -= move - 5;
+		//				}
+		//			}
+		//			cvs.Invalidate();
+		//		}
+	}
+
 	// -----------------------------------------------------------------------
 	public class CTextBox : Diagram.CShape
 	{
@@ -553,16 +690,19 @@ namespace Widgets
 
 		// Save a reference to the block palette
 		internal CBlockPalette _palette = null;
+		internal CTabPalette _pnlTab = null;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette,
+		public CRoundedTab (double x, double y, double w, double h, string label, CBlockPalette palette, CTabPalette pnlTab,
 							Cairo.Color fillColor, Cairo.Color lineColor)
 			: base(x, y, w, h)
 		{
 			_palette = palette;
+			_pnlTab = pnlTab;
 			this.positionAbsolute = true;
 			this.absoluteX = x;
 			this.absoluteY = y;
+			this.TopMost = true;
 			this.Text = label;
 			this.Radius = 5;
 			this.LineWidth = 0;
@@ -574,7 +714,14 @@ namespace Widgets
 			this.Selectable = false;
 			this.SetToggle(null, false);
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll e)
+		{
+			// delegate event to tab palette
+			if (_pnlTab != null) _pnlTab.OnScroll(cvs, e);
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {	// Override CShape OnMouseDown method 

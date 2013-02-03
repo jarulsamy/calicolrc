@@ -26,9 +26,9 @@ namespace Diagram
 		public static readonly Color Silver         = new Color(0.75,   0.75,   0.75);
 		public static readonly Color Gray           = new Color(0.5,    0.5,    0.5);
 		public static readonly Color LightGray      = new Color(0.8242, 0.8242, 0.8242);
-		public static readonly Color DarkGray       = new Color(0.6601, 0.6601, 0.6601);
+		public static readonly Color DarkGray       = new Color(0.3601, 0.3601, 0.3601);
 		public static readonly Color SlateGray      = new Color(0.4375, 0.5,    0.5625);
-		public static readonly Color DarkSlateGray  = new Color(0.1562, 0.3086, 0.3086);
+		public static readonly Color DarkSlateGray  = new Color(0.3281, 0.375,  0.4219); //0.1562, 0.3086, 0.3086);
 		public static readonly Color LightSlateGray = new Color(0.4648, 0.5312, 0.5977);
 		public static readonly Color WhiteSmoke     = new Color(0.9570, 0.9570, 0.9570);
 		public static readonly Color Black          = new Color(0.0,    0.0,    0.0);
@@ -1337,7 +1337,22 @@ namespace Diagram
             }
 
             // Add the shape to the list
-            this.shapes.Add(shp);
+//            this.shapes.Add(shp);
+
+			if (shp.TopMost == true || this.shapes.Count == 0) {
+				this.shapes.Add(shp);
+			} else {
+				int insertAt = this.shapes.Count;
+				while ( insertAt > 0 ) {
+					if (this.shapes[insertAt-1].TopMost == false) {
+						break;
+					}
+					insertAt--;
+				}
+				//Console.WriteLine (insertAt);
+				this.shapes.Insert(insertAt, shp);
+			}
+
             this.Modified = true;
         }
 
@@ -1651,24 +1666,24 @@ namespace Diagram
         /// <summary>
         ///  Bring selected shapes to front of z-order
         /// </summary>
-        public void BringSelectedToFront()
-        {
-            List<CShape> tmp = new List<CShape>();
-
-            for (int i = this.shapes.Count - 1; i >= 0; i--)
-            {
-                CShape s = this.shapes[i];
-
-                // Do not start swapping until found first unselected shape
-                if (s.Selected)
-                {
-                    tmp.Insert(0, s);
-                    this.shapes.RemoveAt(i);
-                }
-            }
-            this.shapes.AddRange(tmp);
-            this.Invalidate();
-        }
+//        public void BringSelectedToFront()
+//        {
+//            List<CShape> tmp = new List<CShape>();
+//
+//            for (int i = this.shapes.Count - 1; i >= 0; i--)
+//            {
+//                CShape s = this.shapes[i];
+//
+//                // Do not start swapping until found first unselected shape
+//                if (s.Selected)
+//                {
+//                    tmp.Insert(0, s);
+//                    this.shapes.RemoveAt(i);
+//                }
+//            }
+//            this.shapes.AddRange(tmp);
+//            this.Invalidate();
+//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void SendSelectedToBack()
@@ -1695,7 +1710,8 @@ namespace Diagram
 		/// </summary>
 		public void BringToFront(CShape s) {
 			this.shapes.Remove(s);
-			this.shapes.Add(s);
+			//this.shapes.Add(s);
+			this.AddShape(s);
 		}
 		
 		/// <summary>
@@ -1968,6 +1984,12 @@ namespace Diagram
 		internal bool positionAbsolute = false;				// Set to true if the shape is to maintain its absolute position wrt to the window
 		internal double absoluteX = 0.0;					// Absolute position, if set.
 		internal double absoluteY = 0.0;
+
+		// The TopMost flag is used by the AddShape() method.
+		// A shape with this flag set will be added to the top of the list, as normal.
+		// If the flag is not set, the shape will be added to the shape list 
+		// below all shapes with this flag set to true.
+		internal bool TopMost = false;
 
 		internal DockSide Dock = DockSide.None;				// Default to no docking
 		

@@ -80,8 +80,9 @@ namespace Jigsaw
 		// Path to look for modules to load
 		private string _modulePath = null;
 		
-		// Reference to block panel
+		// Reference to block and tab palettes
 		internal Widgets.CBlockPalette pnlBlock = null;
+		internal Widgets.CTabPalette pnlTab = null;
 		
 		// List of all tab widgets
 		private List<Widgets.CRoundedTab> allTabs = null;
@@ -129,18 +130,21 @@ namespace Jigsaw
 			//List<Widgets.CRoundedTab> allTabs = new List<Widgets.CRoundedTab>();
 			allTabs = new List<Widgets.CRoundedTab>();
 			
-			// Add block panel background to canvas
-			//Widgets.CBlockPalette pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, 205.0, 10000.0);
+			// Add block palette background to canvas
 			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
 			this.AddShape(pnlBlock);
-			
+
+			pnlTab = new Widgets.CTabPalette(0.0, 0.0, 100.0, 10000.0);
+			pnlTab.allTabs = allTabs;
+			this.AddShape(pnlTab);
+
 			// Build tabbed panel for blocks
 			int tabY = 0; //33;
 			int os = 34;
 
 			// ----- Control tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Control", pnlBlock,
+			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Control", pnlBlock, pnlTab,
 											Diagram.Colors.PaleGoldenrod, Diagram.Colors.DarkGoldenrod);
 			tbCtrl.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbCtrl);
@@ -180,7 +184,7 @@ namespace Jigsaw
 			
 			// ----- Statement tab and factory blocks	
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Statements", pnlBlock,
+			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Statements", pnlBlock, pnlTab,
 												Diagram.Colors.LightGreen, Diagram.Colors.DarkGreen);
 			tbStats.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbStats);
@@ -208,7 +212,7 @@ namespace Jigsaw
 			
 			// ----- IO tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Input/Output", pnlBlock,
+			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Input/Output", pnlBlock, pnlTab,
 												Diagram.Colors.LightBlue, Diagram.Colors.DarkBlue);
 			tbInOut.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbInOut);
@@ -236,7 +240,7 @@ namespace Jigsaw
 			
 			// ----- Procedures tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Procedures", pnlBlock,
+			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Procedures", pnlBlock, pnlTab,
 												Diagram.Colors.Thistle, Diagram.Colors.Purple);
 			tbProc.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbProc);
@@ -569,7 +573,7 @@ namespace Jigsaw
 				// Add tab if has at least one block
 				tabY += tabHeight;
 				List<Color> colors = makeColor(tabName);
-				tab = new Widgets.CRoundedTab (0, tabY, 100, tabHeight-3, tabName, pnlBlock, colors[0], colors[1]);
+				tab = new Widgets.CRoundedTab (0, tabY, 100, tabHeight-3, tabName, pnlBlock, pnlTab, colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape (tab);
 				pnlBlock.BringToFront (this);
@@ -882,7 +886,7 @@ namespace Jigsaw
 				// Add tab
 				tabY += tabHeight;
 				List<Color> colors = makeColor(assembly_name);
-				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, assembly_name, pnlBlock,
+				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, assembly_name, pnlBlock, pnlTab,
 												colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape(tab);
@@ -2279,7 +2283,7 @@ namespace Jigsaw
 			if (palette != null) {
 				this._isFactory = true;
 				this.positionAbsolute = true;
-				//this.Dock = Diagram.DockSide.Left;
+				this.TopMost = true;
 			}
 			
 			// Default edges

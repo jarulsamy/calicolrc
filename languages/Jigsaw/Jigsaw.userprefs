@@ -1,12 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Widgets.cs">
     <Files>
-      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="538" Column="25" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="1712" Column="26" />
-      <File FileName="Jigsaw\Widgets.cs" Line="563" Column="9" />
-      <File FileName="Jigsaw\MainWindow.cs" Line="826" Column="19" />
+      <File FileName="c:\Programs\Calico\trunk\languages\Jigsaw\Jigsaw\Diagram.cs" Line="32" Column="83" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="2887" Column="12" />
+      <File FileName="Jigsaw\Widgets.cs" Line="441" Column="49" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
