@@ -2270,6 +2270,7 @@ namespace Calico {
             Gtk.Notebook nb = findNotebook("Shell");
             int idx = findTab("Shell");
             nb.Page = idx;
+            Shell.GrabFocus();
         }
         
         protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
