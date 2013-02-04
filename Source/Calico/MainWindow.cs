@@ -3228,7 +3228,6 @@ namespace Calico {
 
         protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
             Gtk.Application.Invoke(delegate {
-                if (aux_window == null) { // Good, only do swap if in window
                     if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
                         vpaned2.Remove(NotebookPane);
                         vpaned2.Remove(notebook_docs);
@@ -3247,9 +3246,7 @@ namespace Calico {
                             vpaned2.Add2(NotebookPane);
                         }
                     }
-                } else { // ignore, it is in other window
-                }
-            });
+                });
         }
 
         private bool ResizeOutput() {
@@ -3260,7 +3257,6 @@ namespace Calico {
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
             Gtk.Application.Invoke(delegate {
-                if (aux_window == null) { // Good, only do swap if in window
                     if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
                         // swap:
                         hpaned1.Remove(NotebookPane);
@@ -3288,9 +3284,7 @@ namespace Calico {
                         }
                         GLib.Timeout.Add(1, ResizeOutput);
                     }
-                } else { // ignore, it is in other window
-                }
-            });
+                });
         }
     }
 }
