@@ -1429,9 +1429,21 @@ namespace Jigsaw
 			double deltaY = 0.0;
 
 			if (scl.Direction == Gdk.ScrollDirection.Up) {
-				deltaY = 20.0;
+				if ((this.ModifierKeys & Gdk.ModifierType.ControlMask) > 0) {		// If control key is pressed
+					this.DoZoom (1.05);												// zoom up
+				} else if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) > 0) {	// If shift key is pressed
+					deltaX = 20.0;													// scroll right
+				} else {															// If neither is pressed
+					deltaY = 20.0;													// scroll down
+				}
 			} else if (scl.Direction == Gdk.ScrollDirection.Down) {
-				deltaY = -20.0;
+				if ((this.ModifierKeys & Gdk.ModifierType.ControlMask) > 0) {		// If control key is pressed
+					this.DoZoom (1.0/1.05);											// zoom down
+				} else if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) > 0) {	// If shift key is pressed
+					deltaX = -20.0;													// scroll left
+				} else {															// If neither is pressed
+					deltaY = -20.0;													// scroll up
+				}
 			} else if (scl.Direction == Gdk.ScrollDirection.Left) {
 				deltaX = -20.0;
 			} else if (scl.Direction == Gdk.ScrollDirection.Right) {

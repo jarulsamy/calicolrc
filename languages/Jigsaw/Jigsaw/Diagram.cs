@@ -526,8 +526,8 @@ namespace Diagram
 			this.scaleCenterY = 0.0; //0.5*this.Allocation.Height
 			
 			// Update and clip offsets
-			this.UpdateOffsetLimits();
-			this.ClipOffsets();
+			//this.UpdateOffsetLimits();
+			//this.ClipOffsets();
 			this.FixAbsolutePositionedShapes();
 			this.Invalidate();	
 		}
@@ -539,8 +539,8 @@ namespace Diagram
 			//this.offsetY = 0.0;
 			this.scaleCenterX = 0.5*this.Allocation.Width; //scl.X;
 			this.scaleCenterY = 0.5*this.Allocation.Height; //scl.Y;
-			this.UpdateOffsetLimits();
-			this.ClipOffsets ();
+			//this.UpdateOffsetLimits();
+			//this.ClipOffsets ();
 			this.FixAbsolutePositionedShapes();
 			this.Invalidate();	
 		}
