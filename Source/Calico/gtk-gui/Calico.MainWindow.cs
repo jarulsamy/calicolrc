@@ -750,7 +750,7 @@ namespace Calico {
 			w67.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button11 = new global::Gtk.Button();
-			this.button11.TooltipMarkup = "Show Tabs in new window";
+			this.button11.TooltipMarkup = "Show Output in new window";
 			this.button11.CanFocus = true;
 			this.button11.Name = "button11";
 			this.button11.UseUnderline = true;

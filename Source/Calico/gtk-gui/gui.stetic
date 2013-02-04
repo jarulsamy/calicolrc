@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -713,7 +713,7 @@
             <child>
               <widget class="Gtk.Button" id="button11">
                 <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Show Tabs in new window</property>
+                <property name="Tooltip" translatable="yes">Show Output in new window</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:gtk-copy Menu</property>
