@@ -55,7 +55,7 @@ public class CollaborateDocument: Document
 	base (calico, filename, "collaborate")
 	{
 	    CreateWidgets ();
-	    webview.Open ("http://titanpad.com/");
+	    webview.Open ("http://beta.etherpad.org/p/banana");
 	}
     
     private void CreateWidgets ()
@@ -82,6 +82,7 @@ public class CollaborateDocument: Document
 	//widget.Add (vbox);
 	widget.AddWithViewport (vbox);
 	widget.ShowAll ();
+	toolbar.Hide();
     }
     
     private void CreateActions ()
