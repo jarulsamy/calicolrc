@@ -1,3 +1,5 @@
+from Processing import *
+
 size(400, 400)
 smooth()
 background(255)
