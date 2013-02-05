@@ -79,7 +79,8 @@ public class CollaborateDocument: Document
 	//vbox.PackStart (findbar, false, false, 0);
 	vbox.PackEnd (statusbar, false, true, 0);
 	
-	widget.Add (vbox);
+	//widget.Add (vbox);
+	widget.AddWithViewport (vbox);
 	widget.ShowAll ();
     }
     
