@@ -218,6 +218,15 @@ namespace Calico {
             config.SetValue("config", "visible-languages", vlangs);
             // End of loading languages
             // -------------------------------------------
+
+	    // Handle interrupt:
+	    MainWindow win = null;
+	    System.Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
+		e.Cancel = true;
+		if (win != null)
+		    win.RequestQuit();
+	    };
+
             // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {
@@ -236,24 +245,24 @@ namespace Calico {
             } else if (((IList<string>)args).Contains("--exec")) {
                 if (withGraphics) {
                     Application.Init();
-                    new CalicoConsole(args, manager, Debug, config, false);
+                    win = new CalicoConsole(args, manager, Debug, config, false);
                     Application.Run();
 
                 } else {
                     Application.Init();
-                    new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
+                    win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
                 }
                 //rs.Show();
             } else if (((IList<string>)args).Contains("--repl")) {
                 if (withGraphics) {
                     Application.Init();
-                    MainWindow win = new CalicoConsole(args, manager, Debug, config, true);  
+                    win = new CalicoConsole(args, manager, Debug, config, true);  
                     //win.Show();
                     Application.Run();
 
                 } else {
                     Application.Init();
-                    new CalicoConsoleNoGUI(args, manager, Debug, config, true);
+                    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
                 }
                 //rs.Show();
             }
@@ -261,7 +270,7 @@ namespace Calico {
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
-                MainWindow win = new MainWindow(args, manager, Debug, config);
+                win = new MainWindow(args, manager, Debug, config);
                 win.Show();
                 Application.Run();
             }
