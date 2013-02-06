@@ -219,14 +219,31 @@ namespace Calico {
             // End of loading languages
             // -------------------------------------------
 
-	    // Handle interrupt:
-	    MainWindow win = null;
-	    System.Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
-		e.Cancel = true;
-		if (win != null)
-		    win.RequestQuit();
-	    };
-
+			// Handle interrupt:
+			MainWindow win = null;
+			/* // This doesn't let the app run in the background:
+			   System.Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
+			   e.Cancel = true;
+			   if (win != null)
+			   win.RequestQuit();
+			   };
+			*/
+			
+			// Catch SIGINT and SIGUSR1
+			UnixSignal[] signals = new UnixSignal [] {
+			  new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
+			};
+			
+			System.Threading.Thread signal_thread = new System.Threading.Thread (delegate () {
+				  System.Console.WriteLine(".");
+				  // Wait for a signal to be delivered
+				  int index = UnixSignal.WaitAny (signals, -1);
+				  System.Console.WriteLine("Received signal!");
+				  if (win != null)
+					win.RequestQuit(); 
+				});
+			signal_thread.Start();
+			
             // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {

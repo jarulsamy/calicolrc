@@ -36,7 +36,7 @@ namespace Calico {
         // label for notebook page
         public Gtk.Button close_button;
         // tab close button
-        bool _isDirty = false;
+        protected bool _isDirty = false;
         double _speedValue = 100;
 
         public Document(MainWindow calico, string filename, string language) : base() {
