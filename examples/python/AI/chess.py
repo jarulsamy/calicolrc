@@ -39,11 +39,13 @@ Plays a random game of chess. Some abbreviations and terms:
 from copy import deepcopy
 import random
 import Graphics
+import Myro
 
 def printReason(game_result):
     # Reason values
     if game_result == 0:
-        print("Running...")
+        #print("Running...")
+        pass
     elif game_result == 1:
         print("INVALID_MOVE")
     elif game_result == 2:
@@ -1151,8 +1153,8 @@ class ChessBoard(object):
         return newState
 
     def checkStatus(self, state):
-        print("Move: %s" % state.move_count)
-        print(self)
+        #print("Move: %s" % state.move_count)
+        #print(self)
         if self.isCheck(state):
             state.cur_move[5]="+"
         if not self.hasAnyValidMoves(state):
@@ -1238,6 +1240,7 @@ def gplay(player1, player2):
     board = ChessBoard()
     size = 600
     window, images = makeWindow(size)
+    window.Title = "Chess: %s (black) vs %s (white)" % (player1.__name__, player2.__name__)
     count = 0
     displayBoard(window, board, images, count)
     while state.game_result == 0:
@@ -1249,9 +1252,26 @@ def gplay(player1, player2):
             else:
                 fromPos, toPos = player1(board, state, moves)
 
-            print("%s moves %s from %s to %s" %
-                  (state.player, board.board[fromPos[1]][fromPos[0]],
-                   fromPos, toPos))
+            #print("%s moves %s from %s to %s" %
+            #      (state.player, board.board[fromPos[1]][fromPos[0]],
+            #       fromPos, toPos))
+            rect1 = Graphics.Rectangle((fromPos[0] * size/8, fromPos[1] * size/8),
+                                      ((fromPos[0] + 1) * size/8, (fromPos[1] + 1) * size/8))
+            rect2 = Graphics.Rectangle((toPos[0] * size/8, toPos[1] * size/8),
+                                      ((toPos[0] + 1) * size/8, (toPos[1] + 1) * size/8))
+            even = (count % 2) == 0
+            if even:
+                rect1.tag = "piece-even"
+                rect2.tag = "piece-even"
+                rect1.fill = Graphics.Color("lightblue")
+                rect2.fill = Graphics.Color("lightblue")
+            else:
+                rect1.tag = "piece-odd"
+                rect2.tag = "piece-odd"
+                rect1.fill = Graphics.Color("pink")
+                rect2.fill = Graphics.Color("pink")
+            rect1.draw(window)
+            rect2.draw(window)
             board.makeMove(state, fromPos, toPos)
             displayBoard(window, board, images, count)
             if state.game_result == 0:
@@ -1260,6 +1280,7 @@ def gplay(player1, player2):
         else:
             print("No moves!")
             break
+    return state.game_result
 
 def play(player1, player2):
     # player1 is black
@@ -1285,6 +1306,7 @@ def play(player1, player2):
         else:
             print("No moves!")
             break
+    return state.game_result
 
 def randomPlayer1(board, state, moves):
     """
@@ -1351,23 +1373,49 @@ def staticAnalysis(board, state):
     #print("Static analysis")
     #print("State.player:", state.player)
     #print(board)
-    score = random.random() # small random value
+    return evaluateColor(board, state, state.player) - evaluateColor(board, state, board.getOtherPlayer(state))
+
+def evaluateColor(board, state, player):
+    state.player = player
+    #print("evaluateColor", state.player)
+    total = random.random() # small random value
     for x in range(8):
         for y in range(8):
             color = board.getColor(x, y)
             piece = board.board[y][x].upper()
             if color == state.player:
-                score += 1 # one of my pieces
-            elif color == ' ':
-                pass       # an empty place
-            else:
-                score -= 1 # the other player
-    #print(score)
-    return score
+                score = 0
+                if piece == 'K':
+                    score += 1000
+                elif piece == 'Q':
+                    score += 216
+                elif piece == 'N':
+                    score += 108
+                elif piece == 'R':
+                    score += 56
+                elif piece == 'B':
+                    score += 28
+                elif piece == 'P':
+                    score += 14 * distanceToBackRow(player, y)
+                if board.isThreatened(state, x, y):
+                    #print("%s at (%s,%s) is threatend" % (piece, x, y))
+                    score *= .25
+                total += score
+    #if state.player == 'w':
+    #    print(board)
+    #    print(total)
+    #    Myro.ask("Next?")
+    return total
+
+def distanceToBackRow(player, y):
+    if player == 'w':
+        return abs(y - 7)/7
+    else:
+        return y/7
 
 # Play a game:
 # black, white:
-gplay(randomPlayer1, player1)
+gplay(randomPlayer2, player1)
 #play(randomPlayer, randomPlayer)
 
 ## or interactively test:
