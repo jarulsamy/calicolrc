@@ -202,7 +202,8 @@ class BasicInterpreter:
       'LOG':    lambda x : math.log(x),
       'EXP':    lambda x : math.exp(x),
       'TIME':   lambda x : time.time(),
-      'RND':    lambda x : random.random()
+      'RND':    lambda x : random.random(),
+      'CHR$':    lambda x : chr(x),
     }
 
     class Print:
