@@ -110,7 +110,7 @@ namespace Calico {
         int animationSequence = 0;
         Gtk.Image[] animationImages = new Gtk.Image [2];
         public AuxWindow aux_window = null;
-		System.Threading.Thread signal_thread;
+	System.Threading.Thread signal_thread;	
         public static MainWindow _mainWindow = null;
 
         enum TargetType {
@@ -129,19 +129,11 @@ namespace Calico {
         public MainWindow(): base(Gtk.WindowType.Toplevel) {
         }
 
-        public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config) :
+        public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config, 
+			  System.Threading.Thread signal_thread) :
                 base(Gtk.WindowType.Toplevel) {
 
-			// Catch SIGINT
-			UnixSignal[] signals = new UnixSignal [] {
-			  new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
-			};
-		    signal_thread = new System.Threading.Thread (delegate () {
-				// Wait for a signal to be delivered
-				int index = UnixSignal.WaitAny (signals, -1);
-				RequestQuit(); 
-			  });
-			signal_thread.Start();
+	    this.signal_thread = signal_thread;
             _mainWindow = this;
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));
             this.config = config;
