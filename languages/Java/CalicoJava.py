@@ -33,6 +33,15 @@ for filename in glob.glob(os.path.join(jarpath, "*.jar")):
 options = edu.rice.cs.dynamicjava.Options.DEFAULT
 loader = edu.rice.cs.plt.reflect.PathClassLoader(classpath)
 
+# FIXME: get line of error
+# HINT: drjava only does that on compile, not interpreter
+#inputStream = java.io.ByteArrayInputStream(System.Array[System.Byte](map(ord,list("class Person {"))))
+#p = koala.dynamicjava.parser.impl.Parser(inputStream)
+#try:
+#    print(p.parseStream())
+#except Exception, e:
+#    pass
+
 class OutputStream(java.io.ByteArrayOutputStream):
     def write(self, *args):
         if len(args) == 1:
@@ -162,10 +171,3 @@ def MakeLanguage():
     just once, even for non-visible languages.
     """
     return MyLanguage()
-
-try:
-    engine = MyLanguageEngine(calico.manager)
-    engine.PostSetup(calico)
-    ## engine.Execute("1 + 1;", True)\
-except:
-    pass
