@@ -1205,7 +1205,6 @@ def upgrade_fluke(url=None, port=None):
 
 
     if version >= [3, 0, 0]:
-        import time
         s.flushOutput()
         s.flushInput()
         print ("Sending firmware")
