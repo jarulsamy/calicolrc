@@ -57,7 +57,7 @@ public class CollaborateDocument: Document
 	{
 	    wc = new System.Net.WebClient();
 	    CreateWidgets ();
-		webview.Open(String.Format("http://beta.etherpad.org/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
+		webview.Open(String.Format("http://drablab.org:9001/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
 					   "calico-New%20Collaborate%20Script"));
 		this._isDirty = true;
 	}
@@ -72,7 +72,7 @@ public class CollaborateDocument: Document
 	    if (retval != null) {
 		retval.TryGetValue("Filename:", out filename);
 		if (filename != "") {
-		    webview.Open (String.Format("http://beta.etherpad.org/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
+		    webview.Open (String.Format("http://drablab.org:9001/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
 						"calico-" + filename));
 		    this._isDirty = false;
 		    this.tab_label.Text = filename;
@@ -90,7 +90,7 @@ public class CollaborateDocument: Document
 		padname = "calico-" + filename;
 	    else
 		padname = "calico-New%20Collaborate%20Script";
-	    string jsonData = wc.DownloadString("http://beta.etherpad.org/api/1.2.1/getText?apikey=EtherpadFTW&padID=" + padname);
+	    string jsonData = wc.DownloadString("http://drablab.org:9001/api/1.2.1/getText?apikey=LQ68td8c8Z3aeEVnK30Jfe0eEBTZdojc&padID=" + padname);
 	    Newtonsoft.Json.JsonTextReader reader = new Newtonsoft.Json.JsonTextReader(
 			       new System.IO.StringReader(jsonData));
 	    string retval = "";
