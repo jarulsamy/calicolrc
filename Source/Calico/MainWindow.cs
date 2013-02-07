@@ -1110,7 +1110,8 @@ namespace Calico {
             }
             if (filename != null) {
                 string dir = System.IO.Path.GetDirectoryName(filename);
-                System.IO.Directory.SetCurrentDirectory(dir);
+		if (dir != "")
+		    System.IO.Directory.SetCurrentDirectory(dir);
             }
             if (language != null && manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                 ShellLanguage = language;
@@ -2013,7 +2014,8 @@ namespace Calico {
                     ResetShell();
                 }
                 string dir = System.IO.Path.GetDirectoryName(filename);
-                System.IO.Directory.SetCurrentDirectory(dir);
+		if (dir != "")
+		    System.IO.Directory.SetCurrentDirectory(dir);
                 manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                 Invoke(OnStopRunning);
             }));
