@@ -33,10 +33,10 @@ using GtkSharp;
 using WebKit;
 using Calico;
 
+using System.Collections.Generic;
+
 public class CollaborateDocument: Document
 {
-    private string url = "http://www.google.com/";
-    
     private Gtk.VBox vbox = null;
     private Gtk.Toolbar toolbar = null;
     private Gtk.Toolbar findbar = null;
@@ -44,20 +44,79 @@ public class CollaborateDocument: Document
     private Gtk.Entry find_entry = null;
     private WebKit.WebView webview = null;
     private Gtk.Statusbar statusbar = null;
-    
+	
     private Gtk.Action action_back;
     private Gtk.Action action_forward;
     private Gtk.Action action_reload;
     private Gtk.Action action_stop;
     private Gtk.Action action_jump;
+    System.Net.WebClient wc;
 
     public CollaborateDocument (Calico.MainWindow calico, string filename): 
 	base (calico, filename, "collaborate")
 	{
+	    wc = new System.Net.WebClient();
 	    CreateWidgets ();
-	    webview.Open ("http://beta.etherpad.org/p/banana");
+		webview.Open(String.Format("http://beta.etherpad.org/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
+					   "calico-New%20Collaborate%20Script"));
+		this._isDirty = true;
 	}
     
+	public override bool Save() {
+	    if (filename == null)
+		return SaveAs();
+	    return true;
+	}
+	public override bool SaveAs() {
+	    Dictionary<string,string> retval = Calico.MainWindow.ask(new List<string>() {"Filename:"}, "Name the Collaborate file");
+	    if (retval != null) {
+		retval.TryGetValue("Filename:", out filename);
+		if (filename != "") {
+		    webview.Open (String.Format("http://beta.etherpad.org/p/{0}?noColors=true&showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=true",
+						"calico-" + filename));
+		    this._isDirty = false;
+		    this.tab_label.Text = filename;
+		    return true;
+		}
+		return false;
+	    } else {
+		return true;
+	    }
+	}
+
+	public override string GetText() {
+	    string padname;
+	    if (filename != null) 
+		padname = "calico-" + filename;
+	    else
+		padname = "calico-New%20Collaborate%20Script";
+	    string jsonData = wc.DownloadString("http://beta.etherpad.org/api/1.2.1/getText?apikey=EtherpadFTW&padID=" + padname);
+	    Newtonsoft.Json.JsonTextReader reader = new Newtonsoft.Json.JsonTextReader(
+			       new System.IO.StringReader(jsonData));
+	    string retval = "";
+	    while (reader.Read()) {
+		if (reader.Value != null) {
+		    if (reader.TokenType.ToString() == "String") // FIXME
+			retval = reader.Value.ToString(); // HACK! last one
+		}
+	    }
+	    return retval;
+	}
+	
+        public override void ExecuteFileInBackground() {
+	    string text = GetText();
+	    try {
+		// FIXME: in temp place (folder or file)
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+                sw.Write(text);
+                sw.Close();
+	    } catch {
+		return;
+	    }
+	    string language = calico.manager.GetLanguageFromExtension(filename);
+	    calico.ExecuteFileInBackground(filename, language);
+        }
+
     private void CreateWidgets ()
     {
 	//this.Title = APP_NAME;
@@ -226,6 +285,13 @@ public class CollaborateDocument: Document
     }
 }
 
+public class CollaborateEngine: Engine
+{
+    public CollaborateEngine (LanguageManager manager) : 
+        base(manager) {
+    }
+}
+
 public class CollaborateLanguage : Language
 {
 	public CollaborateLanguage () : 
@@ -236,7 +302,7 @@ public class CollaborateLanguage : Language
     
 	public override void MakeEngine (LanguageManager manager)
 	{
-		engine = new Engine (manager);
+		engine = new CollaborateEngine (manager);
 	}
 
 	public override Document MakeDocument (Calico.MainWindow calico, string filename)
