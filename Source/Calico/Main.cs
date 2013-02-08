@@ -251,7 +251,7 @@ namespace Calico {
                     Application.Run();
 
                 } else {
-                    Application.Init();
+                    //Application.Init();
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
                 }
                 //rs.Show();
@@ -263,7 +263,7 @@ namespace Calico {
                     Application.Run();
 
                 } else {
-                    Application.Init();
+                    //Application.Init();
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
                 }
                 //rs.Show();
