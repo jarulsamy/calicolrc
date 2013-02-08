@@ -270,24 +270,28 @@ namespace Calico {
             }
             else {
 		// Catch SIGINT
-		UnixSignal[] signals = new UnixSignal [] {
-		    new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
-		};
-		System.Threading.Thread  signal_thread = new System.Threading.Thread (delegate () {
-			// Wait for a signal to be delivered
-			int index = UnixSignal.WaitAny (signals, -1);
-			Gtk.Application.Invoke( delegate { 
-				if (win != null)
-				    win.RequestQuit(); 
-			    });
-		    });
-		signal_thread.Start();
+                System.Threading.Thread  signal_thread = null;
+                if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
+            		UnixSignal[] signals = new UnixSignal [] {
+            		    new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
+            		};
+            		signal_thread = new System.Threading.Thread (delegate () {
+            			// Wait for a signal to be delivered
+            			int index = UnixSignal.WaitAny (signals, -1);
+            			Gtk.Application.Invoke( delegate { 
+            				if (win != null)
+            				    win.RequestQuit(); 
+            			    });
+            		    });
+            		signal_thread.Start();
+                }
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
                 win = new MainWindow(args, manager, Debug, config, signal_thread);
                 win.Show();
                 Application.Run();
+
             }
         }
 
