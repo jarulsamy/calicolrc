@@ -1201,7 +1201,7 @@ def makeWindow(size):
 def displayBoard(window, board, images, count):
     size = window.width
     #chess_set = Graphics.Picture("/usr/local/lib/Calico/examples/images/chess_set.png")
-    chess_set = Graphics.Picture("../../images/chess_set.png")
+    chess_set = Graphics.Picture(calico.relativePath("../examples/images/chess_set.png"))
     map = {"r": ("rook", "black"),
            "n": ("knight", "black"),
            "b": ("bishop", "black"),
