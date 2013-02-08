@@ -133,7 +133,7 @@ namespace Calico {
 			  System.Threading.Thread signal_thread) :
                 base(Gtk.WindowType.Toplevel) {
 
-	    this.signal_thread = signal_thread;
+            this.signal_thread = signal_thread;
             _mainWindow = this;
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));
             this.config = config;
@@ -383,6 +383,10 @@ namespace Calico {
 
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        public string relativePath(string path_file) {
+            return System.IO.Path.Combine(path, path_file);
         }
 
         void configureIO()
