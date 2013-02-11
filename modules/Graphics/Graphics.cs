@@ -1155,6 +1155,7 @@ public static class Graphics
 		public double simulationStepTime = 0.01;
 		public string state = "init";
 		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
+		public bool requestStop = false;
 		Gtk.ScrolledWindow _scrolledWindow = null;
 
 		public WindowClass (string title="Calico Graphics",
@@ -1469,8 +1470,9 @@ public static class Graphics
 
 		public void run ()
 		{
-			while (true)
-				step (.01);
+		  requestStop = false;
+		  while (! requestStop)
+			step (.01);
 		}
 
 		public void onMouseUp (Func<object,Event,object> function)
@@ -1691,7 +1693,10 @@ public static class Graphics
 			// Same as update, but will make sure it 
 			// doesn't update too fast.
 			// handle physics
-
+		  if (_canvas == null ) {
+			requestStop = true;
+			return;
+		  }
 			// kjo
 			_canvas.need_to_draw_surface = true;
       
