@@ -1471,8 +1471,13 @@ public static class Graphics
 		public void run ()
 		{
 		  requestStop = false;
-		  while (! requestStop)
-			step (.01);
+		  while (! requestStop) {
+			try {
+			  step (.01);
+			} catch {
+			  requestStop = true;
+			}
+		  }
 		}
 
 		public void onMouseUp (Func<object,Event,object> function)
@@ -1693,7 +1698,7 @@ public static class Graphics
 			// Same as update, but will make sure it 
 			// doesn't update too fast.
 			// handle physics
-		  if (_canvas == null ) {
+		  if (_canvas == null) {
 			requestStop = true;
 			return;
 		  }
@@ -1734,9 +1739,13 @@ public static class Graphics
 			_dirty = false;
 			ManualResetEvent ev = new ManualResetEvent (false);
 			Invoke (delegate { 
-				QueueDraw ();
-				GdkWindow.ProcessUpdates (true);
-				ev.Set ();
+				  try {
+					QueueDraw ();
+					GdkWindow.ProcessUpdates (true);
+				  } catch {
+					requestStop = true;
+				  }
+				  ev.Set ();
 			});
 			ev.WaitOne ();
 		}
@@ -2792,6 +2801,11 @@ public static class Graphics
 				if (! shape.shapes.Contains (this)) {
 					shape.shapes.Add (this);
 					//System.Console.Error.WriteLine("Added to shape!");
+					//if (window.canvas.world != null) {
+					//_bodyType = FarseerPhysics.Dynamics.BodyType.Static; // must be static, to stay
+											// where it is
+					  //addToPhysics();
+					  //}
 				}
 			}
 			window = shape.window;
