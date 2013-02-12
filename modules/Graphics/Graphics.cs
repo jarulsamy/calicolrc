@@ -4593,31 +4593,32 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Polygon
-			world = window._canvas.world;
-			float MeterInPixels = 64.0f;
-			// from x,y to meters of window
-			FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices ();
-			// Position is absolute:
-			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
-                                     ((float)y) / MeterInPixels);
-			// Points should be relative to position:
-			foreach (Point point in points) {
-				vertices.Add (new Vector2 ((float)((point.x) / MeterInPixels), 
-                                  (float)((point.y) / MeterInPixels)));
-			}
-			body = FarseerPhysics.Factories.BodyFactory.CreatePolygon (
-                 world,
-                 vertices, 
-                 _density,
-                 position);
-			// Give it some bounce and friction
-			body.BodyType = _bodyType;
-			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-			body.Restitution = _bounce;
-			body.Rotation = (float)_rotation;
-			body.Friction = _friction;
-			body.UserData = this; // point back to this shape
-			body.FixtureList [0].UserData = this; // point back to this shape
+		    world = window._canvas.world;
+		    float MeterInPixels = 64.0f;
+		    // from x,y to meters of window
+		    FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices ();
+		    // Position is absolute:
+		    Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+						    ((float)y) / MeterInPixels);
+		    // Points should be relative to position:
+		    foreach (Point point in points) {
+			vertices.Add (new Vector2 ((float)((point.x) / MeterInPixels), 
+						   (float)((point.y) / MeterInPixels)));
+		    }
+	
+		    List<FarseerPhysics.Common.Vertices> list = FarseerPhysics.Common.Decomposition.BayazitDecomposer.ConvexPartition(vertices);
+		    body = FarseerPhysics.Factories.BodyFactory.CreateCompoundPolygon (world,
+										       list, 
+										       _density,
+										       position);
+		    // Give it some bounce and friction
+		    body.BodyType = _bodyType;
+		    body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+		    body.Restitution = _bounce;
+		    body.Rotation = (float)_rotation;
+		    body.Friction = _friction;
+		    body.UserData = this; // point back to this shape
+		    body.FixtureList [0].UserData = this; // point back to this shape
 		}
 	}
 
