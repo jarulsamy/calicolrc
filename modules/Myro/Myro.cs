@@ -1109,7 +1109,11 @@ public static class Myro
 		    simulation.setup ();
 		}
 		// defaults to SimScribbler in this interface
-		robot = makeRobot ("SimScribbler", simulation); 
+		if (robot != null && robot.GetType().Name == "SimScribbler") {
+		    // don't add another!
+		} else {
+		    robot = makeRobot ("SimScribbler", simulation); 
+		}
 	    } 
 	    else {
 		if (Myro.robot != null)
