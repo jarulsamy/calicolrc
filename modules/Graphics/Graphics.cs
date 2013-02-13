@@ -572,7 +572,7 @@ public static class Graphics
                                            int width=300, 
                                            int height=300)
 	{
-		if (_windows.ContainsKey (title)) {
+		if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear ();
 			_windows [title].mode = "auto";
 			_windows [title].ShowAll ();
