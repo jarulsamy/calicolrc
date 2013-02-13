@@ -542,7 +542,7 @@ public static class Graphics
                                            int width=300,
                                            int height=300)
 	{
-		if (_windows.ContainsKey (title)) {
+	    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear (false);
 			_lastWindow = _windows [title];
 			_lastWindow.KeepAbove = true;
