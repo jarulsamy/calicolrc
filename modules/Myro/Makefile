@@ -13,6 +13,7 @@ all: ../Myro.dll
 		-r:SdlDotNet \
 		-r:System.Drawing \
 		-r:Microsoft.Dynamic \
+		-r:JigsawAttributes \
 		-r:IronPython \
 	        -r:IronRuby \
 		-r:FarseerPhysics.dll \
