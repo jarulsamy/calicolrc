@@ -23,7 +23,7 @@
     </block>
     <block id="3" typeName="Jigsaw.CControlRepeat" left="440" top="86">
         <edge id="4" name="In" linkedTo="3" />
-        <edge id="5" name="Out" linkedTo="-1" />
+        <edge id="5" name="Out" linkedTo="15" />
         <edge id="6" name="Loop" linkedTo="7" />
         <property name="Label" value="repeat 4 times" />
         <property name="Message" value="" />
@@ -51,7 +51,7 @@
             <parameter name="time" type="System.Double" default="" />
         </method>
         <edge id="9" name="In" linkedTo="8" />
-        <edge id="10" name="Out" linkedTo="13" />
+        <edge id="10" name="Out" linkedTo="11" />
         <property name="Label" value="turnLeft(1, 2.35)" />
         <property name="Message" value="" />
         <property name="power" value="1" />
@@ -59,21 +59,12 @@
         <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
         <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
     </block>
-    <block id="6" typeName="Jigsaw.CMethodBlock" left="430" top="210">
-        <method assembly_name="Myro" type_name="Myro" method_name="joystick" return_type="System.Void" />
-        <edge id="11" name="In" linkedTo="-1" />
-        <edge id="12" name="Out" linkedTo="-1" />
-        <property name="Label" value="joystick()" />
-        <property name="Message" value="" />
-        <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
-        <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
-    </block>
-    <block id="7" typeName="Jigsaw.CMethodBlock" left="460" top="146">
+    <block id="6" typeName="Jigsaw.CMethodBlock" left="460" top="146">
         <method assembly_name="Myro" type_name="Myro" method_name="takePicture" return_type="Graphics+Picture">
             <parameter name="mode" type="System.String" default="jpeg" />
         </method>
-        <edge id="13" name="In" linkedTo="10" />
-        <edge id="14" name="Out" linkedTo="15" />
+        <edge id="11" name="In" linkedTo="10" />
+        <edge id="12" name="Out" linkedTo="13" />
         <property name="Label" value="pic=takePicture(&quot;jpeg&quot;)" />
         <property name="Message" value="" />
         <property name="Variable" value="pic" />
@@ -81,17 +72,26 @@
         <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
         <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
     </block>
-    <block id="8" typeName="Jigsaw.CMethodBlock" left="460" top="166">
+    <block id="7" typeName="Jigsaw.CMethodBlock" left="460" top="166">
         <method assembly_name="Myro" type_name="Myro" method_name="show" return_type="System.Void">
             <parameter name="picture" type="Graphics+Picture" default="" />
             <parameter name="title" type="System.String" default="Myro Camera" />
         </method>
-        <edge id="15" name="In" linkedTo="14" />
-        <edge id="16" name="Out" linkedTo="-1" />
+        <edge id="13" name="In" linkedTo="12" />
+        <edge id="14" name="Out" linkedTo="-1" />
         <property name="Label" value="show(pic, &quot;Myro Camera&quot;)" />
         <property name="Message" value="" />
         <property name="picture" value="pic" />
         <property name="title" value="&quot;Myro Camera&quot;" />
+        <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
+        <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="440" top="206">
+        <method assembly_name="Myro" type_name="Myro" method_name="joystick" return_type="System.Void" />
+        <edge id="15" name="In" linkedTo="5" />
+        <edge id="16" name="Out" linkedTo="-1" />
+        <property name="Label" value="joystick()" />
+        <property name="Message" value="" />
         <fill_color R="0.584583588915217" G="0.600875923224201" B="0.750586070237023" A="1" />
         <line_color R="0.233833435566087" G="0.240350369289681" B="0.300234428094809" A="1" />
     </block>
