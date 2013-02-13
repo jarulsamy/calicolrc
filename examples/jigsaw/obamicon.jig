@@ -2,6 +2,7 @@
 <jigsaw>
     <module name="Common.dll" />
     <module name="Graphics.dll" />
+    <module name="Myro.dll" />
     <block id="1" typeName="Jigsaw.CControlStart" left="440" top="25">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
@@ -139,7 +140,7 @@
         <edge id="23" name="In" linkedTo="22" />
         <edge id="24" name="Out" linkedTo="25" />
         <property name="Label" value="pixels=getPixels(picture)" />
-        <property name="Message" value="" />
+        <property name="Message" value="name 'Myro' is not defined" />
         <property name="Variable" value="pixels" />
         <property name="picture" value="picture" />
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
