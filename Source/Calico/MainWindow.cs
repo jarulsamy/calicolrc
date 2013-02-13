@@ -1689,8 +1689,8 @@ namespace Calico {
                                                      searchEntry.Entry.Text.Length);
                         CurrentDocument.SearchMore(searchEntry.Entry.Text);
                         args.RetVal = true;
-                    } else if (Focus == Shell){
-                      //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+		    //} else if (Focus == Shell){
+                    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                         if (history.SearchMore(searchEntry.ActiveText)) {
                             Shell.Text = history.update();
                             UpdateUpDownArrows();
@@ -1700,9 +1700,8 @@ namespace Calico {
                     if (CurrentDocument != null) {
                         CurrentDocument.SearchNext(searchEntry.ActiveText);
                         args.RetVal = true;
-                    } else if (Focus == Shell){
-                      //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
-
+		    //} else if (Focus == Shell){
+                    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                         if (history.SearchPrevious(searchEntry.ActiveText)) {
                             Shell.Text = history.update();
                             UpdateUpDownArrows();
@@ -2966,8 +2965,8 @@ namespace Calico {
         protected void OnSearchEntryChanged(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchMore(searchEntry.ActiveText);
-            } //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
-            else if (Focus == Shell){
+	    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+            //} else if (Focus == Shell){
                 if (history.SearchMore(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
@@ -2978,8 +2977,8 @@ namespace Calico {
         protected void OnSearchNextButtonClicked(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchNext(searchEntry.ActiveText);
-            }else if (Focus == Shell){
-            //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+	    //}else if (Focus == Shell){
+            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
@@ -2991,8 +2990,8 @@ namespace Calico {
         protected void OnSearchPrevButtonClicked(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchPrevious(searchEntry.ActiveText);
-            } else if (Focus == Shell){
-                //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+	    // } else if (Focus == Shell){
+            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     Shell.Text = history.update();
                     UpdateUpDownArrows();
