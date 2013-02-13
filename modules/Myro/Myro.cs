@@ -2151,6 +2151,7 @@ public static class Myro
 			window.QueueDraw ();
 			if (getRobot () != null) {
 				getRobot ().stop ();
+				wait(.1);
 			}
 		}
 
@@ -2170,6 +2171,7 @@ public static class Myro
 			window.QueueDraw ();
 			if (getRobot () != null) {
 				getRobot ().move (t, r);
+				wait(.1);
 			}
 		}
 
@@ -2189,6 +2191,7 @@ public static class Myro
 				window.QueueDraw ();
 				if (getRobot () != null) {
 					getRobot ().move (t, r);
+					wait(.1);
 				}
 			}
 		}
