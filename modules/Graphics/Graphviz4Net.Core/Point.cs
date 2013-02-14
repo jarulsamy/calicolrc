@@ -30,7 +30,8 @@ using System;
 //using System.Windows.Media;
 using System.Globalization;
 
-
+namespace Graphviz4Net
+{
 	[Serializable]
 	//[TypeConverter (typeof (PointConverter))]
 	//[ValueSerializer (typeof (PointValueSerializer))]
@@ -199,3 +200,4 @@ using System.Globalization;
 		double x;
 		double y;
 	}
+}

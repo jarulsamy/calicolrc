@@ -24,6 +24,7 @@
 //
 
 using System;
+using Graphviz4Net;
 //using System.ComponentModel;
 //using System.Windows.Threading;
 

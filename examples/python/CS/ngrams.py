@@ -6,10 +6,12 @@ import Graphics
 import string
 
 def process(filename):
+    global g
     fp = open(filename)
     prev = None
     ngram = {}
     for line in fp:
+        #print("Line:", line)
         remove = ".-?:/=(),[]#><{}\"'\\"
         line = line.translate(string.maketrans(remove, " " * len(remove)))
         line = line.translate(None, "0123456789")
@@ -26,7 +28,7 @@ def process(filename):
     win = Window(500, 500)
     win.addScrollbars(5000, 500)
     counts = list(reversed(list(set([len(ngram[key]) for key in ngram]))))
-    print(len(ngram))
+    print("NGrams read:", len(ngram))
     for key in ngram.keys()[:20]:
         #print(key, ngram[key])
         #if 10 < len(ngram[key]) < 15:
@@ -35,4 +37,4 @@ def process(filename):
     g.layout()
     g.draw(win)
 
-process(pickAFile())
+process(calico.relativePath("../examples/data/ngram-test.txt"))

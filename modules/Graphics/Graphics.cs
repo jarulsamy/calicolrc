@@ -5273,9 +5273,12 @@ public static class Graphics
 		edge.graph = this;
 	    }
 	    
-	    Point translate(double x, double y) {
-        	return new Point(x * scale + window.width/2 - graph.Width/ 2 * scale,
-				 (graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
+	    Point translate(double x, double y, int width, int height) {
+		//System.Console.WriteLine(String.Format("Scale: {0}", scale));
+		//System.Console.WriteLine(String.Format("X,Y: <{0},{1}>", x, y));
+		Point p = new Point(x * scale + width/2, (graph.Height - y) * scale + height/2);
+		//System.Console.WriteLine(String.Format("new X,Y: <{0},{1}>", p.x, p.y));
+		return p;
 	    }
 	    
 	    public string recurseEdges(IList list, int left, int root, int right) {
@@ -5377,6 +5380,7 @@ public static class Graphics
 	    }
 	    
 	    public void draw() {
+		int width, height;
 		if (window == null) {
 		    string label;
 		    if (options.ContainsKey("label")) {
@@ -5387,7 +5391,6 @@ public static class Graphics
                 	label = String.Format("Graph #{0}", Graph.graph_count);
 			Graph.graph_count++;
 		    }
-		    int width, height;
 		    if (options.ContainsKey("width")) {
 			width = (int)options["width"];
 		    } else {
@@ -5399,19 +5402,22 @@ public static class Graphics
 			height = (int)graph.Height;
 		    }
 		    window = Graphics.Window(label, width, height);
+		} else {
+		    width = Math.Max(window.width, 1000);
+		    height = window.height;
 		}
 		if (options.ContainsKey("scale")) {
 		    scale = (double)options["scale"];
 		} else {
-		    scale = Math.Min(window.width/(double)graph.Width, window.height/(double)graph.Height) * .95;
+		    scale = Math.Min(width/(double)graph.Width, height/(double)graph.Height) * .95;
 		}
 		foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
 	            if (v.Position == null) {
 	                continue;
 		    }
-	            Point c = translate(((Graphviz4Net.Point)v.Position).X, ((Graphviz4Net.Point)v.Position).Y);
-	            int width = (int)(((double)v.Width) * 72 * scale);
-		    int height = (int)(((double)v.Height) * 72 * scale);
+	            Point c = translate(((Graphviz4Net.Point)v.Position).X, ((Graphviz4Net.Point)v.Position).Y, width, height);
+	            width = (int)(((double)v.Width) * 72 * scale);
+		    height = (int)(((double)v.Height) * 72 * scale);
 		    string shape;
 		    if (options.ContainsKey("shape")) {
 	                shape = (string)options["shape"];
@@ -5509,7 +5515,7 @@ public static class Graphics
 	            edges[index]["line"] = new List<Shape>();
 		    List<Point> points = new List<Point>();
 		    foreach(Graphviz4Net.Point p in e.Path) {
-	            	points.Add(new Graphics.Point(translate(p.X, p.Y)));
+	            	points.Add(new Graphics.Point(translate(p.X, p.Y, width, height)));
 		    }
 		    string color;
 	            if (e.Attributes.ContainsKey("color")) {
@@ -5571,7 +5577,7 @@ public static class Graphics
 		    }
 	            if (e.LabelPos != null) {
 	                Point p = translate(((Graphviz4Net.Point)e.LabelPos).X, 
-					    ((Graphviz4Net.Point)e.LabelPos).Y);
+					    ((Graphviz4Net.Point)e.LabelPos).Y, width, height);
 	                Text text = new Graphics.Text(p, e.Label);
 	                text.fontSize = 10 * scale;
 	                text.color = new Graphics.Color("black");
