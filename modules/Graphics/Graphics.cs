@@ -5206,262 +5206,262 @@ public static class Graphics
 
 	public class Graph
 	{
-		public static double graph_count = 1;
-		public Graphics.WindowClass window = null;
-		public Dictionary<string,Dictionary<string,Shape>> vertices = new Dictionary<string,Dictionary<string,Shape>> ();
-		public Dictionary<string,Dictionary<string,object>> edges = new Dictionary<string, Dictionary<string,object>> ();
-		public Dictionary<string,object> options = new Dictionary<string, object> {
-			{"default_shape", "circle"},
-			{"default_outline", "black"},
-			{"fill", "white"},
-			{"line_type", "curve"},
-		};
-	  public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
-	  public Graphviz4Net.Dot.DotGraph<string> graph = null;
-		public Dictionary<string,Node> graphNodes = new Dictionary<string,Node>();
-		public List<Edge> graphEdges = new List<Edge>();
-		public string pre_text;
-		public string post_text;
-		double scale = 1.0;
-		
-		public Graph ()
-		{
+	    public static double graph_count = 1;
+	    public Graphics.WindowClass window = null;
+	    public Dictionary<string,Dictionary<string,Shape>> vertices = new Dictionary<string,Dictionary<string,Shape>> ();
+	    public Dictionary<string,Dictionary<string,object>> edges = new Dictionary<string, Dictionary<string,object>> ();
+	    public Dictionary<string,object> options = new Dictionary<string, object> {
+		{"default_shape", "circle"},
+		{"default_outline", "black"},
+		{"fill", "white"},
+		{"line_type", "curve"},
+	    };
+	    public Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string> parser = null;
+	    public Graphviz4Net.Dot.DotGraph<string> graph = null;
+	    public Dictionary<string,Node> graphNodes = new Dictionary<string,Node>();
+	    public List<Edge> graphEdges = new List<Edge>();
+	    public string pre_text;
+	    public string post_text;
+	    double scale = 1.0;
+	    
+	    public Graph ()
+	    {
+	    }
+	    
+	    public void addNode(string name) {
+		graphNodes[name] = new Graphics.Node(name);
+		graphNodes[name].graph = this;
+	    }
+	    
+	    public void addNode(Node node) {
+		graphNodes[node.name] = node;
+		graphNodes[node.name].graph = this;
+	    }
+	    
+	    public Node lookupNode(string name) {
+		foreach(Node node in graphNodes.Values) {
+		    if (node.name == name)
+			return node;
 		}
-		
-		public void addNode(string name) {
-			graphNodes[name] = new Graphics.Node(name);
-			graphNodes[name].graph = this;
+		return null;
+	    }
+	    
+	    public List<Shape> getEdgeLines(object id) {
+		return (List<Shape>)edges[id.ToString()]["line"];
+	    }
+	    
+	    public Shape getNode(object id) {
+		return (Shape)vertices[id.ToString()]["shape"];
+	    }
+	    
+	    public void addEdge(string nameFrom, string nameTo) {
+		string recordFrom = null;
+		string recordTo = null;
+		if (nameFrom.Contains(":")) {
+		    string [] parts = nameFrom.Split(':');
+		    nameFrom = parts[0];
+		    recordFrom = parts[1];
 		}
-		
-		public void addNode(Node node) {
-			graphNodes[node.name] = node;
-			graphNodes[node.name].graph = this;
+		if (nameTo.Contains(":")) {
+		    string [] parts = nameTo.Split(':');
+		    nameTo = parts[0];
+		    recordTo = parts[1];
 		}
-		
-		public Node lookupNode(string name) {
-			foreach(Node node in graphNodes.Values) {
-				if (node.name == name)
-					return node;
-			}
-			return null;
-		}
-		
-		public List<Shape> getEdgeLines(object id) {
-			return (List<Shape>)edges[id.ToString()]["line"];
-		}
-
-		public Shape getNode(object id) {
-			return (Shape)vertices[id.ToString()]["shape"];
-		}
-
-		public void addEdge(string nameFrom, string nameTo) {
-			string recordFrom = null;
-			string recordTo = null;
-			if (nameFrom.Contains(":")) {
-				string [] parts = nameFrom.Split(':');
-				nameFrom = parts[0];
-				recordFrom = parts[1];
-			}
-			if (nameTo.Contains(":")) {
-				string [] parts = nameTo.Split(':');
-				nameTo = parts[0];
-				recordTo = parts[1];
-			}
-			Edge edge = new Edge(nameFrom, recordFrom, lookupNode(nameFrom), 
-						  		 nameTo, recordTo, lookupNode(nameTo));
-			graphEdges.Add(edge);
-			edge.graph = this;
-		}
-
-		Point translate(double x, double y) {
+		Edge edge = new Edge(nameFrom, recordFrom, lookupNode(nameFrom), 
+				     nameTo, recordTo, lookupNode(nameTo));
+		graphEdges.Add(edge);
+		edge.graph = this;
+	    }
+	    
+	    Point translate(double x, double y) {
         	return new Point(x * scale + window.width/2 - graph.Width/ 2 * scale,
-                			(graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
-		}
-
-		public string recurseEdges(IList list, int left, int root, int right) {
-			string edges = "";
-			if (list == null || list.Count == 0) {
-				// Pass
-			} else {
-				if (left < list.Count && list[left] != null) {
-					if (list[left] is IList && ((IList)list[left]).Count > 0) {
-						edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
-						edges += recurseEdges((IList)list[left], left, root, right);
-					} else if (list[left] != null && !(list[left] is IList)) {
-						edges += String.Format("  {0}:left -> {1};\n", list[root], list[left]);
-					}
-				}
-				if (right < list.Count && list[right] != null) {
-					if (list[right] is IList && ((IList)list[right]).Count > 0) {
-						edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
-						edges += recurseEdges((IList)list[right], left, root, right);
-					} else if (list[right] != null  && !(list[right] is IList)) {
-						edges += String.Format("  {0}:right -> {1};\n", list[root], list[right]);
-					}
-				}
+				 (graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
+	    }
+	    
+	    public string recurseEdges(IList list, int left, int root, int right) {
+		string edges = "";
+		if (list == null || list.Count == 0) {
+		    // Pass
+		} else {
+		    if (left < list.Count && list[left] != null) {
+			if (list[left] is IList && ((IList)list[left]).Count > 0) {
+			    edges += String.Format("  {0}:left -> {1};\n", list[root], ((IList)list[left])[root]);
+			    edges += recurseEdges((IList)list[left], left, root, right);
+			} else if (list[left] != null && !(list[left] is IList)) {
+			    edges += String.Format("  {0}:left -> {1};\n", list[root], list[left]);
 			}
-			return edges;
-		}
-		
-		public string recurseNodes(IList list, int left, int root, int right) {
-			string nodes = "";
-			if (list != null && list.Count > 0) {
-				// Left:
-				if (left < list.Count && list[left] is IList)
-					nodes += recurseNodes((IList)list[left], left, root, right);
-				else if (left < list.Count && list[left] != null)
-					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[left].ToString());
-				// Root:
-				nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[root].ToString());
-				// Right:
-				if (right < list.Count && list[right] is IList)
-					nodes += recurseNodes((IList)list[right], left, root, right);
-				else if (right < list.Count && list[right] != null)
-					nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[right].ToString());
+		    }
+		    if (right < list.Count && list[right] != null) {
+			if (list[right] is IList && ((IList)list[right]).Count > 0) {
+			    edges += String.Format("  {0}:right -> {1};\n", list[root], ((IList)list[right])[root]);
+			    edges += recurseEdges((IList)list[right], left, root, right);
+			} else if (list[right] != null  && !(list[right] is IList)) {
+			    edges += String.Format("  {0}:right -> {1};\n", list[root], list[right]);
 			}
-			return nodes;
+		    }
 		}
-
-		public void layout(IList list) {
-			layout(list, 0, 1, 2);
+		return edges;
+	    }
+	    
+	    public string recurseNodes(IList list, int left, int root, int right) {
+		string nodes = "";
+		if (list != null && list.Count > 0) {
+		    // Left:
+		    if (left < list.Count && list[left] is IList)
+			nodes += recurseNodes((IList)list[left], left, root, right);
+		    else if (left < list.Count && list[left] != null)
+			nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[left].ToString());
+		    // Root:
+		    nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[root].ToString());
+		    // Right:
+		    if (right < list.Count && list[right] is IList)
+			nodes += recurseNodes((IList)list[right], left, root, right);
+		    else if (right < list.Count && list[right] != null)
+			nodes += String.Format("  {0} [label=\"<left> | {0} | <right>\"];\n", list[right].ToString());
 		}
-		
-		public void layout(IList list, int left, int root, int right) {
-			string edges = "digraph {\n";
-			edges += @"  node [label=""\\N"", shape=record];";
-			edges += "\n";
-			edges += recurseNodes(list, left, root, right); // left, root, right
-			edges += recurseEdges(list, left, root, right); // left, root, right
-			edges += "}";
-			layout(edges);
+		return nodes;
+	    }
+	    
+	    public void layout(IList list) {
+		layout(list, 0, 1, 2);
+	    }
+	    
+	    public void layout(IList list, int left, int root, int right) {
+		string edges = "digraph {\n";
+		edges += @"  node [label=""\\N"", shape=record];";
+		edges += "\n";
+		edges += recurseNodes(list, left, root, right); // left, root, right
+		edges += recurseEdges(list, left, root, right); // left, root, right
+		edges += "}";
+		layout(edges);
+	    }
+	    
+	    public void layout() {
+		string edges = "digraph {\n";
+		foreach (Edge edge in graphEdges) {
+		    edges += String.Format("{0} -> {1}\n", edge.getFromName(), edge.getToName());
 		}
-		
-		public void layout() {
-			string edges = "digraph {\n";
-			foreach (Edge edge in graphEdges) {
-				edges += String.Format("{0} -> {1}\n", edge.getFromName(), edge.getToName());
-			}
-			edges += "}";
-			layout(edges);
+		edges += "}";
+		layout(edges);
+	    }
+	    
+	    public void layout (string contents) {
+		layout(contents, true);
+	    }
+	    
+	    public void layout (string contents, bool process)
+	    {
+		pre_text = contents; // for debugging
+		if (process)
+		    contents = processDot(contents);
+		post_text = contents; // for debugging
+		parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser();
+		graph = parser.Parse (contents);
+	    }
+	    
+	    public void draw(WindowClass window) {
+		this.window = window;
+		draw();
+	    }
+	    
+	    public void draw(WindowClass window, IDictionary options) {
+		this.window = window;
+		draw(options);
+	    }
+	    
+	    public void draw(IDictionary options) {
+		foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
+		    this.options[kvp.Key.ToString()] = kvp.Value;
 		}
-		
-		public void layout (string contents) {
-			layout(contents, true);
-		}
-
-		public void layout (string contents, bool process)
-		{
-			pre_text = contents; // for debugging
-			if (process)
-				contents = processDot(contents);
-			post_text = contents; // for debugging
-			parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser();
-			graph = parser.Parse (contents);
-		}
-
-		public void draw(WindowClass window) {
-			this.window = window;
-			draw();
-		}
-
-		public void draw(WindowClass window, IDictionary options) {
-			this.window = window;
-			draw(options);
-		}
-
-		public void draw(IDictionary options) {
-			foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
-				this.options[kvp.Key.ToString()] = kvp.Value;
-			}
-			draw();
-		}
-		
-		public void draw() {
-			if (window == null) {
-				string label;
-				if (options.ContainsKey("label")) {
+		draw();
+	    }
+	    
+	    public void draw() {
+		if (window == null) {
+		    string label;
+		    if (options.ContainsKey("label")) {
                 	label = (string)options["label"];
-				} else if (graph.Attributes.ContainsKey("label")) {
+		    } else if (graph.Attributes.ContainsKey("label")) {
                 	label = graph.Attributes["label"].Trim().Split('\n')[0].Trim();
-				} else {
+		    } else {
                 	label = String.Format("Graph #{0}", Graph.graph_count);
-					Graph.graph_count++;
-				}
-				int width, height;
-				if (options.ContainsKey("width")) {
-					width = (int)options["width"];
-				} else {
-					width = (int)graph.Width;
-				}
-				if (options.ContainsKey("height")) {
-					height = (int)options["height"];
-				} else {
-					height = (int)graph.Height;
-				}
-				window = Graphics.Window(label, width, height);
-			}
-			if (options.ContainsKey("scale")) {
-            	scale = (double)options["scale"];
-			} else {
-            	scale = Math.Min(window.width/(double)graph.Width, window.height/(double)graph.Height) * .95;
-			}
-	        foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
+			Graph.graph_count++;
+		    }
+		    int width, height;
+		    if (options.ContainsKey("width")) {
+			width = (int)options["width"];
+		    } else {
+			width = (int)graph.Width;
+		    }
+		    if (options.ContainsKey("height")) {
+			height = (int)options["height"];
+		    } else {
+			height = (int)graph.Height;
+		    }
+		    window = Graphics.Window(label, width, height);
+		}
+		if (options.ContainsKey("scale")) {
+		    scale = (double)options["scale"];
+		} else {
+		    scale = Math.Min(window.width/(double)graph.Width, window.height/(double)graph.Height) * .95;
+		}
+		foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
 	            if (v.Position == null) {
 	                continue;
-				}
+		    }
 	            Point c = translate(((Graphviz4Net.Point)v.Position).X, ((Graphviz4Net.Point)v.Position).Y);
 	            int width = (int)(((double)v.Width) * 72 * scale);
-				int height = (int)(((double)v.Height) * 72 * scale);
-				string shape;
-				if (options.ContainsKey("shape")) {
+		    int height = (int)(((double)v.Height) * 72 * scale);
+		    string shape;
+		    if (options.ContainsKey("shape")) {
 	                shape = (string)options["shape"];
-				} else if (v.Attributes.ContainsKey("shape")) {
+		    } else if (v.Attributes.ContainsKey("shape")) {
 	                shape = v.Attributes["shape"];
-				} else {
+		    } else {
 	                shape = (string)options["default_shape"];
-				}
-				Graphics.Color outline;
-				if (options.ContainsKey("outline")) {
+		    }
+		    Graphics.Color outline;
+		    if (options.ContainsKey("outline")) {
 	                outline = new Graphics.Color((string)options["outline"]);
-				} else if  (v.Attributes.ContainsKey("color")) {
+		    } else if  (v.Attributes.ContainsKey("color")) {
 	                outline = new Graphics.Color(v.Attributes["color"]);
-				} else {
+		    } else {
 	                outline = new Graphics.Color((string)options["default_outline"]);
-				}
+		    }
 	            // Shapes:
-				Shape obj1 = null;
-				Shape obj2 = null;
+		    Shape obj1 = null;
+		    Shape obj2 = null;
 	            if (shape == "circle" || shape == "ellipse") {
 	                obj1 = new Graphics.Oval(c, width/2, height/2);
-				} else if (shape == "doublecircle") {
+		    } else if (shape == "doublecircle") {
 	                obj1 = new Graphics.Oval(c, width/2, height/2);
 	                obj2 = new Graphics.Oval(c, width/2 - 4, height/2 - 4);
-				} else if (shape == "box") {
+		    } else if (shape == "box") {
 	                obj1 = new Graphics.Rectangle(new Point(c.x - width/2, c.y - height/2),
-	                                          	  new Point(c.x + width/2, c.y + height/2));
-	            //elif shape == "diamond":
-				} else {
+						      new Point(c.x + width/2, c.y + height/2));
+			//elif shape == "diamond":
+		    } else {
 	                throw new Exception(String.Format("unknown shape: {0}", shape));
-				}
+		    }
 	            if (obj1 != null) {
 	                obj1.outline = new Graphics.Color(outline);
 	                obj1.fill = new Graphics.Color((string)options["fill"]);
 	                obj1.border = 2;
 	                obj1.draw(window);
-				}
+		    }
 	            if (obj2 != null) {
 	                obj2.outline = new Graphics.Color(outline);
 	                obj2.fill = new Graphics.Color((string)options["fill"]);
 	                obj2.border = 2;
 	                obj2.draw(window);
-				}
+		    }
 	            // Text:
-				string label;
+		    string label;
 	            if (v.Attributes.ContainsKey("label")) {
 	                label = v.Attributes["label"].Trim();
-				} else {
+		    } else {
 	                label = v.Id.Trim();
-				}
+		    }
 	            if (label.Contains("|")) {
 	                string [] labels = label.Split('|');
 	                int parts = labels.Length;
@@ -5473,50 +5473,50 @@ public static class Graphics
 	                    Line line = new Graphics.Line(new Point(x1, y1), new Point(x2, y2));
 	                    line.outline = new Graphics.Color("black");
 	                    line.draw(window);
-					}
+			}
 	                label = labels[1].Trim(); // FIXME: should draw each part
-				}
-				// Add label as tag to objects
+		    }
+		    // Add label as tag to objects
 	            if (obj1 != null) {
 	                obj1.tag = label;
-				}
+		    }
 	            if (obj2 != null) {
 	                obj2.tag = label;
-				}
-				// Draw text:
+		    }
+		    // Draw text:
 	            Graphics.Text text = new Graphics.Text(c, label);
 	            text.fontSize = 10 * scale;
 	            text.color = new Graphics.Color("black");
 	            text.draw(window);
-				// Add group to shape list:
+		    // Add group to shape list:
 	            vertices[label] = new Dictionary<string,Shape>();
 	            if (obj1 != null && obj2 != null) {
 	                vertices[label]["shape"] = new Graphics.Group(obj1, obj2);
-				} else {
+		    } else {
 	                vertices[label]["shape"] = obj1;
-				}
+		    }
 	            vertices[label]["label"] = text;
-			}
+		}
 	        int count = 0;
 	        foreach(Graphviz4Net.Dot.DotEdge<string> e in graph.Edges) {
-				string index;
+		    string index;
 	            if (e.LabelPos != null) {
 	                index = e.Label.Trim();
-				} else {
+		    } else {
 	                index = count.ToString();
-				}
+		    }
 	            edges[index] = new Dictionary<string,object>();
 	            edges[index]["line"] = new List<Shape>();
-				List<Point> points = new List<Point>();
-				foreach(Graphviz4Net.Point p in e.Path) {
+		    List<Point> points = new List<Point>();
+		    foreach(Graphviz4Net.Point p in e.Path) {
 	            	points.Add(new Graphics.Point(translate(p.X, p.Y)));
-				}
-				string color;
+		    }
+		    string color;
 	            if (e.Attributes.ContainsKey("color")) {
 	                color = e.Attributes["color"];
-				} else {
+		    } else {
 	                color = "black";
-				}
+		    }
 	            // Line:
 	            if ((string)options["line_type"] == "curve") {
 	                for (int i = 0; i < points.Count/3; i++) {
@@ -5526,63 +5526,63 @@ public static class Graphics
 	                    line.border = 2;
 	                    line.draw(window);
 	                    ((List<Shape>)edges[index]["line"]).Add(line);
-					}
-				} else {
+			}
+		    } else {
 	                Line line = new Graphics.Line(points[0], points[points.Count - 1]);
 	                line.outline = new Graphics.Color(color);
 	                line.border = 2;
 	                line.draw(window);
 	                ((List<Shape>)edges[index]["line"]).Add(line);
-				}
-				// Arrows:
-		        double w;
-				double h;
-	           	if (e.SourceArrowEnd != null) {
+		    }
+		    // Arrows:
+		    double w;
+		    double h;
+		    if (e.SourceArrowEnd != null) {
 	                Arrow arrow = new Graphics.Arrow(points[0]);
 	                if ((string)options["line_type"] == "curve") {
 	                    w = points[0].x - points[1].x;
 	                    h = points[0].y - points[1].y;
-					} else {
+			} else {
 	                    w = points[0].x - points[points.Count - 1].x;
 	                    h = points[0].y - points[points.Count - 1].y;
-					}
+			}
 	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
 	                arrow.fill = new Graphics.Color(color);
 	                arrow.rotate(degrees);
 	                arrow.scale(scale);
 	                arrow.draw(window);
 	                edges[index]["source_arrow"] = arrow;
-				}
+		    }
 	            if (e.DestinationArrowEnd != null) {
 	                Arrow arrow = new Graphics.Arrow(points[points.Count - 1]);
 	                if ((string)options["line_type"] == "curve") { // FIXME: these may be backwards:
 	                    w = points[points.Count - 2].x - points[points.Count - 1].x;
 	                    h = points[points.Count - 2].y - points[points.Count - 1].y;
-					} else {
+			} else {
 	                    w = points[0].x - points[points.Count - 1].x;
 	                    h = points[0].y - points[points.Count - 1].y;
-					}
+			}
 	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
 	                arrow.fill = new Graphics.Color(color);
 	                arrow.rotate(degrees);
 	                arrow.scale(scale);
 	                arrow.draw(window);
 	                edges[index]["destination_arrow"] = arrow;
-				}
+		    }
 	            if (e.LabelPos != null) {
 	                Point p = translate(((Graphviz4Net.Point)e.LabelPos).X, 
-										((Graphviz4Net.Point)e.LabelPos).Y);
+					    ((Graphviz4Net.Point)e.LabelPos).Y);
 	                Text text = new Graphics.Text(p, e.Label);
 	                text.fontSize = 10 * scale;
 	                text.color = new Graphics.Color("black");
 	                text.draw(window);
 	                edges[index]["label"] = text;
-				}
+		    }
 	            count++;
-			}
 		}
-		
-		public static string processDot(string text) {
+	    }
+	    
+	    public static string processDot(string text) {
 			string retval = null;
 		    Process myProcess = new Process();
 
@@ -5602,25 +5602,14 @@ public static class Graphics
 		        file = Path.Combine(file, "dot");
 		        myProcess.StartInfo.FileName = Path.Combine(file, "dot.exe");
 		      } else {
-		        if (File.Exists("/usr/bin/dot")){
-		        // assumes espeak is in /usr/bin/ on macs
-		            myProcess.StartInfo.FileName = "dot";
-		        }
-		        else if (File.Exists("/usr/local/bin/dot")){
-			// or look for espeak is in /usr/local/bin/ on macs
-		            myProcess.StartInfo.FileName = "dot";
-		        }
-		        else{
-		        // assumes in path
-		            myProcess.StartInfo.FileName = "dot";
-		        }
+			  myProcess.StartInfo.FileName = "dot";
 		      }
 		      myProcess.StartInfo.CreateNoWindow = true;
 			  myProcess.StartInfo.RedirectStandardOutput = true;
 		      myProcess.StartInfo.Arguments = ("-Tdot " + textpath);
 		      myProcess.Start();
-			  retval = myProcess.StandardOutput.ReadToEnd();			  
-			  myProcess.WaitForExit();
+		      retval = myProcess.StandardOutput.ReadToEnd();
+		      myProcess.WaitForExit();
 		#pragma warning disable 219
 		    } catch (Exception e) {
 		#pragma warning restore 219
@@ -5629,7 +5618,7 @@ public static class Graphics
 		        warn_missing_dot = false; // just once
 		      }
 		    }
-			return retval;
+		    return retval;
 		}
 
 	}
