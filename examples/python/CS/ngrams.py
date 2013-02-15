@@ -12,7 +12,7 @@ def process(filename):
     ngram = {}
     for line in fp:
         #print("Line:", line)
-        remove = ".-?:/=(),[]#><{}\"'\\"
+        remove = ".-?:/=(),[]#><{}\"'\\$;"
         line = line.translate(string.maketrans(remove, " " * len(remove)))
         line = line.translate(None, "0123456789")
         line = line.lower()
@@ -25,20 +25,17 @@ def process(filename):
             prev = word
 
     g = Graphics.Graph()
-    ##win = Window(500, 500)
-    ##win.addScrollbars(5000, 5000)
     counts = list(reversed(list(set([len(ngram[key]) for key in ngram]))))
-    print(ngram)
+    #print(ngram)
     print(counts)
     print("NGrams read:", len(ngram))
-    for key in ngram.keys()[:20]:
+    for key in ngram.keys()[:200]:
         #print(key, ngram[key])
-        #if 10 < len(ngram[key]) < 15:
-        for word in ngram[key]:
-            ##print("edge:", key, word)
-            g.addEdge(key, word)
+        if len(ngram[key]):
+            for word in ngram[key]:
+                ##print("edge:", key, word)
+                g.addEdge(key, word)
     g.layout()
-    ##g.draw(win, {"width": 500, "height": 500})
     g.draw()
     # Resize to something reasonable:
     g.window.Resize(500, 500)
