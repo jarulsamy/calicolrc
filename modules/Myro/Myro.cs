@@ -3017,26 +3017,32 @@ public static class Myro
     
 		public void translate (double speed)
 		{
-			move (speed, 0);
+			_lastTranslate = speed;
+			adjustSpeed ();
 		}
     
 		public void translate (double speed, double interval)
 		{
-			move (speed, 0);
+			_lastTranslate = speed;
+			adjustSpeed ();
 			wait (interval);
-			stop ();
+			_lastTranslate = 0;
+			adjustSpeed ();
 		}
     
 		public void rotate (double speed)
 		{
-			move (0, speed);
+			_lastRotate = speed;
+			adjustSpeed ();
 		}
     
 		public void rotate (double speed, double interval)
 		{
-			move (0, speed);
+			_lastRotate = speed;
+			adjustSpeed ();
 			wait (interval);
-			stop ();
+			_lastRotate = 0;
+			adjustSpeed ();
 		}
     
 		public void backward (double speed)
