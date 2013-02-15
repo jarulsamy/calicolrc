@@ -62,7 +62,7 @@ class MyLanguage(Calico.Language):
         return MyDocument(calico, filename, "images")
 
     def getExamplesPath(self, root_path):
-    	return os.path.join(os.path.dirname(__file__), "examples")
+    	return os.path.join(root_path, "../examples/images")
 
 def MakeLanguage():
     return MyLanguage()
