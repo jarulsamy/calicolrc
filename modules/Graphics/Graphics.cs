@@ -5393,6 +5393,8 @@ public static class Graphics
 			height = (int)graph.Height;
 		    }
 		    window = Graphics.Window(label, width, height);
+		    // in case we need them:
+		    window.addScrollbars((int)graph.Width, (int)graph.Height);
 		}
 		if (options.ContainsKey("scale")) {
 		    scale = (double)options["scale"];

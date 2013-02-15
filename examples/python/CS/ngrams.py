@@ -25,16 +25,23 @@ def process(filename):
             prev = word
 
     g = Graphics.Graph()
-    win = Window(500, 500)
-    win.addScrollbars(5000, 500)
+    ##win = Window(500, 500)
+    ##win.addScrollbars(5000, 5000)
     counts = list(reversed(list(set([len(ngram[key]) for key in ngram]))))
+    print(ngram)
+    print(counts)
     print("NGrams read:", len(ngram))
     for key in ngram.keys()[:20]:
         #print(key, ngram[key])
         #if 10 < len(ngram[key]) < 15:
         for word in ngram[key]:
+            ##print("edge:", key, word)
             g.addEdge(key, word)
     g.layout()
-    g.draw(win)
+    ##g.draw(win, {"width": 500, "height": 500})
+    g.draw()
+    # Resize to something reasonable:
+    g.window.Resize(500, 500)
 
-process(calico.relativePath("../examples/data/ngram-test.txt"))
+
+process(calico.relativePath("../examples/data/obamajobs.txt"))
