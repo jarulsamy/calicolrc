@@ -1,0 +1,11 @@
+Numeric.array(vector|matrix, ctype='f')
+ok Numeric.zeros(size, ctype='f')
+Numeric.put(toarray, range as array of positions for to, fromarray or value?)
+Numeric.add.reduce(vector ** 2)
+Numeric.multiply.reduce(connection.dweight.shape)
+Numeric.fabs(vector) # abs
+Numeric.argmax(vector) # pos of maximum
+Numeric.matrixmultiply(vector, matrix)
+Numeric.exp(-v)
+Numeric.tanh(0.66666 * v)
+Numeric.outerproduct(vector, vector)
