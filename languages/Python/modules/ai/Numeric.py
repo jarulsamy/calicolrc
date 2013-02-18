@@ -1,11 +1,15 @@
 ## Pure-Python Numeric replacement
+## (c) 2013, Doug Blank <doug.blank@gmail.com>
+## GPL, version 3.0
 
 import math, operator
 import array as python_array
+import random
 
 def ndim(n, *args, **kwargs):
     """
-    Makes a multi-dimensional array of random floats. (Replaces RandomArray).
+    Makes a multi-dimensional array of random floats. (Replaces
+    RandomArray).
     """
     thunk = kwargs.get("thunk", lambda: random.random())
     if not args: 
@@ -16,9 +20,12 @@ def ndim(n, *args, **kwargs):
     return A 
 
 class array:
+    """
+    Replaces Numeric's ndarray.
+    """
     def __init__(self, data, typecode='f'):
-        ## Array([1, 2])
-        ## Array([[1, 2], [3, 4]])
+        ## array([1, 2])
+        ## array([[1, 2], [3, 4]])
         if type(data) == array:
             self.array = data[:]
         elif type(data[0]) in [int, float, long, bool]:
@@ -59,7 +66,7 @@ class array:
     def __mul__(self, other):
         if type(other) in [int, float, long]:
             return array(map(lambda v: v * other, self.array))
-        else: # array * [0, 1] maybe difference between list and array?
+        else: # array * [0, 1] 
             return array(map(lambda a,b: a * b, self.array, other))
 
     def __sub__(self, other):
@@ -205,7 +212,9 @@ def test():
 
     def testexpr(expr, solution, count):
         print "Test %s: %s" % (count, expr)
-        orig = expr.replace("Numeric.", "MyNumeric.")
+        # Testing original Numeric versus this version
+        # Define one, or both of these:
+        #orig = expr.replace("Numeric.", "MyNumeric.")
         #repl = expr.replace("Numeric.", "Numeric.")
         try:
             a = eval(orig)
