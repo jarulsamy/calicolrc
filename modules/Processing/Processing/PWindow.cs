@@ -174,7 +174,7 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public void size(int w, int h) 
+	public void size(int w = 400, int h = 300) 
 	{	// Set window size
 		this.SetSizeRequest(w, h);
 		Cairo.ImageSurface timg = new Cairo.ImageSurface(Format.Argb32, w, h);
@@ -193,13 +193,13 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public double map(double n, double min1, double max1, double min2, double max2) 
+	public double map(double n = 0.0, double min1 = 0.0, double max1 = 1.0, double min2 = 0.0, double max2 = 1.0) 
 	{	// Map a number from one range to another
 		return ((n - min1)/(max1 - min1)) * (max2 - min2) + min2;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public double constrain(double n, double min, double max) 
+	public double constrain(double n = 0.0, double min = 0.0, double max = 1.0)
 	{	// Constrain a number to a range
 		if (n < min) n = min;
 		if (n > max) n = max;
