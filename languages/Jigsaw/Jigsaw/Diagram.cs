@@ -216,7 +216,7 @@ namespace Diagram
 		
 		// Boolean indicating whether or not to draw inset
 		internal bool _showInset = false;
-		
+
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public Canvas(int width, int height, double worldWidth, double worldHeight)
         {
@@ -367,7 +367,7 @@ namespace Diagram
 			// Translate to a point in the upper right corner
 			// Leave a border of 10 pixels
 			g.Translate( w-310,  10);
-			
+
 			// Set up a clip region into which a small version of diagram will be drawn
 			g.Rectangle(-1.0, -1.0, 302.0, 202.0);
 			g.Clip();
@@ -391,7 +391,8 @@ namespace Diagram
 			// Scaling world down to 10% into a box of 300x200
 			// Assumes original world size is 3000x2000
 			g.Scale(0.1, 0.1);
-			
+			g.Translate( this.offsetX,       this.offsetY);
+
             // Always draw in antialias mode.
             // Caution: this smears single pixels into small blurs on pixel boundaries.
             //g.Antialias = Antialias.Subpixel;
@@ -1813,7 +1814,7 @@ namespace Diagram
                 s._id = 0;
             }
         }
-			
+
 		// - - -
 		public void ShowPropertiesWindow() {
 			

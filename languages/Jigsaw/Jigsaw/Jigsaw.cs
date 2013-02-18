@@ -98,7 +98,10 @@ namespace Jigsaw
 		
 		// Left tab height
 		public int tabHeight = 33;
-		
+
+		protected int _X;										// Cache for context menu
+		protected int _Y;
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
@@ -1380,8 +1383,15 @@ namespace Jigsaw
 	            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
 				if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
 	            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
-				this.EditMode = Diagram.EMode.TranslatingStart;			// Start translating diagram
-				
+
+				// Intercept the right-mouse
+				if (e.Button == Diagram.MouseButtons.Right) 
+				{
+					this.ShowContextMenu((int)e.X, (int)e.Y);
+				} else {
+					this.EditMode = Diagram.EMode.TranslatingStart;		// Start translating diagram
+				}
+
 				this.Invalidate();										// Redraw
 			}
 		}
@@ -1453,6 +1463,54 @@ namespace Jigsaw
 			this.offsetY += deltaY;
 			this.FixAbsolutePositionedShapes();
 			this.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnHelpShow(object sender, EventArgs e)
+		{
+			string target = String.Format ("http://calicoproject.org/Calico_Jigsaw");
+			try
+			{
+				System.Diagnostics.Process.Start(target);
+			} catch (System.Exception other) {
+				Console.WriteLine(other.Message);
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected void OnContextRun(object sender, EventArgs e)
+		{
+			this.Run ();
+		}
+
+		// - - - Create the context menu for this block - - - - - - - - - - -
+		protected virtual bool ShowContextMenu(int X, int Y) 
+		{
+			// Cache info
+			_X = X;
+			_Y = Y;
+			
+			// Create and show context menu
+			Gtk.Menu mnu = new Gtk.Menu();
+
+			Gtk.MenuItem mnuRun = new Gtk.MenuItem("Run");
+			mnuRun.Activated += OnContextRun;
+			
+			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle _Inset");
+			mnuToggleInset.Activated += OnViewToggleInset;
+			
+			Gtk.MenuItem mnuHelp = new Gtk.MenuItem("Help");
+			mnuHelp.Activated += OnHelpShow;
+			
+			mnu.Append(mnuToggleInset);
+			mnu.Append(mnuRun);
+			mnu.Append( new Gtk.SeparatorMenuItem() );
+			mnu.Append(mnuHelp);
+			
+			mnu.ShowAll();
+			mnu.Popup();
+			
+			return true;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2928,12 +2986,16 @@ namespace Jigsaw
 			Gtk.MenuItem mnuRun = new Gtk.MenuItem("Run");
 			mnuRun.Activated += OnRunBlockStack;
 			
-			Gtk.MenuItem mnuBreak = new Gtk.MenuItem("Toggle Breakpoint");
+			Gtk.MenuItem mnuBreak = new Gtk.MenuItem("Toggle _Breakpoint");
 			mnuBreak.Activated += OnToggleBreakpoint;
 			//Gtk.MenuItem mnuProps = new Gtk.MenuItem("Properties");
 			//mnuProps.Activated += OnPropertiesShow;
 			//Gtk.MenuItem mnuInspect = new Gtk.MenuItem("Inspector");
 			//mnuInspect.Activated += OnInspectorShow;
+
+			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle _Inset");
+			mnuToggleInset.Activated += _cvs.OnViewToggleInset;
+
 			Gtk.MenuItem mnuHelp = new Gtk.MenuItem("Help");
 			mnuHelp.Activated += OnHelpShow;
 			
@@ -2942,11 +3004,12 @@ namespace Jigsaw
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuToFront);
 			mnu.Append(mnuToBack);
-			mnu.Append( new Gtk.SeparatorMenuItem() );
-			mnu.Append(mnuRun);
 			mnu.Append(mnuBreak);
+			mnu.Append( new Gtk.SeparatorMenuItem() );
 			//mnu.Append(mnuProps);
 			//mnu.Append(mnuInspect);
+			mnu.Append(mnuToggleInset);
+			mnu.Append(mnuRun);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuHelp);
 			
@@ -2956,6 +3019,13 @@ namespace Jigsaw
 			return true;
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+		//protected void OnToggleInset(object sender, EventArgs a)
+		//{	
+		//	this.ToggleInset();
+		//	this.Invalidate();
+		//}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		protected void OnInspectorShow(object sender, EventArgs e)
 //		{
