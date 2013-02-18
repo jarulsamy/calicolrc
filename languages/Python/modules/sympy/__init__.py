@@ -80,4 +80,4 @@ evalf._create_evalf_table()
 # This is slow to import:
 #import abc
 
-init_printing(use_unicode=True, wrap_line=True, no_global=True)
+init_printing(use_unicode=True, wrap_line=False, no_global=True)
