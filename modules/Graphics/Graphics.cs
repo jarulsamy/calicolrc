@@ -33,9 +33,10 @@ using System.Net;
 using System.IO;
 // MemoryStream
 using System;
-
 using Microsoft.Xna.Framework;
 using System.Diagnostics;// Vector2, Matrix
+// Font:
+using Cairo;
 
 public static class Extensions
 {
@@ -271,6 +272,11 @@ public static class Graphics
 	public static void run ()
 	{
 		getWindow ().run ();
+	}
+
+	public static void run (double step_time)
+	{
+		getWindow ().run (step_time);
 	}
 
 	public static void run (Func<object> function)
@@ -991,14 +997,14 @@ public static class Graphics
 		}
 
 		public void QueueDraw ()
-		{ // color
-			if (window is WindowClass) {
-				if (window.getMode () == "auto" || 
-	    window.getMode () == "bitmap" || 
-            window.getMode () == "physics")
-					window.update ();
-				// else, manually call step()
-			} 
+	        { // color
+		    if (window is WindowClass) {
+			if (window.getMode () == "auto" || 
+			    window.getMode () == "bitmap" || 
+			    window.getMode () == "physics")
+			    window.update ();
+			// else, manually call step()
+		    } 
 		}
     
 		public int red {
@@ -1157,6 +1163,7 @@ public static class Graphics
 		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
 		public bool requestStop = false;
 		Gtk.ScrolledWindow _scrolledWindow = null;
+		ManualResetEvent ev = new ManualResetEvent (false);
 
 		public WindowClass (string title="Calico Graphics",
                   int width=300, 
@@ -1468,12 +1475,16 @@ public static class Graphics
 			}
 		}
 
-		public void run ()
+		public void run () {
+		    run(.01);
+		}
+
+		public void run (double step_time)
 		{
 		  requestStop = false;
 		  while (! requestStop) {
 			try {
-			  step (.01);
+			  step (step_time);
 			} catch {
 			  requestStop = true;
 			}
@@ -1611,45 +1622,45 @@ public static class Graphics
 		}
     
 		public void need_to_redraw ()
-		{
-			_dirty = true;
-			DateTime now = DateTime.Now;
-			// diff is TimeSpan
-			if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
-				// pass, too soon!
-				// but we need to make sure that someone checks
-				// in the future. 
-				if (timer_running) {
-					// already one running!
-					// we'll just wait
-				} else {
-					// let's spawn one to check in 100 ms or so
-					timer_running = true;
-					GLib.Timeout.Add ((uint)(updateInterval * 1000), 
-                           new GLib.TimeoutHandler (_redraw_now));
-				}
-			} else { // it is not too soon
-				if (timer_running) {
-					// no need to start another
-				} else {
-					// let's spawn one to check in 100 ms or so
-					timer_running = true;
-					GLib.Timeout.Add ((uint)(updateInterval * 1000), 
-                           new GLib.TimeoutHandler (_redraw_now));
-				}
+		{ 
+		    _dirty = true;
+		    DateTime now = DateTime.Now;
+		    // diff is TimeSpan
+		    if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
+			// pass, too soon!
+			// but we need to make sure that someone checks
+			// in the future. 
+			if (timer_running) {
+			    // already one running!
+			    // we'll just wait
+			} else {
+			    // let's spawn one to check in 100 ms or so
+			    timer_running = true;
+			    GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+			    	      new GLib.TimeoutHandler (_redraw_now));
 			}
+		    } else { // it is not too soon
+			if (timer_running) {
+			    // no need to start another
+			} else {
+			    // let's spawn one to check in 100 ms or so
+			    timer_running = true;
+			    GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+			    		      new GLib.TimeoutHandler (_redraw_now));
+			}
+		    }
 		}
-    
+		
 		private bool _redraw_now ()
 		{
-			DateTime now = DateTime.Now;
-			if (_dirty) {
-				last_update = now;
-				_dirty = false;
-				QueueDraw (); // gtk
-			}
-			timer_running = false;
-			return false; // return true to try again
+		    DateTime now = DateTime.Now;
+		    if (_dirty) {
+			last_update = now;
+			_dirty = false;
+			QueueDraw (); // gtk
+		    }
+		    timer_running = false;
+		    return false; // return true to try again
 		}
 
 		public string getMode ()
@@ -1672,20 +1683,20 @@ public static class Graphics
 
 		public void updateNow ()
 		{ // Window
-			need_to_redraw ();
-			// Manual call to update, let's update then:
-			while (Gtk.Application.EventsPending())
-				Gtk.Application.RunIteration ();
+		    need_to_redraw ();
+		    // Manual call to update, let's update then:
+		    while (Gtk.Application.EventsPending())
+			Gtk.Application.RunIteration ();
 		}
 
 		public void update ()
 		{ // Window
-			if (mode == "manual" || mode == "bitmapmanual") {
-				_canvas.need_to_draw_surface = true;
-				QueueDraw ();
-			} else {
-				need_to_redraw ();
-			}
+		    if (mode == "manual" || mode == "bitmapmanual") {
+			_canvas.need_to_draw_surface = true;
+			QueueDraw ();
+		    } else {
+			need_to_redraw ();
+		    }
 		}
 
 		public void step ()
@@ -1698,56 +1709,60 @@ public static class Graphics
 			// Same as update, but will make sure it 
 			// doesn't update too fast.
 			// handle physics
-		  if (_canvas == null) {
+		    if (_canvas == null) {
 			requestStop = true;
 			return;
-		  }
-			// kjo
-			_canvas.need_to_draw_surface = true;
-      
-			if (mode == "physics") {
-				_canvas.world.Step ((float)simulationStepTime); 
-				time += simulationStepTime; 
-				// update the sprites
-				lock (_canvas.shapes) {
-					foreach (Shape shape in _canvas.shapes) {
-						shape.updateFromPhysics ();
-					}
-				}
+		    }
+		    // kjo
+		    _canvas.need_to_draw_surface = true;
+		    
+		    if (mode == "physics") {
+			_canvas.world.Step ((float)simulationStepTime); 
+			time += simulationStepTime; 
+			// update the sprites
+			lock (_canvas.shapes) {
+			    foreach (Shape shape in _canvas.shapes) {
+				shape.updateFromPhysics ();
+			    }
 			}
-			// and now the update
-			DateTime now = DateTime.Now;
-			// diff is TimeSpan, converted to seconds:
-			double diff = (now - last_update).TotalMilliseconds / 1000.0;
-			while (diff < step_time) {
-				Thread.Sleep ((int)(diff / 10 * 1000)); // 10 times per diff
-				now = DateTime.Now;
-				diff = (now - last_update).TotalMilliseconds / 1000.0;
-			}
-			last_update = DateTime.Now;
-      
-			if (mode == "bitmapmanual") {
-				using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
-					g.Save ();
-					g.Operator = Cairo.Operator.Source;
-					g.SetSourceSurface (_canvas.surface, 0, 0);
-					g.Paint ();
-					g.Restore ();
-				}	   
-			}      
-	  
-			_dirty = false;
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Invoke (delegate { 
-				  try {
-					QueueDraw ();
-					GdkWindow.ProcessUpdates (true);
-				  } catch {
-					requestStop = true;
-				  }
-				  ev.Set ();
+		    }
+		    // and now the update
+		    DateTime now = DateTime.Now;
+		    // diff is TimeSpan, converted to seconds:
+		    double diff = (now - last_update).TotalMilliseconds / 1000.0;
+		    while (diff < step_time) { // seconds
+			//System.Console.Write(".");
+			Thread.Sleep ((int)(diff / 2 * 1000)); // 2 times per diff
+			//System.Console.Write("+");
+			now = DateTime.Now;
+			diff = (now - last_update).TotalMilliseconds / 1000.0;
+		    }
+		    last_update = DateTime.Now;
+		    
+		    if (mode == "bitmapmanual") {
+			using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
+			    g.Save ();
+			    g.Operator = Cairo.Operator.Source;
+			    g.SetSourceSurface (_canvas.surface, 0, 0);
+			    g.Paint ();
+			    g.Restore ();
+			}	   
+		    }      
+		    
+		    _dirty = false;
+		    ev.Reset();
+		    Invoke (delegate { 
+			    try {
+				QueueDraw ();
+				GdkWindow.ProcessUpdates (true);
+				//System.Console.Write("!");
+			    } catch {
+				requestStop = true;
+			    }
+			    ev.Set ();
 			});
-			ev.WaitOne ();
+		    ev.WaitOne ();
+		    //System.Console.Write("<");
 		}
 
 		public override string ToString ()
@@ -2217,14 +2232,14 @@ public static class Graphics
 
 		public void updatePhysics ()
 		{
-			// get from sprite, put in body
-			if (body != null) {
-				float MeterInPixels = 64.0f;
-				body.Position = new Vector2 (((float)x) / MeterInPixels, 
-                                    ((float)y) / MeterInPixels);
-				// FIXME: undo operation; call rotateTo()?
-				body.Rotation = (float)_rotation;
-			}
+		    // get from sprite, put in body
+		    if (body != null) {
+			float MeterInPixels = 64.0f;
+			body.Position = new Vector2 (((float)x) / MeterInPixels, 
+						     ((float)y) / MeterInPixels);
+			// FIXME: undo operation; call rotateTo()?
+			body.Rotation = (float)_rotation;
+		    }
 		}
 
 		public void stackOnTop ()
@@ -2376,13 +2391,13 @@ public static class Graphics
     
 		public void QueueDraw ()
 		{ // shape
-			if (window is WindowClass) {
-				if (window.getMode () == "auto" ||
-	    window.getMode () == "bitmap" || 
-            window.getMode () == "physics")
-					window.update ();
-				// else, manually call step()
-			}
+		    if (window is WindowClass) {
+			if (window.getMode () == "auto" ||
+			    window.getMode () == "bitmap" || 
+			    window.getMode () == "physics")
+			    window.update ();
+			// else, manually call step()
+		    }
 		}
     
 		public bool contains (IList iterable)
@@ -2494,8 +2509,9 @@ public static class Graphics
     
 		public void updatePen ()
 		{
-			if (has_pen && pen.down)
-				pen.appendPath (new Point (center.x, center.y));
+		    if (has_pen && pen.down) {
+			pen.appendPath (new Point (center.x, center.y));
+		    }
 		}
 
 		public void  updateGlobalPosition (Cairo.Context g)
@@ -2612,11 +2628,11 @@ public static class Graphics
 			center.y += dy;
 			updatePen ();
 			if (wrap) {
-				center.x = wrap_width (center.x);
-				center.y = wrap_height (center.y);
+			    center.x = wrap_width (center.x);
+			    center.y = wrap_height (center.y);
 			}
 			if (body != null)
-				updatePhysics ();
+			    updatePhysics ();
 			QueueDraw ();
 		}
 
@@ -2702,7 +2718,7 @@ public static class Graphics
 		{
 			_rotation -= (Math.PI / 180.0) * degrees;
 			if (body != null)
-				updatePhysics ();
+			    updatePhysics ();
 			QueueDraw ();
 		}
     
@@ -2710,7 +2726,7 @@ public static class Graphics
 		{
 			_rotation = degrees * (Math.PI) / 180.0;
 			if (body != null)
-				updatePhysics ();
+			    updatePhysics ();
 			QueueDraw ();
 		}
 
@@ -2967,72 +2983,67 @@ public static class Graphics
 
 		public override void render (Cairo.Context g)
 		{
-			if (!visible)
-				return;
-			g.Save ();
-			Point temp = screen_coord (center);
-			g.Translate (temp.x, temp.y);
-			g.Rotate (_rotation);
-			g.Scale (_scaleFactor, _scaleFactor);
-			if (gradient != null) {
-				Cairo.Gradient pat;
-				if (gradient.gtype == "linear")
-					pat = new Cairo.LinearGradient (gradient.p1.x,
-                                         gradient.p1.y, 
-                                         gradient.p2.x, 
-                                         gradient.p2.y);
-				else
-					pat = new Cairo.RadialGradient (gradient.p1.x,
-                                         gradient.p1.y, 
-                                         gradient.radius1,
-                                         gradient.p2.x, 
-                                         gradient.p2.y,
-                                         gradient.radius2);
-        
-				pat.AddColorStop (0, gradient.c1.getCairo ());
-				pat.AddColorStop (1, gradient.c2.getCairo ());
-				g.Pattern = pat;
-				g.FillPreserve ();
-			} else if (_fill != null)
-				g.Color = _fill._cairo;
+		    // MEMORY LEAK!
+		    if (!visible)
+			return;
+		    g.Save ();
+		    Point temp = screen_coord (center);
+		    g.Translate (temp.x, temp.y);
+		    g.Rotate (_rotation);
+		    g.Scale (_scaleFactor, _scaleFactor);
+		    if (gradient != null) {
+			Cairo.Gradient pat;
+			if (gradient.gtype == "linear")
+			    pat = new Cairo.LinearGradient (gradient.p1.x,
+							    gradient.p1.y, 
+							    gradient.p2.x, 
+							    gradient.p2.y);
 			else
-				g.Color = new Cairo.Color (0, 0, 0); // default color when none given
-			Pango.Layout layout = Pango.CairoHelper.CreateLayout (g);
-			Pango.FontDescription desc = Pango.FontDescription.FromString (
-                            String.Format ("{0} {1}", fontFace, fontSize));
-			layout.FontDescription = desc;
-			layout.SetText (text);
-			layout.Alignment = Pango.Alignment.Center;
-			int layoutWidth, layoutHeight;
-			layout.GetSize (out layoutWidth, out layoutHeight);
-			double teHeight = (double)layoutHeight / Pango.Scale.PangoScale; 
-			double teWidth = (double)layoutWidth / Pango.Scale.PangoScale;
-			Point p = new Point (0, 0);
-			if (xJustification == "center") {
-				p.x = points [0].x - teWidth / 2; // - te.XBearing;
-			} else if (xJustification == "left") {
-				p.x = points [0].x;
-			} else if (xJustification == "right") {
-				p.x = points [0].x + teWidth;
-			}
-			if (yJustification == "center") {
-				p.y = points [0].y - teHeight / 2; // - te.YBearing;
-			} else if (yJustification == "bottom") {
-				p.y = points [0].y;
-			} else if (yJustification == "top") {
-				p.y = points [0].y - teHeight;
-			}
-			temp = screen_coord (p);
-			g.MoveTo (temp.x, temp.y);
-			Pango.CairoHelper.ShowLayout (g, layout);
-			foreach (Shape shape in shapes) {
-				shape.render (g);
-				shape.updateGlobalPosition (g);
-			}
-			g.Stroke ();
-			g.Restore ();
-		}
+			    pat = new Cairo.RadialGradient (gradient.p1.x,
+							    gradient.p1.y, 
+							    gradient.radius1,
+							    gradient.p2.x, 
+							    gradient.p2.y,
+							    gradient.radius2);
+			
+			pat.AddColorStop (0, gradient.c1.getCairo ());
+			pat.AddColorStop (1, gradient.c2.getCairo ());
+			g.Pattern = pat;
+			g.FillPreserve ();
+		    } else if (_fill != null)
+			g.Color = _fill._cairo;
+		    else
+			g.Color = new Cairo.Color (0, 0, 0); // default color when none given
 
+		    g.SelectFontFace(fontFace, FontSlant.Normal, FontWeight.Normal);
+		    g.SetFontSize(fontSize);
+		    TextExtents te = g.TextExtents(text);
+		    Point p = new Point (0, 0);
+		    if (xJustification == "center") {
+			p.x = points [0].x - te.Width / 2 - te.XBearing;
+		    } else if (xJustification == "left") {
+			p.x = points [0].x;
+		    } else if (xJustification == "right") {
+			p.x = points [0].x + te.Width;
+		    }
+		    if (yJustification == "center") {
+			p.y = points [0].y - te.Height / 2 - te.YBearing;
+		    } else if (yJustification == "bottom") {
+			p.y = points [0].y;
+		    } else if (yJustification == "top") {
+			p.y = points [0].y - te.Height;
+		    }
+		    temp = screen_coord (p);
+		    g.MoveTo (temp.x, temp.y);
+		    g.ShowText(text);
+		    foreach (Shape shape in shapes) {
+			shape.render (g);
+			shape.updateGlobalPosition (g);
+		    }
+		    g.Stroke ();
+		    g.Restore ();
+		}
+		
 		public double width {
 			get {
 				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
@@ -5594,9 +5605,9 @@ public static class Graphics
 		      if (Graphics.os_name == "Windows") {
 		        string file = Graphics.startup_path;
 		        //file = Path.Combine(file, "bin");
-		        file = Path.Combine(file, "windows");
-		        file = Path.Combine(file, "dot");
-		        myProcess.StartInfo.FileName = Path.Combine(file, "dot.exe");
+		        file = System.IO.Path.Combine(file, "windows");
+		        file = System.IO.Path.Combine(file, "dot");
+		        myProcess.StartInfo.FileName = System.IO.Path.Combine(file, "dot.exe");
 		      } else {
 			  myProcess.StartInfo.FileName = "dot";
 		      }
