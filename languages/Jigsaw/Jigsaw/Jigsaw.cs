@@ -292,7 +292,28 @@ namespace Jigsaw
 			// Init to starting state with initial set of blocks
 			this.OnFileNew(null, null);
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public static void log(object msg, string path) {
+			using (StreamWriter w = File.AppendText(path))
+			{
+				w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public static void MsgBox(object msg)
+		{
+			Gtk.MessageDialog md = new Gtk.MessageDialog(
+				null, 
+				Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Info, 
+				Gtk.ButtonsType.Close, 
+				msg.ToString ());
+			md.Run();
+			md.Destroy();
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public new RunningState State {
 			get {
@@ -506,6 +527,13 @@ namespace Jigsaw
 				foreach (System.Reflection.MethodInfo mi in Reflection.Utils.getStaticMethods(type)) {
 
 					string tabName = assembly_name;		// Default tab name
+
+					// Look for special methods
+					if (mi.Name == "set_gui_thread_id")
+					{
+						mi.Invoke(null, new object [] {System.Threading.Thread.CurrentThread.ManagedThreadId});
+						continue;
+					}
 
 					// Look for attributes and skip if tab name is set to null
 					object[] attrs = mi.GetCustomAttributes(false); 
