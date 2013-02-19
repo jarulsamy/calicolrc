@@ -6,6 +6,10 @@ import math, operator, copy
 import array as python_array
 import random
 
+#class python_array(parray.array):
+#    def __new__(cls, *args, **kwargs):
+#        return parray.array.__new__(cls, *args, **kwargs)
+
 def ndim(n, *args, **kwargs):
     """
     Makes a multi-dimensional array of random floats. (Replaces
@@ -214,7 +218,7 @@ def test():
         return int(correct)
 
     def testexpr(expr, solution, count):
-        print "Test %s: %s" % (count, expr)
+        print("Test %s: %s" % (count, expr))
         # Testing original Numeric versus this version
         # Define one, or both of these:
         #orig = expr.replace("Numeric.", "MyNumeric.")
@@ -224,13 +228,13 @@ def test():
         except:
             traceback.print_exc()
             a = "ERROR"
-        print "   Numeric:", a
+        print("   Numeric:", a)
         try:
             b = eval(repl)
         except:
             traceback.print_exc()
             b = "ERROR"
-        print "   Replace:", b
+        print("   Replace:", b)
         return compare(a, solution, expr), compare(b, solution, expr)
 
     for expr, result in [
@@ -279,8 +283,8 @@ def test():
         ]:
         count += 1
         o, r = testexpr(expr, result, count)
-        print "-" * 60
-        print count, o, r
+        print("-" * 60)
+        print(count, o, r)
         ocount += o
         rcount += r
-    print "%s expressions tested: %s originals passed; %s replacements passed" % (count, ocount, rcount)
+    print("%s expressions tested: %s originals passed; %s replacements passed" % (count, ocount, rcount))

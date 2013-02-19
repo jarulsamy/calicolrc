@@ -4,7 +4,7 @@ An Artificial Neural Network System Implementing
 Backprop. Part of the Pyrobot Robotics Project.
 Provided under the GNU General Public License.
 ----------------------------------------------------
-(c) 2001-2006, Developmental Robotics Research Group
+(c) 2001-2013, Developmental Robotics Research Group
 ----------------------------------------------------
 
 This file implements the major classes and functions for
@@ -1742,6 +1742,16 @@ class Network(object):
                     self.Print("auto saving network to '%s'..." % self.lastAutoSaveNetworkFilename)
         else:
             print "Final: nothing done"
+
+    def trainOne(self, **args):
+        """
+        Network.trainOne()
+        Does a single step, but just returns error.
+        Calls propagate(), backprop(), and change_weights() if learning is set.
+        Format for parameters: <layer name> = <activation/target list>
+        """
+        return self.step(**args)[0]
+
     def step(self, **args):
         """
         Network.step()
@@ -2450,23 +2460,13 @@ class Network(object):
             output += layer.toString()
         return output
     def prompt(self):
-        print "--More-- [<enter>, <q>uit, <g>o] ",
-        try:
-            stdoutName = sys.stdout.name
-        except:
-            stdoutName = "<other>" # probably IDLE
-        if stdoutName == "<tkgui>":
-            chr = "\n"
-            print
-            sys.stdout.flush()
-        else:
-            chr = sys.stdin.readline()
-        if len(chr) == 0:
-            char = "g"
-        if chr[0] == 'g':
-            self.interactive = 0
-        elif chr[0] == 'q':
+        s = input("<q>uit, <g>o, or press Ok: ")
+        if s is None or s == "q":
             sys.exit(1)
+        elif s == 'g':
+            self.interactive = 0
+        else:
+            return
     def displayConnections(self, title = "Connections"):
         fromColWidth    = 8
         decimals        = 2
