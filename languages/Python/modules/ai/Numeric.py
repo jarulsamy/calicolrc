@@ -2,7 +2,7 @@
 ## (c) 2013, Doug Blank <doug.blank@gmail.com>
 ## GPL, version 3.0
 
-import math, operator
+import math, operator, copy
 import array as python_array
 import random
 
@@ -45,11 +45,14 @@ class array:
         return len(self.array)
 
     def copy(self):
-        return self.array[:]
+        if type(self.array) is list:
+            return copy.deepcopy(self.array)
+        else:
+            return self.array[:] # vector only!
 
     def __repr__(self):
         if type(self.array) is list:
-            return str(map(lambda v: str(v.array.tolist()), self.array))
+            return str(map(lambda v: str(v), self.array))
         else:
             return str(self.array.tolist())
 

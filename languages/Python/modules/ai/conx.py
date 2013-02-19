@@ -202,6 +202,8 @@ class Node:
         self.__dict__["_attributes"] = keywords.keys()
         for key in keywords:
             self.__dict__[key] = keywords[key]
+    def __repr__(self):
+        return str(self)
     def __str__(self):
         retval = "Node:"
         if self._layer != None:
@@ -293,6 +295,8 @@ class Layer:
         Returns the number of nodes in the layer.
         """
         return self.size
+    def __repr__(self):
+        return str(self)
     def __str__(self):
         return self.toString()
     def __getitem__(self, i):
@@ -620,6 +624,9 @@ class Connection:
     def __str__(self):
         return self.toString()
     
+    def __repr__(self):
+        return str(self)
+
     # connection modification methods
     def changeSize(self, fromLayerSize, toLayerSize):
         """
@@ -869,6 +876,11 @@ class Network(object):
         Returns string representation of network.
         """
         return self.toString()
+    def __repr__(self):
+        """
+        Returns string representation of network.
+        """
+        return str(self)
     def __iter__(self):
         for layer in self.layers:
             yield layer
@@ -2434,7 +2446,7 @@ class Network(object):
         Returns the network layers as a string.
         """
         output = ""
-        for layer in self.layers:
+        for layer in reverse(self.layers):
             output += layer.toString()
         return output
     def prompt(self):
