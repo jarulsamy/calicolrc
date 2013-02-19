@@ -1,7 +1,7 @@
 /*
 Calico - Scripting Environment
 
-Copyright (c) 2012, Mark F. Russo <mfrusso@brynmawr.edu>
+Copyright (c) 2012, 2013, Mark F. Russo <russomf@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@ using System.Threading;
 using System.Collections.Generic;
 using Cairo;
 using Gtk;
-
-//p.DashStyle = this.LineStyle;
 
 // ------------------ Shared Constants -----------------------------------
 internal enum EllipseMode
@@ -205,8 +203,44 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab(null)]
+	public static void log(object msg, string path) {
+		using (StreamWriter w = File.AppendText(path))
+		{
+			w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab(null)]
+	public static void MsgBox(object msg) {
+		Gtk.MessageDialog md = new Gtk.MessageDialog(
+			null, 
+			Gtk.DialogFlags.DestroyWithParent, 
+			Gtk.MessageType.Info, 
+			Gtk.ButtonsType.Close, 
+			msg.ToString ());
+		md.Run();
+		md.Destroy();
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab(null)]
+	public static void set_gui_thread_id (int gui_thread_id)
+	{
+		_guiThreadId = gui_thread_id;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
 	public static void window(int w = 400, int h = 300) 
 	{
+		// If the current thread is the same as the main GUI thread, use the window2() method instead
+		if (_guiThreadId == Thread.CurrentThread.ManagedThreadId)
+		{
+			window2 (w, h);
+			return;
+		}
+
 		// Create new window. Do not return until window creation is done.
 		ManualResetEvent ev = new ManualResetEvent(false);
 		Application.Invoke ( delegate {
@@ -229,7 +263,6 @@ public static class Processing
 			// Init window parameters
 			_width = w;
 			_height = h;
-			_guiThreadId = Thread.CurrentThread.ManagedThreadId;
 			_p.rectMode ( RectMode.CORNER );
 			_p.ellipseMode ( EllipseMode.CENTER );
 			_p.imageMode ( ImageMode.CORNER );
@@ -252,13 +285,13 @@ public static class Processing
 			Application.Run ();
 		} );
 
-		// This hangs when used with Jigsaw. Why?	
+		// Wait to be signalled	
 		ev.WaitOne();
-
+		
 		// Set up helper objects
 		_tmr = new PTimer();
 		_tmr.Elapsed += _onLoop;
-
+		
 		// Reset all internal state variables
 		_mouseX = 0.0;
 		_mouseY = 0.0;
@@ -271,45 +304,56 @@ public static class Processing
 		_keyCode = 0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
-
-		// This hangs when used with Jigsaw. Why?	
-		//ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab("P/Environ")]
+	//[JigsawTab("P/Environ")]
+	[JigsawTab(null)]
 	public static void window2(int w = 400, int h = 300) 
 	{	// Create window on current thread, not a new one. Jigsaw needs this.
+
+		//_guiThreadId = Thread.CurrentThread.ManagedThreadId;
+
+		// Create new window. Do not return until window creation is done.
+		ManualResetEvent ev = new ManualResetEvent(false);
 
 		// Destroy existing window, if there is one.
 		int[] wchars = exit ();
 
 		// Create new window.
 		if (wchars != null) {
-			int x = wchars[0]; int y = wchars[1];
+			int x = wchars[0];
+			int y = wchars[1];
 			_p = new PWindow(w, h, x, y, false);
 		} else {
 			_p = new PWindow(w, h, false);
 		}
+
 		_width = w;
 		_height = h;
+		_p.rectMode ( RectMode.CORNER );
+		_p.ellipseMode ( EllipseMode.CENTER );
+		_p.imageMode ( ImageMode.CORNER );
+
 		_p._cvs.ButtonPressEvent += _onButtonPressEvent;
 		_p._cvs.ButtonReleaseEvent += _onButtonReleaseEvent;
 		_p._cvs.MotionNotifyEvent += _onMotionNotifyEvent;
 		_p._cvs.KeyPressEvent += _onKeyPressEvent;
 		_p._cvs.KeyReleaseEvent += _onKeyReleaseEvent;
 		_p.windowClosed += _onWindowClosed;
-
-		_p.rectMode ( RectMode.CORNER );
-		_p.ellipseMode ( EllipseMode.CENTER );
-		_p.imageMode ( ImageMode.CORNER );
-
+		
 		_p.ShowAll ();
+
+		// Signal the manual reset event
+		ev.Set ();
+		
+		// Wait to be signalled	
+		ev.WaitOne();
 
 		// Set up helper objects
 		_tmr = new PTimer();
 		_tmr.Elapsed += _onLoop;
-
+		
 		// Reset all internal state variables
 		_mouseX = 0.0;
 		_mouseY = 0.0;
@@ -351,7 +395,7 @@ public static class Processing
 		onKeyReleased = null;
 
 		// Reset various other flags and settings
-		_guiThreadId = -1;
+		//_guiThreadId = -1;
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
@@ -376,11 +420,6 @@ public static class Processing
 			wchars[3] = h;
 			_p.Destroy ();
 		}
-		// Quit if window is on its own gui thread
-		if (_guiThreadId > 0) { 
-			Application.Quit (); 	// Does this need to execute on the gui thread using something like the following?
-			//Runtime.DispatchService.GuiDispatch (new StatefulMessageHandler (UpdateGui), n);
-		}
 
 		// Clean up all other various doo-dads
 		_cleanup ();
@@ -390,8 +429,7 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _invoke( VoidDelegate fxn ) 
-	{	// Invoke a void delegate on thread if necessary
-
+	{	// Invoke a void delegate on thread if necessary;
 		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
 		{
 			Application.Invoke ( delegate{ fxn(); } );
@@ -631,12 +669,13 @@ public static class Processing
 	public static void endShape(bool toClose = false)
 	{	// Finish up and render
 		if (_p == null) return;
+		if (_shape == null) return;
 
 		ManualResetEvent ev = new ManualResetEvent(false);
-		_invoke ( delegate { 
+		_invoke ( delegate {
 			try {
 				_p.spline( _shape, toClose );
-				//if (_immediateMode) _p.redraw ();
+				if (_immediateMode) _p.redraw ();
 			} catch (Exception e) {
 				debug (String.Format ("endShape(): {0}", e.Message), 1);
 			}
@@ -644,7 +683,7 @@ public static class Processing
 			return;
 		} );
 		ev.WaitOne();
-		if (_immediateMode) _p.redraw ();
+	
 	}
 	[JigsawTab("P/Shapes")]
 	public static void endShape() { endShape (false); }
@@ -1293,9 +1332,9 @@ public static class Processing
 	public static double strokeWeight(double w = 1.0) 
 	{	// Set and/or return stroke weight
 		if (_p == null) return -1.0;
-		ManualResetEvent ev = new ManualResetEvent(false);
 		double cw = w;
 
+		ManualResetEvent ev = new ManualResetEvent(false);
 		_invoke ( delegate { 
 			try {
 				cw = _p.strokeWeight;			// Copy current value

@@ -81,9 +81,19 @@ internal class PWindow : Gtk.Window
 		// Create internal image on which all drawing is done
 		_img = new Cairo.ImageSurface(Format.Argb32, w, h);
 
+		//log ("PWindow.PWindow: " + Thread.CurrentThread.ManagedThreadId.ToString(), "proc.txt");
+
 		this.ShowAll ();
 	}
 	public PWindow (int w, int h, bool needsQuit ): this(w, h, -10000, -10000, needsQuit) {}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void log(object msg, string path) {
+		using (StreamWriter w = File.AppendText(path))
+		{
+			w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
+		}
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	protected void onDeleteEvent (object o, DeleteEventArgs args)
@@ -603,6 +613,7 @@ internal class PWindow : Gtk.Window
 	public void spline(List<PKnot> knots, bool toClose) 
 	{	// Render a spline given a list of knots
 		PKnot ph, pi, pj, pk;
+		//log ("PWindow.spline: " + Thread.CurrentThread.ManagedThreadId.ToString(), "proc.txt");
 
 		int n = knots.Count;
 		if (n == 0) return;
