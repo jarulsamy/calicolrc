@@ -463,18 +463,18 @@ namespace Calico {
                 if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name)) {
                     continue;
                 }
-                if (language.name == "python") {
-                    // FIXME: get from defaults, preferred lang
-                    CurrentLanguage = language.name;
-                    if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
-                        ShellLanguage = language.name;
-                    }
-                } else if (CurrentLanguage == null) {
-                    CurrentLanguage = language.name;
-                    if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
-                        ShellLanguage = language.name;
-                    }
-                }
+				if (language.name == "python") {
+				  // FIXME: get from defaults, preferred lang
+				  CurrentLanguage = language.name;
+				  if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
+					ShellLanguage = language.name;
+				  }
+				} else if (CurrentLanguage == null) {
+				  CurrentLanguage = language.name;
+				  if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
+					ShellLanguage = language.name;
+				  }
+				}
                 // FIXME: select default language initially
                 // unique name, label, mnemonic, accel, tooltip, user data
                 string name = String.Format("Switch to {0}", language.proper_name);
@@ -1009,8 +1009,8 @@ namespace Calico {
                 if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
                     ShellLanguage = language.name;
                 }
-                switchToShell();
-                Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
+                //switchToShell();
+                //Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             }
         }
 
