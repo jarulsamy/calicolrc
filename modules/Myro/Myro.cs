@@ -2157,6 +2157,72 @@ public static class Myro
 	    return pickAFontResponse;
 	}
 
+	[method: JigsawTab("Senses")]
+	public static object ask (object question, string title)
+	{
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    object askResponse = null;
+	    Gtk.Entry myentry = null;
+	    PythonDictionary responses = new PythonDictionary ();
+	    Gtk.MessageDialog fc = new MessageDialog (null,
+                               0, Gtk.MessageType.Question,
+                               Gtk.ButtonsType.OkCancel,
+                               title);
+	    if (question is List) {
+		foreach (string choice in (List)question) {
+		    Gtk.HBox hbox = new Gtk.HBox ();
+		    Gtk.Label label = new Gtk.Label (choice.Replace("_", "__") + ":");
+		    Gtk.Entry entry = new Gtk.Entry ();
+		    responses [choice] = entry;
+		    hbox.PackStart (label);
+		    hbox.PackStart (entry);
+		    fc.VBox.PackStart (hbox);
+		}
+	    } else 	if (question is IDictionary) {
+		foreach (Object choice in ((IDictionary)question).Keys) {
+		    Gtk.HBox hbox = new Gtk.HBox ();
+		    Gtk.Label label = new Gtk.Label (choice.ToString().Replace("_", "__") + ":");
+		    Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
+		    responses [choice.ToString()] = entry;
+		    hbox.PackStart (label);
+		    hbox.PackStart (entry);
+		    fc.VBox.PackStart (hbox);
+		}
+		
+	    } else {
+		string choice = (string)question;
+		Gtk.HBox hbox = new Gtk.HBox ();
+		Gtk.Label label = new Gtk.Label (choice + ":");
+		Gtk.Entry entry = new Gtk.Entry ();
+		myentry = entry;
+		hbox.PackStart (label);
+		hbox.PackStart (entry);
+		fc.VBox.PackStart (hbox);
+	    }
+	    Invoke (delegate {
+		    fc.ShowAll();
+		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
+			if (question is List) {
+			    foreach (string choice in responses.Keys) {
+				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+			    }
+			    askResponse = responses;
+			} else if (question is IDictionary) {
+			    foreach (string choice in responses.Keys) {
+				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+			    }
+			    askResponse = responses;
+			} else {
+			    askResponse = myentry.Text;
+			}
+		    }
+		    fc.Destroy();
+		    ev.Set();
+		}); 
+	    ev.WaitOne ();
+	    return askResponse;
+	}
+
         [method: JigsawTab("Graphics")]
 	public static List getColorNames ()
 	{
@@ -2208,7 +2274,11 @@ public static class Myro
 	    fc.VBox.PackStart (new Gtk.Label (question));
 	    foreach (string choice in choices) {
 		Gtk.Button button = new Gtk.Button (choice);
-		//button.Clicked += (o, a) => DialogHandler (o, a, fc);
+		button.Clicked += (obj, a) => {
+		    askResponse = ((Gtk.Button)obj).Label;
+		    fc.Destroy ();
+		    ev.Set();
+		};
 		if (choices.Count < 5) {
 		    fc.AddActionWidget (button, Gtk.ResponseType.Ok);
 		} else {
@@ -2216,14 +2286,17 @@ public static class Myro
 		}
 	    }
 	    Invoke (delegate {
-		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
-			//dialogResponse = ((Gtk.Button)obj).Label;
-		    }
-		    dialog.Destroy ();
-		    ev.Set();
+		    fc.ShowAll();
+		    fc.Run();
 		});
 	    ev.WaitOne ();
 	    return askResponse;
+	}
+
+        public static void DialogHandler (object obj, 
+					  System.EventArgs args, 
+					  Gtk.Dialog dialog)
+        {
 	}
 
         [method: JigsawTab(null)]
@@ -2394,69 +2467,6 @@ public static class Myro
 				args.RetVal = true;
 			}
 		}
-	}
-
-	[method: JigsawTab("Senses")]
-	public static object ask (object question, string title)
-	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    string askResponse = null;
-	    Gtk.Entry myentry = null;
-	    PythonDictionary responses = new PythonDictionary ();
-	    Gtk.MessageDialog fc = new MessageDialog (null,
-                               0, Gtk.MessageType.Question,
-                               Gtk.ButtonsType.OkCancel,
-                               title);
-	    if (question is List) {
-		foreach (string choice in (List)question) {
-		    Gtk.HBox hbox = new Gtk.HBox ();
-		    Gtk.Label label = new Gtk.Label (choice.Replace("_", "__") + ":");
-		    Gtk.Entry entry = new Gtk.Entry ();
-		    responses [choice] = entry;
-		    hbox.PackStart (label);
-		    hbox.PackStart (entry);
-		    fc.VBox.PackStart (hbox);
-		}
-	    } else 	if (question is IDictionary) {
-		foreach (Object choice in ((IDictionary)question).Keys) {
-		    Gtk.HBox hbox = new Gtk.HBox ();
-		    Gtk.Label label = new Gtk.Label (choice.ToString().Replace("_", "__") + ":");
-		    Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
-		    responses [choice.ToString()] = entry;
-		    hbox.PackStart (label);
-		    hbox.PackStart (entry);
-		    fc.VBox.PackStart (hbox);
-		}
-		
-	    } else {
-		string choice = (string)question;
-		Gtk.HBox hbox = new Gtk.HBox ();
-		Gtk.Label label = new Gtk.Label (choice + ":");
-		Gtk.Entry entry = new Gtk.Entry ();
-		myentry = entry;
-		hbox.PackStart (label);
-		hbox.PackStart (entry);
-		fc.VBox.PackStart (hbox);
-	    }
-	    Invoke (delegate {
-		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
-			if (question is List) {
-			    foreach (string choice in responses.Keys) {
-				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-			    }
-			    askResponse = responses;
-			} else if (question is IDictionary) {
-			    foreach (string choice in responses.Keys) {
-				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-			    }
-			    askResponse = responses;
-			} else {
-			    askResponse = myentry.Text;
-			}
-		    }
-		}); 
-	    ev.WaitOne ();
-	    return askResponse;
 	}
 
 	[method: JigsawTab("Misc")]
