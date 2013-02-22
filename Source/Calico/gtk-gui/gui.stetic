@@ -327,8 +327,8 @@
       </action>
       <action id="UseALibraryAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Use a Library</property>
-        <property name="ShortLabel" translatable="yes">Use a Library</property>
+        <property name="Label" translatable="yes">Use a Module</property>
+        <property name="ShortLabel" translatable="yes">Use a Module</property>
       </action>
       <action id="GettingStartedAction">
         <property name="Type">Action</property>

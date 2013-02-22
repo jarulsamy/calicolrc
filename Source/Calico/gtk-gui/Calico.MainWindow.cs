@@ -466,8 +466,8 @@ namespace Calico {
 			this.findAction = new global::Gtk.Action("findAction", global::Mono.Unix.Catalog.GetString("_Find Next"), null, "gtk-find");
 			this.findAction.ShortLabel = global::Mono.Unix.Catalog.GetString("_Find");
 			w1.Add(this.findAction, null);
-			this.UseALibraryAction = new global::Gtk.Action("UseALibraryAction", global::Mono.Unix.Catalog.GetString("Use a Library"), null, null);
-			this.UseALibraryAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Use a Library");
+			this.UseALibraryAction = new global::Gtk.Action("UseALibraryAction", global::Mono.Unix.Catalog.GetString("Use a Module"), null, null);
+			this.UseALibraryAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Use a Module");
 			w1.Add(this.UseALibraryAction, null);
 			this.GettingStartedAction = new global::Gtk.Action("GettingStartedAction", global::Mono.Unix.Catalog.GetString("Getting started..."), null, null);
 			this.GettingStartedAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Getting started...");
