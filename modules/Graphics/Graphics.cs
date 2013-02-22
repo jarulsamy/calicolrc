@@ -2490,21 +2490,12 @@ public static class Graphics
 			}
 		}
     
-		public double screen_angle (double dir)
-		{
-			// Screen coords are 45 degrees from system
-			return dir - (45 * Math.PI / 180.0);
-		}
-
 		public void forward (double distance)
 		{
-			double angle = screen_angle (_rotation);
-			double x = ((distance) * Math.Cos (angle) - (distance) * Math.Sin (angle));
-			double y = ((distance) * Math.Sin (angle) + (distance) * Math.Cos (angle));
-			center.x += x;
-			center.y += y;
-			updatePen ();
-			QueueDraw ();
+		    center.x += distance * Math.Cos (_rotation);
+		    center.y += distance * Math.Sin (_rotation);
+		    updatePen ();
+		    QueueDraw ();
 		}
     
 		public void updatePen ()
