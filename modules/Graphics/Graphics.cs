@@ -2207,8 +2207,10 @@ public static class Graphics
 			//	body.FixtureList[0].UserData = null; // point back to this shape
 			//}
 		    if (body != null) {
-			body.DestroyFixture(body.FixtureList[0]);
-			body = null;
+			lock(world) {
+			    body.DestroyFixture(body.FixtureList[0]);
+			    body = null;
+			}
 		    }
 		}
 
@@ -2216,6 +2218,7 @@ public static class Graphics
 		{
 			// get from body, put in sprite
 			if (body != null) {
+			    lock(world) {
 				float MeterInPixels = 64.0f;
 				if (wrap) {
 					float x = (float)wrap_width ((float)(body.Position.X * MeterInPixels));
@@ -2227,6 +2230,7 @@ public static class Graphics
 				// Move it
 				_moveTo (position.X, position.Y);
 				_rotateTo (rotation);
+			    }
 			}
 		}
 
@@ -2234,11 +2238,13 @@ public static class Graphics
 		{
 		    // get from sprite, put in body
 		    if (body != null) {
-			float MeterInPixels = 64.0f;
-			body.Position = new Vector2 (((float)x) / MeterInPixels, 
-						     ((float)y) / MeterInPixels);
-			// FIXME: undo operation; call rotateTo()?
-			body.Rotation = (float)_rotation;
+			lock(world) {
+			    float MeterInPixels = 64.0f;
+			    body.Position = new Vector2 (((float)x) / MeterInPixels, 
+							 ((float)y) / MeterInPixels);
+			    // FIXME: undo operation; call rotateTo()?
+			    body.Rotation = (float)_rotation;
+			}
 		    }
 		}
 
@@ -3055,7 +3061,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Text
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			double width = 0;
 			double height = 0;
 			using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
@@ -3084,6 +3091,7 @@ public static class Graphics
 			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 	}
 
@@ -4488,7 +4496,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Rectangle
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			float MeterInPixels = 64.0f;
 			// from x,y to meters of window
 			// arbitrary:
@@ -4508,6 +4517,7 @@ public static class Graphics
 			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 	}
 
@@ -4595,7 +4605,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Polygon
-		    world = window._canvas.world;
+		  world = window._canvas.world;
+		  lock(world) {
 		    float MeterInPixels = 64.0f;
 		    // from x,y to meters of window
 		    FarseerPhysics.Common.Vertices vertices = new FarseerPhysics.Common.Vertices ();
@@ -4621,6 +4632,7 @@ public static class Graphics
 		    body.Friction = _friction;
 		    body.UserData = this; // point back to this shape
 		    body.FixtureList [0].UserData = this; // point back to this shape
+		  }
 		}
 	}
 
@@ -4695,7 +4707,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Circle
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			float MeterInPixels = 64.0f;
 			// from x,y to meters of window
 			// arbitrary:
@@ -4714,6 +4727,7 @@ public static class Graphics
 			body.Friction = _friction;
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 
 		public override void render (Cairo.Context g)
@@ -4854,7 +4868,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Circle
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			float MeterInPixels = 64.0f;
 			// from x,y to meters of window
 			// arbitrary:
@@ -4875,6 +4890,7 @@ public static class Graphics
 			body.Friction = _friction;
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 	}
 
@@ -4894,7 +4910,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Circle
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			float MeterInPixels = 64.0f;
 			// from x,y to meters of window
 			// arbitrary:
@@ -4913,6 +4930,7 @@ public static class Graphics
 			body.Friction = _friction;
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 
 		/*
@@ -5042,7 +5060,8 @@ public static class Graphics
 
 		public override void addToPhysics ()
 		{ // Circle
-			world = window._canvas.world;
+		    world = window._canvas.world;
+		    lock(world) {
 			float MeterInPixels = 64.0f;
 			// from x,y to meters of window
 			// arbitrary:
@@ -5061,6 +5080,7 @@ public static class Graphics
 			body.Friction = _friction;
 			body.UserData = this; // point back to this shape
 			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
 		}
 
 		public override void render (Cairo.Context g)
