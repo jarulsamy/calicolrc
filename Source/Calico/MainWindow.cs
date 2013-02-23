@@ -304,7 +304,7 @@ namespace Calico {
             Shell.Options.TabsToSpaces = true;
             Shell.Options.HighlightMatchingBracket = true;
 
-            Print(Tag.Info, String.Format("The Calico Project, Version {0}\n", MainClass.Version));
+            PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
             // Load files:
             bool debug_handler = true;
@@ -328,20 +328,20 @@ namespace Calico {
             HistoryPage.Child.Hide();
             property_notebook.Hide();
             // Update rest of GUI:
-            ChatPrint("Chat commands:\n" +
+            ChatPrint(_("Chat commands:\n" +
                 "    MESSAGE\n" +
                 "    @USER MESSAGE\n" + "" +
                 "    /join CONF\n" +
                 "    /list\n" +
                 "    /create CONF\n" +
-                "    /help\n", true);
+		"    /help\n"), true);
 
             history = new History((List<string>)this.config.values ["shell"] ["history"]);
-            ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of previous history]\n");
+            ((Gtk.TextView)historyview).Buffer.InsertAtCursor(_("[Start of previous history]") + "\n");
             foreach (string text in (List<string>)this.config.values["shell"]["history"]) {
                 ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.Trim() + "\n");
             }
-            ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Start of current history]\n");
+            ((Gtk.TextView)historyview).Buffer.InsertAtCursor(_("[Start of current history]") + "\n");
             UpdateUpDownArrows();
             UpdateZoom();
             addToRecentsMenu(null);
@@ -439,7 +439,7 @@ namespace Calico {
             // If needed, add options to menu:
             string [] parts = filename.Split(System.IO.Path.DirectorySeparatorChar);
             Gtk.MenuItem menuitem = new Gtk.MenuItem(
-                String.Format("Go to \"{0}\" line {1}", parts[parts.Length - 1], lineno));
+		     String.Format(_("Go to \"{0}\" line {1}"), parts[parts.Length - 1], lineno));
             menuitem.Activated += delegate(object sender, EventArgs e) {
                 Open(String.Format("{0}:{1}", filename, lineno));
             };
@@ -477,7 +477,7 @@ namespace Calico {
 				}
                 // FIXME: select default language initially
                 // unique name, label, mnemonic, accel, tooltip, user data
-                string name = String.Format("Switch to {0}", language.proper_name);
+		string name = String.Format(_("Switch to {0}"), language.proper_name);
                 if (count == 0) {
                     radioitem = new Gtk.RadioMenuItem(name);
                     language_group = radioitem;
@@ -896,7 +896,7 @@ namespace Calico {
         }
         
         public void HandleException(GLib.UnhandledExceptionArgs args) {
-            Print(Tag.Error, String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
+            PrintLine(Tag.Error, String.Format(_("Exception: {0}"), args.ExceptionObject.ToString()));
             OnStopRunning();
         }
         
@@ -911,15 +911,15 @@ namespace Calico {
             ScrolledWindow.Add(_shell);
             ScrolledWindow.ShowAll();
             // Environment table:
-            EnvironmentTreeView.AppendColumn("Variable", new Gtk.CellRendererText(), "text", 0);
-            EnvironmentTreeView.AppendColumn("Value", new Gtk.CellRendererText(), "text", 1);
+            EnvironmentTreeView.AppendColumn(_("Variable"), new Gtk.CellRendererText(), "text", 0);
+            EnvironmentTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
             // Create a ListStore as the Model
             EnvironmentList = new Gtk.ListStore(typeof(string), typeof(string));
             EnvironmentTreeView.Model = EnvironmentList;
             EnvironmentTreeView.ShowAll();
             // Local environment:
-            LocalTreeView.AppendColumn("Variable", new Gtk.CellRendererText(), "text", 0);
-            LocalTreeView.AppendColumn("Value", new Gtk.CellRendererText(), "text", 1);
+            LocalTreeView.AppendColumn(("Variable"), new Gtk.CellRendererText(), "text", 0);
+            LocalTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
             LocalList = new Gtk.ListStore(typeof(string), typeof(string));
             LocalTreeView.Model = LocalList;
             LocalTreeView.ShowAll();
@@ -1251,18 +1251,18 @@ namespace Calico {
             dialogResponse = null;
             Invoke(delegate {
                 Gtk.Dialog fc = new Gtk.Dialog(title, null, 0);
-                fc.VBox.PackStart(new Gtk.Label("Save this file?"));
+                fc.VBox.PackStart(new Gtk.Label(_("Save this file?")));
                 fc.VBox.PackStart(new Gtk.Label(title));
 
-                Gtk.Button button = new Gtk.Button("Save");
+                Gtk.Button button = new Gtk.Button(_("Save"));
                 fc.AddActionWidget(button, Gtk.ResponseType.Ok);
                 button.Clicked += (o, a) => DialogHandler(o, a, fc);
 
-                button = new Gtk.Button("Abandon changes");
+                button = new Gtk.Button(_("Abandon changes"));
                 button.Clicked += (o, a) => DialogHandler(o, a, fc);
                 fc.AddActionWidget(button, Gtk.ResponseType.Ok);
 
-                button = new Gtk.Button("Cancel");
+                button = new Gtk.Button(_("Cancel"));
                 button.Clicked += (o, a) => DialogHandler(o, a, fc);
                 fc.AddActionWidget(button, Gtk.ResponseType.Ok);
 
@@ -1325,9 +1325,9 @@ namespace Calico {
                 ManualResetEvent ev = new ManualResetEvent(false);
                 dialogResponse = null;
                 Invoke(delegate {
-                    Gtk.Dialog fc = new Gtk.Dialog("Select item type", this, 0);
+   		    Gtk.Dialog fc = new Gtk.Dialog(_("Select item type"), this, 0);
                     fc.SetSizeRequest(200, -1);
-                    fc.VBox.PackStart(new Gtk.Label("Create a new item"));
+                    fc.VBox.PackStart(new Gtk.Label(_("Create a new item")));
                     foreach (string lang in manager.getLanguages()) {
                         Language language = manager [lang];
                         if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name)) {
@@ -2007,7 +2007,7 @@ namespace Calico {
 	    if (language == null)
 	       return;
             // This is run from text documents that don't run themselves:
-            Print(Tag.Info, String.Format("Running '{0}'...\n", filename));
+            PrintLine(Tag.Info, String.Format(_("Running '{0}'..."), filename));
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 CurrentLanguage = language;
                 if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
@@ -2035,9 +2035,21 @@ namespace Calico {
             Print(Tag.Normal, format);
         }
 
+        public void PrintLine(string format) {
+            Print(Tag.Normal, format + "\n");
+        }
+
         public void Error(string format) {
             Print(Tag.Error, format);
         }
+
+        public void ErrorLine(string format) {
+            Print(Tag.Error, format + "\n");
+        }
+
+        public void PrintLine(Tag tag, string format) {
+	    Print(tag, format);
+	}
 
         public void Print(Tag tag, string format) {
             // These Write functions are the only approved methods of output
@@ -2119,7 +2131,7 @@ namespace Calico {
         }
 
         protected void OnNotebookDocsChangeCurrentPage(object o, Gtk.ChangeCurrentPageArgs args) {
-            Console.WriteLine("change! {0}", o);
+            //Console.WriteLine("change! {0}", o);
         }
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
@@ -2151,13 +2163,13 @@ namespace Calico {
                 CurrentDocument.SetOptionsMenu(options_menu);
                 CurrentDocument.widget.Child.GrabFocus();
                 //CurrentDocument.tab_label.Text =
-                Title = String.Format("{0} - Calico Editor - {1}", CurrentDocument.basename, System.Environment.UserName);
+                Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
 
                 // Looks for property notebook widget from current document.
                 // Adds as new page in property notebook if one is provided.
                 Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
                 if (propWidget != null) {
-                    nb.AppendPage(propWidget, new Gtk.Label("Properties"));
+                    nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
                     nb.Visible = true;
                     nb.ShowAll();
                 }
@@ -2189,7 +2201,7 @@ namespace Calico {
                     Shell.GrabFocus();
                     return false;
                 });
-                Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
+                Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
             } else {
                 ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
@@ -2306,7 +2318,7 @@ namespace Calico {
         public virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 if (! ((IList<string>)config.GetValue("config", "visible-languages")).Contains(CurrentLanguage)) {
-                    Error(String.Format("Error: '{0}' is not an active language\n", CurrentLanguage));
+                    ErrorLine(String.Format(_("Error: '{0}' is not an active language"), CurrentLanguage));
                     return;
                 }
                 bool retval = CurrentDocument.Save();
@@ -2335,7 +2347,7 @@ namespace Calico {
                     OnStartRunning();
                     // If document handles running, it manages UI itself
                     CurrentDocument.ExecuteFileInBackground();
-                    ((Gtk.TextView)historyview).Buffer.InsertAtCursor("[Run file]\n");
+                    ((Gtk.TextView)historyview).Buffer.InsertAtCursor(_("[Run file]") + "\n");
                     //}
                 }
             } else if (tabShowing("Shell"))
@@ -3137,14 +3149,14 @@ namespace Calico {
             dialogResponse = null;
             Invoke(delegate {
                 Gtk.Dialog fc = new Gtk.Dialog(title, null, 0);
-                fc.VBox.PackStart(new Gtk.Label("Accept this script?"));
+                fc.VBox.PackStart(new Gtk.Label(_("Accept this script?")));
                 fc.VBox.PackStart(new Gtk.Label(title));
 
-                Gtk.Button button = new Gtk.Button("Accept");
+                Gtk.Button button = new Gtk.Button(_("Accept"));
                 fc.AddActionWidget(button, Gtk.ResponseType.Ok);
                 button.Clicked += (o, a) => DialogHandler(o, a, fc);
 
-                button = new Gtk.Button("Decline");
+                button = new Gtk.Button(_("Decline"));
                 button.Clicked += (o, a) => DialogHandler(o, a, fc);
                 fc.AddActionWidget(button, Gtk.ResponseType.Ok);
 
@@ -3158,7 +3170,7 @@ namespace Calico {
         }
 
         public void ReceiveBlast(string address, string type, string filename, string code) {
-            if (AcceptBlast(String.Format("Blast: Accept '{0}' from '{1}'?", filename, address)) == "Accept") {
+            if (AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == "Accept") {
                 string tempPath = System.IO.Path.GetTempPath();
                 filename = System.IO.Path.Combine(tempPath, filename);
                 string language = manager.GetLanguageFromExtension(filename);
@@ -3169,7 +3181,7 @@ namespace Calico {
                     Open(filename, language);
                 });
             } else {
-                Print(String.Format("Blast '{0}' from '{1}' declined.", filename, address));
+                Print(String.Format(_("Blast '{0}' from '{1}' declined."), filename, address));
             }
         }
 
@@ -3215,7 +3227,7 @@ namespace Calico {
         }
 
         protected void OnInstallNewAddonActionActivated(object sender, System.EventArgs e) {
-            inform("No addons are currently available");
+            inform(_("No addons are currently available"));
         }
   
         protected void OnButton11Clicked(object sender, System.EventArgs e) {
@@ -3223,7 +3235,7 @@ namespace Calico {
             // Create new window, unparent output tabs etc, and show
             Gtk.Application.Invoke(delegate {
                 if (aux_window == null) {
-                    aux_window = new AuxWindow("Calico Tools", this);
+                    aux_window = new AuxWindow(_("Calico Tools"), this);
                     movePage("Output", aux_window.AuxNotebook);
                     movePage("Shell", ToolNotebook);
                     int width, height;

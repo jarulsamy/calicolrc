@@ -63,14 +63,14 @@ namespace Calico {
 		 */
         [STAThread]
         public static void Main(string[] args) {
-            System.Console.WriteLine("Loading Calico version {0}...", Version);
+            System.Console.WriteLine(_("Loading Calico version {0}..."), Version);
             if (((IList<string>)args).Contains("--verbose")) {
                 verbose = true;
             }
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             if (verbose) {
-                System.Console.WriteLine("    looking for config in \"{0}\"...", config_path);
+                System.Console.WriteLine(_("    looking for config in \"{0}\"..."), config_path);
             }
             config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
             Config config;
@@ -89,7 +89,7 @@ namespace Calico {
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
             if (verbose) {
-                System.Console.WriteLine("    looking for languages in \"{0}\"...", 
+                System.Console.WriteLine(_("    looking for languages in \"{0}\"..."), 
                                      System.IO.Path.Combine(path, "..", "languages"));
             }
 
@@ -167,7 +167,7 @@ namespace Calico {
             string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
             if (verbose) {
-                System.Console.WriteLine("    looking for local languages in \"{0}\"...", local_lang_path);
+                System.Console.WriteLine(_("    looking for local languages in \"{0}\"..."), local_lang_path);
             }
             dir = new DirectoryInfo(local_lang_path);
             if (dir.Exists) {

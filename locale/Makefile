@@ -14,6 +14,8 @@ CSHARP = ../Source/Calico/Main.cs \
 	 ../Source/Calico/Printing.cs \
 	 ../Source/Calico/TabCompletion.cs \
 
+GUI = ../Source/Calico/gtk-gui/gui.stetic
+
 all: es/LC_MESSAGES/calico.mo fr/LC_MESSAGES/calico.mo
 
 es/LC_MESSAGES/calico.mo: es.po
@@ -22,9 +24,16 @@ es/LC_MESSAGES/calico.mo: es.po
 fr/LC_MESSAGES/calico.mo: fr.po
 	msgfmt fr.po -o fr/LC_MESSAGES/calico.mo
 
-calico.pot: $(CSHARP)
+es.po: calico.pot
+	msgmerge --update es.po calico.pot
+
+fr.po: calico.pot
+	msgmerge --update fr.po calico.pot
+
+calico.pot: $(CSHARP) $(GUI)
 	touch calico.pot
 	xgettext --keyword=_ --language=C# --from-code=UTF-8 $(CSHARP) -j -o calico.pot
+	xgettext --language=Glade --from-code=UTF-8 $(GUI) -j -o calico.pot
 
 clean:
 	rm -f fr/LC_MESSAGES/calico.mo es/LC_MESSAGES/calico.mo
