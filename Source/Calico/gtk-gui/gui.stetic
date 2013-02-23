@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -18,7 +18,7 @@
       <action id="NewAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">New</property>
-        <property name="ShortLabel" translatable="yes">Open</property>
+        <property name="ShortLabel" translatable="yes">New</property>
       </action>
       <action id="newAction">
         <property name="Type">Action</property>
@@ -53,15 +53,15 @@
       </action>
       <action id="openAction1">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">_Open</property>
-        <property name="ShortLabel" translatable="yes">_Open</property>
+        <property name="Label" translatable="yes">Open</property>
+        <property name="ShortLabel" translatable="yes">Open</property>
         <property name="StockId">gtk-open</property>
         <signal name="Activated" handler="OnOpenAction1Activated" />
       </action>
       <action id="saveAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">_Save</property>
-        <property name="ShortLabel" translatable="yes">_Save</property>
+        <property name="Label" translatable="yes">Save</property>
+        <property name="ShortLabel" translatable="yes">Save</property>
         <property name="StockId">gtk-save</property>
         <signal name="Activated" handler="OnSaveActionActivated" />
       </action>
@@ -916,7 +916,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label7">
                     <property name="MemberName" />
-                    <property name="LabelProp" translatable="yes">&lt;b&gt;Find: &lt;/b&gt;</property>
+                    <property name="LabelProp" translatable="yes">Find</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
@@ -1088,8 +1088,9 @@
                                             <child>
                                               <widget class="Gtk.Label" id="label8">
                                                 <property name="MemberName" />
-                                                <property name="LabelProp" translatable="yes">&lt;big&gt;&lt;u&gt;The Calico Project&lt;/u&gt;&lt;/big&gt;</property>
+                                                <property name="LabelProp" translatable="yes">The Calico Project</property>
                                                 <property name="UseMarkup">True</property>
+                                                <property name="UseUnderline">True</property>
                                               </widget>
                                               <packing>
                                                 <property name="Position">1</property>
@@ -1694,7 +1695,7 @@
                 <child>
                   <widget class="Gtk.Label" id="status_langauge">
                     <property name="MemberName" />
-                    <property name="LabelProp" translatable="yes">&lt;i&gt;Python&lt;/i&gt;</property>
+                    <property name="LabelProp" translatable="yes">Python</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
@@ -1729,7 +1730,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label11">
                     <property name="MemberName" />
-                    <property name="LabelProp" translatable="yes">&lt;i&gt;offline&lt;/i&gt;</property>
+                    <property name="LabelProp" translatable="yes">offline</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>

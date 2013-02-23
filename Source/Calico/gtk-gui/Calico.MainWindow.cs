@@ -331,7 +331,7 @@ namespace Calico {
 			this.FileAction.ShortLabel = global::Mono.Unix.Catalog.GetString("File");
 			w1.Add(this.FileAction, null);
 			this.NewAction = new global::Gtk.Action("NewAction", global::Mono.Unix.Catalog.GetString("New"), null, null);
-			this.NewAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Open");
+			this.NewAction.ShortLabel = global::Mono.Unix.Catalog.GetString("New");
 			w1.Add(this.NewAction, null);
 			this.newAction = new global::Gtk.Action("newAction", null, null, "gtk-new");
 			w1.Add(this.newAction, null);
@@ -346,11 +346,11 @@ namespace Calico {
 			this.EditAction = new global::Gtk.Action("EditAction", global::Mono.Unix.Catalog.GetString("Edit"), null, null);
 			this.EditAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Edit");
 			w1.Add(this.EditAction, null);
-			this.openAction1 = new global::Gtk.Action("openAction1", global::Mono.Unix.Catalog.GetString("_Open"), null, "gtk-open");
-			this.openAction1.ShortLabel = global::Mono.Unix.Catalog.GetString("_Open");
+			this.openAction1 = new global::Gtk.Action("openAction1", global::Mono.Unix.Catalog.GetString("Open"), null, "gtk-open");
+			this.openAction1.ShortLabel = global::Mono.Unix.Catalog.GetString("Open");
 			w1.Add(this.openAction1, null);
-			this.saveAction = new global::Gtk.Action("saveAction", global::Mono.Unix.Catalog.GetString("_Save"), null, "gtk-save");
-			this.saveAction.ShortLabel = global::Mono.Unix.Catalog.GetString("_Save");
+			this.saveAction = new global::Gtk.Action("saveAction", global::Mono.Unix.Catalog.GetString("Save"), null, "gtk-save");
+			this.saveAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Save");
 			w1.Add(this.saveAction, null);
 			this.saveAsAction = new global::Gtk.Action("saveAsAction", global::Mono.Unix.Catalog.GetString("Save _As..."), null, "gtk-save-as");
 			this.saveAsAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Save _As");
@@ -1001,7 +1001,7 @@ namespace Calico {
 			// Container child searchbox.Gtk.Box+BoxChild
 			this.label7 = new global::Gtk.Label();
 			this.label7.Name = "label7";
-			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("<b>Find: </b>");
+			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("Find");
 			this.label7.UseMarkup = true;
 			this.searchbox.Add(this.label7);
 			global::Gtk.Box.BoxChild w143 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.label7]));
@@ -1170,8 +1170,9 @@ namespace Calico {
 			// Container child hbox5.Gtk.Box+BoxChild
 			this.label8 = new global::Gtk.Label();
 			this.label8.Name = "label8";
-			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("<big><u>The Calico Project</u></big>");
+			this.label8.LabelProp = global::Mono.Unix.Catalog.GetString("The Calico Project");
 			this.label8.UseMarkup = true;
+			this.label8.UseUnderline = true;
 			this.hbox5.Add(this.label8);
 			global::Gtk.Box.BoxChild w177 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.label8]));
 			w177.Position = 1;
@@ -1714,7 +1715,7 @@ namespace Calico {
 			// Container child statusbar1.Gtk.Box+BoxChild
 			this.status_langauge = new global::Gtk.Label();
 			this.status_langauge.Name = "status_langauge";
-			this.status_langauge.LabelProp = global::Mono.Unix.Catalog.GetString("<i>Python</i>");
+			this.status_langauge.LabelProp = global::Mono.Unix.Catalog.GetString("Python");
 			this.status_langauge.UseMarkup = true;
 			this.statusbar1.Add(this.status_langauge);
 			global::Gtk.Box.BoxChild w289 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.status_langauge]));
@@ -1740,7 +1741,7 @@ namespace Calico {
 			// Container child statusbar2.Gtk.Box+BoxChild
 			this.label11 = new global::Gtk.Label();
 			this.label11.Name = "label11";
-			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("<i>offline</i>");
+			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("offline");
 			this.label11.UseMarkup = true;
 			this.statusbar2.Add(this.label11);
 			global::Gtk.Box.BoxChild w292 = ((global::Gtk.Box.BoxChild)(this.statusbar2[this.label11]));

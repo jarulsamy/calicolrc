@@ -1,31 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Calico\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-23 13:27-0500\n"
-"PO-Revision-Date: 2011-06-28 14:52-0500\n"
-"Last-Translator: Jose S Becerra <josesaidb@hotmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2013-02-23 14:31-0500\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-Basepath: .\n"
-"X-Poedit-SearchPath-0: src\n"
-
-#: ../src/calico.py:251
-msgid "Cannot load language file '%s'"
-msgstr "No se puede cargar el archivo de lenguaje '%s'"
-
-#: ../src/calico.py:269
-msgid "unknown file extension: '%s'"
-msgstr "extensión de archivo desconocida: '%s'"
+"Content-Transfer-Encoding: UTF-8\n"
+"X-Generator: POEditor.com\n"
 
 #: ../src/calico.py:278
 msgid "Do you want to run the script?"
@@ -35,26 +17,6 @@ msgstr "Desea ejecutar la secuencia de comandos o script?"
 msgid "Do you want to open the script?"
 msgstr "Desea Abrir la secuencia de comandos o script?"
 
-#: ../src/calico.py:285
-msgid ""
-"You have received a blast from '%(mfrom)s'.\n"
-"%(q)s"
-msgstr ""
-"Usted ha recibido un mensaje de '%(mfrom)s'.\n"
-"%(q)s "
-
-#: ../src/calico.py:403
-msgid "Searching for %r in %s/%s..."
-msgstr "Buscando %r en %s/%s..."
-
-#: ../src/calico.py:424
-msgid "  File \"%s\", line %d, %s\""
-msgstr "  Archivo \"%s\", línea %d, %s\""
-
-#: ../src/calico.py:432
-msgid "Found %d match%s. Right-click file to open."
-msgstr "Encontro %d coincidencias%s. Botón Derecho para abrir el archivo."
-
 #: ../src/calico.py:434
 msgid "No matches found."
 msgstr "No se encontraron coincidencias."
@@ -63,10 +25,6 @@ msgstr "No se encontraron coincidencias."
 #: ../Source/Calico/MainWindow.cs:1456
 msgid "Scripting Environment"
 msgstr "Ambiente de desarrollo"
-
-#: ../src/calico.py:497
-msgid "Running on %s"
-msgstr "Ejecutándose en %s"
 
 #: ../src/calico.py:499
 msgid "(c) 2011, Institute for Personal Robots in Education"
@@ -126,13 +84,9 @@ msgstr "nuevamente su contraseña"
 msgid "Course keyword"
 msgstr "Palabra clave"
 
-#: keyword" translated but no "Course" ../src/calico.py:60
+#: ../src/calico.py:600
 msgid "Register"
 msgstr "Registrarse"
-
-#: ../src/calico.py:637
-msgid "Calico Project, Version %s, on %s"
-msgstr "Proyecto Calico, Versión %s, de %s"
 
 #: ../src/calico.py:640 ../Source/Calico/Main.cs:203
 #: ../Source/Calico/Main.cs:319
@@ -176,11 +130,6 @@ msgstr ""
 "  calico --exec --nogui FILENAMEs   Ejecuta solamente el NOMBREARCHIVO, sin "
 "gráficos"
 
-#: ../src/calico.py:648
-msgid "  calico --version                  Displays the version number (%s)"
-msgstr ""
-"  calico --version                  Muestra el número de la versión (%s)"
-
 #: ../src/calico.py:649
 msgid "  calico --help                     Displays this message"
 msgstr "  calico --help                     Muestra este mensaje"
@@ -188,10 +137,6 @@ msgstr "  calico --help                     Muestra este mensaje"
 #: ../src/calico.py:650
 msgid "  calico --debug                    Puts Calico in debugging mode"
 msgstr "  calico --debug                    Coloca Calico en modo depuración"
-
-#: ../src/chat.py:37
-msgid "Calico Chat - %s"
-msgstr "Calico Chat - %s"
 
 #: ../src/chat.py:45 ../src/editor.py:44 ../src/shell.py:115
 #: ../Source/Calico/gtk-gui/gui.stetic:15
@@ -363,10 +308,6 @@ msgstr "Primero debe iniciar sesión"
 msgid "offline"
 msgstr "fuera de línea"
 
-#: ../src/document.py:53 ../src/window.py:164
-msgid "New %s Script"
-msgstr "Nueva Secuencia de Comandos %s"
-
 #: ../src/document.py:110 ../Source/Calico/Document.cs:179
 msgid "Enter the file to save"
 msgstr "Ingrese el nombre del archivo a guardar"
@@ -375,10 +316,6 @@ msgstr "Ingrese el nombre del archivo a guardar"
 #: ../Source/Calico/MainWindow.cs:1257
 msgid "Save"
 msgstr "Guardar"
-
-#: ../src/editor.py:35 ../src/editor.py:171
-msgid "Calico Editor - %s"
-msgstr "Editor Calico - %s"
 
 #: ../src/editor.py:53
 msgid "Save..."
@@ -478,17 +415,9 @@ msgstr "Ud. no esta en línea"
 msgid "You need to login"
 msgstr "Necesita iniciar sesión"
 
-#: ../src/shell.py:96 ../src/shell.py:526
-msgid "Loading file '%s'..."
-msgstr "Cargando archivo '%s'..."
-
 #: ../src/shell.py:98 ../src/shell.py:530
 msgid "Done loading file."
 msgstr "Carga de archivo exitosa."
-
-#: ../src/shell.py:105
-msgid "Calico Shell - %s"
-msgstr "Calico Shell - %s"
 
 #: ../src/shell.py:121
 msgid "Search in files..."
@@ -498,18 +427,9 @@ msgstr "Buscar en archivos"
 msgid "Stop script"
 msgstr "Detener secuencia de comandos"
 
-#: msgid "Swap script and history areas" msgstr "Intercambiar secuencia de
-#: comandos e historial" ../src/shell.py:157
+#: ../src/shell.py:157
 msgid "Swap script and history areas"
 msgstr "Intercambiar secuencia de comandos e historial"
-
-#: ../src/shell.py:229
-msgid "Calico Project %s"
-msgstr "Proyecto Calico %s"
-
-#: ../src/shell.py:286
-msgid "Change to %s"
-msgstr "Cambiar a %s"
 
 #: ../src/shell.py:291
 msgid "Clear"
@@ -519,10 +439,6 @@ msgstr "Limpiar"
 msgid "Restart shell"
 msgstr "Reiniciar el shell"
 
-#: ../src/shell.py:302
-msgid "%s - Calico Shell - %s"
-msgstr "%s - Calico Shell - %s"
-
 #: ../src/shell.py:417
 msgid ""
 "Possible completions:\n"
@@ -530,10 +446,6 @@ msgid ""
 msgstr ""
 "Posibles coincidencias:\n"
 "   "
-
-#: ../src/shell.py:419
-msgid "No completions found for '%s'\n"
-msgstr "No se encontraron coincidencias para '%s'\n"
 
 #: ../src/shell.py:472
 msgid "Stopping..."
@@ -551,17 +463,9 @@ msgstr "Obtener ayuda en caso de error"
 msgid "File \"(.*)\", line (\\d*)"
 msgstr "Archivo \"(.*)\", línea (\\d*)"
 
-#: ../src/shell.py:647
-msgid "Edit %s"
-msgstr "Editar %s"
-
 #: ../src/utils.py:161
 msgid "Select a file"
 msgstr "Seleccione un archivo"
-
-#: ../src/utils.py:303
-msgid "You are now logged in as '%s'."
-msgstr "Usted ha iniciado sesión como '%s'"
 
 #: ../src/utils.py:314
 msgid "rejected"
@@ -583,10 +487,6 @@ msgstr "Buscar:"
 msgid "Search in files:"
 msgstr "Buscar en archivos:"
 
-#: ../src/utils.py:578
-msgid "%s: %s"
-msgstr "%s: %s"
-
 #: ../src/window.py:171 ../src/window.py:175
 msgid "Recent files"
 msgstr "Archivos recientes"
@@ -600,7 +500,7 @@ msgstr "Ejemplos"
 #: ../Source/Calico/Main.cs:171 ../Source/Calico/Main.cs:201
 #: ../Source/Calico/Main.cs:246 ../Source/Calico/Main.cs:317
 msgid "Using Mono runtime version {0}"
-msgstr ""
+msgstr "Usando Mono versión runtime {0}"
 
 #: ../Source/Calico/Main.cs:200 ../Source/Calico/Main.cs:316
 #, fuzzy
@@ -624,6 +524,8 @@ msgstr ""
 msgid ""
 "  StartCalico --lang=LANGUAGE            Sets default language (python, etc.)"
 msgstr ""
+"  StartCalico - lang = Idioma Establece el idioma predeterminado (python, "
+"etc)"
 
 #: ../Source/Calico/Main.cs:207
 #, fuzzy
@@ -676,15 +578,6 @@ msgstr "Ejecutándose en %s"
 msgid "(c) 2011-2012, Institute for Personal Robots in Education"
 msgstr "(c) 2011, Instituto de Robots Personales en la Educación"
 
-#: ../Source/Calico/Document.cs:325
-msgid "for Calico"
-msgstr ""
-
-#: ../Source/Calico/Document.cs:326
-#, fuzzy
-msgid "(c) 2012, Institute for Personal Robots in Education"
-msgstr "(c) 2011, Instituto de Robots Personales en la Educación"
-
 #: ../Source/Calico/MainWindow.cs:1677 ../Source/Calico/MainWindow.cs:1987
 #, fuzzy
 msgid "Stopping...\n"
@@ -700,9 +593,18 @@ msgstr "   esperando confirmación..."
 msgid "Received messages:\n"
 msgstr "mensajes recibidos:"
 
+#: ../Source/Calico/Document.cs:325
+msgid "for Calico"
+msgstr "por Calico"
+
+#: ../Source/Calico/Document.cs:326
+#, fuzzy
+msgid "(c) 2012, Institute for Personal Robots in Education"
+msgstr "(c) 2011, Instituto de Robots Personales en la Educación"
+
 #: ../Source/Calico/Main.cs:66
 msgid "Loading Calico version {0}..."
-msgstr ""
+msgstr "Cargando Calico versión {0} ..."
 
 #: ../Source/Calico/Main.cs:73
 #, fuzzy
@@ -711,11 +613,11 @@ msgstr "   esperando confirmación..."
 
 #: ../Source/Calico/Main.cs:92
 msgid "    looking for languages in \"{0}\"..."
-msgstr ""
+msgstr "    en busca de idiomas en \"{0}\" ..."
 
 #: ../Source/Calico/Main.cs:170
 msgid "    looking for local languages in \"{0}\"..."
-msgstr ""
+msgstr "    en busca de las lenguas locales en \"{0}\" ..."
 
 #: ../Source/Calico/Main.cs:320
 #, fuzzy
@@ -736,6 +638,8 @@ msgid ""
 "  StartCalico --lang=LANGUAGE               Sets default language (python, "
 "etc.)"
 msgstr ""
+"  StartCalico - lang = Idioma Establece el idioma predeterminado (python, "
+"etc)"
 
 #: ../Source/Calico/Main.cs:323
 #, fuzzy
@@ -812,42 +716,49 @@ msgid ""
 "    /create CONF\n"
 "    /help\n"
 msgstr ""
+"Chatear comandos:\n"
+"    MENSAJE\n"
+"    @ USER MESSAGE\n"
+"    / Join CONF\n"
+"    / List\n"
+"    / Crear CONF\n"
+"    / Help\n"
 
 #: ../Source/Calico/MainWindow.cs:340
 msgid "[Start of previous history]"
-msgstr ""
+msgstr "[Comienzo de la historia anterior]"
 
 #: ../Source/Calico/MainWindow.cs:344
 msgid "[Start of current history]"
-msgstr ""
+msgstr "[Comienzo de la historia actual]"
 
 #: ../Source/Calico/MainWindow.cs:442
 msgid "Go to \"{0}\" line {1}"
-msgstr ""
+msgstr "Ir a \"{0}\" línea {1}"
 
 #: ../Source/Calico/MainWindow.cs:480
 msgid "Switch to {0}"
-msgstr ""
+msgstr "Cambiar a: {0}"
 
 #: ../Source/Calico/MainWindow.cs:899
 msgid "Exception: {0}"
-msgstr ""
+msgstr "Excepción: {0}"
 
 #: ../Source/Calico/MainWindow.cs:914
 msgid "Variable"
-msgstr ""
+msgstr "Variable"
 
 #: ../Source/Calico/MainWindow.cs:915 ../Source/Calico/MainWindow.cs:922
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: ../Source/Calico/MainWindow.cs:1254
 msgid "Save this file?"
-msgstr ""
+msgstr "Guardar este archivo?"
 
 #: ../Source/Calico/MainWindow.cs:1261
 msgid "Abandon changes"
-msgstr ""
+msgstr "Sin hacer cambios"
 
 #: ../Source/Calico/MainWindow.cs:1328
 #, fuzzy
@@ -866,7 +777,7 @@ msgstr "(c) 2011, Instituto de Robots Personales en la Educación"
 
 #: ../Source/Calico/MainWindow.cs:2010
 msgid "Running '{0}'..."
-msgstr ""
+msgstr "Running '{0}' ..."
 
 #: ../Source/Calico/MainWindow.cs:2166
 #, fuzzy
@@ -876,11 +787,11 @@ msgstr "%s - Calico Shell - %s"
 #: ../Source/Calico/MainWindow.cs:2172
 #: ../Source/Calico/gtk-gui/gui.stetic:1578
 msgid "Properties"
-msgstr ""
+msgstr "Propiedades"
 
 #: ../Source/Calico/MainWindow.cs:2321
 msgid "Error: '{0}' is not an active language"
-msgstr ""
+msgstr "Error: '{0}' no es un idioma activo"
 
 #: ../Source/Calico/MainWindow.cs:2350
 #, fuzzy
@@ -889,11 +800,11 @@ msgstr "Archivos recientes"
 
 #: ../Source/Calico/MainWindow.cs:3152
 msgid "Accept this script?"
-msgstr ""
+msgstr "Acepte este guión?"
 
 #: ../Source/Calico/MainWindow.cs:3155
 msgid "Accept"
-msgstr ""
+msgstr "Aceptar"
 
 #: ../Source/Calico/MainWindow.cs:3159
 #, fuzzy
@@ -902,15 +813,15 @@ msgstr "en línea"
 
 #: ../Source/Calico/MainWindow.cs:3173
 msgid "Blast: Accept '{0}' from '{1}'?"
-msgstr ""
+msgstr "Card: Aceptar '{0}' de '{1}'?"
 
 #: ../Source/Calico/MainWindow.cs:3184
 msgid "Blast '{0}' from '{1}' declined."
-msgstr ""
+msgstr "Blast '{0}' de '{1}' se negó."
 
 #: ../Source/Calico/MainWindow.cs:3230
 msgid "No addons are currently available"
-msgstr ""
+msgstr "No hay addons disponibles actualmente"
 
 #: ../Source/Calico/MainWindow.cs:3238
 #, fuzzy
@@ -919,7 +830,7 @@ msgstr "Inicio de sesión Calico"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:20
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:43
 #: ../Source/Calico/gtk-gui/gui.stetic:45
@@ -972,17 +883,17 @@ msgstr "Pegar"
 #: ../Source/Calico/gtk-gui/gui.stetic:99
 #: ../Source/Calico/gtk-gui/gui.stetic:100
 msgid "Cu_t"
-msgstr ""
+msgstr "Cu_t"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:107
 #: ../Source/Calico/gtk-gui/gui.stetic:108
 msgid "_Undo"
-msgstr ""
+msgstr "_Undo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:115
 #: ../Source/Calico/gtk-gui/gui.stetic:116
 msgid "_Redo"
-msgstr ""
+msgstr "_Redo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:123
 #: ../Source/Calico/gtk-gui/gui.stetic:124
@@ -993,22 +904,22 @@ msgstr "Seleccionar todo"
 #: ../Source/Calico/gtk-gui/gui.stetic:131
 #: ../Source/Calico/gtk-gui/gui.stetic:132
 msgid "Indent Region"
-msgstr ""
+msgstr "Sangría Región"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:139
 #: ../Source/Calico/gtk-gui/gui.stetic:140
 msgid "Unindent Region"
-msgstr ""
+msgstr "Región Unindent"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:147
 #: ../Source/Calico/gtk-gui/gui.stetic:148
 msgid "Comment Region"
-msgstr ""
+msgstr "Opina Región"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:154
 #: ../Source/Calico/gtk-gui/gui.stetic:155
 msgid "Uncomment Region"
-msgstr ""
+msgstr "Elimine el comentario de la Región"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:171
 #, fuzzy
@@ -1017,7 +928,7 @@ msgstr "Acerca del Proyecto Calico"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:172
 msgid "_About"
-msgstr ""
+msgstr "_about"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:189
 #: ../Source/Calico/gtk-gui/gui.stetic:191
@@ -1027,26 +938,26 @@ msgstr "Guardar la secuencia de comandos actual"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:205
 msgid "View"
-msgstr ""
+msgstr "Ver"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:211
 #: ../Source/Calico/gtk-gui/gui.stetic:212
 msgid "Zoom _In"
-msgstr ""
+msgstr "Ampliar _En"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:219
 #: ../Source/Calico/gtk-gui/gui.stetic:220
 msgid "Zoom _Out"
-msgstr ""
+msgstr "Ampliar _Out"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:226
 #: ../Source/Calico/gtk-gui/gui.stetic:227
 msgid "Change _Font..."
-msgstr ""
+msgstr "Cambiar _Font ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:234
 msgid "Switch to Shell"
-msgstr ""
+msgstr "Cambiar a Shell"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:240
 #: ../Source/Calico/gtk-gui/gui.stetic:241
@@ -1068,7 +979,7 @@ msgstr "Opciones"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:270
 msgid "Recently opened"
-msgstr ""
+msgstr "Recientemente inaugurado"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:271
 #, fuzzy
@@ -1077,11 +988,11 @@ msgstr "Archivos recientes"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:275
 msgid "Tabs"
-msgstr ""
+msgstr "Tabs"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:276
 msgid "Show"
-msgstr ""
+msgstr "Mostrar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:281
 #: ../Source/Calico/gtk-gui/gui.stetic:282
@@ -1092,11 +1003,11 @@ msgstr "Ambiente de desarrollo"
 #: ../Source/Calico/gtk-gui/gui.stetic:290
 #: ../Source/Calico/gtk-gui/gui.stetic:291
 msgid "Locals Tab"
-msgstr ""
+msgstr "Los locales Tab"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:298
 msgid "_Print..."
-msgstr ""
+msgstr "Imprimir Prueba..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:299
 #, fuzzy
@@ -1111,19 +1022,19 @@ msgstr "Reinicie el Shell"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:311
 msgid "Clear Output"
-msgstr ""
+msgstr "Salida Borrar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:312
 msgid "Clear Output tab"
-msgstr ""
+msgstr "Ficha Salida Borrar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:317
 msgid "Export as Python..."
-msgstr ""
+msgstr "Exportar como Python ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:318
 msgid "Export..."
-msgstr ""
+msgstr "Exportar ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:323
 #, fuzzy
@@ -1132,18 +1043,18 @@ msgstr "Buscar siguiente"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:324
 msgid "_Find"
-msgstr ""
+msgstr "_Find"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:330
 #: ../Source/Calico/gtk-gui/gui.stetic:331
 msgid "Use a Module"
-msgstr ""
+msgstr "El uso de un módulo de"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:335
 #: ../Source/Calico/gtk-gui/gui.stetic:336
 #: ../Source/Calico/gtk-gui/gui.stetic:1128
 msgid "Getting started..."
-msgstr ""
+msgstr "Primeros pasos ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:341
 #: ../Source/Calico/gtk-gui/gui.stetic:342
@@ -1156,19 +1067,19 @@ msgstr "Ayuda"
 #: ../Source/Calico/gtk-gui/gui.stetic:348
 #: ../Source/Calico/gtk-gui/gui.stetic:1250
 msgid "What's new..."
-msgstr ""
+msgstr "¿Qué hay de nuevo ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:354
 msgid "Tools"
-msgstr ""
+msgstr "Instrumentos"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:358
 msgid "About"
-msgstr ""
+msgstr "Sobre"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:359
 msgid "About..."
-msgstr ""
+msgstr "Acerca de ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:364
 #: ../Source/Calico/gtk-gui/gui.stetic:365
@@ -1179,7 +1090,7 @@ msgstr "Opciones"
 #: ../Source/Calico/gtk-gui/gui.stetic:370
 #: ../Source/Calico/gtk-gui/gui.stetic:371
 msgid "Toggle Breakpoint"
-msgstr ""
+msgstr "Alternar punto de interrupción"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:376
 #, fuzzy
@@ -1195,7 +1106,7 @@ msgstr "Buscar anterior"
 #: ../Source/Calico/gtk-gui/gui.stetic:387
 #: ../Source/Calico/gtk-gui/gui.stetic:388
 msgid "History Tab"
-msgstr ""
+msgstr "Historia Tab"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:407
 #: ../Source/Calico/gtk-gui/gui.stetic:408
@@ -1212,12 +1123,12 @@ msgstr "Mensajes..."
 #: ../Source/Calico/gtk-gui/gui.stetic:421
 #: ../Source/Calico/gtk-gui/gui.stetic:422
 msgid "_Normal Size"
-msgstr ""
+msgstr "Tamaño _Normal"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:428
 #: ../Source/Calico/gtk-gui/gui.stetic:429
 msgid "Property Tab"
-msgstr ""
+msgstr "Propiedad Tab"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:434
 #: ../Source/Calico/gtk-gui/gui.stetic:435
@@ -1229,12 +1140,12 @@ msgstr "Inicio de sesión Calico"
 #: ../Source/Calico/gtk-gui/gui.stetic:439
 #: ../Source/Calico/gtk-gui/gui.stetic:440
 msgid "Addons"
-msgstr ""
+msgstr "Addons"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:444
 #: ../Source/Calico/gtk-gui/gui.stetic:445
 msgid "Install New Addon..."
-msgstr ""
+msgstr "Instale Addon Nuevo ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:450
 #: ../Source/Calico/gtk-gui/gui.stetic:451
@@ -1254,11 +1165,11 @@ msgstr "Guardar la secuencia de comandos actual"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:648
 msgid "Zoom in"
-msgstr ""
+msgstr "Zoom in"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:667
 msgid "Zoom out"
-msgstr ""
+msgstr "Alejar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:686
 #, fuzzy
@@ -1267,15 +1178,15 @@ msgstr "Hacer la fuente más grande"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:716
 msgid "Show Output in new window"
-msgstr ""
+msgstr "Mostrar la salida en una nueva ventana"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:735
 msgid "Vertical Panes"
-msgstr ""
+msgstr "Paneles verticales"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:754
 msgid "Horizontal Panes"
-msgstr ""
+msgstr "Paneles horizontales"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:785
 #, fuzzy
@@ -1289,7 +1200,7 @@ msgstr "Ejecutar secuencia de comandos"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:825
 msgid "Run fast (far-left), Single-step (far-right)"
-msgstr ""
+msgstr "Corre rápido (a la izquierda), de un solo paso (a la derecha)"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:847
 #, fuzzy
@@ -1303,23 +1214,23 @@ msgstr "Crear un nuevo script"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:886
 msgid "Running Script indicator"
-msgstr ""
+msgstr "Ejecución de secuencias de comandos indicador"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:919
 msgid "<b>Find: </b>"
-msgstr ""
+msgstr "<b> Buscar: </ b>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:933
 msgid "Text to search for"
-msgstr ""
+msgstr "Texto a buscar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:948
 msgid "Find next matching text"
-msgstr ""
+msgstr "Buscar texto siguiente juego"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:967
 msgid "Find previous matching text|Find Previous matching text"
-msgstr ""
+msgstr "Buscar texto anterior juego | Buscar texto anterior a juego"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:971
 #, fuzzy
@@ -1328,7 +1239,7 @@ msgstr "Buscar anterior"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:986
 msgid "Close search"
-msgstr ""
+msgstr "Volver a la búsqueda"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1091
 #, fuzzy
@@ -1337,15 +1248,15 @@ msgstr "Acerca del Proyecto Calico"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1124
 msgid "Go to Getting Started webpage"
-msgstr ""
+msgstr "Ir a página web Cómo empezar"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1142
 msgid "Go to Help overview webpage"
-msgstr ""
+msgstr "Ir a la página del resumen Ayuda"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1180
 msgid "New..."
-msgstr ""
+msgstr "Nuevo ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1198
 #, fuzzy
@@ -1359,47 +1270,47 @@ msgstr "Abrir un script existente"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1232
 msgid "Recently used..."
-msgstr ""
+msgstr "Últimos usados ​​..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1246
 msgid "Go to What's new webpage"
-msgstr ""
+msgstr "Ir a Qué hay nueva página web"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1292
 msgid "Home tab"
-msgstr ""
+msgstr "En la ficha Inicio"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1293
 msgid "Home"
-msgstr ""
+msgstr "Casa"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1316
 msgid "python>"
-msgstr ""
+msgstr "python>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1333
 msgid "Previous interactive code"
-msgstr ""
+msgstr "Código interactivo anterior"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1352
 msgid "Next interactive code"
-msgstr ""
+msgstr "Código interactivo Siguiente"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1420
 msgid "Enter code interactively"
-msgstr ""
+msgstr "Introduzca el código de forma interactiva"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1463
 msgid "Results of running code"
-msgstr ""
+msgstr "Los resultados de la ejecución de código"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1464
 msgid "Output"
-msgstr ""
+msgstr "Salida"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1489
 msgid "Variables and their values"
-msgstr ""
+msgstr "Las variables y sus valores"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1490
 #, fuzzy
@@ -1408,15 +1319,15 @@ msgstr "Ambiente de desarrollo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1516
 msgid "Local variables"
-msgstr ""
+msgstr "Las variables locales"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1517
 msgid "Locals"
-msgstr ""
+msgstr "Locales"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1544
 msgid "Past interactive code"
-msgstr ""
+msgstr "Pasado código interactivo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1545
 #, fuzzy
@@ -1430,7 +1341,7 @@ msgstr "Lenguaje"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1697
 msgid "<i>Python</i>"
-msgstr ""
+msgstr "<i> Python </ i>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1720
 #, fuzzy
@@ -1442,40 +1353,120 @@ msgstr "Estado"
 msgid "<i>offline</i>"
 msgstr "fuera de línea"
 
-#~ msgid "considering 1:"
-#~ msgstr "consideración 1:"
+msgid "Cannot load language file '%s'"
+msgstr "No se puede cargar el archivo de lenguaje '%s'"
 
-#~ msgid "considering 2:"
-#~ msgstr "consideración 2:"
+msgid "unknown file extension: '%s'"
+msgstr "extensión de archivo desconocida: '%s'"
 
-#~ msgid "   Class:"
-#~ msgstr "   Clase:"
+msgid ""
+"You have received a blast from '%(mfrom)s'.\n"
+"%(q)s"
+msgstr ""
+"Usted ha recibido un mensaje de '%(mfrom)s'.\n"
+"%(q)s "
 
-#~ msgid "      Method:"
-#~ msgstr "      Metodo:"
+msgid "Found %d match%s. Right-click file to open."
+msgstr "Encontro %d coincidencias%s. Botón Derecho para abrir el archivo."
 
-#~ msgid "This voice provides an American English male ..."
-#~ msgstr "This voz corresponde a un hombre Inglés Americano ..."
+msgid "Change to %s"
+msgstr "Cambiar a %s"
 
-#~ msgid "For each variable below, fill in a value:"
-#~ msgstr "Para cada variable, ingrese un valor:"
+msgid "No completions found for '%s'\n"
+msgstr "No se encontraron coincidencias para '%s'\n"
 
-#~ msgid "Number"
-#~ msgstr "Número"
+msgid "You are now logged in as '%s'."
+msgstr "Usted ha iniciado sesión como '%s'"
 
-#~ msgid "Try #%d: Guess a number between 1 and %d"
-#~ msgstr "Intenta #%d: Adivinar un número entre 1 y %d"
+msgid "%s: %s"
+msgstr "%s: %s"
 
-#~ msgid "On try number %d you guessed %d and that is too low."
-#~ msgstr "En el intento %d usted ingreso %d y es demasiado pequeño."
+msgid "considering 1:"
+msgstr "consideración 1:"
 
-#~ msgid "On try number %d you guessed %d and that is too high."
-#~ msgstr "En el intento %d usted ingreso %d y es demasiado grande."
+msgid "considering 2:"
+msgstr "consideración 2:"
 
-#~ msgid "Sorry, but you didn't guess it in %d tries. My number was %d."
+msgid "   Class:"
+msgstr "   Clase:"
+
+msgid "      Method:"
+msgstr "      Metodo:"
+
+msgid "This voice provides an American English male ..."
+msgstr "This voz corresponde a un hombre Inglés Americano ..."
+
+msgid "For each variable below, fill in a value:"
+msgstr "Para cada variable, ingrese un valor:"
+
+msgid "Number"
+msgstr "Número"
+
+msgid "Try #%d: Guess a number between 1 and %d"
+msgstr "Intenta #%d: Adivinar un número entre 1 y %d"
+
+msgid "On try number %d you guessed %d and that is too low."
+msgstr "En el intento %d usted ingreso %d y es demasiado pequeño."
+
+msgid "On try number %d you guessed %d and that is too high."
+msgstr "En el intento %d usted ingreso %d y es demasiado grande."
+
+msgid "Sorry, but you didn't guess it in %d tries. My number was %d."
+msgstr ""
+"Lo siento, pero Usted no adivinó el número en %d intentos. Mi numero fue %d."
+
+msgid "You guessed my secret number in %d tries! It was %d."
+msgstr "Adivinó mi número secreto en %d intentos! Este fue %d."
+
+#, fuzzy
+#~ msgid "Searching for %r in %s/%s..."
+#~ msgstr "Buscar en archivos"
+
+#, fuzzy
+#~ msgid "  File \"%s\", line %d, %s\""
+#~ msgstr "Archivo \"(.*)\", línea (\\d*)"
+
+#, fuzzy
+#~ msgid "Running on %s"
+#~ msgstr "Ejecutándose en %s"
+
+#, fuzzy
+#~ msgid "Calico Project, Version %s, on %s"
+#~ msgstr "Proyecto Calico, Versión %s, de %s"
+
+#, fuzzy
+#~ msgid "  calico --version                  Displays the version number (%s)"
 #~ msgstr ""
-#~ "Lo siento, pero Usted no adivinó el número en %d intentos. Mi numero fue "
-#~ "%d."
+#~ "  calico --version                  Muestra el número de la versión (%s)"
 
-#~ msgid "You guessed my secret number in %d tries! It was %d."
-#~ msgstr "Adivinó mi número secreto en %d intentos! Este fue %d."
+#, fuzzy
+#~ msgid "Calico Chat - %s"
+#~ msgstr "Ventana de Chat Calico"
+
+#, fuzzy
+#~ msgid "New %s Script"
+#~ msgstr "Guardar la secuencia de comandos actual"
+
+#, fuzzy
+#~ msgid "Calico Editor - %s"
+#~ msgstr "Editor Calico"
+
+#, fuzzy
+#~ msgid "Loading file '%s'..."
+#~ msgstr "Carga de archivo exitosa."
+
+#, fuzzy
+#~ msgid "Calico Shell - %s"
+#~ msgstr "Inicio de sesión Calico"
+
+#, fuzzy
+#~ msgid "Calico Project %s"
+#~ msgstr "Proyecto Calico"
+
+#, fuzzy
+#~ msgid "%s - Calico Shell - %s"
+#~ msgstr "%s - Calico Shell - %s"
+
+#, fuzzy
+#~ msgid "Edit %s"
+#~ msgstr "Editar"
