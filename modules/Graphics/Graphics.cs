@@ -1284,10 +1284,12 @@ public static class Graphics
 
 		public void setBackground (Color color)
 		{
-			bg = new Gdk.Color ((byte)color.red, 
-                  (byte)color.green, 
-                  (byte)color.blue);
-			_canvas.ModifyBg (Gtk.StateType.Normal, bg);
+		    bg = new Gdk.Color ((byte)color.red, 
+					(byte)color.green, 
+					(byte)color.blue);
+		    Invoke( delegate {
+			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			});
 		}
     
 		public Gdk.Drawable getDrawable ()
