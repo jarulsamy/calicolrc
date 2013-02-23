@@ -1131,6 +1131,7 @@ namespace Calico {
                 bool result = document.Close(); // any cleanup?
                 if (result) {
                     int page_num = DocumentNotebook.PageNum(document.widget);
+                    documents.Remove(document.widget);
                     DocumentNotebook.RemovePage(page_num);
                 }
             }
