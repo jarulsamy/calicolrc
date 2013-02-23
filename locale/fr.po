@@ -20,12 +20,10 @@ msgstr ""
 "X-Poedit-SearchPath-0: src\n"
 
 #: ../src/calico.py:251
-#, python-format
 msgid "Cannot load language file '%s'"
 msgstr "Impossible de charger le fichier de langue '%s'"
 
 #: ../src/calico.py:269
-#, python-format
 msgid "unknown file extension: '%s'"
 msgstr "Extension de fichier inconnu: '%s'"
 
@@ -38,7 +36,6 @@ msgid "Do you want to open the script?"
 msgstr "Voulez-vous ouvrir le Script?"
 
 #: ../src/calico.py:285
-#, python-format
 msgid ""
 "You have received a blast from '%(mfrom)s'.\n"
 "%(q)s"
@@ -47,17 +44,14 @@ msgstr ""
 "%(q)s "
 
 #: ../src/calico.py:403
-#, python-format
 msgid "Searching for %r in %s/%s..."
 msgstr "Recherche pour %r dans %s/%s..."
 
 #: ../src/calico.py:424
-#, python-format
 msgid "  File \"%s\", line %d, %s\""
 msgstr "  Fichier \"%s\", ligne %d, %s\""
 
 #: ../src/calico.py:432
-#, python-format
 msgid "Found %d match%s. Right-click file to open."
 msgstr "Trouvé %d résultat%s. Click droit pour ouvrir le fichier."
 
@@ -71,7 +65,6 @@ msgid "Scripting Environment"
 msgstr "Environnement de Script"
 
 #: ../src/calico.py:497
-#, python-format
 msgid "Running on %s"
 msgstr "Fonctionnant sur %s"
 
@@ -134,12 +127,11 @@ msgid "Course keyword"
 msgstr "Mots-clés"
 
 # "keyword" translated but no "Course" 
-#: ../src/calico.py:600
+#: keyword" translated but no "Course" ../src/calico.py:60
 msgid "Register"
 msgstr "S'enregistrer"
 
 #: ../src/calico.py:637
-#, python-format
 msgid "Calico Project, Version %s, on %s"
 msgstr "Projet Calico, Version %s, de %s"
 
@@ -184,7 +176,6 @@ msgstr ""
 "sans graphismes"
 
 #: ../src/calico.py:648
-#, python-format
 msgid "  calico --version                  Displays the version number (%s)"
 msgstr "  calico --version                  Affiche le numéro de version (%s)"
 
@@ -197,7 +188,6 @@ msgid "  calico --debug                    Puts Calico in debugging mode"
 msgstr "  calico --debug                    Met Calico en mode débogage"
 
 #: ../src/chat.py:37
-#, python-format
 msgid "Calico Chat - %s"
 msgstr "Calico Chat - %s"
 
@@ -372,7 +362,6 @@ msgid "offline"
 msgstr "Vous n'êtes plus en ligne"
 
 #: ../src/document.py:53 ../src/window.py:164
-#, python-format
 msgid "New %s Script"
 msgstr "Nouveau Script %s"
 
@@ -386,7 +375,6 @@ msgid "Save"
 msgstr "Sauvegarder"
 
 #: ../src/editor.py:35 ../src/editor.py:171
-#, python-format
 msgid "Calico Editor - %s"
 msgstr "Editeur Calico - %s"
 
@@ -489,7 +477,6 @@ msgid "You need to login"
 msgstr "Vous devez vous identifier"
 
 #: ../src/shell.py:96 ../src/shell.py:526
-#, python-format
 msgid "Loading file '%s'..."
 msgstr "Chargement du fichier '%s'..."
 
@@ -498,7 +485,6 @@ msgid "Done loading file."
 msgstr "Fin du chargement du fichier."
 
 #: ../src/shell.py:105
-#, python-format
 msgid "Calico Shell - %s"
 msgstr "Calico Shell - %s"
 
@@ -512,17 +498,16 @@ msgstr "Stopper le Script"
 
 # msgid "Swap script and history areas"
 # msgstr "Intercambiar secuencia de comandos e historial"
-#: ../src/shell.py:157
+#: msgid "Swap script and history areas" msgstr "Intercambiar secuencia de
+#: comandos e historial" ../src/shell.py:157
 msgid "Swap script and history areas"
 msgstr "Echanger Script et historique"
 
 #: ../src/shell.py:229
-#, python-format
 msgid "Calico Project %s"
 msgstr "Projet Calico %s"
 
 #: ../src/shell.py:286
-#, python-format
 msgid "Change to %s"
 msgstr "Changer pour %s"
 
@@ -535,7 +520,6 @@ msgid "Restart shell"
 msgstr "Redémarrer le Shell"
 
 #: ../src/shell.py:302
-#, python-format
 msgid "%s - Calico Shell - %s"
 msgstr "%s - Calico Shell - %s"
 
@@ -548,7 +532,6 @@ msgstr ""
 "   "
 
 #: ../src/shell.py:419
-#, python-format
 msgid "No completions found for '%s'\n"
 msgstr "Pas de complétions trouvée pour '%s'\n"
 
@@ -569,7 +552,6 @@ msgid "File \"(.*)\", line (\\d*)"
 msgstr "Fichier \"(.*)\", ligne (\\d*)"
 
 #: ../src/shell.py:647
-#, python-format
 msgid "Edit %s"
 msgstr "Editer %s"
 
@@ -578,7 +560,6 @@ msgid "Select a file"
 msgstr "Sélectionnez un fichier"
 
 #: ../src/utils.py:303
-#, python-format
 msgid "You are now logged in as '%s'."
 msgstr "Vous êtes maintenant connecté en tant que '%s'."
 
@@ -603,7 +584,6 @@ msgid "Search in files:"
 msgstr "Recherche dans les fichiers:"
 
 #: ../src/utils.py:578
-#, python-format
 msgid "%s: %s"
 msgstr "%s: %s"
 
@@ -619,12 +599,11 @@ msgstr "Exemples"
 
 #: ../Source/Calico/Main.cs:171 ../Source/Calico/Main.cs:201
 #: ../Source/Calico/Main.cs:246 ../Source/Calico/Main.cs:317
-#, csharp-format
 msgid "Using Mono runtime version {0}"
 msgstr ""
 
 #: ../Source/Calico/Main.cs:200 ../Source/Calico/Main.cs:316
-#, fuzzy, csharp-format
+#, fuzzy
 msgid "Calico Project, version {0} on {1}"
 msgstr "Projet Calico, Version %s, de %s"
 
@@ -667,7 +646,7 @@ msgstr ""
 "sans graphismes"
 
 #: ../Source/Calico/Main.cs:210
-#, fuzzy, csharp-format
+#, fuzzy
 msgid ""
 "  StartCalico --version                  Displays the version number ({0})"
 msgstr "  calico --version                  Affiche le numéro de version (%s)"
@@ -685,13 +664,22 @@ msgid "  StartCalico --help                     Displays this message"
 msgstr "  calico --help                     Affiche ce message"
 
 #: ../Source/Calico/MainWindow.cs:1171 ../Source/Calico/MainWindow.cs:1457
-#, fuzzy, csharp-format
+#, fuzzy
 msgid "Running on {0}"
 msgstr "Fonctionnant sur %s"
 
 #: ../Source/Calico/MainWindow.cs:1174
 #, fuzzy
 msgid "(c) 2011-2012, Institute for Personal Robots in Education"
+msgstr "(c) 2011, Institute for Personal Robots in Education"
+
+#: ../Source/Calico/Document.cs:325
+msgid "for Calico"
+msgstr ""
+
+#: ../Source/Calico/Document.cs:326
+#, fuzzy
+msgid "(c) 2012, Institute for Personal Robots in Education"
 msgstr "(c) 2011, Institute for Personal Robots in Education"
 
 #: ../Source/Calico/MainWindow.cs:1677 ../Source/Calico/MainWindow.cs:1987
@@ -709,32 +697,20 @@ msgstr "   en attente de confirmation..."
 msgid "Received messages:\n"
 msgstr "messages reçus:"
 
-#: ../Source/Calico/Document.cs:325
-msgid "for Calico"
-msgstr ""
-
-#: ../Source/Calico/Document.cs:326
-#, fuzzy
-msgid "(c) 2012, Institute for Personal Robots in Education"
-msgstr "(c) 2011, Institute for Personal Robots in Education"
-
 #: ../Source/Calico/Main.cs:66
-#, csharp-format
 msgid "Loading Calico version {0}..."
 msgstr ""
 
 #: ../Source/Calico/Main.cs:73
-#, fuzzy, csharp-format
+#, fuzzy
 msgid "    looking for config in \"{0}\"..."
 msgstr "   en attente de confirmation..."
 
 #: ../Source/Calico/Main.cs:92
-#, csharp-format
 msgid "    looking for languages in \"{0}\"..."
 msgstr ""
 
 #: ../Source/Calico/Main.cs:170
-#, csharp-format
 msgid "    looking for local languages in \"{0}\"..."
 msgstr ""
 
@@ -798,7 +774,7 @@ msgstr ""
 "sans graphismes"
 
 #: ../Source/Calico/Main.cs:328
-#, fuzzy, csharp-format
+#, fuzzy
 msgid ""
 "  StartCalico --version                     Displays the version number ({0})"
 msgstr "  calico --version                  Affiche le numéro de version (%s)"
@@ -816,7 +792,7 @@ msgid "  StartCalico --help                        Displays this message"
 msgstr "  calico --help                     Affiche ce message"
 
 #: ../Source/Calico/MainWindow.cs:307
-#, fuzzy, csharp-format
+#, fuzzy
 msgid "The Calico Project, Version {0}"
 msgstr "Projet Calico, Version %s, de %s"
 
@@ -840,17 +816,14 @@ msgid "[Start of current history]"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:442
-#, csharp-format
 msgid "Go to \"{0}\" line {1}"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:480
-#, csharp-format
 msgid "Switch to {0}"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:899
-#, csharp-format
 msgid "Exception: {0}"
 msgstr ""
 
@@ -886,12 +859,11 @@ msgid "(c) 2011-2013, Institute for Personal Robots in Education"
 msgstr "(c) 2011, Institute for Personal Robots in Education"
 
 #: ../Source/Calico/MainWindow.cs:2010
-#, csharp-format
 msgid "Running '{0}'..."
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:2166
-#, fuzzy, csharp-format
+#, fuzzy
 msgid "{0} - Calico - {1}"
 msgstr "%s - Calico Shell - %s"
 
@@ -901,7 +873,6 @@ msgid "Properties"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:2321
-#, csharp-format
 msgid "Error: '{0}' is not an active language"
 msgstr ""
 
@@ -924,12 +895,10 @@ msgid "Decline"
 msgstr "en ligne"
 
 #: ../Source/Calico/MainWindow.cs:3173
-#, csharp-format
 msgid "Blast: Accept '{0}' from '{1}'?"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:3184
-#, csharp-format
 msgid "Blast '{0}' from '{1}' declined."
 msgstr ""
 
