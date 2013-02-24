@@ -1681,6 +1681,18 @@ namespace Jigsaw
 			fc.AddFilter(f1);
 			fc.AddFilter(f2);
 			
+			// Suggest a name:
+			if ( _currentPath != null) {
+			    string suggestedName = _currentPath;
+			    if (suggestedName.EndsWith(".jig", StringComparison.OrdinalIgnoreCase))	
+				suggestedName = suggestedName.Substring(0, suggestedName.Length - 4) + ".py";
+			    fc.SetFilename(suggestedName);
+			    fc.CurrentName = System.IO.Path.GetFileName(suggestedName);
+			} else {
+			    fc.SetFilename("JigsawExport.py");
+			    fc.CurrentName = "JigsawExport.py";
+			}
+			
 			// Collect the path
 			int response = fc.Run();
 			String ppath = null;
