@@ -211,6 +211,7 @@ public class SimScribbler : Myro.Robot
 				((float)y) / MeterInPixels);
 			frame.body.Rotation = (float)(theta * Math.PI/180.0);
 		  }
+		  simulation.window.refresh();
 		}
 
 		public override void setOption (string key, object value)
@@ -416,7 +417,7 @@ public class SimScribbler : Myro.Robot
 					if (position is int) {
 						if (((int)position) == 0) {
 							key = "distance-left";
-						} else if (((int)position) == 2) {
+						} else if (((int)position) == 1) {
 							key = "distance-right";
 						} else {
 							throw new Exception ("invalid position in getDistance()");
@@ -425,7 +426,7 @@ public class SimScribbler : Myro.Robot
 						if (((double)position) == 0) {
 							key = "distance-left";
 						} else if (((double)position) == 1) {
-							key = "distance-center";
+							key = "distance-right";
 						} else {
 							throw new Exception ("invalid position in getDistance()");
 						}

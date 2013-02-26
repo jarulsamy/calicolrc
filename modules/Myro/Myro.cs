@@ -1326,12 +1326,12 @@ public static class Myro
 
 	  public void setPose(int position, int x, int y, double theta) {
 		robots[position].setPose(x, y, theta);
-		robots[position].draw_simulation ();
+		window.refresh ();
 	  }
 
 	  public void setOption(int position, string option, object value) {
 		robots[position].setOption(option, value);
-		robots[position].draw_simulation ();
+		window.refresh ();
 	  }
 
 	  public void loop ()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Threading;
 using System;
+using Microsoft.Xna.Framework; // Vector2, Matrix
 
 	public class SimPioneer : Myro.Robot
 	{
@@ -200,6 +201,16 @@ using System;
 				velocity = _lastTranslate * rate;
 				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
 			}
+		}
+
+  	        public override void setPose(int x, int y, double theta) {
+		  float MeterInPixels = 64.0f;
+		  lock(frame.world) {
+			frame.body.Position = new Vector2 (((float)x) / MeterInPixels, 
+				((float)y) / MeterInPixels);
+			frame.body.Rotation = (float)(theta * Math.PI/180.0);
+		  }
+		  simulation.window.refresh();
 		}
 
 		public override void setOption (string key, object value)
@@ -405,8 +416,6 @@ using System;
 				if (((int)position) == 0) {
 				    key = "distance-left";
 				} else if (((int)position) == 1) {
-				    key = "distance-center";
-				} else if (((int)position) == 2) {
 				    key = "distance-right";
 				} else {
 				    throw new Exception ("invalid position in getDistance()");
@@ -415,8 +424,6 @@ using System;
 				if (((double)position) == 0) {
 				    key = "distance-left";
 				} else if (((double)position) == 1) {
-				    key = "distance-center";
-				} else if (((double)position) == 2) {
 				    key = "distance-right";
 				} else {
 				    throw new Exception ("invalid position in getDistance()");
@@ -424,8 +431,6 @@ using System;
 			    } else if (position is string) {
 				if (((string)position) == "left") {
 				    key = "distance-left";
-				} else if (((string)position) == "center") {
-				    key = "distance-center";
 				} else if (((string)position) == "right") {
 				    key = "distance-right";
 				} else {
@@ -437,7 +442,7 @@ using System;
 			    if (readings.Contains (key)) {
 				retval.append (readings [key]);
 			    } else {
-				retval.append (0);
+				retval.append (1.0);
 			    }
 			}
 		    }
