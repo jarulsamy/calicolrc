@@ -33,8 +33,8 @@ using System.Net;
 using System.IO;
 // MemoryStream
 using System;
-using Microsoft.Xna.Framework;
-using System.Diagnostics;// Vector2, Matrix
+using Microsoft.Xna.Framework; // Vector2, Matrix
+using System.Diagnostics;
 // Font:
 using Cairo;
 

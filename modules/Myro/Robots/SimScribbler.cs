@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Threading;
 using System;
+using Microsoft.Xna.Framework; // Vector2, Matrix
 
-	public class SimScribbler : Myro.Robot
+public class SimScribbler : Myro.Robot
 	{
 		public Graphics.Rectangle frame;
 		public Myro.Simulation simulation;
@@ -184,6 +185,7 @@ using System;
 			frame.body.OnCollision += SetStall;
 
 			this.simulation.robots.Add (this);
+			setup();
 		}
 
 		bool SetStall (FarseerPhysics.Dynamics.Fixture fixture1,
@@ -200,6 +202,15 @@ using System;
 				velocity = _lastTranslate * rate;
 				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
 			}
+		}
+
+	    public override void setPose(int x, int y, double theta) {
+		  float MeterInPixels = 64.0f;
+		  lock(frame.world) {
+			frame.body.Position = new Vector2 (((float)x) / MeterInPixels, 
+				((float)y) / MeterInPixels);
+			frame.body.Rotation = (float)(theta * Math.PI/180.0);
+		  }
 		}
 
 		public override void setOption (string key, object value)

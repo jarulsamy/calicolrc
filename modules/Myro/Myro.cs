@@ -1124,41 +1124,40 @@ public static class Myro
 	}
 
 	[method: JigsawTab(null)]
-        public static void initialize (string port, int baud=38400)
-	{
-	    // assumes a single robot will be used
-	    if (port == null) {
+	public static void initialize (string port, int baud=38400)
+    {
+	  // assumes a single robot will be used
+	  if (port == null) {
 		object retval = ask("Please enter port");
 		if (retval == null)
-		    return;
+		  return;
 		else
-		    port = retval.ToString();
-	    }
-	    if (port.StartsWith ("sim")) {
+		  port = retval.ToString();
+	  }
+	  if (port.StartsWith ("sim")) {
 		if (simulation == null || ! simulation.window.Visible) {
-		    simulation = new Simulation ();
-		    //Thread.Sleep ((int)(5 * 1000));
+		  simulation = new Simulation ();
+		  //Thread.Sleep ((int)(5 * 1000));
 		} 
 		else {
-		    simulation.setup ();
+		  simulation.setup ();
 		}
 		// defaults to SimScribbler in this interface
 		if (robot != null && robot.GetType().Name == "SimScribbler") {
-		    // don't add another!
+		  // don't add another!
 		} else {
-		    robot = makeRobot ("SimScribbler", simulation); 
+		  robot = makeRobot ("SimScribbler", simulation); 
 		}
-	    } 
-	    else {
+	  } else {
 		if (Myro.robot != null)
-		    Myro.robot.reinit (port, baud);
+		  Myro.robot.reinit (port, baud);
 		else {
-		    // defaults to Scribbler in this interface
-		    Myro.robot = makeRobot ("Scribbler", port, baud);
+		  // defaults to Scribbler in this interface
+		  Myro.robot = makeRobot ("Scribbler", port, baud);
 		}
-	    }
+	  }
 	}
-
+  
 	[method: JigsawTab(null)]
 	public static Type[] getTypesOfArgs (object [] objects)
 	{
@@ -1212,6 +1211,7 @@ public static class Myro
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
 		public double extra_simulation_time = 0.0;
+        public bool run = true;
 	    
 		public Simulation (string title, int width, int height, Graphics.Color color)
 		{
@@ -1311,17 +1311,41 @@ public static class Myro
 			}      
 		}
 
-		public void loop ()
-		{
-			while (window.IsRealized) {
-				foreach (Robot robot in robots) {
-					robot.draw_simulation ();
-				}
-				if (!window.IsRealized)
-					return;
-				window.step (.1);
-				wait (extra_simulation_time);
+	  public void step() {
+		if (window.IsRealized) {
+		  foreach (Robot robot in robots) {
+			robot.draw_simulation ();
+		  }
+		  window.step (.1);
+		}
+	  }
+
+	  public void stop() {
+		run = false;
+	  }
+
+	  public void setPose(int position, int x, int y, double theta) {
+		robots[position].setPose(x, y, theta);
+		robots[position].draw_simulation ();
+	  }
+
+	  public void setOption(int position, string option, object value) {
+		robots[position].setOption(option, value);
+		robots[position].draw_simulation ();
+	  }
+
+	  public void loop ()
+	  {
+		  run = true;
+		  while (window.IsRealized && run) {
+			foreach (Robot robot in robots) {
+			  robot.draw_simulation ();
 			}
+			if (!window.IsRealized)
+			  return;
+			window.step (.1);
+			wait (extra_simulation_time);
+		  }
 		}
 	}
 
@@ -2581,6 +2605,10 @@ public static class Myro
 
 		public virtual void setOption (string key, object value)
 		{
+		}
+    
+	    public virtual void setPose (int x, int y, double theta)
+	    {
 		}
     
 		public virtual void beep (double duration, double frequency, double frequency2)
