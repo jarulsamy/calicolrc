@@ -1186,7 +1186,7 @@ public static class Myro
 		    foreach (Type type in assembly.GetTypes()) {
 			Type [] types = getTypesOfArgs (args);
 			ConstructorInfo constructor = type.GetConstructor (types);
-			if (constructor != null) {
+			if (constructor != null && type.Name == robot_type) {
 			    Robot robot;
 			    try {
 				robot = (Robot)constructor.Invoke (args);
