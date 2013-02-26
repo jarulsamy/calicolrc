@@ -2048,7 +2048,7 @@ namespace Calico {
         }
 
         public void PrintLine(Tag tag, string format) {
-	    Print(tag, format);
+	    Print(tag, format + "\n");
 	}
 
         public void Print(Tag tag, string format) {
