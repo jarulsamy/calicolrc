@@ -564,6 +564,7 @@ public static class Graphics
 
 	public static void wait (double seconds)
 	{
+	    if (seconds > 0) 
 		Thread.Sleep ((int)(seconds * 1000));
     
 		/*    ManualResetEvent mre = new ManualResetEvent(false);
@@ -1734,7 +1735,9 @@ public static class Graphics
 		    double diff = (now - last_update).TotalMilliseconds / 1000.0;
 		    while (diff < step_time) { // seconds
 			//System.Console.Write(".");
-			Thread.Sleep ((int)(diff / 2 * 1000)); // 2 times per diff
+			if (diff > 0) {
+			    Thread.Sleep ((int)(diff / 2 * 1000)); // 2 times per diff
+			}
 			//System.Console.Write("+");
 			now = DateTime.Now;
 			diff = (now - last_update).TotalMilliseconds / 1000.0;
