@@ -1,4 +1,4 @@
-from pyrobot.brain.conx import *
+from conx import *
 import math
 
 __author__  = "George Dahl <gdahl1@swarthmore.edu>"
@@ -68,36 +68,36 @@ class CascorNetwork(Network):
         line = ("=" * fromColWidth) + "="
         for i in range(layer.size):
             line += ("=" * colWidth) + "="
-        print line
+        print(line)
         # to layer name:
         line = " " * fromColWidth + "|" + pad(layer.name, (colWidth * layer.size) + (layer.size - 1), align="center", )
-        print line
+        print(line)
         # sep bar:
         line = ("-" * fromColWidth) + "+"
         for i in range(layer.size):
             line += ("-" * colWidth) + "+"
-        print line
+        print(line)
         # col header:
         line = pad("correlations", fromColWidth, align="center")
         for i in range(layer.size):
             line += pad(str(i), colWidth, align = "center")
-        print line
+        print(line)
         # sep bar:
         line = ("-" * fromColWidth) + "+"
         for i in range(layer.size):
             line += ("-" * colWidth) + "+"
-        print line
+        print(line)
         # correlations:
         for i in range(self["output"].size):
             line = pad(str(i), fromColWidth, align = "center")
             for j in range(layer.size):
                 line += pad(("%." + str(decimals) + "f") % self.correlations[i][j], colWidth, align = "right")
-            print line
+            print(line)
         # bottom bar:
         line = ("=" * fromColWidth) + "="
         for i in range(layer.size):
             line += ("=" * colWidth) + "="
-        print line
+        print(line)
                     
     def displayConnections(self, title = "Cascade Connections"):
         Network.displayConnections(self, title)
@@ -108,26 +108,26 @@ class CascorNetwork(Network):
         Displays the weights of the network in a way similar to how Fahlman's code
         stores them.
         """
-        print "Output weights:"
-        print self["output"].weight[0]
+        print("Output weights:")
+        print(self["output"].weight[0])
         for r in range(len(self["input","output"].weight[0])):
             for c in range(len(self["input","output"].weight)):
-                print self["input","output"].weight[c][r]
+                print(self["input","output"].weight[c][r])
         #print hidden to output weights
         for layer in self:
             if layer.type == "Hidden":
                 #print len(self["input","output"].weight)+1,self[layer.name, "output"].weight[0][0]
-                print self[layer.name, "output"].weight[0][0]
+                print(self[layer.name, "output"].weight[0][0])
         #print input to hidden weights and hidden to hidden weights
-        print "Weights incident on hidden units"
+        print("Weights incident on hidden units")
         for layer in self:
             if layer.type == "Hidden":
-                print layer.name[-1],layer.weight[0]
+                print(layer.name[-1],layer.weight[0])
                 for connection in self.connections:
                     if connection.toLayer.name == layer.name:
                         for r in range(len(connection.weight[0])):
                             for c in range(len(connection.weight)):
-                                print layer.name[-1], connection.weight[c][r]
+                                print(layer.name[-1], connection.weight[c][r])
     def setSigmoid_prime_offset(self, value):
         self.sigmoid_prime_offset = value
         self.sig_prime_offset_copy = self.sigmoid_prime_offset
@@ -179,19 +179,19 @@ class CascorNetwork(Network):
             self["output"].active = 1
             self.setCache(1)
             self["output"].active = act
-            print len(self)-3, " Hidden nodes"
+            print(len(self)-3, " Hidden nodes")
         if len(self)-3 == self.maxHidden:
             self.trainOutputs(self.maxOutputEpochs, cont)
         self.saveNetworkToFile(self.autoSaveNetworkFile, mode = self.autoSaveNetworkFileFormat, counter = len(self) - 3)
         self.Print("   Saving network to '%s'..." % self.lastAutoSaveNetworkFilename)
-        print "Total epochs:", self.totalEpoch
+        print("Total epochs:", self.totalEpoch)
     def trainCandidates(self):
         """ This function trains the candidate layer to maximize its
         correlation with the output errors.  The way this is done is
         by setting weight error derivatives for connections and layers
         and assuming the change_weights function will update the
         weights appropriately based on those data members.  """
-        print "Candidate phase ------------------------------------"
+        print("Candidate phase ------------------------------------")
         self["output"].active = 1 #we need the output error, etc. so the output layer must be active during propagation
         self["candidate"].active = 1 #candidate should be active throughout this function
 
@@ -277,7 +277,7 @@ class CascorNetwork(Network):
                     self.quitEpoch = ep + self.patience
                     previousBest = bestScore
             if ep % self.candreportRate == 0: #simplified candidate epoch reporting mechanism
-                print "Epoch: %6d | Candidate Epoch: %7d | Best score: %7.4f" % (self.totalEpoch, ep, previousBest)
+                print("Epoch: %6d | Candidate Epoch: %7d | Best score: %7.4f" % (self.totalEpoch, ep, previousBest))
         #self.totalEpoch += ep
         return best #return the index of the candidate we should recruit
     def updateCandidateLayer(self, dSdw_bias, c):
@@ -348,7 +348,7 @@ class CascorNetwork(Network):
         error drops below the threshold (either self.stopPercent or cross validation if self.useCrossValidationToStop
         is set), or a maximum number of training epochs have been performed.
         """
-        print "Output phase    ------------------------------------"
+        print("Output phase    ------------------------------------")
         self["output"].active = 1 #make sure output layer is active, afterall, that is what we are training in this function
         self["candidate"].active = 0 #in fact, don't let the candidate layer do anything!  Hopefully this won't cause problems
         self.quitEpoch = self.patience
@@ -425,7 +425,7 @@ class CascorNetwork(Network):
                     self.saveWeightsToFile(self.autoSaveWeightsFile)
                     self.Print("auto saving weights to '%s'..." % self.autoSaveWeightsFile)
         else:
-            print "Final: nothing done"
+            print("Final: nothing done")
         #print "----------------------------------------------------"
         #self.totalEpoch += self.epoch
         return (totalCorrect * 1.0 / totalCount <  self.stopPercent) #true means we continue
@@ -445,7 +445,7 @@ class CascorNetwork(Network):
         Grab the Nth candidate node and all incoming weights and make it
         a layer unto itself. New layer is a frozen layer.
         """
-        print "Recruiting candidate: %d, correlation(s): %s" % (n, self.correlations[:,n])
+        print("Recruiting candidate: %d, correlation(s): %s" % (n, self.correlations[:,n]))
         # first, add the new layer:
         hcount = 0
         for layer in self:

@@ -1772,46 +1772,45 @@ public static class Graphics
 
 		public void refresh()
 		{ // Window, in seconds
-		    // Same as update, but will make sure it 
-		    // doesn't update too fast.
-		    // handle physics
-		    // kjo
-		    _canvas.need_to_draw_surface = true;
-		    
-		    if (mode == "physics") {
+		  // Same as update, but will make sure it 
+		  // doesn't update too fast.
+		  // handle physics
+		  // kjo
+		  _canvas.need_to_draw_surface = true;
+		  
+		  if (mode == "physics") {
 			// update the sprites
 			lock (_canvas.shapes) {
-			    foreach (Shape shape in _canvas.shapes) {
+			  foreach (Shape shape in _canvas.shapes) {
 				shape.updateFromPhysics ();
-			    }
+			  }
 			}
-		    }
-		    if (mode == "bitmapmanual") {
+		  }
+		  if (mode == "bitmapmanual") {
 			using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
-			    g.Save ();
-			    g.Operator = Cairo.Operator.Source;
-			    g.SetSourceSurface (_canvas.surface, 0, 0);
-			    g.Paint ();
-			    g.Restore ();
+			  g.Save ();
+			  g.Operator = Cairo.Operator.Source;
+			  g.SetSourceSurface (_canvas.surface, 0, 0);
+			  g.Paint ();
+			  g.Restore ();
 			}	   
-		    }      
-		    
-		    _dirty = false;
-		    ev.Reset();
-		    Invoke (delegate { 
+		  }      
+		  
+		  _dirty = false;
+		  ev.Reset();
+		  Invoke (delegate { 
 			    try {
-				QueueDraw ();
-				GdkWindow.ProcessUpdates (true);
-				//System.Console.Write("!");
+				  QueueDraw ();
+				  GdkWindow.ProcessUpdates (true);
+				  //System.Console.Write("!");
 			    } catch {
-				requestStop = true;
+				  requestStop = true;
 			    }
 			    ev.Set ();
-			});
-		    ev.WaitOne ();
-		    //System.Console.Write("<");
+			  });
+		  ev.WaitOne ();
+		  //System.Console.Write("<");
 		}
-
 
 		public override string ToString ()
 		{

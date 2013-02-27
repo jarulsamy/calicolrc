@@ -1,5 +1,5 @@
-from pyrobot.brain.governor import *
-net = GovernorNetwork(5, 2.1, 0.01, 5, 0.2) 
+from ai.governor import *
+net = GovernorNetwork(3, 2.1, 0.01, 5, 0.2) 
 net.addLayers(2, 2, 1) # sizes
 net.setInputs( [[0, 0], [0, 1], [1, 0], [1, 1]])
 net.setTargets([[0], [1], [1], [0]])

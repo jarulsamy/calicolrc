@@ -1,6 +1,7 @@
-import numpy.oldnumeric as Numeric
-import math, random, sys
-from pyrobot.tools.circularlist import CircularList
+from __future__ import print_function
+
+import Numeric, math, random, sys
+from circularlist import CircularList
 
 __author__ = "Jeremy Stober"
 __version__ = "$Revision$"
@@ -171,16 +172,16 @@ class RAVQ:
         ravq.
         """
         if self.verbosity > 1:
-            print "Step:", self.time
+            print("Step:", self.time)
         if self.verbosity > 2:
-            print vec
+            print(vec)
         array = Numeric.array(vec, 'd')
         if self.mask == None:
             self.mask = Numeric.ones(len(array), 'd')
         self.buffer.addItem(array)
         if self.time >= len(self.buffer):
             self.process() 
-        if self.verbosity > 2: print self
+        if self.verbosity > 2: print(self)
         self.time += 1
         return (self.newWinnerIndex, self.winner)
 
@@ -243,10 +244,10 @@ class RAVQ:
         self.setMovingAverageDistance()
         self.setModelVectorsDistance()
         if self.verbosity > 2:
-            print "Moving average:", self.movingAverage
+            print("Moving average:", self.movingAverage)
         if self.verbosity > 1:
-            print "Moving average distance: ", self.movingAverageDistance
-            print "Model vectors distance: ", self. modelVectorsDistance
+            print("Moving average distance: ", self.movingAverageDistance)
+            print("Model vectors distance: ", self. modelVectorsDistance)
         if self.addModels:
             self.updateModelVectors()
         self.updateWinner()
@@ -279,12 +280,12 @@ class RAVQ:
             name = self.models.names[-1]
             self.newModelVector = (name, self.movingAverage)
             if self.verbosity > 1:
-                print '***Adding model vector***'
-                print 'Unique name', name
-                print 'Moving avg dist', self.movingAverageDistance
-                print 'Model vec dist', self.modelVectorsDistance
+                print('***Adding model vector***')
+                print('Unique name', name)
+                print('Moving avg dist', self.movingAverageDistance)
+                print('Model vec dist', self.modelVectorsDistance)
             if self.verbosity > 2:
-                print 'New model vector', self.movingAverage
+                print('New model vector', self.movingAverage)
 
     def updateWinner(self):
         """
@@ -395,13 +396,13 @@ class ARAVQ(RAVQ):
     def updateDeltaWinner(self):
         if not self.winner == 'No Winner':
             if self.verbosity > 3:
-                print 'MAandW' , euclideanDistance(self.movingAverage, self.winner, self.mask)
-                print 'MA' ,  self.movingAverageDistance
-                print 'MV' ,  self.modelVectorsDistance
-                print 'MVMD' ,  self.modelVectorsDistance - self.delta
+                print('MAandW' , euclideanDistance(self.movingAverage, self.winner, self.mask))
+                print('MA' ,  self.movingAverageDistance)
+                print('MV' ,  self.modelVectorsDistance)
+                print('MVMD' ,  self.modelVectorsDistance - self.delta)
             if euclideanDistance(self.movingAverage, self.winner, self.mask) < self.epsilon / 2:
                 self.deltaWinner = self.alpha * (self.movingAverage - self.winner)
-                if self.verbosity > 4: print 'Learning'
+                if self.verbosity > 4: print('Learning')
             else:
                 self.deltaWinner = Numeric.zeros(len(self.winner)) 
         else:
@@ -412,7 +413,7 @@ class ARAVQ(RAVQ):
         next time step anyway.
         """
         if self.deltaWinner != 'No Winner' and self.learning:
-            if self.verbosity > 2: print "LEARNING: was:", self.models[self.newWinnerIndex].vector, "delta:", self.deltaWinner
+            if self.verbosity > 2: print("LEARNING: was:", self.models[self.newWinnerIndex].vector, "delta:", self.deltaWinner)
             self.models[self.newWinnerIndex].vector += self.deltaWinner
         else:
             pass 
@@ -425,31 +426,31 @@ class ARAVQ(RAVQ):
         self.learn()
 
 if __name__ == '__main__':
-    print "Creating a RAVQ using all possible lists of 8 bits"
-    print "------------------------------------------------------------"
+    print("Creating a RAVQ using all possible lists of 8 bits")
+    print("------------------------------------------------------------")
     bitlist = makeBitList()
     #parameters are buffer size, epsilon, delta, and history size
     ravq = RAVQ(4, 2.1, 1.1, 5)
     #ravq.setVerbosity(2)
     for bits in bitlist:
         ravq.input(bits)
-    print ravq
-    print "Distance map:"
-    print ravq.distanceMapAsString()
+    print(ravq)
+    print("Distance map:")
+    print(ravq.distanceMapAsString())
 
-    print "Creating an adaptive RAVQ using all possible lists of 8 bits"
-    print "------------------------------------------------------------"
+    print("Creating an adaptive RAVQ using all possible lists of 8 bits")
+    print("------------------------------------------------------------")
     #parameters are buffer size, epsilon, delta, history size, and alpha (learning rate)
     ravq = ARAVQ(4, 2.1, 1.1, 2, .2)
     #ravq.setVerbosity(2)
     for bits in bitlist:
         ravq.input(bits)
-    print ravq
-    print "Distance map:"
-    print ravq.distanceMapAsString()
+    print(ravq)
+    print("Distance map:")
+    print(ravq.distanceMapAsString())
 
-    print "Creating a RAVQ using a sequence of real-valued lists"
-    print "------------------------------------------------------------"
+    print("Creating a RAVQ using a sequence of real-valued lists")
+    print("------------------------------------------------------------")
     seq = makeNoisySequence([[0.0, 0.5, 1.0],
                              [0.5, 0.5, 0.5],
                              [1.0, 0.1, 0.1],
@@ -459,20 +460,20 @@ if __name__ == '__main__':
     #ravq.setVerbosity(2)
     for i in range(len(seq)):
         ravq.input(seq[i])
-    print ravq
+    print(ravq)
     
-    print "Test the masking capability and distance measures"
-    print "------------------------------------------------------------"
-    print "mask:", ravq.mask
-    print "Test masking functionality in euclidean distance calc's:", 
-    print euclideanDistance(Numeric.array([1,2]),
+    print("Test the masking capability and distance measures")
+    print("------------------------------------------------------------")
+    print("mask:", ravq.mask)
+    print("Test masking functionality in euclidean distance calc's:", end="")
+    print(euclideanDistance(Numeric.array([1,2]),
                             Numeric.array([3,5]),
-                            Numeric.array([1,0]))
-    print ravq
-    print "Saving to file..."
+                            Numeric.array([1,0])))
+    print(ravq)
+    print("Saving to file...")
     ravq.saveRAVQToFile('test.ravq')
-    print "Loading from file..."
+    print("Loading from file...")
     ravq.loadRAVQFromFile('test.ravq')
-    print "Comparing after save..."
-    print ravq
-    print "Done testing!"
+    print("Comparing after save...")
+    print(ravq)
+    print("Done testing!")

@@ -76,6 +76,14 @@ class array:
         else: # array * [0, 1] 
             return array(map(lambda a,b: a * b, self.array, other))
 
+    def __div__(self, other):
+        if type(other) in [int, float, long]:
+            return array(map(lambda v: v / other, self.array))
+        else:
+            raise Exception("not implemented yet")
+        #else: # array * [0, 1] 
+        #    return array(map(lambda a,b: a / b, self.array, other))
+
     def __sub__(self, other):
         if type(other) in [int, float, long]:
             return array(map(lambda v: v - other, self.array))
@@ -119,6 +127,7 @@ class array:
 
 fabs = abs
 exp = math.exp
+argmin = lambda vector: vector.index(min(vector))
 
 def put(toArray, arange, fromArray):
     for i in arange:
@@ -134,6 +143,11 @@ def zeros(dims, typecode='f'):
     if type(dims) == type(1):
         dims = (dims,)
     return array(ndim(*dims, thunk=lambda: 0.0))
+
+def ones(dims, typecode='f'):
+    if type(dims) == type(1):
+        dims = (dims,)
+    return array(ndim(*dims, thunk=lambda: 1.0))
 
 class add:
     @staticmethod

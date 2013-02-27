@@ -2279,12 +2279,12 @@ public static class Myro
 		       Gtk.ButtonsType.YesNo,
 		       question);
 	    Invoke (delegate {
-		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
-			yesnoResponse = true;
-		    }
-		    fc.Destroy();
-		    ev.Set();
-		});
+			  if (fc.Run() == (int)Gtk.ResponseType.Yes) {
+				yesnoResponse = true;
+			  }
+			  fc.Destroy();
+			  ev.Set();
+			});
 	    ev.WaitOne ();
 	    return yesnoResponse;
 	}

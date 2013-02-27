@@ -7,8 +7,8 @@ Governor code for self regulating networks.
 __author__ = "Douglas Blank <dblank@brynmawr.edu>"
 __version__ = "$Revision$"
 
-from pyrobot.brain.conx import *
-from pyrobot.brain.ravq import ARAVQ, euclideanDistance
+from ai.conx import *
+from ai.ravq import ARAVQ, euclideanDistance
 
 class Governor:
     """
@@ -133,7 +133,7 @@ class Governor:
         parts = len(layerWeights)
         for name in layerWeights:
             layerWeights[name] = (1.0 / layerWeights[name]) * (1.0 / parts)
-        print "layerWeights:", layerWeights
+        print("layerWeights:", layerWeights)
         self.setMask(**layerWeights)
         
     def setMask(self, **args):
@@ -153,7 +153,7 @@ class Governor:
                 maskOutput += [args[name]] * self[name].size
         self.ravq.setMask( maskInput + maskContext + maskOutput )
         if self.verbosity:
-            print "mask:", self.ravq.mask
+            print("mask:", self.ravq.mask)
  
     def decayModelVectors(self):
         good = []
@@ -210,11 +210,11 @@ class GovernorNetwork(Governor, Network):
                 elif self[layerName].kind == 'Output':
                     targetValues += list(args[layerName])
             vectorIn = inputValues + targetValues
-            if self.verbosity: print "in:", vectorIn
+            if self.verbosity: print("in:", vectorIn)
             self.map(vectorIn)
             # get the next
             vectorOut = self.next()
-            if self.verbosity: print "out:", vectorOut
+            if self.verbosity: print("out:", vectorOut)
             if vectorOut == None:
                 vectorOut = vectorIn
             # get the pieces out of vectorOut:
@@ -230,7 +230,13 @@ class GovernorNetwork(Governor, Network):
                     length = self[layerName].size
                     govNet[layerName] = vectorOut[current:current+length]
                     current += length
-            return Network.step(self, **govNet)
+            return Network.step(self, **govNet) 
+            # but I want actual error for orig pattern
+            #previousLearning = self.learning
+            #self.setLearning(0)
+            #results = Network.step(self, **args)
+            #self.setLearning(previousLearning)
+            #return results
         else:
             # just do it:
             return Network.step(self, **args)
@@ -280,9 +286,9 @@ class GovernorSRN(Governor, SRN):
                 
     def report(self, hist=1):
         if hist:
-            print "Model vectors: %d Histogram: %s" %( len(self.ravq.models), self.histogram)
+            print("Model vectors: %d Histogram: %s" %( len(self.ravq.models), self.histogram))
         else:
-            print "Model vectors: %d" %( len(self.ravq.models),)
+            print("Model vectors: %d" %( len(self.ravq.models),))
 
     def sweep(self):
         retval = SRN.sweep(self)
@@ -428,10 +434,10 @@ class GovernorSRN(Governor, SRN):
         self.ravq.setAddModels(value)
         self.learning = value
 
-if __name__ == '__main__':
+if __name__ == '<module>':
     import os, gzip, sys
     if len(sys.argv) != 4:
-        print "call with: python govenor.py governing resetEpoch decay"
+        print("call with: python govenor.py governing resetEpoch decay")
         sys.exit(1)
     # read in 20,000 lines of experimental training data
     locationfile = gzip.open('location.dat.gz', 'r')
@@ -479,18 +485,18 @@ if __name__ == '__main__':
         net.learning = 1
     net.setResetEpoch(int(sys.argv[2]))
     net.decay = int(sys.argv[3])
-    print "Governing is", net.governing
-    print "Decay is", net.decay
+    print("Governing is", net.governing)
+    print("Decay is", net.decay)
     net.train()
-    print net.ravq
-    print "Decay:", net.decay
-    print "Testing..."
-    print "This takes a while..."
+    print(net.ravq)
+    print("Decay:", net.decay)
+    print("Testing...")
+    print("This takes a while...")
     net.governing = 0
     net.setTargets( targets )
     net.setInputs( inputs )
     net.governing = 0
     tss, correct, total, pcorrect = net.sweep()
-    print "TSS: %.4f Percent: %.4f" % (tss, correct / float(total))
+    print("TSS: %.4f Percent: %.4f" % (tss, correct / float(total)))
     # run with -i to see net
     
