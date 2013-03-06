@@ -110,6 +110,9 @@ namespace Calico {
             return true;
         }
 
+        public virtual void SelectLine(int lineno) {
+        }
+
         public virtual bool HasContent {
             get {return true;}
         }
@@ -467,6 +470,10 @@ namespace Calico {
             data.Caret.Column = 1;
             texteditor.ScrollToCaret();
             return true;
+        }
+
+        public override void SelectLine(int lineno) {
+	    texteditor.SetSelection(lineno, 1, lineno + 1, 1);
         }
 
         public override string GetText() {
