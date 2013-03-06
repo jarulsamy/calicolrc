@@ -53,6 +53,8 @@ class OutputStream(java.io.ByteArrayOutputStream):
             retval = ""
             for i in range(offset, length):
                 retval += chr(byte[i])
+        if retval == "Derived classes must implement it":
+            retval = "java.lang.NullPointerException"
         if self.out_type == "output":
             print(retval, end="")
         elif self.out_type == "error":
@@ -103,6 +105,7 @@ class MyLanguageEngine(Calico.Engine):
             message = error.message
             message = message.replace("koala.dynamicjava.interpreter.error.", "")
             message = message.replace("koala.dynamicjava.parser.wrapper.", "")
+            message = message.replace("Derived classes must implement it", "java.lang.NullPointerException");
             self.calico.Error(message + "\n")
         return True
 
