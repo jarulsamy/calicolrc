@@ -1,7 +1,7 @@
 from Graphics import *
 from Myro import getFilenames
 
-files = getFilenames("../images/brain/*.jpg")
+files = getFilenames(calico.relativePath("../examples/images/brain/*.jpg"))
 
 pics = []
 

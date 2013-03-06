@@ -1,8 +1,7 @@
 from Myro import makeRobot, Simulation, Color, yesno
-from ai.governor import *
+from ai.conx import *
 
 network = Network()
-#network = GovernorNetwork(3, 2.1, 0.01, 5, 0.2) # length of input + output
 network.addLayers(2, 5, 1)
 
 width, height = 500, 400
