@@ -551,13 +551,17 @@ public static class Graphics
 	    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear (false);
 			_lastWindow = _windows [title];
-			_lastWindow.KeepAbove = true;
+			Invoke( delegate {
+				_lastWindow.KeepAbove = true;
+			    });
 			return _windows [title];
 		} else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 			_lastWindow = _windows [title];
-			_lastWindow.KeepAbove = true;
-			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
+			Invoke( delegate {
+				_lastWindow.KeepAbove = true;
+			    });
+			//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
 			return _windows [title];
 		}
 	}
@@ -582,10 +586,12 @@ public static class Graphics
 		if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear ();
 			_windows [title].mode = "auto";
-			_windows [title].ShowAll ();
-			_windows [title].Resize (width, height);
-			_windows [title].QueueDraw ();
-			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for redraw
+			Invoke( delegate {
+				_windows [title].ShowAll ();
+				_windows [title].Resize (width, height);
+				_windows [title].QueueDraw ();
+			    });
+				//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for redraw
 			/*
       Gtk.Application.Invoke(delegate { 
           _windows[title].GdkWindow.UrgencyHint = true;
@@ -601,8 +607,10 @@ public static class Graphics
         });
       */
 			_lastWindow = _windows [title];
-			_lastWindow.KeepAbove = true;
-			Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
+			Invoke( delegate {
+				_lastWindow.KeepAbove = true;
+			    });
+			//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
 			return _windows [title];
 		}
 	}
