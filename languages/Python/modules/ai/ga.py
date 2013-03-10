@@ -5,12 +5,26 @@ A simple Genetic Algorithm in Python
 __author__ = "Douglas Blank <dblank@brynmawr.edu>"
 __version__ = "$Revision$"
 
-import numpy.oldnumeric as Numeric
 import math, random, time, sys, string
 from copy import deepcopy
+try:
+    import numpy.oldnumeric as Numeric
+    def yesno(question):
+        print(question, end="")
+        return sys.stdin.readline().lower()[0] == 'y'
+    def inform(question):
+        print(question, end="")
+        sys.stdin.readline()
+    def flush():
+        sys.stdout.flush()
+except:
+    import Numeric
+    from Myro import yesno, inform
+    def flush():
+        pass
 
 def display(v):
-    print v,
+    print(v, end="")
 
 def sum(a):
     sum = 0
@@ -89,11 +103,11 @@ class Gene:
 
     def display(self):
         if self.mode == 'bit' or self.mode == 'integer': 
-            print string.join(map(lambda v: `int(v)`, self.genotype), "")
+            print(string.join(map(lambda v: `int(v)`, self.genotype), ""))
         elif self.mode == 'float':
             map(lambda v: display("%3.2f" % v), self.genotype)
         elif self.mode == 'char':
-            print string.join(self.genotype, '')
+            print(string.join(self.genotype, ''))
         else:
             raise "unknownMode", self.mode
 
@@ -104,7 +118,7 @@ class Gene:
         for i in range(len(self.genotype)):
             if flip(mutationRate):
                 if self.verbose > 2:
-                    print "mutating at position", i
+                    print("mutating at position", i)
                 if self.mode == 'bit': 
                     self.genotype[i] = not self.genotype[i]
                 elif self.mode == 'integer': 
@@ -176,7 +190,7 @@ class Gene:
             for i in range(geneLength):
                 if crossPoints[i]:
                     if self.verbose > 2:
-                        print "crossing over at point", i
+                        print("crossing over at point", i)
                     p1, p2 = p2, p1
                 child1[i] = p1[i]
                 child2[i] = p2[i]
@@ -187,7 +201,7 @@ class Gene:
             return new_child1, new_child2
         else:
             if self.verbose > 2:
-                print "no crossover"
+                print("no crossover")
             return parent1.copy(), parent2.copy()
 
 class Population:
@@ -244,9 +258,9 @@ class Population:
                 break
             index += 1
         if self.verbose > 2:
-            print "selected",
+            print("selected",end="")
             self.individuals[index].display(),
-            print "fitness", self.individuals[index].fitness
+            print("fitness", self.individuals[index].fitness)
         return self.individuals[index].copy()
 
     def statistics(self):
@@ -280,12 +294,12 @@ class Population:
         self.bestMember = best
         self.avgFitness = (self.sumFitness * 1.0) / self.size
         if self.verbose > 0:
-            print "Fitness: Total", "%7.2f" % self.sumFitness, 
-            print "Best", "%5.2f" % best.fitness,
-            print "Average", "%5.2f" % self.avgFitness,
-            print "Worst", "%5.2f" % worst.fitness
-            print "Elite fitness:", map( lambda x: x.fitness, self.eliteMembers)
-            sys.stdout.flush()
+            print("Fitness: Total", "%7.2f" % self.sumFitness, end="")
+            print("Best", "%5.2f" % best.fitness, end="")
+            print("Average", "%5.2f" % self.avgFitness, end="")
+            print("Worst", "%5.2f" % worst.fitness)
+            print("Elite fitness:", map( lambda x: x.fitness, self.eliteMembers))
+            flush()
 
 class GA:
     """
@@ -311,12 +325,12 @@ class GA:
         self.setSeed(x)
         self.origPop = population
         if self.verbose > 0:
-            print "crossoverRate  = %.3f" % self.crossoverRate
-            print "mutationRate   = %.3f" % self.mutationRate
-            print "populationSize = %d" % self.origPop.size
-            print "elitePercent   = %.3f" % self.origPop.elitePercent
-            print "maxGeneration  = %d" % self.maxGeneration
-            print "================================================================================"
+            print("crossoverRate  = %.3f" % self.crossoverRate)
+            print("mutationRate   = %.3f" % self.mutationRate)
+            print("populationSize = %d" % self.origPop.size)
+            print("elitePercent   = %.3f" % self.origPop.elitePercent)
+            print("maxGeneration  = %d" % self.maxGeneration)
+            print("================================================================================")
         self.setup(**args)
         self.reInitialize()
 
@@ -330,8 +344,8 @@ class GA:
     def initialize(self):
         self.applyFitnessFunction() 
         if self.verbose > 0:
-            print "-" * 60
-            print "Initial population"
+            print("-" * 60)
+            print("Initial population")
         self.pop.statistics()
         if self.verbose > 1:
             self.display()
@@ -360,10 +374,10 @@ class GA:
 
     def display_one(self, p):
         self.pop.individuals[p].display()
-        print "Fitness:", self.pop.individuals[p].fitness
+        print("Fitness:", self.pop.individuals[p].fitness)
 
     def display(self):
-        print "Population:"
+        print("Population:")
         for p in range(len(self.pop.individuals)):
             self.display_one(p)
 
@@ -403,8 +417,8 @@ class GA:
         while self.generation < self.maxGeneration or self.maxGeneration == 0:
             self.generation += 1
             if self.verbose > 0:
-                print "-" * 60
-                print "Generation", self.generation
+                print("-" * 60)
+                print("Generation", self.generation)
             self.generate()
             self.applyFitnessFunction()
             self.pop.statistics()
@@ -420,17 +434,17 @@ class GA:
                 self.display()
             if self.isDone():
                 break
-        print "-" * 60
-        print "Done evolving at generation", self.generation
-        print "Current best individual [#%d]" % self.pop.bestMember.bestPosition,
+        print("-" * 60)
+        print("Done evolving at generation", self.generation)
+        print("Current best individual [#%d]" % self.pop.bestMember.bestPosition, end="")
         self.pop.bestMember.display()
-        print "Fitness", self.pop.bestMember.fitness
+        print("Fitness", self.pop.bestMember.fitness)
 
     def saveToFile(self, filename):
         import pickle
         fp = open(filename, "w")
         if self.verbose > 0:
-            print "Saving GA to '%s'..." % (filename,)
+            print("Saving GA to '%s'..." % (filename,))
         pickle.dump(self, fp)
         fp.close()
 
@@ -440,7 +454,7 @@ class GA:
         import pickle
         fp = open(filename, "w")
         if self.verbose > 0:
-            print "Loading GA from '%s'..." % (filename,)
+            print("Loading GA from '%s'..." % (filename,))
         fp.close()
         return pickle.load(fp)
 
@@ -450,7 +464,7 @@ class GA:
             listOfPositions = range(len(self.pop.individuals))
         fp = open(filename, "w")
         if self.verbose > 0:
-            print "Saving %d genes to '%s'..." % (len(listOfPositions), filename)
+            print("Saving %d genes to '%s'..." % (len(listOfPositions), filename))
         pickle.dump( len(listOfPositions), fp)
         for i in listOfPositions:
             pickle.dump(self.pop.individuals[i], fp)
@@ -461,7 +475,7 @@ class GA:
         fp = open(filename, "r")
         geneCount = pickle.load(fp)
         if self.verbose > 0:
-            print "Loading %d genes from '%s'..." % (geneCount, filename)
+            print("Loading %d genes from '%s'..." % (geneCount, filename))
         individuals = []
         for i in range(geneCount):
             individuals.append(pickle.load(fp))
@@ -479,9 +493,9 @@ class GA:
         if sampleSize == 0:
             sampleSize = len(oldGenes)
         if self.verbose > 0:
-            print "oldGenes had %d individuals" % len(oldGenes)
-            print "current  has %d individuals" % len(self.pop.individuals)
-            print "Loading %d..." % sampleSize
+            print("oldGenes had %d individuals" % len(oldGenes))
+            print("current  has %d individuals" % len(self.pop.individuals))
+            print("Loading %d..." % sampleSize)
         if full:
             currentOld = 0
             for i in range(len(self.pop.individuals)):
@@ -496,20 +510,19 @@ class GA:
                 if mutate:
                     self.pop.individuals[i].mutate(self.mutationRate)
 
-if __name__ == '__main__':
+if __name__ in ['__main__', '<module>']:
     # Here is a test to evolve a list of integers to maximize their sum:
 
     class MaxSumGA(GA):
         def fitnessFunction(self, i):
             return max(sum(self.pop.individuals[i].genotype), 0)
         def isDone(self):
-            print "Best:",
+            print("Best:", end="")
             self.pop.bestMember.display()
-            print
+            print()
             return self.pop.bestMember.fitness > 30
 
-    print "Do you want to evolve a list of integers to maximize their sum? ",
-    if sys.stdin.readline().lower()[0] == 'y':
+    if yesno("Do you want to evolve a list of integers to maximize their sum? "):
         print
         ga = MaxSumGA(Population(20, Gene, size=10, mode='integer',
                                  verbose=1, elitePercent = .1,
@@ -518,37 +531,33 @@ if __name__ == '__main__':
                       mutationRate=0.1, crossoverRate=0.5, verbose=1,
                       maxGeneration=50)
         ga.evolve()
-        print "Testing loading/saving..."
+        print("Testing loading/saving...")
         ga.saveGenesToFile("maxsumga.genes")
-        print "Deleting genes..."
+        print("Deleting genes...")
         ga.pop.individuals = []
         ga.loadGenesFromFile("maxsumga.genes")
-        print "Press enter to continue evolving...",
-        sys.stdin.readline()
+        inform("Press enter to continue evolving...")
         ga.evolve()
-        print "Press enter to Test init from file (load all with mutate)...",
-        sys.stdin.readline()
-        print "reInitialize pop..."
+        inform("Press enter to Test init from file (load all with mutate)...")
+        print("reInitialize pop...")
         ga.reInitialize()
         ga.initGenesFromFile("maxsumga.genes")
         ga.evolve()
-        print "Press enter to Test init from file (load 1 no mutate)...",
-        sys.stdin.readline()
+        inform("Press enter to Test init from file (load 1 no mutate)...")
         ga.saveGenesToFile("bestsumga.genes", (ga.pop.bestMember.position,))
         ga.reInitialize()
         ga.initGenesFromFile("bestsumga.genes", 1, 0)
         ga.evolve()
-        print "Press enter to Test init from file (load 1, with mutate, full)...",
-        sys.stdin.readline()
+        inform("Press enter to Test init from file (load 1, with mutate, full)...")
         ga.reInitialize()
         ga.initGenesFromFile("bestsumga.genes", mutate = 1, full = 1)
         ga.evolve()
-    print 
+    print()
 
     # Here is a test to evolve the weights/biases in a neural network
     # that solves the XOR problem:
 
-    from pyrobot.brain.conx import *
+    from ai.conx import *
     class NNGA(GA):
         def __init__(self, cnt):
             n = Network()
@@ -584,11 +593,10 @@ if __name__ == '__main__':
         def isDone(self):
             self.network.unArrayify(self.pop.bestMember.genotype)
             error, correct, count, pcorrect = self.network.sweep()
-            print "Correct:", correct
+            print("Correct:", correct)
             return correct == 4
 
-    print "Do you want to evolve a neural network that can do XOR? ",
-    if sys.stdin.readline().lower()[0] == 'y':
+    if yesno("Do you want to evolve a neural network that can do XOR? "):
         ga = NNGA(300)
         ga.evolve()
         ga.network.unArrayify(ga.pop.bestMember.genotype)
@@ -597,8 +605,7 @@ if __name__ == '__main__':
         ga.saveGenesToFile("gann.pop")
         ga.initGenesFromFile("gann.pop")
 
-    print "Do you want to evolve a phrase? ",
-    if sys.stdin.readline().lower()[0] == 'y':
+    if yesno("Do you want to evolve a phrase? "):
         phrase = "evolution is one cool search mechanism"
         size = len(phrase)
         print
@@ -610,7 +617,7 @@ if __name__ == '__main__':
                         sum += 1
                 return float(sum) / len(self.pop.individuals[i].genotype)
             def isDone(self):
-                print "Best:",
+                print("Best:", end="")
                 self.pop.bestMember.display()
                 return (phrase == string.join(self.pop.bestMember.genotype, ""))
 
@@ -621,8 +628,7 @@ if __name__ == '__main__':
                       maxGeneration=0)
         ga.evolve()
 
-    print "Do you want to play mastermind? ",
-    if sys.stdin.readline().lower()[0] == 'y':
+    if yesno("Do you want to play mastermind? "):
         # composed of N colors, M places (usually 6 and 4)
         # feedback is # in correct place, # of correct color
         phrase = "evolution is one cool search mechanism"
@@ -646,7 +652,7 @@ if __name__ == '__main__':
                         sumColor += 1
                 return sumColor + sumPosition * 100
             def isDone(self):
-                print "Best:",
+                print("Best:", end="")
                 self.pop.bestMember.display()
                 return (phrase == string.join(self.pop.bestMember.genotype, ""))
 
