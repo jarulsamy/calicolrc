@@ -110,6 +110,10 @@ namespace Calico {
             return true;
         }
 
+        public virtual void GotoEndOfLine() {
+            // Move position to end of line
+        }
+
         public virtual void SelectLine(int lineno) {
         }
 
@@ -470,6 +474,12 @@ namespace Calico {
             data.Caret.Column = 1;
             texteditor.ScrollToCaret();
             return true;
+        }
+
+        public override void GotoEndOfLine() {
+            var data = texteditor.GetTextEditorData();
+            var curLine = texteditor.GetLine (data.Caret.Line);
+            data.Caret.Column = System.Math.Min (curLine.EditableLength, System.Math.Max (0, curLine.Length)) + 1;
         }
 
         public override void SelectLine(int lineno) {

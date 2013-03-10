@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -67,7 +67,6 @@
       </action>
       <action id="saveAsAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Alt&gt;&lt;Mod2&gt;a</property>
         <property name="Label" translatable="yes">Save _As...</property>
         <property name="ShortLabel" translatable="yes">Save _As</property>
         <property name="StockId">gtk-save-as</property>
@@ -167,7 +166,7 @@
       </action>
       <action id="aboutAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Mod2&gt;F10</property>
+        <property name="Accelerator">F10</property>
         <property name="Label" translatable="yes">_About Calico</property>
         <property name="ShortLabel" translatable="yes">_About</property>
         <property name="StockId">gtk-about</property>
@@ -207,7 +206,7 @@
       </action>
       <action id="zoomInAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;plus</property>
+        <property name="Accelerator">&lt;Primary&gt;plus</property>
         <property name="Label" translatable="yes">Zoom _In</property>
         <property name="ShortLabel" translatable="yes">Zoom _In</property>
         <property name="StockId">gtk-zoom-in</property>
@@ -215,7 +214,7 @@
       </action>
       <action id="zoomOutAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;minus</property>
+        <property name="Accelerator">&lt;Primary&gt;minus</property>
         <property name="Label" translatable="yes">Zoom _Out</property>
         <property name="ShortLabel" translatable="yes">Zoom _Out</property>
         <property name="StockId">gtk-zoom-out</property>
@@ -277,7 +276,6 @@
       </action>
       <action id="EnvironmentTabAction">
         <property name="Type">Toggle</property>
-        <property name="Accelerator">&lt;Control&gt;e</property>
         <property name="Label" translatable="yes">Environment Tab</property>
         <property name="ShortLabel" translatable="yes">Environment Tab</property>
         <property name="DrawAsRadio">False</property>
@@ -286,7 +284,6 @@
       </action>
       <action id="LocalsTabAction">
         <property name="Type">Toggle</property>
-        <property name="Accelerator">&lt;Control&gt;l</property>
         <property name="Label" translatable="yes">Locals Tab</property>
         <property name="ShortLabel" translatable="yes">Locals Tab</property>
         <property name="DrawAsRadio">False</property>
@@ -320,7 +317,7 @@
       </action>
       <action id="findAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">_Find Next</property>
+        <property name="Label" translatable="yes">_Find</property>
         <property name="ShortLabel" translatable="yes">_Find</property>
         <property name="StockId">gtk-find</property>
         <signal name="Activated" handler="OnFindActionActivated" />
@@ -366,7 +363,7 @@
       </action>
       <action id="ToggleBreakpointAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;period</property>
+        <property name="Accelerator">&lt;Primary&gt;period</property>
         <property name="Label" translatable="yes">Toggle Breakpoint</property>
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />
@@ -378,9 +375,10 @@
       </action>
       <action id="FindPreviousAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Control&gt;r</property>
+        <property name="Accelerator">&lt;Primary&gt;r</property>
         <property name="Label" translatable="yes">Find Previous</property>
         <property name="ShortLabel" translatable="yes">Find Previous</property>
+        <signal name="Activated" handler="OnFindPreviousActionActivated" />
       </action>
       <action id="HistoryTabAction">
         <property name="Type">Toggle</property>
@@ -450,6 +448,13 @@
         <property name="Label" translatable="yes">Languages</property>
         <property name="ShortLabel" translatable="yes">Languages</property>
       </action>
+      <action id="FindNextAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;g</property>
+        <property name="Label" translatable="yes">Find Next</property>
+        <property name="ShortLabel" translatable="yes">Find Next</property>
+        <signal name="Activated" handler="OnFindNextActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -502,6 +507,7 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="findAction" />
                 <node type="Menuitem" action="FindPreviousAction" />
+                <node type="Menuitem" action="FindNextAction" />
               </node>
               <node type="Menu" action="ViewAction">
                 <node type="Menuitem" action="zoomInAction" />
@@ -916,7 +922,7 @@
                 <child>
                   <widget class="Gtk.Label" id="label7">
                     <property name="MemberName" />
-                    <property name="LabelProp" translatable="yes">Find</property>
+                    <property name="LabelProp" translatable="yes">Find:</property>
                     <property name="UseMarkup">True</property>
                   </widget>
                   <packing>
