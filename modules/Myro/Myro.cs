@@ -2289,6 +2289,23 @@ public static class Myro
 	    return yesnoResponse;
 	}
 
+	[method: JigsawTab("Graphics")]
+	public static void inform (string question)
+	{
+            ManualResetEvent ev = new ManualResetEvent(false);
+	    Gtk.MessageDialog fc = new Gtk.MessageDialog (
+		       null,
+		       0, Gtk.MessageType.Info,
+		       Gtk.ButtonsType.Ok,
+		       question);
+	    Invoke (delegate {
+		    fc.Run();
+		    fc.Destroy();
+		    ev.Set();
+		});
+	    ev.WaitOne ();
+	}
+
 	[method: JigsawTab("Senses")]
 	public static string askQuestion (string question, IList choices)
 	{
