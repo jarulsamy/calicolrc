@@ -21,7 +21,7 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
-from sets import Set
+#from sets import Set
 
 from pylogo.common import *
 from pylogo import reader
