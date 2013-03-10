@@ -95,15 +95,7 @@ def _maybe_compile(compiler, source, filename, symbol):
 
     if code:
         return code
-    try:
-        e1 = err1.__dict__
-    except AttributeError:
-        e1 = err1
-    try:
-        e2 = err2.__dict__
-    except AttributeError:
-        e2 = err2
-    if not code1 and e1 == e2:
+    if not code1 and repr(err1) == repr(err2):
         raise SyntaxError, err1
 
 def _compile(source, filename, symbol):
@@ -135,7 +127,7 @@ class Compile:
     statement, it "remembers" and compiles all subsequent program texts
     with the statement in force."""
     def __init__(self):
-        self.flags = 0
+        self.flags = PyCF_DONT_IMPLY_DEDENT
 
     def __call__(self, source, filename, symbol):
         codeob = compile(source, filename, symbol, self.flags, 1)

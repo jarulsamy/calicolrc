@@ -19,9 +19,6 @@ xmlreader -- Base classes and constants which define the SAX 2 API for
 expatreader -- Driver that allows use of the Expat parser with SAX.
 """
 
-# Workaround IronPython import bug
-import handler
-
 from xmlreader import InputSource
 from handler import ContentHandler, ErrorHandler
 from _exceptions import SAXException, SAXNotRecognizedException, \
@@ -62,7 +59,7 @@ if _false:
     import xml.sax.expatreader
 
 import os, sys
-if os.environ.has_key("PY_SAX_PARSER"):
+if "PY_SAX_PARSER" in os.environ:
     default_parser_list = os.environ["PY_SAX_PARSER"].split(",")
 del os
 
@@ -84,7 +81,7 @@ def make_parser(parser_list = []):
             return _create_parser(parser_name)
         except ImportError,e:
             import sys
-            if sys.modules.has_key(parser_name):
+            if parser_name in sys.modules:
                 # The parser module was found, but importing it
                 # failed unexpectedly, pass this exception through
                 raise
