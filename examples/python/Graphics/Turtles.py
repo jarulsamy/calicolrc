@@ -36,7 +36,7 @@ for t in range(1000):
 
 win.ShowAll()
 
-for step in range(10):
+for step in range(100):
     for t in turtles:
         t.move(random.random() * 6 - 3, 
                random.random() * 6 - 3)

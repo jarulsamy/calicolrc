@@ -1,5 +1,5 @@
 from Graphics import *
-from Myro import random, getColorNames, pickOne, wait
+from Myro import random, getColorNames, pickOne
 
 win = Window()
 win.mode = "bitmap"
@@ -9,6 +9,4 @@ while True:
     line = Line((x1, y1), (x2, y2))
     line.color = Color(pickOne(getColorNames()))
     line.draw(win)
-    wait(.01)
-#print(len(win.canvas.shapes))
 

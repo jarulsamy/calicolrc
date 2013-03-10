@@ -6,7 +6,7 @@ to estimate :low :high :test :accuracy 3
   make :mid (:low + :high) / 2
   make :estimate :mid
   make :result (run :test)
-  if :accuracy > abs :result [output :mid]
+  if :accuracy > [abs :result] [output :mid]
   (ifelse :result > 0 [output (estimate :mid :high :test :accuracy)]
                       [output (estimate :low :mid :test :accuracy)])
 end
