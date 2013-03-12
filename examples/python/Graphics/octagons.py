@@ -39,7 +39,7 @@ for rows in range(10):
             turtle1.rotate(45)
             turtle1.forward(10)
             win.step(.01)
-        line = turtle1.penUp()
+        line = turtle1.penUp(True)
         s = Polygon(line)
         hexes.append(s)
         s.fill = makeColor(random.choice(["red", "black", "green", "white"]))

@@ -32,7 +32,7 @@ def make_star(x, y, segment):
         arrow.forward(segment)
         arrow.rotate(-72)
         arrow.rotate(-72)
-    line = arrow.penUp()
+    line = arrow.penUp(True)
     polygon = Polygon(line)
     polygon.draw(win)
     polygon.color = makeColor("white")
@@ -65,7 +65,8 @@ for col in range(6):
 
 def animate():
     g = Group(*stars)
-    win.mode = "manual"
     for i in range(20):
         g.rotate(10)
-        win.step(.5)
+        win.step(.1)
+
+animate()

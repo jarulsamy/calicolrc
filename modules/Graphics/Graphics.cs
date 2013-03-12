@@ -2151,11 +2151,7 @@ public static class Graphics
 		}
 
 	        public virtual void setPenColor(Color color) {
-		    Line line = penUp();
-		    if (window != null) {
-			line.color = pen.color;
-			line.draw(window);
-		    }
+		    penUp();
 		    pen.color = color;
 		    penDown();
 		}
@@ -2585,8 +2581,23 @@ public static class Graphics
 
 		public Line penUp ()
 		{
+		    return penUp(false);
+		}
+    
+		public Line penUp (bool getLine)
+		{
+		    if (getLine) {
 			pen._down = false;
 			return pen.resetPath ();
+		    } else {
+			if (window != null) {
+			    pen._down = false;
+			    Line line = pen.resetPath ();
+			    line.color = pen.color;
+			    line.draw(window);
+			}
+			return null;
+		    }
 		}
     
 		public void penDown ()
