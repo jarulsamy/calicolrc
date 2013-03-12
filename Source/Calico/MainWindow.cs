@@ -1777,7 +1777,7 @@ namespace Calico {
                     args.RetVal = true;
                 }
             } else if (args.Event.Key == Gdk.Key.e && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
-		        // Emacs, go to end of line
+		// Emacs, go to end of line
                 var data = Shell.GetTextEditorData();
                 var curLine = Shell.GetLine (data.Caret.Line);
                 data.Caret.Column = System.Math.Min (curLine.EditableLength, System.Math.Max (0, curLine.Length)) + 1;
@@ -1823,6 +1823,40 @@ namespace Calico {
                     args.RetVal = true;
                 }
                 UpdateUpDownArrows();
+            } else if (args.Event.Key == Gdk.Key.Up && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+		// copy current (if anything), go up, paste
+		string current_text = Shell.Document.Text;
+                if (current_text != null) {
+		    // Part of KeyUp():
+		    history.update(current_text.TrimEnd());
+		    string text = history.up();
+		    Shell.Document.Text = text.TrimEnd() + "\n" + current_text;
+		    Shell.GrabFocus();
+		    Shell.Caret.Line = 1;
+		    int col = Shell.Document.GetLine(1).Length;
+		    Shell.Caret.Column = col + 1;
+                    args.RetVal = true;
+		    UpdateUpDownArrows();
+                } else {
+		    KeyUp(false); 
+		}
+            } else if (args.Event.Key == Gdk.Key.Down && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+		// copy current (if anything), go down, paste
+		string current_text = Shell.Document.Text;
+                if (current_text != null) {
+		    // Part of KeyDown():
+		    history.update(current_text.TrimEnd());
+		    string text = history.down();
+		    Shell.Document.Text = text.TrimEnd() + "\n" + current_text;
+		    Shell.GrabFocus();
+		    Shell.Caret.Line = 1;
+		    int col = Shell.Document.GetLine(1).Length;
+		    Shell.Caret.Column = col + 1;
+                    args.RetVal = true;
+		    UpdateUpDownArrows();
+                } else {
+		    KeyDown(false); 
+		}
             } else if (args.Event.Key == Gdk.Key.Up) {
                 KeyUp(false); // look at cursor (don't force)
             } else if (args.Event.Key == Gdk.Key.Down) {
@@ -2231,8 +2265,8 @@ namespace Calico {
                     StartAction.Sensitive = false;
                 }
                 Title = String.Format("Calico - {0}", System.Environment.UserName);
-            } //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
-            else if (Focus == Shell) {
+            } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+		//else if (Focus == Shell) {
                 ProgramSpeed.Sensitive = false;
                 saveaspython_menu.Sensitive = false;
                 if (! ProgramRunning) {
