@@ -2150,6 +2150,16 @@ public static class Graphics
 			return false;
 		}
 
+	        public virtual void setPenColor(Color color) {
+		    Line line = penUp();
+		    if (window != null) {
+			line.color = pen.color;
+			line.draw(window);
+		    }
+		    pen.color = color;
+		    penDown();
+		}
+
 		public void connect (string signal, Func<object,Event,object> function)
 		{
 			if (signal == "click") {
@@ -3094,6 +3104,8 @@ public static class Graphics
 		    }
 		    g.Stroke ();
 		    g.Restore ();
+		    if (has_pen)
+			pen.render (g);
 		}
 		
 		public double width {
@@ -4833,6 +4845,8 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			if (has_pen)
+				pen.render (g);
 		}
 	}
 
@@ -4919,6 +4933,8 @@ public static class Graphics
 			}
 			g.Stroke ();
 			g.Restore ();
+			if (has_pen)
+				pen.render (g);
 		}
 
 		public override void addToPhysics ()
@@ -5064,6 +5080,8 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			if (has_pen)
+				pen.render (g);
 		}
 
 		public int radius {
@@ -5187,6 +5205,8 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			if (has_pen)
+				pen.render (g);
 		}
 
 		public int radius {
