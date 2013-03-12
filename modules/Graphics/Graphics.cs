@@ -2588,7 +2588,9 @@ public static class Graphics
 		{
 		    if (getLine) {
 			pen._down = false;
-			return pen.resetPath ();
+			Line line = pen.resetPath ();
+			line.color = pen.color;
+			return line;
 		    } else {
 			if (window != null) {
 			    pen._down = false;
