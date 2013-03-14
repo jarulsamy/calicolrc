@@ -10,10 +10,10 @@ from copy import deepcopy
 try:
     import numpy.oldnumeric as Numeric
     def yesno(question):
-        print(question, end="")
+        print(question, end=" ")
         return sys.stdin.readline().lower()[0] == 'y'
     def inform(question):
-        print(question, end="")
+        print(question, end=" ")
         sys.stdin.readline()
     def flush():
         sys.stdout.flush()
@@ -24,7 +24,7 @@ except:
         pass
 
 def display(v):
-    print(v, end="")
+    print(v, end=" ")
 
 def sum(a):
     sum = 0
@@ -258,7 +258,7 @@ class Population:
                 break
             index += 1
         if self.verbose > 2:
-            print("selected",end="")
+            print("selected",end=" ")
             self.individuals[index].display(),
             print("fitness", self.individuals[index].fitness)
         return self.individuals[index].copy()
@@ -294,9 +294,9 @@ class Population:
         self.bestMember = best
         self.avgFitness = (self.sumFitness * 1.0) / self.size
         if self.verbose > 0:
-            print("Fitness: Total", "%7.2f" % self.sumFitness, end="")
-            print("Best", "%5.2f" % best.fitness, end="")
-            print("Average", "%5.2f" % self.avgFitness, end="")
+            print("Fitness: Total", "%7.2f" % self.sumFitness, end=" ")
+            print("Best", "%5.2f" % best.fitness, end=" ")
+            print("Average", "%5.2f" % self.avgFitness, end=" ")
             print("Worst", "%5.2f" % worst.fitness)
             print("Elite fitness:", map( lambda x: x.fitness, self.eliteMembers))
             flush()
@@ -436,7 +436,7 @@ class GA:
                 break
         print("-" * 60)
         print("Done evolving at generation", self.generation)
-        print("Current best individual [#%d]" % self.pop.bestMember.bestPosition, end="")
+        print("Current best individual [#%d]" % self.pop.bestMember.bestPosition, end=" ")
         self.pop.bestMember.display()
         print("Fitness", self.pop.bestMember.fitness)
 
@@ -517,7 +517,7 @@ if __name__ in ['__main__', '<module>']:
         def fitnessFunction(self, i):
             return max(sum(self.pop.individuals[i].genotype), 0)
         def isDone(self):
-            print("Best:", end="")
+            print("Best:", end=" ")
             self.pop.bestMember.display()
             print()
             return self.pop.bestMember.fitness > 30
@@ -617,7 +617,7 @@ if __name__ in ['__main__', '<module>']:
                         sum += 1
                 return float(sum) / len(self.pop.individuals[i].genotype)
             def isDone(self):
-                print("Best:", end="")
+                print("Best:", end=" ")
                 self.pop.bestMember.display()
                 return (phrase == string.join(self.pop.bestMember.genotype, ""))
 
@@ -652,7 +652,7 @@ if __name__ in ['__main__', '<module>']:
                         sumColor += 1
                 return sumColor + sumPosition * 100
             def isDone(self):
-                print("Best:", end="")
+                print("Best:", end=" ")
                 self.pop.bestMember.display()
                 return (phrase == string.join(self.pop.bestMember.genotype, ""))
 
