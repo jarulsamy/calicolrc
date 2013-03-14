@@ -33,7 +33,7 @@ class Unparser:
         self.future_imports = []
         self._indent = 0
         self.dispatch(tree)
-        self.f.write("")
+        self.f.write("\n")
         self.f.flush()
 
     def fill(self, text = ""):
@@ -439,7 +439,7 @@ class Unparser:
 
     binop = { "Add":"+", "Sub":"-", "Mult":"*", "Div":"/", "Mod":"%",
                     "LShift":"<<", "RShift":">>", "BitOr":"|", "BitXor":"^", "BitAnd":"&",
-                    "FloorDiv":"//", "Pow": "**"}
+                    "FloorDiv":"//", "Pow": "**", "TrueDivide": "/"}
     def _BinOp(self, t):
         self.write("(")
         self.dispatch(t.left)
@@ -571,10 +571,14 @@ class Unparser:
 def roundtrip(filename, output=sys.stdout):
     with open(filename, "r") as pyfile:
         source = pyfile.read()
-    tree = compile(source, filename, "exec", ast.PyCF_ONLY_AST)
+    tree = Parse(source, filename)
     Unparser(tree, output)
 
+def Unparse(tree, file=sys.stdout):
+    Unparser(tree, file)
 
+def Parse(source, filename="<string>"):
+    return compile(source, filename, "exec", ast.PyCF_ONLY_AST)
 
 def testdir(a):
     try:
