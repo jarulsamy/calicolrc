@@ -1770,13 +1770,13 @@ namespace Calico {
 	    /*
             # Valid command structures:
             # -------------------------
-            # "password reset\npassword: ENCRYPTED"
-            # "register\npassword: ENCRYPTED\nkeyword: KEY"
-	    # "package\ndata: DATA\nid: ID\nfrom: FROM\nsegments: COUNT"
-            # "segment\ndata: DATA\nid: ID"
+            # "[password reset]\npassword: ENCRYPTED"
+            # "[register]\npassword: ENCRYPTED\nkeyword: KEY"
+	    # "[package]\ndata: DATA\nid: ID\nfrom: FROM\nsegments: COUNT"
+            # "[segment]\ndata: DATA\nid: ID"
             # "[join]\nconference: ROOM" (General, Developers)
-            # "[broadcast]\nconference: ROOM"
-            # "[blast]\nto: ROOM|ID"
+            # "[broadcast]\nconference: ROOM\n"
+            # "[blast]\nto: ROOM|ID\nfrom: ID\ntype: TYPE\nfile: FILENAME\nDATA"
             # "[file]\nfilename: FILENAME\nRAWDATA..."
             # "[photo]\nfilename: FILENAME\nRAWDATA..."
             # "[help]"
@@ -3206,7 +3206,7 @@ namespace Calico {
             Chat chat = new Chat(this, "testname", "password");
             wait(5);
             chat.Send("admin", String.Format(
-                "register\n" +
+                "[register]\n" +
                 "email: {0}\n" +
                 "username: {1}\n" +
                 "password: {2}\n" +
