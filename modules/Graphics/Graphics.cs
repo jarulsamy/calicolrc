@@ -551,7 +551,9 @@ public static class Graphics
 	    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear (false);
 			_lastWindow = _windows [title];
+			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			Invoke( delegate {
+				_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
 				_lastWindow.KeepAbove = true;
 			    });
 			return _windows [title];
@@ -591,26 +593,14 @@ public static class Graphics
 				_windows [title].Resize (width, height);
 				_windows [title].QueueDraw ();
 			    });
-				//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for redraw
-			/*
-      Gtk.Application.Invoke(delegate { 
-          _windows[title].GdkWindow.UrgencyHint = true;
-        });
-      */
 			_lastWindow = _windows [title];
 			return _windows [title];
 		} else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
-			/*
-      Gtk.Application.Invoke(delegate { 
-          _windows[title].GdkWindow.UrgencyHint = true;
-        });
-      */
 			_lastWindow = _windows [title];
 			Invoke( delegate {
 				_lastWindow.KeepAbove = true;
 			    });
-			//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
 			return _windows [title];
 		}
 	}
@@ -1262,10 +1252,12 @@ public static class Graphics
 			state = "init";
 			lock (_canvas.shapes)
 				_canvas.shapes.Clear ();
+			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			Invoke (delegate {
 				foreach (Gtk.Widget child in _canvas.Children) {
 					_canvas.Remove (child);
 				}
+				_canvas.ModifyBg (Gtk.StateType.Normal, bg);
 			});
 			if (redraw)
 				QueueDraw ();
@@ -4716,53 +4708,24 @@ public static class Graphics
 		}
 	}
 
-	public class Dot : Shape
+	public class Dot : Circle
 	{
-		public Dot (int x, int y) : base(true)
+	    public Dot (int x, int y) : base(new List() {x, y}, 0)
 		{
-			set_points (new Point (x, y));
 		}
-
-		public Dot (double x, double y) : base(true)
+	    
+	    public Dot (double x, double y) : base(new List() {x, y}, 0)
 		{
-			set_points (new Point (x, y));
 		}
-
-		public Dot (IList iterable) : base(true)
+	    
+	    public Dot (IList iterable) : base(iterable, 0)
 		{
-			set_points (new Point (iterable));
 		}
     
-		public Dot (Dot dot) : base(true)
+	    public Dot (Dot dot) : base(new List() {dot.x, dot.y}, 0)
 		{
-			set_points (new Point (dot.x, dot.y));
 		}
         
-		public override void render (Cairo.Context g)
-		{
-			if (!visible)
-				return;
-			g.Save ();
-			Point temp = screen_coord (center);
-			g.Translate (temp.x, temp.y);
-			g.Rotate (_rotation);
-			g.Scale (_scaleFactor, _scaleFactor);
-			if (points != null) {
-				g.LineWidth = border;
-				temp = screen_coord (points [0]);
-				g.MoveTo (temp.x, temp.y);
-				g.LineTo (temp.x + 1, temp.y + 1);
-				g.ClosePath ();
-				g.Stroke ();
-			}
-			foreach (Shape shape in shapes) {
-				shape.render (g);
-				shape.updateGlobalPosition (g);
-			}
-			g.Restore ();
-			if (has_pen)
-				pen.render (g);
-		}
 	}
 
 	public class Circle : Shape
@@ -4824,8 +4787,19 @@ public static class Graphics
 			// Now move to 0,0 as origin of shape
 			temp = screen_coord (points [0]);
 			g.LineWidth = border;
-			g.Arc (temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
-			g.ClosePath ();
+			if (radius == 0) { // actual point
+			    g.MoveTo (temp.x, temp.y);
+			    g.LineTo (temp.x + 1, temp.y + 1);
+			    g.ClosePath ();
+			    if (_outline != null) {
+				g.Color = _outline._cairo;
+			    }
+			    g.Stroke ();
+			} else { // radius starting with 1
+			    g.LineWidth = border;
+			    g.Arc (temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
+			    g.ClosePath ();
+			}
 			if (gradient != null) {
 				Cairo.Gradient pat;
 				if (gradient.gtype == "linear")

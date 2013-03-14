@@ -39,7 +39,6 @@ using System.Collections.Generic;
 
 // IList
 using System.Collections;
-using Tao.Sdl;
 using System.Reflection;// IEnumerator
 
 public static class Extensions
