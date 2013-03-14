@@ -1748,7 +1748,7 @@ namespace Calico {
                     string text = ChatCommand.Buffer.Text;
                     ChatCommand.Buffer.Text = "";
                     //ChatOutput.Buffer.InsertAtCursor(text.TrimEnd() + "\n");
-                    connection.Send("t123", text);
+		    ProcessChatText(text);
                     args.RetVal = true;
                 }
             } else if (Focus is Mono.TextEditor.TextEditor) {
@@ -1765,6 +1765,45 @@ namespace Calico {
                 }
             }
         }
+
+	public void ProcessChatText(string text) {
+	    /*
+            # Valid command structures:
+            # -------------------------
+            # "password reset\npassword: ENCRYPTED"
+            # "register\npassword: ENCRYPTED\nkeyword: KEY"
+	    # "package\ndata: DATA\nid: ID\nfrom: FROM\nsegments: COUNT"
+            # "segment\ndata: DATA\nid: ID"
+            # "[join]\nconference: ROOM" (General, Developers)
+            # "[broadcast]\nconference: ROOM"
+            # "[blast]\nto: ROOM|ID"
+            # "[file]\nfilename: FILENAME\nRAWDATA..."
+            # "[photo]\nfilename: FILENAME\nRAWDATA..."
+            # "[help]"
+            # "[list]"
+
+	    # Valid return structures:
+	    # ------------------------
+            # "[result]\nDATA..."
+            # "[update]\nroom: ROOM"
+	    */
+
+	    if (text.StartsWith("@")) {
+		string [] parts = text.Split(new char[] {' '}, 2); // 2 parts
+		connection.Send(parts[0].Substring(1), parts[1]);
+                ChatPrint(Tag.Info, 
+			  String.Format("{0} to {1}: {2}\n", 
+					connection.user, 
+					parts[0].Substring(1), 
+					parts[1])); // @userid: MESSAGE
+	    } else if (text.StartsWith("/list")) {
+		connection.Send("admin", "[list]");
+	    } else if (text.StartsWith("/help")) {
+		connection.Send("admin", "[help]");
+	    } else {
+		connection.Send("admin", "[broadcast]\nconference: General\n" + text);
+	    }
+	}
 
         public void handleShellKey(object o, Gtk.KeyPressEventArgs args) {
             // Shell handler
@@ -3294,7 +3333,7 @@ namespace Calico {
         protected void OnBlastScriptActionActivated(object sender, System.EventArgs e) {
             // Blast a script:
             if (connection != null && CurrentDocument != null) {
-                connection.Send("t123",
+                connection.Send("admin",
                                 String.Format("[blast]\n" +
                     "from: {0}\n" +
                     "type: {1}\n" +

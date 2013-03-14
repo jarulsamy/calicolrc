@@ -124,12 +124,15 @@ namespace Calico {
                 string [] lines = msg.Body.ToString().Split('\n');
                 string [] sfrom = lines[1].Split(':');
                 calico.ChatPrint(Tag.Info,
-                   String.Format("{0}:\n{1}\n", ParseFrom(sfrom[1].Trim()), lines[2]));
+                   String.Format("{0} to all: {1}\n", ParseFrom(sfrom[1].Trim()), lines[2]));
             } else if (msg.From.ToString().StartsWith("myro.roboteducation.org")) {
                 // system message
             } else {
                 calico.ChatPrint(Tag.Info,
-                   String.Format("{0}:\n{1}\n", ParseFrom(msg.From), msg.Body));
+                   String.Format("{0} to {1}: {2}\n", 
+				 ParseFrom(msg.From), 
+				 user,
+				 msg.Body));
             }
         }
 
