@@ -2968,8 +2968,8 @@ namespace Calico {
             if (CurrentDocument != null) {
                 CurrentDocument.SearchStop();
                 CurrentDocument.widget.Child.GrabFocus();
-            } else if (Focus == Shell) {
-                //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
+		//} else if (Focus == Shell) {
+	    } else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 Shell.GrabFocus();
             }
         }
