@@ -1847,7 +1847,7 @@ namespace Calico {
 		    // Part of KeyDown():
 		    history.update(current_text.TrimEnd());
 		    string text = history.down();
-		    Shell.Document.Text = text.TrimEnd() + "\n" + current_text;
+		    Shell.Document.Text = current_text.TrimEnd() + "\n" + text;
 		    Shell.GrabFocus();
 		    Shell.Caret.Line = 1;
 		    int col = Shell.Document.GetLine(1).Length;
