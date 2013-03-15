@@ -1147,7 +1147,7 @@ namespace Calico {
         }
 
         public void TryToClose(Document document) {
-            if ((!document.IsDirty) || (Close(document) != "Cancel")) {
+            if ((!document.IsDirty) || (Close(document) != _("Cancel"))) {
                 bool result = document.Close(); // any cleanup?
                 if (result) {
                     int page_num = DocumentNotebook.PageNum(document.widget);
@@ -1227,14 +1227,14 @@ namespace Calico {
         public string Close(Document document) {
             while (true) {
                 string answer = SaveAbandonCancel(document.basename);
-                if (answer == "Cancel") {
-                    return "Cancel";
-                } else if (answer == "Abandon changes") {
-                    return "Abandon changes";
+                if (answer == _("Cancel")) {
+                    return _("Cancel");
+                } else if (answer == _("Abandon changes")) {
+                    return _("Abandon changes");
                 } else { // Save
                     bool result = document.Save(); // save doc
                     if (result) {
-                        return "Save";
+                        return _("Save");
                     }
                 }
             }
@@ -1249,9 +1249,9 @@ namespace Calico {
                     document = documents [widget];
                     if (document.IsDirty) {
                         string answer = Close(document);
-                        if (answer == "Cancel") {
+                        if (answer == _("Cancel")) {
                             return false;
-                        } else if (answer == "Abandon changes") {
+                        } else if (answer == _("Abandon changes")) {
                             // ok, continue
                         } else { // saved
                             // ok, continue
@@ -3313,7 +3313,7 @@ namespace Calico {
         }
 
         public void ReceiveBlast(string address, string type, string filename, string code) {
-            if (AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == "Accept") {
+            if (AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
                 string tempPath = System.IO.Path.GetTempPath();
                 filename = System.IO.Path.Combine(tempPath, filename);
                 string language = manager.GetLanguageFromExtension(filename);
