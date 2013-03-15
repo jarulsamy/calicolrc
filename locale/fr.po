@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Calico\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-15 00:40-0400\n"
+"POT-Creation-Date: 2013-03-15 01:51-0400\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -183,17 +183,21 @@ msgstr "Enregistrez ce fichier?"
 #: ../Source/Calico/MainWindow.cs:1257 ../Source/Calico/Document.cs:183
 #: ../Source/Calico/gtk-gui/gui.stetic:63
 #: ../Source/Calico/gtk-gui/gui.stetic:64 ../Source/Calico/MainWindow.cs:1278
-#: ../Source/Calico/Document.cs:190
+#: ../Source/Calico/Document.cs:190 ../Source/Calico/MainWindow.cs:1237
 msgid "Save"
 msgstr "Sauvegarder"
 
 #: ../Source/Calico/MainWindow.cs:1261 ../Source/Calico/MainWindow.cs:1282
+#: ../Source/Calico/MainWindow.cs:1232 ../Source/Calico/MainWindow.cs:1233
+#: ../Source/Calico/MainWindow.cs:1254
 msgid "Abandon changes"
 msgstr "Abandonner les modifications"
 
 #: ../Source/Calico/MainWindow.cs:1265 ../Source/Calico/MainWindow.cs:1368
 #: ../Source/Calico/Document.cs:182 ../Source/Calico/MainWindow.cs:1286
 #: ../Source/Calico/MainWindow.cs:1391 ../Source/Calico/Document.cs:189
+#: ../Source/Calico/MainWindow.cs:1150 ../Source/Calico/MainWindow.cs:1230
+#: ../Source/Calico/MainWindow.cs:1231 ../Source/Calico/MainWindow.cs:1252
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -281,6 +285,7 @@ msgid "Accept this script?"
 msgstr "Accepter ce script?"
 
 #: ../Source/Calico/MainWindow.cs:3155 ../Source/Calico/MainWindow.cs:3297
+#: ../Source/Calico/MainWindow.cs:3316
 msgid "Accept"
 msgstr "Accepter"
 
@@ -812,6 +817,7 @@ msgstr "Enregistrer le Script actuel"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:648
 #: ../Source/Calico/gtk-gui/gui.stetic:654
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:244
 msgid "Zoom in"
 msgstr "Zoom in"
 
@@ -988,6 +994,7 @@ msgstr "Les résultats de l'exécution du code"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1465
 #: ../Source/Calico/gtk-gui/gui.stetic:1471
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:351
 msgid "Output"
 msgstr "Sortie"
 
@@ -1090,6 +1097,46 @@ msgstr "Trouver suivant"
 msgid "Find:"
 msgstr "_Find"
 
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:150
+msgid "Control"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:190
+#, fuzzy
+msgid "Statements"
+msgstr "Etat"
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:218
+#, fuzzy
+msgid "Input/Output"
+msgstr "Sortie"
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:246
+msgid "Procedures"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:75
+msgid "_New"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:80
+#, fuzzy
+msgid "_Open"
+msgstr "Ouvrir"
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:88
+#, fuzzy
+msgid "_Save"
+msgstr "Sauvegarder"
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:235
+msgid "Save the program"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/ControlBlocks.cs:27
+msgid "when program starts"
+msgstr ""
+
 #~ msgid "Do you want to run the script?"
 #~ msgstr "Voulez-vous exécuter le Script?"
 
@@ -1190,9 +1237,6 @@ msgstr "_Find"
 
 #~ msgid "About the Calico Project"
 #~ msgstr "Au sujet du projet Calico"
-
-#~ msgid "Status"
-#~ msgstr "Etat"
 
 #~ msgid "Chat: "
 #~ msgstr "Chat"
@@ -1407,14 +1451,6 @@ msgstr "_Find"
 #, fuzzy
 #~ msgid "(c) 2011-2012, Institute for Personal Robots in Education"
 #~ msgstr "(c) 2011, Institute for Personal Robots in Education"
-
-#, fuzzy
-#~ msgid "_Open"
-#~ msgstr "Ouvrir"
-
-#, fuzzy
-#~ msgid "_Save"
-#~ msgstr "Sauvegarder"
 
 #~ msgid "<b>Find: </b>"
 #~ msgstr "Trouvez <b>: </ b>"

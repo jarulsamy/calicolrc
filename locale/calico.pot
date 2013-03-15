@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-15 00:40-0400\n"
+"POT-Creation-Date: 2013-03-15 01:51-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,17 +166,21 @@ msgstr ""
 #: ../Source/Calico/MainWindow.cs:1257 ../Source/Calico/Document.cs:183
 #: ../Source/Calico/gtk-gui/gui.stetic:63
 #: ../Source/Calico/gtk-gui/gui.stetic:64 ../Source/Calico/MainWindow.cs:1278
-#: ../Source/Calico/Document.cs:190
+#: ../Source/Calico/Document.cs:190 ../Source/Calico/MainWindow.cs:1237
 msgid "Save"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:1261 ../Source/Calico/MainWindow.cs:1282
+#: ../Source/Calico/MainWindow.cs:1232 ../Source/Calico/MainWindow.cs:1233
+#: ../Source/Calico/MainWindow.cs:1254
 msgid "Abandon changes"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:1265 ../Source/Calico/MainWindow.cs:1368
 #: ../Source/Calico/Document.cs:182 ../Source/Calico/MainWindow.cs:1286
 #: ../Source/Calico/MainWindow.cs:1391 ../Source/Calico/Document.cs:189
+#: ../Source/Calico/MainWindow.cs:1150 ../Source/Calico/MainWindow.cs:1230
+#: ../Source/Calico/MainWindow.cs:1231 ../Source/Calico/MainWindow.cs:1252
 msgid "Cancel"
 msgstr ""
 
@@ -257,6 +261,7 @@ msgid "Accept this script?"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:3155 ../Source/Calico/MainWindow.cs:3297
+#: ../Source/Calico/MainWindow.cs:3316
 msgid "Accept"
 msgstr ""
 
@@ -758,6 +763,7 @@ msgstr ""
 
 #: ../Source/Calico/gtk-gui/gui.stetic:648
 #: ../Source/Calico/gtk-gui/gui.stetic:654
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:244
 msgid "Zoom in"
 msgstr ""
 
@@ -922,6 +928,7 @@ msgstr ""
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1465
 #: ../Source/Calico/gtk-gui/gui.stetic:1471
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:351
 msgid "Output"
 msgstr ""
 
@@ -1014,4 +1021,40 @@ msgstr ""
 
 #: ../Source/Calico/gtk-gui/gui.stetic:925
 msgid "Find:"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:150
+msgid "Control"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:190
+msgid "Statements"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:218
+msgid "Input/Output"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/Jigsaw.cs:246
+msgid "Procedures"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:75
+msgid "_New"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:80
+msgid "_Open"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:88
+msgid "_Save"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/MainWindow.cs:235
+msgid "Save the program"
+msgstr ""
+
+#: ../languages/Jigsaw/Jigsaw/ControlBlocks.cs:27
+msgid "when program starts"
 msgstr ""
