@@ -38,7 +38,6 @@ namespace Calico {
             Resizable = true;
             Gtk.HBox box = new Gtk.HBox(false, 0);
             AuxNotebook = new Gtk.Notebook();
-            AuxNotebook.GroupId = 0;
 
             KeyPressEvent += new Gtk.KeyPressEventHandler(OnKeyPressEvent);
 
@@ -364,8 +363,6 @@ namespace Calico {
             //     target_table, Gdk.DragAction.Copy | Gdk.DragAction.Move);
             //StartButton.DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
             // All done, show if minimized:
-            ToolNotebook.GroupId = 0;
-            DocumentNotebook.GroupId = 0;
             // main & shell window
             for (int i = 0; i < DocumentNotebook.NPages; i++) {
                 DocumentNotebook.SetTabReorderable(DocumentNotebook.GetNthPage(i), true);
@@ -597,7 +594,6 @@ namespace Calico {
 
         public Document CurrentDocument {
             get {
-                Document d = null;
                 int page_num = DocumentNotebook.Page;                
                 Gtk.Widget widget = DocumentNotebook.GetNthPage(page_num);
                 if (documents.ContainsKey(widget)) {
@@ -3198,11 +3194,11 @@ namespace Calico {
         }
 
         protected void OnRegisterActionActivated(object sender, System.EventArgs e) {
-            Dictionary<string,string > response = ask(new List<string>() {"Email", "User", "Password", "Keyword"}, "Register new user");
+            Dictionary<string,string > response = ask(new List<string>() {_("Email"), _("Username"), _("Password"), _("Keyword")}, _("Register new user"));
             if (response == null) {
                 return;
             }
-            string email = response ["Email"], user = response ["User"], password = response ["Password"], keyword = response ["Keyword"];
+            string email = response [_("Email")], user = response [_("Username")], password = response [_("Password")], keyword = response [_("Keyword")];
             Chat chat = new Chat(this, "testname", "password");
             wait(5);
             chat.Send("admin", String.Format(
@@ -3233,13 +3229,13 @@ namespace Calico {
         }
 
         protected void OnLoginActionActivated(object sender, System.EventArgs e) {
-            Dictionary<string,string > response = (Dictionary<string,string>)ask(new List<string>() {"User", "Password"}, "title");
+            Dictionary<string,string > response = (Dictionary<string,string>)ask(new List<string>() {_("Username"), _("Password")}, _("Login"));
             if (response == null) {
                 return;
             }
             connection = new Chat(this,
-                                  response ["User"].ToString(),
-                                  response ["Password"].ToString());
+                                  response [_("Username")].ToString(),
+                                  response [_("Password")].ToString());
             ChatTab.Active = true;
             vpaned1.Show();
             ChatCommand.GrabFocus();
@@ -3267,6 +3263,9 @@ namespace Calico {
                     Gtk.HBox hbox = new Gtk.HBox();
                     Gtk.Label label = new Gtk.Label(choice);
                     Gtk.Entry entry = new Gtk.Entry();
+                    if (choice.ToLower() == "password" || choice == _("Password")) {
+                        entry.Visibility = false;
+                    }
                     entries [choice] = entry;
                     hbox.PackStart(label);
                     hbox.PackStart(entry);

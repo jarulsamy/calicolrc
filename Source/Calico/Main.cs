@@ -277,7 +277,7 @@ namespace Calico {
             		};
             		signal_thread = new System.Threading.Thread (delegate () {
             			// Wait for a signal to be delivered
-            			int index = UnixSignal.WaitAny (signals, -1);
+            			UnixSignal.WaitAny (signals, -1);
             			Gtk.Application.Invoke( delegate { 
             				if (win != null)
             				    win.RequestQuit(); 

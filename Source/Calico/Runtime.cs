@@ -58,7 +58,6 @@ namespace Calico {
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
                 "import sys as _sys; _sys.setrecursionlimit(1000);" +
                 "del division, with_statement, print_function, _sys", false);
-            bool debug_handler = true;
 
             //Build();
             // Run this in in the GUI thread, after we start:
@@ -75,9 +74,7 @@ namespace Calico {
 
             foreach (string arg in args) {
                 if (arg.StartsWith("--")) {
-                    if (arg == "--debug-handler") {
-                        debug_handler = false;
-                    }
+                    // skip
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
                     //Console.WriteLine("NO GUI MODE" + CurrentLanguage + " "  + arg);
