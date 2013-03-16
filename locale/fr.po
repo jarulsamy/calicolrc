@@ -60,7 +60,7 @@ msgid ""
 "  StartCalico --lang=LANGUAGE               Sets default language (python, "
 "etc.)"
 msgstr ""
-"  StartCalico - LANG = langue Définit la langue par défaut (python, etc)"
+"  StartCalico --LANG=LANGUE                 Définit la langue par défaut (python, etc)"
 
 #: ../Source/Calico/Main.cs:323
 #, fuzzy

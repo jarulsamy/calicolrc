@@ -58,7 +58,7 @@ msgid ""
 "  StartCalico FILENAME:LINE ...             Edits FILENAMEs, positioned on "
 "LINEs"
 msgstr ""
-"  StartCalico ARCHIVOs:LINEA ...            Edita el/los ARCHIVOs, "
+"  StartCalico ARCHIVOs:LINEA ...             Edita el/los ARCHIVOs, "
 "ubicándose en la LINEA"
 
 #: ../Source/Calico/Main.cs:322
@@ -66,7 +66,7 @@ msgid ""
 "  StartCalico --lang=LANGUAGE               Sets default language (python, "
 "etc.)"
 msgstr ""
-"  StartCalico - lang = Idioma           Establece el lenguaje predeterminado "
+"  StartCalico --lang=Idioma                  Establece el lenguaje predeterminado "
 "(python, etc)"
 
 #: ../Source/Calico/Main.cs:323

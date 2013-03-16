@@ -19,7 +19,7 @@ CSHARP = ../Source/Calico/Main.cs \
 
 GUI = ../Source/Calico/gtk-gui/gui.stetic
 
-all: es/LC_MESSAGES/calico.mo fr/LC_MESSAGES/calico.mo
+all: es/LC_MESSAGES/calico.mo fr/LC_MESSAGES/calico.mo ch/LC_MESSAGES/calico.mo 
 
 es/LC_MESSAGES/calico.mo: es.po
 	msgfmt es.po -o es/LC_MESSAGES/calico.mo
@@ -27,11 +27,17 @@ es/LC_MESSAGES/calico.mo: es.po
 fr/LC_MESSAGES/calico.mo: fr.po
 	msgfmt fr.po -o fr/LC_MESSAGES/calico.mo
 
+ch/LC_MESSAGES/calico.mo: ch.po
+	msgfmt ch.po -o ch/LC_MESSAGES/calico.mo
+
 es.po: calico.pot
 	msgmerge --update es.po calico.pot
 
 fr.po: calico.pot
 	msgmerge --update fr.po calico.pot
+
+ch.po: calico.pot
+	msgmerge --update ch.po calico.pot
 
 calico.pot: $(CSHARP) $(GUI)
 	touch calico.pot
@@ -39,4 +45,5 @@ calico.pot: $(CSHARP) $(GUI)
 	xgettext --language=Glade --from-code=UTF-8 $(GUI) -j -o calico.pot
 
 clean:
-	rm -f fr/LC_MESSAGES/calico.mo es/LC_MESSAGES/calico.mo
+	rm -f fr/LC_MESSAGES/calico.mo es/LC_MESSAGES/calico.mo ch/LC_MESSAGES/calico.mo
+
