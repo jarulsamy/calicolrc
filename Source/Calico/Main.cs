@@ -29,11 +29,11 @@ using System.Diagnostics;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.2.8";
+        public static string Version = "2.2.10";
         public static bool IsLoadLanguages = true;
         public static bool verbose = false;
 
-		/*
+       /*
        private static bool IsApplicationRunningOnMono(string processName)
        {
            var processFound = 0;
@@ -60,7 +60,7 @@ namespace Calico {
            //we don't find the current process, but if there is already another one running, return true!
            return (processFound == 1);
        }
-		 */
+       */
         [STAThread]
         public static void Main(string[] args) {
             System.Console.WriteLine(_("Loading Calico version {0}..."), Version);
@@ -86,20 +86,29 @@ namespace Calico {
             }
             Catalog.Init("calico", System.IO.Path.Combine(path, "..", "locale"));
             
+            // Process non executing flags which stop quickly:
+            if (((IList<string>)args).Contains("--help")) {
+                Usage();
+                System.Environment.Exit(0);
+            } else if (((IList<string>)args).Contains("--version")) {
+                Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
+                Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
+                System.Environment.Exit(0);
+            }
+            // The rest of this involves executing files of some kind:
             Dictionary<string, Language> languages = new Dictionary<string, Language>();
             // for language in directory, load languages:
             if (verbose) {
-                System.Console.WriteLine(_("    looking for languages in \"{0}\"..."), 
+                System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
                                      System.IO.Path.Combine(path, "..", "languages"));
             }
-
             DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
             if (IsLoadLanguages) {
                 foreach (DirectoryInfo d in dir.GetDirectories("*")) {
                     foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
-                        //System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, "Calico(.*).dll");
-                        //Print("Loading {0}...", f.FullName);
-                        //string loading = match.Groups[1].ToString().ToLower();
+			if (verbose) {
+                            Print("        Loading {0}...", f.FullName);
+                        }
                         Assembly assembly = Assembly.LoadFrom(f.FullName);
                         if (assembly != null) {
                             foreach (Type type in assembly.GetTypes()) {
@@ -136,6 +145,9 @@ namespace Calico {
             foreach (DirectoryInfo d in dir.GetDirectories("*")) {
                 foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
                     System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
+		    if (verbose) {
+                        Print("        Loading {0}...", f.FullName);
+                    }
                     //Print("Loading {0}...", f.FullName);
                     string def_language = match.Groups [2].ToString().ToLower();
                     if (def_language == "dll" || 
@@ -167,14 +179,16 @@ namespace Calico {
             string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
             if (verbose) {
-                System.Console.WriteLine(_("    looking for local languages in \"{0}\"..."), local_lang_path);
+                System.Console.WriteLine(_("    Looking for local languages in \"{0}\"..."), local_lang_path);
             }
             dir = new DirectoryInfo(local_lang_path);
             if (dir.Exists) {
                 foreach (DirectoryInfo d in dir.GetDirectories("*")) {
                     foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
                         System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
-                        //Print("Loading {0}...", f.FullName);
+			if (verbose) {
+                            Print("        Loading {0}...", f.FullName);
+                        }
                         string def_language = match.Groups [2].ToString().ToLower();
                         if (def_language == "dll" || 
                             def_language == "cs" || 
@@ -219,16 +233,8 @@ namespace Calico {
             // End of loading languages
             // -------------------------------------------
 
-	    // Handle interrupt:
-	    MainWindow win = null;
-	    /* // This doesn't let the app run in the background:
-	       System.Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
-	       e.Cancel = true;
-	       if (win != null)
-	       win.RequestQuit();
-	       };
-	    */
-			
+            // Handle interrupt:
+            MainWindow win = null;
             // Global settings:
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {
@@ -238,52 +244,40 @@ namespace Calico {
             if (((IList<string>)args).Contains("--nographics")) {
                 withGraphics = false;
             }
-            // Process some commands here:
-            if (((IList<string>)args).Contains("--help")) {
-                Usage();
-            } else if (((IList<string>)args).Contains("--version")) {
-                Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
-                Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
-            } else if (((IList<string>)args).Contains("--exec")) {
+            // Process executable commands here:
+            if (((IList<string>)args).Contains("--exec")) {
                 if (withGraphics) {
                     Application.Init();
                     win = new CalicoConsole(args, manager, Debug, config, false);
                     Application.Run();
-
                 } else {
-                    //Application.Init();
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
                 }
-                //rs.Show();
             } else if (((IList<string>)args).Contains("--repl")) {
                 if (withGraphics) {
                     Application.Init();
                     win = new CalicoConsole(args, manager, Debug, config, true);  
-                    //win.Show();
                     Application.Run();
-
                 } else {
-                    //Application.Init();
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
                 }
-                //rs.Show();
             }
             else {
-		// Catch SIGINT
+                // Catch SIGINT
                 System.Threading.Thread  signal_thread = null;
                 if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
-            		UnixSignal[] signals = new UnixSignal [] {
-            		    new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
-            		};
-            		signal_thread = new System.Threading.Thread (delegate () {
-            			// Wait for a signal to be delivered
-            			UnixSignal.WaitAny (signals, -1);
-            			Gtk.Application.Invoke( delegate { 
-            				if (win != null)
-            				    win.RequestQuit(); 
-            			    });
-            		    });
-            		signal_thread.Start();
+                            UnixSignal[] signals = new UnixSignal [] {
+                                new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
+                            };
+                            signal_thread = new System.Threading.Thread (delegate () {
+                                    // Wait for a signal to be delivered
+                                    UnixSignal.WaitAny (signals, -1);
+                                    Gtk.Application.Invoke( delegate { 
+                                            if (win != null)
+                                                win.RequestQuit(); 
+                                        });
+                                });
+                            signal_thread.Start();
                 }
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
@@ -291,7 +285,6 @@ namespace Calico {
                 win = new MainWindow(args, manager, Debug, config, signal_thread);
                 win.Show();
                 Application.Run();
-
             }
         }
 
@@ -326,6 +319,8 @@ namespace Calico {
             Print(_("  StartCalico --exec --nographics FILENAMEs Run FILENAMEs standalone without graphics"));
             Print(_("  StartCalico --repl --nographics FILENAMEs Run FILENAMEs standalone without graphics and then start read-eval loop"));
             Print(_("  StartCalico --version                     Displays the version number ({0})"), Version);
+            Print(_("  StartCalico --verbose                     Displays detailed information, useful for debugging Calico"));
+            Print(_("  StartCalico --debug                       Calico output goes to console rather than GUI"));
             Print(_("  StartCalico --reset                       Resets config settings to factory defaults"));
             Print(_("  StartCalico --help                        Displays this message"));
             Print("");
