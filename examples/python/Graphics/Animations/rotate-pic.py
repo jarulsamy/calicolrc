@@ -21,7 +21,8 @@
 from Graphics import *
 from Myro import wait
 win = Window()
-pic = Picture(pickAFile())
+#pic = Picture(pickAFile())
+pic = Picture(calico.relativePath("../examples/images/blueslug.png"))
 pic.draw(win)
 
 arrow = Arrow(Point(10, 10), 0)

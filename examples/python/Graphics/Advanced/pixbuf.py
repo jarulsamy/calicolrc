@@ -26,39 +26,30 @@ import Gtk
 import Gdk
 import Cairo
 
-filename = "../../images/blankenship.jpg"
+filename = calico.relativePath("../examples/images/blankenship.jpg")
 _pixbuf = Gdk.Pixbuf(filename)
 _pixbuf.HasAlpha
 format = Cairo.Format.Rgb24
 
-#surface = Cairo.Surface.CreateForImage(format, _pixbuf.Width, _pixbuf.Height)
-
 surface = Cairo.ImageSurface(format, _pixbuf.Width, _pixbuf.Height)
-
 
 from Graphics import *
 Init()
-#win = Window()
 
 class MyWindow(Gtk.Window):
     def __init__(self, title):
         super(MyWindow, self).__init__()
-        self.Add(Gtk.DrawingArea())
+        self.Add(MyCanvas())
         Gtk.Application.Invoke(self.update)
 
     def update(self, obj, event):
         self.ShowAll()
 
 class MyCanvas(Gtk.DrawingArea):
-    #def __init__(self):
-    #    self.ExposeEvent += self.render
-    #    pass
-    #def OnExposeEvent(self, event):
-        #Gtk.Application.Invoke(self.update)
-    #    print event
+    def OnExposeEvent(self, event):
+        Gtk.Application.Invoke(self.update)
 
     def update(self, obj, args):
         print("expose!", obj, args)
-
 
 win = MyWindow("")
