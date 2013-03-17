@@ -204,7 +204,7 @@ namespace Calico {
             configureIO();
 
             // Run this in in the GUI thread, after we start:
-            Gtk.Application.Invoke(delegate {
+            Invoke(delegate {
                 manager.PostSetup(this);
             }
             );
@@ -1061,7 +1061,7 @@ namespace Calico {
         }
 
         public bool Open(string filename) {
-            Gtk.Application.Invoke(delegate {
+            Invoke(delegate {
                 Open(filename, null);
             }
             );
@@ -3419,7 +3419,7 @@ namespace Calico {
         protected void OnButton11Clicked(object sender, System.EventArgs e) {
             // If output tabs are in pane:
             // Create new window, unparent output tabs etc, and show
-            Gtk.Application.Invoke(delegate {
+            Invoke( delegate {
                 if (aux_window == null) {
                     aux_window = new AuxWindow(_("Calico Tools"), this);
                     movePage("Output", aux_window.AuxNotebook);
@@ -3438,7 +3438,7 @@ namespace Calico {
         }
 
         protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
-            Gtk.Application.Invoke(delegate {
+            Invoke(delegate {
                 if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
                     vpaned2.Remove(NotebookPane);
                     vpaned2.Remove(notebook_docs);
@@ -3468,7 +3468,7 @@ namespace Calico {
         }
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
-            Gtk.Application.Invoke(delegate {
+            Invoke(delegate {
                 if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
                     // swap:
                     hpaned1.Remove(NotebookPane);
