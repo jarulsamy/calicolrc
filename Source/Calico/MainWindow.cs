@@ -1239,7 +1239,10 @@ namespace Calico {
                 } else if (answer == _("Abandon changes")) {
                     return _("Abandon changes");
                 } else { // Save
-                    bool result = document.Save(); // save doc
+		    bool result = false;
+		    Invoke( delegate {
+			    result = document.Save(); // save doc
+			});
                     if (result) {
                         return _("Save");
                     }
@@ -1409,7 +1412,9 @@ namespace Calico {
 
         protected virtual void OnSaveActionActivated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
-                CurrentDocument.Save();
+		Invoke( delegate {
+			CurrentDocument.Save();
+		    });
                 SetLanguage(CurrentLanguage);
                 addToRecentsMenu(CurrentDocument.filename); // needed, if didn't have filename before
             }
@@ -1417,7 +1422,9 @@ namespace Calico {
 
         protected virtual void OnSaveAsActionActivated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
-                CurrentDocument.SaveAs();
+		Invoke( delegate {
+			CurrentDocument.SaveAs();
+		    });
                 SetLanguage(CurrentLanguage);
                 addToRecentsMenu(CurrentDocument.filename);
             }
@@ -2478,7 +2485,10 @@ namespace Calico {
                     ErrorLine(String.Format(_("Error: '{0}' is not an active language"), CurrentLanguage));
                     return;
                 }
-                bool retval = CurrentDocument.Save();
+		bool retval = false;
+		Invoke( delegate {
+			retval = CurrentDocument.Save();
+		    });
                 if (retval) {
                     // if select, just send that
                     //if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {
@@ -2842,7 +2852,9 @@ namespace Calico {
 
         protected void OnSaveButtonClicked(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
-                CurrentDocument.Save();
+		Invoke( delegate {
+			CurrentDocument.Save();
+		    });
             }
         }
 
