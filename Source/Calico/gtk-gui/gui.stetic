@@ -1607,6 +1607,7 @@
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="CurrentPage">-1</property>
+                    <property name="Scrollable">True</property>
                   </widget>
                 </child>
               </widget>

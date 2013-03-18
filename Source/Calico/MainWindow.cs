@@ -65,7 +65,7 @@ namespace Calico {
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
-                System.Console.WriteLine("setting lastSelectedPage = " + value);
+                //System.Console.WriteLine("setting lastSelectedPage = " + value);
                 _lastSelectedPage = value;
             }
         }
@@ -271,6 +271,7 @@ namespace Calico {
             Gtk.Notebook notebook = searchForNotebook(ShellEditor);
             notebook.FocusChildSet += delegate {
                 lastSelectedPage = searchForPage(ShellEditor);
+                //updateControls();
             };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
@@ -1093,8 +1094,10 @@ namespace Calico {
                 documents [page.widget] = page;
                 page.widget.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
                     Gtk.Widget result = searchForPage(args.Widget);
-                    if (result != null)
+                    if (result != null) {
                         lastSelectedPage = result;
+                        //updateControls();
+                    }
                 };
                 notebook.SetTabReorderable(page.widget, true);
                 notebook.SetTabDetachable(page.widget, true);                
@@ -2297,6 +2300,90 @@ namespace Calico {
                 GLib.Timeout.Add(0, delegate {
                     ShellEditor.GrabFocus();
                     return false;
+                }
+                );
+            } else if (CurrentDocument != null) {
+                // Set save as python menu:
+                saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+                ProgramSpeed.Sensitive = true;
+                ProgramSpeed.Value = CurrentDocument.SpeedValue;
+                // Set options menu:
+                if (! ProgramRunning) {
+                    if (CurrentDocument.HasContent) {
+                        StartButton.Sensitive = true;
+                        StartAction.Sensitive = true;
+                    } else {
+                        StartButton.Sensitive = false;
+                        StartAction.Sensitive = false;
+                    }
+                }
+                SetLanguage(CurrentDocument.language);
+                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
+                CurrentDocument.SetOptionsMenu(options_menu);
+                CurrentDocument.widget.Child.GrabFocus();
+                //CurrentDocument.tab_label.Text =
+                Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
+
+                // Looks for property notebook widget from current document.
+                // Adds as new page in property notebook if one is provided.
+                Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
+                if (propWidget != null) {
+                    nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
+                    nb.Visible = true;
+                    nb.ShowAll();
+                }
+            } else {
+                Invoke(delegate {
+                    ProgramSpeed.Sensitive = false;
+                    saveaspython_menu.Sensitive = false;
+                    if (! ProgramRunning) {
+                        StartButton.Sensitive = false;
+                        StartAction.Sensitive = false;
+                    }
+                    // Some other page
+                    Title = String.Format("Calico - {0}", System.Environment.UserName);
+                }
+                );
+            }
+        }
+
+        public void updateControls() { 
+            Gtk.Notebook nb = this.PropertyNotebook;
+            while (nb.NPages > 0) {
+                nb.RemovePage(0);
+            }
+            nb.Visible = false;
+            Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+            if (lastSelectedPage == searchForPage(Home)) {
+                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Home")) {
+                Invoke(delegate {
+                    ProgramSpeed.Sensitive = false;
+                    saveaspython_menu.Sensitive = false;
+                    if (! ProgramRunning) {
+                        StartButton.Sensitive = false;
+                        StartAction.Sensitive = false;
+                    }
+                    Title = String.Format("Calico - {0}", System.Environment.UserName);
+                }
+                );
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
+                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
+                //else if (Focus == Shell) {
+                Invoke(delegate {
+                    ProgramSpeed.Sensitive = false;
+                    saveaspython_menu.Sensitive = false;
+                    if (! ProgramRunning) {
+                        if (ShellEditor.Document.Text != "") {
+                            StartAction.Sensitive = true;
+                            StartButton.Sensitive = true;
+                        } else {
+                            StartAction.Sensitive = false;
+                            StartButton.Sensitive = false;
+                        }
+                    }
+                    SetLanguage(ShellLanguage);
+                    // Workaround: had to add this for notebook page selection:
+                    Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
                 }
                 );
             } else if (CurrentDocument != null) {
