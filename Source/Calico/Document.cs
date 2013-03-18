@@ -444,17 +444,30 @@ namespace Calico {
         }
 
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
-            if (! calico.ProgramRunning) {
 		MainWindow.Invoke( delegate {
-			if (texteditor.Document.Text == "") {
-			    calico.StartButton.Sensitive = false;
-			    calico.StartAction.Sensitive = false;
-			} else {
-			    calico.StartButton.Sensitive = true;
-			    calico.StartAction.Sensitive = true;
-			}
-		    });
-            }
+            // FIXME: set all of the controls here
+            if (!calico.isRunning) {
+    			if (texteditor.Document.Text == "") { // disable
+    			    calico.StartButton.Sensitive = false;
+    			    calico.StartAction.Sensitive = false;
+                    calico.PlayButton.Sensitive = false;
+                    calico.PauseButton.Sensitive = false;
+                    calico.ProgramSpeed.Sensitive = false;
+    			} else { // enable
+    			    calico.StartButton.Sensitive = true;
+    			    calico.StartAction.Sensitive = true;
+                    calico.PlayButton.Sensitive = true;
+                    calico.PauseButton.Sensitive = false;
+                    calico.ProgramSpeed.Sensitive = true;
+    			}
+            } else {
+                calico.StartButton.Sensitive = false;
+                calico.StartAction.Sensitive = false;
+                calico.PlayButton.Sensitive = false;
+                calico.PauseButton.Sensitive = false;
+                calico.ProgramSpeed.Sensitive = true;
+		    }
+          });
         }
 
         public override void Configure(Config config) {
@@ -486,7 +499,9 @@ namespace Calico {
         }
 
         public override void SelectLine(int lineno) {
-	    texteditor.SetSelection(lineno, 1, lineno + 1, 1);
+            var data = texteditor.GetTextEditorData();
+            var curLine = texteditor.GetLine (data.Caret.Line);
+    	    texteditor.SetSelection(lineno, 1, lineno, System.Math.Min (curLine.EditableLength, System.Math.Max (0, curLine.Length)) + 1);
         }
 
         public override string GetText() {
