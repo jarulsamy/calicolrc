@@ -1042,7 +1042,7 @@
               <widget class="Gtk.HPaned" id="hpaned2">
                 <property name="MemberName" />
                 <property name="CanFocus">True</property>
-                <property name="Position">455</property>
+                <property name="Position">531</property>
                 <child>
                   <widget class="Gtk.VPaned" id="vpaned2">
                     <property name="MemberName" />
@@ -1440,7 +1440,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">447</property>
+                        <property name="Position">523</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />

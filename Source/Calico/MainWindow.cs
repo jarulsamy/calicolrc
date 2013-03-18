@@ -60,7 +60,15 @@ namespace Calico {
         Gtk.Image[] animationImages = new Gtk.Image [2];
         System.Threading.Thread signal_thread;
         public static MainWindow _mainWindow = null;
-        Gtk.Widget lastSelectedPage = null;
+        Gtk.Widget _lastSelectedPage = null;
+
+        public Gtk.Widget lastSelectedPage {
+            get { return _lastSelectedPage;}
+            set { 
+                System.Console.WriteLine("setting lastSelectedPage = " + value);
+                _lastSelectedPage = value;
+            }
+        }
 
         enum TargetType {
             String,
@@ -259,6 +267,11 @@ namespace Calico {
             // option
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
+            //Gtk.Widget widget = searchForPage(ShellEditor);
+            Gtk.Notebook notebook = searchForNotebook(ShellEditor);
+            notebook.FocusChildSet += delegate {
+                lastSelectedPage = searchForPage(ShellEditor);
+            };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
@@ -331,7 +344,6 @@ namespace Calico {
                 EditorNotebook.SetTabReorderable(ToolNotebook.GetNthPage(i), true);
                 EditorNotebook.SetTabDetachable(ToolNotebook.GetNthPage(i), true);  
             }
-
             this.Present();
             // End of GUI setup
             // Load images for animation:
@@ -1848,7 +1860,7 @@ namespace Calico {
                     history.update(current_text.TrimEnd());
                     string text = history.up();
                     ShellEditor.Document.Text = text.TrimEnd() + "\n" + current_text;
-                    grabFocus(ShellEditor);
+                    ShellEditor.GrabFocus();
                     ShellEditor.Caret.Line = 1;
                     int col = ShellEditor.Document.GetLine(1).Length;
                     ShellEditor.Caret.Column = col + 1;
@@ -1865,7 +1877,7 @@ namespace Calico {
                     history.update(current_text.TrimEnd());
                     string text = history.down();
                     ShellEditor.Document.Text = current_text.TrimEnd() + "\n" + text;
-                    grabFocus(ShellEditor);
+                    ShellEditor.GrabFocus();
                     ShellEditor.Caret.Line = 1;
                     int col = ShellEditor.Document.GetLine(1).Length;
                     ShellEditor.Caret.Column = col + 1;
@@ -1902,14 +1914,6 @@ namespace Calico {
             }            
         }
  
-        public void grabFocus(Gtk.Widget widget) {
-            if (widget == findTabByName(_("Shell"))) {
-                ShellEditor.GrabFocus();
-            } else {
-                widget.GrabFocus();
-            }
-        }
-
         public void KeyDown(bool force) {
             string text = ShellEditor.Document.Text;
             var caret = ShellEditor.Caret;
@@ -2248,11 +2252,6 @@ namespace Calico {
             }
             );
         }
-        /*
-        protected void OnNotebookDocsChangeCurrentPage(object o, Gtk.ChangeCurrentPageArgs args) {
-            Console.WriteLine("change! {0}", o);
-        }
-        */
 
         protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
             // Always start by wiping out and hiding properties
@@ -2263,7 +2262,7 @@ namespace Calico {
             }
             nb.Visible = false;
             Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
-            if (Focus == Home) {
+            if (lastSelectedPage == searchForPage(Home)) {
                 //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Home")) {
                 Invoke(delegate {
                     ProgramSpeed.Sensitive = false;
@@ -2275,7 +2274,7 @@ namespace Calico {
                     Title = String.Format("Calico - {0}", System.Environment.UserName);
                 }
                 );
-            } else if (Focus == ShellEditor) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
                 //else if (Focus == Shell) {
                 Invoke(delegate {
@@ -2393,9 +2392,17 @@ namespace Calico {
         }
 
         public Gtk.Widget searchForPage(Gtk.Widget widget) {
-            Gtk.Notebook notebook = searchForNotebook(widget);
-            if (notebook != null) {
-                return notebook.GetNthPage(notebook.Page);
+            Gtk.Widget child = null;
+            while (widget != null) {
+                if (widget.GetType() == typeof(Gtk.Notebook))
+                    if (child == null)
+                        return ((Gtk.Notebook)widget).GetNthPage(((Gtk.Notebook)widget).Page);
+                    else 
+                        return child;
+                else {
+                    child = widget;
+                    widget = widget.Parent;
+                }
             }
             return null;
         }
@@ -2469,7 +2476,7 @@ namespace Calico {
 
         public virtual void OnYesAction1Activated(object sender, System.EventArgs e) {
             // doesn't work in document; but save does
-            if (lastSelectedPage == findTabByName(_("Shell"))) {
+            if (lastSelectedPage == searchForPage(ShellEditor)) {
                 //} else if (tabShowing("Shell")) {
                 //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 string text = ShellEditor.Document.Text;
@@ -3047,8 +3054,10 @@ namespace Calico {
         }
 
         void resetFocus() {
-            if (lastSelectedPage != null) {
-                lastSelectedPage.GrabFocus();
+            if (lastSelectedPage == searchForPage(ShellEditor)) {
+                ShellEditor.GrabFocus();
+            } else if (CurrentDocument != null) {
+                CurrentDocument.widget.GrabFocus();
             }
         }
 
@@ -3164,7 +3173,7 @@ namespace Calico {
         protected void OnSearchEntryChanged(object sender, System.EventArgs e) {
             if (documents.ContainsKey(lastSelectedPage)) {
                 documents[lastSelectedPage].SearchMore(searchEntry.ActiveText);
-            } else if (lastSelectedPage == findTabByName(_("Shell"))) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchMore(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
                     UpdateUpDownArrows();
@@ -3175,8 +3184,7 @@ namespace Calico {
         protected void OnSearchNextButtonClicked(object sender, System.EventArgs e) {
             if (documents.ContainsKey(lastSelectedPage)) {
                 documents[lastSelectedPage].SearchNext(searchEntry.ActiveText);
-                //}else if (Focus == Shell){
-            } else if (lastSelectedPage == findTabByName(_("Shell"))) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
                     UpdateUpDownArrows();
@@ -3188,8 +3196,7 @@ namespace Calico {
         protected void OnSearchPrevButtonClicked(object sender, System.EventArgs e) {
             if (documents.ContainsKey(lastSelectedPage)) {
                 documents[lastSelectedPage].SearchPrevious(searchEntry.ActiveText);
-                // } else if (Focus == Shell){
-            } else if (lastSelectedPage == findTabByName(_("Shell"))) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
                     UpdateUpDownArrows();
@@ -3513,7 +3520,7 @@ namespace Calico {
         protected void OnFindNextActionActivated(object sender, EventArgs e) {
             if (documents.ContainsKey(lastSelectedPage)) {
                 documents[lastSelectedPage].SearchNext(searchEntry.ActiveText);
-            } else if (lastSelectedPage == findTabByName(_("Shell"))) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
                     UpdateUpDownArrows();
@@ -3524,7 +3531,7 @@ namespace Calico {
         protected void OnFindPreviousActionActivated(object sender, EventArgs e) {
             if (documents.ContainsKey(lastSelectedPage)) {
                 documents[lastSelectedPage].SearchPrevious(searchEntry.ActiveText);
-            } else if (lastSelectedPage == findTabByName(_("Shell"))) {
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
                     UpdateUpDownArrows();
