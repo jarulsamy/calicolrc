@@ -38,6 +38,7 @@ namespace Calico {
         // tab close button
         protected bool _isDirty = false;
         double _speedValue = 100;
+        public string preferredNotebook = "editor"; // "editor", "main", "tools"
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;

@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="839 527">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="930 527">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -1037,7 +1037,7 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">640</property>
+            <property name="Position">728</property>
             <child>
               <widget class="Gtk.HPaned" id="hpaned2">
                 <property name="MemberName" />
@@ -1055,7 +1055,6 @@
                         <property name="CurrentPage">0</property>
                         <property name="Scrollable">True</property>
                         <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
-                        <signal name="ChangeCurrentPage" handler="OnNotebookDocsChangeCurrentPage" />
                         <child>
                           <widget class="Gtk.HBox" id="hbox2">
                             <property name="MemberName" />
@@ -1604,51 +1603,33 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.VPaned" id="vpaned1">
+                  <widget class="Gtk.Notebook" id="editor_docs">
                     <property name="MemberName" />
-                    <property name="Visible">False</property>
                     <property name="CanFocus">True</property>
-                    <property name="Position">151</property>
+                    <property name="CurrentPage">-1</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="Resize">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VPaned" id="vpaned1">
+                <property name="MemberName" />
+                <property name="Visible">False</property>
+                <property name="CanFocus">True</property>
+                <property name="Position">151</property>
+                <child>
+                  <widget class="Gtk.Frame" id="frame1">
+                    <property name="MemberName" />
+                    <property name="ShadowType">None</property>
                     <child>
-                      <widget class="Gtk.Frame" id="frame1">
-                        <property name="MemberName" />
-                        <property name="ShadowType">None</property>
-                        <child>
-                          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow3">
-                            <property name="MemberName" />
-                            <property name="ShadowType">In</property>
-                            <child>
-                              <widget class="Gtk.TextView" id="ChatCommand">
-                                <property name="MemberName" />
-                                <property name="CanFocus">True</property>
-                                <property name="ShowScrollbars">True</property>
-                                <property name="Text" translatable="yes" />
-                                <property name="WrapMode">Word</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="Gtk.Label" id="GtkLabel35">
-                            <property name="MemberName" />
-                            <property name="LabelProp" translatable="yes">Chat</property>
-                            <property name="UseMarkup">True</property>
-                          </widget>
-                          <packing>
-                            <property name="type">label_item</property>
-                          </packing>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="Resize">False</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow2">
+                      <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow3">
                         <property name="MemberName" />
                         <property name="ShadowType">In</property>
                         <child>
-                          <widget class="Gtk.TextView" id="ChatOutput">
+                          <widget class="Gtk.TextView" id="ChatCommand">
                             <property name="MemberName" />
                             <property name="CanFocus">True</property>
                             <property name="ShowScrollbars">True</property>
@@ -1658,18 +1639,37 @@
                         </child>
                       </widget>
                     </child>
+                    <child>
+                      <widget class="Gtk.Label" id="GtkLabel35">
+                        <property name="MemberName" />
+                        <property name="LabelProp" translatable="yes">Chat</property>
+                        <property name="UseMarkup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="type">label_item</property>
+                      </packing>
+                    </child>
                   </widget>
                   <packing>
                     <property name="Resize">False</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow2">
+                    <property name="MemberName" />
+                    <property name="ShadowType">In</property>
+                    <child>
+                      <widget class="Gtk.TextView" id="ChatOutput">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="ShowScrollbars">True</property>
+                        <property name="Text" translatable="yes" />
+                        <property name="WrapMode">Word</property>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
               </widget>
-              <packing>
-                <property name="Resize">False</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder />
             </child>
           </widget>
           <packing>
