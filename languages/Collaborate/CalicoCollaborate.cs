@@ -131,6 +131,7 @@ public class CollaborateDocument: Document
 	
 	Gtk.ScrolledWindow scroll = new Gtk.ScrolledWindow ();
 	scroll.Add (webview);
+	focus_widget = webview;
 	
 	vbox = new Gtk.VBox (false, 1);
 	vbox.PackStart (toolbar, false, false, 0);

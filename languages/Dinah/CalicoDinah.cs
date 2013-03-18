@@ -64,6 +64,7 @@ public class CalicoDinahDocument : Document
 	base(calico, filename, "dinah")
 	{
 		dinah = new Dinah.DinahWidget();
+		focus_widget = dinah;
 		widget.AddWithViewport(dinah);
 		if (filename != null)
 			dinah.ReadFile (filename);

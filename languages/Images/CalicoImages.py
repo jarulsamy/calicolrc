@@ -38,9 +38,12 @@ class MyDocument(Calico.Document):
         self.canvas = Graphics.Canvas("auto", 
                                       self.widget.Hadjustment, 
                                       self.widget.Vadjustment)
+        self.focus_widget = self.canvas
+        if filename:
+            pic = Graphics.Picture(filename)
+            pic.draw(self.canvas)
         self.widget.AddWithViewport(self.canvas)
-        pic = Graphics.Picture(filename)
-        pic.draw(self.canvas)
+        self.widget.ScrollChild += lambda o, args: print("here")
         self.widget.ShowAll()
 
     def GetAuthors(self):
