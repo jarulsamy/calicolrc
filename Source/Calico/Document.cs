@@ -31,6 +31,7 @@ namespace Calico {
         public Document document;
         string _documentType;
         public Gtk.ScrolledWindow widget;
+        public Gtk.Widget focus_widget;
         public Gtk.Widget tab_widget;
         public Gtk.Label tab_label;
         // label for notebook page
@@ -385,6 +386,7 @@ namespace Calico {
                 // FIXME: new file? invalid path? no longer exists?
             }
             texteditor = new MyTextEditor(document, options);
+            focus_widget = texteditor;
             //texteditor.DragDataReceived += HandleTexteditorDragDataReceived;
             if (mimetype != null)
                 texteditor.Document.MimeType = mimetype;

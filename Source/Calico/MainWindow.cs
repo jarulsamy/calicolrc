@@ -1096,7 +1096,6 @@ namespace Calico {
                     Gtk.Widget result = searchForPage(args.Widget);
                     if (result != null) {
                         lastSelectedPage = result;
-                        //updateControls();
                     }
                 };
                 notebook.SetTabReorderable(page.widget, true);
@@ -1105,6 +1104,10 @@ namespace Calico {
                 page.close_button.Clicked += delegate {
                     TryToClose(page);
                 };
+                if (page.focus_widget != null)
+                    page.focus_widget.GrabFocus();
+                else
+                    System.Console.Error.WriteLine("Document needs to set focus_widget.");
             }
             if (filename != null) {
                 string dir = System.IO.Path.GetDirectoryName(filename);
