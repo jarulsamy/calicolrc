@@ -450,7 +450,7 @@
       </action>
       <action id="FindNextAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;r</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;g</property>
         <property name="Label" translatable="yes">Find Next</property>
         <property name="ShortLabel" translatable="yes">Find Next</property>
         <signal name="Activated" handler="OnFindNextActionActivated" />

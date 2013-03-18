@@ -2323,7 +2323,7 @@ namespace Calico {
                 SetLanguage(CurrentDocument.language);
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
                 CurrentDocument.SetOptionsMenu(options_menu);
-                CurrentDocument.widget.Child.GrabFocus();
+                CurrentDocument.focus_widget.GrabFocus();
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
 
@@ -2407,7 +2407,7 @@ namespace Calico {
                 SetLanguage(CurrentDocument.language);
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
                 CurrentDocument.SetOptionsMenu(options_menu);
-                CurrentDocument.widget.Child.GrabFocus();
+                CurrentDocument.focus_widget.GrabFocus();
                 //CurrentDocument.tab_label.Text =
                 Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
 
@@ -3147,7 +3147,7 @@ namespace Calico {
             if (lastSelectedPage == searchForPage(ShellEditor)) {
                 ShellEditor.GrabFocus();
             } else if (CurrentDocument != null) {
-                CurrentDocument.widget.GrabFocus();
+                CurrentDocument.focus_widget.GrabFocus();
             }
         }
 
