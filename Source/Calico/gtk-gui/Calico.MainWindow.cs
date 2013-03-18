@@ -559,7 +559,7 @@ namespace Calico {
 			this.hbox4.Name = "hbox4";
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._printButton = new global::Gtk.Button();
-			this._printButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Print a script");
+			this._printButton.TooltipMarkup = "Print a script";
 			this._printButton.CanFocus = true;
 			this._printButton.Name = "_printButton";
 			this._printButton.UseUnderline = true;
@@ -585,7 +585,7 @@ namespace Calico {
 			w11.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._newButton = new global::Gtk.Button();
-			this._newButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Create a new script");
+			this._newButton.TooltipMarkup = "Create a new script";
 			this._newButton.CanFocus = true;
 			this._newButton.Name = "_newButton";
 			this._newButton.UseUnderline = true;
@@ -611,7 +611,7 @@ namespace Calico {
 			w20.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._openButton = new global::Gtk.Button();
-			this._openButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Open an existing script");
+			this._openButton.TooltipMarkup = "Open an existing script";
 			this._openButton.CanFocus = true;
 			this._openButton.Name = "_openButton";
 			this._openButton.UseUnderline = true;
@@ -637,7 +637,7 @@ namespace Calico {
 			w29.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._saveButton = new global::Gtk.Button();
-			this._saveButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Save script");
+			this._saveButton.TooltipMarkup = "Save script";
 			this._saveButton.CanFocus = true;
 			this._saveButton.Name = "_saveButton";
 			this._saveButton.UseUnderline = true;
@@ -671,7 +671,7 @@ namespace Calico {
 			w39.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button8 = new global::Gtk.Button();
-			this.button8.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Zoom in");
+			this.button8.TooltipMarkup = "Zoom in";
 			this.button8.CanFocus = true;
 			this.button8.Name = "button8";
 			this.button8.UseUnderline = true;
@@ -697,7 +697,7 @@ namespace Calico {
 			w48.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button9 = new global::Gtk.Button();
-			this.button9.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Zoom out");
+			this.button9.TooltipMarkup = "Zoom out";
 			this.button9.CanFocus = true;
 			this.button9.Name = "button9";
 			this.button9.UseUnderline = true;
@@ -723,7 +723,7 @@ namespace Calico {
 			w57.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button10 = new global::Gtk.Button();
-			this.button10.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Make font standard size");
+			this.button10.TooltipMarkup = "Make font standard size";
 			this.button10.CanFocus = true;
 			this.button10.Name = "button10";
 			this.button10.UseUnderline = true;
@@ -757,7 +757,7 @@ namespace Calico {
 			w67.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button11 = new global::Gtk.Button();
-			this.button11.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Show Output in new window");
+			this.button11.TooltipMarkup = "Show Output in new window";
 			this.button11.CanFocus = true;
 			this.button11.Name = "button11";
 			this.button11.UseUnderline = true;
@@ -783,7 +783,7 @@ namespace Calico {
 			w76.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.swap_vertical = new global::Gtk.Button();
-			this.swap_vertical.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Vertical Panes");
+			this.swap_vertical.TooltipMarkup = "Vertical Panes";
 			this.swap_vertical.CanFocus = true;
 			this.swap_vertical.Name = "swap_vertical";
 			this.swap_vertical.UseUnderline = true;
@@ -809,7 +809,7 @@ namespace Calico {
 			w85.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.swap_horizontal = new global::Gtk.Button();
-			this.swap_horizontal.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Horizontal Panes");
+			this.swap_horizontal.TooltipMarkup = "Horizontal Panes";
 			this.swap_horizontal.CanFocus = true;
 			this.swap_horizontal.Name = "swap_horizontal";
 			this.swap_horizontal.UseUnderline = true;
@@ -843,7 +843,7 @@ namespace Calico {
 			w95.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._stopButton = new global::Gtk.Button();
-			this._stopButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Stop a running script");
+			this._stopButton.TooltipMarkup = "Stop a running script";
 			this._stopButton.Sensitive = false;
 			this._stopButton.CanFocus = true;
 			this._stopButton.Name = "_stopButton";
@@ -870,7 +870,7 @@ namespace Calico {
 			w104.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._startButton = new global::Gtk.Button();
-			this._startButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Run a script");
+			this._startButton.TooltipMarkup = "Run a script";
 			this._startButton.Sensitive = false;
 			this._startButton.CanFocus = true;
 			this._startButton.Name = "_startButton";
@@ -897,7 +897,7 @@ namespace Calico {
 			w113.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.debugSpeed = new global::Gtk.HScale(null);
-			this.debugSpeed.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Run fast (far-left), Single-step (far-right)");
+			this.debugSpeed.TooltipMarkup = "Run fast (far-left), Single-step (far-right)";
 			this.debugSpeed.WidthRequest = 100;
 			this.debugSpeed.CanFocus = true;
 			this.debugSpeed.Name = "debugSpeed";
@@ -915,7 +915,7 @@ namespace Calico {
 			w114.Expand = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._pauseButton1 = new global::Gtk.Button();
-			this._pauseButton1.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Pause a running script");
+			this._pauseButton1.TooltipMarkup = "Pause a running script";
 			this._pauseButton1.Sensitive = false;
 			this._pauseButton1.CanFocus = true;
 			this._pauseButton1.Name = "_pauseButton1";
@@ -942,7 +942,7 @@ namespace Calico {
 			w123.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._playButton = new global::Gtk.Button();
-			this._playButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Continue a paused script");
+			this._playButton.TooltipMarkup = "Continue a paused script";
 			this._playButton.Sensitive = false;
 			this._playButton.CanFocus = true;
 			this._playButton.Name = "_playButton";
@@ -969,7 +969,7 @@ namespace Calico {
 			w132.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.butterfly = new global::Gtk.Button();
-			this.butterfly.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Running Script indicator");
+			this.butterfly.TooltipMarkup = "Running Script indicator";
 			this.butterfly.CanFocus = true;
 			this.butterfly.Name = "butterfly";
 			this.butterfly.UseUnderline = true;
@@ -1017,7 +1017,7 @@ namespace Calico {
 			w143.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
 			this.searchEntry = global::Gtk.ComboBoxEntry.NewText();
-			this.searchEntry.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Text to search for");
+			this.searchEntry.TooltipMarkup = "Text to search for";
 			this.searchEntry.WidthRequest = 119;
 			this.searchEntry.Name = "searchEntry";
 			this.searchbox.Add(this.searchEntry);
@@ -1027,7 +1027,7 @@ namespace Calico {
 			w144.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
 			this.searchNextButton = new global::Gtk.Button();
-			this.searchNextButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Find next matching text");
+			this.searchNextButton.TooltipMarkup = "Find next matching text";
 			this.searchNextButton.CanFocus = true;
 			this.searchNextButton.Name = "searchNextButton";
 			this.searchNextButton.UseUnderline = true;
@@ -1053,7 +1053,7 @@ namespace Calico {
 			w153.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
 			this.searchPrevButton = new global::Gtk.Button();
-			this.searchPrevButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Find Previous matching text");
+			this.searchPrevButton.TooltipMarkup = "Find Previous matching text";
 			this.searchPrevButton.CanFocus = true;
 			this.searchPrevButton.Name = "searchPrevButton";
 			this.searchPrevButton.UseUnderline = true;
@@ -1079,7 +1079,7 @@ namespace Calico {
 			w162.Fill = false;
 			// Container child searchbox.Gtk.Box+BoxChild
 			this.searchStopButton = new global::Gtk.Button();
-			this.searchStopButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Close search");
+			this.searchStopButton.TooltipMarkup = "Close search";
 			this.searchStopButton.CanFocus = true;
 			this.searchStopButton.Name = "searchStopButton";
 			this.searchStopButton.UseUnderline = true;
@@ -1203,7 +1203,7 @@ namespace Calico {
 			this.vbuttonbox1.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(3));
 			// Container child vbuttonbox1.Gtk.ButtonBox+ButtonBoxChild
 			this.button4 = new global::Gtk.Button();
-			this.button4.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to Getting Started webpage");
+			this.button4.TooltipMarkup = "Go to Getting Started webpage";
 			this.button4.CanFocus = true;
 			this.button4.Name = "button4";
 			this.button4.UseUnderline = true;
@@ -1231,7 +1231,7 @@ namespace Calico {
 			w187.Fill = false;
 			// Container child vbuttonbox1.Gtk.ButtonBox+ButtonBoxChild
 			this.button26 = new global::Gtk.Button();
-			this.button26.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to Help overview webpage");
+			this.button26.TooltipMarkup = "Go to Help overview webpage";
 			this.button26.CanFocus = true;
 			this.button26.Name = "button26";
 			this.button26.UseUnderline = true;
@@ -1271,7 +1271,7 @@ namespace Calico {
 			this.vbuttonbox2.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(3));
 			// Container child vbuttonbox2.Gtk.ButtonBox+ButtonBoxChild
 			this.button3 = new global::Gtk.Button();
-			this.button3.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Create a new script");
+			this.button3.TooltipMarkup = "Create a new script";
 			this.button3.CanFocus = true;
 			this.button3.Name = "button3";
 			this.button3.UseUnderline = true;
@@ -1299,7 +1299,7 @@ namespace Calico {
 			w206.Fill = false;
 			// Container child vbuttonbox2.Gtk.ButtonBox+ButtonBoxChild
 			this.button7 = new global::Gtk.Button();
-			this.button7.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Open an existing script");
+			this.button7.TooltipMarkup = "Open an existing script";
 			this.button7.CanFocus = true;
 			this.button7.Name = "button7";
 			this.button7.UseUnderline = true;
@@ -1339,7 +1339,7 @@ namespace Calico {
 			this.vbuttonbox3.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(3));
 			// Container child vbuttonbox3.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonRecentlyUsed = new global::Gtk.Button();
-			this.buttonRecentlyUsed.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Open a recently used script");
+			this.buttonRecentlyUsed.TooltipMarkup = "Open a recently used script";
 			this.buttonRecentlyUsed.CanFocus = true;
 			this.buttonRecentlyUsed.Name = "buttonRecentlyUsed";
 			this.buttonRecentlyUsed.UseUnderline = true;
@@ -1367,7 +1367,7 @@ namespace Calico {
 			w225.Fill = false;
 			// Container child vbuttonbox3.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonWhatsNew = new global::Gtk.Button();
-			this.buttonWhatsNew.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to What's new webpage");
+			this.buttonWhatsNew.TooltipMarkup = "Go to What's new webpage";
 			this.buttonWhatsNew.CanFocus = true;
 			this.buttonWhatsNew.Name = "buttonWhatsNew";
 			this.buttonWhatsNew.UseUnderline = true;
@@ -1411,7 +1411,7 @@ namespace Calico {
 			this.notebook_docs.Add(this.hbox2);
 			// Notebook tab
 			this.label2 = new global::Gtk.Label();
-			this.label2.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Home tab");
+			this.label2.TooltipMarkup = "Home tab";
 			this.label2.Name = "label2";
 			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString("Home");
 			this.label2.WidthChars = 8;
@@ -1445,7 +1445,7 @@ namespace Calico {
 			this.hbox7.Spacing = 6;
 			// Container child hbox7.Gtk.Box+BoxChild
 			this.history_up = new global::Gtk.Button();
-			this.history_up.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Previous interactive code");
+			this.history_up.TooltipMarkup = "Previous interactive code";
 			this.history_up.Sensitive = false;
 			this.history_up.Name = "history_up";
 			this.history_up.UseUnderline = true;
@@ -1471,7 +1471,7 @@ namespace Calico {
 			w250.Fill = false;
 			// Container child hbox7.Gtk.Box+BoxChild
 			this.history_down = new global::Gtk.Button();
-			this.history_down.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Next interactive code");
+			this.history_down.TooltipMarkup = "Next interactive code";
 			this.history_down.Sensitive = false;
 			this.history_down.Name = "history_down";
 			this.history_down.UseUnderline = true;
@@ -1521,7 +1521,7 @@ namespace Calico {
 			w264.Position = 1;
 			// Notebook tab
 			this.label1 = new global::Gtk.Label();
-			this.label1.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Enter code interactively");
+			this.label1.TooltipMarkup = "Enter code interactively";
 			this.label1.Name = "label1";
 			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString("Shell");
 			this.label1.WidthChars = 8;
@@ -1555,7 +1555,7 @@ namespace Calico {
 			this.notebook_tools.Add(this.GtkScrolledWindow);
 			// Notebook tab
 			this.label3 = new global::Gtk.Label();
-			this.label3.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Results of running code");
+			this.label3.TooltipMarkup = "Results of running code";
 			this.label3.Name = "label3";
 			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString("Output");
 			this.notebook_tools.SetTabLabel(this.GtkScrolledWindow, this.label3);
@@ -1574,7 +1574,7 @@ namespace Calico {
 			w269.Position = 1;
 			// Notebook tab
 			this.label4 = new global::Gtk.Label();
-			this.label4.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Variables and their values");
+			this.label4.TooltipMarkup = "Variables and their values";
 			this.label4.Name = "label4";
 			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString("Environment");
 			this.notebook_tools.SetTabLabel(this.GtkScrolledWindow1, this.label4);
@@ -1594,7 +1594,7 @@ namespace Calico {
 			w271.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
-			this.label5.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Local variables");
+			this.label5.TooltipMarkup = "Local variables";
 			this.label5.Name = "label5";
 			this.label5.LabelProp = global::Mono.Unix.Catalog.GetString("Locals");
 			this.notebook_tools.SetTabLabel(this.scrolledwindow2, this.label5);
@@ -1615,7 +1615,7 @@ namespace Calico {
 			w273.Position = 3;
 			// Notebook tab
 			this.label999 = new global::Gtk.Label();
-			this.label999.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Past interactive code");
+			this.label999.TooltipMarkup = "Past interactive code";
 			this.label999.Name = "label999";
 			this.label999.LabelProp = global::Mono.Unix.Catalog.GetString("History");
 			this.notebook_tools.SetTabLabel(this.scrolledwindow4, this.label999);

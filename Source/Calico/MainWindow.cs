@@ -2517,28 +2517,6 @@ namespace Calico {
             return -1;
         }
 
-        public Gtk.Widget findTabByName(string name) {
-            for (int i = 0; i < MainNotebook.NPages; i++) {
-                Gtk.Widget widget = MainNotebook.GetNthPage(i);
-                Gtk.Label label = (Gtk.Label)MainNotebook.GetTabLabel(widget);
-                if (label.Text == name)
-                    return widget;
-            }
-            for (int i = 0; i < ToolNotebook.NPages; i++) {
-                Gtk.Widget widget = ToolNotebook.GetNthPage(i);
-                Gtk.Label label = (Gtk.Label)ToolNotebook.GetTabLabel(widget);
-                if (label.Text == name)
-                    return widget;
-            }
-            for (int i = 0; i < EditorNotebook.NPages; i++) {
-                Gtk.Widget widget = EditorNotebook.GetNthPage(i);
-                Gtk.Label label = (Gtk.Label)EditorNotebook.GetTabLabel(widget);
-                if (label.Text == name)
-                    return widget;
-            }
-            return null;
-        }
-
         public void switchToShell() {
             Gtk.Notebook nb = searchForNotebook(ShellEditor);
             int idx = findTabByWidget(ShellEditor);
