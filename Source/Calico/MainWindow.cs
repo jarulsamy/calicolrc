@@ -2254,7 +2254,7 @@ namespace Calico {
             );
         }
 
-        protected virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
+        public virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
             // Always start by wiping out and hiding properties
             lastSelectedPage = searchForPage((Gtk.Widget)o);
             Gtk.Notebook nb = this.PropertyNotebook;
@@ -2345,53 +2345,21 @@ namespace Calico {
             }
         }
 
-        public void updateControls() { 
-            Gtk.Notebook nb = this.PropertyNotebook;
-            while (nb.NPages > 0) {
-                nb.RemovePage(0);
-            }
-            nb.Visible = false;
-            Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
-            if (lastSelectedPage == searchForPage(Home)) {
-                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Home")) {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    }
-                    Title = String.Format("Calico - {0}", System.Environment.UserName);
+        public void updateControls(Document document) { 
+            Invoke( delegate {
+                Gtk.Notebook nb = this.PropertyNotebook;
+                while (nb.NPages > 0) {
+                    nb.RemovePage(0);
                 }
-                );
-            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
-                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
-                //else if (Focus == Shell) {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        if (ShellEditor.Document.Text != "") {
-                            StartAction.Sensitive = true;
-                            StartButton.Sensitive = true;
-                        } else {
-                            StartAction.Sensitive = false;
-                            StartButton.Sensitive = false;
-                        }
-                    }
-                    SetLanguage(ShellLanguage);
-                    // Workaround: had to add this for notebook page selection:
-                    Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
-                }
-                );
-            } else if (CurrentDocument != null) {
+                nb.Visible = false;
+                Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
                 // Set save as python menu:
-                saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+                saveaspython_menu.Sensitive = document.CanSaveAsPython();
                 ProgramSpeed.Sensitive = true;
-                ProgramSpeed.Value = CurrentDocument.SpeedValue;
+                ProgramSpeed.Value = document.SpeedValue;
                 // Set options menu:
                 if (! ProgramRunning) {
-                    if (CurrentDocument.HasContent) {
+                    if (document.HasContent) {
                         StartButton.Sensitive = true;
                         StartAction.Sensitive = true;
                     } else {
@@ -2399,72 +2367,24 @@ namespace Calico {
                         StartAction.Sensitive = false;
                     }
                 }
-                SetLanguage(CurrentDocument.language);
+                SetLanguage(document.language);
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
-                CurrentDocument.SetOptionsMenu(options_menu);
-                CurrentDocument.focus_widget.GrabFocus();
+                document.SetOptionsMenu(options_menu);
+                //document.focus_widget.GrabFocus();
                 //CurrentDocument.tab_label.Text =
-                Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
+                Title = String.Format(_("{0} - Calico - {1}"), document.basename, System.Environment.UserName);
 
                 // Looks for property notebook widget from current document.
                 // Adds as new page in property notebook if one is provided.
-                Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
+                Gtk.Widget propWidget = document.GetPropertyNotebookWidget();
                 if (propWidget != null) {
                     nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
                     nb.Visible = true;
                     nb.ShowAll();
                 }
-            } else {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    }
-                    // Some other page
-                    Title = String.Format("Calico - {0}", System.Environment.UserName);
-                }
-                );
-            }
+            });
         }
 
-        public void movePage(Gtk.Notebook dst) {
-            // Move currently select tab to AuxWindow tab
-            int idx = MainNotebook.CurrentPage;
-            if (idx < 0) {
-                return;
-            }
-            Gtk.Notebook src = MainNotebook;
-            Gtk.Widget page = src.GetNthPage(idx);
-            Gtk.Widget l = src.GetTabLabel(page);
-            src.RemovePage(idx);
-            dst.AppendPage(page, l);
-            dst.SetTabReorderable(page, true);
-            dst.SetTabDetachable(page, true);            
-        }
-
-        public void movePage(Gtk.Notebook src, int idx, Gtk.Notebook dst) {
-            if (idx < 0) {
-                return;
-            }
-            Gtk.Widget page = src.GetNthPage(idx);
-            Gtk.Widget l = src.GetTabLabel(page);
-            src.RemovePage(idx);
-            dst.AppendPage(page, l);
-            dst.SetTabReorderable(page, true);
-            dst.SetTabDetachable(page, true);            
-        }
-        /*
-        public void movePage(string name, Gtk.Notebook dst) {
-            int idx = findTabByLabel(name);
-            if (idx != -1) {                
-                Gtk.Notebook nb = findNotebook(name);
-                movePage(nb, idx, dst);
-            }
-        }
-        */
- 
         public Document getFocusDocument() {
             Gtk.Notebook notebook = searchForNotebook(lastSelectedPage);
             if (notebook != null) {
@@ -3527,67 +3447,39 @@ namespace Calico {
         protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
             // Swap the vertical parts of MainNotebook
             Invoke(delegate {
-                if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
+                if (vpaned2.Child1 == notebook_docs) { // normal
                     vpaned2.Remove(NotebookPane);
                     vpaned2.Remove(notebook_docs);
                     vpaned2.Add1(NotebookPane);
                     vpaned2.Add2(notebook_docs);
-                } else if (vpaned2.Child2 == notebook_docs && vpaned2.Child1 == NotebookPane) {
+                } else {
                     vpaned2.Remove(NotebookPane);
                     vpaned2.Remove(notebook_docs);
                     vpaned2.Add1(notebook_docs);
                     vpaned2.Add2(NotebookPane);
-                } else { // else, in horizontal position
-                    hpaned1.Remove(NotebookPane);
-                    if (vpaned2.Child1 == null) {
-                        vpaned2.Add1(NotebookPane);
-                    } else {
-                        vpaned2.Add2(NotebookPane);
-                    }
                 }
-            }
-            );
-        }
-
-        private bool ResizeOutput() {
-            NotebookPane.SetSizeRequest(-1, -1);
-            // keep updating?
-            return false;
+            });
         }
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
             // Swap MainNotebook and EditorNotebook
             // FIXME: if hidden, show EditorNotebook
-            Invoke(delegate {
-                if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
-                    // swap:
-                    hpaned1.Remove(NotebookPane);
-                    hpaned1.Remove(hpaned2);
-                    hpaned1.Add1(NotebookPane);
-                    hpaned1.Add2(hpaned2);
-                } else if (hpaned1.Child2 == hpaned2 && hpaned1.Child1 == NotebookPane) { // they are next to each other
-                    // swap:
-                    hpaned1.Remove(NotebookPane);
-                    hpaned1.Remove(hpaned2);
-                    hpaned1.Add1(hpaned2);
-                    hpaned1.Add2(NotebookPane);
-                } else { // else, in vertical position
-                    // remove from vpaned, and add to hpaned:
-                    vpaned2.Remove(NotebookPane);
-                    if (hpaned1.Child1 == null) {
-                        hpaned1.Pack1(NotebookPane, true, false);
-                    } else {
-                        hpaned1.Pack2(NotebookPane, true, false);
-                    }
-                    //Console.WriteLine(NotebookPane.WidthRequest);
-                    if (NotebookPane.WidthRequest == -1) {
-                        // creating this
-                        NotebookPane.SetSizeRequest(hpaned1.Allocation.Width / 2, -1);
-                    }
-                    GLib.Timeout.Add(1, ResizeOutput);
-                }
+            if (!EditorNotebook.Visible) {
+                OnButton11Clicked(null, null); // show EditorNotebook
             }
-            );
+            Invoke(delegate {
+                if (hpaned2.Child1 == vpaned2) {
+                    hpaned2.Remove(vpaned2);
+                    hpaned2.Remove(editor_docs);
+                    hpaned2.Add1(editor_docs);
+                    hpaned2.Add2(vpaned2);
+                } else {
+                    hpaned2.Remove(vpaned2);
+                    hpaned2.Remove(editor_docs);
+                    hpaned2.Add1(vpaned2);
+                    hpaned2.Add2(editor_docs);
+                }
+            });
         }
 
         protected void OnFindNextActionActivated(object sender, EventArgs e) {

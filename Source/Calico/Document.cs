@@ -446,30 +446,7 @@ namespace Calico {
         }
 
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
-		MainWindow.Invoke( delegate {
-            // FIXME: set all of the controls here
-            if (!calico.isRunning) {
-    			if (texteditor.Document.Text == "") { // disable
-    			    calico.StartButton.Sensitive = false;
-    			    calico.StartAction.Sensitive = false;
-                    calico.PlayButton.Sensitive = false;
-                    calico.PauseButton.Sensitive = false;
-                    calico.ProgramSpeed.Sensitive = false;
-    			} else { // enable
-    			    calico.StartButton.Sensitive = true;
-    			    calico.StartAction.Sensitive = true;
-                    calico.PlayButton.Sensitive = true;
-                    calico.PauseButton.Sensitive = false;
-                    calico.ProgramSpeed.Sensitive = true;
-    			}
-            } else {
-                calico.StartButton.Sensitive = false;
-                calico.StartAction.Sensitive = false;
-                calico.PlayButton.Sensitive = false;
-                calico.PauseButton.Sensitive = false;
-                calico.ProgramSpeed.Sensitive = true;
-		    }
-          });
+            calico.updateControls(this); 
         }
 
         public override void Configure(Config config) {
