@@ -65,7 +65,7 @@ namespace Calico {
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
-                //System.Console.WriteLine("setting lastSelectedPage = " + value);
+                System.Console.WriteLine("setting lastSelectedPage = " + value);
                 _lastSelectedPage = value;
             }
         }
@@ -267,12 +267,6 @@ namespace Calico {
             // option
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
-            //Gtk.Widget widget = searchForPage(ShellEditor);
-            Gtk.Notebook notebook = searchForNotebook(ShellEditor);
-            notebook.FocusChildSet += delegate {
-                lastSelectedPage = searchForPage(ShellEditor);
-                //updateControls();
-            };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
@@ -1104,6 +1098,7 @@ namespace Calico {
                 page.close_button.Clicked += delegate {
                     TryToClose(page);
                 };
+                lastSelectedPage = page.widget;
                 if (page.focus_widget != null)
                     page.focus_widget.GrabFocus();
                 else
@@ -2851,7 +2846,6 @@ namespace Calico {
         }
 
         protected void OnStartButtonClicked(object sender, System.EventArgs e) {
-            System.Console.WriteLine("here");
             OnYesAction1Activated(sender, e);
         }
 
