@@ -65,7 +65,7 @@ namespace Calico {
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
-                System.Console.WriteLine("setting lastSelectedPage = " + value);
+                //System.Console.WriteLine("setting lastSelectedPage = " + value);
                 _lastSelectedPage = value;
             }
         }
@@ -3492,31 +3492,40 @@ namespace Calico {
         }
   
         protected void OnButton11Clicked(object sender, System.EventArgs e) {
-            // If output tabs are in pane:
-            // Create new window, unparent output tabs etc, and show
-            // Move all editor tabs back and forth between Editor and Notebook
-            /*
+            // Move all editor tabs back and forth between EditorNotebook and MainNotebook
             Invoke( delegate {
-                if (aux_window == null) {
-                    aux_window = new AuxWindow(_("Calico Editor"), this);
-            movePage(aux_window.AuxNotebook);
-                    //movePage("Output", aux_window.AuxNotebook);
-                    //movePage("Shell", ToolNotebook);
-                    int width, height;
-                    this.GetSize(out width, out height);
-                    aux_window.SetSizeRequest(width / 2, height);
-                    //aux_window.SetDefaultSize(width, height);
-                    aux_window.Show();
-                } else {
-                    aux_window.Close();
+                if (EditorNotebook.Visible) {
+                    // Empty it to MainNoteBook
+                    // FIXME: get in same order
+                    for(int idx=EditorNotebook.NPages - 1; idx >= 0; idx--) {
+                        Gtk.Widget page = EditorNotebook.GetNthPage(idx);
+                        Gtk.Widget l = EditorNotebook.GetTabLabel(page);
+                        EditorNotebook.RemovePage(idx);
+                        MainNotebook.AppendPage(page, l);
+                        MainNotebook.SetTabReorderable(page, true);
+                        MainNotebook.SetTabDetachable(page, true);            
+                    }
+                    EditorNotebook.Hide();
+                } else { 
+                    // Show it, and load it with Documents from MainNotebook
+                    // FIXME: get in same order
+                    for(int idx=MainNotebook.NPages - 1; idx >= 0; idx--) {
+                        Gtk.Widget page = MainNotebook.GetNthPage(idx);
+                        if (documents.ContainsKey(page)) { // it is a document
+                            Gtk.Widget l = MainNotebook.GetTabLabel(page);
+                            MainNotebook.RemovePage(idx);
+                            EditorNotebook.AppendPage(page, l);
+                            EditorNotebook.SetTabReorderable(page, true);
+                            EditorNotebook.SetTabDetachable(page, true);            
+                        }
+                    }
+                    EditorNotebook.Show();
                 }
-            }
-            );
-            */
-            // else put back
+            });
         }
 
         protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
+            // Swap the vertical parts of MainNotebook
             Invoke(delegate {
                 if (vpaned2.Child1 == notebook_docs && vpaned2.Child2 == NotebookPane) { // normal
                     vpaned2.Remove(NotebookPane);
@@ -3547,7 +3556,8 @@ namespace Calico {
         }
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
-            // FIXME: move editor docs back and forth?
+            // Swap MainNotebook and EditorNotebook
+            // FIXME: if hidden, show EditorNotebook
             Invoke(delegate {
                 if (hpaned1.Child1 == hpaned2 && hpaned1.Child2 == NotebookPane) { // they are next to each other
                     // swap:
