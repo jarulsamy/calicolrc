@@ -464,7 +464,7 @@ namespace Calico {
                 ((Gtk.Menu)switch_menu.Submenu).Add(radioitem);
                 uint key;
                 Gdk.ModifierType mod;
-                Gtk.Accelerator.Parse(String.Format("<primary>{0}", count + 1), out key, out mod);
+                Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
                 radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                 languages_by_count [count + 1] = language;
                 //DragDataReceived += SelectionReceived;
@@ -667,7 +667,7 @@ namespace Calico {
                         int count = languages_by_count.Count;
                         uint key;
                         Gdk.ModifierType mod;
-                        Gtk.Accelerator.Parse(String.Format("<primary>{0}", count + 1), out key, out mod);
+                        Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
                         radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                         languages_by_count [count + 1] = language;
                         radioitem.Data ["id"] = count + 1;
@@ -2851,6 +2851,7 @@ namespace Calico {
         }
 
         protected void OnStartButtonClicked(object sender, System.EventArgs e) {
+            System.Console.WriteLine("here");
             OnYesAction1Activated(sender, e);
         }
 
