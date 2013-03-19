@@ -4600,35 +4600,35 @@ class SRN(BackpropNetwork):
             netType = kw["type"]
         self.addLayer('input', arg[0])
         hiddens = []
-        if len(arg) > 3: # FIXME: add context foR each
+        contexts = []
+        if len(arg) > 3: # FIXME: add context for each
             hcount = 0
             for hidc in arg[1:-1]:
                 name = 'hidden%d' % hcount
+                cname = 'context%d' % hcount
                 self.addLayer(name, hidc)
                 hiddens.append(name)
+                self.addContextLayer(cname, hidc, name)
+                hiddens.append((cname, name))
                 hcount += 1
         elif len(arg) == 3:
-                self.addLayer("context", arg[1])
                 name = 'hidden'
+                self.addContextLayer('context', arg[1], name)
                 self.addLayer(name, arg[1])
                 hiddens.append(name)
+                contexts.append(('context', name))
         elif len(arg) == 2:
             pass
         else:
             raise AttributeError, "not enough layers! need >= 2"
         self.addLayer('output', arg[-1])
+        # Connect contexts
+        for (fromName, toName) in contexts:
+            self.connect(fromName, toName)
         lastName = "input"
         for name in hiddens:
             if netType == "parallel":
                 self.connect('input', name)
-                self.connect(name, 'output')
-            else: # serial
-                self.connect(lastName, name)
-                lastName = name
-        lastName = "context"
-        for name in hiddens:
-            if netType == "parallel":
-                self.connect('context', name)
                 self.connect(name, 'output')
             else: # serial
                 self.connect(lastName, name)
@@ -4723,7 +4723,7 @@ class SRN(BackpropNetwork):
         inputBankTotalSize = sum(inputBankSizes)
         inputArgSizes = [len(args[name]) for name in inputBankNames if name in args]
         inputArgTotalSize = sum(inputArgSizes)
-        sequenceLength = inputArgTotalSize / inputBankTotalSize
+        sequenceLength = inputArgTotalSize // inputBankTotalSize
         learning = self.learning
         totalRetvals = (0.0, 0, 0) # error, correct, total
         totalPCorrect = {}
@@ -5778,5 +5778,5 @@ def main():
         except Exception, err:
             print("Good!", err)
 
-if __name__ == '<module>':
-    main()
+#if __name__ == '<module>':
+#    main()
