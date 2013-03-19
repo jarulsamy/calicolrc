@@ -390,7 +390,7 @@ namespace Calico {
 
             // Look for appropriate text:
             System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(
-            text, "^.*File \"(.*)\", line ([0-9]*), .*$");
+            text, "^.*File \"(.*)\", line ([0-9]*).*$");
             string filename;
             int lineno;
             if (match.Success) {
