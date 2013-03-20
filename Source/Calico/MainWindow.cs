@@ -1274,7 +1274,7 @@ namespace Calico {
             ManualResetEvent ev = new ManualResetEvent(false);
             dialogResponse = null;
             Invoke(delegate {
-                Gtk.Dialog fc = new Gtk.Dialog(title, null, 0);
+                Gtk.Dialog fc = new Gtk.Dialog(title, _mainWindow, 0);
                 fc.VBox.PackStart(new Gtk.Label(_("Save this file?")));
                 fc.VBox.PackStart(new Gtk.Label(title));
 
@@ -2720,7 +2720,7 @@ namespace Calico {
         }
 
         protected virtual void SelectFont(object sender, System.EventArgs e) {
-            Gtk.FontSelectionDialog d = new Gtk.FontSelectionDialog("Select Calico Font");
+		  Gtk.FontSelectionDialog d = new Gtk.FontSelectionDialog(_("Select Calico Font"));
             Pango.FontDescription pangofont = GetFont();
             d.SetFontName(pangofont.ToString());
             int response = d.Run();
@@ -3085,7 +3085,7 @@ namespace Calico {
             ManualResetEvent ev = new ManualResetEvent(false);
             bool retval = false;
             Invoke(delegate {
-                Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                Gtk.MessageDialog fc = new Gtk.MessageDialog(_mainWindow,
                                        0, Gtk.MessageType.Question,
                                        Gtk.ButtonsType.YesNo,
                                        question);
@@ -3104,7 +3104,7 @@ namespace Calico {
         public static void inform(string information) {
             ManualResetEvent ev = new ManualResetEvent(false);
             Invoke(delegate {
-                Gtk.MessageDialog fc = new Gtk.MessageDialog(null,
+                Gtk.MessageDialog fc = new Gtk.MessageDialog(_mainWindow,
                                        0, Gtk.MessageType.Info,
                                        Gtk.ButtonsType.Ok,
                                        information);
@@ -3353,7 +3353,7 @@ namespace Calico {
             ManualResetEvent ev = new ManualResetEvent(false);
             dialogResponse = null;
             Invoke(delegate {
-                Gtk.Dialog fc = new Gtk.Dialog(title, null, 0);
+                Gtk.Dialog fc = new Gtk.Dialog(title, _mainWindow, 0);
                 fc.VBox.PackStart(new Gtk.Label(_("Accept this script?")));
                 fc.VBox.PackStart(new Gtk.Label(title));
 
