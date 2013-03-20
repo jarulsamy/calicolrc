@@ -429,6 +429,7 @@ public static class Myro
 	public static void set_gui_thread_id (int gui_thread_id)
 	{
 		Myro.gui_thread_id = gui_thread_id;
+		System.Console.WriteLine("gui_thread_id = ", gui_thread_id);
 	}
 
 	public delegate void InvokeDelegate ();
@@ -453,7 +454,8 @@ public static class Myro
 	[method: JigsawTab(null)]
 	public static bool needInvoke ()
 	{
-		//Console.WriteLine("gui_thread_id: {0}", Myro.gui_thread_id);
+		Console.WriteLine("gui_thread_id: {0}", Myro.gui_thread_id);
+		Console.WriteLine("current thread_id: {0}", Thread.CurrentThread.ManagedThreadId);
 		if (Myro.gui_thread_id == -1) {
 			return false; // in another thread
 		} else if (Myro.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
