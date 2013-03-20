@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Calico\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-15 01:51-0400\n"
+"POT-Creation-Date: 2013-03-20 10:24-0400\n"
 "Language: zh-CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,88 +30,94 @@ msgid "    looking for local languages in \"{0}\"..."
 msgstr "    寻找当地语言中的“{0}”..."
 
 #: ../Source/Calico/Main.cs:246 ../Source/Calico/Main.cs:317
+#: ../Source/Calico/Main.cs:95 ../Source/Calico/Main.cs:310
 #, csharp-format
 msgid "Using Mono runtime version {0}"
 msgstr "使用Mono运行时版本{0}"
 
-#: ../Source/Calico/Main.cs:316
+#: ../Source/Calico/Main.cs:316 ../Source/Calico/Main.cs:309
 #, csharp-format
 msgid "Calico Project, version {0} on {1}"
 msgstr "印花布项目，版本{0} {1}"
 
-#: ../Source/Calico/Main.cs:319
+#: ../Source/Calico/Main.cs:319 ../Source/Calico/Main.cs:312
 msgid "Start calico with the following options:"
 msgstr "开始印花布下列选项："
 
-#: ../Source/Calico/Main.cs:320
+#: ../Source/Calico/Main.cs:320 ../Source/Calico/Main.cs:313
 msgid "  StartCalico                               Defaults to shell"
 msgstr "  StartCalico                             默认为壳"
 
-#: ../Source/Calico/Main.cs:321
+#: ../Source/Calico/Main.cs:321 ../Source/Calico/Main.cs:314
 msgid ""
 "  StartCalico FILENAME:LINE ...             Edits FILENAMEs, positioned on "
 "LINEs"
 msgstr "  StartCalico 文件名：行...                编辑文件名，定位于线"
 
-#: ../Source/Calico/Main.cs:322
+#: ../Source/Calico/Main.cs:322 ../Source/Calico/Main.cs:315
 msgid ""
 "  StartCalico --lang=LANGUAGE               Sets default language (python, "
 "etc.)"
 msgstr "  StartCalico  --LANG=语                 言设置默认语言（Python等）"
 
-#: ../Source/Calico/Main.cs:323
+#: ../Source/Calico/Main.cs:323 ../Source/Calico/Main.cs:316
 msgid "  StartCalico --chat                        Brings up chat window"
 msgstr "  StartCalico  --chat                    带来了聊天窗口"
 
-#: ../Source/Calico/Main.cs:324
+#: ../Source/Calico/Main.cs:324 ../Source/Calico/Main.cs:317
 msgid ""
 "  StartCalico --exec FILENAMEs              Run FILENAMEs standalone with "
 "graphics"
-msgstr "  StartCalico  --exec                     行的文件名与图形独立运行的文件名"
+msgstr ""
+"  StartCalico  --exec                     行的文件名与图形独立运行的文件名"
 
-#: ../Source/Calico/Main.cs:325
+#: ../Source/Calico/Main.cs:325 ../Source/Calico/Main.cs:318
 msgid ""
 "  StartCalico --repl FILENAMEs              Run FILENAMEs standalone with "
 "graphics and then start read-eval loop"
 msgstr ""
-"  StartCalico  --repl                         文件名运行独立与图形的文件名，然后开始读-EVAL循环的"
+"  StartCalico  --repl                         文件名运行独立与图形的文件名，"
+"然后开始读-EVAL循环的"
 
-#: ../Source/Calico/Main.cs:326
+#: ../Source/Calico/Main.cs:326 ../Source/Calico/Main.cs:319
 msgid ""
 "  StartCalico --exec --nographics FILENAMEs Run FILENAMEs standalone without "
 "graphics"
-msgstr "  StartCalico  --exec --nographics 的文  件名，不带显卡独立运行的文件名"
+msgstr ""
+"  StartCalico  --exec --nographics 的文  件名，不带显卡独立运行的文件名"
 
-#: ../Source/Calico/Main.cs:327
+#: ../Source/Calico/Main.cs:327 ../Source/Calico/Main.cs:320
 msgid ""
 "  StartCalico --repl --nographics FILENAMEs Run FILENAMEs standalone without "
 "graphics and then start read-eval loop"
 msgstr ""
-"  StartCalico  --repl --nographics 的文件名，   不带显卡独立运行的文件名，然后开"
-"始读-EVAL循环"
+"  StartCalico  --repl --nographics 的文件名，   不带显卡独立运行的文件名，然"
+"后开始读-EVAL循环"
 
-#: ../Source/Calico/Main.cs:328
+#: ../Source/Calico/Main.cs:328 ../Source/Calico/Main.cs:321
 #, csharp-format
 msgid ""
 "  StartCalico --version                     Displays the version number ({0})"
 msgstr "  StartCalico  --version             显示的版本号（{0}）"
 
-#: ../Source/Calico/Main.cs:329
+#: ../Source/Calico/Main.cs:329 ../Source/Calico/Main.cs:324
 msgid ""
 "  StartCalico --reset                       Resets config settings to "
 "factory defaults"
 msgstr "  StartCalico  --reset              重置配置设置为出厂默认值"
 
-#: ../Source/Calico/Main.cs:330
+#: ../Source/Calico/Main.cs:330 ../Source/Calico/Main.cs:325
 msgid "  StartCalico --help                        Displays this message"
 msgstr "  StartCalico  --help                     显示此消息"
 
 #: ../Source/Calico/MainWindow.cs:307 ../Source/Calico/MainWindow.cs:315
+#: ../Source/Calico/MainWindow.cs:272
 #, csharp-format
 msgid "The Calico Project, Version {0}"
 msgstr "印花布项目，版本{0}"
 
 #: ../Source/Calico/MainWindow.cs:331 ../Source/Calico/MainWindow.cs:339
+#: ../Source/Calico/MainWindow.cs:301
 msgid ""
 "Chat commands:\n"
 "    MESSAGE\n"
@@ -130,38 +136,46 @@ msgstr ""
 "    /帮助\n"
 
 #: ../Source/Calico/MainWindow.cs:340 ../Source/Calico/MainWindow.cs:349
+#: ../Source/Calico/MainWindow.cs:311
 msgid "[Start of previous history]"
 msgstr "[以前的历史的开始]"
 
 #: ../Source/Calico/MainWindow.cs:344 ../Source/Calico/MainWindow.cs:353
+#: ../Source/Calico/MainWindow.cs:315
 msgid "[Start of current history]"
 msgstr "从目前的历史]"
 
 #: ../Source/Calico/MainWindow.cs:442 ../Source/Calico/MainWindow.cs:447
+#: ../Source/Calico/MainWindow.cs:419
 #, csharp-format
 msgid "Go to \"{0}\" line {1}"
 msgstr "“{0}”行{1}"
 
 #: ../Source/Calico/MainWindow.cs:480 ../Source/Calico/MainWindow.cs:485
+#: ../Source/Calico/MainWindow.cs:457
 #, csharp-format
 msgid "Switch to {0}"
 msgstr "切换到{0}"
 
 #: ../Source/Calico/MainWindow.cs:899 ../Source/Calico/MainWindow.cs:914
+#: ../Source/Calico/MainWindow.cs:877
 #, csharp-format
 msgid "Exception: {0}"
 msgstr "异常：{0}"
 
 #: ../Source/Calico/MainWindow.cs:914 ../Source/Calico/MainWindow.cs:929
+#: ../Source/Calico/MainWindow.cs:895
 msgid "Variable"
 msgstr "变量"
 
 #: ../Source/Calico/MainWindow.cs:915 ../Source/Calico/MainWindow.cs:922
 #: ../Source/Calico/MainWindow.cs:930 ../Source/Calico/MainWindow.cs:937
+#: ../Source/Calico/MainWindow.cs:896 ../Source/Calico/MainWindow.cs:903
 msgid "Value"
 msgstr "值"
 
 #: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1275
+#: ../Source/Calico/MainWindow.cs:1286
 msgid "Save this file?"
 msgstr "保存该文件？"
 
@@ -169,12 +183,17 @@ msgstr "保存该文件？"
 #: ../Source/Calico/gtk-gui/gui.stetic:63
 #: ../Source/Calico/gtk-gui/gui.stetic:64 ../Source/Calico/MainWindow.cs:1278
 #: ../Source/Calico/Document.cs:190 ../Source/Calico/MainWindow.cs:1237
+#: ../Source/Calico/MainWindow.cs:1235 ../Source/Calico/MainWindow.cs:1289
+#: ../Source/Calico/Document.cs:192 ../Source/Calico/Document.cs:195
+#: ../Source/Calico/Document.cs:196
 msgid "Save"
 msgstr "保存"
 
 #: ../Source/Calico/MainWindow.cs:1261 ../Source/Calico/MainWindow.cs:1282
 #: ../Source/Calico/MainWindow.cs:1232 ../Source/Calico/MainWindow.cs:1233
-#: ../Source/Calico/MainWindow.cs:1254
+#: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1226
+#: ../Source/Calico/MainWindow.cs:1227 ../Source/Calico/MainWindow.cs:1266
+#: ../Source/Calico/MainWindow.cs:1293
 msgid "Abandon changes"
 msgstr "放弃更改"
 
@@ -183,23 +202,32 @@ msgstr "放弃更改"
 #: ../Source/Calico/MainWindow.cs:1391 ../Source/Calico/Document.cs:189
 #: ../Source/Calico/MainWindow.cs:1150 ../Source/Calico/MainWindow.cs:1230
 #: ../Source/Calico/MainWindow.cs:1231 ../Source/Calico/MainWindow.cs:1252
+#: ../Source/Calico/MainWindow.cs:1143 ../Source/Calico/MainWindow.cs:1224
+#: ../Source/Calico/MainWindow.cs:1225 ../Source/Calico/MainWindow.cs:1264
+#: ../Source/Calico/MainWindow.cs:1297 ../Source/Calico/MainWindow.cs:1402
+#: ../Source/Calico/Document.cs:191 ../Source/Calico/Document.cs:194
+#: ../Source/Calico/Document.cs:195
 msgid "Cancel"
 msgstr "取消"
 
 #: ../Source/Calico/MainWindow.cs:1328 ../Source/Calico/MainWindow.cs:1350
+#: ../Source/Calico/MainWindow.cs:1361
 msgid "Select item type"
 msgstr "选择项目类型"
 
 #: ../Source/Calico/MainWindow.cs:1330 ../Source/Calico/MainWindow.cs:1352
+#: ../Source/Calico/MainWindow.cs:1363
 msgid "Create a new item"
 msgstr "创建一个新项目"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/MainWindow.cs:1391
+#: ../Source/Calico/MainWindow.cs:1402
 msgid "Select the file to open"
 msgstr "选择要打开的文件"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/gtk-gui/gui.stetic:56
 #: ../Source/Calico/gtk-gui/gui.stetic:57 ../Source/Calico/MainWindow.cs:1391
+#: ../Source/Calico/MainWindow.cs:1402
 msgid "Open"
 msgstr "打开"
 
@@ -221,15 +249,18 @@ msgid "Calico Project"
 msgstr "印花布项目"
 
 #: ../Source/Calico/MainWindow.cs:1987 ../Source/Calico/MainWindow.cs:2097
+#: ../Source/Calico/MainWindow.cs:2114
 msgid "Stopping...\n"
 msgstr "停止...\n"
 
 #: ../Source/Calico/MainWindow.cs:2010 ../Source/Calico/MainWindow.cs:2122
+#: ../Source/Calico/MainWindow.cs:2139
 #, csharp-format
 msgid "Running '{0}'..."
 msgstr "运行“{0}”..."
 
 #: ../Source/Calico/MainWindow.cs:2166 ../Source/Calico/MainWindow.cs:2284
+#: ../Source/Calico/MainWindow.cs:2335 ../Source/Calico/MainWindow.cs:2410
 #, csharp-format
 msgid "{0} - Calico - {1}"
 msgstr "{0}  - 印花布 -  {1}"
@@ -238,50 +269,62 @@ msgstr "{0}  - 印花布 -  {1}"
 #: ../Source/Calico/gtk-gui/gui.stetic:1579
 #: ../Source/Calico/MainWindow.cs:2290
 #: ../Source/Calico/gtk-gui/gui.stetic:1585
+#: ../Source/Calico/MainWindow.cs:2341 ../Source/Calico/MainWindow.cs:2416
+#: ../Source/Calico/gtk-gui/gui.stetic:1575
 msgid "Properties"
 msgstr "属性"
 
 #: ../Source/Calico/MainWindow.cs:2321 ../Source/Calico/MainWindow.cs:2457
+#: ../Source/Calico/MainWindow.cs:2508
 #, csharp-format
 msgid "Error: '{0}' is not an active language"
 msgstr "错误：“{0}”不是一个积极的语言"
 
 #: ../Source/Calico/MainWindow.cs:2350 ../Source/Calico/MainWindow.cs:2486
+#: ../Source/Calico/MainWindow.cs:2544
 msgid "[Run file]"
 msgstr "[运行文件]"
 
 #: ../Source/Calico/MainWindow.cs:3080 ../Source/Calico/MainWindow.cs:3218
+#: ../Source/Calico/MainWindow.cs:3289
 msgid "   waiting for confirmation...\n"
 msgstr "   等待确认...\n"
 
 #: ../Source/Calico/MainWindow.cs:3083 ../Source/Calico/MainWindow.cs:3221
+#: ../Source/Calico/MainWindow.cs:3292
 msgid "Received messages:\n"
 msgstr "收到的消息：\n"
 
 #: ../Source/Calico/MainWindow.cs:3152 ../Source/Calico/MainWindow.cs:3294
+#: ../Source/Calico/MainWindow.cs:3365
 msgid "Accept this script?"
 msgstr "接受这个脚本？"
 
 #: ../Source/Calico/MainWindow.cs:3155 ../Source/Calico/MainWindow.cs:3297
-#: ../Source/Calico/MainWindow.cs:3316
+#: ../Source/Calico/MainWindow.cs:3316 ../Source/Calico/MainWindow.cs:3368
+#: ../Source/Calico/MainWindow.cs:3387
 msgid "Accept"
 msgstr "接受"
 
 #: ../Source/Calico/MainWindow.cs:3159 ../Source/Calico/MainWindow.cs:3301
+#: ../Source/Calico/MainWindow.cs:3372
 msgid "Decline"
 msgstr "拒绝"
 
 #: ../Source/Calico/MainWindow.cs:3173 ../Source/Calico/MainWindow.cs:3316
+#: ../Source/Calico/MainWindow.cs:3387
 #, csharp-format
 msgid "Blast: Accept '{0}' from '{1}'?"
 msgstr "冲击：接受“{0}”从“{1}”？"
 
 #: ../Source/Calico/MainWindow.cs:3184 ../Source/Calico/MainWindow.cs:3328
+#: ../Source/Calico/MainWindow.cs:3399
 #, csharp-format
 msgid "Blast '{0}' from '{1}' declined."
 msgstr "高炉“{0}”从“{1}”有所下降。"
 
 #: ../Source/Calico/MainWindow.cs:3230 ../Source/Calico/MainWindow.cs:3375
+#: ../Source/Calico/MainWindow.cs:3446
 msgid "No addons are currently available"
 msgstr "目前无插件"
 
@@ -290,14 +333,20 @@ msgid "Calico Tools"
 msgstr "印花布工具"
 
 #: ../Source/Calico/Document.cs:179 ../Source/Calico/Document.cs:186
+#: ../Source/Calico/Document.cs:188 ../Source/Calico/Document.cs:191
+#: ../Source/Calico/Document.cs:192
 msgid "Enter the file to save"
 msgstr "输入要保存的文件"
 
 #: ../Source/Calico/Document.cs:325 ../Source/Calico/Document.cs:332
+#: ../Source/Calico/Document.cs:334 ../Source/Calico/Document.cs:337
+#: ../Source/Calico/Document.cs:338
 msgid "for Calico"
 msgstr "为印花布"
 
 #: ../Source/Calico/Document.cs:326 ../Source/Calico/Document.cs:333
+#: ../Source/Calico/Document.cs:335 ../Source/Calico/Document.cs:338
+#: ../Source/Calico/Document.cs:339
 msgid "(c) 2012, Institute for Personal Robots in Education"
 msgstr "（三）2012年，个人机器人研究所教育"
 
@@ -424,6 +473,7 @@ msgstr "_关于我们"
 #: ../Source/Calico/gtk-gui/gui.stetic:177
 #: ../Source/Calico/gtk-gui/gui.stetic:234
 #: ../Source/Calico/gtk-gui/gui.stetic:1428
+#: ../Source/Calico/gtk-gui/gui.stetic:1418
 msgid "Shell"
 msgstr "外壳"
 
@@ -611,11 +661,12 @@ msgstr "帮助..."
 #: ../Source/Calico/gtk-gui/gui.stetic:344
 #: ../Source/Calico/gtk-gui/gui.stetic:345
 #: ../Source/Calico/gtk-gui/gui.stetic:1257
+#: ../Source/Calico/gtk-gui/gui.stetic:1247
 msgid "What's new..."
 msgstr "有什么新..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:353
-#: ../Source/Calico/gtk-gui/gui.stetic:350
+#: ../Source/Calico/gtk-gui/gui.stetic:350 ../Source/Calico/Document.cs:74
 msgid "Script"
 msgstr "脚本"
 
@@ -748,6 +799,7 @@ msgstr "打印脚本"
 #: ../Source/Calico/gtk-gui/gui.stetic:1177
 #: ../Source/Calico/gtk-gui/gui.stetic:586
 #: ../Source/Calico/gtk-gui/gui.stetic:1183
+#: ../Source/Calico/gtk-gui/gui.stetic:1175
 msgid "Create a new script"
 msgstr "创建一个新的脚本"
 
@@ -755,6 +807,7 @@ msgstr "创建一个新的脚本"
 #: ../Source/Calico/gtk-gui/gui.stetic:1195
 #: ../Source/Calico/gtk-gui/gui.stetic:605
 #: ../Source/Calico/gtk-gui/gui.stetic:1201
+#: ../Source/Calico/gtk-gui/gui.stetic:1193
 msgid "Open an existing script"
 msgstr "打开一个现有的脚本"
 
@@ -856,6 +909,7 @@ msgstr "关闭搜索"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1091
 #: ../Source/Calico/gtk-gui/gui.stetic:1097
+#: ../Source/Calico/gtk-gui/gui.stetic:1094
 #, fuzzy
 msgid "The Calico Project"
 msgstr "印花布项目"
@@ -872,151 +926,181 @@ msgstr "转到帮助概览网页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1181
 #: ../Source/Calico/gtk-gui/gui.stetic:1187
+#: ../Source/Calico/gtk-gui/gui.stetic:1179
 msgid "New..."
 msgstr "新..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1199
 #: ../Source/Calico/gtk-gui/gui.stetic:1205
+#: ../Source/Calico/gtk-gui/gui.stetic:1197
 msgid "Open..."
 msgstr "打开..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1229
 #: ../Source/Calico/gtk-gui/gui.stetic:1235
+#: ../Source/Calico/gtk-gui/gui.stetic:1225
 msgid "Open a recently used script"
 msgstr "打开最近使用过的脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1233
 #: ../Source/Calico/gtk-gui/gui.stetic:1239
+#: ../Source/Calico/gtk-gui/gui.stetic:1229
 msgid "Recently used..."
 msgstr "最近使用的..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1247
 #: ../Source/Calico/gtk-gui/gui.stetic:1253
+#: ../Source/Calico/gtk-gui/gui.stetic:1243
 msgid "Go to What's new webpage"
 msgstr "什么新的网页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1293
 #: ../Source/Calico/gtk-gui/gui.stetic:1299
+#: ../Source/Calico/gtk-gui/gui.stetic:1289
 msgid "Home tab"
 msgstr "“主页”选项卡"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1294
 #: ../Source/Calico/gtk-gui/gui.stetic:1300
+#: ../Source/Calico/gtk-gui/gui.stetic:1290
 msgid "Home"
 msgstr "家"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1317
 #: ../Source/Calico/gtk-gui/gui.stetic:1323
+#: ../Source/Calico/gtk-gui/gui.stetic:1313
 msgid "python>"
 msgstr "蟒蛇>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1334
 #: ../Source/Calico/gtk-gui/gui.stetic:1340
+#: ../Source/Calico/gtk-gui/gui.stetic:1330
 msgid "Previous interactive code"
 msgstr "上一页交互代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1353
 #: ../Source/Calico/gtk-gui/gui.stetic:1359
+#: ../Source/Calico/gtk-gui/gui.stetic:1349
 msgid "Next interactive code"
 msgstr "下一个交互式代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1421
 #: ../Source/Calico/gtk-gui/gui.stetic:1427
+#: ../Source/Calico/gtk-gui/gui.stetic:1417
 msgid "Enter code interactively"
 msgstr "以交互方式输入验证码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1464
 #: ../Source/Calico/gtk-gui/gui.stetic:1470
+#: ../Source/Calico/gtk-gui/gui.stetic:1460
 msgid "Results of running code"
 msgstr "代码的运行结果"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1465
 #: ../Source/Calico/gtk-gui/gui.stetic:1471
 #: ../languages/Jigsaw/Jigsaw/MainWindow.cs:351
+#: ../Source/Calico/gtk-gui/gui.stetic:1461
 msgid "Output"
 msgstr "产量"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1490
 #: ../Source/Calico/gtk-gui/gui.stetic:1496
+#: ../Source/Calico/gtk-gui/gui.stetic:1486
 msgid "Variables and their values"
 msgstr "变量和它们的值"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1491
 #: ../Source/Calico/gtk-gui/gui.stetic:1497
+#: ../Source/Calico/gtk-gui/gui.stetic:1487
 msgid "Environment"
 msgstr "环境"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1517
 #: ../Source/Calico/gtk-gui/gui.stetic:1523
+#: ../Source/Calico/gtk-gui/gui.stetic:1513
 msgid "Local variables"
 msgstr "局部变量"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1518
 #: ../Source/Calico/gtk-gui/gui.stetic:1524
+#: ../Source/Calico/gtk-gui/gui.stetic:1514
 msgid "Locals"
 msgstr "当地人"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1545
 #: ../Source/Calico/gtk-gui/gui.stetic:1551
+#: ../Source/Calico/gtk-gui/gui.stetic:1541
 msgid "Past interactive code"
 msgstr "过去的交互式代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1546
 #: ../Source/Calico/gtk-gui/gui.stetic:1552
+#: ../Source/Calico/gtk-gui/gui.stetic:1542
 msgid "History"
 msgstr "历史"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1628
 #: ../Source/Calico/gtk-gui/gui.stetic:1634
+#: ../Source/Calico/gtk-gui/gui.stetic:1637
 msgid "Chat"
 msgstr "聊"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1686
 #: ../Source/Calico/gtk-gui/gui.stetic:1692
+#: ../Source/Calico/gtk-gui/gui.stetic:1684
 msgid "Language:"
 msgstr "语言："
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1698
 #: ../Source/Calico/gtk-gui/gui.stetic:1704
+#: ../Source/Calico/gtk-gui/gui.stetic:1696
 #, fuzzy
 msgid "Python"
 msgstr "蟒蛇>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1721
 #: ../Source/Calico/gtk-gui/gui.stetic:1727
+#: ../Source/Calico/gtk-gui/gui.stetic:1719
 msgid "Status:"
 msgstr "状态："
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1733
 #: ../Source/Calico/gtk-gui/gui.stetic:1739
+#: ../Source/Calico/gtk-gui/gui.stetic:1731
 msgid "offline"
 msgstr "当前离线"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
+#: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
 msgid "Email"
 msgstr "电子邮件"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
 #: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3237
+#: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
+#: ../Source/Calico/MainWindow.cs:3303 ../Source/Calico/MainWindow.cs:3308
 msgid "Username"
 msgstr "用户名"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
 #: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3238
-#: ../Source/Calico/MainWindow.cs:3266
+#: ../Source/Calico/MainWindow.cs:3266 ../Source/Calico/MainWindow.cs:3268
+#: ../Source/Calico/MainWindow.cs:3272 ../Source/Calico/MainWindow.cs:3303
+#: ../Source/Calico/MainWindow.cs:3309 ../Source/Calico/MainWindow.cs:3337
 msgid "Password"
 msgstr "密码"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
+#: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
 msgid "Keyword"
 msgstr ""
 
-#: ../Source/Calico/MainWindow.cs:3197
+#: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3268
 #, fuzzy
 msgid "Register new user"
 msgstr "注册"
 
-#: ../Source/Calico/MainWindow.cs:3232
+#: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3303
 msgid "Login"
 msgstr "注册"
 
@@ -1066,6 +1150,35 @@ msgstr ""
 #: ../languages/Jigsaw/Jigsaw/ControlBlocks.cs:27
 msgid "when program starts"
 msgstr "当程序启动"
+
+#: ../Source/Calico/Main.cs:102
+#, fuzzy, csharp-format
+msgid "    Looking for languages in \"{0}\"..."
+msgstr "    在“{0}”的语言..."
+
+#: ../Source/Calico/Main.cs:182
+#, fuzzy, csharp-format
+msgid "    Looking for local languages in \"{0}\"..."
+msgstr "    寻找当地语言中的“{0}”..."
+
+#: ../Source/Calico/Main.cs:322
+#, fuzzy
+msgid ""
+"  StartCalico --verbose                     Displays detailed information, "
+"useful for debugging Calico"
+msgstr "  StartCalico  --version             显示的版本号（{0}）"
+
+#: ../Source/Calico/Main.cs:323
+#, fuzzy
+msgid ""
+"  StartCalico --debug                       Calico output goes to console "
+"rather than GUI"
+msgstr "  StartCalico默认为壳"
+
+#: ../Source/Calico/Document.cs:71
+#, csharp-format
+msgid "New {0} {1}"
+msgstr ""
 
 #~ msgid "Do you want to run the script?"
 #~ msgstr "你要运行的脚本吗？"
@@ -1319,9 +1432,6 @@ msgstr "当程序启动"
 
 #~ msgid "Recent files"
 #~ msgstr "最近的文件"
-
-#~ msgid "  StartCalico                            Defaults to shell"
-#~ msgstr "  StartCalico默认为壳"
 
 #~ msgid ""
 #~ "  StartCalico FILENAME:LINE ...          Edits FILENAMEs, positioned on "

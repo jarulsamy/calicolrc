@@ -68,7 +68,11 @@ namespace Calico {
                 else if (calico == null)
                     basename = System.IO.Path.GetFileName(filename);
                 else
-                   basename = String.Format("New {0} {1}", calico.manager.languages[language].proper_name, _documentType);
+				  basename = String.Format(MainWindow._("New {0} {1}"), 
+					  calico.manager.languages[language].proper_name, 
+					  MainWindow._(_documentType));
+				MainWindow._("Script"); // This is here to make sure
+										// "Script" is translated
                 tab_label.Text = basename; //.Replace("_", "__");
             }
             get { return _documentType; }
