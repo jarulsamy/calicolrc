@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -206,7 +206,7 @@
       </action>
       <action id="zoomInAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;plus</property>
+        <property name="Accelerator">&lt;Control&gt;plus</property>
         <property name="Label" translatable="yes">Zoom _In</property>
         <property name="ShortLabel" translatable="yes">Zoom _In</property>
         <property name="StockId">gtk-zoom-in</property>
@@ -214,7 +214,7 @@
       </action>
       <action id="zoomOutAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;minus</property>
+        <property name="Accelerator">&lt;Control&gt;minus</property>
         <property name="Label" translatable="yes">Zoom _Out</property>
         <property name="ShortLabel" translatable="yes">Zoom _Out</property>
         <property name="StockId">gtk-zoom-out</property>
@@ -363,7 +363,7 @@
       </action>
       <action id="ToggleBreakpointAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;period</property>
+        <property name="Accelerator">&lt;Control&gt;period</property>
         <property name="Label" translatable="yes">Toggle Breakpoint</property>
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />
@@ -450,7 +450,7 @@
       </action>
       <action id="FindNextAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;g</property>
+        <property name="Accelerator">&lt;Control&gt;&lt;Mod2&gt;g</property>
         <property name="Label" translatable="yes">Find Next</property>
         <property name="ShortLabel" translatable="yes">Find Next</property>
         <signal name="Activated" handler="OnFindNextActionActivated" />
