@@ -436,11 +436,18 @@ public static class Myro
 	[method: JigsawTab(null)]
 	public static void Invoke (InvokeDelegate invoke)
 	{
-		if (needInvoke ())
-			Gtk.Application.Invoke (delegate {
-				invoke ();});
-		else
-			invoke ();
+	  System.Console.WriteLine("Invoke");
+	  if (needInvoke ()) {
+		System.Console.WriteLine("needs Invoke");
+		Gtk.Application.Invoke (delegate {
+			  System.Console.WriteLine("Invoking...");
+			  invoke ();});
+			  System.Console.WriteLine("Done Invoking!");
+	  } else {
+		System.Console.WriteLine("No Invoking needed...");
+		invoke ();
+		System.Console.WriteLine("No Invoking needed... done!");
+	  }
 	}
 
 	[method: JigsawTab(null)]
