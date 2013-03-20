@@ -325,6 +325,9 @@ namespace Calico {
             //StartButton.DragDataGet += new Gtk.DragDataGetHandler (HandleSourceDragDataGet);
             // All done, show if minimized:
             // main & shell window
+	    MainNotebook.GroupId = 0;
+	    ToolNotebook.GroupId = 0;
+	    EditorNotebook.GroupId = 0;
             for (int i = 0; i < MainNotebook.NPages; i++) {
                 MainNotebook.SetTabReorderable(MainNotebook.GetNthPage(i), true);
                 MainNotebook.SetTabDetachable(MainNotebook.GetNthPage(i), true);  
