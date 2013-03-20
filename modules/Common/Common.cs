@@ -129,14 +129,7 @@ namespace Common
 		}
 
 		public static bool needInvoke() {
-			//Console.WriteLine("gui_thread_id: {0}", Myro.gui_thread_id);
-			if (Dialogs.gui_thread_id == -1) {
-				return false; // in another thread
-			} else if (Dialogs.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
-				return false; // you are already in the GUI thread
-			} else {
-				return true; // need to invoke!
-			}
+		  return (Thread.CurrentThread.ManagedThreadId != 1);
 		}
 		
 	  	public class MessageDialog : Gtk.MessageDialog {

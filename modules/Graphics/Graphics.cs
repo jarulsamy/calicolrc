@@ -78,13 +78,7 @@ public static class Graphics
 
 	public static bool needInvoke ()
 	{
-		if (Graphics.gui_thread_id == -1) {
-			return false; // direcly in GUI thread
-		} else if (Graphics.gui_thread_id == Thread.CurrentThread.ManagedThreadId) {
-			return false; // you are already in the GUI thread
-		} else {
-			return true; // need to invoke!
-		}
+	  return (Thread.CurrentThread.ManagedThreadId != 1);
 	}
 
 	public static void set_gui_thread_id (int gui_thread_id)

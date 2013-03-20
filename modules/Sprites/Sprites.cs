@@ -183,12 +183,8 @@ public static class Sprites
 
     [JigsawTab(null)]
     public static bool needInvoke () {
-	if (Thread.CurrentThread.ManagedThreadId == 1) {
-	    return false; // you are in the GUI thread
-	} else {
-	    return true; // need to invoke!
+	  return (Thread.CurrentThread.ManagedThreadId != 1);
 	}
-    }
 
     public class Window : Graphics.WindowClass {
 	public Gtk.Notebook notebook1;
