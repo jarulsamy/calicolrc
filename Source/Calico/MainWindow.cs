@@ -400,7 +400,10 @@ namespace Calico {
                 // Groups[0] is entire string
                 try {
                     filename = match.Groups [1].Captures [0].Value;
-                    lineno = Convert.ToInt32(match.Groups [2].Captures [0].Value);
+		    if (filename == "<string>" || filename == "") {
+			return;
+		    } 
+		    lineno = Convert.ToInt32(match.Groups [2].Captures [0].Value);
                 } catch {
                     return;
                 }
@@ -1109,7 +1112,7 @@ namespace Calico {
             }
             if (filename != null) {
                 string dir = System.IO.Path.GetDirectoryName(filename);
-                if (dir != "") {
+                if (dir != "" && dir != null) {
                     System.IO.Directory.SetCurrentDirectory(dir);
                 }
             }
@@ -2139,7 +2142,7 @@ namespace Calico {
                     ResetShell();
                 }
                 string dir = System.IO.Path.GetDirectoryName(filename);
-                if (dir != "") {
+                if (dir != "" && dir != null) {
                     System.IO.Directory.SetCurrentDirectory(dir);
                 }
                 manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
