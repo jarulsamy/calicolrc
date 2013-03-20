@@ -2572,20 +2572,23 @@ public static class Graphics
     
 		public Line penUp (bool getLine)
 		{
+		  if (pen.down) {
 		    if (getLine) {
-			pen._down = false;
-			Line line = pen.resetPath ();
-			line.color = pen.color;
-			return line;
+			  pen._down = false;
+			  Line line = pen.resetPath ();
+			  line.color = pen.color;
+			  return line;
 		    } else {
-			if (window != null) {
+			  if (window != null) {
 			    pen._down = false;
 			    Line line = pen.resetPath ();
 			    line.color = pen.color;
 			    line.draw(window);
-			}
-			return null;
+			  }
+			  return null;
 		    }
+		  }
+		  return null;
 		}
     
 		public void penDown ()
