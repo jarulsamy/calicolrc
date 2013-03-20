@@ -429,7 +429,7 @@ public static class Myro
 	public static void set_gui_thread_id (int gui_thread_id)
 	{
 		Myro.gui_thread_id = gui_thread_id;
-		System.Console.WriteLine("gui_thread_id = ", gui_thread_id);
+		System.Console.WriteLine("gui_thread_id = {0}", gui_thread_id);
 	}
 
 	public delegate void InvokeDelegate ();
