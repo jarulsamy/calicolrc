@@ -1064,10 +1064,10 @@ namespace Calico {
                         Gtk.Notebook nb = searchForNotebook(d.Key);
                         int i = findTabByWidget(d.Key);
                         nb.CurrentPage = i;
-                        return false;
+			add_it = false;
+			page = d.Value;
                     }
                 }
-           
                 if (page == null) {
                     if (language == null) {
                         language = manager.GetLanguageFromExtension(filename);

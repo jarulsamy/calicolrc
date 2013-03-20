@@ -464,6 +464,7 @@ namespace Calico {
         }
 
         public override bool GotoLine(int lineno) {
+	    texteditor.GrabFocus();
             var data = texteditor.GetTextEditorData();
             data.Caret.Line = lineno;
             data.Caret.Column = 1;
