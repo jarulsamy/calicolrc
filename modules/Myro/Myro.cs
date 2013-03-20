@@ -2189,61 +2189,61 @@ public static class Myro
 	    object askResponse = null;
 	    Gtk.Entry myentry = null;
 	    PythonDictionary responses = new PythonDictionary ();
-	    Gtk.MessageDialog fc = new MessageDialog (null,
-                               0, Gtk.MessageType.Question,
-                               Gtk.ButtonsType.OkCancel,
-                               title);
-	    if (question is List) {
-		foreach (string choice in (List)question) {
-		    Gtk.HBox hbox = new Gtk.HBox ();
-		    Gtk.Label label = new Gtk.Label (choice.Replace("_", "__") + ":");
-		    Gtk.Entry entry = new Gtk.Entry ();
-		    responses [choice] = entry;
-		    hbox.PackStart (label);
-		    hbox.PackStart (entry);
-		    fc.VBox.PackStart (hbox);
-		}
-	    } else 	if (question is IDictionary) {
-		foreach (Object choice in ((IDictionary)question).Keys) {
-		    Gtk.HBox hbox = new Gtk.HBox ();
-		    Gtk.Label label = new Gtk.Label (choice.ToString().Replace("_", "__") + ":");
-		    Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
-		    responses [choice.ToString()] = entry;
-		    hbox.PackStart (label);
-		    hbox.PackStart (entry);
-		    fc.VBox.PackStart (hbox);
-		}
-		
-	    } else {
-		string choice = (string)question;
-		Gtk.HBox hbox = new Gtk.HBox ();
-		Gtk.Label label = new Gtk.Label (choice + ":");
-		Gtk.Entry entry = new Gtk.Entry ();
-		myentry = entry;
-		hbox.PackStart (label);
-		hbox.PackStart (entry);
-		fc.VBox.PackStart (hbox);
-	    }
 	    Invoke (delegate {
-		    fc.ShowAll();
-		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
-			if (question is List) {
-			    foreach (string choice in responses.Keys) {
-				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-			    }
-			    askResponse = responses;
-			} else if (question is IDictionary) {
-			    foreach (string choice in responses.Keys) {
-				responses [choice] = ((Gtk.Entry)responses [choice]).Text;
-			    }
-			    askResponse = responses;
-			} else {
-			    askResponse = myentry.Text;
-			}
-		    }
-		    fc.Destroy();
-		    ev.Set();
-		}); 
+			  Gtk.MessageDialog fc = new MessageDialog (null,
+				  0, Gtk.MessageType.Question,
+				  Gtk.ButtonsType.OkCancel,
+				  title);
+			  if (question is List) {
+				foreach (string choice in (List)question) {
+				  Gtk.HBox hbox = new Gtk.HBox ();
+				  Gtk.Label label = new Gtk.Label (choice.Replace("_", "__") + ":");
+				  Gtk.Entry entry = new Gtk.Entry ();
+				  responses [choice] = entry;
+				  hbox.PackStart (label);
+				  hbox.PackStart (entry);
+				  fc.VBox.PackStart (hbox);
+				}
+			  } else 	if (question is IDictionary) {
+				foreach (Object choice in ((IDictionary)question).Keys) {
+				  Gtk.HBox hbox = new Gtk.HBox ();
+				  Gtk.Label label = new Gtk.Label (choice.ToString().Replace("_", "__") + ":");
+				  Gtk.Entry entry = new Gtk.Entry (((IDictionary)question)[choice].ToString());
+				  responses [choice.ToString()] = entry;
+				  hbox.PackStart (label);
+				  hbox.PackStart (entry);
+				  fc.VBox.PackStart (hbox);
+				}
+				
+			  } else {
+				string choice = (string)question;
+				Gtk.HBox hbox = new Gtk.HBox ();
+				Gtk.Label label = new Gtk.Label (choice + ":");
+				Gtk.Entry entry = new Gtk.Entry ();
+				myentry = entry;
+				hbox.PackStart (label);
+				hbox.PackStart (entry);
+				fc.VBox.PackStart (hbox);
+			  }
+			  fc.ShowAll();
+			  if (fc.Run() == (int)Gtk.ResponseType.Ok) {
+				if (question is List) {
+				  foreach (string choice in responses.Keys) {
+					responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+				  }
+				  askResponse = responses;
+				} else if (question is IDictionary) {
+				  foreach (string choice in responses.Keys) {
+					responses [choice] = ((Gtk.Entry)responses [choice]).Text;
+				  }
+				  askResponse = responses;
+				} else {
+				  askResponse = myentry.Text;
+				}
+			  }
+			  fc.Destroy();
+			  ev.Set();
+			}); 
 	    ev.WaitOne ();
 	    return askResponse;
 	}
