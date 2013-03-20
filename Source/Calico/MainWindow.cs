@@ -267,6 +267,7 @@ namespace Calico {
             // option
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
+	    ShellEditor.Document.DocumentUpdated += updateControls;
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
@@ -959,6 +960,7 @@ namespace Calico {
 
         public void SetLanguage(string language) {
             CurrentLanguage = language;
+            ShellLanguage = language;
             if (CurrentLanguage != null) {
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
                 manager [language].SetOptionsMenu(options_menu);
@@ -995,8 +997,8 @@ namespace Calico {
                 if (manager.languages.ContainsKey(language.name) && manager.languages [language.name].IsTextLanguage) {
                     ShellLanguage = language.name;
                 }
-                //switchToShell();
-                //Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
+                switchToShell();
+                Title = String.Format("{0} - Calico Shell - {1}", CurrentProperLanguage, System.Environment.UserName);
             }
         }
 
@@ -2309,14 +2311,15 @@ namespace Calico {
             } else if (CurrentDocument != null) {
                 // Set save as python menu:
                 saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
-                ProgramSpeed.Sensitive = true;
                 ProgramSpeed.Value = CurrentDocument.SpeedValue;
                 // Set options menu:
                 if (! ProgramRunning) {
                     if (CurrentDocument.HasContent) {
+			ProgramSpeed.Sensitive = true;
                         StartButton.Sensitive = true;
                         StartAction.Sensitive = true;
                     } else {
+			ProgramSpeed.Sensitive = false;
                         StartButton.Sensitive = false;
                         StartAction.Sensitive = false;
                     }
@@ -2351,7 +2354,29 @@ namespace Calico {
             }
         }
 
+        public void updateControls(object obj, System.EventArgs args) {
+	    // When Shell is selected by clicking in it, or changes
+            Invoke( delegate {
+		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+                    ProgramSpeed.Sensitive = false;
+                    saveaspython_menu.Sensitive = false;
+                    if (! ProgramRunning) {
+                        if (ShellEditor.Document.Text != "") {
+                            StartAction.Sensitive = true;
+                            StartButton.Sensitive = true;
+                        } else {
+                            StartAction.Sensitive = false;
+                            StartButton.Sensitive = false;
+                        }
+                    }
+                    SetLanguage(ShellLanguage);
+                    // Workaround: had to add this for notebook page selection:
+                    Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
+		});
+	}
+
         public void updateControls(Document document) { 
+	    // When a document is selected by clicking in it, or changes
             Invoke( delegate {
                 Gtk.Notebook nb = this.PropertyNotebook;
                 while (nb.NPages > 0) {
@@ -2361,14 +2386,15 @@ namespace Calico {
                 Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
                 // Set save as python menu:
                 saveaspython_menu.Sensitive = document.CanSaveAsPython();
-                ProgramSpeed.Sensitive = true;
                 ProgramSpeed.Value = document.SpeedValue;
                 // Set options menu:
                 if (! ProgramRunning) {
                     if (document.HasContent) {
+			ProgramSpeed.Sensitive = true;
                         StartButton.Sensitive = true;
                         StartAction.Sensitive = true;
                     } else {
+			ProgramSpeed.Sensitive = false;
                         StartButton.Sensitive = false;
                         StartAction.Sensitive = false;
                     }
