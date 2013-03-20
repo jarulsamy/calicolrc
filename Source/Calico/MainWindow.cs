@@ -1783,23 +1783,26 @@ namespace Calico {
             # "[result]\nDATA..."
             # "[update]\nroom: ROOM"
         */
-
-            if (text.StartsWith("@")) {
-                string [] parts = text.Split(new char[] {' '}, 2); // 2 parts
-                connection.Send(parts [0].Substring(1), parts [1]);
-                ChatPrint(Tag.Info, 
-              String.Format("{0} to {1}: {2}\n", 
-                    connection.user, 
-                    parts [0].Substring(1), 
-                    parts [1])
-                ); // @userid: MESSAGE
-            } else if (text.StartsWith("/list")) {
-                connection.Send("admin", "[list]");
-            } else if (text.StartsWith("/help")) {
-                connection.Send("admin", "[help]");
-            } else {
-                connection.Send("admin", "[broadcast]\nconference: General\n" + text);
-            }
+	    if (connection != null) {
+		if (text.StartsWith("@")) {
+		    string [] parts = text.Split(new char[] {' '}, 2); // 2 parts
+		    connection.Send(parts [0].Substring(1), parts [1]);
+		    ChatPrint(Tag.Info, 
+			      String.Format("{0} to {1}: {2}\n", 
+					    connection.user, 
+					    parts [0].Substring(1), 
+					    parts [1])
+			      ); // @userid: MESSAGE
+		} else if (text.StartsWith("/list")) {
+		    connection.Send("admin", "[list]");
+		} else if (text.StartsWith("/help")) {
+		    connection.Send("admin", "[help]");
+		} else {
+		    connection.Send("admin", "[broadcast]\nconference: General\n" + text);
+		}
+	    } else {
+		ErrorLine("You need to login before using chat.");
+	    }
         }
 
         public void handleShellKey(object o, Gtk.KeyPressEventArgs args) {
