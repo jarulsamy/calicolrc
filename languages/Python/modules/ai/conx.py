@@ -1766,8 +1766,6 @@ class Network(object):
         retargs = self.preStep(**args)
         if retargs: args = retargs # replace the args
         # Propagate activation through network:
-        retargs = self.prePropagate(**args)
-        if retargs: args = retargs # replace the args
         self.propagate(**args)
         retargs = self.postPropagate(**args)
         if retargs: args = retargs # replace the args
@@ -1804,7 +1802,7 @@ class Network(object):
     # Hooks for adding bits without having to breakup step(), train(), and sweep()
     def preBackprop(self, **args):   return None
     def postBackprop(self, **args):  return None
-    def prePropagate(self, **args):  return None
+    def prePropagate(self, **args):  pass
     def postPropagate(self, **args): return None
     def preStep(self, **args):       return None
     def postStep(self, **args):      return None
@@ -1975,6 +1973,7 @@ class Network(object):
         {"output": [0.345]}
         
         """
+        self.prePropagate(**args)
         for key in args:
             layer = self.getLayer(key)
             if layer.kind == 'Input':

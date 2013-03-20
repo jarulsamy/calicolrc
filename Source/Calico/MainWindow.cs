@@ -1092,6 +1092,8 @@ namespace Calico {
             }
             if (add_it) {
                 Gtk.Notebook notebook = selectNotebook(page.preferredNotebook);
+				if (!notebook.Visible) // if it isn't visible, put in "main"
+				  notebook = selectNotebook("main");
                 int page_num = notebook.AppendPage(page.widget, page.tab_widget);
                 documents [page.widget] = page;
                 page.widget.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
