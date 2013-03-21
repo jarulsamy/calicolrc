@@ -252,6 +252,7 @@ class Layer:
         self.log = 0
         self.logFile = ''
         self._logPtr = 0
+        self._namePtr = 0
         self.active = 1 # takes layer out of the processing
         self.frozen = 0 # freezes weights (dbiases), if layer still active
         self._maxRandom = maxRandom
@@ -411,13 +412,15 @@ class Layer:
         self.__dict__.update(dict)
         
     # log methods
-    def setLog(self, fileName):
+    def setLog(self, fileName, writeName=False):
         """
         Opens a log file with name fileName.
         """
         self.log = 1
         self.logFile = fileName
         self._logPtr = open(fileName, "w")
+        if writeName:
+            self._namePtr = open(fileName + ".name", "w")
     def logMsg(self, msg):
         """
         Logs a message.
@@ -428,13 +431,18 @@ class Layer:
         Closes the log file.
         """
         self._logPtr.close()
+        if self._namePtr:
+            self._namePtr.close()
         self.log = 0
-    def writeLog(self):
+    def writeLog(self, network):
         """
         Writes to the log file.
         """
         if self.log:
             writeArray(self._logPtr, self.activation)
+            if self._namePtr:
+                self._namePtr.write(network.getWord(self.activation))
+                self._namePtr.write("\n")
 
     # string and display methods
     def setDisplayWidth(self, val):
@@ -1958,7 +1966,7 @@ class Network(object):
                     layer.activation = self.activationFunction(layer.netinput)
         for layer in propagateLayers:
             if layer.log and layer.active:
-                layer.writeLog()
+                layer.writeLog(self)
     def propagate(self, **args):
         """
         Propagates activation through the network. Optionally, takes input layer names
@@ -2014,7 +2022,7 @@ class Network(object):
                     layer.activation = self.activationFunction(layer.netinput)
         for layer in self.layers:
             if layer.log and layer.active:
-                layer.writeLog()
+                layer.writeLog(self)
         self.count += 1 # counts number of times propagate() is called
         if len(args) != 0:
             dict = {}
@@ -2095,7 +2103,7 @@ class Network(object):
                     layer.activation = self.activationFunction(layer.netinput)
         for layer in self.layers:
             if layer.log and layer.active:
-                layer.writeLog()
+                layer.writeLog(self)
         self.count += 1 # counts number of times propagate() is called
         if len(args) != 0:
             dict = {}
@@ -4418,16 +4426,6 @@ class BackpropNetwork(Network):
             self[layerName].correct = float(pcorrect[layerName][2]) / pcorrect[layerName][3]
         sys.stdout.flush()
 
-    # overrides Network method - removes conx quit option
-    def prompt(self):
-        print("===================================")
-        input = raw_input('<enter> to continue, <q> to quit... ')
-        #input = raw_input('--More-- [<enter> or <g>o...] ')
-        #if input in ['G', 'g']:
-        if input in ['Q', 'q']:
-            self.interactive = 0
-            self.quitFromSweep = True
-
     # overrides Network method
     def display(self):
         """Displays the network to the screen."""
@@ -4451,7 +4449,26 @@ class BackpropNetwork(Network):
                                 self.actDisplay.showWrong()
                     print('Target    : %s%s' % (pretty(layer.target, max=15), tlabel))
                 print('Activation: %s%s' % (pretty(layer.activation, max=15), olabel))
-                print
+                if self.patterned and layer.type != 'Hidden':
+                    targetWord, diff = self.getWord( layer.target, returnDiff = 1)
+                    if layer.kind == 'Output':
+                        if targetWord == None:
+                            print("Target Pattern   = %s" % "No match")
+                        else:
+                            if diff == 0.0:
+                                print("Target Pattern   = '%s'" % targetWord)
+                            else:
+                                print("Target Pattern   = '%s'; difference = %f)" % (targetWord, diff))
+                    actWord, diff = self.getWord( layer.activation, returnDiff = 1 )
+                    if (layer.kind == 'Input' or layer.kind == 'Output'):
+                        if actWord == None:
+                            print("Matching Pattern = %s" % "No match")
+                        else:
+                            if diff == 0.0:
+                                print("Matching Pattern = '%s'" % actWord)
+                            else:
+                                print("Matching Pattern = '%s'; difference = %f" % (actWord, diff))
+                print("------------------------------------")
                 #print "-----------------------------------"
    
 # The following methods have been superseded by the NetworkActivationDisplay
