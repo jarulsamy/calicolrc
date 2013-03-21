@@ -1598,7 +1598,11 @@ class Network(object):
         activations have been set.
         """
         for layer in self.layers:
-            if layer.verify and layer.type == 'Input' and layer.active and not layer.activationSet:
+            if (layer.verify and
+                layer.type == 'Input' and
+                layer.kind != 'Context' and
+                layer.active and
+                not layer.activationSet):
                 raise LayerError, "Inputs are not set and verifyInputs() was called on layer '%s'." % layer.name
             else:
                 layer.resetActivationFlag()
