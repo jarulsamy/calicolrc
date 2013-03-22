@@ -1340,7 +1340,7 @@ namespace Calico {
             if (retval) {
                 Cleanup();
                 if (signal_thread != null) {
-                    signal_thread.Abort();
+                    signal_thread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
                 }
                 // Close up anything
                 foreach (System.Reflection.Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -2104,7 +2104,7 @@ namespace Calico {
         public void AbortThread() {
             if (executeThread != null) {
                 Print(Tag.Warning, _("Stopping...\n"));
-                executeThread.Abort();
+                executeThread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
                 executeThread.Join();
                 executeThread = null;
 

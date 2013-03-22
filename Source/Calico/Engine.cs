@@ -240,114 +240,129 @@ namespace Calico {
         }
 
         public override object Evaluate(string text) {
-            Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
-            Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-	    try {
+		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+		  try {
     	    if (compiler_options != null) {
-    	        source.Compile(compiler_options);
+			  source.Compile(compiler_options);
             } else {
     	      source.Compile();
             }
-	    } catch {
-                Console.Error.WriteLine("Unable to compile!");
-	      return null;
-	    }
-            object retval;
-            if (manager != null && manager.UseSharedScope)
-                retval = source.Execute(manager.scope);
-            else
-                retval = source.Execute(scope);
-            return retval;
+		  } catch {
+			Console.Error.WriteLine("Unable to compile!");
+			return null;
+		  }
+		  object retval = null;
+		  bool aborted = false;
+		  try {
+			if (manager != null && manager.UseSharedScope)
+			  retval = source.Execute(manager.scope);
+			else
+			  retval = source.Execute(scope);
+		  } catch (System.Threading.ThreadAbortException tae) {
+			System.Threading.Thread.ResetAbort();
+		  }
+		  if (aborted) {
+			System.Console.Error.WriteLine("Running script aborted!");
+		  }
+		  return retval;
         }
+
         public override bool Execute(string text) {
-            return Execute(text, true);
+		  return Execute(text, true);
         }
-
+		
         public override bool Execute(string text, bool ok) {
-            // This is called by RunInBackground() in the MainWindow
-            //manager.calico.last_error = ""
-            if (engine == null) {
-                PrintLine("Please restart Calico to use this language.");
-                return false;
-            }
-            Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
-            Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-            try {
-                if (compiler_options != null) {
-                    source.Compile(compiler_options);
-                } else {
-                    source.Compile();
-                }
-            } catch {
-                sctype = Microsoft.Scripting.SourceCodeKind.Statements;
-                source = engine.CreateScriptSourceFromString(text, sctype);
-                try {
-                    if (compiler_options != null) {
-                        source.Compile(compiler_options);
-                    } else {
-                        source.Compile();
-                    }
-                } catch (Exception e) {
-                    Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                    PrintLine(eo.FormatException(e));
-                    return false;
-                }
-            }
-            try {
-                if (manager != null && manager.UseSharedScope)
-                    source.Execute(manager.scope);
-                else
-                    source.Execute(scope);
-            } catch (Exception e) {
-              if (e.Message.Contains("Thread was being aborted")) {
-                manager.stderr.Print("[Script stopped----------]\n");
-              } else {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                PrintLine(eo.FormatException(e));
-              }
-              return false;
-            }
-            if (ok) {
-                if (manager.stderr != null)
-                    PrintLine(Tag.Info, "Ok");
-            }
-            return true;
+		  // This is called by RunInBackground() in the MainWindow
+		  //manager.calico.last_error = ""
+		  if (engine == null) {
+			PrintLine("Please restart Calico to use this language.");
+			return false;
+		  }
+		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+		  try {
+			if (compiler_options != null) {
+			  source.Compile(compiler_options);
+			} else {
+			  source.Compile();
+			}
+		  } catch {
+			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+			source = engine.CreateScriptSourceFromString(text, sctype);
+			try {
+			  if (compiler_options != null) {
+				source.Compile(compiler_options);
+			  } else {
+				source.Compile();
+			  }
+			} catch (Exception e) {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(eo.FormatException(e));
+			  return false;
+			}
+		  }
+		  try {
+			if (manager != null && manager.UseSharedScope)
+			  source.Execute(manager.scope);
+			else
+			  source.Execute(scope);
+		  } catch (System.Threading.ThreadAbortException tae) {
+			manager.stderr.Print("[Script stopped----------]\n");
+			System.Threading.Thread.ResetAbort();
+		  } catch (Exception e) {
+			if (e.Message.Contains("Thread was being aborted")) {
+			  manager.stderr.Print("[Script stopped----------]\n");
+			} else {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(eo.FormatException(e));
+			}
+			return false;
+		  }
+		  if (ok) {
+			if (manager.stderr != null)
+			  PrintLine(Tag.Info, "Ok");
+		  }
+		  return true;
         }
-
+		
         public override bool ExecuteFile(string filename) {
-            //manager.calico.last_error = ""
-            //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
-            Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromFile(filename);
-            try {
-                if (compiler_options != null) {
-                    source.Compile(compiler_options);
-                } else {
-                    source.Compile();
-                }
-            } catch (Exception e) {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                PrintLine(eo.FormatException(e));
-                return false;
-            }
-            ConfigureTrace();
-            try {
-                //if (manager != null && manager.UseSharedScope)
-                    source.Execute(manager.scope);
-                //else
-                //source.Execute(scope);
-            } catch (Exception e) {
-                if (e.Message.ToString().Contains("Thread was being aborted")) {
-                    manager.stderr.Print("[Script stopped----------]\n");
-                } else {
-                    Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                    PrintLine(eo.FormatException(e));
-                }
-                return false;
-            }
-            PrintLine(Tag.Info, "Done");
-            return true;
+		  //manager.calico.last_error = ""
+		  //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
+		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromFile(filename);
+		  try {
+			if (compiler_options != null) {
+			  source.Compile(compiler_options);
+			} else {
+			  source.Compile();
+			}
+		  } catch (Exception e) {
+			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			PrintLine(eo.FormatException(e));
+			return false;
+		  }
+		  ConfigureTrace();
+		  try {
+			//if (manager != null && manager.UseSharedScope)
+			source.Execute(manager.scope);
+			//else
+			//source.Execute(scope);
+		  } catch (System.Threading.ThreadAbortException tae) {
+			manager.stderr.Print("[Script stopped----------]\n");
+			System.Threading.Thread.ResetAbort();
+		  } catch (Exception e) {
+			if (e.Message.ToString().Contains("Thread was being aborted")) {
+			  manager.stderr.Print("[Script stopped----------]\n");
+			} else {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(eo.FormatException(e));
+			}
+			return false;
+		  }
+		  PrintLine(Tag.Info, "Done");
+		  return true;
         }
-
+		
         public override bool tryGetVariable(string variable, out object value) {
             return manager.scope.TryGetVariable(variable, out value);
         }
