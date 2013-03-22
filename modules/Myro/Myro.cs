@@ -713,50 +713,53 @@ public static class Myro
 			    win.ShowAll ();
 			    ev.Set();
 			});
-		    idle = GLib.Idle.Add (new GLib.IdleHandler (update_entries));
+		    idle = 1;
+		    GLib.Timeout.Add (1000, new GLib.TimeoutHandler (update_entries));
 		    ev.WaitOne();
 		}
     
 		private void OnDelete (object obj, Gtk.DeleteEventArgs args)
 		{
-			if (idle != 0) {
-				GLib.Source.Remove (idle);
-			}
 			idle = 0;
 		}
     
 		bool update_entries ()
 		{
-			Invoke (delegate {
-				try {	  
-					List results = (List)getLight ();
-					for (int i=0; i < results.Count; i++) {
-						((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = results [i].ToString ();
-					}
-					results = (List)getBright ();
-					for (int i=0; i < results.Count; i++) {
-						((Gtk.Entry)((List)dict_entry ["Bright:"]) [i]).Text = results [i].ToString ();
-					}
-					results = (List)getObstacle ();
-					for (int i=0; i < results.Count; i++) {
-						((Gtk.Entry)((List)dict_entry ["Obstacle:"]) [i]).Text = results [i].ToString ();
-					}
-					results = (List)getIR ();
-					for (int i=0; i < results.Count; i++) {
-						((Gtk.Entry)((List)dict_entry ["IR:"]) [i]).Text = results [i].ToString ();
-					}
-					results = (List)getLine ();
-					for (int i=0; i < results.Count; i++) {
-						((Gtk.Entry)((List)dict_entry ["Line:"]) [i]).Text = results [i].ToString ();
-					}
-					((Gtk.Entry)((List)dict_entry ["Battery:"]) [0]).Text = getBattery ().ToString ();
-					((Gtk.Entry)((List)dict_entry ["Stall:"]) [0]).Text = getStall ().ToString ();	  
-				} catch {
-					// pass
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // FIXME: enable, somehow
+		    /*
+		    Invoke (delegate {
+			    try {	  
+				List results = (List)getLight ();
+				for (int i=0; i < results.Count; i++) {
+				    ((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = results [i].ToString ();
 				}
+				results = (List)getBright ();
+				for (int i=0; i < results.Count; i++) {
+				    ((Gtk.Entry)((List)dict_entry ["Bright:"]) [i]).Text = results [i].ToString ();
+				}
+				results = (List)getObstacle ();
+				for (int i=0; i < results.Count; i++) {
+				    ((Gtk.Entry)((List)dict_entry ["Obstacle:"]) [i]).Text = results [i].ToString ();
+				}
+				results = (List)getIR ();
+				for (int i=0; i < results.Count; i++) {
+				    ((Gtk.Entry)((List)dict_entry ["IR:"]) [i]).Text = results [i].ToString ();
+				}
+				results = (List)getLine ();
+				for (int i=0; i < results.Count; i++) {
+				    ((Gtk.Entry)((List)dict_entry ["Line:"]) [i]).Text = results [i].ToString ();
+				}
+				((Gtk.Entry)((List)dict_entry ["Battery:"]) [0]).Text = getBattery ().ToString ();
+				((Gtk.Entry)((List)dict_entry ["Stall:"]) [0]).Text = getStall ().ToString ();	  
+			    } catch {
+				// pass
+			    }
+			    ev.Set();
 			});
-			wait (.1);
-			return true; // continue
+		    ev.WaitOne();
+		    */
+		    return idle == 1; // continue
 		}
 	}
 
@@ -1335,11 +1338,11 @@ public static class Myro
 	  public void loop ()
 	  {
 		  run = true;
-		  while (window.IsRealized && run) {
+		  while (window.isRealized() && run) {
 			foreach (Robot robot in robots) {
 			  robot.draw_simulation ();
 			}
-			if (!window.IsRealized)
+			if (!window.isRealized())
 			  return;
 			window.step (.1);
 			wait (extra_simulation_time);
@@ -2320,7 +2323,7 @@ public static class Myro
 				    fc.Destroy ();
 				    ev.Set();
 				});
-			}
+			};
 			if (choices.Count < 5) {
 			    fc.AddActionWidget (button, Gtk.ResponseType.Ok);
 			} else {
@@ -2375,9 +2378,11 @@ public static class Myro
 		public Joystick ()
 		{
 			window = makeWindow ("Myro Joystick", 400, 400);
-			window.ButtonPressEvent += onMouseDown;
-			window.ButtonReleaseEvent += onMouseUp;
-			window.MotionNotifyEvent += onMouseMove;
+			Invoke( delegate {
+				window.ButtonPressEvent += onMouseDown;
+				window.ButtonReleaseEvent += onMouseUp;
+				window.MotionNotifyEvent += onMouseMove;
+			    });
 			Graphics.Circle circle = new Graphics.Circle (
                 new Graphics.Point (200, 200), radius);
 			circle.fill = new Graphics.Color ("white");
@@ -2415,9 +2420,10 @@ public static class Myro
 			arrow.points [1].y = 0;
 			window.QueueDraw ();
 			if (getRobot () != null) {
-				getRobot ().stop ();
-				wait(.1);
+			    //getRobot ().stop ();
+				//wait(.1);
 			}
+			// FIXME
 		}
 
 		void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
@@ -2435,9 +2441,10 @@ public static class Myro
 			arrow.points [1].y = y - center_y;
 			window.QueueDraw ();
 			if (getRobot () != null) {
-				getRobot ().move (t, r);
-				wait(.1);
+			    //getRobot ().move (t, r);
+				//wait(.1);
 			}
+			// FIXME
 		}
 
 		void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
@@ -2455,9 +2462,10 @@ public static class Myro
 				arrow.points [1].y = y - center_y;
 				window.QueueDraw ();
 				if (getRobot () != null) {
-					getRobot ().move (t, r);
-					wait(.1);
+				    //getRobot ().move (t, r);
+					//wait(.1);
 				}
+				// FIXME
 			}
 		}
 	}
@@ -2534,12 +2542,17 @@ public static class Myro
 		if (seconds < .1)
 			Thread.Sleep ((int)(seconds * 1000));
 		else {
-			double start = currentTime ();
-			while (seconds > currentTime () - start) {
+		    double start = currentTime ();
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    while (seconds > currentTime () - start) {
+			Invoke( delegate {
 				while (Gtk.Application.EventsPending ())
-					Gtk.Application.RunIteration ();
-				Thread.Sleep (100); 
-			}
+				    Gtk.Application.RunIteration ();
+				ev.Set();
+			    });
+			ev.WaitOne();
+			ev.Reset();
+		    }
 		}
 	}
 

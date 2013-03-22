@@ -338,9 +338,19 @@ public static class Graphics
 		return picture.getColor (x, y);
 	}
   
+	public static Color _getColor (Picture picture, int x, int y)
+	{
+		return picture._getColor (x, y);
+	}
+  
 	public static Pixel getPixel (Picture picture, int x, int y)
 	{
 		return picture.getPixel (x, y);
+	}
+  
+	public static Pixel _getPixel (Picture picture, int x, int y)
+	{
+		return picture._getPixel (x, y);
 	}
   
 	public static IEnumerable getPixels (Picture picture)
@@ -354,11 +364,16 @@ public static class Graphics
 
 	public static void setPixels (Picture picture, Picture picture2)
 	{
-		for (int x=0; x < picture.width; x++) {
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke( delegate {
+		    for (int x=0; x < picture.width; x++) {
 			for (int y=0; y < picture.height; y++) {
-				picture.setPixel (x, y, picture2.getPixel (x, y));
+			    picture._setPixel (x, y, picture2._getPixel (x, y));
 			}
-		}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
 	}
 
 	public static void setPixel (Picture picture, int x, int y, Color color)
@@ -366,9 +381,19 @@ public static class Graphics
 		picture.setPixel (x, y, color);
 	}
 
+	public static void _setPixel (Picture picture, int x, int y, Color color)
+	{
+		picture._setPixel (x, y, color);
+	}
+
 	public static void setPixel (Picture picture, int x, int y, Pixel pixel)
 	{
 		picture.setPixel (x, y, pixel);
+	}
+
+	public static void _setPixel (Picture picture, int x, int y, Pixel pixel)
+	{
+		picture._setPixel (x, y, pixel);
 	}
 
 	public static Color getColor (Pixel pixel)
@@ -565,13 +590,6 @@ public static class Graphics
 	{
 	    if (seconds > 0) 
 		Thread.Sleep ((int)(seconds * 1000));
-    
-		/*    ManualResetEvent mre = new ManualResetEvent(false);
-        GLib.Timeout.Add(((uint)seconds * 1000), new GLib.TimeoutHandler( delegate {
-                          mre.Set();
-                          return false;
-        }));
-        mre.WaitOne();*/
 	}
 
 	public static Graphics.WindowClass makeWindow (string title="Calico Graphics",
@@ -1184,6 +1202,38 @@ public static class Graphics
 			ShowAll ();
 		}
 		
+		public string title {
+		    get {
+			ManualResetEvent ev = new ManualResetEvent (false);
+			string retval = "";
+			Invoke( delegate {
+				retval = Title;
+				ev.Set();
+			    });
+			ev.WaitOne();
+			return retval;
+		    }
+		    set {
+			ManualResetEvent ev = new ManualResetEvent (false);
+			Invoke( delegate {
+				Title = value;
+				ev.Set();
+			    });
+			ev.WaitOne();
+		    }
+		}
+
+		public bool isRealized() {
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    bool retval = false;
+		    Invoke( delegate {
+			    retval = IsRealized;
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
+		}
+
 		public void removeTagged(String tag) {
 		    List to_remove = new List ();
 		    lock (_canvas.shapes) {
@@ -1221,7 +1271,6 @@ public static class Graphics
     
 		public void clear (bool redraw)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Invoke (delegate {
 			    _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
 								      // FIXME: w,h of Window?
@@ -1252,11 +1301,9 @@ public static class Graphics
 				_canvas.Remove (child);
 			    }
 			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
-			    ev.Set();
+			    if (redraw)
+				QueueDraw();
 			});
-		    ev.WaitOne();
-		    if (redraw)
-			QueueDraw();
 		}
 		
 		public Gtk.ScrolledWindow ScrolledWindow {
@@ -1311,6 +1358,13 @@ public static class Graphics
 		    return _width;
 		}
     
+		public int _getWidth ()
+		{
+		    int _width = 0, _height = 0;
+		    this.GetSize (out _width, out _height);
+		    return _width;
+		}
+    
 		public int getHeight ()
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -1320,6 +1374,13 @@ public static class Graphics
 			    ev.Set();
 			});
 		    ev.WaitOne();
+		    return _height;
+		}
+    
+		public int _getHeight ()
+		{
+		    int _width = 0, _height = 0;
+		    this.GetSize (out _width, out _height);
 		    return _height;
 		}
     
@@ -1546,6 +1607,18 @@ public static class Graphics
 		    }
 		}
 
+		public int _height {
+		    get {
+			int _width = 0, _height = 0;
+			if (Child == _canvas) {
+			    this.GetSize (out _width, out _height);
+			} else { // scrollbars
+			    _height = _canvas.height;
+			}
+			return _height;
+		    }
+		}
+
 		public int width {
 		    get {
 			ManualResetEvent ev = new ManualResetEvent(false);
@@ -1563,6 +1636,18 @@ public static class Graphics
 		    }
 		}
 
+		public int _width {
+		    get {
+			int _width = 0, _height = 0;
+			if (Child == _canvas) {
+			    this.GetSize (out _width, out _height);
+			} else { // scrollbars
+			    _width = _canvas.width;
+			}
+			return _width;
+		    }
+		}
+
 		public Canvas getCanvas ()
 		{
 		    return _canvas;
@@ -1576,11 +1661,9 @@ public static class Graphics
 
 		public PythonTuple getMouse ()
 		{
-			while (Gtk.Application.EventsPending())
-				Gtk.Application.RunIteration ();
-			_lastClickFlag = new ManualResetEvent (false);
-			_lastClickFlag.WaitOne ();
-			return _lastClick;
+		    _lastClickFlag = new ManualResetEvent (false);
+		    _lastClickFlag.WaitOne ();
+		    return _lastClick;
 		}
     
 		public PythonTuple getMouseNow ()
@@ -1712,7 +1795,9 @@ public static class Graphics
 		{ // Window
 		    if (mode == "manual" || mode == "bitmapmanual") {
 			_canvas.need_to_draw_surface = true;
-			QueueDraw ();
+			Invoke( delegate {
+				QueueDraw ();
+			    });
 		    } else {
 			need_to_redraw ();
 		    }
@@ -2343,24 +2428,27 @@ public static class Graphics
 
 		public Point getScreenPoint (IList iterable)
 		{
-			// p is relative to center, rotate, and scale; returns
-			// screen coordinate of p
-			double px = 0, py = 0;
-			//Cairo.Context g = new Cairo.Context(surface);
-			// FIXME: all this for a Context?!
-			using (Cairo.ImageSurface draw = new Cairo.ImageSurface (Cairo.Format.Argb32, 70, 150)){
-	    		using (Cairo.Context g = new Cairo.Context(draw)) {
-					//using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-					Point temp = screen_coord (center);
-					g.Translate (temp.x, temp.y);
-					g.Rotate (_rotation);
-					g.Scale (_scaleFactor, _scaleFactor);
-					px = System.Convert.ToDouble (iterable [0]);
-					py = System.Convert.ToDouble (iterable [1]);
-					g.UserToDevice (ref px, ref py);
+		    // p is relative to center, rotate, and scale; returns
+		    // screen coordinate of p
+		    double px = 0, py = 0;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    using (Cairo.ImageSurface draw = new Cairo.ImageSurface (Cairo.Format.Argb32, 70, 150)){
+				using (Cairo.Context g = new Cairo.Context(draw)) {
+				    //using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+				    Point temp = screen_coord (center);
+				    g.Translate (temp.x, temp.y);
+				    g.Rotate (_rotation);
+				    g.Scale (_scaleFactor, _scaleFactor);
+				    px = System.Convert.ToDouble (iterable [0]);
+				    py = System.Convert.ToDouble (iterable [1]);
+				    g.UserToDevice (ref px, ref py);
 				}
-			}
-			return new Point (px, py);
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return new Point (px, py);
 		}
 
 		public Point getCenter ()
@@ -2915,43 +3003,45 @@ public static class Graphics
 			QueueDraw ();
 		}
     
-		public void undraw ()
-		{
-	      if (drawn_on_shape != null) {
-			lock (drawn_on_shape.shapes) {
-			  if (drawn_on_shape.shapes.Contains (this)) {
+	    public void undraw ()
+	    {
+		if (drawn_on_shape != null) {
+		    lock (drawn_on_shape.shapes) {
+			if (drawn_on_shape.shapes.Contains (this)) {
 			    drawn_on_shape.shapes.Remove (this);
-				//System.Console.Error.WriteLine("Removed from shape!");
-			  }
+			    //System.Console.Error.WriteLine("Removed from shape!");
 			}
-			drawn_on_shape = null;
-		      }
-		      if (window != null) {
-			lock (window.getCanvas().shapes) {
-   			  if (window._canvas.world != null) {
-					removeFromPhysics ();
-		      }
-			  if (window.getCanvas ().shapes.Contains (this)) {
+		    }
+		    drawn_on_shape = null;
+		}
+		if (window != null) {
+		    lock (window.getCanvas().shapes) {
+			if (window._canvas.world != null) {
+			    removeFromPhysics ();
+			}
+			if (window.getCanvas ().shapes.Contains (this)) {
 			    window.getCanvas ().shapes.Remove (this);
-				//System.Console.Error.WriteLine("Removed from win!");
+			    //System.Console.Error.WriteLine("Removed from win!");
 			    if (window is WindowClass)
-			      ((WindowClass)window).QueueDraw ();
+				Invoke( delegate {
+					((WindowClass)window).QueueDraw ();
+				    });
 			    window = null;
-			  }
 			}
-	      }
+		    }
 		}
-    
-		public Gradient gradient {
-			set {
-				_gradient = value;
-				QueueDraw ();
-			}
-			get {
-				return _gradient;
-			} 
+	    }
+	    
+	    public Gradient gradient {
+		set {
+		    _gradient = value;
+		    QueueDraw ();
 		}
-
+		get {
+		    return _gradient;
+		} 
+	    }
+	    
 		public Color color {
 			set {
 				if (value != null) {
@@ -3134,55 +3224,71 @@ public static class Graphics
 		
 		public double width {
 			get {
-				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+			    ManualResetEvent ev = new ManualResetEvent (false);
+			    double retval = 0.0;
+			    Invoke( delegate {
+				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					Cairo.TextExtents te = g.TextExtents (text);
-					return te.Width * 2;
-				}
+					retval = te.Width * 2;
+				    }
+				    ev.Set();
+				});
+			    ev.WaitOne();
+			    return retval;
 			}
 		}
 
 		public double height {
 			get {
-				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+			    ManualResetEvent ev = new ManualResetEvent (false);
+			    double retval = 0.0;
+			    Invoke( delegate {
+				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					Cairo.TextExtents te = g.TextExtents (text);
-					return te.Height * 2;
-				}
+					retval = te.Height * 2;
+				    }
+				    ev.Set();
+				});
+			    ev.WaitOne();
+			    return retval;
 			}
 		}
 
 		public override void addToPhysics ()
 		{ // Text
-		    world = window._canvas.world;
-		    lock(world) {
-			double width = 0;
-			double height = 0;
-			using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-				Cairo.TextExtents te = g.TextExtents (text);
-				// FIXME: need to adjust based on justification
-				// This works with x centered, y centered
-				width = te.Width * 2;
-				height = te.Height * 2;
-			}
-			float MeterInPixels = 64.0f;
-			// from x,y to meters of window
-			// arbitrary:
-			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
-                                     ((float)y) / MeterInPixels);
-			body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
-                 world,
-                 (float)(width / MeterInPixels), // radius in meters
-                 (float)(height / MeterInPixels), // radius in meters
-                 _density, // density
-                 position);                        // center
-			// Give it some bounce and friction
-			body.Restitution = _bounce;
-			body.Rotation = (float)_rotation;
-			body.Friction = _friction;
-			body.BodyType = _bodyType;
-			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
-			body.UserData = this; // point back to this shape
-			body.FixtureList [0].UserData = this; // point back to this shape
-		    }
+		    Invoke( delegate {
+			    world = window._canvas.world;
+			    lock(world) {
+				double width = 0;
+				double height = 0;
+				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+				    Cairo.TextExtents te = g.TextExtents (text);
+				    // FIXME: need to adjust based on justification
+				    // This works with x centered, y centered
+				    width = te.Width * 2;
+				    height = te.Height * 2;
+				}
+				float MeterInPixels = 64.0f;
+				// from x,y to meters of window
+				// arbitrary:
+				Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+								((float)y) / MeterInPixels);
+				body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
+						     world,
+						     (float)(width / MeterInPixels), // radius in meters
+						     (float)(height / MeterInPixels), // radius in meters
+						     _density, // density
+						     position);                        // center
+				// Give it some bounce and friction
+				body.Restitution = _bounce;
+				body.Rotation = (float)_rotation;
+				body.Friction = _friction;
+				body.BodyType = _bodyType;
+				body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+				body.UserData = this; // point back to this shape
+				body.FixtureList [0].UserData = this; // point back to this shape
+			    }
+			});
 		}
 	}
 
@@ -3482,9 +3588,19 @@ public static class Graphics
 			return picture.getRed (x, y);
 		}
 
+		public int _getRed ()
+		{
+			return picture._getRed (x, y);
+		}
+
 		public int getGreen ()
 		{
 			return picture.getGreen (x, y);
+		}
+
+		public int _getGreen ()
+		{
+			return picture._getGreen (x, y);
 		}
 
 		public int getBlue ()
@@ -3492,9 +3608,19 @@ public static class Graphics
 			return picture.getBlue (x, y);
 		}
 
+		public int _getBlue ()
+		{
+			return picture._getBlue (x, y);
+		}
+
 		public int getAlpha ()
 		{
 			return picture.getAlpha (x, y);
+		}
+
+		public int _getAlpha ()
+		{
+			return picture._getAlpha (x, y);
 		}
 
 		public void setColor (Color color)
@@ -3502,9 +3628,19 @@ public static class Graphics
 			picture.setColor (x, y, color);
 		}
 
+		public void _setColor (Color color)
+		{
+			picture._setColor (x, y, color);
+		}
+
 		public void setRGB (byte red, byte green, byte blue)
 		{
 			picture.setRGB (x, y, red, green, blue);
+		}
+
+		public void _setRGB (byte red, byte green, byte blue)
+		{
+			picture._setRGB (x, y, red, green, blue);
 		}
 
 		public void setRGBA (byte red, byte green, byte blue, byte alpha)
@@ -3512,9 +3648,19 @@ public static class Graphics
 			picture.setRGBA (x, y, red, green, blue, alpha);
 		}
 
+		public void _setRGBA (byte red, byte green, byte blue, byte alpha)
+		{
+			picture._setRGBA (x, y, red, green, blue, alpha);
+		}
+
 		public void setGray (byte value)
 		{
 			picture.setGray (x, y, value);
+		}
+
+		public void _setGray (byte value)
+		{
+			picture._setGray (x, y, value);
 		}
 
 		public void setRed (byte value)
@@ -3522,9 +3668,19 @@ public static class Graphics
 			picture.setRed (x, y, value);
 		}
 
+		public void _setRed (byte value)
+		{
+			picture._setRed (x, y, value);
+		}
+
 		public void setGreen (byte value)
 		{
 			picture.setGreen (x, y, value);
+		}
+
+		public void _setGreen (byte value)
+		{
+			picture._setGreen (x, y, value);
 		}
 
 		public void setBlue (byte value)
@@ -3532,9 +3688,19 @@ public static class Graphics
 			picture.setBlue (x, y, value);
 		}
 
+		public void _setBlue (byte value)
+		{
+			picture._setBlue (x, y, value);
+		}
+
 		public void setAlpha (byte value)
 		{
 			picture.setAlpha (x, y, value);
+		}
+
+		public void _setAlpha (byte value)
+		{
+			picture._setAlpha (x, y, value);
 		}
 	}
   
@@ -3615,10 +3781,10 @@ public static class Graphics
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-				    byte r = (byte)original.getRed (x, y);
-				    byte g = (byte)original.getGreen (x, y);
-				    byte b = (byte)original.getBlue (x, y);
-				    byte a = (byte)original.getAlpha (x, y);
+				    byte r = (byte)original._getRed (x, y);
+				    byte g = (byte)original._getGreen (x, y);
+				    byte b = (byte)original._getBlue (x, y);
+				    byte a = (byte)original._getAlpha (x, y);
 				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 						       x * _pixbuf.NChannels + 0, r);
 				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -3882,8 +4048,9 @@ public static class Graphics
 		public Picture getRegion (IList iterable, int width, int height, double degrees)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Picture pic = new Picture (width, height);
+		    Picture pic = null;
 		    Invoke( delegate {
+			    pic = new Picture (width, height);
 			    Point p = new Point (iterable);
 			    double angle = degrees * Math.PI / 180.0;
 			    double px, py;
@@ -3895,8 +4062,8 @@ public static class Graphics
 				    px = x * Math.Cos (angle) - y * Math.Sin (angle);
 				    py = x * Math.Sin (angle) + y * Math.Cos (angle);
 				    // set the color of the new image from the offset of this:
-				    pic._setColor (ox, oy, this.getPixel ((int)(p.x + px), 
-									 (int)(p.y + py)).getColor ());
+				    pic._setColor (ox, oy, this._getColor ((int)(p.x + px), 
+									   (int)(p.y + py)));
 				    oy += 1;
 				}
 				ox += 1;
@@ -3910,13 +4077,14 @@ public static class Graphics
 		public Picture getRegion (IList iterable, int width, int height)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Picture pic = new Picture (width, height);
+		    Picture pic = null;
 		    Invoke( delegate {
+			    pic = new Picture (width, height);
 			    Point p = new Point (iterable);
 			    for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-				    pic.setColor (x, y, this.getPixel ((int)(p.x + x), 
-								       (int)(p.y + y)).getColor ());
+				    pic._setColor (x, y, _getColor((int)(p.x + x), 
+								   (int)(p.y + y)));
 				}
 			    }
 			    ev.Set();
@@ -3927,116 +4095,141 @@ public static class Graphics
 
 		public void setRegion (IList iterable, Picture picture)
 		{
-			// FIXME: better way would use Context to draw the image onto
-			// another image. Also, consider making this pic.draw(picture)
-			// This doesn't respect the color pallette of picture.
-			Point p = new Point (iterable);
-			for (int x = 0; x < picture.width; x++) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // FIXME: better way would use Context to draw the image onto
+			    // another image. Also, consider making this pic.draw(picture)
+			    // This doesn't respect the color pallette of picture.
+			    Point p = new Point (iterable);
+			    for (int x = 0; x < picture.width; x++) {
 				for (int y = 0; y < picture.height; y++) {
-					Color c1 = this.getPixel ((int)(p.x + x), 
-				   (int)(p.y + y)).getColor ();
-					Color c2 = picture.getPixel ((int)(x), 
-				      (int)(y)).getColor ();
-					int t2 = c2.alpha;
-					int t1 = Math.Max (Math.Min (255 - t2, 255), 0);
-					this.setColor ((int)(p.x + x), 
-			(int)(p.y + y), 
-			new Color (t1 * c1.red + t2 * c2.red,
-				  t1 * c1.green + t2 * c2.green,
-				  t1 * c1.blue + t2 * c2.blue));
+				    Color c1 = this._getColor ((int)(p.x + x), 
+							      (int)(p.y + y));
+				    Color c2 = picture._getColor ((int)(x), 
+								 (int)(y));
+				    int t2 = c2.alpha;
+				    int t1 = Math.Max (Math.Min (255 - t2, 255), 0);
+				    this._setColor ((int)(p.x + x), 
+						    (int)(p.y + y), 
+						    new Color (t1 * c1.red + t2 * c2.red,
+							       t1 * c1.green + t2 * c2.green,
+							       t1 * c1.blue + t2 * c2.blue));
 				}
-			}
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void flipHorizontal ()
 		{
-		    for (int x = 0; x < width/2; x++) {
-			for (int y = 0; y < height; y++) {
-			    Color c1 = this.getPixel (x, y).getColor ();
-			    Color c2 = this.getPixel (width - x - 1, y).getColor ();
-			    setColor(x, y, c2);
-			    setColor(width - x - 1, y, c1);
-			}
-		    }
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    for (int x = 0; x < width/2; x++) {
+				for (int y = 0; y < height; y++) {
+				    Color c1 = _getColor (x, y);
+				    Color c2 = _getColor (width - x - 1, y);
+				    _setColor(x, y, c2);
+				    _setColor(width - x - 1, y, c1);
+				}
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void flipVertical ()
 		{
-		    for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height/2; y++) {
-			    Color c1 = this.getPixel (x, y).getColor ();
-			    Color c2 = this.getPixel (x, height - y - 1).getColor ();
-			    setColor(x, y, c2);
-			    setColor(x, height - y - 1, c1);
-			}
-		    }
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height/2; y++) {
+				    Color c1 = _getColor(x, y);
+				    Color c2 = _getColor(x, height - y - 1);
+				    _setColor(x, y, c2);
+				    _setColor(x, height - y - 1, c1);
+				}
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void setRegion (IList iterable, int width, int height, double degrees,
                           Picture picture)
 		{
-			Point p = new Point (iterable);
-			double angle = degrees * Math.PI / 180.0;
-			double px, py;
-			int tx, ty;
-			for (int x = -width/2; x < width/2; x++) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    Point p = new Point (iterable);
+			    double angle = degrees * Math.PI / 180.0;
+			    double px, py;
+			    int tx, ty;
+			    for (int x = -width/2; x < width/2; x++) {
 				for (int y = -height/2; y < height/2; y++) {
-					// rotate that x,y:
-					px = x * Math.Cos (angle) - y * Math.Sin (angle);
-					py = x * Math.Sin (angle) + y * Math.Cos (angle);
-					// set the color of the new image from the offset of this:
-					tx = (int)(p.x + px);
-					ty = (int)(p.y + py);
-					this.getPixel (tx, ty).setColor (color);
-					// FIXME: a lame way to not skip any pixels:
-					// Need a region fill algorithm
-					if ((int)px + 1 < width / 2) {
-						this.getPixel (tx + 1, ty).setColor (color);
-						if ((int)py + 1 < height / 2) {
-							this.getPixel (tx + 1, ty + 1).setColor (color);
-							this.getPixel (tx, ty + 1).setColor (color);
-						}
-					} else {
-						if ((int)py + 1 < height / 2) {
-							this.getPixel (tx, ty + 1).setColor (picture.getColor (x + width / 2, 
-								  y + height / 2));
-						}
+				    // rotate that x,y:
+				    px = x * Math.Cos (angle) - y * Math.Sin (angle);
+				    py = x * Math.Sin (angle) + y * Math.Cos (angle);
+				    // set the color of the new image from the offset of this:
+				    tx = (int)(p.x + px);
+				    ty = (int)(p.y + py);
+				    this._setPixel (tx, ty, color);
+				    // FIXME: a lame way to not skip any pixels:
+				    // Need a region fill algorithm
+				    if ((int)px + 1 < width / 2) {
+					this._setColor (tx + 1, ty, color);
+					if ((int)py + 1 < height / 2) {
+					    this._setColor (tx + 1, ty + 1, color);
+					    this._setColor (tx, ty + 1, color);
 					}
+				    } else {
+					if ((int)py + 1 < height / 2) {
+					    this._setColor (tx, ty + 1, picture._getColor (x + width / 2, 
+											   y + height / 2));
+					}
+				    }
 				}
-			}
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void setRegion (IList iterable, int width, int height, double degrees,
                           Color color)
 		{
-			Point p = new Point (iterable);
-			double angle = degrees * Math.PI / 180.0;
-			double px, py;
-			int tx, ty;
-			for (int x = -width/2; x < width/2; x++) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    Point p = new Point (iterable);
+			    double angle = degrees * Math.PI / 180.0;
+			    double px, py;
+			    int tx, ty;
+			    for (int x = -width/2; x < width/2; x++) {
 				for (int y = -height/2; y < height/2; y++) {
-					// rotate that x,y:
-					px = x * Math.Cos (angle) - y * Math.Sin (angle);
-					py = x * Math.Sin (angle) + y * Math.Cos (angle);
-					// set the color of the new image from the offset of this:
-					tx = (int)(p.x + px);
-					ty = (int)(p.y + py);
-					this.getPixel (tx, ty).setColor (color);
-					// FIXME: a lame way to not skip any pixels:
-					// Need a region fill algorithm
-					if ((int)px + 1 < width / 2) {
-						this.getPixel (tx + 1, ty).setColor (color);
-						if ((int)py + 1 < height / 2) {
-							this.getPixel (tx + 1, ty + 1).setColor (color);
-							this.getPixel (tx, ty + 1).setColor (color);
-						}
-					} else {
-						if ((int)py + 1 < height / 2) {
-							this.getPixel (tx, ty + 1).setColor (color);
-						}
+				    // rotate that x,y:
+				    px = x * Math.Cos (angle) - y * Math.Sin (angle);
+				    py = x * Math.Sin (angle) + y * Math.Cos (angle);
+				    // set the color of the new image from the offset of this:
+				    tx = (int)(p.x + px);
+				    ty = (int)(p.y + py);
+				    this._setColor (tx, ty, color);
+				    // FIXME: a lame way to not skip any pixels:
+				    // Need a region fill algorithm
+				    if ((int)px + 1 < width / 2) {
+					this._setColor (tx + 1, ty, color);
+					if ((int)py + 1 < height / 2) {
+					    this._setColor (tx + 1, ty + 1, color);
+					    this._setColor (tx, ty + 1, color);
 					}
+				    } else {
+					if ((int)py + 1 < height / 2) {
+					    this._setColor (tx, ty + 1, color);
+					}
+				    }
 				}
-			}
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
     
 		public Gdk.Pixbuf getPixbuf ()
@@ -4056,6 +4249,11 @@ public static class Graphics
 		    return retval;
 		}
 
+		public int _getWidth ()
+		{
+		    return _pixbuf.Width;
+		}
+
 		public int getHeight ()
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4066,6 +4264,11 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    return retval;
+		}
+
+		public int _getHeight ()
+		{
+		    return _pixbuf.Height;
 		}
 
 		public void savePicture (string filename)
@@ -4092,6 +4295,12 @@ public static class Graphics
 			return new Pixel (this, x, y);
 		}
     
+		public Pixel _getPixel (int x, int y)
+		{
+		    // Not actually any different from getPixel
+		    return new Pixel (this, x, y);
+		}
+    
 		public void setPixel (int x, int y, Color color)
 		{
 			int red = color.red;
@@ -4101,6 +4310,15 @@ public static class Graphics
 			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
 		}
 
+		public void _setPixel (int x, int y, Color color)
+		{
+			int red = color.red;
+			int green = color.green;
+			int blue = color.blue;
+			int alpha = color.alpha;
+			this._setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+		}
+
 		public void setPixel (int x, int y, Pixel pixel)
 		{
 			int red = pixel.getRed ();
@@ -4108,6 +4326,15 @@ public static class Graphics
 			int blue = pixel.getBlue ();
 			int alpha = pixel.getAlpha ();
 			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+		}
+
+		public void _setPixel (int x, int y, Pixel pixel)
+		{
+			int red = pixel._getRed ();
+			int green = pixel._getGreen ();
+			int blue = pixel._getBlue ();
+			int alpha = pixel._getAlpha ();
+			this._setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
 		}
 
 		public IEnumerable getPixels ()
@@ -4128,10 +4355,29 @@ public static class Graphics
 			}
 		}
 
+		public void _setPixels (Picture picture)
+		{
+			for (int x=0; x < width; x++) {
+				for (int y=0; y < height; y++) {
+					_setPixel (x, y, picture.getPixel (x, y));
+				}
+			}
+		}
+
 		public Color getColor (int x, int y)
 		{
 			// red, green, blue, alpha
 			Color temp = new Color (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
+			temp.picture = this;
+			temp.x = x;
+			temp.y = y;
+			return temp;
+		}
+    
+		public Color _getColor (int x, int y)
+		{
+			// red, green, blue, alpha
+			Color temp = new Color (_getRed (x, y), _getGreen (x, y), _getBlue (x, y), _getAlpha (x, y));
 			temp.picture = this;
 			temp.x = x;
 			temp.y = y;
@@ -4144,10 +4390,22 @@ public static class Graphics
 			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y));
 		}
     
+		public PythonTuple _getRGB (int x, int y)
+		{
+			// red, green, blue, alpha
+			return PyTuple (_getRed (x, y), _getGreen (x, y), _getBlue (x, y));
+		}
+    
 		public PythonTuple getRGBA (int x, int y)
 		{
 			// red, green, blue, alpha
 			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
+		}
+
+		public PythonTuple _getRGBA (int x, int y)
+		{
+			// red, green, blue, alpha
+			return PyTuple (_getRed (x, y), _getGreen (x, y), _getBlue (x, y), _getAlpha (x, y));
 		}
 
 		internal int wrap_width (int x)
@@ -4191,6 +4449,20 @@ public static class Graphics
 		    return retval;
 		}
     
+		public int _getGray (int x, int y)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    int r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					      x * _pixbuf.NChannels + 0);
+		    int g = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					      x * _pixbuf.NChannels + 1);
+		    int b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					      x * _pixbuf.NChannels + 2);
+		    return (int)(((double)(r + g + b)) / 3.0);
+		}
+    
 		public int getRed (int x, int y)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4205,6 +4477,15 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    return retval;
+		}
+    
+		public int _getRed (int x, int y)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					     x * _pixbuf.NChannels + 0);
 		}
     
 		public int getGreen (int x, int y)
@@ -4223,6 +4504,15 @@ public static class Graphics
 		    return retval;
 		}
     
+		public int _getGreen (int x, int y)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					     x * _pixbuf.NChannels + 1);
+		}
+    
 		public int getBlue (int x, int y)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4239,6 +4529,15 @@ public static class Graphics
 		    return retval;
 		}
 		
+		public int _getBlue (int x, int y)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					     x * _pixbuf.NChannels + 2);
+		}
+		
 		public int getAlpha (int x, int y)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4253,6 +4552,15 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    return retval;
+		}
+    
+		public int _getAlpha (int x, int y)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					     x * _pixbuf.NChannels + 3);
 		}
     
 		public void setColor (int x, int y, Color color)
@@ -4310,6 +4618,19 @@ public static class Graphics
 		    QueueDraw ();
 		}
     
+		public void _setGray (int x, int y, byte value)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 0, value);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 1, value);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 2, value);
+		}
+    
 		public void setRed (int x, int y, byte value)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4323,6 +4644,15 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    QueueDraw ();
+		}
+
+		public void _setRed (int x, int y, byte value)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 0, value);
 		}
 
 		public void setGreen (int x, int y, byte value)
@@ -4340,6 +4670,15 @@ public static class Graphics
 		    QueueDraw ();
 		}
 
+		public void _setGreen (int x, int y, byte value)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 1, value);
+		}
+
 		public void setBlue (int x, int y, byte value)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4355,6 +4694,15 @@ public static class Graphics
 		    QueueDraw ();
 		}
     
+		public void _setBlue (int x, int y, byte value)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 2, value);
+		}
+    
 		public void setAlpha (int x, int y, byte value)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4368,6 +4716,15 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    QueueDraw ();
+		}
+
+		public void _setAlpha (int x, int y, byte value)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 3, value);
 		}
 
 		public void setAlpha (byte value)
@@ -4390,6 +4747,20 @@ public static class Graphics
 		    QueueDraw ();
 		}
 
+		public void _setAlpha (byte value)
+		{
+		    for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+			    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
+				// Don't change alpha here
+			    } else {
+				Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						   x * _pixbuf.NChannels + 3, value);
+			    }
+			}
+		    }
+		}
+
 		public void setRGB (int x, int y, byte red, byte green, byte blue)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -4407,6 +4778,19 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    QueueDraw ();
+		}
+    
+		public void _setRGB (int x, int y, byte red, byte green, byte blue)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 0, red);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 1, green);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 2, blue);
 		}
     
 		public void setRGBA (int x, int y, byte red, byte green, byte blue, 
@@ -4429,6 +4813,22 @@ public static class Graphics
 			});
 		    ev.WaitOne();
 		    QueueDraw ();
+		}
+
+		public void _setRGBA (int x, int y, byte red, byte green, byte blue, 
+				      byte alpha)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 0, red);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 1, green);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 2, blue);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 3, alpha);
 		}
 
 		public override Color fill {
@@ -4770,13 +5170,13 @@ public static class Graphics
 			// from x,y to meters of window
 			// arbitrary:
 			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
-                                     ((float)y) / MeterInPixels);
+							((float)y) / MeterInPixels);
 			body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
-                 world,
-                 (float)(width / MeterInPixels), // radius in meters
-                 (float)(height / MeterInPixels), // radius in meters
-                 _density, // density
-                 position);                        // center
+				     world,
+				     (float)(width / MeterInPixels), // radius in meters
+				     (float)(height / MeterInPixels), // radius in meters
+				     _density, // density
+				     position);                        // center
 			// Give it some bounce and friction
 			body.Restitution = _bounce;
 			body.Rotation = (float)_rotation;

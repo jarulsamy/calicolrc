@@ -248,7 +248,7 @@ public class SimScribbler : Myro.Robot
 			double max_distance = 20.0;
 			float MeterInPixels = 64.0f;
 			Graphics.Picture picture = new Graphics.Picture (256, 192);
-			if (!simulation.window.IsRealized)
+			if (!simulation.window.isRealized())
 				return picture;
 			lock (this) {
 				double [] distance = new double[256];
@@ -581,7 +581,7 @@ public class SimScribbler : Myro.Robot
 			double max_distance = 20.0;
 			float MeterInPixels = 64.0f;
 			List counts = Graphics.PyList (0, 0, 0);
-			if (!simulation.window.IsRealized)
+			if (!simulation.window.isRealized())
 				return counts;
 			lock (this) {
 				double [] distance = new double[256];
@@ -732,7 +732,7 @@ public class SimScribbler : Myro.Robot
 										 this.frame.body.Rotation);
 			// Get sensor readings
 			this.readings.clear ();
-			if (!simulation.window.IsRealized)
+			if (!simulation.window.isRealized())
 			    return;
 			Graphics.Point p1 = null;
 			Graphics.Point p2 = null;
@@ -742,7 +742,7 @@ public class SimScribbler : Myro.Robot
 				Graphics.Line line = (Graphics.Line)kvp.Value;
 				p1 = this.frame.getScreenPoint (line.getP1 ());
 				p2 = this.frame.getScreenPoint (line.getP2 ());
-				if (!simulation.window.IsRealized)
+				if (!simulation.window.isRealized())
 				    return;
 				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
 					this.readings [key] = hit;
@@ -759,7 +759,7 @@ public class SimScribbler : Myro.Robot
 				    c.x -= 6; // hack to get outside of bounding box
 				    p1 = this.frame.getScreenPoint (c);
 				    p2 = light.center;
-				    if (!simulation.window.IsRealized)
+				    if (!simulation.window.isRealized())
 					return;
 				    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
 					    this.readings [light_sensor.tag] = hit;
