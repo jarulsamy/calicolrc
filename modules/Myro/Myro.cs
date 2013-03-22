@@ -676,42 +676,45 @@ public static class Myro
 
 		public Senses ()
 		{
-			win = new Gtk.Window ("Senses");
-			Gtk.VBox vbox = new Gtk.VBox ();
-			//win.AllowGrow = true;
-			//win.AllowShrink = true;
-			//win.SetDefaultSize(width, height);
-			win.DeleteEvent += OnDelete;
-			win.Add (vbox);
-			Gtk.HBox hbox;
-			PythonDictionary items = new PythonDictionary ();
-			items ["Line:"] = 2;
-			items ["Stall:"] = 1;
-			items ["Bright:"] = 3;
-			items ["Obstacle:"] = 3;
-			items ["IR:"] = 2;
-			items ["Light:"] = 3;
-			items ["Battery:"] = 1;
-			dict_entry = new PythonDictionary ();
-			List entries = new List ();
-			foreach (string key in items.Keys) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    win = new Gtk.Window ("Senses");
+			    Gtk.VBox vbox = new Gtk.VBox ();
+			    //win.AllowGrow = true;
+			    //win.AllowShrink = true;
+			    //win.SetDefaultSize(width, height);
+			    win.DeleteEvent += OnDelete;
+			    win.Add (vbox);
+			    Gtk.HBox hbox;
+			    PythonDictionary items = new PythonDictionary ();
+			    items ["Line:"] = 2;
+			    items ["Stall:"] = 1;
+			    items ["Bright:"] = 3;
+			    items ["Obstacle:"] = 3;
+			    items ["IR:"] = 2;
+			    items ["Light:"] = 3;
+			    items ["Battery:"] = 1;
+			    dict_entry = new PythonDictionary ();
+			    List entries = new List ();
+			    foreach (string key in items.Keys) {
 				hbox = new Gtk.HBox ();
 				Gtk.Label label = new Gtk.Label (key);
 				label.WidthRequest = 100;
 				hbox.PackStart (label, false, false, 0);
 				entries = new List ();
 				for (int i= 0; i < (int)items[key]; i++) {
-					Gtk.Entry entry = new Gtk.Entry ();
-					entries.append (entry);
-					hbox.PackStart (entry);
-					dict_entry [key] = entries;
+				    Gtk.Entry entry = new Gtk.Entry ();
+				    entries.append (entry);
+				    hbox.PackStart (entry);
+				    dict_entry [key] = entries;
 				}
 				vbox.PackStart (hbox);
-			}
-			Invoke (delegate {
-				win.ShowAll ();
+			    }
+			    win.ShowAll ();
+			    ev.Set();
 			});
-			idle = GLib.Idle.Add (new GLib.IdleHandler (update_entries));
+		    idle = GLib.Idle.Add (new GLib.IdleHandler (update_entries));
+		    ev.WaitOne();
 		}
     
 		private void OnDelete (object obj, Gtk.DeleteEventArgs args)
@@ -1307,12 +1310,12 @@ public static class Myro
 		}
 
 	  public void step() {
-		if (window.IsRealized) {
+	      if (window.isRealized()) {
 		  foreach (Robot robot in robots) {
-			robot.draw_simulation ();
+		      robot.draw_simulation ();
 		  }
 		  window.step (.1);
-		}
+	      }
 	  }
 
 	  public void stop() {
@@ -2098,15 +2101,15 @@ public static class Myro
 	{
 	    string pickAFileResponse = null;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
-		 "Select a file",
-		 null,
-		 Gtk.FileChooserAction.Open,
-		 "Cancel", 
-		 Gtk.ResponseType.Cancel,
-		 "Select File", 
-		 Gtk.ResponseType.Accept);
 	    Invoke (delegate {
+		    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
+                            "Select a file",
+			    null,
+			    Gtk.FileChooserAction.Open,
+			    "Cancel", 
+			    Gtk.ResponseType.Cancel,
+			    "Select File", 
+			    Gtk.ResponseType.Accept);
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAFileResponse = fc.Filename;
 		    }
@@ -2122,13 +2125,13 @@ public static class Myro
 	{
 	    string pickAFolderResponse = null;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
-		    "Select a folder",
-		    null,
-		    Gtk.FileChooserAction.SelectFolder,
-		    "Cancel", Gtk.ResponseType.Cancel,
-		    "Select Folder", Gtk.ResponseType.Accept);
 	    Invoke (delegate {
+		    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
+		        "Select a folder",
+			null,
+			Gtk.FileChooserAction.SelectFolder,
+			"Cancel", Gtk.ResponseType.Cancel,
+			"Select Folder", Gtk.ResponseType.Accept);
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAFolderResponse = fc.Filename;
 		    }
@@ -2144,11 +2147,11 @@ public static class Myro
 	{
 	    Graphics.Color pickAColorResponse = null;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
 	    Invoke (delegate {
+		    Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAColorResponse = new Graphics.Color (
-	                   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Red)) / Math.Pow (2, 16) * 255.0),
+  			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Red)) / Math.Pow (2, 16) * 255.0),
 			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Green)) / Math.Pow (2, 16) * 255.0),
 			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Blue)) / Math.Pow (2, 16) * 255.0));
 		    }
@@ -2164,8 +2167,8 @@ public static class Myro
 	{
 	    string pickAFontResponse = null;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog ("Select a font");
 	    Invoke (delegate {
+		    Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog ("Select a font");
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAFontResponse = fc.FontName;
 		    }
@@ -2268,18 +2271,18 @@ public static class Myro
 	{
 	    bool yesnoResponse = false;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.MessageDialog fc = new Gtk.MessageDialog (
-		       null,
-		       0, Gtk.MessageType.Question,
-		       Gtk.ButtonsType.YesNo,
-		       question);
 	    Invoke (delegate {
-			  if (fc.Run() == (int)Gtk.ResponseType.Yes) {
-				yesnoResponse = true;
-			  }
-			  fc.Destroy();
-			  ev.Set();
-			});
+		    Gtk.MessageDialog fc = new Gtk.MessageDialog (
+				null,
+				0, Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				question);
+		    if (fc.Run() == (int)Gtk.ResponseType.Yes) {
+			yesnoResponse = true;
+		    }
+		    fc.Destroy();
+		    ev.Set();
+		});
 	    ev.WaitOne ();
 	    return yesnoResponse;
 	}
@@ -2288,12 +2291,12 @@ public static class Myro
 	public static void inform (string question)
 	{
             ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.MessageDialog fc = new Gtk.MessageDialog (
-		       null,
-		       0, Gtk.MessageType.Info,
-		       Gtk.ButtonsType.Ok,
-		       question);
 	    Invoke (delegate {
+		    Gtk.MessageDialog fc = new Gtk.MessageDialog (
+		          null,
+			  0, Gtk.MessageType.Info,
+			  Gtk.ButtonsType.Ok,
+			  question);
 		    fc.Run();
 		    fc.Destroy();
 		    ev.Set();
@@ -2306,22 +2309,24 @@ public static class Myro
 	{
 	    string askResponse = null;
 	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Gtk.Dialog fc = new Gtk.Dialog ("Information Request", null, 0);
-	    fc.VBox.PackStart (new Gtk.Label (question));
-	    foreach (string choice in choices) {
-		Gtk.Button button = new Gtk.Button (choice);
-		button.Clicked += (obj, a) => {
-		    askResponse = ((Gtk.Button)obj).Label;
-		    fc.Destroy ();
-		    ev.Set();
-		};
-		if (choices.Count < 5) {
-		    fc.AddActionWidget (button, Gtk.ResponseType.Ok);
-		} else {
-		    fc.VBox.PackStart (button, true, true, 5);
-		}
-	    }
 	    Invoke (delegate {
+		    Gtk.Dialog fc = new Gtk.Dialog ("Information Request", null, 0);
+		    fc.VBox.PackStart (new Gtk.Label (question));
+		    foreach (string choice in choices) {
+			Gtk.Button button = new Gtk.Button (choice);
+			button.Clicked += (obj, a) => {
+			    Invoke (delegate {			    
+				    askResponse = ((Gtk.Button)obj).Label;
+				    fc.Destroy ();
+				    ev.Set();
+				});
+			}
+			if (choices.Count < 5) {
+			    fc.AddActionWidget (button, Gtk.ResponseType.Ok);
+			} else {
+			    fc.VBox.PackStart (button, true, true, 5);
+			}
+		    }
 		    fc.ShowAll();
 		    fc.Run();
 		});

@@ -90,7 +90,7 @@ namespace CalicoPython
 		  Calico.MainWindow.Invoke (delegate {
 		      if (calico.CurrentDocument != null 
 			  && calico.CurrentDocument.filename == frame.f_code.co_filename
-			  && (calico.ProgramSpeed.Value != 100
+			  && (calico.ProgramSpeedValue != 100
 			      || calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno))) {
 			  calico.CurrentDocument.GotoLine ((int)frame.f_lineno);
 			  calico.CurrentDocument.SelectLine((int)frame.f_lineno);
@@ -102,7 +102,7 @@ namespace CalicoPython
 		  if ((calico.CurrentDocument != null 
 		       && calico.CurrentDocument.filename == frame.f_code.co_filename
 		       && calico.CurrentDocument.HasBreakpointSetAtLine ((int)frame.f_lineno)) 
-		      || calico.ProgramSpeed.Value == 0 
+		      || calico.ProgramSpeedValue == 0 
 		      || trace_pause) {
 		    Calico.MainWindow.Invoke (delegate {
 			calico.PlayButton.Sensitive = true;
@@ -116,7 +116,7 @@ namespace CalicoPython
 		    calico.playResetEvent.Reset ();
 		    trace_pause = false;
 		  } else { // then we are in a delay:
-		    int pause = (int)((100 - calico.ProgramSpeed.Value) / 100.0 * 1000);
+		    int pause = (int)((100 - calico.ProgramSpeedValue) / 100.0 * 1000);
 		    // Force at least a slight sleep, else no GUI controls
 		    System.Threading.Thread.Sleep (Math.Max (pause, 1));
 		  }

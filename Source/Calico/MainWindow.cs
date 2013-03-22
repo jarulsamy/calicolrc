@@ -62,6 +62,20 @@ namespace Calico {
         public static MainWindow _mainWindow = null;
         Gtk.Widget _lastSelectedPage = null;
 
+	
+	public double ProgramSpeedValue {
+	    get {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    double retval = 0;
+                    Invoke(delegate {
+			    retval = ProgramSpeed.Value;
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
+	    }
+	}
+
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
@@ -808,34 +822,43 @@ namespace Calico {
         }
 
         public Document GetDocument(string name) {
-            for (int i = 0; i < MainNotebook.NPages; i++) {
-                Gtk.Widget widget = MainNotebook.GetNthPage(i);
-                if (documents.ContainsKey(widget) && 
-                    documents [widget].widget.IsRealized &&
-                    documents [widget].filename != null && 
-                    documents [widget].filename.EndsWith(name)) {
-                    return documents [widget];
-                }
-            }
-            for (int i = 0; i < ToolNotebook.NPages; i++) {
-                Gtk.Widget widget = ToolNotebook.GetNthPage(i);
-                if (documents.ContainsKey(widget) && 
-                    documents [widget].widget.IsRealized &&
-                    documents [widget].filename != null && 
-                    documents [widget].filename.EndsWith(name)) {
-                    return documents [widget];
-                }
-            }
-            for (int i = 0; i < EditorNotebook.NPages; i++) {
-                Gtk.Widget widget = EditorNotebook.GetNthPage(i);
-                if (documents.ContainsKey(widget) && 
-                    documents [widget].widget.IsRealized &&
-                    documents [widget].filename != null && 
-                    documents [widget].filename.EndsWith(name)) {
-                    return documents [widget];
-                }
-            }
-            return null;
+	    Document retval = null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke(delegate {
+		    for (int i = 0; i < MainNotebook.NPages; i++) {
+			Gtk.Widget widget = MainNotebook.GetNthPage(i);
+			if (documents.ContainsKey(widget) && 
+			    documents [widget].widget.IsRealized &&
+			    documents [widget].filename != null && 
+			    documents [widget].filename.EndsWith(name)) {
+			    retval = documents [widget];
+			    break;
+			}
+		    }
+		    for (int i = 0; i < ToolNotebook.NPages; i++) {
+			Gtk.Widget widget = ToolNotebook.GetNthPage(i);
+			if (documents.ContainsKey(widget) && 
+			    documents [widget].widget.IsRealized &&
+			    documents [widget].filename != null && 
+			    documents [widget].filename.EndsWith(name)) {
+			    retval = documents [widget];
+			    break;
+			}
+		    }
+		    for (int i = 0; i < EditorNotebook.NPages; i++) {
+			Gtk.Widget widget = EditorNotebook.GetNthPage(i);
+			if (documents.ContainsKey(widget) && 
+			    documents [widget].widget.IsRealized &&
+			    documents [widget].filename != null && 
+			    documents [widget].filename.EndsWith(name)) {
+			    retval = documents [widget];
+			    break;
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+            return retval;
         }
 
         protected void OnButtonWhatsNewClicked(object sender, System.EventArgs e) {
@@ -879,33 +902,32 @@ namespace Calico {
         }
         
         public void PostBuild() {
-            // Had to add this here, as Stetic didn't like it
-            _shell = new MyTextEditor();
-            _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
-            _shell.DragDataReceived += (o, args) => {
-                Invoke(delegate {
-                    StartButton.Sensitive = true;
-                    StartAction.Sensitive = true;
-                }
-                );
-            };
-            ScrolledWindow.Add(_shell);
-            ScrolledWindow.ShowAll();
-            // Environment table:
-            EnvironmentTreeView.AppendColumn(_("Variable"), new Gtk.CellRendererText(), "text", 0);
-            EnvironmentTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
-            // Create a ListStore as the Model
-            EnvironmentList = new Gtk.ListStore(typeof(string), typeof(string));
-            EnvironmentTreeView.Model = EnvironmentList;
-            EnvironmentTreeView.ShowAll();
-            // Local environment:
-            LocalTreeView.AppendColumn(("Variable"), new Gtk.CellRendererText(), "text", 0);
-            LocalTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
-            LocalList = new Gtk.ListStore(typeof(string), typeof(string));
+	    // Had to add this here, as Stetic didn't like it
+	    _shell = new MyTextEditor();
+	    _shell.KeyReleaseEvent += ShellKeyReleaseEvent;
+	    _shell.DragDataReceived += (o, args) => {
+		Invoke(delegate {
+			StartButton.Sensitive = true;
+			StartAction.Sensitive = true;
+		    });
+	    };
+	    ScrolledWindow.Add(_shell);
+	    ScrolledWindow.ShowAll();
+	    // Environment table:
+	    EnvironmentTreeView.AppendColumn(_("Variable"), new Gtk.CellRendererText(), "text", 0);
+	    EnvironmentTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
+	    // Create a ListStore as the Model
+	    EnvironmentList = new Gtk.ListStore(typeof(string), typeof(string));
+	    EnvironmentTreeView.Model = EnvironmentList;
+	    EnvironmentTreeView.ShowAll();
+	    // Local environment:
+	    LocalTreeView.AppendColumn(("Variable"), new Gtk.CellRendererText(), "text", 0);
+	    LocalTreeView.AppendColumn(_("Value"), new Gtk.CellRendererText(), "text", 1);
+	    LocalList = new Gtk.ListStore(typeof(string), typeof(string));
             LocalTreeView.Model = LocalList;
             LocalTreeView.ShowAll();
         }
-
+	
         public bool ProgramRunning {
             get { return ((executeThread != null) || isRunning); }
         }
@@ -1132,15 +1154,20 @@ namespace Calico {
         }
 
         public void TryToClose(Document document) {
-            if ((!document.IsDirty) || (Close(document) != _("Cancel"))) {
-                bool result = document.Close(); // any cleanup?
-                if (result) {
-                    Gtk.Notebook notebook = searchForNotebook(document.widget);
-                    int page_num = notebook.PageNum(document.widget);
-                    documents.Remove(document.widget);
-                    notebook.RemovePage(page_num);
-                }
-            }
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke (delegate {
+		    if ((!document.IsDirty) || (Close(document) != _("Cancel"))) {
+			bool result = document.Close(); // any cleanup?
+			if (result) {
+			    Gtk.Notebook notebook = searchForNotebook(document.widget);
+			    int page_num = notebook.PageNum(document.widget);
+			    documents.Remove(document.widget);
+			    notebook.RemovePage(page_num);
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
         }
 
         public Document MakeDocument(string filename, string language) {
@@ -1219,10 +1246,12 @@ namespace Calico {
                     return _("Abandon changes");
                 } else { // Save
                     bool result = false;
+		    ManualResetEvent ev = new ManualResetEvent(false);
                     Invoke(delegate {
                         result = document.Save(); // save doc
-                    }
-                    );
+			ev.Set();
+                    });
+		    ev.WaitOne();
                     if (result) {
                         return _("Save");
                     }
@@ -1231,21 +1260,28 @@ namespace Calico {
         }
 
         public bool FileSavedAs(Document doc, string filename) {
-            // Some other doucment was saved as this document's name
-            for (int page_num = 0; page_num < MainNotebook.NPages; page_num++) {
-                Gtk.Widget widget = MainNotebook.GetNthPage(page_num);
-                if (documents.ContainsKey(widget)) {
-                    if (documents [widget].filename == filename && documents [widget] != doc) {
-                        // Contents were just overwritten!
-                        documents [widget].filename = null;
-                        documents [widget].basename = "Old " + documents [widget].basename;
-                        documents [widget].IsDirty = true;
-                        documents [widget].UpdateDocument();
-                        return true;
-                    }
-                }
-            }
-            return false;
+	    bool retval = false;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke(delegate {
+		    // Some other doucment was saved as this document's name
+		    for (int page_num = 0; page_num < MainNotebook.NPages; page_num++) {
+			Gtk.Widget widget = MainNotebook.GetNthPage(page_num);
+			if (documents.ContainsKey(widget)) {
+			    if (documents [widget].filename == filename && documents [widget] != doc) {
+				// Contents were just overwritten!
+				documents [widget].filename = null;
+				documents [widget].basename = "Old " + documents [widget].basename;
+				documents [widget].IsDirty = true;
+				documents [widget].UpdateDocument();
+				retval = true;
+				break;
+			    }
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+            return retval;
         }
 
         public bool Close() {
@@ -1407,8 +1443,7 @@ namespace Calico {
             if (CurrentDocument != null) {
                 Invoke(delegate {
                     CurrentDocument.Save();
-                }
-                );
+                });
                 SetLanguage(CurrentLanguage);
                 addToRecentsMenu(CurrentDocument.filename); // needed, if didn't have filename before
             }
@@ -2068,37 +2103,8 @@ namespace Calico {
                     StartButton.Sensitive = false; // need something to execute
                     StartAction.Sensitive = false;
                 }
-            }
-            );
+            });
             executeThread = null;
-            /*
-       if self.calico.last_error != "":
-            url = self.make_error_url(self.language, self.calico.last_error)
-            error_button_text = None
-            text = self.get_error_text(self.calico.last_error)
-            match = re.search(_('File \"(.*)\", line (\d*)'), text)
-            if match: # 'File "<string>", line 167'
-                filename, lineno = match.groups()
-                lineno = int(lineno)
-                basename = os.path.basename(filename)
-                filename = os.path.abspath(filename)
-                if basename != "<string>":
-                    error_button_text = _("Go to error in %s") % basename
-                    error_button_func = lambda w, e: self.goto_file(filename, lineno)
-            def invoke(sender, args):
-                button = Gtk.Button(_("Get help on error"))
-                button.Clicked += lambda o, e: OpenUrl(url)
-                button.Show()
-                anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
-                self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
-                if error_button_text:
-                    button = Gtk.Button(error_button_text)
-                    button.Clicked += error_button_func
-                    button.Show()
-                    anchor_iter = self.history_textview.Buffer.CreateChildAnchor(self.history_textview.Buffer.EndIter)
-                    self.history_textview.AddChildAtAnchor(button, anchor_iter[0])
-            self.calico.Invoke(invoke)
-             */
         }
 
         public void AbortThread() {
@@ -2227,23 +2233,22 @@ namespace Calico {
             if (Debug) {
                 Console.Write(format);
             } else {
-                if (vpaned1.Visible || force) {
-                    Invoke(delegate {
-                        lock (ChatOutput) {
-                            Gtk.TextIter end = ChatOutput.Buffer.EndIter;
-                            ChatOutput.Buffer.PlaceCursor(end);
-                            string colorname = MainWindow.tagnames [tag];
-                            ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
-                            end = ChatOutput.Buffer.EndIter;
-                            Gtk.TextMark mark = ChatOutput.Buffer.GetMark("insert");
-                            ChatOutput.Buffer.MoveMark(mark, end);
-                            ChatOutput.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
-                        }
-                    }
-                    );
-                } else {
-                    Print(tag, format);
-                }
+		Invoke(delegate {
+			if (vpaned1.Visible || force) {
+			    lock (ChatOutput) {
+				Gtk.TextIter end = ChatOutput.Buffer.EndIter;
+				ChatOutput.Buffer.PlaceCursor(end);
+				string colorname = MainWindow.tagnames [tag];
+				ChatOutput.Buffer.InsertWithTagsByName(ref end, format, colorname);
+				end = ChatOutput.Buffer.EndIter;
+				Gtk.TextMark mark = ChatOutput.Buffer.GetMark("insert");
+				ChatOutput.Buffer.MoveMark(mark, end);
+				ChatOutput.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
+			    }
+			} else {
+			    Print(tag, format);
+			}
+		    });
             }
         }
 
@@ -2253,101 +2258,91 @@ namespace Calico {
                 Gtk.TextMark mark = Output.Buffer.GetMark("insert");
                 Output.Buffer.MoveMark(mark, end);
                 Output.ScrollToMark(mark, 0.0, true, 0.0, 1.0);
-            }
-            );
+            });
         }
 
         public virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
-            // Always start by wiping out and hiding properties
-            lastSelectedPage = searchForPage((Gtk.Widget)o);
-            Gtk.Notebook nb = this.PropertyNotebook;
-            while (nb.NPages > 0) {
-                nb.RemovePage(0);
-            }
-            nb.Visible = false;
-            Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
-            if (lastSelectedPage == searchForPage(Home)) {
-                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Home")) {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    }
-                    Title = String.Format("Calico - {0}", System.Environment.UserName);
-                }
-                );
-            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
-                //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
-                //else if (Focus == Shell) {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        if (ShellEditor.Document.Text != "") {
-                            StartAction.Sensitive = true;
-                            StartButton.Sensitive = true;
-                        } else {
-                            StartAction.Sensitive = false;
-                            StartButton.Sensitive = false;
-                        }
-                    }
-                    SetLanguage(ShellLanguage);
-                    // Workaround: had to add this for notebook page selection:
-                    Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
-                }
-                );
-                GLib.Timeout.Add(0, delegate {
-                    ShellEditor.GrabFocus();
-                    return false;
-                }
-                );
-            } else if (CurrentDocument != null) {
-                // Set save as python menu:
-                saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
-                ProgramSpeed.Value = CurrentDocument.SpeedValue;
-                // Set options menu:
-                if (! ProgramRunning) {
-                    if (CurrentDocument.HasContent) {
-			ProgramSpeed.Sensitive = true;
-                        StartButton.Sensitive = true;
-                        StartAction.Sensitive = true;
-                    } else {
+	    Invoke(delegate {
+		    // Always start by wiping out and hiding properties
+		    lastSelectedPage = searchForPage((Gtk.Widget)o);
+		    Gtk.Notebook nb = this.PropertyNotebook;
+		    while (nb.NPages > 0) {
+			nb.RemovePage(0);
+		    }
+		    nb.Visible = false;
+		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+		    if (lastSelectedPage == searchForPage(Home)) {
 			ProgramSpeed.Sensitive = false;
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    }
-                }
-                SetLanguage(CurrentDocument.language);
-                Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
-                CurrentDocument.SetOptionsMenu(options_menu);
-                CurrentDocument.focus_widget.GrabFocus();
-                //CurrentDocument.tab_label.Text =
-                Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
-
-                // Looks for property notebook widget from current document.
-                // Adds as new page in property notebook if one is provided.
-                Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
-                if (propWidget != null) {
-                    nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
-                    nb.Visible = true;
-                    nb.ShowAll();
-                }
-            } else {
-                Invoke(delegate {
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    }
-                    // Some other page
-                    Title = String.Format("Calico - {0}", System.Environment.UserName);
-                }
-                );
-            }
-        }
+			saveaspython_menu.Sensitive = false;
+			if (! ProgramRunning) {
+			    StartButton.Sensitive = false;
+			    StartAction.Sensitive = false;
+			}
+			Title = String.Format("Calico - {0}", System.Environment.UserName);
+		    } else if (lastSelectedPage == searchForPage(ShellEditor)) {
+			//} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
+			//else if (Focus == Shell) {
+			ProgramSpeed.Sensitive = false;
+			saveaspython_menu.Sensitive = false;
+			if (! ProgramRunning) {
+			    if (ShellEditor.Document.Text != "") {
+				StartAction.Sensitive = true;
+				StartButton.Sensitive = true;
+			    } else {
+				StartAction.Sensitive = false;
+				StartButton.Sensitive = false;
+			    }
+			}
+			SetLanguage(ShellLanguage);
+			// Workaround: had to add this for notebook page selection:
+			Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
+			GLib.Timeout.Add(0, delegate {
+				ShellEditor.GrabFocus();
+				return false;
+			    });
+		    } else if (CurrentDocument != null) {
+			// Set save as python menu:
+			saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+			ProgramSpeed.Value = CurrentDocument.SpeedValue;
+			// Set options menu:
+			if (! ProgramRunning) {
+			    if (CurrentDocument.HasContent) {
+				ProgramSpeed.Sensitive = true;
+				StartButton.Sensitive = true;
+				StartAction.Sensitive = true;
+			    } else {
+				ProgramSpeed.Sensitive = false;
+				StartButton.Sensitive = false;
+				StartAction.Sensitive = false;
+			    }
+			}
+			SetLanguage(CurrentDocument.language);
+			Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
+			CurrentDocument.SetOptionsMenu(options_menu);
+			CurrentDocument.focus_widget.GrabFocus();
+			//CurrentDocument.tab_label.Text =
+			Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
+			
+			// Looks for property notebook widget from current document.
+			// Adds as new page in property notebook if one is provided.
+			Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
+			if (propWidget != null) {
+			    nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
+			    nb.Visible = true;
+			    nb.ShowAll();
+			}
+		    } else {
+			ProgramSpeed.Sensitive = false;
+			saveaspython_menu.Sensitive = false;
+			if (! ProgramRunning) {
+			    StartButton.Sensitive = false;
+			    StartAction.Sensitive = false;
+			}
+			// Some other page
+			Title = String.Format("Calico - {0}", System.Environment.UserName);
+		    }
+		});
+	}
 
         public void updateControls(object obj, System.EventArgs args) {
 	    // When Shell is selected by clicking in it, or changes
@@ -2413,40 +2408,59 @@ namespace Calico {
         }
 
         public Document getFocusDocument() {
+	    Document retval = null;
             Gtk.Notebook notebook = searchForNotebook(lastSelectedPage);
-            if (notebook != null) {
-                Gtk.Widget widget = notebook.GetNthPage(notebook.Page);
-                if (documents.ContainsKey(widget)) {
-                    return documents [widget];
-                }
-            }
-            return null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke(delegate {
+		    if (notebook != null) {
+			Gtk.Widget widget = notebook.GetNthPage(notebook.Page);
+			if (documents.ContainsKey(widget)) {
+			    retval = documents [widget];
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+            return retval;
         }
 
         public Gtk.Widget searchForPage(Gtk.Widget widget) {
             Gtk.Widget child = null;
-            while (widget != null) {
-                if (widget.GetType() == typeof(Gtk.Notebook))
-                    if (child == null)
-                        return ((Gtk.Notebook)widget).GetNthPage(((Gtk.Notebook)widget).Page);
-                    else 
-                        return child;
-                else {
-                    child = widget;
-                    widget = widget.Parent;
-                }
-            }
-            return null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke(delegate {
+		    while (widget != null) {
+			if (widget.GetType() == typeof(Gtk.Notebook)) {
+			    if (child == null) {
+				child = ((Gtk.Notebook)widget).GetNthPage(((Gtk.Notebook)widget).Page);
+			    }
+			    break;
+			} else {
+			    child = widget;
+			    widget = widget.Parent;
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+            return child;
         }
 
         public Gtk.Notebook searchForNotebook(Gtk.Widget widget) {
-            while (widget != null) {
-                if (widget.GetType() == typeof(Gtk.Notebook))
-                    return (Gtk.Notebook)widget;
-                else
-                    widget = widget.Parent;
-            }
-            return null;
+	    Gtk.Notebook retval = null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke(delegate {
+		    while (widget != null) {
+			if (widget.GetType() == typeof(Gtk.Notebook)) {
+			    retval = (Gtk.Notebook)widget;
+			    break;
+			} else {
+			    widget = widget.Parent;
+			}
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+            return retval;
         }
 
         public int findTabByWidget(Gtk.Widget w) {
@@ -2501,10 +2515,12 @@ namespace Calico {
                     return;
                 }
                 bool retval = false;
+		ManualResetEvent ev = new ManualResetEvent(false);
                 Invoke(delegate {
-                    retval = CurrentDocument.Save();
-                }
-                );
+			retval = CurrentDocument.Save();
+			ev.Set();
+		    });
+		ev.WaitOne();
                 if (retval) {
                     // if select, just send that
                     //if (manager[CurrentLanguage].IsTextLanguage && CurrentDocument.HasSelection) {

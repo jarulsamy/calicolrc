@@ -542,24 +542,23 @@ public static class Graphics
                                            int width=300,
                                            int height=300)
 	{
-	    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
+	    ManualResetEvent ev = new ManualResetEvent(false);
+    	    Invoke( delegate {
+		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear (false);
 			_lastWindow = _windows [title];
 			Gdk.Color bg = new Gdk.Color (242, 241, 240);
-			Invoke( delegate {
-				_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
-				_lastWindow.KeepAbove = true;
-			    });
-			return _windows [title];
-		} else {
+			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			_lastWindow.KeepAbove = true;
+		    } else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 			_lastWindow = _windows [title];
-			Invoke( delegate {
-				_lastWindow.KeepAbove = true;
-			    });
-			//Thread.Sleep ((int)(.1 * 1000)); // FIXME: wait for realize
-			return _windows [title];
-		}
+			_lastWindow.KeepAbove = true;
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+	    return _windows [title];
 	}
 
 	public static void wait (double seconds)
@@ -579,24 +578,24 @@ public static class Graphics
                                            int width=300, 
                                            int height=300)
 	{
-		if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke( delegate {
+		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
 			_windows [title].clear ();
 			_windows [title].mode = "auto";
-			Invoke( delegate {
-				_windows [title].ShowAll ();
-				_windows [title].Resize (width, height);
-				_windows [title].QueueDraw ();
-			    });
+			_windows [title].ShowAll ();
+			_windows [title].Resize (width, height);
+			_windows [title].QueueDraw ();
 			_lastWindow = _windows [title];
-			return _windows [title];
-		} else {
+		    } else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 			_lastWindow = _windows [title];
-			Invoke( delegate {
-				_lastWindow.KeepAbove = true;
-			    });
-			return _windows [title];
-		}
+			_lastWindow.KeepAbove = true;
+		    }
+		    ev.Set();
+		});
+	    ev.WaitOne();
+	    return _windows [title];
 	}
 
 	public static Graphics.WindowClass getWindow ()
@@ -1222,39 +1221,42 @@ public static class Graphics
     
 		public void clear (bool redraw)
 		{
-			_canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-			// FIXME: w,h of Window?
-					       (int)800, 
-					       (int)600);
-			_canvas.need_to_draw_surface = false;
-
-			mode = "auto";
-			Resize (width, height);
-			timer_running = false;
-			last_update = new DateTime (2000, 1, 1);
-			_update_interval = .1; // how often, in seconds, to update
-			onClickCallbacks = new List ();
-			onMouseMovementCallbacks = new List ();
-			onMouseUpCallbacks = new List ();
-			onKeyPressCallbacks = new List ();
-			onKeyReleaseCallbacks = new List ();
-			_lastKey = "";
-			_mouseState = "up";
-			_keyState = "up";
-			time = 0.0;
-			simulationStepTime = 0.01;
-			state = "init";
-			lock (_canvas.shapes)
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
+								      // FIXME: w,h of Window?
+								      (int)800, 
+								      (int)600);
+			    _canvas.need_to_draw_surface = false;
+			    
+			    mode = "auto";
+			    Resize (width, height);
+			    timer_running = false;
+			    last_update = new DateTime (2000, 1, 1);
+			    _update_interval = .1; // how often, in seconds, to update
+			    onClickCallbacks = new List ();
+			    onMouseMovementCallbacks = new List ();
+			    onMouseUpCallbacks = new List ();
+			    onKeyPressCallbacks = new List ();
+			    onKeyReleaseCallbacks = new List ();
+			    _lastKey = "";
+			    _mouseState = "up";
+			    _keyState = "up";
+			    time = 0.0;
+			    simulationStepTime = 0.01;
+			    state = "init";
+			    lock (_canvas.shapes)
 				_canvas.shapes.Clear ();
-			Gdk.Color bg = new Gdk.Color (242, 241, 240);
-			Invoke (delegate {
-				foreach (Gtk.Widget child in _canvas.Children) {
-					_canvas.Remove (child);
-				}
-				_canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			    Gdk.Color bg = new Gdk.Color (242, 241, 240);
+			    foreach (Gtk.Widget child in _canvas.Children) {
+				_canvas.Remove (child);
+			    }
+			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			    ev.Set();
 			});
-			if (redraw)
-				QueueDraw ();
+		    ev.WaitOne();
+		    if (redraw)
+			QueueDraw();
 		}
 		
 		public Gtk.ScrolledWindow ScrolledWindow {
@@ -1279,10 +1281,10 @@ public static class Graphics
 
 		public void setBackground (Color color)
 		{
-		    bg = new Gdk.Color ((byte)color.red, 
-					(byte)color.green, 
-					(byte)color.blue);
 		    Invoke( delegate {
+			    bg = new Gdk.Color ((byte)color.red, 
+						(byte)color.green, 
+						(byte)color.blue);
 			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
 			});
 		}
@@ -1299,16 +1301,26 @@ public static class Graphics
     
 		public int getWidth ()
 		{
-			int _width, _height;
-			this.GetSize (out _width, out _height);
-			return width;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int _width = 0, _height = 0;
+		    Invoke( delegate {
+			    this.GetSize (out _width, out _height);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return _width;
 		}
     
 		public int getHeight ()
 		{
-			int _width, _height;
-			this.GetSize (out _width, out _height);
-			return _height;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int _width = 0, _height = 0;
+		    Invoke( delegate {
+			    this.GetSize (out _width, out _height);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return _height;
 		}
     
 		public void draw (Shape shape)
@@ -1518,38 +1530,48 @@ public static class Graphics
 		}
     
 		public int height {
-			get {
-			  if (Child == _canvas) {
-			    int _width, _height;
-			    this.GetSize (out _width, out _height);
-			    return _height;
-			  } else { // scrollbars
-			    return _canvas.height;
-			  }
-			}
+		    get {
+			ManualResetEvent ev = new ManualResetEvent(false);
+			int _width = 0, _height = 0;
+			Invoke( delegate {
+				if (Child == _canvas) {
+				    this.GetSize (out _width, out _height);
+				} else { // scrollbars
+				    _height = _canvas.height;
+				}
+				ev.Set();
+			    });
+			ev.WaitOne();
+			return _height;
+		    }
 		}
 
 		public int width {
-			get {
-			  if (Child == _canvas) {
-				int _width, _height;
-				this.GetSize (out _width, out _height);
-				return _width;
-			  } else { // scrollbars
-			    return _canvas.width;
-			  }
-			}
+		    get {
+			ManualResetEvent ev = new ManualResetEvent(false);
+			int _width = 0, _height = 0;
+			Invoke( delegate {
+				if (Child == _canvas) {
+				    this.GetSize (out _width, out _height);
+				    ev.Set();
+				} else { // scrollbars
+				    _width = _canvas.width;
+				}
+			    });
+			ev.WaitOne();
+			return _width;
+		    }
 		}
 
 		public Canvas getCanvas ()
 		{
-			return _canvas;
+		    return _canvas;
 		}
     
 		public Canvas canvas {
-			get {
-				return _canvas;
-			}
+		    get {
+			return _canvas;
+		    }
 		}
 
 		public PythonTuple getMouse ()
@@ -3528,50 +3550,55 @@ public static class Graphics
 
 		public Picture (string filename) : this(true)
 		{
-			if (filename.StartsWith ("http://")) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    if (filename.StartsWith ("http://")) {
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
 				req.KeepAlive = false;
 				req.Timeout = 10000;        
 				WebResponse resp = req.GetResponse ();
 				Stream s = resp.GetResponseStream ();
 				_pixbuf = new Gdk.Pixbuf (s);
-			} else {
+			    } else {
 				_pixbuf = new Gdk.Pixbuf (filename);
-			}
-			if (!_pixbuf.HasAlpha) {
-			  _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
-			}
-			set_points (new Point (0, 0), 
-                 new Point (_pixbuf.Width, 0),
-                 new Point (_pixbuf.Width, _pixbuf.Height), 
-                 new Point (0, _pixbuf.Height));
+			    }
+			    if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 		
 		public Picture (WindowClass window) : this(true)
 		{ 
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Gdk.Pixbuf pixbuf = null;
-			Invoke (delegate {
-				Gdk.Drawable drawable = window.getDrawable ();
-				Gdk.Colormap colormap = drawable.Colormap;
-				int _width = 0;
-				int _height = 0;
-				drawable.GetSize (out _width, out _height);
-				pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
-				ev.Set ();
-			});
-			ev.WaitOne ();
-			// Now, do what Picture(pixbuf) does:
-			_pixbuf = pixbuf;
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    Invoke (delegate {
+			    Gdk.Pixbuf pixbuf = null;
+			    Gdk.Drawable drawable = window.getDrawable ();
+			    Gdk.Colormap colormap = drawable.Colormap;
+			    int _width = 0;
+			    int _height = 0;
+			    drawable.GetSize (out _width, out _height);
+			    pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
+			    // Now, do what Picture(pixbuf) does:
+			    _pixbuf = pixbuf;
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			set_points (new Point (0, 0), 
-                 new Point (_pixbuf.Width, 0),
-                 new Point (_pixbuf.Width, _pixbuf.Height), 
-                 new Point (0, _pixbuf.Height));			
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));			
+			    ev.Set ();
+			});
+		    ev.WaitOne ();
 		}
-
+		
 		public Picture (bool has_pen) : base(has_pen)
 		{
 			this._fill.picture = this;
@@ -3579,274 +3606,323 @@ public static class Graphics
 
 		public Picture (Picture original) : this(true)
 		{
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			for (int x=0; x < _pixbuf.Width; x++) {
+			    }
+			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					byte r = (byte)original.getRed (x, y);
-					byte g = (byte)original.getGreen (x, y);
-					byte b = (byte)original.getBlue (x, y);
-					byte a = (byte)original.getAlpha (x, y);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 0, r);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 1, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 2, b);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 3, a);
+				    byte r = (byte)original.getRed (x, y);
+				    byte g = (byte)original.getGreen (x, y);
+				    byte b = (byte)original.getBlue (x, y);
+				    byte a = (byte)original.getAlpha (x, y);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, r);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, b);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, a);
 				}
-			}
-			set_points (original.points);
-			center = original.center;
+			    }
+			    set_points (original.points);
+			    center = original.center;
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
     
 		public Picture (Gdk.Pixbuf pixbuf) : this(true)
 		{
-			_pixbuf = pixbuf;
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    _pixbuf = pixbuf;
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			set_points (new Point (0, 0), 
-                 new Point (_pixbuf.Width, 0),
-                 new Point (_pixbuf.Width, _pixbuf.Height), 
-                 new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
-	  public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true)
-		{
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			// FIXME: convert bitmap.palette to colormap
-			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
-			if (!_pixbuf.HasAlpha) {
+		public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    // FIXME: convert bitmap.palette to colormap
+			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			int xstep = 1;
-			if (fluke1) xstep = 2;
-			for (int x=0; x < _pixbuf.Width; x += xstep) {
+			    }
+			    int xstep = 1;
+			    if (fluke1) xstep = 2;
+			    for (int x=0; x < _pixbuf.Width; x += xstep) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					System.Drawing.Color pixel = bitmap.GetPixel (x / xstep, y);
-					// First pixel
+				    System.Drawing.Color pixel = bitmap.GetPixel (x / xstep, y);
+				    // First pixel
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, pixel.R);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, pixel.G);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, pixel.B);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, pixel.A);
+				    if (fluke1){
+					// Second pixel
+					int x2 = x + 1;
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 0, pixel.R);
+							   x2 * _pixbuf.NChannels + 0, pixel.R);
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 1, pixel.G);
+							   x2 * _pixbuf.NChannels + 1, pixel.G);
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 2, pixel.B);
+							   x2 * _pixbuf.NChannels + 2, pixel.B);
 					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 3, pixel.A);
-					if (fluke1){
-					  // Second pixel
-					  int x2 = x + 1;
-					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-							     x2 * _pixbuf.NChannels + 0, pixel.R);
-					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-							     x2 * _pixbuf.NChannels + 1, pixel.G);
-					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-							     x2 * _pixbuf.NChannels + 2, pixel.B);
-					  Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-							     x2 * _pixbuf.NChannels + 3, pixel.A);
-					}
+							   x2 * _pixbuf.NChannels + 3, pixel.A);
+				    }
 				}
-			}
-			set_points (new Point (0, 0), 
-                 new Point (_pixbuf.Width, 0),
-                 new Point (_pixbuf.Width, _pixbuf.Height), 
-                 new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void fromArray (Byte [] buffer, string format)
 		{
-			if (format == "BGRX") { // b, r, g, ignore
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    if (format == "BGRX") { // b, r, g, ignore
 				int count = 0;
 				for (int i=0; i < buffer.Length; i+=4) {
-					byte b = buffer [i];
-					byte g = buffer [i + 1];
-					byte r = buffer [i + 2];
-					// NOTE: x is from the other side
-					int x = _pixbuf.Width - count % _pixbuf.Width;
-					int y = count / _pixbuf.Width;
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 0, r);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 1, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 2, b);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 3, 255);
-					count++;
+				    byte b = buffer [i];
+				    byte g = buffer [i + 1];
+				    byte r = buffer [i + 2];
+				    // NOTE: x is from the other side
+				    int x = _pixbuf.Width - count % _pixbuf.Width;
+				    int y = count / _pixbuf.Width;
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, r);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, b);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, 255);
+				    count++;
 				}
-			} else if (format == "GRAY") { 
+			    } else if (format == "GRAY") { 
 				int count = 0;
 				for (int i=0; i < buffer.Length; i++) {
-					byte g = buffer [i];
-					// NOTE: x is from the other side
-					int x = _pixbuf.Width - count % _pixbuf.Width;
-					int y = count / _pixbuf.Width;
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 0, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 1, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 2, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-              x * _pixbuf.NChannels + 3, 255);
-					count++;
+				    byte g = buffer [i];
+				    // NOTE: x is from the other side
+				    int x = _pixbuf.Width - count % _pixbuf.Width;
+				    int y = count / _pixbuf.Width;
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, 255);
+				    count++;
 				}
-			} else {
+			    } else {
 				throw new Exception ("Picture.fromArray(array, format): invalid format");
-			}
-			QueueDraw ();
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
     
 		public Picture (int width, int height, byte [] buffer, int depth) : this(true)
 		{
-			// depth should be 1
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // depth should be 1
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			for (int x=0; x < _pixbuf.Width; x++) {
+			    }
+			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					byte r = buffer [(y * width + x)];
-					byte g = r;
-					byte b = r;
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 0, r);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 1, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 2, b);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 3, 255);
+				    byte r = buffer [(y * width + x)];
+				    byte g = r;
+				    byte b = r;
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, r);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, b);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, 255);
 				}
-			}
-			set_points (new Point (0, 0), 
-                     new Point (_pixbuf.Width, 0),
-                     new Point (_pixbuf.Width, _pixbuf.Height), 
-                     new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height, byte [] buffer) : this(true)
 		{
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			for (int x=0; x < _pixbuf.Width; x++) {
+			    }
+			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					byte r = buffer [(y * width + x) * 3 + 0];
-					byte g = buffer [(y * width + x) * 3 + 1];
-					byte b = buffer [(y * width + x) * 3 + 2];
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 0, r);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 1, g);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 2, b);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                    x * _pixbuf.NChannels + 3, 255);
+				    byte r = buffer [(y * width + x) * 3 + 0];
+				    byte g = buffer [(y * width + x) * 3 + 1];
+				    byte b = buffer [(y * width + x) * 3 + 2];
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, r);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, g);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, b);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, 255);
 				}
-			}
-			set_points (new Point (0, 0), 
-                     new Point (_pixbuf.Width, 0),
-                     new Point (_pixbuf.Width, _pixbuf.Height), 
-                     new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height) : this(true)
 		{
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			// WORKAROUND: image needs alpha set to zero (full opacity/no
-			// transparency). Might as well set default color, too:
-			for (int x=0; x < _pixbuf.Width; x++) {
+			    }
+			    // WORKAROUND: image needs alpha set to zero (full opacity/no
+			    // transparency). Might as well set default color, too:
+			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                          x * _pixbuf.NChannels + 0, 255);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                          x * _pixbuf.NChannels + 1, 255);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                          x * _pixbuf.NChannels + 2, 255);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                          x * _pixbuf.NChannels + 3, 255);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, 255);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, 255);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, 255);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, 255);
 				}
-			}
-			set_points (new Point (0, 0), 
-                     new Point (_pixbuf.Width, 0),
-                     new Point (_pixbuf.Width, _pixbuf.Height), 
-                     new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height, Color color) : this(true)
 		{
-			// Colorspace, has_alpha, bits_per_sample, width, height:
-			_pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
-			if (!_pixbuf.HasAlpha) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke (delegate {
+			    // Colorspace, has_alpha, bits_per_sample, width, height:
+			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
+			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
-			}
-			// WORKAROUND: image needs alpha set to zero (full opacity/no
-			// transparency). Might as well set default color, too:
-			for (int x=0; x < _pixbuf.Width; x++) {
+			    }
+			    // WORKAROUND: image needs alpha set to zero (full opacity/no
+			    // transparency). Might as well set default color, too:
+			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 0, (byte)color.red);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 1, (byte)color.green);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 2, (byte)color.blue);
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 3, (byte)color.alpha);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, (byte)color.red);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1, (byte)color.green);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, (byte)color.blue);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3, (byte)color.alpha);
 				}
-			}
-			set_points (new Point (0, 0), 
-                 new Point (_pixbuf.Width, 0),
-                 new Point (_pixbuf.Width, _pixbuf.Height), 
-                 new Point (0, _pixbuf.Height));
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public Picture getRegion (IList iterable, int width, int height, double degrees)
 		{
-			Point p = new Point (iterable);
-			Picture pic = new Picture (width, height);
-			double angle = degrees * Math.PI / 180.0;
-			double px, py;
-			int ox = 0;
-			for (int x = -width/2; x < width/2; x++) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Picture pic = new Picture (width, height);
+		    Invoke( delegate {
+			    Point p = new Point (iterable);
+			    double angle = degrees * Math.PI / 180.0;
+			    double px, py;
+			    int ox = 0;
+			    for (int x = -width/2; x < width/2; x++) {
 				int oy = 0;
 				for (int y = -height/2; y < height/2; y++) {
-					// rotate that x,y:
-					px = x * Math.Cos (angle) - y * Math.Sin (angle);
-					py = x * Math.Sin (angle) + y * Math.Cos (angle);
-					// set the color of the new image from the offset of this:
-					pic.setColor (ox, oy, this.getPixel ((int)(p.x + px), 
-                                             (int)(p.y + py)).getColor ());
-					oy += 1;
+				    // rotate that x,y:
+				    px = x * Math.Cos (angle) - y * Math.Sin (angle);
+				    py = x * Math.Sin (angle) + y * Math.Cos (angle);
+				    // set the color of the new image from the offset of this:
+				    pic._setColor (ox, oy, this.getPixel ((int)(p.x + px), 
+									 (int)(p.y + py)).getColor ());
+				    oy += 1;
 				}
 				ox += 1;
-			}
-			return pic;
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return pic;
 		}
 
 		public Picture getRegion (IList iterable, int width, int height)
 		{
-			Point p = new Point (iterable);
-			Picture pic = new Picture (width, height);
-			for (int x = 0; x < width; x++) {
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Picture pic = new Picture (width, height);
+		    Invoke( delegate {
+			    Point p = new Point (iterable);
+			    for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-					pic.setColor (x, y, this.getPixel ((int)(p.x + x), 
-					   (int)(p.y + y)).getColor ());
+				    pic.setColor (x, y, this.getPixel ((int)(p.x + x), 
+								       (int)(p.y + y)).getColor ());
 				}
-			}
-			return pic;
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return pic;
 		}
 
 		public void setRegion (IList iterable, Picture picture)
@@ -3970,12 +4046,26 @@ public static class Graphics
 
 		public int getWidth ()
 		{
-			return _pixbuf.Width;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			retval = _pixbuf.Width;
+			ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
 
 		public int getHeight ()
 		{
-			return _pixbuf.Height;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			retval = _pixbuf.Height;
+			ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
 
 		public void savePicture (string filename)
@@ -4082,168 +4172,263 @@ public static class Graphics
 
 		public int getGray (int x, int y)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			int r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 0);
-			int g = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 1);
-			int b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 2);
-			return (int)(((double)(r + g + b)) / 3.0);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    int r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						      x * _pixbuf.NChannels + 0);
+			    int g = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						      x * _pixbuf.NChannels + 1);
+			    int b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						      x * _pixbuf.NChannels + 2);
+			    retval = (int)(((double)(r + g + b)) / 3.0);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
     
 		public int getRed (int x, int y)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                  x * _pixbuf.NChannels + 0);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
     
 		public int getGreen (int x, int y)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                  x * _pixbuf.NChannels + 1);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 1);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
     
 		public int getBlue (int x, int y)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                  x * _pixbuf.NChannels + 2);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
-    
+		
 		public int getAlpha (int x, int y)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			return Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                  x * _pixbuf.NChannels + 3);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    int retval = 0;
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 3);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    return retval;
 		}
     
 		public void setColor (int x, int y, Color color)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                        x * _pixbuf.NChannels + 0, (byte)color.red);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                        x * _pixbuf.NChannels + 1, (byte)color.green);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                        x * _pixbuf.NChannels + 2, (byte)color.blue);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                        x * _pixbuf.NChannels + 3, (byte)color.alpha);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 0, (byte)color.red);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 1, (byte)color.green);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 2, (byte)color.blue);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 3, (byte)color.alpha);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
+		}
+
+		public void _setColor (int x, int y, Color color)
+		{
+		    // red, green, blue, alpha
+		    x = wrap_width (x);
+		    y = wrap_height (y);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 0, (byte)color.red);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 1, (byte)color.green);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 2, (byte)color.blue);
+		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+				       x * _pixbuf.NChannels + 3, (byte)color.alpha);
 		}
 
 		public void setGray (int x, int y, byte value)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 0, value);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 1, value);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 2, value);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 0, value);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 1, value);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 2, value);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
     
 		public void setRed (int x, int y, byte value)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                x * _pixbuf.NChannels + 0, value);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 0, value);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
 
 		public void setGreen (int x, int y, byte value)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 1, value);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 1, value);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
 
 		public void setBlue (int x, int y, byte value)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 2, value);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 2, value);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
     
 		public void setAlpha (int x, int y, byte value)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                            x * _pixbuf.NChannels + 3, value);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 3, value);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
 
 		public void setAlpha (byte value)
 		{
-			for (int x = 0; x < width; x++) {
-			    for (int y = 0; y < height; y++) {
-				if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
-				    // Don't change alpha here
-				} else {
-				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						       x * _pixbuf.NChannels + 3, value);
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+				    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
+					// Don't change alpha here
+				    } else {
+					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+							   x * _pixbuf.NChannels + 3, value);
+				    }
 				}
 			    }
-			}
-			QueueDraw ();
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
 
 		public void setRGB (int x, int y, byte red, byte green, byte blue)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 0, red);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 1, green);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 2, blue);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 0, red);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 1, green);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 2, blue);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
     
 		public void setRGBA (int x, int y, byte red, byte green, byte blue, 
                             byte alpha)
 		{
-			// red, green, blue, alpha
-			x = wrap_width (x);
-			y = wrap_height (y);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 0, red);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 1, green);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 2, blue);
-			Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                  x * _pixbuf.NChannels + 3, alpha);
-			QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Invoke( delegate {
+			    // red, green, blue, alpha
+			    x = wrap_width (x);
+			    y = wrap_height (y);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 0, red);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 1, green);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 2, blue);
+			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+					       x * _pixbuf.NChannels + 3, alpha);
+			    ev.Set();
+			});
+		    ev.WaitOne();
+		    QueueDraw ();
 		}
 
 		public override Color fill {
@@ -4288,15 +4473,27 @@ public static class Graphics
     
 		public int width {
 			get {
-				//return (int)(_pixbuf.Width*_scaleFactor);
-				return _pixbuf.Width;
+			    ManualResetEvent ev = new ManualResetEvent(false);
+			    int retval = 0;
+			    Invoke( delegate {
+				    retval = _pixbuf.Width;
+				    ev.Set();
+				});
+			    ev.WaitOne();
+			    return retval;
 			}
 		}
 
 		public int height {
 			get {
-				//return (int)(_pixbuf.Height*_scaleFactor);
-				return _pixbuf.Height;
+			    ManualResetEvent ev = new ManualResetEvent(false);
+			    int retval = 0;
+			    Invoke( delegate {
+				    retval = _pixbuf.Height;
+				    ev.Set();
+				});
+			    ev.WaitOne();
+			    return retval;
 			}
 		}
 
@@ -4323,6 +4520,7 @@ public static class Graphics
 		return t.TotalSeconds;
 	}
 
+    // FIXME: needs to be Thread-Safe
 	public class Button : Gtk.Button
 	{
 		public double _x, _y;
@@ -4387,6 +4585,7 @@ public static class Graphics
 		}
 	}
 
+    // FIXME: needs to be Thread-Safe
  public class Entry : Gtk.Entry
  {
      public double _x, _y;
@@ -4459,7 +4658,7 @@ public static class Graphics
      }
      */
  }
-
+    // FIXME: needs to be Thread-Safe
  	public class HSlider : Gtk.HScale
 	{
 		public WindowClass window;
@@ -5759,4 +5958,3 @@ public static class Graphics
 	}
 
 }
-
