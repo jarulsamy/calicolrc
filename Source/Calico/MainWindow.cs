@@ -1126,14 +1126,6 @@ namespace Calico {
                 else
                     System.Console.Error.WriteLine("Document needs to set focus_widget.");
             }
-            if (filename != null) {
-                string dir = System.IO.Path.GetDirectoryName(filename);
-                if (dir != "" && dir != null) {
-		    DirectoryInfo dirInfo = new DirectoryInfo(dir);
-		    if (dirInfo.Exists)
-			System.IO.Directory.SetCurrentDirectory(dir);
-                }
-            }
             if (language != null && manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                 ShellLanguage = language;
             }
