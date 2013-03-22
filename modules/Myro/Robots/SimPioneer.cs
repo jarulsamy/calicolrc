@@ -730,7 +730,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 										this.frame.body.Rotation);
 			// Get sensor readings
 			this.readings.clear ();
-			if (!simulation.window.IsRealized)
+			if (!simulation.window.isRealized())
 			    return;
 			Graphics.Point p1 = null;
 			Graphics.Point p2 = null;
@@ -740,7 +740,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 				Graphics.Line line = (Graphics.Line)kvp.Value;
 				p1 = this.frame.getScreenPoint (line.getP1 ());
 				p2 = this.frame.getScreenPoint (line.getP2 ());
-				if (!simulation.window.IsRealized)
+				if (!simulation.window.isRealized())
 				    return;
 				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
 					this.readings [key] = hit;
@@ -757,7 +757,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 				    c.x -= 6; // hack to get outside of bounding box
 				    p1 = this.frame.getScreenPoint (c);
 				    p2 = light.center;
-				    if (!simulation.window.IsRealized)
+				    if (!simulation.window.isRealized())
 					return;
 				    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
 					    this.readings [light_sensor.tag] = hit;
