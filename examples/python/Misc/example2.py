@@ -4,7 +4,7 @@ win = Window("Circles", 480, 120)
 circle = Circle(getMouseNow(), 80)
 circle.draw(win)
 
-while win.IsRealized:
+while win.isRealized():
     circle.center.x, circle.center.y = getMouseNow()
     if getMouseState() == "down":
         circle.fill = Color("black")

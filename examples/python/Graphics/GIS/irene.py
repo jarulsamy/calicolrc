@@ -30,7 +30,7 @@ def main():
     gis.displayControls(win)
     drawIrene(win)
 
-    while win.IsRealized:
+    while win.isRealized():
         x, y = getMouse()
         if x < 50:
             gis.zoom = max(0, gis.zoom - 1)

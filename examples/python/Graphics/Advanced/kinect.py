@@ -64,7 +64,7 @@ def getJoints():
         lines.append(head)
 
 def main():
-    while win.IsRealized and win2.IsRealized:
+    while win.isRealized() and win2.isRealized():
         getRGB()
         getDepth()
         getJoints()

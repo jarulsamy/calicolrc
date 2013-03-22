@@ -59,5 +59,5 @@ def getJoints():
         head.moveTo(640 - (segments[0,0]/zscale+320),
                     480 + 50 - (segments[0,1]/zscale+200))
 
-while win.IsRealized:
+while win.isRealized():
     getJoints()
