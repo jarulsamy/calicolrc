@@ -79,8 +79,13 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
+		widget.Focused += delegate {
+		    calico.updateControls(this); 
+		};
+		cvs.ButtonPressEvent += delegate {
+		    calico.updateControls(this); 
+		};
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
-
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;
