@@ -18,4 +18,5 @@ sim.setup()
 makeRobot("SimScribbler", sim)
 
 # Control it somehow:
-joystick()
+#senses()
+#joystick()

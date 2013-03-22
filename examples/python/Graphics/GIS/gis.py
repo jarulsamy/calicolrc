@@ -166,7 +166,7 @@ def demo():
     drawStates(win)
     drawCapitals(win)
     displayControls(win)
-    while win.IsRealized:
+    while win.isRealized():
         x, y = getMouse()
         if x < 50:
             zoom = max(0, zoom - 1)

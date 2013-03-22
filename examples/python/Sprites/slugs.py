@@ -1,7 +1,7 @@
 
 from Sprites import *
 init()
-makeSprite()       # adds a second sprite
+makeSprite("Joe")       # adds a second sprite
 flipHorizontal()
 speak("Hello, I am a slug!")
 transparency(0.0)

@@ -1198,6 +1198,8 @@ def makeWindow(size):
             images[(piece, color)] = (x, y, w, 80)
     return window, images
 
+images = {}
+
 def displayBoard(window, board, images, count):
     size = window.width
     #chess_set = Graphics.Picture("/usr/local/lib/Calico/examples/images/chess_set.png")
@@ -1219,7 +1221,11 @@ def displayBoard(window, board, images, count):
         for row in range(8):
             if board.board[row][col] != ' ':
                 x, y, w, h = images[map[board.board[row][col]]]
-                image = chess_set.getRegion((x, y), w, h)
+                if (col, row) not in images.keys():
+                    print("start")
+                    images[(col, row)] = chess_set.getRegion((x, y), w, h)
+                    print("stop")
+                image = images[(col, row)]
                 if even:
                     image.tag = "piece-even"
                 else:
@@ -1240,7 +1246,7 @@ def gplay(player1, player2):
     board = ChessBoard()
     size = 600
     window, images = makeWindow(size)
-    window.Title = "Chess: %s (black) vs %s (white)" % (player1.__name__, player2.__name__)
+    window.title = "Chess: %s (black) vs %s (white)" % (player1.__name__, player2.__name__)
     count = 0
     displayBoard(window, board, images, count)
     while state.game_result == 0:

@@ -26,9 +26,9 @@ win.mode = "manual"
 
 turtles = []
 for t in range(1000):
-    width, height = win.DefaultWidth, win.DefaultHeight
-    turtle = Arrow(Point(random.random() * win.DefaultWidth, 
-                         random.random() * win.DefaultHeight), 
+    width, height = win.width, win.height
+    turtle = Arrow(Point(random.random() * win.width,
+                         random.random() * win.height),
                    random.random() * 360)
     turtle.draw(win)
     turtle.color = makeColor(random.choice(["red", "green", "blue", "yellow"]))

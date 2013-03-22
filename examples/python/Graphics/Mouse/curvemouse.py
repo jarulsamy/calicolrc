@@ -2,7 +2,7 @@ from Graphics import *
 win = Window("Shapes", 200, 200)
 curve = None
 
-while win.IsRealized:
+while win.isRealized():
     mouse = getMouseNow()
     if curve:
         curve.undraw()

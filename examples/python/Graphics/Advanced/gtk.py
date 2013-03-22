@@ -7,5 +7,6 @@ def block(obj, e):
     entry = Gtk.Entry()
     vbox.PackStart(entry)
     window.Add(vbox)
+    window.Show()
 
 invoke(block)
