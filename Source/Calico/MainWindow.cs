@@ -3482,11 +3482,14 @@ namespace Calico {
                     for(int idx=MainNotebook.NPages - 1; idx >= 0; idx--) {
                         Gtk.Widget page = MainNotebook.GetNthPage(idx);
                         if (documents.ContainsKey(page)) { // it is a document
-                            Gtk.Widget l = MainNotebook.GetTabLabel(page);
-                            MainNotebook.RemovePage(idx);
-                            EditorNotebook.AppendPage(page, l);
-                            EditorNotebook.SetTabReorderable(page, true);
-                            EditorNotebook.SetTabDetachable(page, true);            
+			    Document doc = documents[page];
+			    if (doc.preferredNotebook == "editor") {
+				Gtk.Widget l = MainNotebook.GetTabLabel(page);
+				MainNotebook.RemovePage(idx);
+				EditorNotebook.AppendPage(page, l);
+				EditorNotebook.SetTabReorderable(page, true);
+				EditorNotebook.SetTabDetachable(page, true);            
+			    }
                         }
                     }
                     EditorNotebook.Show();
