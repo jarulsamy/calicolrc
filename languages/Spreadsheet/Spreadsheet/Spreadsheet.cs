@@ -28,15 +28,15 @@ using IronPython.Runtime; // Operations, List, Tuple, Dict, ...
 public class Column : IEnumerable<object> {
 	Gtk.ListStore liststore;
 	string column = null;
-	Document document;
+	CalicoSpreadsheetDocument document;
 	int x;
 
-	public Column(Document doc, Gtk.ListStore liststore, string column) {
+	public Column(CalicoSpreadsheetDocument doc, Gtk.ListStore liststore, string column) {
 		this.document = doc;
 		this.liststore = liststore;
 		this.column = column;
 	}
-	public Column(Document doc, Gtk.ListStore liststore, int x) {
+	public Column(CalicoSpreadsheetDocument doc, Gtk.ListStore liststore, int x) {
 		this.document = doc;
 		this.liststore = liststore;
 		this.x = x;
@@ -76,7 +76,7 @@ public class Column : IEnumerable<object> {
 	{
 	  Gtk.TreeIter iter;
 	  if (column == null) {
-	    for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
+	    for (int row_or_y = 0; row_or_y < document.Rows; row_or_y++) {
 	      liststore.GetIterFromString(out iter, row_or_y.ToString());
 	      yield return liststore.GetValue(iter, x + 1);		
 	    }
@@ -84,7 +84,7 @@ public class Column : IEnumerable<object> {
 	    char c;
 	    Char.TryParse(column.ToUpper(), out c);
 	    int offset = c - 'A' + 1;
-	    for (int row_or_y = 0; row_or_y < 100; row_or_y++) {
+	    for (int row_or_y = 0; row_or_y < document.Rows; row_or_y++) {
 	      liststore.GetIterFromString(out iter, row_or_y.ToString());
 	      yield return liststore.GetValue(iter, offset);
 	    }
@@ -101,21 +101,17 @@ public class Column : IEnumerable<object> {
 public class SpreadsheetWidget : Gtk.TreeView {
 	
 	public Gtk.ListStore liststore;
-	Document document;
+	CalicoSpreadsheetDocument document;
 
-	public SpreadsheetWidget(Document doc) : base() {
+	public SpreadsheetWidget(CalicoSpreadsheetDocument doc) : base() {
 		document = doc;
 		EnableGridLines = Gtk.TreeViewGridLines.Both;
 		EnableSearch = true;
 		RulesHint = true;
 		// Environment table:
 		makeColumn();
-		int index = 0;
-		foreach(string col in new string [] {"A", "B", "C", "D", "E", "F", "G", "H", "I",
-											"J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-											"T", "U", "V", "W", "X", "Y", "Z"}) {
-			makeColumn(col, index + 1);
-			index++;
+		for(int index = 0; index < document.Cols; index++) {
+			makeColumn(makeColumnName(index), index + 1);
 		}
 		
         // Create a ListStore as the Model
@@ -124,24 +120,31 @@ public class SpreadsheetWidget : Gtk.TreeView {
         ShowAll();
 		
 		//liststore.Append();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < document.Rows; i++) {
 			liststore.AppendValues(makeRow());
 		}
 	}
+
+	public string makeColumnName(int index) {
+		string indexes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		string retval = "";
+		retval += indexes.Substring(index % document.Cols, 1);
+		return retval;
+	}
 	
 	Type [] makeTypes() {
-		Type [] types = new Type[27];
+		Type [] types = new Type[document.Cols + 1];
 		types[0] = typeof(int);
-		for (int i = 1; i < 27; i++) {
+		for (int i = 1; i < document.Cols + 1; i++) {
 			types[i] = typeof(string);
 		}
 		return types;
 	}
 	
 	object [] makeRow() {
-		object [] row = new object[27];
+		object [] row = new object[document.Cols + 1];
 		row[0] = Model.IterNChildren() + 1;
-		for (int i = 1; i < 27; i++) {
+		for (int i = 1; i < document.Cols + 1; i++) {
 			row[i] = "";
 		}
 		return row;
@@ -196,6 +199,8 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	base(calico, filename, "spreadsheet")
 	{
 		DocumentType = "Sheet";
+		Rows = 100;
+		Cols = 26;
 		sheet = new SpreadsheetWidget(this);
 		if (filename != null) {
 			int row = 0;
@@ -210,10 +215,21 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 				row++;
 			}
 		}
+		focus_widget = sheet;
 		widget.AddWithViewport (sheet);
 		widget.ShowAll ();
 	}
 	
+	public int Rows {
+		get;
+		set;
+	}
+
+	public int Cols {
+		get;
+		set;
+	}
+
 	public Column this[int x] {
 		get {
 			return new Column(this, sheet.liststore, x);
@@ -222,7 +238,7 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 		
 	public IEnumerator<object> GetEnumerator ()
 	{
-	  for (int x = 0; x < 26; x++) {
+	  for (int x = 0; x < Cols; x++) {
 	    yield return new Column(this, sheet.liststore, x);
 	  }
 	}
@@ -240,8 +256,8 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 
 	bool SaveRow(Csv.writer writer, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
 		int maxcol = 1;
-		for (int i = 1; i < 27; i++) {
-		    if (model.GetValue(iter, i) != "")
+		for (int i = 1; i < Cols + 1; i++) {
+		    if (((string)model.GetValue(iter, i)) != "")
 			maxcol = i;
 		}
 		object [] content = new object[maxcol];
@@ -254,7 +270,7 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 
 	bool GetData(List<List<string>> list, Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
 		List<string> row = new List<string>();
-		for (int i = 1; i < 27; i++) {
+		for (int i = 1; i < Cols + 1; i++) {
 			row.Add((string)model.GetValue(iter, i));
 		}
 		list.Add(row);
@@ -299,8 +315,8 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	}
 
 	public bool ContainsData(Gtk.TreeModel model, Gtk.TreePath path, Gtk.TreeIter iter) {
-	    for (int i = 1; i < 27; i++) {
-		if (model.GetValue(iter, i) != "") 
+	    for (int i = 1; i < Cols + 1; i++) {
+		if (((string)model.GetValue(iter, i)) != "") 
 		    return true;
 	    }
 	    return false;
