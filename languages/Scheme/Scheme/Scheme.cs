@@ -3524,7 +3524,7 @@ public class Scheme {
       }
       if (calico.ProgramSpeed.Value == 0 || 
 	  calico.CurrentDocument.HasBreakpointSetAtLine(start_line) ||
-	  PJScheme._trace_pause) {
+	  PJScheme.get_trace_pause()) {
 	  printf("{0}trace: Paused!~%", 
 		 string_append(PJScheme.repeat(" |", 
 					       (object)PJScheme.get_closure_depth())));

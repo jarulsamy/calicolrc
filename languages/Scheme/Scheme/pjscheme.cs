@@ -14358,6 +14358,17 @@ public class PJScheme:Scheme
    }
 
    static int _closure_depth = 0;
+   static bool _trace_pause = false;
+
+   public static bool get_trace_pause ()
+   {
+      return _trace_pause;
+   }
+
+   public static void set_trace_pause (bool value)
+   {
+      _trace_pause = value;
+   }
 
    public static int get_closure_depth ()
    {

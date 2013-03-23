@@ -236,7 +236,7 @@
       return _trace_pause;
    }
 
-   public static set_trace_pause (bool value) {
+   public static void set_trace_pause (bool value) {
       _trace_pause = value;
    }
 
