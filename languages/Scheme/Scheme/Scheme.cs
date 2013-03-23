@@ -12,6 +12,7 @@
 using System;
 using System.IO; // File
 using System.Reflection; // Assembly
+using System.Threading;
 using Microsoft.Scripting.Math;
 using Microsoft.Scripting.Hosting;
 using System.Collections; // Hashtable
@@ -3394,15 +3395,50 @@ public class Scheme {
       return t.TotalSeconds;
   }
 
-  public static void wait (double seconds) {
+    public delegate void InvokeDelegate ();
+    
+    public static void Invoke (InvokeDelegate invoke)
+    {
+	if (needInvoke ()) {
+	    Gtk.Application.Invoke (delegate {
+		    invoke ();});
+	} else {
+	    invoke ();
+	}
+    }
+    
+    public static bool needInvoke ()
+    {
+	return (Thread.CurrentThread.ManagedThreadId != 1);
+    }
+    
+    static void invoke_function (Func<object,object> function, object args)
+    {
+	try {
+	    Gtk.Application.Invoke (delegate {
+		    function (args);
+		});
+	} catch (Exception e) {
+	    Console.Error.WriteLine ("Error in function");
+	    Console.Error.WriteLine (e.Message);
+	}        
+    }
+    
+    
+    public static void wait (double seconds) {
       if (seconds < .1)
 	  System.Threading.Thread.Sleep ((int)(seconds * 1000));
       else {
 	  double start = currentTime ();
+	  ManualResetEvent ev = new ManualResetEvent (false);
 	  while (seconds > currentTime () - start) {
-	      while (Gtk.Application.EventsPending ())
-		  Gtk.Application.RunIteration ();
-	      System.Threading.Thread.Sleep (100); 
+	      Invoke( delegate {
+		      while (Gtk.Application.EventsPending ())
+			  Gtk.Application.RunIteration ();
+		      ev.Set();
+		  });
+	      ev.WaitOne();
+	      ev.Reset();
 	  }
       }
   }
@@ -3433,7 +3469,7 @@ public class Scheme {
 		  return;
 	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
 		  // don't return! Fall through and print
-	      } else if (calico.ProgramSpeed.Value == 100) {
+	      } else if (calico.ProgramSpeedValue == 100) {
 		  return;
 	      }
 	  } else {
@@ -3476,7 +3512,7 @@ public class Scheme {
 		  return;
 	      } else if (calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
 		  // don't return! Fall through and wait
-	      } else if (calico.ProgramSpeed.Value == 100) {
+	      } else if (calico.ProgramSpeedValue == 100) {
 		  return;
 	      }
 	  } else {
@@ -3522,15 +3558,16 @@ public class Scheme {
 						   (object)PJScheme.get_closure_depth())));
 	  }
       }
-      if (calico.ProgramSpeed.Value == 0 || 
+      double psv = calico.ProgramSpeedValue;
+      if (psv == 0 || 
 	  calico.CurrentDocument.HasBreakpointSetAtLine(start_line) ||
 	  PJScheme.get_trace_pause()) {
 	  printf("{0}trace: Paused!~%", 
 		 string_append(PJScheme.repeat(" |", 
 					       (object)PJScheme.get_closure_depth())));
 	  calico.playResetEvent.WaitOne();
-      } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
-	  double pause = (2.0 / calico.ProgramSpeed.Value);
+      } else if (psv < 100) { // then we are in a delay:
+	  double pause = (2.0 / psv);
 	  // Force at least a slight sleep, else no GUI controls
 	  wait(pause);
       }
