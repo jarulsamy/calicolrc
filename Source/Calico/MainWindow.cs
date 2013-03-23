@@ -972,7 +972,9 @@ namespace Calico {
 
         public void SetLanguage(string language) {
             CurrentLanguage = language;
-            ShellLanguage = language;
+	    if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
+		ShellLanguage = language;
+	    }
             if (CurrentLanguage != null) {
                 Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
                 manager [language].SetOptionsMenu(options_menu);

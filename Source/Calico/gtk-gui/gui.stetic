@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -1431,7 +1431,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">436</property>
+                        <property name="Position">195</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />
@@ -1584,9 +1584,6 @@
                           </packing>
                         </child>
                       </widget>
-                      <packing>
-                        <property name="Resize">False</property>
-                      </packing>
                     </child>
                   </widget>
                   <packing>
