@@ -285,7 +285,7 @@ namespace Calico {
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
-            // Handle flags:
+            // Handle all flags, in case something crashes:
             bool debug_handler = true;
             foreach (string arg1 in args) {
                 if (arg1 == "--debug-handler") {
@@ -298,8 +298,12 @@ namespace Calico {
             // Load files:
             bool openedFile = false;
             foreach (string arg2 in args) {
-                Open(System.IO.Path.GetFullPath(arg2));
-                openedFile = true;
+		if (arg2.StartsWith("--")) {
+		    // ignore flags; handled above
+		} else {
+		    Open(System.IO.Path.GetFullPath(arg2));
+		    openedFile = true;
+		}
             }
             if (!openedFile) {
                 Open(null, "python"); // FIXME: open a file of DEFAULT type
@@ -1124,7 +1128,11 @@ namespace Calico {
                 };
                 lastSelectedPage = page.widget;
                 if (page.focus_widget != null)
-                    page.focus_widget.GrabFocus();
+                    GLib.Timeout.Add(0, delegate {
+			    page.focus_widget.GrabFocus();
+			    updateControls(null, null);
+			    return false; 
+			});
                 else
                     System.Console.Error.WriteLine("Document needs to set focus_widget.");
             }
@@ -2296,6 +2304,7 @@ namespace Calico {
 			Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
 			GLib.Timeout.Add(0, delegate {
 				ShellEditor.GrabFocus();
+				updateControls(null, null);
 				return false;
 			    });
 		    } else if (CurrentDocument != null) {
