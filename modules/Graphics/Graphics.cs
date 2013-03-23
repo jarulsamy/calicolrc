@@ -824,6 +824,7 @@ public static class Graphics
 		{
 			line.undraw ();
 			data.Add (datum);
+			double h2 = window.height;
 			if (data.Count > 1) {
 				line = new Line ();
 				line.outline = new Color ("red");
@@ -841,11 +842,11 @@ public static class Graphics
 				}
 				foreach (double i in data) {
 					if (max != min) {
-						h = (window.height - border * 2) * (i - min) / (max - min);
+						h = (h2 - border * 2) * (i - min) / (max - min);
 					} else {
-						h = (window.height - border * 2) * .5;
+						h = (h2 - border * 2) * .5;
 					}
-					line.append (new Point (border + col, window.height - border - h));
+					line.append (new Point (border + col, h2 - border - h));
 					col += increment;
 				}
 				line.set_points ();
@@ -868,7 +869,7 @@ public static class Graphics
 				int count = 1;
 				Text text;
 				for (int x = border; x <= window.width - border; x += interval) {
-					text = new Text (new Point (x, window.height - border + 20), count.ToString ());
+					text = new Text (new Point (x, h2 - border + 20), count.ToString ());
 					text.outline = new Color ("black");
 					text.fontSize = 9;
 					text.tag = "tick";
@@ -876,10 +877,10 @@ public static class Graphics
 					count += int_value;
 				}
 				// y ticks:
-				interval = (window.height - border * 2) / 10;
+				interval = (((int)h2) - border * 2) / 10;
 				double interval_value = (max - min) / 10;
 				double sum = min;
-				for (int y = window.height - border; y >= border; y -= interval) {
+				for (int y = ((int)h2) - border; y >= border; y -= interval) {
 					text = new Text (new Point (border - 20, y), String.Format("{0:0.###}", sum));
 					text.outline = new Color ("black");
 					text.fontSize = 9;
@@ -1174,12 +1175,16 @@ public static class Graphics
 		public bool requestStop = false;
 		Gtk.ScrolledWindow _scrolledWindow = null;
 		ManualResetEvent ev = new ManualResetEvent (false);
+		public int _cacheHeight;
+		public int _cacheWidth;
 
 		public WindowClass (string title="Calico Graphics",
                   int width=300, 
                   int height=300) : base(title)
 		{
 			_canvas = new Canvas ("auto", width, height);
+			_cacheWidth = width;
+			_cacheHeight = height;
 			//DoubleBuffered = false;
 			AllowGrow = true;
 			AllowShrink = true;
@@ -1202,6 +1207,14 @@ public static class Graphics
 			ShowAll ();
 		}
 		
+		/*
+		new public void BeginResizeDrag (Gdk.WindowEdge edge, int button, int root_x, int root_y, uint timestamp) {
+		    base.BeginResizeDrag(edge, button, root_x, root_y, timestamp);
+		    _cacheWidth = width;
+		    _cacheHeight = height;
+		}
+		*/
+
 		public string title {
 		    get {
 			ManualResetEvent ev = new ManualResetEvent (false);
@@ -2779,9 +2792,9 @@ public static class Graphics
 		internal double wrap_width (double x)
 		{
 			if (x < 0)
-				return wrap_width (window.width + x);
-			else if (x >= window.width)
-				return wrap_width (x - window.width);
+				return wrap_width (window._cacheWidth + x);
+			else if (x >= window._cacheWidth)
+				return wrap_width (x - window._cacheWidth);
 			else
 				return x;
 		}
@@ -2789,9 +2802,9 @@ public static class Graphics
 		internal double wrap_height (double y)
 		{
 			if (y < 0)
-				return wrap_height (window.height + y);
-			else if (y >= window.height)
-				return wrap_height (y - window.height);
+				return wrap_height (window._cacheHeight + y);
+			else if (y >= window._cacheHeight)
+				return wrap_height (y - window._cacheHeight);
 			else
 				return y;
 		}
@@ -4411,9 +4424,9 @@ public static class Graphics
 		internal int wrap_width (int x)
 		{
 			if (x < 0)
-				return wrap_width ((int)(width + x));
-			else if (x >= width)
-				return wrap_width ((int)(x - width));
+				return wrap_width ((int)(_width + x));
+			else if (x >= _width)
+				return wrap_width ((int)(x - _width));
 			else
 				return x;
 		}
@@ -4421,9 +4434,9 @@ public static class Graphics
 		internal int wrap_height (int y)
 		{
 			if (y < 0)
-				return wrap_height ((int)(height + y));
-			else if (y >= height)
-				return wrap_height ((int)(y - height));
+				return wrap_height ((int)(_height + y));
+			else if (y >= _height)
+				return wrap_height ((int)(y - _height));
 			else
 				return y;
 		}
@@ -4894,6 +4907,18 @@ public static class Graphics
 				});
 			    ev.WaitOne();
 			    return retval;
+			}
+		}
+
+		public int _width {
+			get {
+			    return _pixbuf.Width;
+			}
+		}
+
+		public int _height {
+			get {
+			    return _pixbuf.Height;
 			}
 		}
 
@@ -5948,8 +5973,9 @@ public static class Graphics
 	    }
 	    
 	    Point translate(double x, double y) {
-        	return new Point(x * scale + window.width/2 - graph.Width/ 2 * scale,
-				 (graph.Height - y) * scale + window.height/2 - graph.Height/ 2 * scale);
+		// used in graphviz graphics
+        	return new Point(x * scale + window._width/2 - graph.Width/ 2 * scale,
+				 (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale);
 	    }
 	    
 	    public string recurseEdges(IList list, int left, int root, int right) {
