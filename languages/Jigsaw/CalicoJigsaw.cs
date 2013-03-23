@@ -82,8 +82,9 @@ public class CalicoJigsawDocument : Document
 		widget.Focused += delegate {
 		    calico.updateControls(this); 
 		};
-		cvs.ButtonPressEvent += delegate {
-		    calico.updateControls(this); 
+		widget.ButtonPressEvent += delegate (object o, Gtk.ButtonPressEventArgs e) {
+		    calico.updateControls(this);
+		    cvs.ProcessEvent(e.Event); // HACK: only way to get event passed to canvas!
 		};
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
