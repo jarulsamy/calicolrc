@@ -116,9 +116,11 @@ namespace CalicoPython
 		    calico.playResetEvent.Reset ();
 		    trace_pause = false;
 		  } else { // then we are in a delay:
-		    int pause = (int)((100 - calico.ProgramSpeedValue) / 100.0 * 1000);
-		    // Force at least a slight sleep, else no GUI controls
-		    System.Threading.Thread.Sleep (Math.Max (pause, 1));
+		      // Use the same delay as Jigsaw
+		      // We know that it is 0 < value <= 100
+		      int pause = (int)(2000.0 / calico.ProgramSpeedValue);
+		      // Force at least a slight sleep, else no GUI controls
+		      System.Threading.Thread.Sleep (Math.Max (pause, 1));
 		  }
 		  // return the call back for this frame trace
 		  return OnTraceBack;
