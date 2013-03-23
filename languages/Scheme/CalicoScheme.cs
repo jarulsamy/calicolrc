@@ -57,6 +57,10 @@ public class CalicoSchemeEngine : Engine
     return HandleOutput(result, ok);
   }
 
+  public override void RequestPause () {
+      PJScheme.set_trace_pause(true);
+  }
+
   public void format_trace_back(object list) {
       object current = list;
       while (current != Scheme.EmptyList) {

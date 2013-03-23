@@ -14378,6 +14378,7 @@ public class PJScheme:Scheme
    public static void initialize_execute ()
    {
       _closure_depth = 0;
+      _trace_pause = false;
       initialize_stack_trace ();
    }
 

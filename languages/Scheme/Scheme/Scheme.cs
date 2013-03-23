@@ -3522,13 +3522,15 @@ public class Scheme {
 						   (object)PJScheme.get_closure_depth())));
 	  }
       }
-      if (calico.ProgramSpeed.Value == 0 || calico.CurrentDocument.HasBreakpointSetAtLine(start_line)) {
+      if (calico.ProgramSpeed.Value == 0 || 
+	  calico.CurrentDocument.HasBreakpointSetAtLine(start_line) ||
+	  PJScheme._trace_pause) {
 	  printf("{0}trace: Paused!~%", 
 		 string_append(PJScheme.repeat(" |", 
 					       (object)PJScheme.get_closure_depth())));
 	  calico.playResetEvent.WaitOne();
       } else if (calico.ProgramSpeed.Value < 100) { // then we are in a delay:
-	  double pause = ((100.0 - calico.ProgramSpeed.Value) / 100.0) * 2.0;
+	  double pause = (2.0 / calico.ProgramSpeed.Value);
 	  // Force at least a slight sleep, else no GUI controls
 	  wait(pause);
       }
