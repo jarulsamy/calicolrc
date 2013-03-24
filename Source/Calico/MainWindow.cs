@@ -1130,7 +1130,7 @@ namespace Calico {
                 if (page.focus_widget != null)
                     GLib.Timeout.Add(0, delegate {
 			    page.focus_widget.GrabFocus();
-			    updateControls(null, null);
+			    updateControls(page);
 			    return false; 
 			});
                 else
@@ -2304,7 +2304,7 @@ namespace Calico {
 			Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
 			GLib.Timeout.Add(0, delegate {
 				ShellEditor.GrabFocus();
-				updateControls(null, null);
+				updateControls(ShellEditor.Document, null);
 				return false;
 			    });
 		    } else if (CurrentDocument != null) {
