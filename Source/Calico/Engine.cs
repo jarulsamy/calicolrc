@@ -308,11 +308,11 @@ namespace Calico {
 			else
 			  source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException tae) {
-			manager.stderr.Print("[Script stopped----------]\n");
+			PrintLine("[Script stopped----------]");
 			System.Threading.Thread.ResetAbort();
 		  } catch (Exception e) {
 			if (e.Message.Contains("Thread was being aborted")) {
-			  manager.stderr.Print("[Script stopped----------]\n");
+			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(eo.FormatException(e));
@@ -320,8 +320,7 @@ namespace Calico {
 			return false;
 		  }
 		  if (ok) {
-			if (manager.stderr != null)
-			  PrintLine(Tag.Info, "Ok");
+		      PrintLine(Tag.Info, "Ok");
 		  }
 		  return true;
         }
@@ -348,11 +347,11 @@ namespace Calico {
 			//else
 			//source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException tae) {
-			manager.stderr.Print("[Script stopped----------]\n");
+			PrintLine("[Script stopped----------]");
 			System.Threading.Thread.ResetAbort();
 		  } catch (Exception e) {
 			if (e.Message.ToString().Contains("Thread was being aborted")) {
-			  manager.stderr.Print("[Script stopped----------]\n");
+			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(eo.FormatException(e));

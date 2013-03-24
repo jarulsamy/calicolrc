@@ -1375,7 +1375,8 @@ namespace Calico {
                 if (connection != null) {
                     connection.Close();
                 }
-                Gtk.Application.Quit();
+		System.Environment.Exit(0);
+                //Gtk.Application.Quit();
             }
             return retval;
         }
