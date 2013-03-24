@@ -128,7 +128,10 @@ public class SpreadsheetWidget : Gtk.TreeView {
 	public string makeColumnName(int index) {
 		string indexes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		string retval = "";
-		retval += indexes.Substring(index % document.Cols, 1);
+		if (index >= indexes.Length) {
+		    retval = indexes.Substring(((index / indexes.Length) - 1) % indexes.Length, 1); // AA AB AC ...
+		}
+		retval += indexes.Substring(index % indexes.Length, 1);
 		return retval;
 	}
 	
@@ -198,26 +201,40 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
 	base(calico, filename, "spreadsheet")
 	{
-		DocumentType = "Sheet";
-		Rows = 100;
-		Cols = 26;
-		sheet = new SpreadsheetWidget(this);
-		if (filename != null) {
-			int row = 0;
-			Gtk.TreeIter iter;
-			foreach(List line in new Csv.reader(filename).readLines()) {
-				int col = 1;
-				foreach(string item in line) {
-					sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
-					sheet.liststore.SetValue(iter, col, item);
-					col++;
-				}
-				row++;
-			}
+	    DocumentType = "Sheet";
+	    Rows = 100;
+	    Cols = 26;
+	    int row = 0;
+	    int col = 1;
+	    if (filename != null) {
+		// First, get max rows and cols
+		row = 0;
+		col = 1;
+		foreach(List line in new Csv.reader(filename).readLines()) {
+		    row++;
+		    col = Math.Max(col, line.Count);
 		}
-		focus_widget = sheet;
-		widget.AddWithViewport (sheet);
-		widget.ShowAll ();
+		Rows = Math.Max(Rows, row);
+		Cols = Math.Max(Cols, col);
+	    }
+	    sheet = new SpreadsheetWidget(this); // uses Rows, Cols
+	    if (filename != null) {
+		// now, load the data
+		row = 0;
+		Gtk.TreeIter iter;
+		foreach(List line in new Csv.reader(filename).readLines()) {
+		    col = 1;
+		    foreach(string item in line) {
+			sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+			sheet.liststore.SetValue(iter, col, item);
+			col++;
+		    }
+		    row++;
+		}
+	    }
+	    focus_widget = sheet;
+	    widget.AddWithViewport (sheet);
+	    widget.ShowAll ();
 	}
 	
 	public int Rows {
