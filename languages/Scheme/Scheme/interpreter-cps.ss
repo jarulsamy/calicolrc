@@ -275,6 +275,8 @@
 
 (define *stack-trace* '(()))
 
+(define *stack-trace-length* 0)
+
 (define *use-stack-trace* #t)
 
 (define get-use-stack-trace
@@ -287,28 +289,32 @@
 
 (define initialize-stack-trace
   (lambda ()
-    (set-car! *stack-trace* '())))
+    (set-car! *stack-trace* '())
+    (set! *stack-trace-length* 0)))
 
 (define-native initialize-execute
   (lambda () 'Ok))
 
 (define push-stack-trace
   (lambda (exp)
-    ;;(printf "~a: ~a\n" 'push exp)
-    ;; FIXME: limit size of stack!
-    (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
+    ;; Maximum stack strace size
+    ;; FIXME: ideally it would chop out middle
+    ;; should use a C# data structure
+    (if (< *stack-trace-length* 500)
+	(begin
+	  (set-car! *stack-trace* (cons exp (car *stack-trace*)))
+	  (set! *stack-trace-length* (+ *stack-trace-length* 1)))
+	(begin
+	  (set! *stack-trace* '(()))
+	  (set! *stack-trace-length* 0)))))
 
 (define pop-stack-trace
   (lambda (exp)
     ;;(printf "~a: ~a\n" 'pop exp)
     (if (not (null? (car *stack-trace*)))
-	(set-car! *stack-trace* (cdr (car *stack-trace*))))))
-
-;; (define make-pop-stack-trace-k
-;;   (lambda (exp k2)
-;;     (lambda-cont2 (v fail)
-;;        (pop-stack-trace exp)
-;;        (k2 v fail))))
+	(begin
+	  (set! *stack-trace-length* (- *stack-trace-length* 1))
+	  (set-car! *stack-trace* (cdr (car *stack-trace*)))))))
 
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
