@@ -11962,33 +11962,15 @@ public class PJScheme:Scheme
    new public static void initialize_stack_trace ()
    {
       PJScheme.set_car_b ((object) _starstack_trace_star, (object) EmptyList);
-      _starstack_trace_length_star = 0;
-
    }
 
    new public static void push_stack_trace (object exp)
    {
-      if (true_q
-	  (PJScheme.
-	   LessThan ((object) _starstack_trace_length_star, (object) 500)))
-	{
-	   PJScheme.set_car_b ((object) _starstack_trace_star,
-			       (object) PJScheme.cons ((object) exp,
-						       (object) PJScheme.
-						       car ((object)
-							    _starstack_trace_star)));
-	   _starstack_trace_length_star =
-	      PJScheme.Add ((object) _starstack_trace_length_star,
-			    (object) 1);
-
-	}
-      else
-	{
-	   _starstack_trace_star = PJScheme.list ((object) EmptyList);
-	   _starstack_trace_length_star = 0;
-
-	}
-
+      PJScheme.set_car_b ((object) _starstack_trace_star,
+			  (object) PJScheme.cons ((object) exp,
+						  (object) PJScheme.
+						  car ((object)
+						       _starstack_trace_star)));
    }
 
    new public static void pop_stack_trace (object exp)
@@ -11998,16 +11980,10 @@ public class PJScheme:Scheme
 	   not ((object) PJScheme.
 		null_q ((object) PJScheme.
 			car ((object) _starstack_trace_star)))))
-	{
-	   _starstack_trace_length_star =
-	      PJScheme.Subtract ((object) _starstack_trace_length_star,
-				 (object) 1);
-	   PJScheme.set_car_b ((object) _starstack_trace_star,
-			       (object) PJScheme.cdr ((object) PJScheme.
-						      car ((object)
-							   _starstack_trace_star)));
-	}
-
+	 PJScheme.set_car_b ((object) _starstack_trace_star,
+			     (object) PJScheme.cdr ((object) PJScheme.
+						    car ((object)
+							 _starstack_trace_star)));
    }
 
    new public static void m ()
@@ -14149,7 +14125,6 @@ public class PJScheme:Scheme
       PJScheme.make_handler2 ((object) symbol ("<handler2-3>"));
    static bool _startracing_on_q_star = false;
    static object _starstack_trace_star = PJScheme.list ((object) EmptyList);
-   static object _starstack_trace_length_star = 0;
    static object _staruse_stack_trace_star = true;
    static object void_prim =
       PJScheme.make_proc ((object) symbol ("<proc-5>"));

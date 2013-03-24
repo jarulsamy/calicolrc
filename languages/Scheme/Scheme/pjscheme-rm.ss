@@ -6672,27 +6672,18 @@
   (lambda (value) (set! *use-stack-trace* value)))
 
 (define initialize-stack-trace
-  (lambda ()
-    (set-car! *stack-trace* '())
-    (set! *stack-trace-length* 0)))
+  (lambda () (return* (set-car! *stack-trace* '()))))
 
 (define push-stack-trace
   (lambda (exp)
-    (if (< *stack-trace-length* 500)
-        (begin
-          (set-car! *stack-trace* (cons exp (car *stack-trace*)))
-          (set! *stack-trace-length* (+ *stack-trace-length* 1)))
-        (begin
-          (set! *stack-trace* (list '()))
-          (set! *stack-trace-length* 0)))))
+    (return*
+      (set-car! *stack-trace* (cons exp (car *stack-trace*))))))
 
 (define pop-stack-trace
   (lambda (exp)
     (if (not (null? (car *stack-trace*)))
-        (begin
-          (set! *stack-trace-length* (- *stack-trace-length* 1))
-          (return*
-            (set-car! *stack-trace* (cdr (car *stack-trace*))))))))
+        (return*
+          (set-car! *stack-trace* (cdr (car *stack-trace*)))))))
 
 (define*
   m
@@ -8044,8 +8035,6 @@
     (printf "~s evaluates to ~a~%" (aunparse exp) result)))
 
 (define *stack-trace* (list '()))
-
-(define *stack-trace-length* 0)
 
 (define *use-stack-trace* #t)
 
