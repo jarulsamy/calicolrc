@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Calico\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-20 10:24-0400\n"
+"POT-Creation-Date: 2013-03-24 17:45-0400\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,13 +124,13 @@ msgid "  StartCalico --help                        Displays this message"
 msgstr "  calico --help                     Affiche ce message"
 
 #: ../Source/Calico/MainWindow.cs:307 ../Source/Calico/MainWindow.cs:315
-#: ../Source/Calico/MainWindow.cs:272
+#: ../Source/Calico/MainWindow.cs:272 ../Source/Calico/MainWindow.cs:286
 #, fuzzy, csharp-format
 msgid "The Calico Project, Version {0}"
 msgstr "Projet Calico, Version %s, de %s"
 
 #: ../Source/Calico/MainWindow.cs:331 ../Source/Calico/MainWindow.cs:339
-#: ../Source/Calico/MainWindow.cs:301
+#: ../Source/Calico/MainWindow.cs:301 ../Source/Calico/MainWindow.cs:319
 msgid ""
 "Chat commands:\n"
 "    MESSAGE\n"
@@ -149,46 +149,47 @@ msgstr ""
 "    / Help\n"
 
 #: ../Source/Calico/MainWindow.cs:340 ../Source/Calico/MainWindow.cs:349
-#: ../Source/Calico/MainWindow.cs:311
+#: ../Source/Calico/MainWindow.cs:311 ../Source/Calico/MainWindow.cs:329
 msgid "[Start of previous history]"
 msgstr "[Début de l'histoire précédente]"
 
 #: ../Source/Calico/MainWindow.cs:344 ../Source/Calico/MainWindow.cs:353
-#: ../Source/Calico/MainWindow.cs:315
+#: ../Source/Calico/MainWindow.cs:315 ../Source/Calico/MainWindow.cs:333
 msgid "[Start of current history]"
 msgstr "[Début de l'histoire en cours]"
 
 #: ../Source/Calico/MainWindow.cs:442 ../Source/Calico/MainWindow.cs:447
-#: ../Source/Calico/MainWindow.cs:419
+#: ../Source/Calico/MainWindow.cs:419 ../Source/Calico/MainWindow.cs:437
 #, csharp-format
 msgid "Go to \"{0}\" line {1}"
 msgstr "Allez à \"{0}\" ligne {1}"
 
 #: ../Source/Calico/MainWindow.cs:480 ../Source/Calico/MainWindow.cs:485
-#: ../Source/Calico/MainWindow.cs:457
+#: ../Source/Calico/MainWindow.cs:457 ../Source/Calico/MainWindow.cs:475
 #, csharp-format
 msgid "Switch to {0}"
 msgstr "Basculer vers {0}"
 
 #: ../Source/Calico/MainWindow.cs:899 ../Source/Calico/MainWindow.cs:914
-#: ../Source/Calico/MainWindow.cs:877
+#: ../Source/Calico/MainWindow.cs:877 ../Source/Calico/MainWindow.cs:904
 #, csharp-format
 msgid "Exception: {0}"
 msgstr "Exception: {0}"
 
 #: ../Source/Calico/MainWindow.cs:914 ../Source/Calico/MainWindow.cs:929
-#: ../Source/Calico/MainWindow.cs:895
+#: ../Source/Calico/MainWindow.cs:895 ../Source/Calico/MainWindow.cs:921
 msgid "Variable"
 msgstr "Variable"
 
 #: ../Source/Calico/MainWindow.cs:915 ../Source/Calico/MainWindow.cs:922
 #: ../Source/Calico/MainWindow.cs:930 ../Source/Calico/MainWindow.cs:937
 #: ../Source/Calico/MainWindow.cs:896 ../Source/Calico/MainWindow.cs:903
+#: ../Source/Calico/MainWindow.cs:929
 msgid "Value"
 msgstr "Valeur"
 
 #: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1275
-#: ../Source/Calico/MainWindow.cs:1286
+#: ../Source/Calico/MainWindow.cs:1286 ../Source/Calico/MainWindow.cs:1318
 msgid "Save this file?"
 msgstr "Enregistrez ce fichier?"
 
@@ -198,7 +199,8 @@ msgstr "Enregistrez ce fichier?"
 #: ../Source/Calico/Document.cs:190 ../Source/Calico/MainWindow.cs:1237
 #: ../Source/Calico/MainWindow.cs:1235 ../Source/Calico/MainWindow.cs:1289
 #: ../Source/Calico/Document.cs:192 ../Source/Calico/Document.cs:195
-#: ../Source/Calico/Document.cs:196
+#: ../Source/Calico/Document.cs:196 ../Source/Calico/MainWindow.cs:1260
+#: ../Source/Calico/MainWindow.cs:1321
 msgid "Save"
 msgstr "Sauvegarder"
 
@@ -206,7 +208,9 @@ msgstr "Sauvegarder"
 #: ../Source/Calico/MainWindow.cs:1232 ../Source/Calico/MainWindow.cs:1233
 #: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1226
 #: ../Source/Calico/MainWindow.cs:1227 ../Source/Calico/MainWindow.cs:1266
-#: ../Source/Calico/MainWindow.cs:1293
+#: ../Source/Calico/MainWindow.cs:1293 ../Source/Calico/MainWindow.cs:1249
+#: ../Source/Calico/MainWindow.cs:1250 ../Source/Calico/MainWindow.cs:1298
+#: ../Source/Calico/MainWindow.cs:1325
 msgid "Abandon changes"
 msgstr "Abandonner les modifications"
 
@@ -219,65 +223,73 @@ msgstr "Abandonner les modifications"
 #: ../Source/Calico/MainWindow.cs:1225 ../Source/Calico/MainWindow.cs:1264
 #: ../Source/Calico/MainWindow.cs:1297 ../Source/Calico/MainWindow.cs:1402
 #: ../Source/Calico/Document.cs:191 ../Source/Calico/Document.cs:194
-#: ../Source/Calico/Document.cs:195
+#: ../Source/Calico/Document.cs:195 ../Source/Calico/MainWindow.cs:1163
+#: ../Source/Calico/MainWindow.cs:1247 ../Source/Calico/MainWindow.cs:1248
+#: ../Source/Calico/MainWindow.cs:1296 ../Source/Calico/MainWindow.cs:1329
+#: ../Source/Calico/MainWindow.cs:1439
 msgid "Cancel"
 msgstr "Annuler"
 
 #: ../Source/Calico/MainWindow.cs:1328 ../Source/Calico/MainWindow.cs:1350
-#: ../Source/Calico/MainWindow.cs:1361
+#: ../Source/Calico/MainWindow.cs:1361 ../Source/Calico/MainWindow.cs:1398
 #, fuzzy
 msgid "Select item type"
 msgstr "Sélectionnez le fichier à ouvrir"
 
 #: ../Source/Calico/MainWindow.cs:1330 ../Source/Calico/MainWindow.cs:1352
-#: ../Source/Calico/MainWindow.cs:1363
+#: ../Source/Calico/MainWindow.cs:1363 ../Source/Calico/MainWindow.cs:1400
 #, fuzzy
 msgid "Create a new item"
 msgstr "Creer un nouveau Script"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/MainWindow.cs:1391
-#: ../Source/Calico/MainWindow.cs:1402
+#: ../Source/Calico/MainWindow.cs:1402 ../Source/Calico/MainWindow.cs:1439
 msgid "Select the file to open"
 msgstr "Sélectionnez le fichier à ouvrir"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/gtk-gui/gui.stetic:56
 #: ../Source/Calico/gtk-gui/gui.stetic:57 ../Source/Calico/MainWindow.cs:1391
-#: ../Source/Calico/MainWindow.cs:1402
+#: ../Source/Calico/MainWindow.cs:1402 ../Source/Calico/MainWindow.cs:1439
 msgid "Open"
 msgstr "Ouvrir"
 
 #: ../Source/Calico/MainWindow.cs:1456 ../Source/Calico/MainWindow.cs:1479
+#: ../Source/Calico/MainWindow.cs:1515
 msgid "Scripting Environment"
 msgstr "Environnement de Script"
 
 #: ../Source/Calico/MainWindow.cs:1457 ../Source/Calico/MainWindow.cs:1480
+#: ../Source/Calico/MainWindow.cs:1516
 #, fuzzy, csharp-format
 msgid "Running on {0}"
 msgstr "Fonctionnant sur %s"
 
 #: ../Source/Calico/MainWindow.cs:1460 ../Source/Calico/MainWindow.cs:1483
+#: ../Source/Calico/MainWindow.cs:1519
 #, fuzzy
 msgid "(c) 2011-2013, Institute for Personal Robots in Education"
 msgstr "(c) 2011, Institute for Personal Robots in Education"
 
 #: ../Source/Calico/MainWindow.cs:1465 ../Source/Calico/MainWindow.cs:1488
+#: ../Source/Calico/MainWindow.cs:1524
 msgid "Calico Project"
 msgstr "Projet Calico"
 
 #: ../Source/Calico/MainWindow.cs:1987 ../Source/Calico/MainWindow.cs:2097
-#: ../Source/Calico/MainWindow.cs:2114
+#: ../Source/Calico/MainWindow.cs:2114 ../Source/Calico/MainWindow.cs:2123
 #, fuzzy
 msgid "Stopping...\n"
 msgstr "Arrêt..."
 
 #: ../Source/Calico/MainWindow.cs:2010 ../Source/Calico/MainWindow.cs:2122
-#: ../Source/Calico/MainWindow.cs:2139
+#: ../Source/Calico/MainWindow.cs:2139 ../Source/Calico/MainWindow.cs:2148
 #, csharp-format
 msgid "Running '{0}'..."
 msgstr "Running '{0}' ..."
 
 #: ../Source/Calico/MainWindow.cs:2166 ../Source/Calico/MainWindow.cs:2284
 #: ../Source/Calico/MainWindow.cs:2335 ../Source/Calico/MainWindow.cs:2410
+#: ../Source/Calico/MainWindow.cs:2338 ../Source/Calico/MainWindow.cs:2411
 #, fuzzy, csharp-format
 msgid "{0} - Calico - {1}"
 msgstr "%s - Calico Shell - %s"
@@ -288,64 +300,66 @@ msgstr "%s - Calico Shell - %s"
 #: ../Source/Calico/gtk-gui/gui.stetic:1585
 #: ../Source/Calico/MainWindow.cs:2341 ../Source/Calico/MainWindow.cs:2416
 #: ../Source/Calico/gtk-gui/gui.stetic:1575
+#: ../Source/Calico/MainWindow.cs:2344 ../Source/Calico/MainWindow.cs:2417
 msgid "Properties"
 msgstr "Propriétés"
 
 #: ../Source/Calico/MainWindow.cs:2321 ../Source/Calico/MainWindow.cs:2457
-#: ../Source/Calico/MainWindow.cs:2508
+#: ../Source/Calico/MainWindow.cs:2508 ../Source/Calico/MainWindow.cs:2528
 #, csharp-format
 msgid "Error: '{0}' is not an active language"
 msgstr "Erreur: '{0}' n'est pas une langue active"
 
 #: ../Source/Calico/MainWindow.cs:2350 ../Source/Calico/MainWindow.cs:2486
-#: ../Source/Calico/MainWindow.cs:2544
+#: ../Source/Calico/MainWindow.cs:2544 ../Source/Calico/MainWindow.cs:2566
 #, fuzzy
 msgid "[Run file]"
 msgstr "Fichiers récents"
 
 #: ../Source/Calico/MainWindow.cs:3080 ../Source/Calico/MainWindow.cs:3218
-#: ../Source/Calico/MainWindow.cs:3289
+#: ../Source/Calico/MainWindow.cs:3289 ../Source/Calico/MainWindow.cs:3311
 #, fuzzy
 msgid "   waiting for confirmation...\n"
 msgstr "   en attente de confirmation..."
 
 #: ../Source/Calico/MainWindow.cs:3083 ../Source/Calico/MainWindow.cs:3221
-#: ../Source/Calico/MainWindow.cs:3292
+#: ../Source/Calico/MainWindow.cs:3292 ../Source/Calico/MainWindow.cs:3314
 #, fuzzy
 msgid "Received messages:\n"
 msgstr "messages reçus:"
 
 #: ../Source/Calico/MainWindow.cs:3152 ../Source/Calico/MainWindow.cs:3294
-#: ../Source/Calico/MainWindow.cs:3365
+#: ../Source/Calico/MainWindow.cs:3365 ../Source/Calico/MainWindow.cs:3387
 msgid "Accept this script?"
 msgstr "Accepter ce script?"
 
 #: ../Source/Calico/MainWindow.cs:3155 ../Source/Calico/MainWindow.cs:3297
 #: ../Source/Calico/MainWindow.cs:3316 ../Source/Calico/MainWindow.cs:3368
-#: ../Source/Calico/MainWindow.cs:3387
+#: ../Source/Calico/MainWindow.cs:3387 ../Source/Calico/MainWindow.cs:3390
+#: ../Source/Calico/MainWindow.cs:3409
 msgid "Accept"
 msgstr "Accepter"
 
 #: ../Source/Calico/MainWindow.cs:3159 ../Source/Calico/MainWindow.cs:3301
-#: ../Source/Calico/MainWindow.cs:3372
+#: ../Source/Calico/MainWindow.cs:3372 ../Source/Calico/MainWindow.cs:3394
 #, fuzzy
 msgid "Decline"
 msgstr "en ligne"
 
 #: ../Source/Calico/MainWindow.cs:3173 ../Source/Calico/MainWindow.cs:3316
-#: ../Source/Calico/MainWindow.cs:3387
+#: ../Source/Calico/MainWindow.cs:3387 ../Source/Calico/MainWindow.cs:3409
 #, csharp-format
 msgid "Blast: Accept '{0}' from '{1}'?"
 msgstr "Blast: Accept '{0}' de '{1}'?"
 
 #: ../Source/Calico/MainWindow.cs:3184 ../Source/Calico/MainWindow.cs:3328
-#: ../Source/Calico/MainWindow.cs:3399
+#: ../Source/Calico/MainWindow.cs:3399 ../Source/Calico/MainWindow.cs:3421
 #, csharp-format
 msgid "Blast '{0}' from '{1}' declined."
 msgstr "Blast '{0}' de '{1}' a diminué."
 
 #: ../Source/Calico/MainWindow.cs:3230 ../Source/Calico/MainWindow.cs:3375
-#: ../Source/Calico/MainWindow.cs:3446
+#: ../Source/Calico/MainWindow.cs:3446 ../Source/Calico/MainWindow.cs:3468
 msgid "No addons are currently available"
 msgstr "Aucun addons sont actuellement disponibles"
 
@@ -1110,6 +1124,7 @@ msgstr "Chat"
 #: ../Source/Calico/gtk-gui/gui.stetic:1686
 #: ../Source/Calico/gtk-gui/gui.stetic:1692
 #: ../Source/Calico/gtk-gui/gui.stetic:1684
+#: ../Source/Calico/gtk-gui/gui.stetic:1681
 #, fuzzy
 msgid "Language:"
 msgstr "Langage"
@@ -1117,6 +1132,7 @@ msgstr "Langage"
 #: ../Source/Calico/gtk-gui/gui.stetic:1698
 #: ../Source/Calico/gtk-gui/gui.stetic:1704
 #: ../Source/Calico/gtk-gui/gui.stetic:1696
+#: ../Source/Calico/gtk-gui/gui.stetic:1693
 #, fuzzy
 msgid "Python"
 msgstr "python>"
@@ -1124,6 +1140,7 @@ msgstr "python>"
 #: ../Source/Calico/gtk-gui/gui.stetic:1721
 #: ../Source/Calico/gtk-gui/gui.stetic:1727
 #: ../Source/Calico/gtk-gui/gui.stetic:1719
+#: ../Source/Calico/gtk-gui/gui.stetic:1716
 #, fuzzy
 msgid "Status:"
 msgstr "Etat"
@@ -1131,11 +1148,13 @@ msgstr "Etat"
 #: ../Source/Calico/gtk-gui/gui.stetic:1733
 #: ../Source/Calico/gtk-gui/gui.stetic:1739
 #: ../Source/Calico/gtk-gui/gui.stetic:1731
+#: ../Source/Calico/gtk-gui/gui.stetic:1728
 msgid "offline"
 msgstr "Vous n'êtes plus en ligne"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
 #: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
+#: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
 msgid "Email"
 msgstr "Email"
 
@@ -1143,6 +1162,8 @@ msgstr "Email"
 #: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3237
 #: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
 #: ../Source/Calico/MainWindow.cs:3303 ../Source/Calico/MainWindow.cs:3308
+#: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
+#: ../Source/Calico/MainWindow.cs:3325 ../Source/Calico/MainWindow.cs:3330
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
@@ -1151,20 +1172,26 @@ msgstr "Nom d'utilisateur"
 #: ../Source/Calico/MainWindow.cs:3266 ../Source/Calico/MainWindow.cs:3268
 #: ../Source/Calico/MainWindow.cs:3272 ../Source/Calico/MainWindow.cs:3303
 #: ../Source/Calico/MainWindow.cs:3309 ../Source/Calico/MainWindow.cs:3337
+#: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
+#: ../Source/Calico/MainWindow.cs:3325 ../Source/Calico/MainWindow.cs:3331
+#: ../Source/Calico/MainWindow.cs:3359
 msgid "Password"
 msgstr "Mot de passe"
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3201
 #: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
+#: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
 msgid "Keyword"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3268
+#: ../Source/Calico/MainWindow.cs:3290
 #, fuzzy
 msgid "Register new user"
 msgstr "S'enregistrer"
 
 #: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3303
+#: ../Source/Calico/MainWindow.cs:3325
 msgid "Login"
 msgstr "Identifiant"
 
@@ -1248,6 +1275,11 @@ msgstr "  calico                            Shell par default"
 msgid "New {0} {1}"
 msgstr ""
 
+#: ../Source/Calico/MainWindow.cs:2753
+#, fuzzy
+msgid "Select Calico Font"
+msgstr "Tous sélectionnez"
+
 #~ msgid "Do you want to run the script?"
 #~ msgstr "Voulez-vous exécuter le Script?"
 
@@ -1330,9 +1362,6 @@ msgstr ""
 
 #~ msgid "Cut"
 #~ msgstr "Couper"
-
-#~ msgid "Select all"
-#~ msgstr "Tous sélectionnez"
 
 #~ msgid "Windows"
 #~ msgstr "Fenêtres"
