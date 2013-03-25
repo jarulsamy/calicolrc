@@ -23,7 +23,7 @@ for i in range(0, 360, 36):
 
 alphas.append(alphas.pop(0))
 
-while True:
+while win.isRealized():
     for oval in ovals:
         position = int(abs(oval.rotation/360 * 10))
         oval.color.alpha = alphas[9 - position]

@@ -22,7 +22,7 @@ from Graphics import *
 from Myro import wait
 import random
 
-filename = "../../images/blankenship.jpg"
+filename = calico.relativePath("../examples/images/blankenship.jpg")
 win = Window("Laura")
 pic = Picture(filename)
 pic.draw(win)
@@ -33,7 +33,7 @@ def reverse():
     win.mode = 'manual'
     count = 0
     for p in pixels:
-        p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
+        p._setRGB(255 - p._getRed(), 255 - p._getGreen(), 255 - p._getBlue())
         win.update()
         count += 1
     win.mode = 'auto'

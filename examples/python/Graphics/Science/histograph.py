@@ -1,7 +1,7 @@
 from Graphics import *
 
-left = Picture("../../images/statue-2.png")
-right = Picture("../../images/statue-orig.png")
+left = Picture(calico.relativePath("../examples/images/statue-2.png"))
+right = Picture(calico.relativePath("../examples/images/statue-orig.png"))
 
 win = Window("Histograph", left.width, left.height + 40)
 image = copyPicture(right)

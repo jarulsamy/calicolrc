@@ -37,6 +37,7 @@ a. need an init("show") for show(takePicture())
 13. Can't have two simulations?
 14. need to add Shape.z (start height, end height)
 15. Ashley wants turnby
+16. Closing Sim and re-running doesn't show robot
 
 Calico2
 

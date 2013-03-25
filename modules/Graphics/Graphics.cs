@@ -1406,28 +1406,32 @@ public static class Graphics
 
 		public void stackOnTop (Shape shape)
 		{
-			// last drawn is on top
-			if (_canvas.shapes.Contains (shape)) {
+		    // last drawn is on top
+		    if (_canvas.shapes.Contains (shape)) {
+			Invoke( delegate {
 				lock (_canvas.shapes) {
-					_canvas.shapes.Remove (shape);
-					_canvas.shapes.Insert (_canvas.shapes.Count, shape);
+				    _canvas.shapes.Remove (shape);
+				    _canvas.shapes.Insert (_canvas.shapes.Count, shape);
 				}
-				QueueDraw ();
-			}
+			    });
+			QueueDraw ();
+		    }
 		}
 
 		public void stackOnBottom (Shape shape)
 		{
-			// first drawn is on bottom
-			if (_canvas.shapes.Contains (shape)) {
+		    // first drawn is on bottom
+		    if (_canvas.shapes.Contains (shape)) {
+			Invoke( delegate {
 				lock (_canvas.shapes) {
-					_canvas.shapes.Remove (shape);
-					_canvas.shapes.Insert (0, shape);
+				    _canvas.shapes.Remove (shape);
+				    _canvas.shapes.Insert (0, shape);
 				}
 				QueueDraw ();
-			} else {
-				throw new Exception ("shape not drawn on window");
-			}
+			    });
+		    } else {
+			throw new Exception ("shape not drawn on window");
+		    }
 		}
 
 		void saveLastClick (object obj, Gtk.ButtonPressEventArgs args)

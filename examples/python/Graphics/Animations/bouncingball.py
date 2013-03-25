@@ -39,7 +39,7 @@ wall3 = Rectangle((0, 400), (10, 500))
 wall3.draw(win)
 
 def main():
-    while True:
+    while win.isRealized():
         if getMouseState() == "down":
             x, y = getMouseNow()
             c = Oval((x, y), 10, 20)

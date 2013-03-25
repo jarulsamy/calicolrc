@@ -27,3 +27,4 @@ class MyWindow(Gtk.Window):
                                 5, 5, self.layout)
 
 
+mywin = MyWindow("My Window")

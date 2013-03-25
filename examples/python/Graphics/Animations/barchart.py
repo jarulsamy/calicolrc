@@ -154,6 +154,6 @@ if __name__ == "<module>":
     #BarChart("test 3", 640, 480, range(10))
     bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
     def animate():
-        while bc.win.Visible:
+        while bc.win.isRealized():
             bc.animate([Myro.pickOne(*range(4)) for x in range(100)])
     animate()

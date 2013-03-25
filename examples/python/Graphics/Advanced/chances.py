@@ -3,7 +3,7 @@ from Myro import randomNumber, Random, show, wait
 
 Random.seed = 3456
 
-pic = Picture("../images/Flathead_Lake.jpg")
+pic = Picture(calico.relativePath("../examples/images/Flathead_Lake.jpg"))
 
 width, height = 640, 480
 win = Window("What are the Chances?", width, height)

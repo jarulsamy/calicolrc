@@ -30,7 +30,7 @@ m.draw(win)
 h.draw(win)
 
 def main():
-    while True:
+    while win.isRealized():
         t = time.localtime()
         s.rotateTo(t[5]/60 * 360 - 90)
         m.rotateTo(t[4]/60 * 360 - 90)

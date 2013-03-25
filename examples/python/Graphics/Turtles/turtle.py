@@ -25,3 +25,4 @@ def move():
                    random.random() * 6 - 3)
         win.step()
 
+move()
