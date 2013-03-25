@@ -355,8 +355,8 @@ public static class Graphics
   
 	public static IEnumerable getPixels (Picture picture)
 	{
-		for (int x=0; x < picture.width; x++) {
-			for (int y=0; y < picture.height; y++) {
+		for (int x=0; x < picture._cacheWidth; x++) {
+			for (int y=0; y < picture._cacheHeight; y++) {
 				yield return picture.getPixel(x, y);
 			}
 		}
@@ -366,8 +366,8 @@ public static class Graphics
 	{
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
-		    for (int x=0; x < picture.width; x++) {
-			for (int y=0; y < picture.height; y++) {
+		    for (int x=0; x < picture._cacheWidth; x++) {
+			for (int y=0; y < picture._cacheHeight; y++) {
 			    picture._setPixel (x, y, picture2._getPixel (x, y));
 			}
 		    }
@@ -3719,6 +3719,8 @@ public static class Graphics
 	public class Picture : Shape
 	{
 		Gdk.Pixbuf _pixbuf; // in memory rep of picture
+		public int _cacheWidth;
+		public int _cacheHeight;
     
 		public Gdk.Pixbuf pixbuf {
 			get {
@@ -3747,6 +3749,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -3772,6 +3776,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));			
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set ();
 			});
 		    ev.WaitOne ();
@@ -3809,6 +3815,8 @@ public static class Graphics
 			    }
 			    set_points (original.points);
 			    center = original.center;
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -3826,6 +3834,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -3872,6 +3882,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -3955,6 +3967,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -3988,6 +4002,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -4020,6 +4036,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -4052,6 +4070,8 @@ public static class Graphics
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			    ev.Set();
 			});
 		    ev.WaitOne();
@@ -4113,8 +4133,8 @@ public static class Graphics
 			    // another image. Also, consider making this pic.draw(picture)
 			    // This doesn't respect the color pallette of picture.
 			    Point p = new Point (iterable);
-			    for (int x = 0; x < picture.width; x++) {
-				for (int y = 0; y < picture.height; y++) {
+			    for (int x = 0; x < picture._cacheWidth; x++) {
+				for (int y = 0; y < picture._cacheHeight; y++) {
 				    Color c1 = this._getColor ((int)(p.x + x), 
 							      (int)(p.y + y));
 				    Color c2 = picture._getColor ((int)(x), 
@@ -4137,12 +4157,12 @@ public static class Graphics
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Invoke( delegate {
-			    for (int x = 0; x < width/2; x++) {
-				for (int y = 0; y < height; y++) {
+			    for (int x = 0; x < _cacheWidth/2; x++) {
+				for (int y = 0; y < _cacheHeight; y++) {
 				    Color c1 = _getColor (x, y);
-				    Color c2 = _getColor (width - x - 1, y);
+				    Color c2 = _getColor (_cacheWidth - x - 1, y);
 				    _setColor(x, y, c2);
-				    _setColor(width - x - 1, y, c1);
+				    _setColor(_cacheWidth - x - 1, y, c1);
 				}
 			    }
 			    ev.Set();
@@ -4154,12 +4174,12 @@ public static class Graphics
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Invoke( delegate {
-			    for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height/2; y++) {
+			    for (int x = 0; x < _cacheWidth; x++) {
+				for (int y = 0; y < _cacheHeight/2; y++) {
 				    Color c1 = _getColor(x, y);
-				    Color c2 = _getColor(x, height - y - 1);
+				    Color c2 = _getColor(x, _cacheHeight - y - 1);
 				    _setColor(x, y, c2);
-				    _setColor(x, height - y - 1, c1);
+				    _setColor(x, _cacheHeight - y - 1, c1);
 				}
 			    }
 			    ev.Set();
@@ -4351,8 +4371,8 @@ public static class Graphics
 
 		public IEnumerable getPixels ()
 		{
-			for (int x=0; x < width; x++) {
-				for (int y=0; y < height; y++) {
+			for (int x=0; x < _cacheWidth; x++) {
+				for (int y=0; y < _cacheHeight; y++) {
 					yield return getPixel(x, y);
 				}
 			}
@@ -4360,8 +4380,8 @@ public static class Graphics
 
 		public void setPixels (Picture picture)
 		{
-			for (int x=0; x < width; x++) {
-				for (int y=0; y < height; y++) {
+			for (int x=0; x < _cacheWidth; x++) {
+				for (int y=0; y < _cacheHeight; y++) {
 					setPixel (x, y, picture.getPixel (x, y));
 				}
 			}
@@ -4369,9 +4389,9 @@ public static class Graphics
 
 		public void _setPixels (Picture picture)
 		{
-			for (int x=0; x < width; x++) {
-				for (int y=0; y < height; y++) {
-					_setPixel (x, y, picture.getPixel (x, y));
+			for (int x=0; x < _cacheWidth; x++) {
+				for (int y=0; y < _cacheHeight; y++) {
+					_setPixel (x, y, picture._getPixel (x, y));
 				}
 			}
 		}
@@ -4423,9 +4443,9 @@ public static class Graphics
 		internal int wrap_width (int x)
 		{
 			if (x < 0)
-				return wrap_width ((int)(_width + x));
-			else if (x >= _width)
-				return wrap_width ((int)(x - _width));
+				return wrap_width ((int)(_cacheWidth + x));
+			else if (x >= _cacheWidth)
+				return wrap_width ((int)(x - _cacheWidth));
 			else
 				return x;
 		}
@@ -4433,9 +4453,9 @@ public static class Graphics
 		internal int wrap_height (int y)
 		{
 			if (y < 0)
-				return wrap_height ((int)(_height + y));
-			else if (y >= _height)
-				return wrap_height ((int)(y - _height));
+				return wrap_height ((int)(_cacheHeight + y));
+			else if (y >= _cacheHeight)
+				return wrap_height ((int)(y - _cacheHeight));
 			else
 				return y;
 		}
@@ -4743,8 +4763,8 @@ public static class Graphics
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Invoke( delegate {
-			    for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
+			    for (int x = 0; x < _cacheWidth; x++) {
+				for (int y = 0; y < _cacheHeight; y++) {
 				    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
 					// Don't change alpha here
 				    } else {
@@ -4761,9 +4781,9 @@ public static class Graphics
 
 		public void _setAlpha (byte value)
 		{
-		    for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-			    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
+		    for (int x = 0; x < _cacheWidth; x++) {
+			for (int y = 0; y < _cacheHeight; y++) {
+			    if (_getRed(x,y) == 0 && _getGreen(x,y) == 0 && _getBlue(x,y) == 0) {
 				// Don't change alpha here
 			    } else {
 				Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -4885,39 +4905,13 @@ public static class Graphics
     
 		public int width {
 			get {
-			    ManualResetEvent ev = new ManualResetEvent(false);
-			    int retval = 0;
-			    Invoke( delegate {
-				    retval = _pixbuf.Width;
-				    ev.Set();
-				});
-			    ev.WaitOne();
-			    return retval;
+			    return _cacheWidth;
 			}
 		}
 
 		public int height {
 			get {
-			    ManualResetEvent ev = new ManualResetEvent(false);
-			    int retval = 0;
-			    Invoke( delegate {
-				    retval = _pixbuf.Height;
-				    ev.Set();
-				});
-			    ev.WaitOne();
-			    return retval;
-			}
-		}
-
-		public int _width {
-			get {
-			    return _pixbuf.Width;
-			}
-		}
-
-		public int _height {
-			get {
-			    return _pixbuf.Height;
+			    return _cacheHeight;
 			}
 		}
 
@@ -4928,7 +4922,7 @@ public static class Graphics
 
 		public override string ToString ()
 		{
-			return String.Format ("<Picture (width={0}, height={1})>", width, height);
+			return String.Format ("<Picture (width={0}, height={1})>", _cacheWidth, _cacheHeight);
 		}
 
 		public string __repr__ ()
