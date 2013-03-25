@@ -30,6 +30,10 @@ Hangs!
 11. Rerun hangs! Don't reuse a window!
 a. need an init("show") for show(takePicture())
 
+12. SimScribbler does not have set_blob_yuv
+13. Can't have two simulations?
+14. need to add Shape.z (start height, end height)
+15. Ashley wants turnby
 
 Calico2
 

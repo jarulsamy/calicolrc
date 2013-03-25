@@ -575,8 +575,7 @@ public static class Graphics
 			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
 		    } else {
-			_windows [title] = new Graphics.WindowClass (title, width, height);
-			_lastWindow = _windows [title];
+			throw new Exception("You need to use Myro.show() before using Myro.show(picture)");
 		    }
 		    _lastWindow.KeepAbove = true;
 		    ev.Set();
@@ -597,14 +596,15 @@ public static class Graphics
 	{
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
+		    int x = -10000, y = -10000; //, w, h;
 		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
-			_windows [title].mode = "auto";
-			_windows [title].ShowAll ();
-			_windows [title].Resize (width, height);
-			_windows [title].QueueDraw ();
-		    } else {
-			_windows [title] = new Graphics.WindowClass (title, width, height);
+			//_windows [title].GetSize(out w, out h); 
+			_windows [title].GetPosition(out x, out y);
+			_windows [title].Destroy();
 		    }
+		    _windows [title] = new Graphics.WindowClass (title, width, height);
+		    if (x > -10000)
+			_windows [title].Move(x, y);
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
 		    ev.Set();
@@ -3568,9 +3568,11 @@ public static class Graphics
     
 		public Pixel (Picture picture, int x, int y)
 		{
-			this.picture = picture;
-			this.x = picture.wrap_width (x);
-			this.y = picture.wrap_height (y);
+		    // FIXME: wrap_width uses raw picture height, width
+		    // but if we put it in gui-thread, it will be too slow
+		    this.picture = picture;
+		    this.x = picture.wrap_width (x);
+		    this.y = picture.wrap_height (y);
 		}
 
 		public Color getColor ()

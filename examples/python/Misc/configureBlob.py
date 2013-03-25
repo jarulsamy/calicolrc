@@ -7,6 +7,8 @@ w = None
 r = None
 p = None
 
+show()
+
 def handleMouseUp(obj, event):
     global x1,y1,x2,y2,p
     x2,y2= event.x, event.y

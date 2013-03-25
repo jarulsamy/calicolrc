@@ -1,7 +1,8 @@
 from Myro import *
-init("COM5")
+init()
 pic = takePicture()
-show(pic)
+
+show(pic, init=True)
 backward(1, 1)
 forward(1, 1)
 beep(1, 440)
