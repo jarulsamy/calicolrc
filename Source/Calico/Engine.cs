@@ -260,7 +260,8 @@ namespace Calico {
 			else
 			  retval = source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException tae) {
-			System.Threading.Thread.ResetAbort();
+		      System.Threading.Thread.Sleep(100);
+		      System.Threading.Thread.ResetAbort();
 		  }
 		  if (aborted) {
 			System.Console.Error.WriteLine("Running script aborted!");
@@ -309,6 +310,7 @@ namespace Calico {
 			  source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException tae) {
 			PrintLine("[Script stopped----------]");
+			System.Threading.Thread.Sleep(100);
 			System.Threading.Thread.ResetAbort();
 		  } catch (Exception e) {
 			if (e.Message.Contains("Thread was being aborted")) {
@@ -348,6 +350,7 @@ namespace Calico {
 			//source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException tae) {
 			PrintLine("[Script stopped----------]");
+			System.Threading.Thread.Sleep(100);
 			System.Threading.Thread.ResetAbort();
 		  } catch (Exception e) {
 			if (e.Message.ToString().Contains("Thread was being aborted")) {

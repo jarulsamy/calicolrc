@@ -574,12 +574,11 @@ public static class Graphics
 			_lastWindow = _windows [title];
 			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
-			_lastWindow.KeepAbove = true;
 		    } else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 			_lastWindow = _windows [title];
-			_lastWindow.KeepAbove = true;
 		    }
+		    _lastWindow.KeepAbove = true;
 		    ev.Set();
 		});
 	    ev.WaitOne();
@@ -599,17 +598,15 @@ public static class Graphics
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
 		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
-			_windows [title].clear ();
 			_windows [title].mode = "auto";
 			_windows [title].ShowAll ();
 			_windows [title].Resize (width, height);
 			_windows [title].QueueDraw ();
-			_lastWindow = _windows [title];
 		    } else {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
-			_lastWindow = _windows [title];
-			_lastWindow.KeepAbove = true;
 		    }
+		    _lastWindow = _windows [title];
+		    _lastWindow.KeepAbove = true;
 		    ev.Set();
 		});
 	    ev.WaitOne();

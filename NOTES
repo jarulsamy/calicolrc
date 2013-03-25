@@ -1,6 +1,9 @@
 5. move slider to left, should allow click on pause button
+======================================================
 7. Scheme turned off the pause button
+======================================================
 8. handle --lang=LANG, --chat, --verbose, --reset?
+======================================================
 9. hangs on exit:
 
 while True:
@@ -15,6 +18,18 @@ If it has output, then it exits fine; otherwise hangs.
 
 Solution: don't use Gtk.Application.Quit() but
 System.Environment.Exit(0)
+
+======================================================
+10. Stopping:
+
+while True:
+      takePicture()
+
+Hangs!
+======================================================
+11. Rerun hangs! Don't reuse a window!
+a. need an init("show") for show(takePicture())
+
 
 Calico2
 

@@ -20,3 +20,7 @@ makeRobot("SimScribbler", sim)
 # Control it somehow:
 #senses()
 #joystick()
+
+while True:
+    show(takePicture())
+    

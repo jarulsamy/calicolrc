@@ -2116,13 +2116,14 @@ namespace Calico {
             if (executeThread != null) {
                 Print(Tag.Warning, _("Stopping...\n"));
                 executeThread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
-                executeThread.Join();
+                //executeThread.Join(); don't really care, do we, if it completes?
                 executeThread = null;
-
+		/*
+		FIXME: was hanging here... maybe need to wait some?
                 manager ["python"].engine.Execute("import Myro as _\n" +
                     "if _.robot: _.robot.flush(); _.robot.stop()\n" + 
                     "del _", false);
-             
+		*/
                 Invoke(OnStopRunning);
             }
         }

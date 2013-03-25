@@ -243,63 +243,63 @@ public class SimScribbler : Myro.Robot
 
 		public override Graphics.Picture takePicture (string mode="jpeg")
 		{ 
-			// simscribbler camera
-			double view_angle = 60.0; // degrees
-			double max_distance = 20.0;
-			float MeterInPixels = 64.0f;
-			Graphics.Picture picture = new Graphics.Picture (256, 192);
-			if (!simulation.window.isRealized())
-			    return picture;
-			lock (this) {
-			    double [] distance = new double[256];
-			    Graphics.Color [] colors = new Graphics.Color[256];
-			    Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
-			    for (int i = 0; i < 256; i++) {
-				var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
-							       (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
-				Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
-				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-					distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
-					if (fixture.UserData is Graphics.Shape)
-					    colors [i] = ((Graphics.Shape)fixture.UserData).fill;
-					return 1; 
-				    }, 
-				    Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
-				    Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
-			    }
-			    Graphics.Color c;
-			    double g = 1.0;
-			    Graphics.Color sky = new Graphics.Color ("deepskyblue");
-			    ManualResetEvent ev = new ManualResetEvent(false);
-			    Myro.Invoke (delegate {
-				    for (int i = 0; i < 256; i++) {
-					if (distance [i] > 0) {
-					    if (colors [i] != null)
-						c = colors [i];
-					    else
-						c = new Graphics.Color ("black");
-					    g = distance [i];
+		    // simscribbler camera
+		    Graphics.Picture picture = new Graphics.Picture (256, 192);
+		    double view_angle = 60.0; // degrees
+		    double max_distance = 20.0;
+		    float MeterInPixels = 64.0f;
+		    if (!simulation.window.isRealized())
+			return picture;
+		    lock (this) {
+			double [] distance = new double[256];
+			Graphics.Color [] colors = new Graphics.Color[256];
+			Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
+			for (int i = 0; i < 256; i++) {
+			    var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
+							   (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
+			    Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
+			    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
+				    distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
+				    if (fixture.UserData is Graphics.Shape)
+					colors [i] = ((Graphics.Shape)fixture.UserData).fill;
+				    return 1; 
+				}, 
+				Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
+				Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
+			}
+			Graphics.Color c;
+			double g = 1.0;
+			Graphics.Color sky = new Graphics.Color ("deepskyblue");
+			ManualResetEvent ev = new ManualResetEvent(false);
+			Myro.Invoke (delegate {
+				for (int i = 0; i < 256; i++) {
+				    if (distance [i] > 0) {
+					if (colors [i] != null)
+					    c = colors [i];
+					else
+					    c = new Graphics.Color ("black");
+					g = distance [i];
+				    } else {
+					c = new Graphics.Color ("gray");
+					g = 1.0;
+				    }
+				    for (int h = 0; h < 192; h++) {
+					if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
+					    picture._setColor (i, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
+					} else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
+					    picture._setColor (i, h, sky);
 					} else {
-					    c = new Graphics.Color ("gray");
-					    g = 1.0;
-					}
-					for (int h = 0; h < 192; h++) {
-					    if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
-						picture._setColor (i, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
-					    } else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
-						picture._setColor (i, h, sky);
-					    } else {
-						picture._setColor (i, h, simulation.groundColor);
-					    }
+					    picture._setColor (i, h, simulation.groundColor);
 					}
 				    }
-				    ev.Set();
-				});
-			    ev.WaitOne ();
-			}
-			//Graphics.Picture pic = makePicture("/home/dblank/Calico-dev/trunk/examples/images/pyramid.png");
-			//picture.setRegion(new Graphics.Point(10, 10), pic);
-			return picture;
+				}
+				ev.Set();
+			    });
+			ev.WaitOne ();
+		    }
+		    //Graphics.Picture pic = makePicture("/home/dblank/Calico-dev/trunk/examples/images/pyramid.png");
+		    //picture.setRegion(new Graphics.Point(10, 10), pic);
+		    return picture;
 		}
     
 		public override void setup ()
