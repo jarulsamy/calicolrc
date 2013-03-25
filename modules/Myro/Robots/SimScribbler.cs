@@ -285,11 +285,11 @@ public class SimScribbler : Myro.Robot
 				    }
 				    for (int h = 0; h < 192; h++) {
 					if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
-					    picture._setColor (i, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
+					    picture.setColor (i, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
 					} else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
-					    picture._setColor (i, h, sky);
+					    picture.setColor (i, h, sky);
 					} else {
-					    picture._setColor (i, h, simulation.groundColor);
+					    picture.setColor (i, h, simulation.groundColor);
 					}
 				    }
 				}

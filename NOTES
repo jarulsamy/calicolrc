@@ -38,6 +38,7 @@ a. need an init("show") for show(takePicture())
 14. need to add Shape.z (start height, end height)
 15. Ashley wants turnby
 16. Closing Sim and re-running doesn't show robot
+17. examples/python/Science/Graphviz is broken?
 
 Calico2
 

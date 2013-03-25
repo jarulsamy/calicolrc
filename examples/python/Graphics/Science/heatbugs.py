@@ -66,7 +66,7 @@ def moveBugs(bugs):
             bug.move(0, 2)
 
 def main():
-    while True:
+    while win.isRealized():
         display(picture, bugs)
         moveBugs(bugs)
 

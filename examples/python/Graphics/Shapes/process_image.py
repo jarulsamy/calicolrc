@@ -33,7 +33,7 @@ def reverse():
     win.mode = 'manual'
     count = 0
     for p in pixels:
-        p._setRGB(255 - p._getRed(), 255 - p._getGreen(), 255 - p._getBlue())
+        p.setRGB(255 - p.getRed(), 255 - p.getGreen(), 255 - p.getBlue())
         win.update()
         count += 1
     win.mode = 'auto'

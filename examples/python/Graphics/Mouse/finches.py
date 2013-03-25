@@ -12,7 +12,7 @@ w.setBackground(Color(20, 20, 20))
 i = 32
 x,y = 50, 50
 
-while True:
+while w.isRealized():
 
    r = Rectangle((0, 0), (w.width, w.height))
    r.fill = Color(0, 0, 0, 2)

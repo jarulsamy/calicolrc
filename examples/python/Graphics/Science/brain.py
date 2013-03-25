@@ -14,8 +14,8 @@ last = 0
 pics[last].draw(window)
 pics[last].moveTo(pics[0].width/2, pics[0].height/2)
 
-#slider = HSlider((0,pics[0].height), pics[0].width)
-#slider.draw(window)
+slider = HSlider((0,pics[0].height), pics[0].width)
+slider.draw(window)
 
 def showimage(obj, event):
     global last
@@ -27,4 +27,4 @@ def showimage(obj, event):
         pics[pos].moveTo(pics[0].width/2, pics[0].height/2)
         last = pos
 
-#slider.connect("change-value", showimage)
+slider.connect("change-value", showimage)
