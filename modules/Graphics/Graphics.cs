@@ -338,19 +338,9 @@ public static class Graphics
 		return picture.getColor (x, y);
 	}
   
-	public static Color _getColor (Picture picture, int x, int y)
-	{
-		return picture._getColor (x, y);
-	}
-  
 	public static Pixel getPixel (Picture picture, int x, int y)
 	{
 		return picture.getPixel (x, y);
-	}
-  
-	public static Pixel _getPixel (Picture picture, int x, int y)
-	{
-		return picture._getPixel (x, y);
 	}
   
 	public static IEnumerable getPixels (Picture picture)
@@ -362,13 +352,13 @@ public static class Graphics
 		}
 	}
 
-	public static void setPixels (Picture picture, Picture picture2)
-	{
+        public static void setPixels (Picture picture, Picture picture2)
+        {
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
 		    for (int x=0; x < picture._cacheWidth; x++) {
 			for (int y=0; y < picture._cacheHeight; y++) {
-			    picture._setPixel (x, y, picture2._getPixel (x, y));
+			    picture.setPixel (x, y, picture2.getPixel (x, y));
 			}
 		    }
 		    ev.Set();
@@ -381,19 +371,9 @@ public static class Graphics
 		picture.setPixel (x, y, color);
 	}
 
-	public static void _setPixel (Picture picture, int x, int y, Color color)
-	{
-		picture._setPixel (x, y, color);
-	}
-
 	public static void setPixel (Picture picture, int x, int y, Pixel pixel)
 	{
 		picture.setPixel (x, y, pixel);
-	}
-
-	public static void _setPixel (Picture picture, int x, int y, Pixel pixel)
-	{
-		picture._setPixel (x, y, pixel);
 	}
 
 	public static Color getColor (Pixel pixel)
@@ -3604,19 +3584,9 @@ public static class Graphics
 			return picture.getRed (x, y);
 		}
 
-		public int _getRed ()
-		{
-			return picture._getRed (x, y);
-		}
-
 		public int getGreen ()
 		{
 			return picture.getGreen (x, y);
-		}
-
-		public int _getGreen ()
-		{
-			return picture._getGreen (x, y);
 		}
 
 		public int getBlue ()
@@ -3624,19 +3594,9 @@ public static class Graphics
 			return picture.getBlue (x, y);
 		}
 
-		public int _getBlue ()
-		{
-			return picture._getBlue (x, y);
-		}
-
 		public int getAlpha ()
 		{
 			return picture.getAlpha (x, y);
-		}
-
-		public int _getAlpha ()
-		{
-			return picture._getAlpha (x, y);
 		}
 
 		public void setColor (Color color)
@@ -3644,19 +3604,9 @@ public static class Graphics
 			picture.setColor (x, y, color);
 		}
 
-		public void _setColor (Color color)
-		{
-			picture._setColor (x, y, color);
-		}
-
 		public void setRGB (byte red, byte green, byte blue)
 		{
 			picture.setRGB (x, y, red, green, blue);
-		}
-
-		public void _setRGB (byte red, byte green, byte blue)
-		{
-			picture._setRGB (x, y, red, green, blue);
 		}
 
 		public void setRGBA (byte red, byte green, byte blue, byte alpha)
@@ -3664,19 +3614,9 @@ public static class Graphics
 			picture.setRGBA (x, y, red, green, blue, alpha);
 		}
 
-		public void _setRGBA (byte red, byte green, byte blue, byte alpha)
-		{
-			picture._setRGBA (x, y, red, green, blue, alpha);
-		}
-
 		public void setGray (byte value)
 		{
 			picture.setGray (x, y, value);
-		}
-
-		public void _setGray (byte value)
-		{
-			picture._setGray (x, y, value);
 		}
 
 		public void setRed (byte value)
@@ -3684,19 +3624,9 @@ public static class Graphics
 			picture.setRed (x, y, value);
 		}
 
-		public void _setRed (byte value)
-		{
-			picture._setRed (x, y, value);
-		}
-
 		public void setGreen (byte value)
 		{
 			picture.setGreen (x, y, value);
-		}
-
-		public void _setGreen (byte value)
-		{
-			picture._setGreen (x, y, value);
 		}
 
 		public void setBlue (byte value)
@@ -3704,19 +3634,9 @@ public static class Graphics
 			picture.setBlue (x, y, value);
 		}
 
-		public void _setBlue (byte value)
-		{
-			picture._setBlue (x, y, value);
-		}
-
 		public void setAlpha (byte value)
 		{
 			picture.setAlpha (x, y, value);
-		}
-
-		public void _setAlpha (byte value)
-		{
-			picture._setAlpha (x, y, value);
 		}
 	}
   
@@ -3803,10 +3723,10 @@ public static class Graphics
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
-				    byte r = (byte)original._getRed (x, y);
-				    byte g = (byte)original._getGreen (x, y);
-				    byte b = (byte)original._getBlue (x, y);
-				    byte a = (byte)original._getAlpha (x, y);
+				    byte r = (byte)original.getRed (x, y);
+				    byte g = (byte)original.getGreen (x, y);
+				    byte b = (byte)original.getBlue (x, y);
+				    byte a = (byte)original.getAlpha (x, y);
 				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 						       x * _pixbuf.NChannels + 0, r);
 				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -4098,7 +4018,7 @@ public static class Graphics
 				    px = x * Math.Cos (angle) - y * Math.Sin (angle);
 				    py = x * Math.Sin (angle) + y * Math.Cos (angle);
 				    // set the color of the new image from the offset of this:
-				    pic._setColor (ox, oy, this._getColor ((int)(p.x + px), 
+				    pic.setColor (ox, oy, this.getColor ((int)(p.x + px), 
 									   (int)(p.y + py)));
 				    oy += 1;
 				}
@@ -4119,7 +4039,7 @@ public static class Graphics
 			    Point p = new Point (iterable);
 			    for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-				    pic._setColor (x, y, _getColor((int)(p.x + x), 
+				    pic.setColor (x, y, getColor((int)(p.x + x), 
 								   (int)(p.y + y)));
 				}
 			    }
@@ -4139,13 +4059,13 @@ public static class Graphics
 			    Point p = new Point (iterable);
 			    for (int x = 0; x < picture._cacheWidth; x++) {
 				for (int y = 0; y < picture._cacheHeight; y++) {
-				    Color c1 = this._getColor ((int)(p.x + x), 
+				    Color c1 = this.getColor ((int)(p.x + x), 
 							      (int)(p.y + y));
-				    Color c2 = picture._getColor ((int)(x), 
+				    Color c2 = picture.getColor ((int)(x), 
 								 (int)(y));
 				    int t2 = c2.alpha;
 				    int t1 = Math.Max (Math.Min (255 - t2, 255), 0);
-				    this._setColor ((int)(p.x + x), 
+				    this.setColor ((int)(p.x + x), 
 						    (int)(p.y + y), 
 						    new Color (t1 * c1.red + t2 * c2.red,
 							       t1 * c1.green + t2 * c2.green,
@@ -4163,10 +4083,10 @@ public static class Graphics
 		    Invoke( delegate {
 			    for (int x = 0; x < _cacheWidth/2; x++) {
 				for (int y = 0; y < _cacheHeight; y++) {
-				    Color c1 = _getColor (x, y);
-				    Color c2 = _getColor (_cacheWidth - x - 1, y);
-				    _setColor(x, y, c2);
-				    _setColor(_cacheWidth - x - 1, y, c1);
+				    Color c1 = getColor (x, y);
+				    Color c2 = getColor (_cacheWidth - x - 1, y);
+				    setColor(x, y, c2);
+				    setColor(_cacheWidth - x - 1, y, c1);
 				}
 			    }
 			    ev.Set();
@@ -4180,10 +4100,10 @@ public static class Graphics
 		    Invoke( delegate {
 			    for (int x = 0; x < _cacheWidth; x++) {
 				for (int y = 0; y < _cacheHeight/2; y++) {
-				    Color c1 = _getColor(x, y);
-				    Color c2 = _getColor(x, _cacheHeight - y - 1);
-				    _setColor(x, y, c2);
-				    _setColor(x, _cacheHeight - y - 1, c1);
+				    Color c1 = getColor(x, y);
+				    Color c2 = getColor(x, _cacheHeight - y - 1);
+				    setColor(x, y, c2);
+				    setColor(x, _cacheHeight - y - 1, c1);
 				}
 			    }
 			    ev.Set();
@@ -4208,18 +4128,18 @@ public static class Graphics
 				    // set the color of the new image from the offset of this:
 				    tx = (int)(p.x + px);
 				    ty = (int)(p.y + py);
-				    this._setPixel (tx, ty, color);
+				    this.setPixel (tx, ty, color);
 				    // FIXME: a lame way to not skip any pixels:
 				    // Need a region fill algorithm
 				    if ((int)px + 1 < width / 2) {
-					this._setColor (tx + 1, ty, color);
+					this.setColor (tx + 1, ty, color);
 					if ((int)py + 1 < height / 2) {
-					    this._setColor (tx + 1, ty + 1, color);
-					    this._setColor (tx, ty + 1, color);
+					    this.setColor (tx + 1, ty + 1, color);
+					    this.setColor (tx, ty + 1, color);
 					}
 				    } else {
 					if ((int)py + 1 < height / 2) {
-					    this._setColor (tx, ty + 1, picture._getColor (x + width / 2, 
+					    this.setColor (tx, ty + 1, picture.getColor (x + width / 2, 
 											   y + height / 2));
 					}
 				    }
@@ -4247,18 +4167,18 @@ public static class Graphics
 				    // set the color of the new image from the offset of this:
 				    tx = (int)(p.x + px);
 				    ty = (int)(p.y + py);
-				    this._setColor (tx, ty, color);
+				    this.setColor (tx, ty, color);
 				    // FIXME: a lame way to not skip any pixels:
 				    // Need a region fill algorithm
 				    if ((int)px + 1 < width / 2) {
-					this._setColor (tx + 1, ty, color);
+					this.setColor (tx + 1, ty, color);
 					if ((int)py + 1 < height / 2) {
-					    this._setColor (tx + 1, ty + 1, color);
-					    this._setColor (tx, ty + 1, color);
+					    this.setColor (tx + 1, ty + 1, color);
+					    this.setColor (tx, ty + 1, color);
 					}
 				    } else {
 					if ((int)py + 1 < height / 2) {
-					    this._setColor (tx, ty + 1, color);
+					    this.setColor (tx, ty + 1, color);
 					}
 				    }
 				}
@@ -4331,12 +4251,6 @@ public static class Graphics
 			return new Pixel (this, x, y);
 		}
     
-		public Pixel _getPixel (int x, int y)
-		{
-		    // Not actually any different from getPixel
-		    return new Pixel (this, x, y);
-		}
-    
 		public void setPixel (int x, int y, Color color)
 		{
 			int red = color.red;
@@ -4346,15 +4260,6 @@ public static class Graphics
 			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
 		}
 
-		public void _setPixel (int x, int y, Color color)
-		{
-			int red = color.red;
-			int green = color.green;
-			int blue = color.blue;
-			int alpha = color.alpha;
-			this._setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
-		}
-
 		public void setPixel (int x, int y, Pixel pixel)
 		{
 			int red = pixel.getRed ();
@@ -4362,15 +4267,6 @@ public static class Graphics
 			int blue = pixel.getBlue ();
 			int alpha = pixel.getAlpha ();
 			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
-		}
-
-		public void _setPixel (int x, int y, Pixel pixel)
-		{
-			int red = pixel._getRed ();
-			int green = pixel._getGreen ();
-			int blue = pixel._getBlue ();
-			int alpha = pixel._getAlpha ();
-			this._setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
 		}
 
 		public IEnumerable getPixels ()
@@ -4391,29 +4287,10 @@ public static class Graphics
 			}
 		}
 
-		public void _setPixels (Picture picture)
-		{
-			for (int x=0; x < _cacheWidth; x++) {
-				for (int y=0; y < _cacheHeight; y++) {
-					_setPixel (x, y, picture._getPixel (x, y));
-				}
-			}
-		}
-
 		public Color getColor (int x, int y)
 		{
 			// red, green, blue, alpha
 			Color temp = new Color (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
-			temp.picture = this;
-			temp.x = x;
-			temp.y = y;
-			return temp;
-		}
-    
-		public Color _getColor (int x, int y)
-		{
-			// red, green, blue, alpha
-			Color temp = new Color (_getRed (x, y), _getGreen (x, y), _getBlue (x, y), _getAlpha (x, y));
 			temp.picture = this;
 			temp.x = x;
 			temp.y = y;
@@ -4426,22 +4303,10 @@ public static class Graphics
 			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y));
 		}
     
-		public PythonTuple _getRGB (int x, int y)
-		{
-			// red, green, blue, alpha
-			return PyTuple (_getRed (x, y), _getGreen (x, y), _getBlue (x, y));
-		}
-    
 		public PythonTuple getRGBA (int x, int y)
 		{
 			// red, green, blue, alpha
 			return PyTuple (getRed (x, y), getGreen (x, y), getBlue (x, y), getAlpha (x, y));
-		}
-
-		public PythonTuple _getRGBA (int x, int y)
-		{
-			// red, green, blue, alpha
-			return PyTuple (_getRed (x, y), _getGreen (x, y), _getBlue (x, y), _getAlpha (x, y));
 		}
 
 		internal int wrap_width (int x)
@@ -4466,27 +4331,6 @@ public static class Graphics
 
 		public int getGray (int x, int y)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    int retval = 0;
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    int r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						      x * _pixbuf.NChannels + 0);
-			    int g = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						      x * _pixbuf.NChannels + 1);
-			    int b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						      x * _pixbuf.NChannels + 2);
-			    retval = (int)(((double)(r + g + b)) / 3.0);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    return retval;
-		}
-    
-		public int _getGray (int x, int y)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4501,22 +4345,6 @@ public static class Graphics
     
 		public int getRed (int x, int y)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    int retval = 0;
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						       x * _pixbuf.NChannels + 0);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    return retval;
-		}
-    
-		public int _getRed (int x, int y)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4525,22 +4353,6 @@ public static class Graphics
 		}
     
 		public int getGreen (int x, int y)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    int retval = 0;
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						       x * _pixbuf.NChannels + 1);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    return retval;
-		}
-    
-		public int _getGreen (int x, int y)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
@@ -4551,22 +4363,6 @@ public static class Graphics
     
 		public int getBlue (int x, int y)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    int retval = 0;
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						       x * _pixbuf.NChannels + 2);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    return retval;
-		}
-		
-		public int _getBlue (int x, int y)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4576,22 +4372,6 @@ public static class Graphics
 		
 		public int getAlpha (int x, int y)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    int retval = 0;
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    retval = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						       x * _pixbuf.NChannels + 3);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    return retval;
-		}
-    
-		public int _getAlpha (int x, int y)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4600,27 +4380,6 @@ public static class Graphics
 		}
     
 		public void setColor (int x, int y, Color color)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 0, (byte)color.red);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 1, (byte)color.green);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 2, (byte)color.blue);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 3, (byte)color.alpha);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setColor (int x, int y, Color color)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
@@ -4637,25 +4396,6 @@ public static class Graphics
 
 		public void setGray (int x, int y, byte value)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 0, value);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 1, value);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 2, value);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-    
-		public void _setGray (int x, int y, byte value)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4669,21 +4409,6 @@ public static class Graphics
     
 		public void setRed (int x, int y, byte value)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 0, value);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setRed (int x, int y, byte value)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4692,21 +4417,6 @@ public static class Graphics
 		}
 
 		public void setGreen (int x, int y, byte value)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 1, value);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setGreen (int x, int y, byte value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
@@ -4717,21 +4427,6 @@ public static class Graphics
 
 		public void setBlue (int x, int y, byte value)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 2, value);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-    
-		public void _setBlue (int x, int y, byte value)
-		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
@@ -4740,21 +4435,6 @@ public static class Graphics
 		}
     
 		public void setAlpha (int x, int y, byte value)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 3, value);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setAlpha (int x, int y, byte value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
@@ -4765,29 +4445,9 @@ public static class Graphics
 
 		public void setAlpha (byte value)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    for (int x = 0; x < _cacheWidth; x++) {
-				for (int y = 0; y < _cacheHeight; y++) {
-				    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
-					// Don't change alpha here
-				    } else {
-					Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-							   x * _pixbuf.NChannels + 3, value);
-				    }
-				}
-			    }
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setAlpha (byte value)
-		{
 		    for (int x = 0; x < _cacheWidth; x++) {
 			for (int y = 0; y < _cacheHeight; y++) {
-			    if (_getRed(x,y) == 0 && _getGreen(x,y) == 0 && _getBlue(x,y) == 0) {
+			    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
 				// Don't change alpha here
 			    } else {
 				Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -4798,25 +4458,6 @@ public static class Graphics
 		}
 
 		public void setRGB (int x, int y, byte red, byte green, byte blue)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 0, red);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 1, green);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 2, blue);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-    
-		public void _setRGB (int x, int y, byte red, byte green, byte blue)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
@@ -4830,28 +4471,6 @@ public static class Graphics
 		}
     
 		public void setRGBA (int x, int y, byte red, byte green, byte blue, 
-                            byte alpha)
-		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
-			    // red, green, blue, alpha
-			    x = wrap_width (x);
-			    y = wrap_height (y);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 0, red);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 1, green);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 2, blue);
-			    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-					       x * _pixbuf.NChannels + 3, alpha);
-			    ev.Set();
-			});
-		    ev.WaitOne();
-		    QueueDraw ();
-		}
-
-		public void _setRGBA (int x, int y, byte red, byte green, byte blue, 
 				      byte alpha)
 		{
 		    // red, green, blue, alpha
