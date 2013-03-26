@@ -99,6 +99,9 @@ namespace Jigsaw
 		// Left tab height
 		public int tabHeight = 33;
 
+		// Scrollbars
+		//private Widgets.CYScrollBar ybar;
+
 		protected int _X;										// Cache for context menu
 		protected int _Y;
 
@@ -135,11 +138,13 @@ namespace Jigsaw
 			
 			// Add block palette background to canvas
 			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
-			this.AddShape(pnlBlock);
+			this.AddShape (pnlBlock);				// Add the block panel to the shapes list
+			this.AddShape (pnlBlock.YScrollbar);
 
 			pnlTab = new Widgets.CTabPalette(0.0, 0.0, 100.0, 10000.0);
 			pnlTab.allTabs = allTabs;
 			this.AddShape(pnlTab);
+			this.AddShape(pnlTab.YScrollbar);
 
 			// Build tabbed panel for blocks
 			int tabY = 0; //33;
@@ -263,38 +268,28 @@ namespace Jigsaw
 
 			// Add all tabs to each tabs so that they work as expected
 			foreach (Widgets.CRoundedTab tab in allTabs) tab.AddTabs( allTabs );
-			
+
 			// Bring panel to top after all tabs added to canvas
-			pnlBlock.BringToFront(this);
-			
-			// Look for map files in module path and try to load
-//			if (modulePath != null) {
-//				// Look for all map files and load
-//				string[] filePaths = Directory.GetFiles(modulePath, "*.map");
-//				
-//				// Give each a go
-//				foreach (string pth in filePaths) {
-//					try {
-//						TextReader tr = new StreamReader(pth);
-//						UseLibraryMap(tr);
-//					} catch (Exception ex){
-//						Console.WriteLine (ex.Message);
-//					}
-//				}
-//			}
-			
+			pnlTab.BringToFront (this);
+			pnlBlock.BringToFront (this);
+			pnlTab.YScrollbar.BringToFront (this);
+
 			// Select first tab
 			tbCtrl.SetToggle(this, true);
-			
+
+			//ybar = new Widgets.CYScrollBar(500.0, 0.0, 14, 100);
+			//this.AddShape(ybar);
+
 			// No changes so far
 			this.Modified = false;
-			
+
 			// Init to starting state with initial set of blocks
 			this.OnFileNew(null, null);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public static void log(object msg, string path) {
+		public static void log(object msg, string path) 
+		{
 			using (StreamWriter w = File.AppendText(path))
 			{
 				w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
@@ -1434,8 +1429,10 @@ namespace Jigsaw
 					double dx = (e.X - this.mouseDownExact.X);
 					double dy = (e.Y - this.mouseDownExact.Y);
 					
-					this.offsetX += dx;
-					this.offsetY += dy;
+//					this.offsetX += dx;
+//					this.offsetY += dy;
+					this.DoScroll(dx, dy);
+
 					this.EditMode = Diagram.EMode.Translating;
 					
 					// Clip offsets
@@ -1487,10 +1484,33 @@ namespace Jigsaw
 			} else if (scl.Direction == Gdk.ScrollDirection.Right) {
 				deltaX = 20.0;
 			}
-			this.offsetX += deltaX;
-			this.offsetY += deltaY;
+
+			this.DoScroll(deltaX, deltaY);
+			//this.offsetX += deltaX;
+			//this.offsetY += deltaY;
+
 			this.FixAbsolutePositionedShapes();
 			this.Invalidate();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DoScroll(double dX, double dY)
+		{	// Test if a scroll is acceptible based on window bounds and block positions
+			// and perform is acceptible.
+
+			this.offsetX += dX;
+			this.offsetY += dY;
+
+			int cvsHeight = Convert.ToInt32(this.Allocation.Height/this.scale);
+			int cvsWidth = Convert.ToInt32(this.Allocation.Width/this.scale);
+
+//			double barFrac = cvsHeight/10000.0; //  stackHeight/ySpan;
+//			double barLoc = -this.offsetY/10000.0; //(ySpanMax - maxBottom)/ySpan;		// Offset from the bottom
+//			double barSpan = 1.0; //ySpan/cvsHeight;
+			
+			//ybar.Update((cvsWidth - ybar.Width), -this.offsetY, ybar.Width, cvsHeight, barFrac, barLoc, barSpan);
+			//ybar.Update(200.0, 0.0, ybar.Width, cvsHeight, 0.1, 0.5, barSpan);
+			//Console.WriteLine ("{0} {1} {2} {3} {4} {5} {6}", (cvsWidth - ybar.Width), -this.offsetY, ybar.Width, cvsHeight, barFrac, barLoc, barSpan);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

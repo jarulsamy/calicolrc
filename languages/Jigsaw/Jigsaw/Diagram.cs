@@ -175,7 +175,7 @@ namespace Diagram
 		
 		internal double worldWidth = 3000.0;					// Size of underlying canvas world
 		internal double worldHeight = 2000.0;
-        internal double scale = 1.0001;                            // Drawing scale (zoom) factor
+        internal double scale = 1.0001;                         // Drawing scale (zoom) factor
 		internal double scaleCenterX = 0.0;						// The point about which scaling is performed (screen coordinates)
 		internal double scaleCenterY = 0.0;
 		internal double offsetX = 0.0;							// The current translation amount
@@ -507,7 +507,7 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DoZoom(double factor)
+		public virtual void DoZoom(double factor)
 		{	// Perform the zoom
 			Zoom *= factor;
 			
@@ -530,11 +530,17 @@ namespace Diagram
 			//this.UpdateOffsetLimits();
 			//this.ClipOffsets();
 			this.FixAbsolutePositionedShapes();
+
+			// Give all shapes a chance to react to a zoom
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				s.DoZoom(factor, this);
+			}
+
 			this.Invalidate();	
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DoResetZoom() {
+		public virtual void DoResetZoom() {
 			this.scale = 1.0001;
 			//this.offsetX = 0.0;
 			//this.offsetY = 0.0;
@@ -543,6 +549,12 @@ namespace Diagram
 			//this.UpdateOffsetLimits();
 			//this.ClipOffsets ();
 			this.FixAbsolutePositionedShapes();
+
+			// Give all shapes a chance to react to a zoom
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				s.DoResetZoom(this);
+			}
+
 			this.Invalidate();	
 		}
 		
@@ -570,7 +582,18 @@ namespace Diagram
 			this.ToggleInset();
 			this.Invalidate();
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		protected override bool OnConfigureEvent(Gdk.EventConfigure ev) {
+			base.OnConfigureEvent(ev);
+			
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				s.DoConfigure(this);
+			}
+			
+			return true;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void ToggleInset() {
 			this._showInset = !this._showInset;
@@ -873,7 +896,7 @@ namespace Diagram
                 this.Invalidate();
             }
         }
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //		protected void OnPropertiesShow(object sender, EventArgs e)
 //		{
@@ -1597,7 +1620,7 @@ namespace Diagram
         }
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public double Zoom
+        public virtual double Zoom
         {	// Set drawing zoom factor. A number greater than 0.
             get { return this.scale; }
             set {
@@ -1663,28 +1686,6 @@ namespace Diagram
 
             this.Invalidate();
         }
-
-        /// <summary>
-        ///  Bring selected shapes to front of z-order
-        /// </summary>
-//        public void BringSelectedToFront()
-//        {
-//            List<CShape> tmp = new List<CShape>();
-//
-//            for (int i = this.shapes.Count - 1; i >= 0; i--)
-//            {
-//                CShape s = this.shapes[i];
-//
-//                // Do not start swapping until found first unselected shape
-//                if (s.Selected)
-//                {
-//                    tmp.Insert(0, s);
-//                    this.shapes.RemoveAt(i);
-//                }
-//            }
-//            this.shapes.AddRange(tmp);
-//            this.Invalidate();
-//        }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void SendSelectedToBack()
@@ -1710,8 +1711,8 @@ namespace Diagram
 		/// Bring given CShape to front of z-order 
 		/// </summary>
 		public void BringToFront(CShape s) {
+			if (!this.shapes.Contains(s)) return;		// Prevents unmanaged shapes from inadvertantly being added to shapes list
 			this.shapes.Remove(s);
-			//this.shapes.Add(s);
 			this.AddShape(s);
 		}
 		
@@ -1719,6 +1720,7 @@ namespace Diagram
 		/// Move given shape to bottom of z-order 
 		/// </summary>
 		public void SendToBack(CShape s) {
+			if (!this.shapes.Contains(s)) return;		// Prevents unmanaged shapes from inadvertantly being added to shapes list
 			this.shapes.Remove(s);
 			this.shapes.Insert(0,s);
 		}
@@ -2180,13 +2182,13 @@ namespace Diagram
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void BringToFront(Canvas cvs) 
+		public virtual void BringToFront(Canvas cvs) 
 		{
 			cvs.BringToFront(this);	
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void SendToBack(Canvas cvs) 
+		public virtual void SendToBack(Canvas cvs) 
 		{
 			cvs.SendToBack(this);
 		}
@@ -2710,6 +2712,28 @@ namespace Diagram
             // Needs saving after a transformation
             //cvs.Modified = true;
         }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void DoConfigure(Diagram.Canvas cvs) {
+			// An overridable method that is called by the canvas whenever the ConfigureEvent is fired
+			// By default it does nothing, but it gives shapes a chance to reconfigure themselves
+			// when the window system reconfigures the canvas.
+			return;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void DoZoom(double factor, Diagram.Canvas cvs) {
+			// An overridable method that is called by the canvas whenever it's scale changes.
+			// By default it does nothing, but it gives shapes a chance to react to a scale change.
+			return;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public virtual void DoResetZoom(Diagram.Canvas cvs) {
+			// An overridable method that is called by the canvas whenever it's scale gets reset.
+			// By default it does nothing, but it gives shapes a chance to react on scale resets.
+			return;
+		}
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void UpdateHandles()

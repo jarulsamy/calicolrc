@@ -130,7 +130,11 @@ namespace Widgets
 			return new Color(r/255.0, g/255.0, b/255.0);
 		}
 	}	
-	
+
+	// -----------------------------------------------------------------------
+	// Custom event delegate declarations
+	public delegate void ScrollEventHandler(Object o, ScrollEventArgs e);
+
 	// -----------------------------------------------------------------------
 	public class CRoundedButton : Diagram.CRoundedRectangle
 	{
@@ -214,7 +218,225 @@ namespace Widgets
 			}
 		}
 	}
-	
+
+	// -----------------------------------------------------------------------
+	public class ScrollEventArgs : EventArgs
+	{
+		public Diagram.Canvas cvs;
+		public double dY;
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public ScrollEventArgs(Diagram.Canvas cvs, double dY)
+		{
+			this.cvs = cvs;
+			this.dY = dY;;
+		}
+	}
+
+	// -----------------------------------------------------------------------
+	public class CYScrollBar : Diagram.CRectangle
+	{
+		// Keep track of previous mouse Y position to enable scrolling of factories
+		private double? _prevMouseY = null;
+
+		// The bar that is movable
+		private Diagram.CRoundedRectangle bar;
+		private double barYLoc = 0.0;			// Location of the top of the bar as a fraction of scrollbar height [0, 1]
+		private double barYFrac = 0.5;			// Bar height as a fraction of total scrollbar height 
+		private double barYSpan = 1.0;			// Max span as a fraction of total scrollbar height
+
+		// Event that is raised when the scroll bar is moved
+		public event ScrollEventHandler Scroll;
+
+		public CYScrollBar(double x, double y, double w, double h) : base(x, y, w, h)
+		{
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
+			this.LineWidth = 0;
+			this.FillColor = Diagram.Colors.Transparent;
+			this.Selectable = false;
+			this.TopMost = true;
+
+			// Init the bar
+			bar = new Diagram.CRoundedRectangle(x, y+barYLoc*h, w, barYFrac*h);
+			bar.Radius = 4;
+			bar.LineWidth = 2;
+			//bar.positionAbsolute = true;
+			//bar.absoluteX = barXOffset;
+			//bar.absoluteY = barYOffset;
+			bar.LineColor = Diagram.Colors.DarkGray;
+			bar.FillColor = Diagram.Colors.SemiWhite;
+			bar.TextColor = Diagram.Colors.Transparent;
+			bar.Visible = true;
+			bar.Sizable = false;
+			bar.Selectable = false;
+			bar.Draggable = false;
+			bar.Connectable = false;
+			bar.TopMost = true;
+		}
+
+		public CYScrollBar(double x, double y) : base(x, y) {
+			this.positionAbsolute = true;
+			this.absoluteX = x;
+			this.absoluteY = y;
+			this.TopMost = true;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override Diagram.CShape Clone(double x, double y) {
+			CYScrollBar clone = new CYScrollBar(x, y, this.Width, this.Height);
+			return (Diagram.CShape)clone;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void Draw(Cairo.Context g) {
+			base.Draw (g);
+			bar.Draw (g);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Override Top and Left so that the bar can also be adjusted
+		public override double Top
+		{
+			get { return base.Top; }
+			set
+			{
+				base.Top = value;
+				bar.Top = value + barYLoc*this.Height;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override double Left
+		{
+			get { return base.Left; }
+			set
+			{
+				bar.Left = value;
+				base.Left = value;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override double Width
+		{
+			get { return base.Width; }
+			set
+			{
+				bar.Width = value;
+				base.Width = value;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override double Height
+		{
+			get { return base.Height; }
+			set
+			{
+				bar.Height = barYFrac*value;
+				base.Height = value;
+
+				// Because Top also depends on Height, reset Top when Height is changed. See Top.
+				this.Top = this.Top;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void BringToFront(Diagram.Canvas cvs) 
+		{
+			base.BringToFront(cvs);
+			bar.BringToFront(cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override Boolean ContainsPoint(double X, double Y, Diagram.Canvas cvs)
+		{
+			return base.ContainsPoint (X, Y, cvs) || bar.ContainsPoint (X, Y, cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Raise the OnScroll event
+		public virtual void RaiseScrollEvent(Diagram.Canvas cvs, double dY)
+		{
+			if (Scroll != null) {
+				ScrollEventArgs evargs = new ScrollEventArgs(cvs, dY);
+				Scroll(this, evargs);
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e) 
+		{
+			if (this.ContainsPoint(e.X, e.Y, cvs) ) 
+			{
+				_prevMouseY = e.Y;
+			}
+			//base.OnMouseDown(cvs, e);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+			if (_prevMouseY != null) 
+			{
+				//double dY = e.Y - (double)_prevMouseY;
+				//double dY = ((double)_prevMouseY - e.Y)*(barYSpan/this.Height);
+				double dY = ((double)_prevMouseY - e.Y)*barYSpan;
+				RaiseScrollEvent(cvs, dY);
+				_prevMouseY = e.Y;
+				cvs.Invalidate();
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
+			_prevMouseY = null;
+			base.OnMouseUp (cvs, e);
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void Update( double x, double y, double w, double h, double frac, double loc, double span ) 
+		{
+			// This method resizes and repositions the bar part of the widget.
+			// The frac parameter is the fraction of the total canvas height that is taken up be the bar part.
+			// The loc parameter is the location of the bar over the canvas area
+
+			barYLoc = loc;
+			barYFrac = frac;
+			barYSpan = span;
+
+			this.Top = y;
+			this.Left = x;
+			this.Width = w;
+			this.Height = h;
+
+//			// Update the total span that the scrollbar represents
+//			double ySpanMin = minTop - maxTop;
+//			double ySpanMax = cvsHeight + (maxBottom - minBottom);
+//			yScrollSpan = ySpanMax - ySpanMin;
+//			
+//			// Total height of all blocks
+//			double stackHeight = maxBottom - minTop;
+//			
+//			// barFrac is the fraction of the scrollbar area that should be covered be the bar itself [0, 1]
+//			double barFrac = stackHeight/yScrollSpan;
+//			bar.Height = barFrac*cvsHeight;
+//			
+//			// barLoc is the fraction of the total scrollbar area at which the scrollbar should be located [0, 1]
+//			//double barLoc = (spanMax - maxBottom - cvs.offsetY)/span;
+//			double barLoc = (ySpanMax - maxBottom)/yScrollSpan;		// Offset from the bottom
+//			barYOffset = barLoc*cvsHeight;							// Used on this.Top
+//			
+//			// The scrollbar is offset from the top of the block panel by the given fraction of the canvas
+//			// ... and it straddles the right edge of the block panel
+//			bar.Top = this.Top + barLoc*cvsHeight;
+//			//bar.Left = this.Left + (this.Width - 0.5*bar.Width);
+
+		}
+	}
+
 	// -----------------------------------------------------------------------
 	public class CBlockPalette : Diagram.CRectangle
 	{	// The background palette for currently available block factories
@@ -224,7 +446,17 @@ namespace Widgets
 		
 		// Keep track of previous mouse Y position to enable scrolling of factories
 		private double? _prevMouseY = null;
-		
+
+		private CYScrollBar bar;
+		private double scrollBarWidth = 11;
+
+//		// Depiction of current scroll position
+//		private Diagram.CRoundedRectangle bar;
+//		private double barYOffset = 0.0;
+//		private double barWidth = 12;
+//		private double yScrollSpan = 1.0;		// This parameter is used to communicate the total y-distance that the y-scrollbar represents
+//		private double? _prevBarMouseY = null;
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CBlockPalette(double x, double y, double w, double h) : base(x, y, w, h)
 		{
@@ -241,9 +473,31 @@ namespace Widgets
 			this.Draggable = false;
 			this.Connectable = false;
 			this.TopMost = true;
-			
-			// Add slider to widget - 20 pixels wide
-			//this.slider = new CSlider(x+w-20-5, y+5, 20, h-10, 0.0);
+
+			bar = new CYScrollBar(x + w-0.5*scrollBarWidth, y, scrollBarWidth, h);
+			bar.Scroll += OnScrollBarScroll;
+
+//			// Add scrollbar depiction rectangle
+//			bar = new Diagram.CRoundedRectangle(x+w-0.5*barWidth, y, barWidth, 20);
+//			bar.Radius = 4;
+//			bar.LineWidth = 2;
+//			//bar.positionAbsolute = true;
+//			//bar.absoluteX = barXOffset;
+//			//bar.absoluteY = barYOffset;
+//			bar.LineColor = Diagram.Colors.DarkGray;
+//			bar.FillColor = Diagram.Colors.SemiWhite;
+//			bar.TextColor = Diagram.Colors.Transparent;
+//			bar.Visible = true;
+//			bar.Sizable = false;
+//			bar.Selectable = false;
+//			bar.Draggable = false;
+//			bar.Connectable = false;
+//			bar.TopMost = true;
+		}
+
+		void OnScrollBarScroll (object sender, ScrollEventArgs e)
+		{
+			DoScroll(e.cvs, e.dY);
 		}
 		
 		public CBlockPalette(double x, double y) : base(x, y) {
@@ -259,6 +513,63 @@ namespace Widgets
 			return (Diagram.CShape)clone;
 		}
 
+		public CYScrollBar YScrollbar {
+			get {
+				return bar;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Override Top and Left so that the bar can also be adjusted
+		public override double Top
+		{
+			get { return base.Top; }
+			set
+			{
+				base.Top = value;
+				bar.Top = value; // + barYOffset;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override double Left
+		{
+			get { return base.Left; }
+			set
+			{
+				bar.Left = value; // + this.Width - 0.5*bar.Width;
+				base.Left = value;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void BringToFront(Diagram.Canvas cvs) 
+		{
+			base.BringToFront(cvs);
+			bar.BringToFront(cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoConfigure(Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas is reconfigured
+			this.DoScroll (cvs, 0.0);
+			return;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoZoom(double factor, Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas scale changes
+			this.DoScroll (cvs, 0.0);
+			return;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoResetZoom(Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas scale changes
+			this.DoScroll (cvs, 0.0);
+			return;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoScroll(Diagram.Canvas cvs, double dY)
 		{	// Test if a scroll is acceptible based on window bounds and block positions
@@ -266,62 +577,59 @@ namespace Widgets
 			
 			// The top of at least one shape must be positive
 			// If not, prevent scroll
-			
-			//Console.WriteLine ("{0}, {1}, {2}", cvs.Allocation.Height, cvs.scale, Math.Round(cvs.Allocation.Height/cvs.scale));
-			
 			int cvsHeight = Convert.ToInt32(cvs.Allocation.Height/cvs.scale);
 			int countShps = 0;
 			int countAbove = 0;
 			int countBelow = 0;
-			double maxTop = 0.0;
-			double minBottom = 0.0;
-			
-			// Init minTop and maxBottom
+			double minTop, maxTop;
+			double minBottom, maxBottom;
+
+			// Loop over all factory blocks and find the top and bottom of the top and bottom blocks on the stack
+			// Account for scroll of the main block canvas, which actually shifts the absolute-positioned block palette
+
+			// Init block bounds
 			if (_currTab._shapes.Count > 0) {
 				Diagram.CShape shp = _currTab._shapes[0].Target as Diagram.CShape;
-				maxTop = shp.Top;
-				minBottom = shp.Top + shp.Height;
+				minTop = maxTop = shp.Top + cvs.offsetY;
+				minBottom = maxBottom = shp.Top + cvs.offsetY + shp.Height;
+			} 
+			else
+			{
+				return;
 			}
 
+			// Find block bounds
 			foreach (WeakReference wrshp in _currTab._shapes)
 			{
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
 				if (shp != null) {
 					countShps++;
-					if (shp.Top + shp.Height < 0.0) {
+					double top = shp.Top + cvs.offsetY;
+					double bottom = shp.Top + cvs.offsetY + shp.Height;
+
+					if (bottom < 0.0) {
 						countAbove++;
-					} else if (shp.Top > cvsHeight) {
+					} else if (top > cvsHeight) {
 						countBelow++;
 					}
-
-					if (shp.Top > maxTop) maxTop = shp.Top;
-					double bottom = shp.Top + shp.Height;
+					
+					if (top < minTop) minTop = top;
+					if (top > maxTop) maxTop = top;
 					if (bottom < minBottom) minBottom = bottom;
+					if (bottom > maxBottom) maxBottom = bottom;
 				}
 			}
 			
-			// Perform the scroll if conditions permit
-
-			// Scroll down
-			if (dY < 0.0) {
-				if (countAbove == countShps) {
-					dY = maxTop;
-				} else if (countAbove == countShps - 1) {
-					dY = 0.0;
-				} else if (countBelow == countShps) {
-					dY = cvsHeight-minBottom;
-				}
-
-			// Scroll down
-			} else if (dY > 0.0) {
-				if (countBelow == countShps) {
-					dY = cvsHeight-minBottom;
-				} else if (countBelow == countShps - 1) {
-					dY = 0.0;
-				}
+			// Perform the scroll of blocks, if conditions permit
+			
+			// Clip movement so that at least one block is always visible
+			if (dY < 0.0 && maxTop <= 0.0) {
+				dY = -maxTop;
+			} else if (dY > 0.0 && minBottom >= cvsHeight) {
+				dY = cvsHeight - minBottom;
 			}
 			
-			// If movement is in order, perform it
+			// Scroll all factory blocks
 			foreach (WeakReference wrshp in _currTab._shapes)
 			{
 				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
@@ -330,6 +638,117 @@ namespace Widgets
 					shp.absoluteY += dY;
 				}
 			}
+
+			// Now reposition the scrollbar
+
+			// Update the total span that the scrollbar represents
+			double ySpanMin = minTop - maxTop;
+			double ySpanMax = cvsHeight + (maxBottom - minBottom);
+			double ySpan = ySpanMax - ySpanMin;
+
+			// Total height of all blocks
+			double stackHeight = maxBottom - minTop;
+
+			// barFrac is the fraction of the scrollbar area that should be covered be the bar itself [0, 1]
+			// barLoc is the fraction of the total scrollbar area at which the scrollbar should be located [0, 1]
+			double barFrac = stackHeight/ySpan;
+			double barLoc = (ySpanMax - maxBottom)/ySpan;		// Offset from the bottom
+			double barSpan = ySpan/cvsHeight;
+
+			bar.Update(this.Left + (this.Width - 0.5*bar.Width), this.Top, bar.Width, cvsHeight, barFrac, barLoc, barSpan);
+
+//			bar.Height = barFrac*cvsHeight;
+//			bar.Top = this.Top + barLoc*cvsHeight;
+//			//bar.Left = this.Left + (this.Width - 0.5*bar.Width);
+
+//			// Init bounds
+//			if (_currTab._shapes.Count > 0) {
+//				Diagram.CShape shp = _currTab._shapes[0].Target as Diagram.CShape;
+//				minTop = maxTop = shp.Top;
+//				minBottom = maxBottom = shp.Top + shp.Height;
+//			} 
+//			else
+//			{
+//				return;
+//			}
+//
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					countShps++;
+//					double top = shp.Top;
+//					double bottom = top + shp.Height;
+//
+//					//if (shp.Top + shp.Height < 0.0) {
+//					if (bottom < -cvs.offsetY) {
+//						countAbove++;
+//					//} else if (shp.Top > cvsHeight) {
+//					} else if (top > cvsHeight-cvs.offsetY) {
+//						countBelow++;
+//					}
+//
+//					if (shp.Top < minTop) minTop = shp.Top;
+//					if (shp.Top > maxTop) maxTop = shp.Top;
+//					if (bottom < minBottom) minBottom = bottom;
+//					if (bottom > maxBottom) maxBottom = bottom;
+//				}
+//			}
+//
+//			// Perform the scroll if conditions permit
+//
+//			// Clip movement to max extents
+//			if (dY < 0.0 && maxTop <= -cvs.offsetY) {
+//				dY = -maxTop-cvs.offsetY;
+//			} else if (dY > 0.0 && minBottom >= cvsHeight-cvs.offsetY) {
+//				dY = cvsHeight-minBottom-cvs.offsetY;
+//			}
+//			
+//			// If movement is in order, perform it
+//			foreach (WeakReference wrshp in _currTab._shapes)
+//			{
+//				Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+//				if (shp != null) {
+//					shp.Top += dY;
+//					shp.absoluteY += dY;
+//				}
+//			}
+//
+//			// barFrac is the fraction of the scrollbar area that should be covered bar itself [0, 1]
+//			// barLoc is the fraction of the total span that the scrollbar should be located [0, 1]
+//
+//			// Total height the scrollbar represents
+//			double spanMin = minTop - maxTop;
+//			double spanMax = cvsHeight + (maxBottom - minBottom);
+//			double span = spanMax - spanMin;
+//
+//			// This parameter is required for properly manipulating the scrollbar directly. See mouse events.
+//			barRatio = cvsHeight/span;
+//
+//			// Total height of all blocks
+//			double stackHeight = maxBottom - minTop;
+//			// The height the bar should be to represent the stack of blocks
+//			//bar.Height = stackHeight * barRatio;
+//			double barFrac = (stackHeight/span);
+//			bar.Height = barFrac * cvsHeight;
+//
+//			// The top of the scroll bar to represent the current scroll location
+//			barXOffset = this.Width - 0.5*bar.Width;
+//
+//			//barYOffset = (spanMax - maxBottom - cvs.offsetY)*barRatio;
+//			//barYOffset = (spanMax - maxBottom)*(cvsHeight/span);
+//			//double barLoc = (spanMax - maxBottom - cvs.offsetY)/span;
+//			//double barLoc = (spanMax - maxBottom)/span;
+//
+//			double barLoc = (spanMax - maxBottom - cvs.offsetY)/span;
+//			barYOffset = barLoc*cvsHeight;
+//			bar.Top = this.Top + barLoc*cvsHeight;
+//
+//			//double barLoc = minTop/span;
+//			//barYOffset = cvs.offsetY + barLoc*cvsHeight;
+//			//bar.Top = this.Top + cvs.offsetY + barLoc*cvsHeight;
+//
+//			bar.Left = this.Left + (this.Width - 0.5*bar.Width);
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -353,7 +772,14 @@ namespace Widgets
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override Boolean ContainsPoint(double X, double Y, Diagram.Canvas cvs)
+		{
+			return base.ContainsPoint (X, Y, cvs) || bar.ContainsPoint (X, Y, cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e) 
+		{
 			if (this.ContainsPoint(e.X, e.Y, cvs) ) 
 			{
 				_prevMouseY = e.Y;
@@ -362,7 +788,8 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
 			if (_prevMouseY != null && _currTab != null) 
 			{
 				double dY = e.Y - (double)_prevMouseY;
@@ -374,7 +801,8 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
 			_prevMouseY = null;
 			base.OnMouseUp (cvs, e);
 		}
@@ -584,7 +1012,20 @@ namespace Widgets
 		
 		// Keep track of previous mouse Y position to enable scrolling of factories
 		private double? _prevMouseY = null;
-		
+
+		private CYScrollBar bar;
+		private double scrollBarWidth = 11;
+
+		// Depiction of current scroll position
+		// !!! This widget is managed entirely by the CBlockPalette.
+		// !!! Therefore, all important events must be overridden and delegated to widget as needed
+//		public Diagram.CRoundedRectangle bar;
+//		private double barXOffset;
+//		private double barYOffset;
+//		private double barWidth = 25; //12;
+//		private double barRatio = 0.0;
+//		private double? _prevBarMouseY = null;
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CTabPalette(double x, double y, double w, double h) : base(x, y, w, h)
 		{
@@ -601,8 +1042,31 @@ namespace Widgets
 			this.Selectable = false;
 			this.Draggable = false;
 			this.Connectable = false;
+
+			bar = new CYScrollBar(x + w-scrollBarWidth, y, scrollBarWidth, h);
+			bar.Scroll += HandleScroll;
+
+//			// Add scrollbar depiction rectangle
+//			barXOffset = x+w-0.5*barWidth;
+//			barYOffset = y;
+//			
+//			bar = new Diagram.CRoundedRectangle(barXOffset, barYOffset, barWidth, 20);
+//			bar.Radius = 4;
+//			bar.LineWidth = 2;
+//			bar.positionAbsolute = true;
+//			bar.absoluteX = barXOffset;
+//			bar.absoluteY = barYOffset;
+//			bar.LineColor = Diagram.Colors.DarkGray;
+//			bar.FillColor = Diagram.Colors.SemiWhite;
+//			bar.TextColor = Diagram.Colors.Transparent;
+//			bar.Visible = true;
+//			bar.Sizable = false;
+//			bar.Selectable = false;
+//			bar.Draggable = false;
+//			bar.Connectable = false;
+//			bar.TopMost = true;
 		}
-		
+
 		public CTabPalette(double x, double y) : base(x, y) {
 			this.positionAbsolute = true;
 			this.absoluteX = x;
@@ -614,6 +1078,70 @@ namespace Widgets
 		public override Diagram.CShape Clone(double x, double y) {
 			CTabPalette clone = new CTabPalette(x, y, this.Width, this.Height);
 			return (Diagram.CShape)clone;
+		}
+
+		public CYScrollBar YScrollbar {
+			get {
+				return bar;
+			}
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		void HandleScroll (object sender, ScrollEventArgs e)
+		{
+			DoScroll(e.cvs, e.dY);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Override Top and Left so that the bar can also be adjusted
+		public override double Top
+		{
+			get { return base.Top; }
+			set
+			{
+				base.Top = value;
+				bar.Top = value;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override double Left
+		{
+			get { return base.Left; }
+			set
+			{
+				bar.Left = value;
+				base.Left = value;
+			}
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void BringToFront(Diagram.Canvas cvs) 
+		{
+			base.BringToFront(cvs);
+			foreach (CRoundedTab tab in allTabs) tab.BringToFront(cvs);
+			bar.BringToFront(cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoConfigure(Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas is reconfigured
+			this.DoScroll (cvs, 0.0);
+			return;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoZoom(double factor, Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas scale changes
+			this.DoScroll (cvs, 0.0);
+			return;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void DoResetZoom(Diagram.Canvas cvs) {
+			// Reset the scroll bar when the canvas scale changes
+			this.DoScroll (cvs, 0.0);
+			return;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -628,49 +1156,66 @@ namespace Widgets
 			int countShps = 0;
 			int countAbove = 0;
 			int countBelow = 0;
-			double maxTop = 0.0;
-			double minBottom = 0.0;
+			double minTop = 0;
+			double maxTop = 0;
+			double minBottom = 0;
+			double maxBottom = 0;
 
 			// Init minTop and maxBottom
 			if (allTabs.Count > 0) {
-				maxTop = allTabs[0].Top;
-				minBottom = allTabs[0].Top + allTabs[0].Height;
+				minTop = maxTop = allTabs[0].Top + cvs.offsetY;
+				minBottom = maxBottom = allTabs[0].Top + cvs.offsetY + allTabs[0].Height;
+			}
+			else
+			{
+				return;
 			}
 
 			foreach (CRoundedTab tab in allTabs)
 			{
 				countShps++;
-				if (tab.Top + tab.Height < 0.0) {
+				double top = tab.Top + cvs.offsetY;
+				double bottom = tab.Top + tab.Height + cvs.offsetY;
+
+				if (bottom < 0.0) {
 					countAbove++;
-				} else if (tab.Top > cvsHeight) {
+				} else if (top > cvsHeight) {
 					countBelow++;
 				}
-
-				if (tab.Top > maxTop) maxTop = tab.Top;
-				double bottom = tab.Top + tab.Height;
+				
+				if (top < minTop) minTop = top;
+				if (top > maxTop) maxTop = top;
 				if (bottom < minBottom) minBottom = bottom;
+				if (bottom > maxBottom) maxBottom = bottom;
 			}
 			
 			// Perform the scroll if conditions permit
 
-			// Scroll up
-			if (dY < 0.0) {
-				if (countAbove == countShps) {
-					dY = maxTop;
-				} else if (countAbove == countShps - 1) {
-					dY = 0.0;
-				} else if (countBelow == countShps) {
-					dY = cvsHeight-minBottom;
-				}
-
-			// Scroll down
-			} else if (dY > 0.0) {
-				if (countBelow == countShps) {
-					dY = cvsHeight-minBottom;
-				} else if (countBelow == countShps - 1) {
-					dY = 0.0;
-				}
+			// Clip movement so that at least one block is always visible
+			if (dY < 0.0 && maxTop <= 0.0) {
+				dY = -maxTop;
+			} else if (dY > 0.0 && minBottom >= cvsHeight) {
+				dY = cvsHeight - minBottom;
 			}
+
+//			// Scroll up
+//			if (dY < 0.0) {
+//				if (countAbove == countShps) {
+//					dY = maxTop;
+//				} else if (countAbove == countShps - 1) {
+//					dY = 0.0;
+//				} else if (countBelow == countShps) {
+//					dY = cvsHeight-minBottom;
+//				}
+//
+//			// Scroll down
+//			} else if (dY > 0.0) {
+//				if (countBelow == countShps) {
+//					dY = cvsHeight-minBottom;
+//				} else if (countBelow == countShps - 1) {
+//					dY = 0.0;
+//				}
+//			}
 			
 			// If movement is in order, perform it
 			foreach (CRoundedTab tab in allTabs)
@@ -678,6 +1223,29 @@ namespace Widgets
 				tab.Top += dY;
 				tab.absoluteY += dY;
 			}
+
+			// Total height the scrollbar represents
+			double ySpanMin = minTop - maxTop;
+			double ySpanMax = cvsHeight + (maxBottom - minBottom);
+			double ySpan = ySpanMax - ySpanMin;
+
+			double stackHeight = maxBottom - minTop;
+			double barFrac = stackHeight/ySpan;
+			double barLoc = (ySpanMax - maxBottom)/ySpan;
+			double barSpan = ySpan/cvsHeight;
+			bar.Update(this.Left + (this.Width - bar.Width), this.Top, bar.Width, cvsHeight, barFrac, barLoc, barSpan);
+
+//			// The height the bar should be to represent the stack of blocks
+//			bar.Height = (stackHeight/ySpan) * cvsHeight;
+//			
+//			// The top of the scroll bar to represent the current scroll location
+//			barXOffset = this.Width - 0.5*bar.Width;
+//			barYOffset = ((spanMax - maxBottom - cvs.offsetY)/ySpan)*cvsHeight;
+//			bar.Left = this.Left + barXOffset;
+//			bar.Top = this.Top + barYOffset;
+//			
+//			// This parameter is required for properly manipulating the scrollbar directly. See mouse events.
+//			barRatio = cvsHeight/ySpan;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -697,9 +1265,23 @@ namespace Widgets
 				base.OnScroll(cvs, e);
 			}
 		}
-		
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override Boolean ContainsPoint(double X, double Y, Diagram.Canvas cvs)
+		{
+			return base.ContainsPoint (X, Y, cvs) || bar.ContainsPoint (X, Y, cvs);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override void OnMouseDown( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
+			// First check bar
+//			if (bar.ContainsPoint(e.X, e.Y, cvs) ) 
+//			{
+//				_prevBarMouseY = e.Y;
+//				return;
+//			}
+
 			if (this.ContainsPoint(e.X, e.Y, cvs) ) {
 				_prevMouseY = e.Y;
 			}
@@ -707,7 +1289,18 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override void OnMouseMove( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
+//			if (_prevBarMouseY != null) 
+//			{
+//				double dY = ((double)_prevBarMouseY - e.Y)/barRatio;
+//				
+//				DoScroll (cvs, dY);
+//				_prevBarMouseY = e.Y;
+//				cvs.Invalidate();
+//				return;
+//			}
+
 			if (_prevMouseY != null) {
 				double dY = e.Y - (double)_prevMouseY;
 
@@ -718,7 +1311,9 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e){
+		public override void OnMouseUp( Diagram.Canvas cvs, Diagram.MouseEventArgs e)
+		{
+//			_prevBarMouseY = null;
 			_prevMouseY = null;
 			base.OnMouseUp (cvs, e);
 		}
@@ -853,6 +1448,7 @@ namespace Widgets
 			if (this.ContainsPoint(e.X, e.Y, cvs)) 
 			{	
 				this.SetToggle(cvs, true);
+				_palette.DoConfigure(cvs);
 				cvs.Invalidate();
 			}
 		}
@@ -867,20 +1463,8 @@ namespace Widgets
         public override void Draw(Cairo.Context g)
         {	// Draw the tab widget
 
-			// @@@
-			// Get current x and y offset from the current transformation matrix
-//			Matrix m = g.Matrix;
-//			double x = m.X0;
-//			double y = m.Y0;
-//			g.InverseTransformDistance(ref x, ref y);
-//
-//			g.Save ();
-//			g.Translate(-x, -y);
-
 			// Start with the base rounded rectangle
 			base.Draw(g);
-
-//			g.Restore ();
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
