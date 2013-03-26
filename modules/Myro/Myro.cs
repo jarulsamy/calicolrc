@@ -1642,14 +1642,9 @@ public static class Myro
   */
 
 	[method: JigsawTab("Picture")]
-	    public static void show (string title="Myro Camera") {
-	    Graphics.WindowClass win = Graphics.makeWindow (title, 256, 192);
-	}
-
-	[method: JigsawTab("Picture")]
 	public static void show (Graphics.Picture picture, 
 				 string title="Myro Camera",
-				 bool init=false)
+				 bool init=true)
 	{
 	    Graphics.WindowClass win;
 	    if (init) {
