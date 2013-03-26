@@ -79,7 +79,7 @@ namespace Calico {
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
-                //System.Console.WriteLine("setting lastSelectedPage = " + value);
+                System.Console.WriteLine("setting lastSelectedPage = " + value);
                 _lastSelectedPage = value;
             }
         }
@@ -281,7 +281,7 @@ namespace Calico {
             // option
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
-	    ShellEditor.Document.DocumentUpdated += updateControls;
+			ShellEditor.Document.DocumentUpdated += updateShellControls;
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
@@ -1115,10 +1115,9 @@ namespace Calico {
                 int page_num = notebook.AppendPage(page.widget, page.tab_widget);
                 documents [page.widget] = page;
                 page.widget.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
-                    Gtk.Widget result = searchForPage(args.Widget);
-                    if (result != null) {
-                        lastSelectedPage = result;
-                    }
+				  Gtk.Widget nbp = searchForPage(args.Widget);
+				  if (nbp != null && documents.ContainsKey(nbp))
+					updateControls(documents[nbp]);
                 };
                 notebook.SetTabReorderable(page.widget, true);
                 notebook.SetTabDetachable(page.widget, true);                
@@ -1126,7 +1125,6 @@ namespace Calico {
                 page.close_button.Clicked += delegate {
                     TryToClose(page);
                 };
-                lastSelectedPage = page.widget;
                 if (page.focus_widget != null)
                     GLib.Timeout.Add(0, delegate {
 			    page.focus_widget.GrabFocus();
@@ -2303,7 +2301,7 @@ namespace Calico {
 			Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
 			GLib.Timeout.Add(0, delegate {
 				ShellEditor.GrabFocus();
-				updateControls(ShellEditor.Document, null);
+				updateShellControls(ShellEditor.Document, null);
 				return false;
 			    });
 		    } else if (CurrentDocument != null) {
@@ -2350,10 +2348,15 @@ namespace Calico {
 		});
 	}
 
-        public void updateControls(object obj, System.EventArgs args) {
+        public void updateShellControls(object obj, System.EventArgs args) {
 	    // When Shell is selected by clicking in it, or changes
             Invoke( delegate {
-		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+				  System.Console.WriteLine("updateShellControls");
+				  Gtk.Widget retval = searchForPage(ShellEditor);
+				  if (retval == lastSelectedPage)
+					return;
+				  lastSelectedPage = retval;
+				  Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
                     ProgramSpeed.Sensitive = false;
                     saveaspython_menu.Sensitive = false;
                     if (! ProgramRunning) {
@@ -2374,6 +2377,11 @@ namespace Calico {
         public void updateControls(Document document) { 
 	    // When a document is selected by clicking in it, or changes
             Invoke( delegate {
+				  System.Console.WriteLine("updateControls");
+				  Gtk.Widget nbp = searchForPage(document.widget);
+				  if (lastSelectedPage == nbp)
+					return;
+				  lastSelectedPage = nbp;
                 Gtk.Notebook nb = this.PropertyNotebook;
                 while (nb.NPages > 0) {
                     nb.RemovePage(0);
