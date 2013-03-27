@@ -1116,8 +1116,11 @@ namespace Calico {
             }
             if (add_it) {
                 Gtk.Notebook notebook = selectNotebook(page.preferredNotebook);
-				if (!notebook.Visible) // if it isn't visible, put in "main"
-				  notebook = selectNotebook("main");
+		if (!notebook.Visible) // if it isn't visible, put in "main"
+		    // EditorNotebook is the only one that can be hidden
+		    notebook = selectNotebook("main");
+		if (page.preferredNotebook == "main")
+		    moveEditorNotebookToMain();
                 int page_num = notebook.AppendPage(page.widget, page.tab_widget);
                 documents [page.widget] = page;
                 page.widget.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
@@ -3479,21 +3482,25 @@ namespace Calico {
             inform(_("No addons are currently available"));
         }
   
+	void moveEditorNotebookToMain() {
+	    // FIXME: get in same order
+	    for(int idx=EditorNotebook.NPages - 1; idx >= 0; idx--) {
+		Gtk.Widget page = EditorNotebook.GetNthPage(idx);
+		Gtk.Widget l = EditorNotebook.GetTabLabel(page);
+		EditorNotebook.RemovePage(idx);
+		MainNotebook.AppendPage(page, l);
+		MainNotebook.SetTabReorderable(page, true);
+		MainNotebook.SetTabDetachable(page, true);            
+	    }
+	    EditorNotebook.Hide();
+	}
+
         protected void OnButton11Clicked(object sender, System.EventArgs e) {
             // Move all editor tabs back and forth between EditorNotebook and MainNotebook
             Invoke( delegate {
                 if (EditorNotebook.Visible) {
                     // Empty it to MainNoteBook
-                    // FIXME: get in same order
-                    for(int idx=EditorNotebook.NPages - 1; idx >= 0; idx--) {
-                        Gtk.Widget page = EditorNotebook.GetNthPage(idx);
-                        Gtk.Widget l = EditorNotebook.GetTabLabel(page);
-                        EditorNotebook.RemovePage(idx);
-                        MainNotebook.AppendPage(page, l);
-                        MainNotebook.SetTabReorderable(page, true);
-                        MainNotebook.SetTabDetachable(page, true);            
-                    }
-                    EditorNotebook.Hide();
+		    moveEditorNotebookToMain();
                 } else { 
                     // Show it, and load it with Documents from MainNotebook
                     // FIXME: get in same order
