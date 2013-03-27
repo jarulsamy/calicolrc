@@ -102,9 +102,9 @@ tone440 = makeTone(440)
 tone441 = makeTone(441)
 tone = make2Tone(440, 441)
 
+Myro.play(2, tone)
+
 plotSound(tone)
 plotMoreSound(tone440, "red")
 plotMoreSound(tone441, "blue")
-
-Myro.play(2, tone)
 
