@@ -1238,20 +1238,21 @@ public static class Graphics
 		}
 		
 		public void addScrollbars(int width, int height) {
-			if (Child == _canvas) {
-				Invoke( delegate {
-					Remove(_canvas);
-					_scrolledWindow = new Gtk.ScrolledWindow();
-					Add(_scrolledWindow);
-					_scrolledWindow.Add (_canvas);
-					_canvas.resize(width, height);
-					_scrolledWindow.Show();
-				});
-			} else {
-				Invoke( delegate {
-					_canvas.resize(width, height);
-				});
-			}
+		    ManualResetEvent ev = new ManualResetEvent(false); 
+		    Invoke( delegate {
+			    if (Child == _canvas) {
+				Remove(_canvas);
+				_scrolledWindow = new Gtk.ScrolledWindow();
+				Add(_scrolledWindow);
+				_scrolledWindow.Add (_canvas);
+				_canvas.resize(width, height);
+				_scrolledWindow.Show();
+			    } else {
+				_canvas.resize(width, height);
+			    }
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 		
 		public void clear ()
@@ -5588,8 +5589,15 @@ public static class Graphics
 	    
 	    Point translate(double x, double y) {
 		// used in graphviz graphics
-        	return new Point(x * scale + window._width/2 - graph.Width/ 2 * scale,
-				 (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale);
+		Point p = null;
+		ManualResetEvent ev = new ManualResetEvent(false);
+		Invoke( delegate {
+			p = new Point(x * scale + window._width/2 - graph.Width/ 2 * scale,
+				      (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale);
+			ev.Set();
+		    });
+		ev.WaitOne();
+		return p;
 	    }
 	    
 	    public string recurseEdges(IList list, int left, int root, int right) {
@@ -5691,6 +5699,7 @@ public static class Graphics
 	    }
 	    
 	    public void draw() {
+		int _width = 0, _height = 0;
 		if (window == null) {
 		    string label;
 		    if (options.ContainsKey("label")) {
@@ -5701,25 +5710,24 @@ public static class Graphics
                 	label = String.Format("Graph #{0}", Graph.graph_count);
 			Graph.graph_count++;
 		    }
-		    int width, height;
 		    if (options.ContainsKey("width")) {
-			width = (int)options["width"];
+			_width = (int)options["width"];
 		    } else {
-			width = (int)graph.Width;
+			_width = (int)graph.Width;
 		    }
 		    if (options.ContainsKey("height")) {
-			height = (int)options["height"];
+			_height = (int)options["height"];
 		    } else {
-			height = (int)graph.Height;
+			_height = (int)graph.Height;
 		    }
-		    window = Graphics.Window(label, width, height);
+		    window = Graphics.Window(label, _width, _height);
 		    // in case we need them:
 		    window.addScrollbars((int)graph.Width, (int)graph.Height);
 		}
 		if (options.ContainsKey("scale")) {
 		    scale = (double)options["scale"];
 		} else {
-		    scale = Math.Min(window.width/(double)graph.Width, window.height/(double)graph.Height) * .95;
+		    scale = Math.Min(_width/(double)graph.Width, _height/(double)graph.Height) * .95;
 		}
 		foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
 	            if (v.Position == null) {
