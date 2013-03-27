@@ -576,15 +576,13 @@ public static class Graphics
 	{
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
-		    int x = -10000, y = -10000; //, w, h;
-		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
-			//_windows [title].GetSize(out w, out h); 
-			_windows [title].GetPosition(out x, out y);
-			_windows [title].Destroy();
+		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
+                _windows [title] = new Graphics.WindowClass (title, width, height);
 		    }
-		    _windows [title] = new Graphics.WindowClass (title, width, height);
-		    if (x > -10000)
-			_windows [title].Move(x, y);
+            else{
+                Gdk.Color bg = new Gdk.Color (242, 241, 240);
+                _lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
+            }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
 		    ev.Set();
