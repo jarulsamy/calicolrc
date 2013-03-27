@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <jigsaw>
     <module name="Common.dll" />
-    <module name="Myro.dll" />
     <block id="1" typeName="Jigsaw.CControlStart" left="435" top="35">
         <edge id="1" name="Start" linkedTo="2" />
         <property name="Label" value="when program starts" />
