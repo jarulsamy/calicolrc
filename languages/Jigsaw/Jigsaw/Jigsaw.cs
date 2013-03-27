@@ -620,6 +620,10 @@ namespace Jigsaw
 			// Select the last new tab
 			if (tab != null) tab.SetToggle (this, true);
 
+			// Move the scrollbar to the top and reconfigure panel.
+			pnlTab.YScrollbar.BringToFront(this);
+			pnlTab.DoConfigure(this);
+
 			// Redraw
 			this.Invalidate ();
 
@@ -935,7 +939,11 @@ namespace Jigsaw
 				
 				// Select the new tab
 				tab.SetToggle(this, true);
-				
+
+				// Move the scrollbar to the top and reconfigure panel.
+				pnlTab.YScrollbar.BringToFront(this);
+				pnlTab.DoConfigure(this);
+
 				// Redraw
 				this.Invalidate();
 				
@@ -1501,8 +1509,8 @@ namespace Jigsaw
 			this.offsetX += dX;
 			this.offsetY += dY;
 
-			int cvsHeight = Convert.ToInt32(this.Allocation.Height/this.scale);
-			int cvsWidth = Convert.ToInt32(this.Allocation.Width/this.scale);
+//			int cvsHeight = Convert.ToInt32(this.Allocation.Height/this.scale);
+//			int cvsWidth = Convert.ToInt32(this.Allocation.Width/this.scale);
 
 //			double barFrac = cvsHeight/10000.0; //  stackHeight/ySpan;
 //			double barLoc = -this.offsetY/10000.0; //(ySpanMax - maxBottom)/ySpan;		// Offset from the bottom
