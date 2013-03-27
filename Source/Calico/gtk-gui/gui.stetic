@@ -1052,7 +1052,7 @@
                       <widget class="Gtk.Notebook" id="notebook_docs">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="CurrentPage">0</property>
+                        <property name="CurrentPage">1</property>
                         <property name="Scrollable">True</property>
                         <signal name="SwitchPage" handler="OnNotebookDocsSwitchPage" />
                         <child>
@@ -1431,7 +1431,7 @@
                       <widget class="Gtk.HPaned" id="hpaned3">
                         <property name="MemberName" />
                         <property name="CanFocus">True</property>
-                        <property name="Position">195</property>
+                        <property name="Position">226</property>
                         <child>
                           <widget class="Gtk.Notebook" id="notebook_tools">
                             <property name="MemberName" />
@@ -1579,9 +1579,6 @@
                               </packing>
                             </child>
                           </widget>
-                          <packing>
-                            <property name="Resize">False</property>
-                          </packing>
                         </child>
                       </widget>
                     </child>

@@ -79,7 +79,7 @@ namespace Calico {
         public Gtk.Widget lastSelectedPage {
             get { return _lastSelectedPage;}
             set { 
-                System.Console.WriteLine("setting lastSelectedPage = " + value);
+                //System.Console.WriteLine("setting lastSelectedPage = " + value);
                 _lastSelectedPage = value;
             }
         }
@@ -281,7 +281,10 @@ namespace Calico {
             // option
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
-			ShellEditor.Document.DocumentUpdated += updateShellControls;
+	        //ShellEditor.Document.DocumentUpdated += updateShellControls;
+	        ShellEditor.Focused +=   delegate(object o, Gtk.FocusedArgs fargs) {
+		        updateShellControls(ShellEditor.Document, null);
+	        };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             SetLanguage(CurrentLanguage);
@@ -916,6 +919,9 @@ namespace Calico {
 		    });
 	    };
 	    ScrolledWindow.Add(_shell);
+        ScrolledWindow.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
+                updateShellControls(ShellEditor.Document, null);
+            };
 	    ScrolledWindow.ShowAll();
 	    // Environment table:
 	    EnvironmentTreeView.AppendColumn(_("Variable"), new Gtk.CellRendererText(), "text", 0);
@@ -2125,13 +2131,13 @@ namespace Calico {
 
         public void ExecuteFileInBackground(string filename) {
             string language = manager.GetLanguageFromExtension(filename);
-            if (language != null) {
+            if (language != null && filename != null) {
                 ExecuteFileInBackground(filename, language);
             }
         }
 
         public void ExecuteFileInBackground(string filename, string language) {
-            if (language == null) {
+            if (language == null || filename == null) {
                 return;
             }
             // This is run from text documents that don't run themselves:
@@ -2267,7 +2273,10 @@ namespace Calico {
         public virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
 	    Invoke(delegate {
 		    // Always start by wiping out and hiding properties
-		    lastSelectedPage = searchForPage((Gtk.Widget)o);
+		    Gtk.Widget widget = searchForPage((Gtk.Widget)o);
+		    if (widget == null || widget == lastSelectedPage)
+			return;
+		    lastSelectedPage = widget;
 		    Gtk.Notebook nb = this.PropertyNotebook;
 		    while (nb.NPages > 0) {
 			nb.RemovePage(0);
@@ -2351,12 +2360,13 @@ namespace Calico {
         public void updateShellControls(object obj, System.EventArgs args) {
 	    // When Shell is selected by clicking in it, or changes
             Invoke( delegate {
-				  System.Console.WriteLine("updateShellControls");
-				  Gtk.Widget retval = searchForPage(ShellEditor);
-				  if (retval == lastSelectedPage)
-					return;
-				  lastSelectedPage = retval;
-				  Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+		    //System.Console.WriteLine("updateShellControls...");
+		    Gtk.Widget retval = searchForPage(ShellEditor);
+		    if (retval == null || retval == lastSelectedPage)
+			    return;
+		    //System.Console.WriteLine("...set!");
+		    lastSelectedPage = retval;
+		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
                     ProgramSpeed.Sensitive = false;
                     saveaspython_menu.Sensitive = false;
                     if (! ProgramRunning) {
@@ -2377,11 +2387,12 @@ namespace Calico {
         public void updateControls(Document document) { 
 	    // When a document is selected by clicking in it, or changes
             Invoke( delegate {
-				  System.Console.WriteLine("updateControls");
-				  Gtk.Widget nbp = searchForPage(document.widget);
-				  if (lastSelectedPage == nbp)
-					return;
-				  lastSelectedPage = nbp;
+		    //System.Console.WriteLine("updateControls...");
+		    Gtk.Widget nbp = searchForPage(document.widget);
+		    if (lastSelectedPage == nbp)
+			    return;
+		    //System.Console.WriteLine("...set!");
+		    lastSelectedPage = nbp;
                 Gtk.Notebook nb = this.PropertyNotebook;
                 while (nb.NPages > 0) {
                     nb.RemovePage(0);

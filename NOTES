@@ -1,3 +1,5 @@
+0. Check to see if "bitmap" works with lines, from a program. (Didn't work in Knots.py)
+
 1. senses, joysick disbaled: need a strategy other than building up
 locks
 ======================================================

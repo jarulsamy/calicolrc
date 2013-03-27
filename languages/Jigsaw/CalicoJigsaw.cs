@@ -79,14 +79,23 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
 		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
+		/*
 		widget.Focused += delegate {
 		    calico.updateControls(this); 
 		};
+		*/
+		/*
 		widget.ButtonPressEvent += delegate (object o, Gtk.ButtonPressEventArgs e) {
 		    calico.updateControls(this);
 		    cvs.ProcessEvent(e.Event); // HACK: only way to get event passed to canvas!
 		};
+		*/
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
+		/*
+		cvs.CanvasChanged += delegate {
+		    calico.updateControls(this);
+		};
+		*/
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;

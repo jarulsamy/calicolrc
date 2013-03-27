@@ -272,13 +272,6 @@ namespace Calico {
             }
         }
 
-        public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {
-            if (IsDirty)
-                tab_label.Text = String.Format("*{0}", basename);
-            else
-                tab_label.Text = basename; //.Replace("_", "__");
-        }
-
         public virtual void UpdateZoom() {
         }
         public virtual void ZoomIn() {
@@ -396,7 +389,7 @@ namespace Calico {
                 texteditor.Document.MimeType = mimetype;
             widget.Add(texteditor);
             texteditor.Document.DocumentUpdated += OnDocumentUpdated;
-            texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
+            //texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
             texteditor.ButtonPressEvent += OnPopupMenu;
             widget.ShowAll();
             calico.ProgramSpeed.Value = SpeedValue;
@@ -447,6 +440,13 @@ namespace Calico {
 
         public override void UpdateZoom() {
 	        texteditor.Options.FontName = calico.GetFont().ToString();
+        }
+
+        public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {
+            if (IsDirty)
+                tab_label.Text = String.Format("*{0}", basename);
+            else
+                tab_label.Text = basename; //.Replace("_", "__");
         }
 
         public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
