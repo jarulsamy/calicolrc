@@ -5,7 +5,7 @@ pic = Myro.takePicture()
 #from Graphics import *
 #win = Window()
 #pic.draw(win)
-Myro.show(pic, init=True)
+Myro.show(pic)
 
 print("all", Myro.get("all"))
 print("light", Myro.getLight())
