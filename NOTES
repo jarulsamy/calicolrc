@@ -1,3 +1,13 @@
+SIMULATION
+
+1. crashed when canceling
+forward(1)
+while True: show(takePicture(), init=False)
+
+why? trying to flush ?
+
+2. crashed when made sim window maximized
+
 0. Check to see if "bitmap" works with lines, from a program. (Didn't work in Knots.py)
 
 1. senses, joysick disbaled: need a strategy other than building up

@@ -2125,9 +2125,17 @@ namespace Calico {
                 executeThread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
                 //executeThread.Join(); don't really care, do we, if it completes?
                 executeThread = null;
-                manager ["python"].engine.Execute("import Myro as _\n" +
-                    "if _.robot: _.robot.flush(); _.robot.stop()\n" + 
-                    "del _", false);
+		/*
+		  FIXME: this breaks simulation for some reason
+                manager ["python"].engine.Execute("import Gtk\n" +
+                  "import Myro as _\n" +
+		  "if _.robot:\n" + 
+                  "    def invoke(o, e):\n" +
+                  "        _.robot.flush()\n" +
+                  "        _.robot.stop()\n" +  
+		  "        #del _\n" +
+		  "    Gtk.Application.Invoke(invoke)", true);
+		*/
                 Invoke(OnStopRunning);
             }
         }
