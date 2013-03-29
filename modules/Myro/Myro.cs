@@ -2288,6 +2288,12 @@ public static class Myro
 	}
 
 	[method: JigsawTab("Graphics")]
+	    public static Graphics.WindowClass Window (String title, Gtk.Widget widget)
+	{
+	    return makeWindow (title, widget);
+	}
+
+	[method: JigsawTab("Graphics")]
 	public static bool yesno (string question)
 	{
 	    bool yesnoResponse = false;
@@ -3790,6 +3796,12 @@ public static class Myro
       int height=300)
 	{
 		return Graphics.makeWindow (title, width, height);
+	}
+
+	[method: JigsawTab("Graphics")]
+	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
+	{
+		return Graphics.makeWindow (title, widget);
 	}
 
 	[method: JigsawTab("Graphics")]

@@ -577,12 +577,32 @@ public static class Graphics
 	    ManualResetEvent ev = new ManualResetEvent(false);
 	    Invoke( delegate {
 		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
-                _windows [title] = new Graphics.WindowClass (title, width, height);
+			_windows [title] = new Graphics.WindowClass (title, width, height);
 		    }
-            else{
-                Gdk.Color bg = new Gdk.Color (242, 241, 240);
-                _lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
-            }
+		    else{
+			Gdk.Color bg = new Gdk.Color (242, 241, 240);
+			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
+		    }
+		    _lastWindow = _windows [title];
+		    _lastWindow.KeepAbove = true;
+		    ev.Set();
+		});
+	    ev.WaitOne();
+	    return _windows [title];
+	}
+
+	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
+	{
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke( delegate {
+		    if (!(_windows.ContainsKey (title) && (_windows [title].IsRealized))) {
+			_windows [title] = new Graphics.WindowClass (title, widget);
+		    } else {
+			_lastWindow.Remove(_lastWindow.widget);
+			_lastWindow.Add(widget);
+			_lastWindow.widget = widget;
+			widget.ShowAll();
+		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
 		    ev.Set();
@@ -1129,6 +1149,7 @@ public static class Graphics
 	public class WindowClass : Gtk.Window
 	{
 		internal Canvas _canvas;
+		public Gtk.Widget widget;
 		internal bool _dirty = false;
 		private bool timer_running = false;
 		private DateTime last_update = new DateTime (2000, 1, 1);
@@ -1152,6 +1173,14 @@ public static class Graphics
 		ManualResetEvent ev = new ManualResetEvent (false);
 		public int _cacheHeight;
 		public int _cacheWidth;
+
+		public WindowClass (string title, Gtk.Widget widget) : base(title)
+		{
+		    this.widget = widget;
+		    Add(widget);
+		    DeleteEvent += OnDelete;
+		    ShowAll();
+		}
 
 		public WindowClass (string title="Calico Graphics",
                   int width=300, 
@@ -1588,7 +1617,7 @@ public static class Graphics
 			ManualResetEvent ev = new ManualResetEvent(false);
 			int _width = 0, _height = 0;
 			Invoke( delegate {
-				if (Child == _canvas) {
+				if (Child == _canvas || Child == widget) {
 				    this.GetSize (out _width, out _height);
 				} else { // scrollbars
 				    _height = _canvas.height;
@@ -1603,7 +1632,7 @@ public static class Graphics
 		public int _height {
 		    get {
 			int _width = 0, _height = 0;
-			if (Child == _canvas) {
+			if (Child == _canvas || Child == widget) {
 			    this.GetSize (out _width, out _height);
 			} else { // scrollbars
 			    _height = _canvas.height;
@@ -1617,7 +1646,7 @@ public static class Graphics
 			ManualResetEvent ev = new ManualResetEvent(false);
 			int _width = 0, _height = 0;
 			Invoke( delegate {
-				if (Child == _canvas) {
+				if (Child == _canvas || Child == widget) {
 				    this.GetSize (out _width, out _height);
 				    ev.Set();
 				} else { // scrollbars
