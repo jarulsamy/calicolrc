@@ -731,7 +731,7 @@ public static class Myro
 	        {
 		    while (idle == 1) {
 			update_entries();
-			wait(1);
+			wait(1.5);
 		    }
 		}
     
@@ -2444,7 +2444,6 @@ public static class Myro
 
 		void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
 		{
-			state = "down";
 			x = args.Event.X;
 			y = args.Event.Y;
 			center_x = window.width / 2;
@@ -2456,6 +2455,9 @@ public static class Myro
 			arrow.points [1].x = x - center_x;
 			arrow.points [1].y = y - center_y;
 			window.QueueDraw ();
+			if (state == "down")
+			    return;
+			state = "down";
 			if (getRobot () != null) {
 			    move (t, r);
 			    wait(.1);

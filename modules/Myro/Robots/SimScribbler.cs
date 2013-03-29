@@ -199,15 +199,11 @@ public class SimScribbler : Myro.Robot
 		}
 
 		public override void adjustSpeed () {
-		    if (Monitor.TryEnter(queue, 0)) {
-			try { 
-			    queue.Add(delegate {
-				    velocity = _lastTranslate * rate;
-				    frame.body.AngularVelocity = (float)(-_lastRotate * rate);
-				});
-			} finally { 
-			    Monitor.Exit(queue);
-			}
+		    lock (queue) {
+			queue.Add(delegate {
+				velocity = _lastTranslate * rate;
+				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
+			    });
 		    }
 		}
 
@@ -251,11 +247,15 @@ public class SimScribbler : Myro.Robot
 
 		public override void update () {
 		    // Go through all of the delegates that have built up, and run them
+		    List<Action> copy = new List<Action>();
 		    lock (queue) {
 			foreach(Action function in queue) {
-			    function();
+			    copy.Add(function);
 			}
 			queue.Clear();
+		    }
+		    foreach(Action function in copy) {
+			function();
 		    }
 		}
 
