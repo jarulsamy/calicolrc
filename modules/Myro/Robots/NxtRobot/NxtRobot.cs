@@ -2,8 +2,8 @@ using System;
 using NxtNet;
 using System.IO.Ports;
 using System.Collections.Generic;
-using Gtk;
 using IronPython.Runtime;
+
 /// <summary>
 /// This class is responsible for bluetooth communtication with the NXT robot.
 /// </summary>
@@ -356,47 +356,48 @@ public class NxtRobot: Myro.Robot {
 	class Senses
 	{
 		Gtk.Window win;
-		public Label[] type = new Label[4];
-		public Label[] val = new Label[4];
+		public Gtk.Label[] type = new Gtk.Label[4];
+		public Gtk.Label[] val = new Gtk.Label[4];
 	    private NxtRobot nxtrobot;
 		
 		public Senses (NxtRobot nxtrobot)
 		{
-   		    this.nxtrobot = nxtrobot;
-			Application.Init ();
-			win = new Gtk.Window ("Senses");
-			win.DeleteEvent += delegate {
-				Application.Quit ();
-			};
-			win.SetPosition (WindowPosition.Center);
-			win.SetDefaultSize (400, 400);
-			Table tab = new Table (9, 3, false);
-			uint p_top = 0;
-			uint p_bot = 2;
-			uint t_top = 0;
-			uint v_top = 1;
-			SensorState ss;
-			for (int i = 1; i <= 4; i++) {
-				ss = nxtrobot.getSensor (i);
-				type [i - 1] = new Label ((ss.Type).ToString ());
-				val [i - 1] = new Label ((ss.ScaledValue).ToString ());
-				tab.Attach (new Label ("Port " + i + ": "), 0, 1, p_top, p_bot);
-				tab.Attach (new Label ("Type: "), 1, 2, t_top, t_top + 1);
-				tab.Attach (type [i - 1], 2, 3, t_top, t_top + 1);
-				tab.Attach (val [i - 1], 2, 3, v_top, v_top + 1);
-				tab.Attach (new Label ("Value: "), 1, 2, v_top, v_top + 1);
-				p_top += 2;
-				p_bot += 2;
-				t_top = v_top + 1;
-				v_top = v_top + 2;
-			}
-			Button refresh = new Button ("Refresh");
-			refresh.Clicked += HandleRefreshClicked;
-			tab.Attach (refresh, 0, 2, 8, 9);
-			win.Add (tab);
-			tab.Show ();
-			win.ShowAll ();
-			Application.Run ();
+		  Myro.Invoke( delegate {
+				this.nxtrobot = nxtrobot;
+				win = new Gtk.Window ("Senses");
+				win.DeleteEvent += delegate {
+				  win.Destroy();
+				};
+				win.SetPosition (Gtk.WindowPosition.Center);
+				win.SetDefaultSize (400, 400);
+				Gtk.Table tab = new Gtk.Table (9, 3, false);
+				uint p_top = 0;
+				uint p_bot = 2;
+				uint t_top = 0;
+				uint v_top = 1;
+				SensorState ss;
+				for (int i = 1; i <= 4; i++) {
+				  ss = nxtrobot.getSensor (i);
+				  type [i - 1] = new Gtk.Label ((ss.Type).ToString ());
+				  val [i - 1] = new Gtk.Label ((ss.ScaledValue).ToString ());
+				  tab.Attach (new Gtk.Label ("Port " + i + ": "), 0, 1, p_top, p_bot);
+				  tab.Attach (new Gtk.Label ("Type: "), 1, 2, t_top, t_top + 1);
+				  tab.Attach (type [i - 1], 2, 3, t_top, t_top + 1);
+				  tab.Attach (val [i - 1], 2, 3, v_top, v_top + 1);
+				  tab.Attach (new Gtk.Label ("Value: "), 1, 2, v_top, v_top + 1);
+				  p_top += 2;
+				  p_bot += 2;
+				  t_top = v_top + 1;
+				  v_top = v_top + 2;
+				}
+
+				Gtk.Button refresh = new Gtk.Button ("Refresh");
+				refresh.Clicked += HandleRefreshClicked;
+				tab.Attach (refresh, 0, 2, 8, 9);
+				win.Add (tab);
+				tab.Show ();
+				win.ShowAll ();
+			  });
 		}
 
 		void HandleRefreshClicked (object sender, EventArgs e)
@@ -406,12 +407,14 @@ public class NxtRobot: Myro.Robot {
 		
 		private void repopulateTable ()
 		{
-			SensorState ss;
-			for (int i = 1; i <= 4; i++) {
-				ss = nxtrobot.getSensor (i);
-				type [i - 1].Text = (ss.Type).ToString ();
-				val [i - 1].Text = (ss.ScaledValue).ToString ();			
-			}
+		  Myro.Invoke( delegate {
+				SensorState ss;
+				for (int i = 1; i <= 4; i++) {
+				  ss = nxtrobot.getSensor (i);
+				  type [i - 1].Text = (ss.Type).ToString ();
+				  val [i - 1].Text = (ss.ScaledValue).ToString ();			
+				}
+			  });
 		}
 	}
 }
