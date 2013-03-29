@@ -11,6 +11,7 @@ public class SimScribbler : Myro.Robot
 		public Graphics.Rectangle frame;
 		public Myro.Simulation simulation;
 		public double velocity = 0;
+		public List<Action> queue = new List<Action>();
 		public double rate = 8.0;
 		public bool stall = false;
 		public string name = "Scribby";
@@ -183,6 +184,7 @@ public class SimScribbler : Myro.Robot
 			// set collision
 			frame.draw (simulation.window);
 			frame.body.OnCollision += SetStall;
+			frame.body.IgnoreGravity = true;
 
 			this.simulation.robots.Add (this);
 			setup();
@@ -195,13 +197,14 @@ public class SimScribbler : Myro.Robot
 			stall = true;
 			return true;
 		}
-	
-		public override void adjustSpeed ()
-		{
-			lock (this) {
+
+		public override void adjustSpeed () {
+		    lock (queue) {
+			queue.Add(delegate {
 				velocity = _lastTranslate * rate;
 				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
-			}
+			    });
+		    }
 		}
 
 	    public override void setPose(int x, int y, double theta) {
@@ -241,66 +244,99 @@ public class SimScribbler : Myro.Robot
 			return frame.penUp ();
 		}
 
-		public override Graphics.Picture takePicture (string mode="jpeg")
+
+		public override void update () {
+		    // Go through all of the delegates that have built up, and run them
+		    lock (queue) {
+			foreach(Action function in queue) {
+			    function();
+			}
+			queue.Clear();
+		    }
+		}
+
+		public override Graphics.Picture takePicture (string mode="jpeg") {
+		    Graphics.Picture pic = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				pic = _takePicture();
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return pic;
+		}
+
+		public Graphics.Picture _takePicture (string mode="jpeg")
 		{ 
 		    // simscribbler camera
+		    int band = 8; // width of a vertical color, one band per ray
 		    Graphics.Picture picture = new Graphics.Picture (256, 192);
 		    double view_angle = 60.0; // degrees
 		    double max_distance = 20.0;
 		    float MeterInPixels = 64.0f;
 		    if (!simulation.window.isRealized())
 			return picture;
-		    lock (this) {
-			double [] distance = new double[256];
-			Graphics.Color [] colors = new Graphics.Color[256];
-			Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
-			for (int i = 0; i < 256; i++) {
-			    var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
-							   (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
-			    Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
-			    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-				    distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
-				    if (fixture.UserData is Graphics.Shape)
-					colors [i] = ((Graphics.Shape)fixture.UserData).fill;
-				    return 1; 
-				}, 
-				Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
-				Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
-			}
-			Graphics.Color c;
-			double g = 1.0;
-			Graphics.Color sky = new Graphics.Color ("deepskyblue");
-			ManualResetEvent ev = new ManualResetEvent(false);
-			Myro.Invoke (delegate {
-				for (int i = 0; i < 256; i++) {
-				    if (distance [i] > 0) {
-					if (colors [i] != null)
-					    c = colors [i];
-					else
-					    c = new Graphics.Color ("black");
-					g = distance [i];
+		    double [] distance = new double[256];
+		    Graphics.Color [] colors = new Graphics.Color[256];
+		    Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
+		    for (int i = 0; i < 256; i += band) {
+			var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
+						       (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
+			Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
+			simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
+				distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
+				if (fixture.UserData is Graphics.Shape)
+				    colors [i] = ((Graphics.Shape)fixture.UserData).fill;
+				return 1; 
+			    }, 
+			    Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
+			    Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
+		    }
+		    Graphics.Color c;
+		    double g = 1.0;
+		    Graphics.Color sky = new Graphics.Color ("deepskyblue");
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Myro.Invoke (delegate {
+			    for (int i = 0; i < 256; i += band) {
+				if (distance [i] > 0) {
+				    if (colors [i] != null)
+					c = colors [i];
+				    else
+					c = new Graphics.Color ("black");
+				    g = distance [i];
+				} else {
+				    c = new Graphics.Color ("gray");
+				    g = 1.0;
+				}
+				for (int h = 0; h < 192; h++) {
+				    if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
+					for (int ii=0; ii<band; ii++) {
+					    picture.setColor (i + ii, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
+					}
+				    } else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
+					for (int ii=0; ii<band; ii++) {
+					    picture.setColor (i + ii, h, sky);
+					}
 				    } else {
-					c = new Graphics.Color ("gray");
-					g = 1.0;
-				    }
-				    for (int h = 0; h < 192; h++) {
-					if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
-					    picture.setColor (i, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
-					} else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
-					    picture.setColor (i, h, sky);
-					} else {
-					    picture.setColor (i, h, simulation.groundColor);
+					for (int ii=0; ii<band; ii++) {
+					    picture.setColor (i + ii, h, simulation.groundColor);
 					}
 				    }
 				}
 				ev.Set();
-			    });
-			ev.WaitOne ();
-		    }
+			    }
+			});
+		    ev.WaitOne ();
 		    //Graphics.Picture pic = makePicture("/home/dblank/Calico-dev/trunk/examples/images/pyramid.png");
 		    //picture.setRegion(new Graphics.Point(10, 10), pic);
 		    return picture;
-		}
+	        }
     
 		public override void setup ()
 		{
@@ -352,7 +388,24 @@ public class SimScribbler : Myro.Robot
 			return null;
 		}
     
-		public override object getObstacle (params object [] positions)
+		public override object getObstacle (params object [] positions) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getObstacle(positions);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getObstacle (params object [] positions)
 		{
 			string key = null; 
 			List retval = new List ();
@@ -360,56 +413,70 @@ public class SimScribbler : Myro.Robot
 				positions = new object[3] {0, 1, 2};
 			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
 				positions = new object[3] {0, 1, 2};
-			lock (this) {
-				foreach (object position in positions) {
-					if (position is int) {
-						if (((int)position) == 0) {
-							key = "obstacle-left";
-						} else if (((int)position) == 1) {
-							key = "obstacle-center";
-						} else if (((int)position) == 2) {
-							key = "obstacle-right";
-						} else {
-							throw new Exception ("invalid position in getObstacle()");
-						}
-					} else if (position is double) {
-						if (((double)position) == 0) {
-							key = "obstacle-left";
-						} else if (((double)position) == 1) {
-							key = "obstacle-center";
-						} else if (((double)position) == 2) {
-							key = "obstacle-right";
-						} else {
-							throw new Exception ("invalid position in getObstacle()");
-						}
-					} else if (position is string) {
-						if (((string)position) == "left") {
-							key = "obstacle-left";
-						} else if (((string)position) == "center") {
-							key = "obstacle-center";
-						} else if (((string)position) == "right") {
-							key = "obstacle-right";
-						} else {
-							throw new Exception ("invalid position in getObstacle()");
-						}
-					} else {
-						throw new Exception ("invalid position in getObstacle()");
-					}
-					if (readings.Contains (key)) {
-						retval.append ((int)(((float)readings [key]) * 5000.0));
-					} else {
-						retval.append (0);
-					}
+			foreach (object position in positions) {
+			    if (position is int) {
+				if (((int)position) == 0) {
+				    key = "obstacle-left";
+				} else if (((int)position) == 1) {
+				    key = "obstacle-center";
+				} else if (((int)position) == 2) {
+				    key = "obstacle-right";
+				} else {
+				    throw new Exception ("invalid position in getObstacle()");
 				}
+			    } else if (position is double) {
+				if (((double)position) == 0) {
+				    key = "obstacle-left";
+				} else if (((double)position) == 1) {
+				    key = "obstacle-center";
+				} else if (((double)position) == 2) {
+				    key = "obstacle-right";
+				} else {
+				    throw new Exception ("invalid position in getObstacle()");
+				}
+			    } else if (position is string) {
+				if (((string)position) == "left") {
+				    key = "obstacle-left";
+				} else if (((string)position) == "center") {
+				    key = "obstacle-center";
+				} else if (((string)position) == "right") {
+				    key = "obstacle-right";
+				} else {
+				    throw new Exception ("invalid position in getObstacle()");
+				}
+			    } else {
+				throw new Exception ("invalid position in getObstacle()");
+			    }
+			    if (readings.Contains (key)) {
+				retval.append ((int)(((float)readings [key]) * 5000.0));
+			    } else {
+				retval.append (0);
+			    }
 			}
 			if (retval.Count == 1)
-				return retval [0];
+			    return retval [0];
 			else 
-				return retval;
+			    return retval;
 		}
-    
 
-		public override object getDistance (params object [] positions)
+		public override object getDistance (params object [] positions) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getDistance(positions);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getDistance (params object [] positions)
 		{
 			string key = null; 
 			List retval = new List ();
@@ -417,49 +484,64 @@ public class SimScribbler : Myro.Robot
 			  positions = new object[2] {0, 1};
 			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
 				positions = new object[2] {0, 1};
-			lock (this) {
-				foreach (object position in positions) {
-					if (position is int) {
-						if (((int)position) == 0) {
-							key = "distance-left";
-						} else if (((int)position) == 1) {
-							key = "distance-right";
-						} else {
-							throw new Exception ("invalid position in getDistance()");
-						}
-					} else if (position is double) {
-						if (((double)position) == 0) {
-							key = "distance-left";
-						} else if (((double)position) == 1) {
-							key = "distance-right";
-						} else {
-							throw new Exception ("invalid position in getDistance()");
-						}
-					} else if (position is string) {
-						if (((string)position) == "left") {
-							key = "distance-left";
-						} else if (((string)position) == "right") {
-							key = "distance-right";
-						} else {
-							throw new Exception ("invalid position in getDistance()");
-						}
-					} else {
-						throw new Exception ("invalid position in getDistance()");
-					}
-					if (readings.Contains (key)) {
-					  retval.append (readings [key]);
-					} else {
-					  retval.append (0);
-					}
+			foreach (object position in positions) {
+			    if (position is int) {
+				if (((int)position) == 0) {
+				    key = "distance-left";
+				} else if (((int)position) == 1) {
+				    key = "distance-right";
+				} else {
+				    throw new Exception ("invalid position in getDistance()");
 				}
+			    } else if (position is double) {
+				if (((double)position) == 0) {
+				    key = "distance-left";
+				} else if (((double)position) == 1) {
+				    key = "distance-right";
+				} else {
+				    throw new Exception ("invalid position in getDistance()");
+				}
+			    } else if (position is string) {
+				if (((string)position) == "left") {
+				    key = "distance-left";
+				} else if (((string)position) == "right") {
+				    key = "distance-right";
+				} else {
+				    throw new Exception ("invalid position in getDistance()");
+				}
+			    } else {
+				throw new Exception ("invalid position in getDistance()");
+			    }
+			    if (readings.Contains (key)) {
+				retval.append (readings [key]);
+			    } else {
+				retval.append (0);
+			    }
 			}
 			if (retval.Count == 1)
-				return retval [0];
+			    return retval [0];
 			else 
-				return retval;
+			    return retval;
 		}
-    
-		public override object getLight (params object [] positions)
+		
+		public override object getLight (params object [] positions) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getLight(positions);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getLight (params object [] positions)
 		{
 			string key = null; 
 			List retval = new List ();
@@ -467,7 +549,6 @@ public class SimScribbler : Myro.Robot
 				positions = new object[3] {0, 1, 2};
 			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
 				positions = new object[3] {0, 1, 2};
-			lock (this) {
 				foreach (object position in positions) {
 					if (position is int) {
 						if (((int)position) == 0) {
@@ -507,7 +588,6 @@ public class SimScribbler : Myro.Robot
 					} else {
 						retval.append (null);
 					}
-				}
 			}
 			if (retval.Count == 1)
 				return retval [0];
@@ -515,7 +595,24 @@ public class SimScribbler : Myro.Robot
 				return retval;
 		}
     
-		public override object getIR (params object [] positions)
+		public override object getIR (params object [] positions) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getIR(positions);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getIR (params object [] positions)
 		{
 			string key = null; 
 			List retval = new List ();
@@ -523,7 +620,6 @@ public class SimScribbler : Myro.Robot
 				positions = new object[2] {0, 1};
 			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
 				positions = new object[2] {0, 1};
-			lock (this) {
 				foreach (object position in positions) {
 					if (position is int) {
 						if (((int)position) == 0) {
@@ -557,7 +653,6 @@ public class SimScribbler : Myro.Robot
 					} else {
 						retval.append (1);
 					}
-				}
 			}
 			if (retval.Count == 1)
 				return retval [0];
@@ -565,21 +660,55 @@ public class SimScribbler : Myro.Robot
 				return retval;
 		}
 
-		public override object getBright (string window)
+		public override object getBright (string window) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getBright(window);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getBright (string window)
 		{
 			if (window == "left")
-				return ((List)getBright ()) [0];
+				return ((List)_getBright ()) [0];
 			else if (window == "center")
-				return ((List)getBright ()) [1];
+				return ((List)_getBright ()) [1];
 			else if (window == "right")
-				return ((List)getBright ()) [2];
+				return ((List)_getBright ()) [2];
 			else if (window == "all")
-				return getBright ();
+				return _getBright ();
 			else
 				throw new Exception ("invalid argument to getBright()");
 		}
 
-		public override object getBright ()
+		public override object getBright () {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getBright();
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getBright ()
 		{
 			// simscribbler camera
 			double view_angle = 60.0; // degrees
@@ -588,66 +717,98 @@ public class SimScribbler : Myro.Robot
 			List counts = Graphics.PyList (0, 0, 0);
 			if (!simulation.window.isRealized())
 				return counts;
-			lock (this) {
-				double [] distance = new double[256];
-				Graphics.Color [] colors = new Graphics.Color[256];
-				Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
-				for (int i = 0; i < 256; i++) {
-					var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
-				(float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
-					Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
-					simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-						distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
-						if (fixture.UserData is Graphics.Shape)
-							colors [i] = ((Graphics.Shape)fixture.UserData).fill;
-						return 1; 
-					}, 
-	    Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
-	    Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
+			double [] distance = new double[256];
+			Graphics.Color [] colors = new Graphics.Color[256];
+			Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
+			for (int i = 0; i < 256; i++) {
+			    var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
+							   (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
+			    Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
+			    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
+				    distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
+				    if (fixture.UserData is Graphics.Shape)
+					colors [i] = ((Graphics.Shape)fixture.UserData).fill;
+				    return 1; 
+				}, 
+				Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
+				Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
+			}
+			Graphics.Color c;
+			double g = 1.0;
+			Graphics.Color sky = new Graphics.Color ("deepskyblue");
+			for (int i = 0; i < 256; i++) {
+			    if (distance [i] > 0) {
+				if (colors [i] != null)
+				    c = colors [i];
+				else
+				    c = new Graphics.Color ("black");
+				g = distance [i];
+			    } else {
+				c = new Graphics.Color ("gray");
+				g = 1.0;
+			    }
+			    double red, green, blue;
+			    for (int h = 0; h < 192; h++) {
+				if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
+				    red = c.red * g;
+				    green = c.green * g;
+				    blue = c.blue * g;
+				} else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
+				    red = sky.red;
+				    green = sky.green;
+				    blue = sky.blue;
+				} else {
+				    red = simulation.groundColor.red;
+				    green = simulation.groundColor.green;
+				    blue = simulation.groundColor.blue;
 				}
-				Graphics.Color c;
-				double g = 1.0;
-				Graphics.Color sky = new Graphics.Color ("deepskyblue");
-				for (int i = 0; i < 256; i++) {
-					if (distance [i] > 0) {
-						if (colors [i] != null)
-							c = colors [i];
-						else
-							c = new Graphics.Color ("black");
-						g = distance [i];
-					} else {
-						c = new Graphics.Color ("gray");
-						g = 1.0;
-					}
-					double red, green, blue;
-					for (int h = 0; h < 192; h++) {
-						if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
-							red = c.red * g;
-							green = c.green * g;
-							blue = c.blue * g;
-						} else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
-							red = sky.red;
-							green = sky.green;
-							blue = sky.blue;
-						} else {
-							red = simulation.groundColor.red;
-							green = simulation.groundColor.green;
-							blue = simulation.groundColor.blue;
-						}
-						if (Math.Max (Math.Max (red, green), blue) > 180)
-							counts [Math.Min (i / (256 / 3), 2)] = ((int)counts [Math.Min (i / (256 / 3), 2)]) + 1;
-					}
-				}
+				if (Math.Max (Math.Max (red, green), blue) > 180)
+				    counts [Math.Min (i / (256 / 3), 2)] = ((int)counts [Math.Min (i / (256 / 3), 2)]) + 1;
+			    }
 			}
 			return counts;
 		}
     
-		public override object getBright (int window)
+		public override object getBright (int window) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getBright(window);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getBright (int window)
 		{
-			return ((List)getBright ()) [window];
+			return ((List)_getBright ()) [window];
 		}
     
-		public override object getLine (params object [] position)
+		public override object getLine (params object [] positions) {
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				retval = _getLine(positions);
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    // And return picture
+		    return retval;
+	        }
+
+		public object _getLine (params object [] position)
 		{
 			return Graphics.PyList (0, 0);
 		}
@@ -730,60 +891,56 @@ public class SimScribbler : Myro.Robot
 
 		public override void draw_simulation() {
 		    float MeterInPixels = 64.0f;
-		    lock (this) {
-			this.stall = false;
-			this.frame.body.LinearVelocity = Graphics.VectorRotate (
-										 Graphics.Vector (this.velocity, 0), 
-										 this.frame.body.Rotation);
-			// Get sensor readings
-			this.readings.clear ();
-			if (!simulation.window.isRealized())
-			    return;
-			Graphics.Point p1 = null;
-			Graphics.Point p2 = null;
-			lock (simulation.window.canvas.shapes) {
-			    foreach (KeyValuePair<object,object> kvp in this.sensors) {
-				string key = (string)kvp.Key;
-				Graphics.Line line = (Graphics.Line)kvp.Value;
-				p1 = this.frame.getScreenPoint (line.getP1 ());
-				p2 = this.frame.getScreenPoint (line.getP2 ());
+		    this.stall = false;
+		    this.frame.body.LinearVelocity = Graphics.VectorRotate (
+									    Graphics.Vector (this.velocity, 0), 
+									    this.frame.body.Rotation);
+		    // Get sensor readings
+		    this.readings.clear ();
+		    if (!simulation.window.isRealized())
+			return;
+		    Graphics.Point p1 = null;
+		    Graphics.Point p2 = null;
+		    lock (simulation.window.canvas.shapes) {
+			foreach (KeyValuePair<object,object> kvp in this.sensors) {
+			    string key = (string)kvp.Key;
+			    Graphics.Line line = (Graphics.Line)kvp.Value;
+			    p1 = this.frame.getScreenPoint (line.getP1 ());
+			    p2 = this.frame.getScreenPoint (line.getP2 ());
+			    if (!simulation.window.isRealized())
+				return;
+			    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
+				    this.readings [key] = hit;
+				    return 1; 
+				}, 
+				Graphics.Vector (((float)p1.x) / MeterInPixels, 
+						 ((float)p1.y) / MeterInPixels), 
+				Graphics.Vector (((float)p2.x) / MeterInPixels, 
+						 ((float)p2.y) / MeterInPixels));
+			}
+			foreach (Graphics.Shape light in simulation.lights) {
+			    foreach (Graphics.Shape light_sensor in this.light_sensors) {
+				Graphics.Point c = new Graphics.Point (light_sensor.center);
+				c.x -= 6; // hack to get outside of bounding box
+				p1 = this.frame.getScreenPoint (c);
+				p2 = light.center;
 				if (!simulation.window.isRealized())
 				    return;
 				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-					this.readings [key] = hit;
+					this.readings [light_sensor.tag] = hit;
 					return 1; 
 				    }, 
 				    Graphics.Vector (((float)p1.x) / MeterInPixels, 
 						     ((float)p1.y) / MeterInPixels), 
 				    Graphics.Vector (((float)p2.x) / MeterInPixels, 
 						     ((float)p2.y) / MeterInPixels));
-			    }
-			    foreach (Graphics.Shape light in simulation.lights) {
-				foreach (Graphics.Shape light_sensor in this.light_sensors) {
-				    Graphics.Point c = new Graphics.Point (light_sensor.center);
-				    c.x -= 6; // hack to get outside of bounding box
-				    p1 = this.frame.getScreenPoint (c);
-				    p2 = light.center;
-				    if (!simulation.window.isRealized())
-					return;
-				    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-					    this.readings [light_sensor.tag] = hit;
-					    return 1; 
-					}, 
-					Graphics.Vector (((float)p1.x) / MeterInPixels, 
-							 ((float)p1.y) / MeterInPixels), 
-					Graphics.Vector (((float)p2.x) / MeterInPixels, 
-							 ((float)p2.y) / MeterInPixels));
-				    if (this.readings.Contains (light_sensor.tag)) {
-					this.readings [light_sensor.tag] = (float)5000.0; // blocked
-				    } else {
-					this.readings [light_sensor.tag] = ((float)Math.Min (Math.Pow (p1.distance (p2) / 10.0, 2), 5000));
-				    }
+				if (this.readings.Contains (light_sensor.tag)) {
+				    this.readings [light_sensor.tag] = (float)5000.0; // blocked
+				} else {
+				    this.readings [light_sensor.tag] = ((float)Math.Min (Math.Pow (p1.distance (p2) / 10.0, 2), 5000));
 				}
 			    }
 			}
-			
-			
 		    }
 		}
 	} // SimScribbler

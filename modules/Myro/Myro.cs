@@ -144,6 +144,7 @@ public static class Myro
 	public static Robot robot;
 	public static Simulation simulation;
 	public static int gui_thread_id = -1;
+        public static Thread update_entries_thread;
 	static string REVISION = "$Revision: $";
 	static string startup_path = null;
 	static string os_name = null;
@@ -714,55 +715,61 @@ public static class Myro
 			    ev.Set();
 			});
 		    idle = 1;
-		    GLib.Timeout.Add (1000, new GLib.TimeoutHandler (update_entries));
 		    ev.WaitOne();
+		    // This needs to run async, not via GLib.Timeout:
+		    update_entries_thread = new Thread (new ThreadStart (update_entries_loop));
+		    update_entries_thread.IsBackground = true;
+		    update_entries_thread.Start ();
 		}
     
 		private void OnDelete (object obj, Gtk.DeleteEventArgs args)
 		{
 			idle = 0;
 		}
+
+	        public void update_entries_loop ()
+	        {
+		    while (idle == 1) {
+			update_entries();
+			wait(1);
+		    }
+		}
     
 		bool update_entries ()
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
-		    // FIXME: enable, somehow
-		    /*
+		    List light_results = (List)Myro.robot.getLight ();
+		    List bright_results = (List)getBright ();
+		    List obstacle_results = (List)getObstacle ();
+		    List ir_results = (List)getIR ();
+		    List line_results = (List)getLine ();
+		    double battery_results = getBattery ();
+		    int stall_results = getStall ();
 		    Invoke (delegate {
-			    try {	  
-				List results = (List)getLight ();
-				for (int i=0; i < results.Count; i++) {
-				    ((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = results [i].ToString ();
-				}
-				results = (List)getBright ();
-				for (int i=0; i < results.Count; i++) {
-				    ((Gtk.Entry)((List)dict_entry ["Bright:"]) [i]).Text = results [i].ToString ();
-				}
-				results = (List)getObstacle ();
-				for (int i=0; i < results.Count; i++) {
-				    ((Gtk.Entry)((List)dict_entry ["Obstacle:"]) [i]).Text = results [i].ToString ();
-				}
-				results = (List)getIR ();
-				for (int i=0; i < results.Count; i++) {
-				    ((Gtk.Entry)((List)dict_entry ["IR:"]) [i]).Text = results [i].ToString ();
-				}
-				results = (List)getLine ();
-				for (int i=0; i < results.Count; i++) {
-				    ((Gtk.Entry)((List)dict_entry ["Line:"]) [i]).Text = results [i].ToString ();
-				}
-				((Gtk.Entry)((List)dict_entry ["Battery:"]) [0]).Text = getBattery ().ToString ();
-				((Gtk.Entry)((List)dict_entry ["Stall:"]) [0]).Text = getStall ().ToString ();	  
-			    } catch {
-				// pass
+			    for (int i=0; i < light_results.Count; i++) {
+				((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = light_results [i].ToString ();
 			    }
+			    for (int i=0; i < bright_results.Count; i++) {
+				((Gtk.Entry)((List)dict_entry ["Bright:"]) [i]).Text = bright_results [i].ToString ();
+			    }
+			    for (int i=0; i < obstacle_results.Count; i++) {
+				((Gtk.Entry)((List)dict_entry ["Obstacle:"]) [i]).Text = obstacle_results [i].ToString ();
+			    }
+			    for (int i=0; i < ir_results.Count; i++) {
+				((Gtk.Entry)((List)dict_entry ["IR:"]) [i]).Text = ir_results [i].ToString ();
+			    }
+			    for (int i=0; i < line_results.Count; i++) {
+				((Gtk.Entry)((List)dict_entry ["Line:"]) [i]).Text = line_results [i].ToString ();
+			    }
+			    ((Gtk.Entry)((List)dict_entry ["Battery:"]) [0]).Text = battery_results.ToString ();
+			    ((Gtk.Entry)((List)dict_entry ["Stall:"]) [0]).Text = stall_results.ToString ();	  
 			    ev.Set();
 			});
 		    ev.WaitOne();
-		    */
 		    return idle == 1; // continue
 		}
 	}
-
+    
 	public class Gamepads
 	{
    
@@ -1149,6 +1156,7 @@ public static class Myro
 		} else {
 		  robot = makeRobot ("SimScribbler", simulation); 
 		}
+		wait(1.0); // give it time to get started before trying to read sensors, etc
 	  } else {
 		if (Myro.robot != null)
 		  Myro.robot.reinit (port, baud);
@@ -1211,8 +1219,7 @@ public static class Myro
 		public List<Robot> robots = new List<Robot> ();
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-		public double extra_simulation_time = 0.0;
-        public bool run = true;
+	        public bool run = true;
 	    
 		public Simulation (string title, int width, int height, Graphics.Color color)
 		{
@@ -1300,16 +1307,17 @@ public static class Myro
     
 		public void addShape (Graphics.Shape shape)
 		{
-			shape.draw (window);
+		    shape.draw (window);
+		    shape.body.IgnoreGravity = true;
 		}
     
 		public void setup ()
 		{
-			if (thread == null || !thread.IsAlive) {
-				thread = new Thread (new ThreadStart (loop));
-				thread.IsBackground = true;
-				thread.Start ();
-			}      
+		    if (thread == null || !thread.IsAlive) {
+			thread = new Thread (new ThreadStart (loop));
+			thread.IsBackground = true;
+			thread.Start ();
+		    }      
 		}
 
 	  public void step() {
@@ -1317,10 +1325,13 @@ public static class Myro
 		  foreach (Robot robot in robots) {
 		      robot.draw_simulation ();
 		  }
+		  foreach (Robot robot in robots) {
+		      robot.update ();
+		  }
 		  window.step (.1);
 	      }
 	  }
-
+	    
 	  public void stop() {
 		run = false;
 	  }
@@ -1336,18 +1347,18 @@ public static class Myro
 	  }
 
 	  public void loop ()
-	  {
-		  run = true;
-		  while (window.isRealized() && run) {
-			foreach (Robot robot in robots) {
-			  robot.draw_simulation ();
-			}
-			if (!window.isRealized())
-			  return;
-			window.step (.1);
-			wait (extra_simulation_time);
-		  }
+	    {
+		run = true;
+		while (window.isRealized() && run) {
+		    foreach (Robot robot in robots) {
+			robot.draw_simulation ();
+		    }
+		    foreach (Robot robot in robots) {
+			robot.update ();
+		    }
+		    window.step (.1);
 		}
+	    }
 	}
 
 	[method: JigsawTab("Robot")]
@@ -2427,10 +2438,8 @@ public static class Myro
 			arrow.points [1].y = 0;
 			window.QueueDraw ();
 			if (getRobot () != null) {
-			    //getRobot ().stop ();
-				//wait(.1);
+			    stop ();
 			}
-			// FIXME
 		}
 
 		void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
@@ -2448,10 +2457,9 @@ public static class Myro
 			arrow.points [1].y = y - center_y;
 			window.QueueDraw ();
 			if (getRobot () != null) {
-			    //getRobot ().move (t, r);
-				//wait(.1);
+			    move (t, r);
+			    wait(.1);
 			}
-			// FIXME
 		}
 
 		void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
@@ -2469,10 +2477,9 @@ public static class Myro
 				arrow.points [1].y = y - center_y;
 				window.QueueDraw ();
 				if (getRobot () != null) {
-				    //getRobot ().move (t, r);
-					//wait(.1);
+				    move (t, r);
+				    wait(.1);
 				}
-				// FIXME
 			}
 		}
 	}
@@ -2982,9 +2989,9 @@ public static class Myro
 
 		public void move (double translate, double rotate)
 		{
-			_lastTranslate = translate;
-			_lastRotate = rotate;
-			adjustSpeed ();
+		    _lastTranslate = translate;
+		    _lastRotate = rotate;
+		    adjustSpeed ();
 		}
     
 		public void playSong (List song)
@@ -3103,6 +3110,11 @@ public static class Myro
 		public virtual void draw_simulation ()
 		{
 			throw new NotImplementedException ();
+		}
+
+		public virtual void update ()
+		{
+		    throw new NotImplementedException ();
 		}
 	}
 
