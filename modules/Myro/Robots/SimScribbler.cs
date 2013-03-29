@@ -199,11 +199,15 @@ public class SimScribbler : Myro.Robot
 		}
 
 		public override void adjustSpeed () {
-		    lock (queue) {
-			queue.Add(delegate {
-				velocity = _lastTranslate * rate;
-				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
-			    });
+		    if (Monitor.TryEnter(queue, 0)) {
+			try { 
+			    queue.Add(delegate {
+				    velocity = _lastTranslate * rate;
+				    frame.body.AngularVelocity = (float)(-_lastRotate * rate);
+				});
+			} finally { 
+			    Monitor.Exit(queue);
+			}
 		    }
 		}
 
