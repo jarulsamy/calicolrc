@@ -28,7 +28,7 @@ languages/Jigsaw/CalicoJigsaw.dll: languages/Jigsaw/CalicoJigsaw.cs languages/Ji
 languages/Jigsaw/Jigsaw.exe: 
 	cd languages/Jigsaw && xbuild Jigsaw.sln
 
-modules/Graphics.dll: modules/Graphics/Graphics.cs modules/FarseerPhysics.dll modules/GifLib.dll
+modules/Graphics.dll: modules/Graphics/Graphics.cs modules/FarseerPhysics.dll 
 	cd modules/Graphics && make
 
 modules/Shapes.dll: modules/Graphics/Graphics.cs modules/Graphics/Shapes.cs 
@@ -51,9 +51,6 @@ modules/ExpressionEngine.dll: modules/ExpressionEngine/Expression.cs
 
 modules/Games.dll: modules/Games/Games.cs
 	cd modules/Games && make
-
-modules/GifLib.dll: 
-	cd modules/GifLib && make
 
 modules/Kinect.dll: modules/Kinnect/Kinnect.cs
 	cd modules/Kinnect && make
