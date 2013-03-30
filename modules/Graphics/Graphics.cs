@@ -2278,7 +2278,9 @@ public static class Graphics
 		    joint_type != "revolute" &&
 		    joint_type != "slider" &&
 		    joint_type != "weld") {
-		    throw new Exception(String.Format("invalid joint type: '{0}'", joint_type));
+		    throw new Exception(String.Format("invalid joint type: '{0}'; should be one of: ", 
+		    joint_type,
+		    "'angle', 'distance', 'friction', 'gear', 'line', 'prismatic', 'pully', 'revolute', 'slider', or 'weld'"));
 		}
 		joints.Add(other);
 		if (joint_type != "angle") {
@@ -2291,14 +2293,21 @@ public static class Graphics
 					 other.body.FixtureList[0].Body); // body2
 		} else if (joint_type != "distance") {
 		    // CreateDistanceJoint
+		    //var body1 = this.body.FixtureList[0].Body;
+		    //var body2 = other.body.FixtureList[0].Body;
+		    //Vector2 sep1 = body2.Position - body1.Position;	
+		    //Vector2 sep2 = body1.Position - body2.Position;
+
 		    return FarseerPhysics.Factories.
 			JointFactory.
 			CreateDistanceJoint( 
 					    world, // world
 					    this.body.FixtureList[0].Body, // body1
 					    other.body.FixtureList[0].Body, // body2
-					    Vector2.Zero,  // anchor 1
-					    Vector2.Zero);  // anchor 2
+					    Vector2.Zero,
+					    Vector2.Zero);
+		                            //Vector2.Multiply(sep1, .5f),  // anchor 1
+		                            //Vector2.Multiply(sep2, .5f));  // anchor 2
 		    //} else if (joint_type != "fixed-angle") {
 		    // CreateFixedAngleJoint
 		    //} else if (joint_type != "fixed-distance") {
@@ -2376,13 +2385,19 @@ public static class Graphics
 					  args[1]); // max distance
 		} else if (joint_type != "weld") {
 		    // CreateWeldJoint
+		    //var body1 = this.body.FixtureList[0].Body;
+		    //var body2 = other.body.FixtureList[0].Body;
+		    //Vector2 sep1 = body2.Position - body1.Position;	
+		    //Vector2 sep2 = body1.Position - body2.Position;
+
 		    return FarseerPhysics.Factories.
 			JointFactory.
 			CreateWeldJoint( 
-					world, // world
-					this.body.FixtureList[0].Body, // body1
-					other.body.FixtureList[0].Body, // body2
-					Vector2.Zero);  // anchor2
+					    world, // world
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    Vector2.Zero,  // anchor 1
+					    Vector2.Zero);  // anchor 2
 		}
 		return null;
 	    }
@@ -3378,6 +3393,19 @@ public static class Graphics
 		    }
 		    g.Stroke ();
 		    g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
+			g.Restore ();
 		    if (has_pen)
 			pen.render (g);
 		}
@@ -3576,6 +3604,19 @@ public static class Graphics
 			foreach (Shape shape in shapes) {
 				shape.render (g);
 				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
 			}
 			g.Restore ();
 			if (has_pen)
@@ -4687,6 +4728,19 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
+			g.Restore ();
 			if (has_pen)
 				pen.render (g);
 		}
@@ -5045,6 +5099,19 @@ public static class Graphics
 					shape.updateGlobalPosition (g);
 				}
 				g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
+			g.Restore ();
 				if (has_pen)
 					pen.render (g);
 			}
@@ -5234,6 +5301,19 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
+			g.Restore ();
 			if (has_pen)
 				pen.render (g);
 		}
@@ -5321,6 +5401,19 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Stroke ();
+			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
 			g.Restore ();
 			if (has_pen)
 				pen.render (g);
@@ -5469,6 +5562,19 @@ public static class Graphics
 				shape.updateGlobalPosition (g);
 			}
 			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
+			}
+			g.Restore ();
 			if (has_pen)
 				pen.render (g);
 		}
@@ -5592,6 +5698,19 @@ public static class Graphics
 			foreach (Shape shape in shapes) {
 				shape.render (g);
 				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
 			}
 			g.Restore ();
 			if (has_pen)

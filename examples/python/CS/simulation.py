@@ -26,10 +26,8 @@ makeRobot("SimScribbler", sim)
 
 # Control it somehow:
 #senses()
-#joystick()
+joystick()
 
-show()
 while True:
     show(takePicture())
-    turnLeft(1, 1)
     

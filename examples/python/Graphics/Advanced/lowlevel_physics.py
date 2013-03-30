@@ -1,8 +1,6 @@
 from Graphics import *
 from Myro import pickOne
 
-import clr
-clr.AddReference("FarseerPhysics")
 from FarseerPhysics.Dynamics import World, BodyType
 from FarseerPhysics.Collision.Shapes import CircleShape
 from FarseerPhysics.Factories.BodyFactory import CreateBody, CreateCircle, CreateRectangle

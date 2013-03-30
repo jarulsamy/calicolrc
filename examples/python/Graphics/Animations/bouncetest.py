@@ -13,6 +13,10 @@ c2.draw(win)
 c2.fill = Color("blue")
 c2.mass = 2.0
 
+dj = c1.makeJointTo(c2, "distance")
+dj.CollideConnected = True
+dj.Breakpoint = 1000
+
 ground = Rectangle((0, 580), (200, 610))
 ground.draw(win)
 ground.bodyType = "static"

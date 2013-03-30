@@ -2,7 +2,7 @@ import Myro
 Myro.init()
 
 pic = Myro.takePicture()
-Myro.show(pic, init=True)
+Myro.show(pic)
 
 Myro.robot.backward(1, 1)
 Myro.robot.forward(1, 1)
