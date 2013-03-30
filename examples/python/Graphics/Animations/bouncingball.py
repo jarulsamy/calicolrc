@@ -6,10 +6,20 @@ Random.seed = 247534
 win = Window("Bouncing Shapes", 300, 600)
 win.mode = "physics"
 
-p = Polygon((100, 100), (130, 100), (130, 150))
-p.fill=Color("gold")
-p.bounce = randomNumber() * .3
-p.draw(win)
+p1 = Polygon((100, 100), (130, 100), (130, 150))
+p1.fill=Color("gold")
+p1.bounce = randomNumber() * .3
+p1.draw(win)
+p1.wrap = True
+
+p2 = Polygon((100, 100), (130, 100), (130, 150))
+p2.fill=Color("gold")
+p2.bounce = randomNumber() * .3
+p2.draw(win)
+p2.wrap = True
+
+j = p1.makeJointTo(p2, "df")
+j.CollideConnected = True
 
 for i in range(5):
     c = Rectangle((130 - i, 130 - i), (130 - i + 20, 130 - i + 20))

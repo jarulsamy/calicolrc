@@ -2276,7 +2276,7 @@ public static class Graphics
 		    joint_type != "revolute" &&
 		    joint_type != "slider" &&
 		    joint_type != "weld") {
-		    throw new Exception(String.Format("invalid joint type: '{0}'; should be one of: ", 
+		    throw new Exception(String.Format("invalid joint type: '{0}'; should be one of: {1}", 
 		    joint_type,
 		    "'angle', 'distance', 'friction', 'gear', 'line', 'prismatic', 'pully', 'revolute', 'slider', or 'weld'"));
 		}
