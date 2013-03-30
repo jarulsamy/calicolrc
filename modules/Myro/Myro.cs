@@ -3695,21 +3695,33 @@ public static class Myro
 	}
 
 	[method: JigsawTab("Picture")]
-	public static void savePicture (Graphics.Picture picture, string filename)
+	    public static void savePicture (string filename, Graphics.Picture picture)
 	{
 		picture.savePicture (filename);
 	}
 
 	[method: JigsawTab("Picture")]
-	public static void savePicture (List list, string filename, short delay, bool repeat)
+	    public static void savePicture (string filename, short delay, bool repeat, List list)
 	{
-		Graphics.savePicture (list, filename, delay, repeat);
+	    Graphics.savePicture (filename, delay, repeat, list);
 	}
 
 	[method: JigsawTab("Picture")]
-	public static void savePicture (List list, string filename)
+	    public static void savePicture (string filename, List list)
 	{
-		Graphics.savePicture (list, filename, 0, true);
+	    Graphics.savePicture (filename, 0, true, list);
+	}
+
+	[method: JigsawTab("Picture")]
+	    public static void savePicture (string filename, params Graphics.Picture [] pictures)
+	{
+	    Graphics.savePicture (filename, pictures);
+	}
+
+	[method: JigsawTab("Picture")]
+	    public static void savePicture (string filename, IList pictures)
+        {
+	    Graphics.savePicture (filename, pictures);
 	}
 
         [method: JigsawTab(null)]

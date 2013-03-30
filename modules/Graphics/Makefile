@@ -14,9 +14,8 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:Graphviz4Net \
 		-r:System.Drawing \
 		-r:FarseerPhysics.dll \
-		-r:GifLib.dll \
 		-pkg:gtk-sharp-2.0 \
-		-out:../Graphics.dll 
+		-out:../Graphics.dll
 
 ../Shapes.dll: Shapes.cs Graphics.cs
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
@@ -32,7 +31,6 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:System.Drawing \
 		-r:Mono.Cairo \
 		-r:FarseerPhysics.dll \
-		-r:GifLib.dll \
 		-pkg:gtk-sharp-2.0 \
 		-out:../Shapes.dll 
 
