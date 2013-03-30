@@ -582,6 +582,7 @@ public static class Graphics
 		    else{
 			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			_lastWindow.clear(false);
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
@@ -2226,6 +2227,7 @@ public static class Graphics
 		internal float _friction;
 		internal float _density;
 		public List<Shape> shapes = new List<Shape> ();
+		public List<Shape> joints = new List<Shape> ();
 		public double gx = 0.0;
 		public double gy = 0.0;
 		public bool visible = true;
@@ -2259,6 +2261,131 @@ public static class Graphics
 		// FIXME: points are in relative to center coordinates
 		// FIXME: set x,y of points should go from screen_coords to relative
 		// FIXME: should call QueueDraw on set
+	    
+	    public virtual object makeJointTo(Shape other, string joint_type, params float [] args) {
+		if (joint_type != "angle" &&
+		    joint_type != "distance" &&
+		    //joint_type != "fixed-angle" &&
+		    //joint_type != "fixed-distance" &&
+		    //joint_type != "fixed-friction" &&
+		    //joint_type != "fixed-prismatic" &&
+		    //joint_type != "fixed-revolute" &&
+		    joint_type != "friction" &&
+		    //joint_type != "gear" &&
+		    joint_type != "line" &&
+		    joint_type != "prismatic" &&
+		    joint_type != "pulley" &&
+		    joint_type != "revolute" &&
+		    joint_type != "slider" &&
+		    joint_type != "weld") {
+		    throw new Exception(String.Format("invalid joint type: '{0}'", joint_type));
+		}
+		joints.Add(other);
+		if (joint_type != "angle") {
+		    // CreateAngleJoint 
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateAngleJoint( 
+					 world, // world
+					 this.body.FixtureList[0].Body, // body1
+					 other.body.FixtureList[0].Body); // body2
+		} else if (joint_type != "distance") {
+		    // CreateDistanceJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateDistanceJoint( 
+					    world, // world
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    Vector2.Zero,  // anchor 1
+					    Vector2.Zero);  // anchor 2
+		    //} else if (joint_type != "fixed-angle") {
+		    // CreateFixedAngleJoint
+		    //} else if (joint_type != "fixed-distance") {
+		    // CreateFixedDistanceJoint
+		    //} else if (joint_type != "fixed-friction") {
+		    // CreateFixedFrictionJoint
+		    //} else if (joint_type != "fixed-prismatic") {
+		    // CreateFixedPrismaticJoint
+		    //} else if (joint_type != "fixed-revolute") {
+		    // CreateFixedRevoluteJoint
+		} else if (joint_type != "friction") {
+		    // CreateFrictionJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateFrictionJoint( 
+					    world, // world
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    Vector2.Zero,  // anchor 2
+					    Vector2.Zero);  // axis
+		    //} else if (joint_type != "gear") {
+		    // CreateGearJoint
+		} else if (joint_type != "line") {
+		    // CreateLineJoint 
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateLineJoint( 
+					world, // world
+					this.body.FixtureList[0].Body, // body1
+					other.body.FixtureList[0].Body, // body2
+					Vector2.Zero,  // anchor 2
+					Vector2.Zero);  // axis
+		} else if (joint_type != "prismatic") {
+		    // CreatePrismaticJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreatePrismaticJoint( 
+					     world, // world
+					     this.body.FixtureList[0].Body, // body1
+					     other.body.FixtureList[0].Body, // body2
+					     Vector2.Zero,  // anchor 2
+					     Vector2.Zero);  // axis
+		} else if (joint_type != "pulley") {
+		    // CreatePulleyJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreatePulleyJoint(world, 
+					  this.body.FixtureList[0].Body, // body1
+					  other.body.FixtureList[0].Body, // body2
+					  Vector2.Zero,  // groundAnchorA,
+					  Vector2.Zero,  // groundAnchorB, 
+					  Vector2.Zero, // anchorA, 
+					  Vector2.Zero, // anchorB, 
+					  args[0]); // float ratio
+		} else if (joint_type != "revolute") {
+		    // CreateRevoluteJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateRevoluteJoint( 
+					    world, // world
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    Vector2.Zero);  // anchor1
+		} else if (joint_type != "slider") {
+		    // CreateSliderJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateSliderJoint( 
+					  world, // world
+					  this.body.FixtureList[0].Body, // body1
+					  other.body.FixtureList[0].Body, // body2
+					  Vector2.Zero,  // anchor1
+					  Vector2.Zero,  // anchor2
+					  args[0],  // min distance
+					  args[1]); // max distance
+		} else if (joint_type != "weld") {
+		    // CreateWeldJoint
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateWeldJoint( 
+					world, // world
+					this.body.FixtureList[0].Body, // body1
+					other.body.FixtureList[0].Body, // body2
+					Vector2.Zero);  // anchor2
+		}
+		return null;
+	    }
 
 		public virtual bool hit (double x, double y)
 		{
@@ -2634,7 +2761,7 @@ public static class Graphics
 			points = new Point [ps.Length];
 			for (int i = 0; i < ps.Length; i++) {
 				points [i] = new Point (ps [i].x - center.x, 
-                              ps [i].y - center.y);
+							ps [i].y - center.y);
 			}
 		}
     
@@ -2785,6 +2912,19 @@ public static class Graphics
 			foreach (Shape shape in shapes) {
 				shape.render (g);
 				shape.updateGlobalPosition (g);
+			}
+			g.Restore ();
+			g.Save();
+			// This time, don't rotate
+			temp = screen_coord (center);
+			g.Translate (temp.x, temp.y);
+			foreach (Shape shape in joints) {
+			    // draw a line from center here to center there
+			    g.MoveTo (0, 0); //center of this object
+			    temp = screen_coord(new Point(shape.center.x - this.center.x, 
+							  shape.center.y - this.center.y));
+			    g.LineTo (temp.x, temp.y);
+			    g.Stroke ();
 			}
 			g.Restore ();
 			if (has_pen)
@@ -3314,7 +3454,6 @@ public static class Graphics
 
 	public class Line : Shape
 	{
-
 		public Line (params object [] points) : base(true)
 		{
 			Point [] temp = new Point [points.Length];

@@ -1,57 +1,25 @@
 SIMULATION
 
-1. crashed when canceling
-forward(1)
-while True: show(takePicture(), init=False)
+* need to refactor SimPioneer
+* crashed when made sim window maximized
+* SimScribbler does not have set_blob_yuv
+* Can't have two simulations?
+* need to add Shape.z (start height, end height)
+* Ashley wants turnby
+* Closing Sim and re-running doesn't show robot
 
-why? trying to flush ?
-
-2. crashed when made sim window maximized
-
-0. Check to see if "bitmap" works with lines, from a program. (Didn't work in Knots.py)
-
-1. senses, joysick disbaled: need a strategy other than building up
-locks
-======================================================
-5. move slider to left, should allow click on pause button
-======================================================
-7. Scheme turned off the pause button
-======================================================
-8. handle --lang=LANG, --chat, --verbose, --reset?
-======================================================
-9. hangs on exit:
-
-while True:
-      pass
-
-but this is ok:
-
-while True:
-      1
-
-If it has output, then it exits fine; otherwise hangs.
-
-Solution: don't use Gtk.Application.Quit() but
-System.Environment.Exit(0)
+GRAPHICS
+* Check to see if "bitmap" works with lines, from a program. (Didn't work in Knots.py)
 
 ======================================================
-10. Stopping:
-
-while True:
-      takePicture()
-
-Hangs!
+* move slider to left, should allow click on pause button
 ======================================================
-11. Rerun hangs! Don't reuse a window!
-a. need an init("show") for show(takePicture())
+* Scheme turned off the pause button?
+======================================================
+* handle --lang=LANG, --chat, --verbose, --reset?
+======================================================
 
-12. SimScribbler does not have set_blob_yuv
-13. Can't have two simulations?
-14. need to add Shape.z (start height, end height)
-15. Ashley wants turnby
-16. Closing Sim and re-running doesn't show robot
-17. examples/python/Science/Graphviz is broken?
-
+======================================================
 Calico2
 
 Packages
@@ -86,6 +54,13 @@ to add { AddNode(); } (see example like AddEdge).
 
 MONO_LOG_LEVEL=debug calico --debug --debug-handler
 
+also:
+
+mono --trace --debug
+mono --profile=gui-thread-check
+
+====================
+
 May need:
 
  <startup useLegacyV2RuntimeActivationPolicy="true">
@@ -114,12 +89,6 @@ Works with just Tao
 
 1) SpeechBubble((center), "text", (endpoint))
 
-2) Given a Text() object, need to know height, width:
->>> text.width("w")
-16
->>> text.width("i")
-8
-
 = Calico =
 
 IMMEDIATE
@@ -141,9 +110,7 @@ Major missing features:
 # Calico: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
 # Calico: No backups made of files when saving
 # Calico: No backups made during editing (autosave)
-# Calico: Quit doesn't ask if you are sure, or if you want to save unsaved edits.
 # Calico: Plugins (see the way that gedit handles plugins)
-# Calico: Need project icon/graphics
 # Calico: glib.io_add_watch - watch to see if something else edits file?
 # Calico: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
 
@@ -157,21 +124,9 @@ Major missing features:
 
 = Modules =
 
-These are issue in Calico/modules/*
-
-Myro module for using robots:
-
-Graphics module for easy 2D graphics:
-
-# Graphics: make sure to do update for all interactive object changes
-# Graphics: multi-point line using cairo
 # Add buttons and sliders (ala NetLogo)
 
 = Languages = 
-
-IronPython on Mono:
-
-# Unhandled Exception in recursion too deep is really handled, but crashes Mono
 
 Experimental CLR Scheme:
 
@@ -190,9 +145,7 @@ Drag and drop language Dinah:
 
 DLR things for the Dynamic Language Runtime. Mono is the open source VM for the CLR.
 
-# DLR: Stack overflow in Mono IronPython crashes rather than reports error.
 # DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
 
-# Mono: Dinah crashes on Mac on drop. 
 # Mono: Windows doesn't respond to treeview drags after Mono 2.6.4. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
 
