@@ -543,27 +543,6 @@ public static class Graphics
 		return new Picture (window);
 	}
 
-	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
-                                           int width=300,
-                                           int height=300)
-	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
-    	    Invoke( delegate {
-		    if (_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized)) {
-			_windows [title].clear (false);
-			_lastWindow = _windows [title];
-			Gdk.Color bg = new Gdk.Color (242, 241, 240);
-			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
-		    } else {
-			throw new Exception("You need to use Myro.show() before using Myro.show(picture)");
-		    }
-		    _lastWindow.KeepAbove = true;
-		    ev.Set();
-		});
-	    ev.WaitOne();
-	    return _windows [title];
-	}
-
 	public static void wait (double seconds)
 	{
 	    if (seconds > 0) 

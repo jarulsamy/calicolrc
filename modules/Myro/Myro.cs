@@ -560,7 +560,7 @@ public static class Myro
 				speak ("Say cheese!", 1);
 				try {
 					Graphics.Picture pic = takePicture ();
-					show (pic, "Myro Camera", true);
+					show (pic, "Myro Camera");
 				} catch {
 				}
 			}
@@ -1654,17 +1654,11 @@ public static class Myro
 
 	[method: JigsawTab("Picture")]
 	public static void show (Graphics.Picture picture, 
-				 string title="Myro Camera",
-				 bool init=true)
+				 string title="Myro Camera")
 	{
 	    Graphics.WindowClass win;
-	    if (init) {
-		win = Graphics.makeWindow (title,
-                  (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
-	    } else {
-		win = Graphics.makeWindowFast (title,
-                  (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
-	    }
+	    win = Graphics.makeWindow (title,
+		  (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
 	    picture.draw (win);
 	    picture.setX (picture.width * picture.scaleFactor / 2);
 	    picture.setY (picture.height * picture.scaleFactor / 2);
