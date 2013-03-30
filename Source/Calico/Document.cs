@@ -389,7 +389,6 @@ namespace Calico {
                 texteditor.Document.MimeType = mimetype;
             widget.Add(texteditor);
             texteditor.Document.DocumentUpdated += OnDocumentUpdated;
-            //texteditor.Document.DocumentUpdated += OnDocumentUpdatedRunCheck;
             texteditor.ButtonPressEvent += OnPopupMenu;
             widget.ShowAll();
             calico.ProgramSpeed.Value = SpeedValue;
@@ -447,10 +446,7 @@ namespace Calico {
                 tab_label.Text = String.Format("*{0}", basename);
             else
                 tab_label.Text = basename; //.Replace("_", "__");
-        }
-
-        public void OnDocumentUpdatedRunCheck(object obj, System.EventArgs args) {
-            calico.updateControls(this); 
+            calico.updateControls(this, true); 
         }
 
         public override void Configure(Config config) {

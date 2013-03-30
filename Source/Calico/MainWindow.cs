@@ -1464,9 +1464,9 @@ namespace Calico {
         protected virtual void OnSaveAsActionActivated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 Invoke(delegate {
-                    CurrentDocument.SaveAs();
-                }
-                );
+			CurrentDocument.SaveAs();
+		    }
+		    );
                 SetLanguage(CurrentLanguage);
                 addToRecentsMenu(CurrentDocument.filename);
             }
@@ -2395,12 +2395,12 @@ namespace Calico {
 		});
 	}
 
-        public void updateControls(Document document) { 
+        public void updateControls(Document document, bool force=false) { 
 	    // When a document is selected by clicking in it, or changes
             Invoke( delegate {
 		    //System.Console.WriteLine("updateControls...");
 		    Gtk.Widget nbp = searchForPage(document.widget);
-		    if (lastSelectedPage == nbp)
+		    if (lastSelectedPage == nbp && !force)
 			    return;
 		    //System.Console.WriteLine("...set!");
 		    lastSelectedPage = nbp;
