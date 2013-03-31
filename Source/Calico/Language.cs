@@ -57,6 +57,10 @@ namespace Calico {
             config.SetValue(section, "reset-shell-on-run", ((Gtk.CheckMenuItem)sender).Active);
         }
      
+        public static string _(string message) {
+            return global::Mono.Unix.Catalog.GetString(message);
+        }
+
         public virtual void SetOptionsMenu(Gtk.MenuItem options_menu) {
             //Gtk.Menu menu = (Gtk.Menu)options_menu.Submenu;
             //menu.Detach();
@@ -65,12 +69,12 @@ namespace Calico {
             string section = String.Format("{0}-language", name);
             if (config.HasValue(section, "reset-shell-on-run")) {
                 bool reset_shell_on_run = (bool)config.GetValue(section, "reset-shell-on-run");
-                Gtk.CheckMenuItem reset_shell_on_run_menu_item = new Gtk.CheckMenuItem("Reset Shell on Run");
+                Gtk.CheckMenuItem reset_shell_on_run_menu_item = new Gtk.CheckMenuItem(_("Reset Shell on Run"));
                 reset_shell_on_run_menu_item.Active = reset_shell_on_run;
                 reset_shell_on_run_menu_item.Activated += OnChangeResetShellOnRun;
                 ((Gtk.Menu)options_menu.Submenu).Add(reset_shell_on_run_menu_item);
             } else {
-                Gtk.MenuItem submenu = new Gtk.MenuItem("Reset Shell on Run"); // not available
+                Gtk.MenuItem submenu = new Gtk.MenuItem(_("Reset Shell on Run")); // not available
                 submenu.Sensitive = false;
                 ((Gtk.Menu)options_menu.Submenu).Add(submenu);
             }
