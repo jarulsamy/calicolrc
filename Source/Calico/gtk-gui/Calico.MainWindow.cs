@@ -1131,17 +1131,17 @@ namespace Calico {
 			this.hpaned2 = new global::Gtk.HPaned();
 			this.hpaned2.CanFocus = true;
 			this.hpaned2.Name = "hpaned2";
-			this.hpaned2.Position = 444;
+			this.hpaned2.Position = 478;
 			// Container child hpaned2.Gtk.Paned+PanedChild
 			this.vpaned2 = new global::Gtk.VPaned();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 295;
+			this.vpaned2.Position = 229;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook();
 			this.notebook_docs.CanFocus = true;
 			this.notebook_docs.Name = "notebook_docs";
-			this.notebook_docs.CurrentPage = 1;
+			this.notebook_docs.CurrentPage = 0;
 			this.notebook_docs.Scrollable = true;
 			// Container child notebook_docs.Gtk.Notebook+NotebookChild
 			this.hbox2 = new global::Gtk.HBox();
@@ -1525,7 +1525,7 @@ namespace Calico {
 			this.hpaned3 = new global::Gtk.HPaned();
 			this.hpaned3.CanFocus = true;
 			this.hpaned3.Name = "hpaned3";
-			this.hpaned3.Position = 226;
+			this.hpaned3.Position = 399;
 			// Container child hpaned3.Gtk.Paned+PanedChild
 			this.notebook_tools = new global::Gtk.Notebook();
 			this.notebook_tools.CanFocus = true;
@@ -1614,6 +1614,7 @@ namespace Calico {
 			this.hpaned3.Add(this.notebook_tools);
 			global::Gtk.Paned.PanedChild w274 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.notebook_tools]));
 			w274.Resize = false;
+			w274.Shrink = false;
 			// Container child hpaned3.Gtk.Paned+PanedChild
 			this.property_notebook = new global::Gtk.Notebook();
 			this.property_notebook.CanFocus = true;

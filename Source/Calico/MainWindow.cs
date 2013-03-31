@@ -1516,9 +1516,9 @@ namespace Calico {
                 "Jennifer Kay <kay@rowan.edu>",
             };
             aboutDialog.Comments = (_("Scripting Environment") + "\n\n" +
-                String.Format(_("Running on {0}\n"), System.Environment.OSVersion.VersionString) +
-                String.Format("\nMono: {0}\n", System.Environment.Version) +
-                String.Format("Gtk: {0}", typeof(Gtk.Window).Assembly.GetName().Version)
+                String.Format(_("OS: {0}") + "\n", System.Environment.OSVersion.VersionString) +
+                String.Format(_("Mono: {0}") + "\n", System.Environment.Version) +
+                String.Format(_("Gtk: {0}"), typeof(Gtk.Window).Assembly.GetName().Version)
                       );
             aboutDialog.Copyright = _("(c) 2011-2013, Institute for Personal Robots in Education");
             //aboutDialog.Documenters
