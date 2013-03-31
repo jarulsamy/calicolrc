@@ -13,6 +13,7 @@ CSHARP = ../Source/Calico/Main.cs \
 	 ../Source/Calico/LanguageManager.cs \
 	 ../Source/Calico/Printing.cs \
 	 ../Source/Calico/TabCompletion.cs \
+	 ../Source/Calico/gtk-gui/Calico.MainWindow.cs \
 	 ../languages/Jigsaw/Jigsaw/Jigsaw.cs \
 	 ../languages/Jigsaw/Jigsaw/ControlBlocks.cs \
 	 ../languages/Jigsaw/Jigsaw/MainWindow.cs 

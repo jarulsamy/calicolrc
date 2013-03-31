@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Calico\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-31 12:59-0400\n"
+"POT-Creation-Date: 2013-03-31 17:03-0400\n"
 "Language: zh-CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -186,7 +186,7 @@ msgstr "值"
 
 #: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1275
 #: ../Source/Calico/MainWindow.cs:1286 ../Source/Calico/MainWindow.cs:1318
-#: ../Source/Calico/MainWindow.cs:1325
+#: ../Source/Calico/MainWindow.cs:1325 ../Source/Calico/MainWindow.cs:1327
 msgid "Save this file?"
 msgstr "保存该文件？"
 
@@ -198,7 +198,10 @@ msgstr "保存该文件？"
 #: ../Source/Calico/Document.cs:192 ../Source/Calico/Document.cs:195
 #: ../Source/Calico/Document.cs:196 ../Source/Calico/MainWindow.cs:1260
 #: ../Source/Calico/MainWindow.cs:1321 ../Source/Calico/MainWindow.cs:1267
-#: ../Source/Calico/MainWindow.cs:1328
+#: ../Source/Calico/MainWindow.cs:1328 ../Source/Calico/MainWindow.cs:1269
+#: ../Source/Calico/MainWindow.cs:1330
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:356
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:357
 msgid "Save"
 msgstr "保存"
 
@@ -210,7 +213,9 @@ msgstr "保存"
 #: ../Source/Calico/MainWindow.cs:1250 ../Source/Calico/MainWindow.cs:1298
 #: ../Source/Calico/MainWindow.cs:1325 ../Source/Calico/MainWindow.cs:1256
 #: ../Source/Calico/MainWindow.cs:1257 ../Source/Calico/MainWindow.cs:1305
-#: ../Source/Calico/MainWindow.cs:1332
+#: ../Source/Calico/MainWindow.cs:1332 ../Source/Calico/MainWindow.cs:1258
+#: ../Source/Calico/MainWindow.cs:1259 ../Source/Calico/MainWindow.cs:1307
+#: ../Source/Calico/MainWindow.cs:1334
 msgid "Abandon changes"
 msgstr "放弃更改"
 
@@ -229,37 +234,43 @@ msgstr "放弃更改"
 #: ../Source/Calico/MainWindow.cs:1439 ../Source/Calico/MainWindow.cs:1170
 #: ../Source/Calico/MainWindow.cs:1254 ../Source/Calico/MainWindow.cs:1255
 #: ../Source/Calico/MainWindow.cs:1303 ../Source/Calico/MainWindow.cs:1336
-#: ../Source/Calico/MainWindow.cs:1442
+#: ../Source/Calico/MainWindow.cs:1442 ../Source/Calico/MainWindow.cs:1172
+#: ../Source/Calico/MainWindow.cs:1256 ../Source/Calico/MainWindow.cs:1257
+#: ../Source/Calico/MainWindow.cs:1305 ../Source/Calico/MainWindow.cs:1338
+#: ../Source/Calico/MainWindow.cs:1444
 msgid "Cancel"
 msgstr "取消"
 
 #: ../Source/Calico/MainWindow.cs:1328 ../Source/Calico/MainWindow.cs:1350
 #: ../Source/Calico/MainWindow.cs:1361 ../Source/Calico/MainWindow.cs:1398
-#: ../Source/Calico/MainWindow.cs:1401
+#: ../Source/Calico/MainWindow.cs:1401 ../Source/Calico/MainWindow.cs:1403
 msgid "Select item type"
 msgstr "选择项目类型"
 
 #: ../Source/Calico/MainWindow.cs:1330 ../Source/Calico/MainWindow.cs:1352
 #: ../Source/Calico/MainWindow.cs:1363 ../Source/Calico/MainWindow.cs:1400
-#: ../Source/Calico/MainWindow.cs:1403
+#: ../Source/Calico/MainWindow.cs:1403 ../Source/Calico/MainWindow.cs:1405
 msgid "Create a new item"
 msgstr "创建一个新项目"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/MainWindow.cs:1391
 #: ../Source/Calico/MainWindow.cs:1402 ../Source/Calico/MainWindow.cs:1439
-#: ../Source/Calico/MainWindow.cs:1442
+#: ../Source/Calico/MainWindow.cs:1442 ../Source/Calico/MainWindow.cs:1444
 msgid "Select the file to open"
 msgstr "选择要打开的文件"
 
 #: ../Source/Calico/MainWindow.cs:1368 ../Source/Calico/gtk-gui/gui.stetic:56
 #: ../Source/Calico/gtk-gui/gui.stetic:57 ../Source/Calico/MainWindow.cs:1391
 #: ../Source/Calico/MainWindow.cs:1402 ../Source/Calico/MainWindow.cs:1439
-#: ../Source/Calico/MainWindow.cs:1442
+#: ../Source/Calico/MainWindow.cs:1442 ../Source/Calico/MainWindow.cs:1444
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:353
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:354
 msgid "Open"
 msgstr "打开"
 
 #: ../Source/Calico/MainWindow.cs:1456 ../Source/Calico/MainWindow.cs:1479
 #: ../Source/Calico/MainWindow.cs:1515 ../Source/Calico/MainWindow.cs:1518
+#: ../Source/Calico/MainWindow.cs:1520
 msgid "Scripting Environment"
 msgstr "脚本环境"
 
@@ -271,23 +282,25 @@ msgstr "运行{0}"
 
 #: ../Source/Calico/MainWindow.cs:1460 ../Source/Calico/MainWindow.cs:1483
 #: ../Source/Calico/MainWindow.cs:1519 ../Source/Calico/MainWindow.cs:1523
+#: ../Source/Calico/MainWindow.cs:1525
 msgid "(c) 2011-2013, Institute for Personal Robots in Education"
 msgstr "（三）2011年-2013年，个人机器人研究所教育"
 
 #: ../Source/Calico/MainWindow.cs:1465 ../Source/Calico/MainWindow.cs:1488
 #: ../Source/Calico/MainWindow.cs:1524 ../Source/Calico/MainWindow.cs:1528
+#: ../Source/Calico/MainWindow.cs:1530
 msgid "Calico Project"
 msgstr "印花布项目"
 
 #: ../Source/Calico/MainWindow.cs:1987 ../Source/Calico/MainWindow.cs:2097
 #: ../Source/Calico/MainWindow.cs:2114 ../Source/Calico/MainWindow.cs:2123
-#: ../Source/Calico/MainWindow.cs:2125
+#: ../Source/Calico/MainWindow.cs:2125 ../Source/Calico/MainWindow.cs:2129
 msgid "Stopping...\n"
 msgstr "停止...\n"
 
 #: ../Source/Calico/MainWindow.cs:2010 ../Source/Calico/MainWindow.cs:2122
 #: ../Source/Calico/MainWindow.cs:2139 ../Source/Calico/MainWindow.cs:2148
-#: ../Source/Calico/MainWindow.cs:2156
+#: ../Source/Calico/MainWindow.cs:2156 ../Source/Calico/MainWindow.cs:2160
 #, csharp-format
 msgid "Running '{0}'..."
 msgstr "运行“{0}”..."
@@ -296,6 +309,7 @@ msgstr "运行“{0}”..."
 #: ../Source/Calico/MainWindow.cs:2335 ../Source/Calico/MainWindow.cs:2410
 #: ../Source/Calico/MainWindow.cs:2338 ../Source/Calico/MainWindow.cs:2411
 #: ../Source/Calico/MainWindow.cs:2349 ../Source/Calico/MainWindow.cs:2434
+#: ../Source/Calico/MainWindow.cs:2355 ../Source/Calico/MainWindow.cs:2440
 #, csharp-format
 msgid "{0} - Calico - {1}"
 msgstr "{0}  - 印花布 -  {1}"
@@ -309,37 +323,39 @@ msgstr "{0}  - 印花布 -  {1}"
 #: ../Source/Calico/MainWindow.cs:2344 ../Source/Calico/MainWindow.cs:2417
 #: ../Source/Calico/MainWindow.cs:2355 ../Source/Calico/MainWindow.cs:2440
 #: ../Source/Calico/gtk-gui/gui.stetic:1576
+#: ../Source/Calico/MainWindow.cs:2361 ../Source/Calico/MainWindow.cs:2446
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1636
 msgid "Properties"
 msgstr "属性"
 
 #: ../Source/Calico/MainWindow.cs:2321 ../Source/Calico/MainWindow.cs:2457
 #: ../Source/Calico/MainWindow.cs:2508 ../Source/Calico/MainWindow.cs:2528
-#: ../Source/Calico/MainWindow.cs:2551
+#: ../Source/Calico/MainWindow.cs:2551 ../Source/Calico/MainWindow.cs:2557
 #, csharp-format
 msgid "Error: '{0}' is not an active language"
 msgstr "错误：“{0}”不是一个积极的语言"
 
 #: ../Source/Calico/MainWindow.cs:2350 ../Source/Calico/MainWindow.cs:2486
 #: ../Source/Calico/MainWindow.cs:2544 ../Source/Calico/MainWindow.cs:2566
-#: ../Source/Calico/MainWindow.cs:2589
+#: ../Source/Calico/MainWindow.cs:2589 ../Source/Calico/MainWindow.cs:2595
 msgid "[Run file]"
 msgstr "[运行文件]"
 
 #: ../Source/Calico/MainWindow.cs:3080 ../Source/Calico/MainWindow.cs:3218
 #: ../Source/Calico/MainWindow.cs:3289 ../Source/Calico/MainWindow.cs:3311
-#: ../Source/Calico/MainWindow.cs:3334
+#: ../Source/Calico/MainWindow.cs:3334 ../Source/Calico/MainWindow.cs:3340
 msgid "   waiting for confirmation...\n"
 msgstr "   等待确认...\n"
 
 #: ../Source/Calico/MainWindow.cs:3083 ../Source/Calico/MainWindow.cs:3221
 #: ../Source/Calico/MainWindow.cs:3292 ../Source/Calico/MainWindow.cs:3314
-#: ../Source/Calico/MainWindow.cs:3337
+#: ../Source/Calico/MainWindow.cs:3337 ../Source/Calico/MainWindow.cs:3343
 msgid "Received messages:\n"
 msgstr "收到的消息：\n"
 
 #: ../Source/Calico/MainWindow.cs:3152 ../Source/Calico/MainWindow.cs:3294
 #: ../Source/Calico/MainWindow.cs:3365 ../Source/Calico/MainWindow.cs:3387
-#: ../Source/Calico/MainWindow.cs:3410
+#: ../Source/Calico/MainWindow.cs:3410 ../Source/Calico/MainWindow.cs:3416
 msgid "Accept this script?"
 msgstr "接受这个脚本？"
 
@@ -347,33 +363,34 @@ msgstr "接受这个脚本？"
 #: ../Source/Calico/MainWindow.cs:3316 ../Source/Calico/MainWindow.cs:3368
 #: ../Source/Calico/MainWindow.cs:3387 ../Source/Calico/MainWindow.cs:3390
 #: ../Source/Calico/MainWindow.cs:3409 ../Source/Calico/MainWindow.cs:3413
-#: ../Source/Calico/MainWindow.cs:3432
+#: ../Source/Calico/MainWindow.cs:3432 ../Source/Calico/MainWindow.cs:3419
+#: ../Source/Calico/MainWindow.cs:3438
 msgid "Accept"
 msgstr "接受"
 
 #: ../Source/Calico/MainWindow.cs:3159 ../Source/Calico/MainWindow.cs:3301
 #: ../Source/Calico/MainWindow.cs:3372 ../Source/Calico/MainWindow.cs:3394
-#: ../Source/Calico/MainWindow.cs:3417
+#: ../Source/Calico/MainWindow.cs:3417 ../Source/Calico/MainWindow.cs:3423
 msgid "Decline"
 msgstr "拒绝"
 
 #: ../Source/Calico/MainWindow.cs:3173 ../Source/Calico/MainWindow.cs:3316
 #: ../Source/Calico/MainWindow.cs:3387 ../Source/Calico/MainWindow.cs:3409
-#: ../Source/Calico/MainWindow.cs:3432
+#: ../Source/Calico/MainWindow.cs:3432 ../Source/Calico/MainWindow.cs:3438
 #, csharp-format
 msgid "Blast: Accept '{0}' from '{1}'?"
 msgstr "冲击：接受“{0}”从“{1}”？"
 
 #: ../Source/Calico/MainWindow.cs:3184 ../Source/Calico/MainWindow.cs:3328
 #: ../Source/Calico/MainWindow.cs:3399 ../Source/Calico/MainWindow.cs:3421
-#: ../Source/Calico/MainWindow.cs:3444
+#: ../Source/Calico/MainWindow.cs:3444 ../Source/Calico/MainWindow.cs:3450
 #, csharp-format
 msgid "Blast '{0}' from '{1}' declined."
 msgstr "高炉“{0}”从“{1}”有所下降。"
 
 #: ../Source/Calico/MainWindow.cs:3230 ../Source/Calico/MainWindow.cs:3375
 #: ../Source/Calico/MainWindow.cs:3446 ../Source/Calico/MainWindow.cs:3468
-#: ../Source/Calico/MainWindow.cs:3491
+#: ../Source/Calico/MainWindow.cs:3491 ../Source/Calico/MainWindow.cs:3497
 msgid "No addons are currently available"
 msgstr "目前无插件"
 
@@ -401,11 +418,15 @@ msgstr "（三）2012年，个人机器人研究所教育"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:15
 #: ../Source/Calico/gtk-gui/gui.stetic:16
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:334
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:335
 msgid "File"
 msgstr "文件"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:20
 #: ../Source/Calico/gtk-gui/gui.stetic:21
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:337
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:338
 msgid "New"
 msgstr "新"
 
@@ -415,103 +436,137 @@ msgstr "新"
 #: ../Source/Calico/gtk-gui/gui.stetic:200
 #: ../Source/Calico/gtk-gui/gui.stetic:197
 #: ../Source/Calico/gtk-gui/gui.stetic:199
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:346
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:348
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:413
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:415
 msgid "Stop Script"
 msgstr "停止脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:51
 #: ../Source/Calico/gtk-gui/gui.stetic:52
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:350
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:351
 msgid "Edit"
 msgstr "编辑"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:71
 #: ../Source/Calico/gtk-gui/gui.stetic:70
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:359
 msgid "Save _As..."
 msgstr "保存_AS ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:72
 #: ../Source/Calico/gtk-gui/gui.stetic:71
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:360
 msgid "Save _As"
 msgstr "保存_AS"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:78
 #: ../Source/Calico/gtk-gui/gui.stetic:79
 #: ../Source/Calico/gtk-gui/gui.stetic:77
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:362
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:363
 msgid "_Quit"
 msgstr "_Quit"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:85
 #: ../Source/Calico/gtk-gui/gui.stetic:86
 #: ../Source/Calico/gtk-gui/gui.stetic:84
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:365
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:366
 msgid "_Copy"
 msgstr "_Copy"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:92
 #: ../Source/Calico/gtk-gui/gui.stetic:93
 #: ../Source/Calico/gtk-gui/gui.stetic:91
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:368
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:369
 msgid "_Paste"
 msgstr "_Paste"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:99
 #: ../Source/Calico/gtk-gui/gui.stetic:100
 #: ../Source/Calico/gtk-gui/gui.stetic:98
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:371
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:372
 msgid "Cu_t"
 msgstr "Cu_t"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:107
 #: ../Source/Calico/gtk-gui/gui.stetic:108
 #: ../Source/Calico/gtk-gui/gui.stetic:106
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:374
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:375
 msgid "_Undo"
 msgstr "_Undo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:115
 #: ../Source/Calico/gtk-gui/gui.stetic:116
 #: ../Source/Calico/gtk-gui/gui.stetic:114
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:377
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:378
 msgid "_Redo"
 msgstr "_Redo"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:123
 #: ../Source/Calico/gtk-gui/gui.stetic:124
 #: ../Source/Calico/gtk-gui/gui.stetic:122
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:380
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:381
 msgid "Select _All"
 msgstr "选择_All"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:131
 #: ../Source/Calico/gtk-gui/gui.stetic:132
 #: ../Source/Calico/gtk-gui/gui.stetic:130
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:383
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:384
 msgid "Indent Region"
 msgstr "缩进地区"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:139
 #: ../Source/Calico/gtk-gui/gui.stetic:140
 #: ../Source/Calico/gtk-gui/gui.stetic:138
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:386
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:387
 msgid "Unindent Region"
 msgstr "取消缩进地区"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:147
 #: ../Source/Calico/gtk-gui/gui.stetic:148
 #: ../Source/Calico/gtk-gui/gui.stetic:146
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:389
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:390
 msgid "Comment Region"
 msgstr "注释区域"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:154
 #: ../Source/Calico/gtk-gui/gui.stetic:155
 #: ../Source/Calico/gtk-gui/gui.stetic:153
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:392
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:393
 msgid "Uncomment Region"
 msgstr "取消注释区"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:160
 #: ../Source/Calico/gtk-gui/gui.stetic:161
 #: ../Source/Calico/gtk-gui/gui.stetic:159
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:395
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:396
 msgid "Help"
 msgstr "帮助"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:171
 #: ../Source/Calico/gtk-gui/gui.stetic:170
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:400
 msgid "_About Calico"
 msgstr "_关于印花布"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:172
 #: ../Source/Calico/gtk-gui/gui.stetic:171
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:401
 msgid "_About"
 msgstr "_关于我们"
 
@@ -523,12 +578,18 @@ msgstr "_关于我们"
 #: ../Source/Calico/gtk-gui/gui.stetic:234
 #: ../Source/Calico/gtk-gui/gui.stetic:1428
 #: ../Source/Calico/gtk-gui/gui.stetic:1418
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:403
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:404
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:430
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1517
 msgid "Shell"
 msgstr "外壳"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:183
 #: ../Source/Calico/gtk-gui/gui.stetic:184
 #: ../Source/Calico/gtk-gui/gui.stetic:182
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:406
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:407
 msgid "Language"
 msgstr "语"
 
@@ -536,11 +597,14 @@ msgstr "语"
 #: ../Source/Calico/gtk-gui/gui.stetic:191
 #: ../Source/Calico/gtk-gui/gui.stetic:188
 #: ../Source/Calico/gtk-gui/gui.stetic:190
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:409
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:411
 msgid "Execute Script"
 msgstr "执行脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:205
 #: ../Source/Calico/gtk-gui/gui.stetic:204
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:417
 msgid "View"
 msgstr "看"
 
@@ -548,73 +612,94 @@ msgstr "看"
 #: ../Source/Calico/gtk-gui/gui.stetic:377
 #: ../Source/Calico/gtk-gui/gui.stetic:205
 #: ../Source/Calico/gtk-gui/gui.stetic:374
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:418
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:498
 msgid "Options"
 msgstr "选项"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:211
 #: ../Source/Calico/gtk-gui/gui.stetic:212
 #: ../Source/Calico/gtk-gui/gui.stetic:210
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:420
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:421
 msgid "Zoom _In"
 msgstr "变焦_IN"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:219
 #: ../Source/Calico/gtk-gui/gui.stetic:220
 #: ../Source/Calico/gtk-gui/gui.stetic:218
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:423
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:424
 msgid "Zoom _Out"
 msgstr "变焦_OUT"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:226
 #: ../Source/Calico/gtk-gui/gui.stetic:227
 #: ../Source/Calico/gtk-gui/gui.stetic:225
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:426
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:427
 msgid "Change _Font..."
 msgstr "更改_Font ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:234
 #: ../Source/Calico/gtk-gui/gui.stetic:233
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:429
 msgid "Switch to Shell"
 msgstr "切换到壳牌"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:240
 #: ../Source/Calico/gtk-gui/gui.stetic:241
 #: ../Source/Calico/gtk-gui/gui.stetic:239
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:432
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:433
 msgid "Select"
 msgstr "选择"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:246
 #: ../Source/Calico/gtk-gui/gui.stetic:247
 #: ../Source/Calico/gtk-gui/gui.stetic:245
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:435
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:437
 msgid "Option 1"
 msgstr "选项​​1"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:256
 #: ../Source/Calico/gtk-gui/gui.stetic:257
 #: ../Source/Calico/gtk-gui/gui.stetic:255
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:439
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:441
 msgid "Option 2"
 msgstr "选项​​2"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:265
 #: ../Source/Calico/gtk-gui/gui.stetic:266
 #: ../Source/Calico/gtk-gui/gui.stetic:264
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:443
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:444
 msgid "Examples"
 msgstr "实例"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:270
 #: ../Source/Calico/gtk-gui/gui.stetic:269
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:446
 msgid "Recently opened"
 msgstr "最近打开的"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:271
 #: ../Source/Calico/gtk-gui/gui.stetic:270
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:447
 msgid "Recent Scripts"
 msgstr "近期脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:275
 #: ../Source/Calico/gtk-gui/gui.stetic:274
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:449
 msgid "Tabs"
 msgstr "标签"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:276
 #: ../Source/Calico/gtk-gui/gui.stetic:275
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:450
 msgid "Show"
 msgstr "显示"
 
@@ -622,6 +707,8 @@ msgstr "显示"
 #: ../Source/Calico/gtk-gui/gui.stetic:282
 #: ../Source/Calico/gtk-gui/gui.stetic:279
 #: ../Source/Calico/gtk-gui/gui.stetic:280
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:452
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:453
 msgid "Environment Tab"
 msgstr "环境选项卡"
 
@@ -629,16 +716,20 @@ msgstr "环境选项卡"
 #: ../Source/Calico/gtk-gui/gui.stetic:291
 #: ../Source/Calico/gtk-gui/gui.stetic:287
 #: ../Source/Calico/gtk-gui/gui.stetic:288
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:455
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:456
 msgid "Locals Tab"
 msgstr "当地人标签"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:298
 #: ../Source/Calico/gtk-gui/gui.stetic:295
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:458
 msgid "_Print..."
 msgstr "_Print ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:299
 #: ../Source/Calico/gtk-gui/gui.stetic:296
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:459
 msgid "_Print"
 msgstr "_Print"
 
@@ -646,26 +737,32 @@ msgstr "_Print"
 #: ../Source/Calico/gtk-gui/gui.stetic:306
 #: ../Source/Calico/gtk-gui/gui.stetic:302
 #: ../Source/Calico/gtk-gui/gui.stetic:303
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:461
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:462
 msgid "Reset Shell"
 msgstr "重设外壳"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:311
 #: ../Source/Calico/gtk-gui/gui.stetic:308
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:464
 msgid "Clear Output"
 msgstr "清除输出"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:312
 #: ../Source/Calico/gtk-gui/gui.stetic:309
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:465
 msgid "Clear Output tab"
 msgstr "清除“输出”选项卡"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:317
 #: ../Source/Calico/gtk-gui/gui.stetic:314
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:467
 msgid "Export as Python..."
 msgstr "导出为Python ..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:318
 #: ../Source/Calico/gtk-gui/gui.stetic:315
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:468
 msgid "Export..."
 msgstr "导出..."
 
@@ -676,6 +773,8 @@ msgstr "_find下一页"
 #: ../Source/Calico/gtk-gui/gui.stetic:324
 #: ../Source/Calico/gtk-gui/gui.stetic:320
 #: ../Source/Calico/gtk-gui/gui.stetic:321
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:470
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:471
 msgid "_Find"
 msgstr "_find"
 
@@ -683,6 +782,8 @@ msgstr "_find"
 #: ../Source/Calico/gtk-gui/gui.stetic:331
 #: ../Source/Calico/gtk-gui/gui.stetic:327
 #: ../Source/Calico/gtk-gui/gui.stetic:328
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:473
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:474
 msgid "Use a Module"
 msgstr "使用一个模块"
 
@@ -692,6 +793,9 @@ msgstr "使用一个模块"
 #: ../Source/Calico/gtk-gui/gui.stetic:332
 #: ../Source/Calico/gtk-gui/gui.stetic:333
 #: ../Source/Calico/gtk-gui/gui.stetic:1135
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:476
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:477
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1218
 msgid "Getting started..."
 msgstr "入门..."
 
@@ -701,6 +805,9 @@ msgstr "入门..."
 #: ../Source/Calico/gtk-gui/gui.stetic:338
 #: ../Source/Calico/gtk-gui/gui.stetic:339
 #: ../Source/Calico/gtk-gui/gui.stetic:1153
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:479
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:480
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1246
 msgid "Help..."
 msgstr "帮助..."
 
@@ -711,26 +818,33 @@ msgstr "帮助..."
 #: ../Source/Calico/gtk-gui/gui.stetic:345
 #: ../Source/Calico/gtk-gui/gui.stetic:1257
 #: ../Source/Calico/gtk-gui/gui.stetic:1247
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:482
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:483
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1378
 msgid "What's new..."
 msgstr "有什么新..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:353
 #: ../Source/Calico/gtk-gui/gui.stetic:350 ../Source/Calico/Document.cs:74
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:485
 msgid "Script"
 msgstr "脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:354
 #: ../Source/Calico/gtk-gui/gui.stetic:351
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:486
 msgid "Tools"
 msgstr "工具"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:358
 #: ../Source/Calico/gtk-gui/gui.stetic:355
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:488
 msgid "About"
 msgstr "关于"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:359
 #: ../Source/Calico/gtk-gui/gui.stetic:356
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:489
 msgid "About..."
 msgstr "关于..."
 
@@ -738,6 +852,8 @@ msgstr "关于..."
 #: ../Source/Calico/gtk-gui/gui.stetic:365
 #: ../Source/Calico/gtk-gui/gui.stetic:361
 #: ../Source/Calico/gtk-gui/gui.stetic:362
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:491
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:492
 msgid "Options..."
 msgstr "选项​​..."
 
@@ -745,11 +861,14 @@ msgstr "选项​​..."
 #: ../Source/Calico/gtk-gui/gui.stetic:371
 #: ../Source/Calico/gtk-gui/gui.stetic:367
 #: ../Source/Calico/gtk-gui/gui.stetic:368
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:494
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:495
 msgid "Toggle Breakpoint"
 msgstr "“切换断点”"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:376
 #: ../Source/Calico/gtk-gui/gui.stetic:373
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:497
 msgid "Script Options"
 msgstr "脚本选项"
 
@@ -757,6 +876,8 @@ msgstr "脚本选项"
 #: ../Source/Calico/gtk-gui/gui.stetic:383
 #: ../Source/Calico/gtk-gui/gui.stetic:379
 #: ../Source/Calico/gtk-gui/gui.stetic:380
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:500
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:501
 msgid "Find Previous"
 msgstr "查找上一个"
 
@@ -764,6 +885,8 @@ msgstr "查找上一个"
 #: ../Source/Calico/gtk-gui/gui.stetic:388
 #: ../Source/Calico/gtk-gui/gui.stetic:385
 #: ../Source/Calico/gtk-gui/gui.stetic:386
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:503
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:504
 msgid "History Tab"
 msgstr "历史标签"
 
@@ -771,6 +894,8 @@ msgstr "历史标签"
 #: ../Source/Calico/gtk-gui/gui.stetic:396
 #: ../Source/Calico/gtk-gui/gui.stetic:393
 #: ../Source/Calico/gtk-gui/gui.stetic:394
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:506
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:507
 msgid "Register..."
 msgstr "注册..."
 
@@ -778,6 +903,8 @@ msgstr "注册..."
 #: ../Source/Calico/gtk-gui/gui.stetic:402
 #: ../Source/Calico/gtk-gui/gui.stetic:399
 #: ../Source/Calico/gtk-gui/gui.stetic:400
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:509
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:510
 msgid "Login..."
 msgstr "登录..."
 
@@ -785,6 +912,8 @@ msgstr "登录..."
 #: ../Source/Calico/gtk-gui/gui.stetic:408
 #: ../Source/Calico/gtk-gui/gui.stetic:405
 #: ../Source/Calico/gtk-gui/gui.stetic:406
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:512
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:513
 msgid "Chat Tab"
 msgstr "聊天标签"
 
@@ -792,6 +921,8 @@ msgstr "聊天标签"
 #: ../Source/Calico/gtk-gui/gui.stetic:416
 #: ../Source/Calico/gtk-gui/gui.stetic:413
 #: ../Source/Calico/gtk-gui/gui.stetic:414
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:515
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:516
 msgid "Blast Script..."
 msgstr "高炉脚本..."
 
@@ -799,6 +930,8 @@ msgstr "高炉脚本..."
 #: ../Source/Calico/gtk-gui/gui.stetic:422
 #: ../Source/Calico/gtk-gui/gui.stetic:419
 #: ../Source/Calico/gtk-gui/gui.stetic:420
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:518
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:519
 msgid "_Normal Size"
 msgstr "_Normal尺寸"
 
@@ -806,6 +939,8 @@ msgstr "_Normal尺寸"
 #: ../Source/Calico/gtk-gui/gui.stetic:429
 #: ../Source/Calico/gtk-gui/gui.stetic:426
 #: ../Source/Calico/gtk-gui/gui.stetic:427
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:521
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:522
 msgid "Property Tab"
 msgstr "属性标签"
 
@@ -815,6 +950,9 @@ msgstr "属性标签"
 #: ../Source/Calico/gtk-gui/gui.stetic:432
 #: ../Source/Calico/gtk-gui/gui.stetic:433
 #: ../Source/Calico/gtk-gui/gui.stetic:460
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:524
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:525
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:542
 msgid "Calico"
 msgstr "印花布"
 
@@ -822,6 +960,8 @@ msgstr "印花布"
 #: ../Source/Calico/gtk-gui/gui.stetic:440
 #: ../Source/Calico/gtk-gui/gui.stetic:437
 #: ../Source/Calico/gtk-gui/gui.stetic:438
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:527
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:528
 msgid "Addons"
 msgstr "附加产品"
 
@@ -829,6 +969,8 @@ msgstr "附加产品"
 #: ../Source/Calico/gtk-gui/gui.stetic:445
 #: ../Source/Calico/gtk-gui/gui.stetic:442
 #: ../Source/Calico/gtk-gui/gui.stetic:443
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:530
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:531
 msgid "Install New Addon..."
 msgstr "安装新的插件..."
 
@@ -836,11 +978,14 @@ msgstr "安装新的插件..."
 #: ../Source/Calico/gtk-gui/gui.stetic:451
 #: ../Source/Calico/gtk-gui/gui.stetic:448
 #: ../Source/Calico/gtk-gui/gui.stetic:449
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:533
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:534
 msgid "Languages"
 msgstr "语言"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:561
 #: ../Source/Calico/gtk-gui/gui.stetic:567
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:562
 msgid "Print a script"
 msgstr "打印脚本"
 
@@ -849,6 +994,8 @@ msgstr "打印脚本"
 #: ../Source/Calico/gtk-gui/gui.stetic:586
 #: ../Source/Calico/gtk-gui/gui.stetic:1183
 #: ../Source/Calico/gtk-gui/gui.stetic:1175
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:588
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1267
 msgid "Create a new script"
 msgstr "创建一个新的脚本"
 
@@ -857,72 +1004,87 @@ msgstr "创建一个新的脚本"
 #: ../Source/Calico/gtk-gui/gui.stetic:605
 #: ../Source/Calico/gtk-gui/gui.stetic:1201
 #: ../Source/Calico/gtk-gui/gui.stetic:1193
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:614
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1295
 msgid "Open an existing script"
 msgstr "打开一个现有的脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:618
 #: ../Source/Calico/gtk-gui/gui.stetic:624
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:640
 msgid "Save script"
 msgstr "保存脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:648
 #: ../Source/Calico/gtk-gui/gui.stetic:654
 #: ../languages/Jigsaw/Jigsaw/MainWindow.cs:244
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:674
 msgid "Zoom in"
 msgstr "放大"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:667
 #: ../Source/Calico/gtk-gui/gui.stetic:673
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:700
 msgid "Zoom out"
 msgstr "缩小"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:686
 #: ../Source/Calico/gtk-gui/gui.stetic:692
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:726
 msgid "Make font standard size"
 msgstr "字体标准尺寸"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:716
 #: ../Source/Calico/gtk-gui/gui.stetic:722
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:760
 msgid "Show Output in new window"
 msgstr "在新窗口显示输出"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:735
 #: ../Source/Calico/gtk-gui/gui.stetic:741
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:786
 msgid "Vertical Panes"
 msgstr "垂直窗格"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:754
 #: ../Source/Calico/gtk-gui/gui.stetic:760
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:812
 msgid "Horizontal Panes"
 msgstr "水平窗格"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:785
 #: ../Source/Calico/gtk-gui/gui.stetic:791
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:846
 msgid "Stop a running script"
 msgstr "停止正在运行的脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:805
 #: ../Source/Calico/gtk-gui/gui.stetic:811
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:873
 msgid "Run a script"
 msgstr "运行脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:825
 #: ../Source/Calico/gtk-gui/gui.stetic:831
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:900
 msgid "Run fast (far-left), Single-step (far-right)"
 msgstr "运行速度快（最左边），单步（远右）"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:847
 #: ../Source/Calico/gtk-gui/gui.stetic:853
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:918
 msgid "Pause a running script"
 msgstr "暂停正在运行的脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:867
 #: ../Source/Calico/gtk-gui/gui.stetic:873
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:945
 msgid "Continue a paused script"
 msgstr "继续执行暂停脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:886
 #: ../Source/Calico/gtk-gui/gui.stetic:892
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:972
 msgid "Running Script indicator"
 msgstr "行书指标"
 
@@ -933,11 +1095,13 @@ msgstr "_find"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:933
 #: ../Source/Calico/gtk-gui/gui.stetic:939
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1020
 msgid "Text to search for"
 msgstr "要搜索的文本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:948
 #: ../Source/Calico/gtk-gui/gui.stetic:954
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1030
 msgid "Find next matching text"
 msgstr "查找下一个匹配的文本"
 
@@ -953,95 +1117,111 @@ msgstr "查找前一个匹配的文本|"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:986
 #: ../Source/Calico/gtk-gui/gui.stetic:992
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1082
 msgid "Close search"
 msgstr "关闭搜索"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1091
 #: ../Source/Calico/gtk-gui/gui.stetic:1097
 #: ../Source/Calico/gtk-gui/gui.stetic:1094
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1178
 #, fuzzy
 msgid "The Calico Project"
 msgstr "印花布项目"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1125
 #: ../Source/Calico/gtk-gui/gui.stetic:1131
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1201
 msgid "Go to Getting Started webpage"
 msgstr "入门网页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1143
 #: ../Source/Calico/gtk-gui/gui.stetic:1149
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1229
 msgid "Go to Help overview webpage"
 msgstr "转到帮助概览网页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1181
 #: ../Source/Calico/gtk-gui/gui.stetic:1187
 #: ../Source/Calico/gtk-gui/gui.stetic:1179
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1284
 msgid "New..."
 msgstr "新..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1199
 #: ../Source/Calico/gtk-gui/gui.stetic:1205
 #: ../Source/Calico/gtk-gui/gui.stetic:1197
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1312
 msgid "Open..."
 msgstr "打开..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1229
 #: ../Source/Calico/gtk-gui/gui.stetic:1235
 #: ../Source/Calico/gtk-gui/gui.stetic:1225
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1333
 msgid "Open a recently used script"
 msgstr "打开最近使用过的脚本"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1233
 #: ../Source/Calico/gtk-gui/gui.stetic:1239
 #: ../Source/Calico/gtk-gui/gui.stetic:1229
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1350
 msgid "Recently used..."
 msgstr "最近使用的..."
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1247
 #: ../Source/Calico/gtk-gui/gui.stetic:1253
 #: ../Source/Calico/gtk-gui/gui.stetic:1243
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1361
 msgid "Go to What's new webpage"
 msgstr "什么新的网页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1293
 #: ../Source/Calico/gtk-gui/gui.stetic:1299
 #: ../Source/Calico/gtk-gui/gui.stetic:1289
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1405
 msgid "Home tab"
 msgstr "“主页”选项卡"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1294
 #: ../Source/Calico/gtk-gui/gui.stetic:1300
 #: ../Source/Calico/gtk-gui/gui.stetic:1290
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1407
 msgid "Home"
 msgstr "家"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1317
 #: ../Source/Calico/gtk-gui/gui.stetic:1323
 #: ../Source/Calico/gtk-gui/gui.stetic:1313
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1427
 msgid "python>"
 msgstr "蟒蛇>"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1334
 #: ../Source/Calico/gtk-gui/gui.stetic:1340
 #: ../Source/Calico/gtk-gui/gui.stetic:1330
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1439
 msgid "Previous interactive code"
 msgstr "上一页交互代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1353
 #: ../Source/Calico/gtk-gui/gui.stetic:1359
 #: ../Source/Calico/gtk-gui/gui.stetic:1349
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1465
 msgid "Next interactive code"
 msgstr "下一个交互式代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1421
 #: ../Source/Calico/gtk-gui/gui.stetic:1427
 #: ../Source/Calico/gtk-gui/gui.stetic:1417
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1515
 msgid "Enter code interactively"
 msgstr "以交互方式输入验证码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1464
 #: ../Source/Calico/gtk-gui/gui.stetic:1470
 #: ../Source/Calico/gtk-gui/gui.stetic:1460
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1549
 msgid "Results of running code"
 msgstr "代码的运行结果"
 
@@ -1049,42 +1229,49 @@ msgstr "代码的运行结果"
 #: ../Source/Calico/gtk-gui/gui.stetic:1471
 #: ../languages/Jigsaw/Jigsaw/MainWindow.cs:351
 #: ../Source/Calico/gtk-gui/gui.stetic:1461
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1551
 msgid "Output"
 msgstr "产量"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1490
 #: ../Source/Calico/gtk-gui/gui.stetic:1496
 #: ../Source/Calico/gtk-gui/gui.stetic:1486
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1568
 msgid "Variables and their values"
 msgstr "变量和它们的值"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1491
 #: ../Source/Calico/gtk-gui/gui.stetic:1497
 #: ../Source/Calico/gtk-gui/gui.stetic:1487
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1570
 msgid "Environment"
 msgstr "环境"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1517
 #: ../Source/Calico/gtk-gui/gui.stetic:1523
 #: ../Source/Calico/gtk-gui/gui.stetic:1513
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1588
 msgid "Local variables"
 msgstr "局部变量"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1518
 #: ../Source/Calico/gtk-gui/gui.stetic:1524
 #: ../Source/Calico/gtk-gui/gui.stetic:1514
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1590
 msgid "Locals"
 msgstr "当地人"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1545
 #: ../Source/Calico/gtk-gui/gui.stetic:1551
 #: ../Source/Calico/gtk-gui/gui.stetic:1541
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1609
 msgid "Past interactive code"
 msgstr "过去的交互式代码"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:1546
 #: ../Source/Calico/gtk-gui/gui.stetic:1552
 #: ../Source/Calico/gtk-gui/gui.stetic:1542
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1611
 msgid "History"
 msgstr "历史"
 
@@ -1092,6 +1279,7 @@ msgstr "历史"
 #: ../Source/Calico/gtk-gui/gui.stetic:1634
 #: ../Source/Calico/gtk-gui/gui.stetic:1637
 #: ../Source/Calico/gtk-gui/gui.stetic:1632
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1676
 msgid "Chat"
 msgstr "聊"
 
@@ -1100,6 +1288,7 @@ msgstr "聊"
 #: ../Source/Calico/gtk-gui/gui.stetic:1684
 #: ../Source/Calico/gtk-gui/gui.stetic:1681
 #: ../Source/Calico/gtk-gui/gui.stetic:1679
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1709
 msgid "Language:"
 msgstr "语言："
 
@@ -1108,6 +1297,7 @@ msgstr "语言："
 #: ../Source/Calico/gtk-gui/gui.stetic:1696
 #: ../Source/Calico/gtk-gui/gui.stetic:1693
 #: ../Source/Calico/gtk-gui/gui.stetic:1691
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1718
 #, fuzzy
 msgid "Python"
 msgstr "蟒蛇>"
@@ -1117,6 +1307,7 @@ msgstr "蟒蛇>"
 #: ../Source/Calico/gtk-gui/gui.stetic:1719
 #: ../Source/Calico/gtk-gui/gui.stetic:1716
 #: ../Source/Calico/gtk-gui/gui.stetic:1714
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1735
 msgid "Status:"
 msgstr "状态："
 
@@ -1125,6 +1316,7 @@ msgstr "状态："
 #: ../Source/Calico/gtk-gui/gui.stetic:1731
 #: ../Source/Calico/gtk-gui/gui.stetic:1728
 #: ../Source/Calico/gtk-gui/gui.stetic:1726
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1744
 msgid "offline"
 msgstr "当前离线"
 
@@ -1132,6 +1324,7 @@ msgstr "当前离线"
 #: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
 #: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
 #: ../Source/Calico/MainWindow.cs:3313 ../Source/Calico/MainWindow.cs:3317
+#: ../Source/Calico/MainWindow.cs:3319 ../Source/Calico/MainWindow.cs:3323
 msgid "Email"
 msgstr "电子邮件"
 
@@ -1143,6 +1336,8 @@ msgstr "电子邮件"
 #: ../Source/Calico/MainWindow.cs:3325 ../Source/Calico/MainWindow.cs:3330
 #: ../Source/Calico/MainWindow.cs:3313 ../Source/Calico/MainWindow.cs:3317
 #: ../Source/Calico/MainWindow.cs:3348 ../Source/Calico/MainWindow.cs:3353
+#: ../Source/Calico/MainWindow.cs:3319 ../Source/Calico/MainWindow.cs:3323
+#: ../Source/Calico/MainWindow.cs:3354 ../Source/Calico/MainWindow.cs:3359
 msgid "Username"
 msgstr "用户名"
 
@@ -1156,6 +1351,8 @@ msgstr "用户名"
 #: ../Source/Calico/MainWindow.cs:3359 ../Source/Calico/MainWindow.cs:3313
 #: ../Source/Calico/MainWindow.cs:3317 ../Source/Calico/MainWindow.cs:3348
 #: ../Source/Calico/MainWindow.cs:3354 ../Source/Calico/MainWindow.cs:3382
+#: ../Source/Calico/MainWindow.cs:3319 ../Source/Calico/MainWindow.cs:3323
+#: ../Source/Calico/MainWindow.cs:3360 ../Source/Calico/MainWindow.cs:3388
 msgid "Password"
 msgstr "密码"
 
@@ -1163,27 +1360,33 @@ msgstr "密码"
 #: ../Source/Calico/MainWindow.cs:3268 ../Source/Calico/MainWindow.cs:3272
 #: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3294
 #: ../Source/Calico/MainWindow.cs:3313 ../Source/Calico/MainWindow.cs:3317
+#: ../Source/Calico/MainWindow.cs:3319 ../Source/Calico/MainWindow.cs:3323
 msgid "Keyword"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:3197 ../Source/Calico/MainWindow.cs:3268
 #: ../Source/Calico/MainWindow.cs:3290 ../Source/Calico/MainWindow.cs:3313
+#: ../Source/Calico/MainWindow.cs:3319
 #, fuzzy
 msgid "Register new user"
 msgstr "注册"
 
 #: ../Source/Calico/MainWindow.cs:3232 ../Source/Calico/MainWindow.cs:3303
 #: ../Source/Calico/MainWindow.cs:3325 ../Source/Calico/MainWindow.cs:3348
+#: ../Source/Calico/MainWindow.cs:3354
 msgid "Login"
 msgstr "注册"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:454
 #: ../Source/Calico/gtk-gui/gui.stetic:455
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:536
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:537
 #, fuzzy
 msgid "Find Next"
 msgstr "_find下一页"
 
 #: ../Source/Calico/gtk-gui/gui.stetic:925
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1011
 #, fuzzy
 msgid "Find:"
 msgstr "_find"
@@ -1254,24 +1457,35 @@ msgid "New {0} {1}"
 msgstr ""
 
 #: ../Source/Calico/MainWindow.cs:2753 ../Source/Calico/MainWindow.cs:2776
+#: ../Source/Calico/MainWindow.cs:2782
 #, fuzzy
 msgid "Select Calico Font"
 msgstr "选择所有"
 
-#: ../Source/Calico/MainWindow.cs:1519
+#: ../Source/Calico/MainWindow.cs:1519 ../Source/Calico/MainWindow.cs:1521
 #, csharp-format
 msgid "OS: {0}"
 msgstr ""
 
-#: ../Source/Calico/MainWindow.cs:1520
+#: ../Source/Calico/MainWindow.cs:1520 ../Source/Calico/MainWindow.cs:1522
 #, fuzzy, csharp-format
 msgid "Mono: {0}"
 msgstr "异常：{0}"
 
-#: ../Source/Calico/MainWindow.cs:1521
+#: ../Source/Calico/MainWindow.cs:1521 ../Source/Calico/MainWindow.cs:1523
 #, csharp-format
 msgid "Gtk: {0}"
 msgstr ""
+
+#: ../Source/Calico/Language.cs:72 ../Source/Calico/Language.cs:77
+#, fuzzy
+msgid "Reset Shell on Run"
+msgstr "重设外壳"
+
+#: ../Source/Calico/gtk-gui/Calico.MainWindow.cs:1056
+#, fuzzy
+msgid "Find Previous matching text"
+msgstr "查找前一个匹配的文本|"
 
 #~ msgid "Do you want to run the script?"
 #~ msgstr "你要运行的脚本吗？"
