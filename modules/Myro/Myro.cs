@@ -1249,6 +1249,7 @@ public static class Myro
 			    // Non-physical things here:
 			    addLight (new Graphics.Point (width - 100, height - 100), 
 				      50, new Graphics.Color ("yellow"));
+			    // LOCKS UP IN HERE
 			    addWall (new Graphics.Point (0, 0), 
 				     new Graphics.Point (5, height));
 			    addWall (new Graphics.Point (5, 0), 
@@ -1298,6 +1299,7 @@ public static class Myro
 
 		public void addWall (IList ul, IList lr, Graphics.Color color)
 		{
+		    // FIXME: need to lock something here?! or in draw
 			Graphics.Rectangle wall = new Graphics.Rectangle (new Graphics.Point (ul [0], ul [1]), 
 								  new Graphics.Point (lr [0], lr [1]));
 			wall.fill = color;

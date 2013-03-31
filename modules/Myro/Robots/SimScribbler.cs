@@ -198,6 +198,75 @@ public class SimScribbler : Myro.Robot
 			return true;
 		}
 
+		public override void turnTo (int angle, string units = "deg")
+		{
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // angle is positive (0 to 3.1415, or 0 to 360)
+		    double target;
+		    if (units == "deg") {
+			target = (Math.PI / 180.0) * angle; // degrees
+		    } else {
+			target = angle; // radians
+		    }
+		    // FIXME: go left or right
+		    turnRight(.75); // start turning
+		    lock (queue) {
+			queue.Add(delegate {
+				// FIXME: and still moving:
+				if ((frame.rotation % 3.1415) < (target % 3.1415))
+				    continueTurning("right", target, ev);
+				else {
+				    stop();
+				    ev.Set();
+				}
+			    });
+		    }
+		    ev.WaitOne();
+		}
+		
+		public override void turnBy (int angle, string units = "deg")
+		{
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    // Set target:
+		    double target;
+		    if (units == "deg") {
+			target = frame.rotation - (Math.PI / 180.0) * angle;
+		    } else {
+			target = frame.rotation - angle;
+		    }
+		    // FIXME: figure out which way to turn
+		    turnRight(.75); // start turning
+		    lock (queue) {
+			queue.Add(delegate {
+				// FIXME: and still moving:
+				if ((frame.rotation % 3.1415) < (target % 3.1415))
+				    continueTurning("right", target, ev);
+				else {
+				    stop();
+				    ev.Set();
+				}
+			    });
+		    }
+		    ev.WaitOne();
+		}
+		
+		public void continueTurning(string direction, double target, ManualResetEvent ev) {
+		    lock (queue) {
+			queue.Add(delegate {
+				System.Console.WriteLine(String.Format("continueTurning(rotation: {0}, target: {1})", frame.rotation, target));
+				Myro.wait(.1);
+				// FIXME: which way to turn
+				// FIXME: and still moving:
+				if ((frame.rotation % 3.1415) < (target % 3.1415))
+				    continueTurning(direction, target, ev);
+				else {
+				    stop();
+				    ev.Set();
+				}
+			    });
+		    }
+		}
+		
 		public override void adjustSpeed () {
 		    lock (queue) {
 			queue.Add(delegate {
