@@ -981,6 +981,8 @@ namespace Calico {
         }
 
         public void SetLanguage(string language) {
+	    if (language == null)
+		return;
             CurrentLanguage = language;
 	    if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
 		ShellLanguage = language;
@@ -2063,6 +2065,8 @@ namespace Calico {
         }
 
         public void ExecuteInBackground(string text) {
+	    if (CurrentLanguage == null)
+		return;
             // This is the only approved method of running code
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
                 Invoke(OnStartRunning);
@@ -2137,8 +2141,8 @@ namespace Calico {
 		  "        #del _\n" +
 		  "    Gtk.Application.Invoke(invoke)", true);
 		*/
-                Invoke(OnStopRunning);
             }
+	    Invoke(OnStopRunning);
         }
 
         public void ExecuteFileInBackground(string filename) {
@@ -2169,8 +2173,10 @@ namespace Calico {
 		    if (dirInfo.Exists)
 			System.IO.Directory.SetCurrentDirectory(dir);
                 }
-                manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
-                Invoke(OnStopRunning);
+		if (CurrentLanguage != null && filename != null) {
+		    manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
+		    Invoke(OnStopRunning);
+		}
             }
             )
             );
