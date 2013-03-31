@@ -206,9 +206,43 @@ public class SimScribbler : Myro.Robot
 		    return value;
 		}
 
+		string getTurnDirection(double current, double target) {
+		    current = standard_range(current) + 2.0 * Math.PI;
+		    target = standard_range(target) + 2.0 * Math.PI; // 360 to 720
+		    if (Math.Abs(current -target) < .01) { // same, 1 degree
+			return "same";
+		    } else if (current < target) { // to turn right
+			if (target - current < Math.PI) {
+			    return "right";
+			} else {
+			    return "left";
+			}
+		    } else { // turn to left
+			if (current - target < Math.PI) {
+			    return "left";
+			} else {
+			    return "right";
+			}
+		    }
+		}
+
+		bool isDone(string direction, double current, double target) {
+		    //System.Console.WriteLine(String.Format("isDone: current={0}, target={1}, direction={2}, getTurn={3}", 
+		    //						   current, target, direction,
+		    //					   getTurnDirection(current, target)));
+		    return getTurnDirection(current, target) != direction;
+		}
+		
 		public override void turnBy (int angle, string units = "deg")
 		{
-		    // rewrite in terms of turnTo
+		    double target;
+		    if (units == "deg") {
+			target = (Math.PI / 180.0) * angle; // degrees to rad
+		    } else {
+			target = angle; // radians
+		    }
+		    double current_rotation = (Math.PI / 180.0) * frame.rotation; // convert from degrees
+		    turnTo((int)(standard_range(current_rotation + target) * 180/Math.PI - 360));
 		}
 		
 		public override void turnTo (int angle, string units = "deg")
@@ -222,52 +256,33 @@ public class SimScribbler : Myro.Robot
 		    } else {
 			target = angle; // radians
 		    }
-		    // FIXME: take shortest route  target: 350, current_rotation: 10, turn left
-		    // Get rotation in standard range
-		    double current_rotation = standard_range((Math.PI / 180.0) * frame.rotation); // convert from degrees
-		    string direction = null;
-		    target = standard_range(target);
-		    if (target == current_rotation) {
+		    double current_rotation = (Math.PI / 180.0) * frame.rotation; // convert from degrees
+		    string direction = getTurnDirection(current_rotation, target);
+		    if (direction == "same") {
 			return;
-		    } else if (target > current_rotation) {
-			direction = "right";
-			turnRight(.75); // right, increasing
+		    } else if (direction == "right") {
+			turnRight(.3); // right, increasing
 		    } else {
-			direction = "left";
-			turnLeft(.75); // left, decreasing
+			turnLeft(.3); // left, decreasing
 		    }
-		    System.Console.WriteLine(String.Format("turnTo: current={0}, target={1}", current_rotation, target));
 		    continueTurning(direction, target, ev);
 		    ev.WaitOne();
 		}
 		
 		public void continueTurning(string direction, double target, ManualResetEvent ev) {
-		    System.Console.WriteLine("waiting for lock...");
 		    lock (queue) {
-			System.Console.WriteLine(" adding delegate...");
 			queue.Add(delegate {
-				System.Console.WriteLine(" running delegate...");
 				if (frame.body.AngularVelocity != 0.0) { // still moving
-				    double current_rotation = standard_range((Math.PI / 180.0) * frame.rotation); // convert from degrees
-				    System.Console.WriteLine(String.Format("continueTurning(rotation: {0}, target: {1})", current_rotation, target));
-				    if (direction == "left" && current_rotation > target) {
-					// decreasing
-					queue.Add(delegate {
-						continueTurning(direction, target, ev);
-					    });
-				    } else if (direction == "right" && current_rotation < target) {
-					// increasing
-					queue.Add(delegate {
-						continueTurning(direction, target, ev);
-					    });
-				    } else {
-					System.Console.WriteLine(String.Format("continueTurning: Stop1! (rotation: {0}, target: {1})", current_rotation, target));
+				    if (isDone(direction, frame.rotation * (Math.PI / 180.0), target)) {
 					stop();
 					ev.Set();
+				    } else {
+					queue.Add(delegate {
+						continueTurning(direction, target, ev);
+					    });
 				    }
 				} else {
-				    // offically stop
-				    System.Console.WriteLine("continueTurning: Stop2!");
+				    // offically stop (must have stopped through another means)
 				    stop();
 				    ev.Set();
 				}
