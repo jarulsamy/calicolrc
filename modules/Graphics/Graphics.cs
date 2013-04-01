@@ -4616,6 +4616,7 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			value = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 0, value);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -4629,6 +4630,7 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			value = Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 0, value);
 		}
@@ -4638,6 +4640,7 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			value = Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 1, value);
 		}
@@ -4647,6 +4650,7 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			value = Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 2, value);
 		}
@@ -4656,12 +4660,14 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			value = Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 3, value);
 		}
 
 		public void setAlpha (byte value)
 		{
+		  value = Math.Min(Math.Max((byte)0, value), (byte)255);
 		    for (int x = 0; x < _cacheWidth; x++) {
 			for (int y = 0; y < _cacheHeight; y++) {
 			    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
@@ -4679,6 +4685,9 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			red = Math.Min(Math.Max((byte)0, red), (byte)255);
+			green = Math.Min(Math.Max((byte)0, green), (byte)255);
+			blue = Math.Min(Math.Max((byte)0, blue), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 0, red);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -4693,6 +4702,9 @@ public static class Graphics
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
+			red = Math.Min(Math.Max((byte)0, red), (byte)255);
+			green = Math.Min(Math.Max((byte)0, green), (byte)255);
+			blue = Math.Min(Math.Max((byte)0, blue), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 0, red);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
@@ -6798,7 +6810,7 @@ public static class Graphics
 		 */
 		protected void WritePixels()
 		{
-			LZWEncoder encoder = new LZWEncoder(picture, indexedPixels, colorDepth);
+			LZWEncoder encoder = new LZWEncoder(indexedPixels, colorDepth);
 			encoder.Encode( ms );
 		}
 	
@@ -6827,12 +6839,8 @@ public static class Graphics
 	public class LZWEncoder 
 	{
 		private static readonly int EOF = -1;
-	        private Picture picture;
-		private int imgW, imgH;
 		private byte[] pixAry;
 		private int initCodeSize;
-		private int remaining;
-		private int curPixel;
 
 		// GIFCOMPR.C       - GIF Image compression routines
 		//
@@ -6934,11 +6942,8 @@ public static class Graphics
 		byte[] accum = new byte[256];
 
 		//----------------------------------------------------------------------------
-		public LZWEncoder(Picture picture, byte[] pixels, int color_depth) 
+		public LZWEncoder(byte[] pixels, int color_depth) 
 		{
-		        this.picture = picture;
-			imgW = picture.width;
-			imgH = picture.height;
 			pixAry = pixels;
 			initCodeSize = Math.Max(2, color_depth);
 		}
@@ -7054,12 +7059,7 @@ public static class Graphics
 		public void Encode( Stream os)
 		{
 			os.WriteByte( Convert.ToByte( initCodeSize) ); // write "initial code size" byte
-
-			remaining = imgW * imgH; // reset navigation variables
-			curPixel = 0;
-
 			Compress(initCodeSize + 1, os); // compress and write the pixel data
-
 			os.WriteByte(0); // write block terminator
 		}
 	
@@ -7478,10 +7478,7 @@ public static class Graphics
 		   ----------------------------------------------------------------------------------- */
 		public void Unbiasnet() 
 		{
-
-			int i, j;
-
-			for (i = 0; i < netsize; i++) 
+			for (int i = 0; i < netsize; i++) 
 			{
 				network[i][0] >>= netbiasshift;
 				network[i][1] >>= netbiasshift;
