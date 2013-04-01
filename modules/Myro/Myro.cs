@@ -143,6 +143,8 @@ public static class Myro
 
 	public static Robot robot;
 	public static Simulation simulation;
+        public static Senses sense;
+        public static Joystick joyclass;
 	public static int gui_thread_id = -1;
         public static Thread update_entries_thread;
 	static string REVISION = "$Revision: $";
@@ -663,15 +665,31 @@ public static class Myro
 		return (int)value;
 	}
 
+    public static bool isRealized(Gtk.Window window) {
+	ManualResetEvent ev = new ManualResetEvent(false);
+	bool retval = false;
+	Invoke (delegate {
+		retval = window.IsRealized;
+		ev.Set();
+	    });
+	ev.WaitOne();
+	return retval;
+    }
+
 	[method: JigsawTab("Senses")]
 	public static void senses ()
 	{
-		new Senses ();
+	    if (sense != null && isRealized(sense.win)) {
+		Invoke( delegate {
+			sense.win.Destroy();
+		    });
+	    } 
+	    sense = new Senses ();
 	}
 
-	class Senses
+	public class Senses
 	{
-		Gtk.Window win;
+		public Gtk.Window win;
 		PythonDictionary dict_entry;
 		uint idle = 0;
 
@@ -1143,20 +1161,19 @@ public static class Myro
 		  port = retval.ToString();
 	  }
 	  if (port.StartsWith ("sim")) {
-	      if (simulation == null || ! simulation.window.isVisible()) {
+	      if (simulation != null && simulation.window.isRealized()) {
+		  lock (simulation.robots) {
+		      foreach (Robot r in simulation.robots) {
+			  r.uninit();
+		      }
+		      simulation.robots.Clear();
+		  }
+	      } else {
 		  simulation = new Simulation ();
-		  //Thread.Sleep ((int)(5 * 1000));
-		} 
-		else {
-		  simulation.setup ();
-		}
-		// defaults to SimScribbler in this interface
-		if (robot != null && robot.GetType().Name == "SimScribbler") {
-		  // don't add another!
-		} else {
-		  robot = (Robot)makeRobot ("SimScribbler", simulation); 
-		}
-		wait(1.0); // give it time to get started before trying to read sensors, etc
+	      }
+	      // defaults to SimScribbler in this interface
+	      robot = (Robot)makeRobot ("SimScribbler", simulation); 
+	      wait(1.0); // give it time to get started before trying to read sensors, etc
 	  } else {
 		if (Myro.robot != null)
 		  Myro.robot.reinit (port, baud);
@@ -1324,11 +1341,13 @@ public static class Myro
 
 	  public void step() {
 	      if (window.isRealized()) {
-		  foreach (Robot robot in robots) {
-		      robot.draw_simulation ();
-		  }
-		  foreach (Robot robot in robots) {
-		      robot.update ();
+		  lock (robots) {
+		      foreach (Robot robot in robots) {
+			  robot.draw_simulation ();
+		      }
+		      foreach (Robot robot in robots) {
+			  robot.update ();
+		      }
 		  }
 		  window.step (.1);
 	      }
@@ -1339,24 +1358,30 @@ public static class Myro
 	  }
 
 	  public void setPose(int position, int x, int y, double theta) {
-		robots[position].setPose(x, y, theta);
-		window.refresh ();
+	      lock (robots) {
+		  robots[position].setPose(x, y, theta);
+	      }
+	      window.refresh ();
 	  }
 
 	  public void setOption(int position, string option, object value) {
-		robots[position].setOption(option, value);
-		window.refresh ();
+	      lock (robots) {
+		  robots[position].setOption(option, value);
+	      }
+	      window.refresh ();
 	  }
 
 	  public void loop ()
 	    {
 		run = true;
 		while (window.isRealized() && run) {
-		    foreach (Robot robot in robots) {
-			robot.draw_simulation ();
-		    }
-		    foreach (Robot robot in robots) {
-			robot.update ();
+		    lock (robots) {
+			foreach (Robot robot in robots) {
+			    robot.draw_simulation ();
+			}
+			foreach (Robot robot in robots) {
+			    robot.update ();
+			}
 		    }
 		    window.step (.1);
 		}
@@ -2381,12 +2406,17 @@ public static class Myro
 	[method: JigsawTab("Movement")]
 	public static void joystick ()
 	{
-		new Joystick ();
+	    if (joyclass != null && isRealized(joyclass.window)) {
+		Invoke( delegate {
+			joyclass.window.Destroy();
+		    });
+	    }
+	    joyclass = new Joystick ();
 	}
 
-	class Joystick
+	public class Joystick
 	{
-		Graphics.WindowClass window;
+		public Graphics.WindowClass window;
 		Graphics.Line arrow = new Graphics.Line (new Graphics.Point (200, 200), 
                         new Graphics.Point (200, 200));
 		double x, y;
@@ -2397,40 +2427,42 @@ public static class Myro
 
 		public Joystick ()
 		{
-			window = makeWindow ("Myro Joystick", 400, 400);
-			Invoke( delegate {
-				window.ButtonPressEvent += onMouseDown;
-				window.ButtonReleaseEvent += onMouseUp;
-				window.MotionNotifyEvent += onMouseMove;
-			    });
-			Graphics.Circle circle = new Graphics.Circle (
-                new Graphics.Point (200, 200), radius);
-			circle.fill = new Graphics.Color ("white");
-			circle.draw (window);
-			circle = new Graphics.Circle (
-                new Graphics.Point (200, 200), 10);
-			circle.fill = new Graphics.Color ("black");
-			circle.draw (window);
-			Graphics.Text text = new Graphics.Text (
+		    if (window != null && window.isRealized())
+			return;
+		    window = makeWindow ("Myro Joystick", 400, 400);
+		    Invoke( delegate {
+			    window.ButtonPressEvent += onMouseDown;
+			    window.ButtonReleaseEvent += onMouseUp;
+			    window.MotionNotifyEvent += onMouseMove;
+			});
+		    Graphics.Circle circle = new Graphics.Circle (
+			new Graphics.Point (200, 200), radius);
+		    circle.fill = new Graphics.Color ("white");
+		    circle.draw (window);
+		    circle = new Graphics.Circle (
+		       new Graphics.Point (200, 200), 10);
+		    circle.fill = new Graphics.Color ("black");
+		    circle.draw (window);
+		    Graphics.Text text = new Graphics.Text (
             new Graphics.Point (window.width / 2, 
                        12), "Forward");
-			text.draw (window);
-			text = new Graphics.Text (
+		    text.draw (window);
+		    text = new Graphics.Text (
             new Graphics.Point (window.width / 2, 
                        window.height - 12), "Backward");
-			text.draw (window);
-			text = new Graphics.Text (
+		    text.draw (window);
+		    text = new Graphics.Text (
             new Graphics.Point (12, 
-                       window.height / 2), "Left");
-			text.rotate (90);
-			text.draw (window);
-			text = new Graphics.Text (
+				window.height / 2), "Left");
+		    text.rotate (90);
+		    text.draw (window);
+		    text = new Graphics.Text (
             new Graphics.Point (window.width - 12, 
                        window.height / 2), "Right");
-			text.rotate (-90);
-			text.draw (window);
-			arrow.border = 5;
-			arrow.draw (window);
+		    text.rotate (-90);
+		    text.draw (window);
+		    arrow.border = 5;
+		    arrow.draw (window);
 		}
 
 		void onMouseUp (object obj, Gtk.ButtonReleaseEventArgs args)

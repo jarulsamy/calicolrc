@@ -183,11 +183,17 @@ public class SimScribbler : Myro.Robot
 			frame.outline = simulation.groundColor;
 			// set collision
 			frame.draw (simulation.window);
+			frame.tag = "robot";
 			frame.body.OnCollision += SetStall;
 			frame.body.IgnoreGravity = true;
-
-			this.simulation.robots.Add (this);
+			lock (this.simulation.robots) {
+			    this.simulation.robots.Add (this);
+			}
 			setup();
+		}
+
+		public override void uninit() {
+		    frame.undraw();
 		}
 
 		bool SetStall (FarseerPhysics.Dynamics.Fixture fixture1,
