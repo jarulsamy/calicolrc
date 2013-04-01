@@ -1250,6 +1250,17 @@ public static class Graphics
 		    return retval;
 		}
 
+		public bool isVisible() {
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    bool retval = false;
+		    Invoke( delegate {
+			    retval = Visible;
+			    ev.Set();	
+			});
+		    ev.WaitOne();
+		    return retval;
+		}
+
 		public void removeTagged(String tag) {
 		    List to_remove = new List ();
 		    lock (_canvas.shapes) {

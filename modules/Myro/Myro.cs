@@ -1143,7 +1143,7 @@ public static class Myro
 		  port = retval.ToString();
 	  }
 	  if (port.StartsWith ("sim")) {
-		if (simulation == null || ! simulation.window.Visible) {
+	      if (simulation == null || ! simulation.window.isVisible()) {
 		  simulation = new Simulation ();
 		  //Thread.Sleep ((int)(5 * 1000));
 		} 
