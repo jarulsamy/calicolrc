@@ -2441,88 +2441,85 @@ public static class Myro
 			    window.MotionNotifyEvent += onMouseMove;
 			});
 		    Graphics.Circle circle = new Graphics.Circle (
-			new Graphics.Point (200, 200), radius);
+								  new Graphics.Point (200, 200), radius);
 		    circle.fill = new Graphics.Color ("white");
 		    circle.draw (window);
 		    circle = new Graphics.Circle (
-		       new Graphics.Point (200, 200), 10);
+						  new Graphics.Point (200, 200), 10);
 		    circle.fill = new Graphics.Color ("black");
 		    circle.draw (window);
 		    Graphics.Text text = new Graphics.Text (
-            new Graphics.Point (window.width / 2, 
-                       12), "Forward");
+							    new Graphics.Point (window.width / 2, 
+										12), "Forward");
 		    text.draw (window);
 		    text = new Graphics.Text (
-            new Graphics.Point (window.width / 2, 
-                       window.height - 12), "Backward");
+					      new Graphics.Point (window.width / 2, 
+								  window.height - 12), "Backward");
 		    text.draw (window);
 		    text = new Graphics.Text (
-            new Graphics.Point (12, 
-				window.height / 2), "Left");
+					      new Graphics.Point (12, 
+								  window.height / 2), "Left");
 		    text.rotate (90);
 		    text.draw (window);
 		    text = new Graphics.Text (
-            new Graphics.Point (window.width - 12, 
-                       window.height / 2), "Right");
+					      new Graphics.Point (window.width - 12, 
+								  window.height / 2), "Right");
 		    text.rotate (-90);
 		    text.draw (window);
 		    arrow.border = 5;
 		    arrow.draw (window);
 		}
-
-		void onMouseUp (object obj, Gtk.ButtonReleaseEventArgs args)
-		{
-			state = "up";
-			arrow.points [1].x = 0;
-			arrow.points [1].y = 0;
-			window.QueueDraw ();
-			if (getRobot () != null) {
-			    stop ();
-			}
+	    
+	    void onMouseUp (object obj, Gtk.ButtonReleaseEventArgs args)
+	    {
+		state = "up";
+		arrow.points [1].x = 0;
+		arrow.points [1].y = 0;
+		window.QueueDraw ();
+		if (getRobot () != null) {
+		    stop ();
 		}
-
-		void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
-		{
-			x = args.Event.X;
-			y = args.Event.Y;
-			center_x = window.width / 2;
-			center_y = window.height / 2;
-			r = (center_x - x) / (center_x - radius);
-			t = (center_y - y) / (center_y - radius);
-			r = Math.Min (Math.Max (r, -1), 1);
-			t = Math.Min (Math.Max (t, -1), 1);
-			arrow.points [1].x = x - center_x;
-			arrow.points [1].y = y - center_y;
-			window.QueueDraw ();
-			if (state == "down")
-			    return;
-			state = "down";
-			if (getRobot () != null) {
-			    move (t, r);
-			    wait(.1);
-			}
+	    }
+	    
+	    void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
+	    {
+		x = args.Event.X;
+		y = args.Event.Y;
+		center_x = window.width / 2;
+		center_y = window.height / 2;
+		r = (center_x - x) / (center_x - radius);
+		t = (center_y - y) / (center_y - radius);
+		r = Math.Min (Math.Max (r, -1), 1);
+		t = Math.Min (Math.Max (t, -1), 1);
+		arrow.points [1].x = x - center_x;
+		arrow.points [1].y = y - center_y;
+		window.QueueDraw ();
+		state = "down";
+		if (getRobot () != null) {
+		    move (t, r);
+		    wait(.1);
 		}
-
-		void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
-		{
-			if (state == "down") {
-				x = args.Event.X;
-				y = args.Event.Y;
-				center_x = window.width / 2;
-				center_y = window.height / 2;
-				r = (center_x - x) / (center_x - radius);
-				t = (center_y - y) / (center_y - radius);
-				r = Math.Min (Math.Max (r, -1), 1);
-				t = Math.Min (Math.Max (t, -1), 1);
-				arrow.points [1].x = x - center_x;
-				arrow.points [1].y = y - center_y;
-				window.QueueDraw ();
-				if (getRobot () != null) {
-				    move (t, r);
-				    wait(.1);
-				}
-			}
+	    }
+	    
+	    void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
+	    {
+		if (state == "down") {
+		    x = args.Event.X;
+		    y = args.Event.Y;
+		    center_x = window.width / 2;
+		    center_y = window.height / 2;
+		    r = (center_x - x) / (center_x - radius);
+		    t = (center_y - y) / (center_y - radius);
+		    r = Math.Min (Math.Max (r, -1), 1);
+		    t = Math.Min (Math.Max (t, -1), 1);
+		    arrow.points [1].x = x - center_x;
+		    arrow.points [1].y = y - center_y;
+		    window.QueueDraw ();
+		    if (getRobot () != null) {
+			move (t, r);
+		    }
 		}
+	    }
 	}
 
 	[method: JigsawTab("Senses")]
