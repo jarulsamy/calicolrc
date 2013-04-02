@@ -1883,6 +1883,18 @@ namespace Jigsaw
 			return ProcessXml (xr, 0, 0);
 		}
 
+		int intParse(XmlWrapper xr, string attr) {
+		    int retval = 0;
+		    string value = "";
+		    try {
+			value = xr.GetAttribute(attr);
+			retval = int.Parse(value);
+		    } catch {
+			System.Console.Error.WriteLine(String.Format("Error reading '{0}' from '{1}'; continuing... ", attr, value));
+		    }
+		    return retval;
+		}
+
 		public bool ProcessXml(XmlWrapper xr, int dx, int dy) {
 			// Temp vars to hold parse vals
 			string name, val, typeName = "";
@@ -1920,9 +1932,9 @@ namespace Jigsaw
 					
 					case "block":		// <block id="1" typeName="Jigsaw.CControlStart" left="415" top="50">							
 						typeName = xr.GetAttribute("typeName");
-						X = int.Parse(xr.GetAttribute("left")) + dx;
-						Y = int.Parse(xr.GetAttribute("top")) + dy;
-						id = int.Parse(xr.GetAttribute("id"));
+						X = intParse(xr, "left") + dx;
+						Y = intParse(xr, "top") + dy;
+						id = intParse(xr, "id");
 
 						// This will be set to a non-null value if we are dealing with a CMethodBlock.
 						// Otherwise, it remains null as a signal that we do not have one.
@@ -1962,7 +1974,7 @@ namespace Jigsaw
 
 					case "edge":		// <edge id="3" name="Out" type="Out" linkedTo="4" />
 						name = xr.GetAttribute("name");
-						edgeId = int.Parse(xr.GetAttribute("id"));
+						edgeId = intParse(xr, "id");
 						edges["e"+edgeId.ToString()] = tBlock.GetEdgeByName(name);
 						break;
 
@@ -2042,14 +2054,14 @@ namespace Jigsaw
 					
 					if (name == "block") {
 						// Get a reference to the current block
-						id = int.Parse(xr.GetAttribute("id"));
+					        id = intParse(xr, "id");
 						tBlock = blocks["b"+id.ToString()];
 
 					} else if (name == "edge") {
 						// Link block edges
-						edgeId = int.Parse(xr.GetAttribute("linkedTo"));
+					        edgeId = intParse(xr, "linkedTo");
 						if (edgeId > 0) {
-							id = int.Parse(xr.GetAttribute("id"));
+						        id = intParse(xr, "id");
 							if (edges.ContainsKey("e"+id.ToString()) && 
 						    	edges.ContainsKey("e"+edgeId.ToString())) {
 								tEdge = edges["e"+id.ToString()];
@@ -2680,7 +2692,7 @@ namespace Jigsaw
             w.WriteAttributeString("id", this._id.ToString());
 			w.WriteAttributeString("typeName", FullName);
 			w.WriteAttributeString("left", this.Left.ToString());
-			w.WriteAttributeString("top", this.Top.ToString());
+			w.WriteAttributeString("top", ((int)this.Top).ToString());
         }
 		
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
