@@ -456,14 +456,12 @@ public static class Myro
 	[method: JigsawTab(null)]
 	static void invoke_function (Func<object,object> function, object args)
 	{
-		try {
-			Gtk.Application.Invoke (delegate {
-				function (args);
-			});
-		} catch (Exception e) {
-			Console.Error.WriteLine ("Error in function");
-			Console.Error.WriteLine (e.Message);
-		}        
+	    try {
+		function (args);
+	    } catch (Exception e) {
+		Console.Error.WriteLine ("Error in function");
+		Console.Error.WriteLine (e.Message);
+	    }        
 	}
 	
 	[method: JigsawTab(null)]
@@ -680,9 +678,12 @@ public static class Myro
 	public static void senses ()
 	{
 	    if (sense != null && isRealized(sense.win)) {
+		ManualResetEvent ev = new ManualResetEvent(false);
 		Invoke( delegate {
 			sense.win.Destroy();
+			ev.Set();
 		    });
+		ev.WaitOne();
 	    } 
 	    sense = new Senses ();
 	}
@@ -1247,17 +1248,17 @@ public static class Myro
 			window.gravity = Graphics.Vector (0, 0); // turn off gravity
 		}
 
-		public Simulation () : this(640, 480, true)
-		{
+	        public Simulation () : this(640, 480, true, true)
+	        {
 		}
 
-		public Simulation (int width, int height) : this(width, height, true)
-		{
-		}
+	        public Simulation (int width, int height) : this(width, height, true, true)
+	        {
+	        }
 
-		public Simulation (int width, int height, bool load_default)
-		{
-			window = makeWindow ("Myro Simulation", width, height);
+	        public Simulation (int width, int height, bool load_default, bool run)
+	        {
+		        window = makeWindow ("Myro Simulation", width, height);
 			window.setBackground (groundColor);
 			window.mode = "physics";
 			window.gravity = Graphics.Vector (0, 0); // turn off gravity
@@ -1288,7 +1289,8 @@ public static class Myro
 			    ball.color = makeColor ("blue");
 			    addShape (ball);      
 			}
-			setup();
+			if (run)
+			    setup();
 		}
 	    
 		public void addLight (IList list, int radius, Graphics.Color color)
@@ -1684,7 +1686,7 @@ public static class Myro
 				 string title="Myro Camera")
 	{
 	    Graphics.WindowClass win;
-	    win = Graphics.makeWindow (title,
+	    win = Graphics.makeWindowFast (title,
 		  (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
 	    picture.draw (win);
 	    picture.setX (picture.width * picture.scaleFactor / 2);
@@ -2407,9 +2409,12 @@ public static class Myro
 	public static void joystick ()
 	{
 	    if (joyclass != null && isRealized(joyclass.window)) {
+		ManualResetEvent ev = new ManualResetEvent (false);
 		Invoke( delegate {
 			joyclass.window.Destroy();
+			ev.Set();
 		    });
+		ev.WaitOne();
 	    }
 	    joyclass = new Joystick ();
 	}
@@ -3291,9 +3296,10 @@ public static class Myro
 				    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
 				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
 				    SdlDotNet.Audio.Mixer.OpenAudio (stream);
-				    ev.Set ();
 				} catch {
 				    throw new Exception("Unable to initialize OpenAudio");
+				} finally {
+				    ev.Set ();
 				}
 			    });
 			ev.WaitOne ();
@@ -3310,11 +3316,12 @@ public static class Myro
 				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
 				    SdlDotNet.Audio.Mixer.Open ();
 				    SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
-				    ev.Set ();
 				} catch {
 				    throw new Exception("Unable to initialize sound");
+				} finally {
+				    ev.Set ();
 				}
-			});
+			    });
 			ev.WaitOne ();
 			sound_initialized = true;
 		}

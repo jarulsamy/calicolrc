@@ -585,6 +585,23 @@ public static class Graphics
 	    return _windows [title];
 	}
 
+	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
+                                           int width=300, 
+                                           int height=300)
+	{
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    Invoke( delegate {
+		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
+			_windows [title] = new Graphics.WindowClass (title, width, height);
+		    }
+		    _lastWindow = _windows [title];
+		    _lastWindow.KeepAbove = true;
+		    ev.Set();
+		});
+	    ev.WaitOne();
+	    return _windows [title];
+	}
+
 	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
 	{
 	    ManualResetEvent ev = new ManualResetEvent(false);
@@ -3117,36 +3134,43 @@ public static class Graphics
     
 		public void draw (WindowClass win)
 		{ // Shape
-			// Add this shape to the Canvas list.
-			if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    Invoke( delegate {
+			    // Add this shape to the Canvas list.
+			    if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
 				win.canvas.need_to_draw_surface = true;
 				using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
-					render (g);
+				    render (g);
 				}
-			} else {
+			    } else {
 				lock (win.getCanvas().shapes) {
-					if (! win.getCanvas ().shapes.Contains (this)) {
-						win.getCanvas ().shapes.Add (this);
-						//System.Console.Error.WriteLine("Added to win!");
-					}
+				    if (! win.getCanvas ().shapes.Contains (this)) {
+					win.getCanvas ().shapes.Add (this);
+					//System.Console.Error.WriteLine("Added to win!");
+				    }
 				}
 				// Make sure each subshape is associated with this window
 				// so QueueDraw will redraw:
 				lock (shapes) {
-					foreach (Shape shape in shapes) {
-						shape.window = win;
-					}
+				    foreach (Shape shape in shapes) {
+					shape.window = win;
+				    }
 				}
-			}
-			window = win;
-			if (window._canvas.world != null) {
+			    }
+			    window = win;
+			    if (window._canvas.world != null) {
 				addToPhysics ();
-			}
-			QueueDraw ();
+			    }
+			    QueueDraw ();
+			    ev.Set();
+			});
+		    ev.WaitOne();
 		}
 
 		public void draw (Canvas canvas)
 		{ // Shape
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    Invoke( delegate {
 			// Add this shape to the Canvas list.
 			if (canvas.mode == "bitmap" || canvas.mode == "bitmapmanual") {
 				canvas.need_to_draw_surface = true;
@@ -3163,10 +3187,15 @@ public static class Graphics
 				addToPhysics ();
 			}
 			QueueDraw ();
+			ev.Set();
+			});
+		    ev.WaitOne();
 		}
     
 		public void draw (Shape shape)
 		{ // Shape
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    Invoke( delegate {
 			// Add this shape to the shape's list.
 			lock (shape.shapes) {
 				if (! shape.shapes.Contains (this)) {
@@ -3182,6 +3211,9 @@ public static class Graphics
 			window = shape.window;
 			drawn_on_shape = shape;
 			QueueDraw ();
+			ev.Set();
+			});
+		    ev.WaitOne();
 		}
     
 	    public void undraw ()
@@ -4840,12 +4872,15 @@ public static class Graphics
 
 		public void draw (WindowClass win)
 		{ // button
-			window = win;
-			Invoke (delegate {
-				Show ();
-				window.getCanvas ().Put (this, (int)_x, (int)_y);
-				window.QueueDraw ();
+		    ManualResetEvent ev = new ManualResetEvent (false);
+		    Invoke (delegate {
+			    window = win;
+			    Show ();
+			    window.getCanvas ().Put (this, (int)_x, (int)_y);
+			    window.QueueDraw ();
+			    ev.Set();
 			});
+		    ev.WaitOne();
 		}
 
 		public void connect (string signal, Func<object,Event,object> function)
