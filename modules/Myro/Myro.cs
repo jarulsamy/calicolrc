@@ -1946,9 +1946,9 @@ public static class Myro
 	
     // fluke2
     [method: JigsawTab("Picture")]
-    public static void setPicSize(string size)
+    public static void setPictureSize(string size)
     {
-        robot.setPicSize(size);
+        robot.setPictureSize(size);
     }
 
     [method: JigsawTab("Actions")]
@@ -2588,23 +2588,10 @@ public static class Myro
 
 	[method: JigsawTab("Misc")]
 	public static void wait (double seconds)
-	{
-		if (seconds < .1)
-			Thread.Sleep ((int)(seconds * 1000));
-		else {
-		    double start = currentTime ();
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    while (seconds > currentTime () - start) {
-			Invoke( delegate {
-				while (Gtk.Application.EventsPending ())
-				    Gtk.Application.RunIteration ();
-				ev.Set();
-			    });
-			ev.WaitOne();
-			ev.Reset();
-		    }
-		}
-	}
+    {
+	if (seconds > 0) 
+	    Thread.Sleep ((int)(seconds * 1000));
+    }
 
 	[method: JigsawTab("Misc")]
 	public static double currentTime ()
@@ -2851,7 +2838,7 @@ public static class Myro
         }        
         
         // fluke2
-        public virtual void setPicSize(string size)
+        public virtual void setPictureSize(string size)
         {
         }
         
@@ -3662,68 +3649,58 @@ public static class Myro
 	[method: JigsawTab("Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, IList rgb)
 	{
-		pixel.setRGB (
-			System.Convert.ToByte ((int)rgb [0]), 
-			System.Convert.ToByte ((int)rgb [1]), 
-			System.Convert.ToByte ((int)rgb [2]));
-	}
-
-	[method: JigsawTab("Graphics")]
-	public static void setRGB (Graphics.Pixel pixel, byte red, byte green, byte blue)
-	{
-		pixel.setRGB (red, green, blue);
+		pixel.setRGB (((int)rgb [0]), 
+			      ((int)rgb [1]), 
+			      ((int)rgb [2]));
 	}
 
 	[method: JigsawTab("Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, int red, int green, int blue)
 	{
-		pixel.setRGB (
-			System.Convert.ToByte ((int)red), 
-			System.Convert.ToByte ((int)green), 
-			System.Convert.ToByte ((int)blue));
+		pixel.setRGB (red, green, blue);
 	}
 
 	[method: JigsawTab("Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, float red, float green, float blue)
 	{
 		pixel.setRGB (
-			System.Convert.ToByte ((int)red), 
-			System.Convert.ToByte ((int)green), 
-			System.Convert.ToByte ((int)green));
+			((int)red), 
+			((int)green), 
+			((int)green));
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setRGBA (Graphics.Pixel pixel, byte red, byte green, byte blue, byte alpha)
+	public static void setRGBA (Graphics.Pixel pixel, int red, int green, int blue, int alpha)
 	{
 		pixel.setRGBA (red, green, blue, alpha);
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setGray (Graphics.Pixel pixel, byte value)
+	public static void setGray (Graphics.Pixel pixel, int value)
 	{
 		pixel.setGray (value);
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setRed (Graphics.Pixel pixel, byte value)
+	public static void setRed (Graphics.Pixel pixel, int value)
 	{
 		pixel.setRed (value);
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setGreen (Graphics.Pixel pixel, byte value)
+	public static void setGreen (Graphics.Pixel pixel, int value)
 	{
 		pixel.setGreen (value);
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setBlue (Graphics.Pixel pixel, byte value)
+	public static void setBlue (Graphics.Pixel pixel, int value)
 	{
 		pixel.setBlue (value);
 	}
 
 	[method: JigsawTab("Graphics")]
-	public static void setAlpha (Graphics.Pixel pixel, byte value)
+	public static void setAlpha (Graphics.Pixel pixel, int value)
 	{
 		pixel.setAlpha (value);
 	}

@@ -338,7 +338,7 @@ public class Scribbler: Myro.Robot
             conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
             //set_ir_power (135); // hack for fluke2
             conf_rle (0, 255, 51, 136, 190, 255, 90, 4);			
-            if (isFluke2()) setPicSize("large");
+            if (isFluke2()) setPictureSize("large");
         }
         if (info.Contains ("robot")) {
             loadFudge ();
@@ -1898,7 +1898,7 @@ public class Scribbler: Myro.Robot
         conf_window (window, lx, ly, ux, uy, xstep, ystep);
     }
 
-    public override void setPicSize(string size)
+    public override void setPictureSize(string size)
     {
         if (!flukeIsAtLeast("3.0.9")) return;
         byte sizecode = 213;

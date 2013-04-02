@@ -424,52 +424,47 @@ public static class Graphics
 		return pixel.getAlpha ();
 	}
 
-	public static void setRGB (Pixel pixel, int red, int green, int blue)
-	{
-		pixel.setRGB ((byte)red, (byte)green, (byte)blue);
-	}
-
 	public static void setRGB (Pixel pixel, IList rgb)
 	{
-		pixel.setRGB ((byte)rgb [0], (byte)rgb [1], (byte)rgb [2]);
+	    pixel.setRGB ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
 	}
 
 	public static void setRGB (Pixel pixel, float red, float green, float blue)
 	{
-		pixel.setRGB ((byte)red, (byte)green, (byte)blue);
+	    pixel.setRGB ((int)Math.Round(red), (int)Math.Round(green), (int)Math.Round(blue));
 	}
 
-	public static void setRGB (Pixel pixel, byte red, byte green, byte blue)
+	public static void setRGB (Pixel pixel, int red, int green, int blue)
 	{
 		pixel.setRGB (red, green, blue);
 	}
 
-	public static void setRGBA (Pixel pixel, byte red, byte green, byte blue, byte alpha)
+	public static void setRGBA (Pixel pixel, int red, int green, int blue, int alpha)
 	{
 		pixel.setRGBA (red, green, blue, alpha);
 	}
 
-	public static void setGray (Pixel pixel, byte value)
+	public static void setGray (Pixel pixel, int value)
 	{
 		pixel.setGray (value);
 	}
 
-	public static void setRed (Pixel pixel, byte value)
+	public static void setRed (Pixel pixel, int value)
 	{
 		pixel.setRed (value);
 	}
 
-	public static void setGreen (Pixel pixel, byte value)
+	public static void setGreen (Pixel pixel, int value)
 	{
 		pixel.setGreen (value);
 	}
 
-	public static void setBlue (Pixel pixel, byte value)
+	public static void setBlue (Pixel pixel, int value)
 	{
 		pixel.setBlue (value);
 	}
 
-	public static void setAlpha (Pixel pixel, byte value)
+	public static void setAlpha (Pixel pixel, int value)
 	{
 		pixel.setAlpha (value);
 	}
@@ -1020,10 +1015,10 @@ public static class Graphics
 				_cairo.R = ToCairo (value);
 				if (picture is Picture) {
 					if (x >= 0 && y >= 0)
-						picture.setRed (x, y, (byte)value);
+						picture.setRed (x, y, value);
 					else {
 						foreach (Pixel pixel in picture.getPixels()) {
-							pixel.setRed ((byte)value);
+							pixel.setRed (value);
 						}
 					}
 				} else
@@ -1039,10 +1034,10 @@ public static class Graphics
 				_cairo.G = ToCairo (value);
 				if (picture is Picture) {
 					if (x >= 0 && y >= 0)
-						picture.setGreen (x, y, (byte)value);
+						picture.setGreen (x, y, value);
 					else {
 						foreach (Pixel pixel in picture.getPixels()) {
-							pixel.setGreen ((byte)value);
+							pixel.setGreen (value);
 						}
 					}
 				} else
@@ -1058,10 +1053,10 @@ public static class Graphics
 				_cairo.B = ToCairo (value);
 				if (picture is Picture) {
 					if (x >= 0 && y >= 0)
-						picture.setBlue (x, y, (byte)value);
+						picture.setBlue (x, y, value);
 					else {
 						foreach (Pixel pixel in picture.getPixels()) {
-							pixel.setBlue ((byte)value);
+							pixel.setBlue (value);
 						}
 					}
 				} else
@@ -1077,10 +1072,10 @@ public static class Graphics
 				_cairo.A = ToCairo (value);
 				if (picture is Picture) {
 					if (x >= 0 && y >= 0)
-						picture.setAlpha (x, y, (byte)value);
+						picture.setAlpha (x, y, value);
 					else {
 						foreach (Pixel pixel in picture.getPixels()) {
-							pixel.setAlpha ((byte)value);
+							pixel.setAlpha (value);
 						}
 					}
 				} else
@@ -3819,37 +3814,37 @@ public static class Graphics
 			picture.setColor (x, y, color);
 		}
 
-		public void setRGB (byte red, byte green, byte blue)
+		public void setRGB (int red, int green, int blue)
 		{
 			picture.setRGB (x, y, red, green, blue);
 		}
 
-		public void setRGBA (byte red, byte green, byte blue, byte alpha)
+		public void setRGBA (int red, int green, int blue, int alpha)
 		{
 			picture.setRGBA (x, y, red, green, blue, alpha);
 		}
 
-		public void setGray (byte value)
+		public void setGray (int value)
 		{
 			picture.setGray (x, y, value);
 		}
 
-		public void setRed (byte value)
+		public void setRed (int value)
 		{
 			picture.setRed (x, y, value);
 		}
 
-		public void setGreen (byte value)
+		public void setGreen (int value)
 		{
 			picture.setGreen (x, y, value);
 		}
 
-		public void setBlue (byte value)
+		public void setBlue (int value)
 		{
 			picture.setBlue (x, y, value);
 		}
 
-		public void setAlpha (byte value)
+		public void setAlpha (int value)
 		{
 			picture.setAlpha (x, y, value);
 		}
@@ -4474,7 +4469,7 @@ public static class Graphics
 			int green = color.green;
 			int blue = color.blue;
 			int alpha = color.alpha;
-			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+			this.setRGBA (x, y, red, green, blue, alpha);
 		}
 
 		public void setPixel (int x, int y, Pixel pixel)
@@ -4483,7 +4478,7 @@ public static class Graphics
 			int green = pixel.getGreen ();
 			int blue = pixel.getBlue ();
 			int alpha = pixel.getAlpha ();
-			this.setRGBA (x, y, (byte)red, (byte)green, (byte)blue, (byte)alpha);
+			this.setRGBA (x, y, red, green, blue, alpha);
 		}
 
 		public IEnumerable getPixels ()
@@ -4611,108 +4606,109 @@ public static class Graphics
 				       x * _pixbuf.NChannels + 3, (byte)color.alpha);
 		}
 
-		public void setGray (int x, int y, byte value)
+		public void setGray (int x, int y, int value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			value = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 0, value);
+				       x * _pixbuf.NChannels + 0, bvalue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 1, value);
+				       x * _pixbuf.NChannels + 1, bvalue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 2, value);
+				       x * _pixbuf.NChannels + 2, bvalue);
 		}
     
-		public void setRed (int x, int y, byte value)
+		public void setRed (int x, int y, int value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			value = Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 0, value);
+				       x * _pixbuf.NChannels + 0, bvalue);
 		}
 
-		public void setGreen (int x, int y, byte value)
+		public void setGreen (int x, int y, int value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			value = Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 1, value);
+				       x * _pixbuf.NChannels + 1, bvalue);
 		}
 
-		public void setBlue (int x, int y, byte value)
+		public void setBlue (int x, int y, int value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			value = Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 2, value);
+				       x * _pixbuf.NChannels + 2, bvalue);
 		}
     
-		public void setAlpha (int x, int y, byte value)
+		public void setAlpha (int x, int y, int value)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			value = Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 3, value);
+				       x * _pixbuf.NChannels + 3, bvalue);
 		}
 
-		public void setAlpha (byte value)
+		public void setAlpha (int value)
 		{
-		  value = Math.Min(Math.Max((byte)0, value), (byte)255);
+		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    for (int x = 0; x < _cacheWidth; x++) {
 			for (int y = 0; y < _cacheHeight; y++) {
 			    if (getRed(x,y) == 0 && getGreen(x,y) == 0 && getBlue(x,y) == 0) {
 				// Don't change alpha here
 			    } else {
 				Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-						   x * _pixbuf.NChannels + 3, value);
+						   x * _pixbuf.NChannels + 3, bvalue);
 			    }
 			}
 		    }
 		}
 
-		public void setRGB (int x, int y, byte red, byte green, byte blue)
+		public void setRGB (int x, int y, int red, int green, int blue)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			red = Math.Min(Math.Max((byte)0, red), (byte)255);
-			green = Math.Min(Math.Max((byte)0, green), (byte)255);
-			blue = Math.Min(Math.Max((byte)0, blue), (byte)255);
+		    byte bred = (byte)Math.Min(Math.Max((byte)0, red), (byte)255);
+		    byte bgreen = (byte)Math.Min(Math.Max((byte)0, green), (byte)255);
+		    byte bblue = (byte)Math.Min(Math.Max((byte)0, blue), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 0, red);
+				       x * _pixbuf.NChannels + 0, bred);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 1, green);
+				       x * _pixbuf.NChannels + 1, bgreen);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 2, blue);
+				       x * _pixbuf.NChannels + 2, bblue);
 		}
     
-		public void setRGBA (int x, int y, byte red, byte green, byte blue, 
-				      byte alpha)
+		public void setRGBA (int x, int y, int red, int green, int blue, 
+				      int alpha)
 		{
 		    // red, green, blue, alpha
 		    x = wrap_width (x);
 		    y = wrap_height (y);
-			red = Math.Min(Math.Max((byte)0, red), (byte)255);
-			green = Math.Min(Math.Max((byte)0, green), (byte)255);
-			blue = Math.Min(Math.Max((byte)0, blue), (byte)255);
+		    byte bred = (byte)Math.Min(Math.Max((byte)0, red), (byte)255);
+		    byte bgreen = (byte)Math.Min(Math.Max((byte)0, green), (byte)255);
+		    byte bblue = (byte)Math.Min(Math.Max((byte)0, blue), (byte)255);
+		    byte balpha = (byte)Math.Min(Math.Max((byte)0, alpha), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 0, red);
+				       x * _pixbuf.NChannels + 0, bred);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 1, green);
+				       x * _pixbuf.NChannels + 1, bgreen);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 2, blue);
+				       x * _pixbuf.NChannels + 2, bblue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-				       x * _pixbuf.NChannels + 3, alpha);
+				       x * _pixbuf.NChannels + 3, balpha);
 		}
 
 		public override Color fill {
@@ -7474,7 +7470,7 @@ public static class Graphics
 			return ColorMap();
 		}
 	
-		/* Unbias network to give byte values 0..255 and record position i to prepare for sort
+		/* Unbias network to give int values 0..255 and record position i to prepare for sort
 		   ----------------------------------------------------------------------------------- */
 		public void Unbiasnet() 
 		{
