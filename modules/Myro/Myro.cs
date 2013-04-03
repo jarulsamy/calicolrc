@@ -1957,6 +1957,13 @@ public static class Myro
         robot.setPictureSize(size);
     }
 
+    [method: JigsawTab(null)]
+    public static void setPicSize(string size)
+    {
+	// TODO: deprecate in the future
+        robot.setPictureSize(size);
+    }
+
     [method: JigsawTab("Actions")]
     public static void servo(int id, int value)
     {
@@ -2846,6 +2853,12 @@ public static class Myro
         // fluke2
         public virtual void setPictureSize(string size)
         {
+        }
+        
+        public void setPicSize(string size)
+        {
+	    // TODO: deprecate in the future
+	    setPictureSize(size);
         }
         
         public virtual void servo(int id, int value)
