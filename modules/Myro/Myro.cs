@@ -1163,12 +1163,7 @@ public static class Myro
 	  }
 	  if (port.StartsWith ("sim")) {
 	      if (simulation != null && simulation.window.isRealized()) {
-		  lock (simulation.robots) {
-		      foreach (Robot r in simulation.robots) {
-			  r.uninit();
-		      }
-		      simulation.robots.Clear();
-		  }
+		  simulation.clear();
 	      } else {
 		  simulation = new Simulation ();
 	      }
@@ -1293,6 +1288,15 @@ public static class Myro
 			    setup();
 		}
 	    
+	    public void clear() {
+		lock (robots) {
+		    foreach (Robot r in simulation.robots) {
+			r.uninit();
+		    }
+		    simulation.robots.Clear();
+		}
+	    }
+
 		public void addLight (IList list, int radius, Graphics.Color color)
 		{
 			// Non-physical things here:

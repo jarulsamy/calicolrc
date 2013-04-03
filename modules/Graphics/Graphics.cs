@@ -2222,12 +2222,12 @@ public static class Graphics
 					g.Paint ();
 					g.Restore ();
 				}
-				lock (shapes) {
-					foreach (Shape shape in shapes) {
-						shape.render (g);
-						shape.updateGlobalPosition (g);
-					}
+				//lock (shapes) {
+				foreach (Shape shape in shapes) {
+				    shape.render (g);
+				    shape.updateGlobalPosition (g);
 				}
+				//}
 			}
 			return base.OnExposeEvent (args);
 		}
