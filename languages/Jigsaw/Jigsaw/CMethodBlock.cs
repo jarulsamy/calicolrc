@@ -343,23 +343,26 @@ namespace Jigsaw
 				yield return rr;
 			}
 			
-			// - - - Execute the statement - - - - - - - - - - - - - - - -
-			try {
-				_compiled.Execute(scope);
-//				Gtk.MessageDialog dlg2 = new Gtk.MessageDialog(
-//					null,
-//					Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
-//					Gtk.MessageType.Error,
-//					Gtk.ButtonsType.Ok,
-//					"After Execute"
-//				);
-//				Gtk.ResponseType rsp2 = (Gtk.ResponseType)dlg2.Run ();
-//				dlg2.Destroy();
-			} catch (Exception ex) {
-				this["Message"] = ex.Message;
-				this.State = RunningState.Error;
-				rr.Action = EngineAction.Error;
-				rr.Frame = null;
+			// - - - Execute the statement - - - - - - - - - - - - - -
+			// - - - - -
+
+			System.Threading.ManualResetEvent ev = new System.Threading.ManualResetEvent(false);
+			System.Threading.Thread t = new System.Threading.Thread(() => {
+				  try {
+					_compiled.Execute(scope);
+				  } catch (Exception ex) {
+					this["Message"] = ex.Message;
+					this.State = RunningState.Error;
+					rr.Action = EngineAction.Error;
+					rr.Frame = null;
+				  } finally {
+					ev.Set();
+				  }
+				});
+			t.Start();
+			while (!ev.WaitOne(0)) { // Are we done?
+			  while (Gtk.Application.EventsPending ())
+				Gtk.Application.RunIteration ();
 			}
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
