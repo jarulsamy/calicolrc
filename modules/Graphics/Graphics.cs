@@ -1809,6 +1809,10 @@ public static class Graphics
 		    return false; // return true to try again
 		}
 
+		public void setMode(String mode) {
+		    this.mode = mode;
+		}
+
 		public string getMode ()
 		{
 			return _canvas.mode;
