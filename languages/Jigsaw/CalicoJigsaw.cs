@@ -126,6 +126,12 @@ public class CalicoJigsawDocument : Document
 	}
 	
 	protected void OnJigsawRun(object sender, EventArgs a) {
+                string dir = System.IO.Path.GetDirectoryName(filename);
+                if (dir != "" && dir != null) {
+		    DirectoryInfo dirInfo = new DirectoryInfo(dir);
+		    if (dirInfo.Exists)
+			System.IO.Directory.SetCurrentDirectory(dir);
+                }
 		calico.OnStartRunning();
 	}
 	
