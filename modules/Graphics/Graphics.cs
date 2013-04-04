@@ -571,8 +571,7 @@ public static class Graphics
 	    Invoke( delegate {
 		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
-		    }
-		    else{
+		    } else {
 			Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
 			_lastWindow.clear(false);
@@ -1319,7 +1318,7 @@ public static class Graphics
 			    _canvas.need_to_draw_surface = false;
 			    
 			    mode = "auto";
-			    Resize (width, height);
+			    //Resize (width, height); // removed because of scrollbar issue
 			    timer_running = false;
 			    last_update = new DateTime (2000, 1, 1);
 			    _update_interval = .1; // how often, in seconds, to update
@@ -1683,7 +1682,7 @@ public static class Graphics
 		public int _width {
 		    get {
 			int _width = 0, _height = 0;
-			if (Child == _canvas) {
+			if (Child == _canvas || Child == widget) {
 			    this.GetSize (out _width, out _height);
 			} else { // scrollbars
 			    _width = _canvas.width;
@@ -1761,9 +1760,9 @@ public static class Graphics
 
 		public new void Resize (int width, int height)
 		{
-			_canvas.resize (width, height);
-			Invoke (delegate {
-				base.Resize (width, height);
+		    _canvas.resize (width, height);
+		    Invoke (delegate {
+			    base.Resize (width, height);
 			});
 		}
     
