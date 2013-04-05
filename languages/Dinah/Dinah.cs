@@ -134,7 +134,7 @@ namespace Dinah
 			hbox1.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			Gtk.Image image = new global::Gtk.Image ();
-			image.Pixbuf = IconLoader.LoadIcon (this, "stock_trash_full", Gtk.IconSize.Dialog);
+			image.Pixbuf = IconLoader.LoadIcon (this, "gtk-delete", Gtk.IconSize.Dialog);
 			hbox1.Add(image);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			//global::Gtk.Label w5 = new global::Gtk.Label ();
