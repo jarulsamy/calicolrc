@@ -1,5 +1,6 @@
 = Bugs =
 
+* listOfPictures = makePicture("animated.gif") request
 * ngram.py is acting weird (window size?)
 * tone.jig adding a scrollbar to window that already has one?! crash
 * If you save a file on close, it isn't added to recently used
