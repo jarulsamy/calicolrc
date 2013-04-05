@@ -59,6 +59,7 @@ def step(o as object, e as PElapsedEventArgs) as void:
             if world[x,y,0] == 1:
                 rect(x*sz, y*sz, sz, sz)
 
+    doEvents()
     if (paused):
         return
 
