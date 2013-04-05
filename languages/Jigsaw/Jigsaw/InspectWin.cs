@@ -99,6 +99,13 @@ namespace Jigsaw
 			CProperty prop = (CProperty)model.GetValue(iter, 0);
 			Gtk.CellRendererText cellText = (Gtk.CellRendererText)cell;
 			cellText.Text = prop.Text;
+
+			// Change cell renderer properties based on CProperty object properties
+			if (prop.Name == "Label") {
+				cellText.Editable = false;
+			} else {
+				cellText.Editable = true;
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
