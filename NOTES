@@ -1,82 +1,58 @@
-SIMULATION
+= Bugs =
 
+* ngram.py is acting weird (window size?)
 * tone.jig adding a scrollbar to window that already has one?! crash
 * If you save a file on close, it isn't added to recently used
 * add calico to Jigsaw dictionary
-OK * jigsaw should cd to directory when running a file
-
 * need to refactor SimPioneer
-* crashed when made sim window maximized
 * SimScribbler does not have set_blob_yuv
-* Can't have two simulations?
+* Can't have two simulations? 
 * need to add Shape.z (start height, end height)
-* Ashley wants turnby
-* Closing Sim and re-running doesn't show robot
-
-GRAPHICS
 * Check to see if "bitmap" works with lines, from a program. (Didn't work in Knots.py)
-* AnimatedGif my have issue with transparency...
-
-======================================================
-* move slider to left, should allow click on pause button
-======================================================
+* Scheme: move slider to left, should allow click on pause button
 * Scheme turned off the pause button?
-======================================================
-* handle --lang=LANG, --chat, --verbose, --reset?
-======================================================
+* properly handled? --lang=LANG, --chat, --verbose, --reset?
+* Printing gives error: Cairo.Context: called from finalization thread, 
+  programmer is missing a call to Dispose
+* Running a file does not use print as function. Need to... what? 
+  set Python compiler options?
+* Tab completion [needs refinement]
+* Chat stuff (register, login, blast, chat)
+* Show old error Help button on error
+* Detect that the file has changed outside of Calico
+* Currently, the graphviz code doesn't parse node lines, so attributes
+  about the shape of nodes is ignored. To fix, edit:
+  modules/Graphics/Graphviz4Net.Core/Dot/AntlrParser/DotGrammar.g
+  to add { AddNode(); } (see example like AddEdge).
+# try to save to a read-only/link crashes
+# On close, need to wait for the Chat connection to finish
+  (glib.io_add_watch - watch to see if something else edits file?)
+# SpeechBubble((center), "text", (endpoint))
+# Calico: Need to run code in an AppDomain rather than thread?
+# Calico: options for toggle word wrap, linenumbers, others
+# Calico: No backups made of files when saving
+# Calico: No backups made during editing (autosave)
+# Calico: Plugins (see the way that gedit handles plugins)
+# Provide easy method to take surveys, quiz
+# Log file for teacher analysis
+# Provide student "Hint" links to wiki page on error
+# Interactive instruction ala Classroom Presenter, but via chat
+# Submit zipfile to teacher dialog (zipfiles written in src/utils.py)
+# Scheme: (robot.beep 1.0 400.0 400.0) needs to be floats?
+# Scheme: doesn't raise exception on loading file
+# Dinah: Get working
+# DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
+# Mono: Windows doesn't respond to treeview drags after Mono 2.6.4. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
 
-======================================================
-Calico2
+= Debugging Hints =
 
-Packages
-
-* Fedora
-** mono-devel monodoc gtk-sharp2 gtk-sharp2-devel
-** monodevelop
-
-Bugs
-
- 1. Printing gives error: Cairo.Context: called from finalization thread, 
-    programmer is missing a call to Dispose
- 5. Running a file does not use print as function. Need to... what? 
-    set Python compiler options?
- 6. Tab completion [needs refinement]
- 7. Chat stuff (register, login, blast, chat)
-10. Show error Help button on error
-13. Detect that the file has changed outside of Calico
-
-Problems, issues, features, and questions.
-
-== Graphviz ==
-
-Currently, the graphviz code doesn't parse node lines, so attributes
-about the shape of nodes is ignored. To fix, edit:
-
-modules/Graphics/Graphviz4Net.Core/Dot/AntlrParser/DotGrammar.g
-
-to add { AddNode(); } (see example like AddEdge).
-
-== Debugging ==
-
-MONO_LOG_LEVEL=debug calico --debug --debug-handler
-
-also:
-
-mono --trace --debug
-mono --profile=gui-thread-check
-
-====================
+MONO_LOG_LEVEL=debug mono --trace --profile=gui-thread-check --debug calico --debug --debug-handler
 
 May need:
 
  <startup useLegacyV2RuntimeActivationPolicy="true">
 
 in calico.exe.config to allow different frameworks (2 vs 4).
-
-NOTE:
-
-mono --runtime=v4.0 Calico.exe
-mcs -sdk:2 File.cs ...
 
 = Math.NET =
 
@@ -90,68 +66,4 @@ mathdotnet.com - numerics, symbolic, etc.
 2) copied Calico/lib/SDL.dll to Calico/bin/libSDL.dll.so
 
 Works with just Tao
-
-= Ideas = 
-
-1) SpeechBubble((center), "text", (endpoint))
-
-= Calico =
-
-IMMEDIATE
-
-# Examples
-# Scheme doesn't raise exception in file load
-
-These are issues with the code in Calico/src/*.py
-
-# BUG: right-click on an error line 2nd time on windows doesn't load file (fixed with print? Probably a timing/lock issue)
-# BUG: try to save to a read-only/link crashes
-# BUG: UP and DOWN in history needs to move caret (on windows?)
-# BUG: On close, need to wait for the connection to finish
-
-Major missing features:
-
-# Calico: Need to run code in an AppDomain rather than thread?
-# Calico: options for toggle word wrap, linenumbers, others
-# Calico: connect menu edit/copy/paste/select all (see gtk-sharp for hints)
-# Calico: No backups made of files when saving
-# Calico: No backups made during editing (autosave)
-# Calico: Plugins (see the way that gedit handles plugins)
-# Calico: glib.io_add_watch - watch to see if something else edits file?
-# Calico: Find Libraries for text-to-speech, gamepad, 3D graphics, music, etc
-
-= Education =
-
-# Provide easy method to take surveys, quiz
-# Log file for teacher analysis
-# Provide student "Hint" links to wiki page on error
-# Interactive instruction ala Classroom Presenter, but via chat
-# Submit zipfile to teacher dialog (zipfiles written in src/utils.py)
-
-= Modules =
-
-# Add buttons and sliders (ala NetLogo)
-
-= Languages = 
-
-Experimental CLR Scheme:
-
-# Scheme: (robot.beep 1.0 400.0 400.0) needs to be floats?
-# Scheme: doesn't raise exception on loading file
-
-Drag and drop language Dinah:
-
-# Dinah: Get working
-## Mono doesn't allow drag and drop from TreeView
-## read classes, methods, params and return values from DLL
-## save/read file format
-## execute file
-
-= System = 
-
-DLR things for the Dynamic Language Runtime. Mono is the open source VM for the CLR.
-
-# DLR: Can we run chiron and have our code run in web browser through Silverlight/Moonlight?
-
-# Mono: Windows doesn't respond to treeview drags after Mono 2.6.4. Bug reported as: https://bugzilla.novell.com/show_bug.cgi?id=664824
 
