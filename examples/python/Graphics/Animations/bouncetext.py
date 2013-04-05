@@ -3,7 +3,8 @@ from Graphics import *
 win = Window("Hello World!", 300, 600)
 win.mode = "physics"
 
-for text in ["Hello", "World!", "Welcome", "to", "Calico"]:
+for text in ["Hello", "World!",
+             "Welcome", "to", "Calico"]:
     t = Text((130, 100), text)
     t.draw(win)
     t.wrap = True
