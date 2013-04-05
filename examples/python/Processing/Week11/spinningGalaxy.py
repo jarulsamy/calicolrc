@@ -31,6 +31,7 @@ def draw(o, e):
         ellipse(x, y, 5, 5)
     
     angleChange += 0.0001
+    doEvents()
 
 # Set up looping
 onLoop += draw
