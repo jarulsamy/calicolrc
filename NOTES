@@ -1,5 +1,10 @@
 SIMULATION
 
+* tone.jig adding a scrollbar to window that already has one?! crash
+* If you save a file on close, it isn't added to recently used
+* add calico to Jigsaw dictionary
+OK * jigsaw should cd to directory when running a file
+
 * need to refactor SimPioneer
 * crashed when made sim window maximized
 * SimScribbler does not have set_blob_yuv

@@ -99,7 +99,7 @@ internal class PWindow : Gtk.Window
 	protected void onDeleteEvent (object o, DeleteEventArgs args)
 	{
 		raiseWindowClosed(args);				// Let others know that the window closed itself
-		if (_needsQuit) Application.Quit();		// This must be executed here if required
+		//if (_needsQuit) Application.Quit();		// This must be executed here if required
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

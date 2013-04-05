@@ -249,7 +249,7 @@ public static class Processing
 			int[] wchars = exit ();
 
 			// Initialize Gtk
-			Application.Init ();
+			//Application.Init ();
 
 			// Create a new window with appropriate attributes
 			if (wchars != null) {
@@ -282,7 +282,7 @@ public static class Processing
 			ev.Set ();
 
 			// Run the new window main loop
-			Application.Run ();
+			//Application.Run ();
 		} );
 
 		// Wait to be signalled	
