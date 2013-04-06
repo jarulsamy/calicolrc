@@ -2243,6 +2243,8 @@ public static class Graphics
 		public List<Shape> joints = new List<Shape> ();
 		public double gx = 0.0;
 		public double gy = 0.0;
+	        public double z = 0.0; // height off ground (3D) 0 - 1
+	        public double zHeight = 1.0; // height of shape (3D) 0 - 1
 		public bool visible = true;
 		public Point[] points;
 		internal Color _fill;

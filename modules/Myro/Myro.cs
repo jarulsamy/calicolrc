@@ -1334,6 +1334,7 @@ public static class Myro
 		{
 		    shape.draw (window);
 		    shape.body.IgnoreGravity = true;
+		    shape.zHeight = 0.25;
 		}
     
 		public void setup ()

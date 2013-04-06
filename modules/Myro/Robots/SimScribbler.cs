@@ -377,6 +377,15 @@ public class SimScribbler : Myro.Robot
 		    return pic;
 		}
 
+		public class Hit {
+		    public Graphics.Shape shape;
+		    public double distance;
+		    public Hit(Graphics.Shape shape, double distance) {
+			this.shape = shape;
+			this.distance = distance;
+		    }
+		}
+
 		public Graphics.Picture _takePicture (string mode="jpeg")
 		{ 
 		    // simscribbler camera
@@ -387,59 +396,77 @@ public class SimScribbler : Myro.Robot
 		    float MeterInPixels = 64.0f;
 		    if (!simulation.window.isRealized())
 			return picture;
-		    double [] distance = new double[256];
-		    Graphics.Color [] colors = new Graphics.Color[256];
+		    List<Hit> [] hits = new List<Hit>[256];
 		    Graphics.Point p1 = frame.getScreenPoint (new Graphics.Point (25, 0));
 		    for (int i = 0; i < 256; i += band) {
 			var v = Graphics.VectorRotate (Graphics.Vector (max_distance * MeterInPixels, 0), 
 						       (float)(((i / 256.0) * view_angle) - view_angle / 2.0) * Math.PI / 180.0);
 			Graphics.Point p2 = frame.getScreenPoint (new Graphics.Point (25 + v.X, v.Y));
 			simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-				distance [i] = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
-				if (fixture.UserData is Graphics.Shape)
-				    colors [i] = ((Graphics.Shape)fixture.UserData).fill;
+				if (fixture.UserData is Graphics.Shape) {
+				    double distance = 1.0 - Math.Min (hit * max_distance, max_distance) / max_distance; /// 10 x car
+				    // if not a list, make one
+				    if (hits[i] == null) {
+					hits[i] = new List<Hit>();
+				    }
+				    // add to list, with smallest (furthest) first
+				    int pos = 0;
+				    while (pos < hits[i].Count && distance > hits[i][pos].distance) {
+					pos++;
+				    }
+				    hits[i].Insert(pos, new Hit((Graphics.Shape)fixture.UserData, distance));
+				}
 				return 1; 
 			    }, 
 			    Graphics.Vector ((float)(p1.x / MeterInPixels), (float)(p1.y / MeterInPixels)), 
 			    Graphics.Vector ((float)(p2.x / MeterInPixels), (float)(p2.y / MeterInPixels)));
 		    }
-		    Graphics.Color c;
-		    double g = 1.0;
+		    double center = 192 / 2.0;
+		    int low = 0, high = 0, zero = 0;
 		    Graphics.Color sky = new Graphics.Color ("deepskyblue");
 		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Myro.Invoke (delegate {
-			    for (int i = 0; i < 256; i += band) {
-				if (distance [i] > 0) {
-				    if (colors [i] != null)
-					c = colors [i];
-				    else
-					c = new Graphics.Color ("black");
-				    g = distance [i];
-				} else {
-				    c = new Graphics.Color ("gray");
-				    g = 1.0;
+			    Graphics.Color [] column = new Graphics.Color [192];
+			    int h = 0;
+			    // Compute colors
+			    for (int i = 0; i < 256; i += band) { // width
+				// background:
+				for (h = 0; h < 192; h++) { // height
+				    if (h < center) { // sky
+					column[h] = sky;
+				    } else { // ground
+					column[h] = simulation.groundColor;
+				    }
 				}
-				for (int h = 0; h < 192; h++) {
-				    if (h >= (int)(192 / 2.0 - g * 192 / 2.0) && h <= (int)(192 / 2.0 + g * 192 / 2.0)) {
-					for (int ii=0; ii<band; ii++) {
-					    picture.setColor (i + ii, h, new Graphics.Color (c.red * g, c.green * g, c.blue * g));
+				// layer shapes on background, furtherest to closest
+				if (hits[i] != null) {
+				    // draw half above, half below, normally
+				    //low = (int)(center - g * center);  // position of top
+				    // low is near top
+				    // high is near bottom
+				    foreach (Hit hit in hits[i]) {
+					Graphics.Shape shape = hit.shape;
+					double g = hit.distance;
+					zero = (int)(center + g * center); // position of ground
+					high = (int)(zero - (shape.z * 192 * g)); // distance above ground, 0 to 1
+					low = (int)(high - (shape.zHeight * 192 * g)); // height of shape, 0 to 1
+					for (h = low; h < high; h++) {
+					    column[h] = new Graphics.Color (shape.color.red * g, 
+									    shape.color.green * g, 
+									    shape.color.blue * g);
 					}
-				    } else if (h < (int)(192 / 2.0 - g * 192 / 2.0)) {
-					for (int ii=0; ii<band; ii++) {
-					    picture.setColor (i + ii, h, sky);
-					}
-				    } else {
-					for (int ii=0; ii<band; ii++) {
-					    picture.setColor (i + ii, h, simulation.groundColor);
-					}
+				    }
+				}
+				// now draw the column here:
+				for (h = 0; h < 192; h++) {
+				    for (int ii=0; ii<band; ii++) {
+					picture.setColor (i + ii, h, column[h]);
 				    }
 				}
 				ev.Set();
 			    }
 			});
 		    ev.WaitOne ();
-		    //Graphics.Picture pic = makePicture("/home/dblank/Calico-dev/trunk/examples/images/pyramid.png");
-		    //picture.setRegion(new Graphics.Point(10, 10), pic);
 		    return picture;
 	        }
     
