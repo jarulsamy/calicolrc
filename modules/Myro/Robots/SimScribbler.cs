@@ -267,9 +267,9 @@ public class SimScribbler : Myro.Robot
 		    if (direction == "same") {
 			return;
 		    } else if (direction == "right") {
-			turnRight(.3); // right, increasing
+			turnRight(.7); // right, increasing
 		    } else {
-			turnLeft(.3); // left, decreasing
+			turnLeft(.7); // left, decreasing
 		    }
 		    continueTurning(direction, target, ev);
 		    ev.WaitOne();
@@ -280,7 +280,8 @@ public class SimScribbler : Myro.Robot
 			queue.Add(delegate {
 				if (frame.body.AngularVelocity != 0.0) { // still moving
 				    if (isDone(direction, frame.rotation * (Math.PI / 180.0), target)) {
-					stop();
+					frame.body.AngularVelocity = 0.0f;
+					frame.rotation = target * (180.0 / Math.PI);
 					ev.Set();
 				    } else {
 					lock (queue) {
