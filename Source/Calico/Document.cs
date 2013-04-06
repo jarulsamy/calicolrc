@@ -232,13 +232,11 @@ namespace Calico {
         }
 
         public virtual bool Save(bool force) {
-            if (IsDirty || force) { // only Save if this is dirty
+            if (IsDirty || force) { // only Save if this is dirty or forced
                 if (filename != null) {
-                    try {
-                        return SaveDocument();
-                    } catch {
-                        // fail.. let's try SaveAs...
-                    }
+		    if (SaveDocument())
+			return true;
+		    // fail.. let's try SaveAs...
                 }
                 return SaveAs();
             } else {
