@@ -118,14 +118,14 @@ public static class Shapes
 		Graphics.setRGB (pixel, red, green, blue);
 	}
 
-	public static void savePicture (string filename, Graphics.Picture picture)
+        public static void savePicture (Graphics.Picture picture, string filename)
 	{
-		Graphics.savePicture (filename, picture);
+	        Graphics.savePicture (picture, filename);
 	}
 
-	public static void savePicture (string filename, List list)
+        public static void savePicture (List list, string filename)
 	{
-		Graphics.savePicture (filename, list);
+   	        Graphics.savePicture (list, filename);
 	}
 
 	public static Graphics.Picture makePicture (int x, int y)

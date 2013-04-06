@@ -469,7 +469,7 @@ public static class Graphics
 		pixel.setAlpha (value);
 	}
   
-        public static void savePicture (string filename, params Picture [] pictures) {
+        public static void savePicture (IList pictures, string filename) {
 	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
 	    gif.Start();
 	    gif.SetRepeat(0);
@@ -480,18 +480,7 @@ public static class Graphics
 	    gif.Output(filename);
 	}
 
-        public static void savePicture (string filename, IList pictures) {
-	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
-	    gif.Start();
-	    gif.SetRepeat(0);
-	    foreach (Picture picture in pictures) {
-		gif.AddFrame(picture);
-	    }
-	    gif.Finish();
-	    gif.Output(filename);
-	}
-
-        public static void savePicture (string filename, short delay, bool repeat, List pictures) {
+        public static void savePicture (List pictures, string filename, short delay, bool repeat) {
 	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
 	    gif.Start();
 	    gif.SetRepeat(repeat ? 0 : -1);
@@ -503,19 +492,19 @@ public static class Graphics
 	    gif.Output(filename);
 	}
 
-        public static void savePicture (string filename, Picture picture)
+        public static void savePicture (Picture picture, string filename)
 	{
 	    picture.savePicture (filename);
 	}
 
-        public static void savePicture (string filename, List list)
+        public static void savePicture (List list, string filename)
 	{
-	    savePicture (filename, 10, false, list);
+	    savePicture (list, filename, 10, false);
 	}
 
-        public static void savePicture (string filename, short delay, List list)
+        public static void savePicture (List list, string filename, short delay)
 	{
-	    savePicture (filename, delay, false, list);
+	    savePicture (list, filename, delay, false);
 	}
 
 	public static Picture makePicture (int x, int y)
