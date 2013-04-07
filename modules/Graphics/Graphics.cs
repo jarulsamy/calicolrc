@@ -4062,7 +4062,18 @@ public static class Graphics
 		    Gdk.Pixmap pixmap, mask;
 		    _pixbuf.RenderPixmapAndMask(out pixmap, out mask, 255);
 		    System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(pixmap);
-		    return new System.Drawing.Bitmap(width, height, graphics);
+		    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(width, height, graphics);
+		    for (int x=0; x < width; x++) {
+			for (int y=0; y < height; y++) {
+			    Graphics.Pixel pixel = getPixel(x,y);
+			    bitmap.SetPixel(x, y, 
+					    System.Drawing.Color.FromArgb(pixel.getAlpha(), 
+									  pixel.getRed(), 
+									  pixel.getGreen(), 
+									  pixel.getBlue()));
+			}
+		    }
+		    return bitmap;
 		}
 
 		public void fromArray (Byte [] buffer, string format)
