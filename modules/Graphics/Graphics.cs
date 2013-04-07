@@ -4058,6 +4058,13 @@ public static class Graphics
 		    ev.WaitOne();
 		}
 
+		public System.Drawing.Bitmap toBitmap () {
+		    Gdk.Pixmap pixmap, mask;
+		    _pixbuf.RenderPixmapAndMask(out pixmap, out mask, 0);
+		    System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(pixmap);
+		    return new System.Drawing.Bitmap(width, height, graphics);
+		}
+
 		public void fromArray (Byte [] buffer, string format)
 		{
 		    ManualResetEvent ev = new ManualResetEvent(false);
