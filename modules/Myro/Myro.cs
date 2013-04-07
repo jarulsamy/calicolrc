@@ -3794,6 +3794,12 @@ public static class Myro
 	}
 
 	[method: JigsawTab("Picture")]
+	public static Graphics.Picture makePicture (System.Drawing.Bitmap bitmap)
+	{ //, string filename) {
+		return Graphics.makePicture (bitmap);
+	}
+
+	[method: JigsawTab("Picture")]
 	public static Graphics.Picture copyPicture (Graphics.Picture picture)
 	{ //, string filename) {
 		return Graphics.copyPicture (picture);
