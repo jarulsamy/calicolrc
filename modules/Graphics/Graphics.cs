@@ -4061,9 +4061,8 @@ public static class Graphics
 		public System.Drawing.Bitmap toBitmap () {
 		    Gdk.Pixmap pixmap, mask;
 		    _pixbuf.RenderPixmapAndMask(out pixmap, out mask, 255);
-		    using (System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(mask)) {
-			return new System.Drawing.Bitmap(width, height, graphics);
-		    }
+		    System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(mask);
+		    return new System.Drawing.Bitmap(width, height, graphics);
 		}
 
 		public void fromArray (Byte [] buffer, string format)
