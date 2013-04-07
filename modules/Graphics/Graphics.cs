@@ -4060,10 +4060,7 @@ public static class Graphics
 
 		public System.Drawing.Bitmap toBitmap () {
 		    Gdk.Pixmap pixmap, mask;
-		    //_pixbuf.RenderPixmapAndMask(out pixmap, out mask, 255);
-		    //System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(pixmap);
-		    Gtk.Image image = new Gtk.Image(pixbuf);
-		    image.GetPixmap(out pixmap, out mask);
+		    _pixbuf.RenderPixmapAndMask(out pixmap, out mask, 255);
 		    System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(pixmap);
 		    return new System.Drawing.Bitmap(width, height, graphics);
 		}
