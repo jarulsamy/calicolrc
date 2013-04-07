@@ -546,6 +546,11 @@ public static class Graphics
 		return new Picture (window);
 	}
 
+	public static Picture makePicture (System.Drawing.Bitmap bitmap)
+	{ 
+		return new Picture (bitmap);
+	}
+
 	public static void wait (double seconds)
 	{
 	    if (seconds > 0) 
@@ -3941,6 +3946,10 @@ public static class Graphics
 			    ev.Set ();
 			});
 		    ev.WaitOne ();
+		}
+
+		public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
+		{ 
 		}
 		
 		public Picture (bool has_pen) : base(has_pen)
