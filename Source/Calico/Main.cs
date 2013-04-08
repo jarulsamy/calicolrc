@@ -264,6 +264,7 @@ namespace Calico {
             } else if (((IList<string>)args).Contains("--install")) {
 		// get the script filename
 		// execute the script filename
+		win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
 		for (int i=0; i < args.Length; i++) {
 		    string arg = args[i];
 		    if (arg == "--install") {
