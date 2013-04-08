@@ -317,6 +317,7 @@ namespace Calico {
             Print(_("  StartCalico --repl FILENAMEs              Run FILENAMEs standalone with graphics and then start read-eval loop"));
             Print(_("  StartCalico --exec --nographics FILENAMEs Run FILENAMEs standalone without graphics"));
             Print(_("  StartCalico --repl --nographics FILENAMEs Run FILENAMEs standalone without graphics and then start read-eval loop"));
+	    Print(_("  StartCalico --nomodules                   Does not load the libraries from Calico/modules/*.dll"));
             Print(_("  StartCalico --version                     Displays the version number ({0})"), Version);
             Print(_("  StartCalico --verbose                     Displays detailed information, useful for debugging Calico"));
             Print(_("  StartCalico --debug                       Calico output goes to console rather than GUI"));
