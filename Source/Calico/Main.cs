@@ -261,6 +261,18 @@ namespace Calico {
                 } else {
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
                 }
+            } else if (((IList<string>)args).Contains("--install")) {
+		// get the script filename
+		// execute the script filename
+		for (int i=0; i < args.Length; i++) {
+		    string arg = args[i];
+		    if (arg == "--install") {
+			i++;
+			string filename = args[i];
+			manager ["python"].engine.ExecuteFile(filename);
+		    }
+		}
+		System.Environment.Exit(0);
             }
             else {
                 // Catch SIGINT
