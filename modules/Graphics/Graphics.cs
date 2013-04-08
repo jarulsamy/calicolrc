@@ -41,6 +41,9 @@ using Cairo;
 // Animated Gifs:
 using System.Drawing.Imaging;
 
+// Extensions:
+using System.ComponentModel;
+
 public static class Extensions
 {
     // Can't use extension methods to override existing methods
@@ -53,6 +56,12 @@ public static class Extensions
 	    retval += item.ToString();
 	}
 	return "[" + retval + "]";
+    }
+
+    public static System.Drawing.Bitmap ToBitmap(this Gdk.Pixbuf pix) {
+	TypeConverter tc = TypeDescriptor.GetConverter(typeof(Bitmap));
+	//// Possible file formats are: "jpeg", "png", "ico" and "bmp"
+	return (Bitmap)tc.ConvertFrom(pix.SaveToBuffer("bmp")); 
     }
 }
 
@@ -4059,21 +4068,7 @@ public static class Graphics
 		}
 
 		public System.Drawing.Bitmap toBitmap () {
-		    Gdk.Pixmap pixmap, mask;
-		    _pixbuf.RenderPixmapAndMask(out pixmap, out mask, 255);
-		    System.Drawing.Graphics graphics = Gtk.DotNet.Graphics.FromDrawable(pixmap);
-		    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(width, height, graphics);
-		    for (int x=0; x < width; x++) {
-			for (int y=0; y < height; y++) {
-			    Graphics.Pixel pixel = getPixel(x,y);
-			    bitmap.SetPixel(x, y, 
-					    System.Drawing.Color.FromArgb(pixel.getAlpha(), 
-									  pixel.getRed(), 
-									  pixel.getGreen(), 
-									  pixel.getBlue()));
-			}
-		    }
-		    return bitmap;
+		    return _pixbuf.ToBitmap();
 		}
 
 		public void fromArray (Byte [] buffer, string format)
