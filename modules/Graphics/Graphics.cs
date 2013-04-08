@@ -61,7 +61,7 @@ public static class Extensions
     public static System.Drawing.Bitmap ToBitmap(this Gdk.Pixbuf pix) {
 	TypeConverter tc = TypeDescriptor.GetConverter(typeof(Bitmap));
 	//// Possible file formats are: "jpeg", "png", "ico" and "bmp"
-	return (Bitmap)tc.ConvertFrom(pix.SaveToBuffer("jpeg")); 
+	return (Bitmap)tc.ConvertFrom(pix.SaveToBuffer("png")); 
     }
 }
 
