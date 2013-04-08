@@ -16,6 +16,6 @@ pics = []
 for i in range(10):
     pics.append(takePicture())
     show(pics[-1])
-    wait(.1)
+    wait(1)
 stop()
-savePicture("animated.gif", pics)
+savePicture(pics, "animated.gif")
