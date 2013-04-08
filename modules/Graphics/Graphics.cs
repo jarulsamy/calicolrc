@@ -70,7 +70,7 @@ public static class Extensions
 					  x * pix.NChannels + 2);
 		int a = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
 					  x * pix.NChannels + 3);
-		System.Drawing.Color color = System.Drawing.Color.FromArgb(r, g, b, a);
+		System.Drawing.Color color = System.Drawing.Color.FromArgb(a, r, g, b);
 		bitmap.SetPixel(x, y, color);
 	    }
 	}
