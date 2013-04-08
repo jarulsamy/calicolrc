@@ -173,10 +173,11 @@ namespace Calico {
             configureIO();
 
             // Run this in in the GUI thread, after we start:
-            Invoke(delegate {
-                manager.PostSetup(this);
+	    if (!((IList<string>)args).Contains("--nomodules")) {
+	        Invoke(delegate {
+	           manager.PostSetup(this);
+                });
             }
-            );
             
             // Examples menu:
             Gtk.MenuItem examples_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExamplesAction");

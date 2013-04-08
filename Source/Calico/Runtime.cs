@@ -64,10 +64,11 @@ namespace Calico {
             //manager.PostSetup(this); 
 
             // Run this in in the GUI thread, after we start:
-            Gtk.Application.Invoke(delegate {
-                manager.PostSetup(this); });
-
-            manager ["python"].engine.Execute("from __builtin__ import raw_input, input", false);
+	    if (!((IList<string>)args).Contains("--nomodules")) {
+		Gtk.Application.Invoke(delegate {
+			manager.PostSetup(this); });
+	    }
+	    manager ["python"].engine.Execute("from __builtin__ import raw_input, input", false);
 
             // All done, show if minimized:
             //this.Present();
@@ -78,7 +79,15 @@ namespace Calico {
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
                     //Console.WriteLine("NO GUI MODE" + CurrentLanguage + " "  + arg);
-                    ExecuteFileInBackground(arg, CurrentLanguage);
+		    string dirname = System.IO.Path.GetDirectoryName(arg);
+		    if (dirname != "" && dirname != null) {
+			DirectoryInfo dirInfo = new DirectoryInfo(dirname);
+			if (dirInfo.Exists) {
+			    System.IO.Directory.SetCurrentDirectory(dirname);
+			    //System.Console.WriteLine("cd: " + dirname);
+			    ExecuteFileInBackground(arg, CurrentLanguage);
+			}
+		    }
                     //manager [CurrentLanguage].engine.ExecuteFile(arg);
                 }
             }
@@ -134,7 +143,7 @@ namespace Calico {
                             manager.Register(manager[CurrentLanguage], true);
                             manager[CurrentLanguage].engine.Setup(path);
                             manager[CurrentLanguage].engine.Start(path);
-                            manager[CurrentLanguage].engine.PostSetup(this);
+			    manager[CurrentLanguage].engine.PostSetup(this);
                         }
                         expr = "";
                         prompt = CurrentLanguage + "> ";
@@ -583,12 +592,22 @@ namespace Calico {
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
                 "import sys as _sys; _sys.setrecursionlimit(1000);" +
                 "del division, with_statement, print_function, _sys", false);
-            manager.PostSetup(this); 
+	    if (!((IList<string>)args).Contains("--nomodules")) {
+		manager.PostSetup(this); 
+	    }
 
             foreach (string arg in args) {
                 if (!arg.StartsWith("--")) {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
-                    manager [CurrentLanguage].engine.ExecuteFile(arg);
+		    string dirname = System.IO.Path.GetDirectoryName(arg);
+		    if (dirname != "" && dirname != null) {
+			DirectoryInfo dirInfo = new DirectoryInfo(dirname);
+			if (dirInfo.Exists) {
+			    System.IO.Directory.SetCurrentDirectory(dirname);
+			    //System.Console.WriteLine("cd: " + dirname);
+			    manager [CurrentLanguage].engine.ExecuteFile(arg);
+			}
+		    }
                 }
             }
 

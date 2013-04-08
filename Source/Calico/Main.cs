@@ -261,28 +261,7 @@ namespace Calico {
                 } else {
                     win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
                 }
-            } else if (((IList<string>)args).Contains("--install")) {
-		// get the script filename
-		// execute the script filename
-		win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
-		for (int i=0; i < args.Length; i++) {
-		    string arg = args[i];
-		    if (arg == "--install") {
-			i++;
-			string filename = args[i];
-			string dirname = System.IO.Path.GetDirectoryName(filename);
-			if (dirname != "" && dirname != null) {
-			    DirectoryInfo dirInfo = new DirectoryInfo(dirname);
-			    if (dirInfo.Exists) {
-				System.IO.Directory.SetCurrentDirectory(dirname);
-				manager ["python"].engine.ExecuteFile(filename);
-			    }
-			}
-		    }
-		}
-		System.Environment.Exit(0);
-            }
-            else {
+            } else {
                 // Catch SIGINT
                 System.Threading.Thread  signal_thread = null;
                 if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
