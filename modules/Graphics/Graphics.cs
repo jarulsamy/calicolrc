@@ -59,9 +59,22 @@ public static class Extensions
     }
 
     public static System.Drawing.Bitmap ToBitmap(this Gdk.Pixbuf pix) {
-	TypeConverter tc = TypeDescriptor.GetConverter(typeof(Bitmap));
-	//// Possible file formats are: "jpeg", "png", "ico" and "bmp"
-	return (Bitmap)tc.ConvertFrom(pix.SaveToBuffer("png")); 
+	System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height);
+	for (int x=0; x < pix.Width; x++) {
+	    for (int y=0; y < pix.Height; y++) {
+		int r = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
+					  x * pix.NChannels + 0);
+		int g = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
+					  x * pix.NChannels + 1);
+		int b = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
+					  x * pix.NChannels + 2);
+		int a = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
+					  x * pix.NChannels + 3);
+		System.Drawing.Color color = System.Drawing.Color.FromArgb(r, g, b, a);
+		bitmap.SetPixel(x, y, color);
+	    }
+	}
+	return bitmap;
     }
 }
 
