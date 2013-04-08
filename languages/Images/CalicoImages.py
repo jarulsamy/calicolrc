@@ -55,7 +55,7 @@ class MyLanguage(Calico.Language):
     def __init__(self):
         self.name = "images"
         self.proper_name = "Images"
-        self.extensions = System.Array[str](["png", "jpg", "gif"])
+        self.extensions = System.Array[str](["png", "jpg", "gif", "bmp"])
         self.mimetype = "image/png"
         
     def MakeEngine(self, manager):
