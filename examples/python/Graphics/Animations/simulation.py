@@ -13,7 +13,7 @@ init("sim")
 ## backward(1, 1)
 turnLeft(.3)
 pics = []
-for i in range(10):
+for i in range(20):
     pics.append(takePicture())
     show(pics[-1])
     wait(1)
