@@ -270,7 +270,14 @@ namespace Calico {
 		    if (arg == "--install") {
 			i++;
 			string filename = args[i];
-			manager ["python"].engine.ExecuteFile(filename);
+			string dirname = System.IO.Path.GetDirectoryName(filename);
+			if (dirname != "" && dirname != null) {
+			    DirectoryInfo dirInfo = new DirectoryInfo(dirname);
+			    if (dirInfo.Exists) {
+				System.IO.Directory.SetCurrentDirectory(dirname);
+				manager ["python"].engine.ExecuteFile(filename);
+			    }
+			}
 		    }
 		}
 		System.Environment.Exit(0);
