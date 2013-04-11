@@ -3788,6 +3788,20 @@ public static class Myro
 	}
 
 	[method: JigsawTab("Picture")]
+	public static List loadPictures (string filename)
+	{
+	    List list = new List();
+	    System.Drawing.Bitmap image = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromFile(filename);
+	    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(image.FrameDimensionsList[0]);
+	    int frame_count = image.GetFrameCount(dimension);
+	    for (int i=0; i < frame_count; i++) {
+		image.SelectActiveFrame(dimension, i);
+		list.append( new Graphics.Picture(image));
+	    }
+	    return list;
+	}
+
+	[method: JigsawTab("Picture")]
 	public static Graphics.Picture makePicture (Graphics.Picture picture)
 	{
 		return new Graphics.Picture (picture);
