@@ -41,6 +41,9 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;// IEnumerator
 
+// WebRequest
+using System.Net;
+
 using Tao.Sdl;
 
 public static class Extensions
@@ -3790,6 +3793,12 @@ public static class Myro
 	[method: JigsawTab("Picture")]
 	public static List loadPictures (string filename)
 	{
+	    if (filename.StartsWith ("http://")) {
+		WebClient myWebClient = new WebClient();
+		string local_filename = Path.GetTempFileName();
+		myWebClient.DownloadFile(filename,local_filename);        
+		filename = local_filename;
+	    }
 	    List list = new List();
 	    System.Drawing.Bitmap image = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromFile(filename);
 	    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(image.FrameDimensionsList[0]);
