@@ -3782,6 +3782,12 @@ public static class Myro
 	}
 
 	[method: JigsawTab("Picture")]
+	public static Graphics.Picture loadPicture (string filename)
+	{
+		return new Graphics.Picture (filename);
+	}
+
+	[method: JigsawTab("Picture")]
 	public static Graphics.Picture makePicture (Graphics.Picture picture)
 	{
 		return new Graphics.Picture (picture);
