@@ -92,6 +92,32 @@ public static class Graphics
     	    Graphics.os_name = os;
         }
 	
+
+        public static void InvokeBlocking (InvokeDelegate invoke)
+        {
+	    System.Exception exception = null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    if (needInvoke ()) {
+		Gtk.Application.Invoke (delegate {
+			try {
+			    invoke ();
+			} catch (Exception e) {
+			    exception = e;
+			}
+			ev.Set();
+		    });
+		ev.WaitOne();
+	    } else {
+		try {
+		    invoke ();
+		} catch (Exception e) {
+		    exception = e;
+		}
+	    }
+	    if (exception != null)
+		throw exception;
+	}
+
 	public static void Invoke (InvokeDelegate invoke)
 	{
 		if (needInvoke ())
@@ -379,16 +405,13 @@ public static class Graphics
 
         public static void setPixels (Picture picture, Picture picture2)
         {
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke( delegate {
+	    InvokeBlocking( delegate {
 		    for (int x=0; x < picture._cacheWidth; x++) {
 			for (int y=0; y < picture._cacheHeight; y++) {
 			    picture.setPixel (x, y, picture2.getPixel (x, y));
 			}
 		    }
-		    ev.Set();
 		});
-	    ev.WaitOne();
 	}
 
 	public static void setPixel (Picture picture, int x, int y, Color color)
@@ -583,8 +606,7 @@ public static class Graphics
                                            int width=300, 
                                            int height=300)
 	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke( delegate {
+	    InvokeBlocking( delegate {
 		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 		    } else {
@@ -594,9 +616,7 @@ public static class Graphics
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
-		    ev.Set();
 		});
-	    ev.WaitOne();
 	    return _windows [title];
 	}
 
@@ -604,23 +624,19 @@ public static class Graphics
                                            int width=300, 
                                            int height=300)
 	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke( delegate {
+	    InvokeBlocking( delegate {
 		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
 			_windows [title] = new Graphics.WindowClass (title, width, height);
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
-		    ev.Set();
 		});
-	    ev.WaitOne();
 	    return _windows [title];
 	}
 
 	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
 	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke( delegate {
+	    InvokeBlocking( delegate {
 		    if (!(_windows.ContainsKey (title) && (_windows [title].IsRealized))) {
 			_windows [title] = new Graphics.WindowClass (title, widget);
 		    } else {
@@ -631,9 +647,7 @@ public static class Graphics
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
-		    ev.Set();
 		});
-	    ev.WaitOne();
 	    return _windows [title];
 	}
 
@@ -1196,7 +1210,6 @@ public static class Graphics
 		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
 		public bool requestStop = false;
 		Gtk.ScrolledWindow _scrolledWindow = null;
-		ManualResetEvent ev = new ManualResetEvent (false);
 		public int _cacheHeight;
 		public int _cacheWidth;
 
@@ -1247,44 +1260,32 @@ public static class Graphics
 
 		public string title {
 		    get {
-			ManualResetEvent ev = new ManualResetEvent (false);
 			string retval = "";
-			Invoke( delegate {
+			InvokeBlocking( delegate {
 				retval = Title;
-				ev.Set();
 			    });
-			ev.WaitOne();
 			return retval;
 		    }
 		    set {
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Invoke( delegate {
+			InvokeBlocking( delegate {
 				Title = value;
-				ev.Set();
 			    });
-			ev.WaitOne();
 		    }
 		}
 
 		public bool isRealized() {
-		    ManualResetEvent ev = new ManualResetEvent (false);
 		    bool retval = false;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    retval = IsRealized;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return retval;
 		}
 
 		public bool isVisible() {
-		    ManualResetEvent ev = new ManualResetEvent (false);
 		    bool retval = false;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    retval = Visible;
-			    ev.Set();	
 			});
-		    ev.WaitOne();
 		    return retval;
 		}
 
@@ -1302,8 +1303,7 @@ public static class Graphics
 		}
 		
 		public void addScrollbars(int width, int height) {
-		    ManualResetEvent ev = new ManualResetEvent(false); 
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    if (Child == _canvas) {
 				Remove(_canvas);
 				_scrolledWindow = new Gtk.ScrolledWindow();
@@ -1314,9 +1314,7 @@ public static class Graphics
 			    } else {
 				_canvas.resize(width, height);
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 		
 		public void clear ()
@@ -1403,13 +1401,10 @@ public static class Graphics
     
 		public int getWidth ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    int _width = 0, _height = 0;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    this.GetSize (out _width, out _height);
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return _width;
 		}
     
@@ -1422,13 +1417,10 @@ public static class Graphics
     
 		public int getHeight ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    int _width = 0, _height = 0;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    this.GetSize (out _width, out _height);
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return _height;
 		}
     
@@ -1651,17 +1643,14 @@ public static class Graphics
     
 		public int height {
 		    get {
-			ManualResetEvent ev = new ManualResetEvent(false);
 			int _width = 0, _height = 0;
-			Invoke( delegate {
+			InvokeBlocking( delegate {
 				if (Child == _canvas || Child == widget) {
 				    this.GetSize (out _width, out _height);
 				} else { // scrollbars
 				    _height = _canvas.height;
 				}
-				ev.Set();
 			    });
-			ev.WaitOne();
 			return _height;
 		    }
 		}
@@ -1680,17 +1669,14 @@ public static class Graphics
 
 		public int width {
 		    get {
-			ManualResetEvent ev = new ManualResetEvent(false);
 			int _width = 0, _height = 0;
-			Invoke( delegate {
+			InvokeBlocking( delegate {
 				if (Child == _canvas || Child == widget) {
 				    this.GetSize (out _width, out _height);
-				    ev.Set();
 				} else { // scrollbars
 				    _width = _canvas.width;
 				}
 			    });
-			ev.WaitOne();
 			return _width;
 		    }
 		}
@@ -1720,7 +1706,7 @@ public static class Graphics
 
 		public PythonTuple getMouse ()
 		{
-		    _lastClickFlag = new ManualResetEvent (false);
+		    _lastClickFlag.Reset();
 		    _lastClickFlag.WaitOne ();
 		    return _lastClick;
 		}
@@ -1728,12 +1714,9 @@ public static class Graphics
 		public PythonTuple getMouseNow ()
 		{
 			int x = 0, y = 0;
-			ManualResetEvent mre = new ManualResetEvent (false);
-			Invoke (delegate { 
+			InvokeBlocking (delegate { 
 				GetPointer (out x, out y);
-				mre.Set ();
 			});
-			mre.WaitOne ();
 			return PyTuple (x, y);
 		}
     
@@ -1919,8 +1902,7 @@ public static class Graphics
 		    }      
 		    
 		    _dirty = false;
-		    ev.Reset();
-		    Invoke (delegate { 
+		    InvokeBlocking (delegate { 
 			    try {
 				QueueDraw ();
 				GdkWindow.ProcessUpdates (true);
@@ -1928,10 +1910,7 @@ public static class Graphics
 			    } catch {
 				requestStop = true;
 			    }
-			    ev.Set ();
 			});
-		    ev.WaitOne ();
-		    //System.Console.Write("<");
 		}
 
 		public void refresh()
@@ -1961,8 +1940,7 @@ public static class Graphics
 		  }      
 		  
 		  _dirty = false;
-		  ev.Reset();
-		  Invoke (delegate { 
+		  InvokeBlocking (delegate { 
 			    try {
 				  QueueDraw ();
 				  GdkWindow.ProcessUpdates (true);
@@ -1970,10 +1948,7 @@ public static class Graphics
 			    } catch {
 				  requestStop = true;
 			    }
-			    ev.Set ();
 			  });
-		  ev.WaitOne ();
-		  //System.Console.Write("<");
 		}
 
 		public override string ToString ()
@@ -2637,8 +2612,7 @@ public static class Graphics
 		    // p is relative to center, rotate, and scale; returns
 		    // screen coordinate of p
 		    double px = 0, py = 0;
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    using (Cairo.ImageSurface draw = new Cairo.ImageSurface (Cairo.Format.Argb32, 70, 150)){
 				using (Cairo.Context g = new Cairo.Context(draw)) {
 				    //using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
@@ -2651,9 +2625,7 @@ public static class Graphics
 				    g.UserToDevice (ref px, ref py);
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return new Point (px, py);
 		}
 
@@ -3155,8 +3127,7 @@ public static class Graphics
     
 		public void draw (WindowClass win)
 		{ // Shape
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    // Add this shape to the Canvas list.
 			    if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
 				win.canvas.need_to_draw_surface = true;
@@ -3183,15 +3154,12 @@ public static class Graphics
 				addToPhysics ();
 			    }
 			    QueueDraw ();
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void draw (Canvas canvas)
 		{ // Shape
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			// Add this shape to the Canvas list.
 			if (canvas.mode == "bitmap" || canvas.mode == "bitmapmanual") {
 				canvas.need_to_draw_surface = true;
@@ -3208,15 +3176,12 @@ public static class Graphics
 				addToPhysics ();
 			}
 			QueueDraw ();
-			ev.Set();
 			});
-		    ev.WaitOne();
 		}
     
 		public void draw (Shape shape)
 		{ // Shape
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			// Add this shape to the shape's list.
 			lock (shape.shapes) {
 				if (! shape.shapes.Contains (this)) {
@@ -3232,9 +3197,7 @@ public static class Graphics
 			window = shape.window;
 			drawn_on_shape = shape;
 			QueueDraw ();
-			ev.Set();
 			});
-		    ev.WaitOne();
 		}
     
 	    public void undraw ()
@@ -3469,32 +3432,26 @@ public static class Graphics
 		
 		public double width {
 			get {
-			    ManualResetEvent ev = new ManualResetEvent (false);
 			    double retval = 0.0;
-			    Invoke( delegate {
+			    InvokeBlocking( delegate {
 				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					Cairo.TextExtents te = g.TextExtents (text);
 					retval = te.Width * 2;
 				    }
-				    ev.Set();
 				});
-			    ev.WaitOne();
 			    return retval;
 			}
 		}
 
 		public double height {
 			get {
-			    ManualResetEvent ev = new ManualResetEvent (false);
 			    double retval = 0.0;
-			    Invoke( delegate {
+			    InvokeBlocking( delegate {
 				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					Cairo.TextExtents te = g.TextExtents (text);
 					retval = te.Height * 2;
 				    }
-				    ev.Set();
 				});
-			    ev.WaitOne();
 			    return retval;
 			}
 		}
@@ -3917,8 +3874,7 @@ public static class Graphics
 
 		public Picture (string filename) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    if (filename.StartsWith ("http://")) {
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
 				req.KeepAlive = false;
@@ -3938,15 +3894,12 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 		
 		public Picture (WindowClass window) : this(true)
 		{ 
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    Gdk.Pixbuf pixbuf = null;
 			    Gdk.Drawable drawable = window.getDrawable ();
 			    Gdk.Colormap colormap = drawable.Colormap;
@@ -3965,9 +3918,7 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));			
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set ();
 			});
-		    ev.WaitOne ();
 		}
 
 		public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
@@ -3981,8 +3932,7 @@ public static class Graphics
 
 		public Picture (Picture original) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
 			    if (!_pixbuf.HasAlpha) {
@@ -4008,15 +3958,12 @@ public static class Graphics
 			    center = original.center;
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
     
 		public Picture (Gdk.Pixbuf pixbuf) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
 				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
@@ -4027,14 +3974,11 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    // FIXME: convert bitmap.palette to colormap
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
@@ -4075,9 +4019,7 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public System.Drawing.Bitmap toBitmap () {
@@ -4086,8 +4028,7 @@ public static class Graphics
 
 		public void fromArray (Byte [] buffer, string format)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    if (format == "BGRX") { // b, r, g, ignore
 				int count = 0;
 				for (int i=0; i < buffer.Length; i+=4) {
@@ -4127,16 +4068,13 @@ public static class Graphics
 			    } else {
 				throw new Exception ("Picture.fromArray(array, format): invalid format");
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    QueueDraw ();
 		}
     
 		public Picture (int width, int height, byte [] buffer, int depth) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // depth should be 1
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
@@ -4164,15 +4102,12 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height, byte [] buffer) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
@@ -4199,15 +4134,12 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
@@ -4233,15 +4165,12 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public Picture (int width, int height, Color color) : this(true)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
@@ -4267,16 +4196,13 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public Picture getRegion (IList iterable, int width, int height, double degrees)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Picture pic = null;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    pic = new Picture (width, height);
 			    Point p = new Point (iterable);
 			    double angle = degrees * Math.PI / 180.0;
@@ -4295,17 +4221,14 @@ public static class Graphics
 				}
 				ox += 1;
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return pic;
 		}
 
 		public Picture getRegion (IList iterable, int width, int height)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    Picture pic = null;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    pic = new Picture (width, height);
 			    Point p = new Point (iterable);
 			    for (int x = 0; x < width; x++) {
@@ -4314,16 +4237,13 @@ public static class Graphics
 								   (int)(p.y + y)));
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return pic;
 		}
 
 		public void setRegion (IList iterable, Picture picture)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    // FIXME: better way would use Context to draw the image onto
 			    // another image. Also, consider making this pic.draw(picture)
 			    // This doesn't respect the color pallette of picture.
@@ -4343,15 +4263,12 @@ public static class Graphics
 							       t1 * c1.blue + t2 * c2.blue));
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void flipHorizontal ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    for (int x = 0; x < _cacheWidth/2; x++) {
 				for (int y = 0; y < _cacheHeight; y++) {
 				    Color c1 = getColor (x, y);
@@ -4360,15 +4277,12 @@ public static class Graphics
 				    setColor(_cacheWidth - x - 1, y, c1);
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void flipVertical ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    for (int x = 0; x < _cacheWidth; x++) {
 				for (int y = 0; y < _cacheHeight/2; y++) {
 				    Color c1 = getColor(x, y);
@@ -4377,16 +4291,13 @@ public static class Graphics
 				    setColor(x, _cacheHeight - y - 1, c1);
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void setRegion (IList iterable, int width, int height, double degrees,
                           Picture picture)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    Point p = new Point (iterable);
 			    double angle = degrees * Math.PI / 180.0;
 			    double px, py;
@@ -4416,16 +4327,13 @@ public static class Graphics
 				    }
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void setRegion (IList iterable, int width, int height, double degrees,
                           Color color)
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			    Point p = new Point (iterable);
 			    double angle = degrees * Math.PI / 180.0;
 			    double px, py;
@@ -4454,9 +4362,7 @@ public static class Graphics
 				    }
 				}
 			    }
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
     
 		public Gdk.Pixbuf getPixbuf ()
@@ -4466,13 +4372,10 @@ public static class Graphics
 
 		public int getWidth ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    int retval = 0;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			retval = _pixbuf.Width;
-			ev.Set();
 			});
-		    ev.WaitOne();
 		    return retval;
 		}
 
@@ -4483,13 +4386,10 @@ public static class Graphics
 
 		public int getHeight ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    int retval = 0;
-		    Invoke( delegate {
+		    InvokeBlocking( delegate {
 			retval = _pixbuf.Height;
-			ev.Set();
 			});
-		    ev.WaitOne();
 		    return retval;
 		}
 
@@ -4901,15 +4801,12 @@ public static class Graphics
 
 		public void draw (WindowClass win)
 		{ // button
-		    ManualResetEvent ev = new ManualResetEvent (false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    window = win;
 			    Show ();
 			    window.getCanvas ().Put (this, (int)_x, (int)_y);
 			    window.QueueDraw ();
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		}
 
 		public void connect (string signal, Func<object,Event,object> function)
@@ -5958,13 +5855,10 @@ public static class Graphics
 	    Point translate(double x, double y) {
 		// used in graphviz graphics
 		Point p = null;
-		ManualResetEvent ev = new ManualResetEvent(false);
-		Invoke( delegate {
+		InvokeBlocking( delegate {
 			p = new Point(x * scale + window._width/2 - graph.Width/ 2 * scale,
 				      (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale);
-			ev.Set();
 		    });
-		ev.WaitOne();
 		return p;
 	    }
 	    
