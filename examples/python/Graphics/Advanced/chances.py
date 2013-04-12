@@ -1,5 +1,6 @@
 from Graphics import *
 from Myro import randomNumber, Random, show, wait
+import os
 
 Random.seed = 3456
 
