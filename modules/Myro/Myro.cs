@@ -3791,7 +3791,8 @@ public static class Myro
 	    int frame_count = image.GetFrameCount(dimension);
 	    for (int i=0; i < frame_count; i++) {
 		image.SelectActiveFrame(dimension, i);
-		list.append( new Graphics.Picture(image));
+		System.Drawing.Bitmap newImage = (System.Drawing.Bitmap)new System.Drawing.Bitmap(image);
+		list.append( new Graphics.Picture(newImage));
 	    }
 	    return list;
 	}
