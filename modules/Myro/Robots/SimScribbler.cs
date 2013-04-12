@@ -20,6 +20,7 @@ public class SimScribbler : Myro.Robot
 		public PythonDictionary readings = new PythonDictionary ();
 		public List<Graphics.Shape> light_sensors = new List<Graphics.Shape> ();
 		public bool show_sensors = false;
+		string _forwardness = "fluke-forward";
 
 		public SimScribbler (Myro.Simulation simulation)
 		{
@@ -302,8 +303,12 @@ public class SimScribbler : Myro.Robot
 		public override void adjustSpeed () {
 		    lock (queue) {
 			queue.Add(delegate {
-				velocity = _lastTranslate * rate;
-				frame.body.AngularVelocity = (float)(-_lastRotate * rate);
+				  if (_forwardness == "fluke-forward") {
+					velocity = _lastTranslate * rate;
+				  } else {
+					velocity = _lastTranslate * rate * -1;
+				  }
+				  frame.body.AngularVelocity = (float)(-_lastRotate * rate);
 			    });
 		    }
 		}
@@ -1006,11 +1011,19 @@ public class SimScribbler : Myro.Robot
     
 		public override void setForwardness (object value)
 		{
+		  if (value != null) {
+			if (value.ToString() == "fluke-forward")
+			  _forwardness = "fluke-forward";
+			else if (value.ToString() == "scribbler-forward")
+			  _forwardness = "scribbler-forward";
+			else
+			  throw new Exception("invalid forward direction; should be 'fluke-forward' or 'scribbler-forward'");
+		  }
 		}
     
 		public override object getForwardness ()
 		{
-		  return "fluke-forward";
+		  return _forwardness;
 		}
 
 		public override void setVolume (object volume)
