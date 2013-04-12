@@ -439,15 +439,53 @@ public static class Myro
 
 	public delegate void InvokeDelegate ();
 
+        public static void InvokeBlocking (InvokeDelegate invoke)
+        {
+	    System.Exception exception = null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    if (needInvoke ()) {
+		Gtk.Application.Invoke (delegate {
+			try {
+			    invoke ();
+			} catch (Exception e) {
+			    exception = e;
+			}
+			ev.Set();
+		    });
+		ev.WaitOne();
+	    } else {
+		try {
+		    invoke ();
+		} catch (Exception e) {
+		    exception = e;
+		}
+	    }
+	    if (exception != null)
+		throw exception;
+	}
+
 	[method: JigsawTab(null)]
 	public static void Invoke (InvokeDelegate invoke)
 	{
-	  if (needInvoke ()) {
+	    System.Exception exception = null;
+	    if (needInvoke ()) {
 		Gtk.Application.Invoke (delegate {
-			  invoke ();});
-	  } else {
-		invoke ();
-	  }
+			try {
+			    invoke ();
+			} catch (Exception e) {
+			    // not waiting for result
+			    System.Console.Error.WriteLine(e);
+			}
+		    });
+	    } else {
+		try {
+		    invoke ();
+		} catch (Exception e) {
+		    exception = e;
+		}
+	    }
+	    if (exception != null)
+		throw exception;
 	}
 
 	[method: JigsawTab(null)]
@@ -667,13 +705,10 @@ public static class Myro
 	}
 
     public static bool isRealized(Gtk.Window window) {
-	ManualResetEvent ev = new ManualResetEvent(false);
 	bool retval = false;
-	Invoke (delegate {
+	InvokeBlocking (delegate {
 		retval = window.IsRealized;
-		ev.Set();
 	    });
-	ev.WaitOne();
 	return retval;
     }
 
@@ -681,12 +716,9 @@ public static class Myro
 	public static void senses ()
 	{
 	    if (sense != null && isRealized(sense.win)) {
-		ManualResetEvent ev = new ManualResetEvent(false);
-		Invoke( delegate {
+		InvokeBlocking( delegate {
 			sense.win.Destroy();
-			ev.Set();
 		    });
-		ev.WaitOne();
 	    } 
 	    sense = new Senses ();
 	}
@@ -699,8 +731,7 @@ public static class Myro
 
 		public Senses ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    win = new Gtk.Window ("Senses");
 			    Gtk.VBox vbox = new Gtk.VBox ();
 			    //win.AllowGrow = true;
@@ -734,10 +765,8 @@ public static class Myro
 				vbox.PackStart (hbox);
 			    }
 			    win.ShowAll ();
-			    ev.Set();
 			});
 		    idle = 1;
-		    ev.WaitOne();
 		    // This needs to run async, not via GLib.Timeout:
 		    update_entries_thread = new Thread (new ThreadStart (update_entries_loop));
 		    update_entries_thread.IsBackground = true;
@@ -759,7 +788,6 @@ public static class Myro
     
 		bool update_entries ()
 		{
-		    ManualResetEvent ev = new ManualResetEvent(false);
 		    List light_results = (List)Myro.robot.getLight ();
 		    List bright_results = (List)getBright ();
 		    List obstacle_results = (List)getObstacle ();
@@ -767,7 +795,7 @@ public static class Myro
 		    List line_results = (List)getLine ();
 		    double battery_results = getBattery ();
 		    int stall_results = getStall ();
-		    Invoke (delegate {
+		    InvokeBlocking (delegate {
 			    for (int i=0; i < light_results.Count; i++) {
 				((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = light_results [i].ToString ();
 			    }
@@ -785,9 +813,7 @@ public static class Myro
 			    }
 			    ((Gtk.Entry)((List)dict_entry ["Battery:"]) [0]).Text = battery_results.ToString ();
 			    ((Gtk.Entry)((List)dict_entry ["Stall:"]) [0]).Text = stall_results.ToString ();	  
-			    ev.Set();
 			});
-		    ev.WaitOne();
 		    return idle == 1; // continue
 		}
 	}
@@ -2159,8 +2185,7 @@ public static class Myro
 	public static string pickAFile ()
 	{
 	    string pickAFileResponse = null;
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
                             "Select a file",
 			    null,
@@ -2173,9 +2198,7 @@ public static class Myro
 			pickAFileResponse = fc.Filename;
 		    }
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	    return pickAFileResponse;
 	}
 
@@ -2183,8 +2206,7 @@ public static class Myro
 	public static string pickAFolder ()
 	{
 	    string pickAFolderResponse = null;
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog (
 		        "Select a folder",
 			null,
@@ -2195,9 +2217,7 @@ public static class Myro
 			pickAFolderResponse = fc.Filename;
 		    }
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	    return pickAFolderResponse;
 	}
 
@@ -2205,8 +2225,7 @@ public static class Myro
 	public static Graphics.Color pickAColor ()
 	{
 	    Graphics.Color pickAColorResponse = null;
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAColorResponse = new Graphics.Color (
@@ -2215,9 +2234,7 @@ public static class Myro
 			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Blue)) / Math.Pow (2, 16) * 255.0));
 		    }
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	    return pickAColorResponse;
 	}
 
@@ -2225,27 +2242,23 @@ public static class Myro
 	public static string pickAFont ()
 	{
 	    string pickAFontResponse = null;
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog ("Select a font");
 		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
 			pickAFontResponse = fc.FontName;
 		    }
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	    return pickAFontResponse;
 	}
 
 	[method: JigsawTab("Senses")]
 	public static object ask (object question, string title)
 	{
-	    ManualResetEvent ev = new ManualResetEvent(false);
 	    object askResponse = null;
 	    Gtk.Entry myentry = null;
 	    PythonDictionary responses = new PythonDictionary ();
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 			  Gtk.MessageDialog fc = new MessageDialog (null,
 				  0, Gtk.MessageType.Question,
 				  Gtk.ButtonsType.OkCancel,
@@ -2298,9 +2311,7 @@ public static class Myro
 				}
 			  }
 			  fc.Destroy();
-			  ev.Set();
 			}); 
-	    ev.WaitOne ();
 	    return askResponse;
 	}
 
@@ -2335,8 +2346,7 @@ public static class Myro
 	public static bool yesno (string question)
 	{
 	    bool yesnoResponse = false;
-	    ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.MessageDialog fc = new Gtk.MessageDialog (
 				null,
 				0, Gtk.MessageType.Question,
@@ -2346,17 +2356,14 @@ public static class Myro
 			yesnoResponse = true;
 		    }
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	    return yesnoResponse;
 	}
 
 	[method: JigsawTab("Graphics")]
 	public static void inform (string question)
 	{
-            ManualResetEvent ev = new ManualResetEvent(false);
-	    Invoke (delegate {
+	    InvokeBlocking (delegate {
 		    Gtk.MessageDialog fc = new Gtk.MessageDialog (
 		          null,
 			  0, Gtk.MessageType.Info,
@@ -2364,9 +2371,7 @@ public static class Myro
 			  question);
 		    fc.Run();
 		    fc.Destroy();
-		    ev.Set();
 		});
-	    ev.WaitOne ();
 	}
 
 	[method: JigsawTab("Senses")]
@@ -2424,12 +2429,9 @@ public static class Myro
 	public static void joystick ()
 	{
 	    if (joyclass != null && isRealized(joyclass.window)) {
-		ManualResetEvent ev = new ManualResetEvent (false);
-		Invoke( delegate {
+		InvokeBlocking( delegate {
 			joyclass.window.Destroy();
-			ev.Set();
 		    });
-		ev.WaitOne();
 	    }
 	    joyclass = new Joystick ();
 	}
@@ -3296,52 +3298,36 @@ public static class Myro
 
 		public void initialize_tone ()
 		{
-			ManualResetEvent ev = new ManualResetEvent (false);
-			try {
-			    audioCallback = new SdlDotNet.Audio.AudioCallback (Callback);
-			    stream = new SdlDotNet.Audio.AudioStream (playbackFreq,
-								      SdlDotNet.Audio.AudioFormat.Unsigned8,
-								      SdlDotNet.Audio.SoundChannel.Mono,
-								      samples,
-								      audioCallback,
-								      null);
-			} catch {
-			    throw new Exception("Unable to initialize tone");
-			}
-			Invoke (delegate {
-				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
-				try {
-				    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-				    SdlDotNet.Audio.Mixer.OpenAudio (stream);
-				} catch {
-				    throw new Exception("Unable to initialize OpenAudio");
-				} finally {
-				    ev.Set ();
-				}
-			    });
-			ev.WaitOne ();
-			audio_initialized = true;
+		    try {
+			audioCallback = new SdlDotNet.Audio.AudioCallback (Callback);
+			stream = new SdlDotNet.Audio.AudioStream (playbackFreq,
+								  SdlDotNet.Audio.AudioFormat.Unsigned8,
+								  SdlDotNet.Audio.SoundChannel.Mono,
+								  samples,
+								  audioCallback,
+								  null);
+		    } catch {
+			throw new Exception("Unable to initialize tone");
+		    }
+		    InvokeBlocking (delegate {
+			    // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+			    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+			    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+			    SdlDotNet.Audio.Mixer.OpenAudio (stream);
+			});
+		    audio_initialized = true;
 		}
 
 		public void initialize_sound ()
 		{
-			ManualResetEvent ev = new ManualResetEvent (false);
-			Invoke (delegate {
-				// BUG: OpenAudio (or lower) apparently requires a *visible* screen
-				try {
-				    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-				    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
-				    SdlDotNet.Audio.Mixer.Open ();
-				    SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
-				} catch {
-				    throw new Exception("Unable to initialize sound");
-				} finally {
-				    ev.Set ();
-				}
-			    });
-			ev.WaitOne ();
-			sound_initialized = true;
+		    InvokeBlocking (delegate {
+			    // BUG: OpenAudio (or lower) apparently requires a *visible* screen
+			    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
+			    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+			    SdlDotNet.Audio.Mixer.Open ();
+			    SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
+			});
+		    sound_initialized = true;
 		}
 
 		public void beep (double duration, double frequency1, double frequency2)

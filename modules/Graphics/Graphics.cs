@@ -120,11 +120,25 @@ public static class Graphics
 
 	public static void Invoke (InvokeDelegate invoke)
 	{
-		if (needInvoke ())
-			Gtk.Application.Invoke (delegate {
-				invoke ();});
-		else
-			invoke ();
+	    System.Exception exception = null;
+	    if (needInvoke ()) {
+		Gtk.Application.Invoke (delegate {
+			try {
+			    invoke ();
+			} catch (Exception e) {
+			    // not waiting for result
+			    System.Console.Error.WriteLine(e);
+			}
+		    });
+	    } else {
+		try {
+		    invoke ();
+		} catch (Exception e) {
+		    exception = e;
+		}
+	    }
+	    if (exception != null)
+		throw exception;
 	}
 
 	public static bool needInvoke ()
