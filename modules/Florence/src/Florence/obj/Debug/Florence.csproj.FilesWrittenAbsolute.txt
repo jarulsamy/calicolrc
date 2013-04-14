@@ -1,0 +1,5 @@
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence/obj/Debug/Florence.Florence-icon.ico
+/home/dblank/Calico/trunk/modules/Florence-master/bin/Debug/Florence.dll.mdb
+/home/dblank/Calico/trunk/modules/Florence-master/bin/Debug/Florence.dll
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence/obj/Debug/Florence.dll
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence/obj/Debug/Florence.dll.mdb

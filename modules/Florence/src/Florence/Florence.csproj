@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E6867FF5-74EC-4464-8958-D71CB46232F3}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <AssemblyName>Florence</AssemblyName>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Florence</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <ErrorReport>prompt</ErrorReport>
+    <BaseFX1_1OutputPath>bin\net\1.1\</BaseFX1_1OutputPath>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CHECK_ERRORS</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;RELEASE</DefineConstants>
+    <DocumentationFile>Florence.xml</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\NPlot-key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdapterUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ArrowItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AxesConstraint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Axis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BarPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BasePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BaseSequencePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Bitmap.PlotSurface2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CandlePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DateTimeAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FilledRegion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Grid.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HistogramPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HorizontalLine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IDrawable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IGradient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ImagePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ImperativeApi\BaseImperativeFigure.cs" />
+    <Compile Include="ImperativeApi\BaseImperativeHost.cs" />
+    <Compile Include="ImperativeApi\ImperativePlottable.cs" />
+    <Compile Include="Interactions\AxisDrag.cs" />
+    <Compile Include="Interactions\CursorType.cs" />
+    <Compile Include="Interactions\HorizontalGuideline.cs" />
+    <Compile Include="Interactions\Interaction.cs" />
+    <Compile Include="Interactions\InteractivePlotSurface2D.cs" />
+    <Compile Include="Interactions\KeyActions.cs" />
+    <Compile Include="Interactions\Modifier.cs" />
+    <Compile Include="Interactions\PlotDrag.cs" />
+    <Compile Include="Interactions\PlotSelection.cs" />
+    <Compile Include="Interactions\PlotZoom.cs" />
+    <Compile Include="ImperativeApi\ImperativeHost.cs" />
+    <Compile Include="Interactions\VerticalGuideline.cs" />
+    <Compile Include="IPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IPlotSurface2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IPlotWidget.cs" />
+    <Compile Include="ISequencePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ITransform2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LabelAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LabelPointPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Legend.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LegendBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinearGradient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LinePlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LogAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Marker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MarkerItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FlorenceException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PageAlignedPhysicalAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PhysicalAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PiAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ImperativeApi\ImperativeFigure.cs" />
+    <Compile Include="PlotSurface2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PointD.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PointPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RectangleBrushes.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RectangleD.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SequenceAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StartStep.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StepGradient.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="StepPlot.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TextItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TradingDateTimeAxis.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Transform2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VerticalLine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="..\..\resources\Florence-icon.ico">
+      <LogicalName>NPlot.icon.ico</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition="'$(SharpDevelopBinPath)'==''" />
+  <Import Project="$(MSBuildExtensionsPath)\MSBee\MSBuildExtras.FX1_1.CSharp.targets" Condition="'$(SharpDevelopBinPath)'=='' AND '$(TargetFrameworkVersion)'=='v1.1' and Exists('$(MSBuildExtensionsPath)\MSBee\MSBuildExtras.FX1_1.CSharp.targets')" />
+  <Import Project="$(SharpDevelopBinPath)\SharpDevelop.Build.CSharp.targets" Condition="'$(SharpDevelopBinPath)'!=''" />
+</Project>

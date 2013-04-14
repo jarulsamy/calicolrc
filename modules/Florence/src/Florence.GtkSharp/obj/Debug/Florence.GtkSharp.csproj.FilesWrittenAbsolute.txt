@@ -1,0 +1,5 @@
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence.GtkSharp/obj/Debug/Florence.GtkSharp.Properties.asx_jbh.xml
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence.GtkSharp/bin/Debug/Florence.GtkSharp.dll.mdb
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence.GtkSharp/bin/Debug/Florence.GtkSharp.dll
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence.GtkSharp/obj/Debug/Florence.GtkSharp.dll
+/home/dblank/Calico/trunk/modules/Florence-master/src/Florence.GtkSharp/obj/Debug/Florence.GtkSharp.dll.mdb
