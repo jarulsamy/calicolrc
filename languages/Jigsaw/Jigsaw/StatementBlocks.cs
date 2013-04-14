@@ -25,7 +25,7 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
+			CVarNameProperty VarName = new CVarNameProperty("Variable", "result");
 			CExpressionProperty RHS = new CExpressionProperty("Expression", "0");
 			
 			VarName.PropertyChanged += OnPropertyChanged;
@@ -49,7 +49,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
-			this.Text = String.Format("{0} = {1}", this.VariableName, this["Expression"]);
+			this.Text = String.Format("`{0}` = `{1}`", this.VariableName, this["Expression"]);
 			RaiseBlockChanged();
 		}
 		
@@ -160,7 +160,7 @@ namespace Jigsaw
 			this.Sizable = false;
 			
 			// Properties
-			CVarNameProperty VarName = new CVarNameProperty("Variable", "X");
+			CVarNameProperty VarName = new CVarNameProperty("Variable", "result");
 			CExpressionProperty Min = new CExpressionProperty("Min", "0");
 			CExpressionProperty Max = new CExpressionProperty("Max", "100");
 
@@ -189,7 +189,7 @@ namespace Jigsaw
 		{	// Update text when property changes
 			
 			if (this.VariableName.Length > 0) {
-				this.Text = String.Format("{0} = random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
+				this.Text = String.Format("`{0}` = random({1}, {2})", this.VariableName, this["Min"], this["Max"]);
 			} else {
 				this.Text = String.Format("random({0}, {1})", this["Min"], this["Max"]);
 			}
@@ -327,7 +327,7 @@ namespace Jigsaw
         // - - - Update text when property changes - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
-			this.Text = String.Format("{0}", this["Statement"]);
+			this.Text = String.Format("`{0}`", this["Statement"]);
 			RaiseBlockChanged();
 		}
 		

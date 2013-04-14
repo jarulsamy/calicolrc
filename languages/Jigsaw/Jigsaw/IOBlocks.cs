@@ -37,7 +37,7 @@ namespace Jigsaw
 			: base(X, Y, palette )
 		{
 			// Properties
-			CExpressionProperty Expr = new CExpressionProperty("Expression", "X");
+			CExpressionProperty Expr = new CExpressionProperty("Expression", "'hello'");
 			Expr.PropertyChanged += OnPropertyChanged;
 			_properties["Expression"] = Expr;
 			this.OnPropertyChanged(null, null);
@@ -219,7 +219,7 @@ namespace Jigsaw
 		{
 			// Properties
 			CExpressionProperty Question = new CExpressionProperty("Ask", "'Question: '");
-			CVarNameProperty Answer = new CVarNameProperty("Answer", "X");
+			CVarNameProperty Answer = new CVarNameProperty("Answer", "result");
 			Question.PropertyChanged += OnPropertyChanged;
 			Answer.PropertyChanged += OnPropertyChanged;
 			_properties["Ask"] = Question;
@@ -251,9 +251,9 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			if (this.Answer.Length > 0) {
-				this.Text = String.Format("{0} = Ask: {1}", this.Answer, this.Question);
+				this.Text = String.Format("`{0}` = Ask({1})", this.Answer, this.Question);
 			} else {
-				this.Text = String.Format("Ask: {0}", this.Question);
+				this.Text = String.Format("Ask({0})", this.Question);
 			}
 			RaiseBlockChanged();
 		}
@@ -373,7 +373,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
-			this.Text = String.Format("Tell: {0}",  this["Tell"]);
+			this.Text = String.Format("Tell({0})",  this["Tell"]);
 			RaiseBlockChanged();
 		}
 		

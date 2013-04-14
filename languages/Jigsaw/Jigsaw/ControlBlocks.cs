@@ -395,7 +395,7 @@ namespace Jigsaw
         // - - - Update text when property changes - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
-			this.Text = String.Format("repeat {0} times", this["Repetitions"]);
+			this.Text = String.Format("repeat `{0}` times", this["Repetitions"]);
 			RaiseBlockChanged();
 		}
 		
@@ -636,7 +636,7 @@ namespace Jigsaw
         // - - - Update text when property changes - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
-			this.Text = String.Format("if {0}", this["IfTest"]);
+			this.Text = String.Format("if `{0}`", this["IfTest"]);
 			RaiseBlockChanged();
 		}
 		
@@ -932,7 +932,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
 			
-			this.Text = String.Format("if {0}", this["IfTest"]);
+			this.Text = String.Format("if `{0}`", this["IfTest"]);
 			RaiseBlockChanged();
 		}
 		
@@ -1351,7 +1351,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
-			this.Text = String.Format("while ({0})", this["WhileTest"]);
+			this.Text = String.Format("while `{0}`", this["WhileTest"]);
 			RaiseBlockChanged();
 		}
 		
@@ -1743,7 +1743,7 @@ namespace Jigsaw
 			CExpressionProperty Sequence = new CExpressionProperty("Sequence", "[1, 2, 3]");
 			Sequence.PropertyChanged += OnPropertyChanged;
 			_properties["Sequence"] = Sequence;
-			CVarNameProperty Variable = new CVarNameProperty("Variable", "X");
+			CVarNameProperty Variable = new CVarNameProperty("Variable", "item");
 			Sequence.PropertyChanged += OnPropertyChanged;
 			_properties["Variable"] = Variable;
 			this.OnPropertyChanged(null, null);
@@ -1801,7 +1801,7 @@ namespace Jigsaw
         // - - - Update text when property changes - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
-			this.Text = String.Format("for each {0} in {1}", this["Variable"], this["Sequence"]);
+			this.Text = String.Format("for each `{0}` in `{1}`", this["Variable"], this["Sequence"]);
 			RaiseBlockChanged();
 		}
 		

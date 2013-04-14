@@ -156,7 +156,7 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			// Update block text
-			this.Text = String.Format("define {0} ({1})", this.ProcedureName, argListString);
+			this.Text = String.Format("define `{0}` ({1})", this.ProcedureName, argListString);
 			RaiseBlockChanged();
 		}
 		
@@ -312,7 +312,7 @@ namespace Jigsaw
 			this.Text = "call ...";
 			
 			// Properties
-			CVarNameProperty VarName  = new CVarNameProperty("Variable", "X");
+			CVarNameProperty VarName  = new CVarNameProperty("Variable", "result");
 			VarName.PropertyChanged  += OnPropertyChanged;
 			_properties["Variable"] = VarName;
 			
@@ -368,9 +368,9 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{
 			if (this.VariableName.Length > 0) {
-				this.Text = String.Format("{0} = {1}({2})", this.VariableName, this.ProcedureName, paramListString);
+				this.Text = String.Format("`{0}` = `{1}`({2})", this.VariableName, this.ProcedureName, paramListString);
 			} else {
-				this.Text = String.Format("{0}({1})", this.ProcedureName, paramListString);
+				this.Text = String.Format("`{0}`({1})", this.ProcedureName, paramListString);
 			}
 			RaiseBlockChanged();
 		}
@@ -559,7 +559,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
-			this.Text = String.Format("return {0}", this["Expression"]);
+			this.Text = String.Format("return `{0}`", this["Expression"]);
 			RaiseBlockChanged();
 		}
 		

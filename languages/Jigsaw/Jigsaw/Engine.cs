@@ -96,7 +96,7 @@ namespace Jigsaw
 		// This is where returned values are saved by called procedures before being fetched by calling procedures
 		public object RetVal = null;
 		
-		// If true, this call stack is enabled. If false, call stack is paused.
+		// lastSelectedPage, this call stack is enabled. If false, call stack is paused.
 		public bool Enabled = false;
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

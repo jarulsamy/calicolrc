@@ -90,7 +90,7 @@ namespace Jigsaw
 		// True if to update block display while running
 		private bool _updateDisplay = true;
 		
-		// If true, automatically show properties dialog when dropping new block
+		// lastSelectedPage, automatically show properties dialog when dropping new block
 		internal bool _autoProperties = true; //false;
 		
 		// Ref to internal search helper object
@@ -2411,7 +2411,7 @@ namespace Jigsaw
 		
 		protected int _textYOffset = 12;				// Y offset for when a block's text
 		protected bool _hasBreakPoint = false;			// True if a has a debugging break point applied
-		internal bool _breakStop = false;				// If true, marks a block as a stopping point for popping frames from stack 
+		internal bool _breakStop = false;				// lastSelectedPage, marks a block as a stopping point for popping frames from stack 
 														// when a break is executed. Should be set to true for all loops.
 		protected Gtk.Window _propDialog = null;
 		protected Gtk.Window _contextMenu = null;
@@ -2498,7 +2498,7 @@ namespace Jigsaw
 		public virtual string this[string key]
 		{
 			get { return _properties[key].Text;  }
-			set { _properties[key].Text = value; }
+			set { _properties[key].Text = value.Replace("`", ""); }
 		}
 		
 		// - - Override Text property of basic shapes
@@ -2831,8 +2831,7 @@ namespace Jigsaw
 					g.Save ();
 					g.Rectangle(x, y+6.0+_textYOffset, w-12.0, -h);
 					g.Clip ();
-					g.MoveTo(x+10.0, y+3.0+_textYOffset);
-					g.ShowText(text);
+					ShowText(x+10.0, y+3.0+_textYOffset, g, text);
 					g.Restore ();
 					g.MoveTo (x+w-11.0, y+3.0+_textYOffset);
 					g.ShowText("...");
@@ -2840,8 +2839,7 @@ namespace Jigsaw
 					g.Save ();
 					g.Rectangle(x, y+6.0+_textYOffset, w, -h);
 					g.Clip ();
-					g.MoveTo(x+10.0, y+3.0+_textYOffset);
-					g.ShowText(text);
+					ShowText(x+10.0, y+3.0+_textYOffset, g, text);
 					g.Restore ();
 				}
 				
@@ -2862,6 +2860,141 @@ namespace Jigsaw
 //				desc.Dispose();
 //				layout.Dispose();
             }
+		}
+
+		protected virtual void ShowHighlights (Cairo.Context g, string text)
+		{
+			if (text.Contains ("(") || text.Contains("[")) {
+				g.Save ();
+				int inside = 0;
+				for(int i=0; i<text.Length; i++) {
+					string c = text.Substring(i, 1);
+					if (c == ")" || c == "]") 
+						inside--;
+					TextExtents te = g.TextExtents(c);
+					if (inside > 0) {
+						g.Color = Diagram.Colors.White;
+						g.RelMoveTo(-1, 1);
+						g.RelLineTo (0, - (10 + 2));
+						g.RelLineTo (te.Width + 2, 0);
+						g.RelLineTo (0, 10 + 2);
+						g.RelLineTo (-(te.Width + 2), 0);
+						g.ClosePath();
+						g.Fill();
+						g.RelMoveTo(1, -1); // back where we began
+					}
+					g.RelMoveTo(te.Width, 0); // advance width of character
+					if (c == "(" || c == "[")
+						inside++;
+				}
+				g.Restore ();
+				g.Color = this.TextColor; // let's make sure it is back to original
+			}
+		}
+
+		List<String> SplitIntoWords (string text)
+		{
+			List<String> retval = new List<String>();
+			string delimiters = "(), `";
+			string current = "";
+			Stack<string> stack = new Stack<string>();
+			for (int i=0; i<text.Length; i++) {
+				string s = text.Substring(i, 1);
+				if (stack.Count > 0 && stack.Peek() == "'") {
+					current += s;
+					if (s == "'") {
+						retval.Add(current);
+						current = "";
+					}
+				} else if (stack.Count > 0 && stack.Peek() == "\"") {
+					current += s;
+					if (s == "\"") {
+						retval.Add(current);
+						current = "";
+					}
+				} else if (stack.Count > 0 && stack.Peek() == "[") {
+					current += s;
+					if (s == "]") {
+						retval.Add(current);
+						current = "";
+					}
+				} else if (s == "\"") {
+					current += "\"";
+					stack.Push ("\"");
+				} else if (s == "'") {
+					current += "'";
+					stack.Push ("'");
+				} else if (s == "[") {
+					current += "[";
+					stack.Push ("[");
+				} else if (delimiters.Contains(s)) {
+					if (current != "")
+						retval.Add(current);
+					retval.Add(s);
+					current = "";
+				} else {
+					current += s;
+				}
+			}
+			if (current != "")
+				retval.Add(current);
+			return retval;
+		}
+
+		protected virtual void ShowText (double x, double y, Cairo.Context g, string text)
+		{
+			double cx = x, cy = y;
+			if (text.Contains ("(") || text.Contains ("`")) { 
+				// break it up
+				int inside = 0;
+				List<String> words = SplitIntoWords(text);
+				for(int i=0; i<words.Count; i++) {
+					string word = words[i];
+					TextExtents te = g.TextExtents(word);
+					if (word == ")") 
+						inside--;
+					else if (word == "`") {
+						if (inside > 0) {
+							inside--;
+						} else {
+							inside++;
+						}
+					}
+					double w = te.Width; // space width
+					double advance = te.XAdvance; // advance
+					if (word == " ") {
+						cx += 1.0;
+						continue;
+					}
+					if (word != "`") {
+						if (inside > 0 && word != ",") {
+							// fill in background:
+							g.Save ();
+							g.Color = Diagram.Colors.White;
+							g.MoveTo (cx - .25, cy + 2);
+							g.LineTo (cx - .25, cy - 9.0); // height
+							g.LineTo (cx + w + 1.0, cy - 9.0); // height
+							g.LineTo (cx + w + 1.0, cy + 2);
+							g.LineTo (cx - .25, cy + 2);
+							g.ClosePath();
+							g.Fill();
+							g.Restore ();
+							g.Color = Diagram.Colors.DarkBlue;
+						} else {
+							g.Color = this.TextColor;
+						}
+						g.MoveTo(cx, cy);
+						g.ShowText (word);
+						cx = cx + 1.0 + advance;
+					}
+					if (word == "(")
+						inside++;
+				}
+				g.Color = this.TextColor; // let's make sure it is back to original
+			} else {
+				g.MoveTo(cx, cy);
+				g.ShowText (text);
+			}
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
