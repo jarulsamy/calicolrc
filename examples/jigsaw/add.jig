@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="420" top="36">
+        <edge id="1" name="Start" linkedTo="2" />
+        <property name="Label" value="when script starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CProcedureCall" left="440" top="66">
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="result = Add(23, 47)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="result" />
+        <property name="Procedure Name" value="Add" />
+        <property name="Arg1" value="23" />
+        <property name="Arg2" value="47" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CIOTell" left="440" top="86">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="-1" />
+        <property name="Label" value="Tell('The answer is ' + str(result))" />
+        <property name="Message" value="" />
+        <property name="Tell" value="'The answer is ' + str(result)" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CProcedureStart" left="420" top="151">
+        <edge id="6" name="Start" linkedTo="7" />
+        <property name="Label" value="define Add (num1, num2)" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="Add" />
+        <property name="Param1" value="num1" />
+        <property name="Param2" value="num2" />
+        <property name="Param3" value="" />
+        <property name="Param4" value="" />
+        <property name="Param5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CProcedureReturn" left="440" top="181">
+        <edge id="7" name="In" linkedTo="6" />
+        <property name="Label" value="return num1 + num2" />
+        <property name="Message" value="" />
+        <property name="Expression" value="num1 + num2" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+</jigsaw>
