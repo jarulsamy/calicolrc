@@ -73,6 +73,7 @@ public class CalicoJigsawDocument : Document
 		widget.AddWithViewport (cvs);
 		if (filename != null)
 			cvs.ReadFile (filename);
+		cvs.engine.SetGlobalVariable("calico", calico);
 		cvs.JigsawRun += new EventHandler(OnJigsawRun);		
 		cvs.JigsawStop += new EventHandler(OnJigsawStop);
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);

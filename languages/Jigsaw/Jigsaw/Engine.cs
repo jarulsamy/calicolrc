@@ -346,6 +346,17 @@ namespace Jigsaw
 //			}
 //		}
 
+		public void SetGlobalVariable (string variable, object value)
+		{
+			globals[variable] = value;
+		}
+
+
+		public object GetGlobalVariable (string variable)
+		{
+			return globals[variable];
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public EngineState State
 		{
