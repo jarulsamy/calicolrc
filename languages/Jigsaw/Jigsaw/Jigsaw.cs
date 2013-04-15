@@ -483,8 +483,11 @@ namespace Jigsaw
 			blockPos[assembly_name] = 34;
 			blockCount[assembly_name] = 0;
 
-			foreach (string type_name in Reflection.Utils.getTypeNames(assembly)) {
+			foreach (string type_name in Reflection.Utils.getTypeNames(assembly).ToArray()) {
 				Type type = Reflection.Utils.getType (assembly, type_name);
+				if (type_name.Contains("Extensions")) {
+				    continue;
+				}
 
 				// Skip constructors for now
 //				foreach (System.Reflection.ConstructorInfo ci in Reflection.Utils.getConstructors(type)) {
@@ -518,6 +521,7 @@ namespace Jigsaw
 //					blocks.Add (block);
 //					y += 40;
 //				}
+
 
 				foreach (System.Reflection.MethodInfo mi in Reflection.Utils.getStaticMethods(type)) {
 
@@ -591,7 +595,9 @@ namespace Jigsaw
 			}
 
 			// Add all new tabs and blocks
-			foreach (String tabName in tabNames) 
+			string [] tabArray = tabNames.ToArray();
+			Array.Sort(tabArray);
+			foreach (String tabName in tabArray) 
 			{
 				// Skip empty tabs
 				if (blockCount[tabName] == 0) continue;

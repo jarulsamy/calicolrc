@@ -439,6 +439,7 @@ public static class Myro
 
 	public delegate void InvokeDelegate ();
 
+        [method: JigsawTab(null)]
         public static void InvokeBlocking (InvokeDelegate invoke)
         {
 	    System.Exception exception = null;
@@ -511,7 +512,7 @@ public static class Myro
 		return list.Slice (start, end);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void gamepad (PythonDictionary dict)
 	{
 		// everytime something (up/down) happens on the keys being
@@ -529,7 +530,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void gamepad ()
 	{
 		// sample robot controller
@@ -704,6 +705,7 @@ public static class Myro
 		return (int)value;
 	}
 
+        [method: JigsawTab(null)]
     public static bool isRealized(Gtk.Window window) {
 	bool retval = false;
 	InvokeBlocking (delegate {
@@ -712,7 +714,7 @@ public static class Myro
 	return retval;
     }
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static void senses ()
 	{
 	    if (sense != null && isRealized(sense.win)) {
@@ -1016,42 +1018,42 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow ()
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (0, "all");
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (index, "all");
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (0, what);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index, string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (index, what);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index, List whats)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (index, whats);
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable)
 	{
 		Sdl.SDL_JoystickUpdate ();
@@ -1061,7 +1063,7 @@ public static class Myro
 		return retval;
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable, string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
@@ -1071,7 +1073,7 @@ public static class Myro
 		return retval;
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable, List whats)
 	{
 		Sdl.SDL_JoystickUpdate ();
@@ -1081,56 +1083,56 @@ public static class Myro
 		return retval;
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad ()
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, "all");
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, "all");
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, what);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index, string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, what);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index, List whats)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, whats);
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List whats)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, whats);
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List indices, string what)
 	{
 		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (indices, what);
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List indices, List whats)
 	{
 		Sdl.SDL_JoystickUpdate ();
@@ -1144,13 +1146,13 @@ public static class Myro
 
 	// Functional Interface
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static Robot getRobot ()
 	{
 		return robot;
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void init ()
 	{
 		initialize (null);
@@ -1167,7 +1169,7 @@ public static class Myro
 	{
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void init (string port)
 	{
 		initialize (port, 38400);
@@ -1221,7 +1223,7 @@ public static class Myro
 		return retval;
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static object makeRobot (string robot_type, params object [] args)
   {
 	string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
@@ -1424,7 +1426,7 @@ public static class Myro
 	    }
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void uninit ()
 	{
 		if (Myro.robot != null)
@@ -1453,7 +1455,7 @@ public static class Myro
 		}
 	}
   
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static List rgb2yuv (int R, int G, int B)
 	{
 		int Y = (int)(0.299 * R + 0.587 * G + 0.114 * B);
@@ -1465,121 +1467,121 @@ public static class Myro
         Math.Max (Math.Min (V, 255), 0));
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void forward (double power)
 	{
 		robot.forward (power);
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void forward (double power, double time)
 	{
 		robot.forward (power, time);
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void translate (double power)
 	{
 		robot.translate (power);
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void translate (double power, double time)
 	{
 		robot.translate (power, time);
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void rotate (double power)
 	{
 		robot.rotate (power);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void rotate (double power, double time)
 	{
 		robot.rotate (power, time);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void backward (double power)
 	{
 		robot.backward (power);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void backward (double power, double time)
 	{
 		robot.backward (power, time);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void stop ()
 	{
 		robot.stop ();
 	}
   
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void penDown ()
 	{
 		robot.penDown ();
 	}
   
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void penDown (string color)
 	{
 		robot.penDown (color);
 	}
   
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static Graphics.Line penUp ()
 	{
 		return robot.penUp ();
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void move (double translate, double rotate)
 	{
 		robot.move (translate, rotate);
 	}
   
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void turnLeft (double power)
 	{
 		robot.turnLeft (power);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void turnLeft (double power, double time)
 	{
 		robot.turnLeft (power, time);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void turnRight (double power)
 	{
 		robot.turnRight (power);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void turnRight (double power, double time)
 	{
 		robot.turnRight (power, time);
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void motors (double left, double right)
 	{
 		robot.motors (left, right);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void reboot ()
 	{
 		robot.reboot ();
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void stopBeep ()
 	{
 		if (robot != null)
@@ -1589,7 +1591,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (double duration, double frequency)
 	{
 		if (robot != null)
@@ -1599,7 +1601,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (double duration, double frequency, double frequency2)
 	{
 		if (robot != null)
@@ -1609,7 +1611,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (int duration, int frequency)
 	{
 		if (robot != null)
@@ -1619,7 +1621,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (int duration, int frequency, int frequency2)
 	{
 		if (robot != null)
@@ -1629,7 +1631,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (double duration, int frequency)
 	{
 		if (robot != null)
@@ -1639,7 +1641,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void beep (double duration, int frequency, int frequency2)
 	{
 		if (robot != null)
@@ -1649,55 +1651,55 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void play (string filename)
 	{
 		Myro.computer.play (filename);
 	}
 	
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void playUntilDone (string filename)
 	{
 		Myro.computer.playUntilDone (filename);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void playUntilDone (SdlDotNet.Audio.Sound sound)
 	{
 		Myro.computer.playUntilDone (sound);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static SdlDotNet.Audio.Channel play (string filename, int loop, double seconds)
 	{
 		return Myro.computer.play (filename, loop, seconds);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static SdlDotNet.Audio.Channel play (string filename, int loop)
 	{
 		return Myro.computer.play (filename, loop);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static SdlDotNet.Audio.Channel play (string filename, bool loop_forever)
 	{
 		return Myro.computer.play (filename, loop_forever);
 	}
 	
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static object makeSound (string filename)
 	{
 		return Myro.computer.makeSound (filename);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void setPhases (double phase1, double phase2)
 	{
 		Myro.computer.setPhases (phase1, phase2);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void play (double duration, Func<int[],int,object> function)
 	{
 		Myro.computer.play (duration, function);
@@ -1715,7 +1717,7 @@ public static class Myro
   }
   */
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static void show (Graphics.Picture picture, 
 				 string title="Myro Camera")
 	{
@@ -1727,37 +1729,37 @@ public static class Myro
 	    picture.setY (picture.height * picture.scaleFactor / 2);
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static void setOption (string key, object value)
 	{
 		robot.setOption (key, value);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void reinit (string port, int baud)
 	{
 		robot.reinit (port, baud);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void setup ()
 	{
 		robot.setup ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string getName ()
 	{
 		return robot.getName ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static List getIRMessage ()
 	{
 		return robot.getIRMessage ();
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void sendIRMessage (string data)
 	{
 	}
@@ -1767,13 +1769,13 @@ public static class Myro
 	{
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static List getBlob ()
 	{
 		return robot.getBlob ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getData (params int [] position)
 	{
 		return robot.getData (position);
@@ -1785,19 +1787,19 @@ public static class Myro
 		robot.setData (position, value);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getAll ()
 	{
 		return robot.getAll ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getInfo ()
 	{
 		return robot.getInfo ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getObstacle (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -1806,7 +1808,7 @@ public static class Myro
 			return robot.getObstacle (position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getDistance (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -1815,7 +1817,7 @@ public static class Myro
 			return robot.getDistance (position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getLight (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -1824,7 +1826,7 @@ public static class Myro
 			return robot.getLight (position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getIR (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -1833,25 +1835,25 @@ public static class Myro
 			return robot.getIR (position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getBright ()
 	{
 		return robot.getBright ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getBright (string window)
 	{
 		return robot.getBright (window);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getBright (int window)
 	{
 		return robot.getBright (window);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getLine (params object [] position)
 	{
 		if (position == null || position.Length == 0)
@@ -1860,128 +1862,128 @@ public static class Myro
 			return robot.getLine (position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object get (string sensor="all")
 	{
 		return robot.get (sensor);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object get (string sensor="all", params object [] position)
 	{
 		return robot.get (sensor, position);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string getPassword ()
 	{
 		return robot.getPassword ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static double getBattery ()
 	{
 		return robot.getBattery ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getConfig ()
 	{
 		return robot.getConfig ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static int getStall ()
 	{
 		return robot.getStall ();
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setLED (string position, object value)
 	{
 		robot.setLED (position, value);
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setLEDFront (object value)
 	{
 		robot.setLEDFront (value);
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setLEDBack (double value)
 	{
 		robot.setLEDBack (value);
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setEchoMode (int value)
 	{
 		robot.setEchoMode (value);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void setName (string name)
 	{
 		robot.setName (name);
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setIRPower (int power)
 	{
 		robot.setIRPower (power);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static void setWhiteBalance (object value)
 	{
 		robot.setWhiteBalance (value);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void setForwardness (object value)
 	{
 		robot.setForwardness (value);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getForwardness ()
 	{
 		return robot.getForwardness ();
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void setVolume (object volume)
 	{
 		robot.setVolume (volume);
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static void setPassword (string password)
 	{
 		robot.setPassword (password);
 	}
 
-    [method: JigsawTab("Picture")]
+    [method: JigsawTab("M/Picture")]
     public static void darkenCamera(int level)
     {
         robot.darkenCamera(level);
     }
     
-    [method: JigsawTab("Picture")]
+    [method: JigsawTab("M/Picture")]
     public static void manualCamera(int gain=0x00, int brightness=0x80, int exposure=0x41)
     {
         robot.manualCamera(gain, brightness, exposure);
     }
 
-    [method: JigsawTab("Picture")]
+    [method: JigsawTab("M/Picture")]
     public static void autoCamera()
     {
         robot.autoCamera();
     }
 	
     // fluke2
-    [method: JigsawTab("Picture")]
+    [method: JigsawTab("M/Picture")]
     public static void setPictureSize(string size)
     {
         robot.setPictureSize(size);
@@ -1994,7 +1996,7 @@ public static class Myro
         robot.setPictureSize(size);
     }
 
-    [method: JigsawTab("Actions")]
+    [method: JigsawTab("M/Actions")]
     public static void servo(int id, int value)
     {
         robot.servo(id, value);
@@ -2006,110 +2008,110 @@ public static class Myro
         robot.enablePanNetworking();
     }
     
-    [method: JigsawTab("Actions")]
+    [method: JigsawTab("M/Actions")]
     public static string getFlukeLog()
     {
         return robot.getFlukeLog();
     }
 
 	// s2
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getEncoders (bool zero = false)
 	{
 		return robot.getEncoders (zero);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getMicrophone ()
 	{
 		return robot.getMicrophone ();
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object getPosition ()
 	{
 		return robot.getPosition ();
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static int getAngle ()
 	{
 		return robot.getAngle ();
 	}
   
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void turnTo (int angle, string units = "deg")
 	{
 		robot.turnTo (angle, units);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void turnBy (int angle, string units = "deg")
 	{
 		robot.turnBy (angle, units);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void setPosition (int x, int y)
 	{
 		robot.setPosition (x, y);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void setAngle (uint a)
 	{
 		robot.setAngle (a);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void setBeginPath (int speed=7)
 	{
 		robot.setBeginPath (speed);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void moveTo (int x, int y, string units = "mm")
 	{
 		robot.moveTo (x, y, units);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void moveBy (int x, int y, string units = "mm")
 	{
 		robot.moveBy (x, y, units);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void arc (int degrees, int radius)
 	{
 		robot.arc (degrees, radius);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void arcTo (int x, int y, int radius, string units = "mm")
 	{
 		robot.arcTo (x, y, radius, units);
 	}
 
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void arcBy (int x, int y, int radius, string units = "mm")
 	{
 		robot.arcBy (x, y, radius, units);
 	}
   
-       [method: JigsawTab("Movement")]
+       [method: JigsawTab("M/Movement")]
 	public static void setEndPath ()
 	{
 		robot.setEndPath ();
 	}
   
-       [method: JigsawTab("Audio")]
+       [method: JigsawTab("M/Audio")]
 	public static void setS2Volume (int level)
 	{
 		robot.setS2Volume (level);
 	}
  	
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static string flipCoin ()
 	{
 		if (Random.random () < .5) {
@@ -2125,31 +2127,31 @@ public static class Myro
 		return (int)(Random.random () * (end - start + 1) + start);
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static bool heads ()
 	{
 		return (flipCoin () == "heads");
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static bool tails ()
 	{
 		return (flipCoin () == "tails");
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static double randomNumber ()
 	{
 		return Random.random ();
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static double random ()
 	{
 		return Random.random ();
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static List getFilenames (string path)
 	{
 		List<string > retval = new List<string> ();
@@ -2181,7 +2183,7 @@ public static class Myro
 		return filenames;
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static string pickAFile ()
 	{
 	    string pickAFileResponse = null;
@@ -2202,7 +2204,7 @@ public static class Myro
 	    return pickAFileResponse;
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static string pickAFolder ()
 	{
 	    string pickAFolderResponse = null;
@@ -2221,7 +2223,7 @@ public static class Myro
 	    return pickAFolderResponse;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color pickAColor ()
 	{
 	    Graphics.Color pickAColorResponse = null;
@@ -2238,7 +2240,7 @@ public static class Myro
 	    return pickAColorResponse;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static string pickAFont ()
 	{
 	    string pickAFontResponse = null;
@@ -2252,7 +2254,7 @@ public static class Myro
 	    return pickAFontResponse;
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object ask (object question, string title)
 	{
 	    object askResponse = null;
@@ -2315,13 +2317,13 @@ public static class Myro
 	    return askResponse;
 	}
 
-        [method: JigsawTab("Graphics")]
+        [method: JigsawTab("M/Graphics")]
 	public static List getColorNames ()
 	{
 		return Graphics.getColorNames ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass Window (
       string title="Calico Graphics",
       int width=300, 
@@ -2330,19 +2332,19 @@ public static class Myro
 		return Graphics.makeWindow (title, width, height);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass Window (int width, int height)
 	{
 		return makeWindow ("Calico Graphics", width, height);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	    public static Graphics.WindowClass Window (String title, Gtk.Widget widget)
 	{
 	    return makeWindow (title, widget);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static bool yesno (string question)
 	{
 	    bool yesnoResponse = false;
@@ -2360,7 +2362,7 @@ public static class Myro
 	    return yesnoResponse;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void inform (string question)
 	{
 	    InvokeBlocking (delegate {
@@ -2374,7 +2376,7 @@ public static class Myro
 		});
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string askQuestion (string question, IList choices)
 	{
 	    string askResponse = null;
@@ -2404,12 +2406,6 @@ public static class Myro
 	    return askResponse;
 	}
 
-        public static void DialogHandler (object obj, 
-					  System.EventArgs args, 
-					  Gtk.Dialog dialog)
-        {
-	}
-
         [method: JigsawTab(null)]
 	public static string to_s (object obj)
 	{
@@ -2425,7 +2421,7 @@ public static class Myro
 		return list;
 	}
 
-	[method: JigsawTab("Movement")]
+	[method: JigsawTab("M/Movement")]
 	public static void joystick ()
 	{
 	    if (joyclass != null && isRealized(joyclass.window)) {
@@ -2539,25 +2535,25 @@ public static class Myro
 	    }
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string askQuestion (string question)
 	{
 		return askQuestion (question, Graphics.PyList ("Yes", "No"));
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string input (object question)
 	{
 		return ask (question, "Input").ToString ();
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object ask ()
 	{
 		return ask ("Input: ", "Information Request");
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static object ask (object question)
 	{
 		return ask (question, "Information Request");
@@ -2587,7 +2583,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static object pickOne (params object [] items)
 	{
 		if (items.Length == 1) {
@@ -2605,45 +2601,45 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static void wait (double seconds)
     {
 	if (seconds > 0) 
 	    Thread.Sleep ((int)(seconds * 1000));
     }
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static double currentTime ()
 	{
 		System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime (1970, 1, 1);
 		return t.TotalSeconds;
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static bool odd (int n)
 	{
 		return ((n % 2) == 1);
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static bool even (int n)
 	{
 		return ((n % 2) == 0);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture takePicture (string mode="jpeg")
 	{
 		return robot.takePicture (mode);
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static void setSeed (int value)
 	{
 		Random.seed = value;
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static int getSeed ()
 	{
 		return Random.seed;
@@ -3401,7 +3397,7 @@ public static class Myro
 		}
 	}	
 	
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static IEnumerable timer (double seconds)
 	{
 		double start = currentTime ();
@@ -3488,25 +3484,25 @@ public static class Myro
 
 	// Graphics.cs
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (IList rgb)
 	{
 		return Graphics.makeColor ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (string color)
 	{
 		return Graphics.makeColor (color);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color Color (IList rgb)
 	{
 		return Graphics.makeColor ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color Color (string color)
 	{
 		return Graphics.makeColor (color);
@@ -3524,140 +3520,140 @@ public static class Myro
   }
   */
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Color getColor (Graphics.Picture picture, int x, int y)
 	{
 		return picture.getColor (x, y);
 	}
   
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static IEnumerable getPixels (Graphics.Picture picture)
 	{
 		return Graphics.getPixels (picture);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Pixel getPixel (Graphics.Picture picture, int col, int row)
 	{
 		return picture.getPixel (col, row);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static void setPixel (Graphics.Picture picture, int col, int row, Graphics.Color color)
 	{
 		picture.setPixel (col, row, color);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static void setPixel (Graphics.Picture picture, int col, int row, Graphics.Pixel pixel)
 	{
 		picture.setPixel (col, row, pixel);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (int r, int g, int b)
 	{
 		return Graphics.makeColor (r, g, b);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (int r, int g, int b, int a)
 	{
 		return Graphics.makeColor (r, g, b, a);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (double r, double g, double b)
 	{
 		return Graphics.makeColor (r, g, b);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (double r, double g, double b, double a)
 	{
 		return Graphics.makeColor (r, g, b, a);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color getColor (Graphics.Pixel pixel)
 	{
 		return pixel.getColor ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static PythonTuple getRGB (Graphics.Pixel pixel)
 	{
 		return pixel.getRGB ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static PythonTuple getRGBA (Graphics.Pixel pixel)
 	{
 		return pixel.getRGBA ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getX (Graphics.Pixel pixel)
 	{
 		return pixel.x;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getY (Graphics.Pixel pixel)
 	{
 		return pixel.y;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getGray (Graphics.Pixel pixel)
 	{
 		return pixel.getGray ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getRed (Graphics.Pixel pixel)
 	{
 		return pixel.getRed ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getGreen (Graphics.Pixel pixel)
 	{
 		return pixel.getGreen ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getBlue (Graphics.Pixel pixel)
 	{
 		return pixel.getBlue ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getAlpha (Graphics.Pixel pixel)
 	{
 		return pixel.getAlpha ();
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static object get (IList tuple, int position)
 	{
 		return tuple [position];
 	}
 
-	[method: JigsawTab("Misc")]
+	[method: JigsawTab("M/Misc")]
 	public static PythonTuple makeTuple (params object [] items)
 	{
 		// make a tuple from an array
 		return new PythonTuple (items);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setColor (Graphics.Pixel pixel, Graphics.Color c)
 	{
 		pixel.setColor (c);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, IList rgb)
 	{
 		pixel.setRGB (((int)rgb [0]), 
@@ -3665,13 +3661,13 @@ public static class Myro
 			      ((int)rgb [2]));
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, int red, int green, int blue)
 	{
 		pixel.setRGB (red, green, blue);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRGB (Graphics.Pixel pixel, float red, float green, float blue)
 	{
 		pixel.setRGB (
@@ -3680,61 +3676,61 @@ public static class Myro
 			((int)green));
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRGBA (Graphics.Pixel pixel, int red, int green, int blue, int alpha)
 	{
 		pixel.setRGBA (red, green, blue, alpha);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setGray (Graphics.Pixel pixel, int value)
 	{
 		pixel.setGray (value);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRed (Graphics.Pixel pixel, int value)
 	{
 		pixel.setRed (value);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setGreen (Graphics.Pixel pixel, int value)
 	{
 		pixel.setGreen (value);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setBlue (Graphics.Pixel pixel, int value)
 	{
 		pixel.setBlue (value);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setAlpha (Graphics.Pixel pixel, int value)
 	{
 		pixel.setAlpha (value);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	    public static void savePicture (Graphics.Picture picture, string filename)
 	{
 		picture.savePicture (filename);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	    public static void savePicture (List list, string filename, short delay, bool repeat)
 	{
 	    Graphics.savePicture (list, filename, delay, repeat);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	    public static void savePicture (List list, string filename)
 	{
 	    Graphics.savePicture (list, filename, 0, true);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	    public static void savePicture (IList pictures, string filename)
         {
 	    Graphics.savePicture (pictures, filename);
@@ -3752,31 +3748,31 @@ public static class Myro
 		return Graphics.Vector ((float)x, (float)y);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (int x, int y)
 	{
 		return new Graphics.Picture (x, y);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (int x, int y, Graphics.Color c)
 	{
 		return new Graphics.Picture (x, y, c);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (string filename)
 	{
 		return new Graphics.Picture (filename);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture loadPicture (string filename)
 	{
 		return new Graphics.Picture (filename);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static List loadPictures (string filename)
 	{
 	    if (filename.StartsWith ("http://")) {
@@ -3797,25 +3793,25 @@ public static class Myro
 	    return list;
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (Graphics.Picture picture)
 	{
 		return new Graphics.Picture (picture);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (Graphics.WindowClass window)
 	{ //, string filename) {
 		return Graphics.makePicture (window);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (System.Drawing.Bitmap bitmap)
 	{ //, string filename) {
 		return Graphics.makePicture (bitmap);
 	}
 
-	[method: JigsawTab("Picture")]
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture copyPicture (Graphics.Picture picture)
 	{ //, string filename) {
 		return Graphics.copyPicture (picture);
@@ -3845,7 +3841,7 @@ public static class Myro
 		return (object[])dict.Keys;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass makeWindow (string title="Calico Graphics",
       int width=300,
       int height=300)
@@ -3853,61 +3849,61 @@ public static class Myro
 		return Graphics.makeWindow (title, width, height);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
 	{
 		return Graphics.makeWindow (title, widget);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass getWindow ()
 	{
 		return Graphics.getWindow ();
 	}
 
-	[method: JigsawTab("Robot")]
+	[method: JigsawTab("M/Robot")]
 	public static Simulation getSimulation ()
 	{
 		return Myro.simulation;
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static PythonTuple getMouse ()
 	{
 		return Graphics.getMouse ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static PythonTuple getMouseNow ()
 	{
 		return Graphics.getMouseNow ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static string getMouseState ()
 	{
 		return Graphics.getMouseState ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static string getKeyState ()
 	{
 		return Graphics.getKeyState ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static string getKeyPressed ()
 	{
 		return Graphics.getKeyPressed ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void run ()
 	{
 		Graphics.run ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void run (Func<object> function)
 	{
 		Graphics.run (function);
@@ -3915,80 +3911,80 @@ public static class Myro
 
 	// Callbacks:
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void onMouseUp (Func<object,Graphics.Event,object> function)
 	{
 		Graphics.onMouseUp (function);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void onMouseDown (Func<object,Graphics.Event,object> function)
 	{
 		Graphics.onMouseDown (function);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void onMouseMovement (Func<object,Graphics.Event,object> function)
 	{
 		Graphics.onMouseMovement (function);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void onKeyPress (Func<object,Graphics.Event,object> function)
 	{
 		Graphics.onKeyPress (function);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void onKeyRelease (Func<object,Graphics.Event,object> function)
 	{
 		Graphics.onKeyRelease (function);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.WindowClass getWindow (string title)
 	{
 		return Graphics.getWindow (title);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getHeight (Graphics.WindowClass window)
 	{
 		return window.getHeight ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getHeight (Graphics.Picture picture)
 	{
 		return picture.getHeight ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getWidth (Graphics.WindowClass window)
 	{
 		return window.getWidth ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static int getWidth (Graphics.Picture picture)
 	{
 		return picture.getWidth ();
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Picture getRegion (Graphics.Picture picture, IList iterable, int width, int height, 
                     double degrees)
 	{
 		return picture.getRegion (new Graphics.Point (iterable [0], iterable [1]), width, height, degrees);
 	}
   
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Picture getRegion (Graphics.Picture picture, Graphics.Point p, int width, int height, double degrees)
 	{
 		return picture.getRegion (p, width, height, degrees);
 	}
 
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRegion (Graphics.Picture picture, IList iterable, 
                    int width, int height, 
                    double degrees, Graphics.Color color)
@@ -3997,7 +3993,7 @@ public static class Myro
               height, degrees, color);
 	}
   
-	[method: JigsawTab("Graphics")]
+	[method: JigsawTab("M/Graphics")]
 	public static void setRegion (Graphics.Picture picture, Graphics.Point p, 
                    int width, int height, double degrees,
                    Graphics.Color color)
@@ -4387,25 +4383,25 @@ public static class Myro
 		return list;
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static List getVoiceNames ()
 	{
 		return Sort (voices.values ());
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static List getVoices ()
 	{
 		return voices.keys ();
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setVoice (string name)
 	{
 		speech_name = name;
 	}
 
-	[method: JigsawTab("Actions")]
+	[method: JigsawTab("M/Actions")]
 	public static void setVoiceName (string name)
 	{
 		foreach (string key in voices.keys()) {
@@ -4417,19 +4413,19 @@ public static class Myro
 		throw new Exception ("voice name not found: " + name);
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string getVoice ()
 	{
 		return speech_name;
 	}
 
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string getVoiceName ()
 	{
 		return getVoiceName (speech_name);
 	}
   
-	[method: JigsawTab("Senses")]
+	[method: JigsawTab("M/Senses")]
 	public static string getVoiceName (string name)
 	{
 		foreach (string key in voices.keys()) {
@@ -4440,25 +4436,25 @@ public static class Myro
 		return name;
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void speak (string text)
 	{
 		speak (text, 0); // not async, wait for exit
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void speak (string text, bool async)
 	{
 		speak (text, bool_to_int (async)); // not async, wait for exit
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void speak (string text, double async)
 	{
 		speak (text, (int)async); // not async, wait for exit
 	}
 
-        [method: JigsawTab("Audio")]
+        [method: JigsawTab("M/Audio")]
 	public static void speak (string text, int async)
 	{
 		Console.WriteLine (text);
@@ -4513,13 +4509,13 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static string getNoteFromFrequency (int frequency)
 	{
 		return getNoteFromFrequency (System.Convert.ToDouble (frequency));
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static string getNoteFromFrequency (double frequency)
 	{
 		// Return closest note name based on a given frequency. 
@@ -4535,13 +4531,13 @@ public static class Myro
       diffNote.Substring (1, diffNote.Length - 1);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void playSong (List song)
 	{
 		playSong (song, 1.0);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void playSong (List song, double speed)
 	{
 		if (robot != null)
@@ -4550,13 +4546,13 @@ public static class Myro
 			computer.playSong (song, speed);
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void saveSong (List song, string filename, int append)
 	{
 		saveSong (song, filename, int_to_bool (append));
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static void saveSong (List song, string filename, bool append)
 	{
 		//  Writes a song list to a file. 
@@ -4577,7 +4573,7 @@ public static class Myro
 		}
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static List readSong (string filename)
 	{
 		// Read a song file. Returns a song list 
@@ -4596,7 +4592,7 @@ public static class Myro
 		return song;
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static string song2text (List song)
 	{
 		// Given a song list, return a text string form 
@@ -4618,7 +4614,7 @@ public static class Myro
 		return text;
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	public static List makeSong (string text)
 	{
 		// Given a text string format of a song, return a song list 
@@ -4633,7 +4629,7 @@ public static class Myro
 		return song;
 	}
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	static void parseSongLine (List song, string line, 
                 int lineNumber, string filename)
 	{
@@ -4664,7 +4660,7 @@ public static class Myro
 	}
 
 #pragma warning disable 0168
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	static double getFrequency (string s, int line, string text)
 	{
 		//Takes a string that is a note name, or a frequency. Returns
@@ -4681,7 +4677,7 @@ public static class Myro
 
 #pragma warning restore 0168
 
-	[method: JigsawTab("Audio")]
+	[method: JigsawTab("M/Audio")]
 	static double getDuration (string v, int line, string text)
 	{
 		// Takes a string that is a fraction, or a number. Returns whole

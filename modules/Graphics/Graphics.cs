@@ -86,6 +86,7 @@ public static class Graphics
 	public static bool warn_missing_dot = false;
 	public delegate void InvokeDelegate ();
 	
+        [method: JigsawTab(null)]
         public static void initialize_module(string path, string os) {
     	    Graphics.startup_path = path;
     	    Graphics.os_name = os;
@@ -306,49 +307,49 @@ public static class Graphics
        {"white", new Color(0xFF, 0xFF, 0xFF)}, 
     };
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static PythonTuple getMouse ()
 	{
 		return getWindow ().getMouse ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static PythonTuple getMouseNow ()
 	{
 		return getWindow ().getMouseNow ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static string getMouseState ()
 	{
 		return getWindow ().getMouseState ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static string getKeyState ()
 	{
 		return getWindow ().getKeyState ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static string getKeyPressed ()
 	{
 		return getWindow ().getKeyPressed ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void run ()
 	{
 		getWindow ().run ();
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void run (double step_time)
 	{
 		getWindow ().run (step_time);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void run (Func<object> function)
 	{
 		getWindow ().run (function);
@@ -356,37 +357,37 @@ public static class Graphics
 
 	// Callbacks:
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void onMouseUp (Func<object,Event,object> function)
 	{
 		getWindow ().onMouseUp (function);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void onMouseDown (Func<object,Event,object> function)
 	{
 		getWindow ().onMouseDown (function);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void onMouseMovement (Func<object,Event,object> function)
 	{
 		getWindow ().onMouseMovement (function);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void onKeyPress (Func<object,Event,object> function)
 	{
 		getWindow ().onKeyPress (function);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void onKeyRelease (Func<object,Event,object> function)
 	{
 		getWindow ().onKeyRelease (function);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static List getColorNames ()
 	{
 		List retval = new List ();
@@ -417,19 +418,19 @@ public static class Graphics
 	private static Dictionary<string, Graphics.WindowClass> _windows =
     new Dictionary<string, Graphics.WindowClass> ();
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color getColor (Picture picture, int x, int y)
 	{
 		return picture.getColor (x, y);
 	}
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Pixel getPixel (Picture picture, int x, int y)
 	{
 		return picture.getPixel (x, y);
 	}
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static IEnumerable getPixels (Picture picture)
 	{
 		for (int x=0; x < picture._cacheWidth; x++) {
@@ -439,7 +440,7 @@ public static class Graphics
 		}
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void setPixels (Picture picture, Picture picture2)
         {
 	    InvokeBlocking( delegate {
@@ -451,127 +452,127 @@ public static class Graphics
 		});
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setPixel (Picture picture, int x, int y, Color color)
 	{
 		picture.setPixel (x, y, color);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setPixel (Picture picture, int x, int y, Pixel pixel)
 	{
 		picture.setPixel (x, y, pixel);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color getColor (Pixel pixel)
 	{
 		return pixel.getColor ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setColor (Pixel pixel, Color color)
 	{
 		pixel.setColor (color);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static PythonTuple getRGB (Pixel pixel)
 	{
 		return pixel.getRGB ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static PythonTuple getRGBA (Pixel pixel)
 	{
 		return pixel.getRGBA ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static int getGray (Pixel pixel)
 	{
 		return pixel.getGray ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static int getRed (Pixel pixel)
 	{
 		return pixel.getRed ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static int getGreen (Pixel pixel)
 	{
 		return pixel.getGreen ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static int getBlue (Pixel pixel)
 	{
 		return pixel.getBlue ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static int getAlpha (Pixel pixel)
 	{
 		return pixel.getAlpha ();
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setRGB (Pixel pixel, IList rgb)
 	{
 	    pixel.setRGB ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setRGB (Pixel pixel, float red, float green, float blue)
 	{
 	    pixel.setRGB ((int)Math.Round(red), (int)Math.Round(green), (int)Math.Round(blue));
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setRGB (Pixel pixel, int red, int green, int blue)
 	{
 		pixel.setRGB (red, green, blue);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setRGBA (Pixel pixel, int red, int green, int blue, int alpha)
 	{
 		pixel.setRGBA (red, green, blue, alpha);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setGray (Pixel pixel, int value)
 	{
 		pixel.setGray (value);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setRed (Pixel pixel, int value)
 	{
 		pixel.setRed (value);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setGreen (Pixel pixel, int value)
 	{
 		pixel.setGreen (value);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setBlue (Pixel pixel, int value)
 	{
 		pixel.setBlue (value);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static void setAlpha (Pixel pixel, int value)
 	{
 		pixel.setAlpha (value);
 	}
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void savePicture (IList pictures, string filename) {
 	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
 	    gif.Start();
@@ -583,7 +584,7 @@ public static class Graphics
 	    gif.Output(filename);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void savePicture (List pictures, string filename, short delay, bool repeat) {
 	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
 	    gif.Start();
@@ -596,43 +597,43 @@ public static class Graphics
 	    gif.Output(filename);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void savePicture (Picture picture, string filename)
 	{
 	    picture.savePicture (filename);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void savePicture (List list, string filename)
 	{
 	    savePicture (list, filename, 10, false);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
         public static void savePicture (List list, string filename, short delay)
 	{
 	    savePicture (list, filename, delay, false);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (int x, int y)
 	{
 		return new Picture (x, y);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (int x, int y, Color c)
 	{
 		return new Picture (x, y, c);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (string filename)
 	{
 		return new Picture (filename);
 	}
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture copyPicture (Picture picture)
 	{
 		return new Picture (picture);
@@ -654,26 +655,26 @@ public static class Graphics
 		Gtk.Application.Run ();
 	}
   
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (WindowClass window)
 	{ 
 		return new Picture (window);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (System.Drawing.Bitmap bitmap)
 	{ 
 		return new Picture (bitmap);
 	}
 
-        [method: JigsawTab("Misc")]
+        [method: JigsawTab("G/Misc")]
 	public static void wait (double seconds)
 	{
 	    if (seconds > 0) 
 		Thread.Sleep ((int)(seconds * 1000));
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass makeWindow (string title="Calico Graphics",
                                            int width=300, 
                                            int height=300)
@@ -692,7 +693,7 @@ public static class Graphics
 	    return _windows [title];
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
                                            int width=300, 
                                            int height=300)
@@ -707,7 +708,7 @@ public static class Graphics
 	    return _windows [title];
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass makeWindow (string title, Gtk.Widget widget)
 	{
 	    InvokeBlocking( delegate {
@@ -725,7 +726,7 @@ public static class Graphics
 	    return _windows [title];
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass getWindow ()
 	{
 		if (_lastWindow != null) {
@@ -735,7 +736,7 @@ public static class Graphics
 		}
 	}
   
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass getWindow (string title)
 	{
 		if (_windows.ContainsKey (title)) {
@@ -745,7 +746,7 @@ public static class Graphics
 		}
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass Window (string title="Calico Graphics",
                                        int width=300, 
                                        int height=300)
@@ -753,38 +754,38 @@ public static class Graphics
 		return makeWindow (title, width, height);
 	}
 
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass Window (int width,
                                             int height)
 	{
 		return makeWindow ("Calico Graphics", width, height);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color makeColor (string color)
 	{
 		return new Color (color);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color makeColor (int r, int g, int b)
 	{
 		return new Color (r, g, b);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color makeColor (int r, int g, int b, int a)
 	{
 		return new Color (r, g, b, a);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color makeColor (double r, double g, double b)
 	{
 		return new Color (r, g, b);
 	}
 
-        [method: JigsawTab("Pictures")]
+        [method: JigsawTab("G/Pictures")]
 	public static Color makeColor (double r, double g, double b, double a)
 	{
 		return new Color (r, g, b, a);
@@ -2045,31 +2046,34 @@ public static class Graphics
 		}
 	}
   
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void ShowAll (object o)
 	{
 		Invoke (delegate {
 			((Gtk.Widget)o).ShowAll (); });
 	}
   
-        [method: JigsawTab("Windows")]
+        [method: JigsawTab("G/Windows")]
 	public static void Show (object o)
 	{
 		Invoke (delegate {
 			((Gtk.Widget)o).Show (); });
 	}
   
+        [method: JigsawTab(null)]
 	public static Vector2 VectorRotate (Vector2 v, double angle)
 	{
 		Microsoft.Xna.Framework.Matrix m = Microsoft.Xna.Framework.Matrix.CreateRotationZ ((float)angle);
 		return Vector2.Transform (v, m);
 	}
 
+        [method: JigsawTab(null)]
 	public static Vector2 Vector (int x, int y)
 	{
 		return new Vector2 ((float)x, (float)y);
 	}
   
+        [method: JigsawTab(null)]
 	public static Vector2 Vector (double x, double y)
 	{
 		return new Vector2 ((float)x, (float)y);
@@ -6253,6 +6257,7 @@ public static class Graphics
 		}
 	    }
 	    
+	    [method: JigsawTab("G/Misc")]
 	    public static string processDot(string text) {
 			string retval = null;
 		    Process myProcess = new Process();
@@ -7668,6 +7673,7 @@ public static class Graphics
 	}
     }
 
+    [method: JigsawTab(null)]
     public static void Main(string [] args) {
 	Gtk.Application.Init();
 	var ag = new AnimatedGifEncoder();
