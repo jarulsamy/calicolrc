@@ -24,7 +24,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
-			this.Text = "when program starts";
+			this.Text = "when script starts";
 			
 			double offsetX = 0.5*this.Width + 10.0;
 			this.StartEdge = new CEdge(this, "Start", EdgeType.Out, null, offsetX, 30.0, 20.0, 30.0, this.Width-20.0);
@@ -225,7 +225,7 @@ namespace Jigsaw
 			this.LineColor = Diagram.Colors.DarkGoldenrod;
 			this.FillColor = Diagram.Colors.PaleGoldenrod;
 			this.Sizable = false;
-			this.Text = "end program";
+			this.Text = "end script";
 		}
 		
 		public CControlEnd(Double X, Double Y) : this(X, Y, null) {}
