@@ -3670,7 +3670,7 @@ namespace Jigsaw
 		internal double _azX = 0.0;					// Offset from block's left to left of activating zone
 		internal double _azY = 0.0;					// Offset from block's top to top of activation zone
 		internal double _azW = 100.0;				// Width of activation zone
-		internal double _azH = 6.0; 				// Height of activation zone
+		internal double _azH = 10.0; 				// Height of activation zone
 		private Diagram.CShape _activationZone = null;		// Not null if this edge is activated by another
 		private CEdge _isActivating = null;			// Ref to a edge that this edge is currently activating
 		internal int _id = 0;
@@ -3689,7 +3689,7 @@ namespace Jigsaw
 			_azX = offsetLeft;			// offset of activation zone from top of block
 			_azY = offsetTop;				
 			_azW = width;				// Size of activation zone
-			_azH = 6.0;
+			_azH = 12.0;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3757,7 +3757,7 @@ namespace Jigsaw
 			// Check if activating point location is within activation zone
 			double l = _block.Left + this._azX;
 			double r = l + this._azW;
-			double t = _block.Top + this._azY;
+			double t = _block.Top + this._azY - 0.5*this._azH;
 			double b = t + this._azH;
 			double ax = prt.ActivatingX;
 			double ay = prt.ActivatingY;
