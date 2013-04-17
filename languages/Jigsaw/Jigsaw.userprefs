@@ -1,13 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\CMethodBlock.cs">
     <Files>
-      <File FileName="Jigsaw\Jigsaw.cs" Line="3761" Column="29" />
-      <File FileName="Jigsaw\Diagram.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\StatementBlocks.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\IOBlocks.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\ProcedureBlocks.cs" Line="1" Column="1" />
-      <File FileName="Jigsaw\Engine.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\Widgets.cs" Line="1" Column="1" />
+      <File FileName="Jigsaw\CMethodBlock.cs" Line="373" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">

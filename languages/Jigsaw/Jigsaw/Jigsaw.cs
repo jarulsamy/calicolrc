@@ -2314,7 +2314,7 @@ namespace Jigsaw
 						
 						// Get text of block
 						string txt = bb.Text.ToLower();
-						//Console.WriteLine ("{0} in {1}?", ss, txt);
+
 						// A match is found. Select block.
 						if (txt.Contains ( ss )) {
 							// Select the tab

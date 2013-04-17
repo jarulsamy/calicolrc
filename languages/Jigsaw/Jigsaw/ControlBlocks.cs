@@ -1744,7 +1744,7 @@ namespace Jigsaw
 			Sequence.PropertyChanged += OnPropertyChanged;
 			_properties["Sequence"] = Sequence;
 			CVarNameProperty Variable = new CVarNameProperty("Variable", "item");
-			Sequence.PropertyChanged += OnPropertyChanged;
+			Variable.PropertyChanged += OnPropertyChanged;
 			_properties["Variable"] = Variable;
 			this.OnPropertyChanged(null, null);
 		}
