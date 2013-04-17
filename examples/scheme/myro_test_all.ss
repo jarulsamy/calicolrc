@@ -7,7 +7,7 @@
 (incr 'using)
 (using "Myro")
 (incr 'init)
-(Myro.init "/dev/rfcomm1")
+(Myro.init)
 (incr 'takePicture)
 (define pic (Myro.takePicture))
 (incr 'show)
