@@ -20,23 +20,25 @@ using System.Collections.Generic; // List
 using IronPython;
 
 public class Method {
-  public object classobj;
-  public MethodInfo method;
+    public object classobj;
+    public MethodInfo method;
+    public string name;
+    public Type type;
 
-  public Method(object classobj, MethodInfo method) {
-    this.classobj = classobj;
-    this.method = method;
-  }
-}
+    public Method(object classobj, string name) {
+	this.classobj = classobj;
+	this.name = name;
+    }
 
-public class MethodNeedsArgs {
-  public object classobj;
-  public string name;
-  
-  public MethodNeedsArgs(object classobj, string name) {
-    this.classobj = classobj;
-    this.name = name;
-  }
+    public object Invoke(object [] args) {
+	if (this.type == null) {
+	    this.type = classobj.GetType();
+	}
+	// then invoke
+	this.method = type.GetMethod(this.name, Scheme.get_types(args));
+	object retval = this.method.Invoke(this.classobj, args);
+	return retval != null ? retval : Scheme.symbol("<void>");
+    }
 }
 
 public class Config {
@@ -1171,12 +1173,11 @@ public class Scheme {
       try {
 	  method = type.GetMethod(name);
       } catch (System.Reflection.AmbiguousMatchException) {
-	  // wait till you have more info from args
-	  return (object)new MethodNeedsArgs(obj, name);
+	  return new Method(obj, name);
       }
-      if (method != null) {
+      if (method != null) { // not ambiguous
 	  //printf("GetMethod: {0}\n", method);
-	  return new Method(obj, method);
+	  return new Method(obj, name);
       }
       FieldInfo field = type.GetField(name);
       if (field != null) {
@@ -1302,7 +1303,6 @@ public class Scheme {
       return ((rator is IronPython.Runtime.Types.BuiltinFunction) ||
 	      (rator is IronPython.Runtime.PythonFunction) ||
 	      (rator is IronPython.Runtime.Method) ||
-	      (rator is MethodNeedsArgs) ||
 	      (rator is Method) ||
 	      (rator is IronPython.Runtime.Types.PythonType) ||
 	      (rator is Closure));
@@ -1313,18 +1313,7 @@ public class Scheme {
 	//printf("dlr_apply({0}, {1})\n", proc, args);
 	object retval;
 	if (proc is Method) {
-	  retval = ((Method)proc).method.Invoke(((Method)proc).classobj, 
-		  list_to_array(args));
-  	    return retval != null ? retval : symbol("<void>");
-	} else if (proc is MethodNeedsArgs) {
-	  // get the method based on args
-	  Type type = ((MethodNeedsArgs)proc).classobj.GetType();
-	  MethodInfo method;
-	  method = type.GetMethod(((MethodNeedsArgs)proc).name, 
-				  get_types(list_to_array(args)));
-	  // then invoke
-	  retval = method.Invoke(((MethodNeedsArgs)proc).classobj, 
-			       list_to_array(args));
+	    retval = ((Method)proc).Invoke( list_to_array(args));
   	    return retval != null ? retval : symbol("<void>");
 	} else if (proc is Closure) {
 	    return (proc as Closure)(list_to_array(args));
