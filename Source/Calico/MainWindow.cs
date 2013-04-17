@@ -2132,15 +2132,13 @@ namespace Calico {
                 //executeThread.Join(); don't really care, do we, if it completes?
                 executeThread = null;
                 manager ["python"].engine.Execute(@"
-def invoke(o, e):
-    import Gtk
-    import Myro as _
+def _invoke():
     if _.robot:
         _.robot.flush()
         _.robot.stop()
-    del _, Gtk
-import Gtk
-Gtk.Application.Invoke(invoke)
+import Myro as _
+_.InvokeBlocking(_invoke)
+del _invoke, _
 ");
             }
 	    Invoke(OnStopRunning);
