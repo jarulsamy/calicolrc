@@ -502,7 +502,9 @@ public class Scheme {
 	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
 	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
 	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
-	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0))
+	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0)),
+	       list(symbol("dict"), new Proc("dict", (Procedure1) make_dict, -1, 1)),
+	       list(symbol("apply-with-keywords"), new Proc("apply-with-keywords", (Procedure1) apply_with_keywords, -1, 1))
 			       );
       /// -------------------
       // FIXME: remove check when done
@@ -907,6 +909,56 @@ public class Scheme {
 
   public static object vector_to_list(object obj) {
     return ((Vector)obj).ToList();
+  }
+
+  public static object apply_with_keywords(object args) {
+      // proc '(1 2 3) (dict '("option4" 4) '("option5" 5))
+      object proc = car(args);
+      object pargs = cadr(args);
+      object [] positional_args;      
+      Hashtable named_args;
+
+      if (pargs is Hashtable) { // no positional arguments
+	  positional_args = new object[0];
+	  named_args = (Hashtable)pargs; // hashtable
+      } else { // some positional arguments
+	  positional_args = list_to_array(pargs);
+	  named_args = (Hashtable)caddr(args); // hashtable
+      }
+
+      // Make room for all args:
+      object [] all_args = new object[positional_args.Length + named_args.Count];
+      // Copy the passed in args:
+      int i;
+      for (i=0; i < positional_args.Length; i++) {
+	  all_args[i] = positional_args[i];
+      }
+      // Get the ones from the hashtable:
+      int pos = positional_args.Length;
+      i = 0;
+      string [] names = new string[named_args.Count];
+      foreach (DictionaryEntry pair in (System.Collections.Hashtable)named_args) {
+	  all_args[pos++] = pair.Value;
+	  names[i++] = pair.Key.ToString();
+      }
+      //System.Console.WriteLine("all_args: " + repr(all_args));
+      //System.Console.WriteLine("names: " + repr(names));
+      object retval = IronPython.Runtime.Operations.PythonCalls.CallWithKeywordArgs(
+		 IronPython.Runtime.DefaultContext.Default, 
+		 proc, 
+		 all_args,
+		 names);
+      return retval;
+  }
+
+  public static object make_dict(object args) {
+      Hashtable hashtable = new Hashtable();
+      object current = args;
+      while (!Eq(current, EmptyList)) {
+	  hashtable[caar(current)] = cadar(current);
+	  current = cdr(current);
+      }
+      return hashtable;
   }
 
   public static object list_to_vector(object lyst) {
@@ -1465,6 +1517,12 @@ public class Scheme {
 		  IronPython.Runtime.DefaultContext.Default);
 	} else if (obj is IronPython.Runtime.PythonTuple) {
 	  return obj.ToString();
+	} else if (obj is System.Collections.Hashtable) {
+	    string retval = "";
+	    foreach (DictionaryEntry pair in (System.Collections.Hashtable)obj) {
+                retval += String.Format(" '({0} {1})", ToString(pair.Key), ToString(pair.Value));
+            }
+	    return "(dict" + retval + ")";
 	} else if (obj is Array) {
 	    //System.Console.WriteLine("Here 1");
 	  return (string)array_to_string((object[]) obj);
@@ -1538,6 +1596,12 @@ public class Scheme {
 		  IronPython.Runtime.DefaultContext.Default);
 	} else if (obj is IronPython.Runtime.PythonTuple) {
 	  return obj.ToString();
+	} else if (obj is System.Collections.Hashtable) {
+	    string retval = "";
+	    foreach (DictionaryEntry pair in (System.Collections.Hashtable)obj) {
+                retval += String.Format(" '({0} {1})", repr(pair.Key), repr(pair.Value));
+            }
+	    return "(dict" + retval + ")";
 	} else if (obj is Array) {
 	    //System.Console.WriteLine("Here 1");
 	  return (string)array_to_string((object[]) obj);
