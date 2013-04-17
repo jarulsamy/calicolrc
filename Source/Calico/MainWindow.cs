@@ -2028,7 +2028,7 @@ namespace Calico {
 
         public bool ExecuteShell() {
             string text = ShellEditor.Document.Text;
-            bool results = Execute(text.TrimEnd(), CurrentLanguage, false);
+            bool results = ExecuteInBackground(text.TrimEnd(), CurrentLanguage);
             if (results) {
                 Mono.TextEditor.SelectionActions.SelectAll(ShellEditor.GetTextEditorData());
                 Mono.TextEditor.DeleteActions.DeleteSelection(ShellEditor.GetTextEditorData());
@@ -2040,10 +2040,10 @@ namespace Calico {
         }
 
         public bool Execute(string text, string language) {
-            return manager [language].engine.Execute(text);
+            return manager [language].engine.Execute(text, false);
 	}
 
-        public bool Execute(string text, string language, bool force) {
+        public bool ExecuteInBackground(string text, string language) {
             if (ProgramRunning) {
                 return false;
             }
