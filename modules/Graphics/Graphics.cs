@@ -3985,6 +3985,31 @@ public static class Graphics
 			    _cacheHeight = _pixbuf.Height;
 			});
 		}
+
+		public Picture (Gtk.Window gtk_window) : this(true)
+		{
+		    InvokeBlocking (delegate {
+			    Gdk.Pixbuf pixbuf = null;
+			    Gdk.Drawable drawable = gtk_window.GdkWindow;
+			    Gdk.Colormap colormap = drawable.Colormap;
+			    int _width = 0;
+			    int _height = 0;
+			    drawable.GetSize (out _width, out _height);
+			    pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
+			    // Now, do what Picture(pixbuf) does:
+			    _pixbuf = pixbuf;
+			    if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));			
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
+			});
+		}
+
 		
 		public Picture (WindowClass window) : this(true)
 		{ 
@@ -6286,9 +6311,7 @@ public static class Graphics
 		      myProcess.Start();
 		      retval = myProcess.StandardOutput.ReadToEnd();
 		      myProcess.WaitForExit();
-		#pragma warning disable 219
-		    } catch (Exception e) {
-		#pragma warning restore 219
+		    } catch (Exception) {
 		      if (warn_missing_dot) {
 		        Console.WriteLine("WARNING: missing dot command");
 		        warn_missing_dot = false; // just once
@@ -6488,7 +6511,7 @@ public static class Graphics
 				WritePixels(); // encode and write pixel data
 				firstFrame = false;
 			} 
-			catch (IOException e) 
+			catch (IOException) 
 			{
 				ok = false;
 			}
@@ -6515,7 +6538,7 @@ public static class Graphics
 //					ms.Close();
 				}
 			} 
-			catch (IOException e) 
+			catch (IOException) 
 			{
 				ok = false;
 			}
@@ -6601,7 +6624,7 @@ public static class Graphics
 			{
 				WriteString("GIF89a"); // header
 			} 
-			catch (IOException e) 
+			catch (IOException) 
 			{
 				ok = false;
 			}
@@ -6621,7 +6644,7 @@ public static class Graphics
 				ok = Start(new MemoryStream(10*1024));
 				closeStream = true;
 			} 
-			catch (IOException e) 
+			catch (IOException) 
 			{
 				ok = false;
 			}
@@ -6641,7 +6664,7 @@ public static class Graphics
 				fs.Write(ms.ToArray(),0,(int) ms.Length);
 				fs.Close();
 			}
-			catch (IOException e) 
+			catch (IOException) 
 			{
 				return false;
 			}
@@ -7561,7 +7584,7 @@ public static class Graphics
 						p[1] -= (a * (p[1] - g)) / alpharadbias;
 						p[2] -= (a * (p[2] - r)) / alpharadbias;
 					} 
-					catch (Exception e) 
+					catch (Exception) 
 					{
 					} // prevents 1.3 miscompilation
 				}
@@ -7574,7 +7597,7 @@ public static class Graphics
 						p[1] -= (a * (p[1] - g)) / alpharadbias;
 						p[2] -= (a * (p[2] - r)) / alpharadbias;
 					} 
-					catch (Exception e) 
+					catch (Exception) 
 					{
 					}
 				}
