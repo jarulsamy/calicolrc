@@ -1500,9 +1500,15 @@ namespace Jigsaw
 			}
 
 			this.DoScroll(deltaX, deltaY);
-			//this.offsetX += deltaX;
-			//this.offsetY += deltaY;
+			this.FixAbsolutePositionedShapes();
+			this.Invalidate();
+		}
 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnResetScrollZoom(object sender, EventArgs e)
+		{
+			this.DoScroll(-this.offsetX, -this.offsetY);
+			this.DoResetZoom();
 			this.FixAbsolutePositionedShapes();
 			this.Invalidate();
 		}
@@ -1560,12 +1566,17 @@ namespace Jigsaw
 			
 			Gtk.MenuItem mnuToggleInset = new Gtk.MenuItem("Toggle _Inset");
 			mnuToggleInset.Activated += OnViewToggleInset;
-			
+
+			Gtk.MenuItem mnuResetScroll = new Gtk.MenuItem("_Reset Scroll and Zoom");
+			mnuResetScroll.Activated += OnResetScrollZoom;
+
 			Gtk.MenuItem mnuHelp = new Gtk.MenuItem("Help");
 			mnuHelp.Activated += OnHelpShow;
 			
 			mnu.Append(mnuToggleInset);
+			mnu.Append(mnuResetScroll);
 			mnu.Append(mnuRun);
+			//OnResetScroll
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuHelp);
 			
