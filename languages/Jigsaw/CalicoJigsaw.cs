@@ -200,7 +200,7 @@ public class CalicoJigsawDocument : Document
 
 	public override void DefaultZoom()
 	{
-    	cvs.DoResetZoom();
+	    cvs.OnResetScrollZoom(null, null);
 	}
 
 	public override void ToggleBreakpoint ()
