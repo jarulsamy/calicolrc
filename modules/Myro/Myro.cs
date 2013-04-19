@@ -150,7 +150,7 @@ public static class Myro
         public static Joystick joyclass;
 	public static int gui_thread_id = -1;
         public static Thread update_entries_thread;
-	static string REVISION = "$Revision: $";
+	public static string Revision = "$Revision$";
 	static string startup_path = null;
 	static string os_name = null;
 	static string speech_name = "default";
@@ -1242,7 +1242,7 @@ public static class Myro
 			object robot;
 			try {
 			  robot = constructor.Invoke (args);
-			} catch (Exception e) {
+			} catch (Exception) {
 			  //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
 			  continue;
 			}
@@ -3806,6 +3806,12 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Picture")]
+	public static Graphics.Picture makePicture (Gtk.Window gtk_window)
+	{ //, string filename) {
+		return Graphics.makePicture(gtk_window);
+	}
+
+	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture makePicture (System.Drawing.Bitmap bitmap)
 	{ //, string filename) {
 		return Graphics.makePicture (bitmap);
@@ -4499,9 +4505,7 @@ public static class Myro
 
 			if (async == 0)
 				myProcess.WaitForExit ();
-#pragma warning disable 0168
-		} catch (Exception e) {
-#pragma warning restore 0168
+		} catch (Exception) {
 			if (warn_missing_speak) {
 				Console.WriteLine ("WARNING: missing speak command");
 				warn_missing_speak = false; // just once
@@ -4666,10 +4670,10 @@ public static class Myro
 		//Takes a string that is a note name, or a frequency. Returns
 		try {
 			return (double)frequencies [s.ToLower ()];
-		} catch (Exception e1) {
+		} catch (Exception) {
 			try {
 				return Double.Parse (s);
-			} catch (Exception e2) {
+			} catch (Exception) {
 				throw new Exception (String.Format ("invalid note name/frequency '{0}' on line {1}: {2}", s, line, text));
 			}
 		}
@@ -4688,9 +4692,7 @@ public static class Myro
 				double numerator = Double.Parse ((string)numerator_denominator.GetValue (0));
 				double denominator = Double.Parse ((string)numerator_denominator.GetValue (1));
 				return numerator / denominator;
-#pragma warning disable 0168
-			} catch (Exception e) {
-#pragma warning restore 0168
+			} catch (Exception) {
 				throw new Exception (
        String.Format ("invalid duration value '{0}' on line {1}: {2}",
              v, line, text));

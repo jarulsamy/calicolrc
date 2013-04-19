@@ -662,6 +662,12 @@ public static class Graphics
 	}
 
         [method: JigsawTab("G/Pictures")]
+	public static Picture makePicture (Gtk.Window gtk_window)
+	{ 
+		return new Picture (gtk_window);
+	}
+
+        [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (System.Drawing.Bitmap bitmap)
 	{ 
 		return new Picture (bitmap);
