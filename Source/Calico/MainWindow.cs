@@ -37,7 +37,7 @@ namespace Calico {
         public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
         public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag, Gtk.TextTag>();
         public static Dictionary<Tag, string> tagnames = new Dictionary<Tag, string>();
-	public Dictionary<string,Action<object,Gtk.KeyPressEventArgs,Gtk.Widget>> onKey = 
+	public static Dictionary<string,Action<object,Gtk.KeyPressEventArgs,Gtk.Widget>> onKey = 
 	    new Dictionary<string,Action<object,Gtk.KeyPressEventArgs,Gtk.Widget>>();
         public ManualResetEvent playResetEvent = new ManualResetEvent(false);
         public Gtk.RadioMenuItem language_group;
@@ -1748,8 +1748,9 @@ namespace Calico {
 
 	public void handleOnKeyPressEvents(object o, Gtk.KeyPressEventArgs args, Gtk.Widget focus) {
 	    //System.Console.WriteLine("'" + args.Event.Key.ToString() + "'");
-	    if (onKey.ContainsKey(args.Event.Key.ToString()))
-		onKey[args.Event.Key.ToString()](o, args, focus);
+	    if (onKey.ContainsKey(args.Event.Key.ToString())) {
+		onKey[args.Event.Key.ToString()](o,args,focus);
+	    }
 	}
 
         [GLib.ConnectBeforeAttribute]

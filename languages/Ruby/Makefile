@@ -1,6 +1,6 @@
 
 CalicoRuby.dll: CalicoRuby.cs ../../bin/Calico.exe
-	gmcs CalicoRuby.cs \
+	dmcs CalicoRuby.cs \
 		-lib:../../bin \
 		-r:Calico.exe \
 		-r:IronRuby \
