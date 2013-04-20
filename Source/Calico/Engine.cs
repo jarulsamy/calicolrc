@@ -259,7 +259,7 @@ namespace Calico {
 			  retval = source.Execute(manager.scope);
 			else
 			  retval = source.Execute(scope);
-		  } catch (System.Threading.ThreadAbortException tae) {
+		  } catch (System.Threading.ThreadAbortException) {
 		      System.Threading.Thread.Sleep(100);
 		      System.Threading.Thread.ResetAbort();
 		  }
@@ -308,7 +308,7 @@ namespace Calico {
 			  source.Execute(manager.scope);
 			else
 			  source.Execute(scope);
-		  } catch (System.Threading.ThreadAbortException tae) {
+		  } catch (System.Threading.ThreadAbortException) {
 			PrintLine("[Script stopped----------]");
 			System.Threading.Thread.Sleep(100);
 			System.Threading.Thread.ResetAbort();
@@ -348,7 +348,7 @@ namespace Calico {
 			source.Execute(manager.scope);
 			//else
 			//source.Execute(scope);
-		  } catch (System.Threading.ThreadAbortException tae) {
+		  } catch (System.Threading.ThreadAbortException) {
 			PrintLine("[Script stopped----------]");
 			System.Threading.Thread.Sleep(100);
 			System.Threading.Thread.ResetAbort();
