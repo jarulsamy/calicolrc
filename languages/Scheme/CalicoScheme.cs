@@ -103,10 +103,10 @@ public class CalicoSchemeEngine : Engine
 	}
 	return false;
     }
+    if (result != null) {
+	System.Console.WriteLine(resultString);
+    }
     if (ok) {
-	if (result != null) {
-	    System.Console.WriteLine(resultString);
-	}
 	try {
 	    calico.manager.stderr.PrintLine(Calico.Tag.Info, "Done");
 	} catch {
@@ -119,7 +119,7 @@ public class CalicoSchemeEngine : Engine
   public override bool Execute(string text) {
     initialize_execute();
     object result = PJScheme.execute_string_rm(text);
-    return HandleOutput(result, false);
+    return HandleOutput(result, true);
   }
 
   public override object Evaluate(string text) {
@@ -186,7 +186,7 @@ public class CalicoSchemeEngine : Engine
 		  expr = line;
 	      if (scheme.engine.ReadyToExecute(expr)) {
 		  PJScheme.initialize_execute();
-		  scheme.engine.Execute(expr);
+		  scheme.engine.Execute(expr, true);
 		  expr = "";
 		  prompt = "scheme>>> ";
 		  indent = "";
