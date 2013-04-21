@@ -1252,6 +1252,13 @@ namespace Jigsaw
 			this.Modified = true;
 		}
 
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+		public List<Widgets.CRoundedTab> AllTabs()
+		{
+		    return allTabs;
+		}
+
 		// - - - Return a list of all non-factory blocks - - - - - - -
 		// TODO: Change to an enumerator
 		public List<CBlock> AllBlocks()
@@ -1269,6 +1276,19 @@ namespace Jigsaw
 			return blocks;
 		}
 		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+		// Get all blocks on a Tab
+		public List<Diagram.CShape> AllShapes(int position)
+		{
+		        Widgets.CRoundedTab tab = AllTabs()[position];
+			List<Diagram.CShape> shapes = new List<Diagram.CShape>();
+			
+			foreach (Diagram.CShape s in tab.AllShapes()) {
+			    shapes.Add(s);
+			}
+			return shapes;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void ToggleBreakPoint()
 		{
@@ -2324,7 +2344,7 @@ namespace Jigsaw
 						CBlock bb = (CBlock) shp;
 						
 						// Get text of block
-						string txt = bb.Text.ToLower();
+						string txt = bb.Text.Replace("`", "").ToLower();
 
 						// A match is found. Select block.
 						if (txt.Contains ( ss )) {

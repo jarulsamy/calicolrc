@@ -1433,6 +1433,19 @@ namespace Widgets
 			this.SetToggle(null, false);
 		}
 
+
+		public List<Diagram.CShape> AllShapes () 
+		{
+		    List<Diagram.CShape> retval = new List<Diagram.CShape>();
+		    foreach (WeakReference wrshp in _shapes) {
+			Diagram.CShape shp = wrshp.Target as Diagram.CShape;
+			if (shp != null) {
+			    retval.Add(shp);
+			}
+		    }
+		    return retval;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public override void OnScroll(Diagram.Canvas cvs, Gdk.EventScroll e)
 		{
