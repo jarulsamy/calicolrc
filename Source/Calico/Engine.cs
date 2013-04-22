@@ -117,6 +117,9 @@ namespace Calico {
 
         public virtual void PrintLine(Tag tag, string message) {
         }
+
+        public virtual void Close() {
+        }
     }
     
     public class DLREngine : Engine {

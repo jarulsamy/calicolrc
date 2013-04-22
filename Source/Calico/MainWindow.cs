@@ -1387,7 +1387,12 @@ namespace Calico {
                 if (connection != null) {
                     connection.Close();
                 }
-		System.Environment.Exit(0);
+				foreach (String lang in manager.getLanguages()) {
+				  //manager[lang].engine.Close();
+				  if (manager[lang].engine != null)
+					manager[lang].engine.Close();
+				}
+				System.Environment.Exit(0);
                 //Gtk.Application.Quit();
             }
             return retval;
