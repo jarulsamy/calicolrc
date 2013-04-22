@@ -524,4 +524,6 @@ aliases = {
     'zip'                : 'zlib_codec',
     'zlib'               : 'zlib_codec',
 
+    # Calico
+    'braces'             : 'braces',
 }
