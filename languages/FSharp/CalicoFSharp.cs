@@ -53,19 +53,19 @@ public class CalicoFSharpEngine : Engine
 				  arguments + 
 				  "--readline- " + 
 				  "--lib:\"" + combine(path, "..", "..", "modules") +"\" " +
-				  "--lib:\"" + combine(path, "..", "..", "bin") + "\" "
-				  //"--lib:\"" + gtk + "\" " +
-				  //"--lib:\"" + gdk + "\" " +
-				  //"--lib:\"" + glib + "\" " +
-				  //"--lib:\"" + atk + "\" " +
-				  //"-r:atk-sharp.dll " +
-				  //"-r:gdk-sharp.dll " +
-				  //"-r:glib-sharp.dll " +
-				  //"-r:Myro.dll " + 
-				  //"-r:gtk-sharp.dll " +
-				  //"-r:Mono.Cairo.dll " + 
-				  //"-r:Myro.dll " + 
-				  //"-r:Graphics.dll"
+				  "--lib:\"" + combine(path, "..", "..", "bin") + "\" " +
+				  "--lib:\"" + gtk + "\" " +
+				  "--lib:\"" + gdk + "\" " +
+				  "--lib:\"" + glib + "\" " +
+				  "--lib:\"" + atk + "\" " +
+				  "-r:atk-sharp.dll " +
+				  "-r:gdk-sharp.dll " +
+				  "-r:glib-sharp.dll " +
+				  "-r:Myro.dll " +
+				  "-r:gtk-sharp.dll " +
+				  "-r:Mono.Cairo.dll " +
+				  "-r:Myro.dll " +
+				  "-r:Graphics.dll"
 				  );
 	   startInfo.UseShellExecute = false;
 	   startInfo.RedirectStandardError = true;
@@ -116,9 +116,11 @@ public class CalicoFSharpEngine : Engine
 	   return true;
 	 }
 	 
-     public void Close() {
-	   process.StandardInput.Close();
-	   process.Close();
+     public override void Close() {
+	   if (process != null) {
+		 //process.StandardInput.Close();
+		 process.Kill();
+	   }
      }
 	 
      private static void outputHandler(object sendingProcess,
@@ -140,7 +142,7 @@ public class CalicoFSharpEngine : Engine
 	 }
 	 
 	 public override bool ExecuteFile(string filename) {
-	   Evaluate(String.Format("#load \"{0}\";;", filename));
+	   Execute(String.Format("#load \"{0}\";;", filename));
 	   return true;
 	 }
 	 

@@ -2,42 +2,6 @@
 <doc>
 <assembly><name>FSharp.Compiler.Interactive.Settings</name></assembly>
 <members>
-<member name="">
-
-</member>
-<member name="">
-
-</member>
-<member name="">
-
-</member>
-<member name="">
-
-</member>
-<member name="P:FSInteractiveSettings.SR.SwallowResourceText(System.Boolean)">
-<summary>
- If set to true, then all error messages will just return the filled &apos;holes&apos; delimited by &apos;,,,&apos;s - this is for language-neutral testing (e.g. localization-invariant baselines).
-</summary>
-</member>
-<member name="P:FSInteractiveSettings.SR.SwallowResourceText">
-<summary>
- If set to true, then all error messages will just return the filled &apos;holes&apos; delimited by &apos;,,,&apos;s - this is for language-neutral testing (e.g. localization-invariant baselines).
-</summary>
-</member>
-<member name="M:FSInteractiveSettings.SR.RunStartupValidation">
-<summary>
- Call this method once to validate that all known resources are valid; throws if not
-</summary>
-</member>
-<member name="">
-
-</member>
-<member name="">
-
-</member>
-<member name="">
-
-</member>
 <member name="M:Microsoft.FSharp.Compiler.Interactive.IEventLoop.ScheduleRestart">
  <summary>Schedule a restart for the event loop.</summary>
 </member>
@@ -45,7 +9,7 @@
  <summary>Run the event loop.</summary>
  <returns>True if the event loop was restarted; false otherwise.</returns>
 </member>
-<member name="M:Microsoft.FSharp.Compiler.Interactive.IEventLoop.Invoke``1(Microsoft.FSharp.Core.FSharpFunc`2{Microsoft.FSharp.Core.Unit,``0})">
+<member name="M:Microsoft.FSharp.Compiler.Interactive.IEventLoop.Invoke``1(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,``0})">
  <summary>Request that the given operation be run synchronously on the event loop.</summary>
  <returns>The result of the operation.</returns>
 </member>
@@ -130,10 +94,10 @@
 <member name="">
 
 </member>
-<member name="M:Microsoft.FSharp.Compiler.Interactive.InteractiveSession.AddPrinter``1(Microsoft.FSharp.Core.FSharpFunc`2{``0,System.String})">
+<member name="M:Microsoft.FSharp.Compiler.Interactive.InteractiveSession.AddPrinter``1(Microsoft.FSharp.Core.FSharpFunc{``0,System.String})">
  <summary>Register a printer that controls the output of the interactive session.</summary>
 </member>
-<member name="M:Microsoft.FSharp.Compiler.Interactive.InteractiveSession.AddPrintTransformer``1(Microsoft.FSharp.Core.FSharpFunc`2{``0,System.Object})">
+<member name="M:Microsoft.FSharp.Compiler.Interactive.InteractiveSession.AddPrintTransformer``1(Microsoft.FSharp.Core.FSharpFunc{``0,System.Object})">
  <summary>Register a print transformer that controls the output of the interactive session.</summary>
 </member>
 <member name="T:Microsoft.FSharp.Compiler.Interactive.InteractiveSession">
