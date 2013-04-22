@@ -39,6 +39,7 @@ public class CalicoFSharpEngine : Engine
 	   string gdk = make_path("gdk-sharp");
 	   string glib = make_path("glib-sharp");
 	   string atk = make_path("atk-sharp");
+	   string gtk_dotnet = make_path("gtk-dotnet");
 	   string fsi = combine(path, "fsi.exe");
 	   ProcessStartInfo startInfo = new ProcessStartInfo();
 	   // FIXME: on windows, run directly; on others need mono in path
@@ -58,14 +59,39 @@ public class CalicoFSharpEngine : Engine
 				  "--lib:\"" + gdk + "\" " +
 				  "--lib:\"" + glib + "\" " +
 				  "--lib:\"" + atk + "\" " +
+				  "--lib:\"" + gtk_dotnet + "\" " +
 				  "-r:atk-sharp.dll " +
 				  "-r:gdk-sharp.dll " +
 				  "-r:glib-sharp.dll " +
-				  "-r:Myro.dll " +
 				  "-r:gtk-sharp.dll " +
+				  "-r:gtk-dotnet.dll " +
 				  "-r:Mono.Cairo.dll " +
+				  "-r:IronPython.dll " +
+				  "-r:Microsoft.Dynamic.dll " +
+				  "-r:System.Drawing.dll " +
+
+				  "-r:Calico.exe " +
+				  "-r:JigsawAttributes.dll " +
+				  "-r:SQL.dll " +
+				  "-r:Kinect.dll " +
+				  "-r:Rhyduino.dll " +
+				  "-r:Graphviz4Net.dll " +
+				  "-r:Common.dll " +
+				  "-r:Math.dll " +
+				  "-r:Reflection.dll " +
+				  "-r:SdlDotNet.dll " +
+				  "-r:crypto.dll " +
+				  "-r:MathNet.Iridium.dll " +
+				  "-r:Csv.dll " +
+				  "-r:FarseerPhysics.dll " +
 				  "-r:Myro.dll " +
-				  "-r:Graphics.dll"
+				  "-r:Processing.dll " +
+				  "-r:Florence.GtkSharp.dll " +
+				  "-r:Florence.dll " +
+				  "-r:Games.dll " +
+				  "-r:Graphics.dll " +
+				  "-r:Shapes.dll " +
+				  "-r:Sprites.dll "
 				  );
 	   startInfo.UseShellExecute = false;
 	   startInfo.RedirectStandardError = true;
