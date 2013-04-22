@@ -4685,6 +4685,7 @@ public static class Graphics
 				       x * _pixbuf.NChannels + 2, (byte)color.blue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 3, (byte)color.alpha);
+			QueueDraw();
 		}
 
 		public void setGray (int x, int y, int value)
@@ -4699,6 +4700,7 @@ public static class Graphics
 				       x * _pixbuf.NChannels + 1, bvalue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 2, bvalue);
+			QueueDraw();
 		}
     
 		public void setRed (int x, int y, int value)
@@ -4709,6 +4711,7 @@ public static class Graphics
 		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 0, bvalue);
+			QueueDraw();
 		}
 
 		public void setGreen (int x, int y, int value)
@@ -4719,6 +4722,7 @@ public static class Graphics
 		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 1, bvalue);
+			QueueDraw();
 		}
 
 		public void setBlue (int x, int y, int value)
@@ -4729,6 +4733,7 @@ public static class Graphics
 		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 2, bvalue);
+			QueueDraw();
 		}
     
 		public void setAlpha (int x, int y, int value)
@@ -4739,6 +4744,7 @@ public static class Graphics
 		    byte bvalue = (byte)Math.Min(Math.Max((byte)0, value), (byte)255);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 3, bvalue);
+			QueueDraw();
 		}
 
 		public void setAlpha (int value)
@@ -4754,6 +4760,7 @@ public static class Graphics
 			    }
 			}
 		    }
+			QueueDraw();
 		}
 
 		public void setRGB (int x, int y, int red, int green, int blue)
@@ -4770,6 +4777,7 @@ public static class Graphics
 				       x * _pixbuf.NChannels + 1, bgreen);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 2, bblue);
+			QueueDraw();
 		}
     
 		public void setRGBA (int x, int y, int red, int green, int blue, 
@@ -4790,6 +4798,7 @@ public static class Graphics
 				       x * _pixbuf.NChannels + 2, bblue);
 		    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
 				       x * _pixbuf.NChannels + 3, balpha);
+			QueueDraw();
 		}
 
 		public override Color fill {
