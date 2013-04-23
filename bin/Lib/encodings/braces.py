@@ -8,6 +8,7 @@ def braces_encode(input, errors='strict',
     return (str(input), len(input))
 
 def braces_decode(input, errors='strict'):
+    global indent_width, current_depth
     if not input: return (u'', 0)
     length = len(input)
     # Deal with chunked reading, where we don't get
@@ -17,9 +18,9 @@ def braces_decode(input, errors='strict'):
     input = input[:length]
 
     acc = []
-    global indent_width, current_depth
     lines = input.split('\n')
     for l in [x.strip().replace('++', '+=1') for x in lines]:
+        ##print("line:", l, indent_width, current_depth)
         if l.endswith(';'):
             l = l[:-1]
 
