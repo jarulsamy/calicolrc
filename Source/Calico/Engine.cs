@@ -304,7 +304,7 @@ namespace Calico {
 			source = engine.CreateScriptSourceFromString(text, sctype);
 			try {
 			  if (compiler_options != null) {
-				SetDLRSpecificCompilerOptions(source, compiler_options);
+				compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
 			  } else {
 				compiledCode = source.Compile();
 			  }

@@ -156,14 +156,14 @@ namespace CalicoPython
 		
         public override void PostSetup(MainWindow calico) {
 			base.PostSetup(calico);
-            // Set up input
-            Execute(//"import clr;" +
-                //"clr.AddReference('Myro');" +
-                "from Myro import ask;" +
-                "__builtins__['input'] = ask;" +
-                "__builtins__['raw_input'] = ask;" +
-				//"del __builtins__['raw_input'];" +
-                "del ask;", false);
+            // Set up input and recursion limit
+            Execute(
+                "from Myro import ask as _ask;" +
+				"from sys import setrecursionlimit as _srl;" +
+                "__builtins__['input'] = _ask;" +
+                "__builtins__['raw_input'] = _ask;" +
+				"_srl(1024);" + 
+                "del _ask, _srl;", false);
 		}
 	}
 
