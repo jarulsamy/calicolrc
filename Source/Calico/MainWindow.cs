@@ -167,10 +167,11 @@ namespace Calico {
             
             manager.SetCalico(this);
             // FIXME: move to Python language
+	    /*
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
                 "import sys as _sys; _sys.setrecursionlimit(1000);" +
                 "del division, with_statement, print_function, _sys", false);
-
+	    */
 
             configureIO();
 
@@ -2908,9 +2909,11 @@ del _invoke, _
             manager.Start(path);
             manager.SetCalico(this);
             // FIXME: move to Python language
+	    /*
             manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
                 "import sys as _sys; _sys.setrecursionlimit(1000);" +
                 "del division, with_statement, print_function, _sys", false);
+	    */
             configureIO();
 
             manager.PostSetup(this);

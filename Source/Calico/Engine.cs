@@ -233,7 +233,7 @@ namespace Calico {
             int line_count = lines.Length;
             if (line_count == 1) {
                 // Need this here, as there are no compiler_options used:
-                text = "from __future__ import division, with_statement, print_function;" + text;
+                //text = "from __future__ import division, with_statement, print_function;" + text;
                 var sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
                 var source = engine.CreateScriptSourceFromString(text, sctype);
                 return (source.GetCodeProperties() ==
@@ -242,34 +242,41 @@ namespace Calico {
             return lines[lines.Length - 1].Trim() == ""; // ok, if nothing
         }
 
+        public virtual Microsoft.Scripting.Hosting.CompiledCode SetDLRSpecificCompilerOptions(
+			  Microsoft.Scripting.Hosting.ScriptSource source, 
+			  Microsoft.Scripting.CompilerOptions compiler_options) {
+            return source.Compile(compiler_options);
+        }
+
         public override object Evaluate(string text) {
-		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
-		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-		  try {
-    	    if (compiler_options != null) {
-			  source.Compile(compiler_options);
-            } else {
-    	      source.Compile();
-            }
-		  } catch {
-			Console.Error.WriteLine("Unable to compile!");
-			return null;
-		  }
-		  object retval = null;
-		  bool aborted = false;
-		  try {
-			if (manager != null && manager.UseSharedScope)
-			  retval = source.Execute(manager.scope);
-			else
-			  retval = source.Execute(scope);
-		  } catch (System.Threading.ThreadAbortException) {
-		      System.Threading.Thread.Sleep(100);
-		      System.Threading.Thread.ResetAbort();
-		  }
-		  if (aborted) {
-			System.Console.Error.WriteLine("Running script aborted!");
-		  }
-		  return retval;
+	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+	    Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+	    Microsoft.Scripting.Hosting.CompiledCode compiledCode = null;
+	    try {
+		if (compiler_options != null) {
+		    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		} else {
+		    compiledCode = source.Compile();
+		}
+	    } catch {
+		Console.Error.WriteLine("Unable to compile!");
+		return null;
+	    }
+	    object retval = null;
+	    bool aborted = false;
+	    try {
+		if (manager != null && manager.UseSharedScope)
+		    retval = compiledCode.Execute(manager.scope);
+		else
+		    retval = compiledCode.Execute(scope);
+	    } catch (System.Threading.ThreadAbortException) {
+		System.Threading.Thread.Sleep(100);
+		System.Threading.Thread.ResetAbort();
+	    }
+	    if (aborted) {
+		System.Console.Error.WriteLine("Running script aborted!");
+	    }
+	    return retval;
         }
 
         public override bool Execute(string text) {
@@ -285,20 +292,21 @@ namespace Calico {
 		  }
 		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
 		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+		  Microsoft.Scripting.Hosting.CompiledCode compiledCode = null;
 		  try {
-			if (compiler_options != null) {
-			  source.Compile(compiler_options);
-			} else {
-			  source.Compile();
-			}
+		      if (compiler_options != null) {
+			  compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		      } else {
+			  compiledCode = source.Compile();
+		      }
 		  } catch {
 			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
 			source = engine.CreateScriptSourceFromString(text, sctype);
 			try {
 			  if (compiler_options != null) {
-				source.Compile(compiler_options);
+				SetDLRSpecificCompilerOptions(source, compiler_options);
 			  } else {
-				source.Compile();
+				compiledCode = source.Compile();
 			  }
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
@@ -308,9 +316,9 @@ namespace Calico {
 		  }
 		  try {
 			if (manager != null && manager.UseSharedScope)
-			  source.Execute(manager.scope);
+			  compiledCode.Execute(manager.scope);
 			else
-			  source.Execute(scope);
+			  compiledCode.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException) {
 			PrintLine("[Script stopped----------]");
 			System.Threading.Thread.Sleep(100);
@@ -334,11 +342,12 @@ namespace Calico {
 		  //manager.calico.last_error = ""
 		  //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
 		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromFile(filename);
+		  Microsoft.Scripting.Hosting.CompiledCode compiledCode = null;
 		  try {
 			if (compiler_options != null) {
-			  source.Compile(compiler_options);
+			  compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
 			} else {
-			  source.Compile();
+			  compiledCode = source.Compile();
 			}
 		  } catch (Exception e) {
 			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
@@ -348,7 +357,7 @@ namespace Calico {
 		  ConfigureTrace();
 		  try {
 			//if (manager != null && manager.UseSharedScope)
-			source.Execute(manager.scope);
+			compiledCode.Execute(manager.scope);
 			//else
 			//source.Execute(scope);
 		  } catch (System.Threading.ThreadAbortException) {

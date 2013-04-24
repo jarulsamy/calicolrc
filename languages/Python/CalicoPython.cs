@@ -73,6 +73,16 @@ namespace CalicoPython
 			engine.SetSearchPaths (paths);
 		}
 		
+		public override Microsoft.Scripting.Hosting.CompiledCode SetDLRSpecificCompilerOptions(
+					  Microsoft.Scripting.Hosting.ScriptSource source, 
+					  Microsoft.Scripting.CompilerOptions compiler_options) {
+		    IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
+		    options.PrintFunction = true;
+		    options.AllowWithStatement = true;
+		    options.TrueDivision = true;
+		    return source.Compile(options);
+		}
+
 		public override void RequestPause () {
 		  trace_pause = true;
 		}
