@@ -1,6 +1,7 @@
 from ai.conx import *
+import time
 
-network = Network()
+network = Network(seed=2354)
 network.addLayers(2, 2, 1)
 
 network.setInputs([[0, 0], [0, 1], [1, 0], [1, 1]])
@@ -10,7 +11,10 @@ network.setTolerance(.2)
 network.setEpsilon(.5)
 network.setMomentum(.975)
 network.setBatch(1)
+start = time.time()
 network.train()
+stop = time.time()
+print("Learning took %s secconds" % str(stop - start))
 network.setLearning(0)
 
 #network.setInteractive(1)
