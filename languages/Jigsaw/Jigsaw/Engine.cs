@@ -82,6 +82,12 @@ namespace Jigsaw
 			return _runner.MoveNext ();
 		}
 
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBlock GetBlock()
+		{
+			return _block;
+		}
+
 	}
 	
 	// -----------------------------------------------------------------------
@@ -175,6 +181,12 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void PushFrame(StackFrame frame) {
 			_stack.Insert(0, frame);
+		}
+
+	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	        public Dictionary<string,object> GetGlobals ()
+	        {
+		        return globals;
 		}
 	}
 	
@@ -355,6 +367,33 @@ namespace Jigsaw
 		public object GetGlobalVariable (string variable)
 		{
 			return globals[variable];
+		}
+
+	        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public Dictionary<string,object> GetGlobals ()
+		{
+			return globals;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public Dictionary<string,object> GetLocals ()
+		{
+			Dictionary<string,object> locals = new Dictionary<string,object> ();
+			for (int i=CallStacks.Count-1; i>=0; i--) {
+				CallStack stack = CallStacks [i];
+				StackFrame stack_frame = stack.GetTopFrame ();
+				RunnerResponse rr = stack_frame.Current;
+				//System.Console.WriteLine("GetLocals");
+				if (rr.RetVal is ScriptScope) {
+					//System.Console.WriteLine("ScriptScope!");
+					ScriptScope scope = (ScriptScope)rr.RetVal;
+					foreach (string name in scope.GetVariableNames()) {
+						//System.Console.WriteLine("var: " + name);
+						locals [name] = scope.GetVariable (name);
+					}
+				}
+			}
+			return locals;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

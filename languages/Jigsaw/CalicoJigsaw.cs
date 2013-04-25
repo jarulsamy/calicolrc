@@ -79,24 +79,7 @@ public class CalicoJigsawDocument : Document
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
-		//cvs.JigsawRunBlockStack += new EventHandler(OnJigsawRunBlockStack);
-		/*
-		widget.Focused += delegate {
-		    calico.updateControls(this); 
-		};
-		*/
-		/*
-		widget.ButtonPressEvent += delegate (object o, Gtk.ButtonPressEventArgs e) {
-		    calico.updateControls(this);
-		    cvs.ProcessEvent(e.Event); // HACK: only way to get event passed to canvas!
-		};
-		*/
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
-		/*
-		cvs.CanvasChanged += delegate {
-		    calico.updateControls(this);
-		};
-		*/
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
 		calico.ProgramSpeed.Value = cvs.TimeOut;
@@ -145,16 +128,34 @@ public class CalicoJigsawDocument : Document
 				calico.OnStopRunning();
 		//}
 	}
+
+	protected void UpdateCalicoVariables()
+	{
+	    Dictionary<object,object> temp = new Dictionary<object,object>();
+	    Dictionary<string,object> globals = cvs.engine.GetGlobals();
+	    Dictionary<string,object> locals = cvs.engine.GetLocals();
+
+	    foreach(String key in globals.Keys) {
+		calico.manager.scope.SetVariable(key, globals[key]);
+	    }
+
+	    foreach(String key in locals.Keys) {
+		temp[(object)key] = locals[key];
+	    }
+	    calico.UpdateLocal(temp);
+	}
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
 	{
-		// This is fired when Jigsaw Steps
+	    // This is fired when Jigsaw Steps
+	    UpdateCalicoVariables();
 	}
 	
 	protected void OnJigsawPause(object sender, EventArgs a)
 	{
 		// This is fired when Jigsaw pauses, such as hits a breakpoint
 		calico.PlayButton.Sensitive = true;
+		UpdateCalicoVariables();
 	}
 	
 	protected void OnJigsawError(object sender, EventArgs a)
