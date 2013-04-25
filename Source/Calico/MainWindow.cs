@@ -407,16 +407,7 @@ namespace Calico {
 
         }
 
-        void HandlePopulatePopup(object o, Gtk.PopulatePopupArgs args) {
-            // First, see what kind of line this is:
-            int position = Output.Buffer.CursorPosition;
-            Gtk.TextIter currentiter = Output.Buffer.GetIterAtOffset(position);
-            int char_offset = currentiter.CharsInLine;
-            int line = currentiter.Line;
-            Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
-            Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
-            String text = textiter.GetVisibleText(enditer);
-
+	void AddGotoFileToMenu(String text, Gtk.PopulatePopupArgs args) {
             // Look for appropriate text:
             System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(
             text, "^.*File \"(.*)\", line ([0-9]*).*$");
@@ -426,7 +417,7 @@ namespace Calico {
                 // Groups[0] is entire string
                 try {
                     filename = match.Groups [1].Captures [0].Value;
-		    if (filename == "<string>" || filename == "") {
+		    if (filename == "<string>" || filename == "stdin" || filename == "") {
 			return;
 		    } 
 		    lineno = Convert.ToInt32(match.Groups [2].Captures [0].Value);
@@ -448,6 +439,44 @@ namespace Calico {
             menuitem.Show();
             // Add item to menu
             args.Menu.Insert(menuitem, 0);
+	}
+
+	void AddGotoHelpToMenu(String text, Gtk.PopulatePopupArgs args) {
+            // Look for appropriate text:
+	    string [] parts = text.Split();
+	    if (parts.Length > 0) {
+		parts[0] = parts[0].Replace(":", "");
+		if (parts[0].Contains("Error") || 
+		    parts[0].Contains("Exception") ||
+		    parts[0].Contains("Warning") ||
+		    parts[0].Contains("StopIteration") ||
+		    parts[0].Contains("Interrupt")
+		    ) {
+		    // add to menu
+		    Gtk.MenuItem menuitem = new Gtk.MenuItem(
+			    String.Format(_("Get Help on \"{0}\""), parts [0]));
+		    menuitem.Activated += delegate(object sender, EventArgs e) {
+			System.Diagnostics.Process.Start(String.Format("http://calicoproject.org/Calico:_{0}", parts[0]));
+		    };
+		    menuitem.Show();
+		    // Add item to menu
+		    args.Menu.Insert(menuitem, 0);
+		}
+	    }
+	    return;
+	}
+
+        void HandlePopulatePopup(object o, Gtk.PopulatePopupArgs args) {
+            // First, see what kind of line this is:
+            int position = Output.Buffer.CursorPosition;
+            Gtk.TextIter currentiter = Output.Buffer.GetIterAtOffset(position);
+            int char_offset = currentiter.CharsInLine;
+            int line = currentiter.Line;
+            Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
+            Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
+            String text = textiter.GetVisibleText(enditer);
+	    AddGotoFileToMenu(text, args);
+	    AddGotoHelpToMenu(text, args);
         }
 
         public void initialize_switch_menu(Gtk.MenuItem switch_menu) {
