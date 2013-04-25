@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="420" top="36">
+        <edge id="1" name="Start" linkedTo="4" />
+        <property name="Label" value="when script starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CProcedureStart" left="425" top="151">
+        <edge id="2" name="Start" linkedTo="26" />
+        <property name="Label" value="define mergeSort (L)" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="mergeSort" />
+        <property name="Param1" value="L" />
+        <property name="Param2" value="" />
+        <property name="Param3" value="" />
+        <property name="Param4" value="" />
+        <property name="Param5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CProcedureStart" left="760" top="36">
+        <edge id="3" name="Start" linkedTo="8" />
+        <property name="Label" value="define merge (L1, L2)" />
+        <property name="Message" value="" />
+        <property name="Procedure Name" value="merge" />
+        <property name="Param1" value="L1" />
+        <property name="Param2" value="L2" />
+        <property name="Param3" value="" />
+        <property name="Param4" value="" />
+        <property name="Param5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CProcedureCall" left="440" top="66">
+        <edge id="4" name="In" linkedTo="1" />
+        <edge id="5" name="Out" linkedTo="6" />
+        <property name="Label" value="result = mergeSort([2, 6, 1, 8, 2, 5, 7, 1, 7, 3, 0, 9])" />
+        <property name="Message" value="" />
+        <property name="Variable" value="result" />
+        <property name="Procedure Name" value="mergeSort" />
+        <property name="Arg1" value="[2, 6, 1, 8, 2, 5, 7, 1, 7, 3, 0, 9]" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CIOPrint" left="440" top="86">
+        <edge id="6" name="In" linkedTo="5" />
+        <edge id="7" name="Out" linkedTo="-1" />
+        <property name="Label" value="print(result)" />
+        <property name="Message" value="" />
+        <property name="Expression" value="result" />
+        <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
+        <line_color R="0" G="0" B="0.543" A="1" />
+    </block>
+    <block id="6" typeName="Jigsaw.CAssignment" left="780" top="66">
+        <edge id="8" name="In" linkedTo="3" />
+        <edge id="9" name="Out" linkedTo="10" />
+        <property name="Label" value="result = []" />
+        <property name="Message" value="" />
+        <property name="Variable" value="result" />
+        <property name="Expression" value="[]" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CControlWhile" left="780" top="86">
+        <edge id="10" name="In" linkedTo="9" />
+        <edge id="11" name="Out" linkedTo="21" />
+        <edge id="12" name="Loop" linkedTo="13" />
+        <property name="Label" value="while len(L1) &gt; 0 and len(L2) &gt; 0" />
+        <property name="Message" value="" />
+        <property name="WhileTest" value="len(L1) &gt; 0 and len(L2) &gt; 0" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CControlIfElse" left="800" top="106">
+        <edge id="13" name="In" linkedTo="12" />
+        <edge id="14" name="Out" linkedTo="-1" />
+        <edge id="15" name="If" linkedTo="17" />
+        <edge id="16" name="Else" linkedTo="19" />
+        <property name="Label" value="if L1[0] &lt; L2[0]" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="L1[0] &lt; L2[0]" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="9" typeName="Jigsaw.CStatement" left="820" top="126">
+        <edge id="17" name="In" linkedTo="15" />
+        <edge id="18" name="Out" linkedTo="-1" />
+        <property name="Label" value="result.append(L1.pop(0))" />
+        <property name="Message" value="" />
+        <property name="Statement" value="result.append(L1.pop(0))" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="10" typeName="Jigsaw.CStatement" left="820" top="166">
+        <edge id="19" name="In" linkedTo="16" />
+        <edge id="20" name="Out" linkedTo="-1" />
+        <property name="Label" value="result.append(L2.pop(0))" />
+        <property name="Message" value="" />
+        <property name="Statement" value="result.append(L2.pop(0))" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="11" typeName="Jigsaw.CStatement" left="780" top="226">
+        <edge id="21" name="In" linkedTo="11" />
+        <edge id="22" name="Out" linkedTo="23" />
+        <property name="Label" value="result.extend(L1)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="result.extend(L1)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="12" typeName="Jigsaw.CStatement" left="780" top="246">
+        <edge id="23" name="In" linkedTo="22" />
+        <edge id="24" name="Out" linkedTo="25" />
+        <property name="Label" value="result.extend(L2)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="result.extend(L2)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="13" typeName="Jigsaw.CProcedureReturn" left="780" top="266">
+        <edge id="25" name="In" linkedTo="24" />
+        <property name="Label" value="return result" />
+        <property name="Message" value="" />
+        <property name="Expression" value="result" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="14" typeName="Jigsaw.CControlIfElse" left="445" top="181">
+        <edge id="26" name="In" linkedTo="2" />
+        <edge id="27" name="Out" linkedTo="30" />
+        <edge id="28" name="If" linkedTo="33" />
+        <edge id="29" name="Else" linkedTo="31" />
+        <property name="Label" value="if len(L) &gt; 1" />
+        <property name="Message" value="" />
+        <property name="IfTest" value="len(L) &gt; 1" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="15" typeName="Jigsaw.CProcedureReturn" left="445" top="321">
+        <edge id="30" name="In" linkedTo="27" />
+        <property name="Label" value="return result" />
+        <property name="Message" value="" />
+        <property name="Expression" value="result" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="16" typeName="Jigsaw.CAssignment" left="465" top="281">
+        <edge id="31" name="In" linkedTo="29" />
+        <edge id="32" name="Out" linkedTo="-1" />
+        <property name="Label" value="result = L" />
+        <property name="Message" value="" />
+        <property name="Variable" value="result" />
+        <property name="Expression" value="L" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="17" typeName="Jigsaw.CProcedureCall" left="465" top="201">
+        <edge id="33" name="In" linkedTo="28" />
+        <edge id="34" name="Out" linkedTo="35" />
+        <property name="Label" value="L1 = mergeSort(L[:len(L)//2])" />
+        <property name="Message" value="" />
+        <property name="Variable" value="L1" />
+        <property name="Procedure Name" value="mergeSort" />
+        <property name="Arg1" value="L[:len(L)//2]" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="18" typeName="Jigsaw.CProcedureCall" left="465" top="221">
+        <edge id="35" name="In" linkedTo="34" />
+        <edge id="36" name="Out" linkedTo="37" />
+        <property name="Label" value="L2 = mergeSort(L[len(L)//2:])" />
+        <property name="Message" value="" />
+        <property name="Variable" value="L2" />
+        <property name="Procedure Name" value="mergeSort" />
+        <property name="Arg1" value="L[len(L)//2:]" />
+        <property name="Arg2" value="" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+    <block id="19" typeName="Jigsaw.CProcedureCall" left="465" top="241">
+        <edge id="37" name="In" linkedTo="36" />
+        <edge id="38" name="Out" linkedTo="-1" />
+        <property name="Label" value="result = merge(L1, L2)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="result" />
+        <property name="Procedure Name" value="merge" />
+        <property name="Arg1" value="L1" />
+        <property name="Arg2" value="L2" />
+        <property name="Arg3" value="" />
+        <property name="Arg4" value="" />
+        <property name="Arg5" value="" />
+        <fill_color R="0.844" G="0.746" B="0.844" A="1" />
+        <line_color R="0.56" G="0" B="0.5" A="1" />
+    </block>
+</jigsaw>

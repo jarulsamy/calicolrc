@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <module name="Myro.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="735" top="29.6419560014442">
+        <edge id="1" name="Start" linkedTo="2" />
+        <property name="Label" value="when program starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CStatement" left="755" top="59.6419560014442">
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="pass" />
+        <property name="Message" value="" />
+        <property name="Statement" value="pass" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CControlWhile" left="755" top="79.6419560014442">
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="-1" />
+        <edge id="6" name="Loop" linkedTo="7" />
+        <property name="Label" value="while (True)" />
+        <property name="Message" value="" />
+        <property name="WhileTest" value="True" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CStatement" left="775" top="99.6419560014442">
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="-1" />
+        <property name="Label" value="sim.step()" />
+        <property name="Message" value="" />
+        <property name="Statement" value="sim.step()" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CControlStart" left="420" top="31">
+        <edge id="9" name="Start" linkedTo="10" />
+        <property name="Label" value="when program starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="6" typeName="Jigsaw.CStatement" left="440" top="61">
+        <edge id="10" name="In" linkedTo="9" />
+        <edge id="11" name="Out" linkedTo="12" />
+        <property name="Label" value="sim = Myro.Simulation(600, 400, True, False)" />
+        <property name="Message" value="" />
+        <property name="Statement" value="sim = Myro.Simulation(600, 400, True, False)" />
+        <fill_color R="0.5625" G="0.9297" B="0.5625" A="1" />
+        <line_color R="0" G="0.391" B="0" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CMethodBlock" left="440" top="81">
+        <method assembly_name="Myro" type_name="Myro" method_name="makeRobot" return_type="System.Object">
+            <parameter name="robot_type" type="System.String" default="" />
+            <parameter name="args" type="System.Object[]" default="" />
+        </method>
+        <edge id="12" name="In" linkedTo="11" />
+        <edge id="13" name="Out" linkedTo="14" />
+        <property name="Label" value="makeRobot(&quot;SimScribbler&quot;, sim)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="robot_type" value="&quot;SimScribbler&quot;" />
+        <property name="args" value="sim" />
+        <fill_color R="0.662915930460634" G="0.923356200299857" B="0.752189419116913" A="1" />
+        <line_color R="0.265166372184253" G="0.369342480119943" B="0.300875767646765" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="440" top="101">
+        <method assembly_name="Myro" type_name="Myro" method_name="joystick" return_type="System.Void" />
+        <edge id="14" name="In" linkedTo="13" />
+        <edge id="15" name="Out" linkedTo="-1" />
+        <property name="Label" value="joystick()" />
+        <property name="Message" value="" />
+        <fill_color R="0.748680236865152" G="0.912460859358525" B="0.927279936348684" A="1" />
+        <line_color R="0.299472094746061" G="0.36498434374341" B="0.370911974539474" A="1" />
+    </block>
+</jigsaw>
