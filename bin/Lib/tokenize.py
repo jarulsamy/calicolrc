@@ -152,7 +152,10 @@ def printtoken(type, token, srow_scol, erow_ecol, line): # for testing
     print "%d,%d-%d,%d:\t%s\t%s" % \
         (srow, scol, erow, ecol, tok_name[type], repr(token))
 
-def tokenize(readline, tokeneater=printtoken):
+def noprinttoken(type, token, srow_scol, erow_ecol, line):
+   pass
+
+def tokenize(readline, tokeneater=noprinttoken):
     """
     The tokenize() function accepts two parameters: one representing the
     input stream, and one providing an output mechanism for tokenize().

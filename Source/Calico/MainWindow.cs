@@ -37,8 +37,8 @@ namespace Calico {
         public Dictionary<int, Language> languages_by_count = new Dictionary<int, Language>();
         public static Dictionary<Tag, Gtk.TextTag> tags = new Dictionary<Tag, Gtk.TextTag>();
         public static Dictionary<Tag, string> tagnames = new Dictionary<Tag, string>();
-	public static Dictionary<string,Action<object,Gtk.KeyPressEventArgs,Gtk.Widget>> onKey = 
-	    new Dictionary<string,Action<object,Gtk.KeyPressEventArgs,Gtk.Widget>>();
+	public static Dictionary<string,Func<object,Gtk.KeyPressEventArgs,Gtk.Widget,bool>> onKey = 
+	    new Dictionary<string,Func<object,Gtk.KeyPressEventArgs,Gtk.Widget,bool>>();
         public ManualResetEvent playResetEvent = new ManualResetEvent(false);
         public Gtk.RadioMenuItem language_group;
         public LanguageManager manager;
@@ -1781,17 +1781,21 @@ namespace Calico {
             }
         }
 
-	public void handleOnKeyPressEvents(object o, Gtk.KeyPressEventArgs args, Gtk.Widget focus) {
+	public bool handleOnKeyPressEvents(object o, Gtk.KeyPressEventArgs args, Gtk.Widget focus) {
+	    bool retval = false;
 	    //System.Console.WriteLine("'" + args.Event.Key.ToString() + "'");
 	    if (onKey.ContainsKey(args.Event.Key.ToString())) {
-		onKey[args.Event.Key.ToString()](o,args,focus);
+		object tretval = onKey[args.Event.Key.ToString()](o,args,focus);
+		if (tretval is bool)
+		    retval = (bool)tretval;
 	    }
+	    return retval;
 	}
 
         [GLib.ConnectBeforeAttribute]
         public virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-	    handleOnKeyPressEvents(o, args, Focus);
-	    if (args.RetVal is bool && ((bool)args.RetVal)) // handled
+	    
+	    if (handleOnKeyPressEvents(o, args, Focus)) // handled
 		return;
 	    // else let's have the normal system handle it:
             if (Focus == searchEntry.Entry) {
