@@ -1637,7 +1637,11 @@ namespace Calico {
 			this.property_notebook.SetTabLabel(this.GtkScrolledWindow4, this.label6);
 			this.label6.ShowAll();
 			this.hpaned3.Add(this.property_notebook);
+			global::Gtk.Paned.PanedChild w277 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.property_notebook]));
+			w277.Resize = false;
 			this.vpaned2.Add(this.hpaned3);
+			global::Gtk.Paned.PanedChild w278 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.hpaned3]));
+			w278.Resize = false;
 			this.hpaned2.Add(this.vpaned2);
 			global::Gtk.Paned.PanedChild w279 = ((global::Gtk.Paned.PanedChild)(this.hpaned2[this.vpaned2]));
 			w279.Resize = false;

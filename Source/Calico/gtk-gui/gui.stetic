@@ -1580,8 +1580,14 @@
                               </packing>
                             </child>
                           </widget>
+                          <packing>
+                            <property name="Resize">False</property>
+                          </packing>
                         </child>
                       </widget>
+                      <packing>
+                        <property name="Resize">False</property>
+                      </packing>
                     </child>
                   </widget>
                   <packing>
