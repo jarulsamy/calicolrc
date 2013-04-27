@@ -648,7 +648,7 @@ class Interpreter(object):
         Import a logo file.  This executes the file, including any TO
         statements, putting everything into the normal namespace/scope.
         """
-        print("Loading %s." % filename)
+        print("Loading '%s'..." % filename)
         f = open(filename)
         self.import_logo_stream(f)
         try:

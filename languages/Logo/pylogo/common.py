@@ -124,14 +124,14 @@ def error_for_file(errorFile, row=None, col=None):
         except AttributeError:
             pass
     if row is not None:
-        s = 'File %s, line %i\n' % (name, row)
+        s = 'File "%s", line %i\n' % (name, row)
         l = errorFile.row_line(row)
         if l is not None:
             s += l
             s += '\n'
             s += '%s^\n' % (' '*col)
     else:
-        s = 'File %s\n' % name
+        s = 'File "%s"\n' % name
     return s
 
 def error_for_list(lst, pos=None):

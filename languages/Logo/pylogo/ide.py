@@ -1,10 +1,10 @@
-import Tkinter
-import Pmw
+##import Tkinter
+##import Pmw
 import threading
 from pylogo import reader
 from Queue import Queue, Empty
 
-root = Pmw.initialise()
+##root = Pmw.initialise()
 
 class IDE:
     def __init__(self, parent):
@@ -144,7 +144,7 @@ class IDE:
         kw['_nowait'] = 1
         return self.run_command(func, *args, **kw)
 
-class TurtleSpace(Pmw.ScrolledCanvas):
+class TurtleSpace(): ##Pmw.ScrolledCanvas):
 
     def __init__(self, *args, **kw):
         Pmw.ScrolledCanvas.__init__(self, *args, **kw)

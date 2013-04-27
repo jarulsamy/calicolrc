@@ -4,6 +4,9 @@ clr.AddReference("Calico")
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                 "pylogo"))
 from pylogo.interpreter import Logo
 from pylogo.reader import StringTokenizer
 from pylogo.common import EOF, LogoError, LogoOutput
