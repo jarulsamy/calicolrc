@@ -68,7 +68,7 @@ namespace Calico {
             // Languages that are pre-approved, if they exist. You can add to these by checking in menu
             SetValue("calico", "version", "double", 2.0);
             SetValue("config", "visible-languages", "strings", // Language system name (not proper name)
-                    new List<string>() {"python", "jigsaw", "scheme", "spreadsheet", "ruby", "csharp"});
+                    new List<string>() {"python", "jigsaw", "scheme", "spreadsheet"});
             SetValue("config", "recent-files", "strings", new List<string>());
             SetValue("config", "recent-files-size", "int", 15);
 	        SetValue("calico", "font", "string", "Courier");
