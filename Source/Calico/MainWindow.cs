@@ -2347,7 +2347,7 @@ del _invoke, _
 	    Invoke(delegate {
 		    // Always start by wiping out and hiding properties
 		    Gtk.Widget widget = searchForPage((Gtk.Widget)o);
-		    if (widget == null || widget == lastSelectedPage)
+		    if (widget == null) // || widget == lastSelectedPage)
 			return;
 		    lastSelectedPage = widget;
 		    Gtk.Notebook nb = this.PropertyNotebook;
