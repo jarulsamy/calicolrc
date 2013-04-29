@@ -686,32 +686,35 @@ public static class Graphics
                                            int height=300)
 	{
 	    InvokeBlocking( delegate {
-		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
-			_windows [title] = new Graphics.WindowClass (title, width, height);
-		    } else {
-			Gdk.Color bg = new Gdk.Color (242, 241, 240);
-			_lastWindow._canvas.ModifyBg (Gtk.StateType.Normal, bg);
-			_lastWindow.clear(false);
-		    }
-		    _lastWindow = _windows [title];
-		    _lastWindow.KeepAbove = true;
-		});
+			  if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
+				_windows [title] = new Graphics.WindowClass (title, width, height);
+			  } else {
+				_windows [title].clear(false);
+			  }
+			  _lastWindow = _windows [title];
+			  _lastWindow.KeepAbove = true;
+			});
 	    return _windows [title];
 	}
 
-        [method: JigsawTab("G/Windows")]
+    [method: JigsawTab("G/Windows")]
 	public static Graphics.WindowClass makeWindowFast (string title="Calico Graphics",
-                                           int width=300, 
-                                           int height=300)
-	{
-	    InvokeBlocking( delegate {
-		    if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
-			_windows [title] = new Graphics.WindowClass (title, width, height);
-		    }
-		    _lastWindow = _windows [title];
-		    _lastWindow.KeepAbove = true;
-		});
-	    return _windows [title];
+		int width=300, 
+		int height=300,
+		Picture picture=null)
+    {
+	  InvokeBlocking( delegate {
+			if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
+			  _windows [title] = new Graphics.WindowClass (title, width, height);
+			} else {
+			  _windows [title].canvas.shapes.Clear();
+			}
+			_lastWindow = _windows [title];
+			_lastWindow.KeepAbove = true;
+			if (picture != null)
+			  picture.draw(_lastWindow);
+		  });
+	  return _windows [title];
 	}
 
         [method: JigsawTab("G/Windows")]

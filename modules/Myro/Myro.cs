@@ -1721,12 +1721,10 @@ public static class Myro
 	public static void show (Graphics.Picture picture, 
 				 string title="Myro Camera")
 	{
-	    Graphics.WindowClass win;
-	    win = Graphics.makeWindowFast (title,
-		  (int)(picture.width * picture.scaleFactor), (int)(picture.height * picture.scaleFactor));
-	    picture.draw (win);
-	    picture.setX (picture.width * picture.scaleFactor / 2);
-	    picture.setY (picture.height * picture.scaleFactor / 2);
+	    Graphics.makeWindowFast (title,
+			(int)(picture.width * picture.scaleFactor), 
+			(int)(picture.height * picture.scaleFactor),
+			picture);
 	}
 
 	[method: JigsawTab("M/Misc")]
