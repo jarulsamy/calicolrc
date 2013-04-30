@@ -2588,7 +2588,7 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public virtual StackFrame Frame(ScriptScope scope, CallStack stack ) 
 		{
-			StackFrame frm = new StackFrame(this, this.Runner (scope, stack) );
+			StackFrame frm = new StackFrame(this, this.Runner (scope, stack), scope );
 			return frm;
 		}
 		

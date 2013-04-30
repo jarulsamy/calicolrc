@@ -14,6 +14,17 @@ using Microsoft.Scripting.Hosting;
 namespace Jigsaw
 {
 	// -----------------------------------------------------------------------
+	public class MessageBox
+	{
+		public static void Show(string Msg)
+		{
+			Gtk.MessageDialog md = new Gtk.MessageDialog (null, Gtk.DialogFlags.Modal, Gtk.MessageType.Info, Gtk.ButtonsType.Ok, Msg);
+			md.Run ();
+			md.Destroy();
+		}
+	}
+
+	// -----------------------------------------------------------------------
 	public enum EngineAction {
 		NoAction = 0, 	// Just keep going.
 		Add = 1, 		// Add new block runner to call stack.
@@ -57,11 +68,15 @@ namespace Jigsaw
 		
 		// Internal runner encapsulated by the stack frame
 		internal IEnumerator<RunnerResponse> _runner = null;
-		
+
+		// script scope used by the runner
+		internal ScriptScope _scope = null;
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public StackFrame(CBlock blk, IEnumerator<RunnerResponse> runner) {
+		public StackFrame(CBlock blk, IEnumerator<RunnerResponse> runner, ScriptScope scope) {
 			_block = blk;
 			_runner = runner;
+			_scope = scope;
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +84,13 @@ namespace Jigsaw
 		{
 			get	{ return _runner; }
 		}
-		
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public ScriptScope Scope
+		{
+			get	{ return _scope; }
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public RunnerResponse Current
 		{
@@ -87,7 +108,6 @@ namespace Jigsaw
 		{
 			return _block;
 		}
-
 	}
 	
 	// -----------------------------------------------------------------------
@@ -122,7 +142,7 @@ namespace Jigsaw
 		{	// Create a block runner given a block
 			// createa a StackFrame and append it to the end of the stack
 			IEnumerator<RunnerResponse> runner = b.Runner(scope, this);
-			_stack.Add( new StackFrame(b, runner ));
+			_stack.Add( new StackFrame(b, runner, scope ));
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -379,19 +399,27 @@ namespace Jigsaw
 		public Dictionary<string,object> GetLocals ()
 		{
 			Dictionary<string,object> locals = new Dictionary<string,object> ();
+			//MessageBox.Show(String.Format ("{0} CallStacks", CallStacks.Count));
 			for (int i=CallStacks.Count-1; i>=0; i--) {
 				CallStack stack = CallStacks [i];
 				StackFrame stack_frame = stack.GetTopFrame ();
-				RunnerResponse rr = stack_frame.Current;
-				//System.Console.WriteLine("GetLocals");
-				if (rr.RetVal is ScriptScope) {
-					//System.Console.WriteLine("ScriptScope!");
-					ScriptScope scope = (ScriptScope)rr.RetVal;
-					foreach (string name in scope.GetVariableNames()) {
-						//System.Console.WriteLine("var: " + name);
-						locals [name] = scope.GetVariable (name);
+				if (stack_frame != null) {
+					ScriptScope scope = stack_frame.Scope;
+					if (scope != null) {
+						foreach (string name in scope.GetVariableNames()) {
+							locals [name] = scope.GetVariable (name);
+						}
 					}
 				}
+
+				//RunnerResponse rr = stack_frame.Current;
+				//if (rr.RetVal is ScriptScope) {
+				//	ScriptScope scope = (ScriptScope)rr.RetVal;
+				//	foreach (string name in scope.GetVariableNames()) {
+				//		locals [name] = scope.GetVariable (name);
+				//	}
+				//}
+
 			}
 			return locals;
 		}
