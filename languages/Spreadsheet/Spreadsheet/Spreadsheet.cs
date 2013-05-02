@@ -207,29 +207,42 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	    int row = 0;
 	    int col = 1;
 	    if (filename != null) {
-		// First, get max rows and cols
-		row = 0;
-		col = 1;
-		foreach(List line in new Csv.reader(filename).readLines()) {
-		    row++;
-		    col = Math.Max(col, line.Count);
+                if (System.IO.File.Exists(filename)) {
+		    // First, get max rows and cols
+		    row = 0;
+		    col = 1;
+		    try {
+			foreach(List line in new Csv.reader(filename).readLines()) {
+			    row++;
+			    col = Math.Max(col, line.Count);
+			}
+		    } catch {
+			// just continue
+			calico.Error("Invalid spreadsheet format");
+		    }
+		    Rows = Math.Max(Rows, row);
+		    Cols = Math.Max(Cols, col);
 		}
-		Rows = Math.Max(Rows, row);
-		Cols = Math.Max(Cols, col);
 	    }
 	    sheet = new SpreadsheetWidget(this); // uses Rows, Cols
 	    if (filename != null) {
-		// now, load the data
-		row = 0;
-		Gtk.TreeIter iter;
-		foreach(List line in new Csv.reader(filename).readLines()) {
-		    col = 1;
-		    foreach(string item in line) {
-			sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
-			sheet.liststore.SetValue(iter, col, item);
-			col++;
+                if (System.IO.File.Exists(filename)) {
+		    // now, load the data
+		    row = 0;
+		    Gtk.TreeIter iter;
+		    try {
+			foreach(List line in new Csv.reader(filename).readLines()) {
+			    col = 1;
+			    foreach(string item in line) {
+				sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+				sheet.liststore.SetValue(iter, col, item);
+				col++;
+			    }
+			    row++;
+			}
+		    } catch {
+			calico.Error("Invalid spreadsheet format\n");
 		    }
-		    row++;
 		}
 	    }
 	    focus_widget = sheet;
