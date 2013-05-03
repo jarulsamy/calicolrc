@@ -3653,6 +3653,26 @@ del _invoke, _
                 }
             }
         }
+
+        protected void OnSyncToCloudActionActivated (object sender, System.EventArgs e)
+        {
+		  // copy all local cloud files to cloud
+        }
+
+        protected void OnSyncFromCloudActionActivated (object sender, System.EventArgs e)
+        {
+		  // copy all cloud files to local cloud
+        }
+
+        protected void OnOpenFromCloudActionActivated (object sender, System.EventArgs e)
+        {
+		  // open from local cloud
+        }
+
+        protected void OnSaveToCloudActionActivated (object sender, System.EventArgs e)
+        {
+		  // save to local cloud
+        }
     }
 }
 

@@ -455,6 +455,35 @@
         <property name="ShortLabel" translatable="yes">Find Next</property>
         <signal name="Activated" handler="OnFindNextActionActivated" />
       </action>
+      <action id="CloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Cloud</property>
+        <property name="ShortLabel" translatable="yes">Cloud</property>
+      </action>
+      <action id="SyncFromCloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Sync from cloud</property>
+        <property name="ShortLabel" translatable="yes">Sync from cloud</property>
+        <signal name="Activated" handler="OnSyncFromCloudActionActivated" />
+      </action>
+      <action id="SyncToCloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Sync to cloud</property>
+        <property name="ShortLabel" translatable="yes">Sync to cloud</property>
+        <signal name="Activated" handler="OnSyncToCloudActionActivated" />
+      </action>
+      <action id="OpenFromCloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Open from cloud...</property>
+        <property name="ShortLabel" translatable="yes">Open from cloud...</property>
+        <signal name="Activated" handler="OnOpenFromCloudActionActivated" />
+      </action>
+      <action id="SaveToCloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Save to cloud...</property>
+        <property name="ShortLabel" translatable="yes">Save to cloud...</property>
+        <signal name="Activated" handler="OnSaveToCloudActionActivated" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Calico</property>
@@ -484,6 +513,12 @@
                 <node type="Separator" />
                 <node type="Menuitem" action="RegisterAction" />
                 <node type="Menuitem" action="LoginAction" />
+                <node type="Menu" action="CloudAction">
+                  <node type="Menuitem" action="SyncFromCloudAction" />
+                  <node type="Menuitem" action="SyncToCloudAction" />
+                  <node type="Menuitem" action="OpenFromCloudAction" />
+                  <node type="Menuitem" action="SaveToCloudAction" />
+                </node>
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
               </node>
