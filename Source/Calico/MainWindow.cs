@@ -1299,6 +1299,7 @@ namespace Calico {
                     });
 		    ev.WaitOne();
                     if (result) {
+			addToRecentsMenu(document.filename);
                         return _("Save");
                     }
                 }
