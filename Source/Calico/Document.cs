@@ -327,7 +327,7 @@ namespace Calico {
             aboutDialog.DefaultResponse = Gtk.ResponseType.Close;
             aboutDialog.Authors = GetAuthors();
             aboutDialog.Comments = (proper_name + " " + _("for Calico"));
-            aboutDialog.Copyright = _("(c) 2012, Institute for Personal Robots in Education");
+            aboutDialog.Copyright = _("(c) 2012-2013, Institute for Personal Robots in Education");
             aboutDialog.ProgramName = "Calico " + proper_name;
             aboutDialog.Version = MainClass.Version;
             aboutDialog.Website = "http://CalicoProject.org/Calico_" + proper_name;
@@ -388,10 +388,28 @@ namespace Calico {
             widget.Add(texteditor);
             texteditor.Document.DocumentUpdated += OnDocumentUpdated;
             texteditor.ButtonPressEvent += OnPopupMenu;
+	    //widget.PopulatePopup += HandlePopulatePopup;
             widget.ShowAll();
             calico.ProgramSpeed.Value = SpeedValue;
         }
-  
+
+        void HandlePopulatePopup(object o, Gtk.PopulatePopupArgs args) {
+            // First, see what kind of line this is:
+	    /*
+            int position = Output.Buffer.CursorPosition;
+            Gtk.TextIter currentiter = Output.Buffer.GetIterAtOffset(position);
+            int char_offset = currentiter.CharsInLine;
+            int line = currentiter.Line;
+	    if (char_offset > 1) {
+		Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
+		Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
+		String text = textiter.GetVisibleText(enditer);
+		AddGotoFileToMenu(text, args);
+		AddGotoHelpToMenu(text, args);
+	    }
+	    */
+        }
+
         [GLib.ConnectBeforeAttribute]
         void HandleTexteditorDragDataReceived (object o, Gtk.DragDataReceivedArgs args)
         {
