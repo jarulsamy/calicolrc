@@ -140,6 +140,16 @@ namespace Calico {
 		
 		private global::Gtk.Action FindNextAction;
 		
+		private global::Gtk.Action CloudAction;
+		
+		private global::Gtk.Action SyncFromCloudAction;
+		
+		private global::Gtk.Action SyncToCloudAction;
+		
+		private global::Gtk.Action OpenFromCloudAction;
+		
+		private global::Gtk.Action SaveToCloudAction;
+		
 		private global::Gtk.VBox vbox1;
 		
 		private global::Gtk.MenuBar menubar2;
@@ -536,6 +546,21 @@ namespace Calico {
 			this.FindNextAction = new global::Gtk.Action("FindNextAction", global::Mono.Unix.Catalog.GetString("Find Next"), null, null);
 			this.FindNextAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Find Next");
 			w1.Add(this.FindNextAction, "<Control><Mod2>g");
+			this.CloudAction = new global::Gtk.Action("CloudAction", global::Mono.Unix.Catalog.GetString("Cloud"), null, null);
+			this.CloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Cloud");
+			w1.Add(this.CloudAction, null);
+			this.SyncFromCloudAction = new global::Gtk.Action("SyncFromCloudAction", global::Mono.Unix.Catalog.GetString("Sync from cloud"), null, null);
+			this.SyncFromCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Sync from cloud");
+			w1.Add(this.SyncFromCloudAction, null);
+			this.SyncToCloudAction = new global::Gtk.Action("SyncToCloudAction", global::Mono.Unix.Catalog.GetString("Sync to cloud"), null, null);
+			this.SyncToCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Sync to cloud");
+			w1.Add(this.SyncToCloudAction, null);
+			this.OpenFromCloudAction = new global::Gtk.Action("OpenFromCloudAction", global::Mono.Unix.Catalog.GetString("Open from cloud..."), null, null);
+			this.OpenFromCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Open from cloud...");
+			w1.Add(this.OpenFromCloudAction, null);
+			this.SaveToCloudAction = new global::Gtk.Action("SaveToCloudAction", global::Mono.Unix.Catalog.GetString("Save to cloud..."), null, null);
+			this.SaveToCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Save to cloud...");
+			w1.Add(this.SaveToCloudAction, null);
 			this.UIManager.InsertActionGroup(w1, 0);
 			this.AddAccelGroup(this.UIManager.AccelGroup);
 			this.Name = "Calico.MainWindow";
@@ -546,7 +571,7 @@ namespace Calico {
 			this.vbox1.Name = "vbox1";
 			this.vbox1.BorderWidth = ((uint)(5));
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentlyOpenedAction' action='RecentlyOpenedAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='printAction' action='printAction'/><menuitem name='ExportAsPythonAction' action='ExportAsPythonAction'/><separator/><menuitem name='RegisterAction' action='RegisterAction'/><menuitem name='LoginAction' action='LoginAction'/><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menu name='UseALibraryAction' action='UseALibraryAction'/><separator/><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/><separator/><menuitem name='findAction' action='findAction'/><menuitem name='FindPreviousAction' action='FindPreviousAction'/><menuitem name='FindNextAction' action='FindNextAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><menuitem name='zoom100Action' action='zoom100Action'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='TabsAction' action='TabsAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/><menuitem name='HistoryTabAction' action='HistoryTabAction'/><menuitem name='ChatTabAction' action='ChatTabAction'/></menu></menu><menu name='ShellAction1' action='ShellAction1'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='SwitchToShellAction' action='SwitchToShellAction'/><menuitem name='ResetShellAction' action='ResetShellAction'/><menuitem name='ClearOutputAction' action='ClearOutputAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menuitem name='AboutAction' action='AboutAction'/><separator/><menuitem name='ToggleBreakpointAction' action='ToggleBreakpointAction'/><menuitem name='BlastScriptAction' action='BlastScriptAction'/><menu name='ScriptOptionsAction' action='ScriptOptionsAction'/></menu><menu name='CalicoAction' action='CalicoAction'><menu name='AddonsAction' action='AddonsAction'><menuitem name='InstallNewAddonAction' action='InstallNewAddonAction'/></menu><menu name='LanguagesAction' action='LanguagesAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='aboutAction' action='aboutAction'/><menuitem name='GettingStartedAction' action='GettingStartedAction'/><menuitem name='HelpAction1' action='HelpAction1'/><menuitem name='WhatSNewAction' action='WhatSNewAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString("<ui><menubar name='menubar2'><menu name='FileAction' action='FileAction'><menuitem name='openAction1' action='openAction1'/><menu name='NewAction' action='NewAction'/><separator/><menu name='RecentlyOpenedAction' action='RecentlyOpenedAction'/><menu name='ExamplesAction' action='ExamplesAction'/><separator/><menuitem name='saveAction' action='saveAction'/><menuitem name='saveAsAction' action='saveAsAction'/><separator/><menuitem name='printAction' action='printAction'/><menuitem name='ExportAsPythonAction' action='ExportAsPythonAction'/><separator/><menuitem name='RegisterAction' action='RegisterAction'/><menuitem name='LoginAction' action='LoginAction'/><menu name='CloudAction' action='CloudAction'><menuitem name='SyncFromCloudAction' action='SyncFromCloudAction'/><menuitem name='SyncToCloudAction' action='SyncToCloudAction'/><menuitem name='OpenFromCloudAction' action='OpenFromCloudAction'/><menuitem name='SaveToCloudAction' action='SaveToCloudAction'/></menu><separator/><menuitem name='quitAction' action='quitAction'/></menu><menu name='EditAction' action='EditAction'><menu name='UseALibraryAction' action='UseALibraryAction'/><separator/><menuitem name='copyAction' action='copyAction'/><menuitem name='pasteAction' action='pasteAction'/><menuitem name='cutAction' action='cutAction'/><separator/><menuitem name='undoAction' action='undoAction'/><menuitem name='redoAction' action='redoAction'/><separator/><menuitem name='selectAllAction' action='selectAllAction'/><separator/><menuitem name='indentAction' action='indentAction'/><menuitem name='unindentAction' action='unindentAction'/><separator/><menuitem name='CommentRegionAction' action='CommentRegionAction'/><menuitem name='UncommentRegionAction' action='UncommentRegionAction'/><separator/><menuitem name='findAction' action='findAction'/><menuitem name='FindPreviousAction' action='FindPreviousAction'/><menuitem name='FindNextAction' action='FindNextAction'/></menu><menu name='ViewAction' action='ViewAction'><menuitem name='zoomInAction' action='zoomInAction'/><menuitem name='zoomOutAction' action='zoomOutAction'/><menuitem name='zoom100Action' action='zoom100Action'/><separator/><menuitem name='selectFontAction' action='selectFontAction'/><menu name='TabsAction' action='TabsAction'><menuitem name='EnvironmentTabAction' action='EnvironmentTabAction'/><menuitem name='LocalsTabAction' action='LocalsTabAction'/><menuitem name='HistoryTabAction' action='HistoryTabAction'/><menuitem name='ChatTabAction' action='ChatTabAction'/></menu></menu><menu name='ShellAction1' action='ShellAction1'><menu name='LanguageAction' action='LanguageAction'/><menuitem name='yesAction1' action='yesAction1'/><menuitem name='noAction' action='noAction'/><menuitem name='SwitchToShellAction' action='SwitchToShellAction'/><menuitem name='ResetShellAction' action='ResetShellAction'/><menuitem name='ClearOutputAction' action='ClearOutputAction'/></menu><menu name='ScriptAction' action='ScriptAction'><menuitem name='AboutAction' action='AboutAction'/><separator/><menuitem name='ToggleBreakpointAction' action='ToggleBreakpointAction'/><menuitem name='BlastScriptAction' action='BlastScriptAction'/><menu name='ScriptOptionsAction' action='ScriptOptionsAction'/></menu><menu name='CalicoAction' action='CalicoAction'><menu name='AddonsAction' action='AddonsAction'><menuitem name='InstallNewAddonAction' action='InstallNewAddonAction'/></menu><menu name='LanguagesAction' action='LanguagesAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='aboutAction' action='aboutAction'/><menuitem name='GettingStartedAction' action='GettingStartedAction'/><menuitem name='HelpAction1' action='HelpAction1'/><menuitem name='WhatSNewAction' action='WhatSNewAction'/></menu></menubar></ui>");
 			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget("/menubar2")));
 			this.menubar2.Name = "menubar2";
 			this.vbox1.Add(this.menubar2);
@@ -1816,6 +1841,10 @@ namespace Calico {
 			this.PropertyTabAction.Activated += new global::System.EventHandler(this.OnPropertyTabActionActivated);
 			this.InstallNewAddonAction.Activated += new global::System.EventHandler(this.OnInstallNewAddonActionActivated);
 			this.FindNextAction.Activated += new global::System.EventHandler(this.OnFindNextActionActivated);
+			this.SyncFromCloudAction.Activated += new global::System.EventHandler(this.OnSyncFromCloudActionActivated);
+			this.SyncToCloudAction.Activated += new global::System.EventHandler(this.OnSyncToCloudActionActivated);
+			this.OpenFromCloudAction.Activated += new global::System.EventHandler(this.OnOpenFromCloudActionActivated);
+			this.SaveToCloudAction.Activated += new global::System.EventHandler(this.OnSaveToCloudActionActivated);
 			this._printButton.Clicked += new global::System.EventHandler(this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler(this.OnNewButtonClicked);
 			this._openButton.Clicked += new global::System.EventHandler(this.OnOpenButtonClicked);
