@@ -472,11 +472,13 @@ namespace Calico {
             Gtk.TextIter currentiter = Output.Buffer.GetIterAtOffset(position);
             int char_offset = currentiter.CharsInLine;
             int line = currentiter.Line;
-            Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
-            Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
-            String text = textiter.GetVisibleText(enditer);
-	    AddGotoFileToMenu(text, args);
-	    AddGotoHelpToMenu(text, args);
+	    if (char_offset > 1) {
+		Gtk.TextIter enditer = Output.Buffer.GetIterAtLineOffset(line, char_offset - 1);
+		Gtk.TextIter textiter = Output.Buffer.GetIterAtLine(line);
+		String text = textiter.GetVisibleText(enditer);
+		AddGotoFileToMenu(text, args);
+		AddGotoHelpToMenu(text, args);
+	    }
         }
 
         public void initialize_switch_menu(Gtk.MenuItem switch_menu) {
