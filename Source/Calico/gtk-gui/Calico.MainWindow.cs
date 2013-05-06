@@ -555,11 +555,11 @@ namespace Calico {
 			this.SyncToCloudAction = new global::Gtk.Action("SyncToCloudAction", global::Mono.Unix.Catalog.GetString("Sync to cloud"), null, null);
 			this.SyncToCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Sync to cloud");
 			w1.Add(this.SyncToCloudAction, null);
-			this.OpenFromCloudAction = new global::Gtk.Action("OpenFromCloudAction", global::Mono.Unix.Catalog.GetString("Open from cloud..."), null, null);
-			this.OpenFromCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Open from cloud...");
+			this.OpenFromCloudAction = new global::Gtk.Action("OpenFromCloudAction", global::Mono.Unix.Catalog.GetString("Open..."), null, null);
+			this.OpenFromCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Open...");
 			w1.Add(this.OpenFromCloudAction, null);
-			this.SaveToCloudAction = new global::Gtk.Action("SaveToCloudAction", global::Mono.Unix.Catalog.GetString("Save to cloud..."), null, null);
-			this.SaveToCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Save to cloud...");
+			this.SaveToCloudAction = new global::Gtk.Action("SaveToCloudAction", global::Mono.Unix.Catalog.GetString("Save..."), null, null);
+			this.SaveToCloudAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Save...");
 			w1.Add(this.SaveToCloudAction, null);
 			this.UIManager.InsertActionGroup(w1, 0);
 			this.AddAccelGroup(this.UIManager.AccelGroup);

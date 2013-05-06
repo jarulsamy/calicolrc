@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -474,14 +474,14 @@
       </action>
       <action id="OpenFromCloudAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Open from cloud...</property>
-        <property name="ShortLabel" translatable="yes">Open from cloud...</property>
+        <property name="Label" translatable="yes">Open...</property>
+        <property name="ShortLabel" translatable="yes">Open...</property>
         <signal name="Activated" handler="OnOpenFromCloudActionActivated" />
       </action>
       <action id="SaveToCloudAction">
         <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Save to cloud...</property>
-        <property name="ShortLabel" translatable="yes">Save to cloud...</property>
+        <property name="Label" translatable="yes">Save...</property>
+        <property name="ShortLabel" translatable="yes">Save...</property>
         <signal name="Activated" handler="OnSaveToCloudActionActivated" />
       </action>
     </action-group>
