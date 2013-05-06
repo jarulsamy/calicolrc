@@ -150,5 +150,27 @@ namespace Calico {
         public void OnClose(object sender) {
             Close();
         }
+
+	public bool GetFileFromCloud(string filename) {
+	    string cloud_path = (string)calico.config.GetValue("config", "cloud-path");
+            if (!System.IO.Directory.Exists(cloud_path)) {
+                System.IO.Directory.CreateDirectory(cloud_path);
+            }
+	    // FIXME: get file and put in directory:
+	    // if successful, return true:
+	    return true;
+	}
+
+	public bool SaveFileToCloud(string filename, string basename) {
+	    System.IO.TextReader reader = new System.IO.StreamReader(filename);
+	    string file_text = reader.ReadToEnd();
+	    reader.Close();
+	    // FIXME: get file and put in directory:
+	    Send("admin", String.Format("[save]\nfilename: {0}\n{1}",
+					basename,
+					file_text));
+	    // if successful, return true:
+	    return true;
+	}
     }
 }

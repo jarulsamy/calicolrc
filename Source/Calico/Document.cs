@@ -40,10 +40,14 @@ namespace Calico {
         protected bool _isDirty = false;
         double _speedValue = 100;
         public string preferredNotebook = "editor"; // "editor", "main", "tools"
+	public bool inCloud = false;
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
             this.filename = filename;
+	    if (filename != null && (filename.Contains("/Cloud/") || filename.Contains("\\Cloud\\"))) {
+		inCloud = true;
+	    }
             this.language = language;
             widget = new Gtk.ScrolledWindow();
             tab_widget = new Gtk.HBox();
@@ -208,6 +212,9 @@ namespace Calico {
                         return false;
                 }
                 filename = fc.Filename;
+		if (filename != null && (filename.Contains("/Cloud/") || filename.Contains("\\Cloud\\"))) {
+		    inCloud = true;
+		}
                 // Update GUI:
                 language = calico.manager.GetLanguageFromExtension(filename);
                 basename = System.IO.Path.GetFileName(filename);
@@ -226,6 +233,15 @@ namespace Calico {
             fc.Destroy();
             return retval;
         }
+
+	public virtual void SetFilename(string filename) {
+	    this.filename = filename;
+	    if (filename != null && (filename.Contains("/Cloud/") || filename.Contains("\\Cloud\\"))) {
+		inCloud = true;
+	    }
+	    basename = System.IO.Path.GetFileName(filename);
+            tab_label.TooltipText = filename;
+	}
 
         public virtual bool Save() {
             return Save(false);
@@ -546,7 +562,11 @@ namespace Calico {
                     texteditor.Document.Text = texteditor.Document.Text;
                 }
                 texteditor.Document.SetNotDirtyState();
+		tab_label.TooltipText = filename;
                 base.IsDirty = false;
+		if (inCloud) {
+		    calico.SaveToCloud(filename);
+		}
                 return true;
             } catch {
                 return false;

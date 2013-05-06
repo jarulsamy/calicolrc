@@ -75,6 +75,9 @@ namespace Calico {
 	        SetValue("calico", "font-size", "int", 10);
             SetValue("shell", "history", "strings", new List<string>());
             SetValue("shell", "history-size", "int", 50);
+            string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            config_path = System.IO.Path.Combine(config_path, "Cloud", "");
+            SetValue("config", "cloud-path", "string", config_path);
         }
         public object GetValue(string section, string setting) {
             return values[section][setting];

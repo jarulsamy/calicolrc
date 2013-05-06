@@ -71,8 +71,9 @@ public class CalicoJigsawDocument : Document
 		this.focus_widget = cvs;
 		this.preferredNotebook = "main";
 		widget.AddWithViewport (cvs);
-		if (filename != null)
+		if (filename != null) {
 			cvs.ReadFile (filename);
+		}
 		cvs.engine.SetGlobalVariable("calico", calico);
 		cvs.JigsawRun += new EventHandler(OnJigsawRun);		
 		cvs.JigsawStop += new EventHandler(OnJigsawStop);
@@ -235,8 +236,12 @@ public class CalicoJigsawDocument : Document
 	public override bool SaveDocument ()
 	{
 		bool retval = cvs.SaveDocument (filename);
-		if (retval) 
+		if (retval) {
 			cvs.Modified = false;
+			if (inCloud) {
+			    calico.SaveToCloud(filename);
+			}
+		}
 		return retval;
 	}
 

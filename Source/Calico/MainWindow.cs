@@ -1899,7 +1899,7 @@ namespace Calico {
 		    connection.Send("admin", "[broadcast]\nconference: General\n" + text);
 		}
 	    } else {
-		ErrorLine("You need to login before using chat.");
+		ErrorLine(_("You need to login before using chat."));
 	    }
         }
 
@@ -3659,24 +3659,101 @@ del _invoke, _
 
         protected void OnSyncToCloudActionActivated (object sender, System.EventArgs e)
         {
-		  // copy all local cloud files to cloud
+	    // copy all local cloud files to cloud
+	    if (connection != null) {
+		// for all local files
+		// save to cloud
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
         }
 
         protected void OnSyncFromCloudActionActivated (object sender, System.EventArgs e)
         {
-		  // copy all cloud files to local cloud
+	    // copy all cloud files to local cloud
+	    if (connection != null) {
+		// get filenames
+		// for each file, get from cloud
+		// save
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
         }
 
         protected void OnOpenFromCloudActionActivated (object sender, System.EventArgs e)
         {
-		  // open from local cloud
+	    // open from local cloud
+	    if (connection != null) {
+		Dictionary<string,string > response = ask(new List<string>() {_("Filename")}, _("Cloud Filename")); // FIXME: pick
+		if (response == null) {
+		    ErrorLine(_("Open a file from the Calico Cloud aborted."));
+		    return;
+		}
+		string filename = response[_("Filename")];
+		string cloud_path = (string)config.GetValue("config", "cloud-path");
+		// get from cloud, put in local cloud dir:
+		if (connection.GetFileFromCloud(filename)) {
+		    // open it, so when save, it will save in cloud:
+		    Open(System.IO.Path.Combine(cloud_path, filename));
+		} else {
+		    ErrorLine(String.Format(_("Failed to get the file named '{0}' from the Calico Cloud."), filename));
+		}
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
         }
+
+        public void SaveToCloud(string filename) {
+	    if (connection != null) {
+		string basename = System.IO.Path.GetFileName(filename);
+		if (!connection.SaveFileToCloud(filename, basename)) {
+		    ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
+		}
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+	}
 
         protected void OnSaveToCloudActionActivated (object sender, System.EventArgs e)
         {
-		  // save to local cloud
+	    // save to local cloud, and in the cloud
+	    if (connection != null) {
+		if (CurrentDocument != null) { // current document
+		    string filename = CurrentDocument.basename;
+		    string cloud_path = (string)config.GetValue("config", "cloud-path");
+		    // save in local cloud dir:
+		    if (!System.IO.Directory.Exists(cloud_path)) {
+			System.IO.Directory.CreateDirectory(cloud_path);
+		    }
+		    if (CurrentDocument.filename == null) {
+			Dictionary<string,string > response = ask(new List<string>() {_("Filename")}, _("Cloud Filename")); 
+			if (response == null) {
+			    ErrorLine(_("Save to the Calico Cloud aborted."));
+			    return;
+			}
+			filename = response[_("Filename")];
+		    }
+		    if (filename == "") {
+			ErrorLine(_("File must have a proper name to save to the Calico Cloud."));
+			return;
+		    }
+		    filename = System.IO.Path.Combine(cloud_path, filename);
+		    string basename = System.IO.Path.GetFileName(filename);
+		    CurrentDocument.filename = filename;
+		    CurrentDocument.basename = basename;
+		    CurrentDocument.Save(true); // force save, even if not dirty
+		    // save in cloud:
+		    if (!connection.SaveFileToCloud(filename, basename)) {
+			ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
+		    } else {
+			CurrentDocument.inCloud = true; // will mirror a save to cloud when saved locally
+		    }
+		} else {
+		    ErrorLine(_("You need to select an open document before attempting to save in the Calico Cloud."));
+		}
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
         }
     }
 }
-
-// enter not on bottom row inserts, not executes
