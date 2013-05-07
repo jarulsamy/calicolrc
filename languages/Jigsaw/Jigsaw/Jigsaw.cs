@@ -1325,42 +1325,36 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DeleteBlock(CBlock b, bool reattach) 
-		{	// Properly delete given block 
-		        // First, get blocks to 
-			CBlock parent = null;
-			CBlock child = null;
-			if (reattach) {
-			    foreach (CEdge e in b.Edges) {
-				if (e.Type == EdgeType.Out && e.IsConnected ) { // child, next
-				    child = e.LinkedTo.Block;
-				} else if (e.Type == EdgeType.In && e.IsConnected ) { // parent, previous
-				    parent = e.LinkedTo.Block;
-				}
-			    }
-			}
-			// Next, remove specific block:
+		public void DeleteBlock(CBlock b) 
+		{	// Properly delete given block
+			CEdge outEdge = null;
+			CEdge inEdge = null;
+
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			b.Deselect(cvs);
 			b.Deactivate(cvs);
+
+			// If there are blocks connected to the input and output edges, then save references for subsequent reconnection.
+			if (b.InEdge.IsConnected && b.OutEdge.IsConnected) {
+				outEdge = b.InEdge.LinkedTo;
+				inEdge = b.OutEdge.LinkedTo;
+			}
+
+			// Break all connections
 			b.Disconnect();
+
+			// Reconnect, if possible
+			if (outEdge != null && inEdge != null) {
+				outEdge.LinkedTo = inEdge;
+				inEdge.LinkedTo = outEdge;
+			}
+
 			b.StopOutline (cvs);
 			b.BlockChanged -= OnBlockChanged;
 			cvs.DeleteShape(b);
-			// Finally, if reattach, connect child to parent:
-			if (reattach && parent != null && child != null) {
-			    foreach (CEdge edge in parent.Edges) {
-				if (!edge.IsConnected && edge.Type == EdgeType.Out) { 
-				    edge.SetIsActivating(child.InEdge); // manually set this up to connect
-				    child.Connect(edge, cvs);
-				    CBlock linked = edge.LinkedTo.Block;	
-				    linked.RepositionBlocks(null);
-				}
-			    }
-			}
 		}
 		
-		// - - - Delete an entire stack of block given block that istop of stack - - - - -
+		// - - - Delete an entire stack of blocks given the block that is the top of stack - - - - -
 		public void DeleteStack(CBlock block)
 		{
 			CBlock top = block.StackTop;
@@ -1381,7 +1375,7 @@ namespace Jigsaw
 				}
 				
 				// Delete the block
-				this.DeleteBlock(nextBlock, false); // don't reattach parent to child
+				this.DeleteBlock(nextBlock);
 			}
 			
 			top.RepositionBlocks(null);
@@ -3370,7 +3364,7 @@ namespace Jigsaw
 			if (rsp == Gtk.ResponseType.No) return;
 			
 			// Delete and reposition what's left
-			(_cvs as Canvas).DeleteBlock(this, true);
+			(_cvs as Canvas).DeleteBlock(this);
 			if (top != this) top.RepositionBlocks(null);
 			
 			// Redraw
@@ -3619,18 +3613,20 @@ namespace Jigsaw
 			return edges;
 		}
 		
-		// - - -A utility method to completely disconnect this block for all others - - -
+		// - - -A utility method to completely disconnect this block from all others - - -
 		public override void Disconnect()
 		{
+			// Disconnect all edges of current block
 			foreach (CEdge e in this.Edges) e.Disconnect();
 		}
-		
+
 		// - - Establish the putative link of an activating edge - - - -
 		public bool Connect(CEdge activatingEdge, Diagram.Canvas cvs)
 		{
 			// Get and check the edge that this edge is activating
 			CEdge activatedEdge = activatingEdge.IsActivating;
 			if (activatedEdge == null) return false;
+
 			if (activatedEdge.Type == EdgeType.Out) 
 			{
 				// Save edge this edge is linked to, if any					
@@ -3744,12 +3740,6 @@ namespace Jigsaw
 			_azY = offsetTop;				
 			_azW = width;				// Size of activation zone
 			_azH = 12.0;
-		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	        public void SetIsActivating (CEdge edge) {
-		    // Manually set an edge to connect to
-		    _isActivating = edge;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
