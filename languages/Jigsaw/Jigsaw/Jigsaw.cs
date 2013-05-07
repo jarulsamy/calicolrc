@@ -1150,6 +1150,12 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void RunBlockStack(CBlock b)
 		{
+			if (_engine.State != EngineState.Paused) {
+				Console.WriteLine ("Resetting");
+				//Console.WriteLine (_engine.State);
+				_engine.Reset(this, _inspector);
+			}
+
 			// Load block onto call stack enabled
 			_engine.LoadBlockStack(b, true);
 			
@@ -1162,7 +1168,7 @@ namespace Jigsaw
 		{
 			if (_engine.State != EngineState.Paused) {
 				Console.WriteLine ("Resetting");
-				Console.WriteLine (_engine.State);
+				//Console.WriteLine (_engine.State);
 				_engine.Reset(this, _inspector);
 			}
 			_engine.Run();
