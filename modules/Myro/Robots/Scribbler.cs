@@ -1055,10 +1055,15 @@ public class Scribbler: Myro.Robot
 
     public override object getBright (int window)
     {
-        write (Scribbler.GET_WINDOW_LIGHT);
-        write ((byte)window);
-        return read_3byte (); // (63.0 * 192.0 * 255.0)
-    }
+	  if (window == 0)
+		return getBright("left");
+	  else if (window == 1)
+		return getBright("middle");
+	  else if (window == 2)
+		return getBright("right");
+	  else 
+		throw new Exception ("invalid bright argument");    
+	}
 
     public override object getBright (string window)
     {
@@ -1073,7 +1078,7 @@ public class Scribbler: Myro.Robot
             } else if ((string)window == "right") {
                 byte_window = 2;
             } else {
-                throw new Exception ();
+                throw new Exception ("invalid bright argument");
             }
         }
         write (Scribbler.GET_WINDOW_LIGHT);
