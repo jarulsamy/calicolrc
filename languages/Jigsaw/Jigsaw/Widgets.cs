@@ -573,7 +573,7 @@ namespace Widgets
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void DoScroll(Diagram.Canvas cvs, double dY)
 		{	// Test if a scroll is acceptible based on window bounds and block positions
-			// and perform is acceptible.
+			// and perform if acceptible.
 			
 			// The top of at least one shape must be positive
 			// If not, prevent scroll

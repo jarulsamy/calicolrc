@@ -2375,19 +2375,14 @@ namespace Jigsaw
 							// Select the tab
 							tab.SetToggle(_cvs, true);
 							
-							// Shift all factory blocks up
+							// Shift found block into view. Account for canvas y-translate
 							double dY = 70.0 - bb.Top; 
-							foreach (WeakReference wrshp in tab._shapes)
-							{
-								Diagram.CShape shp2 = wrshp.Target as Diagram.CShape;
-								if (shp2 != null) {
-									shp2.Top += dY;
-								}
-							}
+							_cvs.pnlBlock.DoScroll(_cvs, dY - _cvs.offsetY);
 							
 							// Select the found block
 							_cvs.DeselectAll();
 							bb.Select(_cvs);
+
 							_cvs.Invalidate();
 							return true;
 						}
