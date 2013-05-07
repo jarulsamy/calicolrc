@@ -1471,8 +1471,13 @@ public class Scribbler: Myro.Robot
     {
         // fixme  make sure serial.Read returns 1?
         byte [] bytes = new byte[1];
-        lock (serial)
+		try {
+		  lock (serial)
             serial.Read (bytes, 0, 1);
+		} catch {
+		  System.Console.Error.WriteLine("Serial timeout...");
+		  return 0;
+		}
         return bytes [0];
     }
 
