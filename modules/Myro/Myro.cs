@@ -745,7 +745,7 @@ public static class Myro
 			    PythonDictionary items = new PythonDictionary ();
 			    items ["Line:"] = 2;
 			    items ["Stall:"] = 1;
-			    items ["Bright:"] = 3;
+			    //items ["Bright:"] = 3;
 			    items ["Obstacle:"] = 3;
 			    items ["IR:"] = 2;
 			    items ["Light:"] = 3;
@@ -791,7 +791,7 @@ public static class Myro
 		bool update_entries ()
 		{
 		    List light_results = (List)Myro.robot.getLight ();
-		    List bright_results = (List)getBright ();
+		    //List bright_results = (List)getBright ();
 		    List obstacle_results = (List)getObstacle ();
 		    List ir_results = (List)getIR ();
 		    List line_results = (List)getLine ();
@@ -801,9 +801,11 @@ public static class Myro
 			    for (int i=0; i < light_results.Count; i++) {
 				((Gtk.Entry)((List)dict_entry ["Light:"]) [i]).Text = light_results [i].ToString ();
 			    }
+				/*
 			    for (int i=0; i < bright_results.Count; i++) {
 				((Gtk.Entry)((List)dict_entry ["Bright:"]) [i]).Text = bright_results [i].ToString ();
 			    }
+				*/
 			    for (int i=0; i < obstacle_results.Count; i++) {
 				((Gtk.Entry)((List)dict_entry ["Obstacle:"]) [i]).Text = obstacle_results [i].ToString ();
 			    }
