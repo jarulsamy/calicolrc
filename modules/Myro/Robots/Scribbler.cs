@@ -631,10 +631,6 @@ public class Scribbler: Myro.Robot
                                                        getObstacle1 ("left"), 
                                                        getObstacle1 ("center"), 
                                                        getObstacle1 ("right")),
-                                     "bright", list (
-                                                     getBright ("left"), 
-                                                     getBright ("middle"), 
-                                                     getBright ("right")),
                                      "blob", getBlob (),
                                      "battery", getBattery ()
                                      );
