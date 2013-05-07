@@ -1325,8 +1325,21 @@ namespace Jigsaw
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DeleteBlock(CBlock b) 
+		public void DeleteBlock(CBlock b, bool reattach) 
 		{	// Properly delete given block 
+		        // First, get blocks to 
+			CBlock parent = null;
+			CBlock child = null;
+			if (reattach) {
+			    foreach (CEdge e in b.Edges) {
+				if (e.Type == EdgeType.Out && e.IsConnected ) { // child, next
+				    child = e.LinkedTo.Block;
+				} else if (e.Type == EdgeType.In && e.IsConnected ) { // parent, previous
+				    parent = e.LinkedTo.Block;
+				}
+			    }
+			}
+			// Next, remove specific block:
 			Diagram.Canvas cvs = (Diagram.Canvas)this;
 			b.Deselect(cvs);
 			b.Deactivate(cvs);
@@ -1334,6 +1347,17 @@ namespace Jigsaw
 			b.StopOutline (cvs);
 			b.BlockChanged -= OnBlockChanged;
 			cvs.DeleteShape(b);
+			// Finally, if reattach, connect child to parent:
+			if (reattach && parent != null && child != null) {
+			    foreach (CEdge edge in parent.Edges) {
+				if (!edge.IsConnected && edge.Type == EdgeType.Out) { 
+				    edge.SetIsActivating(child.InEdge); // manually set this up to connect
+				    child.Connect(edge, cvs);
+				    CBlock linked = edge.LinkedTo.Block;	
+				    linked.RepositionBlocks(null);
+				}
+			    }
+			}
 		}
 		
 		// - - - Delete an entire stack of block given block that istop of stack - - - - -
@@ -1357,7 +1381,7 @@ namespace Jigsaw
 				}
 				
 				// Delete the block
-				this.DeleteBlock(nextBlock);
+				this.DeleteBlock(nextBlock, false); // don't reattach parent to child
 			}
 			
 			top.RepositionBlocks(null);
@@ -3346,7 +3370,7 @@ namespace Jigsaw
 			if (rsp == Gtk.ResponseType.No) return;
 			
 			// Delete and reposition what's left
-			(_cvs as Canvas).DeleteBlock(this);
+			(_cvs as Canvas).DeleteBlock(this, true);
 			if (top != this) top.RepositionBlocks(null);
 			
 			// Redraw
@@ -3607,7 +3631,6 @@ namespace Jigsaw
 			// Get and check the edge that this edge is activating
 			CEdge activatedEdge = activatingEdge.IsActivating;
 			if (activatedEdge == null) return false;
-			
 			if (activatedEdge.Type == EdgeType.Out) 
 			{
 				// Save edge this edge is linked to, if any					
@@ -3721,6 +3744,12 @@ namespace Jigsaw
 			_azY = offsetTop;				
 			_azW = width;				// Size of activation zone
 			_azH = 12.0;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	        public void SetIsActivating (CEdge edge) {
+		    // Manually set an edge to connect to
+		    _isActivating = edge;
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
