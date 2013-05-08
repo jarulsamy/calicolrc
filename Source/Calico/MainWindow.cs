@@ -3676,7 +3676,11 @@ del _invoke, _
 	    // copy all local cloud files to cloud
 	    if (connection != null) {
 		// for all local files
-		// save to cloud
+		string cloud_path = (string)config.GetValue("config", "cloud-path");
+		DirectoryInfo dirInfo = new DirectoryInfo(cloud_path);
+		foreach (FileInfo f in dirInfo.GetFiles("*.*")) {
+		    SaveToCloud(f.FullName);
+		}
 	    } else {
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
@@ -3686,9 +3690,7 @@ del _invoke, _
         {
 	    // copy all cloud files to local cloud
 	    if (connection != null) {
-		// get filenames
-		// for each file, get from cloud
-		// save
+		connection.Send("admin", "[sync-from-cloud]");
 	    } else {
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
