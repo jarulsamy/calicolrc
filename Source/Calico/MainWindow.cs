@@ -3495,8 +3495,14 @@ del _invoke, _
         }
 
         public void ReceiveBlast(string address, string type, string filename, string code) {
-            if (AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
-                string tempPath = System.IO.Path.GetTempPath();
+	    // type: file, open, run
+            if (address == connection.user || AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
+		string tempPath = null;
+		if (type == "file") {
+		    tempPath = (string)config.GetValue("config", "cloud-path");
+		} else {
+		    tempPath = System.IO.Path.GetTempPath();
+		}
                 filename = System.IO.Path.Combine(tempPath, filename);
                 string language = manager.GetLanguageFromExtension(filename);
                 System.IO.StreamWriter sw = new System.IO.StreamWriter(filename, false, Encoding.ASCII);

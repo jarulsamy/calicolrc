@@ -115,6 +115,21 @@ namespace Calico {
                     return;
                 }
                 calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
+            } else if (msg.Body.ToString().StartsWith("[file]")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [file]
+                if (lines.Length >= 1) {
+                    string [] filename  = lines[1].Split(new char[] {':'}, 2);  // file:
+                    System.Text.StringBuilder code = new System.Text.StringBuilder();
+                    for (int i = 4; i < lines.Length - 1; i++) {
+                        code.AppendLine(lines[i]);                             // code
+                    }
+                    // Last line, no return:
+                    code.Append(lines[lines.Length - 1]);
+                    // Receive blast:
+		    calico.ReceiveBlast(msg.From, "file", filename[1].Trim(), code.ToString());
+                    return;
+                }
+                calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
             } else if (msg.Body.ToString().StartsWith("[data]")) {
                 messages.Add(new List<string>() {msg.From, msg.Body});
             } else if (msg.Body.ToString().StartsWith("[info]")) {
@@ -158,6 +173,7 @@ namespace Calico {
             }
 	    // FIXME: get file and put in directory:
 	    // if successful, return true:
+	    Send("admin", String.Format("[load]\nfilename: {0}", filename));
 	    return true;
 	}
 
