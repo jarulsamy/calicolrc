@@ -3494,17 +3494,18 @@ del _invoke, _
             return dialogResponse;
         }
 
-        public void ReceiveBlast(string address, string type, string filename, string code) {
-	    // type: file, open, run
+        public void ReceiveBlast(string address, string mode, string filename, string code) {
+	    //PrintLine(String.Format("{0}: {1} {2}", address, mode, filename));
+	    // type: cloud-save, cloud-open, open, run, save
 	    if (address.StartsWith(connection.user + "@")) {
 		// Ignore blasts from yourself
-		Print("Blast was received from self.");
+		PrintLine("Blast was received from self.");
 		return;
 	    }
             if (address.StartsWith("admin@") || // always except from admin
 		AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
 		string tempPath = null;
-		if (type == "file") {
+		if (mode == "cloud-save" || mode == "cloud-open") {
 		    tempPath = (string)config.GetValue("config", "cloud-path");
 		} else {
 		    tempPath = System.IO.Path.GetTempPath();
@@ -3515,13 +3516,17 @@ del _invoke, _
                 sw.Write(code);
                 sw.Close();
                 Invoke(delegate {
-			if (type == "open" || type == "file")
+			if (mode == "open" || mode == "cloud-open")
 			    Open(filename, language);
-			else if (type == "run")
+			else if (mode == "run")
 			    ExecuteInBackground(filename, language);
+			else if (mode == "save")
+			    PrintLine(String.Format(_("File '{0}' saved."), filename));
+			else if (mode == "cloud-save")
+			    PrintLine(String.Format(_("File '{0}' synched."), filename));
 		    });
             } else {
-                Print(String.Format(_("Blast '{0}' from '{1}' declined."), filename, address));
+                PrintLine(String.Format(_("Blast '{0}' from '{1}' declined."), filename, address));
             }
         }
 
