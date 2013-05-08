@@ -3496,7 +3496,13 @@ del _invoke, _
 
         public void ReceiveBlast(string address, string type, string filename, string code) {
 	    // type: file, open, run
-            if (address == connection.user || AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
+	    if (address.StartsWith(connection.user + "@")) {
+		// Ignore blasts from yourself
+		Print("Blast was received from self.");
+		return;
+	    }
+            if (address.StartsWith("admin@") || // always except from admin
+		AcceptBlast(String.Format(_("Blast: Accept '{0}' from '{1}'?"), filename, address)) == _("Accept")) {
 		string tempPath = null;
 		if (type == "file") {
 		    tempPath = (string)config.GetValue("config", "cloud-path");
@@ -3509,9 +3515,11 @@ del _invoke, _
                 sw.Write(code);
                 sw.Close();
                 Invoke(delegate {
-                    Open(filename, language);
-                }
-                );
+			if (type == "open" || type == "file")
+			    Open(filename, language);
+			else if (type == "run")
+			    ExecuteInBackground(filename, language);
+		    });
             } else {
                 Print(String.Format(_("Blast '{0}' from '{1}' declined."), filename, address));
             }
@@ -3696,11 +3704,9 @@ del _invoke, _
 		    return;
 		}
 		string filename = response[_("Filename")];
-		string cloud_path = (string)config.GetValue("config", "cloud-path");
 		// get from cloud, put in local cloud dir:
 		if (connection.GetFileFromCloud(filename)) {
-		    // open it, so when save, it will save in cloud:
-		    Open(System.IO.Path.Combine(cloud_path, filename));
+		    // it will open when received...
 		} else {
 		    ErrorLine(String.Format(_("Failed to get the file named '{0}' from the Calico Cloud."), filename));
 		}

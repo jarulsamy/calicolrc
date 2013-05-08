@@ -120,7 +120,7 @@ namespace Calico {
                 if (lines.Length >= 1) {
                     string [] filename  = lines[1].Split(new char[] {':'}, 2);  // file:
                     System.Text.StringBuilder code = new System.Text.StringBuilder();
-                    for (int i = 4; i < lines.Length - 1; i++) {
+                    for (int i = 2; i < lines.Length - 1; i++) {
                         code.AppendLine(lines[i]);                             // code
                     }
                     // Last line, no return:

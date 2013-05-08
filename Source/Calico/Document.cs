@@ -72,12 +72,16 @@ namespace Calico {
                 else if (calico == null)
                     basename = System.IO.Path.GetFileName(filename);
                 else
-				  basename = String.Format(MainWindow._("New {0} {1}"), 
-					  calico.manager.languages[language].proper_name, 
-					  MainWindow._(_documentType));
-				MainWindow._("Script"); // This is here to make sure
-										// "Script" is translated
-                tab_label.Text = basename; //.Replace("_", "__");
+		    basename = String.Format(MainWindow._("New {0} {1}"), 
+					     calico.manager.languages[language].proper_name, 
+					     MainWindow._(_documentType));
+		MainWindow._("Script"); // This is here to make sure
+		// "Script" is translated
+		if (inCloud) {
+		    tab_label.Text = String.Format("{{{0}}}", basename); 
+		} else {
+		    tab_label.Text = basename; //.Replace("_", "__");
+		}
             }
             get { return _documentType; }
         }
@@ -218,7 +222,11 @@ namespace Calico {
                 // Update GUI:
                 language = calico.manager.GetLanguageFromExtension(filename);
                 basename = System.IO.Path.GetFileName(filename);
-                tab_label.Text = basename;
+		if (inCloud) {
+		    tab_label.Text = String.Format("{{{0}}}", basename); 
+		} else {
+		    tab_label.Text = basename; //.Replace("_", "__");
+		}
                 tab_label.TooltipText = filename;
                 // Already agreed to overwrite:
                 retval = Save(true); // force saveas
@@ -277,11 +285,19 @@ namespace Calico {
             if (tab_label != null && basename != null) {
                 if (IsDirty)
                     Gtk.Application.Invoke( delegate {
-			    tab_label.Text = String.Format("*{0}", basename);
+			    if (inCloud) {
+				tab_label.Text = String.Format("*{{{0}}}", basename); 
+			    } else {
+				tab_label.Text = String.Format("*{0}", basename);
+			    }
                     });
                 else
                     Gtk.Application.Invoke( delegate {
-			    tab_label.Text = basename; // .Replace("_", "__");
+			    if (inCloud) {
+				tab_label.Text = String.Format("{{{0}}}", basename); 
+			    } else {
+				tab_label.Text = basename; 
+			    }
                     });
             }
         }
@@ -474,10 +490,19 @@ namespace Calico {
         }
 
         public virtual void OnDocumentUpdated(object obj, System.EventArgs args) {
-            if (IsDirty)
-                tab_label.Text = String.Format("*{0}", basename);
-            else
-                tab_label.Text = basename; //.Replace("_", "__");
+            if (IsDirty) {
+		if (inCloud) {
+		    tab_label.Text = String.Format("*{{{0}}}", basename); 
+		} else {
+		    tab_label.Text = String.Format("*{0}", basename);
+		}
+            } else {
+		if (inCloud) {
+		    tab_label.Text = String.Format("{{{0}}}", basename); 
+		} else {
+		    tab_label.Text = basename; 
+		}
+	    }
             calico.updateControls(this, true); 
         }
 
