@@ -20,7 +20,7 @@
 
 using System;
 
-public class Printing {
+public class JigsawPrinting {
     Calico.MainWindow calico;
     string title;
     double headerHeight;
@@ -33,7 +33,7 @@ public class Printing {
     int numPages;
     int numLines;
 
-    public Printing(Calico.MainWindow calico, string title, string filename) {
+    public JigsawPrinting(Calico.MainWindow calico, string title, string filename) {
       this.calico = calico;
       this.title = title;
         if (calico.OS == "Windows") {

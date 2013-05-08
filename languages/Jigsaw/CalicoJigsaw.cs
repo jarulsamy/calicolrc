@@ -185,12 +185,14 @@ public class CalicoJigsawDocument : Document
 			}
 		});
 	}
-	/*
-	void override Print ()
-	{
-		new Printing("base", "filename");
-	}	
-	*/
+
+        public override void Print(Calico.MainWindow calico) {
+            Save();
+            if (filename != null) {
+                new JigsawPrinting(calico, "", filename);
+            }
+        }
+
 	public override void ZoomIn ()
 	{
 		cvs.DoZoom (1.05);
