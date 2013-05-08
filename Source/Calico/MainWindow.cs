@@ -3677,6 +3677,9 @@ del _invoke, _
 	    if (connection != null) {
 		// for all local files
 		string cloud_path = (string)config.GetValue("config", "cloud-path");
+		if (!System.IO.Directory.Exists(cloud_path)) {
+		  System.IO.Directory.CreateDirectory(cloud_path);
+		}
 		DirectoryInfo dirInfo = new DirectoryInfo(cloud_path);
 		foreach (FileInfo f in dirInfo.GetFiles("*.*")) {
 		    SaveToCloud(f.FullName);
@@ -3688,14 +3691,19 @@ del _invoke, _
 
         protected void OnSyncFromCloudActionActivated (object sender, System.EventArgs e)
         {
-	    // copy all cloud files to local cloud
-	    if (connection != null) {
-		connection.Send("admin", "[sync-from-cloud]");
-	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
-	    }
+		  // copy all cloud files to local cloud
+		  if (connection != null) {
+			// make sure that there is a cloud directory
+			string cloud_path = (string)config.GetValue("config", "cloud-path");
+			if (!System.IO.Directory.Exists(cloud_path)) {
+			  System.IO.Directory.CreateDirectory(cloud_path);
+			}
+			connection.Send("admin", "[sync-from-cloud]");
+		  } else {
+			ErrorLine(_("You need to login before using the Calico Cloud."));
+		  }
         }
-
+		
         protected void OnOpenFromCloudActionActivated (object sender, System.EventArgs e)
         {
 	    // open from local cloud
