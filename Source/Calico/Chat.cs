@@ -130,6 +130,12 @@ namespace Calico {
                     string [] filenames  = lines[1].Split(new char[] {':'}, 2);  // filenames:
 		    calico.OnOpenFromCloudCallback (filenames[1].Split(new char[] {','}));
 		}
+            } else if (msg.Body.ToString().StartsWith("[delete-list-cloud]")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [delete-list-cloud]
+                if (lines.Length >= 0) {
+                    string [] filenames  = lines[1].Split(new char[] {':'}, 2);  // filenames:
+		    calico.OnDeleteFromCloudCallback (filenames[1].Split(new char[] {','}));
+		}
             } else if (msg.Body.ToString().StartsWith("[file]")) {
                 string [] lines = msg.Body.ToString().Split('\n');             // [file]
                 if (lines.Length >= 1) {
@@ -196,21 +202,25 @@ namespace Calico {
             if (!System.IO.Directory.Exists(cloud_path)) {
                 System.IO.Directory.CreateDirectory(cloud_path);
             }
-	    // FIXME: get file and put in directory:
-	    // if successful, return true:
 	    Send("admin", String.Format("[load]\nfilename: {0}", filename));
 	    return true;
+	}
+
+	public void DeleteFileFromCloud(string filename) {
+	    string cloud_path = (string)calico.config.GetValue("config", "cloud-path");
+            if (!System.IO.Directory.Exists(cloud_path)) {
+                System.IO.Directory.CreateDirectory(cloud_path);
+            }
+	    Send("admin", String.Format("[delete]\nfilename: {0}", filename));
 	}
 
 	public bool SaveFileToCloud(string filename, string basename) {
 	    System.IO.TextReader reader = new System.IO.StreamReader(filename);
 	    string file_text = reader.ReadToEnd();
 	    reader.Close();
-	    // FIXME: get file and put in directory:
 	    Send("admin", String.Format("[save]\nfilename: {0}\n{1}",
 					basename,
 					file_text));
-	    // if successful, return true:
 	    return true;
 	}
     }

@@ -3767,7 +3767,7 @@ del _invoke, _
         }
 		
 	public void OnOpenFromCloudCallback (string [] list) {
-	    string response = pickOne(_("Filename"), _("Cloud Filename"), list);
+	    string response = pickOne(_("Open"), _("Open Cloud Filename"), list);
 	    if (response == null) {
 		ErrorLine(_("Open a file from the Calico Cloud aborted."));
 		return;
@@ -3777,6 +3777,21 @@ del _invoke, _
 		// it will open when received...
 	    } else {
 		ErrorLine(String.Format(_("Failed to get the file named '{0}' from the Calico Cloud."), response));
+	    }
+	}
+
+	public void OnDeleteFromCloudCallback (string [] list) {
+	    string response = pickOne(_("Delete"), _("Delete Cloud Filename"), list);
+	    if (response == null) {
+		ErrorLine(_("Delete a file from the Calico Cloud aborted."));
+		return;
+	    }
+	    // get from cloud, put in local cloud dir:
+	    connection.DeleteFileFromCloud(response.Trim());
+	    string filename = System.IO.Path.Combine((string)config.GetValue("config", "cloud-path"), 
+						     response.Trim());
+	    if (System.IO.File.Exists(filename)) {
+		System.IO.File.Delete(filename);
 	    }
 	}
 
