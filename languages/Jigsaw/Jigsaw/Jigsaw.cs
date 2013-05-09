@@ -7,6 +7,7 @@ using System.Xml;
 using System.IO;
 using System.Reflection;
 using Cairo;
+using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
 // Model for Block Connections:
@@ -34,7 +35,26 @@ namespace Jigsaw
 	{
 		Idle = 1, Running = 2, Paused = 3, Error = 4
 	}
-	
+
+	// --- Used to define a shared set of compiler options ---------------------
+	public static class Compiler 
+	{
+		private static CompilerOptions _compiler_options = null;
+
+		public static CompilerOptions Options(ScriptEngine engine) 
+		{
+			if (_compiler_options == null) {
+				CompilerOptions compiler_options = engine.GetCompilerOptions();
+				((IronPython.Compiler.PythonCompilerOptions)compiler_options).PrintFunction = true;
+				((IronPython.Compiler.PythonCompilerOptions)compiler_options).AllowWithStatement = true;
+				((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
+				_compiler_options = compiler_options;
+			}
+			return _compiler_options;
+		}
+	}
+
+	// ---
 	public class XmlWrapper : XmlTextReader {
 		string filename = null;
 		string contents = null;

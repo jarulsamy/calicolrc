@@ -310,7 +310,7 @@ namespace Jigsaw
 				string code = this.ToPython();
 				
 				ScriptSource ssrc = engine.CreateScriptSourceFromString(code, Microsoft.Scripting.SourceCodeKind.Statements);
-				_compiled = ssrc.Compile();
+				_compiled = ssrc.Compile(Compiler.Options(engine));
 				
 				return true;
 				

@@ -439,7 +439,7 @@ namespace Jigsaw
 		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
 		{
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Expression);
-			_Compiled = _Source.Compile();
+			_Compiled = _Source.Compile(Compiler.Options(engine));
 			_Text = _Source.GetCode();
 		}
 		
@@ -481,7 +481,7 @@ namespace Jigsaw
 		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
 		{
 			_Source = engine.CreateScriptSourceFromString(_Text, Microsoft.Scripting.SourceCodeKind.Statements);
-			_Compiled = _Source.Compile();
+			_Compiled = _Source.Compile(Compiler.Options(engine));
 			string code = _Source.GetCode();
 			if (code.Length > 0) _Text = code;
 		}
@@ -490,7 +490,7 @@ namespace Jigsaw
 		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, string statement) 
 		{
 			_Source = engine.CreateScriptSourceFromString(statement, Microsoft.Scripting.SourceCodeKind.Statements);
-			_Compiled = _Source.Compile();
+			_Compiled = _Source.Compile(Compiler.Options(engine));
 			string code = _Source.GetCode();
 			if (code.Length > 0) Text = code;
 		}

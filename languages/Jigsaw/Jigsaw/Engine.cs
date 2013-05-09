@@ -222,7 +222,7 @@ namespace Jigsaw
 		public ScriptRuntimeSetup scriptRuntimeSetup;
 		public ScriptRuntime scriptRuntime;
 		public LanguageSetup languageSetup;
-		public CompilerOptions compiler_options;
+		//internal CompilerOptions compiler_options;
 		public ScriptEngine engine;
 		
 		// This dictionary is injected into all ScriptScope objects as the global namespace
@@ -259,14 +259,19 @@ namespace Jigsaw
 			
 			// Create engine and global scope:
 			scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
+
 			engine = scriptRuntime.GetEngine("py");
+//			var compiler_options = new Dictionary<string, object>();
+//			compiler_options["DivisionOptions"] = PythonDivisionOptions.New;
+//			engine = Python.CreateEngine (compiler_options);
+
 			globals = new Dictionary<string, object>();
 			
-			compiler_options = engine.GetCompilerOptions();
-			((IronPython.Compiler.PythonCompilerOptions)compiler_options).PrintFunction = true;
-			((IronPython.Compiler.PythonCompilerOptions)compiler_options).AllowWithStatement = true;
-			((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
-			
+//			Microsoft.Scripting.CompilerOptions compiler_options = engine.GetCompilerOptions();
+//			((IronPython.Compiler.PythonCompilerOptions)compiler_options).PrintFunction = true;
+//			((IronPython.Compiler.PythonCompilerOptions)compiler_options).AllowWithStatement = true;
+//			((IronPython.Compiler.PythonCompilerOptions)compiler_options).TrueDivision = true;
+
 			//%%%
 			//GLib.Timeout.Add(_timeOut, new GLib.TimeoutHandler(OnTimerElapsed));
 		}
