@@ -478,6 +478,12 @@
         <property name="ShortLabel" translatable="yes">Open...</property>
         <signal name="Activated" handler="OnOpenFromCloudActionActivated" />
       </action>
+      <action id="DeleteFromCloudAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Delete...</property>
+        <property name="ShortLabel" translatable="yes">Delete...</property>
+        <signal name="Activated" handler="OnDeleteFromCloudActionActivated" />
+      </action>
       <action id="SaveToCloudAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Save...</property>
@@ -519,6 +525,8 @@
                   <node type="Separator" />
                   <node type="Menuitem" action="SyncFromCloudAction" />
                   <node type="Menuitem" action="SyncToCloudAction" />
+                  <node type="Separator" />
+                  <node type="Menuitem" action="DeleteFromCloudAction" />
                 </node>
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />

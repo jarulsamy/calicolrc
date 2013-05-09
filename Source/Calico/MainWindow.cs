@@ -3789,6 +3789,15 @@ del _invoke, _
 	    }
         }
 
+        protected void OnDeleteFromCloudActionActivated (object sender, System.EventArgs e)
+        {
+	    if (connection != null) {
+		connection.Send("admin", "[delete-list-cloud]"); // when received, process from there
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+        }
+
         public void SaveToCloud(string filename) {
 	    if (connection != null) {
 		string basename = System.IO.Path.GetFileName(filename);
