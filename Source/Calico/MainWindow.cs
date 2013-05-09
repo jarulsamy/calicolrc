@@ -1046,6 +1046,13 @@ namespace Calico {
             );
         }
 
+        public void SetStatus(string status) {
+		  Invoke(delegate {
+				this.label11.LabelProp = "<i>" + status + "</i>";
+				this.label11.UseMarkup = true;
+			  });
+		}
+
         public void OnSwitchLanguage(object obj, EventArgs e) {
             Gtk.RadioMenuItem radioitem = (Gtk.RadioMenuItem)obj;
             OnSwitchLanguage((int)radioitem.Data ["id"]);

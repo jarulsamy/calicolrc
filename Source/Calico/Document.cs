@@ -159,10 +159,12 @@ namespace Calico {
         public virtual bool inCloud {
             get { return _inCloud; }
             set { 
-			  this.filename = System.IO.Path.Combine(
-				  (string)calico.config.GetValue("config", "cloud-path"),
-				  basename);
-			  tab_label.TooltipText = filename;
+			  if (basename != null) {
+				this.filename = System.IO.Path.Combine(
+					(string)calico.config.GetValue("config", "cloud-path"),
+					basename);
+				tab_label.TooltipText = filename;
+			  }
 			  _inCloud = value; 
 			}
         }

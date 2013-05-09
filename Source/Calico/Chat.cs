@@ -17,7 +17,7 @@ namespace Calico {
         bool debug;
 
         public Chat(Calico.MainWindow calico, string user, string password) :
-            this(calico, user, password, true) {
+            this(calico, user, password, false) {
         }
 
         public static string ParseFrom(string sfrom) {
@@ -93,6 +93,7 @@ namespace Calico {
                                             "General",
                                             user));
             }
+			calico.SetStatus(String.Format(global::Mono.Unix.Catalog.GetString("online as {0}"), user));
             if (debug) {
                 calico.Print(String.Format("LOGIN: {0}\n", user));
                 //self.client.SendMyPresence()
