@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -514,11 +514,11 @@
                 <node type="Menuitem" action="RegisterAction" />
                 <node type="Menuitem" action="LoginAction" />
                 <node type="Menu" action="CloudAction">
-                  <node type="Menuitem" action="SyncFromCloudAction" />
-                  <node type="Menuitem" action="SyncToCloudAction" />
-                  <node type="Separator" />
                   <node type="Menuitem" action="OpenFromCloudAction" />
                   <node type="Menuitem" action="SaveToCloudAction" />
+                  <node type="Separator" />
+                  <node type="Menuitem" action="SyncFromCloudAction" />
+                  <node type="Menuitem" action="SyncToCloudAction" />
                 </node>
                 <node type="Separator" />
                 <node type="Menuitem" action="quitAction" />
