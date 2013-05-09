@@ -3468,6 +3468,31 @@ del _invoke, _
             return responses;
         }
 
+        public static string pickOne(String question, string title, string [] options) {
+            ManualResetEvent ev = new ManualResetEvent(false);
+	    string response = null;
+            Invoke(delegate {
+		    Gtk.MessageDialog fc = new Gtk.MessageDialog(_mainWindow,
+								 0, Gtk.MessageType.Question,
+								 Gtk.ButtonsType.OkCancel,
+								 title);
+		    Gtk.HBox hbox = new Gtk.HBox();
+		    Gtk.Label label = new Gtk.Label(question);
+		    Gtk.ComboBoxEntry entry = new Gtk.ComboBoxEntry(options);
+		    hbox.PackStart(label);
+		    hbox.PackStart(entry);
+		    fc.VBox.PackStart(hbox);
+		    fc.ShowAll();
+		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
+			response = entry.ActiveText;
+		    }
+		    fc.Destroy();
+		    ev.Set();
+		});
+            ev.WaitOne();
+            return response;
+        }
+
         public static string AcceptBlast(string title) {
             ManualResetEvent ev = new ManualResetEvent(false);
             dialogResponse = null;
@@ -3709,22 +3734,24 @@ del _invoke, _
 		  }
         }
 		
+	public void OnOpenFromCloudCallback (string [] list) {
+	    string response = pickOne(_("Filename"), _("Cloud Filename"), list);
+	    if (response == null) {
+		ErrorLine(_("Open a file from the Calico Cloud aborted."));
+		return;
+	    }
+	    // get from cloud, put in local cloud dir:
+	    if (connection.GetFileFromCloud(response.Trim())) {
+		// it will open when received...
+	    } else {
+		ErrorLine(String.Format(_("Failed to get the file named '{0}' from the Calico Cloud."), response));
+	    }
+	}
+
         protected void OnOpenFromCloudActionActivated (object sender, System.EventArgs e)
         {
-	    // open from local cloud
 	    if (connection != null) {
-		Dictionary<string,string > response = ask(new List<string>() {_("Filename")}, _("Cloud Filename")); // FIXME: pick
-		if (response == null) {
-		    ErrorLine(_("Open a file from the Calico Cloud aborted."));
-		    return;
-		}
-		string filename = response[_("Filename")];
-		// get from cloud, put in local cloud dir:
-		if (connection.GetFileFromCloud(filename)) {
-		    // it will open when received...
-		} else {
-		    ErrorLine(String.Format(_("Failed to get the file named '{0}' from the Calico Cloud."), filename));
-		}
+		connection.Send("admin", "[list-cloud]"); // when received, process from there
 	    } else {
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }

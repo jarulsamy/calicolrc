@@ -115,6 +115,13 @@ namespace Calico {
                     return;
                 }
                 calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
+
+            } else if (msg.Body.ToString().StartsWith("[list-cloud]")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [list-cloud]
+                if (lines.Length >= 0) {
+                    string [] filenames  = lines[1].Split(new char[] {':'}, 2);  // filenames:
+		    calico.OnOpenFromCloudCallback (filenames[1].Split(new char[] {','}));
+		}
             } else if (msg.Body.ToString().StartsWith("[file]")) {
                 string [] lines = msg.Body.ToString().Split('\n');             // [file]
                 if (lines.Length >= 1) {
