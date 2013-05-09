@@ -245,11 +245,15 @@ def show_files(form, db, uid):
     if len(filelist) == 0:
         print p("You don't have any files uploaded yet.")
     else:
+        print hr()
         print p("You have the following files uploaded:")
         print begin("ul")
         for file in filelist:
-            print li( link("/myweb/" + file, file) +
-                      format("TT", """    &lt;img src="/myweb/%s"&gt;""" % file))
+            if file.endswith(".jpg"):
+                print li( link("/myweb/" + file, file) +
+                          format("TT", """    &lt;img src="/myweb/%s"&gt;""" % file))
+            else:
+                print li( link("/myweb/" + file, file))
         print end("ul")
     
 def show_student_page(form, db, uid):
@@ -268,12 +272,12 @@ def show_student_page(form, db, uid):
         show_body_foot()
     else:
         print data[0]["webpage"]
-        show_files(form, db, uid)
 
 def edit_mode(form, db, uid):
     args = form.getvalue('args')
     school, section, robot, mode, index = args.split("/", 4)
     show_body_head()
+    print h1("Edit MyWeb")
     print begin("FORM", name="MAIN", method="POST", # PUT
                 action=URLPATH + school + "/" + section + "/" + robot + "/save/",
                 enctype="multipart/form-data", target="_top")
@@ -283,19 +287,38 @@ def edit_mode(form, db, uid):
         webpage = data[0]["webpage"]
     else:
         webpage = ""
+    print begin("table", border="1")
+    print begin("tr")
+    print begin("td")
     print input("webpage", webpage, "TEXTAREA", rows=20, cols=60)
-    print p()
+    print end("td")
+    print begin("td", width="500", valign="top")
+    print webpage
+    print end("td")
+    print end("tr")
+    print begin("tr")
+    print begin("td")
     print submit("Save")
+    print end("td")
+    print begin("td")
+    print p("Preview")
+    print end("td")
+    print end("tr")
+    print end("table")
     print end("FORM")
     filelist = glob.glob("data/" + uid + "/*")
     if len(filelist) == 0:
         print p("You don't have any files uploaded yet.")
     else:
+        print hr()
         print p("You have the following files uploaded:")
         print begin("ul")
         for file in filelist:
-            print li( link("/myweb/" + file, file) +
-                      format("TT", """    &lt;img src="/myweb/%s"&gt;""" % file))
+            if file.endswith(".jpg"):
+                print li( link("/myweb/" + file, file) +
+                          format("TT", """    &lt;img src="/myweb/%s"&gt;""" % file))
+            else:
+                print li( link("/myweb/" + file, file))
         print end("ul")
     
     show_body_foot()

@@ -12,6 +12,7 @@ http://wiki.roboteducation.org/
 
 import threading, time, random, pickle, sys
 import StringIO, Image, os, sqllib
+import glob
 from functions import fptime2stime, encrypt
 import base64
 import traceback
@@ -167,6 +168,22 @@ if __name__ == "__main__":
     conferences = {"Developers": set(), "General": set()}
     if ch.ok == 1:
         while 1:
+            # Valid command structures:
+            # -------------------------
+            # "password reset\npassword: ENCRYPTED"
+            # "register\npassword: ENCRYPTED\nkeyword: KEY"
+            # "package\ndata: DATA\nid: ID\nfrom: FROM\nsegments: COUNT"
+            # "segment\ndata: DATA\nid: ID"
+            # "[join]\nconference: ROOM" (General, Developers)
+            # "[broadcast]\nconference: ROOM"
+            # "[blast]\nto: ROOM|ID"
+            # "[file]\nfilename: FILENAME\nRAWDATA..."
+            # "[photo]\nfilename: FILENAME\nRAWDATA..."
+            
+            # Valid return structures:
+            # ------------------------
+            # "[result]\nDATA..."
+            # "[update]\nroom: ROOM"
             #print "listening..."
             data = ch.receive()
             for msg in data:
@@ -174,9 +191,14 @@ if __name__ == "__main__":
                 fromname, school = fromaddress.split("@")
                 print >> log, "From:", fromaddress, "at", time.time()
                 log.flush()
-                line0, rest = msg[1].split("\n", 1)
+                ## FIX, till we get [broadcast] working again
+                if "\n" in msg[1]:
+                    line0, rest = msg[1].split("\n", 1)
+                else:
+                    line0, rest = msg[1], ""
+                #############################################
                 print >> log, ("   line0: '%s'" % line0)
-                if line0 == "password reset":
+                if line0 == "[password reset]":
                     print >> log, "   Reset password request", fromaddress
                     log.flush()
                     lines = rest.split("\n")
@@ -199,7 +221,11 @@ if __name__ == "__main__":
                         ch.send(fromname, "[result]\npassword reset!")
                     else:
                         ch.send(fromname, "[result]\ninvalid name/email combination!")
-                elif line0 == "register":
+                elif line0 == "[list]":
+                        ch.send(fromname, "[result]\n" + str(conferences.keys()))
+                elif line0 == "[help]":
+                        ch.send(fromname, "[result]\n" + "You need help.")
+                elif line0 == "[register]":
                     data = {}
                     print >> log, "   Registering", fromaddress
                     log.flush()
@@ -256,7 +282,7 @@ if __name__ == "__main__":
                             ch.send(fromname, "[result]\nreceived registration!")
                     else:
                         ch.send(fromname, "[result]\ninvalid course keyword!")
-                elif line0 == "package":
+                elif line0 == "[package]":
                     header = {'data': '', 'from': msg[0]}
                     for line in rest.split("\n"):
                         key, value = [item.strip() for item in line.split(":")]
@@ -266,7 +292,7 @@ if __name__ == "__main__":
                         print >> log, "initiating package: id=%s" % header["id"]
                     else:
                         print >> log, "invalid package: no id"
-                elif line0 == "segment":
+                elif line0 == "[segment]":
                     line1, data = rest.split("\n", 1)
                     id, segment = [item.strip() for item in line1.split(" ", 1)]
                     package[id]["data"] += data
@@ -282,21 +308,24 @@ if __name__ == "__main__":
                         # FIXME: no permissions, just joining it
                         conferences[value].add(msg[0]) # from address
                         print >> log, ("/join: %s to %s" % (msg[0], value))
-                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[update]\nroom: %s" % value)
-                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[result]\nSuccessfully joined '%s'" % value)
+                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[update]\nroom: %s" % value)
+                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[result]\nSuccessfully joined '%s'" % value)
                     else:
                         print >> log, ("ERROR: cannot /join: %s to %s, no such conference" % (msg[0], value))
-                        ch.send("%s/%s" % (msg[0], "CalicoClient"), "[result]\nNo such conference '%s'" % value)
+                        ch.send("%s/%s" % (msg[0], "PyjamaClient"), "[result]\nNo such conference '%s'" % value)
                 elif line0 == "[broadcast]":
-                    line1, rest = rest.split("\n", 1)
-                    prop, value = line1.split(":")
+                    try:
+                        line1, rest = rest.split("\n", 1) ## second line prop, value: "conference: room"
+                        prop, value = line1.split(":")
+                    except:
+                        value = "General"
                     value = value.strip()
                     if value in conferences:
                         # FIXME: no permissions, just joining it
                         if msg[0] not in conferences[value]:
                             conferences[value].add(msg[0]) # from address
                         for address in conferences[value]:
-                            ch.send("%s/%s" % (address, "CalicoClient"), "[broadcast]\nfrom: %s\n%s" % (msg[0], rest))
+                            ch.send("%s/%s" % (address, "PyjamaClient"), "[broadcast]\nfrom: %s\n%s" % (msg[0], rest))
                             print >> log, ("/broadcast to %s" % address)
                 elif line0 == "[blast]":
                     line1, rest = rest.split("\n", 1)
@@ -307,11 +336,11 @@ if __name__ == "__main__":
                         if msg[0] not in conferences[value]:
                             conferences[value].add(msg[0]) # from address
                         for address in conferences[value]:
-                            ch.send("%s/%s" % (address, "CalicoClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
+                            ch.send("%s/%s" % (address, "PyjamaClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
                             print >> log, ("/broadcast to %s" % address)
                     else:
                         # send to an individual
-                        ch.send("%s@myro.roboteducation.org/%s" % (value, "CalicoClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
+                        ch.send("%s@myro.roboteducation.org/%s" % (value, "PyjamaClient"), "[blast]\nfrom: %s\n%s" % (msg[0], rest))
                         print >> log, ("/broadcast to %s" % value)
                 elif line0 == "[file]":
                     print >> log, "   receiving file..."
@@ -331,7 +360,100 @@ if __name__ == "__main__":
                         print >> log, "      failed from", fromname
                         traceback.print_exc()
                     log.flush()
-                elif line0 == "photo":
+                elif line0 == "[save]":
+                    try:
+                        line1, raw = rest.split("\n", 1)
+                        field, value = line1.split(": ")
+                        print >> log, "      filename:", value
+                        ascii = raw.encode("ascii")
+                        path = "data/" + fromname.strip()
+                        os.system("mkdir -p %s" % path)
+                        fp = open(path + "/" + value.strip(), "w")
+                        fp.write(ascii)
+                        fp.close()
+                        ch.send(fromname, "[result]\nsaved file in cloud!")
+                        print >> log, "      from", fromname, "saved file in cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed saving file in cloud!")
+                        print >> log, "      failed from", fromname
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[list-cloud]":
+                    try:
+                        path = "data/" + fromname.strip()
+                        filenames = glob.glob(path + "/*.*")
+                        data = sorted([os.path.basename(f) for f in filenames])
+                        ch.send(fromname, ("[list-cloud]\nfilenames: " + ",".join(data)))
+                        print >> log, "      from", fromname, "retrieved file from cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed to retrieve filenames from cloud!")
+                        print >> log, "      failed from", fromname
+                        traceback.print_exc()
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[delete-list-cloud]":
+                    try:
+                        path = "data/" + fromname.strip()
+                        filenames = glob.glob(path + "/*.*")
+                        data = sorted([os.path.basename(f) for f in filenames])
+                        ch.send(fromname, ("[delete-list-cloud]\nfilenames: " + ",".join(data)))
+                        print >> log, "      from", fromname, "retrieved file from cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed to retrieve filenames from cloud!")
+                        print >> log, "      failed from", fromname
+                        traceback.print_exc()
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[sync-from-cloud]":
+                    try:
+                        path = "data/" + fromname.strip()
+                        filenames = glob.glob(path + "/*.*")
+                        for filename in filenames:
+                            print >> log, "      filename:", filename
+                            fp = open(filename.strip(), "r")
+                            data = fp.readlines()
+                            fp.close()
+                            ch.send(fromname, ("[file]\nfilename: %s\nmode: cloud-save\n" % os.path.basename(filename.strip())) + "".join(data))
+                            print >> log, "      from", fromname, "retrieved file from cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed to retrieve file from cloud!")
+                        print >> log, "      failed from", fromname
+                        traceback.print_exc()
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[load]":
+                    try:
+                        line1 = rest.strip()
+                        field, value = line1.split(": ")
+                        print >> log, "      filename:", value
+                        path = "data/" + fromname.strip()
+                        fp = open(path + "/" + value.strip(), "r")
+                        data = fp.readlines()
+                        fp.close()
+                        ch.send(fromname, ("[file]\nfilename: %s\nmode: cloud-open\n" % value.strip()) + "".join(data))
+                        print >> log, "      from", fromname, "retrieved file from cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed to retrieve file from cloud!")
+                        print >> log, "      failed from", fromname
+                        traceback.print_exc()
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[delete]":
+                    try:
+                        line1 = rest.strip()
+                        field, value = line1.split(": ")
+                        print >> log, "      filename:", value
+                        path = "data/" + fromname.strip()
+                        os.remove(path + "/" + value.strip())
+                        ch.send(fromname, ("[result]\ndeleted file in cloud."))
+                        print >> log, "      from", fromname, "retrieved file from cloud!"
+                    except:
+                        ch.send(fromname, "[result]\nfailed to retrieve file from cloud!")
+                        print >> log, "      failed from", fromname
+                        traceback.print_exc()
+                    print >> log, "   done!"
+                    log.flush()
+                elif line0 == "[photo]":
                     print >> log, "   receiving photo..."
                     try:
                         line1, raw = rest.split("\n", 1)
