@@ -40,7 +40,7 @@ namespace Calico {
         protected bool _isDirty = false;
         double _speedValue = 100;
         public string preferredNotebook = "editor"; // "editor", "main", "tools"
-	public bool inCloud = false;
+	    private bool _inCloud = false;
 
         public Document(MainWindow calico, string filename, string language) : base() {
             this.calico = calico;
@@ -156,6 +156,17 @@ namespace Calico {
             set { _isDirty = value; }
         }
 
+        public virtual bool inCloud {
+            get { return _inCloud; }
+            set { 
+			  this.filename = System.IO.Path.Combine(
+				  (string)calico.config.GetValue("config", "cloud-path"),
+				  basename);
+			  tab_label.TooltipText = filename;
+			  _inCloud = value; 
+			}
+        }
+
         public virtual void Configure(Config config) {
             // For setting defaults
         }
@@ -243,12 +254,12 @@ namespace Calico {
         }
 
 	public virtual void SetFilename(string filename) {
-	    this.filename = filename;
-	    if (filename != null && (filename.Contains("/Cloud/") || filename.Contains("\\Cloud\\"))) {
+	  this.filename = filename;
+	  if (filename != null && (filename.Contains("/Cloud/") || filename.Contains("\\Cloud\\"))) {
 		inCloud = true;
-	    }
-	    basename = System.IO.Path.GetFileName(filename);
-            tab_label.TooltipText = filename;
+	  }
+	  basename = System.IO.Path.GetFileName(filename);
+	  tab_label.TooltipText = filename;
 	}
 
         public virtual bool Save() {
@@ -571,31 +582,31 @@ namespace Calico {
         }
 
         public override bool SaveDocument() {
-            try {
-                System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-                sw.Write(texteditor.Document.Text);
-                sw.Close();
-                string possible_new_mime_type = calico.GetMimeType(filename);
-                if (possible_new_mime_type != null &&
-                    texteditor.Document.MimeType != possible_new_mime_type) {
-                    texteditor.Document.MimeType = possible_new_mime_type;
-                    // FAIL:
-                    //texteditor.Document.UpdateHighlighting();
-                    //texteditor.Document.CommitUpdateAll();
-                    //Mono.TextEditor.Highlighting.SyntaxModeService.WaitUpdate(texteditor.Document);
-                    // HACK:
-                    texteditor.Document.Text = texteditor.Document.Text;
-                }
-                texteditor.Document.SetNotDirtyState();
-		tab_label.TooltipText = filename;
-                base.IsDirty = false;
-		if (inCloud) {
-		    calico.SaveToCloud(filename);
-		}
-                return true;
-            } catch {
-                return false;
-            }
+		  try {
+			System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+			sw.Write(texteditor.Document.Text);
+			sw.Close();
+			string possible_new_mime_type = calico.GetMimeType(filename);
+			if (possible_new_mime_type != null &&
+				texteditor.Document.MimeType != possible_new_mime_type) {
+			  texteditor.Document.MimeType = possible_new_mime_type;
+			  // FAIL:
+			  //texteditor.Document.UpdateHighlighting();
+			  //texteditor.Document.CommitUpdateAll();
+			  //Mono.TextEditor.Highlighting.SyntaxModeService.WaitUpdate(texteditor.Document);
+			  // HACK:
+			  texteditor.Document.Text = texteditor.Document.Text;
+			}
+			texteditor.Document.SetNotDirtyState();
+			tab_label.TooltipText = filename;
+			base.IsDirty = false;
+			if (inCloud) {
+			  calico.SaveToCloud(filename);
+			}
+			return true;
+		  } catch {
+			return false;
+		  }
         }
 
         bool Search(string s, bool from_selection_start) {

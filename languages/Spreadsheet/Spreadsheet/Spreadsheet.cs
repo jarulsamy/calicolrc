@@ -355,22 +355,25 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	public override bool SaveDocument()
 	{
 		try {
-			Csv.writer writer = new Csv.writer(filename);
-			FindMaxRow();
-			int currow = 0;
-			sheet.liststore.Foreach((model, path, iter) => {
+		  Csv.writer writer = new Csv.writer(filename);
+		  FindMaxRow();
+		  int currow = 0;
+		  sheet.liststore.Foreach((model, path, iter) => {
 				currow++;
 				if (currow <= maxrow)
-				    SaveRow(writer, model, path, iter);
+				  SaveRow(writer, model, path, iter);
 				return false;
-			    }
-			    );
-			writer.Close();
-			IsDirty = false;
-			UpdateDocument();	
-			return true;
+			  }
+			);
+		  writer.Close();
+		  IsDirty = false;
+		  if (inCloud) {
+			calico.SaveToCloud(filename);
+		  }
+		  UpdateDocument();	
+		  return true;
 		} catch {
-			return false;
+		  return false;
 		}
 	}
 }
