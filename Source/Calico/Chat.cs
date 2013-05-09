@@ -57,7 +57,14 @@ namespace Calico {
                                                     text));
         }
 
-        public List<List<string>> Receive() {
+        public void SendData(string to, string text) {
+            client.Send(
+                new agsXMPP.protocol.client.Message(String.Format("{0}@{1}", to, server),
+                                                    agsXMPP.protocol.client.MessageType.chat,
+                                                    "[data]\n" + text));
+        }
+
+        public List<List<string>> ReceiveData() {
             List<List<string>> retval = new List<List<string>>();
             lock (messages) {
                 foreach(List<string> message in messages) {
@@ -138,8 +145,17 @@ namespace Calico {
                     return;
                 }
                 calico.Print(Tag.Error, String.Format("ERROR in Chat from {0}, not enough lines: {1}\n", msg.From, msg.Body));
-            } else if (msg.Body.ToString().StartsWith("[data]")) {
-                messages.Add(new List<string>() {msg.From, msg.Body});
+            } else if (msg.Body.ToString().StartsWith("[data]\n")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [data]
+		System.Text.StringBuilder message = new System.Text.StringBuilder();
+		for (int i = 1; i < lines.Length - 1; i++) {
+		    message.AppendLine(lines[i]);           
+		}
+		// Last line, no return:
+		message.Append(lines[lines.Length - 1]);
+		lock (messages) {
+		    messages.Add(new List<string>() {msg.From, message.ToString()});
+		}
             } else if (msg.Body.ToString().StartsWith("[info]")) {
                 calico.Print(Tag.Info,
                    String.Format("Chat info: {0}\n", msg.Body));

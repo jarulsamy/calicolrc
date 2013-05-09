@@ -3392,10 +3392,10 @@ del _invoke, _
             );
             // send a special message to create account
             // wait for response:
-            List<List<string >> messages = chat.Receive();
+            List<List<string >> messages = chat.ReceiveData();
             int count = 0;
             while (messages.Count == 0 && count < 10) {
-                messages = chat.Receive();
+                messages = chat.ReceiveData();
                 wait(1);
                 Print(_("   waiting for confirmation...\n"));
                 count++;
@@ -3700,6 +3700,31 @@ del _invoke, _
                 }
             }
         }
+
+        public void SendData(string to, string text) {
+	    if (connection != null) {
+		connection.SendData(to, text);
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+        }
+
+        public void SendMessage(string to, string text) {
+	    if (connection != null) {
+		connection.Send(to, text);
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+        }
+
+        public List<List<string>> ReceiveData() {
+	    if (connection != null) {
+		return connection.ReceiveData();
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+		return null;
+	    }
+	}
 
         protected void OnSyncToCloudActionActivated (object sender, System.EventArgs e)
         {
