@@ -1,6 +1,6 @@
 
 CalicoCSharp.dll: CalicoCSharp.cs ../../bin/Calico.exe
-	mcs -sdk:4 CalicoCSharp.cs \
+	dmcs -sdk:4 CalicoCSharp.cs \
 		-lib:. \
 		-lib:../../bin \
 		-r:Calico.exe \
