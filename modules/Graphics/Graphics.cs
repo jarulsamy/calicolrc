@@ -3227,31 +3227,33 @@ public static class Graphics
 		{ // Shape
 		    InvokeBlocking( delegate {
 			    // Add this shape to the Canvas list.
-			    if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
-				win.canvas.need_to_draw_surface = true;
-				using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
-				    render (g);
-				}
-			    } else {
-				lock (win.getCanvas().shapes) {
-				    if (! win.getCanvas ().shapes.Contains (this)) {
-					win.getCanvas ().shapes.Add (this);
-					//System.Console.Error.WriteLine("Added to win!");
+			    if (win.IsRealized) {
+				if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
+				    win.canvas.need_to_draw_surface = true;
+				    using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
+					render (g);
+				    }
+				} else {
+				    lock (win.getCanvas().shapes) {
+					if (! win.getCanvas ().shapes.Contains (this)) {
+					    win.getCanvas ().shapes.Add (this);
+					    //System.Console.Error.WriteLine("Added to win!");
+					}
+				    }
+				    // Make sure each subshape is associated with this window
+				    // so QueueDraw will redraw:
+				    lock (shapes) {
+					foreach (Shape shape in shapes) {
+					    shape.window = win;
+					}
 				    }
 				}
-				// Make sure each subshape is associated with this window
-				// so QueueDraw will redraw:
-				lock (shapes) {
-				    foreach (Shape shape in shapes) {
-					shape.window = win;
-				    }
+				window = win;
+				if (window._canvas.world != null) {
+				    addToPhysics ();
 				}
+				QueueDraw ();
 			    }
-			    window = win;
-			    if (window._canvas.world != null) {
-				addToPhysics ();
-			    }
-			    QueueDraw ();
 			});
 		}
 
@@ -3532,9 +3534,11 @@ public static class Graphics
 			get {
 			    double retval = 0.0;
 			    InvokeBlocking( delegate {
-				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-					Cairo.TextExtents te = g.TextExtents (text);
-					retval = te.Width * 2;
+				    if (window.IsRealized) {
+					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					    Cairo.TextExtents te = g.TextExtents (text);
+					    retval = te.Width * 2;
+					}
 				    }
 				});
 			    return retval;
@@ -3545,9 +3549,11 @@ public static class Graphics
 			get {
 			    double retval = 0.0;
 			    InvokeBlocking( delegate {
-				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-					Cairo.TextExtents te = g.TextExtents (text);
-					retval = te.Height * 2;
+				    if (window.IsRealized) {
+					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					    Cairo.TextExtents te = g.TextExtents (text);
+					    retval = te.Height * 2;
+					}
 				    }
 				});
 			    return retval;
@@ -3561,12 +3567,14 @@ public static class Graphics
 			    lock(world) {
 				double width = 0;
 				double height = 0;
-				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
-				    Cairo.TextExtents te = g.TextExtents (text);
-				    // FIXME: need to adjust based on justification
-				    // This works with x centered, y centered
-				    width = te.Width * 2;
-				    height = te.Height * 2;
+				if (window.IsRealized) {
+				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					Cairo.TextExtents te = g.TextExtents (text);
+					// FIXME: need to adjust based on justification
+					// This works with x centered, y centered
+					width = te.Width * 2;
+					height = te.Height * 2;
+				    }
 				}
 				float MeterInPixels = 64.0f;
 				// from x,y to meters of window
