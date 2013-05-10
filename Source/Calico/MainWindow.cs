@@ -3712,7 +3712,7 @@ del _invoke, _
 	    if (connection != null) {
 		connection.SendData(to, text);
 	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
+		throw new Exception(_("You need to login before using the Calico Cloud."));
 	    }
         }
 
@@ -3720,7 +3720,7 @@ del _invoke, _
 	    if (connection != null) {
 		connection.Send(to, text);
 	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
+		throw new Exception(_("You need to login before using the Calico Cloud."));
 	    }
         }
 
@@ -3728,8 +3728,7 @@ del _invoke, _
 	    if (connection != null) {
 		return connection.ReceiveData();
 	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
-		return null;
+		throw new Exception(_("You need to login before using the Calico Cloud."));
 	    }
 	}
 
