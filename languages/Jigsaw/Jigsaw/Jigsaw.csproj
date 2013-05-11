@@ -123,6 +123,7 @@
     <Compile Include="Slider.cs" />
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="ProcedureBlocks.cs" />
+    <Compile Include="Printing.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

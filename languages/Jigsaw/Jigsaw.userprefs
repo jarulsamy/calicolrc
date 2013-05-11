@@ -1,11 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\CMethodBlock.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Printing.cs">
     <Files>
-      <File FileName="Jigsaw\CMethodBlock.cs" Line="311" Column="5" />
-      <File FileName="Jigsaw\InspectWin.cs" Line="444" Column="4" />
-      <File FileName="Jigsaw\Engine.cs" Line="267" Column="4" />
-      <File FileName="Jigsaw\Jigsaw.cs" Line="45" Column="4" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="1301" Column="5" />
+      <File FileName="Jigsaw\Diagram.cs" Line="1360" Column="1" />
+      <File FileName="Jigsaw\Printing.cs" Line="114" Column="4" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">

@@ -1306,7 +1306,7 @@ namespace Jigsaw
 		// Get all blocks on a Tab
 		public List<Diagram.CShape> AllShapes(int position)
 		{
-		        Widgets.CRoundedTab tab = AllTabs()[position];
+		    Widgets.CRoundedTab tab = AllTabs()[position];
 			List<Diagram.CShape> shapes = new List<Diagram.CShape>();
 			
 			foreach (Diagram.CShape s in tab.AllShapes()) {
@@ -1475,7 +1475,55 @@ namespace Jigsaw
 			}
 			return null;
 		}
-		
+
+		// - - - Returns a dictionary that holds the bounds of the current blocks, including factories - - - - -
+		public Dictionary<string,double> GetBlockBounds()
+		{
+			Dictionary<string,double> bounds = new Dictionary<string, double>();
+			
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock bl = (CBlock)s;
+					if (!bl.IsFactory) {
+						
+						double t = bl.Top;
+						double l = bl.Left;
+						double r = l + bl.Width;
+						double b = t + bl.Height;
+						
+						// Left
+						if (!bounds.ContainsKey("Left")) {
+							bounds["Left"] = l;
+						} else if (l < bounds["Left"]) {
+							bounds["Left"] = l;
+						}
+						
+						// Right
+						if (!bounds.ContainsKey("Right")) {
+							bounds["Right"] = r;
+						} else if (r > bounds["Right"]) {
+							bounds["Right"] = r;
+						}
+						
+						// Top
+						if (!bounds.ContainsKey("Top")) {
+							bounds["Top"] = t;
+						} else if (t < bounds["Top"]) {
+							bounds["Top"] = t;
+						}
+						
+						// Bottom
+						if (!bounds.ContainsKey("Bottom")) {
+							bounds["Bottom"] = b;
+						} else if (b > bounds["Bottom"]) {
+							bounds["Bottom"] = b;
+						}
+					}
+				}
+			}
+			return bounds;
+		}
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public override void OnMouseDown(Diagram.Canvas cvs, Diagram.MouseEventArgs e)
         {

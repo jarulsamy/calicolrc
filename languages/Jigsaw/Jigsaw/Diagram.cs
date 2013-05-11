@@ -342,13 +342,40 @@ namespace Diagram
             // Caution: this smears single pixels into small blurs on pixel boundaries.
             g.Antialias = Antialias.Subpixel;
 			
-            // Draw all visible 
-			// connectors (bottom layer), then
-			// shapes (middle layer), and finally
-			// annotations (top layer)
+            // Draw all visible connectors (bottom layer), 
+			// then shapes (middle layer), 
+			// and finally annotations (top layer)
             foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
             foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
             foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
+			
+			// Reset transform
+			g.Restore();
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DrawTransformed(Cairo.Context g, double tx, double ty, double sx, double sy)
+		{
+			g.Save();
+			
+			// translate the diagram
+			g.Translate( tx,  ty);
+			g.Scale(     sx,  sy);
+			
+			// Clear background
+			//g.Color = this.BackColor;
+			//g.Paint();
+			
+			// Always draw in antialias mode.
+			// Caution: this smears single pixels into small blurs on pixel boundaries.
+			g.Antialias = Antialias.Subpixel;
+			
+			// Draw all visible connectors (bottom layer), 
+			// then shapes (middle layer), 
+			// and finally annotations (top layer)
+			foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
+			foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
+			//foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
 			
 			// Reset transform
 			g.Restore();
