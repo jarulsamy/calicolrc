@@ -368,7 +368,7 @@ namespace Diagram
 			g.Translate( this.offsetX,       this.offsetY);
 
 			// Set up a clip region
-			g.Rectangle(-this.offsetX, -this.offsetY, wx, wy);
+			g.Rectangle (-this.offsetX, -this.offsetY, 10000, 10000);
 			g.Clip();
 
 			// translate the diagram
