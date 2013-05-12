@@ -580,6 +580,10 @@ def Unparse(tree, file=sys.stdout):
 def Parse(source, filename="<string>"):
     return compile(source, filename, "exec", ast.PyCF_ONLY_AST)
 
+def ParseFile(filename):
+    source = "".join(open(filename).readlines())
+    return compile(source, filename, "exec", ast.PyCF_ONLY_AST)
+
 def testdir(a):
     try:
         names = [n for n in os.listdir(a) if n.endswith('.py')]
