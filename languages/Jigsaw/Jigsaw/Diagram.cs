@@ -354,14 +354,27 @@ namespace Diagram
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DrawTransformed(Cairo.Context g, double tx, double ty, double sx, double sy)
+		public void DrawTransformed(Cairo.Context g, double tx, double ty, double wx, double wy, double sx, double sy)
 		{
 			g.Save();
-			
-			// translate the diagram
+
+			// Scale the diagram to the zoom factor at center point
+			g.Translate( this.scaleCenterX,  this.scaleCenterY);
+			g.Scale(     this.scale,         this.scale);
+			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
+
 			g.Translate( tx,  ty);
 			g.Scale(     sx,  sy);
-			
+			g.Translate( this.offsetX,       this.offsetY);
+
+			// Set up a clip region
+			g.Rectangle(-this.offsetX, -this.offsetY, wx, wy);
+			g.Clip();
+
+			// translate the diagram
+			//			g.Translate( tx,  ty);
+			//g.Scale(     sx,  sy);
+
 			// Clear background
 			//g.Color = this.BackColor;
 			//g.Paint();

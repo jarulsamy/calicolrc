@@ -92,6 +92,32 @@ namespace Jigsaw
 			Cairo.Context g = context.CairoContext;
 			double width;
 
+			// ---------------
+			// Get the bounds of all the current blocks
+			Dictionary<string,double> bounds = cvs.GetBlockBounds();
+
+			// If no bounds, set some default values
+			if (bounds.Count == 0) {
+				bounds["Left"] = 0.0;
+				bounds["Right"] = 1000.0;
+				bounds["Top"] = 0.0;
+				bounds["Bottom"] = 1000.0;
+			}
+
+			// TODO: Eliminate the block palette by translating
+			// TODO: Check that there is at least one block (cvs.AllBlocks().Length)
+			// TODO: Translation not accounted when measuring bounds.
+
+			double s = 1.0;
+			if (bounds["Right"] > bounds["Bottom"] ) s = context.Width/bounds["Right"];
+			if (bounds["Bottom"] > bounds["Right"] ) s = context.Height/bounds["Bottom"];
+
+			double ty = this.headerHeight + this.headerGap;
+			double tx = 0.0;
+
+			cvs.DrawTransformed (g, tx, ty, context.Width, context.Height, s, s);
+			// ---------------
+
 			//if (calico.OS == "Windows")
 			if (OS == "Windows")
 	            width = context.Width - 200;
@@ -137,30 +163,7 @@ namespace Jigsaw
 			desc = Pango.FontDescription.FromString("Monospace 10");
 			//desc.Size = (int)(this.fontSize * this.pangoScale);
 			layout.FontDescription = desc;
-			g.MoveTo(0, this.headerHeight + this.headerGap);
 
-			// Get the bounds of all the current blocks
-			Dictionary<string,double> bounds = cvs.GetBlockBounds();
-
-			// If no bounds, set some default values
-			if (bounds.Count == 0) {
-				bounds["Left"] = 0.0;
-				bounds["Right"] = 600.0;
-				bounds["Top"] = 0.0;
-				bounds["Bottom"] = 600.0;
-			}
-
-			// TODO: Eliminate the block palette by translating
-			// TODO: Check that there is at least one block (cvs.AllBlocks().Length)
-
-			double s = 1.0;
-			if (bounds["Right"] > bounds["Bottom"] ) s = context.Width/bounds["Right"];
-			if (bounds["Bottom"] > bounds["Right"] ) s = context.Height/bounds["Bottom"];
-
-			double ty = this.headerHeight + this.headerGap;
-			double tx = 0.0;
-			cvs.DrawTransformed (g, tx, ty, s, s);
-			//cvs.DrawTransformed (g, 0.0, this.headerHeight + this.headerGap, s, s);
 
 			/*
 			  int line = args.PageNr * this.linesPerPage;
@@ -176,6 +179,9 @@ namespace Jigsaw
 			    i++;
 			  }
 			  */
+
+			// Must dispose the Cairo context and the Pango layout
+			((IDisposable) g).Dispose(); 
 			layout.Dispose();
 	    }
 
