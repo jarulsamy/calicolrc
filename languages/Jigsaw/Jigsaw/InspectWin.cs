@@ -72,7 +72,8 @@ namespace Jigsaw
 			// If at least one block is selected, show properties of selected block.
 			this.ClearProperties();
 			List<Diagram.CShape> shps = cvs.SelectedShapes();
-			if (shps.Count > 0){
+			//if (shps.Count > 0){
+			if (shps.Count == 1){
 				if (shps[0] is CBlock) {
 					CBlock b = (CBlock)shps[0];
 					if (b.IsFactory == false) {

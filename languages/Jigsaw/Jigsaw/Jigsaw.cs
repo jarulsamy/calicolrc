@@ -1476,6 +1476,21 @@ namespace Jigsaw
 			return null;
 		}
 
+		// - - - Returns all selected blocks - - - - -
+		public List<CBlock> GetAllSelected()
+		{
+			List<CBlock> blocks = new List<CBlock>();
+			foreach (Diagram.CShape s in this.AllShapes()) {
+				if (s is CBlock) {
+					CBlock b = (CBlock)s;
+					if (!b.IsFactory && b.Selected) {
+						blocks.Add (b);
+					}
+				}
+			}
+			return blocks;
+		}
+
 		// - - - Returns a dictionary that holds the bounds of the current blocks, including factories - - - - -
 		public Dictionary<string,double> GetBlockBounds()
 		{
@@ -3257,20 +3272,32 @@ namespace Jigsaw
             // If the canvas is in the editing state
             if (cvs.Mode == Diagram.EMode.Editing)
             {
-				cvs.DeselectAll();		// Deselect everything. Cannot select multiple blocks.
-	            this.Select(cvs);		// Select this shape
+				// Toggle selection of blocks on shift key and mouse
+				if ((cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) != 0) {
+					if (this.Selected == true) {
+						this.Deselect (cvs);
+					} else {
+						this.Select(cvs);
+					}
+				} else {
+					// Deselect all on left mouse if no Shift. Does not deselect on right mouse.
+					if (e.Button == Diagram.MouseButtons.Left) cvs.DeselectAll();
+
+					// Select this shape
+	            	this.Select(cvs);		
+				}
 				
 				// Indicate that the canvas selection has changed
             	cvs.RaiseSelectionChangedEvent();
 				
-				// Intercept the right-mouse and show inspector window
+				// Intercept the right-mouse and show context
 				if (e.Button == Diagram.MouseButtons.Right && this.IsFactory == false) 
 				{
 					this.ShowContextMenu(cvs, (int)e.X, (int)e.Y);
 					
 					// Reset event handler. We are done.
 					cvs.handler = cvs;
-					
+				
 				} else {
 	            
 	                // Change the canvas state to "drag left start"
@@ -3308,12 +3335,15 @@ namespace Jigsaw
 			// Create and show context menu
 			Gtk.Menu mnu = new Gtk.Menu();
 			
-			Gtk.MenuItem mnuDelBlock = new Gtk.MenuItem("Delete");
+			Gtk.MenuItem mnuDelBlock = new Gtk.MenuItem("Delete Block");
 			mnuDelBlock.Activated += OnDeleteBlock;
-			
+
+			Gtk.MenuItem mnuDelSelBlocks = new Gtk.MenuItem("Delete Selected Blocks");
+			mnuDelSelBlocks.Activated += OnDeleteSelBlocks;
+
 			Gtk.MenuItem mnuDelStack = new Gtk.MenuItem("Delete Substack");
 			mnuDelStack.Activated += OnDeleteStack;
-			
+
 			Gtk.MenuItem mnuToFront = new Gtk.MenuItem("Bring to Front");
 			mnuToFront.Activated += OnBringToFront;
 			
@@ -3337,6 +3367,7 @@ namespace Jigsaw
 			mnuHelp.Activated += OnHelpShow;
 			
 			mnu.Append(mnuDelBlock);
+			mnu.Append (mnuDelSelBlocks);
 			mnu.Append(mnuDelStack);
 			mnu.Append( new Gtk.SeparatorMenuItem() );
 			mnu.Append(mnuToFront);
@@ -3415,18 +3446,19 @@ namespace Jigsaw
 		{
 			// First get the stack top
 			CBlock top = this.StackTop;
-			
+
 			// Get top level window
 			Gtk.Window toplevel = null;
 			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
 			
 			// Ask to delete the block
+			string blockName = this.Text.Replace ("`", "");
 			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
 				toplevel,
 				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 				Gtk.MessageType.Question,
 				Gtk.ButtonsType.YesNo,
-				"Delete the selected block?");
+				String.Format ("Delete '{0}'?", blockName));
 			dlg.Title = "Delete Block?";
 			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
 			dlg.Destroy();
@@ -3436,6 +3468,45 @@ namespace Jigsaw
 			(_cvs as Canvas).DeleteBlock(this);
 			if (top != this) top.RepositionBlocks(null);
 			
+			// Redraw
+			_cvs.Invalidate();
+			_cvs = null;
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Delete all selected blocks
+		protected virtual void OnDeleteSelBlocks(object sender, EventArgs e)
+		{
+			// Get list of all selected blocks
+			List<CBlock> allSelected = (_cvs as Canvas).GetAllSelected ();
+
+			// Get all selected block stack tops
+			Dictionary<CBlock, bool> tops = new Dictionary<CBlock, bool> ();
+			foreach (CBlock b in allSelected) {
+				CBlock top = b.StackTop;
+				tops [top] = true;
+			}
+
+			// Get top level window
+			Gtk.Window toplevel = null;
+			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
+
+			// Ask to delete the selected blocks
+			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+				toplevel,
+				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
+				Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				String.Format ("Delete {0} block(s)?", allSelected.Count));
+			dlg.Title = "Delete Selected Blocks?";
+			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			dlg.Destroy();
+			if (rsp == Gtk.ResponseType.No) return;
+
+			// Delete and reposition what's left
+			foreach (CBlock b in allSelected) (_cvs as Canvas).DeleteBlock(b);
+			foreach (CBlock top in tops.Keys) top.RepositionBlocks(null);
+
 			// Redraw
 			_cvs.Invalidate();
 			_cvs = null;
