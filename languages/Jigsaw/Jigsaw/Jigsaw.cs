@@ -1544,8 +1544,8 @@ namespace Jigsaw
         {
         	if (this.Mode == Diagram.EMode.Editing)
         	{
-	            int ndeselected = 0;									// Deselect all if click on canvas with no shift key
-				if ((this.ModifierKeys & Gdk.ModifierType.ShiftMask) == 0) ndeselected = this.DeselectAll();
+	            int ndeselected = 0;									// Deselect all if click on canvas with no control key
+				if ((this.ModifierKeys & Gdk.ModifierType.ControlMask) == 0) ndeselected = this.DeselectAll();
 	            if (ndeselected > 0) this.RaiseSelectionChangedEvent();	// Indicate that the canvas selection has changed
 
 				// Intercept the right-mouse
@@ -3277,15 +3277,15 @@ namespace Jigsaw
             // If the canvas is in the editing state
             if (cvs.Mode == Diagram.EMode.Editing)
             {
-				// Toggle selection of blocks on shift key and mouse
-				if ((cvs.ModifierKeys & Gdk.ModifierType.ShiftMask) != 0) {
+				// Toggle selection of blocks on control key and mouse
+				if ((cvs.ModifierKeys & Gdk.ModifierType.ControlMask) != 0) {
 					if (this.Selected == true) {
 						this.Deselect (cvs);
 					} else {
 						this.Select(cvs);
 					}
 				} else {
-					// Deselect all on left mouse if no Shift. Does not deselect on right mouse.
+					// Deselect all on left mouse if no control. Does not deselect on right mouse.
 					if (e.Button == Diagram.MouseButtons.Left) cvs.DeselectAll();
 
 					// Select this shape
