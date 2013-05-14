@@ -2322,12 +2322,11 @@ public static class Graphics
 					g.Paint ();
 					g.Restore ();
 				}
-				//lock (shapes) {
-				foreach (Shape shape in shapes) {
+				List<Shape> s = new List<Shape>(shapes);
+				foreach (Shape shape in s) {
 				    shape.render (g);
 				    shape.updateGlobalPosition (g);
 				}
-				//}
 			}
 			return base.OnExposeEvent (args);
 		}
