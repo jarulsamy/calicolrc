@@ -1,3 +1,15 @@
+-> /help
+You need help.
+
+-> ok
+dblank to dblank: ok
+dblank to dblank: ok
+
+/join Developers
+admin to dblank: [result]
+['Developers', 'General']
+dblank to all: /join Developers
+
 * Unicode Font in Jigsaw
 
 JIGSAW

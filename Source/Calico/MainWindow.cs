@@ -1535,6 +1535,8 @@ namespace Calico {
                 }
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.CopyClipboard(clipboard);
+            } else if (Focus is Gtk.Entry) {
+                ((Gtk.Entry)Focus).CopyClipboard();
             } else if (CurrentDocument != null && CurrentDocument.HasSelection) {
                 clipboard.Text = CurrentDocument.Selection.ToString();
             }
@@ -1617,6 +1619,8 @@ namespace Calico {
                     ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
                 }
                 ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
+            } else if (Focus is Gtk.Entry) {
+                ((Gtk.Entry)Focus).PasteClipboard();
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.PasteClipboard(clipboard);
             } else if (CurrentDocument != null) {
@@ -1631,6 +1635,8 @@ namespace Calico {
                     clipboard.Text = text;
                 }
                 ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+            } else if (Focus is Gtk.Entry) {
+                ((Gtk.Entry)Focus).CutClipboard();
             } else if (Focus is Gtk.TextView) {
                 ((Gtk.TextView)Focus).Buffer.CutClipboard(clipboard, true);
             }
@@ -1655,6 +1661,8 @@ namespace Calico {
                 Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
                 
                 Mono.TextEditor.SelectionActions.SelectAll(editor.GetTextEditorData());
+            } else if (Focus is Gtk.Entry) {
+                ((Gtk.Entry)Focus).SelectRegion(0, ((Gtk.Entry)Focus).Text.Length);
             } else if (Focus is Gtk.TextView) {
                 Gtk.TextView textview = (Gtk.TextView)Focus;
                 textview.Buffer.SelectRange(textview.Buffer.StartIter, textview.Buffer.EndIter);
