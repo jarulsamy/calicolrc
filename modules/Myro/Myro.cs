@@ -1472,115 +1472,172 @@ public static class Myro
 	[method: JigsawTab("M/Movement")]
 	public static void forward (double power)
 	{
+	    if (robot != null) 
 		robot.forward (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void forward (double power, double time)
 	{
+	    if (robot != null) 
 		robot.forward (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void translate (double power)
 	{
+	    if (robot != null) 
 		robot.translate (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void translate (double power, double time)
 	{
+	    if (robot != null) 
 		robot.translate (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void rotate (double power)
 	{
+	    if (robot != null) 
 		robot.rotate (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void rotate (double power, double time)
 	{
+	    if (robot != null) 
 		robot.rotate (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void backward (double power)
 	{
+	    if (robot != null) 
 		robot.backward (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void backward (double power, double time)
 	{
+	    if (robot != null) 
 		robot.backward (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void stop ()
 	{
+	    if (robot != null) 
 		robot.stop ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Actions")]
 	public static void penDown ()
 	{
+	    if (robot != null) 
 		robot.penDown ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Actions")]
 	public static void penDown (string color)
 	{
+	    if (robot != null) 
 		robot.penDown (color);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Actions")]
 	public static Graphics.Line penUp ()
 	{
+	    if (robot != null) 
 		return robot.penUp ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void move (double translate, double rotate)
 	{
+	    if (robot != null) 
 		robot.move (translate, rotate);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
   
 	[method: JigsawTab("M/Movement")]
 	public static void turnLeft (double power)
 	{
+	    if (robot != null) 
 		robot.turnLeft (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void turnLeft (double power, double time)
 	{
+	    if (robot != null) 
 		robot.turnLeft (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void turnRight (double power)
 	{
+	    if (robot != null) 
 		robot.turnRight (power);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void turnRight (double power, double time)
 	{
+	    if (robot != null) 
 		robot.turnRight (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
 	public static void motors (double left, double right)
 	{
+	    if (robot != null) 
 		robot.motors (left, right);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void reboot ()
 	{
+	    if (robot != null) 
 		robot.reboot ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Audio")]
@@ -1732,31 +1789,46 @@ public static class Myro
 	[method: JigsawTab("M/Misc")]
 	public static void setOption (string key, object value)
 	{
+	    if (robot != null) 
 		robot.setOption (key, value);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void reinit (string port, int baud)
 	{
+	    if (robot != null) 
 		robot.reinit (port, baud);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void setup ()
 	{
+	    if (robot != null) 
 		robot.setup ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static string getName ()
 	{
+	    if (robot != null) 
 		return robot.getName ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static List getIRMessage ()
 	{
+	    if (robot != null) 
 		return robot.getIRMessage ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Actions")]
@@ -1772,343 +1844,554 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static List getBlob ()
 	{
+	    if (robot != null) 
 		return robot.getBlob ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getData (params int [] position)
 	{
+	    if (robot != null) 
 		return robot.getData (position);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab(null)]
 	public static void setData (int position, int value)
 	{
+	    if (robot != null) 
 		robot.setData (position, value);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getAll ()
 	{
+	    if (robot != null) 
 		return robot.getAll ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getInfo ()
 	{
+	    if (robot != null) 
 		return robot.getInfo ();
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getObstacle (params object [] position)
 	{
+	    if (robot != null) {
 		if (position == null || position.Length == 0)
 			return robot.getObstacle ();
 		else
 			return robot.getObstacle (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getDistance (params object [] position)
 	{
+	    if (robot != null) {
 		if (position == null || position.Length == 0)
-			return robot.getDistance ();
+		    return robot.getDistance ();
 		else
-			return robot.getDistance (position);
+		    return robot.getDistance (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getLight (params object [] position)
 	{
+	    if (robot != null) {
 		if (position == null || position.Length == 0)
 			return robot.getLight ();
 		else
 			return robot.getLight (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getIR (params object [] position)
 	{
+	    if (robot != null) {
 		if (position == null || position.Length == 0)
 			return robot.getIR ();
 		else
 			return robot.getIR (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getBright ()
 	{
+	    if (robot != null) {
 		return robot.getBright ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getBright (string window)
 	{
+	    if (robot != null) {
 		return robot.getBright (window);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getBright (int window)
 	{
+	    if (robot != null) {
 		return robot.getBright (window);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getLine (params object [] position)
 	{
+	    if (robot != null) {
 		if (position == null || position.Length == 0)
 			return robot.getLine ();
 		else
 			return robot.getLine (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object get (string sensor="all")
 	{
+	    if (robot != null) {
 		return robot.get (sensor);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object get (string sensor="all", params object [] position)
 	{
+	    if (robot != null) {
 		return robot.get (sensor, position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static string getPassword ()
 	{
+	    if (robot != null) {
 		return robot.getPassword ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static double getBattery ()
 	{
+	    if (robot != null) {
 		return robot.getBattery ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static PythonDictionary getConfig ()
 	{
+	    if (robot != null) {
 		return robot.getConfig ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static int getStall ()
 	{
+	    if (robot != null) {
 		return robot.getStall ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Actions")]
 	public static void setLED (string position, object value)
 	{
+	    if (robot != null) {
 		robot.setLED (position, value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Actions")]
 	public static void setLEDFront (object value)
 	{
+	    if (robot != null) {
 		robot.setLEDFront (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Actions")]
 	public static void setLEDBack (double value)
 	{
+	    if (robot != null) {
 		robot.setLEDBack (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Actions")]
 	public static void setEchoMode (int value)
 	{
+	    if (robot != null) {
 		robot.setEchoMode (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void setName (string name)
 	{
+	    if (robot != null) {
 		robot.setName (name);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Actions")]
 	public static void setIRPower (int power)
 	{
+	    if (robot != null) {
 		robot.setIRPower (power);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Picture")]
 	public static void setWhiteBalance (object value)
 	{
+	    if (robot != null) {
 		robot.setWhiteBalance (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void setForwardness (object value)
 	{
+	    if (robot != null) {
 		robot.setForwardness (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getForwardness ()
 	{
+	    if (robot != null) {
 		return robot.getForwardness ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Audio")]
 	public static void setVolume (object volume)
 	{
+	    if (robot != null) {
 		robot.setVolume (volume);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void setPassword (string password)
 	{
+	    if (robot != null) {
 		robot.setPassword (password);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
     [method: JigsawTab("M/Picture")]
     public static void darkenCamera(int level)
     {
-        robot.darkenCamera(level);
+	    if (robot != null) {
+		robot.darkenCamera(level);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
     }
     
     [method: JigsawTab("M/Picture")]
     public static void manualCamera(int gain=0x00, int brightness=0x80, int exposure=0x41)
     {
-        robot.manualCamera(gain, brightness, exposure);
+	if (robot != null) {
+	    robot.manualCamera(gain, brightness, exposure);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
     }
 
     [method: JigsawTab("M/Picture")]
     public static void autoCamera()
     {
-        robot.autoCamera();
+	if (robot != null) {
+	    robot.autoCamera();
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
 	
     // fluke2
     [method: JigsawTab("M/Picture")]
     public static void setPictureSize(string size)
     {
-        robot.setPictureSize(size);
+	if (robot != null) {
+	    robot.setPictureSize(size);
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
 
     [method: JigsawTab(null)]
     public static void setPicSize(string size)
     {
 	// TODO: deprecate in the future
-        robot.setPictureSize(size);
+	if (robot != null) {
+	    robot.setPictureSize(size);
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
 
     [method: JigsawTab("M/Actions")]
     public static void servo(int id, int value)
     {
-        robot.servo(id, value);
+	if (robot != null) {
+	    robot.servo(id, value);
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
     
     [method: JigsawTab(null)]
     public static void enablePanNetworking()
     {
-        robot.enablePanNetworking();
+	if (robot != null) {
+	    robot.enablePanNetworking();
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
     
     [method: JigsawTab("M/Actions")]
     public static string getFlukeLog()
     {
-        return robot.getFlukeLog();
+	if (robot != null) {
+	    return robot.getFlukeLog();
+	} else {
+	    throw new Exception("Robot has not been initialized");
+	}
     }
 
 	// s2
 	[method: JigsawTab("M/Senses")]
 	public static object getEncoders (bool zero = false)
 	{
+	    if (robot != null) {
 		return robot.getEncoders (zero);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getMicrophone ()
 	{
+	    if (robot != null) {
 		return robot.getMicrophone ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getPosition ()
 	{
+	    if (robot != null) {
 		return robot.getPosition ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static int getAngle ()
 	{
+	    if (robot != null) {
 		return robot.getAngle ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
   
        [method: JigsawTab("M/Movement")]
 	public static void turnTo (int angle, string units = "deg")
 	{
+	    if (robot != null) {
 		robot.turnTo (angle, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void turnBy (int angle, string units = "deg")
 	{
+	    if (robot != null) {
 		robot.turnBy (angle, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void setPosition (int x, int y)
 	{
+	    if (robot != null) {
 		robot.setPosition (x, y);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void setAngle (uint a)
 	{
+	    if (robot != null) {
 		robot.setAngle (a);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void setBeginPath (int speed=7)
 	{
+	    if (robot != null) {
 		robot.setBeginPath (speed);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void moveTo (int x, int y, string units = "mm")
 	{
+	    if (robot != null) {
 		robot.moveTo (x, y, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void moveBy (int x, int y, string units = "mm")
 	{
+	    if (robot != null) {
 		robot.moveBy (x, y, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void arc (int degrees, int radius)
 	{
+	    if (robot != null) {
 		robot.arc (degrees, radius);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void arcTo (int x, int y, int radius, string units = "mm")
 	{
+	    if (robot != null) {
 		robot.arcTo (x, y, radius, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
        [method: JigsawTab("M/Movement")]
 	public static void arcBy (int x, int y, int radius, string units = "mm")
 	{
+	    if (robot != null) {
 		robot.arcBy (x, y, radius, units);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
   
        [method: JigsawTab("M/Movement")]
 	public static void setEndPath ()
 	{
+	    if (robot != null) {
 		robot.setEndPath ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
   
        [method: JigsawTab("M/Audio")]
 	public static void setS2Volume (int level)
 	{
+	    if (robot != null) {
 		robot.setS2Volume (level);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
  	
 	[method: JigsawTab("M/Misc")]
@@ -2630,7 +2913,11 @@ public static class Myro
 	[method: JigsawTab("M/Picture")]
 	public static Graphics.Picture takePicture (string mode="jpeg")
 	{
+	    if (robot != null) {
 		return robot.takePicture (mode);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Misc")]
@@ -4544,10 +4831,14 @@ public static class Myro
 	[method: JigsawTab("M/Audio")]
 	public static void playSong (List song, double speed)
 	{
+	    if (robot != null) {
 		if (robot != null)
 			robot.playSong (song, speed);
 		else
 			computer.playSong (song, speed);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	[method: JigsawTab("M/Audio")]
