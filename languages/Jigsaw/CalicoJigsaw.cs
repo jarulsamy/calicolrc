@@ -72,7 +72,11 @@ public class CalicoJigsawDocument : Document
 		this.preferredNotebook = "main";
 		widget.AddWithViewport (cvs);
 		if (filename != null) {
+		    try {
 			cvs.ReadFile (filename);
+		    } catch {
+			System.Console.Error.WriteLine(String.Format("Error reading file '{0}'... ignored.", filename));
+		    }
 		}
 		cvs.engine.SetGlobalVariable("calico", calico);
 		cvs.JigsawRun += new EventHandler(OnJigsawRun);		
