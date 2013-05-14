@@ -2034,7 +2034,12 @@ namespace Jigsaw
 			value = xr.GetAttribute(attr);
 			retval = int.Parse(value);
 		    } catch {
-			System.Console.Error.WriteLine(String.Format("Error reading '{0}' from '{1}'; continuing... ", attr, value));
+			try {
+			    value = xr.GetAttribute(attr);
+			    retval = Convert.ToInt32(double.Parse(value));
+			} catch {
+			    System.Console.Error.WriteLine(String.Format("Error reading '{0}' from '{1}'; continuing... ", attr, value));
+			}
 		    }
 		    return retval;
 		}
