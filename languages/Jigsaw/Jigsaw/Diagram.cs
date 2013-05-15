@@ -1,3 +1,24 @@
+//
+//  Diagram.cs
+//  
+//  Author:
+//       Mark F. Russo <russomf@gmail.com>
+// 
+//  Copyright (c) 2013 The Calico Project
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -352,48 +373,7 @@ namespace Diagram
 			// Reset transform
 			g.Restore();
 		}
-
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		public void DrawTransformed(Cairo.Context g, double tx, double ty, double wx, double wy, double sx, double sy)
-		{
-			g.Save();
-
-			// Scale the diagram to the zoom factor at center point
-			g.Translate( this.scaleCenterX,  this.scaleCenterY);
-			g.Scale(     this.scale,         this.scale);
-			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
-
-			g.Translate( tx,  ty);
-			g.Scale(     sx,  sy);
-			g.Translate( this.offsetX,       this.offsetY);
-
-			// Set up a clip region
-			g.Rectangle (-this.offsetX, -this.offsetY, 10000, 10000);
-			g.Clip();
-
-			// translate the diagram
-			//			g.Translate( tx,  ty);
-			//g.Scale(     sx,  sy);
-
-			// Clear background
-			//g.Color = this.BackColor;
-			//g.Paint();
-			
-			// Always draw in antialias mode.
-			// Caution: this smears single pixels into small blurs on pixel boundaries.
-			g.Antialias = Antialias.Subpixel;
-			
-			// Draw all visible connectors (bottom layer), 
-			// then shapes (middle layer), 
-			// and finally annotations (top layer)
-			foreach (CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
-			foreach (CShape     o in this.shapes    ) if (o.Visible == true) o.Draw(g);
-			//foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
-			
-			// Reset transform
-			g.Restore();
-		}
-
+		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public void DrawInset(Cairo.Context g)
         {	// Draw the inset navigation thumbnail in upper right corner of window

@@ -88,41 +88,45 @@ namespace Jigsaw
 
 	    public void OnDrawPage(object obj, Gtk.DrawPageArgs args) 
 		{
+			double width;
 			Gtk.PrintContext context = args.Context;
 			Cairo.Context g = context.CairoContext;
-			double width;
+
+			//if (calico.OS == "Windows")
+			if (this.OS == "Windows")
+				width = context.Width - 200;
+			else
+				width = context.Width;
 
 			// ---------------
 			// Get the bounds of all the current blocks
-			Dictionary<string,double> bounds = cvs.GetBlockBounds();
+			Bounds bounds = cvs.GetBlockBounds();
 
-			// If no bounds, set some default values
-			if (bounds.Count == 0) {
-				bounds["Left"] = 0.0;
-				bounds["Right"] = 1000.0;
-				bounds["Top"] = 0.0;
-				bounds["Bottom"] = 1000.0;
+			// If bounds not initialized, set some default values
+			if (!bounds.IsInitialized()) {
+				bounds.Left = 0.0;
+				bounds.Right = 1000.0;
+				bounds.Top = 0.0;
+				bounds.Bottom = 1000.0;
 			}
 
 			// TODO: Eliminate the block palette by translating
 			// TODO: Check that there is at least one block (cvs.AllBlocks().Length)
-			// TODO: Translation not accounted when measuring bounds.
+			// TODO: Translation not accounted for when measuring bounds.
 
+			// Calculate a suitable scale factor
 			double s = 1.0;
-			if (bounds["Right"] > bounds["Bottom"] ) s = context.Width/bounds["Right"];
-			if (bounds["Bottom"] > bounds["Right"] ) s = context.Height/bounds["Bottom"];
+			if ((double)bounds.Right > (double)bounds.Bottom ) s = context.Width/((double)bounds.Right - (double)bounds.Left);
+			if ((double)bounds.Bottom > (double)bounds.Right ) s = context.Height/((double)bounds.Bottom - (double)bounds.Top);
+			if (s > 10.0) s = 10.0;		// Clip at a scale of 10
+			s = s * 0.95;				// Shrink 5% to leave a kind of margin 
 
-			double ty = this.headerHeight + this.headerGap;
-			double tx = 0.0;
+			double ty = this.headerHeight + this.headerGap;		// Translate down to leave room for header
+			double tx = -(double)bounds.Left * s;				// translate by left block position
 
-			cvs.DrawTransformed (g, tx, ty, context.Width, context.Height, s, s);
+			cvs.DrawPrint (g, tx, ty, s, s);
+
 			// ---------------
-
-			//if (calico.OS == "Windows")
-			if (OS == "Windows")
-	            width = context.Width - 200;
-	      	else
-	            width = context.Width;
 
 			g.Rectangle (0, 0, width, this.headerHeight);
 			g.SetSourceRGB(0.8, 0.8, 0.8);

@@ -1,3 +1,24 @@
+//
+//  Jigsaw.cs
+//  
+//  Author:
+//       Mark F. Russo <russomf@gmail.com>
+// 
+//  Copyright (c) 2013 The Calico Project
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,6 +72,34 @@ namespace Jigsaw
 				_compiler_options = compiler_options;
 			}
 			return _compiler_options;
+		}
+	}
+
+	// --- Helper class to hold bounds
+	public class Bounds {
+		public double? Top = null;
+		public double? Left = null;
+		public double? Right = null;
+		public double? Bottom = null;
+
+		public Bounds() {}
+		public Bounds(double top, double left, double right, double bottom) {
+			this.Top = top;
+			this.Left = left;
+			this.Right = right;
+			this.Bottom = bottom;
+		}
+
+		public bool IsInitialized() {
+			if (this.Top == null) return false;
+			if (this.Left == null) return false;
+			if (this.Bottom == null) return false;
+			if (this.Right == null) return false;
+			return true;
+		}
+
+		public override string ToString() {
+			return String.Format ("Top: {0}, Left: {1}, Right: {2}, Bottom: {3}", this.Top, this.Left, this.Right, this.Bottom);
 		}
 	}
 
@@ -367,6 +416,55 @@ namespace Jigsaw
 			// Make the line color be a little darker than fill:
 			Color line_color = new Color(fill_color.R * .4, fill_color.G * .4, fill_color.B * .4);
 			return new List<Color>() {fill_color, line_color};
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void DrawPrint(Cairo.Context g, double tx, double ty, double sx, double sy)
+		{
+			g.Save();
+
+			// Scale the diagram to the zoom factor at center point
+			g.Translate( this.scaleCenterX,  this.scaleCenterY);
+			g.Scale(     this.scale,         this.scale);
+			g.Translate(-this.scaleCenterX, -this.scaleCenterY);
+
+			g.Translate( tx,  ty);
+			g.Scale(     sx,  sy);
+
+			g.Translate( this.offsetX,       this.offsetY);
+
+			// Set up a clip region
+			g.Rectangle (-this.offsetX, -this.offsetY, 10000, 10000);
+			g.Clip();
+
+			// translate the diagram
+			//			g.Translate( tx,  ty);
+			//g.Scale(     sx,  sy);
+
+			// Clear background
+			//g.Color = this.BackColor;
+			//g.Paint();
+
+			// Always draw in antialias mode.
+			// Caution: this smears single pixels into small blurs on pixel boundaries.
+			g.Antialias = Antialias.Subpixel;
+
+			// Draw all visible connectors (bottom layer), 
+			// then shapes (middle layer), 
+			// and finally annotations (top layer)
+			foreach (Diagram.CConnector o in this.connectors) if (o.Visible == true) o.Draw(g);
+			foreach (Diagram.CShape     o in this.shapes    ) {
+				if (o.Visible == true) {
+					if (o is CBlock) {
+						CBlock b = (CBlock)o;
+						if (!b.IsFactory) o.Draw(g);
+					}
+				}
+			}
+			//foreach (CShape     o in this.annotation) if (o.Visible == true) o.Draw(g);
+
+			// Reset transform
+			g.Restore();
 		}
 		
 		// - - - Create XML map file in StringBuilder object - - - - - - - - -
@@ -1492,9 +1590,9 @@ namespace Jigsaw
 		}
 
 		// - - - Returns a dictionary that holds the bounds of the current blocks, including factories - - - - -
-		public Dictionary<string,double> GetBlockBounds()
+		public Bounds GetBlockBounds()
 		{
-			Dictionary<string,double> bounds = new Dictionary<string, double>();
+			Bounds bounds = new Bounds();
 			
 			foreach (Diagram.CShape s in this.AllShapes()) {
 				if (s is CBlock) {
@@ -1507,31 +1605,31 @@ namespace Jigsaw
 						double b = t + bl.Height;
 						
 						// Left
-						if (!bounds.ContainsKey("Left")) {
-							bounds["Left"] = l;
-						} else if (l < bounds["Left"]) {
-							bounds["Left"] = l;
+						if (bounds.Left == null) {
+							bounds.Left = l;
+						} else if (l < bounds.Left) {
+							bounds.Left = l;
 						}
 						
 						// Right
-						if (!bounds.ContainsKey("Right")) {
-							bounds["Right"] = r;
-						} else if (r > bounds["Right"]) {
-							bounds["Right"] = r;
+						if (bounds.Right == null) {
+							bounds.Right = r;
+						} else if (r > bounds.Right) {
+							bounds.Right = r;
 						}
 						
 						// Top
-						if (!bounds.ContainsKey("Top")) {
-							bounds["Top"] = t;
-						} else if (t < bounds["Top"]) {
-							bounds["Top"] = t;
+						if (bounds.Top == null) {
+							bounds.Top = t;
+						} else if (t < bounds.Top) {
+							bounds.Top = t;
 						}
 						
 						// Bottom
-						if (!bounds.ContainsKey("Bottom")) {
-							bounds["Bottom"] = b;
-						} else if (b > bounds["Bottom"]) {
-							bounds["Bottom"] = b;
+						if (bounds.Bottom == null) {
+							bounds.Bottom = b;
+						} else if (b > bounds.Bottom) {
+							bounds.Bottom = b;
 						}
 					}
 				}
