@@ -1350,9 +1350,11 @@ public class Scribbler: Myro.Robot
 
 
     public bool _IsInTransit ()
-    {    
-        byte b = GetBytes (Scribbler.GET_MOTOR_STATS, 5) [4];
-        if (b == 0)
+    {   
+        // returns true if the wheels are going; not exactly correct
+        // but the move_ready byte was not changing
+        byte b = GetBytes (Scribbler.GET_MOTOR_STATS, 5) [3];        
+        if ((b & 0x03) != 0)
             return true;
         else
             return false;
