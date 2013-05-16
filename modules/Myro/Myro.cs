@@ -1630,6 +1630,19 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
+    
+    	[method: JigsawTab("M/Movement")]
+	public static void motors (double left, double right, double time)
+	{
+	    if (robot != null) {
+		robot.motors (left, right);
+		wait(time);
+		robot.stop();
+	    }
+	
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
 
 	[method: JigsawTab("M/Robot")]
 	public static void reboot ()
@@ -3436,6 +3449,15 @@ public static class Myro
 			double trans = (right + left) / 2.0;
 			double rotate = (right - left) / 2.0;
 			move (trans, rotate);
+		}
+
+	    public void motors (double left, double right, double time)
+		{
+			double trans = (right + left) / 2.0;
+			double rotate = (right - left) / 2.0;
+			move (trans, rotate);
+			wait(time);
+			stop();
 		}
 
 		public virtual void draw_simulation ()
