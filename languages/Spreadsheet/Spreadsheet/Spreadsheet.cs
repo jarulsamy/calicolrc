@@ -117,7 +117,6 @@ public class SpreadsheetWidget : Gtk.TreeView {
         // Create a ListStore as the Model
         liststore = new Gtk.ListStore(makeTypes()); 
         Model = liststore;
-        ShowAll();
 		
 		//liststore.Append();
 		for (int i = 0; i < document.Rows; i++) {
@@ -196,59 +195,68 @@ public class SpreadsheetWidget : Gtk.TreeView {
 
 public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 {
-	public SpreadsheetWidget sheet;	
-	public int maxrow;
-	public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
-	base(calico, filename, "spreadsheet")
-	{
-	    DocumentType = "Sheet";
-	    Rows = 100;
-	    Cols = 26;
-	    int row = 0;
-	    int col = 1;
-	    if (filename != null) {
-                if (System.IO.File.Exists(filename)) {
-		    // First, get max rows and cols
-		    row = 0;
-		    col = 1;
-		    try {
-			foreach(List line in new Csv.reader(filename).readLines()) {
-			    row++;
-			    col = Math.Max(col, line.Count);
-			}
-		    } catch {
-			// just continue
-			calico.Error("Invalid spreadsheet format");
-		    }
-		    Rows = Math.Max(Rows, row);
-		    Cols = Math.Max(Cols, col);
+  public SpreadsheetWidget sheet;	
+  public int maxrow;
+  public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
+	  base(calico, filename, "spreadsheet")
+  {
+	DocumentType = "Sheet";
+	Rows = 100;
+	Cols = 26;
+	MaxRows = 0;
+	MaxCols = 0;
+	int row = 0;
+	int col = 1;
+	if (filename != null) {
+	  if (System.IO.File.Exists(filename)) {
+		// First, get max rows and cols
+		MaxRows = 0;
+		MaxCols = 0;
+		row = 0;
+		col = 1;
+		try {
+		  foreach(List line in new Csv.reader(filename).readLines()) {
+			row++;
+			col = Math.Max(col, line.Count);
+			MaxCols = Math.Max(MaxCols, col);
+		  }
+		  MaxRows = Math.Max(MaxRows, row);
+		} catch {
+		  // just continue
+		  System.Console.Error.WriteLine("Invalid spreadsheet format");
 		}
-	    }
-	    sheet = new SpreadsheetWidget(this); // uses Rows, Cols
-	    if (filename != null) {
-                if (System.IO.File.Exists(filename)) {
-		    // now, load the data
-		    row = 0;
-		    Gtk.TreeIter iter;
-		    try {
-			foreach(List line in new Csv.reader(filename).readLines()) {
-			    col = 1;
-			    foreach(string item in line) {
-				sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
-				sheet.liststore.SetValue(iter, col, item);
-				col++;
-			    }
-			    row++;
-			}
-		    } catch {
-			calico.Error("Invalid spreadsheet format\n");
-		    }
-		}
-	    }
-	    focus_widget = sheet;
-	    widget.AddWithViewport (sheet);
-	    widget.ShowAll ();
+		Rows = Math.Max(Rows, row);
+		Cols = Math.Max(Cols, col);
+	  }
 	}
+	sheet = new SpreadsheetWidget(this); // uses Rows, Cols
+	if (filename != null) {
+	  if (System.IO.File.Exists(filename)) {
+		// now, load the data
+		row = 0;
+		Gtk.TreeIter iter;
+		try {
+		  foreach(List line in new Csv.reader(filename).readLines()) {
+			col = 1;
+			foreach(string item in line) {
+			  sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+			  sheet.liststore.SetValue(iter, col, item);
+			  col++;
+			}
+			row++;
+		  }
+		} catch {
+		  System.Console.Error.WriteLine("Invalid spreadsheet format");
+		}
+	  }
+	}
+	if (calico != null) { // if it is null, then this is outside of
+						  // Calico GUI
+	  focus_widget = sheet;
+	  widget.AddWithViewport (sheet);
+	  widget.ShowAll ();
+	}
+  }
 	
 	public int Rows {
 		get;
@@ -256,6 +264,16 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 	}
 
 	public int Cols {
+		get;
+		set;
+	}
+
+	public int MaxRows {
+		get;
+		set;
+	}
+
+	public int MaxCols {
 		get;
 		set;
 	}
