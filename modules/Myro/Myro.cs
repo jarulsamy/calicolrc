@@ -717,12 +717,16 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static void senses ()
 	{
-	    if (sense != null && isRealized(sense.win)) {
-		InvokeBlocking( delegate {
-			sense.win.Destroy();
-		    });
-	    } 
-	    sense = new Senses ();
+	    if (robot != null) {
+		if (sense != null && isRealized(sense.win)) {
+		    InvokeBlocking( delegate {
+			    sense.win.Destroy();
+			});
+		} 
+		sense = new Senses ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
 	}
 
 	public class Senses
@@ -783,7 +787,11 @@ public static class Myro
 	        public void update_entries_loop ()
 	        {
 		    while (idle == 1) {
-			update_entries();
+			try {
+			    update_entries();
+			} catch {
+			    // fail, and continue
+			}
 			wait(1.5);
 		    }
 		}
