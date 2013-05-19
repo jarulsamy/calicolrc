@@ -1913,10 +1913,10 @@ public class Scribbler: Myro.Robot
         if (size == "small")
         {
             sizecode = 71;
-            imagewidth = 256;
-            imageheight = 192;
-            //imagewidth = 427;
-            //imageheight = 266;
+            //imagewidth = 256;
+            //imageheight = 192;
+            imagewidth = 427;
+            imageheight = 266;
         }
         else if (size == "large")
         {
