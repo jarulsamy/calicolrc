@@ -1917,11 +1917,15 @@ public class Scribbler: Myro.Robot
             //imageheight = 192;
             imagewidth = 427;
             imageheight = 266;
+            color_header = null;
+            gray_header = null;
         }
         else if (size == "large")
         {
             imagewidth = 1280;
             imageheight = 800;
+            color_header = null;
+            gray_header = null;
         }
         else
         {
