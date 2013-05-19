@@ -126,12 +126,20 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStop(object sender, EventArgs a)
 	{
-		//if (!cvs.IsRunning) {
-		//if (cvs.State != Jigsaw.RunningState.Running) {
-			if (calico.CurrentDocument == this)
-				// FIXME: only do this when this is the toplevel doc which was running
-				calico.OnStopRunning();
-		//}
+	    if (calico.CurrentDocument == this) {
+		// FIXME: only do this when this is the toplevel doc which was running
+		UpdateCalicoVariables();
+		calico.OnStopRunning();
+                calico.manager ["python"].engine.Execute(@"
+def _invoke():
+    if _.robot:
+        _.robot.flush()
+        _.robot.stop()
+import Myro as _
+_.InvokeBlocking(_invoke)
+del _invoke, _
+");
+	    }
 	}
 
 	protected void UpdateCalicoVariables()
@@ -152,13 +160,13 @@ public class CalicoJigsawDocument : Document
 	
 	protected void OnJigsawStep(object sender, EventArgs a)
 	{
-	    // This is fired when Jigsaw Steps
+	    // This is fired when Calico tells Jigsaw to step
 	    UpdateCalicoVariables();
 	}
 	
 	protected void OnJigsawPause(object sender, EventArgs a)
 	{
-		// This is fired when Jigsaw pauses, such as hits a breakpoint
+		// This is fired when Calico tells Jigsaw to pause
 		calico.PlayButton.Sensitive = true;
 		UpdateCalicoVariables();
 	}

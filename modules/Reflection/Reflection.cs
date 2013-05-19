@@ -476,28 +476,50 @@ namespace Reflection
 
 		public static string ListToString(IList args) {
 			string retval = "";
-            int count = args.Count;
-            for (int i = 0; i < count; i++) {
-	            if (retval != "")
-	                retval += ", ";
-	            retval += args[i];
-            }
-            return retval;
-        }
-		
-		public static MethodInfo[] getStaticMethods (Type type)
-		{
-			// get the methods of a Class (cls) given these flags:
-			MethodInfo[] methodInfos = type.GetMethods (BindingFlags.Public |
-						 BindingFlags.Static);
-			// sort methods by name:
-			Array.Sort (methodInfos,
-		 delegate(MethodInfo methodInfo1, MethodInfo methodInfo2)
-			{
-				return methodInfo1.Name.CompareTo (methodInfo2.Name); });
-			return methodInfos;
+			int count = args.Count;
+			for (int i = 0; i < count; i++) {
+			    if (retval != "")
+				retval += ", ";
+			    retval += args[i];
+			}
+			return retval;
 		}
-
+		
+	        public static string getSigatureString(MethodInfo mi) {
+		    List<string > parameters = new List<string> ();
+		    foreach (ParameterInfo pi in mi.GetParameters()) {
+			parameters.Add (pi.Name);
+		    } 
+		    return String.Format("{0}({1})", mi.Name, ListToString(parameters));
+		}
+	    
+	        public static List<MethodInfo> getStaticMethods (Type type)
+	        {
+		    // get the methods of a Class (cls) given these flags:
+		    MethodInfo[] methodInfos = type.GetMethods (BindingFlags.Public |
+								BindingFlags.Static);
+		    // sort methods by name:
+		    Array.Sort (methodInfos,
+				delegate(MethodInfo methodInfo1, MethodInfo methodInfo2)
+				{
+				    string s1 = getSigatureString(methodInfo1);
+				    string s2 = getSigatureString(methodInfo2);
+				    return s1.CompareTo (s2); 
+				});
+		    
+		    // remove duplicates
+		    List<MethodInfo> methodList = new List<MethodInfo>();
+		    string lastMethod = "";
+		    foreach(MethodInfo methodInfo in methodInfos) {
+			string sig = getSigatureString(methodInfo);
+			if (lastMethod != sig) { 
+			    methodList.Add(methodInfo);
+			    lastMethod = sig;
+			}
+		    }
+		    return methodList;
+		}
+	    
 		public static List<string> getMethodNames (string aname, string tname)
 		{
 			Type type = getType (aname, tname);

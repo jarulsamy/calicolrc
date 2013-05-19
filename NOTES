@@ -1,3 +1,12 @@
+1) Sorted methods. DONE
+2) Remove duplicates. DONE
+3) Stop robot, if there is one. DONE
+4) TAB received in Jigsaw Entry [google: how to add widget in tab list]
+5) double-click block shows value or variable, or return value. DONE (shows in locals)
+6) If STOP button pressed, stop regardless of what tab is on top [Not sure...]
+
+7) Emgu on Linux [google VIDIOC_QUERYMENU: Invalid argument]
+
 -> /help
 You need help.
 
