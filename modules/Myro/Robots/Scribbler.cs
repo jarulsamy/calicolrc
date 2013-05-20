@@ -1112,27 +1112,33 @@ public class Scribbler: Myro.Robot
 
     public string ReadLine ()
     {
-        // Replaces serial.ReadLine() as it doesn't stop on \n
-        string retval = "";
-        byte b = read_byte ();
-        int counter = 0;
-        while (b != 10 && counter < 255) { // '\n' newline
-            retval += (char)b;
-            b = read_byte ();
-            counter++;
-        }
-        return (retval + "\n");
+      // Replaces serial.ReadLine() as it doesn't stop on \n
+      string retval = "";
+      byte b = 0;
+      int counter = 0;
+      do
+	{	  
+	  try{		
+	    b = read_byte ();
+	    retval += (char)b;
+	  } catch{
+	    break;
+	    //return "n";	    
+	    //System.Console.Error.WriteLine("Serial ReadLine error");
+	  }
+	  counter++;
+	} while (b != 10 && counter < 1024);  // '\n' newline	  
+	return (retval + "\n");
     }
 
     public override PythonDictionary getInfo ()
     {
         PythonDictionary retDict = new PythonDictionary ();
-        //int old = serial.ReadTimeout; // milliseconds
+        int old = serial.ReadTimeout; // milliseconds
         string retval;
         // serial.setTimeout(4)
-        //lock(serial)
-        //  serial.ReadTimeout = 4000; // milliseconds
         flush ();
+        lock(serial) serial.ReadTimeout = 4000; // milliseconds
         // have to do this twice since sometime the first echo isn't
         // echoed correctly (spaces) from the scribbler
         lock (this) { // lock robot
@@ -1141,7 +1147,7 @@ public class Scribbler: Myro.Robot
                 try {
                     retval = ReadLine ();
                 } catch {
-                    //serial.ReadTimeout = old;
+                    serial.ReadTimeout = old;
                     return retDict;
                 }
             }
@@ -1153,13 +1159,13 @@ public class Scribbler: Myro.Robot
                 try {
                     retval = ReadLine ();
                 } catch {
-                    //serial.ReadTimeout = old;
+                    serial.ReadTimeout = old;
                     return retDict;
                 }
             }
             if (retval.Length == 0) {
                 lock (serial) 
-                    //serial.ReadTimeout = old;
+                    serial.ReadTimeout = old;
                     return retDict;
             }
         }
@@ -1179,8 +1185,7 @@ public class Scribbler: Myro.Robot
                 retDict [it.ToLower ().Trim ()] = value.Trim ();
             }
         }
-        //lock(serial)
-        //serial.ReadTimeout = old;
+        lock(serial) serial.ReadTimeout = old;
         return retDict;
     }
 
@@ -1469,13 +1474,7 @@ public class Scribbler: Myro.Robot
     {
         // fixme  make sure serial.Read returns 1?
         byte [] bytes = new byte[1];
-		try {
-		  lock (serial)
-            serial.Read (bytes, 0, 1);
-		} catch {
-		  System.Console.Error.WriteLine("Serial timeout...");
-		  return 0;
-		}
+	lock (serial) serial.Read (bytes, 0, 1);
         return bytes [0];
     }
 
