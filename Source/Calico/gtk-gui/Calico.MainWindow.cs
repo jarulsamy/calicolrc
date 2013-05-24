@@ -147,7 +147,7 @@ namespace Calico {
 		private global::Gtk.Action SyncToCloudAction;
 		
 		private global::Gtk.Action OpenFromCloudAction;
-
+		
 		private global::Gtk.Action DeleteFromCloudAction;
 		
 		private global::Gtk.Action SaveToCloudAction;
@@ -155,6 +155,10 @@ namespace Calico {
 		private global::Gtk.VBox vbox1;
 		
 		private global::Gtk.MenuBar menubar2;
+		
+		private global::Gtk.Table table3;
+		
+		private global::Gtk.Button butterfly;
 		
 		private global::Gtk.HBox hbox4;
 		
@@ -194,19 +198,31 @@ namespace Calico {
 		
 		private global::Gtk.Button _playButton;
 		
-		private global::Gtk.Button butterfly;
-		
-		private global::Gtk.HBox searchbox;
-		
-		private global::Gtk.VSeparator vseparator2;
-		
-		private global::Gtk.Label label7;
-		
 		private global::Gtk.ComboBoxEntry searchEntry;
+		
+		private global::Gtk.Button searchExpandButton;
+		
+		private global::Gtk.Label searchFindLabel;
 		
 		private global::Gtk.Button searchNextButton;
 		
 		private global::Gtk.Button searchPrevButton;
+		
+		private global::Gtk.Button searchReplaceAllButton;
+		
+		private global::Gtk.Button searchReplaceButton;
+		
+		private global::Gtk.ComboBoxEntry searchReplaceEntry;
+		
+		private global::Gtk.Label searchRepleaceLabel;
+		
+		private global::Gtk.VSeparator searchSeparator1;
+		
+		private global::Gtk.VSeparator searchSeparator2;
+		
+		private global::Gtk.VSeparator searchSeparator3;
+		
+		private global::Gtk.VSeparator searchSeparator4;
 		
 		private global::Gtk.Button searchStopButton;
 		
@@ -585,6 +601,38 @@ namespace Calico {
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
+			this.table3 = new global::Gtk.Table(((uint)(2)), ((uint)(10)), false);
+			this.table3.Name = "table3";
+			this.table3.RowSpacing = ((uint)(6));
+			this.table3.ColumnSpacing = ((uint)(6));
+			// Container child table3.Gtk.Table+TableChild
+			this.butterfly = new global::Gtk.Button();
+			this.butterfly.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Running Script indicator");
+			this.butterfly.CanFocus = true;
+			this.butterfly.Name = "butterfly";
+			this.butterfly.UseUnderline = true;
+			this.butterfly.Relief = ((global::Gtk.ReliefStyle)(2));
+			// Container child butterfly.Gtk.Container+ContainerChild
+			global::Gtk.Alignment w3 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			// Container child GtkAlignment.Gtk.Container+ContainerChild
+			global::Gtk.HBox w4 = new global::Gtk.HBox();
+			w4.Spacing = 2;
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Image w5 = new global::Gtk.Image();
+			w5.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("Calico.icon-1.png");
+			w4.Add(w5);
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Label w7 = new global::Gtk.Label();
+			w4.Add(w7);
+			w3.Add(w4);
+			this.butterfly.Add(w3);
+			this.table3.Add(this.butterfly);
+			global::Gtk.Table.TableChild w11 = ((global::Gtk.Table.TableChild)(this.table3[this.butterfly]));
+			w11.LeftAttach = ((uint)(9));
+			w11.RightAttach = ((uint)(10));
+			w11.XOptions = ((global::Gtk.AttachOptions)(4));
+			w11.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
 			this.hbox4 = new global::Gtk.HBox();
 			this.hbox4.Name = "hbox4";
 			// Container child hbox4.Gtk.Box+BoxChild
@@ -595,24 +643,24 @@ namespace Calico {
 			this._printButton.UseUnderline = true;
 			this._printButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _printButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w3 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w12 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w4 = new global::Gtk.HBox();
-			w4.Spacing = 2;
+			global::Gtk.HBox w13 = new global::Gtk.HBox();
+			w13.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w5 = new global::Gtk.Image();
-			w5.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-print", global::Gtk.IconSize.SmallToolbar);
-			w4.Add(w5);
+			global::Gtk.Image w14 = new global::Gtk.Image();
+			w14.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-print", global::Gtk.IconSize.SmallToolbar);
+			w13.Add(w14);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w7 = new global::Gtk.Label();
-			w4.Add(w7);
-			w3.Add(w4);
-			this._printButton.Add(w3);
+			global::Gtk.Label w16 = new global::Gtk.Label();
+			w13.Add(w16);
+			w12.Add(w13);
+			this._printButton.Add(w12);
 			this.hbox4.Add(this._printButton);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._printButton]));
-			w11.Position = 0;
-			w11.Expand = false;
-			w11.Fill = false;
+			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._printButton]));
+			w20.Position = 0;
+			w20.Expand = false;
+			w20.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._newButton = new global::Gtk.Button();
 			this._newButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Create a new script");
@@ -621,24 +669,24 @@ namespace Calico {
 			this._newButton.UseUnderline = true;
 			this._newButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _newButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w12 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w21 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w13 = new global::Gtk.HBox();
-			w13.Spacing = 2;
+			global::Gtk.HBox w22 = new global::Gtk.HBox();
+			w22.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w14 = new global::Gtk.Image();
-			w14.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-new", global::Gtk.IconSize.SmallToolbar);
-			w13.Add(w14);
+			global::Gtk.Image w23 = new global::Gtk.Image();
+			w23.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-new", global::Gtk.IconSize.SmallToolbar);
+			w22.Add(w23);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w16 = new global::Gtk.Label();
-			w13.Add(w16);
-			w12.Add(w13);
-			this._newButton.Add(w12);
+			global::Gtk.Label w25 = new global::Gtk.Label();
+			w22.Add(w25);
+			w21.Add(w22);
+			this._newButton.Add(w21);
 			this.hbox4.Add(this._newButton);
-			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._newButton]));
-			w20.Position = 1;
-			w20.Expand = false;
-			w20.Fill = false;
+			global::Gtk.Box.BoxChild w29 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._newButton]));
+			w29.Position = 1;
+			w29.Expand = false;
+			w29.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._openButton = new global::Gtk.Button();
 			this._openButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Open an existing script");
@@ -647,24 +695,24 @@ namespace Calico {
 			this._openButton.UseUnderline = true;
 			this._openButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _openButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w21 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w30 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w22 = new global::Gtk.HBox();
-			w22.Spacing = 2;
+			global::Gtk.HBox w31 = new global::Gtk.HBox();
+			w31.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w23 = new global::Gtk.Image();
-			w23.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-open", global::Gtk.IconSize.SmallToolbar);
-			w22.Add(w23);
+			global::Gtk.Image w32 = new global::Gtk.Image();
+			w32.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-open", global::Gtk.IconSize.SmallToolbar);
+			w31.Add(w32);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w25 = new global::Gtk.Label();
-			w22.Add(w25);
-			w21.Add(w22);
-			this._openButton.Add(w21);
+			global::Gtk.Label w34 = new global::Gtk.Label();
+			w31.Add(w34);
+			w30.Add(w31);
+			this._openButton.Add(w30);
 			this.hbox4.Add(this._openButton);
-			global::Gtk.Box.BoxChild w29 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._openButton]));
-			w29.Position = 2;
-			w29.Expand = false;
-			w29.Fill = false;
+			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._openButton]));
+			w38.Position = 2;
+			w38.Expand = false;
+			w38.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._saveButton = new global::Gtk.Button();
 			this._saveButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Save script");
@@ -673,32 +721,32 @@ namespace Calico {
 			this._saveButton.UseUnderline = true;
 			this._saveButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _saveButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w30 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w39 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w31 = new global::Gtk.HBox();
-			w31.Spacing = 2;
+			global::Gtk.HBox w40 = new global::Gtk.HBox();
+			w40.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w32 = new global::Gtk.Image();
-			w32.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-save", global::Gtk.IconSize.SmallToolbar);
-			w31.Add(w32);
+			global::Gtk.Image w41 = new global::Gtk.Image();
+			w41.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-save", global::Gtk.IconSize.SmallToolbar);
+			w40.Add(w41);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w34 = new global::Gtk.Label();
-			w31.Add(w34);
-			w30.Add(w31);
-			this._saveButton.Add(w30);
+			global::Gtk.Label w43 = new global::Gtk.Label();
+			w40.Add(w43);
+			w39.Add(w40);
+			this._saveButton.Add(w39);
 			this.hbox4.Add(this._saveButton);
-			global::Gtk.Box.BoxChild w38 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._saveButton]));
-			w38.Position = 3;
-			w38.Expand = false;
-			w38.Fill = false;
+			global::Gtk.Box.BoxChild w47 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._saveButton]));
+			w47.Position = 3;
+			w47.Expand = false;
+			w47.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.vseparator1 = new global::Gtk.VSeparator();
 			this.vseparator1.Name = "vseparator1";
 			this.hbox4.Add(this.vseparator1);
-			global::Gtk.Box.BoxChild w39 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator1]));
-			w39.Position = 4;
-			w39.Expand = false;
-			w39.Fill = false;
+			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator1]));
+			w48.Position = 4;
+			w48.Expand = false;
+			w48.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button8 = new global::Gtk.Button();
 			this.button8.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Zoom in");
@@ -707,24 +755,24 @@ namespace Calico {
 			this.button8.UseUnderline = true;
 			this.button8.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child button8.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w40 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w49 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w41 = new global::Gtk.HBox();
-			w41.Spacing = 2;
+			global::Gtk.HBox w50 = new global::Gtk.HBox();
+			w50.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w42 = new global::Gtk.Image();
-			w42.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-in", global::Gtk.IconSize.Menu);
-			w41.Add(w42);
+			global::Gtk.Image w51 = new global::Gtk.Image();
+			w51.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-in", global::Gtk.IconSize.Menu);
+			w50.Add(w51);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w44 = new global::Gtk.Label();
-			w41.Add(w44);
-			w40.Add(w41);
-			this.button8.Add(w40);
+			global::Gtk.Label w53 = new global::Gtk.Label();
+			w50.Add(w53);
+			w49.Add(w50);
+			this.button8.Add(w49);
 			this.hbox4.Add(this.button8);
-			global::Gtk.Box.BoxChild w48 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button8]));
-			w48.Position = 5;
-			w48.Expand = false;
-			w48.Fill = false;
+			global::Gtk.Box.BoxChild w57 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button8]));
+			w57.Position = 5;
+			w57.Expand = false;
+			w57.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button9 = new global::Gtk.Button();
 			this.button9.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Zoom out");
@@ -733,24 +781,24 @@ namespace Calico {
 			this.button9.UseUnderline = true;
 			this.button9.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child button9.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w49 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w58 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w50 = new global::Gtk.HBox();
-			w50.Spacing = 2;
+			global::Gtk.HBox w59 = new global::Gtk.HBox();
+			w59.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w51 = new global::Gtk.Image();
-			w51.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-out", global::Gtk.IconSize.Menu);
-			w50.Add(w51);
+			global::Gtk.Image w60 = new global::Gtk.Image();
+			w60.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-out", global::Gtk.IconSize.Menu);
+			w59.Add(w60);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w53 = new global::Gtk.Label();
-			w50.Add(w53);
-			w49.Add(w50);
-			this.button9.Add(w49);
+			global::Gtk.Label w62 = new global::Gtk.Label();
+			w59.Add(w62);
+			w58.Add(w59);
+			this.button9.Add(w58);
 			this.hbox4.Add(this.button9);
-			global::Gtk.Box.BoxChild w57 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button9]));
-			w57.Position = 6;
-			w57.Expand = false;
-			w57.Fill = false;
+			global::Gtk.Box.BoxChild w66 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button9]));
+			w66.Position = 6;
+			w66.Expand = false;
+			w66.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button10 = new global::Gtk.Button();
 			this.button10.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Make font standard size");
@@ -759,32 +807,32 @@ namespace Calico {
 			this.button10.UseUnderline = true;
 			this.button10.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child button10.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w58 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w67 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w59 = new global::Gtk.HBox();
-			w59.Spacing = 2;
+			global::Gtk.HBox w68 = new global::Gtk.HBox();
+			w68.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w60 = new global::Gtk.Image();
-			w60.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-100", global::Gtk.IconSize.Menu);
-			w59.Add(w60);
+			global::Gtk.Image w69 = new global::Gtk.Image();
+			w69.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-zoom-100", global::Gtk.IconSize.Menu);
+			w68.Add(w69);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w62 = new global::Gtk.Label();
-			w59.Add(w62);
-			w58.Add(w59);
-			this.button10.Add(w58);
+			global::Gtk.Label w71 = new global::Gtk.Label();
+			w68.Add(w71);
+			w67.Add(w68);
+			this.button10.Add(w67);
 			this.hbox4.Add(this.button10);
-			global::Gtk.Box.BoxChild w66 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button10]));
-			w66.Position = 7;
-			w66.Expand = false;
-			w66.Fill = false;
+			global::Gtk.Box.BoxChild w75 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button10]));
+			w75.Position = 7;
+			w75.Expand = false;
+			w75.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.vseparator3 = new global::Gtk.VSeparator();
 			this.vseparator3.Name = "vseparator3";
 			this.hbox4.Add(this.vseparator3);
-			global::Gtk.Box.BoxChild w67 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator3]));
-			w67.Position = 8;
-			w67.Expand = false;
-			w67.Fill = false;
+			global::Gtk.Box.BoxChild w76 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator3]));
+			w76.Position = 8;
+			w76.Expand = false;
+			w76.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.button11 = new global::Gtk.Button();
 			this.button11.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Show Output in new window");
@@ -793,24 +841,24 @@ namespace Calico {
 			this.button11.UseUnderline = true;
 			this.button11.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child button11.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w68 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w77 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w69 = new global::Gtk.HBox();
-			w69.Spacing = 2;
+			global::Gtk.HBox w78 = new global::Gtk.HBox();
+			w78.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w70 = new global::Gtk.Image();
-			w70.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-copy", global::Gtk.IconSize.Menu);
-			w69.Add(w70);
+			global::Gtk.Image w79 = new global::Gtk.Image();
+			w79.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-copy", global::Gtk.IconSize.Menu);
+			w78.Add(w79);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w72 = new global::Gtk.Label();
-			w69.Add(w72);
-			w68.Add(w69);
-			this.button11.Add(w68);
+			global::Gtk.Label w81 = new global::Gtk.Label();
+			w78.Add(w81);
+			w77.Add(w78);
+			this.button11.Add(w77);
 			this.hbox4.Add(this.button11);
-			global::Gtk.Box.BoxChild w76 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button11]));
-			w76.Position = 9;
-			w76.Expand = false;
-			w76.Fill = false;
+			global::Gtk.Box.BoxChild w85 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.button11]));
+			w85.Position = 9;
+			w85.Expand = false;
+			w85.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.swap_vertical = new global::Gtk.Button();
 			this.swap_vertical.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Vertical Panes");
@@ -819,24 +867,24 @@ namespace Calico {
 			this.swap_vertical.UseUnderline = true;
 			this.swap_vertical.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child swap_vertical.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w77 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w86 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w78 = new global::Gtk.HBox();
-			w78.Spacing = 2;
+			global::Gtk.HBox w87 = new global::Gtk.HBox();
+			w87.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w79 = new global::Gtk.Image();
-			w79.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-goto-top", global::Gtk.IconSize.Menu);
-			w78.Add(w79);
+			global::Gtk.Image w88 = new global::Gtk.Image();
+			w88.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-goto-top", global::Gtk.IconSize.Menu);
+			w87.Add(w88);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w81 = new global::Gtk.Label();
-			w78.Add(w81);
-			w77.Add(w78);
-			this.swap_vertical.Add(w77);
+			global::Gtk.Label w90 = new global::Gtk.Label();
+			w87.Add(w90);
+			w86.Add(w87);
+			this.swap_vertical.Add(w86);
 			this.hbox4.Add(this.swap_vertical);
-			global::Gtk.Box.BoxChild w85 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.swap_vertical]));
-			w85.Position = 10;
-			w85.Expand = false;
-			w85.Fill = false;
+			global::Gtk.Box.BoxChild w94 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.swap_vertical]));
+			w94.Position = 10;
+			w94.Expand = false;
+			w94.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.swap_horizontal = new global::Gtk.Button();
 			this.swap_horizontal.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Horizontal Panes");
@@ -845,32 +893,32 @@ namespace Calico {
 			this.swap_horizontal.UseUnderline = true;
 			this.swap_horizontal.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child swap_horizontal.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w86 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w95 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w87 = new global::Gtk.HBox();
-			w87.Spacing = 2;
+			global::Gtk.HBox w96 = new global::Gtk.HBox();
+			w96.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w88 = new global::Gtk.Image();
-			w88.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-goto-last", global::Gtk.IconSize.Menu);
-			w87.Add(w88);
+			global::Gtk.Image w97 = new global::Gtk.Image();
+			w97.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-goto-last", global::Gtk.IconSize.Menu);
+			w96.Add(w97);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w90 = new global::Gtk.Label();
-			w87.Add(w90);
-			w86.Add(w87);
-			this.swap_horizontal.Add(w86);
+			global::Gtk.Label w99 = new global::Gtk.Label();
+			w96.Add(w99);
+			w95.Add(w96);
+			this.swap_horizontal.Add(w95);
 			this.hbox4.Add(this.swap_horizontal);
-			global::Gtk.Box.BoxChild w94 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.swap_horizontal]));
-			w94.Position = 11;
-			w94.Expand = false;
-			w94.Fill = false;
+			global::Gtk.Box.BoxChild w103 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.swap_horizontal]));
+			w103.Position = 11;
+			w103.Expand = false;
+			w103.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.vseparator4 = new global::Gtk.VSeparator();
 			this.vseparator4.Name = "vseparator4";
 			this.hbox4.Add(this.vseparator4);
-			global::Gtk.Box.BoxChild w95 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator4]));
-			w95.Position = 12;
-			w95.Expand = false;
-			w95.Fill = false;
+			global::Gtk.Box.BoxChild w104 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.vseparator4]));
+			w104.Position = 12;
+			w104.Expand = false;
+			w104.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._stopButton = new global::Gtk.Button();
 			this._stopButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Stop a running script");
@@ -880,24 +928,24 @@ namespace Calico {
 			this._stopButton.UseUnderline = true;
 			this._stopButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _stopButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w96 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w105 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w97 = new global::Gtk.HBox();
-			w97.Spacing = 2;
+			global::Gtk.HBox w106 = new global::Gtk.HBox();
+			w106.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w98 = new global::Gtk.Image();
-			w98.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-no", global::Gtk.IconSize.SmallToolbar);
-			w97.Add(w98);
+			global::Gtk.Image w107 = new global::Gtk.Image();
+			w107.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-no", global::Gtk.IconSize.SmallToolbar);
+			w106.Add(w107);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w100 = new global::Gtk.Label();
-			w97.Add(w100);
-			w96.Add(w97);
-			this._stopButton.Add(w96);
+			global::Gtk.Label w109 = new global::Gtk.Label();
+			w106.Add(w109);
+			w105.Add(w106);
+			this._stopButton.Add(w105);
 			this.hbox4.Add(this._stopButton);
-			global::Gtk.Box.BoxChild w104 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._stopButton]));
-			w104.Position = 13;
-			w104.Expand = false;
-			w104.Fill = false;
+			global::Gtk.Box.BoxChild w113 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._stopButton]));
+			w113.Position = 13;
+			w113.Expand = false;
+			w113.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._startButton = new global::Gtk.Button();
 			this._startButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Run a script");
@@ -907,24 +955,24 @@ namespace Calico {
 			this._startButton.UseUnderline = true;
 			this._startButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _startButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w105 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w114 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w106 = new global::Gtk.HBox();
-			w106.Spacing = 2;
+			global::Gtk.HBox w115 = new global::Gtk.HBox();
+			w115.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w107 = new global::Gtk.Image();
-			w107.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-yes", global::Gtk.IconSize.SmallToolbar);
-			w106.Add(w107);
+			global::Gtk.Image w116 = new global::Gtk.Image();
+			w116.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-yes", global::Gtk.IconSize.SmallToolbar);
+			w115.Add(w116);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w109 = new global::Gtk.Label();
-			w106.Add(w109);
-			w105.Add(w106);
-			this._startButton.Add(w105);
+			global::Gtk.Label w118 = new global::Gtk.Label();
+			w115.Add(w118);
+			w114.Add(w115);
+			this._startButton.Add(w114);
 			this.hbox4.Add(this._startButton);
-			global::Gtk.Box.BoxChild w113 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._startButton]));
-			w113.Position = 14;
-			w113.Expand = false;
-			w113.Fill = false;
+			global::Gtk.Box.BoxChild w122 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._startButton]));
+			w122.Position = 14;
+			w122.Expand = false;
+			w122.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this.debugSpeed = new global::Gtk.HScale(null);
 			this.debugSpeed.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Run fast (far-left), Single-step (far-right)");
@@ -940,9 +988,9 @@ namespace Calico {
 			this.debugSpeed.Digits = 0;
 			this.debugSpeed.ValuePos = ((global::Gtk.PositionType)(2));
 			this.hbox4.Add(this.debugSpeed);
-			global::Gtk.Box.BoxChild w114 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.debugSpeed]));
-			w114.Position = 15;
-			w114.Expand = false;
+			global::Gtk.Box.BoxChild w123 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.debugSpeed]));
+			w123.Position = 15;
+			w123.Expand = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._pauseButton1 = new global::Gtk.Button();
 			this._pauseButton1.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Pause a running script");
@@ -952,24 +1000,24 @@ namespace Calico {
 			this._pauseButton1.UseUnderline = true;
 			this._pauseButton1.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _pauseButton1.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w115 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w124 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w116 = new global::Gtk.HBox();
-			w116.Spacing = 2;
+			global::Gtk.HBox w125 = new global::Gtk.HBox();
+			w125.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w117 = new global::Gtk.Image();
-			w117.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-media-pause", global::Gtk.IconSize.SmallToolbar);
-			w116.Add(w117);
+			global::Gtk.Image w126 = new global::Gtk.Image();
+			w126.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-media-pause", global::Gtk.IconSize.SmallToolbar);
+			w125.Add(w126);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w119 = new global::Gtk.Label();
-			w116.Add(w119);
-			w115.Add(w116);
-			this._pauseButton1.Add(w115);
+			global::Gtk.Label w128 = new global::Gtk.Label();
+			w125.Add(w128);
+			w124.Add(w125);
+			this._pauseButton1.Add(w124);
 			this.hbox4.Add(this._pauseButton1);
-			global::Gtk.Box.BoxChild w123 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._pauseButton1]));
-			w123.Position = 16;
-			w123.Expand = false;
-			w123.Fill = false;
+			global::Gtk.Box.BoxChild w132 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._pauseButton1]));
+			w132.Position = 16;
+			w132.Expand = false;
+			w132.Fill = false;
 			// Container child hbox4.Gtk.Box+BoxChild
 			this._playButton = new global::Gtk.Button();
 			this._playButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Continue a paused script");
@@ -979,83 +1027,78 @@ namespace Calico {
 			this._playButton.UseUnderline = true;
 			this._playButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child _playButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w124 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
-			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w125 = new global::Gtk.HBox();
-			w125.Spacing = 2;
-			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w126 = new global::Gtk.Image();
-			w126.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-media-play", global::Gtk.IconSize.SmallToolbar);
-			w125.Add(w126);
-			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w128 = new global::Gtk.Label();
-			w125.Add(w128);
-			w124.Add(w125);
-			this._playButton.Add(w124);
-			this.hbox4.Add(this._playButton);
-			global::Gtk.Box.BoxChild w132 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._playButton]));
-			w132.Position = 17;
-			w132.Expand = false;
-			w132.Fill = false;
-			// Container child hbox4.Gtk.Box+BoxChild
-			this.butterfly = new global::Gtk.Button();
-			this.butterfly.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Running Script indicator");
-			this.butterfly.CanFocus = true;
-			this.butterfly.Name = "butterfly";
-			this.butterfly.UseUnderline = true;
-			this.butterfly.Relief = ((global::Gtk.ReliefStyle)(2));
-			// Container child butterfly.Gtk.Container+ContainerChild
 			global::Gtk.Alignment w133 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
 			global::Gtk.HBox w134 = new global::Gtk.HBox();
 			w134.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Image w135 = new global::Gtk.Image();
-			w135.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("Calico.icon-1.png");
+			w135.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-media-play", global::Gtk.IconSize.SmallToolbar);
 			w134.Add(w135);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Label w137 = new global::Gtk.Label();
 			w134.Add(w137);
 			w133.Add(w134);
-			this.butterfly.Add(w133);
-			this.hbox4.Add(this.butterfly);
-			global::Gtk.Box.BoxChild w141 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.butterfly]));
-			w141.PackType = ((global::Gtk.PackType)(1));
-			w141.Position = 18;
+			this._playButton.Add(w133);
+			this.hbox4.Add(this._playButton);
+			global::Gtk.Box.BoxChild w141 = ((global::Gtk.Box.BoxChild)(this.hbox4[this._playButton]));
+			w141.Position = 17;
 			w141.Expand = false;
 			w141.Fill = false;
-			// Container child hbox4.Gtk.Box+BoxChild
-			this.searchbox = new global::Gtk.HBox();
-			this.searchbox.Name = "searchbox";
-			// Container child searchbox.Gtk.Box+BoxChild
-			this.vseparator2 = new global::Gtk.VSeparator();
-			this.vseparator2.Name = "vseparator2";
-			this.searchbox.Add(this.vseparator2);
-			global::Gtk.Box.BoxChild w142 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.vseparator2]));
-			w142.Position = 0;
-			w142.Expand = false;
-			w142.Fill = false;
-			// Container child searchbox.Gtk.Box+BoxChild
-			this.label7 = new global::Gtk.Label();
-			this.label7.Name = "label7";
-			this.label7.LabelProp = global::Mono.Unix.Catalog.GetString("Find:");
-			this.label7.UseMarkup = true;
-			this.searchbox.Add(this.label7);
-			global::Gtk.Box.BoxChild w143 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.label7]));
-			w143.Position = 1;
-			w143.Expand = false;
-			w143.Fill = false;
-			// Container child searchbox.Gtk.Box+BoxChild
+			this.table3.Add(this.hbox4);
+			global::Gtk.Table.TableChild w142 = ((global::Gtk.Table.TableChild)(this.table3[this.hbox4]));
+			w142.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
 			this.searchEntry = global::Gtk.ComboBoxEntry.NewText();
 			this.searchEntry.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Text to search for");
 			this.searchEntry.WidthRequest = 119;
 			this.searchEntry.Name = "searchEntry";
-			this.searchbox.Add(this.searchEntry);
-			global::Gtk.Box.BoxChild w144 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.searchEntry]));
-			w144.Position = 2;
-			w144.Expand = false;
-			w144.Fill = false;
-			// Container child searchbox.Gtk.Box+BoxChild
+			this.table3.Add(this.searchEntry);
+			global::Gtk.Table.TableChild w143 = ((global::Gtk.Table.TableChild)(this.table3[this.searchEntry]));
+			w143.LeftAttach = ((uint)(4));
+			w143.RightAttach = ((uint)(5));
+			w143.XOptions = ((global::Gtk.AttachOptions)(4));
+			w143.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchExpandButton = new global::Gtk.Button();
+			this.searchExpandButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Find next matching text");
+			this.searchExpandButton.CanFocus = true;
+			this.searchExpandButton.Name = "searchExpandButton";
+			this.searchExpandButton.UseUnderline = true;
+			this.searchExpandButton.Relief = ((global::Gtk.ReliefStyle)(2));
+			// Container child searchExpandButton.Gtk.Container+ContainerChild
+			global::Gtk.Alignment w144 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			// Container child GtkAlignment.Gtk.Container+ContainerChild
+			global::Gtk.HBox w145 = new global::Gtk.HBox();
+			w145.Spacing = 2;
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Image w146 = new global::Gtk.Image();
+			w146.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-add", global::Gtk.IconSize.SmallToolbar);
+			w145.Add(w146);
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Label w148 = new global::Gtk.Label();
+			w145.Add(w148);
+			w144.Add(w145);
+			this.searchExpandButton.Add(w144);
+			this.table3.Add(this.searchExpandButton);
+			global::Gtk.Table.TableChild w152 = ((global::Gtk.Table.TableChild)(this.table3[this.searchExpandButton]));
+			w152.LeftAttach = ((uint)(1));
+			w152.RightAttach = ((uint)(2));
+			w152.XOptions = ((global::Gtk.AttachOptions)(4));
+			w152.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchFindLabel = new global::Gtk.Label();
+			this.searchFindLabel.Name = "searchFindLabel";
+			this.searchFindLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Find:");
+			this.searchFindLabel.UseMarkup = true;
+			this.table3.Add(this.searchFindLabel);
+			global::Gtk.Table.TableChild w153 = ((global::Gtk.Table.TableChild)(this.table3[this.searchFindLabel]));
+			w153.LeftAttach = ((uint)(3));
+			w153.RightAttach = ((uint)(4));
+			w153.XPadding = ((uint)(20));
+			w153.XOptions = ((global::Gtk.AttachOptions)(4));
+			w153.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
 			this.searchNextButton = new global::Gtk.Button();
 			this.searchNextButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Find next matching text");
 			this.searchNextButton.CanFocus = true;
@@ -1063,25 +1106,26 @@ namespace Calico {
 			this.searchNextButton.UseUnderline = true;
 			this.searchNextButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child searchNextButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w145 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w154 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w146 = new global::Gtk.HBox();
-			w146.Spacing = 2;
+			global::Gtk.HBox w155 = new global::Gtk.HBox();
+			w155.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w147 = new global::Gtk.Image();
-			w147.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-down", global::Gtk.IconSize.SmallToolbar);
-			w146.Add(w147);
+			global::Gtk.Image w156 = new global::Gtk.Image();
+			w156.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-down", global::Gtk.IconSize.SmallToolbar);
+			w155.Add(w156);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w149 = new global::Gtk.Label();
-			w146.Add(w149);
-			w145.Add(w146);
-			this.searchNextButton.Add(w145);
-			this.searchbox.Add(this.searchNextButton);
-			global::Gtk.Box.BoxChild w153 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.searchNextButton]));
-			w153.Position = 3;
-			w153.Expand = false;
-			w153.Fill = false;
-			// Container child searchbox.Gtk.Box+BoxChild
+			global::Gtk.Label w158 = new global::Gtk.Label();
+			w155.Add(w158);
+			w154.Add(w155);
+			this.searchNextButton.Add(w154);
+			this.table3.Add(this.searchNextButton);
+			global::Gtk.Table.TableChild w162 = ((global::Gtk.Table.TableChild)(this.table3[this.searchNextButton]));
+			w162.LeftAttach = ((uint)(5));
+			w162.RightAttach = ((uint)(6));
+			w162.XOptions = ((global::Gtk.AttachOptions)(4));
+			w162.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
 			this.searchPrevButton = new global::Gtk.Button();
 			this.searchPrevButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Find Previous matching text");
 			this.searchPrevButton.CanFocus = true;
@@ -1089,25 +1133,149 @@ namespace Calico {
 			this.searchPrevButton.UseUnderline = true;
 			this.searchPrevButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child searchPrevButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w154 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w163 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w155 = new global::Gtk.HBox();
-			w155.Spacing = 2;
+			global::Gtk.HBox w164 = new global::Gtk.HBox();
+			w164.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w156 = new global::Gtk.Image();
-			w156.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-up", global::Gtk.IconSize.SmallToolbar);
-			w155.Add(w156);
+			global::Gtk.Image w165 = new global::Gtk.Image();
+			w165.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-up", global::Gtk.IconSize.SmallToolbar);
+			w164.Add(w165);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w158 = new global::Gtk.Label();
-			w155.Add(w158);
-			w154.Add(w155);
-			this.searchPrevButton.Add(w154);
-			this.searchbox.Add(this.searchPrevButton);
-			global::Gtk.Box.BoxChild w162 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.searchPrevButton]));
-			w162.Position = 4;
-			w162.Expand = false;
-			w162.Fill = false;
-			// Container child searchbox.Gtk.Box+BoxChild
+			global::Gtk.Label w167 = new global::Gtk.Label();
+			w164.Add(w167);
+			w163.Add(w164);
+			this.searchPrevButton.Add(w163);
+			this.table3.Add(this.searchPrevButton);
+			global::Gtk.Table.TableChild w171 = ((global::Gtk.Table.TableChild)(this.table3[this.searchPrevButton]));
+			w171.LeftAttach = ((uint)(6));
+			w171.RightAttach = ((uint)(7));
+			w171.XOptions = ((global::Gtk.AttachOptions)(4));
+			w171.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchReplaceAllButton = new global::Gtk.Button();
+			this.searchReplaceAllButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Replace all matching text");
+			this.searchReplaceAllButton.CanFocus = true;
+			this.searchReplaceAllButton.Name = "searchReplaceAllButton";
+			this.searchReplaceAllButton.UseUnderline = true;
+			this.searchReplaceAllButton.Relief = ((global::Gtk.ReliefStyle)(2));
+			// Container child searchReplaceAllButton.Gtk.Container+ContainerChild
+			global::Gtk.Alignment w172 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			// Container child GtkAlignment.Gtk.Container+ContainerChild
+			global::Gtk.HBox w173 = new global::Gtk.HBox();
+			w173.Spacing = 2;
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Image w174 = new global::Gtk.Image();
+			w174.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "stock_search-and-replace", global::Gtk.IconSize.SmallToolbar);
+			w173.Add(w174);
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Label w176 = new global::Gtk.Label();
+			w173.Add(w176);
+			w172.Add(w173);
+			this.searchReplaceAllButton.Add(w172);
+			this.table3.Add(this.searchReplaceAllButton);
+			global::Gtk.Table.TableChild w180 = ((global::Gtk.Table.TableChild)(this.table3[this.searchReplaceAllButton]));
+			w180.TopAttach = ((uint)(1));
+			w180.BottomAttach = ((uint)(2));
+			w180.LeftAttach = ((uint)(6));
+			w180.RightAttach = ((uint)(7));
+			w180.XOptions = ((global::Gtk.AttachOptions)(4));
+			w180.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchReplaceButton = new global::Gtk.Button();
+			this.searchReplaceButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Replace next matching text");
+			this.searchReplaceButton.CanFocus = true;
+			this.searchReplaceButton.Name = "searchReplaceButton";
+			this.searchReplaceButton.UseUnderline = true;
+			this.searchReplaceButton.Relief = ((global::Gtk.ReliefStyle)(2));
+			// Container child searchReplaceButton.Gtk.Container+ContainerChild
+			global::Gtk.Alignment w181 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			// Container child GtkAlignment.Gtk.Container+ContainerChild
+			global::Gtk.HBox w182 = new global::Gtk.HBox();
+			w182.Spacing = 2;
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Image w183 = new global::Gtk.Image();
+			w183.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "stock_search", global::Gtk.IconSize.SmallToolbar);
+			w182.Add(w183);
+			// Container child GtkHBox.Gtk.Container+ContainerChild
+			global::Gtk.Label w185 = new global::Gtk.Label();
+			w182.Add(w185);
+			w181.Add(w182);
+			this.searchReplaceButton.Add(w181);
+			this.table3.Add(this.searchReplaceButton);
+			global::Gtk.Table.TableChild w189 = ((global::Gtk.Table.TableChild)(this.table3[this.searchReplaceButton]));
+			w189.TopAttach = ((uint)(1));
+			w189.BottomAttach = ((uint)(2));
+			w189.LeftAttach = ((uint)(5));
+			w189.RightAttach = ((uint)(6));
+			w189.XOptions = ((global::Gtk.AttachOptions)(4));
+			w189.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchReplaceEntry = global::Gtk.ComboBoxEntry.NewText();
+			this.searchReplaceEntry.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Text to search for");
+			this.searchReplaceEntry.WidthRequest = 119;
+			this.searchReplaceEntry.Name = "searchReplaceEntry";
+			this.table3.Add(this.searchReplaceEntry);
+			global::Gtk.Table.TableChild w190 = ((global::Gtk.Table.TableChild)(this.table3[this.searchReplaceEntry]));
+			w190.TopAttach = ((uint)(1));
+			w190.BottomAttach = ((uint)(2));
+			w190.LeftAttach = ((uint)(4));
+			w190.RightAttach = ((uint)(5));
+			w190.XOptions = ((global::Gtk.AttachOptions)(4));
+			w190.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchRepleaceLabel = new global::Gtk.Label();
+			this.searchRepleaceLabel.Name = "searchRepleaceLabel";
+			this.searchRepleaceLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Replace:");
+			this.table3.Add(this.searchRepleaceLabel);
+			global::Gtk.Table.TableChild w191 = ((global::Gtk.Table.TableChild)(this.table3[this.searchRepleaceLabel]));
+			w191.TopAttach = ((uint)(1));
+			w191.BottomAttach = ((uint)(2));
+			w191.LeftAttach = ((uint)(3));
+			w191.RightAttach = ((uint)(4));
+			w191.XOptions = ((global::Gtk.AttachOptions)(4));
+			w191.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchSeparator1 = new global::Gtk.VSeparator();
+			this.searchSeparator1.Name = "searchSeparator1";
+			this.table3.Add(this.searchSeparator1);
+			global::Gtk.Table.TableChild w192 = ((global::Gtk.Table.TableChild)(this.table3[this.searchSeparator1]));
+			w192.LeftAttach = ((uint)(2));
+			w192.RightAttach = ((uint)(3));
+			w192.XOptions = ((global::Gtk.AttachOptions)(4));
+			w192.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchSeparator2 = new global::Gtk.VSeparator();
+			this.searchSeparator2.Name = "searchSeparator2";
+			this.table3.Add(this.searchSeparator2);
+			global::Gtk.Table.TableChild w193 = ((global::Gtk.Table.TableChild)(this.table3[this.searchSeparator2]));
+			w193.TopAttach = ((uint)(1));
+			w193.BottomAttach = ((uint)(2));
+			w193.LeftAttach = ((uint)(2));
+			w193.RightAttach = ((uint)(3));
+			w193.XOptions = ((global::Gtk.AttachOptions)(4));
+			w193.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchSeparator3 = new global::Gtk.VSeparator();
+			this.searchSeparator3.Name = "searchSeparator3";
+			this.table3.Add(this.searchSeparator3);
+			global::Gtk.Table.TableChild w194 = ((global::Gtk.Table.TableChild)(this.table3[this.searchSeparator3]));
+			w194.LeftAttach = ((uint)(7));
+			w194.RightAttach = ((uint)(8));
+			w194.XOptions = ((global::Gtk.AttachOptions)(4));
+			w194.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
+			this.searchSeparator4 = new global::Gtk.VSeparator();
+			this.searchSeparator4.Name = "searchSeparator4";
+			this.table3.Add(this.searchSeparator4);
+			global::Gtk.Table.TableChild w195 = ((global::Gtk.Table.TableChild)(this.table3[this.searchSeparator4]));
+			w195.TopAttach = ((uint)(1));
+			w195.BottomAttach = ((uint)(2));
+			w195.LeftAttach = ((uint)(7));
+			w195.RightAttach = ((uint)(8));
+			w195.XOptions = ((global::Gtk.AttachOptions)(4));
+			w195.YOptions = ((global::Gtk.AttachOptions)(4));
+			// Container child table3.Gtk.Table+TableChild
 			this.searchStopButton = new global::Gtk.Button();
 			this.searchStopButton.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Close search");
 			this.searchStopButton.CanFocus = true;
@@ -1115,48 +1283,43 @@ namespace Calico {
 			this.searchStopButton.UseUnderline = true;
 			this.searchStopButton.Relief = ((global::Gtk.ReliefStyle)(2));
 			// Container child searchStopButton.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w163 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w196 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w164 = new global::Gtk.HBox();
-			w164.Spacing = 2;
+			global::Gtk.HBox w197 = new global::Gtk.HBox();
+			w197.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w165 = new global::Gtk.Image();
-			w165.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-close", global::Gtk.IconSize.SmallToolbar);
-			w164.Add(w165);
+			global::Gtk.Image w198 = new global::Gtk.Image();
+			w198.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-close", global::Gtk.IconSize.SmallToolbar);
+			w197.Add(w198);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w167 = new global::Gtk.Label();
-			w164.Add(w167);
-			w163.Add(w164);
-			this.searchStopButton.Add(w163);
-			this.searchbox.Add(this.searchStopButton);
-			global::Gtk.Box.BoxChild w171 = ((global::Gtk.Box.BoxChild)(this.searchbox[this.searchStopButton]));
-			w171.Position = 5;
-			w171.Expand = false;
-			w171.Fill = false;
-			this.hbox4.Add(this.searchbox);
-			global::Gtk.Box.BoxChild w172 = ((global::Gtk.Box.BoxChild)(this.hbox4[this.searchbox]));
-			w172.PackType = ((global::Gtk.PackType)(1));
-			w172.Position = 19;
-			w172.Expand = false;
-			w172.Fill = false;
-			this.vbox1.Add(this.hbox4);
-			global::Gtk.Box.BoxChild w173 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox4]));
-			w173.Position = 1;
-			w173.Expand = false;
-			w173.Fill = false;
+			global::Gtk.Label w200 = new global::Gtk.Label();
+			w197.Add(w200);
+			w196.Add(w197);
+			this.searchStopButton.Add(w196);
+			this.table3.Add(this.searchStopButton);
+			global::Gtk.Table.TableChild w204 = ((global::Gtk.Table.TableChild)(this.table3[this.searchStopButton]));
+			w204.LeftAttach = ((uint)(8));
+			w204.RightAttach = ((uint)(9));
+			w204.XOptions = ((global::Gtk.AttachOptions)(4));
+			w204.YOptions = ((global::Gtk.AttachOptions)(4));
+			this.vbox1.Add(this.table3);
+			global::Gtk.Box.BoxChild w205 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.table3]));
+			w205.Position = 1;
+			w205.Expand = false;
+			w205.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hseparator1 = new global::Gtk.HSeparator();
 			this.hseparator1.Name = "hseparator1";
 			this.vbox1.Add(this.hseparator1);
-			global::Gtk.Box.BoxChild w174 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hseparator1]));
-			w174.Position = 2;
-			w174.Expand = false;
-			w174.Fill = false;
+			global::Gtk.Box.BoxChild w206 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hseparator1]));
+			w206.Position = 2;
+			w206.Expand = false;
+			w206.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hpaned1 = new global::Gtk.HPaned();
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 728;
+			this.hpaned1.Position = 768;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.hpaned2 = new global::Gtk.HPaned();
 			this.hpaned2.CanFocus = true;
@@ -1166,7 +1329,7 @@ namespace Calico {
 			this.vpaned2 = new global::Gtk.VPaned();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 229;
+			this.vpaned2.Position = 207;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook();
 			this.notebook_docs.CanFocus = true;
@@ -1183,8 +1346,8 @@ namespace Calico {
 			this.scrolledwindow3.Name = "scrolledwindow3";
 			this.scrolledwindow3.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child scrolledwindow3.Gtk.Container+ContainerChild
-			global::Gtk.Viewport w175 = new global::Gtk.Viewport();
-			w175.ShadowType = ((global::Gtk.ShadowType)(0));
+			global::Gtk.Viewport w207 = new global::Gtk.Viewport();
+			w207.ShadowType = ((global::Gtk.ShadowType)(0));
 			// Container child GtkViewport1.Gtk.Container+ContainerChild
 			this.vbox4 = new global::Gtk.VBox();
 			this.vbox4.Name = "vbox4";
@@ -1197,11 +1360,11 @@ namespace Calico {
 			this.image430.Ypad = 9;
 			this.image430.Pixbuf = global::Gdk.Pixbuf.LoadFromResource("Calico.abstract-butterfly-icon.gif");
 			this.hbox5.Add(this.image430);
-			global::Gtk.Box.BoxChild w176 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.image430]));
-			w176.Position = 0;
-			w176.Expand = false;
-			w176.Fill = false;
-			w176.Padding = ((uint)(35));
+			global::Gtk.Box.BoxChild w208 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.image430]));
+			w208.Position = 0;
+			w208.Expand = false;
+			w208.Fill = false;
+			w208.Padding = ((uint)(35));
 			// Container child hbox5.Gtk.Box+BoxChild
 			this.label8 = new global::Gtk.Label();
 			this.label8.Name = "label8";
@@ -1209,16 +1372,16 @@ namespace Calico {
 			this.label8.UseMarkup = true;
 			this.label8.UseUnderline = true;
 			this.hbox5.Add(this.label8);
-			global::Gtk.Box.BoxChild w177 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.label8]));
-			w177.Position = 1;
-			w177.Expand = false;
-			w177.Fill = false;
-			w177.Padding = ((uint)(27));
+			global::Gtk.Box.BoxChild w209 = ((global::Gtk.Box.BoxChild)(this.hbox5[this.label8]));
+			w209.Position = 1;
+			w209.Expand = false;
+			w209.Fill = false;
+			w209.Padding = ((uint)(27));
 			this.vbox4.Add(this.hbox5);
-			global::Gtk.Box.BoxChild w178 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox5]));
-			w178.Position = 0;
-			w178.Expand = false;
-			w178.Fill = false;
+			global::Gtk.Box.BoxChild w210 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox5]));
+			w210.Position = 0;
+			w210.Expand = false;
+			w210.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.hbox6 = new global::Gtk.HBox();
 			this.hbox6.Name = "hbox6";
@@ -1235,25 +1398,25 @@ namespace Calico {
 			this.button4.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.button4.Xalign = 0F;
 			// Container child button4.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w179 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w211 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w180 = new global::Gtk.HBox();
-			w180.Spacing = 2;
+			global::Gtk.HBox w212 = new global::Gtk.HBox();
+			w212.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w181 = new global::Gtk.Image();
-			w181.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-dialog-authentication", global::Gtk.IconSize.LargeToolbar);
-			w180.Add(w181);
+			global::Gtk.Image w213 = new global::Gtk.Image();
+			w213.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-dialog-authentication", global::Gtk.IconSize.LargeToolbar);
+			w212.Add(w213);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w183 = new global::Gtk.Label();
-			w183.LabelProp = global::Mono.Unix.Catalog.GetString("Getting started...");
-			w183.UseUnderline = true;
-			w180.Add(w183);
-			w179.Add(w180);
-			this.button4.Add(w179);
+			global::Gtk.Label w215 = new global::Gtk.Label();
+			w215.LabelProp = global::Mono.Unix.Catalog.GetString("Getting started...");
+			w215.UseUnderline = true;
+			w212.Add(w215);
+			w211.Add(w212);
+			this.button4.Add(w211);
 			this.vbuttonbox1.Add(this.button4);
-			global::Gtk.ButtonBox.ButtonBoxChild w187 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox1[this.button4]));
-			w187.Expand = false;
-			w187.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w219 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox1[this.button4]));
+			w219.Expand = false;
+			w219.Fill = false;
 			// Container child vbuttonbox1.Gtk.ButtonBox+ButtonBoxChild
 			this.button26 = new global::Gtk.Button();
 			this.button26.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to Help overview webpage");
@@ -1263,31 +1426,31 @@ namespace Calico {
 			this.button26.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.button26.Xalign = 0F;
 			// Container child button26.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w188 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w220 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w189 = new global::Gtk.HBox();
-			w189.Spacing = 2;
+			global::Gtk.HBox w221 = new global::Gtk.HBox();
+			w221.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w190 = new global::Gtk.Image();
-			w190.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-help", global::Gtk.IconSize.LargeToolbar);
-			w189.Add(w190);
+			global::Gtk.Image w222 = new global::Gtk.Image();
+			w222.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-help", global::Gtk.IconSize.LargeToolbar);
+			w221.Add(w222);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w192 = new global::Gtk.Label();
-			w192.LabelProp = global::Mono.Unix.Catalog.GetString("Help...");
-			w192.UseUnderline = true;
-			w189.Add(w192);
-			w188.Add(w189);
-			this.button26.Add(w188);
+			global::Gtk.Label w224 = new global::Gtk.Label();
+			w224.LabelProp = global::Mono.Unix.Catalog.GetString("Help...");
+			w224.UseUnderline = true;
+			w221.Add(w224);
+			w220.Add(w221);
+			this.button26.Add(w220);
 			this.vbuttonbox1.Add(this.button26);
-			global::Gtk.ButtonBox.ButtonBoxChild w196 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox1[this.button26]));
-			w196.Position = 1;
-			w196.Expand = false;
-			w196.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w228 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox1[this.button26]));
+			w228.Position = 1;
+			w228.Expand = false;
+			w228.Fill = false;
 			this.hbox6.Add(this.vbuttonbox1);
-			global::Gtk.Box.BoxChild w197 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox1]));
-			w197.Position = 0;
-			w197.Expand = false;
-			w197.Fill = false;
+			global::Gtk.Box.BoxChild w229 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox1]));
+			w229.Position = 0;
+			w229.Expand = false;
+			w229.Fill = false;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.vbuttonbox2 = new global::Gtk.VButtonBox();
 			this.vbuttonbox2.Name = "vbuttonbox2";
@@ -1301,25 +1464,25 @@ namespace Calico {
 			this.button3.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.button3.Xalign = 0F;
 			// Container child button3.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w198 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w230 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w199 = new global::Gtk.HBox();
-			w199.Spacing = 2;
+			global::Gtk.HBox w231 = new global::Gtk.HBox();
+			w231.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w200 = new global::Gtk.Image();
-			w200.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-new", global::Gtk.IconSize.LargeToolbar);
-			w199.Add(w200);
+			global::Gtk.Image w232 = new global::Gtk.Image();
+			w232.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-new", global::Gtk.IconSize.LargeToolbar);
+			w231.Add(w232);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w202 = new global::Gtk.Label();
-			w202.LabelProp = global::Mono.Unix.Catalog.GetString("New...");
-			w202.UseUnderline = true;
-			w199.Add(w202);
-			w198.Add(w199);
-			this.button3.Add(w198);
+			global::Gtk.Label w234 = new global::Gtk.Label();
+			w234.LabelProp = global::Mono.Unix.Catalog.GetString("New...");
+			w234.UseUnderline = true;
+			w231.Add(w234);
+			w230.Add(w231);
+			this.button3.Add(w230);
 			this.vbuttonbox2.Add(this.button3);
-			global::Gtk.ButtonBox.ButtonBoxChild w206 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox2[this.button3]));
-			w206.Expand = false;
-			w206.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w238 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox2[this.button3]));
+			w238.Expand = false;
+			w238.Fill = false;
 			// Container child vbuttonbox2.Gtk.ButtonBox+ButtonBoxChild
 			this.button7 = new global::Gtk.Button();
 			this.button7.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Open an existing script");
@@ -1329,31 +1492,31 @@ namespace Calico {
 			this.button7.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.button7.Xalign = 0F;
 			// Container child button7.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w207 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w239 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w208 = new global::Gtk.HBox();
-			w208.Spacing = 2;
+			global::Gtk.HBox w240 = new global::Gtk.HBox();
+			w240.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w209 = new global::Gtk.Image();
-			w209.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-open", global::Gtk.IconSize.LargeToolbar);
-			w208.Add(w209);
+			global::Gtk.Image w241 = new global::Gtk.Image();
+			w241.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-open", global::Gtk.IconSize.LargeToolbar);
+			w240.Add(w241);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w211 = new global::Gtk.Label();
-			w211.LabelProp = global::Mono.Unix.Catalog.GetString("Open...");
-			w211.UseUnderline = true;
-			w208.Add(w211);
-			w207.Add(w208);
-			this.button7.Add(w207);
+			global::Gtk.Label w243 = new global::Gtk.Label();
+			w243.LabelProp = global::Mono.Unix.Catalog.GetString("Open...");
+			w243.UseUnderline = true;
+			w240.Add(w243);
+			w239.Add(w240);
+			this.button7.Add(w239);
 			this.vbuttonbox2.Add(this.button7);
-			global::Gtk.ButtonBox.ButtonBoxChild w215 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox2[this.button7]));
-			w215.Position = 1;
-			w215.Expand = false;
-			w215.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w247 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox2[this.button7]));
+			w247.Position = 1;
+			w247.Expand = false;
+			w247.Fill = false;
 			this.hbox6.Add(this.vbuttonbox2);
-			global::Gtk.Box.BoxChild w216 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox2]));
-			w216.Position = 1;
-			w216.Expand = false;
-			w216.Fill = false;
+			global::Gtk.Box.BoxChild w248 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox2]));
+			w248.Position = 1;
+			w248.Expand = false;
+			w248.Fill = false;
 			// Container child hbox6.Gtk.Box+BoxChild
 			this.vbuttonbox3 = new global::Gtk.VButtonBox();
 			this.vbuttonbox3.Name = "vbuttonbox3";
@@ -1367,25 +1530,25 @@ namespace Calico {
 			this.buttonRecentlyUsed.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.buttonRecentlyUsed.Xalign = 0F;
 			// Container child buttonRecentlyUsed.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w217 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w249 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w218 = new global::Gtk.HBox();
-			w218.Spacing = 2;
+			global::Gtk.HBox w250 = new global::Gtk.HBox();
+			w250.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w219 = new global::Gtk.Image();
-			w219.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-edit", global::Gtk.IconSize.LargeToolbar);
-			w218.Add(w219);
+			global::Gtk.Image w251 = new global::Gtk.Image();
+			w251.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-edit", global::Gtk.IconSize.LargeToolbar);
+			w250.Add(w251);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w221 = new global::Gtk.Label();
-			w221.LabelProp = global::Mono.Unix.Catalog.GetString("Recently used...");
-			w221.UseUnderline = true;
-			w218.Add(w221);
-			w217.Add(w218);
-			this.buttonRecentlyUsed.Add(w217);
+			global::Gtk.Label w253 = new global::Gtk.Label();
+			w253.LabelProp = global::Mono.Unix.Catalog.GetString("Recently used...");
+			w253.UseUnderline = true;
+			w250.Add(w253);
+			w249.Add(w250);
+			this.buttonRecentlyUsed.Add(w249);
 			this.vbuttonbox3.Add(this.buttonRecentlyUsed);
-			global::Gtk.ButtonBox.ButtonBoxChild w225 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonRecentlyUsed]));
-			w225.Expand = false;
-			w225.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w257 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonRecentlyUsed]));
+			w257.Expand = false;
+			w257.Fill = false;
 			// Container child vbuttonbox3.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonWhatsNew = new global::Gtk.Button();
 			this.buttonWhatsNew.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to What's new webpage");
@@ -1395,40 +1558,40 @@ namespace Calico {
 			this.buttonWhatsNew.Relief = ((global::Gtk.ReliefStyle)(2));
 			this.buttonWhatsNew.Xalign = 0F;
 			// Container child buttonWhatsNew.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w226 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w258 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w227 = new global::Gtk.HBox();
-			w227.Spacing = 2;
+			global::Gtk.HBox w259 = new global::Gtk.HBox();
+			w259.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w228 = new global::Gtk.Image();
-			w228.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-dialog-info", global::Gtk.IconSize.LargeToolbar);
-			w227.Add(w228);
+			global::Gtk.Image w260 = new global::Gtk.Image();
+			w260.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-dialog-info", global::Gtk.IconSize.LargeToolbar);
+			w259.Add(w260);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w230 = new global::Gtk.Label();
-			w230.LabelProp = global::Mono.Unix.Catalog.GetString("What's new...");
-			w230.UseUnderline = true;
-			w227.Add(w230);
-			w226.Add(w227);
-			this.buttonWhatsNew.Add(w226);
+			global::Gtk.Label w262 = new global::Gtk.Label();
+			w262.LabelProp = global::Mono.Unix.Catalog.GetString("What's new...");
+			w262.UseUnderline = true;
+			w259.Add(w262);
+			w258.Add(w259);
+			this.buttonWhatsNew.Add(w258);
 			this.vbuttonbox3.Add(this.buttonWhatsNew);
-			global::Gtk.ButtonBox.ButtonBoxChild w234 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonWhatsNew]));
-			w234.Position = 1;
-			w234.Expand = false;
-			w234.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w266 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonWhatsNew]));
+			w266.Position = 1;
+			w266.Expand = false;
+			w266.Fill = false;
 			this.hbox6.Add(this.vbuttonbox3);
-			global::Gtk.Box.BoxChild w235 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox3]));
-			w235.Position = 2;
-			w235.Expand = false;
-			w235.Fill = false;
-			w235.Padding = ((uint)(31));
+			global::Gtk.Box.BoxChild w267 = ((global::Gtk.Box.BoxChild)(this.hbox6[this.vbuttonbox3]));
+			w267.Position = 2;
+			w267.Expand = false;
+			w267.Fill = false;
+			w267.Padding = ((uint)(31));
 			this.vbox4.Add(this.hbox6);
-			global::Gtk.Box.BoxChild w236 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox6]));
-			w236.Position = 1;
-			w175.Add(this.vbox4);
-			this.scrolledwindow3.Add(w175);
+			global::Gtk.Box.BoxChild w268 = ((global::Gtk.Box.BoxChild)(this.vbox4[this.hbox6]));
+			w268.Position = 1;
+			w207.Add(this.vbox4);
+			this.scrolledwindow3.Add(w207);
 			this.hbox2.Add(this.scrolledwindow3);
-			global::Gtk.Box.BoxChild w239 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.scrolledwindow3]));
-			w239.Position = 0;
+			global::Gtk.Box.BoxChild w271 = ((global::Gtk.Box.BoxChild)(this.hbox2[this.scrolledwindow3]));
+			w271.Position = 0;
 			this.notebook_docs.Add(this.hbox2);
 			// Notebook tab
 			this.label2 = new global::Gtk.Label();
@@ -1456,10 +1619,10 @@ namespace Calico {
 			this.prompt.Xalign = 0F;
 			this.prompt.LabelProp = global::Mono.Unix.Catalog.GetString("python>");
 			this.vbox3.Add(this.prompt);
-			global::Gtk.Box.BoxChild w241 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.prompt]));
-			w241.Position = 0;
-			w241.Expand = false;
-			w241.Fill = false;
+			global::Gtk.Box.BoxChild w273 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.prompt]));
+			w273.Position = 0;
+			w273.Expand = false;
+			w273.Fill = false;
 			// Container child vbox3.Gtk.Box+BoxChild
 			this.hbox7 = new global::Gtk.HBox();
 			this.hbox7.Name = "hbox7";
@@ -1472,24 +1635,24 @@ namespace Calico {
 			this.history_up.UseUnderline = true;
 			this.history_up.FocusOnClick = false;
 			// Container child history_up.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w242 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w274 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w243 = new global::Gtk.HBox();
-			w243.Spacing = 2;
+			global::Gtk.HBox w275 = new global::Gtk.HBox();
+			w275.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w244 = new global::Gtk.Image();
-			w244.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-up", global::Gtk.IconSize.Menu);
-			w243.Add(w244);
+			global::Gtk.Image w276 = new global::Gtk.Image();
+			w276.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-up", global::Gtk.IconSize.Menu);
+			w275.Add(w276);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w246 = new global::Gtk.Label();
-			w243.Add(w246);
-			w242.Add(w243);
-			this.history_up.Add(w242);
+			global::Gtk.Label w278 = new global::Gtk.Label();
+			w275.Add(w278);
+			w274.Add(w275);
+			this.history_up.Add(w274);
 			this.hbox7.Add(this.history_up);
-			global::Gtk.Box.BoxChild w250 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.history_up]));
-			w250.Position = 0;
-			w250.Expand = false;
-			w250.Fill = false;
+			global::Gtk.Box.BoxChild w282 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.history_up]));
+			w282.Position = 0;
+			w282.Expand = false;
+			w282.Fill = false;
 			// Container child hbox7.Gtk.Box+BoxChild
 			this.history_down = new global::Gtk.Button();
 			this.history_down.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Next interactive code");
@@ -1498,48 +1661,48 @@ namespace Calico {
 			this.history_down.UseUnderline = true;
 			this.history_down.FocusOnClick = false;
 			// Container child history_down.Gtk.Container+ContainerChild
-			global::Gtk.Alignment w251 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+			global::Gtk.Alignment w283 = new global::Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
-			global::Gtk.HBox w252 = new global::Gtk.HBox();
-			w252.Spacing = 2;
+			global::Gtk.HBox w284 = new global::Gtk.HBox();
+			w284.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Image w253 = new global::Gtk.Image();
-			w253.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-down", global::Gtk.IconSize.Menu);
-			w252.Add(w253);
+			global::Gtk.Image w285 = new global::Gtk.Image();
+			w285.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-go-down", global::Gtk.IconSize.Menu);
+			w284.Add(w285);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
-			global::Gtk.Label w255 = new global::Gtk.Label();
-			w252.Add(w255);
-			w251.Add(w252);
-			this.history_down.Add(w251);
+			global::Gtk.Label w287 = new global::Gtk.Label();
+			w284.Add(w287);
+			w283.Add(w284);
+			this.history_down.Add(w283);
 			this.hbox7.Add(this.history_down);
-			global::Gtk.Box.BoxChild w259 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.history_down]));
-			w259.Position = 1;
-			w259.Expand = false;
-			w259.Fill = false;
+			global::Gtk.Box.BoxChild w291 = ((global::Gtk.Box.BoxChild)(this.hbox7[this.history_down]));
+			w291.Position = 1;
+			w291.Expand = false;
+			w291.Fill = false;
 			this.vbox3.Add(this.hbox7);
-			global::Gtk.Box.BoxChild w260 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hbox7]));
-			w260.Position = 1;
-			w260.Expand = false;
-			w260.Fill = false;
+			global::Gtk.Box.BoxChild w292 = ((global::Gtk.Box.BoxChild)(this.vbox3[this.hbox7]));
+			w292.Position = 1;
+			w292.Expand = false;
+			w292.Fill = false;
 			this.vbox2.Add(this.vbox3);
-			global::Gtk.Box.BoxChild w261 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.vbox3]));
-			w261.Position = 0;
+			global::Gtk.Box.BoxChild w293 = ((global::Gtk.Box.BoxChild)(this.vbox2[this.vbox3]));
+			w293.Position = 0;
 			this.hbox3.Add(this.vbox2);
-			global::Gtk.Box.BoxChild w262 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.vbox2]));
-			w262.Position = 0;
-			w262.Expand = false;
-			w262.Fill = false;
+			global::Gtk.Box.BoxChild w294 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.vbox2]));
+			w294.Position = 0;
+			w294.Expand = false;
+			w294.Fill = false;
 			// Container child hbox3.Gtk.Box+BoxChild
 			this.scrolledwindow1 = new global::Gtk.ScrolledWindow();
 			this.scrolledwindow1.CanFocus = true;
 			this.scrolledwindow1.Name = "scrolledwindow1";
 			this.scrolledwindow1.ShadowType = ((global::Gtk.ShadowType)(1));
 			this.hbox3.Add(this.scrolledwindow1);
-			global::Gtk.Box.BoxChild w263 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.scrolledwindow1]));
-			w263.Position = 1;
+			global::Gtk.Box.BoxChild w295 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.scrolledwindow1]));
+			w295.Position = 1;
 			this.notebook_docs.Add(this.hbox3);
-			global::Gtk.Notebook.NotebookChild w264 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs[this.hbox3]));
-			w264.Position = 1;
+			global::Gtk.Notebook.NotebookChild w296 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_docs[this.hbox3]));
+			w296.Position = 1;
 			// Notebook tab
 			this.label1 = new global::Gtk.Label();
 			this.label1.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Enter code interactively");
@@ -1549,8 +1712,8 @@ namespace Calico {
 			this.notebook_docs.SetTabLabel(this.hbox3, this.label1);
 			this.label1.ShowAll();
 			this.vpaned2.Add(this.notebook_docs);
-			global::Gtk.Paned.PanedChild w265 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.notebook_docs]));
-			w265.Resize = false;
+			global::Gtk.Paned.PanedChild w297 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.notebook_docs]));
+			w297.Resize = false;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.hpaned3 = new global::Gtk.HPaned();
 			this.hpaned3.CanFocus = true;
@@ -1591,8 +1754,8 @@ namespace Calico {
 			this.treeview1.Name = "treeview1";
 			this.GtkScrolledWindow1.Add(this.treeview1);
 			this.notebook_tools.Add(this.GtkScrolledWindow1);
-			global::Gtk.Notebook.NotebookChild w269 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]));
-			w269.Position = 1;
+			global::Gtk.Notebook.NotebookChild w301 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.GtkScrolledWindow1]));
+			w301.Position = 1;
 			// Notebook tab
 			this.label4 = new global::Gtk.Label();
 			this.label4.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Variables and their values");
@@ -1611,8 +1774,8 @@ namespace Calico {
 			this.treeview2.Name = "treeview2";
 			this.scrolledwindow2.Add(this.treeview2);
 			this.notebook_tools.Add(this.scrolledwindow2);
-			global::Gtk.Notebook.NotebookChild w271 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]));
-			w271.Position = 2;
+			global::Gtk.Notebook.NotebookChild w303 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow2]));
+			w303.Position = 2;
 			// Notebook tab
 			this.label5 = new global::Gtk.Label();
 			this.label5.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Local variables");
@@ -1632,8 +1795,8 @@ namespace Calico {
 			this.historyview.Editable = false;
 			this.scrolledwindow4.Add(this.historyview);
 			this.notebook_tools.Add(this.scrolledwindow4);
-			global::Gtk.Notebook.NotebookChild w273 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow4]));
-			w273.Position = 3;
+			global::Gtk.Notebook.NotebookChild w305 = ((global::Gtk.Notebook.NotebookChild)(this.notebook_tools[this.scrolledwindow4]));
+			w305.Position = 3;
 			// Notebook tab
 			this.label999 = new global::Gtk.Label();
 			this.label999.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Past interactive code");
@@ -1642,9 +1805,9 @@ namespace Calico {
 			this.notebook_tools.SetTabLabel(this.scrolledwindow4, this.label999);
 			this.label999.ShowAll();
 			this.hpaned3.Add(this.notebook_tools);
-			global::Gtk.Paned.PanedChild w274 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.notebook_tools]));
-			w274.Resize = false;
-			w274.Shrink = false;
+			global::Gtk.Paned.PanedChild w306 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.notebook_tools]));
+			w306.Resize = false;
+			w306.Shrink = false;
 			// Container child hpaned3.Gtk.Paned+PanedChild
 			this.property_notebook = new global::Gtk.Notebook();
 			this.property_notebook.CanFocus = true;
@@ -1667,14 +1830,14 @@ namespace Calico {
 			this.property_notebook.SetTabLabel(this.GtkScrolledWindow4, this.label6);
 			this.label6.ShowAll();
 			this.hpaned3.Add(this.property_notebook);
-			global::Gtk.Paned.PanedChild w277 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.property_notebook]));
-			w277.Resize = false;
+			global::Gtk.Paned.PanedChild w309 = ((global::Gtk.Paned.PanedChild)(this.hpaned3[this.property_notebook]));
+			w309.Resize = false;
 			this.vpaned2.Add(this.hpaned3);
-			global::Gtk.Paned.PanedChild w278 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.hpaned3]));
-			w278.Resize = false;
+			global::Gtk.Paned.PanedChild w310 = ((global::Gtk.Paned.PanedChild)(this.vpaned2[this.hpaned3]));
+			w310.Resize = false;
 			this.hpaned2.Add(this.vpaned2);
-			global::Gtk.Paned.PanedChild w279 = ((global::Gtk.Paned.PanedChild)(this.hpaned2[this.vpaned2]));
-			w279.Resize = false;
+			global::Gtk.Paned.PanedChild w311 = ((global::Gtk.Paned.PanedChild)(this.hpaned2[this.vpaned2]));
+			w311.Resize = false;
 			// Container child hpaned2.Gtk.Paned+PanedChild
 			this.editor_docs = new global::Gtk.Notebook();
 			this.editor_docs.CanFocus = true;
@@ -1683,8 +1846,8 @@ namespace Calico {
 			this.editor_docs.Scrollable = true;
 			this.hpaned2.Add(this.editor_docs);
 			this.hpaned1.Add(this.hpaned2);
-			global::Gtk.Paned.PanedChild w281 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.hpaned2]));
-			w281.Resize = false;
+			global::Gtk.Paned.PanedChild w313 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.hpaned2]));
+			w313.Resize = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.vpaned1 = new global::Gtk.VPaned();
 			this.vpaned1.CanFocus = true;
@@ -1711,8 +1874,8 @@ namespace Calico {
 			this.GtkLabel35.UseMarkup = true;
 			this.frame1.LabelWidget = this.GtkLabel35;
 			this.vpaned1.Add(this.frame1);
-			global::Gtk.Paned.PanedChild w284 = ((global::Gtk.Paned.PanedChild)(this.vpaned1[this.frame1]));
-			w284.Resize = false;
+			global::Gtk.Paned.PanedChild w316 = ((global::Gtk.Paned.PanedChild)(this.vpaned1[this.frame1]));
+			w316.Resize = false;
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.GtkScrolledWindow2 = new global::Gtk.ScrolledWindow();
 			this.GtkScrolledWindow2.Name = "GtkScrolledWindow2";
@@ -1725,12 +1888,12 @@ namespace Calico {
 			this.GtkScrolledWindow2.Add(this.ChatOutput);
 			this.vpaned1.Add(this.GtkScrolledWindow2);
 			this.hpaned1.Add(this.vpaned1);
-			global::Gtk.Paned.PanedChild w287 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vpaned1]));
-			w287.Resize = false;
-			w287.Shrink = false;
+			global::Gtk.Paned.PanedChild w319 = ((global::Gtk.Paned.PanedChild)(this.hpaned1[this.vpaned1]));
+			w319.Resize = false;
+			w319.Shrink = false;
 			this.vbox1.Add(this.hpaned1);
-			global::Gtk.Box.BoxChild w288 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hpaned1]));
-			w288.Position = 3;
+			global::Gtk.Box.BoxChild w320 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hpaned1]));
+			w320.Position = 3;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hbox8 = new global::Gtk.HBox();
 			this.hbox8.Name = "hbox8";
@@ -1745,23 +1908,23 @@ namespace Calico {
 			this.label9.Name = "label9";
 			this.label9.LabelProp = global::Mono.Unix.Catalog.GetString("Language:");
 			this.statusbar1.Add(this.label9);
-			global::Gtk.Box.BoxChild w289 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label9]));
-			w289.Position = 0;
-			w289.Expand = false;
-			w289.Fill = false;
+			global::Gtk.Box.BoxChild w321 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.label9]));
+			w321.Position = 0;
+			w321.Expand = false;
+			w321.Fill = false;
 			// Container child statusbar1.Gtk.Box+BoxChild
 			this.status_langauge = new global::Gtk.Label();
 			this.status_langauge.Name = "status_langauge";
 			this.status_langauge.LabelProp = global::Mono.Unix.Catalog.GetString("Python");
 			this.status_langauge.UseMarkup = true;
 			this.statusbar1.Add(this.status_langauge);
-			global::Gtk.Box.BoxChild w290 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.status_langauge]));
-			w290.Position = 1;
-			w290.Expand = false;
-			w290.Fill = false;
+			global::Gtk.Box.BoxChild w322 = ((global::Gtk.Box.BoxChild)(this.statusbar1[this.status_langauge]));
+			w322.Position = 1;
+			w322.Expand = false;
+			w322.Fill = false;
 			this.hbox8.Add(this.statusbar1);
-			global::Gtk.Box.BoxChild w291 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.statusbar1]));
-			w291.Position = 0;
+			global::Gtk.Box.BoxChild w323 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.statusbar1]));
+			w323.Position = 0;
 			// Container child hbox8.Gtk.Box+BoxChild
 			this.statusbar2 = new global::Gtk.Statusbar();
 			this.statusbar2.Name = "statusbar2";
@@ -1771,33 +1934,33 @@ namespace Calico {
 			this.label10.Name = "label10";
 			this.label10.LabelProp = global::Mono.Unix.Catalog.GetString("Status:");
 			this.statusbar2.Add(this.label10);
-			global::Gtk.Box.BoxChild w292 = ((global::Gtk.Box.BoxChild)(this.statusbar2[this.label10]));
-			w292.Position = 0;
-			w292.Expand = false;
-			w292.Fill = false;
+			global::Gtk.Box.BoxChild w324 = ((global::Gtk.Box.BoxChild)(this.statusbar2[this.label10]));
+			w324.Position = 0;
+			w324.Expand = false;
+			w324.Fill = false;
 			// Container child statusbar2.Gtk.Box+BoxChild
 			this.label11 = new global::Gtk.Label();
 			this.label11.Name = "label11";
 			this.label11.LabelProp = global::Mono.Unix.Catalog.GetString("offline");
 			this.label11.UseMarkup = true;
 			this.statusbar2.Add(this.label11);
-			global::Gtk.Box.BoxChild w293 = ((global::Gtk.Box.BoxChild)(this.statusbar2[this.label11]));
-			w293.Position = 1;
-			w293.Expand = false;
-			w293.Fill = false;
+			global::Gtk.Box.BoxChild w325 = ((global::Gtk.Box.BoxChild)(this.statusbar2[this.label11]));
+			w325.Position = 1;
+			w325.Expand = false;
+			w325.Fill = false;
 			this.hbox8.Add(this.statusbar2);
-			global::Gtk.Box.BoxChild w294 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.statusbar2]));
-			w294.Position = 1;
+			global::Gtk.Box.BoxChild w326 = ((global::Gtk.Box.BoxChild)(this.hbox8[this.statusbar2]));
+			w326.Position = 1;
 			this.vbox1.Add(this.hbox8);
-			global::Gtk.Box.BoxChild w295 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox8]));
-			w295.Position = 4;
-			w295.Expand = false;
-			w295.Fill = false;
+			global::Gtk.Box.BoxChild w327 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox8]));
+			w327.Position = 4;
+			w327.Expand = false;
+			w327.Fill = false;
 			this.Add(this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll();
 			}
-			this.DefaultWidth = 930;
+			this.DefaultWidth = 980;
 			this.DefaultHeight = 527;
 			this.property_notebook.Hide();
 			this.vpaned1.Hide();
@@ -1854,6 +2017,11 @@ namespace Calico {
 			this.OpenFromCloudAction.Activated += new global::System.EventHandler(this.OnOpenFromCloudActionActivated);
 			this.DeleteFromCloudAction.Activated += new global::System.EventHandler(this.OnDeleteFromCloudActionActivated);
 			this.SaveToCloudAction.Activated += new global::System.EventHandler(this.OnSaveToCloudActionActivated);
+			this.searchStopButton.Clicked += new global::System.EventHandler(this.OnButton125Clicked);
+			this.searchPrevButton.Clicked += new global::System.EventHandler(this.OnSearchPrevButtonClicked);
+			this.searchNextButton.Clicked += new global::System.EventHandler(this.OnSearchNextButtonClicked);
+			this.searchExpandButton.Clicked += new global::System.EventHandler(this.OnSearchExpandButtonClicked);
+			this.searchEntry.Changed += new global::System.EventHandler(this.OnSearchEntryChanged);
 			this._printButton.Clicked += new global::System.EventHandler(this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler(this.OnNewButtonClicked);
 			this._openButton.Clicked += new global::System.EventHandler(this.OnOpenButtonClicked);
@@ -1869,10 +2037,6 @@ namespace Calico {
 			this.debugSpeed.ChangeValue += new global::Gtk.ChangeValueHandler(this.OnDebugSpeedChangeValue);
 			this._pauseButton1.Clicked += new global::System.EventHandler(this.OnPauseButton1Clicked);
 			this._playButton.Clicked += new global::System.EventHandler(this.OnPlayButtonClicked);
-			this.searchEntry.Changed += new global::System.EventHandler(this.OnSearchEntryChanged);
-			this.searchNextButton.Clicked += new global::System.EventHandler(this.OnSearchNextButtonClicked);
-			this.searchPrevButton.Clicked += new global::System.EventHandler(this.OnSearchPrevButtonClicked);
-			this.searchStopButton.Clicked += new global::System.EventHandler(this.OnButton125Clicked);
 			this.notebook_docs.SwitchPage += new global::Gtk.SwitchPageHandler(this.OnNotebookDocsSwitchPage);
 			this.button4.Clicked += new global::System.EventHandler(this.OnButton4Clicked);
 			this.button26.Clicked += new global::System.EventHandler(this.OnButton26Clicked);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="930 527">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="980 527">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -603,332 +603,23 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.HBox" id="hbox4">
+          <widget class="Gtk.Table" id="table3">
             <property name="MemberName" />
+            <property name="NRows">2</property>
+            <property name="NColumns">10</property>
+            <property name="RowSpacing">6</property>
+            <property name="ColumnSpacing">6</property>
             <child>
-              <widget class="Gtk.Button" id="_printButton">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Print a script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-print SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnPrintButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">0</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
+              <placeholder />
             </child>
             <child>
-              <widget class="Gtk.Button" id="_newButton">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Create a new script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-new SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnNewButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">1</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
+              <placeholder />
             </child>
             <child>
-              <widget class="Gtk.Button" id="_openButton">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Open an existing script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-open SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnOpenButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">2</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
+              <placeholder />
             </child>
             <child>
-              <widget class="Gtk.Button" id="_saveButton">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Save script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-save SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnSaveButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">3</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.VSeparator" id="vseparator1">
-                <property name="MemberName" />
-              </widget>
-              <packing>
-                <property name="Position">4</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="button8">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Zoom in</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-zoom-in Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnButton8Clicked" />
-              </widget>
-              <packing>
-                <property name="Position">5</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="button9">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Zoom out</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-zoom-out Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnButton9Clicked" />
-              </widget>
-              <packing>
-                <property name="Position">6</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="button10">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Make font standard size</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-zoom-100 Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnButton10Clicked" />
-              </widget>
-              <packing>
-                <property name="Position">7</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.VSeparator" id="vseparator3">
-                <property name="MemberName" />
-              </widget>
-              <packing>
-                <property name="Position">8</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="button11">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Show Output in new window</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-copy Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnButton11Clicked" />
-              </widget>
-              <packing>
-                <property name="Position">9</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="swap_vertical">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Vertical Panes</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-goto-top Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnSwapVerticalClicked" />
-              </widget>
-              <packing>
-                <property name="Position">10</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="swap_horizontal">
-                <property name="MemberName" />
-                <property name="Tooltip" translatable="yes">Horizontal Panes</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-goto-last Menu</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnSwapHorizontalClicked" />
-              </widget>
-              <packing>
-                <property name="Position">11</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.VSeparator" id="vseparator4">
-                <property name="MemberName" />
-              </widget>
-              <packing>
-                <property name="Position">12</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="_stopButton">
-                <property name="MemberName" />
-                <property name="Sensitive">False</property>
-                <property name="Tooltip" translatable="yes">Stop a running script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-no SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnStopButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">13</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="_startButton">
-                <property name="MemberName" />
-                <property name="Sensitive">False</property>
-                <property name="Tooltip" translatable="yes">Run a script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-yes SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnStartButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">14</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.HScale" id="debugSpeed">
-                <property name="MemberName" />
-                <property name="WidthRequest">100</property>
-                <property name="Tooltip" translatable="yes">Run fast (far-left), Single-step (far-right)</property>
-                <property name="CanFocus">True</property>
-                <property name="Inverted">True</property>
-                <property name="Upper">100</property>
-                <property name="PageIncrement">10</property>
-                <property name="StepIncrement">1</property>
-                <property name="Value">100</property>
-                <property name="DrawValue">False</property>
-                <property name="Digits">0</property>
-                <property name="ValuePos">Top</property>
-                <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
-              </widget>
-              <packing>
-                <property name="Position">15</property>
-                <property name="AutoSize">False</property>
-                <property name="Expand">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="_pauseButton1">
-                <property name="MemberName" />
-                <property name="Sensitive">False</property>
-                <property name="Tooltip" translatable="yes">Pause a running script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-media-pause SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnPauseButton1Clicked" />
-              </widget>
-              <packing>
-                <property name="Position">16</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="Gtk.Button" id="_playButton">
-                <property name="MemberName" />
-                <property name="Sensitive">False</property>
-                <property name="Tooltip" translatable="yes">Continue a paused script</property>
-                <property name="CanFocus">True</property>
-                <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:gtk-media-play SmallToolbar</property>
-                <property name="Label" translatable="yes" />
-                <property name="UseUnderline">True</property>
-                <property name="Relief">None</property>
-                <signal name="Clicked" handler="OnPlayButtonClicked" />
-              </widget>
-              <packing>
-                <property name="Position">17</property>
-                <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
-              </packing>
+              <placeholder />
             </child>
             <child>
               <widget class="Gtk.Button" id="butterfly">
@@ -942,19 +633,33 @@
                 <property name="Relief">None</property>
               </widget>
               <packing>
-                <property name="PackType">End</property>
-                <property name="Position">18</property>
+                <property name="LeftAttach">9</property>
+                <property name="RightAttach">10</property>
                 <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
               </packing>
             </child>
             <child>
-              <widget class="Gtk.HBox" id="searchbox">
+              <widget class="Gtk.HBox" id="hbox4">
                 <property name="MemberName" />
                 <child>
-                  <widget class="Gtk.VSeparator" id="vseparator2">
+                  <widget class="Gtk.Button" id="_printButton">
                     <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Print a script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-print SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnPrintButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">0</property>
@@ -964,10 +669,16 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Label" id="label7">
+                  <widget class="Gtk.Button" id="_newButton">
                     <property name="MemberName" />
-                    <property name="LabelProp" translatable="yes">Find:</property>
-                    <property name="UseMarkup">True</property>
+                    <property name="Tooltip" translatable="yes">Create a new script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-new SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnNewButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">1</property>
@@ -977,13 +688,16 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.ComboBoxEntry" id="searchEntry">
+                  <widget class="Gtk.Button" id="_openButton">
                     <property name="MemberName" />
-                    <property name="WidthRequest">119</property>
-                    <property name="Tooltip" translatable="yes">Text to search for</property>
-                    <property name="IsTextCombo">True</property>
-                    <property name="Items" translatable="yes" />
-                    <signal name="Changed" handler="OnSearchEntryChanged" />
+                    <property name="Tooltip" translatable="yes">Open an existing script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-open SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnOpenButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">2</property>
@@ -993,16 +707,16 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="searchNextButton">
+                  <widget class="Gtk.Button" id="_saveButton">
                     <property name="MemberName" />
-                    <property name="Tooltip" translatable="yes">Find next matching text</property>
+                    <property name="Tooltip" translatable="yes">Save script</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-go-down SmallToolbar</property>
+                    <property name="Icon">stock:gtk-save SmallToolbar</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
-                    <signal name="Clicked" handler="OnSearchNextButtonClicked" />
+                    <signal name="Clicked" handler="OnSaveButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">3</property>
@@ -1012,16 +726,8 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="searchPrevButton">
+                  <widget class="Gtk.VSeparator" id="vseparator1">
                     <property name="MemberName" />
-                    <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Find Previous matching text</property>
-                    <property name="CanFocus">True</property>
-                    <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-go-up SmallToolbar</property>
-                    <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
-                    <property name="UseUnderline">True</property>
-                    <property name="Relief">None</property>
-                    <signal name="Clicked" handler="OnSearchPrevButtonClicked" />
                   </widget>
                   <packing>
                     <property name="Position">4</property>
@@ -1031,16 +737,16 @@
                   </packing>
                 </child>
                 <child>
-                  <widget class="Gtk.Button" id="searchStopButton">
+                  <widget class="Gtk.Button" id="button8">
                     <property name="MemberName" />
-                    <property name="Tooltip" translatable="yes">Close search</property>
+                    <property name="Tooltip" translatable="yes">Zoom in</property>
                     <property name="CanFocus">True</property>
                     <property name="Type">TextAndIcon</property>
-                    <property name="Icon">stock:gtk-close SmallToolbar</property>
+                    <property name="Icon">stock:gtk-zoom-in Menu</property>
                     <property name="Label" translatable="yes" />
                     <property name="UseUnderline">True</property>
                     <property name="Relief">None</property>
-                    <signal name="Clicked" handler="OnButton125Clicked" />
+                    <signal name="Clicked" handler="OnButton8Clicked" />
                   </widget>
                   <packing>
                     <property name="Position">5</property>
@@ -1049,13 +755,558 @@
                     <property name="Fill">False</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="Gtk.Button" id="button9">
+                    <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Zoom out</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-zoom-out Menu</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnButton9Clicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">6</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="button10">
+                    <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Make font standard size</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-zoom-100 Menu</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnButton10Clicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">7</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.VSeparator" id="vseparator3">
+                    <property name="MemberName" />
+                  </widget>
+                  <packing>
+                    <property name="Position">8</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="button11">
+                    <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Show Output in new window</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-copy Menu</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnButton11Clicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">9</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="swap_vertical">
+                    <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Vertical Panes</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-goto-top Menu</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnSwapVerticalClicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">10</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="swap_horizontal">
+                    <property name="MemberName" />
+                    <property name="Tooltip" translatable="yes">Horizontal Panes</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-goto-last Menu</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnSwapHorizontalClicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">11</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.VSeparator" id="vseparator4">
+                    <property name="MemberName" />
+                  </widget>
+                  <packing>
+                    <property name="Position">12</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="_stopButton">
+                    <property name="MemberName" />
+                    <property name="Sensitive">False</property>
+                    <property name="Tooltip" translatable="yes">Stop a running script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-no SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnStopButtonClicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">13</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="_startButton">
+                    <property name="MemberName" />
+                    <property name="Sensitive">False</property>
+                    <property name="Tooltip" translatable="yes">Run a script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-yes SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnStartButtonClicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">14</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.HScale" id="debugSpeed">
+                    <property name="MemberName" />
+                    <property name="WidthRequest">100</property>
+                    <property name="Tooltip" translatable="yes">Run fast (far-left), Single-step (far-right)</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Inverted">True</property>
+                    <property name="Upper">100</property>
+                    <property name="PageIncrement">10</property>
+                    <property name="StepIncrement">1</property>
+                    <property name="Value">100</property>
+                    <property name="DrawValue">False</property>
+                    <property name="Digits">0</property>
+                    <property name="ValuePos">Top</property>
+                    <signal name="ChangeValue" handler="OnDebugSpeedChangeValue" />
+                  </widget>
+                  <packing>
+                    <property name="Position">15</property>
+                    <property name="AutoSize">False</property>
+                    <property name="Expand">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="_pauseButton1">
+                    <property name="MemberName" />
+                    <property name="Sensitive">False</property>
+                    <property name="Tooltip" translatable="yes">Pause a running script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-media-pause SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnPauseButton1Clicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">16</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="_playButton">
+                    <property name="MemberName" />
+                    <property name="Sensitive">False</property>
+                    <property name="Tooltip" translatable="yes">Continue a paused script</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextAndIcon</property>
+                    <property name="Icon">stock:gtk-media-play SmallToolbar</property>
+                    <property name="Label" translatable="yes" />
+                    <property name="UseUnderline">True</property>
+                    <property name="Relief">None</property>
+                    <signal name="Clicked" handler="OnPlayButtonClicked" />
+                  </widget>
+                  <packing>
+                    <property name="Position">17</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
-                <property name="PackType">End</property>
-                <property name="Position">19</property>
                 <property name="AutoSize">True</property>
-                <property name="Expand">False</property>
-                <property name="Fill">False</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">True</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.ComboBoxEntry" id="searchEntry">
+                <property name="MemberName" />
+                <property name="WidthRequest">119</property>
+                <property name="Tooltip" translatable="yes">Text to search for</property>
+                <property name="IsTextCombo">True</property>
+                <property name="Items" translatable="yes" />
+                <signal name="Changed" handler="OnSearchEntryChanged" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">4</property>
+                <property name="RightAttach">5</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchExpandButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Find next matching text</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-add SmallToolbar</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnSearchExpandButtonClicked" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">1</property>
+                <property name="RightAttach">2</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="searchFindLabel">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">Find:</property>
+                <property name="UseMarkup">True</property>
+              </widget>
+              <packing>
+                <property name="LeftAttach">3</property>
+                <property name="RightAttach">4</property>
+                <property name="XPadding">20</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchNextButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Find next matching text</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-go-down SmallToolbar</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnSearchNextButtonClicked" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">5</property>
+                <property name="RightAttach">6</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchPrevButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Find Previous matching text</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-go-up SmallToolbar</property>
+                <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnSearchPrevButtonClicked" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">6</property>
+                <property name="RightAttach">7</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchReplaceAllButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Replace all matching text</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:stock_search-and-replace SmallToolbar</property>
+                <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">6</property>
+                <property name="RightAttach">7</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchReplaceButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Replace next matching text</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:stock_search SmallToolbar</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">5</property>
+                <property name="RightAttach">6</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.ComboBoxEntry" id="searchReplaceEntry">
+                <property name="MemberName" />
+                <property name="WidthRequest">119</property>
+                <property name="Tooltip" translatable="yes">Text to search for</property>
+                <property name="IsTextCombo">True</property>
+                <property name="Items" translatable="yes" />
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">4</property>
+                <property name="RightAttach">5</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="searchRepleaceLabel">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">Replace:</property>
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">3</property>
+                <property name="RightAttach">4</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="searchSeparator1">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">2</property>
+                <property name="RightAttach">3</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="searchSeparator2">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">2</property>
+                <property name="RightAttach">3</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="searchSeparator3">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">7</property>
+                <property name="RightAttach">8</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.VSeparator" id="searchSeparator4">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="TopAttach">1</property>
+                <property name="BottomAttach">2</property>
+                <property name="LeftAttach">7</property>
+                <property name="RightAttach">8</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="searchStopButton">
+                <property name="MemberName" />
+                <property name="Tooltip" translatable="yes">Close search</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextAndIcon</property>
+                <property name="Icon">stock:gtk-close SmallToolbar</property>
+                <property name="Label" translatable="yes" />
+                <property name="UseUnderline">True</property>
+                <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnButton125Clicked" />
+              </widget>
+              <packing>
+                <property name="LeftAttach">8</property>
+                <property name="RightAttach">9</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
               </packing>
             </child>
           </widget>
@@ -1081,7 +1332,7 @@
           <widget class="Gtk.HPaned" id="hpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">728</property>
+            <property name="Position">768</property>
             <child>
               <widget class="Gtk.HPaned" id="hpaned2">
                 <property name="MemberName" />
@@ -1091,7 +1342,7 @@
                   <widget class="Gtk.VPaned" id="vpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">229</property>
+                    <property name="Position">207</property>
                     <child>
                       <widget class="Gtk.Notebook" id="notebook_docs">
                         <property name="MemberName" />

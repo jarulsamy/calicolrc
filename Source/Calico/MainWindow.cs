@@ -63,6 +63,7 @@ namespace Calico {
         System.Threading.Thread signal_thread;
         public static MainWindow _mainWindow = null;
         Gtk.Widget _lastSelectedPage = null;
+        private bool searchMode; // true: search-only; false: replace
 
 	
 	public double ProgramSpeedValue {
@@ -316,7 +317,7 @@ namespace Calico {
                 Open(null, "python"); // FIXME: open a file of DEFAULT type
             }
             // Hide things that shouldn't be seen yet:
-            searchbox.Hide();
+            searchboxHide();
             vpaned1.Hide();
             EnvironmentPage.Child.Hide();
             LocalsPage.Child.Hide();
@@ -384,6 +385,70 @@ namespace Calico {
 
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
+        }
+
+        void searchboxHide() {
+            // hide all of the search components
+            // row 1:
+            searchMode = true;
+            searchSeparator1.Hide();
+            searchExpandButton.Hide();
+            searchFindLabel.Hide();
+            searchEntry.Hide();
+            searchNextButton.Hide();
+            searchPrevButton.Hide();
+            searchStopButton.Hide();
+            searchSeparator3.Hide();
+            // row 2:
+            searchSeparator2.Hide();
+            searchRepleaceLabel.Hide();
+            searchReplaceEntry.Hide();
+            searchReplaceButton.Hide();
+            searchReplaceAllButton.Hide();
+            searchSeparator4.Hide();
+        }
+
+        void searchboxShow() {
+            // show all of the search components
+            // show row 1:
+            searchSeparator1.Show();
+            searchExpandButton.Show();
+            searchFindLabel.Show();
+            searchEntry.Show();
+            searchNextButton.Show();
+            searchPrevButton.Show();
+            searchStopButton.Show();
+            searchSeparator3.Show();
+            searchMode = true;
+            // set the search/replace to search
+            // hide row 2:
+            searchSeparator2.Hide();
+            searchRepleaceLabel.Hide();
+            searchReplaceEntry.Hide();
+            searchReplaceButton.Hide();
+            searchReplaceAllButton.Hide();
+            searchSeparator4.Hide();
+        }
+
+        void replaceboxToggle() {
+            if (searchMode) {
+                // row 2: now in replace mode
+                searchSeparator2.Show();
+                searchRepleaceLabel.Show();
+                searchReplaceEntry.Show();
+                searchReplaceButton.Show();
+                searchReplaceAllButton.Show();
+                searchSeparator4.Show();
+            } else {
+                // row 2: now in search-only mode
+                searchSeparator2.Hide();
+                searchRepleaceLabel.Hide();
+                searchReplaceEntry.Hide();
+                searchReplaceButton.Hide();
+                searchReplaceAllButton.Hide();
+                searchSeparator4.Hide();
+            }
+            searchMode = ! searchMode;
         }
 
         public string relativePath(string path_file) {
@@ -3193,7 +3258,7 @@ del _invoke, _
         */
 
         void HandleSearchboxHidden(object sender, EventArgs e) {
-            searchbox.Hide();
+            searchboxHide();
             resetFocus();
         }
 
@@ -3206,7 +3271,7 @@ del _invoke, _
         }
 
         void HandleSearchboxShown(object sender, EventArgs e) {
-            searchbox.Show();
+            searchboxShow();
             searchEntry.GrabFocus();
         }
 
@@ -3872,5 +3937,10 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
         }
+        protected void OnSearchExpandButtonClicked (object sender, EventArgs e)
+        {
+            replaceboxToggle();
+        }
+
     }
 }
