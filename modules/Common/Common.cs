@@ -104,7 +104,18 @@ namespace Common
 		}
 				
 		public static void beep() {
-			SystemSounds.Beep.Play();
+			//SystemSounds.Beep.Play();
+            string filename = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+            if (filename.StartsWith("\\")) {
+                filename = filename.Substring(1);
+            }
+			filename = System.IO.Path.Combine(filename, "..", "examples", "sounds", "Beep.wav");
+			Myro.play (filename);
+		}
+
+		public static void speak(string text) {
+			//SystemSounds.Beep.Play();
+			Myro.speak (text);
 		}
 
 		public static void wait(double seconds) {
