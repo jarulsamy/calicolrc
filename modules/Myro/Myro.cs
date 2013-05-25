@@ -3531,7 +3531,10 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Sound sound = null;
+			InvokeBlocking (delegate {
+				sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			return sound;
 		}
 
@@ -3539,10 +3542,13 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Sound sound;
+			InvokeBlocking (delegate {
+			    sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			SdlDotNet.Audio.Channel channel = sound.Play ();
 			while (channel.IsPlaying())
-				wait (.1);
+			    wait (.1);
 		}
 
 		public void playUntilDone (SdlDotNet.Audio.Sound sound)
@@ -3556,7 +3562,10 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Sound sound;
+			InvokeBlocking (delegate {
+			    sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			return sound.Play ();
 		}
 
@@ -3564,7 +3573,10 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Sound sound;
+			InvokeBlocking (delegate {
+			    sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			return sound.Play (loop, (int)(seconds * 100));
 		}
 
@@ -3572,7 +3584,11 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+
+			SdlDotNet.Audio.Sound sound;
+			InvokeBlocking (delegate {
+			    sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			return sound.Play (loop);
 		}
 
@@ -3580,7 +3596,10 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound = new SdlDotNet.Audio.Sound (filename);
+			SdlDotNet.Audio.Sound sound;
+			InvokeBlocking (delegate {
+			    sound = new SdlDotNet.Audio.Sound (filename);
+			    });
 			return sound.Play (loop_forever);
 		}
 

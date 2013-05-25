@@ -64,8 +64,7 @@ namespace Jigsaw
 			this.OnPropertyChanged(null, null);
 		}
 		public CIOPrint(Double X, Double Y) : this(X, Y, null) {}
-		
-		
+				
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs e)
 		{	// Update text when property changes
@@ -613,6 +612,449 @@ namespace Jigsaw
 			yield return rr;
 		}
     }
+
+	// -----------------------------------------------------------------------
+    public class CBeepFreq : CInputOutput
+    {	// System beep with freq
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBeepFreq(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
+		{
+			// Properties
+			CExpressionProperty Expr = new CExpressionProperty("Duration", "1");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Duration"] = Expr;
+			// Frequency
+			Expr = new CExpressionProperty("Frequency", "440");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Frequency"] = Expr;
+			this.OnPropertyChanged(null, null);
+		}
+		public CBeepFreq(Double X, Double Y) : this(X, Y, null) {}
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = String.Format ("beep({0},{1})", this["Duration"], this["Frequency"]);
+			RaiseBlockChanged();
+		}
+		
+		// - - - Generate and return Python statement - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Utils.beep({0}, {1})");
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', Constant.SPACES * indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CBeepFreq.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CExpressionProperty Expr1 = (CExpressionProperty)_properties["Duration"];
+			CExpressionProperty Expr2 = (CExpressionProperty)_properties["Frequency"];
+			try {
+				Expr1.Compile(engine);
+				Expr2.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{	// Execute a variable assignment
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = RunningState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Evaluate
+			try {
+				CExpressionProperty Duration = (CExpressionProperty)_properties["Duration"];
+				CExpressionProperty Frequency = (CExpressionProperty)_properties["Frequency"];
+				double duration = Double.Parse (Duration.Evaluate(scope).ToString ());
+				double frequency = Double.Parse (Frequency.Evaluate(scope).ToString ());
+				Common.Utils.beep(duration, frequency);
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = RunningState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == RunningState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = RunningState.Idle;
+			yield return rr;
+		}
+    }
+
+	// -----------------------------------------------------------------------
+    public class CBeepFreq2 : CInputOutput
+    {	// System beep with freq
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CBeepFreq2(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
+		{
+			// Properties
+			CExpressionProperty Expr = new CExpressionProperty("Duration", "1");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Duration"] = Expr;
+			// Frequency1
+			Expr = new CExpressionProperty("Frequency1", "440");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Frequency1"] = Expr;
+			// Frequency2
+			Expr = new CExpressionProperty("Frequency2", "660");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Frequency2"] = Expr;
+			this.OnPropertyChanged(null, null);
+		}
+		public CBeepFreq2(Double X, Double Y) : this(X, Y, null) {}
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = String.Format ("beep({0},{1},{2})", 
+			                           this["Duration"], this["Frequency1"], this["Frequency2"]);
+			RaiseBlockChanged();
+		}
+		
+		// - - - Generate and return Python statement - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Utils.beep({0}, {1}, {2})", 
+			                            this["Duration"], this["Frequency1"], this["Frequency2"]);
+			return code;
+		}
+		
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', Constant.SPACES * indent);
+				
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+			
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CBeepFreq2.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing a print involves evaluting the given exression
+			CExpressionProperty Expr1 = (CExpressionProperty)_properties["Duration"];
+			CExpressionProperty Expr2 = (CExpressionProperty)_properties["Frequency1"];
+			CExpressionProperty Expr3 = (CExpressionProperty)_properties["Frequency2"];
+			try {
+				Expr1.Compile(engine);
+				Expr2.Compile(engine);
+				Expr3.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{	// Execute a variable assignment
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = RunningState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				yield return rr;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Evaluate
+			try {
+				CExpressionProperty Duration = (CExpressionProperty)_properties["Duration"];
+				CExpressionProperty Frequency1 = (CExpressionProperty)_properties["Frequency1"];
+				CExpressionProperty Frequency2 = (CExpressionProperty)_properties["Frequency2"];
+				double duration = Double.Parse (Duration.Evaluate(scope).ToString ());
+				double frequency1 = Double.Parse (Frequency1.Evaluate(scope).ToString ());
+				double frequency2 = Double.Parse (Frequency2.Evaluate(scope).ToString ());
+				Common.Utils.beep(duration, frequency1, frequency2);
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				
+				this.State = RunningState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == RunningState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = RunningState.Idle;
+			yield return rr;
+		}
+    }
+
+	// -----------------------------------------------------------------------
+    public class CSpeak : CInputOutput
+    {	// Print block shape class
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public CSpeak(Double X, Double Y, Widgets.CBlockPalette palette=null) 
+			: base(X, Y, palette )
+		{
+			// Properties
+			CExpressionProperty Expr = new CExpressionProperty("Expression", "'hello'");
+			Expr.PropertyChanged += OnPropertyChanged;
+			_properties["Expression"] = Expr;
+			this.OnPropertyChanged(null, null);
+		}
+		public CSpeak(Double X, Double Y) : this(X, Y, null) {}
+		
+		
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public void OnPropertyChanged(object sender, EventArgs e)
+		{	// Update text when property changes
+			this.Text = String.Format("speak({0})", this["Expression"]);
+			RaiseBlockChanged();
+		}
+		
+		// - - - Generate and return Python statement - - - - - - - - - - -
+		public override bool ToPython (StringBuilder o, int indent)
+		{
+			try
+			{
+				string sindent = new string (' ', Constant.SPACES * indent);
+				o.AppendFormat("{0}Common.Utils.speak({1})\n", sindent, this["Expression"]);
+				
+				if (this.OutEdge.IsConnected) {
+					CBlock b = this.OutEdge.LinkedTo.Block;
+					b.ToPython(o, indent);
+				}
+				
+			} catch (Exception ex){
+				Console.WriteLine("{0} (in CSpeak.ToPython)", ex.Message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
+		{
+			// Executing speak involves evaluting the given exression
+			CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
+			try {
+				Expr.Compile(engine);
+			} catch (Exception ex) {
+				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				return false;
+			}
+			return true;
+		}
+		
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public static string Repr(object obj)
+		{
+			return Repr(obj, 0);
+		}
+
+		public static string Repr(object obj, int depth)
+		{
+			if (depth > 3) // FIXME: cheap trick to avoid recursive data structures
+				return "...";
+			if (obj == null) {
+				return "None";
+//			} else if (obj is IronPython.Runtime.List) {
+//				return ((IronPython.Runtime.List)obj).__repr__ (
+//		  			IronPython.Runtime.DefaultContext.Default);
+//			} else if (obj is IronPython.Runtime.PythonTuple) {
+//				return obj.ToString();
+			} else if (obj is Array) {
+				return ArrayToString((object[])obj, depth);
+			} else if (obj is IList) {
+				return ListToString((IList)obj, depth);
+			} else if (obj is IDictionary) {
+				return DictionaryToString((IDictionary)obj, depth);
+			} else {
+				return obj.ToString ();
+			}
+		}
+		
+		public static string ArrayToString(object[] args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				int count = ((Array)args).Length;
+				for (int i = 0; i < count; i++) {
+					if (retval != "")
+						retval += ", ";
+					retval += Repr(args[i], depth + 1);
+				}
+			}
+			return String.Format("Array[{0}]", retval);
+		}
+
+		public static string ListToString(IList args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				foreach(object item in args) {
+					if (retval != "")
+						retval += ", ";
+					retval += Repr(item, depth + 1);
+				}
+			}
+			return String.Format("[{0}]", retval);
+		}
+
+		public static string DictionaryToString(IDictionary args, int depth)
+		{
+			string retval = "";
+			if (args != null) {
+				foreach(object key in args.Keys) {
+					if (retval != "")
+						retval += ", ";
+					retval += String.Format("{0}: {1}", 
+								Repr(key, depth + 1), 
+								Repr(args[key], depth + 1));
+				}
+			}
+			return String.Format("{{{0}}}", retval);
+		}
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		public override IEnumerator<RunnerResponse> Runner(ScriptScope scope, CallStack stack) 
+		{	// Execute speak statement
+
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+			// Always place this block of code at the top of all block runners
+			this.State = RunningState.Running;				// Indicate that the block is running
+			RunnerResponse rr = new RunnerResponse();		// Create and return initial response object
+			yield return rr;
+			if (this.BreakPoint == true) {					// Indicate if breakpoint is set on this block
+				rr.Action = EngineAction.Pause;				// so that engine can stop
+				//rr.Frame = null;
+				yield return rr;
+			}
+			
+			// - - - Do the print - - - - - - - - - - - - - - - - - - - -
+
+			try {
+				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
+				object o = Expr.Evaluate(scope);
+				string toPrint = Repr(o);
+				Common.Utils.speak(toPrint);
+				//((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
+				//((InspectorWindow)scope.GetVariable("_inspector")).WriteLine(toPrint);
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				this["Message"] = ex.Message;
+				this.State = RunningState.Error;
+				rr.Action = EngineAction.Error;
+				rr.Frame = null;
+			}
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+			// Go into a loop while block remains in an error state
+			while (this.State == RunningState.Error) yield return rr;
+
+			// If connected, replace this runner with the next runner to the stack.
+			if (this.OutEdge.IsConnected) {
+				rr.Action = EngineAction.Replace;
+				rr.Frame = this.OutEdge.LinkedTo.Block.Frame(scope, stack);
+			} else {
+				// If not connected, just remove this runner
+				rr.Action = EngineAction.Remove;
+				rr.Frame = null;
+			}
+			
+			// Indicate that the block is no longer running
+			this.State = RunningState.Idle;
+			yield return rr;
+		}
+	}
 
 	// -----------------------------------------------------------------------
     public class CIOWriteToFile : CInputOutput

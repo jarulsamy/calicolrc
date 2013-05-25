@@ -311,6 +311,18 @@ namespace Jigsaw
 			this.AddShape(sBeep);
 			tbInOut.AddShape(sBeep);
 			
+			CBeepFreq sBeepFreq = new CBeepFreq(110, 230-os, pnlBlock);
+			this.AddShape(sBeepFreq);
+			tbInOut.AddShape(sBeepFreq);
+
+			CBeepFreq2 sBeepFreq2 = new CBeepFreq2(110, 270-os, pnlBlock);
+			this.AddShape(sBeepFreq2);
+			tbInOut.AddShape(sBeepFreq2);
+
+			CSpeak sSpeak = new CSpeak(110, 310-os, pnlBlock);
+			this.AddShape(sSpeak);
+			tbInOut.AddShape(sSpeak);
+			
 //			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 150-os, pnlBlock);
 //			this.AddShape(_ciowritefile);
 //			tbInOut.AddShape(_ciowritefile);
