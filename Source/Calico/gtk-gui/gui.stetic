@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -1111,13 +1111,14 @@
             <child>
               <widget class="Gtk.Button" id="searchReplaceAllButton">
                 <property name="MemberName" />
-                <property name="Tooltip" translatable="yes" context="yes">Find previous matching text|Replace all matching text</property>
+                <property name="Tooltip" translatable="yes" context="no">Replace all matching text</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:stock_search-and-replace SmallToolbar</property>
-                <property name="Label" translatable="yes" context="yes">Find previous matching text|</property>
+                <property name="Label" translatable="yes"></property>
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnSearchReplaceAllButtonClicked" />
               </widget>
               <packing>
                 <property name="TopAttach">1</property>
@@ -1145,6 +1146,7 @@
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
+                <signal name="Clicked" handler="OnSearchReplaceButtonClicked" />
               </widget>
               <packing>
                 <property name="TopAttach">1</property>
@@ -1187,7 +1189,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="searchRepleaceLabel">
+              <widget class="Gtk.Label" id="searchReplaceLabel">
                 <property name="MemberName" />
                 <property name="LabelProp" translatable="yes">Replace:</property>
               </widget>

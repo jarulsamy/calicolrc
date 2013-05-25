@@ -167,13 +167,6 @@ namespace Calico {
             Title = String.Format("Calico - {0}", System.Environment.UserName);
             
             manager.SetCalico(this);
-            // FIXME: move to Python language
-	    /*
-            manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "import sys as _sys; _sys.setrecursionlimit(1000);" +
-                "del division, with_statement, print_function, _sys", false);
-	    */
-
             configureIO();
 
             // Run this in in the GUI thread, after we start:
@@ -401,7 +394,7 @@ namespace Calico {
             searchSeparator3.Hide();
             // row 2:
             searchSeparator2.Hide();
-            searchRepleaceLabel.Hide();
+            searchReplaceLabel.Hide();
             searchReplaceEntry.Hide();
             searchReplaceButton.Hide();
             searchReplaceAllButton.Hide();
@@ -411,6 +404,7 @@ namespace Calico {
         void searchboxShow() {
             // show all of the search components
             // show row 1:
+	    searchExpandButton.Image = new Gtk.Image("gtk-add", global::Gtk.IconSize.SmallToolbar);
             searchSeparator1.Show();
             searchExpandButton.Show();
             searchFindLabel.Show();
@@ -423,26 +417,32 @@ namespace Calico {
             // set the search/replace to search
             // hide row 2:
             searchSeparator2.Hide();
-            searchRepleaceLabel.Hide();
+            searchReplaceLabel.Hide();
             searchReplaceEntry.Hide();
             searchReplaceButton.Hide();
             searchReplaceAllButton.Hide();
             searchSeparator4.Hide();
         }
 
+        protected void OnSearchExpandButtonClicked (object sender, EventArgs e) {
+            replaceboxToggle();
+        }
+
         void replaceboxToggle() {
             if (searchMode) {
                 // row 2: now in replace mode
+		searchExpandButton.Image = new Gtk.Image("gtk-remove", global::Gtk.IconSize.SmallToolbar);
                 searchSeparator2.Show();
-                searchRepleaceLabel.Show();
+                searchReplaceLabel.Show();
                 searchReplaceEntry.Show();
                 searchReplaceButton.Show();
                 searchReplaceAllButton.Show();
                 searchSeparator4.Show();
             } else {
                 // row 2: now in search-only mode
+		searchExpandButton.Image = new Gtk.Image("gtk-add", global::Gtk.IconSize.SmallToolbar);
                 searchSeparator2.Hide();
-                searchRepleaceLabel.Hide();
+                searchReplaceLabel.Hide();
                 searchReplaceEntry.Hide();
                 searchReplaceButton.Hide();
                 searchReplaceAllButton.Hide();
@@ -1752,7 +1752,6 @@ namespace Calico {
         public static int CommentLine(Mono.TextEditor.TextEditorData data,
                 Mono.TextEditor.LineSegment line,
                 string line_comment) {
-            // FIXME: get comment string from language
             data.Insert(line.Offset, String.Format("{0} ", line_comment));
             return 1;
         }
@@ -1763,7 +1762,6 @@ namespace Calico {
             // FIXME: assumes a two-char comment string OR allow string
             char c1 = line_comment [0];
             char c2 = line_comment [1];
-            // FIXME: get comment string from language
             if (data.Document.GetCharAt(line.Offset) == c1 &&
                 data.Document.GetCharAt(line.Offset + 1) == c2 &&
                 data.Document.GetCharAt(line.Offset + 2) == ' ') {
@@ -2347,11 +2345,6 @@ del _invoke, _
         }
 
         public void Print(Tag tag, string format) {
-            // These Write functions are the only approved methods of output
-            // FIXME: total hack?! Need to pause long enough, especially in Scheme
-            //        when lots of text with no newline
-            //ManualResetEvent ev = new ManualResetEvent(false);
-            // FIXME: maybe use a wait/reset thing
             if (Debug) {
                 Console.Write(format);
             } else {
@@ -2664,16 +2657,6 @@ del _invoke, _
         protected virtual void OnShellActionActivated(object sender, System.EventArgs e) {
             switchToShell();
         }
-
-        /*
-        public virtual void trace_on() {
-         // FIXME: doesn't work; appears to need to be set before starting
-         ProgramSpeed.Value = 50;
-         ProgramSpeed.Sensitive = true;
-            manager[CurrentLanguage].engine.SetTraceOn(this);
-            manager[CurrentLanguage].engine.ConfigureTrace();
-     }
-        */
 
         public virtual void trace_off() {
             manager [CurrentLanguage].engine.SetTraceOff();
@@ -3024,12 +3007,6 @@ del _invoke, _
             manager.Setup(path);
             manager.Start(path);
             manager.SetCalico(this);
-            // FIXME: move to Python language
-	    /*
-            manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "import sys as _sys; _sys.setrecursionlimit(1000);" +
-                "del division, with_statement, print_function, _sys", false);
-	    */
             configureIO();
 
             manager.PostSetup(this);
@@ -3414,6 +3391,30 @@ del _invoke, _
             searchEntry.Entry.GrabFocus();
         }
 
+        protected void OnSearchReplaceButtonClicked (object sender, EventArgs e) {
+            if (documents.ContainsKey(lastSelectedPage)) {
+		Document doc = documents[lastSelectedPage];
+		String searchText = searchEntry.ActiveText;
+		String replaceText = searchReplaceEntry.ActiveText;
+		doc.Replace(searchText, replaceText);
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
+		// shell replace
+            }
+            searchReplaceEntry.Entry.GrabFocus();
+        }
+
+        protected void OnSearchReplaceAllButtonClicked (object sender, EventArgs e) {
+            if (documents.ContainsKey(lastSelectedPage)) {
+		Document doc = documents[lastSelectedPage];
+		String searchText = searchEntry.ActiveText;
+		String replaceText = searchReplaceEntry.ActiveText;
+		doc.ReplaceAll(searchText, replaceText);
+            } else if (lastSelectedPage == searchForPage(ShellEditor)) {
+		// shell replace
+            }
+            searchReplaceEntry.Entry.GrabFocus();
+        }
+
         protected void OnSetBreakpointActionActivated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.ToggleBreakpoint();
@@ -3740,7 +3741,6 @@ del _invoke, _
 
         protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
             // Swap MainNotebook and EditorNotebook
-            // FIXME: if hidden, show EditorNotebook
             if (!EditorNotebook.Visible) {
                 OnButton11Clicked(null, null); // show EditorNotebook
             }
@@ -3937,10 +3937,5 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
         }
-        protected void OnSearchExpandButtonClicked (object sender, EventArgs e)
-        {
-            replaceboxToggle();
-        }
-
     }
 }

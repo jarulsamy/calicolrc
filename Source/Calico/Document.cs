@@ -336,6 +336,10 @@ namespace Calico {
         }
         public virtual void SearchStop() {
         }
+	public virtual void Replace(string searchText, string replaceText) {
+	}
+	public virtual void ReplaceAll(string searchText, string replaceText) {
+	}
         public virtual void ToggleBreakpoint() {
         }
         public virtual bool HasBreakpointSet {
@@ -611,7 +615,7 @@ namespace Calico {
 		  }
         }
 
-        bool Search(string s, bool from_selection_start) {
+        Mono.TextEditor.SearchResult Search(string s, bool from_selection_start) {
             // internal to handle next/next with more text
             int offset;
             Mono.TextEditor.SearchResult search_result = null;
@@ -634,16 +638,34 @@ namespace Calico {
                 texteditor.SetSelection(offset, offset + length);
                 texteditor.ScrollToCaret();
             }
-            return (search_result != null);
+            return search_result;
         }
 
+
+        public override void Replace(string searchText, string replaceText) {
+	    Mono.TextEditor.SearchResult sr = Search(searchText, true);
+	    if (sr != null) {
+		texteditor.SearchEngine.Replace(sr, replaceText);
+		sr = Search(searchText, true);
+	    }
+	}
+
+        public override void ReplaceAll(string searchText, string replaceText) {
+	    Mono.TextEditor.SearchResult sr = Search(searchText, true);
+	    while (sr != null) {
+		texteditor.SearchEngine.Replace(sr, replaceText);
+		sr = Search(searchText, true);
+	    }
+	}
+
         public override bool SearchNext(string s) {
-            return Search(s, false);
+            return Search(s, false) != null;
         }
         public override bool SearchMore(string s) {
             // continue with more text to search
-            return Search(s, true);
+            return Search(s, true) != null;
         }
+
         public override bool SearchPrevious(string s) {
             texteditor.SearchPattern = s;
             int offset;

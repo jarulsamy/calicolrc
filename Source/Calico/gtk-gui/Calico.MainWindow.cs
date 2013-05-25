@@ -214,7 +214,7 @@ namespace Calico {
 		
 		private global::Gtk.ComboBoxEntry searchReplaceEntry;
 		
-		private global::Gtk.Label searchRepleaceLabel;
+		private global::Gtk.Label searchReplaceLabel;
 		
 		private global::Gtk.VSeparator searchSeparator1;
 		
@@ -1224,11 +1224,11 @@ namespace Calico {
 			w190.XOptions = ((global::Gtk.AttachOptions)(4));
 			w190.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table3.Gtk.Table+TableChild
-			this.searchRepleaceLabel = new global::Gtk.Label();
-			this.searchRepleaceLabel.Name = "searchRepleaceLabel";
-			this.searchRepleaceLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Replace:");
-			this.table3.Add(this.searchRepleaceLabel);
-			global::Gtk.Table.TableChild w191 = ((global::Gtk.Table.TableChild)(this.table3[this.searchRepleaceLabel]));
+			this.searchReplaceLabel = new global::Gtk.Label();
+			this.searchReplaceLabel.Name = "searchReplaceLabel";
+			this.searchReplaceLabel.LabelProp = global::Mono.Unix.Catalog.GetString("Replace:");
+			this.table3.Add(this.searchReplaceLabel);
+			global::Gtk.Table.TableChild w191 = ((global::Gtk.Table.TableChild)(this.table3[this.searchReplaceLabel]));
 			w191.TopAttach = ((uint)(1));
 			w191.BottomAttach = ((uint)(2));
 			w191.LeftAttach = ((uint)(3));
@@ -2021,6 +2021,8 @@ namespace Calico {
 			this.searchPrevButton.Clicked += new global::System.EventHandler(this.OnSearchPrevButtonClicked);
 			this.searchNextButton.Clicked += new global::System.EventHandler(this.OnSearchNextButtonClicked);
 			this.searchExpandButton.Clicked += new global::System.EventHandler(this.OnSearchExpandButtonClicked);
+			this.searchReplaceButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceButtonClicked);
+			this.searchReplaceAllButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceAllButtonClicked);
 			this.searchEntry.Changed += new global::System.EventHandler(this.OnSearchEntryChanged);
 			this._printButton.Clicked += new global::System.EventHandler(this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler(this.OnNewButtonClicked);
