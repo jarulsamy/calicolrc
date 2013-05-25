@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -8,7 +8,7 @@
     <widget-library name="../../../bin/Mono.TextEditor.dll" />
     <widget-library name="../../../bin/Calico.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="980 527">
+  <widget class="Gtk.Window" id="Calico.MainWindow" design-size="980 574">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -1111,11 +1111,11 @@
             <child>
               <widget class="Gtk.Button" id="searchReplaceAllButton">
                 <property name="MemberName" />
-                <property name="Tooltip" translatable="yes" context="no">Replace all matching text</property>
+                <property name="Tooltip" translatable="yes">Replace all matching text</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
                 <property name="Icon">stock:stock_search-and-replace SmallToolbar</property>
-                <property name="Label" translatable="yes"></property>
+                <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
                 <signal name="Clicked" handler="OnSearchReplaceAllButtonClicked" />
@@ -1344,7 +1344,7 @@
                   <widget class="Gtk.VPaned" id="vpaned2">
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
-                    <property name="Position">207</property>
+                    <property name="Position">235</property>
                     <child>
                       <widget class="Gtk.Notebook" id="notebook_docs">
                         <property name="MemberName" />

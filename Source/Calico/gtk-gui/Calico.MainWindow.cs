@@ -1329,7 +1329,7 @@ namespace Calico {
 			this.vpaned2 = new global::Gtk.VPaned();
 			this.vpaned2.CanFocus = true;
 			this.vpaned2.Name = "vpaned2";
-			this.vpaned2.Position = 207;
+			this.vpaned2.Position = 235;
 			// Container child vpaned2.Gtk.Paned+PanedChild
 			this.notebook_docs = new global::Gtk.Notebook();
 			this.notebook_docs.CanFocus = true;
@@ -1961,7 +1961,7 @@ namespace Calico {
 				this.Child.ShowAll();
 			}
 			this.DefaultWidth = 980;
-			this.DefaultHeight = 527;
+			this.DefaultHeight = 574;
 			this.property_notebook.Hide();
 			this.vpaned1.Hide();
 			this.Show();
@@ -2018,11 +2018,11 @@ namespace Calico {
 			this.DeleteFromCloudAction.Activated += new global::System.EventHandler(this.OnDeleteFromCloudActionActivated);
 			this.SaveToCloudAction.Activated += new global::System.EventHandler(this.OnSaveToCloudActionActivated);
 			this.searchStopButton.Clicked += new global::System.EventHandler(this.OnButton125Clicked);
+			this.searchReplaceButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceButtonClicked);
+			this.searchReplaceAllButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceAllButtonClicked);
 			this.searchPrevButton.Clicked += new global::System.EventHandler(this.OnSearchPrevButtonClicked);
 			this.searchNextButton.Clicked += new global::System.EventHandler(this.OnSearchNextButtonClicked);
 			this.searchExpandButton.Clicked += new global::System.EventHandler(this.OnSearchExpandButtonClicked);
-			this.searchReplaceButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceButtonClicked);
-			this.searchReplaceAllButton.Clicked += new global::System.EventHandler(this.OnSearchReplaceAllButtonClicked);
 			this.searchEntry.Changed += new global::System.EventHandler(this.OnSearchEntryChanged);
 			this._printButton.Clicked += new global::System.EventHandler(this.OnPrintButtonClicked);
 			this._newButton.Clicked += new global::System.EventHandler(this.OnNewButtonClicked);
