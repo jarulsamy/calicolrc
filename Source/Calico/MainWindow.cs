@@ -1875,7 +1875,6 @@ namespace Calico {
 
         [GLib.ConnectBeforeAttribute]
         public virtual void OnKeyPressEvent(object o, Gtk.KeyPressEventArgs args) {
-	    
 	    if (handleOnKeyPressEvents(o, args, Focus)) // handled
 		return;
 	    // else let's have the normal system handle it:
@@ -1935,7 +1934,20 @@ namespace Calico {
                     data.Caret.Column = System.Math.Min(curLine.EditableLength, System.Math.Max(0, curLine.Length)) + 1;  
                     args.RetVal = true;
                 }
-            }
+            } /* else if (Focus is Gtk.TreeView) {
+                if (args.Event.Key == Gdk.Key.Tab) {
+		    Gtk.TreeView treeView = ((Gtk.TreeView)Focus);
+		    Gtk.TreeSelection selection = treeView.Selection;
+		    if (selection.CountSelectedRows() > 0) {
+			Gtk.TreePath treePath = selection.GetSelectedRows()[0];
+			if (treePath != null) {
+			    treePath.Down();
+			    treeView.ActivateRow(treePath, treeView.Columns[1]);
+			    args.RetVal = true;
+			}
+		    }
+		}
+	    } */
         }
 
         public void ProcessChatText(string text) {
