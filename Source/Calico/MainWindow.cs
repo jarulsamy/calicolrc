@@ -1934,20 +1934,22 @@ namespace Calico {
                     data.Caret.Column = System.Math.Min(curLine.EditableLength, System.Math.Max(0, curLine.Length)) + 1;  
                     args.RetVal = true;
                 }
-            } /* else if (Focus is Gtk.TreeView) {
+            } else if (Focus is Gtk.TreeView) {
                 if (args.Event.Key == Gdk.Key.Tab) {
 		    Gtk.TreeView treeView = ((Gtk.TreeView)Focus);
 		    Gtk.TreeSelection selection = treeView.Selection;
 		    if (selection.CountSelectedRows() > 0) {
 			Gtk.TreePath treePath = selection.GetSelectedRows()[0];
 			if (treePath != null) {
-			    treePath.Down();
-			    treeView.ActivateRow(treePath, treeView.Columns[1]);
+			    bool startEditing = true;
+			    treePath.Next();
+			    treeView.SetCursor(treePath, treeView.Columns[1], startEditing);
+			    //treeView.ActivateRow(treePath, treeView.Columns[1]);
 			    args.RetVal = true;
 			}
 		    }
 		}
-	    } */
+	    } 
         }
 
         public void ProcessChatText(string text) {
