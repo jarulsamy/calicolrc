@@ -423,7 +423,6 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', Constant.SPACES * indent);
-				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				
@@ -531,7 +530,6 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', Constant.SPACES * indent);
-				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				
@@ -644,8 +642,9 @@ namespace Jigsaw
 		// - - - Generate and return Python statement - - - - -
 		private string ToPython ()
 		{
-			string code = String.Format("Common.Utils.beep({0}, {1})");
-			return code;
+		    string code = String.Format("Common.Utils.beep({0}, {1})", 
+						this["Duration"], this["Frequency"]);
+		    return code;
 		}
 		
 		public override bool ToPython (StringBuilder o, int indent)
@@ -653,7 +652,6 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', Constant.SPACES * indent);
-				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				
@@ -785,7 +783,6 @@ namespace Jigsaw
 			try
 			{
 				string sindent = new string (' ', Constant.SPACES * indent);
-				
 				string code = this.ToPython ();
 				o.AppendFormat("{0}{1}\n", sindent, code);
 				
@@ -899,13 +896,21 @@ namespace Jigsaw
 			RaiseBlockChanged();
 		}
 		
+		// - - - Generate and return Python statement - - - - -
+		private string ToPython ()
+		{
+			string code = String.Format("Common.Utils.speak({0})", this["Expression"]);
+			return code;
+		}
+		
 		// - - - Generate and return Python statement - - - - - - - - - - -
 		public override bool ToPython (StringBuilder o, int indent)
 		{
 			try
 			{
 				string sindent = new string (' ', Constant.SPACES * indent);
-				o.AppendFormat("{0}Common.Utils.speak({1})\n", sindent, this["Expression"]);
+				string code = this.ToPython ();
+				o.AppendFormat("{0}{1}\n", sindent, code);
 				
 				if (this.OutEdge.IsConnected) {
 					CBlock b = this.OutEdge.LinkedTo.Block;
