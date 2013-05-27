@@ -3742,7 +3742,7 @@ public static class Myro
 		}
 	}
 	
-        [method: JigsawTab(null)]
+        [method: JigsawTab("M/Control")]
 	public static Func<object> freeze (Func<object> function)
 	{
 		return () => function.Invoke ();
@@ -3805,14 +3805,14 @@ public static class Myro
 		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 	}
 	
-        [method: JigsawTab(null)]
+        [method: JigsawTab("M/Control")]
 	public static Func<object> freeze (Func<object,object,object,object,object,object,object,object,object,object,object> function, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6,
 									object arg7, object arg8, object arg9, object arg10)
 	{
 		return () => function.Invoke (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 	}
 	
-        [method: JigsawTab(null)]
+        [method: JigsawTab("M/Control")]
 	public static object thaw (Func<object> thunk)
 	{
 		return thunk.Invoke ();
@@ -4394,9 +4394,30 @@ public static class Myro
 		}; 
 	}
 
+        [method: JigsawTab("M/Control")]
+	public static object apply (object func, IList args)
+	{
+	    object [] array = new object[args.Count];
+	    args.CopyTo(array, 0);
+	    return callFunc(func, array.Length, array);
+	}
+
+	[method: JigsawTab("M/Control")]
+	public static List map (Func<object,object> function, IList<object> args)
+	{
+	    List retval = new List ();
+	    // For each function, make a return list, and thread list
+	    foreach (object arg in args) { 
+		retval.append ( function(arg));
+	    }
+	    return retval;
+	}
+
+
         [method: JigsawTab(null)]
 	public static object callFunc (object func, int len, object [] args)
 	{
+	    // this is Apply(f, args)
 		if (len == 1) 
 			return IronPython.Runtime.Converter.Convert<Func<object,object>> (func) (args [0]);
 		else if (len == 2) 
@@ -4427,7 +4448,7 @@ public static class Myro
 	// doTogether(f1, [a1, a2, ...])
 	// doTogether([f1 a1 ...], [f2 a2 ...], ...)
 	
-	[method: JigsawTab(null)]
+	[method: JigsawTab("M/Control")]
 	public static List doTogether (params Func<object> [] functions)
 	{
 		List retval = new List ();
@@ -4466,7 +4487,7 @@ public static class Myro
 		return retval;
 	}
 	
-	[method: JigsawTab(null)]
+	[method: JigsawTab("M/Control")]
 	public static List doTogether (IList<dynamic> functions)
 	{
 		List retval = new List ();
@@ -4506,7 +4527,7 @@ public static class Myro
 		return retval;
 	}
 	
-	[method: JigsawTab(null)]
+	[method: JigsawTab("M/Control")]
 	public static List doTogether (IList farg1, IList farg2, params IList [] fargs)
 	{
 		List retval = new List ();
@@ -4563,7 +4584,7 @@ public static class Myro
 		return retval;
 	}
 
-	[method: JigsawTab(null)]
+	[method: JigsawTab("M/Control")]
 	public static List doTogether (IList<dynamic> functions, object arg)
 	{
 		List retval = new List ();
@@ -4603,7 +4624,7 @@ public static class Myro
 		return retval;
 	}
 	
-	[method: JigsawTab(null)]
+	[method: JigsawTab("M/Control")]
 	public static List doTogether (Func<object,object> function, IList<object> args)
 	{
 		List retval = new List ();
@@ -4718,7 +4739,8 @@ public static class Myro
 		return;
 	}
   
-	static List Sort (List list)
+        [method: JigsawTab("M/Control")]
+	public static List Sort (List list)
 	{
 		// in-place String sort
 		QuickSort (list, 0, list.Count - 1);
