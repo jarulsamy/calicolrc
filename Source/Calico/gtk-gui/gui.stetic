@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -1114,7 +1114,7 @@
                 <property name="Tooltip" translatable="yes">Replace all matching text</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:stock_search-and-replace SmallToolbar</property>
+                <property name="Icon">stock:gtk-find-and-replace SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
@@ -1142,7 +1142,7 @@
                 <property name="Tooltip" translatable="yes">Replace next matching text</property>
                 <property name="CanFocus">True</property>
                 <property name="Type">TextAndIcon</property>
-                <property name="Icon">stock:stock_search SmallToolbar</property>
+                <property name="Icon">stock:gtk-find SmallToolbar</property>
                 <property name="Label" translatable="yes" />
                 <property name="UseUnderline">True</property>
                 <property name="Relief">None</property>
