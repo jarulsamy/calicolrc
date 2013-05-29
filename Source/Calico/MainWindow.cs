@@ -586,7 +586,7 @@ namespace Calico {
                 ((Gtk.Menu)switch_menu.Submenu).Add(radioitem);
                 uint key;
                 Gdk.ModifierType mod;
-                Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
+                Gtk.Accelerator.Parse(String.Format("{0}{1}", GetControlString(), count + 1), out key, out mod);
                 radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                 languages_by_count [count + 1] = language;
                 //DragDataReceived += SelectionReceived;
@@ -599,7 +599,7 @@ namespace Calico {
             }
             switch_menu.Submenu.ShowAll();
         }
-        
+
         public void process_example_dir(Gtk.MenuItem root_menu, string menu_name, DirectoryInfo dir, Language language) {
             Gtk.MenuItem menu = new Gtk.MenuItem(menu_name);
             ((Gtk.Menu)root_menu.Submenu).Add(menu);
@@ -789,7 +789,7 @@ namespace Calico {
                         int count = languages_by_count.Count;
                         uint key;
                         Gdk.ModifierType mod;
-                        Gtk.Accelerator.Parse(String.Format("<control>{0}", count + 1), out key, out mod);
+                        Gtk.Accelerator.Parse(String.Format("{0}{1}", GetControlString(), count + 1), out key, out mod);
                         radioitem.AddAccelerator("activate", UIManager.AccelGroup, new Gtk.AccelKey((Gdk.Key)key, mod, Gtk.AccelFlags.Visible));
                         languages_by_count [count + 1] = language;
                         radioitem.Data ["id"] = count + 1;
@@ -1862,6 +1862,20 @@ namespace Calico {
             }
         }
 
+		public string GetControlString() {
+		  if (OS == "Mac")
+			return "<Primary>";
+		  else
+			return "<Control>";
+		}
+        
+		public Gdk.ModifierType GetControlMask () {
+		  if (OS == "Mac")
+			return Gdk.ModifierType.MetaMask;
+		  else
+			return Gdk.ModifierType.ControlMask;
+		}
+
 	public bool handleOnKeyPressEvents(object o, Gtk.KeyPressEventArgs args, Gtk.Widget focus) {
 	    bool retval = false;
 	    //System.Console.WriteLine("'" + args.Event.Key.ToString() + "'");
@@ -1912,7 +1926,7 @@ namespace Calico {
             } else if (Focus == ChatCommand) { // This is a TextView
                 if (args.Event.Key == Gdk.Key.Return) {
                     // if control key is down, too, just insert a return
-                    if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+				  if ((args.Event.State & GetControlMask()) != 0) {
                         // Don't handle!
                         return;
                     }
@@ -1926,7 +1940,7 @@ namespace Calico {
                 // Handle not dirty
                 // not shell
                 // Editor, handle : on end of line
-                if (args.Event.Key == Gdk.Key.e && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                if (args.Event.Key == Gdk.Key.e && (args.Event.State & GetControlMask()) != 0) {
                     // emacs mode control+e end of line
                     var texteditor = (Mono.TextEditor.TextEditor)Focus;
                     var data = texteditor.GetTextEditorData();
@@ -1998,14 +2012,14 @@ namespace Calico {
         public void handleShellKey(object o, Gtk.KeyPressEventArgs args) {
             // Shell handler
             // FIXME: control+c, if nothing is selected, else it is a copy
-            if (args.Event.Key == Gdk.Key.c && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+            if (args.Event.Key == Gdk.Key.c && (args.Event.State & GetControlMask()) != 0) {
                 string text = ShellEditor.SelectedText;
                 if (text == null) {
                     Mono.TextEditor.SelectionActions.SelectAll(ShellEditor.GetTextEditorData());
                     ShellEditor.DeleteSelectedText();
                     args.RetVal = true;
                 }
-            } else if (args.Event.Key == Gdk.Key.e && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+            } else if (args.Event.Key == Gdk.Key.e && (args.Event.State & GetControlMask()) != 0) {
                 // Emacs, go to end of line
                 var data = ShellEditor.GetTextEditorData();
                 var curLine = ShellEditor.GetLine(data.Caret.Line);
@@ -2022,7 +2036,7 @@ namespace Calico {
                 args.RetVal = true;
             } else if (args.Event.Key == Gdk.Key.Return) {
                 // if control key is down, too, just insert a return
-                if ((args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+                if ((args.Event.State & GetControlMask()) != 0) {
                     ShellEditor.InsertAtCaret("\n");
                     args.RetVal = true;
                     return;
@@ -2054,7 +2068,7 @@ namespace Calico {
                     args.RetVal = true;
                 }
                 UpdateUpDownArrows();
-            } else if (args.Event.Key == Gdk.Key.Up && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+            } else if (args.Event.Key == Gdk.Key.Up && (args.Event.State & GetControlMask()) != 0) {
                 // copy current (if anything), go up, paste
                 string current_text = ShellEditor.Document.Text;
                 if (current_text != null) {
@@ -2071,7 +2085,7 @@ namespace Calico {
                 } else {
                     KeyUp(false); 
                 }
-            } else if (args.Event.Key == Gdk.Key.Down && (args.Event.State & Gdk.ModifierType.ControlMask) != 0) {
+            } else if (args.Event.Key == Gdk.Key.Down && (args.Event.State & GetControlMask()) != 0) {
                 // copy current (if anything), go down, paste
                 string current_text = ShellEditor.Document.Text;
                 if (current_text != null) {
