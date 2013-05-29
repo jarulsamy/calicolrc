@@ -1166,7 +1166,7 @@ namespace Calico {
 			w173.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Image w174 = new global::Gtk.Image();
-			w174.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "stock_search-and-replace", global::Gtk.IconSize.SmallToolbar);
+			w174.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-find-and-replace", global::Gtk.IconSize.SmallToolbar);
 			w173.Add(w174);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Label w176 = new global::Gtk.Label();
@@ -1195,7 +1195,7 @@ namespace Calico {
 			w182.Spacing = 2;
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Image w183 = new global::Gtk.Image();
-			w183.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "stock_search", global::Gtk.IconSize.SmallToolbar);
+			w183.Pixbuf = global::Stetic.IconLoader.LoadIcon(this, "gtk-find", global::Gtk.IconSize.SmallToolbar);
 			w182.Add(w183);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Label w185 = new global::Gtk.Label();
