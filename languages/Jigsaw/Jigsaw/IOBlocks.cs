@@ -125,16 +125,47 @@ namespace Jigsaw
 //			} else if (obj is IronPython.Runtime.PythonTuple) {
 //				return obj.ToString();
 			} else if (obj is Array) {
-				return ArrayToString((object[])obj, depth);
+				return ArrayTypeToString((Array)obj, depth);
+			} else if (obj is object []) {
+				return ArrayTypeToString((object [])obj, depth);
 			} else if (obj is IList) {
 				return ListToString((IList)obj, depth);
 			} else if (obj is IDictionary) {
 				return DictionaryToString((IDictionary)obj, depth);
+			} else if (obj is IronPython.Runtime.SetCollection) {
+				return SetToString((IronPython.Runtime.SetCollection)obj, depth);
 			} else {
 				return obj.ToString ();
 			}
 		}
 		
+		public static string SetToString(IronPython.Runtime.SetCollection set, int depth)
+		{
+		    string retval = "";
+		    foreach(object item in set) {
+			if (retval != "") {
+			    retval += ", ";
+			}
+			retval += Repr(item, depth + 1);
+		    }
+		    return "Set(" + retval + ")";
+		}
+
+		public static string ArrayTypeToString(Array args, int depth) 
+		{
+		    string retval = "";
+		    if (args != null) {
+			int count = ((Array)args).Length;
+			for (int i = 0; i < count; i++) {
+			    if (retval != "") {
+				retval += ", ";
+			    }
+			    retval += Repr(args.GetValue(i), depth + 1);
+			}
+		    }
+		    return "[" + retval + "]";
+		}
+
 		public static string ArrayToString(object[] args, int depth)
 		{
 			string retval = "";
