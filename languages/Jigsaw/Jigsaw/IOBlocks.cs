@@ -269,12 +269,12 @@ namespace Jigsaw
 			: base(X, Y, palette )
 		{
 			// Properties
-			CExpressionProperty Question = new CExpressionProperty("Ask", "'Question: '");
-			CVarNameProperty Answer = new CVarNameProperty("Answer", "result");
+			CExpressionProperty Question = new CExpressionProperty("ask", "'question: '");
+			CVarNameProperty Answer = new CVarNameProperty("answer", "result");
 			Question.PropertyChanged += OnPropertyChanged;
 			Answer.PropertyChanged += OnPropertyChanged;
-			_properties["Ask"] = Question;
-			_properties["Answer"] = Answer;
+			_properties["ask"] = Question;
+			_properties["answer"] = Answer;
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -285,7 +285,7 @@ namespace Jigsaw
 		{
 			get
 			{
-				return _properties["Ask"].Text;
+				return _properties["ask"].Text;
 			}
 		}
 		
@@ -294,7 +294,7 @@ namespace Jigsaw
 		{
 			get 
 			{
-				return _properties["Answer"].Text.Trim();
+				return _properties["answer"].Text.Trim();
 			}
 		}
 		
@@ -302,9 +302,9 @@ namespace Jigsaw
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
 			if (this.Answer.Length > 0) {
-				this.Text = String.Format("`{0}` = Ask({1})", this.Answer, this.Question);
+				this.Text = String.Format("`{0}` = ask({1})", this.Answer, this.Question);
 			} else {
-				this.Text = String.Format("Ask({0})", this.Question);
+				this.Text = String.Format("ask({0})", this.Question);
 			}
 			RaiseBlockChanged();
 		}
@@ -313,7 +313,7 @@ namespace Jigsaw
 		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing a print involves evaluting the given exression
-			CExpressionProperty Ask = (CExpressionProperty)_properties["Ask"];
+			CExpressionProperty Ask = (CExpressionProperty)_properties["ask"];
 			try {
 				Ask.Compile(engine);
 			} catch (Exception ex) {
@@ -372,10 +372,11 @@ namespace Jigsaw
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			
 			try {
-				CExpressionProperty Ask = (CExpressionProperty)_properties["Ask"];
+				CExpressionProperty Ask = (CExpressionProperty)_properties["ask"];
 				string question = String.Format ("{0}", Ask.Evaluate(scope));
 				object answer = Common.Dialogs.ask (question);
 				scope.SetVariable(Answer, answer);
+				//Compiler.ExecAssignment (scope, Answer, answer);
 				
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -413,9 +414,9 @@ namespace Jigsaw
 			: base(X, Y, palette )
 		{
 			// Properties
-			CExpressionProperty Tell = new CExpressionProperty("Tell", "'message'");
+			CExpressionProperty Tell = new CExpressionProperty("tell", "'message'");
 			Tell.PropertyChanged += OnPropertyChanged;
-			_properties["Tell"] = Tell;
+			_properties["tell"] = Tell;
 			this.OnPropertyChanged(null, null);
 		}
 		
@@ -424,7 +425,7 @@ namespace Jigsaw
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void OnPropertyChanged(object sender, EventArgs E)
 		{	// Update text when property changes
-			this.Text = String.Format("Tell({0})",  this["Tell"]);
+			this.Text = String.Format("tell({0})",  this["tell"]);
 			RaiseBlockChanged();
 		}
 		
@@ -432,7 +433,7 @@ namespace Jigsaw
 		public override bool Compile(Microsoft.Scripting.Hosting.ScriptEngine engine, Jigsaw.Canvas cvs)
 		{
 			// Executing a print involves evaluting the given exression
-			CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
+			CExpressionProperty Tell = (CExpressionProperty)_properties["tell"];
 			try {
 				Tell.Compile(engine);
 			} catch (Exception ex) {
@@ -445,7 +446,7 @@ namespace Jigsaw
 		// - - -
 		private string ToPython ()
 		{
-			string code = String.Format("Common.Dialogs.tell({0})", _properties["Tell"].Text);
+			string code = String.Format("Common.Dialogs.tell({0})", _properties["tell"].Text);
 			return code;
 		}
 		
@@ -486,7 +487,7 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			try {
-				CExpressionProperty Tell = (CExpressionProperty)_properties["Tell"];
+				CExpressionProperty Tell = (CExpressionProperty)_properties["tell"];
 				string msg = String.Format ("{0}", Tell.Evaluate(scope));
 				Common.Dialogs.tell (msg);
 				

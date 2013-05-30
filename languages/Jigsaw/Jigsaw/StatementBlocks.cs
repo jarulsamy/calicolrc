@@ -130,9 +130,9 @@ namespace Jigsaw
 			try {
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
-				
+
 				scope.SetVariable(VarName.Text, RHS.Evaluate(scope));
-				//scope.Assignment(VarName.Text, RHS.Expr.ParsedExpression());
+				//Compiler.ExecAssignment(scope, VarName.Text, RHS.Text);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);
@@ -289,6 +289,7 @@ namespace Jigsaw
 				double max = Double.Parse (Max.Evaluate(scope).ToString ());
 				double val = Common.Utils.random(min, max);
 				scope.SetVariable(VariableName, val);
+				//Compiler.ExecAssignment(scope, VariableName, val);
 
 			} catch (Exception ex) {
 				Console.WriteLine(ex.Message);

@@ -73,6 +73,16 @@ namespace Jigsaw
 			}
 			return _compiler_options;
 		}
+
+		// Helper function to build, compile and execute an assignment
+//		public static void ExecAssignment(ScriptScope scope, string varname, object rhs) {
+//			string stmt = String.Format ("{0} = {1}", varname, rhs);
+//			ScriptEngine engine = scope.Engine;
+//			Microsoft.Scripting.Hosting.ScriptSource src = engine.CreateScriptSourceFromString(stmt, Microsoft.Scripting.SourceCodeKind.SingleStatement);
+//			Microsoft.Scripting.Hosting.CompiledCode compld = src.Compile(Compiler.Options(engine));
+//			compld.Execute(scope);
+//		}
+		
 	}
 
 	// --- Helper class to hold bounds

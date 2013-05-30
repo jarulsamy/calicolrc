@@ -1,17 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw/Jigsaw.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
     <Files>
-      <File FileName="Jigsaw/IOBlocks.cs" Line="846" Column="49" />
-      <File FileName="Jigsaw/Jigsaw.cs" Line="309" Column="4" />
-      <File FileName="Jigsaw/InspectWin.cs" Line="500" Column="6" />
-      <File FileName="Jigsaw/StatementBlocks.cs" Line="291" Column="1" />
+      <File FileName="Jigsaw\Jigsaw.cs" Line="72" Column="42" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="291" Column="13" />
+      <File FileName="Jigsaw\ControlBlocks.cs" Line="1910" Column="13" />
+      <File FileName="Jigsaw\IOBlocks.cs" Line="379" Column="7" />
+      <File FileName="Jigsaw\ProcedureBlocks.cs" Line="515" Column="13" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Jigsaw" expanded="True">
-            <Node name="References" expanded="True" selected="True" />
+            <Node name="Jigsaw.cs" selected="True" />
           </Node>
         </State>
       </Pad>

@@ -442,20 +442,6 @@ namespace Jigsaw
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public CExpressionProperty(string name, string txt) : base(name, txt) 
 		{ }
-
-//		public override string Text 
-//		{	// Setting/getting Text parses and updates internal expression
-//			get { return _Text; }
-//			set {
-//				_Expr = Expression.Engine.makeExpression(value);
-//				if (_Expr.HasErrors()) {
-//					_Text = "Err: " + value;
-//				} else {
-//					_Text = _Expr.ParsedExpression();
-//					this.RaisePropertyChanged();
-//				}
-//			}
-//		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public void Compile(Microsoft.Scripting.Hosting.ScriptEngine engine) 
