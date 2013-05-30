@@ -2768,6 +2768,26 @@ del _invoke, _
             return false;
         }
 
+        public static string ArrayTypeToString(Array args) {
+            string retval = "";
+            if (args != null) {
+                int count = ((Array)args).Length;
+                for (int i = 0; i < count; i++) {
+                    if (args.GetValue(i) is object[]) {
+                        retval += ArrayToString((object[])args.GetValue(i));
+                    } else if (args.GetValue(i) is Array) {
+                        retval += ArrayTypeToString((Array)args.GetValue(i));
+                    } else {
+                        if (retval != "") {
+                            retval += ", ";
+                        }
+                        retval += args.GetValue(i);
+                    }
+                }
+            }
+            return "[" + retval + "]";
+        }
+
         public static string ArrayToString(object[] args) {
             string retval = "";
             if (args != null) {
@@ -2829,8 +2849,10 @@ del _invoke, _
                 repr = InvokeMethod(obj, "__repr__", manager ["python"].engine.GetDefaultContext());
             } else if (HasMethod(obj, "to_s")) {
                 repr = InvokeMethod(obj, "to_s");
-            } else if (obj is Array) {
+            } else if (obj is object[]) {
                 repr = (string)ArrayToString((object[])obj);
+            } else if (obj is Array) {
+                repr = (string)ArrayTypeToString((Array)obj);
             } else if (obj is string) {
                 repr = String.Format("'{0}'", obj);
             }
