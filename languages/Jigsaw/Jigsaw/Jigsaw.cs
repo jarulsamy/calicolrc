@@ -3159,18 +3159,21 @@ namespace Jigsaw
 					if (s == "'") {
 						retval.Add(current);
 						current = "";
+						stack.Pop();
 					}
 				} else if (stack.Count > 0 && stack.Peek() == "\"") {
 					current += s;
 					if (s == "\"") {
 						retval.Add(current);
 						current = "";
+						stack.Pop();
 					}
 				} else if (stack.Count > 0 && stack.Peek() == "[") {
 					current += s;
 					if (s == "]") {
 						retval.Add(current);
 						current = "";
+						stack.Pop();
 					}
 				} else if (s == "\"") {
 					current += "\"";
@@ -3195,6 +3198,16 @@ namespace Jigsaw
 			return retval;
 		}
 
+		public static string ListToString(List<string> list) {
+		    string retval = "";
+		    foreach(string item in list) {
+			if (retval != "")
+			    retval += ", ";
+			retval += item;
+		    }
+		    return retval;
+		}
+
 		protected virtual void ShowText (double x, double y, Cairo.Context g, string text)
 		{
 			double cx = x, cy = y;
@@ -3202,6 +3215,8 @@ namespace Jigsaw
 				// break it up
 				int inside = 0;
 				List<String> words = SplitIntoWords(text);
+				System.Console.WriteLine(ListToString(words));
+				
 				for(int i=0; i<words.Count; i++) {
 					string word = words[i];
 					TextExtents te = g.TextExtents(word);
