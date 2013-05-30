@@ -20,7 +20,7 @@ REM Start up Calico in the background with no terminal:
 REM C:\PROGRA~2\MONO-2~1.8\bin\mono bin\Calico.exe %*
 REM /cygdrive/c/Program\ Files\ \(x86\)/Mono-2.10.8/bin/mono.exe bin/Calico.exe %*
 
-PAUSE
+REM PAUSE
 
 REM Change back to where we were:
 cd %PD%
