@@ -78,12 +78,12 @@ public class CalicoJigsawDocument : Document
 			System.Console.Error.WriteLine(String.Format("Error reading file '{0}'... ignored.", filename));
 		    }
 		}
-		cvs.engine.SetGlobalVariable("calico", calico);
 		cvs.JigsawRun += new EventHandler(OnJigsawRun);		
 		cvs.JigsawStop += new EventHandler(OnJigsawStop);
 		cvs.JigsawStep += new EventHandler(OnJigsawStep);
 		cvs.JigsawPause += new EventHandler(OnJigsawPause);
 		cvs.JigsawError += new EventHandler(OnJigsawError);
+		cvs.engine.EngineReset += new EventHandler(OnEngineReset);
 		cvs.CanvasChanged += new EventHandler(OnJigsawCanvasChanged);
 		cvs.Modified = false;
 		cvs.AutoProperties = true;
@@ -175,6 +175,12 @@ del _invoke, _
 	{
 		// This is fired when Jigsaw has an error
 		calico.OnStopRunning();		
+	}
+	
+	protected void OnEngineReset(object sender, EventArgs a)
+	{
+		// This is fired when Jigsaw is reset
+		cvs.engine.SetGlobalVariable("calico", calico);
 	}
 	
 	public override double SpeedValue {
