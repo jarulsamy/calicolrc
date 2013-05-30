@@ -87,31 +87,90 @@ public static class DataStructures
 	}
   }
   
-  public static void set(object structure, int position, object value)
+  public static void set(object structure, object position, object value)
   {
-	if (structure is string[]) {
-	  (structure as string[])[position] = (string)value;
-	} else if (structure is int[]) {
-	  (structure as int[])[position] = (int)value;
-	} else if (structure is double[]) {
-	  (structure as double[])[position] = (double)value;
-	} else {
+      if (structure is string[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      (structure as string[])[pos] = (string)value;
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }	  
+      } else if (structure is int[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      (structure as int[])[pos] = (int)value;
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is double[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      (structure as double[])[pos] = (double)value;
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is IronPython.Runtime.SetCollection) {
+	  throw new System.Exception("Set is unscriptable");
+      } else if (structure is IronPython.Runtime.List) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      (structure as IronPython.Runtime.List)[pos] = value;
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is IronPython.Runtime.PythonTuple) {
+	  throw new System.Exception("Tuple is readonly");
+      } else if (structure is IronPython.Runtime.PythonDictionary) {
+	  (structure as IronPython.Runtime.PythonDictionary)[position] = value;
+      } else {
 	  throw new System.Exception("Invalid collection type");
-	} 
+      } 
   }
 
-  public static object get(object structure, int position)
+  public static object get(object structure, object position)
   {
-	if (structure is string[]) {
-	  return (structure as string[])[position];
-	} else if (structure is int[]) {
-	  return (structure as int[])[position];
-	} else if (structure is double[]) {
-	  return (structure as double[])[position];
-	} else {
+      if (structure is string[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      return (structure as string[])[pos];
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is int[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      return (structure as int[])[pos];
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is double[]) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      return (structure as double[])[pos];
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is IronPython.Runtime.SetCollection) {
+	  throw new System.Exception("Set is unscriptable");
+      } else if (structure is IronPython.Runtime.List) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      return (structure as IronPython.Runtime.List)[pos];
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is IronPython.Runtime.PythonTuple) {
+	  if (position is int) {
+	      int pos = (int)position;
+	      return (structure as IronPython.Runtime.PythonTuple)[pos];
+	  } else {
+	      throw new System.Exception("position must be an integer");
+	  }
+      } else if (structure is IronPython.Runtime.PythonDictionary) {
+	  return (structure as IronPython.Runtime.PythonDictionary)[position];
+      } else {
 	  throw new System.Exception("Invalid collection type");
-	} 
+      } 
   }
-
-  
 }
