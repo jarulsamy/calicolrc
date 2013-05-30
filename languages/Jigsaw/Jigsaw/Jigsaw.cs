@@ -139,7 +139,6 @@ namespace Jigsaw
 		public event EventHandler JigsawStop;
 		public event EventHandler JigsawPause;
 		public event EventHandler JigsawError;
-		public event EventHandler JigsawReset;
 
 		// A private reference to the engine that runs Jigsaw programs.
 		private Engine _engine = null;
