@@ -26,9 +26,9 @@
     <block id="3" typeName="Jigsaw.CIOTell" left="440" top="86">
         <edge id="4" name="In" linkedTo="3" />
         <edge id="5" name="Out" linkedTo="-1" />
-        <property name="Label" value="Tell('The answer is ' + str(result))" />
+        <property name="Label" value="tell(result)" />
         <property name="Message" value="" />
-        <property name="Tell" value="'The answer is ' + str(result)" />
+        <property name="tell" value="'message'" />
         <fill_color R="0.6758" G="0.8437" B="0.8984" A="1" />
         <line_color R="0" G="0" B="0.543" A="1" />
     </block>
