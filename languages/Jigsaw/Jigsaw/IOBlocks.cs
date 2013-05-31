@@ -375,7 +375,7 @@ namespace Jigsaw
 				CExpressionProperty Ask = (CExpressionProperty)_properties["ask"];
 				string question = String.Format ("{0}", Ask.Evaluate(scope));
 				object answer = Common.Dialogs.ask (question);
-				scope.SetVariable(Answer, answer);
+				SetVariable(scope, Answer, answer);
 				//Compiler.ExecAssignment (scope, Answer, answer);
 				
 			} catch (Exception ex) {

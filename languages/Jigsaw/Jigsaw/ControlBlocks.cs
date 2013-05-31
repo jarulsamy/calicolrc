@@ -1907,7 +1907,7 @@ namespace Jigsaw
 			foreach (object item in sequence)
 			{
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-				scope.SetVariable(VarName.Text, item);
+				SetVariable(scope, VarName.Text, item);
 				//Compiler.ExecAssignment (scope, VarName.Text, item);
 
 				// Next perform one iteration of the enclosed stack

@@ -3974,6 +3974,24 @@ namespace Jigsaw
 				this.OutEdge._azW = this.Width;
 			}
 		}
+
+		public void SetVariable(ScriptScope scope, string variable, object value) {
+		    if (variable.Contains(".")) {
+			string [] parts = variable.Split('.');
+			object obj = scope.GetVariable(parts[0]);
+			for (int i = 1; i < parts.Length - 1; i++) {
+			    obj = scope.Engine.Operations.GetMember(obj, parts[i]);
+			}
+			if (obj != null) {
+			    scope.Engine.Operations.SetMember(obj, parts[parts.Length - 1], value);
+			} else {
+			    throw new Exception(String.Format("no such item: '{0}'", variable));
+			}
+		    } else {
+			scope.SetVariable(variable, value);
+		    }
+		}
+
 	}
 
 	// -----------------------------------------------------------------------

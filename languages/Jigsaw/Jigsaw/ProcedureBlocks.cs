@@ -512,7 +512,7 @@ namespace Jigsaw
 			try
 			{	// When continue, grab the returned value and assign to variable in this scope, if specified
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-				scope.SetVariable(VarName.Text, stack.RetVal);	// Why does this not throw an exception when VarName is a zero-length string?
+				SetVariable(scope, VarName.Text, stack.RetVal);	// Why does this not throw an exception when VarName is a zero-length string?
 				//Compiler.ExecAssignment(scope, VarName.Text, stack.RetVal);
 
 			} catch (Exception ex) {

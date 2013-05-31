@@ -131,7 +131,7 @@ namespace Jigsaw
 				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
 				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
 
-				scope.SetVariable(VarName.Text, RHS.Evaluate(scope));
+				SetVariable(scope, VarName.Text, RHS.Evaluate(scope));
 				//Compiler.ExecAssignment(scope, VarName.Text, RHS.Text);
 
 			} catch (Exception ex) {
@@ -161,6 +161,20 @@ namespace Jigsaw
 			// Indicate that the block is no longer running
 			this.State = RunningState.Idle;
 			yield return rr;
+		}
+
+		public static string ArrayTypeToString(Array args) {
+		    string retval = "";
+		    if (args != null) {
+			int count = ((Array)args).Length;
+			for (int i = 0; i < count; i++) {
+			    if (retval != "") {
+				retval += ", ";
+			    }
+			    retval += args.GetValue(i);
+			}
+		    }
+		    return "[" + retval + "]";
 		}
     }
 	
@@ -288,7 +302,7 @@ namespace Jigsaw
 				double min = Double.Parse (Min.Evaluate(scope).ToString ());
 				double max = Double.Parse (Max.Evaluate(scope).ToString ());
 				double val = Common.Utils.random(min, max);
-				scope.SetVariable(VariableName, val);
+				SetVariable(scope, VariableName, val);
 				//Compiler.ExecAssignment(scope, VariableName, val);
 
 			} catch (Exception ex) {
