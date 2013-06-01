@@ -1514,7 +1514,7 @@ namespace Widgets
 		    double hpi = 0.5*Math.PI;
 		    if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 		    
-		    if (! _toggled) {
+		    if (_toggled) {
 			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
@@ -1534,7 +1534,7 @@ namespace Widgets
 			g.LineWidth = 2;
 			g.Stroke();
 			g.Restore();
-		    } else {
+
 			// Border:
 			w = this.width;
 			hw = 0.5*w;
@@ -1612,11 +1612,10 @@ namespace Widgets
 			_toggled = val;
 			
 			if (_toggled) {
-			    ///\\\
 			    // Change the tab to indicate it is selected
-			    this.FillColor = this.OriginalFillColor;
-			} else {
 			    this.FillColor = Diagram.Colors.Honeydew;
+			} else {
+			    this.FillColor = this.OriginalFillColor;
 			}
 			
 			// If turned on, turn off all other tabs in group
