@@ -1500,11 +1500,12 @@ namespace Widgets
 		    
 		    // Start with the base rounded rectangle
 		    base.Draw(g);
-		    // Draw the color tab indicator, if not toggled
+		    // Next, draw the specifics for a CRoundedTab
 		    double x = this.left;
 		    double y = this.top;
 		    
-		    double w = 10; //this.width;
+		    double endWidth = 10;
+		    double w = endWidth; 
 		    double h = this.height;
 		    double hh = 0.5*h;
 		    double hw = 0.5*w;
@@ -1514,7 +1515,9 @@ namespace Widgets
 		    double hpi = 0.5*Math.PI;
 		    if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 		    
+		    // Draw the color tab indicator, toggled
 		    if (_toggled) {
+			// Draw the tab end 
 			g.Save();
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
@@ -1525,7 +1528,7 @@ namespace Widgets
 			g.ClosePath();
 			
 			// Fill
-			g.Color = this.OriginalFillColor;
+			g.Color = Diagram.Colors.Honeydew;
 			g.FillPreserve();
 
 			// Stroke
@@ -1533,16 +1536,25 @@ namespace Widgets
 			//g.DashStyle = this.LineStyle;
 			g.LineWidth = 2;
 			g.Stroke();
-			g.Restore();
 
-			// Border:
+
+			// Full size:
 			w = this.width;
 			hw = 0.5*w;
 			cx = x + hw;
 			if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 
-			g.Save();
-			
+			g.MoveTo( x+w, y );
+			g.LineTo( x+w, y+h );
+			g.LineTo( x+w-endWidth, y+h );
+			g.LineTo( x+w-endWidth, y );
+			g.ClosePath();
+
+			g.Color = Diagram.Colors.Honeydew;
+			g.FillPreserve();
+			g.Color = new Color(this.LineColor.R, this.LineColor.G, this.LineColor.B, 0.4); 
+			g.Stroke();
+
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
 			g.LineTo( x+w-r, y );
@@ -1611,12 +1623,14 @@ namespace Widgets
 			// Set this tab state
 			_toggled = val;
 			
+			/*
 			if (_toggled) {
 			    // Change the tab to indicate it is selected
 			    this.FillColor = Diagram.Colors.Honeydew;
 			} else {
 			    this.FillColor = this.OriginalFillColor;
 			}
+			*/
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes
