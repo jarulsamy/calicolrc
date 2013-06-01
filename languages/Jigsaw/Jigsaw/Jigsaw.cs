@@ -218,7 +218,7 @@ namespace Jigsaw
 			allTabs = new List<Widgets.CRoundedTab>();
 			
 			// Add block palette background to canvas
-			pnlBlock = new Widgets.CBlockPalette(tabWidth - 3, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
+			pnlBlock = new Widgets.CBlockPalette(tabWidth - 5, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
 			this.AddShape (pnlBlock);				// Add the block panel to the shapes list
 			this.AddShape (pnlBlock.YScrollbar);
 
