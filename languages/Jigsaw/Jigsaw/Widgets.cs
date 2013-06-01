@@ -1494,11 +1494,73 @@ namespace Widgets
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public override void Draw(Cairo.Context g)
-        {	// Draw the tab widget
+		public override void Draw(Cairo.Context g)
+		{	
+		    // Draw the tab widget
+		    
+		    // Start with the base rounded rectangle
+		    base.Draw(g);
+		    // Draw the color tab indicator, if not toggled
+		    double x = this.left;
+		    double y = this.top;
+		    
+		    double w = 10; //this.width;
+		    double h = this.height;
+		    double hh = 0.5*h;
+		    double hw = 0.5*w;
+		    double cx = x + hw;
+		    double cy = y + hh;
+		    double r = this.Radius;
+		    double hpi = 0.5*Math.PI;
+		    if ( r > hh || r > hw ) r = Math.Min( hh, hw );
+		    
+		    if (! _toggled) {
+			g.Save();
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+w, y );
+			g.LineTo( x+w, y+h );
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.ClosePath();
+			
+			// Fill
+			g.Color = this.OriginalFillColor;
+			g.FillPreserve();
 
-			// Start with the base rounded rectangle
-			base.Draw(g);
+			// Stroke
+			g.Color = new Color(this.LineColor.R, this.LineColor.G, this.LineColor.B, 0.4); 
+			//g.DashStyle = this.LineStyle;
+			g.LineWidth = 2;
+			g.Stroke();
+			g.Restore();
+		    } else {
+			// Border:
+			w = this.width;
+			hw = 0.5*w;
+			cx = x + hw;
+			if ( r > hh || r > hw ) r = Math.Min( hh, hw );
+
+			g.Save();
+			
+			g.MoveTo( x, y+r );
+			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+			g.LineTo( x+w-r, y );
+			g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+			g.LineTo( x+w, y+h-r );
+			g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+			g.LineTo( x+r, y+h );
+			g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+			g.ClosePath();
+			
+			// Stroke
+			g.Color = Diagram.Colors.Black;
+			//g.DashStyle = this.LineStyle;
+			g.LineWidth = 2;
+			g.Stroke();
+
+			g.Restore();
+		    }
 		}
 		
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1549,8 +1611,13 @@ namespace Widgets
 			// Set this tab state
 			_toggled = val;
 			
-			if (_toggled) this.FillColor = Diagram.Colors.Honeydew;
-			else		  this.FillColor = this.OriginalFillColor;
+			if (_toggled) {
+			    ///\\\
+			    // Change the tab to indicate it is selected
+			    this.FillColor = this.OriginalFillColor;
+			} else {
+			    this.FillColor = Diagram.Colors.Honeydew;
+			}
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes

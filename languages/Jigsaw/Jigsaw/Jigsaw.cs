@@ -177,12 +177,14 @@ namespace Jigsaw
 		
 		// Left tab height
 		public int tabHeight = 33;
+		public int tabWidth = 110;
 
 		// Scrollbars
 		//private Widgets.CYScrollBar ybar;
 
 		protected int _X;										// Cache for context menu
 		protected int _Y;
+		protected int paletteWidth = 110;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
@@ -216,11 +218,11 @@ namespace Jigsaw
 			allTabs = new List<Widgets.CRoundedTab>();
 			
 			// Add block palette background to canvas
-			pnlBlock = new Widgets.CBlockPalette( 95.0, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
+			pnlBlock = new Widgets.CBlockPalette(tabWidth - 5, 0.0, CBlock.BlockWidth + 30.0, 10000.0);
 			this.AddShape (pnlBlock);				// Add the block panel to the shapes list
 			this.AddShape (pnlBlock.YScrollbar);
 
-			pnlTab = new Widgets.CTabPalette(0.0, 0.0, 100.0, 10000.0);
+			pnlTab = new Widgets.CTabPalette(0.0, 0.0, tabWidth, 10000.0);
 			pnlTab.allTabs = allTabs;
 			this.AddShape(pnlTab);
 			this.AddShape(pnlTab.YScrollbar);
@@ -231,129 +233,131 @@ namespace Jigsaw
 
 			// ----- Control tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Control", pnlBlock, pnlTab,
+			Widgets.CRoundedTab tbCtrl = new Widgets.CRoundedTab(0, tabY, tabWidth, tabHeight-3, "Control", pnlBlock, pnlTab,
 											Diagram.Colors.PaleGoldenrod, Diagram.Colors.DarkGoldenrod);
 			tbCtrl.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbCtrl);
 			allTabs.Add (tbCtrl);
 			
-			CControlStart block20 = new CControlStart(110, 70-os, pnlBlock);
+			CControlStart block20 = new CControlStart(paletteWidth + 10, 70-os, pnlBlock);
 			this.AddShape(block20);
 			tbCtrl.AddShape(block20);
 
-			CControlIf block21 = new CControlIf(110, 150-os, pnlBlock);
+			CControlIf block21 = new CControlIf(paletteWidth + 10, 150-os, pnlBlock);
 			this.AddShape(block21);
 			tbCtrl.AddShape(block21);
 
-			CControlIfElse block22 = new CControlIfElse(110, 220-os, pnlBlock);
+			CControlIfElse block22 = new CControlIfElse(paletteWidth + 10, 220-os, pnlBlock);
 			this.AddShape(block22);
 			tbCtrl.AddShape(block22);
 			
-			CControlWhile block23 = new CControlWhile(110, 320-os, pnlBlock);
+			CControlWhile block23 = new CControlWhile(paletteWidth + 10, 320-os, pnlBlock);
 			this.AddShape(block23);
 			tbCtrl.AddShape(block23);
 			
-			CControlRepeat block24 = new CControlRepeat(110, 390-os, pnlBlock);
+			CControlRepeat block24 = new CControlRepeat(paletteWidth + 10, 390-os, pnlBlock);
 			this.AddShape(block24);
 			tbCtrl.AddShape(block24);
 
-			CControlForeach block27 = new CControlForeach(110, 460-os, pnlBlock);
+			CControlForeach block27 = new CControlForeach(paletteWidth + 10, 460-os, pnlBlock);
 			this.AddShape(block27);
 			tbCtrl.AddShape(block27);
 			
-			CControlBreak block25 = new CControlBreak(110, 530-os, pnlBlock);
+			CControlBreak block25 = new CControlBreak(paletteWidth + 10, 530-os, pnlBlock);
 			this.AddShape(block25);
 			tbCtrl.AddShape(block25);
 			
-			CControlEnd block26 = new CControlEnd(110, 570-os, pnlBlock);
+			CControlEnd block26 = new CControlEnd(paletteWidth + 10, 570-os, pnlBlock);
 			this.AddShape(block26);
 			tbCtrl.AddShape(block26);
 			
 			// ----- Statement tab and factory blocks	
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Statements", pnlBlock, pnlTab,
+			Widgets.CRoundedTab tbStats = new Widgets.CRoundedTab(0, tabY, tabWidth, tabHeight-3, "Statements", pnlBlock, pnlTab,
 												Diagram.Colors.LightGreen, Diagram.Colors.DarkGreen);
 			tbStats.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbStats);
 			allTabs.Add (tbStats);
 
-			CAssignment vblock1 = new CAssignment(110, 70-os, pnlBlock);
+			CAssignment vblock1 = new CAssignment(paletteWidth + 10, 70-os, pnlBlock);
 			this.AddShape(vblock1);
 			tbStats.AddShape(vblock1);
 
-			CStatement vblock2 = new CStatement(110, 110-os, pnlBlock);
+			CStatement vblock2 = new CStatement(paletteWidth + 10, 110-os, pnlBlock);
 			this.AddShape(vblock2);
 			tbStats.AddShape(vblock2);
 			
-			CRandom sRandomBlock = new CRandom(110, 150-os, pnlBlock);
+			CRandom sRandomBlock = new CRandom(paletteWidth + 10, 150-os, pnlBlock);
 			this.AddShape(sRandomBlock);
 			tbStats.AddShape(sRandomBlock);
 			
-			CInlineComment bCmt1 = new CInlineComment(110, 190-os, pnlBlock);
+			CInlineComment bCmt1 = new CInlineComment(paletteWidth + 10, 190-os, pnlBlock);
 			this.AddShape(bCmt1);
 			tbStats.AddShape(bCmt1);
 			
-			CComment bCmt2 = new CComment(110, 230-os, pnlBlock);
+			CComment bCmt2 = new CComment(paletteWidth + 10, 230-os, pnlBlock);
 			this.AddShape(bCmt2);
 			tbStats.AddShape(bCmt2);
 			
 			// ----- IO tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Input/Output", pnlBlock, pnlTab,
+			Widgets.CRoundedTab tbInOut = new Widgets.CRoundedTab(0, tabY, tabWidth, tabHeight-3, "Input/Output", pnlBlock, pnlTab,
 												Diagram.Colors.LightBlue, Diagram.Colors.DarkBlue);
 			tbInOut.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbInOut);
 			allTabs.Add (tbInOut);
 			
-			CIOPrint _cioprint = new CIOPrint(110, 70-os, pnlBlock);
+			CIOPrint _cioprint = new CIOPrint(paletteWidth + 10, 70-os, pnlBlock);
 			this.AddShape(_cioprint);
 			tbInOut.AddShape(_cioprint);
 			
-			CIOAsk _cioask = new CIOAsk(110, 110-os, pnlBlock);
+			CIOAsk _cioask = new CIOAsk(paletteWidth + 10, 110-os, pnlBlock);
 			this.AddShape(_cioask);
 			tbInOut.AddShape(_cioask);
 
-			CIOTell _ciotell = new CIOTell(110, 150-os, pnlBlock);
+			CIOTell _ciotell = new CIOTell(paletteWidth + 10, 150-os, pnlBlock);
 			this.AddShape(_ciotell);
 			tbInOut.AddShape(_ciotell);
 
-			CBeep sBeep = new CBeep(110, 190-os, pnlBlock);
+			CBeep sBeep = new CBeep(paletteWidth + 10, 190-os, pnlBlock);
 			this.AddShape(sBeep);
 			tbInOut.AddShape(sBeep);
 			
-			CBeepFreq sBeepFreq = new CBeepFreq(110, 230-os, pnlBlock);
+			CBeepFreq sBeepFreq = new CBeepFreq(paletteWidth + 10, 230-os, pnlBlock);
 			this.AddShape(sBeepFreq);
 			tbInOut.AddShape(sBeepFreq);
 
-			CBeepFreq2 sBeepFreq2 = new CBeepFreq2(110, 270-os, pnlBlock);
+			/*
+			CBeepFreq2 sBeepFreq2 = new CBeepFreq2(paletteWidth + 10, 270-os, pnlBlock);
 			this.AddShape(sBeepFreq2);
 			tbInOut.AddShape(sBeepFreq2);
+			*/
 
-			CSpeak sSpeak = new CSpeak(110, 310-os, pnlBlock);
+			CSpeak sSpeak = new CSpeak(paletteWidth + 10, 270-os, pnlBlock);
 			this.AddShape(sSpeak);
 			tbInOut.AddShape(sSpeak);
 			
-//			CIOWriteToFile _ciowritefile = new CIOWriteToFile(110, 150-os, pnlBlock);
+//			CIOWriteToFile _ciowritefile = new CIOWriteToFile(paletteWidth + 10, 150-os, pnlBlock);
 //			this.AddShape(_ciowritefile);
 //			tbInOut.AddShape(_ciowritefile);
 			
 			// ----- Procedures tab and factory blocks
 			tabY += tabHeight;
-			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, "Procedures", pnlBlock, pnlTab,
+			Widgets.CRoundedTab tbProc = new Widgets.CRoundedTab(0, tabY, tabWidth, tabHeight-3, "Procedures", pnlBlock, pnlTab,
 												Diagram.Colors.Thistle, Diagram.Colors.Purple);
 			tbProc.Dock = Diagram.DockSide.Left;
 			this.AddShape(tbProc);
 			allTabs.Add (tbProc);
 
-			CProcedureStart bProcStart = new CProcedureStart(110, 70-os, pnlBlock);
+			CProcedureStart bProcStart = new CProcedureStart(paletteWidth + 10, 70-os, pnlBlock);
 			this.AddShape(bProcStart);
 			tbProc.AddShape(bProcStart);
 			
-			CProcedureReturn bProcRet = new CProcedureReturn(110, 150-os, pnlBlock);
+			CProcedureReturn bProcRet = new CProcedureReturn(paletteWidth + 10, 150-os, pnlBlock);
 			this.AddShape(bProcRet);
 			tbProc.AddShape(bProcRet);
 			
-			CProcedureCall bProcCall = new CProcedureCall(110, 190-os, pnlBlock);
+			CProcedureCall bProcCall = new CProcedureCall(paletteWidth + 10, 190-os, pnlBlock);
 			this.AddShape(bProcCall);
 			tbProc.AddShape(bProcCall);
 
@@ -711,7 +715,7 @@ namespace Jigsaw
 
 					string return_type = mi.ReturnType.ToString ();
 					int y = blockPos[tabName];
-					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
+					block = new CMethodBlock (paletteWidth + 10, y, assembly_name, type_name, mi.Name,
                                                 param_names, param_type_names, param_defaults,
                                                 return_type, pnlBlock);
 					block.Visible = false;
@@ -745,7 +749,7 @@ namespace Jigsaw
 				// Add tab if has at least one block
 				tabY += tabHeight;
 				List<Color> colors = makeColor(tabName);
-				tab = new Widgets.CRoundedTab (0, tabY, 100, tabHeight-3, tabName, pnlBlock, pnlTab, colors[0], colors[1]);
+				tab = new Widgets.CRoundedTab (0, tabY, tabWidth, tabHeight-3, tabName, pnlBlock, pnlTab, colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape (tab);
 				pnlBlock.BringToFront (this);
@@ -815,7 +819,7 @@ namespace Jigsaw
 //						param_defaults.Add (pi.DefaultValue.ToString ());
 //					}
 //					string return_type = type_name;
-//					block = new CMethodBlock (110, y, assembly_name, type_name, type_name,
+//					block = new CMethodBlock (paletteWidth + 10, y, assembly_name, type_name, type_name,
 //                                                    param_names, param_type_names, param_defaults,
 //                                                    return_type, pnlBlock);
 //					block.Visible = false;
@@ -850,7 +854,7 @@ namespace Jigsaw
 //						}
 //					}
 //					string return_type = mi.ReturnType.ToString ();
-//					block = new CMethodBlock (110, y, assembly_name, type_name, mi.Name,
+//					block = new CMethodBlock (paletteWidth + 10, y, assembly_name, type_name, mi.Name,
 //                                                param_names, param_type_names, param_defaults,
 //                                                return_type, pnlBlock);
 //					block.Visible = false;
@@ -1022,7 +1026,7 @@ namespace Jigsaw
 							
 							switch (name) {
 			                case "method":
-						    	block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+						    	block = new CMethodBlock(paletteWidth + 10, y, assembly_name, type_name, method_name, 
 										    			 param_names, param_type_names, param_defaults, 
 														 return_type, pnlBlock);
 								block.Visible = false;
@@ -1035,7 +1039,7 @@ namespace Jigsaw
 								
 			                case "constructor":
 								return_type = type_name;
-						    	block = new CMethodBlock(110, y, assembly_name, type_name, type_name, 
+						    	block = new CMethodBlock(paletteWidth + 10, y, assembly_name, type_name, type_name, 
 										    			 param_names, param_type_names, param_defaults, 
 								                         return_type, pnlBlock);
 								block.Visible = false;
@@ -1062,7 +1066,7 @@ namespace Jigsaw
 				// Add tab
 				tabY += tabHeight;
 				List<Color> colors = makeColor(assembly_name);
-				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, 100, tabHeight-3, assembly_name, pnlBlock, pnlTab,
+				Widgets.CRoundedTab tab = new Widgets.CRoundedTab(0, tabY, tabWidth, tabHeight-3, assembly_name, pnlBlock, pnlTab,
 												colors[0], colors[1]);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape(tab);
@@ -1133,7 +1137,7 @@ namespace Jigsaw
 //					{
 //						if (mapping.CheckSignature(type_name, method_name, types[n])) 
 //						{
-//					    	CBlock block = new CMethodBlock(110, y, assembly_name, type_name, method_name, 
+//					    	CBlock block = new CMethodBlock(paletteWidth + 10, y, assembly_name, type_name, method_name, 
 //									    					names[n], types[n], defaults[n], return_type, palette);
 //					    	if (! blocknames.Contains(block.Text)) 
 //							{

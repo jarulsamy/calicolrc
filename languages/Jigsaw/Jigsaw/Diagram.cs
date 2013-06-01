@@ -1983,7 +1983,7 @@ namespace Diagram
         internal String fontFace = "Arial"; //"Consolas"; //"courier new"; //
         internal double fontSize = 12.0;
         internal FontSlant fontSlant = FontSlant.Normal;
-		internal FontWeight fontWeight = FontWeight.Bold;
+	internal FontWeight fontWeight = FontWeight.Bold;
         protected Boolean selected = false;
         private System.Object tag = null;                       // An arbitrary object that tags this object
 //        private StringAlignment horizontalAlign = StringAlignment.Center;
@@ -3731,8 +3731,8 @@ namespace Diagram
 			double x = this.left;
 			double y = this.top;
 			
-            double w = this.width;
-            double h = this.height;
+			double w = this.width;
+			double h = this.height;
 			double hh = 0.5*h;
 			double hw = 0.5*w;
 			double cx = x + hw;
