@@ -1528,7 +1528,7 @@ namespace Widgets
 			g.ClosePath();
 			
 			// Fill
-			g.Color = Diagram.Colors.Honeydew;
+			g.Color = this.OriginalFillColor;
 			g.FillPreserve();
 
 			// Stroke
@@ -1544,6 +1544,7 @@ namespace Widgets
 			cx = x + hw;
 			if ( r > hh || r > hw ) r = Math.Min( hh, hw );
 
+			/*  Right-hand side:
 			g.MoveTo( x+w, y );
 			g.LineTo( x+w, y+h );
 			g.LineTo( x+w-endWidth, y+h );
@@ -1554,6 +1555,7 @@ namespace Widgets
 			g.FillPreserve();
 			g.Color = new Color(this.LineColor.R, this.LineColor.G, this.LineColor.B, 0.4); 
 			g.Stroke();
+			*/
 
 			g.MoveTo( x, y+r );
 			g.Arc(    x+r, y+r, r, Math.PI, -hpi );
@@ -1623,14 +1625,12 @@ namespace Widgets
 			// Set this tab state
 			_toggled = val;
 			
-			/*
 			if (_toggled) {
 			    // Change the tab to indicate it is selected
 			    this.FillColor = Diagram.Colors.Honeydew;
 			} else {
 			    this.FillColor = this.OriginalFillColor;
 			}
-			*/
 			
 			// If turned on, turn off all other tabs in group
 			// and show all referenced shapes

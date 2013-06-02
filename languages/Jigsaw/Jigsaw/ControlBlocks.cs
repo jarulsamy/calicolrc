@@ -120,8 +120,8 @@ namespace Jigsaw
 				if (this.StartEdge.IsConnected) {
 					CBlock b = this.StartEdge.LinkedTo.Block;
 					b.ToPython(o, indent);
-//				} else {
-//					o.AppendFormat ("{0}pass\n", sindent);
+				} else {
+					o.AppendFormat ("{0}pass\n", sindent);
 				}
 				
 			} catch (Exception ex){
