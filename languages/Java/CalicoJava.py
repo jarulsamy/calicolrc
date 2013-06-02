@@ -109,6 +109,29 @@ class MyLanguageEngine(Calico.Engine):
             self.calico.Error(message + "\n")
         return True
 
+    def Evaluate(self, text):
+        """
+        This is where you do something for the text (code). This is
+        the interpreter.
+        """
+        try:
+            retval = self.interpreter.interpret(text)
+            try:
+                retval = retval.unwrap()
+            except:
+                pass
+            if not isNone(retval):
+                return retval
+            else:
+                return None
+        except Exception, error:
+            message = error.message
+            message = message.replace("koala.dynamicjava.interpreter.error.", "")
+            message = message.replace("koala.dynamicjava.parser.wrapper.", "")
+            message = message.replace("Derived classes must implement it", "java.lang.NullPointerException");
+            self.calico.Error(message + "\n")
+        return None
+
     def ExecuteFile(self, filename):
         """
         This is the code that will interprete a file.

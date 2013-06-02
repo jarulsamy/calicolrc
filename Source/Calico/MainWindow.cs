@@ -750,6 +750,28 @@ namespace Calico {
             get { return treeview2; }
         }
 
+	public bool RegisterLanguage(string language_name) {
+	    // RegisterLanguage("python")
+	    Language language = GetLanguageFromName(language_name);
+	    if (language != null) {
+		IList<string > visible_languages = (IList<string>)config.GetValue("config", "visible-languages");
+		if (!visible_languages.Contains(language.name)) {
+		    // Add language on the fly!
+		    manager.Register(language, true); // This may fail, which won't add language
+		    if (language.engine != null) {
+			language.engine.Setup(path);
+			language.engine.Start(path);
+			language.engine.PostSetup(this);
+			visible_languages.Add(language.name); 
+			return true;
+		    }	
+		} else {
+		    return true; // already visible
+		}
+	    }
+	    return false;
+	}
+	
         void OnChangeActiveLanguages(object sender, EventArgs e) {
             Gtk.MenuItem languages_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/LanguagesAction");
             if (languages_menu == null) {
