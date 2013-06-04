@@ -1519,7 +1519,9 @@ namespace Calico {
 				  if (manager[lang].engine != null)
 					manager[lang].engine.Close();
 				}
-				System.Environment.Exit(0);
+				Invoke( delegate {
+					  System.Environment.Exit(0);
+					});
                 //Gtk.Application.Quit();
             }
             return retval;
