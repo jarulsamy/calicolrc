@@ -1519,6 +1519,15 @@ namespace Calico {
 				  if (manager[lang].engine != null)
 					manager[lang].engine.Close();
 				}
+                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
+                    try {
+                        if (process.ProcessName == "mono") {
+                            process.Kill();
+                        }
+                    } catch {
+                        // pass
+                    }
+                }
 				System.Environment.Exit(0);
                 //Gtk.Application.Quit();
             }
