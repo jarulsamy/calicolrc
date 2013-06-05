@@ -2,17 +2,15 @@ from Graphics import *
 from Myro import randomNumber, Random, show, wait
 import os
 
-Random.seed = 3456
-
 pic = Picture(calico.relativePath("../examples/images/chances/640x480.jpg"))
 
 width, height = 640, 480
 win = Window("What are the Chances?", width, height)
 win.mode = "physics"
 
-if os.path.exists(calico.relativePath("../examples/images/chances/missing.jpg")):
-    background = Picture(calico.relativePath("../examples/images/chances/missing.jpg"))
-    win.canvas.shapes.Add(background)
+#if os.path.exists(calico.relativePath("../examples/images/chances/missing.jpg")):
+#    background = Picture(calico.relativePath("../examples/images/chances/missing.jpg"))
+#    win.canvas.shapes.Add(background)
 
 thickness = 25
 wall = Rectangle((0, -1000), (thickness, height - thickness))
