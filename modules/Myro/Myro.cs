@@ -1264,7 +1264,25 @@ public static class Myro
 	}
 	throw new Exception(String.Format("Unable to make robot of type '{0}'; did you give proper arguments?",
 			robot_type));
-  }
+    }
+
+
+    [method: JigsawTab("M/Robot")]
+    public static List getRobotTypes ()
+    {
+	List retval = Graphics.PyList();
+	string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
+	if (path.StartsWith ("\\")) {
+	    path = path.Substring (1);
+	}
+	DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
+	foreach (FileInfo f in d.GetFiles("*.dll")) {
+	    //System.Console.WriteLine ("Loading {0}...", f.FullName);
+	    retval.append(f.Name.Substring(0, f.Name.Length - 4));
+	}
+	return retval;
+    }
+
 
 	public class Simulation
 	{
